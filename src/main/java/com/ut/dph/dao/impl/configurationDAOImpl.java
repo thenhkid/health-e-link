@@ -2,7 +2,6 @@ package com.ut.dph.dao.impl;
 
 import java.util.List;
 
-import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +33,7 @@ public class configurationDAOImpl implements configurationDAO {
   public List<configuration> getConfigurationsByOrgId(int orgId) {
     Query query = sessionFactory.
       getCurrentSession().
-      createQuery("from configurations where orgId = :orgId");
+      createQuery("from configuration where orgId = :orgId");
     query.setParameter("orgId", orgId);
     return query.list();
   }
@@ -42,11 +41,12 @@ public class configurationDAOImpl implements configurationDAO {
   
   @Override
   @SuppressWarnings("unchecked")
-  public List<configuration> getConfigurations() {
-    Criteria criteria = sessionFactory.
-      getCurrentSession().
-      createCriteria(configuration.class);
-    return criteria.list();
+  public List<configuration> getConfigurations(int firstResults, int maxResults) {
+      Query query = sessionFactory.getCurrentSession().createQuery("from configuration order by configName asc");
+      query.setFirstResult(firstResults);
+      query.setMaxResults(maxResults);
+      List<configuration> configurationList = query.list(); 
+      return configurationList;	
   }
 
 }

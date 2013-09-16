@@ -1,4 +1,4 @@
-package com.ut.dph.configuration.impl;
+package com.ut.dph.service.impl;
 
 import java.util.List;
 
@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ut.dph.dao.configurationDAO;
 import com.ut.dph.model.configuration;
-import com.ut.dph.configuration.configurationManager;
+import com.ut.dph.service.configurationManager;
 
 @Service
 public class configurationManagerImpl implements configurationManager {
@@ -37,8 +37,8 @@ public class configurationManagerImpl implements configurationManager {
 
   @Override
   @Transactional
-  public List<configuration> getConfigurations() {
-    return configurationDAO.getConfigurations();
+  public List<configuration> getConfigurations(int firstResults, int maxResults) {
+    return configurationDAO.getConfigurations(firstResults, maxResults);
   }
 
 }

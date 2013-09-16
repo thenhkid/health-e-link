@@ -7,7 +7,11 @@
 </c:if>
 
 
-You are in the conifgurations list page.
+<c:if test="${not empty configurationList}" >
+	<c:forEach items="${configurationList}" var="config">		
+		 ${config.configName}<br />
+	</c:forEach>	
+</c:if>
 
 
 <%@ include file="../../common/footer.jsp" %>
