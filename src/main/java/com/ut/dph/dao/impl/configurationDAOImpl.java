@@ -17,13 +17,13 @@ public class configurationDAOImpl implements configurationDAO {
   private SessionFactory sessionFactory;
   
   @Override
-  public void insertConfiguration(configuration configuration) {
-    sessionFactory.getCurrentSession().save(configuration);
+  public void saveConfiguration(configuration configuration) {
+	sessionFactory.getCurrentSession().update(configuration);
   }
 
   @Override
   public configuration getConfigurationById(int configId) {
-    return (configuration) sessionFactory.
+     return (configuration) sessionFactory.
       getCurrentSession().
       get(configuration.class, configId);
   }
@@ -31,9 +31,7 @@ public class configurationDAOImpl implements configurationDAO {
   @Override
   @SuppressWarnings("unchecked")
   public List<configuration> getConfigurationsByOrgId(int orgId) {
-    Query query = sessionFactory.
-      getCurrentSession().
-      createQuery("from configuration where orgId = :orgId");
+    Query query = sessionFactory.getCurrentSession().createQuery("from configuration where orgId = :orgId order by configName asc");
     query.setParameter("orgId", orgId);
     return query.list();
   }

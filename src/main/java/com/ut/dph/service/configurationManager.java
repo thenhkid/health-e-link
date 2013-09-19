@@ -6,7 +6,7 @@ import com.ut.dph.model.configuration;
 
 public interface configurationManager {
 	
-  void insertConfiguration(configuration configuration);
+  void saveConfiguration(configuration configuration);
   
   configuration getConfigurationById(int configId);
   

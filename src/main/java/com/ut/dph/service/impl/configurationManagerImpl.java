@@ -18,8 +18,8 @@ public class configurationManagerImpl implements configurationManager {
   
   @Override
   @Transactional
-  public void insertConfiguration(configuration configuration) {
-    configurationDAO.insertConfiguration(configuration);
+  public void saveConfiguration(configuration configuration) {
+    configurationDAO.saveConfiguration(configuration);
   }
 
   @Override

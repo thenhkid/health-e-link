@@ -6,6 +6,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import org.hibernate.validator.constraints.NotEmpty;
 
 @Entity
 @Table(name="CONFIGURATIONS")
@@ -19,6 +20,7 @@ public class configuration {
   @Column(name="orgId", nullable = false)
   private int orgId;
   
+  @NotEmpty
   @Column(name="configName", nullable = false)
   private String configName;
   
@@ -30,11 +32,11 @@ public class configuration {
     this.id = id;
   }
 
-  public int getOrganizationId() {
+  public int getorgId() {
     return orgId;
   }
   
-  public void setOrganizationId(int orgId) {
+  public void setorgId(int orgId) {
     this.orgId = orgId;
   }
   
