@@ -11,4 +11,5 @@
 
 </head>
 <body>
-<div class="header"><h1>Spring 3 and Hibernate 4</h1></div>
+
+<div class="header"><h1>Spring 3 and Hibernate 4</h1><br /><a href="<c:url value='/logout' />">logout</a> </div>
