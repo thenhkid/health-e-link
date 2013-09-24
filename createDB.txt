@@ -1,0 +1,82 @@
+CREATE DATABASE `universalTranslator` /*!40100 DEFAULT CHARACTER SET latin1 */;
+
+
+CREATE TABLE `configurations` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `orgId` int(11) NOT NULL,
+  `configName` varchar(55) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idconfigurations_UNIQUE` (`id`),
+  KEY `orgId_idx` (`orgId`),
+  CONSTRAINT `orgId` FOREIGN KEY (`orgId`) REFERENCES `organizations` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=latin1;
+
+INSERT INTO `universalTranslator`.`configurations`
+(`id`,`orgId`,`configName`)
+VALUES
+(1,1,'configuration 1'),
+(2,1,'configuration 2');
+
+
+CREATE TABLE `organizations` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `orgName` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id_UNIQUE` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+
+INSERT INTO `universalTranslator`.`organizations`
+(`id`,
+`orgName`)
+VALUES
+(1,
+'org 1');
+
+
+CREATE TABLE `userRoles` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `role` varchar(45) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+
+INSERT INTO `universalTranslator`.`userRoles`
+(`id`,`role`)
+VALUES
+(1,'ROLE_ADMIN'),
+(2,'ROLE_USER');
+
+
+CREATE TABLE `users` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `active` bit(1) NOT NULL DEFAULT b'1',
+  `orgId` int(11) NOT NULL DEFAULT '0',
+  `firstName` varchar(55) NOT NULL,
+  `lastName` varchar(55) NOT NULL,
+  `username` varchar(15) NOT NULL,
+  `password` varchar(15) DEFAULT NULL,
+  `roleId` int(11) NOT NULL DEFAULT '2',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id_UNIQUE` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+
+INSERT INTO `universalTranslator`.`users`
+(`id`,
+`active`,
+`orgId`,
+`firstName`,
+`lastName`,
+`username`,
+`password`,
+`roleId`)
+VALUES
+(1,
+1,
+0,
+'admin',
+'admin',
+'admin',
+'!admin!',
+1);
+
+
+
