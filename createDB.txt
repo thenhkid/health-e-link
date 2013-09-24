@@ -57,7 +57,7 @@ VALUES
 
 CREATE TABLE `users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `active` bit(1) NOT NULL DEFAULT b'1',
+  `status` bit(1) NOT NULL DEFAULT b'1',
   `orgId` int(11) NOT NULL DEFAULT '0',
   `firstName` varchar(55) NOT NULL,
   `lastName` varchar(55) NOT NULL,
