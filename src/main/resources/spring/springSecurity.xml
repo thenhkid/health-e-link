@@ -26,9 +26,9 @@
         <authentication-provider>
          <jdbc-user-service data-source-ref="dataSource"
  
-		   users-by-username-query="select username,password,active from users where username=?" 
+		   users-by-username-query="select username,password,status from users where username=?" 
  
-		   authorities-by-username-query="select u.username, r.role as authority from users u inner join userRoles r on u.roleId = r.id where u.username =?  " 
+		   authorities-by-username-query="select u.username, r.role as authority from users u inner join userRoles r on u.roleId = r.id where u.status = 1 and u.username =?  " 
  
 		/>
         </authentication-provider>
