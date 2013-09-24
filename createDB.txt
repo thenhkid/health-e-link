@@ -21,16 +21,25 @@ VALUES
 CREATE TABLE `organizations` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `orgName` varchar(255) NOT NULL,
+  `address` varchar(45) DEFAULT NULL,
+  `address2` varchar(45) DEFAULT NULL,
+  `city` varchar(45) DEFAULT NULL,
+  `state` varchar(2) DEFAULT NULL,
+  `postalCode` varchar(15) DEFAULT NULL,
+  `phone` varchar(45) DEFAULT NULL,
+  `fax` varchar(45) DEFAULT NULL,
+  `public` bit(1) NOT NULL DEFAULT b'1' COMMENT '1 = Public\n0 = Private',
+  `dateCreated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `status` bit(1) NOT NULL DEFAULT b'1' COMMENT '1 = Active\n0 = Inactive',
   PRIMARY KEY (`id`),
   UNIQUE KEY `id_UNIQUE` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+
 
 INSERT INTO `universalTranslator`.`organizations`
-(`id`,
-`orgName`)
+(`id`,`orgName`,'public','status')
 VALUES
-(1,
-'org 1');
+(1,'Universal Translator',0,1);
 
 
 CREATE TABLE `userRoles` (
@@ -71,7 +80,7 @@ INSERT INTO `universalTranslator`.`users`
 VALUES
 (1,
 1,
-0,
+1,
 'admin',
 'admin',
 'admin',
