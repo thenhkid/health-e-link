@@ -5,17 +5,16 @@ CREATE TABLE `configurations` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `orgId` int(11) NOT NULL,
   `configName` varchar(55) NOT NULL,
+  `status` bit(1) NOT NULL DEFAULT b'0',
+  `type` smallint(6) NOT NULL DEFAULT '1' COMMENT '1 = Source Organizations\n2 = Target Organization',
+  `messageTypeId` int(11) NOT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `idconfigurations_UNIQUE` (`id`),
   KEY `orgId_idx` (`orgId`),
+  KEY `mtID_idx` (`messageTypeId`),
   CONSTRAINT `orgId` FOREIGN KEY (`orgId`) REFERENCES `organizations` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=latin1;
 
-INSERT INTO `universalTranslator`.`configurations`
-(`id`,`orgId`,`configName`)
-VALUES
-(1,1,'configuration 1'),
-(2,1,'configuration 2');
+
 
 
 CREATE TABLE `organizations` (

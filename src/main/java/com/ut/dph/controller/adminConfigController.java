@@ -51,6 +51,7 @@ public class adminConfigController {
 		mav.setViewName("/administrator/configurations/configurationDetails");
 		
 		configuration configDetails = configurationmanager.getConfigurationById(id);
+		mav.addObject("id",id);
 		mav.addObject("configuration",configDetails);
 		
 		return mav;
@@ -58,11 +59,12 @@ public class adminConfigController {
 	}
 	
 	@RequestMapping(value="/detail/{id}", method = RequestMethod.POST)
-    public ModelAndView saveConfiguration(@Valid configuration configuration, BindingResult result, RedirectAttributes redirectAttr) throws Exception {
+    public ModelAndView saveConfiguration(@Valid configuration configuration, BindingResult result, RedirectAttributes redirectAttr,@RequestParam String action, @PathVariable Integer id) throws Exception {
 		
 		
 		if(result.hasErrors()) {
 			ModelAndView mav = new ModelAndView();
+			mav.addObject("id",id);
 			mav.setViewName("/administrator/configurations/configurationDetails");
 			
 			return mav;
@@ -70,8 +72,19 @@ public class adminConfigController {
 		
 		configurationmanager.saveConfiguration(configuration);
 		redirectAttr.addFlashAttribute("savedStatus", "success");
-	    ModelAndView mav = new ModelAndView(new RedirectView("../list"));
-	    return mav;
+		
+		if(action.equals("save")) {
+			ModelAndView mav = new ModelAndView();
+			mav.addObject("id",id);
+			mav.setViewName("/administrator/configurations/configurationDetails");
+			
+			return mav;
+		}
+		else {
+			ModelAndView mav = new ModelAndView(new RedirectView("../list"));
+			return mav;			
+		}
+	    
 		
     }
 
