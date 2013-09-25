@@ -1,0 +1,264 @@
+// default theme
+*.unstyled-link{
+	color: @text-color;
+	&:hover {
+		text-decoration: none;
+		color:@text-color;
+	}
+};
+
+h1,h2,h3 {
+	color: @gray-darker;
+}
+
+.form-sub-heading {
+	border-bottom: 1px solid @table-border-color;
+	font-size: 14px;
+
+}
+
+
+.panel {
+	.form-sub-heading {
+		background-color: @panel-default-heading-bg;
+		border-top:1px solid @table-border-color;
+	}
+
+	&.panel-has-nav {
+		background-color: #666;
+	}
+
+	.tab-content {
+		background-color: @white;
+	}
+
+	&.panel-collapsed {
+
+		.panel-heading{
+			border-bottom:0;
+		}
+	}
+
+}
+
+.panel-nav {
+
+	> li {
+		a {
+			border:0;
+			color:#fff;
+			font-weight: bold;
+
+			&:hover {
+				background-color: #555;
+				border:0;
+				padding-bottom:9px;
+			}
+
+		}
+
+		&.active a{
+			color:#666;
+
+			&:hover {
+				background-color: @white;
+				padding-bottom:10px;
+			}
+		}
+	}
+
+	border-bottom:0
+}
+
+.sub-nav {
+
+	.nav-pills {
+		> li {
+
+			// Normal State
+			> a {
+				&:hover {
+					color: #333;
+					background-color: transparent;
+
+					> .badge {
+						background-color: #333;
+					}
+				}
+				color: @nav-disabled-link-color;
+			}
+
+			// Disabled State
+			&.disabled
+			{
+				> a, &:hover{
+					color: @medium-shadow-color;
+				}
+
+				> a > .badge {
+					background-color: @medium-shadow-color;
+				}
+			}
+
+			// Active State
+			&.active > a {
+				&,
+				&:hover,
+				&:focus {
+					color: @brand-primary;
+					background-color: transparent;
+				}
+
+				.badge,
+				&:hover > .badge
+				{
+					color: @white;
+					background-color: @brand-primary;
+				}
+			}
+
+
+		}
+	}
+}
+
+.secondary-nav {
+
+	.nav {
+		>li > a{
+			border-radius:0;
+			color:@text-color;
+			font-weight: bold;
+			border-bottom: 1px solid @light-border-color;
+		}
+
+		li ul li a{
+			color: @brand-primary;
+			font-weight: normal;
+			border-bottom:0;
+		}
+
+		li.active a{
+			color:@white;
+			.sprite-common(right, 8px)
+		}
+	}
+}
+
+// Header section
+.primary-nav {
+	border:0;
+	background-color: @base-nav-color;
+
+	.navbar-nav {
+		li > a, li > a:hover, li.active > a, li.active >a:hover {
+			color:@nav-text-color;
+		};
+
+		li {
+			&.active > a {
+				background-color: @nav-active-background-color;
+
+				&:hover {
+					background-color: @nav-active-background-color;
+				}
+			}
+
+			> a {
+				border-right:0px solid @nav-border-shadow-color;
+				border-left:0px solid @nav-border-highlight-color;
+
+				&:hover {
+					background-color: @nav-hover-background-color;
+				};
+			}
+		}
+
+		li:first-child > a {
+			border-left:0;
+		}
+
+
+		li:last-child > a {
+			border-right:0;
+		}
+	}
+}
+
+.navbar-brand, .navbar-brand:hover {
+	color:@white;
+}
+
+// Actions bar
+.actions-nav {
+	border-bottom:0;
+	border-top:0;
+	background-color: @white;
+	border-bottom:1px solid @light-shadow-color;
+
+	.border-radius(0);
+	.box-shadow(0 5px 10px 0 @light-shadow-color);
+
+
+	.navbar-nav > li > a {
+		color:@brand-primary;
+
+		&:hover {
+			color:darken(@brand-primary, 10%);
+		};
+
+		&:hover .custom-icon {
+			// background-color:darken(@brand-primary, 10%);
+		};
+	}
+
+	.custom-icon {
+		// background-color: @brand-primary;
+	}
+}
+
+.section-title {
+	font-weight: bold;
+}
+
+// in
+.arrow-left {
+	.sprite-common(-20px,0)
+}
+
+.arrow-up {
+	.sprite-common(0,0)
+}
+
+.footer {
+	border-top:1px solid @medium-shadow-color;
+	background-color: @light-shadow-color;
+	color: @secondary-text-color;
+}
+
+.icon-cancel {
+	.sprite-common(-80px, 0);
+}
+
+
+.login {
+	background-color: @white;
+	border-radius:2px;
+	overflow: hidden;
+	border:1px solid @medium-border-color;
+	.box-shadow(0px 0px 10px 0 @medium-shadow-color);
+
+	.login-header {
+		background-color:#666;
+	}
+}
+
+
+// Page specific styles
+body#login {
+	background-color: #efefef;
+}
+
+
+
+

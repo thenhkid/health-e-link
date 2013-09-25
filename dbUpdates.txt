@@ -1,0 +1,353 @@
+
+CREATE TABLE `universalTranslator`.`providers` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `orgId` INT NOT NULL,
+  `firstName` VARCHAR(45) NOT NULL,
+  `lastName` VARCHAR(45) NOT NULL,
+  `providerId` VARCHAR(45) NULL,
+  `email` VARCHAR(255) NULL,
+  `phone` VARCHAR(20) NULL,
+  `fax` VARCHAR(20) NULL,
+  `status` BIT NOT NULL DEFAULT 1 COMMENT '1 = Active\n0 = Inactive',
+  PRIMARY KEY (`id`),
+  INDEX `orgId_idx` (`orgId` ASC),
+  CONSTRAINT `providerOrgId`
+    FOREIGN KEY (`orgId`)
+    REFERENCES `universalTranslator`.`organizations` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+
+CREATE TABLE `universalTranslator`.`brochures` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `orgId` INT NOT NULL,
+  `title` VARCHAR(255) NOT NULL,
+  `fileName` VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `brochureOrgId_idx` (`orgId` ASC),
+  CONSTRAINT `brochureOrgId`
+    FOREIGN KEY (`orgId`)
+    REFERENCES `universalTranslator`.`configurations` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+    
+
+ALTER TABLE `universalTranslator`.`users` 
+ADD COLUMN `mainContact` SMALLINT NOT NULL DEFAULT 0 COMMENT '0 = Not a Main Contact\n1 = Primary Contact\n2 = Secondary Contact' AFTER `roleId`,
+ADD COLUMN `sendEmailAlert` BIT NOT NULL DEFAULT 0 COMMENT '0 = No Email Alerts\n1 = Send Email Alerts' AFTER `mainContact`,
+ADD COLUMN `dateCreated` DATETIME NOT NULL DEFAULT now() AFTER `sendEmailAlert`,
+ADD COLUMN `email` VARCHAR(255) NULL AFTER `dateCreated`,
+ADD INDEX `userOrgId_idx` (`orgId` ASC),
+ADD INDEX `userRoleId_idx` (`roleId` ASC)
+
+ALTER TABLE `universalTranslator`.`users` 
+ADD CONSTRAINT `userRoleId`
+  FOREIGN KEY (`roleId`)
+  REFERENCES `universalTranslator`.`userRoles` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+  
+ALTER TABLE `universalTranslator`.`users` 
+CHANGE COLUMN `orgId` `orgId` INT(11) NOT NULL DEFAULT 1 ;
+ALTER TABLE `universalTranslator`.`users` 
+ADD CONSTRAINT `usersOrgId`
+  FOREIGN KEY (`orgId`)
+  REFERENCES `universalTranslator`.`organizations` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+  
+
+ CREATE TABLE `universalTranslator`.`utSiteFeatures` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `featureName` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`id`));
+ 
+INSERT INTO `universalTranslator`.`utSiteFeatures` (`featureName`) VALUES ('Health-e-Net');
+INSERT INTO `universalTranslator`.`utSiteFeatures` (`featureName`) VALUES ('Health-e-Data');
+INSERT INTO `universalTranslator`.`utSiteFeatures` (`featureName`) VALUES ('Health-e-Web');
+INSERT INTO `universalTranslator`.`utSiteFeatures` (`featureName`) VALUES ('Health-e-Connect');
+
+
+CREATE TABLE `universalTranslator`.`rel_userSiteFeatures` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `userId` INT NOT NULL,
+  `featureId` INT NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `userFeatureuserId_idx` (`userId` ASC),
+  INDEX `userFeatureId_idx` (`featureId` ASC),
+  CONSTRAINT `userFeatureuserId`
+    FOREIGN KEY (`userId`)
+    REFERENCES `universalTranslator`.`users` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `userFeatureId`
+    FOREIGN KEY (`featureId`)
+    REFERENCES `universalTranslator`.`utSiteFeatures` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+    
+    
+ CREATE TABLE `universalTranslator`.`messageTypes` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `status` BIT NOT NULL DEFAULT 0,
+  `dateCreated` DATETIME NOT NULL DEFAULT now(),
+  'name' VARCHAR(255) NOT NULL,
+  `templateFile` VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`id`));
+    
+  
+  CREATE TABLE `universalTranslator`.`messageTypeFormFields` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `messageTypeId` INT NOT NULL,
+  `fieldNo` INT NOT NULL,
+  `fieldDesc` VARCHAR(255) NULL,
+  `fieldLabel` VARCHAR(500) NOT NULL COMMENT 'This field will be used as the field label when displaying on the form.',
+  `validationType` INT NULL,
+  `required` BIT NOT NULL DEFAULT 0,
+  `saveToTableName` INT NOT NULL,
+  `saveToTableRow` INT NOT NULL,
+  `bucketNo` VARCHAR(45) NOT NULL,
+  `bucketDspPos` INT NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `messageTypeId_idx` (`messageTypeId` ASC),
+  CONSTRAINT `messageTypeId`
+    FOREIGN KEY (`messageTypeId`)
+    REFERENCES `universalTranslator`.`messageTypes` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+    
+  CREATE TABLE `universalTranslator`.`ref_tables` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `tableName` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`id`));
+  
+  CREATE TABLE `universalTranslator`.`ref_tableColumns` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `tableId` INT NOT NULL,
+  `colName` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `tableId_idx` (`tableId` ASC),
+  CONSTRAINT `tableId`
+    FOREIGN KEY (`tableId`)
+    REFERENCES `universalTranslator`.`ref_tables` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+  
+ ALTER TABLE `universalTranslator`.`messageTypeFormFields` 
+CHANGE COLUMN `saveToTableRow` `saveToTableCol` INT(11) NOT NULL ,
+ADD INDEX `refTableId_idx` (`saveToTableName` ASC),
+ADD INDEX `refTableColId_idx` (`saveToTableCol` ASC);
+ALTER TABLE `universalTranslator`.`messageTypeFormFields` 
+ADD CONSTRAINT `refTableId`
+  FOREIGN KEY (`saveToTableName`)
+  REFERENCES `universalTranslator`.`ref_tables` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION,
+ADD CONSTRAINT `refTableColId`
+  FOREIGN KEY (`saveToTableCol`)
+  REFERENCES `universalTranslator`.`ref_tableColumns` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+  
+  
+  CREATE TABLE `universalTranslator`.`ref_validationTypes` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `validationType` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`id`));
+  
+INSERT INTO `universalTranslator`.`ref_validationTypes` (`validationType`) VALUES ('Email');
+INSERT INTO `universalTranslator`.`ref_validationTypes` (`validationType`) VALUES ('Phone Number');
+INSERT INTO `universalTranslator`.`ref_validationTypes` (`validationType`) VALUES ('Date');
+INSERT INTO `universalTranslator`.`ref_validationTypes` (`validationType`) VALUES ('Numeric');
+INSERT INTO `universalTranslator`.`ref_validationTypes` (`validationType`) VALUES ('URL');
+
+ALTER TABLE `universalTranslator`.`messageTypeFormFields` 
+ADD INDEX `refValidationId_idx` (`validationType` ASC);
+ALTER TABLE `universalTranslator`.`messageTypeFormFields` 
+ADD CONSTRAINT `refValidationId`
+  FOREIGN KEY (`validationType`)
+  REFERENCES `universalTranslator`.`ref_validationTypes` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+  
+  CREATE TABLE `universalTranslator`.`messageTypeCrosswalks` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(45) NOT NULL,
+  `fileDelimiter` INT NOT NULL,
+  `fileName` VARCHAR(45) NOT NULL,
+  `dateCreated` DATETIME NULL DEFAULT now(),
+  PRIMARY KEY (`id`));
+  
+  CREATE TABLE `universalTranslator`.`ref_delimiters` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `delimiter` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`id`));
+  
+INSERT INTO `universalTranslator`.`ref_delimiters` (`delimiter`) VALUES ('comma');
+INSERT INTO `universalTranslator`.`ref_delimiters` (`delimiter`) VALUES ('pipe');
+INSERT INTO `universalTranslator`.`ref_delimiters` (`delimiter`) VALUES ('colon');
+INSERT INTO `universalTranslator`.`ref_delimiters` (`delimiter`) VALUES ('doc');
+INSERT INTO `universalTranslator`.`ref_delimiters` (`delimiter`) VALUES ('excel');
+INSERT INTO `universalTranslator`.`ref_delimiters` (`delimiter`) VALUES ('mdb');
+INSERT INTO `universalTranslator`.`ref_delimiters` (`delimiter`) VALUES ('new-line');
+INSERT INTO `universalTranslator`.`ref_delimiters` (`delimiter`) VALUES ('odbc');
+INSERT INTO `universalTranslator`.`ref_delimiters` (`delimiter`) VALUES ('pdf');
+INSERT INTO `universalTranslator`.`ref_delimiters` (`delimiter`) VALUES ('pipe-nl');
+INSERT INTO `universalTranslator`.`ref_delimiters` (`delimiter`) VALUES ('semi-colon');
+INSERT INTO `universalTranslator`.`ref_delimiters` (`delimiter`) VALUES ('tab');
+INSERT INTO `universalTranslator`.`ref_delimiters` (`delimiter`) VALUES ('xls');
+  
+  
+ALTER TABLE `universalTranslator`.`messageTypeCrosswalks` 
+ADD INDEX `delimId_idx` (`fileDelimiter` ASC);
+ALTER TABLE `universalTranslator`.`messageTypeCrosswalks` 
+ADD CONSTRAINT `delimId`
+  FOREIGN KEY (`fileDelimiter`)
+  REFERENCES `universalTranslator`.`ref_delimiters` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+  
+CREATE TABLE `universalTranslator`.`rel_messageTypeCrosswalks` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `messageTypeId` INT NOT NULL,
+  `crosswalkId` INT NOT NULL,
+  `processOrder` INT NOT NULL DEFAULT 1,
+  PRIMARY KEY (`id`),
+  INDEX `messageTypeId_idx` (`messageTypeId` ASC),
+  INDEX `cwId_idx` (`crosswalkId` ASC),
+  CONSTRAINT `msgTypeId`
+    FOREIGN KEY (`messageTypeId`)
+    REFERENCES `universalTranslator`.`messageTypes` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `cwId`
+    FOREIGN KEY (`crosswalkId`)
+    REFERENCES `universalTranslator`.`messageTypeCrosswalks` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+    
+
+ALTER TABLE `universalTranslator`.`configurations` 
+ADD CONSTRAINT `mtid`
+  FOREIGN KEY (`messageTypeId`)
+  REFERENCES `universalTranslator`.`messageTypes` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+  
+CREATE TABLE `universalTranslator`.`ref_fileTypes` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `fileType` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`id`));
+  
+INSERT INTO `universalTranslator`.`ref_fileTypes` (`fileType`) VALUES ('txt');
+INSERT INTO `universalTranslator`.`ref_fileTypes` (`fileType`) VALUES ('csv');
+INSERT INTO `universalTranslator`.`ref_fileTypes` (`fileType`) VALUES ('hl7');
+INSERT INTO `universalTranslator`.`ref_fileTypes` (`fileType`) VALUES ('mdb');
+INSERT INTO `universalTranslator`.`ref_fileTypes` (`fileType`) VALUES ('pdf');
+INSERT INTO `universalTranslator`.`ref_fileTypes` (`fileType`) VALUES ('odbc');
+INSERT INTO `universalTranslator`.`ref_fileTypes` (`fileType`) VALUES ('xls');
+INSERT INTO `universalTranslator`.`ref_fileTypes` (`fileType`) VALUES ('xml');
+INSERT INTO `universalTranslator`.`ref_fileTypes` (`fileType`) VALUES ('doc');
+  
+  
+CREATE TABLE `universalTranslator`.`configurationTransportDetails` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `configId` INT NOT NULL,
+  `transportMethod` INT NOT NULL,
+  `fileName` VARCHAR(255) NULL,
+  `messageTypeColNo` INT NULL,
+  `messageTypeCustomVal` VARCHAR(45) NULL,
+  `targetOrgColNo` INT NULL,
+  `fileType` INT NULL DEFAULT 0,
+  `fileDelimiter` INT NULL,
+  `containsHeader` BIT NULL DEFAULT 0,
+  PRIMARY KEY (`id`),
+  INDEX `fileDelimId_idx` (`fileDelimiter` ASC),
+  INDEX `filetypeId_idx` (`fileType` ASC),
+  CONSTRAINT `fileDelimId`
+    FOREIGN KEY (`fileDelimiter`)
+    REFERENCES `universalTranslator`.`ref_delimiters` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `filetypeId`
+    FOREIGN KEY (`fileType`)
+    REFERENCES `universalTranslator`.`ref_FileTypes` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+ CREATE TABLE `universalTranslator`.`rel_transportFTPDetails` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `transportId` INT NOT NULL,
+  `IP` VARCHAR(45) NOT NULL,
+  `directory` VARCHAR(255) NOT NULL,
+  `usename` VARCHAR(45) NOT NULL,
+  `password` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `transportId_idx` (`transportId` ASC),
+  CONSTRAINT `transportId`
+    FOREIGN KEY (`transportId`)
+    REFERENCES `universalTranslator`.`configurationTransportDetails` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);   
+    
+CREATE TABLE `universalTranslator`.`rel_transportJSONDetails` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `transportId` INT NOT NULL,
+  `url` VARCHAR(255) NOT NULL,
+  `identifier` VARCHAR(255) NULL,
+  PRIMARY KEY (`id`),
+  INDEX `trnsid_idx` (`transportId` ASC),
+  CONSTRAINT `trnsid`
+    FOREIGN KEY (`transportId`)
+    REFERENCES `universalTranslator`.`configurationTransportDetails` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+    
+    
+CREATE TABLE `universalTranslator`.`configurationFieldMappings` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `configId` INT NOT NULL,
+  `sourceFieldNo` INT NOT NULL,
+  `targetFieldNo` INT NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `configId_idx` (`configId` ASC),
+  CONSTRAINT `configId`
+    FOREIGN KEY (`configId`)
+    REFERENCES `universalTranslator`.`configurations` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+    
+CREATE TABLE `universalTranslator`.`configurationFormFields` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `configId` INT NOT NULL,
+  `fieldNo` INT NOT NULL,
+  `fieldLabel` VARCHAR(500) NOT NULL,
+  `validationType` INT NULL,
+  `required` BIT NOT NULL DEFAULT 0,
+  `saveToTableName` INT NOT NULL,
+  `saveToTableCol` INT NOT NULL,
+  `bucketNo` INT NOT NULL,
+  `bucketDspPos` INT NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `configId_idx` (`configId` ASC),
+  INDEX `ffrefTableId_idx` (`saveToTableName` ASC),
+  INDEX `ffrefTableColId_idx` (`saveToTableCol` ASC),
+  CONSTRAINT `formfieldconfigId`
+    FOREIGN KEY (`configId`)
+    REFERENCES `universalTranslator`.`configurations` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `ffrefTableId`
+    FOREIGN KEY (`saveToTableName`)
+    REFERENCES `universalTranslator`.`ref_tables` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `ffrefTableColId`
+    FOREIGN KEY (`saveToTableCol`)
+    REFERENCES `universalTranslator`.`ref_tableColumns` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+ 
+  
+

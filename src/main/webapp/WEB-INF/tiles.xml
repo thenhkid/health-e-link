@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE tiles-definitions PUBLIC
+       "-//Apache Software Foundation//DTD Tiles Configuration 2.0//EN"
+       "http://tiles.apache.org/dtds/tiles-config_2_0.dtd">
+<tiles-definitions>
+    <definition name="base.definition" template="/WEB-INF/tiles/layout.jsp">
+        <put-attribute name="title" value="" />
+        <put-attribute name="header" value="" />
+        <put-attribute name="actions" value="" />
+        <put-attribute name="menu" value="" />
+        <put-attribute name="body" value="" />
+        <put-attribute name="footer" value="" />
+    </definition>
+    
+    <!-- Admin Definitions -->
+	    <definition name="/administrator/menu" extends="base.definition">
+	        <put-attribute name="title" value="Administrator" />
+	        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp" />
+	        <put-attribute name="body" value="/WEB-INF/jsp/administrator/index.jsp" />
+	        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
+	    </definition>
+    	
+    	<!-- Admin Configuration Definitions -->
+    	<definition name="/administrator/configurations/listConfigurations" extends="base.definition">
+	        <put-attribute name="title" value="Administrator" />
+	        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=config" />
+	        <put-attribute name="actions" value="/WEB-INF/jsp/common/adminActions.jsp?page=listConfigs" />
+	        <put-attribute name="body" value="/WEB-INF/jsp/administrator/configurations/listConfigurations.jsp" />
+	        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
+	    </definition>
+	    
+	    <definition name="/administrator/configurations/configurationDetails" extends="base.definition">
+	        <put-attribute name="title" value="Administrator" />
+	        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=config" />
+	        <put-attribute name="actions" value="/WEB-INF/jsp/common/adminActions.jsp?page=configDetails" />
+	        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/configurations/menu.jsp?page=details" />
+	        <put-attribute name="body" value="/WEB-INF/jsp/administrator/configurations/configurationDetails.jsp" />
+	        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
+	    </definition>
+    
+    <!--  End Admin Definitions -->
+    
+    
+   
+ 
+</tiles-definitions>

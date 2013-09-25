@@ -1,0 +1,327 @@
+html, body {
+	height: 100%;
+}
+
+.wrap {
+	min-height:100%;
+	padding-bottom:40px;
+	height: auto;
+	position:relative;
+	width:100%;
+}
+
+.main {
+	margin-left:160px;
+
+	// fixes issue with floated sidebar.
+	// not sure what the cause is 
+	.panel-body:before, .panel-body:after {
+		content:none;
+	}
+}
+
+.form-group .half {
+	width:50%
+}
+
+.table {
+	th {
+		white-space: nowrap;
+		text-overflow:ellipsis;
+		overflow: hidden;
+	}
+}
+
+.scrollable {
+	overflow: auto;
+}
+
+.modal {
+	overflow: auto;
+}
+
+.logo {
+	width:125px;
+	height:30px;
+	display: block;
+}
+
+
+
+// forms
+.form-control + .form-group-note {
+	margin-top:5px;
+	display: block;
+}
+
+.form-control-disabled {
+	opacity:.5
+}
+
+.form-sub-heading {
+	padding-bottom:10px;
+	padding-top:10px;
+	margin-bottom: 20px;
+}
+
+
+// panels
+.panel {
+	.form-sub-heading {
+		margin-top:30px;
+		margin-bottom: 30px;
+		margin-left:-10px;
+		margin-right:-10px;
+		padding-left:10px;
+	}
+
+	.tab-content {
+		padding:15px;
+		margin-left:-15px;
+		margin-right:-15px;
+	}
+
+	&.panel-has-nav {
+		.panel-body {
+			padding:10px;
+			padding-bottom:0;
+			overflow: hidden;
+		}
+	}
+
+	.panel-nav {
+		> li {
+			a:hover {
+				padding-bottom:9px;
+			}
+
+			&.active a:hover{
+				padding-bottom:10px;
+			}
+		}
+	}
+}
+
+
+// sub nav
+
+.main .sub-nav {
+	overflow:hidden;
+	.nav:after {
+		clear:none;
+	}
+}
+
+.sub-nav {
+
+	margin: 0px 0 20px 0;
+	width:100%;
+
+	.nav-pills a {
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow:ellipsis;
+		font-size: @font-size-medium;
+	}
+
+	.nav-pills a > .badge {
+		font-size: @font-size-large;
+		font-weight: bold;
+		border-radius: 25px;
+		margin-left: 0;
+		margin-right: 5px;
+		padding-bottom: 4px;
+	}
+
+}
+
+
+// secondary, stacked nav
+.secondary {
+	width:160px;
+	float:left;
+	height: 100%;
+	position: relative;
+}
+
+.secondary-nav {
+	li + li {
+		margin-top: 0;
+	}
+
+	li li a{
+		padding-left: 25px;
+	}
+
+	.indicator-active {
+		position: absolute;
+		right:-2px;
+		top:50%;
+		margin-top:-10px;
+	}
+}
+
+
+// Primary Nav
+.primary-nav {
+	margin-bottom:0;
+	border-radius: 0;
+
+	.indicator-active {
+		position: absolute;
+		bottom:-2px;
+		margin-left:-10px;
+		left:50%;
+	}
+
+	.logo {
+		margin-top:-16px;
+		position:relative;
+		top:9px;
+	}
+}
+
+
+// Action bar
+.section-title {
+	margin-top:0;
+	margin-bottom:0;
+}
+
+.actions-nav{
+	// TODO[Implement] : Figure out a way to make this less static
+	.navbar-brand{
+		padding-top:21px;
+		padding-bottom:22px;
+	}
+	margin-bottom:20px;
+}
+
+.icon-stacked {
+	display:block;
+	text-align:center;
+	margin:0;
+	font-size:18px;
+	margin-bottom:5px;
+	margin-right:0;
+
+	&.glyphicon {
+		width:auto;
+	}
+
+	&.custom-icon {
+		margin-left:auto;
+		margin-right:auto;
+		width:18px;
+	}
+}
+
+.custom-icon {
+	width:18px;
+	height:18px;
+}
+
+.navbar-actions {
+	&.navbar-nav{
+		li > a {
+			padding-top:10px;
+			padding-bottom:10px;
+			text-align:center;
+		}
+	}
+}
+
+
+// icons, graphics
+.arrow-left{
+	width:10px;
+	height: 20px;
+	display:block;
+}
+
+.arrow-up{
+	width:20px;
+	height: 10px;
+	display:block;
+}
+
+
+.footer {
+	position: absolute;
+	bottom:0;
+	padding:10px 20px;
+	display: block;
+	width:100%;
+}
+
+// Login
+.login-container{
+	width:300px;
+	margin:auto;
+	height: 300px;
+	position: absolute;
+	top:50%;
+	margin-top:-150px;
+	left:50%;
+	margin-left:-150px;
+
+}
+
+.login-container {
+
+	.login {
+		padding:20px;
+
+		.login-header {
+			margin-left:-20px;
+			margin-right:-20px;
+			margin-top:-20px;
+			margin-bottom:20px;
+		}
+		.login-header-content {
+			padding:15px 20px;
+			width:100%;
+			height: 100%;
+		}
+		.logo {
+			margin:auto;
+		}
+	}
+
+	.login-note {
+		text-align:center;
+		margin-top:10px;
+	}
+}
+
+// Helpers
+.filler:after{
+	background-color:inherit;
+	bottom: 0;
+	content: "";
+	height: auto;
+	min-height: 100%;
+	left: 0;
+	margin:inherit;
+	right: 0;
+	position: absolute;
+	top: 0;
+	width: inherit;
+	z-index: -1;  
+}
+
+.ir {
+	display:block;
+	text-indent: -9999px;
+	overflow: hidden;
+}
+
+
+
+.basic-clearfix {
+	overflow:hidden;
+	height: 1%;
+	zoom:1;
+}
+
+
