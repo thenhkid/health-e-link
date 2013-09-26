@@ -45,6 +45,36 @@ LOCK TABLES `brochures` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `configurationConnections`
+--
+
+DROP TABLE IF EXISTS `configurationConnections`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `configurationConnections` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `configId` int(11) NOT NULL,
+  `orgId` int(11) NOT NULL,
+  `dateCreated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `status` bit(1) NOT NULL DEFAULT b'1' COMMENT '1 = Active\n0 = Inactive',
+  PRIMARY KEY (`id`),
+  KEY `connectConfigId_idx` (`configId`),
+  KEY `connectOrgId_idx` (`orgId`),
+  CONSTRAINT `connectConfigId` FOREIGN KEY (`configId`) REFERENCES `configurations` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `connectOrgId` FOREIGN KEY (`orgId`) REFERENCES `organizations` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `configurationConnections`
+--
+
+LOCK TABLES `configurationConnections` WRITE;
+/*!40000 ALTER TABLE `configurationConnections` DISABLE KEYS */;
+/*!40000 ALTER TABLE `configurationConnections` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `configurationFieldMappings`
 --
 
@@ -106,6 +136,36 @@ CREATE TABLE `configurationFormFields` (
 LOCK TABLES `configurationFormFields` WRITE;
 /*!40000 ALTER TABLE `configurationFormFields` DISABLE KEYS */;
 /*!40000 ALTER TABLE `configurationFormFields` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `configurationSchedule`
+--
+
+DROP TABLE IF EXISTS `configurationSchedule`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `configurationSchedule` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `configId` int(11) NOT NULL,
+  `type` smallint(6) NOT NULL DEFAULT '0' COMMENT '0 = Never\n1 = Manual\n2 = Daily\n3 = Weekly\n4 = Monthly',
+  `processingType` smallint(6) DEFAULT NULL COMMENT '1 = Scheduled\n2 = Continuous',
+  `newfilecheck` int(11) DEFAULT NULL COMMENT '5 = Every 5 Mintues\n10 = Every 10 Minutes\netc',
+  `processingDay` int(11) DEFAULT NULL COMMENT '1 = Sun\n2 = Mon\n3 = Tues\n4 = Wed\n5 = Thur\n6 = Fri\n7 = Sat',
+  `processingTime` int(11) DEFAULT NULL COMMENT '1 - 24',
+  PRIMARY KEY (`id`),
+  KEY `schedConfigId_idx` (`configId`),
+  CONSTRAINT `schedConfigId` FOREIGN KEY (`configId`) REFERENCES `configurations` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `configurationSchedule`
+--
+
+LOCK TABLES `configurationSchedule` WRITE;
+/*!40000 ALTER TABLE `configurationSchedule` DISABLE KEYS */;
+/*!40000 ALTER TABLE `configurationSchedule` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -271,6 +331,37 @@ INSERT INTO `messageTypes` VALUES (1,'','2013-09-25 13:11:46','Weight Loss','we
 UNLOCK TABLES;
 
 --
+-- Table structure for table `organizationCrosswalks`
+--
+
+DROP TABLE IF EXISTS `organizationCrosswalks`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `organizationCrosswalks` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `orgId` int(11) NOT NULL,
+  `name` varchar(45) NOT NULL,
+  `fileDelimiter` int(11) NOT NULL,
+  `fileName` varchar(45) NOT NULL,
+  `dateCreated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `cwalkOrgId_idx` (`orgId`),
+  KEY `cwalkDelim_idx` (`fileDelimiter`),
+  CONSTRAINT `cwalkDelim` FOREIGN KEY (`fileDelimiter`) REFERENCES `ref_delimiters` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `cwalkOrgId` FOREIGN KEY (`orgId`) REFERENCES `organizations` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `organizationCrosswalks`
+--
+
+LOCK TABLES `organizationCrosswalks` WRITE;
+/*!40000 ALTER TABLE `organizationCrosswalks` DISABLE KEYS */;
+/*!40000 ALTER TABLE `organizationCrosswalks` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `organizations`
 --
 
@@ -386,6 +477,30 @@ INSERT INTO `ref_fileTypes` VALUES (1,'txt'),(2,'csv'),(3,'hl7'),(4,'mdb'),(5,'p
 UNLOCK TABLES;
 
 --
+-- Table structure for table `ref_macros`
+--
+
+DROP TABLE IF EXISTS `ref_macros`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ref_macros` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(45) NOT NULL,
+  `scriptName` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ref_macros`
+--
+
+LOCK TABLES `ref_macros` WRITE;
+/*!40000 ALTER TABLE `ref_macros` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ref_macros` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `ref_tableColumns`
 --
 
@@ -488,32 +603,71 @@ LOCK TABLES `rel_TransportFTPDetails` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `rel_messageTypeCrosswalks`
+-- Table structure for table `rel_configurationDataTranslations`
 --
 
-DROP TABLE IF EXISTS `rel_messageTypeCrosswalks`;
+DROP TABLE IF EXISTS `rel_configurationDataTranslations`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `rel_messageTypeCrosswalks` (
+CREATE TABLE `rel_configurationDataTranslations` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `configId` int(11) NOT NULL,
+  `fieldNo` int(11) NOT NULL,
+  `crosswalkId` int(11) DEFAULT NULL,
+  `macroId` int(11) DEFAULT NULL,
+  `passClear` smallint(6) DEFAULT '1' COMMENT '1 = Pass Error\n2 = Clear Error',
+  `fieldA` varchar(45) DEFAULT NULL,
+  `fieldB` varchar(45) DEFAULT NULL,
+  `constant1` varchar(45) DEFAULT NULL,
+  `constant2` varchar(45) DEFAULT NULL,
+  `processOrder` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `dtconfigId_idx` (`configId`),
+  KEY `cwalkId_idx` (`crosswalkId`),
+  KEY `dtmacroId_idx` (`macroId`),
+  CONSTRAINT `cwalkId` FOREIGN KEY (`crosswalkId`) REFERENCES `organizationCrosswalks` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `dtconfigId` FOREIGN KEY (`configId`) REFERENCES `configurations` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `dtmacroId` FOREIGN KEY (`macroId`) REFERENCES `ref_macros` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `rel_configurationDataTranslations`
+--
+
+LOCK TABLES `rel_configurationDataTranslations` WRITE;
+/*!40000 ALTER TABLE `rel_configurationDataTranslations` DISABLE KEYS */;
+/*!40000 ALTER TABLE `rel_configurationDataTranslations` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `rel_messageTypeDataTranslations`
+--
+
+DROP TABLE IF EXISTS `rel_messageTypeDataTranslations`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `rel_messageTypeDataTranslations` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `messageTypeId` int(11) NOT NULL,
+  `fieldNo` int(11) NOT NULL,
   `crosswalkId` int(11) NOT NULL,
   `processOrder` int(11) NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
   KEY `messageTypeId_idx` (`messageTypeId`),
   KEY `cwId_idx` (`crosswalkId`),
-  CONSTRAINT `msgTypeId` FOREIGN KEY (`messageTypeId`) REFERENCES `messageTypes` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `cwId` FOREIGN KEY (`crosswalkId`) REFERENCES `messageTypeCrosswalks` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `cwId` FOREIGN KEY (`crosswalkId`) REFERENCES `messageTypeCrosswalks` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `msgTypeId` FOREIGN KEY (`messageTypeId`) REFERENCES `messageTypes` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `rel_messageTypeCrosswalks`
+-- Dumping data for table `rel_messageTypeDataTranslations`
 --
 
-LOCK TABLES `rel_messageTypeCrosswalks` WRITE;
-/*!40000 ALTER TABLE `rel_messageTypeCrosswalks` DISABLE KEYS */;
-/*!40000 ALTER TABLE `rel_messageTypeCrosswalks` ENABLE KEYS */;
+LOCK TABLES `rel_messageTypeDataTranslations` WRITE;
+/*!40000 ALTER TABLE `rel_messageTypeDataTranslations` DISABLE KEYS */;
+/*!40000 ALTER TABLE `rel_messageTypeDataTranslations` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -666,4 +820,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2013-09-26  9:50:28
+-- Dump completed on 2013-09-26 11:20:04
