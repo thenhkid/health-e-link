@@ -1,6 +1,155 @@
-CREATE DATABASE `universalTranslator` /*!40100 DEFAULT CHARACTER SET latin1 */;
+CREATE DATABASE  IF NOT EXISTS `universalTranslator` /*!40100 DEFAULT CHARACTER SET latin1 */;
+USE `universalTranslator`;
+-- MySQL dump 10.13  Distrib 5.6.11, for osx10.6 (i386)
+--
+-- Host: 127.0.0.1    Database: universalTranslator
+-- ------------------------------------------------------
+-- Server version	5.6.13
 
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
+--
+-- Table structure for table `brochures`
+--
+
+DROP TABLE IF EXISTS `brochures`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `brochures` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `orgId` int(11) NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `fileName` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `brochureOrgId_idx` (`orgId`),
+  CONSTRAINT `brochureOrgId` FOREIGN KEY (`orgId`) REFERENCES `configurations` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `brochures`
+--
+
+LOCK TABLES `brochures` WRITE;
+/*!40000 ALTER TABLE `brochures` DISABLE KEYS */;
+/*!40000 ALTER TABLE `brochures` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `configurationFieldMappings`
+--
+
+DROP TABLE IF EXISTS `configurationFieldMappings`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `configurationFieldMappings` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `configId` int(11) NOT NULL,
+  `sourceFieldNo` int(11) NOT NULL,
+  `targetFieldNo` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `configId_idx` (`configId`),
+  CONSTRAINT `configId` FOREIGN KEY (`configId`) REFERENCES `configurations` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `configurationFieldMappings`
+--
+
+LOCK TABLES `configurationFieldMappings` WRITE;
+/*!40000 ALTER TABLE `configurationFieldMappings` DISABLE KEYS */;
+/*!40000 ALTER TABLE `configurationFieldMappings` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `configurationFormFields`
+--
+
+DROP TABLE IF EXISTS `configurationFormFields`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `configurationFormFields` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `configId` int(11) NOT NULL,
+  `fieldNo` int(11) NOT NULL,
+  `fieldLabel` varchar(500) NOT NULL,
+  `validationType` int(11) DEFAULT NULL,
+  `required` bit(1) NOT NULL DEFAULT b'0',
+  `saveToTableName` int(11) NOT NULL,
+  `saveToTableCol` int(11) NOT NULL,
+  `bucketNo` int(11) NOT NULL,
+  `bucketDspPos` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `configId_idx` (`configId`),
+  KEY `ffrefTableId_idx` (`saveToTableName`),
+  KEY `ffrefTableColId_idx` (`saveToTableCol`),
+  CONSTRAINT `formfieldconfigId` FOREIGN KEY (`configId`) REFERENCES `configurations` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `ffrefTableId` FOREIGN KEY (`saveToTableName`) REFERENCES `ref_tables` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `ffrefTableColId` FOREIGN KEY (`saveToTableCol`) REFERENCES `ref_tableColumns` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `configurationFormFields`
+--
+
+LOCK TABLES `configurationFormFields` WRITE;
+/*!40000 ALTER TABLE `configurationFormFields` DISABLE KEYS */;
+/*!40000 ALTER TABLE `configurationFormFields` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `configurationTransportDetails`
+--
+
+DROP TABLE IF EXISTS `configurationTransportDetails`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `configurationTransportDetails` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `configId` int(11) NOT NULL,
+  `transportMethod` int(11) NOT NULL,
+  `fileName` varchar(255) DEFAULT NULL,
+  `messageTypeColNo` int(11) DEFAULT NULL,
+  `messageTypeCustomVal` varchar(45) DEFAULT NULL,
+  `targetOrgColNo` int(11) DEFAULT NULL,
+  `fileType` int(11) DEFAULT '0',
+  `fileDelimiter` int(11) DEFAULT NULL,
+  `containsHeader` bit(1) DEFAULT b'0',
+  PRIMARY KEY (`id`),
+  KEY `fileDelimId_idx` (`fileDelimiter`),
+  KEY `filetypeId_idx` (`fileType`),
+  CONSTRAINT `fileDelimId` FOREIGN KEY (`fileDelimiter`) REFERENCES `ref_delimiters` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `filetypeId` FOREIGN KEY (`fileType`) REFERENCES `ref_FileTypes` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `configurationTransportDetails`
+--
+
+LOCK TABLES `configurationTransportDetails` WRITE;
+/*!40000 ALTER TABLE `configurationTransportDetails` DISABLE KEYS */;
+/*!40000 ALTER TABLE `configurationTransportDetails` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `configurations`
+--
+
+DROP TABLE IF EXISTS `configurations`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `configurations` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `orgId` int(11) NOT NULL,
@@ -11,12 +160,123 @@ CREATE TABLE `configurations` (
   PRIMARY KEY (`id`),
   KEY `orgId_idx` (`orgId`),
   KEY `mtID_idx` (`messageTypeId`),
+  CONSTRAINT `mtid` FOREIGN KEY (`messageTypeId`) REFERENCES `messageTypes` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `orgId` FOREIGN KEY (`orgId`) REFERENCES `organizations` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
+--
+-- Dumping data for table `configurations`
+--
 
+LOCK TABLES `configurations` WRITE;
+/*!40000 ALTER TABLE `configurations` DISABLE KEYS */;
+INSERT INTO `configurations` VALUES (13,1,'configuration one','',1,1);
+/*!40000 ALTER TABLE `configurations` ENABLE KEYS */;
+UNLOCK TABLES;
 
+--
+-- Table structure for table `messageTypeCrosswalks`
+--
 
+DROP TABLE IF EXISTS `messageTypeCrosswalks`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `messageTypeCrosswalks` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(45) NOT NULL,
+  `fileDelimiter` int(11) NOT NULL,
+  `fileName` varchar(45) NOT NULL,
+  `dateCreated` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `delimId_idx` (`fileDelimiter`),
+  CONSTRAINT `delimId` FOREIGN KEY (`fileDelimiter`) REFERENCES `ref_delimiters` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `messageTypeCrosswalks`
+--
+
+LOCK TABLES `messageTypeCrosswalks` WRITE;
+/*!40000 ALTER TABLE `messageTypeCrosswalks` DISABLE KEYS */;
+/*!40000 ALTER TABLE `messageTypeCrosswalks` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `messageTypeFormFields`
+--
+
+DROP TABLE IF EXISTS `messageTypeFormFields`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `messageTypeFormFields` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `messageTypeId` int(11) NOT NULL,
+  `fieldNo` int(11) NOT NULL,
+  `fieldDesc` varchar(255) DEFAULT NULL,
+  `fieldLabel` varchar(500) NOT NULL COMMENT 'This field will be used as the field label when displaying on the form.',
+  `validationType` int(11) DEFAULT NULL,
+  `required` bit(1) NOT NULL DEFAULT b'0',
+  `saveToTableName` int(11) NOT NULL,
+  `saveToTableCol` int(11) NOT NULL,
+  `bucketNo` varchar(45) NOT NULL,
+  `bucketDspPos` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `messageTypeId_idx` (`messageTypeId`),
+  KEY `refTableId_idx` (`saveToTableName`),
+  KEY `refTableColId_idx` (`saveToTableCol`),
+  KEY `refValidationId_idx` (`validationType`),
+  CONSTRAINT `refValidationId` FOREIGN KEY (`validationType`) REFERENCES `ref_validationTypes` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `messageTypeId` FOREIGN KEY (`messageTypeId`) REFERENCES `messageTypes` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `refTableColId` FOREIGN KEY (`saveToTableCol`) REFERENCES `ref_tableColumns` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `refTableId` FOREIGN KEY (`saveToTableName`) REFERENCES `ref_tables` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `messageTypeFormFields`
+--
+
+LOCK TABLES `messageTypeFormFields` WRITE;
+/*!40000 ALTER TABLE `messageTypeFormFields` DISABLE KEYS */;
+/*!40000 ALTER TABLE `messageTypeFormFields` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `messageTypes`
+--
+
+DROP TABLE IF EXISTS `messageTypes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `messageTypes` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `status` bit(1) NOT NULL DEFAULT b'0',
+  `dateCreated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `name` varchar(255) NOT NULL,
+  `templateFile` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `messageTypes`
+--
+
+LOCK TABLES `messageTypes` WRITE;
+/*!40000 ALTER TABLE `messageTypes` DISABLE KEYS */;
+INSERT INTO `messageTypes` VALUES (1,'','2013-09-25 13:11:46','Weight Loss','weightloss');
+/*!40000 ALTER TABLE `messageTypes` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `organizations`
+--
+
+DROP TABLE IF EXISTS `organizations`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `organizations` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `orgName` varchar(255) NOT NULL,
@@ -33,58 +293,377 @@ CREATE TABLE `organizations` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `id_UNIQUE` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
+--
+-- Dumping data for table `organizations`
+--
 
-INSERT INTO `universalTranslator`.`organizations`
-(`id`,`orgName`,'public','status')
-VALUES
-(1,'Universal Translator',0,1);
+LOCK TABLES `organizations` WRITE;
+/*!40000 ALTER TABLE `organizations` DISABLE KEYS */;
+INSERT INTO `organizations` VALUES (1,'Universal Transaltor',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'\0','2013-09-24 10:31:38',''),(2,'org 1',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'','2013-09-24 10:31:38','');
+/*!40000 ALTER TABLE `organizations` ENABLE KEYS */;
+UNLOCK TABLES;
 
+--
+-- Table structure for table `providers`
+--
 
+DROP TABLE IF EXISTS `providers`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `providers` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `orgId` int(11) NOT NULL,
+  `firstName` varchar(45) NOT NULL,
+  `lastName` varchar(45) NOT NULL,
+  `providerId` varchar(45) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `phone` varchar(20) DEFAULT NULL,
+  `fax` varchar(20) DEFAULT NULL,
+  `status` bit(1) NOT NULL DEFAULT b'1' COMMENT '1 = Active\n0 = Inactive',
+  PRIMARY KEY (`id`),
+  KEY `orgId_idx` (`orgId`),
+  CONSTRAINT `providerOrgId` FOREIGN KEY (`orgId`) REFERENCES `organizations` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `providers`
+--
+
+LOCK TABLES `providers` WRITE;
+/*!40000 ALTER TABLE `providers` DISABLE KEYS */;
+/*!40000 ALTER TABLE `providers` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ref_delimiters`
+--
+
+DROP TABLE IF EXISTS `ref_delimiters`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ref_delimiters` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `delimiter` varchar(45) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ref_delimiters`
+--
+
+LOCK TABLES `ref_delimiters` WRITE;
+/*!40000 ALTER TABLE `ref_delimiters` DISABLE KEYS */;
+INSERT INTO `ref_delimiters` VALUES (1,'comma'),(2,'pipe'),(3,'colon'),(4,'doc'),(5,'excel'),(6,'mdb'),(7,'new-line'),(8,'odbc'),(9,'pdf'),(10,'pipe-nl'),(11,'semi-colon'),(12,'tab'),(13,'xls');
+/*!40000 ALTER TABLE `ref_delimiters` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ref_fileTypes`
+--
+
+DROP TABLE IF EXISTS `ref_fileTypes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ref_fileTypes` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `fileType` varchar(45) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ref_fileTypes`
+--
+
+LOCK TABLES `ref_fileTypes` WRITE;
+/*!40000 ALTER TABLE `ref_fileTypes` DISABLE KEYS */;
+INSERT INTO `ref_fileTypes` VALUES (1,'txt'),(2,'csv'),(3,'hl7'),(4,'mdb'),(5,'pdf'),(6,'odbc'),(7,'xls'),(8,'xml'),(9,'doc');
+/*!40000 ALTER TABLE `ref_fileTypes` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ref_tableColumns`
+--
+
+DROP TABLE IF EXISTS `ref_tableColumns`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ref_tableColumns` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `tableId` int(11) NOT NULL,
+  `colName` varchar(45) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `tableId_idx` (`tableId`),
+  CONSTRAINT `tableId` FOREIGN KEY (`tableId`) REFERENCES `ref_tables` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ref_tableColumns`
+--
+
+LOCK TABLES `ref_tableColumns` WRITE;
+/*!40000 ALTER TABLE `ref_tableColumns` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ref_tableColumns` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ref_tables`
+--
+
+DROP TABLE IF EXISTS `ref_tables`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ref_tables` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `tableName` varchar(45) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ref_tables`
+--
+
+LOCK TABLES `ref_tables` WRITE;
+/*!40000 ALTER TABLE `ref_tables` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ref_tables` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ref_validationTypes`
+--
+
+DROP TABLE IF EXISTS `ref_validationTypes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ref_validationTypes` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `validationType` varchar(45) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ref_validationTypes`
+--
+
+LOCK TABLES `ref_validationTypes` WRITE;
+/*!40000 ALTER TABLE `ref_validationTypes` DISABLE KEYS */;
+INSERT INTO `ref_validationTypes` VALUES (1,'Email'),(2,'Phone Number'),(3,'Date'),(4,'Numeric'),(5,'URL');
+/*!40000 ALTER TABLE `ref_validationTypes` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `rel_TransportFTPDetails`
+--
+
+DROP TABLE IF EXISTS `rel_TransportFTPDetails`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `rel_TransportFTPDetails` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `transportId` int(11) NOT NULL,
+  `IP` varchar(45) NOT NULL,
+  `directory` varchar(255) NOT NULL,
+  `usename` varchar(45) NOT NULL,
+  `password` varchar(45) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `transportId_idx` (`transportId`),
+  CONSTRAINT `transportId` FOREIGN KEY (`transportId`) REFERENCES `configurationTransportDetails` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `rel_TransportFTPDetails`
+--
+
+LOCK TABLES `rel_TransportFTPDetails` WRITE;
+/*!40000 ALTER TABLE `rel_TransportFTPDetails` DISABLE KEYS */;
+/*!40000 ALTER TABLE `rel_TransportFTPDetails` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `rel_messageTypeCrosswalks`
+--
+
+DROP TABLE IF EXISTS `rel_messageTypeCrosswalks`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `rel_messageTypeCrosswalks` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `messageTypeId` int(11) NOT NULL,
+  `crosswalkId` int(11) NOT NULL,
+  `processOrder` int(11) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id`),
+  KEY `messageTypeId_idx` (`messageTypeId`),
+  KEY `cwId_idx` (`crosswalkId`),
+  CONSTRAINT `msgTypeId` FOREIGN KEY (`messageTypeId`) REFERENCES `messageTypes` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `cwId` FOREIGN KEY (`crosswalkId`) REFERENCES `messageTypeCrosswalks` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `rel_messageTypeCrosswalks`
+--
+
+LOCK TABLES `rel_messageTypeCrosswalks` WRITE;
+/*!40000 ALTER TABLE `rel_messageTypeCrosswalks` DISABLE KEYS */;
+/*!40000 ALTER TABLE `rel_messageTypeCrosswalks` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `rel_transportJSONDetails`
+--
+
+DROP TABLE IF EXISTS `rel_transportJSONDetails`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `rel_transportJSONDetails` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `transportId` int(11) NOT NULL,
+  `url` varchar(255) NOT NULL,
+  `identifier` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `trnsid_idx` (`transportId`),
+  CONSTRAINT `trnsid` FOREIGN KEY (`transportId`) REFERENCES `configurationTransportDetails` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `rel_transportJSONDetails`
+--
+
+LOCK TABLES `rel_transportJSONDetails` WRITE;
+/*!40000 ALTER TABLE `rel_transportJSONDetails` DISABLE KEYS */;
+/*!40000 ALTER TABLE `rel_transportJSONDetails` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `rel_userSiteFeatures`
+--
+
+DROP TABLE IF EXISTS `rel_userSiteFeatures`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `rel_userSiteFeatures` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `userId` int(11) NOT NULL,
+  `featureId` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `userFeatureuserId_idx` (`userId`),
+  KEY `userFeatureId_idx` (`featureId`),
+  CONSTRAINT `userFeatureuserId` FOREIGN KEY (`userId`) REFERENCES `users` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `userFeatureId` FOREIGN KEY (`featureId`) REFERENCES `utSiteFeatures` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `rel_userSiteFeatures`
+--
+
+LOCK TABLES `rel_userSiteFeatures` WRITE;
+/*!40000 ALTER TABLE `rel_userSiteFeatures` DISABLE KEYS */;
+/*!40000 ALTER TABLE `rel_userSiteFeatures` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `userRoles`
+--
+
+DROP TABLE IF EXISTS `userRoles`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `userRoles` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `role` varchar(45) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-INSERT INTO `universalTranslator`.`userRoles`
-(`id`,`role`)
-VALUES
-(1,'ROLE_ADMIN'),
-(2,'ROLE_USER');
+--
+-- Dumping data for table `userRoles`
+--
 
+LOCK TABLES `userRoles` WRITE;
+/*!40000 ALTER TABLE `userRoles` DISABLE KEYS */;
+INSERT INTO `userRoles` VALUES (1,'ROLE_ADMIN'),(2,'ROLE_USER');
+/*!40000 ALTER TABLE `userRoles` ENABLE KEYS */;
+UNLOCK TABLES;
 
+--
+-- Table structure for table `users`
+--
+
+DROP TABLE IF EXISTS `users`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `status` bit(1) NOT NULL DEFAULT b'1',
-  `orgId` int(11) NOT NULL DEFAULT '0',
+  `orgId` int(11) NOT NULL DEFAULT '1',
   `firstName` varchar(55) NOT NULL,
   `lastName` varchar(55) NOT NULL,
   `username` varchar(15) NOT NULL,
   `password` varchar(15) DEFAULT NULL,
   `roleId` int(11) NOT NULL DEFAULT '2',
+  `mainContact` smallint(6) NOT NULL DEFAULT '0' COMMENT '0 = Not a Main Contact\n1 = Primary Contact\n2 = Secondary Contact',
+  `sendEmailAlert` bit(1) NOT NULL DEFAULT b'0' COMMENT '0 = No Email Alerts\n1 = Send Email Alerts',
+  `dateCreated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `email` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `id_UNIQUE` (`id`)
+  KEY `userOrgId_idx` (`orgId`),
+  KEY `userRoleId_idx` (`roleId`),
+  CONSTRAINT `usersOrgId` FOREIGN KEY (`orgId`) REFERENCES `organizations` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `userRoleId` FOREIGN KEY (`roleId`) REFERENCES `userRoles` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
-INSERT INTO `universalTranslator`.`users`
-(`id`,
-`active`,
-`orgId`,
-`firstName`,
-`lastName`,
-`username`,
-`password`,
-`roleId`)
-VALUES
-(1,
-1,
-1,
-'admin',
-'admin',
-'admin',
-'!admin!',
-1);
+--
+-- Dumping data for table `users`
+--
 
+LOCK TABLES `users` WRITE;
+/*!40000 ALTER TABLE `users` DISABLE KEYS */;
+INSERT INTO `users` VALUES (1,'',1,'admin','admin','admin','!admin!',1,0,'\0','2013-09-24 10:56:34',NULL);
+/*!40000 ALTER TABLE `users` ENABLE KEYS */;
+UNLOCK TABLES;
 
+--
+-- Table structure for table `utSiteFeatures`
+--
 
+DROP TABLE IF EXISTS `utSiteFeatures`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `utSiteFeatures` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `featureName` varchar(45) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `utSiteFeatures`
+--
+
+LOCK TABLES `utSiteFeatures` WRITE;
+/*!40000 ALTER TABLE `utSiteFeatures` DISABLE KEYS */;
+INSERT INTO `utSiteFeatures` VALUES (1,'Health-e-Net'),(2,'Health-e-Data'),(3,'Health-e-Web'),(4,'Health-e-Connect');
+/*!40000 ALTER TABLE `utSiteFeatures` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2013-09-26  9:50:28
