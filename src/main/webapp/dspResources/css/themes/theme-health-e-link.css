@@ -92,6 +92,9 @@ h3 {
   background-repeat: no-repeat;
   background-position: right 8px;
 }
+.secondary-nav .nav li.disabled  a {
+  color: #cccccc;
+}
 .primary-nav {
   border: 0;
   background-color: rgba(0, 0, 0, 0.4);
@@ -175,6 +178,9 @@ h3 {
 }
 .login .login-header {
   background-color: #666;
+}
+.table-default {
+  border-bottom: 1px solid #efefef;
 }
 body#login {
   background-color: #efefef;

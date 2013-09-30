@@ -1,0 +1,3 @@
+ALTER TABLE `universalTranslator`.`organizations` 
+ADD COLUMN `cleanURL` VARCHAR(255) NOT NULL AFTER `status`;
+

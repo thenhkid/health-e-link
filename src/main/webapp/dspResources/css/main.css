@@ -5980,6 +5980,13 @@ body {
 .main .panel-body:after {
   content: none;
 }
+.contain {
+  /*
+	max-width:1170px;
+	margin:auto;
+	*/
+
+}
 .form-group .half {
   width: 50%;
 }
@@ -6085,6 +6092,10 @@ body {
   bottom: -2px;
   margin-left: -10px;
   left: 50%;
+  display: none;
+}
+.primary-nav li.active .indicator-active {
+  display: block;
 }
 .primary-nav .logo {
   margin-top: -16px;
@@ -6175,10 +6186,12 @@ body {
   text-align: center;
   margin-top: 10px;
 }
-.login-container .login-error {
-  text-align: center;
-  margin-top: 10px;
-  color:red
+.actions-col {
+  text-align: right;
+}
+.table td ul {
+  margin-left: 0;
+  padding-left: 20px;
 }
 .filler:after {
   background-color: inherit;
@@ -6203,4 +6216,10 @@ body {
   overflow: hidden;
   height: 1%;
   zoom: 1;
+}
+.center-text {
+  text-align: center;
+}
+.half {
+  width: 50%;
 }

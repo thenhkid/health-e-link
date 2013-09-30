@@ -176,6 +176,9 @@ h3 {
 .login .login-header {
   background-color: #666;
 }
+.table-default {
+  border-bottom: 1px solid #efefef;
+}
 body#login {
   background-color: #efefef;
 }

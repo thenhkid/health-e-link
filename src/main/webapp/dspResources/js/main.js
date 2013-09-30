@@ -3,7 +3,7 @@ require.config({
 	paths: {
 		'jquery' : 'vendor/jquery-1.10.1.min',
 		'bootstrap' : 'vendor/bootstrap.min',
-		'responsive-tables' : 'vendor/responsive-tables',
+		'responsive-tables' : 'vendor/responsive-tables'
 	},
 	shim: {
 		'bootstrap': ['jquery'],
@@ -11,6 +11,6 @@ require.config({
 	}
 });
 
-require(['jquery','bootstrap', 'responsive-tables'], function () {
-	//console.log('scripts loaded');
+require(['jquery', 'bootstrap', 'responsive-tables'], function () {
+
 });
