@@ -5,10 +5,19 @@
 			<h1 class="section-title navbar-brand">
 				<c:choose>
 					<c:when test="${param['page'] == 'listOrgs'}">
-						<a href="javascript:void(0);" title="Organization List" class="unstyled-link">Organization List</a>
+						<a href="javascript:void(0);" title="Organization List" class="unstyled-link">Organizations</a>
 					</c:when>
 					<c:when test="${param['page'] == 'orgDetails'}">
-						<a href="javascript:void(0);" title="Organization Details" class="unstyled-link">Organization Details</a>
+						<a href="javascript:void(0);" title="Organization Details" class="unstyled-link">
+							<c:choose>
+								<c:when test="${not empty id}">
+									Organization Details
+								</c:when>
+								<c:otherwise>
+									Create New Organization
+								</c:otherwise>
+							</c:choose>
+						</a>
 					</c:when>
 				</c:choose>
 			</h1>
@@ -21,6 +30,9 @@
 					<c:if test="${not empty id}"><li><a href="" title="Delete"><span class="glyphicon glyphicon-remove icon-stacked"></span>Delete</a></li></c:if>
 					<li><a href="<c:url value='/administrator/organizations/list' />" title="Cancel"><span class="glyphicon icon-stacked custom-icon icon-cancel"></span>Cancel</a></li>
 				</c:when>
+				<c:otherwise>
+					<li><a href="create" title="Create New Organization"><span class="glyphicon icon-stacked glyphicon glyphicon-plus"></span>Create New</a></li>
+				</c:otherwise>
 			</c:choose>
 		</ul>
 	</div>

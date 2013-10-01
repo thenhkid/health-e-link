@@ -161,6 +161,8 @@ public class Organization {
 	  public void setcleanURL(String cleanURL) {
 		  this.cleanURL = cleanURL;
 	  }
+	  
+	
 	 
 
 }

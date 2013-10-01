@@ -40,7 +40,7 @@
 <tiles:insertAttribute name="header" />
 <tiles:insertAttribute name="actions" />
 <div class="container-fluid">
-	<div class="row-fluid">
+	<div class="row-fluid contain">
 		<tiles:insertAttribute name="menu" />
 		<tiles:insertAttribute name="body" />
 	</div>

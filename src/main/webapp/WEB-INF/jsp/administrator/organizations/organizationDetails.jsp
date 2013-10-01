@@ -1,22 +1,25 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %> 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+
 <div class="main clearfix" role="main">
 
-	<div class="col-md-6">
-		<section class="panel panel-default">
-			<c:if test="${saved == 'success'}">
-				<p class="success">User Updated Successfully</p>
-			</c:if>
-			<div class="panel-heading">
-				<h3 class="panel-title">Details</h3>
-			</div>
-			<div class="panel-body">
-				<div class="form-container">
-					<form:form commandName="organization"  method="post" role="form">
-						<input type="hidden" id="action" name="action" value="save" />
-						<form:hidden path="id" id="orgId" />
-						<form:hidden path="cleanURL" id="cleanURL" />
+	<div class="col-md-12">
+	
+		<form:form commandName="organization"  method="post" role="form">
+			<input type="hidden" id="action" name="action" value="save" />
+			<form:hidden path="id" id="orgId" />
+			<form:hidden path="cleanURL" id="cleanURL" />
+			
+			<div class="panel panel-default">
+				<c:if test="${saved == 'success'}">
+					<p class="success">User Updated Successfully</p>
+				</c:if>
+				<div class="panel-heading">
+					<h3 class="panel-title">Details</h3>
+				</div>
+				<div class="panel-body">
+					<div class="form-container">
 						<div class="form-group">
 							<label>Status</label>
 							<div>
@@ -91,12 +94,11 @@
 							<label for="fieldB">Fax</label>
 							<form:input path="fax" class="form-control" type="text" />
 						</div>
-					</form:form>
+					</div>
 				</div>
 			</div>
-		</section>
+		</form:form>
 	</div>
-	
 </div>
 
 

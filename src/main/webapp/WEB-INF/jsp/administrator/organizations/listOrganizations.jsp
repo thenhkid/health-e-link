@@ -1,28 +1,28 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@ taglib prefix="s" uri="http://www.springframework.org/tags" %>
 
 
 <div class="main clearfix" role="main">
 	<div class="col-md-12">
 		<section class="panel panel-default">
-			<div class="panel-heading">
-				<h3 class="panel-title">Organizations</h3>
-			</div>
 			<div class="panel-body">
 				<div style="overflow:hidden; margin-bottom:10px;">
-					<div class="form form-search pull-left">
-						<form:form id="searchForm" action="/administrator/organizations/list" method="post">
-							<input type="text" name="searchTerm" id="searchTerm" value="${searchTerm}" class="form-control" placeholder="Search"/>
-						</form:form>
-					</div>
-					<button class="btn btn-primary btn-sm pull-right">
-						<span class="glyphicon glyphicon-plus"></span>
-					</button>
+				
+					<form:form class="form form-inline" action="/administrator/organizations/list" method="post">
+						<div class="form-group">
+							<label class="sr-only" for="search-organizations">Search</label>
+							<input type="text" name="searchTerm" id="searchTerm" value="${searchTerm}" class="form-control" id="search-organizations" placeholder="Search"/>
+						</div>
+						<button id="searchOrgBtn" class="btn btn-primary btn-sm">
+							<span class="glyphicon glyphicon-search"></span>
+						</button>
+					</form:form>
 				</div>
 
 				<div class="form-container scrollable">
-					<table class="table table-striped table-hover">
+					<table class="table table-striped table-hover table-default">
 						<thead>
 							<tr>
 								<th>Organization Name</th>
@@ -31,6 +31,7 @@
 								<th># of Configurations</th>
 								<th>Date Created</th>
 								<th>Access Level</th>
+								<th></th>
 							</tr>
 						</thead>
 						<tbody>
@@ -43,8 +44,12 @@
 												${org.address} <c:if test="not empty ${org.address2}">${org.address2}</c:if>
 												<br />${org.city} ${org.state}, ${org.postalCode}
 											</td>
-											<td>1</td>
-											<td>2</td>
+											<td>
+												#########
+											</td>
+											<td>
+												#########
+											</td>
 											<td><fmt:formatDate value="${org.dateCreated}" type="date" pattern="M/dd/yyyy" /></td>
 											<td>
 												<c:choose>
@@ -55,6 +60,12 @@
 														Private
 													</c:otherwise>
 												</c:choose>
+											</td>
+											<td class="actions-col">
+												<a href="javascript:void(0);" class="btn btn-default">
+													<span class="glyphicon glyphicon-edit"></span>
+													Edit
+												</a>
 											</td>
 										</tr>
 									</c:forEach>
@@ -76,7 +87,7 @@
 		cache:false
 	});
 
-	var searchTimeout;
+	//var searchTimeout;
 
 	jQuery(document).ready(function($) {		
 	    $("input:text,form").attr("autocomplete","off");
@@ -85,22 +96,22 @@
 			window.location.href= $(this).attr('rel')+'/';
 		});
 
-		$(document).on('click','.glyphicon-plus',function() {
-			window.location.href="create";	
+		$('#searchOrgBtn').click(function() {
+			$('#searchForm').submit();
 		});
 
-		$("#searchTerm").keyup(function(event) {
+		/*$("#searchTerm").keyup(function(event) {
 			var term = $(this).val();
 
 			if(term.length >= 3 || term.length == 0) {
 				if(searchTimeout) {clearTimeout(searchTimeout);}
 				searchTimeout = setInterval("orglookup()",500);
 			}
-		});
+		});*/
 		
 	});
 
-	function orglookup() {
+	/*function orglookup() {
 		if(searchTimeout) {clearTimeout(searchTimeout);}
 
 		var term = $('#searchTerm').val().toLowerCase();
@@ -108,7 +119,7 @@
 		if(term.length >= 3 || term.length == 0) {
 			$('#searchForm').submit();
 		}
-	}
+	}*/
 
 	
 </script>

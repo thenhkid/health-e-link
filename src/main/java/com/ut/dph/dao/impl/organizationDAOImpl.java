@@ -72,5 +72,18 @@ public class organizationDAOImpl implements organizationDAO {
 	    List<Organization> organizationList = query.list(); 
 	    return organizationList;	
 	}
+	
+	@Override
+	@SuppressWarnings("unchecked")
+	public Integer findTotalUsers(int orgId) {
+		
+		Query q = sessionFactory.getCurrentSession().createQuery("select count(*) from users where orgId = :orgId");
+		q.setParameter("orgId", orgId);
+		
+		Integer totalUsers = ((Integer) q.iterate().next()).intValue();
+		
+		return totalUsers;
+		
+	}
 
 }

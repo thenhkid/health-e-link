@@ -17,5 +17,7 @@ public interface organizationDAO {
 	List<Organization> findOrganizations(String searchTerm);
 	  
 	List<Organization> getOrganizations(int firstResults, int maxResults);
+	
+	Integer findTotalUsers(int orgId);
 
 }

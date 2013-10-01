@@ -53,5 +53,11 @@ public class organizationManagerImpl implements organizationManager{
 	public List<Organization> getOrganizations(int firstResults, int maxResults) {
 	  return organizationDAO.getOrganizations(firstResults, maxResults);
 	}
+	
+	@Override
+	@Transactional
+	public Integer findTotalUsers(int orgId) {
+	  return organizationDAO.findTotalUsers(orgId);
+	}
 
 }

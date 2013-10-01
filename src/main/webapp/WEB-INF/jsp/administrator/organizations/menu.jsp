@@ -5,12 +5,13 @@
 			<li>
 				<c:choose>
 					<c:when test="${param['page'] == 'details'}">
+						<a href="<c:url value='/administrator/organizations/list' />">All Organizations</a>
 						<c:choose>
 							<c:when test="${id > 0}">
 								<a href="">Edit Organization</a>
 							</c:when>
 							<c:otherwise>
-								<a href="">New Organization</a>
+								<a href="">Create New</a>
 							</c:otherwise>
 						</c:choose>
 						<ul class="nav nav-pills nav-stacked">
@@ -22,10 +23,8 @@
 					</c:when>
 					<c:otherwise>
 						<ul class="nav nav-pills nav-stacked">
-							<li class="active"><a href="<c:url value='/administrator/organizations/list' />" title="Organizations">Organizations</a></li>
-							<li><a href="<c:url value='/administrator/configurations/list' />" title="Configurations">Configurations</a></li>
-							<li><a href="<c:url value='/administrator/library/list' />" title="Message Type Library">Library</a></li>
-							<li><a href="<c:url value='/administrator/scheduler' />" title="Scheduler">Scheduler</a></li>
+							<li class="active"><a href="<c:url value='/administrator/organizations/list' />" title="Organizations">All Organizations</a></li>
+							<li><a href="<c:url value='/administrator/organizations/create' />" title="Configurations">Create New</a></li>
 						</ul>
 					</c:otherwise>
 				</c:choose>
