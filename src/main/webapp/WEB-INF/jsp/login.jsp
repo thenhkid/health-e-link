@@ -42,16 +42,20 @@
 				<div class="login-header-content"><span class="logo" alt="{Company Name Logo}"></span></div>
 			</header>
 			<form role="form" name='f' action="<c:url value='j_spring_security_check' />" method='POST'>
-				<div class="form-group">
-					<label for="username">Username</label>
-					<input id="username" name='j_username' class="form-control" type="text" />
-				</div>
-				<div class="form-group">
-					<label for="passwrod">Password</label>
-					<input id="password" name='j_password' class="form-control" type="password" />
-				</div>
+				<spring:bind path="username">
+					<div class="form-group ${not empty error ? 'has-error' : '' }">
+						<label class="control-label" for="Username">Username</label>
+						<input id="username" name='j_username' class="form-control" type="text" />
+					</div>
+				</spring:bind>
+				<spring:bind path="username">
+					<div class="form-group ${not empty error ? 'has-error' : '' }">
+						<label class="control-label" for="Password">Password</label>
+						<input id="password" name='j_password' class="form-control" type="password" />
+					</div>
+				</spring:bind>
 				<input type="submit" value="Login" class="btn btn-primary pull-right"/>
-				<label for="remember-me" class="pull-left"><input type="checkbox" id="remember-me" value="1">&nbsp;Remember Me</label>
+				<!--<label for="remember-me" class="pull-left"><input id="j_remember" name="_spring_security_remember_me" type="checkbox" value="1">&nbsp;Remember Me</label>-->
 			</form>
 		</div>
 		<p class="login-note"><a href="" title="">Forgot Password</a></p>

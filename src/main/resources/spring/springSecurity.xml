@@ -33,8 +33,7 @@
 		/>
         </authentication-provider>
     </authentication-manager>
-    
-	 
+     
 	<beans:bean class="com.ut.dph.security.CustomAuthenticationHandler" id="authenticationSuccessRedirecthandler"></beans:bean>
     
     

@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ut.dph.dao.organizationDAO;
 import com.ut.dph.model.Organization;
 import com.ut.dph.service.organizationManager;
+import com.ut.dph.model.User;
 
 @Service
 public class organizationManagerImpl implements organizationManager{
@@ -56,8 +57,14 @@ public class organizationManagerImpl implements organizationManager{
 	
 	@Override
 	@Transactional
-	public Integer findTotalUsers(int orgId) {
+	public Long findTotalUsers(int orgId) {
 	  return organizationDAO.findTotalUsers(orgId);
+	}
+	
+	@Override
+	@Transactional
+	public List<User> getOrganizationUsers(int orgId) {
+		return organizationDAO.getOrganizationUsers(orgId);
 	}
 
 }

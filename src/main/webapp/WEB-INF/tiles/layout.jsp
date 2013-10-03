@@ -37,15 +37,17 @@
  	<p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
 <![endif]-->
 <div class="wrap">
-<tiles:insertAttribute name="header" />
-<tiles:insertAttribute name="actions" />
-<div class="container-fluid">
-	<div class="row-fluid contain">
-		<tiles:insertAttribute name="menu" />
-		<tiles:insertAttribute name="body" />
+	<tiles:insertAttribute name="header" />
+	<div>
+		<tiles:insertAttribute name="actions" />
+		<div class="container-fluid">
+			<div class="row-fluid contain">
+				<tiles:insertAttribute name="menu" />
+				<tiles:insertAttribute name="body" />
+			</div>
+		</div>
+		<tiles:insertAttribute name="footer" />
 	</div>
-</div>
-<tiles:insertAttribute name="footer" />
 </div>
 
 </body>

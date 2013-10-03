@@ -1,3 +1,16 @@
 ALTER TABLE `universalTranslator`.`organizations` 
 ADD COLUMN `cleanURL` VARCHAR(255) NOT NULL AFTER `status`;
 
+
+CREATE TABLE `universalTranslator`.`rel_userLogins` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `userId` INT NOT NULL,
+  `dateCreated` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  INDEX `userId_idx` (`userId` ASC),
+  CONSTRAINT `userId`
+    FOREIGN KEY (`userId`)
+    REFERENCES `universalTranslator`.`users` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+

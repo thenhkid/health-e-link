@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.ut.dph.dao.organizationDAO;
 import com.ut.dph.model.Organization;
+import com.ut.dph.model.User;
 
 @Service
 public class organizationDAOImpl implements organizationDAO {
@@ -74,15 +75,26 @@ public class organizationDAOImpl implements organizationDAO {
 	}
 	
 	@Override
-	@SuppressWarnings("unchecked")
-	public Integer findTotalUsers(int orgId) {
+	public Long findTotalUsers(int orgId) {
 		
-		Query q = sessionFactory.getCurrentSession().createQuery("select count(*) from users where orgId = :orgId");
-		q.setParameter("orgId", orgId);
+		Query query = sessionFactory.getCurrentSession().createQuery("select count(*) as totalUsers from User where orgId = :orgId");
+		query.setParameter("orgId", orgId);
 		
-		Integer totalUsers = ((Integer) q.iterate().next()).intValue();
+		Long totalUsers = (Long) query.uniqueResult();
 		
 		return totalUsers;
+		
+	}
+	
+	
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<User>  getOrganizationUsers(int orgId) {
+		
+		Query query = sessionFactory.getCurrentSession().createQuery("from User where orgId = :orgId order by lastName asc");
+		query.setParameter("orgId", orgId);
+		
+		return query.list();
 		
 	}
 

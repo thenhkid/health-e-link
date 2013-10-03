@@ -3,6 +3,7 @@ package com.ut.dph.service;
 import java.util.List;
 
 import com.ut.dph.model.Organization;
+import com.ut.dph.model.User;
 
 public interface organizationManager {
 	
@@ -18,7 +19,9 @@ public interface organizationManager {
   
   List<Organization> getOrganizations(int firstResults, int maxResults);
   
-  Integer findTotalUsers(int orgId);
+  Long findTotalUsers(int orgId);
+  
+  List<User> getOrganizationUsers(int orgId);
 
 }
 

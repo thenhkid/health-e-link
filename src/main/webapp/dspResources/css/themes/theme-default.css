@@ -92,6 +92,18 @@ h3 {
   background-repeat: no-repeat;
   background-position: right 8px;
 }
+.secondary-nav .nav .badge {
+  background-color: #333333;
+}
+.secondary-nav .nav .disabled a {
+  color: #999999;
+}
+.secondary-nav .nav .disabled .badge {
+  background-color: #cccccc;
+}
+.secondary-nav .nav .complete .badge {
+  background-color: #009900;
+}
 .primary-nav {
   border: 0;
   background-color: #666666;

@@ -9,9 +9,28 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 
+/**
+ * The adminController class will handle administrator page requests that
+ * fall outside specific sections.
+ * 
+ * 
+ * @author chadmccue
+ *
+ */
+
 @Controller
 public class adminController {
 	
+	
+	/**
+	 * The '/administrator' request will serve up the administrator dashboard
+	 * after a successful login.
+	 * 
+	 * @param request
+	 * @param response
+	 * @return				the administrator dashboard view
+	 * @throws Exception
+	 */
 	@RequestMapping(value="/administrator", method = RequestMethod.GET)
 	public ModelAndView listConfigurations(HttpServletRequest request,
 			HttpServletResponse response) throws Exception {

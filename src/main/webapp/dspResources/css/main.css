@@ -5980,6 +5980,9 @@ body {
 .main .panel-body:after {
   content: none;
 }
+.main.full-width {
+  margin-left: 0;
+}
 .contain {
   /*
 	max-width:1170px;
@@ -5994,6 +5997,10 @@ body {
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
+}
+.table-actions {
+  overflow: hidden;
+  margin-bottom: 10px;
 }
 .scrollable {
   overflow: auto;
@@ -6082,6 +6089,25 @@ body {
   right: -2px;
   top: 50%;
   margin-top: -10px;
+}
+.secondary-nav .nav-steps .badge {
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  vertical-align: middle;
+  line-height: 100%;
+  margin-right: 5px;
+  font-size: 12px;
+  padding-top: 4px;
+  text-align: center;
+}
+.secondary-nav .nav-steps .badge-icon {
+  padding-top: 3px;
+  padding-left: 4px;
+}
+.secondary-nav .nav-steps .badge:empty {
+  display: inline-block;
+  vertical-align: middle;
 }
 .primary-nav {
   margin-bottom: 0;

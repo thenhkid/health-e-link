@@ -6,10 +6,17 @@
     <listener>
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
     </listener>
+    
     <context-param>
         <param-name>contextConfigLocation</param-name>
         <param-value>classpath:/spring/applicationContext.xml, classpath:/spring/hibernateContext.xml, classpath:/spring/springSecurity.xml</param-value>
     </context-param>
+    
+    <context-param>
+    	<param-name>defaultHtmlEscape</param-name>
+    	<param-value>true</param-value>
+	</context-param>
+    
 
     <servlet>
         <servlet-name>appServlet</servlet-name>
@@ -21,12 +28,21 @@
         <load-on-startup>1</load-on-startup>
     </servlet>
     
-
     <servlet-mapping>
         <servlet-name>appServlet</servlet-name>
         <url-pattern>/</url-pattern>
     </servlet-mapping>
     
+   <error-page>
+		<error-code>404</error-code>
+		<location>/WEB-INF/jsp/404.jsp</location>
+   </error-page>
+   
+   <error-page>
+		<error-code>403</error-code>
+		<location>/WEB-INF/jsp/403.jsp</location>
+   </error-page>
+   
     
     <!-- Spring Security -->
     <filter>

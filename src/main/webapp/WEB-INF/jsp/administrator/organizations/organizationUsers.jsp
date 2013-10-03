@@ -4,15 +4,18 @@
 <%@ taglib prefix="s" uri="http://www.springframework.org/tags" %>
 
 
-<div class="main clearfix full-width" role="main">
+<div class="main clearfix" role="main">
 	<div class="col-md-12">
 		<section class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">System Users</h3>
+			</div>
 			<div class="panel-body">
 				<div class="table-actions">
-					<form:form class="form form-inline" action="/administrator/organizations/list" method="post">
+					<form:form class="form form-inline" method="post">
 						<div class="form-group">
 							<label class="sr-only" for="search-organizations">Search</label>
-							<input type="text" name="searchTerm" id="searchTerm" value="${searchTerm}" class="form-control" id="search-organizations" placeholder="Search"/>
+							<input type="text" name="searchTerm" id="searchTerm" value="${searchTerm}" class="form-control" id="search-users" placeholder="Search"/>
 						</div>
 						<button id="searchOrgBtn" class="btn btn-primary btn-sm">
 							<span class="glyphicon glyphicon-search"></span>
@@ -24,42 +27,28 @@
 					<table class="table table-striped table-hover table-default">
 						<thead>
 							<tr>
-								<th>Organization Name</th>
-								<th>Contact Information</th>
-								<th># of Users</th>
-								<th># of Configurations</th>
-								<th>Date Created</th>
-								<th>Access Level</th>
+								<th>Name</th>
+								<th>Created</th>
+								<th>Primary</th>
+								<th>Secondary</th>
+								<th>Times Logged In</th>
 								<th></th>
 							</tr>
 						</thead>
 						<tbody>
 							<c:choose>
-								  <c:when test="${not empty organizationList}">
-								    <c:forEach var="org" items="${organizationList}">
-										<tr id="orgRow" rel="${org.cleanURL}" style="cursor: pointer">
-											<td>${org.orgName}</td>
+								  <c:when test="${not empty userList}">
+								    <c:forEach var="user" items="${userList}">
+										<tr id="userRow" rel="${user.firstName}${user.lastName}?i=${user.id}" style="cursor: pointer">
+											<td>${user.firstName} ${user.lastName}<br />(<c:choose><c:when test="${user.status == true}">active</c:when><c:otherwise>inactive</c:otherwise></c:choose>)</td>
+											<td><fmt:formatDate value="${user.dateCreated}" type="date" pattern="M/dd/yyyy" /></td>
 											<td>
-												${org.address} <c:if test="not empty ${org.address2}">${org.address2}</c:if>
-												<br />${org.city} ${org.state}, ${org.postalCode}
+												
 											</td>
 											<td>
-												${orgFunctions.findTotalUsers(org.id)}
+												
 											</td>
-											<td>
-												#########
-											</td>
-											<td><fmt:formatDate value="${org.dateCreated}" type="date" pattern="M/dd/yyyy" /></td>
-											<td>
-												<c:choose>
-													<c:when test="${org.publicOrg} == 0">
-														Public
-													</c:when>
-													<c:otherwise>
-														Private
-													</c:otherwise>
-												</c:choose>
-											</td>
+											<td>${userFunctions.findTotalLogins(user.id)}</td>
 											<td class="actions-col">
 												<a href="javascript:void(0);" class="btn btn-link">
 													<span class="glyphicon glyphicon-edit"></span>
@@ -70,7 +59,7 @@
 									</c:forEach>
 								  </c:when>
 								  <c:otherwise>
-								   	<tr><td colspan="4" style="text-align: center">There are currently no organizations set up.</td></tr>
+								   	<tr><td colspan="4" style="text-align: center">There are currently no organization users set up.</td></tr>
 								  </c:otherwise>
 							</c:choose>
 						</tbody>
@@ -91,7 +80,7 @@
 	jQuery(document).ready(function($) {		
 	    $("input:text,form").attr("autocomplete","off");
 	
-		$(document).on('click','#orgRow',function() {
+		$(document).on('click','#userRow',function() {
 			window.location.href= $(this).attr('rel')+'/';
 		});
 

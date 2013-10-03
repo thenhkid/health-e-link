@@ -11,13 +11,16 @@
 						<a href="javascript:void(0);" title="Organization Details" class="unstyled-link">
 							<c:choose>
 								<c:when test="${not empty id}">
-									Organization Details
+									Edit Organization
 								</c:when>
 								<c:otherwise>
 									Create New Organization
 								</c:otherwise>
 							</c:choose>
 						</a>
+					</c:when>
+					<c:when test="${param['page'] == 'orgUsers'}">
+						<a href="javascript:void(0);" title="Organization Users" class="unstyled-link">Organization Users</a>
 					</c:when>
 				</c:choose>
 			</h1>
