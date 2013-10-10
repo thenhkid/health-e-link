@@ -7,13 +7,13 @@ import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions; 
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Repository;
 
 import com.ut.dph.dao.organizationDAO;
 import com.ut.dph.model.Organization;
 import com.ut.dph.model.User;
 
-@Service
+@Repository
 public class organizationDAOImpl implements organizationDAO {
 	
 	@Autowired
@@ -63,13 +63,33 @@ public class organizationDAOImpl implements organizationDAO {
 	     return criteria.list();  
 	}
 	
+	@Override
+	@SuppressWarnings("unchecked")
+	public Long findTotalOrgs() {
+		Query query = sessionFactory.getCurrentSession().createQuery("select count(*) as totalOrgs from Organization where cleanURL is not ''");
+		
+		Long totalOrgs = (Long) query.uniqueResult();
+		
+		return totalOrgs;
+	}
+	
 	
 	@Override
 	@SuppressWarnings("unchecked")
-	public List<Organization> getOrganizations(int firstResults, int maxResults) {
+	public List<Organization> getOrganizations(int page, int maxResults) {
 	    Query query = sessionFactory.getCurrentSession().createQuery("from Organization where cleanURL is not '' order by orgName asc");
-	    query.setFirstResult(firstResults);
-	    //query.setMaxResults(maxResults);
+	    
+	    int firstResult = 0;
+		
+		//Set the parameters for paging
+		//Set the page to load
+		if(page > 1) {
+			firstResult = (maxResults*(page-1));
+		}
+		query.setFirstResult(firstResult);
+		//Set the max results to display
+		query.setMaxResults(maxResults);
+		
 	    List<Organization> organizationList = query.list(); 
 	    return organizationList;	
 	}
@@ -89,10 +109,21 @@ public class organizationDAOImpl implements organizationDAO {
 	
 	@Override
 	@SuppressWarnings("unchecked")
-	public List<User>  getOrganizationUsers(int orgId) {
+	public List<User>  getOrganizationUsers(int orgId, int page, int maxResults) {
 		
-		Query query = sessionFactory.getCurrentSession().createQuery("from User where orgId = :orgId order by lastName asc");
+		Query query = sessionFactory.getCurrentSession().createQuery("from User where orgId = :orgId order by lastName asc, firstName asc");
 		query.setParameter("orgId", orgId);
+		
+		int firstResult = 0;
+		
+		//Set the parameters for paging
+		//Set the page to load
+		if(page > 1) {
+			firstResult = (maxResults*(page-1));
+		}
+		query.setFirstResult(firstResult);
+		//Set the max results to display
+		query.setMaxResults(maxResults);
 		
 		return query.list();
 		

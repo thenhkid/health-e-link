@@ -9,6 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ut.dph.dao.userDAO;
 import com.ut.dph.model.User;
 import com.ut.dph.service.userManager;
+import com.ut.dph.model.siteSections;
+import com.ut.dph.model.userAccess;
 
 @Service
 public class userManagerImpl implements userManager{
@@ -41,6 +43,12 @@ public class userManagerImpl implements userManager{
 	public List<User> findUsers(int orgId, String searchTerm) {
 		return userDAO.findUsers(orgId, searchTerm);
 	}
+	
+	@Override
+	@Transactional
+	public User getUserByUserName(String username) {
+		return userDAO.getUserByUserName(username);
+	}
 	  
 	
 	@Override
@@ -49,5 +57,23 @@ public class userManagerImpl implements userManager{
 	  return userDAO.findTotalLogins(userId);
 	}
 	
-
+	@Override
+	@Transactional
+	public void setLastLogin(String username) {
+		userDAO.setLastLogin(username);
+	}
+	
+	
+	@Override
+	@Transactional
+	public List<siteSections> getSections() {
+		return userDAO.getSections();
+	}
+	
+	@Override
+	@Transactional
+	public List<userAccess> getuserSections(int userId) {
+		return userDAO.getuserSections(userId);
+	}
+	
 }

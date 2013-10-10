@@ -17,10 +17,12 @@ public interface organizationDAO {
 	
 	List<Organization> findOrganizations(String searchTerm);
 	  
-	List<Organization> getOrganizations(int firstResults, int maxResults);
+	List<Organization> getOrganizations(int page, int maxResults);
+	
+	Long findTotalOrgs();
 	
 	Long findTotalUsers(int orgId);
 	
-	 List<User> getOrganizationUsers(int orgId);
+	List<User> getOrganizationUsers(int orgId, int page, int maxResults);
 
 }

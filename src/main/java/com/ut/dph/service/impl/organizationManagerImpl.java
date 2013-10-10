@@ -51,8 +51,14 @@ public class organizationManagerImpl implements organizationManager{
 	  
 	@Override
 	@Transactional
-	public List<Organization> getOrganizations(int firstResults, int maxResults) {
-	  return organizationDAO.getOrganizations(firstResults, maxResults);
+	public List<Organization> getOrganizations(int page, int maxResults) {
+	  return organizationDAO.getOrganizations(page, maxResults);
+	}
+	
+	@Override
+	@Transactional
+	public Long findTotalOrgs() {
+	  return organizationDAO.findTotalOrgs();
 	}
 	
 	@Override
@@ -63,8 +69,8 @@ public class organizationManagerImpl implements organizationManager{
 	
 	@Override
 	@Transactional
-	public List<User> getOrganizationUsers(int orgId) {
-		return organizationDAO.getOrganizationUsers(orgId);
+	public List<User> getOrganizationUsers(int orgId, int page, int maxResults) {
+		return organizationDAO.getOrganizationUsers(orgId, page, maxResults);
 	}
-
+	
 }

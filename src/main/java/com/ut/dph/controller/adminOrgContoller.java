@@ -1,25 +1,31 @@
 package com.ut.dph.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 
 import javax.validation.Valid;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.ut.dph.model.Organization;
+import com.ut.dph.model.userAccess;
 import com.ut.dph.service.organizationManager;
 import com.ut.dph.model.User;
 import com.ut.dph.service.userManager;
+import com.ut.dph.model.siteSections;
 
 /**
  * The adminOrgController class will handle all URL requests that fall inside of
@@ -34,7 +40,6 @@ import com.ut.dph.service.userManager;
 
 @Controller
 @RequestMapping("/administrator/organizations")
-
 public class adminOrgContoller {
 	
 	@Autowired 
@@ -42,6 +47,20 @@ public class adminOrgContoller {
 	
 	@Autowired
 	private userManager userManager;
+	
+	/**
+	 * The private variable orgId will hold the orgId when viewing an organization
+	 * this will be used when on a organization subsection like users, etc.
+	 * We will use this private variable so we don't have to go fetch the id or
+	 * the organization based on the url.
+	 */
+	private static int orgId = 0;
+	
+	/**
+	 * The private maxResults variable will hold the number of results to show per
+	 * list page.
+	 */
+	private static int maxResults = 20;
 	
 	/**
 	 *  The '/list' GET request will serve up the existing list of organizations
@@ -60,22 +79,29 @@ public class adminOrgContoller {
 	public ModelAndView listOrganizations(@RequestParam(value="page", required=false) Integer page) throws Exception {
 		
 		if(page == null){
-	        page = 0;
+	        page = 1;
 	    }
  
 		ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/organizations/listOrganizations");
         
-        List<Organization> organizations = organizationManager.getOrganizations(page,5);
+        List<Organization> organizations = organizationManager.getOrganizations(page,maxResults);
         mav.addObject("orgFunctions",organizationManager);
-        mav.addObject("organizationList", organizations);		
+        mav.addObject("organizationList", organizations);
         
+        //Return the total list of organizations
+        Long totalOrgs = organizationManager.findTotalOrgs();
+        
+        Integer totalPages = Math.round(totalOrgs/maxResults);
+        mav.addObject("totalPages",totalPages);
+        mav.addObject("currentPage",page);
         return mav;
  
 	}
 	
+	
 	/**
-	 * The '/list' POST request will be used to search oranizations from the search form on the
+	 * The '/list' POST request will be used to search organization from the search form on the
 	 * organization list page.
 	 * 
 	 * @param searchTerm	The searchTerm parameter will hold the string to search on
@@ -103,6 +129,7 @@ public class adminOrgContoller {
  
 	}
 	
+	
 	/**
 	 * The '/create' GET request will serve up the create new organization page
 	 * 
@@ -120,6 +147,7 @@ public class adminOrgContoller {
 		return mav;
 		
 	}
+	
 	
 	/**
 	 * The '/create' POST request will submit the new organization once all required fields
@@ -163,6 +191,10 @@ public class adminOrgContoller {
 		redirectAttr.addFlashAttribute("savedStatus", "success");
 		
 		if(action.equals("save")) {
+			/**
+			 * Set the private variable to hold the id of the new organization.
+			 */
+			orgId = id;
 			ModelAndView mav = new ModelAndView(new RedirectView(latestorg.getcleanURL()+"/"));
 			return mav;		
 		}
@@ -172,6 +204,7 @@ public class adminOrgContoller {
 		}
 		
 	}
+	
 	
 	/**
 	 * The '/{cleanURL}' GET request will display the clicked organization details page.
@@ -195,7 +228,13 @@ public class adminOrgContoller {
 		
 		List<Organization> organization = organizationManager.getOrganizationByName(cleanURL);
 		Organization orgDetails = organization.get(0);
-		mav.addObject("id",orgDetails.getId());
+		
+		/**
+		 * Set the private variable to hold the id of the clicked organization.
+		 */
+		orgId = orgDetails.getId();
+		
+		mav.addObject("id",orgId);
 		mav.addObject("organization",orgDetails);
 		
 		return mav;
@@ -206,7 +245,7 @@ public class adminOrgContoller {
 	/**
 	 * The '/{cleanURL}' POST request will handle submitting changes for the selected organization.
 	 * 
-	 * @param organization		The object containing the organiztion form fields
+	 * @param organization		The object containing the organization form fields
 	 * @param result			The validation result
 	 * @param redirectAttr		The variable that will hold values that can be read after the redirect
 	 * @param action			The variable that holds which button was pressed
@@ -256,6 +295,7 @@ public class adminOrgContoller {
 	
 	}
 	
+	
 	/**
 	 * The '/{cleanURL/users' GET request will display the list of system users for the selected 
 	 * organization.
@@ -272,24 +312,31 @@ public class adminOrgContoller {
 	 * @throws Exception
 	 */
 	@RequestMapping(value="/{cleanURL}/users", method = RequestMethod.GET)
-	public ModelAndView listOrganizationUsers(@PathVariable String cleanURL) throws Exception {
+	public ModelAndView listOrganizationUsers(@PathVariable String cleanURL, @RequestParam(value="page", required=false) Integer page) throws Exception {
+		
+		if(page == null) {
+			page = 1;
+		}
 		
 		ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/organizations/organizationUsers");
-        
-        List<Organization> organization = organizationManager.getOrganizationByName(cleanURL);
-		Organization orgDetails = organization.get(0);
-        
-        Integer orgId = orgDetails.getId();
-        
-        List<User> users = organizationManager.getOrganizationUsers(orgId);
+     
+        List<User> users = organizationManager.getOrganizationUsers(orgId,page,maxResults);
         mav.addObject("id",orgId);
         mav.addObject("userFunctions",userManager);
         mav.addObject("userList", users);		
         
+        //Return the total list of users for the organization
+        Long totalUsers = organizationManager.findTotalUsers(orgId);
+        
+        Integer totalPages = Math.round(totalUsers/maxResults);
+        mav.addObject("totalPages",totalPages);
+        mav.addObject("currentPage",page);
+        
         return mav;
  
 	}
+	
 	
 	/**
 	 * The '/{cleanURL}/users' POST request will be used to search users for the selected organization 
@@ -310,11 +357,6 @@ public class adminOrgContoller {
 		ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/organizations/organizationUsers");
         
-        List<Organization> organization = organizationManager.getOrganizationByName(cleanURL);
-		Organization orgDetails = organization.get(0);
-        
-        Integer orgId = orgDetails.getId();
-        
         List<User> users = userManager.findUsers(orgId, searchTerm);
         mav.addObject("id",orgId);
         mav.addObject("searchTerm",searchTerm);
@@ -325,5 +367,163 @@ public class adminOrgContoller {
  
 	}
 	
+	
+	/**
+	 * The '/{cleanURL}/users/newSystemUser' GET request will be used to display the blank new 
+	 * system user screen (In a modal)
+	 *
+	 * 
+	 * @return		The organization user blank form page
+	 * 
+	 * @Objects		(1) An object that will hold all the form fields of a new user
+	 * 				(2) An object to hold the button value "Create"
+	 *
+	 */
+	@RequestMapping(value="/{cleanURL}/newSystemUser", method = RequestMethod.GET)
+	public @ResponseBody ModelAndView newSystemUser() throws Exception {
+		
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/organizations/userDetails");
+		User userdetails = new User();
+		
+		//Set the id of the organization for the new user
+		userdetails.setOrgId(orgId);
+		mav.addObject("btnValue","Create");
+		mav.addObject("userdetails", userdetails);
+		
+		//Get All Available user sections
+		List<siteSections> sections = userManager.getSections();
+		mav.addObject("sections", sections);
+		
+		return mav;
+	}
+	
+	
+	/**
+	 * The '/{cleanURL}/users/create' POST request will handle submitting the new organization system user.
+	 * 
+	 * @param user				The object containing the system user form fields
+	 * @param result			The validation result
+	 * @param redirectAttr		The variable that will hold values that can be read after the redirect
+	 * 
+	 * @return					Will return the system user list page on "Save"
+	 * 							Will return the system user form page on error
+	 * 
+	 * @Objects					(1) The object containing all the information for the clicked org
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/{cleanURL}/create", method = RequestMethod.POST)
+	public @ResponseBody ModelAndView createsystemUser(@Valid @ModelAttribute(value="userdetails") User userdetails, BindingResult result,RedirectAttributes redirectAttr, @PathVariable String cleanURL ) throws Exception {
+		
+		if(result.hasErrors()) {
+			ModelAndView mav = new ModelAndView();
+			mav.setViewName("/administrator/organizations/userDetails");
+			mav.addObject("btnValue","Create");
+			return mav;
+		}
+		
+		User existing = userManager.getUserByUserName(userdetails.getUsername());
+		
+	    if (existing != null) {
+	    	ModelAndView mav = new ModelAndView();
+			mav.setViewName("/administrator/organizations/userDetails");
+			mav.addObject("btnValue","Create");
+			mav.addObject("existingUsername","Username "+userdetails.getUsername().trim()+" already exists.");
+			return mav;	
+        }
+		
+		userManager.createUser(userdetails);
+		
+		ModelAndView mav = new ModelAndView("/administrator/organizations/userDetails");
+		mav.addObject("success","userCreated");
+		return mav;		
+	}
+	
+
+	 
+	 /**
+	 * The '/{cleanURL}/users/update' POST request will handle submitting changes for the selected organization system user.
+	 * 
+	 * @param user				The object containing the system user form fields
+	 * @param result			The validation result
+	 * @param redirectAttr		The variable that will hold values that can be read after the redirect
+	 * 
+	 * @return					Will return the system user list page on "Save"
+	 * 							Will return the system user form page on error
+	 * 
+	 * @Objects					(1) The object containing all the information for the clicked org
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/{cleanURL}/update", method = RequestMethod.POST)
+	public @ResponseBody ModelAndView updatesystemUser(@Valid @ModelAttribute(value="userdetails") User userdetails, BindingResult result,RedirectAttributes redirectAttr, @PathVariable String cleanURL ) throws Exception {
+		
+		if(result.hasErrors()) {
+			ModelAndView mav = new ModelAndView();
+			mav.setViewName("/administrator/organizations/userDetails");
+			mav.addObject("btnValue","Update");
+			return mav;
+		}
+		
+		User currentUser = userManager.getUserById(userdetails.getId());
+		
+		if(!currentUser.getUsername().trim().equals(userdetails.getUsername().trim())) {
+			User existing = userManager.getUserByUserName(userdetails.getUsername());
+		    if (existing != null) {
+	        	ModelAndView mav = new ModelAndView();
+				mav.setViewName("/administrator/organizations/userDetails");
+				mav.addObject("btnValue","Update");
+				mav.addObject("existingUsername","Username "+userdetails.getUsername().trim()+" already exists.");
+				return mav;	
+	        }
+		}
+		
+		userManager.updateUser(userdetails);
+	
+		ModelAndView mav = new ModelAndView("/administrator/organizations/userDetails");
+		mav.addObject("success","userUpdated");
+		return mav;		
+	}
+	
+	/**
+	 * The '/{cleanURL}/users/{person}?i=##' GET request will be used to return the details of the selected
+	 * user.
+	 * 
+	 * @param 	i	The id of the user selected
+	 * 
+	 * @return		The organization user details page
+	 * 
+	 * @Objects		(1) An object that will hold all the details of the clicked user
+	 *
+	 */
+	 @RequestMapping(value="/{cleanURL}/{person}", method= RequestMethod.GET)
+	 @ResponseBody 
+	 public ModelAndView viewUserDetails(@RequestParam(value="i", required=true) Integer userId) throws Exception {
+		 
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/organizations/userDetails");	
+		
+		User userDetails = userManager.getUserById(userId);
+				
+		mav.addObject("userId",userDetails.getId());
+		mav.addObject("btnValue","Update");
+		mav.addObject("userdetails",userDetails);
+		
+		//Get All Available user sections
+		List<siteSections> sections = userManager.getSections();
+		mav.addObject("sections", sections);
+		
+		//Get users set sections
+		List<userAccess> userSections = userManager.getuserSections(userId);
+		List<Integer> userSectionList = new ArrayList<Integer>();  
+		
+		for(int i=0;i<userSections.size();i++) {
+			userSectionList.add(userSections.get(i).getFeatureId());  
+		}
+		
+		userDetails.setsectionList(userSectionList);
+		
+		return mav;
+		 
+	 }
 
 }

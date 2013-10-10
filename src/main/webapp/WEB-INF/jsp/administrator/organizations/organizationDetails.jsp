@@ -43,7 +43,7 @@
 							</div>
 						</div>
 						<spring:bind path="orgName">
-							<div class="form-group ${status.error ? 'has-error' : '' }">
+							<div class="form-group ${status.error ? 'has-error' : '' } ${not empty esistingOrg ? 'has-error' : ''}">
 								<label class="control-label" for="Name">Name</label>
 								<form:input path="orgName" id="orgName" class="form-control" type="text" />
 								<form:errors path="orgName" cssClass="control-label" element="label" />

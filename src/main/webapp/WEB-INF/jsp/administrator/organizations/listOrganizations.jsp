@@ -24,7 +24,7 @@
 					<table class="table table-striped table-hover table-default">
 						<thead>
 							<tr>
-								<th>Organization Name</th>
+								<th>Organization Name ${size}</th>
 								<th>Contact Information</th>
 								<th># of Users</th>
 								<th># of Configurations</th>
@@ -75,6 +75,13 @@
 							</c:choose>
 						</tbody>
 					</table>
+					<ul class="pagination pull-right" role="navigation" aria-labelledby="Paging ">
+						<c:if test="${currentPage > 1}"><li><a href="?page=${currentPage-1}">&laquo;</a></li></c:if>
+						<c:forEach var="i" begin="1" end="${totalPages}">
+						<li><a href="?page=${i}">${i}</a></li>
+						</c:forEach>
+						<c:if test="${currentPage < totalPages}"><li><a href="?page=${currentPage+1}">&raquo;</a></li></c:if>
+					</ul>
 				</div>
 			</div>
 		</section>

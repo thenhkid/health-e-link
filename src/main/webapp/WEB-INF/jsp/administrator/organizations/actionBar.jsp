@@ -33,9 +33,9 @@
 					<c:if test="${not empty id}"><li><a href="" title="Delete"><span class="glyphicon glyphicon-remove icon-stacked"></span>Delete</a></li></c:if>
 					<li><a href="<c:url value='/administrator/organizations/list' />" title="Cancel"><span class="glyphicon icon-stacked custom-icon icon-cancel"></span>Cancel</a></li>
 				</c:when>
-				<c:otherwise>
+				<c:when test="${param['page'] == 'listOrgs'}">
 					<li><a href="create" title="Create New Organization"><span class="glyphicon icon-stacked glyphicon glyphicon-plus"></span>Create New</a></li>
-				</c:otherwise>
+				</c:when>
 			</c:choose>
 		</ul>
 	</div>

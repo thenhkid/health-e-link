@@ -1,6 +1,7 @@
 package com.ut.dph.model;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -8,12 +9,17 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
+import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
 
 @Entity
 @Table(name="USERS")
 public class User {
+	  
+	  @Transient
+	  private List<Integer> sectionList;
 	
 	  @Id
 	  @GeneratedValue(strategy = GenerationType.AUTO)
@@ -23,14 +29,14 @@ public class User {
 	  @Column(name="STATUS", nullable = false)
 	  private boolean status = false;
 	  
-	  @NotEmpty
 	  @Column(name="ORGID", nullable = false)
 	  private int orgId;	 
 	  
 	  @NotEmpty
 	  @Column(name="FIRSTNAME", nullable = false)
 	  private String firstName;
-	 
+	  
+	  @NotEmpty
 	  @Column(name="LASTNAME", nullable = true)
 	  private String lastName;
 	  
@@ -42,23 +48,21 @@ public class User {
 	  @Column(name="PASSWORD", nullable = false)
 	  private String password;
 	  
-	  @NotEmpty
 	  @Column(name="ROLEID", nullable = false)
 	  private int roleId = 2;
 	  
-	  @NotEmpty
 	  @Column(name="MAINCONTACT", nullable = false)
 	  private int mainContact = 0;
 	  
 	  @Column(name="SENDEMAILALERT", nullable = true)
 	  private boolean sendEmailAlert = false;
 	  
+	  @Email
 	  @Column(name="EMAIL", nullable = false)
 	  private String email;
 	  
 	  @Column(name="DATECREATED", nullable = true)
 	  private Date dateCreated = new Date();
-
 	  
 	  public int getId() {
 	    return id;
@@ -147,6 +151,16 @@ public class User {
 	  public boolean getStatus() {
 		  return status;
 	  }
+	  
+	  public void setStatus(boolean status) {
+		  this.status = status;
+	  }
 	 
-
+	 public List<Integer> getsectionList() {
+		 return this.sectionList;
+	 }
+	 
+	 public void setsectionList(List<Integer> sectionList) {
+		 this.sectionList = sectionList; 
+	 }
 }
