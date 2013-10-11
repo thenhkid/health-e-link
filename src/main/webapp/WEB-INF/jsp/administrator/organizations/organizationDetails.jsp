@@ -53,7 +53,7 @@
 						<spring:bind path="orgName">
 							<div class="form-group ${status.error ? 'has-error' : '' } ${not empty esistingOrg ? 'has-error' : ''}">
 								<label class="control-label" for="orgName">Name *</label>
-								<form:input path="orgName" id="orgName" class="form-control" type="text" />
+								<form:input path="orgName" id="orgName" class="form-control" type="text" maxLength="255" />
 								<form:errors path="orgName" cssClass="control-label" element="label" />
 								<c:if test="${not empty existingOrg}">${existingOrg}</c:if>
 							</div>
@@ -61,7 +61,7 @@
 						<spring:bind path="address">
 							<div class="form-group ${status.error ? 'has-error' : '' }">
 								<label class="control-label" for="address">Address *</label>
-								<form:input path="address" id="address" class="form-control" type="text" />
+								<form:input path="address" id="address" class="form-control" type="text" maxLength="45" />
 								<form:errors path="address" cssClass="control-label" element="label" />
 							</div>
 						</spring:bind>
@@ -72,7 +72,7 @@
 						<spring:bind path="city">
 							<div class="form-group ${status.error ? 'has-error' : '' }">
 								<label class="control-label" for="city">City *</label>
-								<form:input path="city" id="city" class="form-control" type="text" />
+								<form:input path="city" id="city" class="form-control" type="text" maxLength="45" />
 								<form:errors path="city" cssClass="control-label" element="label" />
 							</div>
 						</spring:bind>
@@ -89,26 +89,56 @@
 						<spring:bind path="postalCode">
 							<div class="form-group ${status.error ? 'has-error' : '' }">
 								<label class="control-label" for="postalCode">Postal Code *</label>
-								<form:input path="postalCode" id="postalCode" class="form-control" type="text" />
+								<form:input path="postalCode" id="postalCode" class="form-control" type="text" maxLength="15" />
 								<form:errors path="postalCode" cssClass="control-label" element="label" />
 							</div>
 						</spring:bind>
 						<spring:bind path="phone">
 							<div class="form-group ${status.error ? 'has-error' : '' }">
 								<label class="control-label" for="phone">Phone *</label>
-								<form:input path="phone" id="phone" class="form-control" type="text" />
+								<form:input path="phone" id="phone" class="form-control" type="text" maxLength="45" />
 								<form:errors path="phone" cssClass="control-label" element="label" />
 							</div>
 						</spring:bind>
 						<div class="form-group">
 							<label for="fax">Fax</label>
-							<form:input path="fax" class="form-control" type="text" />
+							<form:input path="fax" class="form-control" type="text" maxLength="45" />
 						</div>
 					</div>
 				</div>
 			</div>
 		</form:form>
 	</div>
+</div>
+
+<!-- The delete an organization modal -->
+<div class="modal fade" id="confirmationOrgDelete" role="dialog" tabindex="-1" aria-labeledby="Delete Organization" aria-hidden="true" aria-describedby="Delete Organization">
+<div class="modal-dialog">
+	<div class="modal-content">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+			<h3 class="panel-title">Organization Delete</h3>
+		</div>
+		<div class="modal-body">
+			<p>
+			Are you <strong>ABSOLUTELY</strong> sure?
+			<br/><br />
+			This action <strong>CANNOT</strong> be undone. This will delete all associationed configurations, system users, providers and uploaded brochures.
+			An alternative would be to make the organization inactive. This will set all system usrs and configurations to an inactive state.
+			<br/><br />
+			Please type in your username to confirm this deletion.
+			</p>
+			<form id="confirmOrgDelete" method="post" role="form">
+				<input type="hidden" id="realUsername" name="realUsername" value="${pageContext.request.userPrincipal.name}" />
+				<input type="text" id="username" name="username" class="form-control" maxLength="15"  />
+				<br/>
+				<div class="form-group">
+					<input type="button" disabled id="submitButton" class="btn btn-primary" value="I understand the consequences, delete this organization" />
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
 </div>
 
 
@@ -135,6 +165,14 @@
 			var strippedorgName = orgName.replace(/ +/g, '');
 			$('#cleanURL').val(strippedorgName);
 			$('#nameChange').val(1);
+		});
+
+		//Function to delete the selected organization
+		$("#delete").click(function(event) {
+			var orgId = $(this).attr("rel");
+
+			var confirmed = confirm("Are you sure you want to delete this organization and all of the following:\n\n- Configurations\n- Users\n- Providers\n- Brochures");
+			
 		});
 
 	});

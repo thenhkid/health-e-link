@@ -7,7 +7,7 @@
 	<div class="modal-content">
 		<div class="modal-header">
 			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-			<h3 class="panel-title">Add System Users ${success}</h3>
+			<h3 class="panel-title">Add System Users</h3>
 		</div>
 		<div class="modal-body">
 			<form:form id="userdetailsform" commandName="userdetails" modelAttribute="userdetails"  method="post" role="form">
@@ -47,28 +47,28 @@
 					<spring:bind path="firstName">
 						<div class="form-group ${status.error ? 'has-error' : '' }">
 							<label class="control-label" for="firstName">First Name *</label>
-							<form:input path="firstName" id="firstName" class="form-control" type="text" />
+							<form:input path="firstName" id="firstName" class="form-control" type="text" maxLength="55" />
 							<form:errors path="firstName" cssClass="control-label" element="label" />
 						</div>
 					</spring:bind>
 					<spring:bind path="lastName">
 						<div class="form-group ${status.error ? 'has-error' : '' }">
 							<label class="control-label" for="lastName">Last Name *</label>
-							<form:input path="lastName" id="lastName" class="form-control" type="text" />
+							<form:input path="lastName" id="lastName" class="form-control" type="text" maxLength="55" />
 							<form:errors path="lastName" cssClass="control-label" element="label" />
 						</div>
 					</spring:bind>
 					<spring:bind path="email">
 						<div class="form-group ${status.error ? 'has-error' : '' }">
 							<label class="control-label" for="email">Email</label>
-							<form:input path="email" id="email" class="form-control" type="text" />
+							<form:input path="email" id="email" class="form-control" type="text"  maxLength="255" />
 							<form:errors path="email" cssClass="control-label" element="label" />
 						</div>
 					</spring:bind>
 					<spring:bind path="username">
 						<div class="form-group ${status.error ? 'has-error' : '' } ${not empty existingUsername ? 'has-error' : ''}">
 							<label class="control-label" for="username">Username *</label>
-							<form:input path="username" id="username" class="form-control" type="text" />
+							<form:input path="username" id="username" class="form-control" type="text" maxLength="15" />
 							<form:errors path="username" cssClass="control-label" element="label" />
 							<c:if test="${not empty existingUsername}"><span class="control-label">${existingUsername}</span></c:if>
 						</div>
@@ -76,13 +76,13 @@
 					<spring:bind path="password">
 						<div id="passwordDiv" class="form-group ${status.error ? 'has-error' : '' }">
 							<label class="control-label" for="password">Password *</label>
-							<form:input path="password" id="password" class="form-control" type="password" />
+							<form:input path="password" id="password" class="form-control" type="password" maxLength="15"  />
 							<form:errors path="password" cssClass="control-label" element="label" />
 						</div>
 					</spring:bind>
 					<div id="confirmPasswordDiv" class="form-group">
 						<label class="control-label" for="confirmPassword">Confirm Password *</label>
-						<input id="confirmPassword" name="confirmpassword" class="form-control" type="password" value=${userdetails.getPassword()} />
+						<input id="confirmPassword" name="confirmpassword" class="form-control" maxLength="15"  type="password" value=${userdetails.getPassword()} />
 						<span id="confimPasswordMsg" class="control-label"></span>
 					</div>
 					<div class="form-group">
