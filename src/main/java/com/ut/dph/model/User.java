@@ -148,6 +148,10 @@ public class User {
 		  return dateCreated;
 	  }
 	  
+	  public void setDateCreated(Date dateCreated) {
+		  this.dateCreated = dateCreated;
+	  }
+	  
 	  public boolean getStatus() {
 		  return status;
 	  }

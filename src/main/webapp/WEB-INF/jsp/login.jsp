@@ -45,13 +45,13 @@
 				<spring:bind path="username">
 					<div class="form-group ${not empty error ? 'has-error' : '' }">
 						<label class="control-label" for="Username">Username</label>
-						<input id="username" name='j_username' class="form-control" type="text" />
+						<input id="username" name='j_username' class="form-control" type="text" value="admin" />
 					</div>
 				</spring:bind>
 				<spring:bind path="username">
 					<div class="form-group ${not empty error ? 'has-error' : '' }">
 						<label class="control-label" for="Password">Password</label>
-						<input id="password" name='j_password' class="form-control" type="password" />
+						<input id="password" name='j_password' class="form-control" type="password" value="!admin!" />
 					</div>
 				</spring:bind>
 				<input type="submit" value="Login" class="btn btn-primary pull-right"/>

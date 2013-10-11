@@ -6,15 +6,23 @@
 
 <div class="main clearfix full-width" role="main">
 	<div class="col-md-12">
+		
+		<c:if test="${not empty savedStatus}" >
+			<div class="alert alert-success">
+				<strong>Success!</strong> 
+				<c:choose><c:when test="${savedStatus == 'updated'}">The organization has been successfully updated!</c:when><c:when test="${param.msg == 'created'}">The system user has been successfully added!</c:when></c:choose>
+			</div>
+		</c:if>
+	
 		<section class="panel panel-default">
 			<div class="panel-body">
 				<div class="table-actions">
 					<form:form class="form form-inline" action="/administrator/organizations/list" method="post">
 						<div class="form-group">
-							<label class="sr-only" for="search-organizations">Search</label>
+							<label class="sr-only" for="searchTerm">Search</label>
 							<input type="text" name="searchTerm" id="searchTerm" value="${searchTerm}" class="form-control" id="search-organizations" placeholder="Search"/>
 						</div>
-						<button id="searchOrgBtn" class="btn btn-primary btn-sm">
+						<button id="searchOrgBtn" class="btn btn-primary btn-sm" title="Search Organizations">
 							<span class="glyphicon glyphicon-search"></span>
 						</button>
 					</form:form>
@@ -24,13 +32,13 @@
 					<table class="table table-striped table-hover table-default">
 						<thead>
 							<tr>
-								<th>Organization Name ${size}</th>
-								<th>Contact Information</th>
-								<th># of Users</th>
-								<th># of Configurations</th>
-								<th>Date Created</th>
-								<th>Access Level</th>
-								<th></th>
+								<th scope="col">Organization Name</th>
+								<th scope="col">Contact Information</th>
+								<th scope="col" style="text-align:center"># of Users</th>
+								<th scope="col" style="text-align:center"># of Configurations</th>
+								<th scope="col" style="text-align:center">Date Created</th>
+								<th scope="col" style="text-align:center">Access Level</th>
+								<th scope="col"></th>
 							</tr>
 						</thead>
 						<tbody>
@@ -38,21 +46,21 @@
 								  <c:when test="${not empty organizationList}">
 								    <c:forEach var="org" items="${organizationList}">
 										<tr id="orgRow" rel="${org.cleanURL}" style="cursor: pointer">
-											<td>${org.orgName}</td>
+											<td scope="row">${org.orgName}</td>
 											<td>
-												${org.address} <c:if test="not empty ${org.address2}">${org.address2}</c:if>
+												${org.address} <c:if test="not empty ${org.address2}"><br />${org.address2}</c:if>
 												<br />${org.city} ${org.state}, ${org.postalCode}
 											</td>
-											<td>
+											<td style="text-align:center">
 												${orgFunctions.findTotalUsers(org.id)}
 											</td>
-											<td>
-												#########
+											<td style="text-align:center">
+											 	${orgFunctions.findTotalConfigurations(org.id)}
 											</td>
-											<td><fmt:formatDate value="${org.dateCreated}" type="date" pattern="M/dd/yyyy" /></td>
-											<td>
+											<td style="text-align:center"><fmt:formatDate value="${org.dateCreated}" type="date" pattern="M/dd/yyyy" /></td>
+											<td style="text-align:center">
 												<c:choose>
-													<c:when test="${org.publicOrg} == 0">
+													<c:when test="${org.publicOrg == true}">
 														Public
 													</c:when>
 													<c:otherwise>
@@ -61,7 +69,7 @@
 												</c:choose>
 											</td>
 											<td class="actions-col">
-												<a href="javascript:void(0);" class="btn btn-link">
+												<a href="javascript:void(0);" class="btn btn-link" title="Edit this organization">
 													<span class="glyphicon glyphicon-edit"></span>
 													Edit	
 												</a>

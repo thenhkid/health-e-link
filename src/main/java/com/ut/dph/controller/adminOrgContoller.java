@@ -1,8 +1,8 @@
 package com.ut.dph.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.stereotype.Controller;
@@ -18,7 +18,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.ut.dph.model.Organization;
 import com.ut.dph.model.userAccess;
@@ -144,6 +147,9 @@ public class adminOrgContoller {
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("/administrator/organizations/organizationDetails");
 		mav.addObject("organization", new Organization());
+		
+		//Get the object that will hold the states
+		mav.addObject("stateList",getStates());
 		return mav;
 		
 	}
@@ -170,6 +176,8 @@ public class adminOrgContoller {
 		if(result.hasErrors()) {
 			ModelAndView mav = new ModelAndView();
 			mav.setViewName("/administrator/organizations/organizationDetails");
+			//Get the object that will hold the states
+			mav.addObject("stateList",getStates());
 			return mav;
 		}
 		
@@ -179,6 +187,8 @@ public class adminOrgContoller {
 			mav.setViewName("/administrator/organizations/organizationDetails");
 			mav.addObject("id",organization.getId());
 			mav.addObject("existingOrg","Organization "+organization.getOrgName()+" already exists.");
+			//Get the object that will hold the states
+			mav.addObject("stateList",getStates());
 			return mav;	
         }
 		
@@ -237,6 +247,9 @@ public class adminOrgContoller {
 		mav.addObject("id",orgId);
 		mav.addObject("organization",orgDetails);
 		
+		//Get the object that will hold the states
+		mav.addObject("stateList",getStates());
+		
 		return mav;
 	
 	}
@@ -264,6 +277,9 @@ public class adminOrgContoller {
 		if(result.hasErrors()) {
 			ModelAndView mav = new ModelAndView();
 			mav.setViewName("/administrator/organizations/organizationDetails");
+			mav.addObject("id",orgId);
+			//Get the object that will hold the states
+			mav.addObject("stateList",getStates());
 			return mav;
 		}
 		
@@ -274,20 +290,26 @@ public class adminOrgContoller {
 		    if (!existing.isEmpty()) {
 	        	ModelAndView mav = new ModelAndView();
 				mav.setViewName("/administrator/organizations/organizationDetails");
-				mav.addObject("id",organization.getId());
+				mav.addObject("id",orgId);
 				mav.addObject("existingOrg","Organization "+organization.getOrgName().trim()+" already exists.");
+				//Get the object that will hold the states
+				mav.addObject("stateList",getStates());
 				return mav;	
 	        }
 		}
 		
+		//Update the organization
 		organizationManager.updateOrganization(organization);
 	
-		redirectAttr.addFlashAttribute("savedStatus", "success");
+		//This variable will be used to display the message on the details form
+		redirectAttr.addFlashAttribute("savedStatus", "updated");
 		
+		//If the "Save" button was pressed 
 		if(action.equals("save")) {
 			ModelAndView mav = new ModelAndView(new RedirectView("../"+organization.getcleanURL()+"/"));
 			return mav;		
 		}
+		//If the "Save & Close" button was pressed.
 		else {
 			ModelAndView mav = new ModelAndView(new RedirectView("../list"));
 			return mav;			
@@ -493,6 +515,7 @@ public class adminOrgContoller {
 	 * @return		The organization user details page
 	 * 
 	 * @Objects		(1) An object that will hold all the details of the clicked user
+	 * 				(2) An object that will hold all the available sections the user can have access to
 	 *
 	 */
 	 @RequestMapping(value="/{cleanURL}/{person}", method= RequestMethod.GET)
@@ -502,6 +525,7 @@ public class adminOrgContoller {
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("/administrator/organizations/userDetails");	
 		
+		//Get all the details for the clicked user
 		User userDetails = userManager.getUserById(userId);
 				
 		mav.addObject("userId",userDetails.getId());
@@ -512,7 +536,7 @@ public class adminOrgContoller {
 		List<siteSections> sections = userManager.getSections();
 		mav.addObject("sections", sections);
 		
-		//Get users set sections
+		//Return the sections for the clicked user
 		List<userAccess> userSections = userManager.getuserSections(userId);
 		List<Integer> userSectionList = new ArrayList<Integer>();  
 		
@@ -525,5 +549,63 @@ public class adminOrgContoller {
 		return mav;
 		 
 	 }
+	 
+	 protected Map getStates() throws Exception {
+		
+		LinkedHashMap<String,String> states = new LinkedHashMap<String,String>();
+		
+		states.put("AL", "Alabama");
+		states.put("AK", "Alaska");
+		states.put("AZ", "Arizona");
+		states.put("AR", "Arkansas");
+		states.put("CA", "California");
+		states.put("CO", "Colorado");
+		states.put("DE", "Delaware");
+		states.put("DC", "District of Columbia");
+		states.put("FL", "Florida");
+		states.put("GA", "Georgia");
+		states.put("HI", "Hawaii");
+		states.put("ID", "Idaho");
+		states.put("IL", "Illinois");
+		states.put("IN", "Indiana");
+		states.put("IA", "Iowa");
+		states.put("KS", "Kansas");
+		states.put("KY", "Kentucky");
+		states.put("LA", "Louisiana");
+		states.put("ME", "Maine");
+		states.put("MD", "Maryland");
+		states.put("MA", "Massachusetts");
+		states.put("MI", "Michigan");
+		states.put("MN", "Minnesota");
+		states.put("MS", "Mississippi");
+		states.put("MO", "Missouri");
+		states.put("MT", "Montana");
+		states.put("NE", "Nebraska");
+		states.put("NV", "Nevada");
+		states.put("NH", "New Hampshire");
+		states.put("NJ", "New Jersey");
+		states.put("NM", "New Mexico");
+		states.put("NY", "New York");
+		states.put("NC", "North Carolina");
+		states.put("ND", "North Dakota");
+		states.put("OH", "Ohio");
+		states.put("OK", "Oklahoma");
+		states.put("OR", "Oregon");
+		states.put("PA", "Pennsylvania");
+		states.put("RI", "Rhode Island");
+		states.put("SC", "South Carolina");
+		states.put("SD", "South Dakota");
+		states.put("TN", "Tennessee");
+		states.put("TX", "Texas");
+		states.put("UT", "Utah");
+		states.put("VT", "Vermont");
+		states.put("VA", "Virginia");
+		states.put("WA", "Washington");
+		states.put("WV", "West Virginia");
+		states.put("WI", "Wisconsin");
+		states.put("WY", "Wyoming");
+		
+		return states;
+	}
 
 }

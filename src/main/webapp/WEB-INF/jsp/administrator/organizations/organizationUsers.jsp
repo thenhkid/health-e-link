@@ -20,9 +20,9 @@
 			<div class="panel-body">
 				<div class="table-actions">
 					<div class="form form-inline pull-left">
-						<form:form class="form form-inline" method="post">
+						<form:form class="form form-inline" action="users" method="post">
 							<div class="form-group">
-								<label class="sr-only" for="search-organizations">Search</label>
+								<label class="sr-only" for="searchTerm">Search</label>
 								<input type="text" name="searchTerm" id="searchTerm" value="${searchTerm}" class="form-control" id="search-users" placeholder="Search"/>
 							</div>
 							<button id="searchOrgBtn" class="btn btn-primary btn-sm">
@@ -30,7 +30,7 @@
 							</button>
 						</form:form>
 					</div>
-					<a href="#systemUsersModal" id="createNewUser" data-toggle="modal" class="btn btn-primary btn-sm pull-right">
+					<a href="#systemUsersModal" id="createNewUser" data-toggle="modal" class="btn btn-primary btn-sm pull-right" title="Create a new system user">
 						<span class="glyphicon glyphicon-plus"></span>
 					</a>
 				</div>
@@ -39,12 +39,12 @@
 					<table class="table table-striped table-hover table-default">
 						<thead>
 							<tr>
-								<th>Name</th>
-								<th>Created</th>
-								<th>Primary</th>
-								<th>Secondary</th>
-								<th>Times Logged In</th>
-								<th></th>
+								<th scope="col">Name</th>
+								<th scope="col" style="text-align:center">Created</th>
+								<th scope="col" style="text-align:center">Primary</th>
+								<th scope="col" style="text-align:center">Secondary</th>
+								<th scope="col" style="text-align:center">Times Logged In</th>
+								<th scope="col"></th>
 							</tr>
 						</thead>
 						<tbody>
@@ -52,17 +52,17 @@
 								  <c:when test="${not empty userList}">
 								    <c:forEach var="user" items="${userList}">
 										<tr id="userRow">
-											<td><a href="#systemUsersModal" data-toggle="modal" rel="${user.firstName}${user.lastName}?i=${user.id}" class="userEdit">${user.firstName} ${user.lastName}</a><br />(<c:choose><c:when test="${user.status == true}">active</c:when><c:otherwise>inactive</c:otherwise></c:choose>)</td>
-											<td><fmt:formatDate value="${user.dateCreated}" type="date" pattern="M/dd/yyyy" /></td>
-											<td>
-												
+											<td scope="row"><a href="#systemUsersModal" data-toggle="modal" rel="${user.firstName}${user.lastName}?i=${user.id}" class="userEdit">${user.firstName} ${user.lastName}</a><br />(<c:choose><c:when test="${user.status == true}">active</c:when><c:otherwise>inactive</c:otherwise></c:choose>)</td>
+											<td style="text-align:center"><fmt:formatDate value="${user.dateCreated}" type="date" pattern="M/dd/yyyy" /></td>
+											<td style="text-align:center">
+												<c:if test="${user.mainContact == 1}">X</c:if><c:if test="${user.mainContact != 1}">--</c:if>
 											</td>
-											<td>
-												
+											<td style="text-align:center">
+												<c:if test="${user.mainContact == 2}">X</c:if><c:if test="${user.mainContact != 2}">--</c:if>
 											</td>
-											<td>${userFunctions.findTotalLogins(user.id)}</td>
+											<td style="text-align:center">${userFunctions.findTotalLogins(user.id)}</td>
 											<td class="actions-col">
-												<a href="#systemUsersModal" data-toggle="modal" rel="${user.firstName}${user.lastName}?i=${user.id}" class="btn btn-link userEdit">
+												<a href="#systemUsersModal" data-toggle="modal" rel="${user.firstName}${user.lastName}?i=${user.id}" class="btn btn-link userEdit" title="Edit this user">
 													<span class="glyphicon glyphicon-edit"></span>
 													Edit	
 												</a>
@@ -102,6 +102,7 @@
 
 	jQuery(document).ready(function($) {
 
+		//Fade out the updated/created message after being displayed.
 		if($('.alert').length >0) {
 			$('.alert').delay(2000).fadeOut(1000);
 		}
@@ -174,10 +175,22 @@
 			        async: false,
 			        success: function(data) { 
 				        if(data.indexOf('userUpdated') != -1) {
-							window.location.href="users?msg=updated&page="+currentPage;
+					        if(currentPage > 0) {
+					        	window.location.href="users?msg=updated&page="+currentPage;
+							}
+					        else {
+					        	window.location.href="users?msg=updated";
+							}
+							
 						}
 				        else if(data.indexOf('userCreated') != -1) {
-							window.location.href="users?msg=created&page="+currentPage;
+				        	if(currentPage > 0) {
+					        	window.location.href="users?msg=created&page="+currentPage;
+							}
+					        else {
+					        	window.location.href="users?msg=created";
+							}
+							
 						}
 				        else {
 			        		$("#systemUsersModal").html(data);

@@ -11,6 +11,8 @@ import javax.persistence.Table;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
+import com.ut.dph.validator.Phone;
+
 @Entity
 @Table(name="ORGANIZATIONS")
 public class Organization {
@@ -43,7 +45,7 @@ public class Organization {
 	  @Column(name="POSTALCODE", nullable = false)
 	  private String postalCode;
 	  
-	  @NotEmpty
+	  @NotEmpty @Phone
 	  @Column(name="PHONE", nullable = false)
 	  private String phone;
 	  
@@ -144,6 +146,10 @@ public class Organization {
 	  
 	  public Date getDateCreated() {
 		  return dateCreated;
+	  }
+	  
+	  public void setDateCreated(Date dateCreated) {
+		  this.dateCreated = dateCreated;
 	  }
 	  
 	  public boolean getStatus() {

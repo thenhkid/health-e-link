@@ -23,6 +23,8 @@ public interface organizationManager {
   
   Long findTotalUsers(int orgId);
   
+  Long findTotalConfigurations(int orgId);
+  
   List<User> getOrganizationUsers(int orgId, int page, int maxResults);
   
 }

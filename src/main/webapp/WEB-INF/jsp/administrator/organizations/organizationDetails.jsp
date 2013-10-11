@@ -6,10 +6,18 @@
 
 	<div class="col-md-12">
 	
+		<c:if test="${not empty savedStatus}" >
+			<div class="alert alert-success">
+				<strong>Success!</strong> 
+				<c:choose><c:when test="${savedStatus == 'updated'}">The organization has been successfully updated!</c:when><c:otherwise>The organization has been successfully created!</c:otherwise></c:choose>
+			</div>
+		</c:if>
+	
 		<form:form commandName="organization"  method="post" role="form">
 			<input type="hidden" id="action" name="action" value="save" />
 			<form:hidden path="id" id="orgId" />
 			<form:hidden path="cleanURL" id="cleanURL" />
+			<form:hidden path="dateCreated" />
 			
 			<div class="panel panel-default">
 				<c:if test="${saved == 'success'}">
@@ -21,30 +29,30 @@
 				<div class="panel-body">
 					<div class="form-container">
 						<div class="form-group">
-							<label>Status</label>
+							<label for="status">Status *</label>
 							<div>
 								<label class="radio-inline">
-									<form:radiobutton path="status" value="true"/>Active 
+									<form:radiobutton id="status" path="status" value="true"/>Active 
 								</label>
 								<label class="radio-inline">
-									<form:radiobutton path="status" value="false"/>Inactive
+									<form:radiobutton id="status" path="status" value="false"/>Inactive
 								</label>
 							</div>
 						</div>
 						<div class="form-group">
-							<label>Viewable</label>
+							<label for="publicOrg">Viewable *</label>
 							<div>
 								<label class="radio-inline">
-									<form:radiobutton path="publicOrg" value="true"/>Public
+									<form:radiobutton id="publicOrg" path="publicOrg" value="true"/>Public
 								</label>
 								<label class="radio-inline">
-									<form:radiobutton path="publicOrg" value="false"/>Private 
+									<form:radiobutton id="publicOrg" path="publicOrg" value="false"/>Private 
 								</label>
 							</div>
 						</div>
 						<spring:bind path="orgName">
 							<div class="form-group ${status.error ? 'has-error' : '' } ${not empty esistingOrg ? 'has-error' : ''}">
-								<label class="control-label" for="Name">Name</label>
+								<label class="control-label" for="orgName">Name *</label>
 								<form:input path="orgName" id="orgName" class="form-control" type="text" />
 								<form:errors path="orgName" cssClass="control-label" element="label" />
 								<c:if test="${not empty existingOrg}">${existingOrg}</c:if>
@@ -52,7 +60,7 @@
 						</spring:bind>
 						<spring:bind path="address">
 							<div class="form-group ${status.error ? 'has-error' : '' }">
-								<label class="control-label" for="Address">Address</label>
+								<label class="control-label" for="address">Address *</label>
 								<form:input path="address" id="address" class="form-control" type="text" />
 								<form:errors path="address" cssClass="control-label" element="label" />
 							</div>
@@ -63,35 +71,37 @@
 						</div>
 						<spring:bind path="city">
 							<div class="form-group ${status.error ? 'has-error' : '' }">
-								<label class="control-label" for="City">City</label>
+								<label class="control-label" for="city">City *</label>
 								<form:input path="city" id="city" class="form-control" type="text" />
 								<form:errors path="city" cssClass="control-label" element="label" />
 							</div>
 						</spring:bind>
-						<div class="form-group">
-							<label for="state">State</label>
-							<form:select path="state" class="form-control half">
-								<form:option value="NH" lable="New Hampshire" />
-							    <!--<form:options items="${countryList}" />-->
-							</form:select>
-							<form:errors path="state" cssClass="error" />
-						</div>
+						<spring:bind path="state">
+							<div class="form-group ${status.error ? 'has-error' : '' }">
+								<label class="control-label" for="state">State *</label>
+								<form:select id="state" path="state" cssClass="form-control half">
+								     <option value="Select" label=" - Select - " ></option>
+								     <form:options items="${stateList}"/>
+								</form:select>
+								<form:errors path="state" cssClass="control-label" element="label" />
+							</div>
+						</spring:bind>
 						<spring:bind path="postalCode">
 							<div class="form-group ${status.error ? 'has-error' : '' }">
-								<label class="control-label" for="Postal Code">Postal Code</label>
+								<label class="control-label" for="postalCode">Postal Code *</label>
 								<form:input path="postalCode" id="postalCode" class="form-control" type="text" />
 								<form:errors path="postalCode" cssClass="control-label" element="label" />
 							</div>
 						</spring:bind>
 						<spring:bind path="phone">
 							<div class="form-group ${status.error ? 'has-error' : '' }">
-								<label class="control-label" for="Phone">Phone</label>
+								<label class="control-label" for="phone">Phone *</label>
 								<form:input path="phone" id="phone" class="form-control" type="text" />
 								<form:errors path="phone" cssClass="control-label" element="label" />
 							</div>
 						</spring:bind>
 						<div class="form-group">
-							<label for="fieldB">Fax</label>
+							<label for="fax">Fax</label>
 							<form:input path="fax" class="form-control" type="text" />
 						</div>
 					</div>

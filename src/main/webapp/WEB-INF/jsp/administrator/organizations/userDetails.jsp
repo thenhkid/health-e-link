@@ -13,27 +13,28 @@
 			<form:form id="userdetailsform" commandName="userdetails" modelAttribute="userdetails"  method="post" role="form">
 				<form:hidden path="id" id="id" />
 				<form:hidden path="orgId" id="orgId" />
+				<form:hidden path="dateCreated" />
 				<div class="form-container">
 					<div class="form-group">
 						<div>
-							<label class="radio-inline">
-								<form:radiobutton id="mainContact" path="mainContact" value="1" /> Primary Contact
+							<label class="radio-inline" for="mainContact1">
+								<form:radiobutton id="mainContact1" path="mainContact" value="1" /> Primary Contact
 							</label>
-							<label class="radio-inline">
+							<label class="radio-inline" for="mainContact2">
 								<form:radiobutton id="mainContact" path="mainContact" value="2" /> Secondary Contact
 							</label>
-							<label class="radio-inline">
+							<label class="radio-inline" for="mainContact2">
 								<form:radiobutton id="mainContact" path="mainContact" value="0" /> Not a Main Contact
 							</label>
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="checkbox-inline">
+						<label class="checkbox-inline" for="sendEmailAlert">
 							<form:checkbox id="sendEmailAlert" path="sendEmailAlert" value="true" /> Alert me via email on any new message my organization receives.
 						</label>
 					</div>
 					<div class="form-group">
-						<label for="providerStatus">Status *</label>
+						<label for="status">Status *</label>
 						<div>
 							<label class="radio-inline">
 								<form:radiobutton id="status" path="status" value="true" /> Active
@@ -90,7 +91,7 @@
 							 <div class="row">
 								<div class="col-md-6">
 									<label class="checkbox-inline">
-										 <form:checkbox path="sectionList" value="${section.id}" />${section.featureName}
+										 <form:checkbox id="sectionList" path="sectionList" value="${section.id}" />${section.featureName}
 									</label>
 								</div>
 							</div>

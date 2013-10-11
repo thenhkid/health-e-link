@@ -13,12 +13,30 @@ import com.ut.dph.dao.organizationDAO;
 import com.ut.dph.model.Organization;
 import com.ut.dph.model.User;
 
+/**
+ * The organizationDAOImpl class will implement the DAO access layer to handle
+ * queries for an organization
+ * 
+ * 
+ * @author chadmccue
+ *
+ */
+
 @Repository
 public class organizationDAOImpl implements organizationDAO {
 	
 	@Autowired
 	private SessionFactory sessionFactory;
 	
+	/**
+	 * The 'createOrganziation' function will create a new organization
+	 * 
+	 * @Table	organizations
+	 * 
+	 * @param	organization	Will hold the organization object from the form
+	 * 
+	 * @return 	The function will return the id of the created organization
+	 */
 	@Override
 	public Integer createOrganization(Organization organization) {
 		Integer lastId = null;
@@ -28,11 +46,31 @@ public class organizationDAOImpl implements organizationDAO {
 		return lastId;
 	}
 	
+	
+	/**
+	 * The 'updateOrganization' function will update a selected organization
+	 * 
+	 * @Table	organizations
+	 * 
+	 * @param	organization	Will hold the organization object from the field
+	 *	
+	 */
 	@Override
     public void updateOrganization(Organization organization) {
 		sessionFactory.getCurrentSession().update(organization);
 	}
 	
+	
+	/**
+	 * The 'getOrganizationById' function will return an organization based on
+	 * organiation id passed in.
+	 * 
+	 * @Table 	organizations
+	 * 
+	 * @param	orgId	This will hold the organization id to find
+	 * 
+	 * @return	This function will return a single organization object
+	 */
 	@Override
 	public Organization getOrganizationById(int orgId) {
       return (Organization) sessionFactory.
@@ -40,6 +78,16 @@ public class organizationDAOImpl implements organizationDAO {
       get(Organization.class, orgId);
 	}
 	
+	/**
+	 * The 'getOrganizationByName' function will return a single organization based on
+	 * the name passed in.
+	 * 
+	 * @Table	organiations
+	 * 
+	 * @param	cleanURL	Will hold the 'clean' organiation name from the url
+	 * 
+	 * @return	This function will return a signle organization object
+	 */
 	@Override
 	@SuppressWarnings("unchecked")
 	public List<Organization> getOrganizationByName(String cleanURL) {
@@ -48,6 +96,20 @@ public class organizationDAOImpl implements organizationDAO {
 	     return criteria.list();  
 	}
 	
+	/**
+	 * The 'findOrganizations' function will return a list of organizations based on a 
+	 * search term passed in. The function will search organizations on the following fields
+	 * cleanURL, orgName, city, address
+	 * 
+	 * The cleanURL field will contain the organization name with spaces removed. This will be
+	 * used in the url when you select an organization.
+	 * 
+	 * @Table	organizations
+	 * 
+	 * @param	searchTerm		Will hold the term used search organizations on
+	 * 
+	 * @return	This function will return a list of organization objects
+	 */
 	@Override
 	@SuppressWarnings("unchecked")
 	public List<Organization> findOrganizations(String searchTerm) {
@@ -63,8 +125,15 @@ public class organizationDAOImpl implements organizationDAO {
 	     return criteria.list();  
 	}
 	
+	/**
+	 * The 'findTotalOrgs' function will return the total number of organizations in the system. This
+	 * will be used for pagination when viewing the list of organziations
+	 * 
+	 * @Table organizations
+	 * 
+	 * @return This function will return the total organizations
+	 */
 	@Override
-	@SuppressWarnings("unchecked")
 	public Long findTotalOrgs() {
 		Query query = sessionFactory.getCurrentSession().createQuery("select count(*) as totalOrgs from Organization where cleanURL is not ''");
 		
@@ -73,16 +142,27 @@ public class organizationDAOImpl implements organizationDAO {
 		return totalOrgs;
 	}
 	
-	
+	/**
+	 * The 'getOrganizations' function will return a list of the organizations in the system
+	 * 
+	 * @Table	organizations
+	 * 
+	 * @param	page	This will hold the value of page being viewed (used for pagination)
+	 * 			maxResults	This will hold the value of the maxium number of results we want
+	 * 						to send back to the list page
+	 * 
+	 * @Return	This function will return a list of organization objects
+	 */
 	@Override
 	@SuppressWarnings("unchecked")
 	public List<Organization> getOrganizations(int page, int maxResults) {
 	    Query query = sessionFactory.getCurrentSession().createQuery("from Organization where cleanURL is not '' order by orgName asc");
 	    
+	    //By default we want to return the first result
 	    int firstResult = 0;
 		
-		//Set the parameters for paging
-		//Set the page to load
+		//If viewing a page other than the first we then need to figure out
+	    //which result to start with
 		if(page > 1) {
 			firstResult = (maxResults*(page-1));
 		}
@@ -94,6 +174,16 @@ public class organizationDAOImpl implements organizationDAO {
 	    return organizationList;	
 	}
 	
+	/**
+	 * The 'findTotalUsers' function will return the total number of system users set up for a 
+	 * specific organization.
+	 * 
+	 * @Table	users
+	 * 
+	 * @Param	orgId	This will hold the organization id we want to search on
+	 * 
+	 * @Return	This function will return the total number of users for the organization
+	 */
 	@Override
 	public Long findTotalUsers(int orgId) {
 		
@@ -106,7 +196,40 @@ public class organizationDAOImpl implements organizationDAO {
 		
 	}
 	
+	/**
+	 * The 'findTotalConfigurations' function will return the total number of configurations set up for a 
+	 * specific organization.
+	 * 
+	 * @Table	configurations
+	 * 
+	 * @Param	orgId	This will hold the organization id we want to search on
+	 * 
+	 * @Return	This function will return the total number of configurations for the organization
+	 */
+	@Override
+	public Long findTotalConfigurations(int orgId) {
+		
+		Query query = sessionFactory.getCurrentSession().createQuery("select count(*) as totalConfigs from configuration where orgId = :orgId");
+		query.setParameter("orgId", orgId);
+		
+		Long totalConfigs = (Long) query.uniqueResult();
+		
+		return totalConfigs;
+		
+	}
 	
+	
+	/**
+	 * The 'getOrganizationUsers' function will return the list of users for a specific organization.
+	 * 
+	 * @Table	users
+	 * 
+	 * @Param	orgId		This will hold the organization id to search on
+	 * 			page		This will hold the current page to view
+	 * 			maxResults	This will hold the total number of results to return back to the list page
+	 * 
+	 * @Return	This function will return a list of user objects
+	 */
 	@Override
 	@SuppressWarnings("unchecked")
 	public List<User>  getOrganizationUsers(int orgId, int page, int maxResults) {
