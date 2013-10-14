@@ -27,5 +27,7 @@ public interface organizationManager {
   
   List<User> getOrganizationUsers(int orgId, int page, int maxResults);
   
+  void deleteOrganization(int orgId);
+  
 }
 

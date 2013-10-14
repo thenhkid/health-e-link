@@ -10,7 +10,11 @@
 		<c:if test="${not empty savedStatus}" >
 			<div class="alert alert-success">
 				<strong>Success!</strong> 
-				<c:choose><c:when test="${savedStatus == 'updated'}">The organization has been successfully updated!</c:when><c:when test="${param.msg == 'created'}">The system user has been successfully added!</c:when></c:choose>
+				<c:choose>
+					<c:when test="${savedStatus == 'updated'}">The organization has been successfully updated!</c:when>
+					<c:when test="${savedStatus == 'created'}">The organization has been successfully added!</c:when>
+					<c:when test="${savedStatus == 'deleted'}">The organization has been successfully removed!</c:when>
+				</c:choose>
 			</div>
 		</c:if>
 	
@@ -103,7 +107,13 @@
 
 	//var searchTimeout;
 
-	jQuery(document).ready(function($) {		
+	jQuery(document).ready(function($) {	
+
+		//Fade out the updated/created message after being displayed.
+		if($('.alert').length >0) {
+			$('.alert').delay(2000).fadeOut(1000);
+		}
+			
 	    $("input:text,form").attr("autocomplete","off");
 	
 		$(document).on('click','#orgRow',function() {

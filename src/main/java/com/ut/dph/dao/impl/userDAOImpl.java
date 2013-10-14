@@ -184,7 +184,7 @@ public class userDAOImpl implements userDAO {
 	
 	/**
 	 * The 'getSections' function will return the list of all the available sections a user can have
-	 * acecss to on the site.
+	 * access to on the site.
 	 * 
 	 * @return		The function will return a list of sections
 	 */

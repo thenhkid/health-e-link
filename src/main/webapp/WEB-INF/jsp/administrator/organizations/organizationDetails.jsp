@@ -19,10 +19,8 @@
 			<form:hidden path="cleanURL" id="cleanURL" />
 			<form:hidden path="dateCreated" />
 			
-			<div class="panel panel-default">
-				<c:if test="${saved == 'success'}">
-					<p class="success">User Updated Successfully</p>
-				</c:if>
+			<section class="panel panel-default">
+				
 				<div class="panel-heading">
 					<h3 class="panel-title">Details</h3>
 				</div>
@@ -106,7 +104,7 @@
 						</div>
 					</div>
 				</div>
-			</div>
+			</section>
 		</form:form>
 	</div>
 </div>
@@ -123,14 +121,18 @@
 			<p>
 			Are you <strong>ABSOLUTELY</strong> sure?
 			<br/><br />
-			This action <strong>CANNOT</strong> be undone. This will delete all associationed configurations, system users, providers and uploaded brochures.
-			An alternative would be to make the organization inactive. This will set all system usrs and configurations to an inactive state.
+			This action <strong>CANNOT</strong> be undone. This will delete all associated configurations, system users, providers and uploaded brochures.
+			An alternative would be to make the organization inactive. This will set all system users and configurations to an inactive state.
 			<br/><br />
 			Please type in your username to confirm this deletion.
 			</p>
-			<form id="confirmOrgDelete" method="post" role="form">
-				<input type="hidden" id="realUsername" name="realUsername" value="${pageContext.request.userPrincipal.name}" />
-				<input type="text" id="username" name="username" class="form-control" maxLength="15"  />
+			<form id="confirmOrgDelete" method="post" role="form" action="delete">
+				<div id="confirmDiv" class="form-group" >
+					<input type="hidden" name="id" value="${id}" />
+					<input type="hidden" id="realUsername" name="realUsername" value="${pageContext.request.userPrincipal.name}" />
+					<input type="text" id="username" name="username" class="form-control" maxLength="15"  />
+					<span id="confirmMsg" class="control-label"></span>
+				</div>
 				<br/>
 				<div class="form-group">
 					<input type="button" disabled id="submitButton" class="btn btn-primary" value="I understand the consequences, delete this organization" />
@@ -149,30 +151,49 @@
 	})
 
 	$(function() {
-		$("#saveDetails").click(function(event) {
+		//Fade out the updated/created message after being displayed.
+		if($('.alert').length >0) {
+			$('.alert').delay(2000).fadeOut(1000);
+		}
+
+		//When the user starts to enter their username make the delete button active
+		$('#username').keyup(function(event) {
+			if($('#username').val() == '') {
+				$('#submitButton').attr("disabled", "disabled");
+			}
+			else {
+				$('#submitButton').removeAttr("disabled"); 
+			}
+		});
+
+		//Make sure the two values equal before the delete function is allowed
+		$('#submitButton').click(function(event) {
+			if($('#realUsername').val() != $('#username').val()) {
+				$('#confirmDiv').addClass("has-error");
+				$('#confirmMsg').html('That is not correct!');
+			}
+			else {
+				$('#confirmOrgDelete').submit();
+			}
+			
+		});
+		
+		$('#saveDetails').click(function(event) {
 			$('#action').val('save');
 			$("#organization").submit();
 		});
 		
-		$("#saveCloseDetails").click(function(event) {
+		$('#saveCloseDetails').click(function(event) {
 			$('#action').val('close');
-        	$("#organization").submit();
+        	$('#organization').submit();
 		});
 
 		//Need to set the organization clean url based off of the organization name
-		$("#orgName").keyup(function(event) {
+		$('#orgName').keyup(function(event) {
 			var orgName = $(this).val();
 			var strippedorgName = orgName.replace(/ +/g, '');
 			$('#cleanURL').val(strippedorgName);
 			$('#nameChange').val(1);
-		});
-
-		//Function to delete the selected organization
-		$("#delete").click(function(event) {
-			var orgId = $(this).attr("rel");
-
-			var confirmed = confirm("Are you sure you want to delete this organization and all of the following:\n\n- Configurations\n- Users\n- Providers\n- Brochures");
-			
 		});
 
 	});

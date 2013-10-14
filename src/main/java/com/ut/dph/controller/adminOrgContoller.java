@@ -317,6 +317,26 @@ public class adminOrgContoller {
 	
 	}
 	
+	/**
+	 * The '/{cleanURL}/delete POST request will remove the clicked organization and anything associated
+	 * to it.
+	 * 
+	 * @param id	The variable that holds the id of the clicked organization
+	 * 
+	 * @Return		Will return the organization list page
+	 * 
+	 */
+	@RequestMapping(value="/{cleanURL}/delete", method = RequestMethod.POST)
+	public ModelAndView deleteOrganization(@RequestParam int id, RedirectAttributes redirectAttr) throws Exception {
+		
+		organizationManager.deleteOrganization(id);
+		
+		//This variable will be used to display the message on the details form
+		redirectAttr.addFlashAttribute("savedStatus", "deleted");
+		ModelAndView mav = new ModelAndView(new RedirectView("../list"));
+		return mav;		
+	}
+	
 	
 	/**
 	 * The '/{cleanURL/users' GET request will display the list of system users for the selected 

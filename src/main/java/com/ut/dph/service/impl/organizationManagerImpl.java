@@ -136,4 +136,10 @@ public class organizationManagerImpl implements organizationManager{
 		return organizationDAO.getOrganizationUsers(orgId, page, maxResults);
 	}
 	
+	@Override
+	@Transactional
+	public void deleteOrganization(int orgId) {
+		organizationDAO.deleteOrganization(orgId);
+	}
+	
 }

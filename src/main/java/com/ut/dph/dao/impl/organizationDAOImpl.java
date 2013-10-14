@@ -251,5 +251,53 @@ public class organizationDAOImpl implements organizationDAO {
 		return query.list();
 		
 	}
+	
+	/**
+	 * The 'deleteOrganization' function will remove the organization and all other entities associated to the 
+	 * organization. (Users, Providers, Brochures, Configurations, etc). When deleting users the function will
+	 * also remove anything associated to the users (Logins, Access, etc).
+	 * 
+	 * @Param	orgId	This will hold the organization that will be deleted
+	 * 
+	 * @Return This function will not return any values.
+	 */
+	@Override
+	@SuppressWarnings("unchecked")
+	public void deleteOrganization(int orgId) {
+		
+		//Delete the providers
+		
+		//Find all the users associated to the organization to be deleted
+		Query findUsers = sessionFactory.getCurrentSession().createQuery("from User where orgId = :orgId");
+		findUsers.setParameter("orgId",orgId);
+		
+		List<User> users = findUsers.list();
+		
+		//Loop through all the users.
+		for(int i = 0; i<users.size();i++) {
+			int userId = users.get(i).getId();
+			
+			//Delete the logins for the users associated to the organization to be deleted.
+			Query deleteLogins = sessionFactory.getCurrentSession().createQuery("delete from userLogin where userId = :userId");
+			deleteLogins.setParameter("userId",userId);
+			deleteLogins.executeUpdate();
+			
+			//Delete the user access entries for the users associated to teh organization to be deleted.
+			Query deleteuserFeatures = sessionFactory.getCurrentSession().createQuery("delete from userAccess where userId = :userId");
+			deleteuserFeatures.setParameter("userId",userId);
+			deleteuserFeatures.executeUpdate();
+		}
+		
+		//Delete all users associated to the organization
+		Query deleteUser = sessionFactory.getCurrentSession().createQuery("delete from User where orgId = :orgId");
+		deleteUser.setParameter("orgId", orgId);
+		deleteUser.executeUpdate();
+		
+		//Delete the organization
+		Query deleteOrg = sessionFactory.getCurrentSession().createQuery("delete from Organization where id = :orgId");
+		deleteOrg.setParameter("orgId", orgId);
+		deleteOrg.executeUpdate();
+		
+	}
 
 }
