@@ -14,3 +14,5 @@ CREATE TABLE `universalTranslator`.`rel_userLogins` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION);
 
+
+//Test
