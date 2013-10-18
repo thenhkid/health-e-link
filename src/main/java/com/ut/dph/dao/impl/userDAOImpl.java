@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.hibernate.Query;
 import org.hibernate.Criteria; 
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions; 
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -126,7 +127,7 @@ public class userDAOImpl implements userDAO {
 	
 	/**
 	 * The 'findUsers' function will return a list of user objects based on a specific 
-	 * organization Id and a search term. The search will look for users for a spcicif
+	 * organization Id and a search term. The search will look for users for a specific
 	 * organization and whose first name or last name match the search term provided.
 	 * 
 	 * @param	orgId		This will be the orgId used to find users
@@ -137,13 +138,16 @@ public class userDAOImpl implements userDAO {
 	@Override
 	@SuppressWarnings("unchecked")
 	public List<User> findUsers(int orgId, String searchTerm) {
-	     Criteria criteria = sessionFactory.getCurrentSession().createCriteria(User.class)
+	    //Order by lastname then firstname 
+		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(User.class)
 	    	.add(Restrictions.eq("orgId",orgId))
 	    	.add(Restrictions.or(
 	    			Restrictions.like("firstName", searchTerm+"%"),
 	    			Restrictions.like("lastName", searchTerm+"%")
 	     		)
-	     	);
+	     	)
+	     	.addOrder(Order.asc("lastName"))
+	     	.addOrder(Order.asc("firstName"));
 	     
 	     return criteria.list();  
 	}

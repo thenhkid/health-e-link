@@ -7,7 +7,7 @@
 	<div class="modal-content">
 		<div class="modal-header">
 			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-			<h3 class="panel-title">Add System Users</h3>
+			<h3 class="panel-title"><c:choose><c:when test="${btnValue == 'Update'}">Update</c:when><c:when test="${btnValue == 'Create'}">Add</c:when></c:choose> System User ${success}</h3>
 		</div>
 		<div class="modal-body">
 			<form:form id="userdetailsform" commandName="userdetails" modelAttribute="userdetails"  method="post" role="form">

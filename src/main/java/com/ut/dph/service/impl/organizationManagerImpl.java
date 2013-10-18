@@ -1,6 +1,5 @@
 package com.ut.dph.service.impl;
 
-import java.io.File;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,8 +8,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ut.dph.dao.organizationDAO;
 import com.ut.dph.model.Organization;
+import com.ut.dph.model.Provider;
 import com.ut.dph.service.organizationManager;
 import com.ut.dph.model.User;
+import com.ut.dph.model.Brochure;
+import com.ut.dph.reference.fileSystem;
 
 @Service
 public class organizationManagerImpl implements organizationManager{
@@ -27,57 +29,9 @@ public class organizationManagerImpl implements organizationManager{
 		//Need to create the directory structure for the new organization
 		//Use the cleanURL (name without spaces) for the directory name
 		//First get the operating system
-		String os = System.getProperty("os.name").toLowerCase();
+		fileSystem dir = new fileSystem();
 		
-		try {
-			//Windows
-			if (os.indexOf("win") >= 0) {
-				//C:/BowLink/
-				String dir = "c:\\bowlink\\" + organization.getcleanURL();
-				File directory = new File(dir);
-				if (!directory.exists()) {
-	                directory.mkdir();
-	                new File("c:\\bowlink\\" + organization.getcleanURL() + "\\crosswalks").mkdirs();
-	                new File("c:\\bowlink\\" + organization.getcleanURL() + "\\input files").mkdirs();
-	                new File("c:\\bowlink\\" + organization.getcleanURL() + "\\output files").mkdirs();
-	                new File("c:\\bowlink\\" + organization.getcleanURL() + "\\templates").mkdirs();
-	                new File("c:\\bowlink\\" + organization.getcleanURL() + "\\brochures").mkdirs();
-	            }
-			} 
-			//Mac
-			else if (os.indexOf("mac") >= 0) {
-				String dir = "/Users/chadmccue/bowlink/" + organization.getcleanURL();
-				File directory = new File(dir);
-				if (!directory.exists()) {
-	                directory.mkdir();
-	                new File("/Users/chadmccue/bowlink/" + organization.getcleanURL() + "/crosswalks").mkdirs();
-	                new File("/Users/chadmccue/bowlink/" + organization.getcleanURL() + "/input files").mkdirs();
-	                new File("/Users/chadmccue/bowlink/" + organization.getcleanURL() + "/output files").mkdirs();
-	                new File("/Users/chadmccue/bowlink/" + organization.getcleanURL() + "/templates").mkdirs();
-	                new File("/Users/chadmccue/bowlink/" + organization.getcleanURL() + "/brochures").mkdirs();
-	            }
-			} 
-			//Unix or Linux or Solarix
-			else if (os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0 || os.indexOf("aix") >= 0 || os.indexOf("sunos") >= 0) {
-				String dir = "/home/bowlink/" + organization.getcleanURL();
-				File directory = new File(dir);
-				if (!directory.exists()) {
-	                directory.mkdir();
-	                new File("/home/bowlink/" + organization.getcleanURL() + "/crosswalks").mkdirs();
-	                new File("/home/bowlink/" + organization.getcleanURL() + "/input files").mkdirs();
-	                new File("/home/bowlink/" + organization.getcleanURL() + "/output files").mkdirs();
-	                new File("/home/bowlink/" + organization.getcleanURL() + "/templates").mkdirs();
-	                new File("/home/bowlink/" + organization.getcleanURL() + "/brochures").mkdirs();
-	            }
-			} 
-			else {
-				System.out.println("Your OS is not support!!");
-			}
-		}
-		catch(Exception e) {
-			e.printStackTrace();
-		}
-		
+		dir.creatOrgDirectories(organization.getcleanURL());
 		
 		return lastId;
 	}
@@ -86,6 +40,18 @@ public class organizationManagerImpl implements organizationManager{
 	@Transactional
 	public void updateOrganization(Organization organization) {
 		organizationDAO.updateOrganization(organization);
+		
+		//Need to make sure all folders are created for
+		//the organization
+		fileSystem dir = new fileSystem();
+		
+		dir.creatOrgDirectories(organization.getcleanURL());
+	}
+	
+	@Override
+	@Transactional
+	public void deleteOrganization(int orgId) {
+		organizationDAO.deleteOrganization(orgId);
 	}
 
 	@Override
@@ -136,10 +102,29 @@ public class organizationManagerImpl implements organizationManager{
 		return organizationDAO.getOrganizationUsers(orgId, page, maxResults);
 	}
 	
+	
 	@Override
 	@Transactional
-	public void deleteOrganization(int orgId) {
-		organizationDAO.deleteOrganization(orgId);
+	public List<Provider> getOrganizationProviders(int orgId, int page, int maxResults) {
+		return organizationDAO.getOrganizationProviders(orgId, page, maxResults);
+	}
+	
+	@Override
+	@Transactional
+	public Long findTotalProviders(int orgId) {
+	  return organizationDAO.findTotalProviders(orgId);
+	}
+	
+	@Override
+	@Transactional
+	public List<Brochure> getOrganizationBrochures(int orgId, int page, int maxResults) {
+		return organizationDAO.getOrganizationBrochures(orgId, page, maxResults);
+	}
+	
+	@Override
+	@Transactional
+	public Long findTotalBrochures(int orgId) {
+	  return organizationDAO.findTotalBrochures(orgId);
 	}
 	
 }

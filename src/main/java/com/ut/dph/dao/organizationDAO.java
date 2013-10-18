@@ -2,7 +2,9 @@ package com.ut.dph.dao;
 
 import java.util.List;
 
+import com.ut.dph.model.Brochure;
 import com.ut.dph.model.Organization;
+import com.ut.dph.model.Provider;
 import com.ut.dph.model.User;
 
 public interface organizationDAO {
@@ -28,5 +30,13 @@ public interface organizationDAO {
 	List<User> getOrganizationUsers(int orgId, int page, int maxResults);
 	
 	void deleteOrganization(int orgId);
+	
+	List<Provider> getOrganizationProviders(int orgId, int page, int MaxResults);
+	  
+	Long findTotalProviders(int orgId);
+	
+	List<Brochure> getOrganizationBrochures(int orgId, int page, int MaxResults);
+	  
+	Long findTotalBrochures(int orgId);
 
 }

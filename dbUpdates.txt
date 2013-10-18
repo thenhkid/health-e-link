@@ -19,3 +19,19 @@ CREATE TABLE `universalTranslator`.`rel_userLogins` (
 ALTER TABLE `universaltranslator`.`organizations` 
 ADD COLUMN `cleanURL` VARCHAR(255) NOT NULL AFTER `status`;
 
+ALTER TABLE `universalTranslator`.`providers` 
+ADD COLUMN `dateCreated` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER `status`;
+
+//10-16-2013 (Chad)
+ALTER TABLE `universalTranslator`.`brochures` 
+ADD COLUMN `dateCreated` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER `fileName`;
+
+//10-17-2013 (Chad)
+ALTER TABLE `universalTranslator`.`brochures` 
+DROP FOREIGN KEY `brochureOrgId`;
+ALTER TABLE `universalTranslator`.`brochures` 
+ADD CONSTRAINT `brochureOrgId`
+  FOREIGN KEY (`orgId`)
+  REFERENCES `universalTranslator`.`organizations` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;

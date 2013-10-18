@@ -50,9 +50,12 @@
 								  <c:when test="${not empty organizationList}">
 								    <c:forEach var="org" items="${organizationList}">
 										<tr id="orgRow" rel="${org.cleanURL}" style="cursor: pointer">
-											<td scope="row">${org.orgName}</td>
+											<td scope="row">
+												<a href="javascript:void(0);" title="Edit this organization">${org.orgName}</a>
+												<br />(<c:choose><c:when test="${org.status == true}">active</c:when><c:otherwise>inactive</c:otherwise></c:choose>)
+											</td>
 											<td>
-												${org.address} <c:if test="not empty ${org.address2}"><br />${org.address2}</c:if>
+												${org.address} <c:if test="${not empty org.address2}"><br />${org.address2}</c:if>
 												<br />${org.city} ${org.state}, ${org.postalCode}
 											</td>
 											<td style="text-align:center">

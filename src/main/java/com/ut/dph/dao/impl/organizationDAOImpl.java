@@ -10,8 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.ut.dph.dao.organizationDAO;
+import com.ut.dph.model.Brochure;
 import com.ut.dph.model.Organization;
+import com.ut.dph.model.Provider;
 import com.ut.dph.model.User;
+import com.ut.dph.service.brochureManager;
 
 /**
  * The organizationDAOImpl class will implement the DAO access layer to handle
@@ -27,6 +30,9 @@ public class organizationDAOImpl implements organizationDAO {
 	
 	@Autowired
 	private SessionFactory sessionFactory;
+	
+	@Autowired
+	private brochureManager brochureManager;
 	
 	/**
 	 * The 'createOrganziation' function will create a new organization
@@ -63,7 +69,7 @@ public class organizationDAOImpl implements organizationDAO {
 	
 	/**
 	 * The 'getOrganizationById' function will return an organization based on
-	 * organiation id passed in.
+	 * organization id passed in.
 	 * 
 	 * @Table 	organizations
 	 * 
@@ -253,6 +259,114 @@ public class organizationDAOImpl implements organizationDAO {
 	}
 	
 	/**
+	 * The 'findTotalProviders' function will return the total number of providers set up for a 
+	 * specific organization.
+	 * 
+	 * @Table	providers
+	 * 
+	 * @Param	orgId	This will hold the organization id we want to search on
+	 * 
+	 * @Return	This function will return the total number of providers for the organization
+	 */
+	@Override
+	public Long findTotalProviders(int orgId) {
+		
+		Query query = sessionFactory.getCurrentSession().createQuery("select count(*) as totalProviders from Provider where orgId = :orgId");
+		query.setParameter("orgId", orgId);
+		
+		Long totalProviders = (Long) query.uniqueResult();
+		
+		return totalProviders;
+	}
+	
+	/**
+	 * The 'getOrganizationProviders' function will return the list of providers for a specific organization.
+	 * 
+	 * @Table	providers
+	 * 
+	 * @Param	orgId		This will hold the organization id to search on
+	 * 			page		This will hold the current page to view
+	 * 			maxResults	This will hold the total number of results to return back to the list page
+	 * 
+	 * @Return	This function will return a list of provider objects
+	 */
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<Provider>  getOrganizationProviders(int orgId, int page, int maxResults) {
+		
+		Query query = sessionFactory.getCurrentSession().createQuery("from Provider where orgId = :orgId order by lastName asc, firstName asc");
+		query.setParameter("orgId", orgId);
+		
+		int firstResult = 0;
+		
+		//Set the parameters for paging
+		//Set the page to load
+		if(page > 1) {
+			firstResult = (maxResults*(page-1));
+		}
+		query.setFirstResult(firstResult);
+		//Set the max results to display
+		query.setMaxResults(maxResults);
+		
+		return query.list();
+		
+	}
+	
+	/**
+	 * The 'findTotalBrochures' function will return the total number of brochures set up for a 
+	 * specific organization.
+	 * 
+	 * @Table	brochures
+	 * 
+	 * @Param	orgId	This will hold the organization id we want to search on
+	 * 
+	 * @Return	This function will return the total number of brochures for the organization
+	 */
+	@Override
+	public Long findTotalBrochures(int orgId) {
+		
+		Query query = sessionFactory.getCurrentSession().createQuery("select count(*) as totalBrochures from Brochure where orgId = :orgId");
+		query.setParameter("orgId", orgId);
+		
+		Long totalBrochures = (Long) query.uniqueResult();
+		
+		return totalBrochures;
+	}
+	
+	/**
+	 * The 'getOrganizationBrochures' function will return the list of brochures for a specific organization.
+	 * 
+	 * @Table	brochures
+	 * 
+	 * @Param	orgId		This will hold the organization id to search on
+	 * 			page		This will hold the current page to view
+	 * 			maxResults	This will hold the total number of results to return back to the list page
+	 * 
+	 * @Return	This function will return a list of brochure objects
+	 */
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<Brochure>  getOrganizationBrochures(int orgId, int page, int maxResults) {
+		
+		Query query = sessionFactory.getCurrentSession().createQuery("from Brochure where orgId = :orgId order by title asc");
+		query.setParameter("orgId", orgId);
+		
+		int firstResult = 0;
+		
+		//Set the parameters for paging
+		//Set the page to load
+		if(page > 1) {
+			firstResult = (maxResults*(page-1));
+		}
+		query.setFirstResult(firstResult);
+		//Set the max results to display
+		query.setMaxResults(maxResults);
+		
+		return query.list();
+		
+	}
+	
+	/**
 	 * The 'deleteOrganization' function will remove the organization and all other entities associated to the 
 	 * organization. (Users, Providers, Brochures, Configurations, etc). When deleting users the function will
 	 * also remove anything associated to the users (Logins, Access, etc).
@@ -266,6 +380,22 @@ public class organizationDAOImpl implements organizationDAO {
 	public void deleteOrganization(int orgId) {
 		
 		//Delete the providers
+		Query deleteProvider = sessionFactory.getCurrentSession().createQuery("delete from Provider where orgId = :orgId");
+		deleteProvider.setParameter("orgId", orgId);
+		deleteProvider.executeUpdate();
+		
+		//Delete Brochures and the actual uploaded file
+		//Find all the brochures associated to the organization to be deleted
+		Query findBrochures = sessionFactory.getCurrentSession().createQuery("from Brochure where orgId = :orgId");
+		findBrochures.setParameter("orgId",orgId);
+		
+		List<Brochure> brochures = findBrochures.list();
+		
+		//Loop through all the brochures.
+		for(int i = 0; i<brochures.size();i++) {
+			int brochureId = brochures.get(i).getId();
+			brochureManager.deleteBrochure(brochureId);
+		}
 		
 		//Find all the users associated to the organization to be deleted
 		Query findUsers = sessionFactory.getCurrentSession().createQuery("from User where orgId = :orgId");
@@ -282,7 +412,7 @@ public class organizationDAOImpl implements organizationDAO {
 			deleteLogins.setParameter("userId",userId);
 			deleteLogins.executeUpdate();
 			
-			//Delete the user access entries for the users associated to teh organization to be deleted.
+			//Delete the user access entries for the users associated to the organization to be deleted.
 			Query deleteuserFeatures = sessionFactory.getCurrentSession().createQuery("delete from userAccess where userId = :userId");
 			deleteuserFeatures.setParameter("userId",userId);
 			deleteuserFeatures.executeUpdate();

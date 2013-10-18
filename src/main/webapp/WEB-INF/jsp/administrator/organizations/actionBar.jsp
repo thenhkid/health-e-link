@@ -22,6 +22,12 @@
 					<c:when test="${param['page'] == 'orgUsers'}">
 						<a href="javascript:void(0);" title="Organization Users" class="unstyled-link">Organization Users</a>
 					</c:when>
+					<c:when test="${param['page'] == 'orgProviders'}">
+						<a href="javascript:void(0);" title="Organization Providers" class="unstyled-link">Organization Providers</a>
+					</c:when>
+					<c:when test="${param['page'] == 'orgBrochures'}">
+						<a href="javascript:void(0);" title="Organization Brochures" class="unstyled-link">Organization Brochures</a>
+					</c:when>
 				</c:choose>
 			</h1>
 		</div>

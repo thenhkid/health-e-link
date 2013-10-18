@@ -2,7 +2,6 @@ package com.ut.dph.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.stereotype.Controller;
@@ -13,22 +12,32 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.ut.dph.model.Organization;
 import com.ut.dph.model.userAccess;
+import com.ut.dph.reference.fileSystem;
 import com.ut.dph.service.organizationManager;
 import com.ut.dph.model.User;
 import com.ut.dph.service.userManager;
 import com.ut.dph.model.siteSections;
+import com.ut.dph.model.Provider;
+import com.ut.dph.service.providerManager;
+import com.ut.dph.model.Brochure;
+import com.ut.dph.service.brochureManager;
 
 /**
  * The adminOrgController class will handle all URL requests that fall inside of
@@ -50,6 +59,12 @@ public class adminOrgContoller {
 	
 	@Autowired
 	private userManager userManager;
+	
+	@Autowired
+	private providerManager providerManager;
+	
+	@Autowired
+	private brochureManager brochureManager;
 	
 	/**
 	 * The private variable orgId will hold the orgId when viewing an organization
@@ -339,6 +354,13 @@ public class adminOrgContoller {
 	
 	
 	/**
+	* *********************************************************
+	* 				ORGANIZATION USER FUNCTIONS					
+	* *********************************************************
+	*/
+	
+	
+	/**
 	 * The '/{cleanURL/users' GET request will display the list of system users for the selected 
 	 * organization.
 	 * 
@@ -442,7 +464,7 @@ public class adminOrgContoller {
 	
 	
 	/**
-	 * The '/{cleanURL}/users/create' POST request will handle submitting the new organization system user.
+	 * The '/{cleanURL}/create' POST request will handle submitting the new organization system user.
 	 * 
 	 * @param user				The object containing the system user form fields
 	 * @param result			The validation result
@@ -569,6 +591,403 @@ public class adminOrgContoller {
 		return mav;
 		 
 	 }
+	 
+	 
+	 /**
+	 * *********************************************************
+	 * 			ORGANIZATION PROVIDER FUNCTIONS					
+	 * *********************************************************
+	 */
+	 
+	 /**
+	 * The '/{cleanURL/providers' GET request will display the list of providers for the selected 
+	 * organization.
+	 * 
+	 * @param cleanURL		The variable that holds the organization that is being viewed
+	 * 
+	 * @return				Will return the organization provider list page
+	 * 
+	 * @Objects				(1) An object that holds providers found for the organization
+	 * 						(2)	The orgId used for the menu and action bar
+	 * 
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/{cleanURL}/providers", method = RequestMethod.GET)
+	public ModelAndView listOrganizationProviders(@PathVariable String cleanURL, @RequestParam(value="page", required=false) Integer page) throws Exception {
+		
+		if(page == null) {
+			page = 1;
+		}
+		
+		ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/organizations/organizationProviders");
+     
+        List<Provider> providers = organizationManager.getOrganizationProviders(orgId,page,maxResults);
+        mav.addObject("id",orgId);
+        mav.addObject("providerList", providers);		
+        
+        //Return the total list of providers for the organization
+        Long totalProviders = organizationManager.findTotalProviders(orgId);
+        
+        Integer totalPages = Math.round(totalProviders/maxResults);
+        mav.addObject("totalPages",totalPages);
+        mav.addObject("currentPage",page);
+        
+        return mav;
+       
+	} 
+	
+	/**
+	 * The '/{cleanURL}/providers' POST request will be used to search providers for the selected organization 
+	 * 
+	 * @param searchTerm	The searchTerm parameter will hold the string to search on
+	 * @return				The organization provider list page
+	 * 
+	 * @Objects				(1) An object will be returned holding the requested search term used to 
+	 * 							populate the search box
+	 * 						(2) An object containing the found providers
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/{cleanURL}/providers", method = RequestMethod.POST)
+	public ModelAndView findProviders(@RequestParam String searchTerm, @PathVariable String cleanURL) throws Exception {
+		
+		ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/organizations/organizationProviders");
+        
+        List<Provider> providers = providerManager.findProviders(orgId, searchTerm);
+        mav.addObject("id",orgId);
+        mav.addObject("searchTerm",searchTerm);
+        mav.addObject("providerList", providers);		
+        
+        return mav;
+ 
+	}
+	
+	/**
+	 * The '/{cleanURL}/provider/{person}?i=##' GET request will be used to return the details of the selected
+	 * provider.
+	 * 
+	 * @param 	i	The id of the provider selected
+	 * 
+	 * @return		The organization provider details page
+	 * 
+	 * @Objects		(1) An object that will hold all the details of the clicked provider
+	 * 				(2) An object that will hold all the available sections the provider can have access to
+	 *
+	 */
+	 @RequestMapping(value="/{cleanURL}/provider/{person}", method= RequestMethod.GET)
+	 @ResponseBody 
+	 public ModelAndView viewProviderDetails(@RequestParam(value="i", required=true) Integer providerId) throws Exception {
+		 
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/organizations/providerDetails");	
+		
+		//Get all the details for the clicked provider
+		Provider providerDetails = providerManager.getProviderById(providerId);
+				
+		mav.addObject("providerId",providerDetails.getId());
+		mav.addObject("btnValue","Update");
+		mav.addObject("providerdetails",providerDetails);
+		
+		return mav;
+	 }
+	
+	
+	/**
+	 * The '/{cleanURL}/newProvider' GET request will be used to display the blank new 
+	 * provider screen (In a modal)
+	 *
+	 * 
+	 * @return		The organization provider blank form page
+	 * 
+	 * @Objects		(1) An object that will hold all the form fields of a new provider
+	 * 				(2) An object to hold the button value "Create"
+	 *
+	 */
+	@RequestMapping(value="/{cleanURL}/newProvider", method = RequestMethod.GET)
+	public @ResponseBody ModelAndView newProvider() throws Exception {
+		
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/organizations/providerDetails");
+		Provider providerdetails = new Provider();
+		
+		//Set the id of the organization for the new provider
+		providerdetails.setOrgId(orgId);
+		mav.addObject("btnValue","Create");
+		mav.addObject("providerdetails", providerdetails);
+		
+		return mav;
+	}
+	
+	/**
+	 * The '/{cleanURL}/createProvider' POST request will handle submitting the new organization provider.
+	 * 
+	 * @param provider			The object containing the provider form fields
+	 * @param result			The validation result
+	 * @param redirectAttr		The variable that will hold values that can be read after the redirect
+	 * 
+	 * @return					Will return the provider list page on "Save"
+	 * 							Will return the provider form page on error
+	 * 
+	 * @Objects					(1) The object containing all the information for the clicked org
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/{cleanURL}/createProvider", method = RequestMethod.POST)
+	public @ResponseBody ModelAndView createProvider(@Valid @ModelAttribute(value="providerdetails") Provider providerdetails, BindingResult result,RedirectAttributes redirectAttr, @PathVariable String cleanURL ) throws Exception {
+		
+		if(result.hasErrors()) {
+			ModelAndView mav = new ModelAndView();
+			mav.setViewName("/administrator/organizations/providerDetails");
+			mav.addObject("btnValue","Create");
+			return mav;
+		}
+		
+		providerManager.createProvider(providerdetails);
+		
+		ModelAndView mav = new ModelAndView("/administrator/organizations/providerDetails");
+		mav.addObject("success","providerCreated");
+		return mav;		
+	}
+	
+	/**
+	 * The '/{cleanURL}/updateProvider' POST request will handle submitting changes for the selected organization provider.
+	 * 
+	 * @param provider			The object containing the provider form fields
+	 * @param result			The validation result
+	 * @param redirectAttr		The variable that will hold values that can be read after the redirect
+	 * 
+	 * @return					Will return the provider list page on "Save"
+	 * 							Will return the provider form page on error
+	 * 
+	 * @Objects					(1) The object containing all the information for the clicked org
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/{cleanURL}/updateProvider", method = RequestMethod.POST)
+	public @ResponseBody ModelAndView updateProvider(@Valid @ModelAttribute(value="providerdetails") Provider providerdetails, BindingResult result,RedirectAttributes redirectAttr, @PathVariable String cleanURL ) throws Exception {
+		
+		if(result.hasErrors()) {
+			ModelAndView mav = new ModelAndView();
+			mav.setViewName("/administrator/organizations/providerDetails");
+			mav.addObject("btnValue","Update");
+			return mav;
+		}
+		
+		providerManager.updateProvider(providerdetails);
+	
+		ModelAndView mav = new ModelAndView("/administrator/organizations/providerDetails");
+		mav.addObject("success","providerUpdated");
+		return mav;		
+	}
+	
+	/**
+	 * The '/{cleanURL}/providerDelete/{title}?i=##' GET request will be used to delete the selected
+	 * provider.
+	 * 
+	 * @param 	i	The id of the provider selected
+	 * 
+	 * @return		Will return the provider list page on "Save"
+	 *
+	 */
+	 @RequestMapping(value="/{cleanURL}/providerDelete/{title}", method= RequestMethod.GET)
+	 public ModelAndView deleteProvider(@RequestParam(value="i", required=true) Integer providerId) throws Exception {
+		 
+		providerManager.deleteProvider(providerId);
+			
+		ModelAndView mav = new ModelAndView(new RedirectView("../providers?msg=deleted"));
+		return mav;		
+	 }
+	
+	
+	 /**
+	 * *********************************************************
+	 * 			ORGANIZATION BROCHURE FUNCTIONS					
+	 * *********************************************************
+	 */
+	
+	/**
+	 * The '/{cleanURL/brochures' GET request will display the list of brochures for the selected 
+	 * organization.
+	 * 
+	 * @param cleanURL		The variable that holds the organization that is being viewed
+	 * 
+	 * @return				Will return the organization brochure list page
+	 * 
+	 * @Objects				(1) An object that holds brochures found for the organization
+	 * 						(2)	The orgId used for the menu and action bar
+	 * 
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/{cleanURL}/brochures", method = RequestMethod.GET)
+	public ModelAndView listOrganizationBrochures(@PathVariable String cleanURL, @RequestParam(value="page", required=false) Integer page) throws Exception {
+		
+		if(page == null) {
+			page = 1;
+		}
+		
+		ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/organizations/organizationBrochures");
+     
+        List<Brochure> brochures = organizationManager.getOrganizationBrochures(orgId,page,maxResults);
+        mav.addObject("id",orgId);
+        mav.addObject("brochureList", brochures);		
+        
+        //Return the total list of brochures for the organization
+        Long totalBrochures = organizationManager.findTotalBrochures(orgId);
+        
+        Integer totalPages = Math.round(totalBrochures/maxResults);
+        mav.addObject("totalPages",totalPages);
+        mav.addObject("currentPage",page);
+        
+        return mav;
+	} 
+	
+	/**
+	 * The '/{cleanURL}/brochures' POST request will be used to search brochures for the selected organization 
+	 * 
+	 * @param searchTerm	The searchTerm parameter will hold the string to search on
+	 * @return				The organization brochure list page
+	 * 
+	 * @Objects				(1) An object will be returned holding the requested search term used to 
+	 * 							populate the search box
+	 * 						(2) An object containing the found brochures
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/{cleanURL}/brochures", method = RequestMethod.POST)
+	public ModelAndView findBrochures(@RequestParam String searchTerm, @PathVariable String cleanURL) throws Exception {
+		
+		ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/organizations/organizationBrochures");
+        
+        List<Brochure> brochures = brochureManager.findBrochures(orgId, searchTerm);
+        mav.addObject("id",orgId);
+        mav.addObject("searchTerm",searchTerm);
+        mav.addObject("brochureList", brochures);		
+        
+        return mav;
+	}
+	
+	/**
+	 * The '/{cleanURL}/brochure/{title}?i=##' GET request will be used to return the details of the selected
+	 * brochure.
+	 * 
+	 * @param 	i	The id of the brochure selected
+	 * 
+	 * @return		The organization brochure details page
+	 * 
+	 * @Objects		(1) An object that will hold all the details of the clicked brochure
+	 * 				(2) An object that will hold all the available sections the brochure can have access to
+	 *
+	 */
+	 @RequestMapping(value="/{cleanURL}/brochure/{title}", method= RequestMethod.GET)
+	 @ResponseBody 
+	 public ModelAndView viewBrochureDetails(@RequestParam(value="i", required=true) Integer brochureId) throws Exception {
+		 
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/organizations/brochureDetails");	
+		
+		//Get all the details for the clicked brochure
+		Brochure brochureDetails = brochureManager.getBrochureById(brochureId);
+				
+		mav.addObject("brochureId",brochureDetails.getId());
+		mav.addObject("btnValue","Update");
+		mav.addObject("brochuredetails",brochureDetails);
+		
+		return mav;
+	 }
+	 
+	 /**
+	 * The '/{cleanURL}/newBrochure' GET request will be used to display the blank new 
+	 * brochure screen (In a modal)
+	 *
+	 * 
+	 * @return		The organization brochure blank form page
+	 * 
+	 * @Objects		(1) An object that will hold all the form fields of a new brochure
+	 * 				(2) An object to hold the button value "Create"
+	 *
+	 */
+	@RequestMapping(value="/{cleanURL}/newBrochure", method = RequestMethod.GET)
+	public @ResponseBody ModelAndView newBrochure() throws Exception {
+		
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/organizations/brochureDetails");
+		Brochure brochuredetails = new Brochure();
+		
+		//Set the id of the organization for the new provider
+		brochuredetails.setOrgId(orgId);
+		mav.addObject("btnValue","Create");
+		mav.addObject("brochuredetails", brochuredetails);
+		
+		return mav;
+	}
+		
+	/**
+	 * The '/{cleanURL}/createBrochure' POST request will handle submitting the new organization brochure.
+	 * 
+	 * @param brochure			The object containing the brochure form fields
+	 * @param result			The validation result
+	 * @param redirectAttr		The variable that will hold values that can be read after the redirect
+	 * 
+	 * @return					Will return the brochure list page on "Save"
+	 * 							Will return the brochure form page on error
+	 * 
+	 * @Objects					(1) The object containing all the information for the clicked org
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/{cleanURL}/createBrochure", method = RequestMethod.POST)
+	public ModelAndView createBrochure(@ModelAttribute(value="brochuredetails") Brochure brochuredetails,RedirectAttributes redirectAttr, @PathVariable String cleanURL ) throws Exception {
+		
+		brochureManager.createBrochure(brochuredetails);
+		
+		ModelAndView mav = new ModelAndView(new RedirectView("brochures?msg=created"));
+		return mav;		
+	}
+	
+	
+	/**
+	 * The '/{cleanURL}/updateBrochure' POST request will handle submitting changes for the selected organization brochure.
+	 * 
+	 * @param brochure			The object containing the brochure form fields
+	 * @param result			The validation result
+	 * @param redirectAttr		The variable that will hold values that can be read after the redirect
+	 * 
+	 * @return					Will return the brochure list page on "Save"
+	 * 
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/{cleanURL}/updateBrochure", method = RequestMethod.POST)
+	public ModelAndView updateBrochure(@ModelAttribute(value="brochuredetails") Brochure brochuredetails, RedirectAttributes redirectAttr, @PathVariable String cleanURL ) throws Exception {
+		
+		brochureManager.updateBrochure(brochuredetails);
+	
+		ModelAndView mav = new ModelAndView(new RedirectView("brochures?msg=updated"));
+		return mav;		
+	}
+	
+	/**
+	 * The '/{cleanURL}/brochureDelete/{title}?i=##' GET request will be used to delete the selected
+	 * brochure.
+	 * 
+	 * @param 	i	The id of the brochure selected
+	 * 
+	 * @return		Will return the brochure list page on "Save"
+	 *
+	 */
+	 @RequestMapping(value="/{cleanURL}/brochureDelete/{title}", method= RequestMethod.GET)
+	 public ModelAndView deleteBrochure(@RequestParam(value="i", required=true) Integer brochureId) throws Exception {
+		 
+		brochureManager.deleteBrochure(brochureId);
+			
+		ModelAndView mav = new ModelAndView(new RedirectView("../brochures?msg=deleted"));
+		return mav;		
+	 }
+	 
+	 
+	/**
+	 * *********************************************************
+	 * 								
+	 * *********************************************************
+	 */ 
 	 
 	 protected Map getStates() throws Exception {
 		

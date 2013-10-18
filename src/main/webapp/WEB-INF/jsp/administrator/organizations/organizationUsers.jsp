@@ -40,7 +40,7 @@
 						<thead>
 							<tr>
 								<th scope="col">Name</th>
-								<th scope="col" style="text-align:center">Created</th>
+								<th scope="col" style="text-align:center">Date Created</th>
 								<th scope="col" style="text-align:center">Primary</th>
 								<th scope="col" style="text-align:center">Secondary</th>
 								<th scope="col" style="text-align:center">Times Logged In</th>
@@ -52,7 +52,7 @@
 								  <c:when test="${not empty userList}">
 								    <c:forEach var="user" items="${userList}">
 										<tr id="userRow">
-											<td scope="row"><a href="#systemUsersModal" data-toggle="modal" rel="${user.firstName}${user.lastName}?i=${user.id}" class="userEdit">${user.firstName} ${user.lastName}</a><br />(<c:choose><c:when test="${user.status == true}">active</c:when><c:otherwise>inactive</c:otherwise></c:choose>)</td>
+											<td scope="row"><a href="#systemUsersModal" data-toggle="modal" rel="${user.firstName}${user.lastName}?i=${user.id}" class="userEdit" title="Edit this user">${user.firstName} ${user.lastName}</a><br />(<c:choose><c:when test="${user.status == true}">active</c:when><c:otherwise>inactive</c:otherwise></c:choose>)</td>
 											<td style="text-align:center"><fmt:formatDate value="${user.dateCreated}" type="date" pattern="M/dd/yyyy" /></td>
 											<td style="text-align:center">
 												<c:if test="${user.mainContact == 1}">X</c:if><c:if test="${user.mainContact != 1}">--</c:if>
@@ -71,7 +71,7 @@
 									</c:forEach>
 								  </c:when>
 								  <c:otherwise>
-								   	<tr><td colspan="4" style="text-align: center">There are currently no organization users set up.</td></tr>
+								   	<tr><td colspan="6" style="text-align: center">There are currently no organization users set up.</td></tr>
 								  </c:otherwise>
 							</c:choose>
 						</tbody>
