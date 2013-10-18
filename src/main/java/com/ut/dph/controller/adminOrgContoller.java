@@ -12,16 +12,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -29,7 +23,6 @@ import java.util.Map;
 
 import com.ut.dph.model.Organization;
 import com.ut.dph.model.userAccess;
-import com.ut.dph.reference.fileSystem;
 import com.ut.dph.service.organizationManager;
 import com.ut.dph.model.User;
 import com.ut.dph.service.userManager;
@@ -38,6 +31,7 @@ import com.ut.dph.model.Provider;
 import com.ut.dph.service.providerManager;
 import com.ut.dph.model.Brochure;
 import com.ut.dph.service.brochureManager;
+import com.ut.dph.reference.USStateList;
 
 /**
  * The adminOrgController class will handle all URL requests that fall inside of
@@ -163,8 +157,11 @@ public class adminOrgContoller {
 		mav.setViewName("/administrator/organizations/organizationDetails");
 		mav.addObject("organization", new Organization());
 		
+		//Get a list of states
+		USStateList stateList = new USStateList();
+		
 		//Get the object that will hold the states
-		mav.addObject("stateList",getStates());
+		mav.addObject("stateList",stateList.getStates());
 		return mav;
 		
 	}
@@ -188,11 +185,14 @@ public class adminOrgContoller {
 	@RequestMapping(value="/create", method = RequestMethod.POST)
 	public ModelAndView saveNewOrganization(@Valid Organization organization, BindingResult result, RedirectAttributes redirectAttr,@RequestParam String action) throws Exception {
 		
+		//Get a list of states
+		USStateList stateList = new USStateList();
+		
 		if(result.hasErrors()) {
 			ModelAndView mav = new ModelAndView();
 			mav.setViewName("/administrator/organizations/organizationDetails");
 			//Get the object that will hold the states
-			mav.addObject("stateList",getStates());
+			mav.addObject("stateList",stateList.getStates());
 			return mav;
 		}
 		
@@ -203,7 +203,7 @@ public class adminOrgContoller {
 			mav.addObject("id",organization.getId());
 			mav.addObject("existingOrg","Organization "+organization.getOrgName()+" already exists.");
 			//Get the object that will hold the states
-			mav.addObject("stateList",getStates());
+			mav.addObject("stateList",stateList.getStates());
 			return mav;	
         }
 		
@@ -262,8 +262,11 @@ public class adminOrgContoller {
 		mav.addObject("id",orgId);
 		mav.addObject("organization",orgDetails);
 		
+		//Get a list of states
+		USStateList stateList = new USStateList();
+		
 		//Get the object that will hold the states
-		mav.addObject("stateList",getStates());
+		mav.addObject("stateList",stateList.getStates());
 		
 		return mav;
 	
@@ -288,13 +291,16 @@ public class adminOrgContoller {
 	 */
 	@RequestMapping(value="/{cleanURL}", method = RequestMethod.POST)
 	public ModelAndView updateOrganization(@Valid Organization organization, BindingResult result, RedirectAttributes redirectAttr,@RequestParam String action) throws Exception {
-
+		
+		//Get a list of states
+		USStateList stateList = new USStateList();
+		
 		if(result.hasErrors()) {
 			ModelAndView mav = new ModelAndView();
 			mav.setViewName("/administrator/organizations/organizationDetails");
 			mav.addObject("id",orgId);
 			//Get the object that will hold the states
-			mav.addObject("stateList",getStates());
+			mav.addObject("stateList",stateList.getStates());
 			return mav;
 		}
 		
@@ -308,7 +314,7 @@ public class adminOrgContoller {
 				mav.addObject("id",orgId);
 				mav.addObject("existingOrg","Organization "+organization.getOrgName().trim()+" already exists.");
 				//Get the object that will hold the states
-				mav.addObject("stateList",getStates());
+				mav.addObject("stateList",stateList.getStates());
 				return mav;	
 	        }
 		}
@@ -989,62 +995,6 @@ public class adminOrgContoller {
 	 * *********************************************************
 	 */ 
 	 
-	 protected Map getStates() throws Exception {
-		
-		LinkedHashMap<String,String> states = new LinkedHashMap<String,String>();
-		
-		states.put("AL", "Alabama");
-		states.put("AK", "Alaska");
-		states.put("AZ", "Arizona");
-		states.put("AR", "Arkansas");
-		states.put("CA", "California");
-		states.put("CO", "Colorado");
-		states.put("DE", "Delaware");
-		states.put("DC", "District of Columbia");
-		states.put("FL", "Florida");
-		states.put("GA", "Georgia");
-		states.put("HI", "Hawaii");
-		states.put("ID", "Idaho");
-		states.put("IL", "Illinois");
-		states.put("IN", "Indiana");
-		states.put("IA", "Iowa");
-		states.put("KS", "Kansas");
-		states.put("KY", "Kentucky");
-		states.put("LA", "Louisiana");
-		states.put("ME", "Maine");
-		states.put("MD", "Maryland");
-		states.put("MA", "Massachusetts");
-		states.put("MI", "Michigan");
-		states.put("MN", "Minnesota");
-		states.put("MS", "Mississippi");
-		states.put("MO", "Missouri");
-		states.put("MT", "Montana");
-		states.put("NE", "Nebraska");
-		states.put("NV", "Nevada");
-		states.put("NH", "New Hampshire");
-		states.put("NJ", "New Jersey");
-		states.put("NM", "New Mexico");
-		states.put("NY", "New York");
-		states.put("NC", "North Carolina");
-		states.put("ND", "North Dakota");
-		states.put("OH", "Ohio");
-		states.put("OK", "Oklahoma");
-		states.put("OR", "Oregon");
-		states.put("PA", "Pennsylvania");
-		states.put("RI", "Rhode Island");
-		states.put("SC", "South Carolina");
-		states.put("SD", "South Dakota");
-		states.put("TN", "Tennessee");
-		states.put("TX", "Texas");
-		states.put("UT", "Utah");
-		states.put("VT", "Vermont");
-		states.put("VA", "Virginia");
-		states.put("WA", "Washington");
-		states.put("WV", "West Virginia");
-		states.put("WI", "Wisconsin");
-		states.put("WY", "Wyoming");
-		
-		return states;
-	}
+	
 
 }
