@@ -123,7 +123,7 @@
 		//This function will launch the edit system user overlay populating the fields
 		//with the data of the clicked user.
 		$(document).on('click', '.userEdit',function() {
-			var userDetailsAction = $(this).attr('rel');
+			var userDetailsAction = 'user/'+$(this).attr('rel');
 
 			$.ajax({  
 		        url: userDetailsAction,  

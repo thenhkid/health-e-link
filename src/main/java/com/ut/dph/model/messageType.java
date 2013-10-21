@@ -8,12 +8,17 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 @Entity
 @Table(name="MESSAGETYPES")
-public class Messagetypes {
+public class messageType {
+	
+	 @Transient
+	 private CommonsMultipartFile file; 
 	
 	  @Id
 	  @GeneratedValue(strategy = GenerationType.AUTO)
@@ -73,5 +78,13 @@ public class Messagetypes {
 	  public void setTemplateFile(String templateFile) {
 		  this.templateFile = templateFile;
 	  }
+	  
+	  public CommonsMultipartFile getFile() {  
+		  return file;  
+	  }  
+		  
+	  public void setFile(CommonsMultipartFile file) {  
+		  this.file = file;  
+	  }  
 
 }

@@ -151,6 +151,18 @@
 			}
 		});
 
+		$(document).on('click','.brochureView',function() {
+			var attachmentAction = 'brochureView/'+$(this).attr('rel');
+
+			$.ajax({  
+		        url: attachmentAction,  
+		        type: "GET",  
+		        success: function(data) {  
+		            $("#brochureAttachment").html(data);           
+		        }  
+		    });  
+		});
+
 		//This function will handle searching for brochures
 		$('#searchBrochureBtn').click(function() {
 			$('#searchForm').submit();
@@ -187,13 +199,13 @@
 			}
 			//Make sure the file is a correct format
 			//(.jpg, .gif, .jpeg, .doc, .docx, .pdf)
-			if($('#brochureFile').val().indexOf('.jpg') == -1 && 
+			if($('#brochureFile').val() != '' && ($('#brochureFile').val().indexOf('.jpg') == -1 && 
 					$('#brochureFile').val().indexOf('.jpeg') == -1 &&
 					$('#brochureFile').val().indexOf('.gif') == -1 &&
 					$('#brochureFile').val().indexOf('.pdf') == -1 &&
 					$('#brochureFile').val().indexOf('.doc') == -1 &&
 					$('#brochureFile').val().indexOf('.docx') == -1 &&
-					$('#brochureFile').val().indexOf('.doc') == -1) {
+					$('#brochureFile').val().indexOf('.doc') == -1)) {
 				
 				$('#brochureFileDiv').addClass("has-error");
 				$('#brochureFileMsg').addClass("has-error");

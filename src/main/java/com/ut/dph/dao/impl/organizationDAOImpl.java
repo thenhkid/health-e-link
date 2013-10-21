@@ -14,6 +14,7 @@ import com.ut.dph.model.Brochure;
 import com.ut.dph.model.Organization;
 import com.ut.dph.model.Provider;
 import com.ut.dph.model.User;
+import com.ut.dph.reference.fileSystem;
 import com.ut.dph.service.brochureManager;
 
 /**
@@ -422,6 +423,13 @@ public class organizationDAOImpl implements organizationDAO {
 		Query deleteUser = sessionFactory.getCurrentSession().createQuery("delete from User where orgId = :orgId");
 		deleteUser.setParameter("orgId", orgId);
 		deleteUser.executeUpdate();
+		
+		//Get the organization cleanURL
+		Organization orgDetails = getOrganizationById(orgId);
+		
+		//Delete the organization folder within bowlink
+		fileSystem dir = new fileSystem();
+		dir.deleteOrgDirectories(orgDetails.getcleanURL());
 		
 		//Delete the organization
 		Query deleteOrg = sessionFactory.getCurrentSession().createQuery("delete from Organization where id = :orgId");

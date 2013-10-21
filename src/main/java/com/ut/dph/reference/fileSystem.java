@@ -1,6 +1,7 @@
 package com.ut.dph.reference;
 
 import java.io.File;
+import java.io.IOException;
 
 public class fileSystem {
 	
@@ -12,6 +13,22 @@ public class fileSystem {
 	public String getDir() {
 		return dir;
 	}
+	
+	public void setMessageTypeDir(String folderName) {
+		//Windows
+	    if (os.indexOf("win") >= 0) {
+		  this.dir = "c:\\bowlink\\" + folderName;
+	    }
+	    //Mac
+	    else if (os.indexOf("mac") >= 0) {
+			this.dir = "/Users/chadmccue/bowlink/" + folderName;
+	    }
+	    //Unix or Linux or Solarix
+	    else if (os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0 || os.indexOf("aix") >= 0 || os.indexOf("sunos") >= 0) {
+		  this.dir = "/home/bowlink/" + folderName;
+	    }
+	}
+	
 	
 	public void setDir(String orgName, String folderName) {
 	
@@ -27,6 +44,39 @@ public class fileSystem {
 	   else if (os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0 || os.indexOf("aix") >= 0 || os.indexOf("sunos") >= 0) {
 		  this.dir = "/home/bowlink/" + orgName + "/" + folderName + "/";
 	   }
+		
+	}
+	
+	public void deleteOrgDirectories(String orgName) {
+		
+		try {
+			//Windows
+			if (os.indexOf("win") >= 0) {
+				//C:/BowLink/
+				String dir = "c:\\bowlink\\" +orgName;
+				File directory = new File(dir);
+				delete(directory);			} 
+			//Mac
+			else if (os.indexOf("mac") >= 0) {
+				String dir = "/Users/chadmccue/bowlink/" + orgName;
+				File directory = new File(dir);
+				delete(directory);
+			} 
+			//Unix or Linux or Solarix
+			else if (os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0 || os.indexOf("aix") >= 0 || os.indexOf("sunos") >= 0) {
+				String dir = "/home/bowlink/" + orgName;
+				File directory = new File(dir);
+				delete(directory);
+			} 
+			else {
+				System.out.println("Your OS is not support!!");
+			}
+			
+			
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
 		
 	}
 	
@@ -83,5 +133,39 @@ public class fileSystem {
 		
 		
 	}
+	
+	public static void delete(File file) throws IOException{
+	 
+	    	if(file.isDirectory()){
+	 
+	    		//directory is empty, then delete it
+	    		if(file.list().length==0){
+	 
+	    		   file.delete();
+	 
+	    		}else{
+	 
+	    		   //list all the directory contents
+	        	   String files[] = file.list();
+	 
+	        	   for (String temp : files) {
+	        	      //construct the file structure
+	        	      File fileDelete = new File(file, temp);
+	 
+	        	      //recursive delete
+	        	     delete(fileDelete);
+	        	   }
+	 
+	        	   //check the directory again, if empty then delete it
+	        	   if(file.list().length==0){
+	           	     file.delete();
+	        	   }
+	    		}
+	 
+	    	}else{
+	    		//if file, then delete it
+	    		file.delete();
+	    	}
+	    }
 
 }

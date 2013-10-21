@@ -2,6 +2,7 @@ package com.ut.dph.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.imageio.ImageIO;
 import javax.validation.Valid;
 
 import org.springframework.stereotype.Controller;
@@ -12,14 +13,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
+import java.awt.Image;
+import java.io.File;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.ut.dph.model.Organization;
 import com.ut.dph.model.userAccess;
@@ -32,6 +34,7 @@ import com.ut.dph.service.providerManager;
 import com.ut.dph.model.Brochure;
 import com.ut.dph.service.brochureManager;
 import com.ut.dph.reference.USStateList;
+import com.ut.dph.reference.fileSystem;
 
 /**
  * The adminOrgController class will handle all URL requests that fall inside of
@@ -555,7 +558,7 @@ public class adminOrgContoller {
 	}
 	
 	/**
-	 * The '/{cleanURL}/users/{person}?i=##' GET request will be used to return the details of the selected
+	 * The '/{cleanURL}/userattachmentActionattachmentActionattachmentActionattachmentActionattachmentActionattachmentActionattachmentActionattachmentActionattachmentActionattachmentActionattachmentActionattachmentActionattachmentActionpertinent/{person}?i=##' GET request will be used to return the details of the selected
 	 * user.
 	 * 
 	 * @param 	i	The id of the user selected
@@ -566,7 +569,7 @@ public class adminOrgContoller {
 	 * 				(2) An object that will hold all the available sections the user can have access to
 	 *
 	 */
-	 @RequestMapping(value="/{cleanURL}/{person}", method= RequestMethod.GET)
+	 @RequestMapping(value="/{cleanURL}/user/{person}", method= RequestMethod.GET)
 	 @ResponseBody 
 	 public ModelAndView viewUserDetails(@RequestParam(value="i", required=true) Integer userId) throws Exception {
 		 
@@ -988,6 +991,37 @@ public class adminOrgContoller {
 		return mav;		
 	 }
 	 
+	 @RequestMapping(value="/{cleanURL}/brochureView/{title}", method = RequestMethod.GET)
+	 public @ResponseBody ModelAndView viewBrochureFile(@RequestParam(value="i", required=true) Integer brochureId, @PathVariable String cleanURL) throws Exception {
+		 
+		 //Need to get the file name based on the brochure Id passed
+		 Brochure brochure = brochureManager.getBrochureById(brochureId);
+		 
+		 ModelAndView mav = new ModelAndView();
+		 mav.setViewName("/administrator/organizations/brochureAttachment");
+		 
+		 //Set the type of attachment
+		 fileSystem dir = new fileSystem();
+		 dir.setDir(cleanURL, "brochures");
+		 Image image = ImageIO.read(new File(dir.getDir() + brochure.getfileName()));
+	     if (image == null) {
+	         if(brochure.getfileName().contains(".pdf")) {
+	        	 mav.addObject("fileType","pdf");
+	         }
+	         else {
+	        	 mav.addObject("fileType","other");
+	         }
+	    	
+	     }
+	     else {
+	    	 mav.addObject("fileType","image");
+	     }
+		 
+		 mav.addObject("brochureAttachment", cleanURL+"/brochures/"+brochure.getfileName());
+		 
+		 return mav;
+	 }
+	
 	 
 	/**
 	 * *********************************************************

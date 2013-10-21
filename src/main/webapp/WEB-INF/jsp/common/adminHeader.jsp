@@ -20,9 +20,9 @@
 					</a>
 				</div>
 				<ul class="nav navbar-nav">
-					<li class="${param['sect'] == 'org' ? 'active' : 'none'}"><a href="<c:url value='/administrator/organizations/list' />" title="Organizations">Organizations</a><c:if test="${param['sect'] == 'org'}"><span class="indicator-active arrow-up"></span></c:if></li>
-					<li class="${param['sect'] == 'config' ? 'active' : 'none'}"><a href="<c:url value='/administrator/configurations/list' />" title="Configurations">Configurations</a><c:if test="${param['sect'] == 'config'}"><span class="indicator-active arrow-up"></span></c:if></li>
-					<li class="${param['sect'] == 'lib' ? 'active' : 'none'}"><a href="<c:url value='/administrator/library/list' />" title="Message Type Library">Message Type Library</a><c:if test="${param['sect'] == 'lib'}"><span class="indicator-active arrow-up"></span></c:if></li>
+					<li class="${param['sect'] == 'org' ? 'active' : 'none'}"><a href="<c:url value='/administrator/organizations/list' />" title="Organization Manager">Organizations</a><c:if test="${param['sect'] == 'org'}"><span class="indicator-active arrow-up"></span></c:if></li>
+					<li class="${param['sect'] == 'config' ? 'active' : 'none'}"><a href="<c:url value='/administrator/configurations/list' />" title="Configuration Manager">Configurations</a><c:if test="${param['sect'] == 'config'}"><span class="indicator-active arrow-up"></span></c:if></li>
+					<li class="${param['sect'] == 'lib' ? 'active' : 'none'}"><a href="<c:url value='/administrator/library/list' />" title="Message Type Library Manager">Message Type Library</a><c:if test="${param['sect'] == 'lib'}"><span class="indicator-active arrow-up"></span></c:if></li>
 					<li class="${param['sect'] == 'sched' ? 'active' : 'none'}"><a href="" title="Scheduler">Scheduler</a><c:if test="${param['sect'] == 'sched'}"><span class="indicator-active arrow-up"></span></c:if></li>
 				</ul>
 				<ul class="nav navbar-nav navbar-right" id="secondary-nav">
