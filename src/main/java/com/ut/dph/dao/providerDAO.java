@@ -3,6 +3,7 @@ package com.ut.dph.dao;
 import java.util.List;
 
 import com.ut.dph.model.Provider;
+import com.ut.dph.model.providerAddress;
 
 public interface providerDAO {
 	
@@ -15,6 +16,8 @@ public interface providerDAO {
   Provider getProviderById(int providerId);
   
   List<Provider> findProviders(int orgId, String searchTerm);
+  
+  List<providerAddress> getProviderAddresses(int providerId);
 
 }
 

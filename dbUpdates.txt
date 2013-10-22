@@ -64,7 +64,7 @@ ADD COLUMN `gender` VARCHAR(45) NULL AFTER `dob`;
   `city` varchar(45) DEFAULT NULL,
   `county` varchar(45) DEFAULT NULL,
   `postalCode` varchar(45) DEFAULT NULL,
-  `prority` varchar(45) DEFAULT NULL,
+  `priority` varchar(45) DEFAULT NULL,
   `status` varchar(45) DEFAULT NULL,
   `dateAdded` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `dateModified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,

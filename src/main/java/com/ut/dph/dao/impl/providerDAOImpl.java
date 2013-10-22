@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import com.ut.dph.dao.providerDAO;
 import com.ut.dph.model.Provider;
+import com.ut.dph.model.providerAddress;
 
 /**
  * The providerDAOImpl class will implement the DAO access layer to handle
@@ -45,12 +46,22 @@ public class providerDAOImpl implements providerDAO {
 				
 		lastId = (Integer) sessionFactory.getCurrentSession().save(provider);
 		
+		List<providerAddress> addresses = provider.getProviderAddresses();
+		
+		//Loop through the selected provider address information and save to the provider
+		//This will populate the 'info_ProviderAddresses' table
+		for(int i = 0;i<addresses.size();i++) {
+			addresses.get(i).setProviderId(lastId);
+			sessionFactory.getCurrentSession().save(addresses.get(i));
+		}
+		
+		
 		return lastId;
 	}
 	
 	
 	/**
-	 * The 'updateProvider' function will update the selected provder with the changes
+	 * The 'updateProvider' function will update the selected provider with the changes
 	 * entered into the form.
 	 * 
 	 * @param	provider	This will hold the provider object from the provider form
@@ -117,5 +128,23 @@ public class providerDAOImpl implements providerDAO {
 	     return criteria.list();  
 	}
 	
+	/**
+	 * The 'getProviderAddresses' function will return a list of addresses associated
+	 * with the selected provider.
+	 * 
+	 * @param	providerId	This will be used to query addresses
+	 * 
+	 * #Return 	The function will return a lost providerAddress objects
+	 */
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<providerAddress>  getProviderAddresses(int providerId) {
+		 //Order by city
+		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(providerAddress.class)
+	    	.add(Restrictions.eq("providerId",providerId))
+	    	.addOrder(Order.asc("city"));
+	     
+	     return criteria.list();  
+	}
 
 }

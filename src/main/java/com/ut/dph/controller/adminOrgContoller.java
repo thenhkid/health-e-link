@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.ut.dph.model.Organization;
+import com.ut.dph.model.providerAddress;
 import com.ut.dph.model.userAccess;
 import com.ut.dph.service.organizationManager;
 import com.ut.dph.model.User;
@@ -693,7 +694,11 @@ public class adminOrgContoller {
 		
 		//Get all the details for the clicked provider
 		Provider providerDetails = providerManager.getProviderById(providerId);
-				
+		
+		//Set the provider addresses
+		List<providerAddress> addresses = providerManager.getProviderAddresses(providerId);
+		providerDetails.setProviderAddresses(addresses);
+		mav.addObject("totaladdresses",addresses.size());	
 		mav.addObject("providerId",providerDetails.getId());
 		mav.addObject("btnValue","Update");
 		mav.addObject("providerdetails",providerDetails);

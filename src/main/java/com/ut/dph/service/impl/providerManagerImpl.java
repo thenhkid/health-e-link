@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ut.dph.dao.providerDAO;
 import com.ut.dph.model.Provider;
+import com.ut.dph.model.providerAddress;
 import com.ut.dph.service.providerManager;
 
 @Service
@@ -46,6 +47,12 @@ public class providerManagerImpl implements providerManager{
 	@Transactional
 	public List<Provider> findProviders(int orgId, String searchTerm) {
 		return providerDAO.findProviders(orgId, searchTerm);
+	}
+	
+	@Override
+	@Transactional
+	public List<providerAddress>  getProviderAddresses(int providerId) {
+		return providerDAO.getProviderAddresses(providerId);
 	}
 	
 }

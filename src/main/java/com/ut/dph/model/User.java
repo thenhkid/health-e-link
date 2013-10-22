@@ -10,6 +10,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -40,7 +41,7 @@ public class User {
 	  @Column(name="LASTNAME", nullable = true)
 	  private String lastName;
 	  
-	  @NotEmpty
+	  @NotEmpty @Size(min=5, max = 10)
 	  @Column(name="USERNAME", nullable = false)
 	  private String username;
 	  

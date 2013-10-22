@@ -42,7 +42,7 @@
 					</spring:bind>
 					<spring:bind path="providerId">
 						<div class="form-group ${status.error ? 'has-error' : '' }">
-							<label class="control-label" for="providerId">Provider Id</label>
+							<label class="control-label" for="providerId">Provider Id *</label>
 							<form:input path="providerId" id="providerId" class="form-control" type="text"  maxLength="45" />
 							<form:errors path="providerId" cssClass="control-label" element="label" />
 						</div>
@@ -68,6 +68,38 @@
 							<form:errors path="fax" cssClass="control-label" element="label" />
 						</div>
 					</spring:bind>
+					<label class="control-label" for="fax">Address Info</label>
+					<c:choose>
+						<c:when test="${providerdetails.providerAddresses.size() > 0}">
+							<c:forEach items="${providerdetails.providerAddresses}" var="address" varStatus="pStatus">
+							 	<spring:bind path="providerAddresses[${pStatus.index}].line1">
+								 	<div class="form-group ${status.error ? 'has-error' : '' }">
+										<label class="control-label" for="address1">Address 1 </label>
+										<form:input path="providerAddresses[${pStatus.index}].line1" id="address1" class="form-control" type="text" size="20" maxLength="45" />
+										<form:errors path="providerAddresses[${pStatus.index}].line1" cssClass="control-label" element="label" />
+									</div>
+								</spring:bind>
+								<spring:bind path="providerAddresses[${pStatus.index}].city">
+								 	<div class="form-group ${status.error ? 'has-error' : '' }">
+										<label class="control-label" for="address1">City </label>
+										<form:input path="providerAddresses[${pStatus.index}].city" id="address1" class="form-control" type="text" size="20" maxLength="45" />
+										<form:errors path="providerAddresses[${pStatus.index}].city" cssClass="control-label" element="label" />
+									</div>
+								</spring:bind>
+							</c:forEach>
+						</c:when>
+						<c:otherwise>
+						 	<div class="form-group">
+								<label class="control-label" for="providerAddresses[0].line1">Address 1</label>
+								<input id="providerAddresses[0].line1" class="form-control" name="providerAddresses[0].line1" type="text" size="20" maxLength="45" />
+							</div>
+							<div class="form-group">
+								<label class="control-label" for="providerAddresses[0].city">City</label>
+								<input id="providerAddresses[0].city" class="form-control" name="providerAddresses[0].city" type="text" size="20" maxLength="45" />
+							</div>
+						</c:otherwise>
+					</c:choose>
+					
 					<div class="form-group">
 						<input type="button" id="submitButton" rel="${btnValue}" class="btn btn-primary" value="${btnValue}"/>
 					</div>
