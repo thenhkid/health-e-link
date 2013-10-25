@@ -6,6 +6,7 @@ import java.util.Map;
 
 public class USStateList {
 	
+	@SuppressWarnings("rawtypes")
 	public Map getStates() throws Exception {
 		
 		LinkedHashMap<String,String> states = new LinkedHashMap<String,String>();

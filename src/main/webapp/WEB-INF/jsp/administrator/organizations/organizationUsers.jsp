@@ -138,15 +138,6 @@
 			$('#searchForm').submit();
 		});
 
-		/*$("#searchTerm").keyup(function(event) {
-			var term = $(this).val();
-
-			if(term.length >= 3 || term.length == 0) {
-				if(searchTimeout) {clearTimeout(searchTimeout);}
-				searchTimeout = setInterval("orglookup()",500);
-			}
-		});*/
-
 
 		//Function to submit the changes to an existing user or 
 		//submit the new user fields from the modal window.

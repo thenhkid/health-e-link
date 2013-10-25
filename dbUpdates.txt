@@ -36,26 +36,16 @@ ADD CONSTRAINT `brochureOrgId`
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
 
-//10-20-2013 (Grace)
+//10-24-2013 (Chad)
 ALTER TABLE `universalTranslator`.`providers` 
-DROP COLUMN `fax`,
-DROP COLUMN `phone`,
-DROP COLUMN `lastName`,
-DROP COLUMN `firstName`,
-ADD COLUMN `displayName` VARCHAR(100) NULL AFTER `providerId`,
-ADD COLUMN `specialty` VARCHAR(100) NULL AFTER `displayName`,
-ADD COLUMN `url` VARCHAR(100) NULL AFTER `status`,
-ADD COLUMN `ccrStatus` VARCHAR(45) NULL COMMENT 'CCR restricted field values are Active, Prior History No Longer Active, Unknown' AFTER `url`,
-ADD COLUMN `dateAdded` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER `ccrStatus`,
-ADD COLUMN `dateModified` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER `dateAdded`;
-CHANGE COLUMN `status` `status` BIT(1) NOT NULL DEFAULT b'1' COMMENT '1 = Active\n0 = Inactive' AFTER `providerId`,
-CHANGE COLUMN `ccrStatus` `ccrStatusId` INT NULL DEFAULT NULL COMMENT 'CCR restricted field values are Active, Prior History No Longer Active, Unknown' ,
-ADD COLUMN `dob` DATETIME NULL AFTER `specialty`,
-ADD COLUMN `gender` VARCHAR(45) NULL AFTER `dob`;
+CHANGE COLUMN `phone` `phone1` VARCHAR(20) NULL DEFAULT NULL ,
+ADD COLUMN `phone2` VARCHAR(15) NULL DEFAULT NULL AFTER `dateCreated`,
+ADD COLUMN `specialty` VARCHAR(100) NULL DEFAULT NULL AFTER `phone2`,
+ADD COLUMN `gender` VARCHAR(45) NULL DEFAULT NULL AFTER `specialty`,
+ADD COLUMN `url` VARCHAR(255) NULL DEFAULT NULL AFTER `gender`;
 
 
-//10-20-2013 (Grace)
-  CREATE TABLE `info_ProviderAddresses` (
+ CREATE TABLE `info_ProviderAddresses` (
   `id` int(11) NOT NULL,
   `providerId` int(11) NOT NULL,
   `type` varchar(45) DEFAULT NULL COMMENT 'is there a look up?',
@@ -64,14 +54,17 @@ ADD COLUMN `gender` VARCHAR(45) NULL AFTER `dob`;
   `city` varchar(45) DEFAULT NULL,
   `county` varchar(45) DEFAULT NULL,
   `postalCode` varchar(45) DEFAULT NULL,
+  `state` varchar(2) DEFAULT NULL,
   `priority` varchar(45) DEFAULT NULL,
   `status` varchar(45) DEFAULT NULL,
-  `dateAdded` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `phone1` varchar(45) DEFAULT NULL,
+  `phone2` varchar(45) DEFAULT NULL,
+  `fax` varchar(45) DEFAULT NULL,
+  `dateCreated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `dateModified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
   
-//10-20-2013 (Grace)  
 ALTER TABLE `universalTranslator`.`info_ProviderAddresses` 
 ADD INDEX `providerIdFK_idx` (`providerId` ASC);
 ALTER TABLE `universalTranslator`.`info_ProviderAddresses` 
@@ -81,71 +74,7 @@ ADD CONSTRAINT `providerIdFK`
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
 
-//10-20-2013 (Grace)
-CREATE TABLE `info_ProviderTelephones` (
-  `id` int(11) NOT NULL,
-  `providerId` int(11) NOT NULL,
-  `phoneNumber` varchar(45) DEFAULT NULL,
-  `type` varchar(45) DEFAULT NULL,
-  `priority` varchar(45) DEFAULT NULL,
-  `status` varchar(45) DEFAULT NULL,
-  `dateAdded` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `dateModified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-//10-20-2013 (Grace)
-CREATE TABLE `info_ProviderNames` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `providerId` int(11) NOT NULL,
-  `nameType` varchar(45) NOT NULL,
-  `given` varchar(45) DEFAULT NULL,
-  `middle` varchar(45) DEFAULT NULL,
-  `family` varchar(45) DEFAULT NULL,
-  `suffix` varchar(45) DEFAULT NULL,
-  `title` varchar(45) DEFAULT NULL,
-  `nickName` varchar(45) DEFAULT NULL,
-  `dateAdded` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `dateModified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
-//foreign keys 10-20-2013
-
-ALTER TABLE `universalTranslator`.`info_ProviderNames` 
-ADD INDEX `providerNameFK_idx` (`providerId` ASC);
-ALTER TABLE `universalTranslator`.`info_ProviderNames` 
-ADD CONSTRAINT `providerNameFK`
-  FOREIGN KEY (`providerId`)
-  REFERENCES `universalTranslator`.`providers` (`id`)
-  ON DELETE NO ACTION
-  ON UPDATE NO ACTION;
-
-//info_ProviderTelephones
-CREATE TABLE `info_ProviderTelephones` (
-  `id` int(11) NOT NULL,
-  `providerId` int(11) NOT NULL,
-  `phoneNumber` varchar(45) DEFAULT NULL,
-  `type` varchar(45) DEFAULT NULL,
-  `priority` varchar(45) DEFAULT NULL,
-  `status` varchar(45) DEFAULT NULL,
-  `dateAdded` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `dateModified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `ProviderTelephonesFK_idx` (`providerId`),
-  CONSTRAINT `ProviderTelephonesFK` FOREIGN KEY (`providerId`) REFERENCES `providers` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
-//foreign key
-
-ALTER TABLE `universalTranslator`.`info_ProviderTelephones` 
-ADD INDEX `ProviderTelephonesFK_idx` (`providerId` ASC);
-ALTER TABLE `universalTranslator`.`info_ProviderTelephones` 
-ADD CONSTRAINT `ProviderTelephonesFK`
-  FOREIGN KEY (`providerId`)
-  REFERENCES `universalTranslator`.`providers` (`id`)
-  ON DELETE NO ACTION
-  ON UPDATE NO ACTION;
 
   
   

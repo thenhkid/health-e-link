@@ -9,6 +9,10 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.hibernate.validator.constraints.NotEmpty;
+
+import com.ut.dph.validator.Phone;
+
 @Entity
 @Table(name="INFO_PROVIDERADDRESSES")
 public class providerAddress {
@@ -19,10 +23,14 @@ public class providerAddress {
 	private String line2;
 	private String city;
 	private String county;
+	private String state;
 	private String postalCode;
 	private String priority;
 	private String status;
-	private Date dateAdded = new Date();
+	private String phone1;
+	private String phone2;
+	private String fax;
+	private Date dateCreated = new Date();
 	private Date dateModified = new Date();
 	private int providerId;
 	
@@ -37,7 +45,6 @@ public class providerAddress {
 		this.id = id;
 	}
 	
-	
 	@Column(name="TYPE", nullable = true)
 	public String getType() {
 		return this.type;
@@ -47,7 +54,8 @@ public class providerAddress {
 		this.type = type;
 	}
 	
-	@Column(name="LINE1", nullable = true)
+	@NotEmpty
+	@Column(name="LINE1", nullable = false)
 	public String getLine1() {
 		return this.line1;
 	}
@@ -65,7 +73,8 @@ public class providerAddress {
 		this.line2 = line2;
 	}
 	
-	@Column(name="CITY", nullable = true)
+	@NotEmpty
+	@Column(name="CITY", nullable = false)
 	public String getCity() {
 		return this.city;
 	}
@@ -83,7 +92,51 @@ public class providerAddress {
 		this.county = county;
 	}
 	
-	@Column(name="POSTALCODE", nullable = true)
+	@NotEmpty
+	@Column(name="STATE", nullable = false)
+	public String getState() {
+		return this.state;
+	}
+	
+	public void setState(String state) {
+		this.state = state;
+	}
+	
+	@NotEmpty @Phone
+	@Column(name="PHONE1", nullable = false)
+	
+	public String getPhone1() {
+		return phone1;
+	}
+	  
+	public void setPhone1(String phone) {
+		this.phone1 = phone;
+	}
+	
+	@Phone
+	@Column(name="PHONE2", nullable = true)
+	
+	public String getPhone2() {
+		return phone2;
+	}
+	  
+	public void setPhone2(String phone) {
+		this.phone2 = phone;
+	}
+	  
+	@Phone
+	@Column(name="FAX", nullable = true)
+	
+	public String getFax() {
+		return fax;
+	}
+	 
+	public void setFax(String fax) {
+		this.fax = fax;
+	}
+	
+	@NotEmpty
+	@Column(name="POSTALCODE", nullable = false)
 	public String getPostalCode() {
 		return this.postalCode;
 	}
@@ -110,13 +163,13 @@ public class providerAddress {
 		this.status = status;
 	}
 	
-	@Column(name="DATEADDED", nullable = true)
-	public Date getDateAdded() {
-		 return dateAdded;
+	@Column(name="DATECREATED", nullable = true)
+	public Date getDateCreated() {
+		 return dateCreated;
 	}
 	  
-	public void setDateAdded(Date dateAdded) {
-		 this.dateAdded = dateAdded;
+	public void setDateCreated(Date dateCreated) {
+		 this.dateCreated = dateCreated;
 	}
 	
 	@Column(name="DATEMODIFIED", nullable = true)

@@ -18,6 +18,14 @@ public interface providerManager {
   List<Provider> findProviders(int orgId, String searchTerm);
   
   List<providerAddress> getProviderAddresses(int providerId);
+  
+  providerAddress getAddressDetails(int addressId);
+  
+  void updateAddress(providerAddress providerAddress);
+  
+  void createAddress(providerAddress providerAddress);
+  
+  void deleteAddress(int addressId);
 
 }
 

@@ -25,6 +25,9 @@
 					<c:when test="${param['page'] == 'orgProviders'}">
 						<a href="javascript:void(0);" title="Organization Providers" class="unstyled-link">Organization Providers</a>
 					</c:when>
+					<c:when test="${param['page'] == 'providerDetails'}">
+						<a href="javascript:void(0);" title="Organization Providers" class="unstyled-link">Edit Provider</a>
+					</c:when>
 					<c:when test="${param['page'] == 'orgBrochures'}">
 						<a href="javascript:void(0);" title="Organization Brochures" class="unstyled-link">Organization Brochures</a>
 					</c:when>
@@ -38,6 +41,12 @@
 					<li><a href="javascript:void(0);" id="saveCloseDetails" title="Save &amp; Close"><span class="glyphicon glyphicon-floppy-disk icon-stacked"></span> Save &amp; Close</a></li>
 					<c:if test="${not empty id}"><li><a href="#confirmationOrgDelete" data-toggle="modal" rel="${id}" title="Delete this Organization"><span class="glyphicon glyphicon-remove icon-stacked"></span>Delete</a></li></c:if>
 					<li><a href="<c:url value='/administrator/organizations/list' />" title="Cancel"><span class="glyphicon icon-stacked custom-icon icon-cancel"></span>Cancel</a></li>
+				</c:when>
+				<c:when test="${param['page'] == 'providerDetails'}">
+					<li><a href="javascript:void(0);" id="saveDetails" title="Save this Provider"><span class="glyphicon glyphicon-ok icon-stacked"></span> Save </a></li>
+					<li><a href="javascript:void(0);" id="saveCloseDetails" title="Save And Close"><span class="glyphicon glyphicon-floppy-disk icon-stacked"></span> Save &amp; Close</a></li>
+					<c:if test="${providerId > 0}"><li><a href="javascript:void(0);" id="deleteProvider" rel="${providerId}" title="Delete this Provider"><span class="glyphicon glyphicon-remove icon-stacked"></span>Delete</a></li></c:if>
+					<li><a href="<c:url value='providers' />" title="Cancel"><span class="glyphicon icon-stacked custom-icon icon-cancel"></span>Cancel</a></li>
 				</c:when>
 				<c:when test="${param['page'] == 'listOrgs'}">
 					<li><a href="create" title="Create New Organization"><span class="glyphicon icon-stacked glyphicon glyphicon-plus"></span>Create New</a></li>

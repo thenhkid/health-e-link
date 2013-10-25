@@ -78,7 +78,7 @@
 							<div class="form-group ${status.error ? 'has-error' : '' }">
 								<label class="control-label" for="state">State *</label>
 								<form:select id="state" path="state" cssClass="form-control half">
-								     <option value="Select" label=" - Select - " ></option>
+								     <option value="" label=" - Select - " ></option>
 								     <form:options items="${stateList}"/>
 								</form:select>
 								<form:errors path="state" cssClass="control-label" element="label" />

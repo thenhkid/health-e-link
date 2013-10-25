@@ -1,6 +1,7 @@
 package com.ut.dph.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 
 import javax.imageio.ImageIO;
 import javax.validation.Valid;
@@ -513,7 +514,6 @@ public class adminOrgContoller {
 		return mav;		
 	}
 	
-
 	 
 	 /**
 	 * The '/{cleanURL}/users/update' POST request will handle submitting changes for the selected organization system user.
@@ -559,7 +559,7 @@ public class adminOrgContoller {
 	}
 	
 	/**
-	 * The '/{cleanURL}/userattachmentActionattachmentActionattachmentActionattachmentActionattachmentActionattachmentActionattachmentActionattachmentActionattachmentActionattachmentActionattachmentActionattachmentActionattachmentActionpertinent/{person}?i=##' GET request will be used to return the details of the selected
+	 * The '/{cleanURL}/user/{person}?i=##' GET request will be used to return the details of the selected
 	 * user.
 	 * 
 	 * @param 	i	The id of the user selected
@@ -630,7 +630,7 @@ public class adminOrgContoller {
 		}
 		
 		ModelAndView mav = new ModelAndView();
-        mav.setViewName("/administrator/organizations/organizationProviders");
+        mav.setViewName("/administrator/organizations/providers/list");
      
         List<Provider> providers = organizationManager.getOrganizationProviders(orgId,page,maxResults);
         mav.addObject("id",orgId);
@@ -662,7 +662,7 @@ public class adminOrgContoller {
 	public ModelAndView findProviders(@RequestParam String searchTerm, @PathVariable String cleanURL) throws Exception {
 		
 		ModelAndView mav = new ModelAndView();
-        mav.setViewName("/administrator/organizations/organizationProviders");
+        mav.setViewName("/administrator/organizations/providers/list");
         
         List<Provider> providers = providerManager.findProviders(orgId, searchTerm);
         mav.addObject("id",orgId);
@@ -674,7 +674,81 @@ public class adminOrgContoller {
 	}
 	
 	/**
-	 * The '/{cleanURL}/provider/{person}?i=##' GET request will be used to return the details of the selected
+	 *  The '/{cleanURL}/provider.create' GET request will be used to create a new provider
+	 *  
+	 *  @return The blank organization provider page
+	 *  
+	 *  @Objects (1) An object that will hold the blank provider
+	 */
+	@RequestMapping(value="/{cleanURL}/provider.create", method = RequestMethod.GET)
+	public ModelAndView newProviderForm() throws Exception {
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/organizations/providers/details");	
+		
+		//Create a new blank provider.
+		Provider providerDetails = new Provider();
+		mav.addObject("providerId",0);
+		
+		//Set the id of the organization to add the provider to
+		providerDetails.setOrgId(orgId);
+		
+		mav.addObject("id",orgId);
+		mav.addObject("providerdetails",providerDetails);
+		
+		return mav;
+	}
+	
+	/**
+	 * The '//{cleanURL}/provider.create' POST request will handle submitting the new provider.
+	 * 
+	 * @param providerdetails	The object containing the provider form fields
+	 * @param result			The validation result
+	 * @param redirectAttr		The variable that will hold values that can be read after the redirect
+	 * @param action			The variable that holds which button was pressed
+	 * 
+	 * @return					Will return the provider list page on "Save & Close"
+	 * 							Will return the provider details page on "Save"
+	 * 							Will return the provider create page on error
+	 * 
+	 * @Objects					(1) The object containing all the information for the new provider
+	 * 							(2) The 'id' of the clicked org that will be used in the menu and action bar
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/{cleanURL}/provider.create", method = RequestMethod.POST)
+	public ModelAndView createProvider(@Valid @ModelAttribute(value="providerdetails") Provider providerdetails, BindingResult result, RedirectAttributes redirectAttr,@RequestParam String action) throws Exception {
+		
+		if(result.hasErrors()) {
+			ModelAndView mav = new ModelAndView();
+			mav.setViewName("/administrator/organizations/providers/details");
+			mav.addObject("providerId",providerdetails.getId());
+			mav.addObject("id",orgId);
+			return mav;
+		}
+		
+		//Create the provider
+		Integer providerId = providerManager.createProvider(providerdetails);
+	
+		//If the "Save" button was pressed 
+		if(action.equals("save")) {
+			//This variable will be used to display the message on the details form
+			redirectAttr.addFlashAttribute("savedStatus", "created");
+			ModelAndView mav = new ModelAndView(new RedirectView("provider."+providerdetails.getFirstName()+providerdetails.getLastName()+"?i="+providerId));
+			return mav;
+		}
+		//If the "Save & Close" button was pressed.
+		else {
+			//This variable will be used to display the message on the details form
+			redirectAttr.addFlashAttribute("savedStatus", "created");
+			
+			ModelAndView mav = new ModelAndView(new RedirectView("providers"));
+			return mav;			
+		}
+	
+	}
+	
+	
+	/**
+	 * The '/{cleanURL}/provider.{person}?i=##' GET request will be used to return the details of the selected
 	 * provider.
 	 * 
 	 * @param 	i	The id of the provider selected
@@ -685,113 +759,234 @@ public class adminOrgContoller {
 	 * 				(2) An object that will hold all the available sections the provider can have access to
 	 *
 	 */
-	 @RequestMapping(value="/{cleanURL}/provider/{person}", method= RequestMethod.GET)
-	 @ResponseBody 
+	 @RequestMapping(value="/{cleanURL}/provider.{person}", method= RequestMethod.GET)
 	 public ModelAndView viewProviderDetails(@RequestParam(value="i", required=true) Integer providerId) throws Exception {
 		 
 		ModelAndView mav = new ModelAndView();
-		mav.setViewName("/administrator/organizations/providerDetails");	
+		mav.setViewName("/administrator/organizations/providers/details");	
 		
 		//Get all the details for the clicked provider
 		Provider providerDetails = providerManager.getProviderById(providerId);
 		
 		//Set the provider addresses
 		List<providerAddress> addresses = providerManager.getProviderAddresses(providerId);
-		providerDetails.setProviderAddresses(addresses);
-		mav.addObject("totaladdresses",addresses.size());	
+		providerDetails.setProviderAddresses(addresses);	
 		mav.addObject("providerId",providerDetails.getId());
-		mav.addObject("btnValue","Update");
+		mav.addObject("id",orgId);
 		mav.addObject("providerdetails",providerDetails);
 		
 		return mav;
 	 }
-	
-	
-	/**
-	 * The '/{cleanURL}/newProvider' GET request will be used to display the blank new 
-	 * provider screen (In a modal)
-	 *
+	 
+	 /**
+	 * The '//{cleanURL}/provider.{person}?i=##' POST request will handle submitting changes for the selected provider.
 	 * 
-	 * @return		The organization provider blank form page
-	 * 
-	 * @Objects		(1) An object that will hold all the form fields of a new provider
-	 * 				(2) An object to hold the button value "Create"
-	 *
-	 */
-	@RequestMapping(value="/{cleanURL}/newProvider", method = RequestMethod.GET)
-	public @ResponseBody ModelAndView newProvider() throws Exception {
-		
-		ModelAndView mav = new ModelAndView();
-		mav.setViewName("/administrator/organizations/providerDetails");
-		Provider providerdetails = new Provider();
-		
-		//Set the id of the organization for the new provider
-		providerdetails.setOrgId(orgId);
-		mav.addObject("btnValue","Create");
-		mav.addObject("providerdetails", providerdetails);
-		
-		return mav;
-	}
-	
-	/**
-	 * The '/{cleanURL}/createProvider' POST request will handle submitting the new organization provider.
-	 * 
-	 * @param provider			The object containing the provider form fields
+	 * @param providerdetails	The object containing the provider form fields
 	 * @param result			The validation result
 	 * @param redirectAttr		The variable that will hold values that can be read after the redirect
+	 * @param action			The variable that holds which button was pressed
 	 * 
-	 * @return					Will return the provider list page on "Save"
-	 * 							Will return the provider form page on error
+	 * @return					Will return the provider list page on "Save & Close"
+	 * 							Will return the provider details page on "Save"
+	 * 							Will return the provider details page on error
 	 * 
-	 * @Objects					(1) The object containing all the information for the clicked org
+	 * @Objects					(1) The object containing all the information for the provider
+	 * 							(2) The 'id' of the clicked org that will be used in the menu and action bar
 	 * @throws Exception
 	 */
-	@RequestMapping(value="/{cleanURL}/createProvider", method = RequestMethod.POST)
-	public @ResponseBody ModelAndView createProvider(@Valid @ModelAttribute(value="providerdetails") Provider providerdetails, BindingResult result,RedirectAttributes redirectAttr, @PathVariable String cleanURL ) throws Exception {
+	@RequestMapping(value="/{cleanURL}/provider.{person}", method = RequestMethod.POST)
+	public ModelAndView updateProvider(@Valid @ModelAttribute(value="providerdetails") Provider providerdetails, BindingResult result, RedirectAttributes redirectAttr,@RequestParam String action) throws Exception {
 		
 		if(result.hasErrors()) {
 			ModelAndView mav = new ModelAndView();
-			mav.setViewName("/administrator/organizations/providerDetails");
-			mav.addObject("btnValue","Create");
+			mav.setViewName("/administrator/organizations/providers/details");
+			//Set the provider addresses
+			List<providerAddress> addresses = providerManager.getProviderAddresses(providerdetails.getId());
+			providerdetails.setProviderAddresses(addresses);	
+			mav.addObject("providerId",providerdetails.getId());
+			mav.addObject("id",orgId);
 			return mav;
 		}
 		
-		providerManager.createProvider(providerdetails);
+		//Update the provider
+		providerManager.updateProvider(providerdetails);
+	
 		
-		ModelAndView mav = new ModelAndView("/administrator/organizations/providerDetails");
-		mav.addObject("success","providerCreated");
-		return mav;		
+		//If the "Save" button was pressed 
+		if(action.equals("save")) {
+			ModelAndView mav = new ModelAndView();
+			mav.setViewName("/administrator/organizations/providers/details");
+			//Set the provider addresses
+			List<providerAddress> addresses = providerManager.getProviderAddresses(providerdetails.getId());
+			providerdetails.setProviderAddresses(addresses);	
+			mav.addObject("providerId",providerdetails.getId());
+			mav.addObject("savedStatus","updated");
+			mav.addObject("id",orgId);
+			return mav;
+		}
+		//If the "Save & Close" button was pressed.
+		else {
+			//This variable will be used to display the message on the details form
+			redirectAttr.addFlashAttribute("savedStatus", "updated");
+			
+			ModelAndView mav = new ModelAndView(new RedirectView("providers"));
+			return mav;			
+		}
+	
 	}
 	
 	/**
-	 * The '/{cleanURL}/updateProvider' POST request will handle submitting changes for the selected organization provider.
+	 * The '/{cleanURL}/providerAddress/{address}?i=##' GET request will be used to return the details of the selected
+	 * address.
 	 * 
-	 * @param provider			The object containing the provider form fields
+	 * @param 	i	The id of the address selected
+	 * 
+	 * @return		The provider address details page
+	 * 
+	 * @Objects		(1) An object that will hold all the details of the clicked address
+	 *
+	 */
+	 @RequestMapping(value="/{cleanURL}/providerAddress/{address}", method= RequestMethod.GET)
+	 @ResponseBody 
+	 public ModelAndView viewAddressDetails(@RequestParam(value="i", required=true) Integer addressId) throws Exception {
+		 
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/organizations/providers/addressDetails");	
+		
+		//Get all the details for the clicked address
+		providerAddress addressDetails = providerManager.getAddressDetails(addressId);
+				
+		mav.addObject("btnValue","Update");
+		mav.addObject("addressDetails",addressDetails);
+		
+		//Get a list of states
+		USStateList stateList = new USStateList();
+		
+		//Get the object that will hold the states
+		mav.addObject("stateList",stateList.getStates());
+		
+		return mav;
+		 
+	 }
+	 
+	 /**
+	 * The '/{cleanURL}/address/update' POST request will handle submitting changes for the selected provider address.
+	 * 
+	 * @param user				The object containing the system user form fields
 	 * @param result			The validation result
-	 * @param redirectAttr		The variable that will hold values that can be read after the redirect
 	 * 
-	 * @return					Will return the provider list page on "Save"
-	 * 							Will return the provider form page on error
-	 * 
-	 * @Objects					(1) The object containing all the information for the clicked org
+	 * @return					Will return the provider details page on "Save"
+	 * 							Will return the address form page on error
+
 	 * @throws Exception
 	 */
-	@RequestMapping(value="/{cleanURL}/updateProvider", method = RequestMethod.POST)
-	public @ResponseBody ModelAndView updateProvider(@Valid @ModelAttribute(value="providerdetails") Provider providerdetails, BindingResult result,RedirectAttributes redirectAttr, @PathVariable String cleanURL ) throws Exception {
+	@RequestMapping(value="/{cleanURL}/address/update", method = RequestMethod.POST)
+	public @ResponseBody ModelAndView updateProviderAddress(@Valid @ModelAttribute(value="addressDetails") providerAddress addressDetails, BindingResult result) throws Exception {
 		
 		if(result.hasErrors()) {
-			ModelAndView mav = new ModelAndView();
-			mav.setViewName("/administrator/organizations/providerDetails");
+			ModelAndView mav = new ModelAndView("/administrator/organizations/providers/addressDetails");
+			
+			//Get a list of states
+			USStateList stateList = new USStateList();
+			
+			//Get the object that will hold the states
+			mav.addObject("stateList",stateList.getStates());
+			
 			mav.addObject("btnValue","Update");
 			return mav;
 		}
 		
-		providerManager.updateProvider(providerdetails);
+		
+		providerManager.updateAddress(addressDetails);
 	
-		ModelAndView mav = new ModelAndView("/administrator/organizations/providerDetails");
-		mav.addObject("success","providerUpdated");
+		ModelAndView mav = new ModelAndView("/administrator/organizations/providers/addressDetails");
+		mav.addObject("success","addressUpdated");
 		return mav;		
 	}
+		 
+	 
+	 /**
+	 * The '/{cleanURL}/newProviderAddress' GET request will be used to return a blank provider
+	 * address form.
+	 * 
+	 * @param 	i	The id of the address selected
+	 * 
+	 * @return		The provider address details page
+	 * 
+	 * @Objects		(1) An object that will hold all the details of the clicked address
+	 *
+	 */
+	 @RequestMapping(value="/{cleanURL}/newProviderAddress", method= RequestMethod.GET)
+	 @ResponseBody 
+	 public ModelAndView newProviderAddress(@RequestParam(value="providerId", required=true) Integer providerId) throws Exception {
+		 
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/organizations/providers/addressDetails");	
+		providerAddress addressDetails = new providerAddress();
+		addressDetails.setProviderId(providerId);
+		mav.addObject("addressDetails",addressDetails);
+		mav.addObject("btnValue","Create");
+		
+		//Get a list of states
+		USStateList stateList = new USStateList();
+		
+		//Get the object that will hold the states
+		mav.addObject("stateList",stateList.getStates());
+		
+		return mav;
+		 
+	 }
+	 
+	 /**
+	 * The '/{cleanURL}/address/create' POST request will handle submitting the new provider address.
+	 * 
+	 * @param user				The object containing the system user form fields
+	 * @param result			The validation result
+	 * 
+	 * @return					Will return the provider details page on "Save"
+	 * 							Will return the address form page on error
+
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/{cleanURL}/address/create", method = RequestMethod.POST)
+	public @ResponseBody ModelAndView createProviderAddress(@Valid @ModelAttribute(value="addressDetails") providerAddress addressDetails, BindingResult result) throws Exception {
+		
+		if(result.hasErrors()) {
+			ModelAndView mav = new ModelAndView("/administrator/organizations/providers/addressDetails");
+			
+			//Get a list of states
+			USStateList stateList = new USStateList();
+			
+			//Get the object that will hold the states
+			mav.addObject("stateList",stateList.getStates());
+			
+			mav.addObject("btnValue","Create");
+			return mav;
+		}
+		
+		
+		providerManager.createAddress(addressDetails);
+	
+		ModelAndView mav = new ModelAndView("/administrator/organizations/providers/addressDetails");
+		mav.addObject("success","addressCreated");
+		return mav;		
+	}
+	
+	/**
+	 * The '/{cleanURL}/addressDelete/{title}?i=##' GET request will be used to delete the selected
+	 * address.
+	 * 
+	 * @param 	i	The id of the address selected
+	 * 
+	 * @return		This function returns no value
+	 *
+	 */
+	 @RequestMapping(value="/{cleanURL}/addressDelete/{title}", method= RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	 public @ResponseBody Integer deleteAddress(@RequestParam(value="i", required=true) Integer addressId) throws Exception {	 
+		providerManager.deleteAddress(addressId);
+		return 1;
+	 }
+	
 	
 	/**
 	 * The '/{cleanURL}/providerDelete/{title}?i=##' GET request will be used to delete the selected
@@ -803,11 +998,14 @@ public class adminOrgContoller {
 	 *
 	 */
 	 @RequestMapping(value="/{cleanURL}/providerDelete/{title}", method= RequestMethod.GET)
-	 public ModelAndView deleteProvider(@RequestParam(value="i", required=true) Integer providerId) throws Exception {
+	 public ModelAndView deleteProvider(@RequestParam(value="i", required=true) Integer providerId, RedirectAttributes redirectAttr) throws Exception {
 		 
 		providerManager.deleteProvider(providerId);
-			
-		ModelAndView mav = new ModelAndView(new RedirectView("../providers?msg=deleted"));
+		
+		//This variable will be used to display the message on the details form
+		redirectAttr.addFlashAttribute("savedStatus", "deleted");	
+		
+		ModelAndView mav = new ModelAndView(new RedirectView("../providers"));
 		return mav;		
 	 }
 	

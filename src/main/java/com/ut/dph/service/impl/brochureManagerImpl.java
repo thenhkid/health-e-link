@@ -69,7 +69,6 @@ public class brochureManagerImpl implements brochureManager{
 		   
 		} 
 		catch (IOException e) {  
-		   // TODO Auto-generated catch block  
 		   e.printStackTrace();  
 		}  
 	
@@ -130,7 +129,6 @@ public class brochureManagerImpl implements brochureManager{
 			   
 			} 
 			catch (IOException e) {  
-			   // TODO Auto-generated catch block  
 			   e.printStackTrace();  
 			}  
 		}

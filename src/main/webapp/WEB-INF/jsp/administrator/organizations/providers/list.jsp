@@ -7,13 +7,13 @@
 <div class="main clearfix" role="main" rel="listoforganizationproviders">
 	<div class="col-md-12">
 		
-		<c:if test="${not empty param.msg}" >
+		<c:if test="${not empty savedStatus}" >
 			<div class="alert alert-success">
 				<strong>Success!</strong> 
 				<c:choose>
-					<c:when test="${param.msg == 'updated'}">The provider has been successfully updated!</c:when>
-					<c:when test="${param.msg == 'created'}">The provider has been successfully added!</c:when>
-					<c:when test="${param.msg == 'deleted'}">The provider has been successfully removed!</c:when>
+					<c:when test="${savedStatus == 'updated'}">The provider has been successfully updated!</c:when>
+					<c:when test="${savedStatus == 'created'}">The provider has been successfully added!</c:when>
+					<c:when test="${savedStatus == 'deleted'}">The provider has been successfully removed!</c:when>
 				</c:choose>
 			</div>
 		</c:if>
@@ -34,7 +34,7 @@
 							</button>
 						</form:form>
 					</div>
-					<a href="#systemProvidersModal" id="createNewProvider" data-toggle="modal" class="btn btn-primary btn-sm pull-right" title="Create a new provider">
+					<a href="provider.create"  class="btn btn-primary btn-sm pull-right" title="Create a new provider">
 						<span class="glyphicon glyphicon-plus"></span>
 					</a>
 				</div>
@@ -55,17 +55,17 @@
 								  <c:when test="${not empty providerList}">
 								    <c:forEach var="provider" items="${providerList}">
 										<tr id="userRow">
-											<td scope="row"><a href="#systemProvidersModal" data-toggle="modal" rel="${provider.firstName}${provider.lastName}?i=${provider.id}" class="providerEdit" title="Edit this provider">${provider.firstName} ${provider.lastName}</a><br />(<c:choose><c:when test="${provider.status == true}">active</c:when><c:otherwise>inactive</c:otherwise></c:choose>)</td>
+											<td scope="row"><a href="provider.${provider.firstName}${provider.lastName}?i=${provider.id}"  title="Edit this provider">${provider.firstName} ${provider.lastName}</a><br />(<c:choose><c:when test="${provider.status == true}">active</c:when><c:otherwise>inactive</c:otherwise></c:choose>)</td>
 											<td style="text-align:center">${provider.providerId}</td>
 											<td>
-											    ${provider.email}
-											    <br />
-											    (p) ${provider.phone}
+											    <c:if test="${not empty provider.email}">${provider.email}<br /></c:if>
+											    (p) ${provider.phone1}
+											    <c:if test="${not empty provider.phone2}"><br />(c) ${provider.phone2}</c:if>
 											    <c:if test="${not empty provider.fax}"><br />(f) ${provider.fax}</c:if>
 											</td>
 											<td style="text-align:center"><fmt:formatDate value="${provider.dateCreated}" type="date" pattern="M/dd/yyyy" /></td>
 											<td class="actions-col">
-												<a href="#systemProvidersModal" data-toggle="modal" rel="${provider.firstName}${provider.lastName}?i=${provider.id}" class="btn btn-link providerEdit" title="Edit this provider">
+												<a href="provider.${provider.firstName}${provider.lastName}?i=${provider.id}"  class="btn btn-link" title="Edit this provider">
 												     <span class="glyphicon glyphicon-edit"></span>
 												     Edit	
 												</a>
@@ -78,7 +78,7 @@
 									</c:forEach>
 								  </c:when>
 								  <c:otherwise>
-								   	<tr><td colspan="5" style="text-align: center">There are currently no providers set up.</td></tr>
+								   	<tr><td colspan="5" style="text-align: center">There where no providers found</td></tr>
 								  </c:otherwise>
 							</c:choose>
 						</tbody>
@@ -96,9 +96,6 @@
 	</div>		
 </div>	
 <p rel="${currentPage}" id="currentPageHolder" style="display:none"></p>
-
-<!-- Providers modal -->
-<div class="modal fade" id="systemProvidersModal" role="dialog" tabindex="-1" aria-labeledby="Providers" aria-hidden="true" aria-describedby="Providers"></div>
 
 <script>
 	$.ajaxSetup({
@@ -127,19 +124,6 @@
 		    });  
 		});
 
-		//This function will launch the edit provider overlay populating the fields
-		//with the data of the clicked provider.
-		$(document).on('click', '.providerEdit',function() {
-			var providerDetailsAction = 'provider/'+$(this).attr('rel');
-
-			$.ajax({  
-		        url: providerDetailsAction,  
-		        type: "GET",  
-		        success: function(data) {  
-		            $("#systemProvidersModal").html(data);           
-		        }  
-		    });  
-		});
 
 		//This function will remvoe the clicked provider 
 		$(document).on('click','.providerDelete',function() {
@@ -155,15 +139,6 @@
 		$('#searchProviderBtn').click(function() {
 			$('#searchForm').submit();
 		});
-
-		/*$("#searchTerm").keyup(function(event) {
-			var term = $(this).val();
-
-			if(term.length >= 3 || term.length == 0) {
-				if(searchTimeout) {clearTimeout(searchTimeout);}
-				searchTimeout = setInterval("orglookup()",500);
-			}
-		});*/
 
 
 		//Function to submit the changes to an existing provider or 

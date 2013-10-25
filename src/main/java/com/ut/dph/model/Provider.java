@@ -86,7 +86,7 @@ public class Provider {
 	}
 	
 	@Email
-	@Column(name="EMAIL", nullable = false)
+	@Column(name="EMAIL", nullable = true)
 	private String email;
 	
 	public String getEmail() {
@@ -97,16 +97,62 @@ public class Provider {
 		this.email = email;
 	}
 	
-	@NotEmpty @Phone
-	@Column(name="PHONE", nullable = false)
-	private String phone;
+	@Column(name="URL", nullable = true)
+	private String website;
 	
-	public String getPhone() {
-		return phone;
+	public String getWebsite() {
+		return website;
 	}
 	  
-	public void setPhone(String phone) {
-		this.phone = phone;
+	public void setWebsite(String website) {
+		this.website = website;
+	}
+	
+	@NotEmpty
+	@Column(name="GENDER", nullable = true)
+	private String gender;
+	
+	public String getGender() {
+		return gender;
+	}
+	  
+	public void setGender(String gender) {
+		this.gender = gender;
+	}
+	
+	@Column(name="SPECIALTY", nullable = true)
+	private String specialty;
+	
+	public String getSpecialty() {
+		return specialty;
+	}
+	  
+	public void setSpecialty(String specialty) {
+		this.specialty = specialty;
+	}
+	
+	@NotEmpty @Phone
+	@Column(name="PHONE1", nullable = true)
+	private String phone1;
+	
+	public String getPhone1() {
+		return phone1;
+	}
+	  
+	public void setPhone1(String phone) {
+		this.phone1 = phone;
+	}
+	
+	@Phone
+	@Column(name="PHONE2", nullable = true)
+	private String phone2;
+	
+	public String getPhone2() {
+		return phone2;
+	}
+	  
+	public void setPhone2(String phone) {
+		this.phone2 = phone;
 	}
 	  
 	@Phone

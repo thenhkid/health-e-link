@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import com.ut.dph.dao.providerDAO;
 import com.ut.dph.model.Provider;
+import com.ut.dph.model.User;
 import com.ut.dph.model.providerAddress;
 
 /**
@@ -45,16 +46,6 @@ public class providerDAOImpl implements providerDAO {
 		Integer lastId = null;
 				
 		lastId = (Integer) sessionFactory.getCurrentSession().save(provider);
-		
-		List<providerAddress> addresses = provider.getProviderAddresses();
-		
-		//Loop through the selected provider address information and save to the provider
-		//This will populate the 'info_ProviderAddresses' table
-		for(int i = 0;i<addresses.size();i++) {
-			addresses.get(i).setProviderId(lastId);
-			sessionFactory.getCurrentSession().save(addresses.get(i));
-		}
-		
 		
 		return lastId;
 	}
@@ -92,10 +83,16 @@ public class providerDAOImpl implements providerDAO {
 	 * 
 	 * @param	providerId	This will be id to find the specific provider
 	 * 
-	 * @return			The function will return a provider object 
+	 * @return			The function does not return anything
 	 */
 	@Override
 	public void deleteProvider(int providerId) {
+		//Need to remove the provider addresses
+		//Find all the addresses associated to the provider to be deleted
+		Query deleteAddresses = sessionFactory.getCurrentSession().createQuery("delete from providerAddress where providerId = :providerId");
+		deleteAddresses.setParameter("providerId",providerId);
+		deleteAddresses.executeUpdate();
+		
 		Query deletProvider = sessionFactory.getCurrentSession().createQuery("delete from Provider where id = :providerId");
 		deletProvider.setParameter("providerId",providerId);
 		deletProvider.executeUpdate();
@@ -134,7 +131,7 @@ public class providerDAOImpl implements providerDAO {
 	 * 
 	 * @param	providerId	This will be used to query addresses
 	 * 
-	 * #Return 	The function will return a lost providerAddress objects
+	 * #Return 	The function will return a list providerAddress objects
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
@@ -145,6 +142,60 @@ public class providerDAOImpl implements providerDAO {
 	    	.addOrder(Order.asc("city"));
 	     
 	     return criteria.list();  
+	}
+	
+	/**
+	 * The 'getAddressDetails' function will return the details of the clicked address
+	 * 
+	 * @param	addressId	This will be used to query addresses
+	 * 
+	 * #Return 	The function will return a providerAddress object
+	 */
+	@Override
+	public providerAddress getAddressDetails(int addressId) {
+		return (providerAddress) sessionFactory.getCurrentSession().get(providerAddress.class, addressId);
+	}
+	
+	
+	/**
+	 * The 'updateAddress' function will update the selected address with the changes
+	 * entered into the form.
+	 * 
+	 * @param	systemAddress	This will hold the address object from the address form
+	 * 
+	 * @return 			the function does not return anything
+	 */
+	@Override
+    public void updateAddress(providerAddress providerAddress) {
+		sessionFactory.getCurrentSession().update(providerAddress);
+	}
+	
+	/**
+	 * The 'createAddress' function will submit the new address
+	 * entered into the form.
+	 * 
+	 * @param	systemAddress	This will hold the address object from the address form
+	 * 
+	 * @return 			the function does not return anything
+	 */
+	@Override
+    public void createAddress(providerAddress providerAddress) {
+		sessionFactory.getCurrentSession().save(providerAddress);
+	}
+	
+	/**
+	 * The 'deleteAddress' function will delete the provider address on the addressId
+	 * passed in.
+	 * 
+	 * @param	addressid	This will be id to find the specific address
+	 * 
+	 * @return			The function does not return anything
+	 */
+	@Override
+	public void deleteAddress(int addressid) {
+		Query deleteAddress = sessionFactory.getCurrentSession().createQuery("delete from providerAddress where id = :addressid");
+		deleteAddress.setParameter("addressid",addressid);
+		deleteAddress.executeUpdate();
 	}
 
 }

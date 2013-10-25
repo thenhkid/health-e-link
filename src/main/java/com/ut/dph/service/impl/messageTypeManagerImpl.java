@@ -61,7 +61,6 @@ public class messageTypeManagerImpl implements messageTypeManager {
 		   
 		} 
 		catch (IOException e) {  
-		   // TODO Auto-generated catch block  
 		   e.printStackTrace();  
 		}  
 	

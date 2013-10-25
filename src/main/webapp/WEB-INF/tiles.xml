@@ -65,12 +65,21 @@
 	        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
 	    </definition>
 	    
-	    <definition name="/administrator/organizations/organizationProviders" extends="base.definition">
+	    <definition name="/administrator/organizations/providers/list" extends="base.definition">
 	        <put-attribute name="title" value="Administrator - Manage Organizations" />
 	        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=org" />
 	        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/organizations/actionBar.jsp?page=orgProviders" />
 	        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/organizations/menu.jsp?page=providers" />
-	        <put-attribute name="body" value="/WEB-INF/jsp/administrator/organizations/organizationProviders.jsp" />
+	        <put-attribute name="body" value="/WEB-INF/jsp/administrator/organizations/providers/list.jsp" />
+	        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
+	    </definition>
+	    
+	     <definition name="/administrator/organizations/providers/details" extends="base.definition">
+	        <put-attribute name="title" value="Administrator - Manage Organizations" />
+	        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=org" />
+	        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/organizations/actionBar.jsp?page=providerDetails" />
+	        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/organizations/menu.jsp?page=providers" />
+	        <put-attribute name="body" value="/WEB-INF/jsp/administrator/organizations/providers/details.jsp" />
 	        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
 	    </definition>
 	    

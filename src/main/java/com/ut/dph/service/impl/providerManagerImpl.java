@@ -55,4 +55,28 @@ public class providerManagerImpl implements providerManager{
 		return providerDAO.getProviderAddresses(providerId);
 	}
 	
+	@Override
+	@Transactional
+	public providerAddress getAddressDetails(int addressId) {
+		return providerDAO.getAddressDetails(addressId);
+	}
+	
+	@Override
+	@Transactional
+	public void updateAddress(providerAddress providerAddress) {
+		providerDAO.updateAddress(providerAddress);
+	}
+	
+	@Override
+	@Transactional
+	public void createAddress(providerAddress providerAddress) {
+		providerDAO.createAddress(providerAddress);
+	}
+	
+	@Override
+	@Transactional
+	public void deleteAddress(int addressId) {
+		providerDAO.deleteAddress(addressId);
+	}
+	
 }
