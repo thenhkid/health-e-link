@@ -93,10 +93,10 @@ h3 {
   background-position: right 8px;
 }
 .secondary-nav .nav .badge {
-  background-color: #333333;
+  background-color: #333;
 }
 .secondary-nav .nav .disabled a {
-  color: #999999;
+  color: #999;
 }
 .secondary-nav .nav .disabled .badge {
   background-color: #cccccc;

@@ -56,12 +56,12 @@
 	        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
 	    </definition>
 	    
-	    <definition name="/administrator/organizations/organizationUsers" extends="base.definition">
+	    <definition name="/administrator/organizations/users" extends="base.definition">
 	        <put-attribute name="title" value="Administrator - Manage Organizations" />
 	        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=org" />
 	        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/organizations/actionBar.jsp?page=orgUsers" />
 	        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/organizations/menu.jsp?page=users" />
-	        <put-attribute name="body" value="/WEB-INF/jsp/administrator/organizations/organizationUsers.jsp" />
+	        <put-attribute name="body" value="/WEB-INF/jsp/administrator/organizations/users/list.jsp" />
 	        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
 	    </definition>
 	    
@@ -83,12 +83,12 @@
 	        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
 	    </definition>
 	    
-	    <definition name="/administrator/organizations/organizationBrochures" extends="base.definition">
+	    <definition name="/administrator/organizations/brochures" extends="base.definition">
 	        <put-attribute name="title" value="Administrator - Manage Organizations" />
 	        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=org" />
 	        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/organizations/actionBar.jsp?page=orgBrochures" />
 	        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/organizations/menu.jsp?page=brochures" />
-	        <put-attribute name="body" value="/WEB-INF/jsp/administrator/organizations/organizationBrochures.jsp" />
+	        <put-attribute name="body" value="/WEB-INF/jsp/administrator/organizations/brochures/list.jsp" />
 	        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
 	    </definition>
 	    
