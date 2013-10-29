@@ -94,20 +94,6 @@
 <!-- Brochure Form modal -->
 <div class="modal fade" id="systemBrochureModal" role="dialog" tabindex="-1" aria-labeledby="Brochures" aria-hidden="true" aria-describedby="Brochures"></div>
 
-<!-- Brochure attachment View -->
-<div class="modal fade modal-media" id="brochureAttachment" role="dialog" tabindex="-1" aria-labeledby="Brochure Attachment" aria-hidden="true" aria-describedby="Brochure Attachment">
-div class="modal-dialog">
-	<div class="modal-content">
-		<div class="modal-header">
-			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-			<h3 class="panel-title"></h3>
-		</div>
-		<div class="modal-body">
-		</div>
-	</div>
-</div>
-</div>
-
 <script>
 	$.ajaxSetup({
 		cache:false
@@ -159,19 +145,6 @@ div class="modal-dialog">
 				var id = $(this).attr('rel');
 				window.location.href="brochureDelete/delete?i="+id;
 			}
-		});
-		
-		//This function will display the clicked brochure 
-		$(document).on('click','.brochureView',function() {
-			var attachmentAction = 'brochureView/'+$(this).attr('rel');
-
-			$.ajax({  
-		        url: attachmentAction,  
-		        type: "GET",  
-		        success: function(data) {  
-		            $("#brochureAttachment").html(data);           
-		        }  
-		    });  
 		});
 
 		//This function will handle searching for brochures
