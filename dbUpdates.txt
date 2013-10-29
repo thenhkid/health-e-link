@@ -73,6 +73,23 @@ ADD CONSTRAINT `providerIdFK`
   REFERENCES `universalTranslator`.`providers` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
+  
+  //10-28-2013 (chad)
+  CREATE TABLE `universaltranslator`.`info_providerids` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `providerId` INT NOT NULL,
+  `idNum` VARCHAR(45) NOT NULL,
+  `type` VARCHAR(45) NULL,
+  `issuedBy` VARCHAR(255) NULL,
+  `dateCreated` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+  `dateModified` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  INDEX `idproviderIdfk_idx` (`providerId` ASC),
+  CONSTRAINT `idproviderIdfk`
+    FOREIGN KEY (`providerId`)
+    REFERENCES `universaltranslator`.`providers` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
 
 
 

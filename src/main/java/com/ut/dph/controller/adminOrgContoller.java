@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
 import javax.imageio.ImageIO;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.springframework.stereotype.Controller;
@@ -394,7 +395,7 @@ public class adminOrgContoller {
 		}
 		
 		ModelAndView mav = new ModelAndView();
-        mav.setViewName("/administrator/organizations/organizationUsers");
+        mav.setViewName("/administrator/organizations/users");
      
         List<User> users = organizationManager.getOrganizationUsers(orgId,page,maxResults);
         mav.addObject("id",orgId);
@@ -430,7 +431,7 @@ public class adminOrgContoller {
 	public ModelAndView findUsers(@RequestParam String searchTerm, @PathVariable String cleanURL) throws Exception {
 		
 		ModelAndView mav = new ModelAndView();
-        mav.setViewName("/administrator/organizations/organizationUsers");
+        mav.setViewName("/administrator/organizations/users");
         
         List<User> users = userManager.findUsers(orgId, searchTerm);
         mav.addObject("id",orgId);
@@ -458,7 +459,7 @@ public class adminOrgContoller {
 	public @ResponseBody ModelAndView newSystemUser() throws Exception {
 		
 		ModelAndView mav = new ModelAndView();
-		mav.setViewName("/administrator/organizations/userDetails");
+		mav.setViewName("/administrator/organizations/users/details");
 		User userdetails = new User();
 		
 		//Set the id of the organization for the new user
@@ -492,7 +493,7 @@ public class adminOrgContoller {
 		
 		if(result.hasErrors()) {
 			ModelAndView mav = new ModelAndView();
-			mav.setViewName("/administrator/organizations/userDetails");
+			mav.setViewName("/administrator/organizations/users/details");
 			mav.addObject("btnValue","Create");
 			return mav;
 		}
@@ -501,7 +502,7 @@ public class adminOrgContoller {
 		
 	    if (existing != null) {
 	    	ModelAndView mav = new ModelAndView();
-			mav.setViewName("/administrator/organizations/userDetails");
+			mav.setViewName("/administrator/organizations/users/details");
 			mav.addObject("btnValue","Create");
 			mav.addObject("existingUsername","Username "+userdetails.getUsername().trim()+" already exists.");
 			return mav;	
@@ -509,7 +510,7 @@ public class adminOrgContoller {
 		
 		userManager.createUser(userdetails);
 		
-		ModelAndView mav = new ModelAndView("/administrator/organizations/userDetails");
+		ModelAndView mav = new ModelAndView("/administrator/organizations/users/details");
 		mav.addObject("success","userCreated");
 		return mav;		
 	}
@@ -533,7 +534,7 @@ public class adminOrgContoller {
 		
 		if(result.hasErrors()) {
 			ModelAndView mav = new ModelAndView();
-			mav.setViewName("/administrator/organizations/userDetails");
+			mav.setViewName("/administrator/organizations/users/details");
 			mav.addObject("btnValue","Update");
 			return mav;
 		}
@@ -544,7 +545,7 @@ public class adminOrgContoller {
 			User existing = userManager.getUserByUserName(userdetails.getUsername());
 		    if (existing != null) {
 	        	ModelAndView mav = new ModelAndView();
-				mav.setViewName("/administrator/organizations/userDetails");
+				mav.setViewName("/administrator/organizations/users/details");
 				mav.addObject("btnValue","Update");
 				mav.addObject("existingUsername","Username "+userdetails.getUsername().trim()+" already exists.");
 				return mav;	
@@ -553,7 +554,7 @@ public class adminOrgContoller {
 		
 		userManager.updateUser(userdetails);
 	
-		ModelAndView mav = new ModelAndView("/administrator/organizations/userDetails");
+		ModelAndView mav = new ModelAndView("/administrator/organizations/users/details");
 		mav.addObject("success","userUpdated");
 		return mav;		
 	}
@@ -575,7 +576,7 @@ public class adminOrgContoller {
 	 public ModelAndView viewUserDetails(@RequestParam(value="i", required=true) Integer userId) throws Exception {
 		 
 		ModelAndView mav = new ModelAndView();
-		mav.setViewName("/administrator/organizations/userDetails");	
+		mav.setViewName("/administrator/organizations/users/details");	
 		
 		//Get all the details for the clicked user
 		User userDetails = userManager.getUserById(userId);
@@ -699,7 +700,7 @@ public class adminOrgContoller {
 	}
 	
 	/**
-	 * The '//{cleanURL}/provider.create' POST request will handle submitting the new provider.
+	 * The '/{cleanURL}/provider.create' POST request will handle submitting the new provider.
 	 * 
 	 * @param providerdetails	The object containing the provider form fields
 	 * @param result			The validation result
@@ -1037,7 +1038,7 @@ public class adminOrgContoller {
 		}
 		
 		ModelAndView mav = new ModelAndView();
-        mav.setViewName("/administrator/organizations/organizationBrochures");
+        mav.setViewName("/administrator/organizations/brochures");
      
         List<Brochure> brochures = organizationManager.getOrganizationBrochures(orgId,page,maxResults);
         mav.addObject("id",orgId);
@@ -1068,7 +1069,7 @@ public class adminOrgContoller {
 	public ModelAndView findBrochures(@RequestParam String searchTerm, @PathVariable String cleanURL) throws Exception {
 		
 		ModelAndView mav = new ModelAndView();
-        mav.setViewName("/administrator/organizations/organizationBrochures");
+        mav.setViewName("/administrator/organizations/brochures");
         
         List<Brochure> brochures = brochureManager.findBrochures(orgId, searchTerm);
         mav.addObject("id",orgId);
@@ -1095,7 +1096,7 @@ public class adminOrgContoller {
 	 public ModelAndView viewBrochureDetails(@RequestParam(value="i", required=true) Integer brochureId) throws Exception {
 		 
 		ModelAndView mav = new ModelAndView();
-		mav.setViewName("/administrator/organizations/brochureDetails");	
+		mav.setViewName("/administrator/organizations/brochures/details");	
 		
 		//Get all the details for the clicked brochure
 		Brochure brochureDetails = brochureManager.getBrochureById(brochureId);
@@ -1122,7 +1123,7 @@ public class adminOrgContoller {
 	public @ResponseBody ModelAndView newBrochure() throws Exception {
 		
 		ModelAndView mav = new ModelAndView();
-		mav.setViewName("/administrator/organizations/brochureDetails");
+		mav.setViewName("/administrator/organizations/brochures/details");
 		Brochure brochuredetails = new Brochure();
 		
 		//Set the id of the organization for the new provider
@@ -1195,17 +1196,18 @@ public class adminOrgContoller {
 	 }
 	 
 	 @RequestMapping(value="/{cleanURL}/brochureView/{title}", method = RequestMethod.GET)
-	 public @ResponseBody ModelAndView viewBrochureFile(@RequestParam(value="i", required=true) Integer brochureId, @PathVariable String cleanURL) throws Exception {
+	 public @ResponseBody ModelAndView viewBrochureFile(@RequestParam(value="i", required=true) Integer brochureId, @PathVariable String cleanURL, HttpServletResponse httpServletResponse) throws Exception {
 		 
 		 //Need to get the file name based on the brochure Id passed
 		 Brochure brochure = brochureManager.getBrochureById(brochureId);
 		 
 		 ModelAndView mav = new ModelAndView();
-		 mav.setViewName("/administrator/organizations/brochureAttachment");
+		 mav.setViewName("/administrator/organizations/brochures/viewAttachment");
 		 
 		 //Set the type of attachment
 		 fileSystem dir = new fileSystem();
 		 dir.setDir(cleanURL, "brochures");
+		 
 		 Image image = ImageIO.read(new File(dir.getDir() + brochure.getfileName()));
 	     if (image == null) {
 	         if(brochure.getfileName().contains(".pdf")) {
