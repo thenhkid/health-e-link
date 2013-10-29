@@ -1333,6 +1333,40 @@ public class adminOrgContoller {
 		return mav;		
 	 }
 	 
+<<<<<<< HEAD
+=======
+	 @RequestMapping(value="/{cleanURL}/brochureView/{title}", method = RequestMethod.GET)
+	 public @ResponseBody ModelAndView viewBrochureFile(@RequestParam(value="i", required=true) Integer brochureId, @PathVariable String cleanURL, HttpServletResponse httpServletResponse) throws Exception {
+		 
+		 //Need to get the file name based on the brochure Id passed
+		 Brochure brochure = brochureManager.getBrochureById(brochureId);
+		 
+		 ModelAndView mav = new ModelAndView();
+		 mav.setViewName("/administrator/organizations/brochures/viewAttachment");
+		 
+		 //Set the type of attachment
+		 fileSystem dir = new fileSystem();
+		 dir.setDir(cleanURL, "brochures");
+		 
+		 Image image = ImageIO.read(new File(dir.getDir() + brochure.getfileName()));
+	     if (image == null) {
+	         if(brochure.getfileName().contains(".pdf")) {
+	        	 mav.addObject("fileType","pdf");
+	         }
+	         else {
+	        	 mav.addObject("fileType","other");
+	         }
+	    	
+	     }
+	     else {
+	    	 mav.addObject("fileType","image");
+	     }
+		 
+		 mav.addObject("brochureAttachment", cleanURL+"/brochures/"+brochure.getfileName());
+		 
+		 return mav;
+	 }
+>>>>>>> branch 'master' of git@github.com:thenhkid/universalTranslator.git
 	
 	 
 	/**

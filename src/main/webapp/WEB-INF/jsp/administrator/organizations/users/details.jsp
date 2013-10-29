@@ -1,4 +1,3 @@
-
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %> 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -111,7 +110,4 @@
 	$(document).ready(function() {
 	    $("input:text,form").attr("autocomplete","off");
 	});
-
-	
-
 </script>
