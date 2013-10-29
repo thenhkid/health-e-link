@@ -91,6 +91,9 @@ ADD CONSTRAINT `providerIdFK`
     ON DELETE NO ACTION
     ON UPDATE NO ACTION);
 
+//10-29-2013 Chad
+ALTER TABLE `universalTranslator`.`providers` 
+DROP COLUMN `providerId`;
 
 
   

@@ -12,8 +12,8 @@ import org.springframework.stereotype.Repository;
 
 import com.ut.dph.dao.providerDAO;
 import com.ut.dph.model.Provider;
-import com.ut.dph.model.User;
 import com.ut.dph.model.providerAddress;
+import com.ut.dph.model.providerIdNum;
 
 /**
  * The providerDAOImpl class will implement the DAO access layer to handle
@@ -196,6 +196,79 @@ public class providerDAOImpl implements providerDAO {
 		Query deleteAddress = sessionFactory.getCurrentSession().createQuery("delete from providerAddress where id = :addressid");
 		deleteAddress.setParameter("addressid",addressid);
 		deleteAddress.executeUpdate();
+	}
+	
+	/**
+	 * The 'getProviderIds' function will return a list of ids associated
+	 * with the selected provider.
+	 * 
+	 * @param	providerIdNum	This will be used to query the ids
+	 * 
+	 * #Return 	The function will return a list providerIdNum objects
+	 */
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<providerIdNum>  getProviderIds(int providerId) {
+		
+		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(providerIdNum.class)
+	    	.add(Restrictions.eq("providerId",providerId))
+	    	.addOrder(Order.asc("dateCreated"));
+	     
+	     return criteria.list();  
+	}
+	
+	/**
+	 * The 'getIdDetails' function will return the details of the clicked id
+	 * 
+	 * @param	id	This will be used to query ids
+	 * 
+	 * #Return 	The function will return a providerIdNum object
+	 */
+	@Override
+	public providerIdNum getIdDetails(int id) {
+		return (providerIdNum) sessionFactory.getCurrentSession().get(providerIdNum.class, id);
+	}
+	
+	
+	/**
+	 * The 'updateId' function will update the selected id with the changes
+	 * entered into the form.
+	 * 
+	 * @param	providerIdNum	This will hold the id object from the provider id form
+	 * 
+	 * @return 			the function does not return anything
+	 */
+	@Override
+    public void updateId(providerIdNum providerIdNum) {
+		sessionFactory.getCurrentSession().update(providerIdNum);
+	}
+	
+	/**
+	 * The 'createId' function will submit the new id
+	 * entered into the form.
+	 * 
+	 * @param	providerIdNum	This will hold the id object from the id form
+	 * 
+	 * @return 			the function does not return anything
+	 */
+	@Override
+    public void createId(providerIdNum providerIdNum) {
+		sessionFactory.getCurrentSession().save(providerIdNum);
+	}
+	
+	/**
+	 * The 'deleteAddress' function will delete the provider address on the addressId
+	 * passed in.
+	 * 
+	 * @param	id	This will be id to find the specific provider id
+	 * 
+	 * @return			The function does not return anything
+	 */
+	@Override
+	public void deleteId(int id) {
+		Query deleteProviderId = sessionFactory.getCurrentSession().createQuery("delete from providerIdNum where id = :id");
+		deleteProviderId.setParameter("id",id);
+		deleteProviderId.executeUpdate();
 	}
 
 }

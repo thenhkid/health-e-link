@@ -59,7 +59,7 @@
 												     <span class="glyphicon glyphicon-edit"></span>
 												     Edit	
 												</a>
-												<a href="javascript:void(0);" data-toggle="modal" data-target="#brochureAttachment" rel="view?i=${brochure.id}" class="media-modal brochureView" data-title="${brochure.title}">
+												<a href="<c:url value="/fileDownloadController/downloadFile?filename=${brochure.fileName}&foldername=brochures&orgId=${brochure.orgId}"/>"  class="media-modal" title="Download this brochure">
 												     <span class="glyphicon glyphicon-edit"></span>
 												     View	
 												</a>
@@ -95,7 +95,18 @@
 <div class="modal fade" id="systemBrochureModal" role="dialog" tabindex="-1" aria-labeledby="Brochures" aria-hidden="true" aria-describedby="Brochures"></div>
 
 <!-- Brochure attachment View -->
-<div class="modal fade modal-media" id="brochureAttachment" role="dialog" tabindex="-1" aria-labeledby="Brochure Attachment" aria-hidden="true" aria-describedby="Brochure Attachment"></div>
+<div class="modal fade modal-media" id="brochureAttachment" role="dialog" tabindex="-1" aria-labeledby="Brochure Attachment" aria-hidden="true" aria-describedby="Brochure Attachment">
+div class="modal-dialog">
+	<div class="modal-content">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+			<h3 class="panel-title"></h3>
+		</div>
+		<div class="modal-body">
+		</div>
+	</div>
+</div>
+</div>
 
 <script>
 	$.ajaxSetup({
@@ -198,14 +209,15 @@
 				errorFound = 1;
 			}
 			//Make sure the file is a correct format
-			//(.jpg, .gif, .jpeg, .doc, .docx, .pdf)
+			//(.jpg, .gif, .jpeg, .doc, .docx, .pdf, .txt)
 			if($('#brochureFile').val() != '' && ($('#brochureFile').val().indexOf('.jpg') == -1 && 
 					$('#brochureFile').val().indexOf('.jpeg') == -1 &&
 					$('#brochureFile').val().indexOf('.gif') == -1 &&
 					$('#brochureFile').val().indexOf('.pdf') == -1 &&
 					$('#brochureFile').val().indexOf('.doc') == -1 &&
 					$('#brochureFile').val().indexOf('.docx') == -1 &&
-					$('#brochureFile').val().indexOf('.doc') == -1)) {
+					$('#brochureFile').val().indexOf('.doc') == -1 &&
+					$('#brochureFile').val().indexOf('.txt') == -1)) {
 				
 				$('#brochureFileDiv').addClass("has-error");
 				$('#brochureFileMsg').addClass("has-error");

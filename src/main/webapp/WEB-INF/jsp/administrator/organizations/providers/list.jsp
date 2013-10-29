@@ -44,7 +44,6 @@
 						<thead>
 							<tr>
 								<th scope="col">Name</th>
-								<th scope="col" style="text-align:center">Provider Id</th>
 								<th scope="col">Contact Info</th>
 								<th scope="col" style="text-align:center">Date Created</th>
 								<th scope="col"></th>
@@ -56,7 +55,6 @@
 								    <c:forEach var="provider" items="${providerList}">
 										<tr id="userRow">
 											<td scope="row"><a href="provider.${provider.firstName}${provider.lastName}?i=${provider.id}"  title="Edit this provider">${provider.firstName} ${provider.lastName}</a><br />(<c:choose><c:when test="${provider.status == true}">active</c:when><c:otherwise>inactive</c:otherwise></c:choose>)</td>
-											<td style="text-align:center">${provider.providerId}</td>
 											<td>
 											    <c:if test="${not empty provider.email}">${provider.email}<br /></c:if>
 											    (p) ${provider.phone1}

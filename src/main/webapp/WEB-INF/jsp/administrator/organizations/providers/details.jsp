@@ -23,6 +23,9 @@
 					<c:when test="${param.msg == 'updated'}">The address has been successfully updated!</c:when>
 					<c:when test="${param.msg == 'created'}">The address has been successfully added!</c:when>
 					<c:when test="${param.msg == 'deleted'}">The address has been successfully removed!</c:when>
+					<c:when test="${param.msg == 'idupdated'}">The provider Id has been successfully updated!</c:when>
+					<c:when test="${param.msg == 'idcreated'}">The provider Id has been successfully added!</c:when>
+					<c:when test="${param.msg == 'iddeleted'}">The provider Id has been successfully removed!</c:when>
 				</c:choose>
 			</div>
 		</c:when>
@@ -77,13 +80,6 @@
 									<label class="control-label" for="lastName">Last Name *</label>
 									<form:input path="lastName" id="lastName" class="form-control" type="text" maxLength="45" />
 									<form:errors path="lastName" cssClass="control-label" element="label" />
-								</div>
-							</spring:bind>
-							<spring:bind path="providerId">
-								<div class="form-group ${status.error ? 'has-error' : '' }">
-									<label class="control-label" for="providerId">Provider Id *</label>
-									<form:input path="providerId" id="providerId" class="form-control" type="text"  maxLength="45" />
-									<form:errors path="providerId" cssClass="control-label" element="label" />
 								</div>
 							</spring:bind>
 							<spring:bind path="email">
@@ -193,12 +189,69 @@
 				</div>
 			</div>
 		</section>
+		
+		<section class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">Provider Ids</h3>
+			</div>
+			<div class="panel-body">
+				<div class="form-container scrollable">
+					<a href="#providerIdModal" id="createNewId" data-toggle="modal" class="btn btn-primary btn-sm pull-right" title="Create a new provider Id">
+						<span class="glyphicon glyphicon-plus"></span>
+					</a>
+					<table class="table table-striped table-hover responsive">
+						<thead>
+							<tr>
+								<th scope="col">ID Number</th>
+								<th scope="col">Type</th>
+								<th scope="col">Issued By</th>
+								<th scope="col"></th>
+							</tr>
+						</thead>
+						<tbody>
+							<c:choose>
+								<c:when test="${providerdetails.providerIds.size() > 0}">
+									<c:forEach items="${providerdetails.providerIds}" var="id" varStatus="pStatus">
+									<tr>
+										<td scope="row">
+											${providerdetails.providerIds[pStatus.index].idNum} 
+										</td>
+										<td>
+											${providerdetails.providerIds[pStatus.index].type}
+										</td>
+										<td>
+											${providerdetails.providerIds[pStatus.index].issuedBy}
+										</td>
+										<td>
+											<a href="#providerIdModal" data-toggle="modal" class="btn btn-link editId" rel="address?i=${providerdetails.providerIds[pStatus.index].id}" title="Edit this provider Id">
+											     <span class="glyphicon glyphicon-edit"></span>
+											     Edit
+											</a>
+											<a href="javascript:void(0);"  class="btn btn-link deleteId" rel="${providerdetails.providerIds[pStatus.index].id}" title="Delete this provider Id">
+												<span class="glyphicon glyphicon-remove"></span>
+												Delete
+											</a>
+										</td>
+									</tr>
+									</c:forEach>
+								</c:when>
+								<c:otherwise><tr><td scope="row" colspan="4" style="text-align:center">No provider Ids Found</td></c:otherwise>
+							</c:choose>
+						</tbody>
+					</table>
+
+				</div>
+			</div>
+		</section>
 	</div>
 	</c:if>
 </div>
 
 <!-- Provider Address modal -->
 <div class="modal fade" id="systemAddressModal" role="dialog" tabindex="-1" aria-labeledby="Provider Address" aria-hidden="true" aria-describedby="Provider Address"></div>
+
+<!-- Provider Id modal -->
+<div class="modal fade" id="providerIdModal" role="dialog" tabindex="-1" aria-labeledby="Provider Id" aria-hidden="true" aria-describedby="Provider Id"></div>
 
 
 <script type="text/javascript">
@@ -213,11 +266,15 @@
 			$('.alert').delay(2000).fadeOut(1000);
 		}
 
+		//The function that will be called when the "Save" button
+		//is clicked
 		$('#saveDetails').click(function(event) {
 			$('#action').val('save');
 			$("#providerdetailsform").submit();
 		});
 
+		//The function that will be called when the "Save & Close" button
+		// is clicked
 		$('#saveCloseDetails').click(function(event) {
 			$('#action').val('close');
         	$('#providerdetailsform').submit();
@@ -234,7 +291,84 @@
 			
 		});
 
-		//This function will launch the new provider address overlay with a blank screen
+		//This function will launch the new provider Id overlay with a blank form
+		$(document).on('click','#createNewId',function() {
+			$.ajax({  
+		        url: 'newProviderId'+'?providerId='+$('#id').val(),  
+		        type: "GET",  
+		        success: function(data) {  
+		            $("#providerIdModal").html(data);           
+		        }  
+		    });  
+		});
+
+		//This function will launch the edit provider Id overlay populating the fields
+		//with the data of the clicked id.
+		$(document).on('click', '.editId',function() {
+			var Action = 'providerId/'+$(this).attr('rel');
+
+			$.ajax({  
+		        url: Action,  
+		        type: "GET",  
+		        success: function(data) {  
+		            $("#providerIdModal").html(data);           
+		        }  
+		    });  
+		});
+
+		//This function will delete the selected provider Id
+		$(document).on('click', '.deleteId',function() {
+			var confirmed = confirm("Are you sure you want to remove this provider Id?");
+
+			if(confirmed) {
+				var id = $(this).attr('rel');
+				
+				$.ajax({  
+			        url: "providerIdDelete/delete?i="+id,  
+			        type: "GET",  
+			        async: false,
+			        success: function(data) { 
+			        	//Strip out any remaming msg parameters in the string
+			        	var url = removeVariableFromURL($(location).attr('href'),'msg');
+				        window.location.href=  url + "&msg=iddeleted";
+			        }  
+			    });  
+			}
+		});
+
+		//Function to submit the changes to an existing provider Id or 
+		//submit the new provider Id fields from the modal window.
+		$(document).on('click', '#submitIdButton',function(event) {
+			
+			var formData = $("#providerIddetailsform").serialize();  
+
+			var actionValue = 'providerId/'+$(this).attr('rel').toLowerCase();
+			
+			$.ajax({  
+		        url: actionValue,  
+		        data: formData,  
+		        type: "POST",  
+		        async: false,
+		        success: function(data) { 
+		        	//Strip out any remaming msg parameters in the string
+		        	var url = removeVariableFromURL($(location).attr('href'),'msg');
+			        if(data.indexOf('idUpdated') != -1) {
+				        window.location.href= url + "&msg=idupdated";
+					}
+			        else if(data.indexOf('idCreated') != -1) {
+			        	window.location.href=  url + "&msg=idcreated";
+					}
+			        else {
+		        		$("#providerIdModal").html(data);
+			        }
+		        }  
+		    });  
+			event.preventDefault();
+			return false;
+
+		});
+
+		//This function will launch the new provider address overlay with a blank form
 	    $(document).on('click','#createNewAddress',function() {
 	    	$.ajax({  
 		        url: 'newProviderAddress'+'?providerId='+$('#id').val(),  
@@ -271,9 +405,8 @@
 			        type: "GET",  
 			        async: false,
 			        success: function(data) { 
-			        	var url = $(location).attr('href');
-					    url = url.replace("&msg=created","");
-					    url = url.replace("&msg=updated","");
+			        	//Strip out any remaming msg parameters in the string
+			        	var url = removeVariableFromURL($(location).attr('href'),'msg');
 				        window.location.href=  url + "&msg=deleted";
 			        }  
 			    });  
@@ -294,10 +427,8 @@
 		        type: "POST",  
 		        async: false,
 		        success: function(data) { 
-		        	var url = $(location).attr('href');
-				    url = url.replace("&msg=created","");
-				    url = url.replace("&msg=updated","");
-				    url = url.replace("&msg=deleted","");
+			        //Strip out any remaming msg parameters in the string
+		        	var url = removeVariableFromURL($(location).attr('href'),'msg');
 			        if(data.indexOf('addressUpdated') != -1) {
 				        window.location.href= url + "&msg=updated";
 					}
@@ -315,5 +446,16 @@
 		});
 		
 	});
+
+	function removeVariableFromURL(url_string, variable_name) {
+		var URL = String(url_string);
+	    var regex = new RegExp( "\\?" + variable_name + "=[^&]*&?", "gi");
+	    URL = URL.replace(regex,'?');
+	    regex = new RegExp( "\\&" + variable_name + "=[^&]*&?", "gi");
+	    URL = URL.replace(regex,'&');
+	    URL = URL.replace(/(\?|&)$/,'');
+	    regex = null;
+	    return URL;
+	}
 
 </script>

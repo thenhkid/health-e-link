@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
@@ -27,6 +26,7 @@ import java.util.List;
 
 import com.ut.dph.model.Organization;
 import com.ut.dph.model.providerAddress;
+import com.ut.dph.model.providerIdNum;
 import com.ut.dph.model.userAccess;
 import com.ut.dph.service.organizationManager;
 import com.ut.dph.model.User;
@@ -772,6 +772,11 @@ public class adminOrgContoller {
 		//Set the provider addresses
 		List<providerAddress> addresses = providerManager.getProviderAddresses(providerId);
 		providerDetails.setProviderAddresses(addresses);	
+		
+		//Set the provder Ids
+		List<providerIdNum> ids = providerManager.getProviderIds(providerId);
+		providerDetails.setProviderIds(ids);
+		
 		mav.addObject("providerId",providerDetails.getId());
 		mav.addObject("id",orgId);
 		mav.addObject("providerdetails",providerDetails);
@@ -801,9 +806,15 @@ public class adminOrgContoller {
 		if(result.hasErrors()) {
 			ModelAndView mav = new ModelAndView();
 			mav.setViewName("/administrator/organizations/providers/details");
+			
 			//Set the provider addresses
 			List<providerAddress> addresses = providerManager.getProviderAddresses(providerdetails.getId());
 			providerdetails.setProviderAddresses(addresses);	
+			
+			//Set the provder Ids
+			List<providerIdNum> ids = providerManager.getProviderIds(providerdetails.getId());
+			providerdetails.setProviderIds(ids);
+			
 			mav.addObject("providerId",providerdetails.getId());
 			mav.addObject("id",orgId);
 			return mav;
@@ -811,7 +822,6 @@ public class adminOrgContoller {
 		
 		//Update the provider
 		providerManager.updateProvider(providerdetails);
-	
 		
 		//If the "Save" button was pressed 
 		if(action.equals("save")) {
@@ -820,6 +830,11 @@ public class adminOrgContoller {
 			//Set the provider addresses
 			List<providerAddress> addresses = providerManager.getProviderAddresses(providerdetails.getId());
 			providerdetails.setProviderAddresses(addresses);	
+			
+			//Set the provder Ids
+			List<providerIdNum> ids = providerManager.getProviderIds(providerdetails.getId());
+			providerdetails.setProviderIds(ids);
+			
 			mav.addObject("providerId",providerdetails.getId());
 			mav.addObject("savedStatus","updated");
 			mav.addObject("id",orgId);
@@ -985,6 +1000,129 @@ public class adminOrgContoller {
 	 @RequestMapping(value="/{cleanURL}/addressDelete/{title}", method= RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	 public @ResponseBody Integer deleteAddress(@RequestParam(value="i", required=true) Integer addressId) throws Exception {	 
 		providerManager.deleteAddress(addressId);
+		return 1;
+	 }
+	 
+	 /**
+	 * The '/{cleanURL}/providerId/{id}?i=##' GET request will be used to return the details of the selected
+	 * provider id.
+	 * 
+	 * @param 	i	The id of the provider Id selected
+	 * 
+	 * @return		The provider Id details page
+	 * 
+	 * @Objects		(1) An object that will hold all the details of the clicked provider Id
+	 *
+	 */
+	 @RequestMapping(value="/{cleanURL}/providerId/{id}", method= RequestMethod.GET)
+	 @ResponseBody 
+	 public ModelAndView viewIdDetails(@RequestParam(value="i", required=true) Integer id) throws Exception {
+		 
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/organizations/providers/idDetails");	
+		
+		//Get all the details for the clicked providerId
+		providerIdNum idDetails = providerManager.getIdDetails(id);
+				
+		mav.addObject("btnValue","Update");
+		mav.addObject("idDetails",idDetails);
+		
+		return mav;
+	 }
+	 
+	 /**
+	 * The '/{cleanURL}/providerId/update' POST request will handle submitting changes for the selected provider Id.
+	 * 
+	 * @param id				The object containing the system provider Id form fields
+	 * @param result			The validation result
+	 * 
+	 * @return					Will return the provider Id details page on "Save"
+	 * 							Will return the id form page on error
+
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/{cleanURL}/providerId/update", method = RequestMethod.POST)
+	public @ResponseBody ModelAndView updateProviderId(@Valid @ModelAttribute(value="idDetails") providerIdNum idDetails, BindingResult result) throws Exception {
+		
+		if(result.hasErrors()) {
+			ModelAndView mav = new ModelAndView("/administrator/organizations/providers/idDetails");
+			
+			mav.addObject("btnValue","Update");
+			return mav;
+		}
+	
+		providerManager.updateId(idDetails);
+	
+		ModelAndView mav = new ModelAndView("/administrator/organizations/providers/idDetails");
+		mav.addObject("success","idUpdated");
+		return mav;		
+	}
+		 
+	 
+	 /**
+	 * The '/{cleanURL}/newProviderId' GET request will be used to return a blank provider
+	 * id form.
+	 * 
+	 * @param 	provierid	The id of the selected provider
+	 * 
+	 * @return		The provider Id form page
+	 * 
+	 * @Objects		(1) An object that will hold all the details of a new providerId object
+	 *
+	 */
+	 @RequestMapping(value="/{cleanURL}/newProviderId", method= RequestMethod.GET)
+	 @ResponseBody 
+	 public ModelAndView newProviderId(@RequestParam(value="providerId", required=true) Integer providerId) throws Exception {
+		 
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/organizations/providers/idDetails");	
+		providerIdNum idDetails = new providerIdNum();
+		idDetails.setProviderId(providerId);
+		mav.addObject("idDetails",idDetails);
+		mav.addObject("btnValue","Create");
+		
+		return mav;
+	 }
+	 
+	 /**
+	 * The '/{cleanURL}/providerId/create' POST request will handle submitting the new provider Id.
+	 * 
+	 * @param idDetails			The object containing the system providerId form fields
+	 * @param result			The validation result
+	 * 
+	 * @return					Will return the provider details page on "Save"
+	 * 							Will return the providerId form page on error
+
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/{cleanURL}/providerId/create", method = RequestMethod.POST)
+	public @ResponseBody ModelAndView createProviderId(@Valid @ModelAttribute(value="idDetails") providerIdNum idDetails, BindingResult result) throws Exception {
+		
+		if(result.hasErrors()) {
+			ModelAndView mav = new ModelAndView("/administrator/organizations/providers/idDetails");
+			mav.addObject("btnValue","Create");
+			return mav;
+		}
+		
+		providerManager.createId(idDetails);
+	
+		ModelAndView mav = new ModelAndView("/administrator/organizations/providers/idDetails");
+		mav.addObject("success","idCreated");
+		return mav;		
+	}
+	
+	/**
+	 * The '/{cleanURL}/providerIdDelete/{title}?i=##' GET request will be used to delete the selected
+	 * provider Id.
+	 * 
+	 * @param 	i	The id of the provider Id selected
+	 * 
+	 * @return		This function returns no value
+	 *
+	 */
+	 @RequestMapping(value="/{cleanURL}/providerIdDelete/{title}", method= RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	 public @ResponseBody Integer deleteProviderId(@RequestParam(value="i", required=true) Integer id) throws Exception {	 
+		providerManager.deleteId(id);
 		return 1;
 	 }
 	
@@ -1195,37 +1333,6 @@ public class adminOrgContoller {
 		return mav;		
 	 }
 	 
-	 @RequestMapping(value="/{cleanURL}/brochureView/{title}", method = RequestMethod.GET)
-	 public @ResponseBody ModelAndView viewBrochureFile(@RequestParam(value="i", required=true) Integer brochureId, @PathVariable String cleanURL, HttpServletResponse httpServletResponse) throws Exception {
-		 
-		 //Need to get the file name based on the brochure Id passed
-		 Brochure brochure = brochureManager.getBrochureById(brochureId);
-		 
-		 ModelAndView mav = new ModelAndView();
-		 mav.setViewName("/administrator/organizations/brochures/viewAttachment");
-		 
-		 //Set the type of attachment
-		 fileSystem dir = new fileSystem();
-		 dir.setDir(cleanURL, "brochures");
-		 
-		 Image image = ImageIO.read(new File(dir.getDir() + brochure.getfileName()));
-	     if (image == null) {
-	         if(brochure.getfileName().contains(".pdf")) {
-	        	 mav.addObject("fileType","pdf");
-	         }
-	         else {
-	        	 mav.addObject("fileType","other");
-	         }
-	    	
-	     }
-	     else {
-	    	 mav.addObject("fileType","image");
-	     }
-		 
-		 mav.addObject("brochureAttachment", cleanURL+"/brochures/"+brochure.getfileName());
-		 
-		 return mav;
-	 }
 	
 	 
 	/**

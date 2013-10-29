@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ut.dph.dao.providerDAO;
 import com.ut.dph.model.Provider;
 import com.ut.dph.model.providerAddress;
+import com.ut.dph.model.providerIdNum;
 import com.ut.dph.service.providerManager;
 
 @Service
@@ -77,6 +78,36 @@ public class providerManagerImpl implements providerManager{
 	@Transactional
 	public void deleteAddress(int addressId) {
 		providerDAO.deleteAddress(addressId);
+	}
+	
+	@Override
+	@Transactional
+	public List<providerIdNum>  getProviderIds(int providerId) {
+		return providerDAO.getProviderIds(providerId);
+	}
+	
+	@Override
+	@Transactional
+	public providerIdNum getIdDetails(int id) {
+		return providerDAO.getIdDetails(id);
+	}
+	
+	@Override
+	@Transactional
+	public void updateId(providerIdNum providerIdNum) {
+		providerDAO.updateId(providerIdNum);
+	}
+	
+	@Override
+	@Transactional
+	public void createId(providerIdNum providerIdNum) {
+		providerDAO.createId(providerIdNum);
+	}
+	
+	@Override
+	@Transactional
+	public void deleteId(int id) {
+		providerDAO.deleteId(id);
 	}
 	
 }

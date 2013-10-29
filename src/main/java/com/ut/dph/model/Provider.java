@@ -24,6 +24,9 @@ public class Provider {
 	@Transient
 	private List<providerAddress> providerAddresses = null;
 	
+	@Transient
+	private List<providerIdNum> providerIds = null;
+	
 	
   	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -71,18 +74,6 @@ public class Provider {
 	  
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
-	}
-	
-	@NotEmpty
-	@Column(name="PROVIDERID", nullable = true)
-	private String providerId;
-	
-	public String getProviderId() {
-		return providerId;
-	}
-	
-	public void setProviderId(String providerId) {
-		this.providerId = providerId;
 	}
 	
 	@Email
@@ -198,6 +189,12 @@ public class Provider {
 		this.providerAddresses = providerAddresses;
 	}
 	
-	
+	public List<providerIdNum> getProviderIds() {
+		return providerIds;
+	}
+ 
+	public void setProviderIds(List<providerIdNum> providerIds) {
+		this.providerIds = providerIds;
+	}
 
 }
