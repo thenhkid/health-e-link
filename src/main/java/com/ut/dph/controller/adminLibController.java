@@ -121,6 +121,40 @@ public class adminLibController {
 		
 	}
 	
+	/**
+	 * The '/create' POST request will be used to submit the new message type.
+	 * 
+	 * @param	messageTypeDetails The messageType object
+	 * 
+	 * @Objects	(1) An object will be returned holding the message type
+	 * 
+	 * @Returns The function will return the message type edit page.
+	 */
+	@RequestMapping(value="/create", method = RequestMethod.POST)
+	public ModelAndView createMessageType(@Valid messageType messageTypeDetails, BindingResult result,@RequestParam String action) throws Exception {
+			
+		if(result.hasErrors()) {
+			ModelAndView mav = new ModelAndView();
+			mav.setViewName("/administrator/messageTypeLibrary/details");
+			return mav;
+		}
+		 
+		Integer id = null;
+		id = (Integer) messagetypemanager.createMessageType(messageTypeDetails);
+		
+		if(action.equals("save")) {
+			/**
+			 * Set the private variable to hold the id of the new message type.
+			 */
+			messageTypeId = id;
+			ModelAndView mav = new ModelAndView(new RedirectView("editMessageType?i="+id));
+			return mav;		
+		}
+		else {
+			ModelAndView mav = new ModelAndView(new RedirectView("mappings?i="+id));
+			return mav;			
+		}
+	 }
 	
 	/**
 	 * The '/editMessageType?i={num}' GET request will be used to return the details of the selected
@@ -143,6 +177,35 @@ public class adminLibController {
 		//Get the message type
 		messageType messageTypeDetails = messagetypemanager.getMessageTypeById(Id);
 		mav.addObject("messageTypeDetails", messageTypeDetails);
+		mav.addObject("id",messageTypeId);
+		return mav;
+	 }
+	 
+	 /**
+	 * The '/editMessageType?i={num}' POST request will be used to submit the details of the selected
+	 * message type.
+	 * 
+	 * @param	i	The id of the selected message type
+	 * 			messageTypeDetails The messageType object
+	 * 
+	 * @Objects	(1) An object will be returned holding the message type
+	 * 
+	 * @Returns The function will return the message type edit page.
+	 */
+	 @RequestMapping(value="/editMessageType{num}", method = RequestMethod.POST)
+	 public ModelAndView updateMessageType(@Valid messageType messageTypeDetails, BindingResult result) throws Exception {
+		
+		if(result.hasErrors()) {
+			ModelAndView mav = new ModelAndView();
+			mav.setViewName("/administrator/messageTypeLibrary/details");
+			mav.addObject("id",messageTypeId);
+			return mav;
+		}
+		 
+		messagetypemanager.updateMessageType(messageTypeDetails);
+		
+		ModelAndView mav = new ModelAndView("/administrator/messageTypeLibrary/details");
+		mav.addObject("success","updated");
 		return mav;
 	 }
 

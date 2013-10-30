@@ -26,7 +26,7 @@ public class messageType {
 	  private int id;
 	  
 	  @Column(name="STATUS", nullable = false)
-	  private boolean status;
+	  private int status;
 	  
 	  @Column(name="DATECREATED", nullable = false)
 	  private Date dateCreated;
@@ -47,11 +47,11 @@ public class messageType {
 	    this.id = id;
 	  }
 	
-	  public boolean getStatus() {
+	  public int getStatus() {
 	    return status;
 	  }
 	  
-	  public void setStatus(boolean status) {
+	  public void setStatus(int status) {
 	    this.status = status;
 	  }
 	  

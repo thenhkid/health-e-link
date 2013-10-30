@@ -95,6 +95,11 @@ ADD CONSTRAINT `providerIdFK`
 ALTER TABLE `universalTranslator`.`providers` 
 DROP COLUMN `providerId`;
 
+//10-30-2013 Chad
+ALTER TABLE `universaltranslator`.`messagetypes` 
+CHANGE COLUMN `status` `status` SMALLINT NOT NULL DEFAULT b'0' COMMENT '1 = Active\n0 = Inactive\n2 = Archived' ;
+
+
 
   
   

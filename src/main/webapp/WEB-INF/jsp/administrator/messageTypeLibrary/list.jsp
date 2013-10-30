@@ -48,7 +48,7 @@
 										<tr id="messageTypeRow" style="cursor: pointer">
 											<td scope="row">
 												<a href="editMessageType?i=${messageType.id}" title="Edit this message type">${messageType.name}</a>
-												<br />(<c:choose><c:when test="${messageType.status == true}">active</c:when><c:otherwise>inactive</c:otherwise></c:choose>)
+												<br />(<c:choose><c:when test="${messageType.status == 1}">active</c:when><c:when test="${messageType.status == 0}">inactive</c:when><c:otherwise>archived</c:otherwise></c:choose>)
 											</td>
 											<td style="text-align:center"><fmt:formatDate value="${messageType.dateCreated}" type="date" pattern="M/dd/yyyy" /></td>
 											<td class="actions-col">

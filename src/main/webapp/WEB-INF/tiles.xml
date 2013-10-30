@@ -96,8 +96,17 @@
     	<definition name="/administrator/messageTypeLibrary/list" extends="base.definition">
 	        <put-attribute name="title" value="Administrator - Manage Message Type Library" />
 	        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=lib" />
-	        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/messageTypeLibrary/actionBar.jsp?page=listMessageTypes" />
+	        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/messageTypeLibrary/actionBar.jsp?page=list" />
 	        <put-attribute name="body" value="/WEB-INF/jsp/administrator/messageTypeLibrary/list.jsp" />
+	        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
+	    </definition>
+	    
+	    <definition name="/administrator/messageTypeLibrary/details" extends="base.definition">
+	        <put-attribute name="title" value="Administrator - Manage Message Type Library" />
+	        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=lib" />
+	        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/messageTypeLibrary/actionBar.jsp?page=details" />
+	        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/messageTypeLibrary/menu.jsp?page=details" />
+	        <put-attribute name="body" value="/WEB-INF/jsp/administrator/messageTypeLibrary/details.jsp" />
 	        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
 	    </definition>
 	   
