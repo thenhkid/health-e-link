@@ -45,7 +45,7 @@
 							<tr>
 								<th scope="col">Name</th>
 								<th scope="col">Contact Info</th>
-								<th scope="col" style="text-align:center">Date Created</th>
+								<th scope="col" class="center-text">Date Created</th>
 								<th scope="col"></th>
 							</tr>
 						</thead>
@@ -61,7 +61,7 @@
 											    <c:if test="${not empty provider.phone2}"><br />(c) ${provider.phone2}</c:if>
 											    <c:if test="${not empty provider.fax}"><br />(f) ${provider.fax}</c:if>
 											</td>
-											<td style="text-align:center"><fmt:formatDate value="${provider.dateCreated}" type="date" pattern="M/dd/yyyy" /></td>
+											<td class="center-text"><fmt:formatDate value="${provider.dateCreated}" type="date" pattern="M/dd/yyyy" /></td>
 											<td class="actions-col">
 												<a href="provider.${provider.firstName}${provider.lastName}?i=${provider.id}"  class="btn btn-link" title="Edit this provider">
 												     <span class="glyphicon glyphicon-edit"></span>
@@ -76,7 +76,7 @@
 									</c:forEach>
 								  </c:when>
 								  <c:otherwise>
-								   	<tr><td colspan="5" style="text-align: center">There where no providers found</td></tr>
+								   	<tr><td colspan="5" class="center-text">There where no providers found</td></tr>
 								  </c:otherwise>
 							</c:choose>
 						</tbody>

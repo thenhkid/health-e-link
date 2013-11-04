@@ -6,17 +6,20 @@ import javax.validation.Valid;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.ut.dph.model.messageType;
+import com.ut.dph.model.messageTypeFormFields;
 import com.ut.dph.service.messageTypeManager;
 
 @Controller
@@ -40,6 +43,8 @@ public class adminLibController {
 	 * the messageTypeId based on the url.
 	 */
 	private static int messageTypeId = 0;
+	
+	private static List<messageTypeFormFields> fields = new ArrayList<messageTypeFormFields>();
 	
 	/**
 	 *  The '/list' GET request will serve up the existing list of message types
@@ -131,7 +136,7 @@ public class adminLibController {
 	 * @Returns The function will return the message type edit page.
 	 */
 	@RequestMapping(value="/create", method = RequestMethod.POST)
-	public ModelAndView createMessageType(@Valid messageType messageTypeDetails, BindingResult result,@RequestParam String action) throws Exception {
+	public ModelAndView createMessageType(@Valid @ModelAttribute(value="messageTypeDetails") messageType messageTypeDetails, BindingResult result,@RequestParam String action, RedirectAttributes redirectAttr) throws Exception {
 			
 		if(result.hasErrors()) {
 			ModelAndView mav = new ModelAndView();
@@ -142,22 +147,26 @@ public class adminLibController {
 		Integer id = null;
 		id = (Integer) messagetypemanager.createMessageType(messageTypeDetails);
 		
+		redirectAttr.addFlashAttribute("savedStatus", "created");
+		
+		/**
+		 * Set the private variable to hold the id of the new message type.
+		 */
+		messageTypeId = id;
+		
 		if(action.equals("save")) {
-			/**
-			 * Set the private variable to hold the id of the new message type.
-			 */
-			messageTypeId = id;
-			ModelAndView mav = new ModelAndView(new RedirectView("editMessageType?i="+id));
+			
+			ModelAndView mav = new ModelAndView(new RedirectView("details?i="+id));
 			return mav;		
 		}
 		else {
-			ModelAndView mav = new ModelAndView(new RedirectView("mappings?i="+id));
+			ModelAndView mav = new ModelAndView(new RedirectView("mappings"));
 			return mav;			
 		}
 	 }
 	
 	/**
-	 * The '/editMessageType?i={num}' GET request will be used to return the details of the selected
+	 * The '/details?i={num}' GET request will be used to return the details of the selected
 	 * message type.
 	 * 
 	 * @param	i	The id of the selected message type
@@ -166,23 +175,25 @@ public class adminLibController {
 	 * 
 	 * @Returns The function will return the message type edit page.
 	 */
-	 @RequestMapping(value="/editMessageType{num}", method = RequestMethod.GET)
-	 public ModelAndView viewMessageTypeDetails(@RequestParam(value="i", required=true) Integer Id) throws Exception {
+	 @RequestMapping(value="/details{num}", method = RequestMethod.GET)
+	 public ModelAndView viewMessageTypeDetails(@RequestParam(value="i", required=false) Integer Id) throws Exception {
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("/administrator/messageTypeLibrary/details");
 		
 		//Set the static variable messageTypeId to hold the passed in id
-		messageTypeId = Id;
+		if(Id != null) {
+			messageTypeId = Id;
+		}
 		
 		//Get the message type
-		messageType messageTypeDetails = messagetypemanager.getMessageTypeById(Id);
+		messageType messageTypeDetails = messagetypemanager.getMessageTypeById(messageTypeId);
 		mav.addObject("messageTypeDetails", messageTypeDetails);
 		mav.addObject("id",messageTypeId);
 		return mav;
 	 }
 	 
 	 /**
-	 * The '/editMessageType?i={num}' POST request will be used to submit the details of the selected
+	 * The '/details?i={num}' POST request will be used to submit the details of the selected
 	 * message type.
 	 * 
 	 * @param	i	The id of the selected message type
@@ -192,8 +203,8 @@ public class adminLibController {
 	 * 
 	 * @Returns The function will return the message type edit page.
 	 */
-	 @RequestMapping(value="/editMessageType{num}", method = RequestMethod.POST)
-	 public ModelAndView updateMessageType(@Valid messageType messageTypeDetails, BindingResult result) throws Exception {
+	 @RequestMapping(value="/details{num}", method = RequestMethod.POST)
+	 public ModelAndView updateMessageType(@Valid @ModelAttribute(value="messageTypeDetails") messageType messageTypeDetails, BindingResult result) throws Exception {
 		
 		if(result.hasErrors()) {
 			ModelAndView mav = new ModelAndView();
@@ -205,9 +216,101 @@ public class adminLibController {
 		messagetypemanager.updateMessageType(messageTypeDetails);
 		
 		ModelAndView mav = new ModelAndView("/administrator/messageTypeLibrary/details");
-		mav.addObject("success","updated");
+		mav.addObject("savedStatus","updated");
+		mav.addObject("id",messageTypeId);
 		return mav;
 	 }
+	 
+	 /**
+	 * *********************************************************
+	 * 			MESSAGE TYPE LIBRARY MAPPING FUNCTIONS					
+	 * *********************************************************
+	 */
+	 
+	 /**
+	 * The '/mappings' GET request will display the Field Mappings page for the selected
+	 * message type.
+	 * 
+	 */
+	 @RequestMapping(value="/mappings", method = RequestMethod.GET)
+	 public ModelAndView getFieldMappings() throws Exception {
+		 
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/messageTypeLibrary/mappings");
+		mav.addObject("id",messageTypeId);
+		
+		//Need to get the name of the message type
+		messageType messageTypeDetails = messagetypemanager.getMessageTypeById(messageTypeId);
+		
+		//Need to return a list of associated fields for the selected message type
+		List<messageTypeFormFields> fields = messagetypemanager.getMessageTypeFields(messageTypeId);
+		messageTypeDetails.setFields(fields);
+		
+		mav.addObject("messageTypeDetails", messageTypeDetails);
+		
+		//Get the list of available information tables
+		@SuppressWarnings("rawtypes")
+		List infoTables = messagetypemanager.getInformationTables();
+		mav.addObject("infoTables", infoTables);
+		
+		//Get the list of available field validation types
+		@SuppressWarnings("rawtypes")
+		List validationTypes = messagetypemanager.getValidationTypes();
+		mav.addObject("validationTypes", validationTypes);
+		
+		return mav;
+		 
+	 }
+	 
+	 
+	 /**
+	 * The '/mappings' POST request will submit the fields mapping form from the 
+	 * selected message type.
+	 * 
+	 * #param	messageTypeDetails
+	 * 
+	 * @Return	This function will redirect the user back to the mappings display page. 
+	 * 			A redirect is being used so we can show the fields in the appropriate
+	 * 			display order.
+	 * 
+	 */
+	 @RequestMapping(value="/mappings", method = RequestMethod.POST)
+	 public ModelAndView submitFieldMappings(@ModelAttribute(value="messageTypeDetails") messageType messageTypeDetails, RedirectAttributes redirectAttr) throws Exception {
+		List<messageTypeFormFields> fields = messageTypeDetails.getFields();
+	
+		if(null != fields && fields.size() > 0) {
+			adminLibController.fields = fields;
+			
+			for(messageTypeFormFields formfield : fields) {
+				//Update each mappings
+				messagetypemanager.updateMessageTypeFields(formfield);
+			}
+		}
+		
+		redirectAttr.addFlashAttribute("savedStatus", "updated");
+		ModelAndView mav = new ModelAndView(new RedirectView("mappings"));
+		return mav;	
+		 
+	 }
+	 
+	 /**
+	  * The '/getTableCols.do' GET request will return a list of columns for the passed in
+	  * table name
+	  * 
+	  * @param tableName
+	  * 
+	  * @return The function will return a list of column names.
+	  */
+	 @SuppressWarnings("rawtypes")
+	 @RequestMapping(value="/getTableCols.do", method = RequestMethod.GET)
+	 public @ResponseBody List getTableCols(@RequestParam(value= "tableName", required = true) String tableName) {
+		 
+		 List columns = messagetypemanager.getTableColumns(tableName);
+		 
+		 return columns;
+		 
+	 }
+	 
 
 }
 

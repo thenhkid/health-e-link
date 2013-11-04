@@ -80,8 +80,8 @@ define(['jquery', 'bootstrap'], function ($) {
 				modalImage.height(mediaHeight);
 			}
 
-			$('.modal-body').width(modalImage.width());
-			$('.modal-dialog', modal).width($('.modal-body').outerWidth());
+			$('.modal-body', modal).width(modalImage.width());
+			$('.modal-dialog', modal).width($('.modal-body', modal).outerWidth());
 		},
 
 		resetMediaModal : function (target) {
@@ -107,10 +107,7 @@ define(['jquery', 'bootstrap'], function ($) {
 						activeImage.src = this.filename;
 						$(activeImage).addClass('modal-image');
 
-					console.log(target);
-
 					activeImage.onload = function () {
-						console.log($('.modal-body', target));
 						$('.modal-body', target).get(0).appendChild(activeImage);
 						_self.sizeModal(target, activeImage.width, activeImage.height);
 						_self._super('show');

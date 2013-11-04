@@ -9,9 +9,11 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ut.dph.dao.messageTypeDAO;
 import com.ut.dph.model.messageType;
+import com.ut.dph.model.messageTypeFormFields;
 
 /**
  * The brochureDAOImpl class will implement the DAO access layer to handle
@@ -59,7 +61,7 @@ public class messageTypeDAOImpl implements messageTypeDAO {
 	 */
 	@Override
     public void updateMessageType(messageType messageType) {
-		sessionFactory.getCurrentSession().update(messageType);
+		sessionFactory.getCurrentSession().saveOrUpdate(messageType);
 	}
 	
 
@@ -163,5 +165,75 @@ public class messageTypeDAOImpl implements messageTypeDAO {
 		return totalMessageTypes;
 	}
 	
+	/**
+	* The 'getMessageTypeFields' function will return all the form fields associated to the selected message type.
+	* 
+	* @Table messageTypeFormFields
+	* 
+	* @Return This function will return a list of fields
+	*/
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<messageTypeFormFields> getMessageTypeFields(int messageTypeId) {
+		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(messageTypeFormFields.class)
+			.add(Restrictions.eq("messageTypeId",messageTypeId))
+			.addOrder(Order.asc("bucketNo"))
+	     	.addOrder(Order.asc("bucketDspPos"));
+		
+		return criteria.list();
+	}
+	
+	/**
+	* The 'updateMessageTypeFields' function will update the selected message type field mappings
+	* 
+	* @Table messagTypeFormFields
+	* 
+	* @Return This function does not return anything
+	*/
+	@Override
+	@Transactional
+	public void updateMessageTypeFields(messageTypeFormFields formField) {
+		sessionFactory.getCurrentSession().update(formField);
+	}
+	
+	/**
+	* The 'getInformationTables' function will return a list of all available information tables where we
+	* can associate fields to an actual table and column.
+	*/
+	@Override
+	@SuppressWarnings("rawtypes")
+	@Transactional
+	public List getInformationTables() {
+		Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT distinct table_name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'universalTranslator'");
+		
+		return query.list();
+	}
+	
+	/**
+	* The 'getTableColumns' function will return a list of columns from the passed in table name 
+	* 
+	*/
+	@Override
+	@SuppressWarnings("rawtypes")
+	@Transactional
+	public List getTableColumns(String tableName) {
+		Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'universalTranslator' AND TABLE_NAME = :tableName")
+			.setParameter("tableName", tableName);
+		
+		return query.list();
+	}
+	
+	/**
+	* The 'getValidationTypes' function will return a list of available field validation types
+	* 
+	*/
+	@Override
+	@SuppressWarnings("rawtypes")
+	@Transactional
+	public List getValidationTypes() {
+		Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT id, validationType FROM ref_validationTypes order by validationType asc");
+		
+		return query.list();
+	}
 
 }

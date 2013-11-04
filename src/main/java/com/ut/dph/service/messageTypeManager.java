@@ -3,6 +3,7 @@ package com.ut.dph.service;
 import java.util.List;
 
 import com.ut.dph.model.messageType;
+import com.ut.dph.model.messageTypeFormFields;
 
 public interface messageTypeManager {
 	
@@ -19,5 +20,18 @@ public interface messageTypeManager {
 	List<messageType> findMessageTypes(String searchTerm);
 	
 	Long findTotalMessageTypes();
+	
+	List<messageTypeFormFields> getMessageTypeFields(int messageTypeId);
+	
+	void updateMessageTypeFields(messageTypeFormFields formField);
+	
+	@SuppressWarnings("rawtypes")
+	List getInformationTables();
+	
+	@SuppressWarnings("rawtypes")
+	List getTableColumns(String tableName);
+	
+	@SuppressWarnings("rawtypes")
+	List getValidationTypes();
 
 }

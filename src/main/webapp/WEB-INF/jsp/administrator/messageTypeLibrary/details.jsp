@@ -13,7 +13,7 @@
 			</div>
 		</c:if>
 	
-		<form:form commandName="messageTypeDetails" method="post" role="form">
+		<form:form id="messageType" commandName="messageTypeDetails" modelAttribute="messageTypeDetails" method="post" enctype="multipart/form-data" role="form">
 			<input type="hidden" id="action" name="action" value="save" />
 			<form:hidden path="id" id="id" />
 			<form:hidden path="dateCreated" />
@@ -47,13 +47,23 @@
 								<c:if test="${not empty esistingType}">${esistingType}</c:if>
 							</div>
 						</spring:bind>
-						<spring:bind path="templateFile">
-							<div id="templateFileDiv" class="form-group ${status.error ? 'has-error' : '' }">
-								<label class="control-label" for="templateFile">Template File *</label>
-								<form:input path="templateFile" id="templateFile" type="file" class="form-control" />
-								<span id="templateFileMsg" class="control-label"></span>
-							</div>
-						</spring:bind>
+						<c:choose>
+							<c:when test="${empty id}">
+								<spring:bind path="file">
+									<div id="templateFileDiv" class="form-group ${status.error ? 'has-error' : '' }">
+										<label class="control-label" for="templateFile">Template File *</label>
+										<form:input path="file" id="templateFile" type="file" />
+										<span id="templateFileMsg" class="control-label"></span>
+									</div>
+								</spring:bind>
+							</c:when>
+							<c:otherwise>
+								<div id="templateFileDiv" class="form-group">
+									<label class="control-label" for="templateFile">Uploaded Template File:</label>
+									<form:input path="templateFile" id="templateFile" class="form-control" readonly="true" />
+								</div>
+							</c:otherwise>
+						</c:choose>
 					</div>
 				</div>
 			</section>
@@ -75,16 +85,49 @@
 		
 		$('#saveDetails').click(function(event) {
 			$('#action').val('save');
-			$("#messageType").submit();
+			var hasErrors = 0;
+			hasErrors = checkFileUploaded();
+			if(hasErrors == 0) {
+				$("#messageType").submit();
+			}
+			
 		});
 		
 		$('#next').click(function(event) {
 			$('#action').val('next');
-        	$('#messageType').submit();
+			var hasErrors = 0;
+			hasErrors = checkFileUploaded();
+			if(hasErrors == 0) {
+				$("#messageType").submit();
+			}
 		});
 		
 		
 	});
+
+	function checkFileUploaded() {
+		var errorFound = 0;
+		
+		if($('#templateFile').val() == '' && $('#id').val() == 0) {
+			$('#templateFileDiv').addClass("has-error");
+			$('#templateFileMsg').addClass("has-error");
+			$('#templateFileMsg').html('The message type file is a required field.');
+			errorFound = 1;
+		}
+		//Make sure the file is a correct format
+		//(.xls, .xlsx)
+		if($('#templateFile').val() != '' && ($('#templateFile').val().indexOf('.xls') == -1 && 
+			$('#templateFile').val().indexOf('.xlsx') == -1)) {
+		
+			$('#templateFileDiv').addClass("has-error");
+			$('#templateFileMsg').addClass("has-error");
+			$('#templateFileMsg').html('The message type file must be an excel file.');
+			errorFound = 1;
+
+		}
+
+		return errorFound;
+	}
 	
 
 </script>

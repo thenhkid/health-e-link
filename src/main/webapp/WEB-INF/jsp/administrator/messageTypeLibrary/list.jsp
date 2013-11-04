@@ -37,7 +37,7 @@
 						<thead>
 							<tr>
 								<th scope="col">Message Type Name</th>
-								<th scope="col" style="text-align:center">Date Created</th>
+								<th scope="col" class="center-text">Date Created</th>
 								<th scope="col"></th>
 							</tr>
 						</thead>
@@ -47,12 +47,12 @@
 								    <c:forEach var="messageType" items="${messageTypesList}">
 										<tr id="messageTypeRow" style="cursor: pointer">
 											<td scope="row">
-												<a href="editMessageType?i=${messageType.id}" title="Edit this message type">${messageType.name}</a>
+												<a href="details?i=${messageType.id}" title="Edit this message type">${messageType.name}</a>
 												<br />(<c:choose><c:when test="${messageType.status == 1}">active</c:when><c:when test="${messageType.status == 0}">inactive</c:when><c:otherwise>archived</c:otherwise></c:choose>)
 											</td>
-											<td style="text-align:center"><fmt:formatDate value="${messageType.dateCreated}" type="date" pattern="M/dd/yyyy" /></td>
+											<td class="center-text"><fmt:formatDate value="${messageType.dateCreated}" type="date" pattern="M/dd/yyyy" /></td>
 											<td class="actions-col">
-												<a href="editMessageType?i=${messageType.id}" class="btn btn-link" title="Edit this message type">
+												<a href="details?i=${messageType.id}" class="btn btn-link" title="Edit this message type">
 													<span class="glyphicon glyphicon-edit"></span>
 													Edit	
 												</a>
@@ -61,7 +61,7 @@
 									</c:forEach>
 								  </c:when>
 								  <c:otherwise>
-								   	<tr><td colspan="4" style="text-align: center">There are currently no message types set up.</td></tr>
+								   	<tr><td colspan="4" class="center-text">There are currently no message types set up.</td></tr>
 								  </c:otherwise>
 							</c:choose>
 						</tbody>

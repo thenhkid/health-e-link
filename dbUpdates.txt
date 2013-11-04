@@ -99,6 +99,26 @@ DROP COLUMN `providerId`;
 ALTER TABLE `universaltranslator`.`messagetypes` 
 CHANGE COLUMN `status` `status` SMALLINT NOT NULL DEFAULT b'0' COMMENT '1 = Active\n0 = Inactive\n2 = Archived' ;
 
+//10-31-2013 Chad
+ALTER TABLE `universalTranslator`.`messageTypeFormFields` 
+DROP FOREIGN KEY `refTableColId`,
+DROP FOREIGN KEY `refTableId`;
+
+ALTER TABLE `universalTranslator`.`messageTypeFormFields` 
+CHANGE COLUMN `saveToTableName` `saveToTableName` INT(11) NULL ,
+CHANGE COLUMN `saveToTableCol` `saveToTableCol` INT(11) NULL ;
+
+ALTER TABLE `universalTranslator`.`messageTypeFormFields` 
+DROP INDEX `refTableColId_idx` ,
+DROP INDEX `refTableId_idx` ;
+
+//11-1-2013 Chad
+ALTER TABLE `universalTranslator`.`configurationFormFields` 
+CHANGE COLUMN `saveToTableName` `saveToTableName` VARCHAR(255) NULL DEFAULT NULL ,
+CHANGE COLUMN `saveToTableCol` `saveToTableCol` VARCHAR(255) NULL DEFAULT NULL ;
+  
+
+
 
 
   

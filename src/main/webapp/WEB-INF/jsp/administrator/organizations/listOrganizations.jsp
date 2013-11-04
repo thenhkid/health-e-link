@@ -36,7 +36,7 @@
 					<table class="table table-striped table-hover table-default">
 						<thead>
 							<tr>
-								<th scope="col">Organization Name</th>
+								<th scope="col">Organization Name ${result}</th>
 								<th scope="col">Contact Information</th>
 								<th scope="col" style="text-align:center"># of Users</th>
 								<th scope="col" style="text-align:center"># of Configurations</th>
@@ -58,14 +58,14 @@
 												${org.address} <c:if test="${not empty org.address2}"><br />${org.address2}</c:if>
 												<br />${org.city} ${org.state}, ${org.postalCode}
 											</td>
-											<td style="text-align:center">
+											<td class="center-text">
 												${orgFunctions.findTotalUsers(org.id)}
 											</td>
-											<td style="text-align:center">
+											<td class="center-text">
 											 	${orgFunctions.findTotalConfigurations(org.id)}
 											</td>
-											<td style="text-align:center"><fmt:formatDate value="${org.dateCreated}" type="date" pattern="M/dd/yyyy" /></td>
-											<td style="text-align:center">
+											<td class="center-text"><fmt:formatDate value="${org.dateCreated}" type="date" pattern="M/dd/yyyy" /></td>
+											<td class="center-text">
 												<c:choose>
 													<c:when test="${org.publicOrg == true}">
 														Public
@@ -85,7 +85,7 @@
 									</c:forEach>
 								  </c:when>
 								  <c:otherwise>
-								   	<tr><td colspan="4" style="text-align: center">There are currently no organizations set up.</td></tr>
+								   	<tr><td colspan="4" class="center-text">There are currently no organizations set up.</td></tr>
 								  </c:otherwise>
 							</c:choose>
 						</tbody>

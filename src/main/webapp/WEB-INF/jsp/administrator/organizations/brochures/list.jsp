@@ -53,7 +53,7 @@
 								    <c:forEach var="brochure" items="${brochureList}">
 										<tr id="userRow">
 											<td scope="row"><a href="#systemBrochureModal" data-toggle="modal" rel="details?i=${brochure.id}" class="brochureEdit" title="Edit this brochure">${brochure.title}</a></td>
-											<td style="text-align:center"><fmt:formatDate value="${brochure.dateCreated}" type="date" pattern="M/dd/yyyy" /></td>
+											<td class="center-text"><fmt:formatDate value="${brochure.dateCreated}" type="date" pattern="M/dd/yyyy" /></td>
 											<td class="actions-col">
 												<a href="#systemBrochureModal" data-toggle="modal" rel="details?i=${brochure.id}" class="btn btn-link brochureEdit" title="Edit this brochure">
 												     <span class="glyphicon glyphicon-edit"></span>
@@ -72,7 +72,7 @@
 									</c:forEach>
 								  </c:when>
 								  <c:otherwise>
-								   	<tr><td colspan="5" style="text-align: center">There are currently no brochures uploaded.</td></tr>
+								   	<tr><td colspan="5" class="center-text">There are currently no brochures uploaded.</td></tr>
 								  </c:otherwise>
 							</c:choose>
 						</tbody>

@@ -32,7 +32,7 @@
 					<spring:bind path="file">
 						<div id="brochureFileDiv" class="form-group ${status.error ? 'has-error' : '' }">
 							<label class="control-label" for="brochureFile"><c:if test="${not empty brochuredetails.getfileName()}">New</c:if> File *</label>
-							<form:input path="file" id="brochureFile" type="file" class="form-control" />
+							<form:input path="file" id="brochureFile" type="file"  />
 							<span id="brochureFileMsg" class="control-label"></span>
 						</div>
 					</spring:bind>

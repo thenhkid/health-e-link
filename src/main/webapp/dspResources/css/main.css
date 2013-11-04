@@ -6002,6 +6002,10 @@ body {
   overflow: hidden;
   margin-bottom: 10px;
 }
+.table > tbody > tr.table-section-title > td {
+  border-top: 0;
+  padding-top: 20px;
+}
 .scrollable {
   overflow: auto;
 }
@@ -6076,6 +6080,32 @@ body {
 }
 .panel .panel-nav > li.active a:hover {
   padding-bottom: 10px;
+}
+.panel.panel-stats {
+  text-align: center;
+}
+.panel.panel-stats .stat-number {
+  font-size: 56px;
+  font-weight: bold;
+  line-height: 100%;
+}
+.panel.panel-stats .stat-number a:hover {
+  text-decoration: none;
+}
+.panel.panel-stats h3 {
+  display: block;
+  font-size: 16px;
+  margin: 10px 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  padding: 5px 0;
+}
+.panel.panel-intro h2 {
+  margin-top: 10px;
+}
+.panel.panel-intro p {
+  font-size: 14px;
 }
 .main .sub-nav {
   overflow: hidden;

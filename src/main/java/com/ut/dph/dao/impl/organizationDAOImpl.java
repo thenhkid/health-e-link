@@ -89,11 +89,11 @@ public class organizationDAOImpl implements organizationDAO {
 	 * The 'getOrganizationByName' function will return a single organization based on
 	 * the name passed in.
 	 * 
-	 * @Table	organiations
+	 * @Table	organizations
 	 * 
-	 * @param	cleanURL	Will hold the 'clean' organiation name from the url
+	 * @param	cleanURL	Will hold the 'clean' organization name from the url
 	 * 
-	 * @return	This function will return a signle organization object
+	 * @return	This function will return a single organization object
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
@@ -134,7 +134,7 @@ public class organizationDAOImpl implements organizationDAO {
 	
 	/**
 	 * The 'findTotalOrgs' function will return the total number of organizations in the system. This
-	 * will be used for pagination when viewing the list of organziations
+	 * will be used for pagination when viewing the list of organizations
 	 * 
 	 * @Table organizations
 	 * 

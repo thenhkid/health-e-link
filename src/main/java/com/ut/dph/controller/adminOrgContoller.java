@@ -1,10 +1,9 @@
 package com.ut.dph.controller;
 
+import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
-import javax.imageio.ImageIO;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.springframework.stereotype.Controller;
@@ -19,8 +18,6 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
-import java.awt.Image;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,7 +34,6 @@ import com.ut.dph.service.providerManager;
 import com.ut.dph.model.Brochure;
 import com.ut.dph.service.brochureManager;
 import com.ut.dph.reference.USStateList;
-import com.ut.dph.reference.fileSystem;
 
 /**
  * The adminOrgController class will handle all URL requests that fall inside of
@@ -79,6 +75,9 @@ public class adminOrgContoller {
 	 * list page.
 	 */
 	private static int maxResults = 20;
+	
+	@Autowired
+	private SessionFactory sessionFactory;
 	
 	/**
 	 *  The '/list' GET request will serve up the existing list of organizations

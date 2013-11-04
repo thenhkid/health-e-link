@@ -53,14 +53,14 @@
 								    <c:forEach var="user" items="${userList}">
 										<tr id="userRow">
 											<td scope="row"><a href="#systemUsersModal" data-toggle="modal" rel="${user.firstName}${user.lastName}?i=${user.id}" class="userEdit" title="Edit this user">${user.firstName} ${user.lastName}</a><br />(<c:choose><c:when test="${user.status == true}">active</c:when><c:otherwise>inactive</c:otherwise></c:choose>)</td>
-											<td style="text-align:center"><fmt:formatDate value="${user.dateCreated}" type="date" pattern="M/dd/yyyy" /></td>
-											<td style="text-align:center">
+											<td class="center-text"><fmt:formatDate value="${user.dateCreated}" type="date" pattern="M/dd/yyyy" /></td>
+											<td class="center-text">
 												<c:if test="${user.mainContact == 1}">X</c:if><c:if test="${user.mainContact != 1}">--</c:if>
 											</td>
-											<td style="text-align:center">
+											<td class="center-text">
 												<c:if test="${user.mainContact == 2}">X</c:if><c:if test="${user.mainContact != 2}">--</c:if>
 											</td>
-											<td style="text-align:center">${userFunctions.findTotalLogins(user.id)}</td>
+											<td class="center-text">${userFunctions.findTotalLogins(user.id)}</td>
 											<td class="actions-col">
 												<a href="#systemUsersModal" data-toggle="modal" rel="${user.firstName}${user.lastName}?i=${user.id}" class="btn btn-link userEdit" title="Edit this user">
 													<span class="glyphicon glyphicon-edit"></span>
@@ -71,7 +71,7 @@
 									</c:forEach>
 								  </c:when>
 								  <c:otherwise>
-								   	<tr><td colspan="6" style="text-align: center">There are currently no organization users set up.</td></tr>
+								   	<tr><td colspan="6" class="center-text">There are currently no organization users set up.</td></tr>
 								  </c:otherwise>
 							</c:choose>
 						</tbody>

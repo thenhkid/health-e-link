@@ -191,6 +191,10 @@ h3 {
 .table-default {
   border-bottom: 1px solid #efefef;
 }
+.table > tbody > tr.table-section-title > td {
+  background-color: #fff;
+  font-size: 14px;
+}
 body#login {
   background-color: #efefef;
 }
