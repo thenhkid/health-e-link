@@ -15,18 +15,18 @@ CREATE TABLE `universalTranslator`.`rel_userLogins` (
     ON UPDATE NO ACTION);
 
 
-//10-15-2013 (Chad)
+/*10-15-2013 (Chad)*/
 ALTER TABLE `universaltranslator`.`organizations` 
 ADD COLUMN `cleanURL` VARCHAR(255) NOT NULL AFTER `status`;
 
 ALTER TABLE `universalTranslator`.`providers` 
 ADD COLUMN `dateCreated` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER `status`;
 
-//10-16-2013 (Chad)
+/*10-16-2013 (Chad)*/
 ALTER TABLE `universalTranslator`.`brochures` 
 ADD COLUMN `dateCreated` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER `fileName`;
 
-//10-17-2013 (Chad)
+/*10-17-2013 (Chad)*/
 ALTER TABLE `universalTranslator`.`brochures` 
 DROP FOREIGN KEY `brochureOrgId`;
 ALTER TABLE `universalTranslator`.`brochures` 
@@ -36,7 +36,7 @@ ADD CONSTRAINT `brochureOrgId`
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
 
-//10-24-2013 (Chad)
+/*10-24-2013 (Chad)*/
 ALTER TABLE `universalTranslator`.`providers` 
 CHANGE COLUMN `phone` `phone1` VARCHAR(20) NULL DEFAULT NULL ,
 ADD COLUMN `phone2` VARCHAR(15) NULL DEFAULT NULL AFTER `dateCreated`,
@@ -74,7 +74,7 @@ ADD CONSTRAINT `providerIdFK`
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
   
-  //10-28-2013 (chad)
+  /*10-28-2013 (chad)*/
   CREATE TABLE `universaltranslator`.`info_providerids` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `providerId` INT NOT NULL,
@@ -91,15 +91,15 @@ ADD CONSTRAINT `providerIdFK`
     ON DELETE NO ACTION
     ON UPDATE NO ACTION);
 
-//10-29-2013 Chad
+/*10-29-2013 Chad*/
 ALTER TABLE `universalTranslator`.`providers` 
 DROP COLUMN `providerId`;
 
-//10-30-2013 Chad
+/*10-30-2013 Chad*/
 ALTER TABLE `universaltranslator`.`messagetypes` 
 CHANGE COLUMN `status` `status` SMALLINT NOT NULL DEFAULT b'0' COMMENT '1 = Active\n0 = Inactive\n2 = Archived' ;
 
-//10-31-2013 Chad
+/*10-31-2013 Chad*/
 ALTER TABLE `universalTranslator`.`messageTypeFormFields` 
 DROP FOREIGN KEY `refTableColId`,
 DROP FOREIGN KEY `refTableId`;
@@ -112,7 +112,7 @@ ALTER TABLE `universalTranslator`.`messageTypeFormFields`
 DROP INDEX `refTableColId_idx` ,
 DROP INDEX `refTableId_idx` ;
 
-//11-1-2013 Chad
+/*11-1-2013 Chad*/
 ALTER TABLE `universalTranslator`.`configurationFormFields` 
 CHANGE COLUMN `saveToTableName` `saveToTableName` VARCHAR(255) NULL DEFAULT NULL ,
 CHANGE COLUMN `saveToTableCol` `saveToTableCol` VARCHAR(255) NULL DEFAULT NULL ;
