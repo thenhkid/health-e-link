@@ -30,7 +30,7 @@
 		</div>
 		<ul class="nav navbar-nav navbar-right navbar-actions">
 			<c:choose>
-				<c:when test="${param['page'] == 'details' or param['page'] == 'mappings'}">
+				<c:when test="${param['page'] == 'details' or param['page'] == 'mappings' or param['page'] == 'translations'}">
 					<li><a href="javascript:void(0);" id="saveDetails" title="Save this Message Type"><span class="glyphicon glyphicon-ok icon-stacked"></span> Save </a></li>
 					<c:if test="${empty id}"><li><a href="javascript:void(0);" id="next" title="Save and Proceed to the Next Step"><span class="glyphicon glyphicon-forward icon-stacked"></span>Next Step</a></li></c:if>
 					<!--<c:if test="${not empty id}"><li><a href="#confirmationOrgDelete" data-toggle="modal" rel="${id}" title="Delete this Organization"><span class="glyphicon glyphicon-remove icon-stacked"></span>Delete</a></li></c:if>-->

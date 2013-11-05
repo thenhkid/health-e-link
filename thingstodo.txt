@@ -1,0 +1,3 @@
+
+Need to figure out how to check a file for a correct delimiter
+	- Crosswalks file must have a comma delimited list

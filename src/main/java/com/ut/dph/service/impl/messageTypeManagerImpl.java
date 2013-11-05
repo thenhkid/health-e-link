@@ -1,11 +1,13 @@
 package com.ut.dph.service.impl;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.List;
 
@@ -25,7 +27,9 @@ import org.hibernate.SessionFactory;
 
 import com.ut.dph.dao.messageTypeDAO;
 import com.ut.dph.service.messageTypeManager;
+import com.ut.dph.model.Crosswalks;
 import com.ut.dph.model.messageType;
+import com.ut.dph.model.messageTypeDataTranslations;
 import com.ut.dph.model.messageTypeFormFields;
 import com.ut.dph.reference.fileSystem;
 
@@ -124,6 +128,12 @@ public class messageTypeManagerImpl implements messageTypeManager {
 	
 	@Override
 	@Transactional
+	public Long findTotalCrosswalks() {
+		return messageTypeDAO.findTotalCrosswalks();
+	}
+	
+	@Override
+	@Transactional
 	public void deleteMessageType(int messageTypeId) {
 		
 		//First get the message type details
@@ -172,6 +182,177 @@ public class messageTypeManagerImpl implements messageTypeManager {
 	@Transactional
 	public List getValidationTypes() {
 		return messageTypeDAO.getValidationTypes();
+	}
+	
+	@SuppressWarnings("rawtypes")
+	@Override
+	@Transactional
+	public List getDelimiters() {
+		return messageTypeDAO.getDelimiters();
+	}
+	
+	@Override
+	@Transactional
+	public Long getTotalFields(int messageTypeId) {
+		return messageTypeDAO.getTotalFields(messageTypeId);
+	}
+	
+	@Override
+	@Transactional
+	public List<Crosswalks> getCrosswalks(int page, int maxResults) {
+		return messageTypeDAO.getCrosswalks(page, maxResults);
+	}
+	
+	@SuppressWarnings("rawtypes")
+	@Override
+	@Transactional
+	public List getCrosswalkData(int cwId) {
+		return messageTypeDAO.getCrosswalkData(cwId);
+	}
+	
+	@Override
+	@Transactional
+	public String getFieldName(int fieldId) {
+		return messageTypeDAO.getFieldName(fieldId);
+	}
+	
+	@Override
+	@Transactional
+	public String getCrosswalkName(int cwId) {
+		return messageTypeDAO.getCrosswalkName(cwId);
+	}
+	
+	@Override
+	@Transactional
+	public void createCrosswalk(Crosswalks crosswalkDetails) {
+		Integer lastId = null;
+		
+		MultipartFile file = crosswalkDetails.getFile(); 
+		String fileName = file.getOriginalFilename();
+		
+		InputStream inputStream = null;  
+		OutputStream outputStream = null;  
+		
+		try {  
+		   inputStream = file.getInputStream(); 
+		   File newFile = null;
+		   
+		   //Set the directory to save the uploaded message type template to
+		   fileSystem dir = new fileSystem();
+		   dir.setMessageTypeCrosswalksDir("libraryFiles");
+		  
+		   newFile = new File(dir.getDir() + fileName);
+		  
+		   if (!newFile.exists()) {  
+		    newFile.createNewFile();  
+		   }  
+		   outputStream = new FileOutputStream(newFile);  
+		   int read = 0;  
+		   byte[] bytes = new byte[1024];  
+		  
+		   while ((read = inputStream.read(bytes)) != -1) {  
+		    outputStream.write(bytes, 0, read);  
+		   } 
+		   outputStream.close();
+		   
+		   //Set the filename to the original file name
+		   crosswalkDetails.setfileName(fileName);
+		   
+		} 
+		catch (IOException e) {  
+		   e.printStackTrace();  
+		}  
+	
+		//Submit the new message type to the database
+		lastId = (Integer) messageTypeDAO.createCrosswalk(crosswalkDetails);	
+		
+		//Call the function that will load the content of the crosswalk text file
+		//into the rel_crosswalkData table
+		loadCrosswalkContents(lastId, fileName);
+		
+	}
+	
+	@Override
+	@Transactional
+	public Crosswalks getCrosswalk(int cwId) {
+	  return messageTypeDAO.getCrosswalk(cwId);
+	}
+	
+	@Override
+	@Transactional
+	public void saveDataTranslations(messageTypeDataTranslations translations) {
+		messageTypeDAO.saveDataTranslations(translations);
+	}
+	
+	@Override
+	@Transactional
+	public List<messageTypeDataTranslations> getMessageTypeTranslations(int messageTypeId) {
+		return messageTypeDAO.getMessageTypeTranslations(messageTypeId);
+	}
+	
+	/**
+	 * The 'loadCrosswalkContents' will take the contents of the uploaded text template file and populate
+	 * the rel_crosswalkData table. 
+	 * 
+	 * @param id 			id: value of the latest added crosswalk
+	 * @param fileName		fileName: file name of the uploaded text file.
+	 * 
+	 */
+	public void loadCrosswalkContents(int id, String fileName) {
+		
+		
+		//Set the directory that holds the crosswalk files
+		fileSystem dir = new fileSystem();
+		dir.setMessageTypeCrosswalksDir("libraryFiles");
+		
+		FileInputStream file = null;
+		try {
+			file = new FileInputStream(new File(dir.getDir() + fileName));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		
+		BufferedReader br = new BufferedReader(new InputStreamReader(file));
+		
+		try {
+			String line = null;
+			try {
+				line = br.readLine();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+			while (line != null) {
+				
+				//Need to parse each line via passed in delimiter
+				String[] lineValue = line.split(",");
+				String actualValue = lineValue[0];
+				String descVal = lineValue[1];
+				
+				//Need to insert all the fields into the crosswalk data Fields table
+                Query query = sessionFactory.getCurrentSession().createSQLQuery("INSERT INTO rel_crosswalkData (crosswalkId, actualValue, descValue)" 
+             		   +"VALUES (:crosswalkid, :actualValue, :descVal)")
+                		.setParameter("crosswalkid", id)
+                		.setParameter("actualValue", actualValue)
+                		.setParameter("descVal", descVal);
+                
+                query.executeUpdate();
+				
+				
+				try {
+					line = br.readLine();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			
+		} finally {
+			try {
+				br.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	

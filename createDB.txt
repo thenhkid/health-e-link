@@ -236,13 +236,13 @@ INSERT INTO `configurations` VALUES (13,1,'configuration one','',1,1);
 UNLOCK TABLES;
 
 --
--- Table structure for table `messageTypeCrosswalks`
+-- Table structure for table `crosswalks`
 --
 
-DROP TABLE IF EXISTS `messageTypeCrosswalks`;
+DROP TABLE IF EXISTS `crosswalks`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `messageTypeCrosswalks` (
+CREATE TABLE `crosswalks` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(45) NOT NULL,
   `fileDelimiter` int(11) NOT NULL,
@@ -255,12 +255,12 @@ CREATE TABLE `messageTypeCrosswalks` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `messageTypeCrosswalks`
+-- Dumping data for table `crosswalks`
 --
 
-LOCK TABLES `messageTypeCrosswalks` WRITE;
-/*!40000 ALTER TABLE `messageTypeCrosswalks` DISABLE KEYS */;
-/*!40000 ALTER TABLE `messageTypeCrosswalks` ENABLE KEYS */;
+LOCK TABLES `crosswalks` WRITE;
+/*!40000 ALTER TABLE `crosswalks` DISABLE KEYS */;
+/*!40000 ALTER TABLE `crosswalks` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -328,37 +328,6 @@ LOCK TABLES `messageTypes` WRITE;
 /*!40000 ALTER TABLE `messageTypes` DISABLE KEYS */;
 INSERT INTO `messageTypes` VALUES (1,'','2013-09-25 13:11:46','Weight Loss','weightloss');
 /*!40000 ALTER TABLE `messageTypes` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `organizationCrosswalks`
---
-
-DROP TABLE IF EXISTS `organizationCrosswalks`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `organizationCrosswalks` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `orgId` int(11) NOT NULL,
-  `name` varchar(45) NOT NULL,
-  `fileDelimiter` int(11) NOT NULL,
-  `fileName` varchar(45) NOT NULL,
-  `dateCreated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `cwalkOrgId_idx` (`orgId`),
-  KEY `cwalkDelim_idx` (`fileDelimiter`),
-  CONSTRAINT `cwalkDelim` FOREIGN KEY (`fileDelimiter`) REFERENCES `ref_delimiters` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `cwalkOrgId` FOREIGN KEY (`orgId`) REFERENCES `organizations` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `organizationCrosswalks`
---
-
-LOCK TABLES `organizationCrosswalks` WRITE;
-/*!40000 ALTER TABLE `organizationCrosswalks` DISABLE KEYS */;
-/*!40000 ALTER TABLE `organizationCrosswalks` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --

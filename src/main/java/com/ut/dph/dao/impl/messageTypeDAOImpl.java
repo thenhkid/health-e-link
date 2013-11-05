@@ -12,7 +12,9 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ut.dph.dao.messageTypeDAO;
+import com.ut.dph.model.Crosswalks;
 import com.ut.dph.model.messageType;
+import com.ut.dph.model.messageTypeDataTranslations;
 import com.ut.dph.model.messageTypeFormFields;
 
 /**
@@ -166,6 +168,24 @@ public class messageTypeDAOImpl implements messageTypeDAO {
 	}
 	
 	/**
+	 * The 'findTotalCrosswalks' function will return the total number of generic crosswalks in the system
+	 * 
+	 * @Table	crosswalks
+	 * 
+	 * 
+	 * @Return	This function will return the total number of generic crosswalks set up in the system
+	 */
+	@Override
+	public Long findTotalCrosswalks() {
+		
+		Query query = sessionFactory.getCurrentSession().createQuery("select count(*) as totalCrosswalks from Crosswalks where orgId = 0");
+		
+		Long totalCrosswalks = (Long) query.uniqueResult();
+		
+		return totalCrosswalks;
+	}
+	
+	/**
 	* The 'getMessageTypeFields' function will return all the form fields associated to the selected message type.
 	* 
 	* @Table messageTypeFormFields
@@ -235,5 +255,169 @@ public class messageTypeDAOImpl implements messageTypeDAO {
 		
 		return query.list();
 	}
+	
+	/**
+	* The 'getDelimiters' function will return a list of available file delimiters
+	* 
+	*/
+	@Override
+	@SuppressWarnings("rawtypes")
+	@Transactional
+	public List getDelimiters() {
+		Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT id, delimiter FROM ref_delimiters order by delimiter asc");
+		
+		return query.list();
+	}
+	
+	
+	/**
+	* The 'getTotalFields' function will return the number of fields for a passed in message type.
+	* 
+	* @Param messageTypeId			The message type to search
+	* 
+	* @Return	Long		The total number of fields for the message type
+	*/
+	public Long getTotalFields(int messageTypeId) {
+		
+		Query query = sessionFactory.getCurrentSession().createQuery("select count(*) as totalFields from messageTypeFormFields where messageTypeId = :messageTypeId")
+			.setParameter("messageTypeId", messageTypeId);
+		
+		Long totalFields = (Long) query.uniqueResult();
+		
+		return totalFields;
+		
+	}
+	
+	/**
+	 * The 'getCrosswalks' function will return the list of available crosswalks to associate a
+	 * message types to. This function will only return crosswalks not associated to a specific
+	 * organization.
+	 * 
+	 * @Table	crosswalks
+	 * 
+	 * @Return	This function will return a list of crosswalks
+	 */
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<Crosswalks>  getCrosswalks(int page, int maxResults) {
+		
+		Query query = sessionFactory.getCurrentSession().createQuery("from Crosswalks where orgId = 0 order by name asc");
+		
+		int firstResult = 0;
+		
+		//Set the parameters for paging
+		//Set the page to load
+		if(page > 1) {
+			firstResult = (maxResults*(page-1));
+		}
+		query.setFirstResult(firstResult);
+		
+		//Set the max results to display
+		//If 0 is passed then we want all crosswalks
+		if(maxResults > 0) {
+			query.setMaxResults(maxResults);
+		}
+		
+		return query.list();
+		
+	}
+	
+	/**
+	 * The 'createCrosswalk" function will create the new crosswalk 
+	 * 
+	 * @Table	crosswalks
+	 * 
+	 * @param	crosswalkDetails	This will hold the crosswalk object from the form
+	 * 
+	 * @return 	The function will return the id of the new crosswalk
+	 * 
+	 */
+	@Override
+	public Integer createCrosswalk(Crosswalks crosswalkDetails) {
+		Integer lastId = null;
+			
+		lastId = (Integer) sessionFactory.getCurrentSession().save(crosswalkDetails);
+		
+		return lastId;
+	}
+	
+	
+	/**
+	 * The 'getCrosswalk' function will return a single crosswalk object based on the id
+	 * passed in.
+	 * 
+	 * @param	cwId	This will be id to find the specific crosswalk
+	 * 
+	 * @return			The function will return a crosswalk object 
+	 */
+	@Override
+	public Crosswalks getCrosswalk(int cwId) {
+      return (Crosswalks) sessionFactory.getCurrentSession().get(Crosswalks.class, cwId);
+	}
+	
+	/**
+	* The 'getDelimiters' function will return a list of available file delimiters
+	* 
+	*/
+	@Override
+	@SuppressWarnings("rawtypes")
+	@Transactional
+	public List getCrosswalkData(int cwId) {
+		Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT actualValue, descValue FROM rel_crosswalkData where crosswalkId = :crosswalkid order by id asc");
+			  query.setParameter("crosswalkid", cwId);
+		
+		return query.list();
+	}
+	
+	/**
+	* 
+	*/
+	@Override
+	@Transactional
+	public void saveDataTranslations(messageTypeDataTranslations translations) {
+		sessionFactory.getCurrentSession().saveOrUpdate(translations);
+	}
+	
+	/**
+	* 
+	*/
+	@SuppressWarnings("unchecked")
+	@Override
+	@Transactional
+	public List<messageTypeDataTranslations> getMessageTypeTranslations(int messageTypeId) {
+		Query query = sessionFactory.getCurrentSession().createQuery("from messageTypeDataTranslations where messageTypeId = :messageTypeId order by processOrder asc");
+			  query.setParameter("messageTypeId",messageTypeId);
+		
+		return query.list();
+	}
+	
+	/**
+	 * 
+	 */
+	@Override
+	@Transactional
+	public String getFieldName(int fieldId) {
+		Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT fieldDesc FROM messageTypeFormFields where id = :fieldId")
+				.setParameter("fieldId", fieldId);
+			
+		String fieldName = (String) query.uniqueResult();
+		
+		return fieldName;
+	}
+	
+	/**
+	 * 
+	 */
+	@Override
+	@Transactional
+	public String getCrosswalkName(int cwId) {
+		Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT name FROM crosswalks where id = :cwId")
+				.setParameter("cwId", cwId);
+			
+		String cwName = (String) query.uniqueResult();
+		
+		return cwName;
+	}
+	
 
 }

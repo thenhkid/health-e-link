@@ -29,6 +29,21 @@ public class fileSystem {
 	    }
 	}
 	
+	public void setMessageTypeCrosswalksDir(String folderName) {
+		//Windows
+	    if (os.indexOf("win") >= 0) {
+		  this.dir = "c:\\bowlink\\" + folderName + "\\crosswalks\\";
+	    }
+	    //Mac
+	    else if (os.indexOf("mac") >= 0) {
+			this.dir = "/Users/chadmccue/bowlink/" + folderName + "/crosswalks/";
+	    }
+	    //Unix or Linux or Solarix
+	    else if (os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0 || os.indexOf("aix") >= 0 || os.indexOf("sunos") >= 0) {
+		  this.dir = "/home/bowlink/" + folderName + "/crosswalks/";
+	    }
+	}
+	
 	
 	public void setDir(String orgName, String folderName) {
 	

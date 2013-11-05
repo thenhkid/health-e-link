@@ -157,7 +157,7 @@
 									<c:forEach items="${providerdetails.providerAddresses}" var="address" varStatus="pStatus">
 									<tr>
 										<td scope="row">
-											<c:if test="${not empty providerdetails.providerAddresses[pStatus.index].type}"><span style="font-style:italic">${providerdetails.providerAddresses[pStatus.index].type}</span><br /r></c:if>
+											<c:if test="${not empty providerdetails.providerAddresses[pStatus.index].type}"><span style="font-style:italic">${providerdetails.providerAddresses[pStatus.index].type}</span><br /></c:if>
 											${providerdetails.providerAddresses[pStatus.index].line1} 
 											<c:if test="${not empty providerdetails.providerAddresses[pStatus.index].line2}"><br />${providerdetails.providerAddresses[pStatus.index].line2}</c:if>
 											<br />

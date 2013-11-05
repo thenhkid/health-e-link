@@ -1,6 +1,7 @@
 package com.ut.dph.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 
 import javax.validation.Valid;
 
@@ -18,7 +19,9 @@ import org.springframework.web.servlet.view.RedirectView;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.ut.dph.model.Crosswalks;
 import com.ut.dph.model.messageType;
+import com.ut.dph.model.messageTypeDataTranslations;
 import com.ut.dph.model.messageTypeFormFields;
 import com.ut.dph.service.messageTypeManager;
 
@@ -33,7 +36,7 @@ public class adminLibController {
 	 * The private maxResults variable will hold the number of results to show per
 	 * list page.
 	 */
-	private static int maxResults = 20;
+	private static int maxResults = 10;
 	
 	/**
 	 * The private variable messageTypeId will hold the messageTypeId when viewing a message type
@@ -45,6 +48,8 @@ public class adminLibController {
 	private static int messageTypeId = 0;
 	
 	private static List<messageTypeFormFields> fields = new ArrayList<messageTypeFormFields>();
+	
+	private static List<messageTypeDataTranslations> translations = null;
 	
 	/**
 	 *  The '/list' GET request will serve up the existing list of message types
@@ -177,6 +182,7 @@ public class adminLibController {
 	 */
 	 @RequestMapping(value="/details{num}", method = RequestMethod.GET)
 	 public ModelAndView viewMessageTypeDetails(@RequestParam(value="i", required=false) Integer Id) throws Exception {
+		 
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("/administrator/messageTypeLibrary/details");
 		
@@ -306,11 +312,229 @@ public class adminLibController {
 	 public @ResponseBody List getTableCols(@RequestParam(value= "tableName", required = true) String tableName) {
 		 
 		 List columns = messagetypemanager.getTableColumns(tableName);
-		 
 		 return columns;
-		 
 	 }
 	 
+	 /**
+	 * *********************************************************
+	 * 		MESSAGE TYPE LIBRARY DATA TRANSLATIONS FUNCTIONS					
+	 * *********************************************************
+	 */
+	 
+	 /**
+	 * The '/translations' GET request will display the Field Mappings page for the selected
+	 * message type.
+	 * 
+	 */
+	 @RequestMapping(value="/translations", method = RequestMethod.GET)
+	 public ModelAndView getDataTranslations() throws Exception {
+		 
+		//Set the data translations array to get ready to hold data
+	    translations = new ArrayList<messageTypeDataTranslations>();
+		 
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/messageTypeLibrary/translations");
+		mav.addObject("id",messageTypeId);
+		
+		//Need to return a list of associated fields for the selected message type
+		List<messageTypeFormFields> fields = messagetypemanager.getMessageTypeFields(messageTypeId);
+		mav.addObject("fields",fields);
+		
+		//Return a list of available crosswalks
+		List<Crosswalks> crosswalks = messagetypemanager.getCrosswalks(1,0);
+		mav.addObject("crosswalks",crosswalks);
+		
+		return mav;
+	 }
+	 
+	 /**
+	 * The '/translations' POST request will submit the selected data translations
+	 * and save it to the data base.
+	 * 
+	 */
+	 @RequestMapping(value="/translations", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	 public @ResponseBody Integer submitDataTranslations() throws Exception {
+		 
+		 //Loop through the list of translations
+		 for(messageTypeDataTranslations translation : translations) {
+			 messagetypemanager.saveDataTranslations(translation);
+		 }
+		
+		 return 1;
+	 }
+	 
+	 /**
+	 * The '/getCrosswalks.do' function will return all the available crosswalks.
+	 * 
+	 * @Return list of crosswalks
+	 */
+	 @RequestMapping(value="/getCrosswalks.do", method = RequestMethod.GET)
+	 public @ResponseBody ModelAndView getCrosswalks(@RequestParam(value="page", required=false) Integer page) throws Exception {
+		 
+		if(page == null){
+		     page = 1;
+	    }
+		
+		ModelAndView mav = new ModelAndView(); 
+		mav.setViewName("/administrator/messageTypeLibrary/crosswalks");	 
+		
+		//Need to return a list of crosswalks
+		List<Crosswalks> crosswalks = messagetypemanager.getCrosswalks(page,4);
+		mav.addObject("availableCrosswalks", crosswalks);
+		
+		//Find out the total number of crosswalks
+		Long totalCrosswalks = messagetypemanager.findTotalCrosswalks();
+		
+		double maxCrosswalks = 4;
+		
+		Integer totalPages = (int) Math.round(totalCrosswalks/maxCrosswalks);
+        mav.addObject("totalPages",totalPages);
+        mav.addObject("currentPage",page);
+		
+		return mav;
+		
+	 }
+	 
+	 /**
+	 * The '/getTranslations.do' function will return the list of existing translations
+	 * set up for the selected message type..
+	 * 
+	 * @Return list of translations
+	 */
+	 @RequestMapping(value="/getTranslations.do", method = RequestMethod.GET)
+	 public @ResponseBody ModelAndView getTranslations() throws Exception {
+		 
+		ModelAndView mav = new ModelAndView(); 
+		mav.setViewName("/administrator/messageTypeLibrary/existingTranslations");	 
+		
+		//Need to get a list of existing translations
+		List<messageTypeDataTranslations> existingTranslations = messagetypemanager.getMessageTypeTranslations(messageTypeId);
+		
+		for(messageTypeDataTranslations translation : existingTranslations) {
+			//Get the field name by id
+			String fieldName = messagetypemanager.getFieldName(translation.getFieldId());
+			translation.setfieldName(fieldName);
+			
+			//Get the crosswalk name by id
+			String crosswalkName = messagetypemanager.getCrosswalkName(translation.getCrosswalkId());		
+			translation.setcrosswalkName(crosswalkName);
+			
+			translations.add(translation);
+		}
+		
+		mav.addObject("dataTranslations",translations);	
+		
+		return mav;
+		
+	 }
+	 
+	 
+	 /**
+	 * The '/newCrosswalk' GET request will be used to return a blank crosswalk
+	 * form.
+	 * 
+	 * 
+	 * @return		The crosswalk details page
+	 * 
+	 * @Objects		(1) An object that will hold all the details of the clicked crosswalk
+	 *
+	 */
+	 @RequestMapping(value="/newCrosswalk", method= RequestMethod.GET)
+	 public @ResponseBody ModelAndView newCrosswalk() throws Exception {
+		 
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/messageTypeLibrary/crosswalkDetails");	
+		
+		Crosswalks crosswalkDetails = new Crosswalks();
+		mav.addObject("crosswalkDetails",crosswalkDetails);
+		mav.addObject("btnValue","Create");
+		
+		//Get the list of available file delimiters
+		@SuppressWarnings("rawtypes")
+		List delimiters = messagetypemanager.getDelimiters();
+		mav.addObject("delimiters", delimiters);
+		
+		return mav;
+	 }
+	 
+	 /**
+	 * The '/createCrosswalk' function will be used to create a new crosswalk
+	 * 
+	 * @Return The function will either return the crosswalk form on error or 
+	 * 		   redirect to the data translation page.
+	 */
+	 @RequestMapping(value="/createCrosswalk", method = RequestMethod.POST)
+	 public @ResponseBody ModelAndView createCrosswalk(@ModelAttribute(value="crosswalkDetails") Crosswalks crosswalkDetails, BindingResult result, RedirectAttributes redirectAttr) throws Exception {
+		
+		messagetypemanager.createCrosswalk(crosswalkDetails);
+	
+		redirectAttr.addFlashAttribute("savedStatus", "created");
+		ModelAndView mav = new ModelAndView(new RedirectView("translations"));
+		return mav;	
+	}
+	 
+	/**
+	* The '/viewCrosswals{params}' function will return the details of the selected
+	* crosswalk. The results will be displayed in the overlay.
+	* 
+	* @Param	i	This will hold the id of the selected crosswalk
+	* 
+	* @Return	This function will return the crosswalk details view.
+	*/
+	@RequestMapping(value="/viewCrosswalk{params}", method = RequestMethod.GET)
+	public @ResponseBody ModelAndView viewCrosswalk(@RequestParam(value="i", required=true) Integer cwId) throws Exception {
+		
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/messageTypeLibrary/crosswalkDetails");	
+		
+		//Get the details of the selected crosswalk
+		Crosswalks crosswalkDetails = messagetypemanager.getCrosswalk(cwId);
+		mav.addObject("crosswalkDetails", crosswalkDetails);
+		
+		//Get the data associated with the selected crosswalk
+		@SuppressWarnings("rawtypes")
+		List crosswalkData = messagetypemanager.getCrosswalkData(cwId);
+		mav.addObject("crosswalkData", crosswalkData);
+		
+		return mav;
+		
+	}
+	
+	/**
+	* The '/setTranslations{params}' function will handle taking in a selected field
+	* and a selected crosswalk and add it to an array of translations. This array
+	* will be used when the form is submitted to associate to the existing message type.
+	* 
+	* @param f	This will hold the id of the selected field
+	* 		cw		This will hold the id of the selected crosswalk
+	* 		fText	This will hold the text value of the selected field (used for display purposes)
+	* 		CWText	This will hold the text value of the selected crosswalk (used for display purposes)
+	* 
+	* @Return	This function will return the existing translations view that will display the table of
+	* 			newly selected translations
+	*/
+	@RequestMapping(value="/setTranslations{params}", method = RequestMethod.GET)
+	public @ResponseBody ModelAndView setTranslations(@RequestParam(value="f", required=true) Integer field, @RequestParam(value="cw", required=true) Integer cwId, @RequestParam(value="fText", required=true) String fieldText, @RequestParam(value="CWText", required=true) String cwText) throws Exception {
+		
+		int processOrder = translations.size()+1;
+		
+		messageTypeDataTranslations translation = new messageTypeDataTranslations();
+		translation.setMessageTypeId(messageTypeId);
+		translation.setFieldId(field);
+		translation.setfieldName(fieldText);
+		translation.setCrosswalkId(cwId);
+		translation.setcrosswalkName(cwText);
+		translation.setProcessOrder(processOrder);
+		
+		translations.add(translation);
+		
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/messageTypeLibrary/existingTranslations");	
+		mav.addObject("dataTranslations",translations);
+		
+		return mav;
+		
+	}
 
 }
 

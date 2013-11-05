@@ -23,6 +23,9 @@ public class messageType {
 	  
 	  @Transient
 	  private List<messageTypeFormFields> fields = null;
+	  
+	  @Transient
+	  private List<messageTypeDataTranslations> dataTranslations = null;
 	
 	  @Id
 	  @GeneratedValue(strategy = GenerationType.AUTO)
@@ -94,6 +97,14 @@ public class messageType {
 	  
 	  public void setFields(List<messageTypeFormFields> fields) {
 		  this.fields = fields;
+	  }
+	  
+	  public List<messageTypeDataTranslations> getTranslations() {
+		  return dataTranslations;
+	  }
+	  
+	  public void setTranslations(List<messageTypeDataTranslations> dataTranslations) {
+		  this.dataTranslations = dataTranslations;
 	  }
 
 }

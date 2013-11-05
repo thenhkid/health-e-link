@@ -2,7 +2,9 @@ package com.ut.dph.service;
 
 import java.util.List;
 
+import com.ut.dph.model.Crosswalks;
 import com.ut.dph.model.messageType;
+import com.ut.dph.model.messageTypeDataTranslations;
 import com.ut.dph.model.messageTypeFormFields;
 
 public interface messageTypeManager {
@@ -33,5 +35,29 @@ public interface messageTypeManager {
 	
 	@SuppressWarnings("rawtypes")
 	List getValidationTypes();
+	
+	@SuppressWarnings("rawtypes")
+	List getDelimiters();
+	
+	Long getTotalFields(int messageTypeId);
+	
+	List<Crosswalks> getCrosswalks(int page, int maxResults);
+	
+	void createCrosswalk(Crosswalks crosswalkDetails);
+	
+	Long findTotalCrosswalks();
+	
+	Crosswalks getCrosswalk(int cwId);
+	
+	@SuppressWarnings("rawtypes")
+	List getCrosswalkData(int cwId);
+	
+	void saveDataTranslations(messageTypeDataTranslations translations);
+	
+	List<messageTypeDataTranslations> getMessageTypeTranslations(int messageTypeId);
+	
+	String getFieldName(int fieldId);
+	
+	String getCrosswalkName(int cwId);
 
 }
