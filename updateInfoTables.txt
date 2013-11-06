@@ -1,0 +1,35 @@
+use universalTranslator;
+/*11.06.2013 */
+
+CREATE TABLE `lu_Contraceptives` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `displayText` varchar(45) NOT NULL,
+  `description` varchar(200) DEFAULT NULL,
+  `isCustom` bit(1) NOT NULL DEFAULT b'0',
+  `status` bit(1) NOT NULL DEFAULT b'1',
+  `dateCreated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `dateModified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=latin1;
+
+
+ALTER TABLE `infoTables`.`info_Patients` 
+ADD COLUMN `initialContraceptiveId` INT NULL AFTER `maritalStatusId`,
+ADD INDEX `contraFK_idx` (`initialContraceptiveId` ASC);
+ALTER TABLE `infoTables`.`info_Patients` 
+ADD CONSTRAINT `contraFK`
+  FOREIGN KEY (`initialContraceptiveId`)
+  REFERENCES `infoTables`.`lu_Contraceptives` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+  ALTER TABLE `infoTables`.`message_Details` 
+ADD COLUMN `contraceptiveId` INT NULL COMMENT 'id in lu_Contractives' AFTER `incomeReported`,
+ADD INDEX `messContraFK_idx` (`contraceptiveId` ASC);
+ALTER TABLE `infoTables`.`message_Details` 
+ADD CONSTRAINT `messContraFK`
+  FOREIGN KEY (`contraceptiveId`)
+  REFERENCES `infoTables`.`lu_Contraceptives` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+  
