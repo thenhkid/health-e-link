@@ -122,6 +122,7 @@ ADD CONSTRAINT `fkcrosswalkId`
   ON UPDATE NO ACTION;
   
   
+  
   ALTER TABLE `universalTranslator`.`crosswalks` 
 ADD COLUMN `orgId` INT NULL DEFAULT 0 AFTER `dateCreated`;
 
