@@ -1,5 +1,5 @@
 use universalTranslator;
-/*11.06.2013 */
+/* start changes Grace 11.06.2013 */
 
 CREATE TABLE `lu_Contraceptives` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
@@ -32,4 +32,53 @@ ADD CONSTRAINT `messContraFK`
   REFERENCES `infoTables`.`lu_Contraceptives` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
+  
+/*11062013*/
+ALTER TABLE `infoTables`.`lu_ResultsTypes` 
+RENAME TO  `infoTables`.`lu_TestResultsTypes` ;
+  
+ALTER TABLE `infoTables`.`message_TestResults` 
+CHANGE COLUMN `componentOrder` `testOrder` INT(11) NOT NULL DEFAULT '1' COMMENT 'Several test might be perform in a certain order, this field orders them.' ,
+ADD COLUMN `substance` VARCHAR(45) NULL AFTER `flag`,
+ADD COLUMN `testResultId` INT NULL AFTER `substance`,
+ADD COLUMN `testStatusId` INT NULL AFTER `testResultId`;
+
+CREATE TABLE `infoTables`.`lu_TestStatuses` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `displayText` VARCHAR(45) NOT NULL,
+  `description` VARCHAR(200) NULL,
+  `isCustom` BIT NOT NULL DEFAULT 0,
+  `status` BIT NOT NULL DEFAULT 1,
+  `dateCreated` DATETIME NOT NULL DEFAULT current_timestamp,
+  `dateModified` DATETIME NOT NULL DEFAULT current_timestamp,
+  PRIMARY KEY (`id`));
+  
+  
+  ALTER TABLE `infoTables`.`message_TestResults` 
+ADD INDEX `trTestTypeFK_idx` (`testResultId` ASC),
+ADD INDEX `trTestStatusFK_idx` (`testStatusId` ASC);
+ALTER TABLE `infoTables`.`message_TestResults` 
+ADD CONSTRAINT `trTestTypeFK`
+  FOREIGN KEY (`testResultId`)
+  REFERENCES `infoTables`.`lu_TestResultsTypes` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION,
+ADD CONSTRAINT `trTestStatusFK`
+  FOREIGN KEY (`testStatusId`)
+  REFERENCES `infoTables`.`lu_TestStatuses` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+  
+  
+  ALTER TABLE `infoTables`.`lu_Tests` 
+ADD COLUMN `normalRange` VARCHAR(45) NULL AFTER `description`,
+ADD COLUMN `normalRangeUnit` VARCHAR(45) NULL AFTER `normalRange`;
+  
+  
+  ALTER TABLE `infoTables`.`message_TestResults` 
+DROP COLUMN `normalRangeUnits`,
+DROP COLUMN `normalRange`;
+    
+  /* end changes Grace 11062013 */
+  
   
