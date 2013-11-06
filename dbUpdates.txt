@@ -121,7 +121,6 @@ ADD CONSTRAINT `fkcrosswalkId`
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
   
-  DROP TABLE `universalTranslator`.`organizationCrosswalks`;
   
   ALTER TABLE `universalTranslator`.`crosswalks` 
 ADD COLUMN `orgId` INT NULL DEFAULT 0 AFTER `dateCreated`;
