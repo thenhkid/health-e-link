@@ -115,18 +115,16 @@ CREATE TABLE `configurationFormFields` (
   `fieldLabel` varchar(500) NOT NULL,
   `validationType` int(11) DEFAULT NULL,
   `required` bit(1) NOT NULL DEFAULT b'0',
-  `saveToTableName` int(11) NOT NULL,
-  `saveToTableCol` int(11) NOT NULL,
+  `saveToTableName` VARCHAR(255) NOT NULL,
+  `saveToTableCol` VARCHAR(255) NOT NULL,
   `bucketNo` int(11) NOT NULL,
   `bucketDspPos` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `configId_idx` (`configId`),
   KEY `ffrefTableId_idx` (`saveToTableName`),
   KEY `ffrefTableColId_idx` (`saveToTableCol`),
-  CONSTRAINT `formfieldconfigId` FOREIGN KEY (`configId`) REFERENCES `configurations` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `ffrefTableId` FOREIGN KEY (`saveToTableName`) REFERENCES `ref_tables` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `ffrefTableColId` FOREIGN KEY (`saveToTableCol`) REFERENCES `ref_tableColumns` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  CONSTRAINT `formfieldconfigId` FOREIGN KEY (`configId`) REFERENCES `configurations` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -594,7 +592,6 @@ CREATE TABLE `rel_configurationDataTranslations` (
   KEY `dtconfigId_idx` (`configId`),
   KEY `cwalkId_idx` (`crosswalkId`),
   KEY `dtmacroId_idx` (`macroId`),
-  CONSTRAINT `cwalkId` FOREIGN KEY (`crosswalkId`) REFERENCES `organizationCrosswalks` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `dtconfigId` FOREIGN KEY (`configId`) REFERENCES `configurations` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `dtmacroId` FOREIGN KEY (`macroId`) REFERENCES `ref_macros` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
