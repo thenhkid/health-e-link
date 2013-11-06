@@ -1,3 +1,4 @@
+CREATE DATABASE  IF NOT EXISTS `universalTranslator` /*!40100 DEFAULT CHARACTER SET latin1 */;
 USE `universalTranslator`;
 -- MySQL dump 10.13  Distrib 5.6.13, for osx10.6 (i386)
 --
@@ -856,6 +857,7 @@ DROP TABLE IF EXISTS `lu_Tests`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `lu_Tests` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'primary key - this table tracks the main test that has sub-components, which are stored in test results.\nFor example - a test of Lipid Profile will have components of T Chol, Trig, LDL, HDL, LDL/HDL',
+  `vitalSign` bit(1) DEFAULT b'0' COMMENT 'If a test should be reported to the CCR as a vital sign, we flag it here.',
   `displayText` varchar(45) NOT NULL COMMENT 'e.g. Lipid Profile, Hemoglobin A1C',
   `description` varchar(200) DEFAULT NULL,
   `codeSystem` varchar(45) DEFAULT NULL COMMENT 'the coding system used - ICD-9CM, ICD-10, SNOMED, LOINC, NCPDP, X12, CPT, etc.',
@@ -1498,7 +1500,6 @@ CREATE TABLE `message_TestResults` (
   `sourceDate` varchar(45) DEFAULT NULL COMMENT 'The date that the is provided with the record. e.g. exact time - Nov 11, 2011 11:11AM, age range - age 19-25',
   `relatedTestId` int(11) DEFAULT NULL COMMENT 'Sometimes a test will have different tests associated, if we need to list main test we will look this up.\nThis field is a id in the lu_Test table.',
   `testId` int(11) DEFAULT NULL COMMENT 'id from lu_Test table e.g. Lipid Profile',
-  `vitalSign` bit(1) DEFAULT b'0' COMMENT 'vita signs are reported as a result object in CCR. But it is a test with results.  If it is flag as a vital sign from a source we will flag it as true, 1.',
   `value` varchar(45) DEFAULT NULL COMMENT '180',
   `unit` varchar(45) DEFAULT NULL COMMENT 'mg/dl',
   `description` varchar(45) DEFAULT NULL COMMENT 'description of the test component if needed',
@@ -1540,4 +1541,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2013-11-06 13:16:31
+-- Dump completed on 2013-11-06 13:48:10
