@@ -63,9 +63,17 @@ public class messageTypeManagerImpl implements messageTypeManager {
 		  
 		   newFile = new File(dir.getDir() + fileName);
 		  
-		   if (!newFile.exists()) {  
-		    newFile.createNewFile();  
+		   if (newFile.exists()) {  
+			   int i = 1;
+			   while(newFile.exists()) {
+				   int iDot = fileName.lastIndexOf(".");
+				   newFile = new File(dir.getDir() + fileName.substring(0,iDot)+"_("+ ++i + ")" + fileName.substring(iDot));
+			   }
+			   fileName = newFile.getName();
 		   }  
+		   else {
+			  newFile.createNewFile(); 
+		   }
 		   outputStream = new FileOutputStream(newFile);  
 		   int read = 0;  
 		   byte[] bytes = new byte[1024];  
@@ -75,7 +83,7 @@ public class messageTypeManagerImpl implements messageTypeManager {
 		   } 
 		   outputStream.close();
 		   
-		   //Set the filename to the original file name
+		   //Set the filename to the file name
 		   messageType.setTemplateFile(fileName);
 		   
 		} 
@@ -110,8 +118,20 @@ public class messageTypeManagerImpl implements messageTypeManager {
 	
 	@Override
 	@Transactional
+	public List<messageType> getLatestMessageTypes(int maxResults) {
+		return messageTypeDAO.getLatestMessageTypes(maxResults);
+	}
+	
+	@Override
+	@Transactional
 	public messageType getMessageTypeById(int messageTypeId) {
 	  return messageTypeDAO.getMessageTypeById(messageTypeId);
+	}
+	
+	@Override
+	@Transactional
+	public messageType getMessageTypeByName(String name) {
+		return messageTypeDAO.getMessageTypeByName(name);
 	}
 	
 	@Override
@@ -160,7 +180,6 @@ public class messageTypeManagerImpl implements messageTypeManager {
 		
 		//Update the message type form field mappings
 		messageTypeDAO.updateMessageTypeFields(formField);
-		
 	}
 	
 	@SuppressWarnings("rawtypes")
@@ -224,7 +243,13 @@ public class messageTypeManagerImpl implements messageTypeManager {
 	
 	@Override
 	@Transactional
-	public void createCrosswalk(Crosswalks crosswalkDetails) {
+	public Long checkCrosswalkName(String name) {
+		return messageTypeDAO.checkCrosswalkName(name);
+	}
+	
+	@Override
+	@Transactional
+	public Integer createCrosswalk(Crosswalks crosswalkDetails) {
 		Integer lastId = null;
 		
 		MultipartFile file = crosswalkDetails.getFile(); 
@@ -232,16 +257,14 @@ public class messageTypeManagerImpl implements messageTypeManager {
 		
 		InputStream inputStream = null;  
 		OutputStream outputStream = null;  
+		fileSystem dir = new fileSystem();
+		//Set the directory to save the uploaded message type template to
+		 dir.setMessageTypeCrosswalksDir("libraryFiles");
+		 File newFile = null; 
+		 newFile = new File(dir.getDir() + fileName);
 		
 		try {  
 		   inputStream = file.getInputStream(); 
-		   File newFile = null;
-		   
-		   //Set the directory to save the uploaded message type template to
-		   fileSystem dir = new fileSystem();
-		   dir.setMessageTypeCrosswalksDir("libraryFiles");
-		  
-		   newFile = new File(dir.getDir() + fileName);
 		  
 		   if (!newFile.exists()) {  
 		    newFile.createNewFile();  
@@ -262,14 +285,33 @@ public class messageTypeManagerImpl implements messageTypeManager {
 		catch (IOException e) {  
 		   e.printStackTrace();  
 		}  
+		
+		//Need to get the actual delimiter character
+		String delimChar = (String) messageTypeDAO.getDelimiterChar(crosswalkDetails.getFileDelimiter());
+		
+		//Check to make sure the file contains the selected delimiter
+		//Set the directory that holds the crosswalk files
+		dir.setMessageTypeCrosswalksDir("libraryFiles");
+		int delimCount = (Integer) dir.checkFileDelimiter(dir,fileName,delimChar);
+		
+		if(delimCount > 0) {
+			//Submit the new message type to the database
+			lastId = (Integer) messageTypeDAO.createCrosswalk(crosswalkDetails);	
+			
+			//Call the function that will load the content of the crosswalk text file
+			//into the rel_crosswalkData table
+			loadCrosswalkContents(lastId, fileName,delimChar);
+			
+			return lastId;
+		}
+		else {
+			//Need to delete the file
+			newFile.delete();
+			
+			//Need to return an error
+			return 0;
+		}
 	
-		//Submit the new message type to the database
-		lastId = (Integer) messageTypeDAO.createCrosswalk(crosswalkDetails);	
-		
-		//Call the function that will load the content of the crosswalk text file
-		//into the rel_crosswalkData table
-		loadCrosswalkContents(lastId, fileName);
-		
 	}
 	
 	@Override
@@ -286,9 +328,17 @@ public class messageTypeManagerImpl implements messageTypeManager {
 	
 	@Override
 	@Transactional
+	public void deleteDataTranslations(int messageTypeId) {
+		messageTypeDAO.deleteDataTranslations(messageTypeId);
+	}
+	
+	@Override
+	@Transactional
 	public List<messageTypeDataTranslations> getMessageTypeTranslations(int messageTypeId) {
 		return messageTypeDAO.getMessageTypeTranslations(messageTypeId);
 	}
+	
+	
 	
 	/**
 	 * The 'loadCrosswalkContents' will take the contents of the uploaded text template file and populate
@@ -296,16 +346,17 @@ public class messageTypeManagerImpl implements messageTypeManager {
 	 * 
 	 * @param id 			id: value of the latest added crosswalk
 	 * @param fileName		fileName: file name of the uploaded text file.
+	 * @param delim			delim: the delimiter used in the file
 	 * 
 	 */
-	public void loadCrosswalkContents(int id, String fileName) {
-		
+	public void loadCrosswalkContents(int id, String fileName, String delim) {
 		
 		//Set the directory that holds the crosswalk files
 		fileSystem dir = new fileSystem();
 		dir.setMessageTypeCrosswalksDir("libraryFiles");
 		
 		FileInputStream file = null;
+		String[] lineValue = null;
 		try {
 			file = new FileInputStream(new File(dir.getDir() + fileName));
 		} catch (FileNotFoundException e) {
@@ -325,15 +376,22 @@ public class messageTypeManagerImpl implements messageTypeManager {
 			while (line != null) {
 				
 				//Need to parse each line via passed in delimiter
-				String[] lineValue = line.split(",");
-				String actualValue = lineValue[0];
-				String descVal = lineValue[1];
+				if(delim == "t") {
+					lineValue = line.split("\t");
+				}
+				else {
+					lineValue = line.split("\\"+delim);
+				}
+				String sourceValue = lineValue[0];
+				String targetValue = lineValue[1];
+				String descVal = lineValue[2];
 				
 				//Need to insert all the fields into the crosswalk data Fields table
-                Query query = sessionFactory.getCurrentSession().createSQLQuery("INSERT INTO rel_crosswalkData (crosswalkId, actualValue, descValue)" 
-             		   +"VALUES (:crosswalkid, :actualValue, :descVal)")
+                Query query = sessionFactory.getCurrentSession().createSQLQuery("INSERT INTO rel_crosswalkData (crosswalkId, sourceValue, targetValue, descValue)" 
+             		   +"VALUES (:crosswalkid, :sourceValue, :targetValue, :descVal)")
                 		.setParameter("crosswalkid", id)
-                		.setParameter("actualValue", actualValue)
+                		.setParameter("sourceValue", sourceValue)
+                		.setParameter("targetValue", targetValue)
                 		.setParameter("descVal", descVal);
                 
                 query.executeUpdate();

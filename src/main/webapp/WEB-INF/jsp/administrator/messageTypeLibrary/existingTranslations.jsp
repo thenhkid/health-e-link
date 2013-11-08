@@ -23,7 +23,7 @@
 						${dataTranslations[tStatus.index].crosswalkName} 
 					</td>
 					<td>
-						<select name="processOrder">
+						<select rel="${dataTranslations[tStatus.index].processOrder}" name="processOrder" class="processOrder">
 							<option value="">- Select -</option>
 							<c:forEach begin="1" end="${dataTranslations.size()}" var="i">
 								<option value="${i}" <c:if test="${dataTranslations[tStatus.index].processOrder  == i}">selected</c:if>>${i}</option>
@@ -31,7 +31,7 @@
 						</select>
 					</td>
 					<td class="center-text">
-						<a href="javascript:void(0);" class="btn btn-link viewCrosswalk" rel="?i=${availableCrosswalks[pStatus.index].id}" title="View this Crosswalk">
+						<a href="javascript:void(0);" class="btn btn-link removeTranslation" rel2="${dataTranslations[tStatus.index].processOrder}" rel="${dataTranslations[tStatus.index].fieldId}" title="Remove this field translation.">
 						     <span class="glyphicon glyphicon-edit"></span>
 						    Remove
 						</a>
@@ -39,7 +39,7 @@
 				</tr>
 				</c:forEach>
 			</c:when>
-			<c:otherwise><tr><td scope="row" colspan="3" style="text-align:center">No Existing Translations Found</td></c:otherwise>
+			<c:otherwise><tr><td scope="row" colspan="4" style="text-align:center">No Existing Translations Found</td></c:otherwise>
 		</c:choose>
 	</tbody>
 </table>

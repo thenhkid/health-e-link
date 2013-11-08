@@ -109,7 +109,7 @@ public class brochureDAOImpl implements brochureDAO {
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Brochure.class)
 	    	.add(Restrictions.eq("orgId",orgId))
 	    	.add(Restrictions.or(
-	    			Restrictions.like("title", searchTerm+"%"),
+	    			Restrictions.like("title", "%"+searchTerm+"%"),
 	    			Restrictions.like("fileName", "%"+searchTerm+"%")
 	     		)
 	     	)

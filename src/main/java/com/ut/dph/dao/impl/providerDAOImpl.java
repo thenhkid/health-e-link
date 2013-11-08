@@ -115,8 +115,8 @@ public class providerDAOImpl implements providerDAO {
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Provider.class)
 	    	.add(Restrictions.eq("orgId",orgId))
 	    	.add(Restrictions.or(
-	    			Restrictions.like("firstName", searchTerm+"%"),
-	    			Restrictions.like("lastName", searchTerm+"%")
+	    			Restrictions.like("firstName", "%"+searchTerm+"%"),
+	    			Restrictions.like("lastName", "%"+searchTerm+"%")
 	     		)
 	     	)
 	     	.addOrder(Order.asc("lastName"))

@@ -51,10 +51,19 @@ public class brochureManagerImpl implements brochureManager{
 		   dir.setDir(orgDetails.getcleanURL(), "brochures");
 		  
 		   newFile = new File(dir.getDir() + fileName);
-		  
-		   if (!newFile.exists()) {  
-		    newFile.createNewFile();  
+		   
+		   if (newFile.exists()) {  
+			   int i = 1;
+			   while(newFile.exists()) {
+				   int iDot = fileName.lastIndexOf(".");
+				   newFile = new File(dir.getDir() + fileName.substring(0,iDot)+"_("+ ++i + ")" + fileName.substring(iDot));
+			   }
+			   fileName = newFile.getName();
 		   }  
+		   else {
+			  newFile.createNewFile(); 
+		   }
+		  
 		   outputStream = new FileOutputStream(newFile);  
 		   int read = 0;  
 		   byte[] bytes = new byte[1024];  
@@ -112,9 +121,18 @@ public class brochureManagerImpl implements brochureManager{
 			  
 			   newFile = new File(dir.getDir() + fileName);
 			  
-			   if (!newFile.exists()) {  
-			    newFile.createNewFile();  
+			   if (newFile.exists()) {  
+				   int i = 1;
+				   while(newFile.exists()) {
+					   int iDot = fileName.lastIndexOf(".");
+					   newFile = new File(dir.getDir() + fileName.substring(0,iDot)+"_("+ ++i + ")" + fileName.substring(iDot));
+				   }
+				   fileName = newFile.getName();
 			   }  
+			   else {
+				  newFile.createNewFile(); 
+			   }
+			   
 			   outputStream = new FileOutputStream(newFile);  
 			   int read = 0;  
 			   byte[] bytes = new byte[1024];  

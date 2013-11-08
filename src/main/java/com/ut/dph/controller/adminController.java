@@ -1,12 +1,20 @@
 package com.ut.dph.controller;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
+
+import com.ut.dph.model.Organization;
+import com.ut.dph.model.messageType;
+import com.ut.dph.service.messageTypeManager;
+import com.ut.dph.service.organizationManager;
 
 
 /**
@@ -21,6 +29,13 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class adminController {
 	
+	@Autowired 
+	private organizationManager organizationManager;
+	
+	@Autowired 
+	private messageTypeManager messagetypemanager;
+	
+	private int maxResults = 3;
 	
 	/**
 	 * The '/administrator' request will serve up the administrator dashboard
@@ -32,12 +47,30 @@ public class adminController {
 	 * @throws Exception
 	 */
 	@RequestMapping(value="/administrator", method = RequestMethod.GET)
-	public ModelAndView listConfigurations(HttpServletRequest request,
-			HttpServletResponse response) throws Exception {
+	public ModelAndView listConfigurations(HttpServletRequest request,HttpServletResponse response) throws Exception {
+		
+		ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/dashboard");
+		
+		//Need to get totals for the dashboard.
+		//Return the total list of organizations
+    	Long totalOrgs = organizationManager.findTotalOrgs();
+    	mav.addObject("totalOrgs",totalOrgs);
+    	
+    	//Return the latest  organizations
+    	List<Organization> organizations = organizationManager.getLatestOrganizations(maxResults);
+    	mav.addObject("latestOrgs", organizations);
+    	
+    	//Return the total list of message types
+        Long totalMessageTypes = messagetypemanager.findTotalMessageTypes();
+        mav.addObject("totalMessageTypes",totalMessageTypes);
+        
+        //Return the latest message types created
+    	List<messageType> messagetypes = messagetypemanager.getLatestMessageTypes(maxResults);
+    	mav.addObject("latestMessageTypes", messagetypes);
 
-			ModelAndView mav = new ModelAndView();
-	        mav.setViewName("/administrator/menu");
-	        return mav;
+		
+        return mav;
 	}
     
 	

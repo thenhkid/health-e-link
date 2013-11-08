@@ -80,6 +80,12 @@ public class organizationManagerImpl implements organizationManager{
 	
 	@Override
 	@Transactional
+	public List<Organization> getLatestOrganizations(int maxResults) {
+		return organizationDAO.getLatestOrganizations(maxResults);
+	}
+	
+	@Override
+	@Transactional
 	public Long findTotalOrgs() {
 	  return organizationDAO.findTotalOrgs();
 	}

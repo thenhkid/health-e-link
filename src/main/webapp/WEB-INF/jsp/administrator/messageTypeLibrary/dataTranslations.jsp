@@ -2,19 +2,18 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %> 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-
+<c:set var="currentBucket" value="0" />
 
 <div class="main clearfix" role="main">
 
 	<div class="col-md-12">
 		<c:choose>
 			<c:when test="${not empty savedStatus}" >
-				<div class="alert alert-success">
-					<strong>Success!</strong> 
-					<c:choose>
-						<c:when test="${savedStatus == 'updated'}">The message type data translations have been successfully updated!</c:when>
-					</c:choose>
-				</div>
+				<c:choose>
+					<c:when test="${savedStatus == 'updated'}"><div class="alert alert-success"><strong>Success!</strong> The message type data translations have been successfully updated!</div></c:when>
+					<c:when test="${savedStatus == 'created'}"><div class="alert alert-success"><strong>Success!</strong> The crosswalk has been successfully created!</div></c:when>
+					<c:when test="${savedStatus == 'error'}"><div class="alert alert-danger"><strong>Error!</strong> The uploaded crosswalk did not have the correct delimiter!</div></c:when>
+				</c:choose>
 			</c:when>
 			<c:when test="${not empty param.msg}" >
 				<div class="alert alert-success">
@@ -42,6 +41,24 @@
 						<select id="field" class="form-control half">
 							<option value="">- Select -</option>
 							<c:forEach items="${fields}" var="field" varStatus="fStatus">
+								<c:if test="${currentBucket != fields[fStatus.index].bucketNo}">
+									<c:if test="${currentBucket > 0}"></optgroup></c:if>
+									<c:set var="currentBucket" value="${fields[fStatus.index].bucketNo}" />
+									<c:choose>
+										<c:when test="${currentBucket == 1}">
+											<optgroup label="Bucket 1 (Sender Information)">
+										</c:when>
+										<c:when test="${currentBucket == 2}">
+											<optgroup label="Bucket 2 (Recipient Information)">
+										</c:when>
+										<c:when test="${currentBucket == 3}">
+											<optgroup label="Bucket 3 (Patient Information)">
+										</c:when>
+										<c:when test="${currentBucket == 4}">
+											<optgroup label="Bucket 4 (Other)">
+										</c:when>
+									</c:choose>
+								</c:if>
 								<option value="${fields[fStatus.index].id}">${fields[fStatus.index].fieldDesc} </option>
 							</c:forEach>
 						</select>
@@ -87,9 +104,10 @@
 				<h3 class="panel-title">Existing Data Translations</h3>
 			</div>
 			<div class="panel-body">
-				<div class="form-container scrollable" id="existingTranslations">
-				
+				<div id="translationMsgDiv"  rel="${id}" class="alert alert-danger" style="display:none;">
+					<strong>You must click SAVE above to submit the data translations listed below!</strong>
 				</div>
+				<div class="form-container scrollable" id="existingTranslations"></div>
 			</div>
 		</section>
 	</div>
@@ -106,12 +124,12 @@
 	    $("input:text,form").attr("autocomplete","off");
 
 	    populateCrosswalks(1);
-	    populateExistingTranslations();
+	    populateExistingTranslations(0);
 	});
 
-	function populateExistingTranslations() {
+	function populateExistingTranslations(reload) {
 		$.ajax({  
-	        url: 'getTranslations.do',  
+	        url: 'getTranslations.do?reload='+reload,  
 	        type: "GET",  
 	        success: function(data) {  
 	            $("#existingTranslations").html(data);           
@@ -144,8 +162,10 @@
 		//The function that will be called when the "Save" button
 		//is clicked
 		$('#saveDetails').click(function(event) {
+			var messageTypeId = $('#translationMsgDiv').attr('rel');
+
 			$.ajax({  
-		        url: 'translations',  
+		        url: 'translations?id='+messageTypeId,  
 		        type: "POST",
 		        success: function(data) { 
 			       window.location.href="translations?msg=updated";
@@ -180,6 +200,17 @@
 
 
 	    $(document).on('click', '#submitCrosswalkButton',function(event) {
+
+	    	$('#crosswalkNameDiv').removeClass("has-error");
+			$('#crosswalkNameMsg').removeClass("has-error");
+			$('#crosswalkNameMsg').html('');
+			$('#crosswalkDelimDiv').removeClass("has-error");
+			$('#crosswalkDelimMsg').removeClass("has-error");
+			$('#crosswalkDelimMsg').html('');
+			$('#crosswalkFileDiv').removeClass("has-error");
+			$('#crosswalkFileMsg').removeClass("has-error");
+			$('#crosswalkFileMsg').html('');
+
 		    var errorFound = 0;
 		    var actionValue = $(this).attr('rel').toLowerCase();
 
@@ -190,6 +221,29 @@
 				$('#crosswalkNameMsg').html('The crosswalk name is a required field!');
 				errorFound = 1; 
 			}
+
+			//Need to make sure the crosswalk name doesn't already exist.
+			$.ajax({  
+		        url: 'checkCrosswalkName.do',  
+		        type: "POST",  
+		        data: { 'name' : $('#name').val() },
+		        success: function(data) {  
+		           if(data == 1) {
+		        		$('#crosswalkNameDiv').addClass("has-error");
+						$('#crosswalkNameMsg').addClass("has-error");
+						$('#crosswalkNameMsg').html('The name entered is already associated with another crosswalk in the system!');
+						errorFound = 1;
+				  }        
+		        }  
+		    }); 
+
+		    //Make sure a delimiter is selected
+		    if($('#delimiter').val() == '') {
+		    	$('#crosswalkDelimDiv').addClass("has-error");
+				$('#crosswalkDelimMsg').addClass("has-error");
+				$('#crosswalkDelimMsg').html('The file delimiter is a required field!');
+				errorFound = 1; 
+		    }
 
 		    //Make sure a file is selected and is a text file
 		    if($('#crosswalkFile').val() == '' || $('#crosswalkFile').val().indexOf('.txt') == -1) {
@@ -225,6 +279,7 @@
 			        url: url,  
 			        type: "GET",  
 			        success: function(data) {  
+				        $('#translationMsgDiv').show();
 			            $("#existingTranslations").html(data);   
 			            //Need to clear out the select boxes
 			            $('#field option:eq("")').prop('selected',true);  
@@ -234,7 +289,54 @@
 			}
 		});
 		
-		
+	    //Function that will handle changing a process order and
+		//making sure another field does not have the same process 
+		//order selected. It will swap display position
+		//values with the requested position.
+		$(document).on('change','.processOrder', function() {
+			//Store the current position
+			var currDspPos = $(this).attr('rel');
+			var newDspPos = $(this).val();
+
+			$('.processOrder').each(function() {
+				if($(this).val() == newDspPos) {
+					//Need to update the saved process order
+					$.ajax({  
+				        url: 'updateTranslationProcessOrder?currProcessOrder='+currDspPos+'&newProcessOrder='+newDspPos,  
+				        type: "POST",  
+				        success: function(data) { 
+				        	$('#translationMsgDiv').show();
+				        	populateExistingTranslations(1);
+				        }  
+				    });
+					$(this).val(currDspPos);
+					$(this).attr('rel',currDspPos);
+				}
+			});
+
+			$(this).val(newDspPos);
+			$(this).attr('rel',newDspPos);
+			
+		});
+
+		//Function that will handle removing a line item from the
+		//existing data translations. Function will also update the
+		//processing orders for each displayed.
+		$(document).on('click','.removeTranslation',function() {
+			var currPos = $(this).attr('rel2');
+			var fieldId = $(this).attr('rel');
+			
+			//Need to remove the translation
+			$.ajax({  
+		        url: 'removeTranslations?fieldId='+fieldId+'&processOrder='+currPos,  
+		        type: "POST",  
+		        success: function(data) { 
+		        	$('#translationMsgDiv').show();
+		        	populateExistingTranslations(1);
+		        }  
+		    });
+			
+		});
 		
 	});
 

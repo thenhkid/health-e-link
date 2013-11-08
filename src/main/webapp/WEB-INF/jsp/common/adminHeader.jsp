@@ -5,7 +5,7 @@
 		<nav class="navbar primary-nav" role="navigation">
 			<div class="contain">
 				<div class="navbar-header">
-					<a href="" class="navbar-brand" title="{company name}">
+					<a href="<c:url value='/administrator' />" class="navbar-brand" title="{company name}">
 					<!--
 						<img src="<%=request.getContextPath()%>/dspResources/img/health-e-link/img-health-e-link-logo.png" class="logo" alt="Health-e-Link Logo"/>
 						Required logo specs:

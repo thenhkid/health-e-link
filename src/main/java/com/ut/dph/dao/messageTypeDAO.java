@@ -17,7 +17,11 @@ public interface messageTypeDAO {
 		  
 	messageType getMessageTypeById(int messageTypeId);
 	
+	messageType getMessageTypeByName(String name);
+	
 	List<messageType> getMessageTypes(int page, int maxResults);
+	
+	List<messageType> getLatestMessageTypes(int maxResults);
 	  
 	List<messageType> findMessageTypes(String searchTerm);
 	
@@ -45,6 +49,8 @@ public interface messageTypeDAO {
 	
 	Integer createCrosswalk(Crosswalks crosswalkDetails);
 	
+	Long checkCrosswalkName(String name);
+	
 	Long findTotalCrosswalks();
 	
 	Crosswalks getCrosswalk(int cwId);
@@ -59,5 +65,9 @@ public interface messageTypeDAO {
 	String getFieldName(int fieldId);
 	
 	String getCrosswalkName(int cwId);
+	
+	String getDelimiterChar(int id);
+	
+	void deleteDataTranslations(int messageTypeId);
 
 }

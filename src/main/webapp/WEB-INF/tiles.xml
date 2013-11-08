@@ -13,7 +13,7 @@
     </definition>
     
     <!-- Admin Definitions -->
-	    <definition name="/administrator/menu" extends="base.definition">
+	    <definition name="/administrator/dashboard" extends="base.definition">
 	        <put-attribute name="title" value="Administrator" />
 	        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp" />
 	        <put-attribute name="body" value="/WEB-INF/jsp/administrator/index.jsp" />

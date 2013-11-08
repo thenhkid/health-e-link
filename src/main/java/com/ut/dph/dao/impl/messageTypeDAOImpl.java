@@ -96,6 +96,21 @@ public class messageTypeDAOImpl implements messageTypeDAO {
 	}
 	
 	/**
+	 * The 'getMessageTypeById' function will return a single message type object based on the messageTypeId
+	 * passed in.
+	 * 
+	 * @param	messageTypeId	This will be id to find the specific message type
+	 * 
+	 * @return			The function will return a messageType object 
+	 */
+	@Override
+	public messageType getMessageTypeByName(String name) {
+		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(messageType.class);  
+	    criteria.add(Restrictions.like("name", name));  
+	    return (messageType) criteria.uniqueResult();   
+	}
+	
+	/**
 	 * The 'getMessageTypes' function will return the list of message types in the system.
 	 * 
 	 * @Table	messageTypes
@@ -127,6 +142,28 @@ public class messageTypeDAOImpl implements messageTypeDAO {
 	}
 	
 	/**
+	 * The 'getLatestMessageTypes' function will return the list of the latest message types in the system.
+	 * 
+	 * @Table	messageTypes
+	 * 
+	 * @Param	maxResults	This will hold the total number of results to return back to the page
+	 * 
+	 * @Return	This function will return a list of message type objects
+	 */
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<messageType>  getLatestMessageTypes(int maxResults) {
+		
+		Query query = sessionFactory.getCurrentSession().createQuery("from messageType order by dateCreated desc");
+	
+		//Set the max results to display
+		query.setMaxResults(maxResults);
+		
+		return query.list();
+		
+	}
+	
+	/**
 	 * The 'findMessageTypes' function will return a list of message type objects based on a search term. 
 	 * The search will look for message types whose title or file name match the search term provided.
 	 * 
@@ -140,7 +177,7 @@ public class messageTypeDAOImpl implements messageTypeDAO {
 	    //Order by title
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(messageType.class)
 	    	.add(Restrictions.or(
-	    			Restrictions.like("name", searchTerm+"%"),
+	    			Restrictions.like("name", "%"+searchTerm+"%"),
 	    			Restrictions.like("templateFile", "%"+searchTerm+"%")
 	     		)
 	     	)
@@ -224,7 +261,7 @@ public class messageTypeDAOImpl implements messageTypeDAO {
 	@SuppressWarnings("rawtypes")
 	@Transactional
 	public List getInformationTables() {
-		Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT distinct table_name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'universalTranslator'");
+		Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT distinct table_name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'universalTranslator' and (TABLE_NAME LIKE 'info\\_%' or TABLE_NAME LIKE 'message\\_%')");
 		
 		return query.list();
 	}
@@ -269,6 +306,23 @@ public class messageTypeDAOImpl implements messageTypeDAO {
 		return query.list();
 	}
 	
+	/**
+	* The 'getDelimiterChar' will return the actual character of the delimiter for the id passed
+	* into the function
+	* 
+	* @param id	The id will hold the delimiter ID to retrieve its associated character
+	* 
+	* @returns string
+	*/
+	@Transactional
+	public String getDelimiterChar(int id) {
+		Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT delimChar FROM ref_delimiters where id = :id");
+			query.setParameter("id",id);
+			
+		String delimChar = (String) query.uniqueResult();
+		
+		return delimChar;
+	}
 	
 	/**
 	* The 'getTotalFields' function will return the number of fields for a passed in message type.
@@ -323,6 +377,20 @@ public class messageTypeDAOImpl implements messageTypeDAO {
 	}
 	
 	/**
+	 * 
+	 */
+	@Override
+	@Transactional
+	public Long checkCrosswalkName(String name) {
+		Query query = sessionFactory.getCurrentSession().createQuery("select count(id) as total from Crosswalks where name = :name");
+			  query.setParameter("name",name);
+		
+	    Long cwId = (Long) query.uniqueResult();
+		
+		return cwId;
+	}
+	
+	/**
 	 * The 'createCrosswalk" function will create the new crosswalk 
 	 * 
 	 * @Table	crosswalks
@@ -358,28 +426,58 @@ public class messageTypeDAOImpl implements messageTypeDAO {
 	/**
 	* The 'getDelimiters' function will return a list of available file delimiters
 	* 
+	* @param	cwId	This will be the id of the crosswalk to return the associated
+	* 					data elements for
+	* 
+	* @return		The function will return a list of data objects for the crosswalk
+	* 
 	*/
 	@Override
 	@SuppressWarnings("rawtypes")
 	@Transactional
 	public List getCrosswalkData(int cwId) {
-		Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT actualValue, descValue FROM rel_crosswalkData where crosswalkId = :crosswalkid order by id asc");
+		Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT sourceValue, targetValue, descValue FROM rel_crosswalkData where crosswalkId = :crosswalkid order by id asc");
 			  query.setParameter("crosswalkid", cwId);
 		
 		return query.list();
 	}
 	
 	/**
+	* The 'saveDataTranslations' function will save the submitted translations
+	* for the selected message type
+	* 
+	* @param translations	the messagetypedatatranslations object
 	* 
 	*/
 	@Override
 	@Transactional
 	public void saveDataTranslations(messageTypeDataTranslations translations) {
-		sessionFactory.getCurrentSession().saveOrUpdate(translations);
+		sessionFactory.getCurrentSession().save(translations);
 	}
 	
 	/**
+	* The 'deleteDataTranslations' function will remove all data translations for the
+	* passed in message type.
 	* 
+	* @param	messageTypeId	The id of the message type to remove associated translations
+	* 
+	*/
+	@Override
+	@Transactional
+	public void deleteDataTranslations(int messageTypeId) {
+		Query deleteTranslations = sessionFactory.getCurrentSession().createQuery("delete from messageTypeDataTranslations where messageTypeId = :messageTypeId");
+		deleteTranslations.setParameter("messageTypeId",messageTypeId);
+		deleteTranslations.executeUpdate();
+	}
+	
+	/**
+	* The 'getMessgeTypeTranslations' function will return a list of data translations saved
+	* for the passed in message type.
+	* 
+	* @param	messageTypeId	The id of the message type we want to return associated translations
+	* 							for.
+	* 
+	* @return	This function will return a list of translations
 	*/
 	@SuppressWarnings("unchecked")
 	@Override
@@ -392,7 +490,12 @@ public class messageTypeDAOImpl implements messageTypeDAO {
 	}
 	
 	/**
+	 * The 'getFieldName' function will return the name of a field based on the fieldId passed in.
+	 * This is used for display purposes to show the actual field lable instead of a field name.
 	 * 
+	 * @param fieldId	This will hold the id of the field to retrieve
+	 * 
+	 * @Return This function will return a string (field name)
 	 */
 	@Override
 	@Transactional
@@ -406,7 +509,11 @@ public class messageTypeDAOImpl implements messageTypeDAO {
 	}
 	
 	/**
+	 * The 'getCrosswalkName' function will return the name of a crosswalk based on the id passed in.
 	 * 
+	 * @param cwId		This will hold the id of the crosswalk to retrieve
+	 * 
+	 * @Return 	This function will return a string (crosswalk name).
 	 */
 	@Override
 	@Transactional

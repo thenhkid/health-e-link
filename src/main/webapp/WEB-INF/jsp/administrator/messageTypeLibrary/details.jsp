@@ -40,11 +40,11 @@
 							</div>
 						</div>
 						<spring:bind path="name">
-							<div class="form-group ${status.error ? 'has-error' : '' } ${not empty esistingType ? 'has-error' : ''}">
+							<div class="form-group ${status.error ? 'has-error' : '' } ${not empty existingType ? 'has-error' : ''}">
 								<label class="control-label" for=name>Name *</label>
 								<form:input path="name" id="name" class="form-control" type="text" maxLength="255" />
 								<form:errors path="name" cssClass="control-label" element="label" />
-								<c:if test="${not empty esistingType}">${esistingType}</c:if>
+								<c:if test="${not empty existingType}"><span class="control-label has-error">${existingType}</span></c:if>
 							</div>
 						</spring:bind>
 						<c:choose>
@@ -115,13 +115,12 @@
 			errorFound = 1;
 		}
 		//Make sure the file is a correct format
-		//(.xls, .xlsx)
-		if($('#templateFile').val() != '' && ($('#templateFile').val().indexOf('.xls') == -1 && 
-			$('#templateFile').val().indexOf('.xlsx') == -1)) {
+		//(.xlsx)
+		if($('#templateFile').val() != '' && $('#templateFile').val().indexOf('.xlsx') == -1) {
 		
 			$('#templateFileDiv').addClass("has-error");
 			$('#templateFileMsg').addClass("has-error");
-			$('#templateFileMsg').html('The message type file must be an excel file.');
+			$('#templateFileMsg').html('The message type file must be an excel file (.xlsx format).');
 			errorFound = 1;
 
 		}

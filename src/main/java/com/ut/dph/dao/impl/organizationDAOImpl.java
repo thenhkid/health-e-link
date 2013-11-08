@@ -8,6 +8,7 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ut.dph.dao.organizationDAO;
 import com.ut.dph.model.Brochure;
@@ -123,9 +124,9 @@ public class organizationDAOImpl implements organizationDAO {
 	     Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Organization.class)
 	    	.add(Restrictions.not(Restrictions.eq("cleanURL","")))
 	    	.add(Restrictions.or(
-	    			Restrictions.like("orgName", searchTerm+"%"),
-	     			Restrictions.like("city", searchTerm+"%"),
-	     			Restrictions.like("address", searchTerm+"%")
+	    			Restrictions.like("orgName", "%"+searchTerm+"%"),
+	     			Restrictions.like("city", "%"+searchTerm+"%"),
+	     			Restrictions.like("address", "%"+searchTerm+"%")
 	     		)
 	     	);
 	     
@@ -148,6 +149,7 @@ public class organizationDAOImpl implements organizationDAO {
 		
 		return totalOrgs;
 	}
+	
 	
 	/**
 	 * The 'getOrganizations' function will return a list of the organizations in the system
@@ -174,6 +176,28 @@ public class organizationDAOImpl implements organizationDAO {
 			firstResult = (maxResults*(page-1));
 		}
 		query.setFirstResult(firstResult);
+		//Set the max results to display
+		query.setMaxResults(maxResults);
+		
+	    List<Organization> organizationList = query.list(); 
+	    return organizationList;	
+	}
+	
+	/**
+	 * The 'getLatestOrganizations' function will return a list of the latest organizations added to the system
+	 * 
+	 * @Table	organizations
+	 * 
+	 * @param	maxResults	This will hold the value of the maxium number of results we want
+	 * 						to send back to the page
+	 * 
+	 * @Return	This function will return a list of organization objects
+	 */
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<Organization> getLatestOrganizations(int maxResults) {
+	    Query query = sessionFactory.getCurrentSession().createQuery("from Organization where cleanURL is not '' order by dateCreated desc");
+	   
 		//Set the max results to display
 		query.setMaxResults(maxResults);
 		

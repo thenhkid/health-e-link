@@ -18,7 +18,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 import com.ut.dph.validator.Phone;
 
 @Entity
-@Table(name="PROVIDERS")
+@Table(name="INFO_PROVIDERS")
 public class Provider {
 	
 	@Transient

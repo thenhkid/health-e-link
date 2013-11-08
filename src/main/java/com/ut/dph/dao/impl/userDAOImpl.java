@@ -142,8 +142,8 @@ public class userDAOImpl implements userDAO {
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(User.class)
 	    	.add(Restrictions.eq("orgId",orgId))
 	    	.add(Restrictions.or(
-	    			Restrictions.like("firstName", searchTerm+"%"),
-	    			Restrictions.like("lastName", searchTerm+"%")
+	    			Restrictions.like("firstName", "%"+searchTerm+"%"),
+	    			Restrictions.like("lastName", "%"+searchTerm+"%")
 	     		)
 	     	)
 	     	.addOrder(Order.asc("lastName"))

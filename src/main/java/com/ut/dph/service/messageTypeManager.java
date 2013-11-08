@@ -17,7 +17,11 @@ public interface messageTypeManager {
 		  
 	messageType getMessageTypeById(int messageTypeId);
 	
+	messageType getMessageTypeByName(String name);
+	
 	List<messageType> getMessageTypes(int page, int maxResults);
+	
+	List<messageType> getLatestMessageTypes(int maxResults);
 	  
 	List<messageType> findMessageTypes(String searchTerm);
 	
@@ -43,7 +47,7 @@ public interface messageTypeManager {
 	
 	List<Crosswalks> getCrosswalks(int page, int maxResults);
 	
-	void createCrosswalk(Crosswalks crosswalkDetails);
+	Integer createCrosswalk(Crosswalks crosswalkDetails);
 	
 	Long findTotalCrosswalks();
 	
@@ -59,5 +63,9 @@ public interface messageTypeManager {
 	String getFieldName(int fieldId);
 	
 	String getCrosswalkName(int cwId);
+	
+	Long checkCrosswalkName(String name);
+	
+	void deleteDataTranslations(int messageTypeId);
 
 }

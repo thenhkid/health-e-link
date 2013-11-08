@@ -17,7 +17,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.ut.dph.model.Crosswalks;
 import com.ut.dph.model.messageType;
@@ -148,6 +150,15 @@ public class adminLibController {
 			mav.setViewName("/administrator/messageTypeLibrary/details");
 			return mav;
 		}
+		
+		messageType existing = messagetypemanager.getMessageTypeByName(messageTypeDetails.getName());
+		
+	    if (existing != null) {
+	    	ModelAndView mav = new ModelAndView();
+			mav.setViewName("/administrator/messageTypeLibrary/details");
+			mav.addObject("existingType","Message type "+messageTypeDetails.getName().trim()+" already exists.");
+			return mav;	
+        }
 		 
 		Integer id = null;
 		id = (Integer) messagetypemanager.createMessageType(messageTypeDetails);
@@ -330,7 +341,7 @@ public class adminLibController {
 	 public ModelAndView getDataTranslations() throws Exception {
 		 
 		//Set the data translations array to get ready to hold data
-	    translations = new ArrayList<messageTypeDataTranslations>();
+	    translations = new CopyOnWriteArrayList<messageTypeDataTranslations>();
 		 
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("/administrator/messageTypeLibrary/translations");
@@ -353,7 +364,11 @@ public class adminLibController {
 	 * 
 	 */
 	 @RequestMapping(value="/translations", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	 public @ResponseBody Integer submitDataTranslations() throws Exception {
+	 public @ResponseBody Integer submitDataTranslations(@RequestParam(value="id", required=false) Integer messageTypeId) throws Exception {
+		 
+		 //Delete all the data translations before creating
+		 //This will help with the jquery removing tranlsations
+		 messagetypemanager.deleteDataTranslations(messageTypeId);
 		 
 		 //Loop through the list of translations
 		 for(messageTypeDataTranslations translation : translations) {
@@ -402,24 +417,28 @@ public class adminLibController {
 	 * @Return list of translations
 	 */
 	 @RequestMapping(value="/getTranslations.do", method = RequestMethod.GET)
-	 public @ResponseBody ModelAndView getTranslations() throws Exception {
+	 public @ResponseBody ModelAndView getTranslations(@RequestParam(value="reload", required=true) boolean reload) throws Exception {
 		 
 		ModelAndView mav = new ModelAndView(); 
 		mav.setViewName("/administrator/messageTypeLibrary/existingTranslations");	 
 		
-		//Need to get a list of existing translations
-		List<messageTypeDataTranslations> existingTranslations = messagetypemanager.getMessageTypeTranslations(messageTypeId);
-		
-		for(messageTypeDataTranslations translation : existingTranslations) {
-			//Get the field name by id
-			String fieldName = messagetypemanager.getFieldName(translation.getFieldId());
-			translation.setfieldName(fieldName);
+		//only get the saved translations if reload == 0
+		//We only want to retrieve the saved ones on initial load
+		if(reload == false) {
+			//Need to get a list of existing translations
+			List<messageTypeDataTranslations> existingTranslations = messagetypemanager.getMessageTypeTranslations(messageTypeId);
 			
-			//Get the crosswalk name by id
-			String crosswalkName = messagetypemanager.getCrosswalkName(translation.getCrosswalkId());		
-			translation.setcrosswalkName(crosswalkName);
-			
-			translations.add(translation);
+			for(messageTypeDataTranslations translation : existingTranslations) {
+				//Get the field name by id
+				String fieldName = messagetypemanager.getFieldName(translation.getFieldId());
+				translation.setfieldName(fieldName);
+				
+				//Get the crosswalk name by id
+				String crosswalkName = messagetypemanager.getCrosswalkName(translation.getCrosswalkId());		
+				translation.setcrosswalkName(crosswalkName);
+				
+				translations.add(translation);
+			}
 		}
 		
 		mav.addObject("dataTranslations",translations);	
@@ -465,16 +484,33 @@ public class adminLibController {
 	 */
 	 @RequestMapping(value="/createCrosswalk", method = RequestMethod.POST)
 	 public @ResponseBody ModelAndView createCrosswalk(@ModelAttribute(value="crosswalkDetails") Crosswalks crosswalkDetails, BindingResult result, RedirectAttributes redirectAttr) throws Exception {
+		int lastId = 0;
+		lastId = messagetypemanager.createCrosswalk(crosswalkDetails);
 		
-		messagetypemanager.createCrosswalk(crosswalkDetails);
-	
-		redirectAttr.addFlashAttribute("savedStatus", "created");
+		if(lastId == 0) {
+			redirectAttr.addFlashAttribute("savedStatus", "error");
+		}
+		else {
+			redirectAttr.addFlashAttribute("savedStatus", "created");
+		}
 		ModelAndView mav = new ModelAndView(new RedirectView("translations"));
 		return mav;	
 	}
 	 
 	/**
-	* The '/viewCrosswals{params}' function will return the details of the selected
+	* 
+	*/
+	@RequestMapping(value="/checkCrosswalkName.do", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody Long checkCrosswalkName(@RequestParam(value="name", required=true) String name) throws Exception {
+		
+		Long nameExists = (Long) messagetypemanager.checkCrosswalkName(name);
+		
+		return nameExists;
+		
+	}
+	 
+	/**
+	* The '/viewCrosswalk{params}' function will return the details of the selected
 	* crosswalk. The results will be displayed in the overlay.
 	* 
 	* @Param	i	This will hold the id of the selected crosswalk
@@ -534,6 +570,66 @@ public class adminLibController {
 		
 		return mav;
 		
+	}
+	
+	/**
+	* The 'removeTranslations{params}' function will handle removing a translation from
+	* translations array.
+	* 
+	* @param	fieldId 		This will hold the field that is being removed
+	* @param	processOrder	This will hold the process order of the field to be
+	* 							removed so we remove the correct field number as the 
+	* 							same field could be in the list with different crosswalks
+	* 
+	* @Return	1	The function will simply return a 1 back to the ajax call
+	*/
+	@RequestMapping(value="/removeTranslations{params}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody Integer removeTranslation(@RequestParam(value="fieldId", required=true) Integer fieldId, @RequestParam(value="processOrder", required=true) Integer processOrder) throws Exception {
+		
+		Iterator<messageTypeDataTranslations> it = translations.iterator();
+		int currProcessOrder;
+		
+		while(it.hasNext()) {
+			messageTypeDataTranslations translation = it.next();
+			if(translation.getFieldId() == fieldId && translation.getProcessOrder() == processOrder) {
+				translations.remove(translation);
+			}
+			else if(translation.getProcessOrder() > processOrder) {
+				currProcessOrder = translation.getProcessOrder();
+				translation.setProcessOrder(currProcessOrder-1);
+			}
+		}
+		
+		return 1;
+	}
+	
+	/**
+	* The 'updateTranslationProcessOrder{params}' function will handle removing a translation from
+	* translations array.
+	* 
+	* @param	fieldId 		This will hold the field that is being removed
+	* @param	processOrder	This will hold the process order of the field to be
+	* 							removed so we remove the correct field number as the 
+	* 							same field could be in the list with different crosswalks
+	* 
+	* @Return	1	The function will simply return a 1 back to the ajax call
+	*/
+	@RequestMapping(value="/updateTranslationProcessOrder{params}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody Integer updateTranslationProcessOrder(@RequestParam(value="currProcessOrder", required=true) Integer currProcessOrder, @RequestParam(value="newProcessOrder", required=true) Integer newProcessOrder) throws Exception {
+		
+		Iterator<messageTypeDataTranslations> it = translations.iterator();
+		
+		while(it.hasNext()) {
+			messageTypeDataTranslations translation = it.next();
+			if(translation.getProcessOrder() == currProcessOrder) {
+				translation.setProcessOrder(newProcessOrder);
+			}
+			else if(translation.getProcessOrder() == newProcessOrder) {
+				translation.setProcessOrder(currProcessOrder);
+			}
+		}
+		
+		return 1;
 	}
 
 }

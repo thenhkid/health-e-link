@@ -1,7 +1,11 @@
 package com.ut.dph.reference;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
 public class fileSystem {
 	
@@ -151,36 +155,87 @@ public class fileSystem {
 	
 	public static void delete(File file) throws IOException{
 	 
-	    	if(file.isDirectory()){
-	 
-	    		//directory is empty, then delete it
-	    		if(file.list().length==0){
-	 
-	    		   file.delete();
-	 
-	    		}else{
-	 
-	    		   //list all the directory contents
-	        	   String files[] = file.list();
-	 
-	        	   for (String temp : files) {
-	        	      //construct the file structure
-	        	      File fileDelete = new File(file, temp);
-	 
-	        	      //recursive delete
-	        	     delete(fileDelete);
-	        	   }
-	 
-	        	   //check the directory again, if empty then delete it
-	        	   if(file.list().length==0){
-	           	     file.delete();
-	        	   }
-	    		}
-	 
-	    	}else{
-	    		//if file, then delete it
-	    		file.delete();
-	    	}
-	    }
+    	if(file.isDirectory()){
+ 
+    		//directory is empty, then delete it
+    		if(file.list().length==0){
+ 
+    		   file.delete();
+ 
+    		}else{
+ 
+    		   //list all the directory contents
+        	   String files[] = file.list();
+ 
+        	   for (String temp : files) {
+        	      //construct the file structure
+        	      File fileDelete = new File(file, temp);
+ 
+        	      //recursive delete
+        	     delete(fileDelete);
+        	   }
+ 
+        	   //check the directory again, if empty then delete it
+        	   if(file.list().length==0){
+           	     file.delete();
+        	   }
+    		}
+ 
+    	}else{
+    		//if file, then delete it
+    		file.delete();
+    	}
+    }
+	
+	/**
+	 * The checkFileDelimiters function will check to make sure the file contains data separated
+	 * by the delimiter chosen when uploading the file.
+	 * 
+	 * @param fileName	The name of the file uploaded
+	 * @param delim		The delimiter choosen when uploading the file
+	 * 
+	 * @returns  The function will return 0 if no delimiter was found
+	 *			 or the count of the delimiter
+	 */
+	public Integer checkFileDelimiter(fileSystem dir, String fileName, String delim) {
+		
+		int delimCount = 0;
+		
+		FileInputStream file = null;
+		try {
+			file = new FileInputStream(new File(dir.getDir() + fileName));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		
+		BufferedReader br = new BufferedReader(new InputStreamReader(file));
+		
+		try {
+			String line = null;
+			try {
+				line = br.readLine();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+			while (line != null) {
+				if(delim == "t") {
+					delimCount = line.split("\t",-1).length-1;
+				}
+				else {
+					delimCount = line.split("\\"+delim,-1).length-1;
+				}
+				break;
+			}
+		} finally {
+			try {
+				br.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return delimCount;
+	}
 
 }
