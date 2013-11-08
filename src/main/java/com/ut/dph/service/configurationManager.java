@@ -12,5 +12,11 @@ public interface configurationManager {
   
   List<configuration> getConfigurationsByOrgId(int orgId);
   
+  List<configuration> findConfigurations(String searchTerm);
+  
   List<configuration> getConfigurations(int firstResults, int maxResults);
+  
+  List<configuration> getLatestConfigurations(int maxResults);
+  
+  Long findTotalConfigs();
 }

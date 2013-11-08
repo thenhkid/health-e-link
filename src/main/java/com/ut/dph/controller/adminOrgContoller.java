@@ -106,6 +106,7 @@ public class adminOrgContoller {
         mav.addObject("orgFunctions",organizationManager);
         mav.addObject("organizationList", organizations);
         
+        
         //Return the total list of organizations
         Long totalOrgs = organizationManager.findTotalOrgs();
         
@@ -126,7 +127,7 @@ public class adminOrgContoller {
 	 * 
 	 * @Objects				(1) An object will be returned holding the requested search term used to 
 	 * 							populate the search box
-	 * 						(2) An object will be returned that hold the organiationManager so we can
+	 * 						(2) An object will be returned that hold the organizationManager so we can
 	 * 							run some functions on each returned org in the list
 	 * 						(3) An object containing the found organizations
 	 * @throws Exception

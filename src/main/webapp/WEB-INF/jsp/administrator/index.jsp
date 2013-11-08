@@ -39,7 +39,7 @@
 			<div class="col-md-3 col-sm-3 col-xs-6">
 				<section class="panel panel-default panel-stats">
 					<div class="panel-body">
-						<span class="stat-number"><a href="?page=configurations" title="">0</a></span>
+						<span class="stat-number"><a href="?page=configurations" title="">${totalConfigs}</a></span>
 						<h3>Configurations</h3>
 						<a href="administrator/configurations/list" title="Configuration Manager" class="btn btn-primary btn-small">View all</a>
 					</div>

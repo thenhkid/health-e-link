@@ -2,3 +2,7 @@
 ALTER TABLE `universalTranslator`.`providers` 
 RENAME TO  `universalTranslator`.`info_providers` ;
 
+ALTER TABLE `universalTranslator`.`configurations` 
+ADD COLUMN `dateCreated` DATETIME NULL DEFAULT CURRENT_TIMESTAMP AFTER `messageTypeId`;
+
+

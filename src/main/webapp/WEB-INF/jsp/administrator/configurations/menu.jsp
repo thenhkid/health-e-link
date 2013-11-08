@@ -2,35 +2,16 @@
 <aside class="secondary">
 	<nav class="secondary-nav" role="navigation">
 		<ul class="nav nav-pills nav-stacked">
-			<li>
-				<c:choose>
-					<c:when test="${param['page'] == 'details'}">
-						<a href="">Edit Configuration</a>
-						<ul class="nav nav-pills nav-stacked">
-							<li class="active"><a href="" title="Details">Details</a></li>
-							<li><a href="" title="Transpot Details">Transport Details ${id}</a></li>
-							<li><a href="" title="Field Mappings">Field Mappings</a></li>
-							<li><a href="" title="Data Translations">Data Translations</a></li>
-							<li><a href="" title="Connections">Connections</a></li>
-							<li><a href="" title="Scheduling">Scheduling</a></li>
-							<li><a href="" title="Processing History">Processing History</a></li>
-						</ul>
-					</c:when>
-					<c:when test="${param['page'] == 'create'}">
-						<a href="">Create new Configuration</a>
-						<ul class="nav nav-pills nav-stacked">
-							<li class="active"><a href="" title=""><strong>Step 1:</strong><br/>Details</a></li>
-							<li><a href="" title=""><strong>Step 2:</strong><br/>Field Mappings</a></li>
-							<li><a href="" title=""><strong>Step 3:</strong><br/>Data Translations</a></li>
-							<li><a href="" title=""><strong>Step 4:</strong><br/>Connections</a></li>
-							<li><a href="" title=""><strong>Step 5:</strong><br/>Scheduling</a></li>
-						</ul>
-					</c:when>
-				</c:choose>
-			</li>
+			<li ${param['page'] == 'details' ? 'class="active"' : ''}><a href="${param['page'] != 'details' ? 'details' : 'javascript:void(0);'}" title="Step 1: Configuration Details"><span class="badge">1</span> Details</a></li>
+			<li ${param['page'] == 'transport' ? 'class="active"' : ''} ${id > 0 ? '' : 'class="disabled"'}><a href="${param['page'] != 'transport' && id > 0 ? 'transport' : 'javascript:void(0);'}" title="Step 2: Transport Details"><span class="badge">2</span> Transport Details</a></li>
+			<li ${param['page'] == 'mappings' ? 'class="active"' : ''} ${id > 0 ? '' : 'class="disabled"'}><a href="${param['page'] != 'mappings' && id > 0 ? 'mappings' : 'javascript:void(0);'}" title="Step 3: Field Mappings"><span class="badge">3</span> Field Mappings</a></li>
+			<li ${param['page'] == 'translations' ? 'class="active"' : ''} ${id > 0 ? '' : 'class="disabled"'}><a href="${param['page'] != 'translations' && id > 0 ? 'translations' : 'javascript:void(0);'}" title="Step 4: Data Translations"><span class="badge">4</span> Data Translations</a></li>
+			<li ${param['page'] == 'connections' ? 'class="active"' : ''} ${id > 0 ? '' : 'class="disabled"'}><a href="${param['page'] != 'connections' && id > 0 ? 'connections' : 'javascript:void(0);'}" title="Step 5: Connections"><span class="badge">5</span> Connections</a></li>
+			<li ${param['page'] == 'scheduling' ? 'class="active"' : ''} ${id > 0 ? '' : 'class="disabled"'}><a href="${param['page'] != 'scheduling' && id > 0 ? 'scheduling' : 'javascript:void(0);'}" title="Step 6: Scheduling"><span class="badge">6</span> "Step 6: Scheduling"</a></li>
 		</ul>
 	</nav>
 </aside>
+
 
 
 

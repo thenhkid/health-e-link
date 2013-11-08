@@ -13,8 +13,10 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.ut.dph.model.Organization;
 import com.ut.dph.model.messageType;
+import com.ut.dph.model.configuration;
 import com.ut.dph.service.messageTypeManager;
 import com.ut.dph.service.organizationManager;
+import com.ut.dph.service.configurationManager;
 
 
 /**
@@ -34,6 +36,9 @@ public class adminController {
 	
 	@Autowired 
 	private messageTypeManager messagetypemanager;
+	
+	@Autowired
+	private configurationManager configurationmanager;
 	
 	private int maxResults = 3;
 	
@@ -57,7 +62,7 @@ public class adminController {
     	Long totalOrgs = organizationManager.findTotalOrgs();
     	mav.addObject("totalOrgs",totalOrgs);
     	
-    	//Return the latest  organizations
+    	//Return the latest organizations
     	List<Organization> organizations = organizationManager.getLatestOrganizations(maxResults);
     	mav.addObject("latestOrgs", organizations);
     	
@@ -68,6 +73,14 @@ public class adminController {
         //Return the latest message types created
     	List<messageType> messagetypes = messagetypemanager.getLatestMessageTypes(maxResults);
     	mav.addObject("latestMessageTypes", messagetypes);
+    	
+		//Return the total list of configurations
+    	Long totalConfigs = configurationmanager.findTotalConfigs();
+    	mav.addObject("totalConfigs",totalConfigs);
+    	
+    	//Return the latest configurations
+    	List<configuration> configurations = configurationmanager.getLatestConfigurations(maxResults);
+    	mav.addObject("latestConfigs", configurations);
 
 		
         return mav;

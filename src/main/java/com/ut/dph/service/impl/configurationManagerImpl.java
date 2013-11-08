@@ -13,32 +13,50 @@ import com.ut.dph.service.configurationManager;
 @Service
 public class configurationManagerImpl implements configurationManager {
 
-  @Autowired
-  private configurationDAO configurationDAO;
+	  @Autowired
+	  private configurationDAO configurationDAO;
+	  
+	  @Override
+	  @Transactional
+	  public void saveConfiguration(configuration configuration) {
+	    configurationDAO.saveConfiguration(configuration);
+	  }
+	
+	  @Override
+	  @Transactional
+	  public configuration getConfigurationById(int configId) {
+	    return configurationDAO.getConfigurationById(configId);
+	  }
+	  
+	  @Override
+	  @Transactional
+	  public List<configuration> getConfigurationsByOrgId(int configId) {
+	    return configurationDAO.getConfigurationsByOrgId(configId);
+	  }
+	  
+	
+	  @Override
+	  @Transactional
+	  public List<configuration> getConfigurations(int firstResults, int maxResults) {
+	    return configurationDAO.getConfigurations(firstResults, maxResults);
+	  }
   
-  @Override
-  @Transactional
-  public void saveConfiguration(configuration configuration) {
-    configurationDAO.saveConfiguration(configuration);
-  }
-
-  @Override
-  @Transactional
-  public configuration getConfigurationById(int configId) {
-    return configurationDAO.getConfigurationById(configId);
-  }
+	  @Override
+	  @Transactional
+	  public List<configuration> findConfigurations(String searchTerm) {
+		 return configurationDAO.findConfigurations(searchTerm);
+	  }
   
-  @Override
-  @Transactional
-  public List<configuration> getConfigurationsByOrgId(int configId) {
-    return configurationDAO.getConfigurationsByOrgId(configId);
-  }
-  
-
-  @Override
-  @Transactional
-  public List<configuration> getConfigurations(int firstResults, int maxResults) {
-    return configurationDAO.getConfigurations(firstResults, maxResults);
-  }
+	  @Override
+	  @Transactional
+	  public List<configuration> getLatestConfigurations(int maxResults) {
+		return configurationDAO.getLatestConfigurations(maxResults);
+	  }
+	
+	  @Override
+	  @Transactional
+	  public Long findTotalConfigs() {
+		  return configurationDAO.findTotalConfigs();
+	  }
 
 }
