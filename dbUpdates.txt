@@ -1,3 +1,4 @@
 /* Chad 11-8-2013 */
 ALTER TABLE `universalTranslator`.`providers` 
 RENAME TO  `universalTranslator`.`info_providers` ;
+
