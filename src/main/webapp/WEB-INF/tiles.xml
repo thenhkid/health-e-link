@@ -38,6 +38,15 @@
 	        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
 	    </definition>
 	    
+	     <definition name="/administrator/configurations/transport" extends="base.definition">
+	        <put-attribute name="title" value="Administrator - Manage Configurations" />
+	        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=config" />
+	        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/configurations/actionBar.jsp?page=configDetails" />
+	        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/configurations/menu.jsp?page=transport" />
+	        <put-attribute name="body" value="/WEB-INF/jsp/administrator/configurations/transport.jsp" />
+	        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
+	    </definition>
+	    
 	    <!-- Admin Organization Definitions -->
 	    <definition name="/administrator/organizations/listOrganizations" extends="base.definition">
 	        <put-attribute name="title" value="Administrator - Manage Organizations" />

@@ -164,6 +164,22 @@ public class messageTypeDAOImpl implements messageTypeDAO {
 	}
 	
 	/**
+	 * The 'getActiveMessageTypes' function will return the list of the active message types in the system.
+	 * 
+	 * @Table	messageTypes
+	 * 
+	 * @Return	This function will return a list of active message type objects
+	 */
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<messageType> getActiveMessageTypes() {
+		
+		Query query = sessionFactory.getCurrentSession().createQuery("from messageType where status = 1 order by name asc");
+	
+		return query.list();		
+	}
+	
+	/**
 	 * The 'findMessageTypes' function will return a list of message type objects based on a search term. 
 	 * The search will look for message types whose title or file name match the search term provided.
 	 * 

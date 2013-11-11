@@ -22,6 +22,8 @@ public interface messageTypeManager {
 	List<messageType> getMessageTypes(int page, int maxResults);
 	
 	List<messageType> getLatestMessageTypes(int maxResults);
+	
+	List<messageType> getActiveMessageTypes();
 	  
 	List<messageType> findMessageTypes(String searchTerm);
 	

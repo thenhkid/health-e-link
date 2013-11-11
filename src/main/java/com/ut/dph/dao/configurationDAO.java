@@ -6,7 +6,9 @@ import com.ut.dph.model.configuration;
 
 public interface configurationDAO {
 	
-  void saveConfiguration(configuration configuration);
+  Integer createConfiguration(configuration configuration);
+  
+  void updateConfiguration(configuration configuration);
   
   configuration getConfigurationById(int configId);
   
@@ -14,9 +16,13 @@ public interface configurationDAO {
   
   List<configuration> findConfigurations(String searchTerm);
   
-  List<configuration> getConfigurations(int firstResults, int maxResults);
+  List<configuration> getConfigurationByName(String configName);
+  
+  List<configuration> getConfigurations(int page, int maxResults);
   
   List<configuration> getLatestConfigurations(int maxResults);
   
   Long findTotalConfigs();
+  
+  Long getTotalConnections(int configId);
 }

@@ -1,89 +1,119 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %> 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+
 <div class="main clearfix" role="main">
 
-	<!-- Subnav (if needed) -->
-	<nav class="sub-nav" role="navigation">
-		<ul class="nav nav-pills" >
-			<li class="active">
-				<a href="" title="">
-					<span class="badge">1</span>
-					Details
-				</a>
-			</li>
-			<li>
-				<a href="" title="">
-					<span class="badge">2</span>
-					Field Mappings
-				</a>
-			</li>
-			<li class="disabled">
-				<a href="" title="">
-					<span class="badge">3</span>
-					Data Translations
-				</a>
-			</li>
-			<li class="disabled">
-				<a href="" title="">
-					<span class="badge">4</span>
-					Connections
-				</a>
-			</li>
-			<li class="disabled">
-				<a href="" title="">
-					<span class="badge">5</span>
-					Scheduling
-				</a>
-			</li>
-		</ul>
-	</nav>
+	<div class="col-md-12">
 	
-	<div class="col-md-6">
-		<section class="panel panel-default">
-			<c:if test="${saved == 'success'}">
-				<p class="success">User Updated Successfully</p>
-			</c:if>
-			<div class="panel-heading">
-				<h3 class="panel-title">Configuration Detail</h3>
+		<c:if test="${not empty savedStatus}" >
+			<div class="alert alert-success">
+				<strong>Success!</strong> 
+				<c:choose><c:when test="${savedStatus == 'updated'}">The configuration has been successfully updated!</c:when><c:otherwise>The configuration has been successfully created!</c:otherwise></c:choose>
 			</div>
-			<div class="panel-body">
-				<div class="form-container">
-					<form:form commandName="configuration"  method="post" role="form">
-						<input type="hidden" id="action" name="action" value="save" />
-						<form:hidden path="id" id="configId" />
-						<form:hidden path="orgId" />
-						<div class="form-group">
-							<label for="fieldA">Configuration Name</label>
-							<form:input path="configName" class="form-control" type="text" />
-							<form:errors path="configName" cssClass="error" />
-							<!-- <input id="fieldA" class="form-control" type="text" />-->
-						</div>
-						<%--<input type="submit" alt="Save" title="Save" value="Save" class="btn btn-primary"/>--%>
-						
-					</form:form>
+		</c:if>
+	
+		<form:form id="configuration" commandName="configurationDetails" modelAttribute="configurationDetails" method="post" enctype="multipart/form-data" role="form">
+			<input type="hidden" id="action" name="action" value="save" />
+			<form:hidden path="id" id="id" />
+			<form:hidden path="dateCreated" />
+			
+			<section class="panel panel-default">
+				
+				<div class="panel-heading">
+					<h3 class="panel-title">Details</h3>
 				</div>
-			</div>
-		</section>
+				<div class="panel-body">
+					<div class="form-container">
+						<div class="form-group">
+							<label for="status">Status *</label>
+							<div>
+								<label class="radio-inline">
+									<form:radiobutton id="status" path="status" value="1" disabled = "${notavailable}" />Active 
+								</label>
+								<label class="radio-inline">
+									<form:radiobutton id="status" path="status" value="0"/>Inactive
+								</label>
+							</div>
+						</div>
+						<div class="form-group">
+							<label for="type">Configuration Type *</label>
+							<div>
+								<label class="radio-inline">
+									<form:radiobutton id="type" path="type" value="1"/> For Source Organization 
+								</label>
+								<label class="radio-inline">
+									<form:radiobutton id="type" path="type" value="2"/> For Target Organization
+								</label>
+							</div>
+						</div>
+						<spring:bind path="orgId">
+							<div class="form-group ${status.error ? 'has-error' : '' }">
+								<label class="control-label" for="organization">Organization *</label>
+								<form:select path="orgId" id="organization" class="form-control half">
+									<option value="">- Select -</option>
+									<c:forEach items="${organizations}" var="org" varStatus="oStatus">
+										<option value="${organizations[oStatus.index].id}" <c:if test="${configurationDetails.orgId == organizations[oStatus.index].id}">selected</c:if>>${organizations[oStatus.index].orgName} </option>
+									</c:forEach>
+								</form:select>
+							</div>
+						</spring:bind>
+						<spring:bind path="messageTypeId">
+							<div class="form-group ${status.error ? 'has-error' : '' }">
+								<label class="control-label" for="messageTypeId">Message Type *</label>
+								<form:select path="messageTypeId" id="messageTypeId" class="form-control half">
+									<option value="">- Select -</option>
+									<c:forEach items="${messageTypes}" var="msgType" varStatus="mStatus">
+										<option value="${messageTypes[mStatus.index].id}" <c:if test="${configurationDetails.messageTypeId == messageTypes[mStatus.index].id}">selected</c:if>>${messageTypes[mStatus.index].name} </option>
+									</c:forEach>
+								</form:select>
+							</div>
+						</spring:bind>
+						<spring:bind path="configName">
+							<div class="form-group ${status.error ? 'has-error' : '' } ${not empty existingType ? 'has-error' : ''}">
+								<label class="control-label" for="configName">Configuration Name *</label>
+								<form:input path="configName" id="configName" class="form-control" type="text" maxLength="55" />
+								<form:errors path="configName" cssClass="control-label" element="label" />
+								<c:if test="${not empty existingConfig}"><span class="control-label has-error">${existingConfig}</span></c:if>
+							</div>
+						</spring:bind>
+					</div>
+				</div>
+			</section>
+		</form:form>
 	</div>
-	
 </div>
-
-
-
 
 <script type="text/javascript">
 
+	$(document).ready(function() {
+	    $("input:text,form").attr("autocomplete","off");
+	});
+	
 	$(function() {
-		$("#saveDetails").click(function(event) {
-			//$("#configuration").attr("action", "saveDetails");
+		//Fade out the updated/created message after being displayed.
+		if($('.alert').length >0) {
+			$('.alert').delay(2000).fadeOut(1000);
+		};
+		
+		$('#saveDetails').click(function(event) {
 			$('#action').val('save');
-			$("#configuration").submit();
+			var hasErrors = 0;
+			if(hasErrors == 0) {
+				$("#configuration").submit();
+			}
+			
 		});
 		
-		$("#saveCloseDetails").click(function(event) {
-			$('#action').val('close');
-        	$("#configuration").submit();
+		$('#next').click(function(event) {
+			$('#action').val('next');
+			var hasErrors = 0;
+			if(hasErrors == 0) {
+				$("#configuration").submit();
+			}
 		});
-
+		
 	});
+
+
 </script>

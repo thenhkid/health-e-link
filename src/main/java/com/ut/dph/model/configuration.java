@@ -10,6 +10,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -25,12 +26,16 @@ public class configuration {
 	  
 	  @Transient
 	  private List<Organization> connections = null;
+	  
+	  @Transient
+	  private Long totalConnections = null;
 
 	  @Id
 	  @GeneratedValue(strategy = GenerationType.AUTO)
 	  @Column(name="ID", nullable = false)
 	  private int id;
 	  
+	  @NotNull
 	  @Column(name="orgId", nullable = false)
 	  private int orgId;
 	  
@@ -47,6 +52,7 @@ public class configuration {
 	  @Column(name="TYPE", nullable = false)
 	  private int type = 1;
 	  
+	  @NotNull
 	  @Column(name="MESSAGETYPEID", nullable = false)
 	  private int messageTypeId = 0;
 	  
@@ -128,5 +134,13 @@ public class configuration {
 	  
 	  public void setMessageTypeName(String messageTypeName) {
 	    this.messageTypeName = messageTypeName;
+	  }
+	  
+	  public Long getTotalConnections() {
+		  return totalConnections;
+	  }
+	  
+	  public void setTotalConnections(Long totalConnections) {
+		  this.totalConnections = totalConnections;
 	  }
 }

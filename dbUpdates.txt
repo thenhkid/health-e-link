@@ -6,3 +6,16 @@ ALTER TABLE `universalTranslator`.`configurations`
 ADD COLUMN `dateCreated` DATETIME NULL DEFAULT CURRENT_TIMESTAMP AFTER `messageTypeId`;
 
 
+/* Chad 11-11-13 */
+CREATE TABLE `universalTranslator`.`ref_transportMethods` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `transportMethod` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`id`));
+  
+INSERT INTO `universalTranslator`.`ref_transportMethods` (`transportMethod`) VALUES ('File Upload');
+INSERT INTO `universalTranslator`.`ref_transportMethods` (`transportMethod`) VALUES ('Online Form');
+INSERT INTO `universalTranslator`.`ref_transportMethods` (`transportMethod`) VALUES ('Secure FTP');
+INSERT INTO `universalTranslator`.`ref_transportMethods` (`transportMethod`) VALUES ('JSON');
+  
+
+

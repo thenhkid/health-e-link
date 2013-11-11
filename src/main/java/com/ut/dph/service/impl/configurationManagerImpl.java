@@ -18,8 +18,14 @@ public class configurationManagerImpl implements configurationManager {
 	  
 	  @Override
 	  @Transactional
-	  public void saveConfiguration(configuration configuration) {
-	    configurationDAO.saveConfiguration(configuration);
+	  public Integer createConfiguration(configuration configuration) {
+	     return configurationDAO.createConfiguration(configuration);
+	  }
+	  
+	  @Override
+	  @Transactional
+	  public void updateConfiguration(configuration configuration) {
+		  configurationDAO.updateConfiguration(configuration);
 	  }
 	
 	  @Override
@@ -34,11 +40,16 @@ public class configurationManagerImpl implements configurationManager {
 	    return configurationDAO.getConfigurationsByOrgId(configId);
 	  }
 	  
+	  @Override
+	  @Transactional
+	  public List<configuration> getConfigurationByName(String configName) {
+		  return configurationDAO.getConfigurationByName(configName);
+	  }
 	
 	  @Override
 	  @Transactional
-	  public List<configuration> getConfigurations(int firstResults, int maxResults) {
-	    return configurationDAO.getConfigurations(firstResults, maxResults);
+	  public List<configuration> getConfigurations(int page, int maxResults) {
+	    return configurationDAO.getConfigurations(page, maxResults);
 	  }
   
 	  @Override
@@ -57,6 +68,12 @@ public class configurationManagerImpl implements configurationManager {
 	  @Transactional
 	  public Long findTotalConfigs() {
 		  return configurationDAO.findTotalConfigs();
+	  }
+	  
+	  @Override
+	  @Transactional
+	  public Long getTotalConnections(int configId) {
+		  return configurationDAO.getTotalConnections(configId);
 	  }
 
 }

@@ -184,7 +184,8 @@ public class organizationDAOImpl implements organizationDAO {
 	}
 	
 	/**
-	 * The 'getLatestOrganizations' function will return a list of the latest organizations added to the system
+	 * The 'getLatestOrganizations' function will return a list of the latest organizations added to the system.
+	 * This function will only return active organizations.
 	 * 
 	 * @Table	organizations
 	 * 
@@ -196,11 +197,30 @@ public class organizationDAOImpl implements organizationDAO {
 	@Override
 	@SuppressWarnings("unchecked")
 	public List<Organization> getLatestOrganizations(int maxResults) {
-	    Query query = sessionFactory.getCurrentSession().createQuery("from Organization where cleanURL is not '' order by dateCreated desc");
+	    Query query = sessionFactory.getCurrentSession().createQuery("from Organization where cleanURL is not '' and status = 1 order by dateCreated desc");
 	   
 		//Set the max results to display
-		query.setMaxResults(maxResults);
+	    if(maxResults > 0) {
+	    	query.setMaxResults(maxResults);
+	    }
 		
+	    List<Organization> organizationList = query.list(); 
+	    return organizationList;	
+	}
+	
+	/**
+	* The 'getAllActiveOrganizations' function will return all the active organizations in the system. The function
+	* will sort by organization name
+	* 
+	* @Table	Organizations
+	* 
+	* @Return	This function will return a list of organization objects
+	*/
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<Organization> getAllActiveOrganizations() {
+	    Query query = sessionFactory.getCurrentSession().createQuery("from Organization where cleanURL is not '' and status = 1 order by orgName desc");
+	   
 	    List<Organization> organizationList = query.list(); 
 	    return organizationList;	
 	}

@@ -23,6 +23,8 @@ public interface organizationDAO {
 	
 	List<Organization> getLatestOrganizations(int maxResults);
 	
+	List<Organization> getAllActiveOrganizations();
+	
 	Long findTotalOrgs();
 	
 	Long findTotalUsers(int orgId);

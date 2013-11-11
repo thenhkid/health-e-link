@@ -17,7 +17,7 @@
 				<div class="form-container">
 					<spring:bind path="name">
 						<div id="crosswalkNameDiv" class="form-group ${status.error ? 'has-error' : '' }">
-							<label class="control-label" for="name">Crosswalk Name*</label>
+							<label class="control-label" for="name">Crosswalk Name *</label>
 							<c:choose>
 								<c:when test="${crosswalkDetails.id > 0 }">
 									<br />${crosswalkDetails.name}
@@ -31,7 +31,7 @@
 					</spring:bind>
 					<spring:bind path="fileDelimiter">
 						<div id="crosswalkDelimDiv" class="form-group ${status.error ? 'has-error' : '' }">
-							<label class="control-label" for="name">Delimiter*</label>
+							<label class="control-label" for="name">Delimiter *</label>
 							<form:select path="fileDelimiter" id="delimiter" class="form-control half">
 								<option value="">- Select -</option>
 								<c:forEach items="${delimiters}" var="cwalk" varStatus="dStatus">

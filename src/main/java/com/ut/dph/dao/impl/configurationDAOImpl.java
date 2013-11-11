@@ -1,5 +1,6 @@
 package com.ut.dph.dao.impl;
 
+import java.math.BigInteger;
 import java.util.List;
 
 import org.hibernate.Criteria;
@@ -18,18 +19,64 @@ public class configurationDAOImpl implements configurationDAO {
 	  @Autowired
 	  private SessionFactory sessionFactory;
 	  
+	 /**
+	 * The 'createConfiguration' function will create a new configuration
+	 * 
+	 * @Table	configurations
+	 * 
+	 * @param	configuration	Will hold the configuration object from the form
+	 * 
+	 * @return 	The function will return the id of the created configuration
+	 */
 	  @Override
-	  public void saveConfiguration(configuration configuration) {
-		sessionFactory.getCurrentSession().update(configuration);
+	  public Integer createConfiguration(configuration configuration) {
+		  Integer lastId = null;
+			
+		  lastId = (Integer) sessionFactory.getCurrentSession().save(configuration);
+			
+		  return lastId;
 	  }
+	  
+	 /**
+	 * The 'updateConfiguration' function will update a selected configuration details
+	 * 
+	 * @Table	configurations
+	 * 
+	 * @param	configuration	Will hold the configuration object from the field
+	 *	
+	 */
+	@Override
+    public void updateConfiguration(configuration configuration) {
+		sessionFactory.getCurrentSession().update(configuration);
+	}
 	
-	  @Override
-	  public configuration getConfigurationById(int configId) {
+	/**
+	 * The 'getConfigurationById' function will return a configuration based on the
+	 * id passed in.
+	 * 
+	 * @Table 	configurations
+	 * 
+	 * @param	configId	This will hold the configuration id to find
+	 * 
+	 * @return	This function will return a single configuration object
+	 */
+	 @Override
+	 public configuration getConfigurationById(int configId) {
 	     return (configuration) sessionFactory.
 	      getCurrentSession().
 	      get(configuration.class, configId);
 	  }
-	  
+	 
+	 /**
+	 * The 'getConfigurationsByOrgId' function will return a list of configurations for the
+	 * organization id passed in
+	 * 
+	 * @Table 	configurations
+	 * 
+	 * @param	orgId	This will hold the organization id to find
+	 * 
+	 * @return	This function will return a list of configuration object
+	 */
 	  @Override
 	  @SuppressWarnings("unchecked")
 	  public List<configuration> getConfigurationsByOrgId(int orgId) {
@@ -38,13 +85,53 @@ public class configurationDAOImpl implements configurationDAO {
 	    return query.list();
 	  }
 	  
+	 /**
+	 * The 'getOrganizationByName' function will return a single organization based on
+	 * the name passed in.
+	 * 
+	 * @Table	organizations
+	 * 
+	 * @param	cleanURL	Will hold the 'clean' organization name from the url
+	 * 
+	 * @return	This function will return a single organization object
+	 */
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<configuration> getConfigurationByName(String configName) {
+	     Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configuration.class);  
+	     criteria.add(Restrictions.like("configName", configName));  
+	     return criteria.list();  
+	}
 	  
-	  @Override
-	  @SuppressWarnings("unchecked")
-	  public List<configuration> getConfigurations(int firstResults, int maxResults) {
+	/**
+	 * The 'getConfigurations' function will return a list of the configurations in the system
+	 * 
+	 * @Table	configurations
+	 * 
+	 * @param	page	This will hold the value of page being viewed (used for pagination)
+	 * 			maxResults	This will hold the value of the maximum number of results we want
+	 * 						to send back to the list page
+	 * 
+	 * @Return	This function will return a list of configuration objects
+	 */
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<configuration> getConfigurations(int page, int maxResults) {
 	      Query query = sessionFactory.getCurrentSession().createQuery("from configuration order by configName asc");
-	      query.setFirstResult(firstResults);
-	      query.setMaxResults(maxResults);
+	      
+	      //By default we want to return the first result
+		  int firstResult = 0;
+		  
+		 //If viewing a page other than the first we then need to figure out
+	     //which result to start with
+		 if(page > 1) {
+			firstResult = (maxResults*(page-1));
+		 }
+		 query.setFirstResult(firstResult);
+		 
+		 //Set the max results to display
+		 query.setMaxResults(maxResults);
+		  
 	      List<configuration> configurationList = query.list(); 
 	      return configurationList;	
   	}
@@ -97,7 +184,7 @@ public class configurationDAOImpl implements configurationDAO {
 	 * 
 	 * @Table	organizations
 	 * 
-	 * @param	maxResults	This will hold the value of the maxium number of results we want
+	 * @param	maxResults	This will hold the value of the maximum number of results we want
 	 * 						to send back to the page
 	 * 
 	 * @Return	This function will return a list of organization objects
@@ -112,6 +199,29 @@ public class configurationDAOImpl implements configurationDAO {
 		
 	    List<configuration> configurationList = query.list(); 
 	    return configurationList;	
+	}
+	
+	/**
+	 * The 'getTotalConnections' function will return the total number of active connections set up for a configuration.
+	 * 
+	 * @Table 	configurationCrosswalks
+	 * 
+	 * @param	configId 	The id of the configuration to find connections for.
+	 * 
+	 * @Return	The total number of active connections set up for a configurations
+	 * 
+	 */
+	@Override
+	public Long getTotalConnections(int configId) {
+		
+		Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT count(*) FROM configurationConnections where configId = :configId and status = 1")
+				.setParameter("configId", configId);
+		
+		BigInteger totalCount =  (BigInteger) query.uniqueResult();
+			
+		Long totalConnections = totalCount.longValue();
+		
+		return totalConnections;
 	}
 
 }

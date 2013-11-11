@@ -86,6 +86,12 @@ public class organizationManagerImpl implements organizationManager{
 	
 	@Override
 	@Transactional
+	public List<Organization> getAllActiveOrganizations() {
+		return organizationDAO.getAllActiveOrganizations();
+	}
+	
+	@Override
+	@Transactional
 	public Long findTotalOrgs() {
 	  return organizationDAO.findTotalOrgs();
 	}
