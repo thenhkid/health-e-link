@@ -122,7 +122,7 @@ public class messageTypeDAOImpl implements messageTypeDAO {
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public List<messageType>  getMessageTypes(int page, int maxResults) {
+	public List<messageType> getMessageTypes(int page, int maxResults) {
 		
 		Query query = sessionFactory.getCurrentSession().createQuery("from messageType order by name asc");
 		
@@ -152,7 +152,7 @@ public class messageTypeDAOImpl implements messageTypeDAO {
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public List<messageType>  getLatestMessageTypes(int maxResults) {
+	public List<messageType> getLatestMessageTypes(int maxResults) {
 		
 		Query query = sessionFactory.getCurrentSession().createQuery("from messageType order by dateCreated desc");
 	

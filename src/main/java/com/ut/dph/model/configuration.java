@@ -56,6 +56,9 @@ public class configuration {
 	  @Column(name="MESSAGETYPEID", nullable = false)
 	  private int messageTypeId = 0;
 	  
+	  @Column(name="STEPSCOMPLETED", nullable = false)
+	  private int stepsCompleted = 0;
+	  
 	  public int getId() {
 	    return id;
 	  }
@@ -142,5 +145,13 @@ public class configuration {
 	  
 	  public void setTotalConnections(Long totalConnections) {
 		  this.totalConnections = totalConnections;
+	  }
+	  
+	  public int getstepsCompleted() {
+		  return stepsCompleted;
+	  }
+	  
+	  public void setstepsCompleted(int stepsCompleted) {
+		  this.stepsCompleted = stepsCompleted;
 	  }
 }

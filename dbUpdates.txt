@@ -19,6 +19,27 @@ INSERT INTO `universalTranslator`.`ref_transportMethods` (`transportMethod`) VAL
 
 ALTER TABLE `universalTranslator`.`configurations` 
 ADD COLUMN `stepsCompleted` INT NOT NULL DEFAULT 0 AFTER `dateCreated`;
+
+/* Chad 11-12-2013 */
+ALTER TABLE `universalTranslator`.`configurationTransportDetails` 
+DROP FOREIGN KEY `filetypeId`,
+DROP FOREIGN KEY `fileDelimId`;
+
+
+ALTER TABLE `universalTranslator`.`configurationFieldMappings` 
+CHANGE COLUMN `sourceFieldNo` `configurationFieldId` INT(11) NOT NULL ,
+CHANGE COLUMN `targetFieldNo` `messageTypeFieldId` INT(11) NOT NULL ;
+
+ALTER TABLE `universalTranslator`.`configurationFormFields` 
+DROP COLUMN `saveToTableCol`,
+DROP COLUMN `saveToTableName`,
+ADD COLUMN `useField` BIT NOT NULL DEFAULT FALSE AFTER `bucketDspPos`,
+DROP INDEX `ffrefTableColId_idx` ,
+DROP INDEX `ffrefTableId_idx` ;
+
+ALTER TABLE `universalTranslator`.`configurationFormFields` 
+ADD COLUMN `fieldDesc` VARCHAR(255) NULL DEFAULT NULL AFTER `fieldNo`;
+ADD COLUMN `messageTypeFieldId` INT NOT NULL DEFAULT 0 AFTER `id`;
   
 
 

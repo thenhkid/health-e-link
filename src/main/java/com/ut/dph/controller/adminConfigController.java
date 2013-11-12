@@ -17,6 +17,8 @@ import org.springframework.web.servlet.view.RedirectView;
 import java.util.List;
 
 import com.ut.dph.model.configuration;
+import com.ut.dph.model.configurationFormFields;
+import com.ut.dph.model.messageTypeFormFields;
 import com.ut.dph.service.configurationManager;
 import com.ut.dph.model.Organization;
 import com.ut.dph.service.organizationManager;
@@ -57,12 +59,6 @@ public class adminConfigController {
 	 */
 	private static int maxResults = 20;
 	
-	/**
-	 * The private variable notavailable will hold the value if the configuration can
-	 * be set to active. This will only be set to FALSE after the 5th step (Connections)
-	 * has been completed.
-	 */
-	private static boolean notavailable = true;
 	
 	
 	/**
@@ -175,7 +171,6 @@ public class adminConfigController {
 		//Need to get a list of active message types
 		List<messageType> messageTypes = messagetypemanager.getActiveMessageTypes();
 		mav.addObject("messageTypes", messageTypes);
-		mav.addObject("notavailable", notavailable);
 		
 		return mav;
 		
@@ -214,8 +209,6 @@ public class adminConfigController {
 			//Need to get a list of active message types
 			mav.addObject("messageTypes", messageTypes);
 			
-			mav.addObject("notavailable", notavailable);
-			
 			return mav;
 		}
 		
@@ -231,8 +224,6 @@ public class adminConfigController {
 			
 			//Need to get a list of active message types
 			mav.addObject("messageTypes", messageTypes);
-			
-			mav.addObject("notavailable", notavailable);
 			
 			return mav;	
         }
@@ -271,6 +262,9 @@ public class adminConfigController {
 		configuration configurationDetails = configurationmanager.getConfigurationById(configId);
 		mav.addObject("configurationDetails", configurationDetails);
 		
+		//Set the variable to hold the number of completed steps for this configuration;
+		mav.addObject("completedSteps",configurationDetails.getstepsCompleted());
+		
 		//Need to get a list of active organizations.
 		List<Organization> organizations = organizationmanager.getAllActiveOrganizations();
 		mav.addObject("organizations", organizations);
@@ -279,16 +273,6 @@ public class adminConfigController {
 		List<messageType> messageTypes = messagetypemanager.getActiveMessageTypes();
 		mav.addObject("messageTypes", messageTypes);
 		mav.addObject("id", configId);
-		
-		//Test to see if connections have been made, if so set the ability to 
-		//set the Status of the configuration to TRUE
-		Long totalConnections = null;
-		totalConnections = (Long) configurationmanager.getTotalConnections(configId);
-		
-		if(totalConnections > 0) {
-			notavailable = false;
-		}
-		mav.addObject("notavailable", notavailable);
 		
 		return mav;
 		
@@ -315,15 +299,6 @@ public class adminConfigController {
 		//Need to get a list of active message types
 		List<messageType> messageTypes = messagetypemanager.getActiveMessageTypes();
 		
-		//Test to see if connections have been made, if so set the ability to 
-		//set the Status of the configuration to TRUE
-		Long totalConnections = null;
-		totalConnections = (Long) configurationmanager.getTotalConnections(configId);
-		
-		if(totalConnections > 0) {
-			notavailable = false;
-		}
-		
 		if(result.hasErrors()) {
 			ModelAndView mav = new ModelAndView();
 			mav.setViewName("/administrator/configurations/details");
@@ -332,7 +307,6 @@ public class adminConfigController {
 			mav.addObject("organizations", organizations);
 			//Need to get a list of active message types
 			mav.addObject("messageTypes", messageTypes);
-			mav.addObject("notavailable", notavailable);
 			mav.addObject("id", configId);
 			
 			return mav;
@@ -349,8 +323,7 @@ public class adminConfigController {
 			//Need to get a list of active organizations.
 			mav.addObject("organizations", organizations);			
 			//Need to get a list of active message types
-			mav.addObject("messageTypes", messageTypes);			
-			mav.addObject("notavailable", notavailable);
+			mav.addObject("messageTypes", messageTypes);
 			mav.addObject("id", configId);
 			mav.addObject("savedStatus","updated");
 			
@@ -372,7 +345,8 @@ public class adminConfigController {
 	 * 
 	 * @return		Will return the configuration transport details form
 	 * 
-	 * @Objects
+	 * @Objects		transportDetails will hold a empty object or an object containing the existing
+	 * 				transport details for the selected configuration
 	 * 
 	 * @throws Exception
 	 * 
@@ -390,10 +364,15 @@ public class adminConfigController {
 		//If no transport details have been saved then create new object;
 		if(transportDetails == null) {
 			transportDetails = new configurationTransport();
+			transportDetails.setconfigId(configId);
 		}
 		
 		mav.addObject("transportDetails", transportDetails);
 		mav.addObject("id",configId);
+		
+		configuration configurationDetails = configurationmanager.getConfigurationById(configId);
+		//Set the variable to hold the number of completed steps for this configuration;
+		mav.addObject("completedSteps",configurationDetails.getstepsCompleted());
 		
 		//Get the list of available transport methods
 		List transportMethods = configurationTransportManager.getTransportMethods();
@@ -403,7 +382,145 @@ public class adminConfigController {
 		List delimiters = messagetypemanager.getDelimiters();
 		mav.addObject("delimiters", delimiters);
 		
+		//Get the list of available file types
+		List fileTypes = configurationmanager.getFileTypes();
+		mav.addObject("fileTypes", fileTypes);
+		
 		return mav;
+		
+	}
+	
+	/**
+	 * The '/transport' POST request will submit the transport details
+	 * 
+	 * @param	transportDetails	Will contain the contents of the transport form
+	 * 
+	 * @return	This function will either return to the transport details screen or
+	 * 			redirect to the next step (Field Mappings)
+	 */
+	@RequestMapping(value="/transport", method = RequestMethod.POST)
+	public ModelAndView updateTransportDetails(@Valid @ModelAttribute(value="transportDetails") configurationTransport transportDetails, BindingResult result, RedirectAttributes redirectAttr,@RequestParam String action) throws Exception {
+		
+		//Need to update the configuration completed step
+		configurationmanager.updateCompletedSteps(transportDetails.getconfigId(), 2);
+		
+		//submit the updates
+		configurationTransportManager.updateTransportDetails(transportDetails);
+		
+		redirectAttr.addFlashAttribute("savedStatus", "updated");
+		
+		//If the "Save" button was pressed 
+		if(action.equals("save")) {
+			ModelAndView mav = new ModelAndView(new RedirectView("transport"));
+			return mav;
+		}
+		else {
+			ModelAndView mav = new ModelAndView(new RedirectView("mappings"));
+			return mav;
+		}
+		
+	}
+	
+	/**
+	 * The '/mappings' GET request will determine based on the selected transport method
+	 * what page to display. Either the choose fields page if 'online form' is selected
+	 * or 'mappings' if a custom file is being uploaded.
+	 */
+	@RequestMapping(value="/mappings", method = RequestMethod.GET)
+	public ModelAndView getConfigurationMappings() throws Exception {
+		ModelAndView mav = new ModelAndView();
+		
+		configuration configurationDetails = configurationmanager.getConfigurationById(configId);
+		
+		//Set the variable to hold the number of completed steps for this configuration;
+		mav.addObject("completedSteps",configurationDetails.getstepsCompleted());
+		
+		//Need to get the transport details
+		configurationTransport transportDetails = configurationTransportManager.getTransportDetails(configId);
+		List<configurationFormFields> fields = configurationTransportManager.getConfigurationFields(configId);
+		
+		//Set the selected transport method for the selected configuration
+		int transportMethod = transportDetails.gettransportMethod();
+		
+		//If transportMethod == 2 (Online Form) then send to the choose fields
+		//page. else send to the mappings page.
+		if(transportMethod == 2) {
+			mav.setViewName("/administrator/configurations/chooseFields");
+			
+			//If no fields have been set for this configuration and online form is
+			//chosen for the transport method we need to copy all form fields for
+			//the selected message type
+			if(fields.isEmpty()) {
+				//Need to copy message type fields over to the configuration fields table
+				configurationTransportManager.copyMessageTypeFields(configId, configurationDetails.getMessageTypeId());
+			}
+			
+			//Need to return a list of associated fields for the selected message type
+			List<configurationFormFields> copiedFields = configurationTransportManager.getConfigurationFields(configId);
+			transportDetails.setFields(copiedFields);
+			
+			mav.addObject("transportDetails", transportDetails);
+			
+			//Get the list of available field validation types
+			@SuppressWarnings("rawtypes")
+			List validationTypes = messagetypemanager.getValidationTypes();
+			mav.addObject("validationTypes", validationTypes);
+			
+		}
+		else {
+			mav.setViewName("/administrator/configurations/mappings");
+		}
+		
+		mav.addObject("id",configId);
+		
+		return mav;
+		
+	}
+	
+	
+	/**
+	 * The 'saveFields' POST method will submit the changes to the form field
+	 * settings for the selected configuration. This method is only for configurations
+	 * set for 'Online Form' as the data transportation method.
+	 * 
+	 * @param	transportDetails	The field details from the form
+	 * 			action				The field that will hold which button was pressed
+	 * 								"Save" or "Next Step"
+	 * 	
+	 * @return		This method will either redirect back to the Choose Fields page or
+	 * 				redirect to the next step data translations page.
+	 */
+	@RequestMapping(value="/saveFields", method = RequestMethod.POST)
+	public ModelAndView saveFormFields(@Valid @ModelAttribute(value="transportDetails") configurationTransport transportDetails, RedirectAttributes redirectAttr, @RequestParam String action) throws Exception {
+		
+		//Update the configuration completed step
+		configurationmanager.updateCompletedSteps(configId, 3);
+				
+		//Get the list of fields
+		List<configurationFormFields> fields = transportDetails.getFields();
+		
+		if(null != fields && fields.size() > 0) {
+			for(configurationFormFields formfield : fields) {
+				//Update each field
+				configurationTransportManager.updateConfigurationFormFields(formfield);
+			}
+		}
+		
+		//Populate the field Mappings table, this table will hold the relationship
+		//between the source field and the target field.
+		configurationTransportManager.populateConfigurationFieldMappings(configId);
+		
+		redirectAttr.addFlashAttribute("savedStatus", "updated");
+		
+		//If the "Save" button was pressed 
+		if(action.equals("save")) {
+			ModelAndView mav = new ModelAndView(new RedirectView("mappings"));
+			return mav;
+		}
+		else {
+			ModelAndView mav = new ModelAndView(new RedirectView("translations"));
+			return mav;
+		}
 		
 	}
 

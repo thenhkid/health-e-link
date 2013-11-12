@@ -19,6 +19,7 @@ public class configurationManagerImpl implements configurationManager {
 	  @Override
 	  @Transactional
 	  public Integer createConfiguration(configuration configuration) {
+		 configuration.setstepsCompleted(1);
 	     return configurationDAO.createConfiguration(configuration);
 	  }
 	  
@@ -74,6 +75,19 @@ public class configurationManagerImpl implements configurationManager {
 	  @Transactional
 	  public Long getTotalConnections(int configId) {
 		  return configurationDAO.getTotalConnections(configId);
+	  }
+	  
+	  @Override
+	  @Transactional
+	  public void updateCompletedSteps(int configId, int stepCompleted) {
+		  configurationDAO.updateCompletedSteps(configId, stepCompleted);
+	  }
+	  
+	  @SuppressWarnings("rawtypes")
+	  @Override
+	  @Transactional
+	  public List getFileTypes() {
+		  return configurationDAO.getFileTypes();
 	  }
 
 }

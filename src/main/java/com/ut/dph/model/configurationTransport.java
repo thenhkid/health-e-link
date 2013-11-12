@@ -1,5 +1,7 @@
 package com.ut.dph.model;
 
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -13,6 +15,9 @@ import org.springframework.web.multipart.commons.CommonsMultipartFile;
 @Entity
 @Table(name="CONFIGURATIONTRANSPORTDETAILS")
 public class configurationTransport {
+	
+	  @Transient
+	  private List<configurationFormFields> fields = null;
 	
 	  @Transient
 	  private CommonsMultipartFile file; 
@@ -128,5 +133,13 @@ public class configurationTransport {
 	  public void setFile(CommonsMultipartFile file) {  
 	 	this.file = file;  
 	  }  
+	  
+	  public List<configurationFormFields> getFields() {
+		  return fields;
+	  }
+	  
+	  public void setFields(List<configurationFormFields> fields) {
+		  this.fields = fields;
+	  }
 
 }

@@ -25,4 +25,10 @@ public interface configurationDAO {
   Long findTotalConfigs();
   
   Long getTotalConnections(int configId);
+  
+  void updateCompletedSteps(int configId, int stepCompleted);
+  
+  @SuppressWarnings("rawtypes")
+  List getFileTypes();
+  
 }

@@ -27,5 +27,10 @@ public interface configurationManager {
   
   Long getTotalConnections(int configId);
   
+  void updateCompletedSteps(int configId, int stepCompleted);
+  
+  @SuppressWarnings("rawtypes")
+  List getFileTypes();
+  
  
 }

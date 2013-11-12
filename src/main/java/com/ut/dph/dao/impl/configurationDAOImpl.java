@@ -9,6 +9,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ut.dph.dao.configurationDAO;
 import com.ut.dph.model.configuration;
@@ -222,6 +223,39 @@ public class configurationDAOImpl implements configurationDAO {
 		Long totalConnections = totalCount.longValue();
 		
 		return totalConnections;
+	}
+	
+	/**
+	 * The 'updateCompletedSteps' function will update the steps completed for a passe in
+	 * configurations. This column will be used to determine when you can activate a 
+	 * configuration and when you can access certain steps in the configuration creation
+	 * process.
+	 * 
+	 * @param	configId		This will hold the id of the configuration to update
+	 * 			stepCompleted	This will hold the completed step number
+	 */
+	@Override
+	@Transactional
+	public void updateCompletedSteps(int configId, int stepCompleted) {
+		
+		Query query = sessionFactory.getCurrentSession().createSQLQuery("UPDATE configurations set stepsCompleted = :stepCompleted where id = :configId")
+			 .setParameter("stepCompleted", stepCompleted)
+			 .setParameter("configId", configId);
+		
+		query.executeUpdate();
+	}
+	
+	/**
+	* The 'getFileTypes' function will return a list of available file types
+	* 
+	*/
+	@SuppressWarnings("rawtypes")
+	@Override
+	@Transactional
+	public List getFileTypes() {
+		Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT id, fileType FROM ref_fileTypes order by fileType asc");
+		
+		return query.list();
 	}
 
 }
