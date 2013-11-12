@@ -16,6 +16,9 @@ INSERT INTO `universalTranslator`.`ref_transportMethods` (`transportMethod`) VAL
 INSERT INTO `universalTranslator`.`ref_transportMethods` (`transportMethod`) VALUES ('Online Form');
 INSERT INTO `universalTranslator`.`ref_transportMethods` (`transportMethod`) VALUES ('Secure FTP');
 INSERT INTO `universalTranslator`.`ref_transportMethods` (`transportMethod`) VALUES ('JSON');
+
+ALTER TABLE `universalTranslator`.`configurations` 
+ADD COLUMN `stepsCompleted` INT NOT NULL DEFAULT 0 AFTER `dateCreated`;
   
 
 
