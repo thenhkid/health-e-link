@@ -423,6 +423,15 @@ public class organizationDAOImpl implements organizationDAO {
 	@Override
 	@SuppressWarnings("unchecked")
 	public void deleteOrganization(int orgId) {
+		//delete provider addresses
+		Query deleteProviderAddresses = sessionFactory.getCurrentSession().createQuery("delete from providerAddress where providerId in (select id from Provider where orgId = :orgId)");
+		deleteProviderAddresses.setParameter("orgId", orgId);
+		deleteProviderAddresses.executeUpdate();
+		
+		//delete the provider ids
+		Query deleteProviderIds = sessionFactory.getCurrentSession().createQuery("delete from providerIdNum where providerId in (select id from Provider where orgId = :orgId)");
+		deleteProviderIds.setParameter("orgId", orgId);
+		deleteProviderIds.executeUpdate();
 		
 		//Delete the providers
 		Query deleteProvider = sessionFactory.getCurrentSession().createQuery("delete from Provider where orgId = :orgId");
