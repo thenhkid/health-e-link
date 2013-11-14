@@ -9,15 +9,13 @@ public interface configurationTransportManager {
 	
 	configurationTransport getTransportDetails(int configId);
 	
-	void updateTransportDetails(configurationTransport transportDetails);
+	void updateTransportDetails(configurationTransport transportDetails, int clearFields);
 	
 	void copyMessageTypeFields(int configId, int messageTypeId);
 	
 	List<configurationFormFields> getConfigurationFields(int configId);
 	
 	void updateConfigurationFormFields(configurationFormFields formField);
-	
-	void populateConfigurationFieldMappings(int configId);
 	 
 	@SuppressWarnings("rawtypes")
 	List getTransportMethods();

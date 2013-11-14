@@ -9,6 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.validation.constraints.Digits;
 
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
@@ -20,7 +21,7 @@ public class configurationTransport {
 	  private List<configurationFormFields> fields = null;
 	
 	  @Transient
-	  private CommonsMultipartFile file; 
+	  private CommonsMultipartFile file = null; 
 	
 	  @Id
 	  @GeneratedValue(strategy = GenerationType.AUTO)
@@ -36,14 +37,16 @@ public class configurationTransport {
 	  @Column(name="FILENAME", nullable = true)
 	  private String fileName;
 	  
+	  @Digits(integer=4, fraction=0, message="Wrong Number")
 	  @Column(name="MESSAGETYPECOLNO", nullable = true)
-	  private int messageTypeColNo = 0;
+	  private int messageTypeColNo;
 	  
 	  @Column(name="MESSAGETYPECUSTOMVAL", nullable= true)
 	  private String messageTypeCustomVal = null;
 	  
+	  @Digits(integer=4, fraction=0, message="Wrong Number")
 	  @Column(name="TARGETORGCOLNO", nullable = true)
-	  private int targetOrgColNo = 0;
+	  private int targetOrgColNo;
 	  
 	  @Column(name="FILETYPE", nullable = false)
 	  private int fileType;

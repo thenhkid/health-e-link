@@ -46,7 +46,7 @@ public class messageTypeManagerImpl implements messageTypeManager {
 	@Transactional
 	public Integer createMessageType(messageType messageType) {
 		Integer lastId = null;
-		
+	
 		MultipartFile file = messageType.getFile(); 
 		String fileName = file.getOriginalFilename();
 		

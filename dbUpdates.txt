@@ -40,6 +40,12 @@ DROP INDEX `ffrefTableId_idx` ;
 ALTER TABLE `universalTranslator`.`configurationFormFields` 
 ADD COLUMN `fieldDesc` VARCHAR(255) NULL DEFAULT NULL AFTER `fieldNo`;
 ADD COLUMN `messageTypeFieldId` INT NOT NULL DEFAULT 0 AFTER `id`;
+
+ALTER TABLE `universalTranslator`.`configurationTransportDetails` 
+CHANGE COLUMN `fileType` `fileType` INT(11) NULL DEFAULT NULL ;
+
+/* Chad 11-14-2013 */
+DROP TABLE `universalTranslator`.`configurationFieldMappings`;
   
 
 

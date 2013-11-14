@@ -40,10 +40,24 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
 	 * details
 	 * 
 	 * @param	transportDetails	The details of the transport form
+	 * @param	clearFields			This will hold a variable that will determine if we clear out
+	 * 								existing configuration details.
 	 * 
 	 * @return	this function does not return anything
 	 */
-	public void updateTransportDetails(configurationTransport transportDetails) {
+	public void updateTransportDetails(configurationTransport transportDetails, int clearFields) {
+		
+		//if clearFields == 1 then we need to clear out the configuration form fields, mappings and data
+		//translations. This will allow the admin to change the configuration transport method after
+		//one was previously selected. This will only be available while the configuration is not active.
+		if(clearFields == 1) {
+			//Delete the existing form fields
+			Query deleteFields = sessionFactory.getCurrentSession().createSQLQuery("DELETE from configurationFormFields where configId = :configId");
+			deleteFields.setParameter("configId",transportDetails.getconfigId());
+			deleteFields.executeUpdate();
+			
+		}
+		
 		sessionFactory.getCurrentSession().saveOrUpdate(transportDetails);
 	}
 	
@@ -112,26 +126,5 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
 		sessionFactory.getCurrentSession().update(formField);
 	}
 	
-	/**
-	 * The 'populateConfigurationFieldMappings' function will submit the mappings between the source field id and 
-	 * the target field id. We will first remove the existing mappings for the selected configuration. This will 
-	 * help with updating what fields to use 
-	 * 
-	 * @param	configId	This will hold the id of the configuration to remove the field mappings for.
-	 * 
-	 * @return	This function does not return anything.
-	 */
-	public void populateConfigurationFieldMappings(int configId) {
-		//Delete the existing mappings
-		Query deleteMappings = sessionFactory.getCurrentSession().createSQLQuery("DELETE from configurationFieldMappings where configId = :configId");
-		deleteMappings.setParameter("configId",configId);
-		deleteMappings.executeUpdate();
-		
-		//Bulk insert the field mappings
-		Query query = sessionFactory.getCurrentSession().createSQLQuery("INSERT INTO configurationFieldMappings (configId, configurationFieldId, messageTypeFieldId) SELECT configId, id, messageTypeFieldId FROM configurationFormFields where configId = :configId");
-			  query.setParameter("configId", configId);
-			 
-		query.executeUpdate();
-	}
 	
 }

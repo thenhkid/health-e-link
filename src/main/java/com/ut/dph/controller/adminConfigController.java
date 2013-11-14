@@ -399,13 +399,15 @@ public class adminConfigController {
 	 * 			redirect to the next step (Field Mappings)
 	 */
 	@RequestMapping(value="/transport", method = RequestMethod.POST)
-	public ModelAndView updateTransportDetails(@Valid @ModelAttribute(value="transportDetails") configurationTransport transportDetails, BindingResult result, RedirectAttributes redirectAttr,@RequestParam String action) throws Exception {
+	public ModelAndView updateTransportDetails(@Valid @ModelAttribute(value="transportDetails") configurationTransport transportDetails, BindingResult result, RedirectAttributes redirectAttr,@RequestParam String action, @RequestParam int clearFields) throws Exception {
 		
 		//Need to update the configuration completed step
-		configurationmanager.updateCompletedSteps(transportDetails.getconfigId(), 2);
+		if(transportDetails.getconfigId() < 2) {
+			configurationmanager.updateCompletedSteps(transportDetails.getconfigId(), 2);
+		}
 		
 		//submit the updates
-		configurationTransportManager.updateTransportDetails(transportDetails);
+		configurationTransportManager.updateTransportDetails(transportDetails,clearFields);
 		
 		redirectAttr.addFlashAttribute("savedStatus", "updated");
 		
@@ -468,6 +470,15 @@ public class adminConfigController {
 			
 		}
 		else {
+			//Need to return a list of associated fields for the selected message type
+			List<configurationFormFields> uploadedFields = configurationTransportManager.getConfigurationFields(configId);
+			transportDetails.setFields(uploadedFields);
+			mav.addObject("transportDetails", transportDetails);
+			
+			//Need to return a list of selected template fields
+			List<messageTypeFormFields> templateFields = messagetypemanager.getMessageTypeFields(configurationDetails.getMessageTypeId());
+			mav.addObject("templateFields",templateFields);
+			
 			mav.setViewName("/administrator/configurations/mappings");
 		}
 		
@@ -494,21 +505,23 @@ public class adminConfigController {
 	public ModelAndView saveFormFields(@Valid @ModelAttribute(value="transportDetails") configurationTransport transportDetails, RedirectAttributes redirectAttr, @RequestParam String action) throws Exception {
 		
 		//Update the configuration completed step
-		configurationmanager.updateCompletedSteps(configId, 3);
+		if(transportDetails.getconfigId() < 3) {
+			configurationmanager.updateCompletedSteps(transportDetails.getconfigId(), 2);
+		}
 				
 		//Get the list of fields
 		List<configurationFormFields> fields = transportDetails.getFields();
 		
 		if(null != fields && fields.size() > 0) {
 			for(configurationFormFields formfield : fields) {
+				//If the message type field id is blank then set the use field to no
+				if(formfield.getmessageTypeFieldId() == 0) {
+					formfield.setUseField(false);
+				}
 				//Update each field
 				configurationTransportManager.updateConfigurationFormFields(formfield);
 			}
 		}
-		
-		//Populate the field Mappings table, this table will hold the relationship
-		//between the source field and the target field.
-		configurationTransportManager.populateConfigurationFieldMappings(configId);
 		
 		redirectAttr.addFlashAttribute("savedStatus", "updated");
 		

@@ -25,7 +25,7 @@ public class fileSystem {
 	    }
 	    //Mac
 	    else if (os.indexOf("mac") >= 0) {
-			this.dir = "/Users/chadmccue/bowlink/" + folderName + "/";
+			this.dir = "/Applications/bowlink/" + folderName + "/";
 	    }
 	    //Unix or Linux or Solarix
 	    else if (os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0 || os.indexOf("aix") >= 0 || os.indexOf("sunos") >= 0) {
@@ -40,7 +40,7 @@ public class fileSystem {
 	    }
 	    //Mac
 	    else if (os.indexOf("mac") >= 0) {
-			this.dir = "/Users/chadmccue/bowlink/" + folderName + "/crosswalks/";
+			this.dir = "/Applications/bowlink/" + folderName + "/crosswalks/";
 	    }
 	    //Unix or Linux or Solarix
 	    else if (os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0 || os.indexOf("aix") >= 0 || os.indexOf("sunos") >= 0) {
@@ -57,7 +57,7 @@ public class fileSystem {
 	   }
 	   //Mac
 	   else if (os.indexOf("mac") >= 0) {
-			this.dir = "/Users/chadmccue/bowlink/" + orgName + "/" + folderName + "/";
+			this.dir = "/Applications/bowlink/" + orgName + "/" + folderName + "/";
 	   }
 	   //Unix or Linux or Solarix
 	   else if (os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0 || os.indexOf("aix") >= 0 || os.indexOf("sunos") >= 0) {
@@ -77,7 +77,7 @@ public class fileSystem {
 				delete(directory);			} 
 			//Mac
 			else if (os.indexOf("mac") >= 0) {
-				String dir = "/Users/chadmccue/bowlink/" + orgName;
+				String dir = "/Applications/bowlink/" + orgName;
 				File directory = new File(dir);
 				delete(directory);
 			} 
@@ -118,15 +118,15 @@ public class fileSystem {
 			} 
 			//Mac
 			else if (os.indexOf("mac") >= 0) {
-				String dir = "/Users/chadmccue/bowlink/" + orgName;
+				String dir = "/Applications/bowlink/" + orgName;
 				File directory = new File(dir);
 				if (!directory.exists()) {
 	                directory.mkdir();
-	                new File("/Users/chadmccue/bowlink/" + orgName + "/crosswalks").mkdirs();
-	                new File("/Users/chadmccue/bowlink/" + orgName + "/input files").mkdirs();
-	                new File("/Users/chadmccue/bowlink/" + orgName + "/output files").mkdirs();
-	                new File("/Users/chadmccue/bowlink/" + orgName + "/templates").mkdirs();
-	                new File("/Users/chadmccue/bowlink/" + orgName + "/brochures").mkdirs();
+	                new File("/Applications/bowlink/" + orgName + "/crosswalks").mkdirs();
+	                new File("/Applications/bowlink/" + orgName + "/input files").mkdirs();
+	                new File("/Applications/bowlink/" + orgName + "/output files").mkdirs();
+	                new File("/Applications/bowlink/" + orgName + "/templates").mkdirs();
+	                new File("/Applications/bowlink/" + orgName + "/brochures").mkdirs();
 	            }
 			} 
 			//Unix or Linux or Solarix
@@ -192,7 +192,7 @@ public class fileSystem {
 	 * by the delimiter chosen when uploading the file.
 	 * 
 	 * @param fileName	The name of the file uploaded
-	 * @param delim		The delimiter choosen when uploading the file
+	 * @param delim		The delimiter chosen when uploading the file
 	 * 
 	 * @returns  The function will return 0 if no delimiter was found
 	 *			 or the count of the delimiter
