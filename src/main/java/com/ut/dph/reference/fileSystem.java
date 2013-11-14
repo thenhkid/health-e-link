@@ -14,6 +14,10 @@ public class fileSystem {
 	
 	String dir = null;
 	
+	String macDirectoryPath = "/Applications/bowlink/";
+	String winDirectoryPath = "c:\\bowlink\\";
+	String unixDirectoryPath = "/home/bowlink/";
+	
 	public String getDir() {
 		return dir;
 	}
@@ -21,30 +25,30 @@ public class fileSystem {
 	public void setMessageTypeDir(String folderName) {
 		//Windows
 	    if (os.indexOf("win") >= 0) {
-		  this.dir = "c:\\bowlink\\" + folderName + "\\";
+		  this.dir = winDirectoryPath + folderName + "\\";
 	    }
 	    //Mac
 	    else if (os.indexOf("mac") >= 0) {
-			this.dir = "/Applications/bowlink/" + folderName + "/";
+			this.dir = macDirectoryPath + folderName + "/";
 	    }
 	    //Unix or Linux or Solarix
 	    else if (os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0 || os.indexOf("aix") >= 0 || os.indexOf("sunos") >= 0) {
-		  this.dir = "/home/bowlink/" + folderName + "/";
+		  this.dir = unixDirectoryPath + folderName + "/";
 	    }
 	}
 	
 	public void setMessageTypeCrosswalksDir(String folderName) {
 		//Windows
 	    if (os.indexOf("win") >= 0) {
-		  this.dir = "c:\\bowlink\\" + folderName + "\\crosswalks\\";
+		  this.dir = winDirectoryPath + folderName + "\\crosswalks\\";
 	    }
 	    //Mac
 	    else if (os.indexOf("mac") >= 0) {
-			this.dir = "/Applications/bowlink/" + folderName + "/crosswalks/";
+			this.dir = macDirectoryPath + folderName + "/crosswalks/";
 	    }
 	    //Unix or Linux or Solarix
 	    else if (os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0 || os.indexOf("aix") >= 0 || os.indexOf("sunos") >= 0) {
-		  this.dir = "/home/bowlink/" + folderName + "/crosswalks/";
+		  this.dir = unixDirectoryPath + folderName + "/crosswalks/";
 	    }
 	}
 	
@@ -53,15 +57,15 @@ public class fileSystem {
 	
 	   //Windows
 	   if (os.indexOf("win") >= 0) {
-		  this.dir = "c:\\bowlink\\" + orgName + "\\" + folderName + "\\";
+		  this.dir = winDirectoryPath + orgName + "\\" + folderName + "\\";
 	   }
 	   //Mac
 	   else if (os.indexOf("mac") >= 0) {
-			this.dir = "/Applications/bowlink/" + orgName + "/" + folderName + "/";
+			this.dir = macDirectoryPath + orgName + "/" + folderName + "/";
 	   }
 	   //Unix or Linux or Solarix
 	   else if (os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0 || os.indexOf("aix") >= 0 || os.indexOf("sunos") >= 0) {
-		  this.dir = "/home/bowlink/" + orgName + "/" + folderName + "/";
+		  this.dir = unixDirectoryPath + orgName + "/" + folderName + "/";
 	   }
 		
 	}
@@ -72,18 +76,18 @@ public class fileSystem {
 			//Windows
 			if (os.indexOf("win") >= 0) {
 				//C:/BowLink/
-				String dir = "c:\\bowlink\\" +orgName;
+				String dir = winDirectoryPath +orgName;
 				File directory = new File(dir);
 				delete(directory);			} 
 			//Mac
 			else if (os.indexOf("mac") >= 0) {
-				String dir = "/Applications/bowlink/" + orgName;
+				String dir = macDirectoryPath + orgName;
 				File directory = new File(dir);
 				delete(directory);
 			} 
 			//Unix or Linux or Solarix
 			else if (os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0 || os.indexOf("aix") >= 0 || os.indexOf("sunos") >= 0) {
-				String dir = "/home/bowlink/" + orgName;
+				String dir = unixDirectoryPath + orgName;
 				File directory = new File(dir);
 				delete(directory);
 			} 
@@ -105,41 +109,41 @@ public class fileSystem {
 			//Windows
 			if (os.indexOf("win") >= 0) {
 				//C:/BowLink/
-				String dir = "c:\\bowlink\\" +orgName;
+				String dir = winDirectoryPath +orgName;
 				File directory = new File(dir);
 				if (!directory.exists()) {
 	                directory.mkdir();
-	                new File("c:\\bowlink\\" + orgName + "\\crosswalks").mkdirs();
-	                new File("c:\\bowlink\\" + orgName + "\\input files").mkdirs();
-	                new File("c:\\bowlink\\" + orgName + "\\output files").mkdirs();
-	                new File("c:\\bowlink\\" + orgName + "\\templates").mkdirs();
-	                new File("c:\\bowlink\\" + orgName + "\\brochures").mkdirs();
+	                new File(winDirectoryPath + orgName + "\\crosswalks").mkdirs();
+	                new File(winDirectoryPath + orgName + "\\input files").mkdirs();
+	                new File(winDirectoryPath + orgName + "\\output files").mkdirs();
+	                new File(winDirectoryPath + orgName + "\\templates").mkdirs();
+	                new File(winDirectoryPath + orgName + "\\brochures").mkdirs();
 	            }
 			} 
 			//Mac
 			else if (os.indexOf("mac") >= 0) {
-				String dir = "/Applications/bowlink/" + orgName;
+				String dir = macDirectoryPath + orgName;
 				File directory = new File(dir);
 				if (!directory.exists()) {
 	                directory.mkdir();
-	                new File("/Applications/bowlink/" + orgName + "/crosswalks").mkdirs();
-	                new File("/Applications/bowlink/" + orgName + "/input files").mkdirs();
-	                new File("/Applications/bowlink/" + orgName + "/output files").mkdirs();
-	                new File("/Applications/bowlink/" + orgName + "/templates").mkdirs();
-	                new File("/Applications/bowlink/" + orgName + "/brochures").mkdirs();
+	                new File(macDirectoryPath + orgName + "/crosswalks").mkdirs();
+	                new File(macDirectoryPath + orgName + "/input files").mkdirs();
+	                new File(macDirectoryPath + orgName + "/output files").mkdirs();
+	                new File(macDirectoryPath + orgName + "/templates").mkdirs();
+	                new File(macDirectoryPath + orgName + "/brochures").mkdirs();
 	            }
 			} 
 			//Unix or Linux or Solarix
 			else if (os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0 || os.indexOf("aix") >= 0 || os.indexOf("sunos") >= 0) {
-				String dir = "/home/bowlink/" + orgName;
+				String dir = unixDirectoryPath + orgName;
 				File directory = new File(dir);
 				if (!directory.exists()) {
 	                directory.mkdir();
-	                new File("/home/bowlink/" + orgName + "/crosswalks").mkdirs();
-	                new File("/home/bowlink/" + orgName + "/input files").mkdirs();
-	                new File("/home/bowlink/" + orgName + "/output files").mkdirs();
-	                new File("/home/bowlink/" + orgName + "/templates").mkdirs();
-	                new File("/home/bowlink/" + orgName + "/brochures").mkdirs();
+	                new File(unixDirectoryPath + orgName + "/crosswalks").mkdirs();
+	                new File(unixDirectoryPath + orgName + "/input files").mkdirs();
+	                new File(unixDirectoryPath + orgName + "/output files").mkdirs();
+	                new File(unixDirectoryPath + orgName + "/templates").mkdirs();
+	                new File(unixDirectoryPath + orgName + "/brochures").mkdirs();
 	            }
 			} 
 			else {
