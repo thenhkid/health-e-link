@@ -450,27 +450,16 @@ public class organizationDAOImpl implements organizationDAO {
 			int brochureId = brochures.get(i).getId();
 			brochureManager.deleteBrochure(brochureId);
 		}
-		
-		//Find all the users associated to the organization to be deleted
-		Query findUsers = sessionFactory.getCurrentSession().createQuery("from User where orgId = :orgId");
-		findUsers.setParameter("orgId",orgId);
-		
-		List<User> users = findUsers.list();
-		
-		//Loop through all the users.
-		for(int i = 0; i<users.size();i++) {
-			int userId = users.get(i).getId();
+	
+		//Delete the logins for the users associated to the organization to be deleted.
+		Query deleteLogins = sessionFactory.getCurrentSession().createQuery("delete from userLogin where userId in (select id from User where orgId = :orgId");
+		deleteLogins.setParameter("orgId",orgId);
+		deleteLogins.executeUpdate();
 			
-			//Delete the logins for the users associated to the organization to be deleted.
-			Query deleteLogins = sessionFactory.getCurrentSession().createQuery("delete from userLogin where userId = :userId");
-			deleteLogins.setParameter("userId",userId);
-			deleteLogins.executeUpdate();
-			
-			//Delete the user access entries for the users associated to the organization to be deleted.
-			Query deleteuserFeatures = sessionFactory.getCurrentSession().createQuery("delete from userAccess where userId = :userId");
-			deleteuserFeatures.setParameter("userId",userId);
-			deleteuserFeatures.executeUpdate();
-		}
+		//Delete the user access entries for the users associated to the organization to be deleted.
+		Query deleteuserFeatures = sessionFactory.getCurrentSession().createQuery("delete from userAccess where userId in (select id from User where orgId = :orgId");
+		deleteuserFeatures.setParameter("orgId",orgId);
+		deleteuserFeatures.executeUpdate();
 		
 		//Delete all users associated to the organization
 		Query deleteUser = sessionFactory.getCurrentSession().createQuery("delete from User where orgId = :orgId");
