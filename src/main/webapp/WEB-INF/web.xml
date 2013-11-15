@@ -62,7 +62,7 @@
     </filter-mapping>
     
     
-    <!-- quartz -->
+    <!-- quartz 
      <context-param>
          <param-name>quartz:config-file</param-name>
          <param-value>quartz.properties</param-value>
@@ -84,6 +84,7 @@
              org.quartz.ee.servlet.QuartzInitializerListener
          </listener-class>
      </listener>
+     -->
 <!--  end of quartz --> 
 
 </web-app>
