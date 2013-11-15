@@ -1,18 +1,23 @@
 package com.ut.dph.dao.impl;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ut.dph.dao.configurationDAO;
+import com.ut.dph.model.Organization;
 import com.ut.dph.model.configuration;
+import com.ut.dph.model.configurationTransport;
+import com.ut.dph.model.messageType;
 
 @Service
 public class configurationDAOImpl implements configurationDAO {
@@ -153,17 +158,52 @@ public class configurationDAOImpl implements configurationDAO {
 	@SuppressWarnings("unchecked")
 	public List<configuration> findConfigurations(String searchTerm) {
 		
-	    Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configuration.class)
-	        .createAlias("Organization","orgs")
-	        .createAlias("messageType","msgTypes")
-	    	.add(Restrictions.or(
-	    			Restrictions.like("configName", "%"+searchTerm+"%"),
-	     			Restrictions.like("orgs.orgName", "%"+searchTerm+"%"),
-	     			Restrictions.like("msgTypes.messageTypeName", "%"+searchTerm+"%")
+		if(searchTerm != "") {
+			//get a list of organization id's that match the term passed in
+			List <Integer> orgIdList = new ArrayList<Integer>();
+			Criteria findOrgs = sessionFactory.getCurrentSession().createCriteria(Organization.class);  
+			findOrgs.add(Restrictions.like("orgName", "%"+searchTerm+"%"));  
+		    List<Organization> orgs = findOrgs.list();
+		    
+		    for(Organization org : orgs) {
+		    	orgIdList.add(org.getId());
+			}
+		    
+		    //get a list of message type id's that match the term passed in
+		    List <Integer> msgTypeIdList = new ArrayList<Integer>();
+		    Criteria findMsgTypes = sessionFactory.getCurrentSession().createCriteria(messageType.class);
+		    findMsgTypes.add(Restrictions.like("name", "%"+searchTerm+"%"));
+		    List<messageType> msgTypes = findMsgTypes.list();
+		    
+		    for(messageType msgType : msgTypes) {
+		    	msgTypeIdList.add(msgType.getId());
+			}
+		   
+		    Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configuration.class);
+		    
+		    if(orgIdList.size() == 0) {
+		    	orgIdList.add(0);
+		    }
+		    if(msgTypeIdList.size() == 0) {
+		    	msgTypeIdList.add(0);
+		    }
+		    
+		    criteria.add(Restrictions.or(
+		    		Restrictions.in("orgId", orgIdList),
+		    		Restrictions.in("messageTypeId",msgTypeIdList)
 	     		)
-	     	);
-	     
-	     return criteria.list();  
+	     	)
+	     	.addOrder(Order.desc("dateCreated"));
+		    
+		    return criteria.list();  
+		}
+		else {
+			Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configuration.class);
+			criteria.addOrder(Order.desc("dateCreated"));
+			return criteria.list();  
+		}
+	   
+	    
 	}
 	  
 	 /**

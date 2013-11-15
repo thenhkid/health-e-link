@@ -144,6 +144,10 @@ public class adminConfigController {
         	
         	messagetype = messagetypemanager.getMessageTypeById(config.getMessageTypeId());
         	config.setMessageTypeName(messagetype.getName());
+        	
+        	Long totalConnections = null;
+    		totalConnections = (Long) configurationmanager.getTotalConnections(configId);
+    		config.setTotalConnections(totalConnections);
         }
         
         return mav;
