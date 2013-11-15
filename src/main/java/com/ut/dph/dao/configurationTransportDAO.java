@@ -7,11 +7,9 @@ import com.ut.dph.model.configurationTransport;
 
 public interface configurationTransportDAO {
 	
-	configurationTransport getTransportDetails(int configId);
+	List<configurationTransport> getTransportDetails(int configId);
 	
-	void updateTransportDetails(configurationTransport transportDetails, int clearFields);
-	
-	void copyMessageTypeFields(int configId, int messageTypeId);
+	Integer updateTransportDetails(configurationTransport transportDetails, int clearFields);
 	
 	List<configurationFormFields> getConfigurationFields(int configId);
 	
@@ -19,5 +17,7 @@ public interface configurationTransportDAO {
 	
 	@SuppressWarnings("rawtypes")
 	List getTransportMethods();
+	
+	void setupOnlineForm(int configId, int messageTypeId);
 
 }

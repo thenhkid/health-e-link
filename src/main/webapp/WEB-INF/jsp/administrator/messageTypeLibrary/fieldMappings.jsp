@@ -6,10 +6,7 @@
 <c:set var="endDspPostLoop" value="1" />
 
 <!-- Need to calculate how many fields for current section -->
-<c:set var="totalFieldsBucket1" value="0" />
-<c:set var="totalFieldsBucket2" value="0" />
-<c:set var="totalFieldsBucket3" value="0" />
-<c:set var="totalFieldsBucket4" value="0" />
+<c:set var="totalFieldsBucket1, totalFieldsBucket2, totalFieldsBucket4, totalFieldsBucket4" value="0" />
 <c:forEach items="${messageTypeDetails.fields}" var="mappings" varStatus="field">
 	<c:if test="${mappings.bucketNo == 1}">
 		<c:set var="totalFieldsBucket1" value="${totalFieldsBucket1+1}" />
@@ -42,7 +39,7 @@
 				<div class="panel-heading">
 					<dt>
 						<dd>
-							<strong>Bucket ${i} <c:choose><c:when test="${i==1}">(Sender Information)</c:when><c:when test="${i==2}">(Recipient Information)</c:when><c:when test="${i==3}">(Patient Information)</c:when><c:when test="${i==4}">(Other)</c:when></c:choose></strong>
+							<strong>Bucket ${i} <c:choose><c:when test="${i==1}"> (Sender Information)</c:when><c:when test="${i==2}"> (Recipient Information)</c:when><c:when test="${i==3}"> (Patient Information)</c:when><c:when test="${i==4}"> (Other)</c:when></c:choose></strong>
 						</dd>
 					</dt>
 				</div>

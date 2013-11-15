@@ -1,6 +1,7 @@
 package com.ut.dph.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 
 import javax.validation.Valid;
 
@@ -10,10 +11,12 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.ut.dph.model.configuration;
@@ -58,8 +61,6 @@ public class adminConfigController {
 	 * list page.
 	 */
 	private static int maxResults = 20;
-	
-	
 	
 	/**
 	 *  The '/list' GET request will serve up the existing list of configurations
@@ -125,7 +126,7 @@ public class adminConfigController {
 	 * @throws Exception
 	 */
 	@RequestMapping(value="/list", method = RequestMethod.POST)
-	public ModelAndView findConfigurtions(@RequestParam String searchTerm) throws Exception {
+	public ModelAndView findConfigurations(@RequestParam String searchTerm) throws Exception {
 		
 		ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/configurations/list");
@@ -212,26 +213,15 @@ public class adminConfigController {
 			return mav;
 		}
 		
-		List<configuration> existing = configurationmanager.getConfigurationByName(configurationDetails.getConfigName());
-	    if (!existing.isEmpty()) {
-        	ModelAndView mav = new ModelAndView();
-			mav.setViewName("/administrator/configurations/details");
-			mav.addObject("id",configurationDetails.getId());
-			mav.addObject("existingConfig","configuration "+configurationDetails.getConfigName()+" already exists.");
-			
-			//Need to get a list of active organizations.
-			mav.addObject("organizations", organizations);
-			
-			//Need to get a list of active message types
-			mav.addObject("messageTypes", messageTypes);
-			
-			return mav;	
-        }
-		
 		Integer id = null;
 		id = (Integer) configurationmanager.createConfiguration(configurationDetails);
 		
 		configId = id;
+		
+		//Need to set up the online form transport method
+		//setupOnlineForm(configId,messageTypeId)
+		configurationTransportManager.setupOnlineForm(configId,configurationDetails.getMessageTypeId());
+		
 		redirectAttr.addFlashAttribute("savedStatus", "created");
 		ModelAndView mav = new ModelAndView(new RedirectView("details"));
 		return mav;	
@@ -359,24 +349,32 @@ public class adminConfigController {
 		mav.setViewName("/administrator/configurations/transport");
 		
 		//Get the transport details
-		configurationTransport transportDetails = configurationTransportManager.getTransportDetails(configId);
+		List<configurationTransport> transportDetails = configurationTransportManager.getTransportDetails(configId);
 		
-		//If no transport details have been saved then create new object;
-		if(transportDetails == null) {
-			transportDetails = new configurationTransport();
-			transportDetails.setconfigId(configId);
-		}
-		
-		mav.addObject("transportDetails", transportDetails);
+		//Set the variable id to hold the current configuration id
 		mav.addObject("id",configId);
 		
+		//Get the configuration details for the selected config
 		configuration configurationDetails = configurationmanager.getConfigurationById(configId);
+		configurationDetails.setTransportDetails(transportDetails);
+		
+		//pass the configuration detail object back to the page.
+		mav.addObject("configurationDetails", configurationDetails);
+		
 		//Set the variable to hold the number of completed steps for this configuration;
 		mav.addObject("completedSteps",configurationDetails.getstepsCompleted());
 		
 		//Get the list of available transport methods
 		List transportMethods = configurationTransportManager.getTransportMethods();
 		mav.addObject("transportMethods", transportMethods);
+		
+		//Set a list of transport methods already set up for the configuration
+		List <Integer> transportList = new ArrayList<Integer>();
+		
+		for(configurationTransport details : transportDetails) {
+			transportList.add(details.gettransportMethod());
+		}
+		mav.addObject("usedTransportMethods",transportList);
 		
 		//Get the list of available file delimiters
 		List delimiters = messagetypemanager.getDelimiters();
@@ -391,6 +389,29 @@ public class adminConfigController {
 	}
 	
 	/**
+	 * The 'addTransportMethod.do' POST request will associate the configuration to the selected
+	 * transport Method.
+	 * 
+	 * @param	configId			The configId will hold the id of the current configuration
+	 * @param	transportMethod		The transportMethod will hold the selected transport method
+	 * 
+	 * @return	The method will return a 1 back to the calling ajax function which will handle the
+	 * 			page load.
+	 */
+	@RequestMapping(value="/addTransportMethod.do", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody Integer addNewTransportMethod(@RequestParam int configId, @RequestParam int transportMethod, RedirectAttributes redirectAttr) throws Exception {
+		
+		configurationTransport transportDetails = new configurationTransport();
+		transportDetails.setconfigId(configId);
+		transportDetails.settransportMethod(transportMethod);
+		transportDetails.setFile(null);
+		
+		configurationTransportManager.updateTransportDetails(transportDetails);
+		
+		return 1;
+	}
+	
+	/**
 	 * The '/transport' POST request will submit the transport details
 	 * 
 	 * @param	transportDetails	Will contain the contents of the transport form
@@ -399,15 +420,19 @@ public class adminConfigController {
 	 * 			redirect to the next step (Field Mappings)
 	 */
 	@RequestMapping(value="/transport", method = RequestMethod.POST)
-	public ModelAndView updateTransportDetails(@Valid @ModelAttribute(value="transportDetails") configurationTransport transportDetails, BindingResult result, RedirectAttributes redirectAttr,@RequestParam String action, @RequestParam int clearFields) throws Exception {
+	public ModelAndView updateTransportDetails(@Valid @ModelAttribute(value="transportDetails") configuration configurationDetails, BindingResult result, RedirectAttributes redirectAttr,@RequestParam String action) throws Exception {
 		
 		//Need to update the configuration completed step
-		if(transportDetails.getconfigId() < 2) {
-			configurationmanager.updateCompletedSteps(transportDetails.getconfigId(), 2);
+		if(configurationDetails.getstepsCompleted() < 2) {
+			configurationmanager.updateCompletedSteps(configId,2);
 		}
 		
-		//submit the updates
-		configurationTransportManager.updateTransportDetails(transportDetails,clearFields);
+		List<configurationTransport> details = configurationDetails.getTransportDetails();
+		
+		for(configurationTransport transport : details) {
+			//submit the updates
+			configurationTransportManager.updateTransportDetails(transport);
+		}
 		
 		redirectAttr.addFlashAttribute("savedStatus", "updated");
 		
@@ -449,13 +474,6 @@ public class adminConfigController {
 		if(transportMethod == 2) {
 			mav.setViewName("/administrator/configurations/chooseFields");
 			
-			//If no fields have been set for this configuration and online form is
-			//chosen for the transport method we need to copy all form fields for
-			//the selected message type
-			if(fields.isEmpty()) {
-				//Need to copy message type fields over to the configuration fields table
-				configurationTransportManager.copyMessageTypeFields(configId, configurationDetails.getMessageTypeId());
-			}
 			
 			//Need to return a list of associated fields for the selected message type
 			List<configurationFormFields> copiedFields = configurationTransportManager.getConfigurationFields(configId);

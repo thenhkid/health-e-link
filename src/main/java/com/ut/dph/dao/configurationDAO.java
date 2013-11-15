@@ -31,4 +31,6 @@ public interface configurationDAO {
   @SuppressWarnings("rawtypes")
   List getFileTypes();
   
+  
+  
 }

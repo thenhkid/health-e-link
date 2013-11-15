@@ -1,3 +1,0 @@
-
-Need to hide processing code from source file.
-	- example top of the fieldMappings.jsp page

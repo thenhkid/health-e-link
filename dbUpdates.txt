@@ -46,6 +46,19 @@ CHANGE COLUMN `fileType` `fileType` INT(11) NULL DEFAULT NULL ;
 
 /* Chad 11-14-2013 */
 DROP TABLE `universalTranslator`.`configurationFieldMappings`;
+
+ALTER TABLE `universalTranslator`.`configurations` 
+DROP COLUMN `configName`;
+
+ALTER TABLE `universalTranslator`.`configurationFormFields` 
+ADD COLUMN `transportDetailId` INT NOT NULL AFTER `configId`,
+ADD INDEX `formtransportDetailId_idx` (`transportDetailId` ASC);
+ALTER TABLE `universalTranslator`.`configurationFormFields` 
+ADD CONSTRAINT `formtransportDetailId`
+  FOREIGN KEY (`transportDetailId`)
+  REFERENCES `universalTranslator`.`configurationTransportDetails` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
   
 
 

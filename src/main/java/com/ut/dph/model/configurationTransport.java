@@ -35,24 +35,24 @@ public class configurationTransport {
 	  private int transportMethod;
 	  
 	  @Column(name="FILENAME", nullable = true)
-	  private String fileName;
+	  private String fileName = null;
 	  
 	  @Digits(integer=4, fraction=0, message="Wrong Number")
 	  @Column(name="MESSAGETYPECOLNO", nullable = true)
-	  private int messageTypeColNo;
+	  private int messageTypeColNo = 0;
 	  
 	  @Column(name="MESSAGETYPECUSTOMVAL", nullable= true)
 	  private String messageTypeCustomVal = null;
 	  
 	  @Digits(integer=4, fraction=0, message="Wrong Number")
 	  @Column(name="TARGETORGCOLNO", nullable = true)
-	  private int targetOrgColNo;
+	  private int targetOrgColNo = 0;
 	  
-	  @Column(name="FILETYPE", nullable = false)
-	  private int fileType;
+	  @Column(name="FILETYPE", nullable = true)
+	  private int fileType = 0;
 	  
-	  @Column(name="FILEDELIMITER", nullable = false)
-	  private int fileDelimiter;
+	  @Column(name="FILEDELIMITER", nullable = true)
+	  private int fileDelimiter = 0;
 	  
 	  @Column(name="CONTAINSHEADER", nullable = false)
 	  private boolean containsHeader = false;
@@ -143,6 +143,14 @@ public class configurationTransport {
 	  
 	  public void setFields(List<configurationFormFields> fields) {
 		  this.fields = fields;
+	  }
+	  
+	  public boolean getcontainsHeader() {
+		  return containsHeader;
+	  }
+	  
+	  public void setcontainsHeader(boolean containsHeader) {
+		  this.containsHeader = containsHeader;
 	  }
 
 }

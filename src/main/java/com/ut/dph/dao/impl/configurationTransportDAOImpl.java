@@ -29,11 +29,29 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
 	 * 
 	 * @Return	This function will return a configurationTransport object
 	 */
-	public configurationTransport getTransportDetails(int configId) {
-		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configurationTransport.class);  
-	    criteria.add(Restrictions.like("configId", configId));  
-	    return (configurationTransport) criteria.uniqueResult();  
+	@SuppressWarnings("unchecked")
+	public List<configurationTransport> getTransportDetails(int configId) {
+	    Query query = sessionFactory.getCurrentSession().createQuery("from configurationTransport where configId = :configId");
+	    query.setParameter("configId", configId);
+	    return query.list();
  	}
+	
+	/**
+	 * 
+	 */
+	@Override
+	public void setupOnlineForm(int configId, int messageTypeId) {
+		int transportId = 0;
+		
+		configurationTransport transportDetails = new configurationTransport();
+		transportDetails.settransportMethod(2);
+		transportDetails.setconfigId(configId);
+		
+		transportId = (Integer) sessionFactory.getCurrentSession().save(transportDetails);
+		
+		copyMessageTypeFields(configId, messageTypeId, transportId);
+	}
+	
 	
 	/**
 	 * The 'updateTransportDetails' function will update the configuration transport
@@ -45,20 +63,29 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
 	 * 
 	 * @return	this function does not return anything
 	 */
-	public void updateTransportDetails(configurationTransport transportDetails, int clearFields) {
+	public Integer updateTransportDetails(configurationTransport transportDetails, int clearFields) {
 		
 		//if clearFields == 1 then we need to clear out the configuration form fields, mappings and data
 		//translations. This will allow the admin to change the configuration transport method after
 		//one was previously selected. This will only be available while the configuration is not active.
 		if(clearFields == 1) {
 			//Delete the existing form fields
-			Query deleteFields = sessionFactory.getCurrentSession().createSQLQuery("DELETE from configurationFormFields where configId = :configId");
+			Query deleteFields = sessionFactory.getCurrentSession().createSQLQuery("DELETE from configurationFormFields where configId = :configId and transportDetailId = :transportDetailId");
 			deleteFields.setParameter("configId",transportDetails.getconfigId());
+			deleteFields.setParameter("transportDetailId", transportDetails.getId());
 			deleteFields.executeUpdate();
 			
 		}
 		
-		sessionFactory.getCurrentSession().saveOrUpdate(transportDetails);
+		if(transportDetails.getId() > 0) {
+			sessionFactory.getCurrentSession().update(transportDetails);
+			return transportDetails.getId();
+		}
+		else {
+			int detailId = (Integer) sessionFactory.getCurrentSession().save(transportDetails);
+			return detailId;
+		}
+		
 	}
 	
 	/**
@@ -83,11 +110,11 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
 	 * 
 	 * @return	This function does not return anything
 	 */
-	@Override
 	@Transactional
-	public void copyMessageTypeFields(int configId, int messageTypeId) {
-		Query query = sessionFactory.getCurrentSession().createSQLQuery("INSERT INTO configurationFormFields (messageTypeFieldId, configId, fieldNo, fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos) SELECT id, :configId, fieldNo,  fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos FROM messageTypeFormFields where messageTypeId = :messageTypeId");
+	public void copyMessageTypeFields(int configId, int messageTypeId, int transportDetailId) {
+		Query query = sessionFactory.getCurrentSession().createSQLQuery("INSERT INTO configurationFormFields (messageTypeFieldId, configId, transportDetailId, fieldNo, fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, useField) SELECT id, :configId, :transportDetailId, fieldNo,  fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, 1 FROM messageTypeFormFields where messageTypeId = :messageTypeId");
 			  query.setParameter("configId",configId);
+			  query.setParameter("transportDetailId", transportDetailId);
 			  query.setParameter("messageTypeId",messageTypeId);
 		
 		query.executeUpdate();

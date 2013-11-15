@@ -28,6 +28,7 @@ public class configurationManagerImpl implements configurationManager {
 	  public void updateConfiguration(configuration configuration) {
 		  configurationDAO.updateConfiguration(configuration);
 	  }
+	 
 	
 	  @Override
 	  @Transactional

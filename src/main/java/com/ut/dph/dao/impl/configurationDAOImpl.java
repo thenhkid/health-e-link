@@ -51,6 +51,7 @@ public class configurationDAOImpl implements configurationDAO {
 		sessionFactory.getCurrentSession().update(configuration);
 	}
 	
+	
 	/**
 	 * The 'getConfigurationById' function will return a configuration based on the
 	 * id passed in.
@@ -81,7 +82,7 @@ public class configurationDAOImpl implements configurationDAO {
 	  @Override
 	  @SuppressWarnings("unchecked")
 	  public List<configuration> getConfigurationsByOrgId(int orgId) {
-	    Query query = sessionFactory.getCurrentSession().createQuery("from configuration where orgId = :orgId order by configName asc");
+	    Query query = sessionFactory.getCurrentSession().createQuery("from configuration where orgId = :orgId order by dateCreated desc");
 	    query.setParameter("orgId", orgId);
 	    return query.list();
 	  }
@@ -118,7 +119,7 @@ public class configurationDAOImpl implements configurationDAO {
 	@Override
 	@SuppressWarnings("unchecked")
 	public List<configuration> getConfigurations(int page, int maxResults) {
-	      Query query = sessionFactory.getCurrentSession().createQuery("from configuration order by configName asc");
+	      Query query = sessionFactory.getCurrentSession().createQuery("from configuration order by dateCreated desc");
 	      
 	      //By default we want to return the first result
 		  int firstResult = 0;
@@ -151,11 +152,14 @@ public class configurationDAOImpl implements configurationDAO {
 	@Override
 	@SuppressWarnings("unchecked")
 	public List<configuration> findConfigurations(String searchTerm) {
-	     Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configuration.class)
+		
+	    Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configuration.class)
+	        .createAlias("Organization","orgs")
+	        .createAlias("messageType","msgTypes")
 	    	.add(Restrictions.or(
 	    			Restrictions.like("configName", "%"+searchTerm+"%"),
-	     			Restrictions.like("orgName", "%"+searchTerm+"%"),
-	     			Restrictions.like("messageTypeName", "%"+searchTerm+"%")
+	     			Restrictions.like("orgs.orgName", "%"+searchTerm+"%"),
+	     			Restrictions.like("msgTypes.messageTypeName", "%"+searchTerm+"%")
 	     		)
 	     	);
 	     

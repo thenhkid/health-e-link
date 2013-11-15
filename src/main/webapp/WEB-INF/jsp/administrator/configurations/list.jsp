@@ -34,7 +34,6 @@
 					<table class="table table-striped table-hover table-default">
 						<thead>
 							<tr>
-								<th scope="col">Configuration Name</th>
 								<th scope="col">Organization</th>
 								<th scope="col">Message Type</th>
 								<th scope="col" class="center-text">Connections</th>
@@ -47,10 +46,6 @@
 								  <c:when test="${not empty configurationList}">
 								    <c:forEach var="config" items="${configurationList}">
 										<tr id="configRow" rel="${config.id}" style="cursor: pointer">
-											<td scope="row">
-												<a href="javascript:void(0);" title="Edit this configurations">${config.configName}</a>
-												<br />(<c:choose><c:when test="${config.status == true}">active</c:when><c:otherwise>inactive</c:otherwise></c:choose>)
-											</td>
 											<td>
 												${config.orgName}
 											</td>
@@ -71,7 +66,7 @@
 									</c:forEach>
 								  </c:when>
 								  <c:otherwise>
-								   	<tr><td colspan="6" class="center-text">There are currently no configurations set up.</td></tr>
+								   	<tr><td colspan="5" class="center-text">There are currently no configurations set up.</td></tr>
 								  </c:otherwise>
 							</c:choose>
 						</tbody>

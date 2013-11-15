@@ -19,6 +19,9 @@ import org.hibernate.validator.constraints.NotEmpty;
 public class configuration {
 	
 	  @Transient
+	  private List<configurationTransport> transportDetails = null;
+	
+	  @Transient
 	  private String orgName = null;
 	  
 	  @Transient
@@ -38,10 +41,6 @@ public class configuration {
 	  @NotNull
 	  @Column(name="orgId", nullable = false)
 	  private int orgId;
-	  
-	  @NotEmpty
-	  @Column(name="configName", nullable = false)
-	  private String configName;
 	  
 	  @Column(name="DATECREATED", nullable = true)
 	  private Date dateCreated = new Date();
@@ -73,14 +72,6 @@ public class configuration {
 	  
 	  public void setorgId(int orgId) {
 	    this.orgId = orgId;
-	  }
-	  
-	  public String getConfigName() {
-	    return configName;
-	  }
-	  
-	  public void setConfigName(String configName) {
-	    this.configName = configName;
 	  }
 	  
 	  public Date getDateCreated() {
@@ -153,5 +144,13 @@ public class configuration {
 	  
 	  public void setstepsCompleted(int stepsCompleted) {
 		  this.stepsCompleted = stepsCompleted;
+	  }
+	  
+	  public List<configurationTransport> getTransportDetails() {
+		  return transportDetails;
+	  }
+	  
+	  public void setTransportDetails(List<configurationTransport> transportDetails) {
+		  this.transportDetails = transportDetails;
 	  }
 }

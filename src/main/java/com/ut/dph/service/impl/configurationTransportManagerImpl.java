@@ -49,22 +49,32 @@ public class configurationTransportManagerImpl implements configurationTransport
 
  	@Override
  	@Transactional
- 	public configurationTransport getTransportDetails(int configId) {
+ 	public List<configurationTransport> getTransportDetails(int configId) {
  		return configurationTransportDAO.getTransportDetails(configId);
  	}
  	
  	@Override
  	@Transactional
- 	public void updateTransportDetails(configurationTransport transportDetails, int clearFields) {
+ 	public void setupOnlineForm(int configId, int messageTypeId) {
+ 		configurationTransportDAO.setupOnlineForm(configId, messageTypeId);
+ 	}
+ 	
+ 	@Override
+ 	@Transactional
+ 	public void updateTransportDetails(configurationTransport transportDetails) {
  		boolean processFile = false;
  		String fileName = null;
  		String cleanURL = null;
+ 		int transportDetailId = 0;
+ 		int clearFields = 0;
+ 		
  		
  		MultipartFile file = transportDetails.getFile(); 
  		
  		//If a file is uploaded
- 		if(!file.isEmpty()) {
+ 		if(file != null && !file.isEmpty()) {
  			processFile = true;
+ 			clearFields = 1;
  			
 			fileName = file.getOriginalFilename();
 		
@@ -114,19 +124,13 @@ public class configurationTransportManagerImpl implements configurationTransport
 			   e.printStackTrace();  
 			}  
  		}
- 		
-		configurationTransportDAO.updateTransportDetails(transportDetails, clearFields);
+		
+ 		transportDetailId = (Integer) configurationTransportDAO.updateTransportDetails(transportDetails, clearFields);
 		
 		if(processFile == true) {
-			loadExcelContents(transportDetails.getconfigId(), fileName, cleanURL);
+			loadExcelContents(transportDetails.getconfigId(), transportDetailId, fileName, cleanURL);
 		}
 		
- 	}
- 	
- 	@Override
- 	@Transactional
- 	public void copyMessageTypeFields(int configId, int messageTypeId) {
- 		configurationTransportDAO.copyMessageTypeFields(configId, messageTypeId);
  	}
  	
  	@SuppressWarnings("rawtypes")
@@ -157,7 +161,7 @@ public class configurationTransportManagerImpl implements configurationTransport
 	 * @param cleanURL		cleanURL: the cleanURL of the selected organization
 	 * 
 	 */
-	public void loadExcelContents(int id, String fileName, String cleanURL) {
+	public void loadExcelContents(int id, int transportDetailId, String fileName, String cleanURL) {
 		
 		try {
 			//Set the initial value of the buckets (1);
@@ -234,9 +238,10 @@ public class configurationTransportManagerImpl implements configurationTransport
                     }
                     
                    //Need to insert all the fields into the message type Form Fields table
-                   Query query = sessionFactory.getCurrentSession().createSQLQuery("INSERT INTO configurationFormFields (configId, fieldNo, fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, useField)" 
-                		   +"VALUES (:configId, :fieldNo, :fieldDesc, :fieldLabel, 0, :required, :bucketNo, :bucketDspPos, 1)")
+                   Query query = sessionFactory.getCurrentSession().createSQLQuery("INSERT INTO configurationFormFields (configId, transportDetailId, fieldNo, fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, useField)" 
+                		   +"VALUES (:configId, :transportDetailId, :fieldNo, :fieldDesc, :fieldLabel, 0, :required, :bucketNo, :bucketDspPos, 1)")
                    		.setParameter("configId", id)
+                   		.setParameter("transportDetailId", transportDetailId)
                    		.setParameter("fieldNo", fieldNo)
                    		.setParameter("fieldDesc", fieldDesc)
                    		.setParameter("fieldLabel", fieldDesc)

@@ -31,6 +31,5 @@ public interface configurationManager {
   
   @SuppressWarnings("rawtypes")
   List getFileTypes();
-  
  
 }

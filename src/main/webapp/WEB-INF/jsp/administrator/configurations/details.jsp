@@ -69,14 +69,6 @@
 								</form:select>
 							</div>
 						</spring:bind>
-						<spring:bind path="configName">
-							<div class="form-group ${status.error ? 'has-error' : '' } ${not empty existingType ? 'has-error' : ''}">
-								<label class="control-label" for="configName">Configuration Name *</label>
-								<form:input path="configName" id="configName" class="form-control" type="text" maxLength="55" />
-								<form:errors path="configName" cssClass="control-label" element="label" />
-								<c:if test="${not empty existingConfig}"><span class="control-label has-error">${existingConfig}</span></c:if>
-							</div>
-						</spring:bind>
 					</div>
 				</div>
 			</section>
