@@ -14,20 +14,6 @@
 		</c:if>
 		
 		<div class="row-fluid">
-			<div class="col-md-12">
-				<section class="panel panel-default">
-					<div class="panel-body">
-					<dt>
-						<dt>Configuration Summary:</dt>
-						<dd><strong>Name:</strong> Name of configuration</dd>
-						<dd><strong>Message Type:</strong> Weight loss</dd>
-					</dt>
-					</div>
-				</section>
-			</div>
-		</div>
-		
-		<div class="row-fluid">
 			<div class="col-md-4">
 				<section class="panel panel-default">
 					<div class="panel-heading">

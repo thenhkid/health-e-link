@@ -40,17 +40,17 @@
 							<label for="type">Configuration Type *</label>
 							<div>
 								<label class="radio-inline">
-									<form:radiobutton id="type" path="type" value="1"/> For Source Organization 
+									<form:radiobutton id="type" path="type" value="1" disabled="${configurationDetails.id == 0 ? 'false' : 'true' }"/> For Source Organization 
 								</label>
 								<label class="radio-inline">
-									<form:radiobutton id="type" path="type" value="2"/> For Target Organization
+									<form:radiobutton id="type" path="type" value="2" disabled="${configurationDetails.id == 0 ? 'false' : 'true' }"/> For Target Organization
 								</label>
 							</div>
 						</div>
 						<spring:bind path="orgId">
 							<div class="form-group ${status.error ? 'has-error' : '' }">
 								<label class="control-label" for="organization">Organization *</label>
-								<form:select path="orgId" id="organization" class="form-control half">
+								<form:select path="orgId" id="organization" class="form-control half" disabled="${configurationDetails.id == 0 ? 'false' : 'true' }">
 									<option value="">- Select -</option>
 									<c:forEach items="${organizations}" var="org" varStatus="oStatus">
 										<option value="${organizations[oStatus.index].id}" <c:if test="${configurationDetails.orgId == organizations[oStatus.index].id}">selected</c:if>>${organizations[oStatus.index].orgName} </option>
@@ -61,7 +61,7 @@
 						<spring:bind path="messageTypeId">
 							<div class="form-group ${status.error ? 'has-error' : '' }">
 								<label class="control-label" for="messageTypeId">Message Type *</label>
-								<form:select path="messageTypeId" id="messageTypeId" class="form-control half">
+								<form:select path="messageTypeId" id="messageTypeId" class="form-control half" disabled="${configurationDetails.id == 0 ? 'false' : 'true' }">
 									<option value="">- Select -</option>
 									<c:forEach items="${messageTypes}" var="msgType" varStatus="mStatus">
 										<option value="${messageTypes[mStatus.index].id}" <c:if test="${configurationDetails.messageTypeId == messageTypes[mStatus.index].id}">selected</c:if>>${messageTypes[mStatus.index].name} </option>

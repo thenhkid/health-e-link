@@ -55,6 +55,12 @@ public class configurationTransportManagerImpl implements configurationTransport
  	
  	@Override
  	@Transactional
+ 	public configurationTransport getTransportDetailsByTransportMethod(int configId, int transportMethod) {
+ 		return configurationTransportDAO.getTransportDetailsByTransportMethod(configId, transportMethod);
+ 	}
+ 	
+ 	@Override
+ 	@Transactional
  	public void setupOnlineForm(int configId, int messageTypeId) {
  		configurationTransportDAO.setupOnlineForm(configId, messageTypeId);
  	}
@@ -140,8 +146,8 @@ public class configurationTransportManagerImpl implements configurationTransport
  	
  	@Override
  	@Transactional
- 	public List<configurationFormFields> getConfigurationFields(int configId) {
- 		return configurationTransportDAO.getConfigurationFields(configId);
+ 	public List<configurationFormFields> getConfigurationFields(int configId, int transportDetailId) {
+ 		return configurationTransportDAO.getConfigurationFields(configId, transportDetailId);
  	}
  	
  	@Override

@@ -457,57 +457,62 @@ public class adminConfigController {
 	 * what page to display. Either the choose fields page if 'online form' is selected
 	 * or 'mappings' if a custom file is being uploaded.
 	 */
+	@SuppressWarnings("rawtypes")
 	@RequestMapping(value="/mappings", method = RequestMethod.GET)
-	public ModelAndView getConfigurationMappings() throws Exception {
+	public ModelAndView getConfigurationMappings(@RequestParam(value="i", required=false) Integer transportMethod) throws Exception {
+		int selTransportMethod = 2;
+		
+		if(transportMethod != null) {
+			selTransportMethod = transportMethod;
+		}
+		
 		ModelAndView mav = new ModelAndView();
+		mav.addObject("id",configId);
 		
+		//Get the completed steps for the selected configuration;
 		configuration configurationDetails = configurationmanager.getConfigurationById(configId);
-		
-		//Set the variable to hold the number of completed steps for this configuration;
 		mav.addObject("completedSteps",configurationDetails.getstepsCompleted());
 		
-		//Need to get the transport details
-		configurationTransport transportDetails = configurationTransportManager.getTransportDetails(configId);
-		List<configurationFormFields> fields = configurationTransportManager.getConfigurationFields(configId);
+		//Get a list of all transport details
+		List<configurationTransport> allTransportDetails = configurationTransportManager.getTransportDetails(configId);
 		
-		//Set the selected transport method for the selected configuration
-		int transportMethod = transportDetails.gettransportMethod();
+		//Get the transport details by configid and selected transport method
+		configurationTransport transportDetails = configurationTransportManager.getTransportDetailsByTransportMethod(configId, selTransportMethod);
 		
-		//If transportMethod == 2 (Online Form) then send to the choose fields
-		//page. else send to the mappings page.
-		if(transportMethod == 2) {
+		//Get the transport fields
+		List<configurationFormFields> fields = configurationTransportManager.getConfigurationFields(configId, transportDetails.getId());
+		transportDetails.setFields(fields);
+		
+		mav.addObject("transportDetails", transportDetails);
+		
+		//If online form is selected then show the choose fields page
+		if(selTransportMethod == 2) {
 			mav.setViewName("/administrator/configurations/chooseFields");
-			
-			
-			//Need to return a list of associated fields for the selected message type
-			List<configurationFormFields> copiedFields = configurationTransportManager.getConfigurationFields(configId);
-			transportDetails.setFields(copiedFields);
-			
-			mav.addObject("transportDetails", transportDetails);
-			
-			//Get the list of available field validation types
-			@SuppressWarnings("rawtypes")
-			List validationTypes = messagetypemanager.getValidationTypes();
-			mav.addObject("validationTypes", validationTypes);
-			
 		}
+		//for everything else we need to show the mappings page.
 		else {
-			//Need to return a list of associated fields for the selected message type
-			List<configurationFormFields> uploadedFields = configurationTransportManager.getConfigurationFields(configId);
-			transportDetails.setFields(uploadedFields);
-			mav.addObject("transportDetails", transportDetails);
 			
-			//Need to return a list of selected template fields
+			//Need to get the template fields
 			List<messageTypeFormFields> templateFields = messagetypemanager.getMessageTypeFields(configurationDetails.getMessageTypeId());
 			mav.addObject("templateFields",templateFields);
 			
 			mav.setViewName("/administrator/configurations/mappings");
 		}
+		mav.addObject("selTransportMethod", selTransportMethod);
 		
-		mav.addObject("id",configId);
+		//Get the list of available transport methods
+		List transportMethods = configurationTransportManager.getTransportMethods();
+		mav.addObject("transportMethods", transportMethods);
+		
+		//Set a list of transport methods already set up for the configuration
+		List <Integer> transportList = new ArrayList<Integer>();
+		
+		for(configurationTransport details : allTransportDetails) {
+			transportList.add(details.gettransportMethod());
+		}
+		mav.addObject("availTransportMethods",transportList);
 		
 		return mav;
-		
 	}
 	
 	
@@ -524,11 +529,14 @@ public class adminConfigController {
 	 * 				redirect to the next step data translations page.
 	 */
 	@RequestMapping(value="/saveFields", method = RequestMethod.POST)
-	public ModelAndView saveFormFields(@Valid @ModelAttribute(value="transportDetails") configurationTransport transportDetails, RedirectAttributes redirectAttr, @RequestParam String action) throws Exception {
+	public ModelAndView saveFormFields(@Valid @ModelAttribute(value="transportDetails") configurationTransport transportDetails, RedirectAttributes redirectAttr, @RequestParam String action, @RequestParam int transportMethod) throws Exception {
+		
+		//Get the configuration details for the selected config
+		configuration configurationDetails = configurationmanager.getConfigurationById(configId);
 		
 		//Update the configuration completed step
-		if(transportDetails.getconfigId() < 3) {
-			configurationmanager.updateCompletedSteps(transportDetails.getconfigId(), 2);
+		if(configurationDetails.getstepsCompleted() < 3) {
+			configurationmanager.updateCompletedSteps(configId, 3);
 		}
 				
 		//Get the list of fields
@@ -549,7 +557,7 @@ public class adminConfigController {
 		
 		//If the "Save" button was pressed 
 		if(action.equals("save")) {
-			ModelAndView mav = new ModelAndView(new RedirectView("mappings"));
+			ModelAndView mav = new ModelAndView(new RedirectView("mappings?i="+transportMethod));
 			return mav;
 		}
 		else {

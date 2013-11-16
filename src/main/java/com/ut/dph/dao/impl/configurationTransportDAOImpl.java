@@ -27,7 +27,7 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
 	 * 
 	 * @param configId	Holds the id of the selected configuration
 	 * 
-	 * @Return	This function will return a configurationTransport object
+	 * @Return	This function will return a list of configurationTransport objects
 	 */
 	@SuppressWarnings("unchecked")
 	public List<configurationTransport> getTransportDetails(int configId) {
@@ -37,7 +37,31 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
  	}
 	
 	/**
+	 * The 'getTransportDetailsByTransportMethod' function will return the details of the transport
+	 * method for the passed in configuration id and passed in transport method
 	 * 
+	 * @param configId			Holds the id of the selected configuration
+	 * @param transportMethod	Holds the selected transport method
+	 * 
+	 * @Return	This function will return a configurationTransport object
+	 */
+	public	configurationTransport getTransportDetailsByTransportMethod(int configId, int transportMethod){
+		Query query = sessionFactory.getCurrentSession().createQuery("from configurationTransport where configId = :configId and transportMethod = :transportMethod");
+	    query.setParameter("configId", configId);
+	    query.setParameter("transportMethod", transportMethod);
+	    
+	    return (configurationTransport) query.uniqueResult();
+	}
+	
+	/**
+	 * The 'setupOnlineForm' function will complete the set up for the online
+	 * form for the new configuration. Every configuration will have an 
+	 * associated online form. 
+	 * 
+	 * @param	configId		Holds the id of the new configuration
+	 * @param	messageTypeid	Holds the id of the selected message type
+	 * 
+	 * @Return	This function does not return anything
 	 */
 	@Override
 	public void setupOnlineForm(int configId, int messageTypeId) {
@@ -132,9 +156,10 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
 	@SuppressWarnings("unchecked")
 	@Override
 	@Transactional
-	public List<configurationFormFields> getConfigurationFields(int configId) {
+	public List<configurationFormFields> getConfigurationFields(int configId, int transportDetailId) {
 	Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configurationFormFields.class)
 			.add(Restrictions.eq("configId",configId))
+			.add(Restrictions.eq("transportDetailId", transportDetailId))
 			.addOrder(Order.asc("bucketNo"))
 	     	.addOrder(Order.asc("bucketDspPos"));
 		

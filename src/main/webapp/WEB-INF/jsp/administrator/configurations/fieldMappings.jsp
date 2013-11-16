@@ -7,18 +7,49 @@
 <div class="main clearfix" role="main">
 
 	<div class="col-md-12">
-	<c:choose>
-		<c:when test="${not empty savedStatus}" >
-			<div class="alert alert-success">
-				<strong>Success!</strong> 
-				<c:choose>
-					<c:when test="${savedStatus == 'updated'}">The field mappings have been successfully updated!</c:when>
-				</c:choose>
+		<c:choose>
+			<c:when test="${not empty savedStatus}" >
+				<div class="alert alert-success">
+					<strong>Success!</strong> 
+					<c:choose>
+						<c:when test="${savedStatus == 'updated'}">The field mappings have been successfully updated!</c:when>
+					</c:choose>
+				</div>
+			</c:when>
+		</c:choose>
+		
+		<section class="panel panel-default">
+			<div class="panel-heading">
+				<dt>
+					<dd>
+						<strong>Choose a Transport Method</strong>
+					</dd>
+				</dt>
 			</div>
-		</c:when>
-	</c:choose>
+			<div class="panel-body">
+				<div class="form-container scrollable">
+					<div class="col-md-8">
+						<div id="transportMethodDiv" class="form-group ${status.error ? 'has-error' : '' }">
+                             <label class="sr-only" for="transportMethod">Transport Method *</label>
+                             <select id="transportMethod" class="form-control">
+                                  <option value="">- Select -</option>
+                                  <c:forEach items="${transportMethods}" var="transMethod" varStatus="tStatus">
+                                       <c:if test="${availTransportMethods.contains(transportMethods[tStatus.index][0])}">
+                                      	 <option value="${transportMethods[tStatus.index][0]}" <c:if test="${selTransportMethod == transportMethods[tStatus.index][0]}">selected</c:if>>${transportMethods[tStatus.index][1]} </option>
+                                       </c:if>
+                                  </c:forEach>
+                             </select>
+                             <span id="transportMethodMsg" class="control-label"></span>
+                        </div>
+					</div>
+					<div class="col-md-4">
+						<button class="btn btn-primary changeTransportMethod">Go</button>
+					</div>
+				</div>
+			</div>
+		</section>
 	</div>
-
+	
 	<div class="col-md-6">
 	
 		<section class="panel panel-default">
@@ -32,6 +63,7 @@
 				<div class="form-container scrollable">
 					<form:form id="formFields" modelAttribute="transportDetails" method="post" role="form">
 						<input type="hidden" id="action" name="action" value="save" />
+						<input type="hidden" id="seltransportMethod" name="transportMethod" value="0" />
 						<table class="table table-striped table-hover table-default">
 							<thead>
 								<tr>
@@ -48,18 +80,21 @@
 								 	 </tr>
 									 <c:forEach items="${transportDetails.fields}" var="mappings" varStatus="field">
 									 	<c:if test="${mappings.bucketNo == i}">
-									 		<input type="hidden" name="fields[${field.index}].id" value="${mappings.id}" />
-											<input type="hidden" name="fields[${field.index}].configId" value="${mappings.configId}" />
-											<input type="hidden" name="fields[${field.index}].fieldNo" value="${mappings.fieldNo}" />
-											<input type="hidden" name="fields[${field.index}].bucketNo" value="${mappings.bucketNo}" />
-											<input type="hidden" name="fields[${field.index}].fieldDesc" value="${mappings.fieldDesc}" />
-											<input type="hidden" name="fields[${field.index}].fieldLabel" value="${mappings.fieldLabel}" />
-											<input type="hidden" name="fields[${field.index}].useField" value="${mappings.useField}" />
-											<input type="hidden" name="fields[${field.index}].required" value="${mappings.required}" />
-											<input type="hidden" name="fields[${field.index}].bucketDspPos" value="${mappings.bucketDspPos}" />
-											<input type="hidden" name="fields[${field.index}].validationType" value="${mappings.validationType}" />
 										 	<tr class="uFieldRow" rel="${mappings.fieldNo}">
-										 		<td scope="row" class="center-text">${mappings.fieldNo}</td>
+										 		<td scope="row" class="center-text">
+										 			<input type="hidden" name="fields[${field.index}].id" value="${mappings.id}" />
+													<input type="hidden" name="fields[${field.index}].configId" value="${mappings.configId}" />
+													<input type="hidden" name="fields[${field.index}].transportDetailId" value="${mappings.transportDetailId}" />
+													<input type="hidden" name="fields[${field.index}].fieldNo" value="${mappings.fieldNo}" />
+													<input type="hidden" name="fields[${field.index}].bucketNo" value="${mappings.bucketNo}" />
+													<input type="hidden" name="fields[${field.index}].fieldDesc" value="${mappings.fieldDesc}" />
+													<input type="hidden" name="fields[${field.index}].fieldLabel" value="${mappings.fieldLabel}" />
+													<input type="hidden" name="fields[${field.index}].useField" value="${mappings.useField}" />
+													<input type="hidden" name="fields[${field.index}].required" value="${mappings.required}" />
+													<input type="hidden" name="fields[${field.index}].bucketDspPos" value="${mappings.bucketDspPos}" />
+													<input type="hidden" name="fields[${field.index}].validationType" value="${mappings.validationType}" />
+										 			${mappings.fieldNo}
+										 		</td>
 										 		<td>${mappings.fieldDesc}</td>
 										 		<td class="center-text">
 										 			<input type="checkbox" disabled="disabled" <c:if test="${mappings.required == true}">checked</c:if>  />
@@ -137,9 +172,23 @@
 			$('.alert').delay(2000).fadeOut(1000);
 		}
 
+		//function that will get the field mappings for the selected transport method
+		$('.changeTransportMethod').click(function() {
+			var selTransportMethod = $('#transportMethod').val();
+
+			if(selTransportMethod == "") {
+				$('#transportMethodDiv').addClass("has-error");
+			}
+			else {
+				window.location.href='mappings?i='+selTransportMethod;
+			}
+		});
+		
+
 		//This function will save the messgae type field mappings
 		$('#saveDetails').click(function(event) {
 			$('#action').val('save');
+			$('#seltransportMethod').val($('#transportMethod').val());
 			
 			//Need to make sure all required fields are marked if empty.
 			var hasErrors = 0;
@@ -187,7 +236,7 @@
 		$(document).on('click', '#clearFields',function() {
 			$('.uFieldRow').each(function() {
 				fieldNo = $(this).attr('rel');
-				$('#matchingField_'+fieldNo).val("");
+				$('#matchingField_'+fieldNo).val("0");
 			});
 
 			$(this).val("Meets Standard")

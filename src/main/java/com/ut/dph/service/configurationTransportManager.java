@@ -9,9 +9,11 @@ public interface configurationTransportManager {
 	
 	List<configurationTransport> getTransportDetails(int configId);
 	
+	configurationTransport getTransportDetailsByTransportMethod(int configId, int transportMethod);
+	
 	void updateTransportDetails(configurationTransport transportDetails);
 	
-	List<configurationFormFields> getConfigurationFields(int configId);
+	List<configurationFormFields> getConfigurationFields(int configId, int transportDetailId);
 	
 	void updateConfigurationFormFields(configurationFormFields formField);
 	 

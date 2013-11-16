@@ -11,7 +11,9 @@ public interface configurationTransportDAO {
 	
 	Integer updateTransportDetails(configurationTransport transportDetails, int clearFields);
 	
-	List<configurationFormFields> getConfigurationFields(int configId);
+	configurationTransport getTransportDetailsByTransportMethod(int configId, int transportMethod);
+	
+	List<configurationFormFields> getConfigurationFields(int configId, int transportDetailId);
 	
 	void updateConfigurationFormFields(configurationFormFields formField);
 	

@@ -6,10 +6,7 @@
 <c:set var="endDspPostLoop" value="1" />
 
 <!-- Need to calculate how many fields for current section -->
-<c:set var="totalFieldsBucket1" value="0" />
-<c:set var="totalFieldsBucket2" value="0" />
-<c:set var="totalFieldsBucket3" value="0" />
-<c:set var="totalFieldsBucket4" value="0" />
+<c:set var="totalFieldsBucket1, totalFieldsBucket2, totalFieldsBucket3, totalFieldsBucket4" value="0" />
 <c:forEach items="${transportDetails.fields}" var="mappings" varStatus="field">
 	<c:if test="${mappings.bucketNo == 1}">
 		<c:set var="totalFieldsBucket1" value="${totalFieldsBucket1+1}" />
@@ -36,18 +33,51 @@
 		</c:if>
 		<div class="alert alert-danger" style="display:none;"><strong>Error!</strong> At least one field must be checked!</div>
 		
+		
+		<section class="panel panel-default">
+			<div class="panel-heading">
+				<dt>
+					<dd>
+						<strong>Choose a Transport Method</strong>
+					</dd>
+				</dt>
+			</div>
+			<div class="panel-body">
+				<div class="form-container scrollable">
+					<div class="col-md-8">
+						<div id="transportMethodDiv" class="form-group ${status.error ? 'has-error' : '' }">
+                             <label class="sr-only" for="transportMethod">Transport Method *</label>
+                             <select id="transportMethod" class="form-control">
+                                  <option value="">- Select -</option>
+                                  <c:forEach items="${transportMethods}" var="transMethod" varStatus="tStatus">
+                                       <c:if test="${availTransportMethods.contains(transportMethods[tStatus.index][0])}">
+                                      	 <option value="${transportMethods[tStatus.index][0]}" <c:if test="${selTransportMethod == transportMethods[tStatus.index][0]}">selected</c:if>>${transportMethods[tStatus.index][1]} </option>
+                                       </c:if>
+                                  </c:forEach>
+                             </select>
+                             <span id="transportMethodMsg" class="control-label"></span>
+                        </div>
+					</div>
+					<div class="col-md-4">
+						<button class="btn btn-primary changeTransportMethod">Go</button>
+					</div>
+				</div>
+			</div>
+		</section>
+		
 		<div class="form-group">
-			<input type="button" id="selectAllFields" class="btn btn-primary" value="Use All Fields"/>
+			<input type="button" id="selectAllFields" class="btn btn-primary" value="Toggle Used Fields"/>
 		</div>
 		
 		<form:form id="formFields" modelAttribute="transportDetails" method="post" role="form">
 			<input type="hidden" id="action" name="action" value="save" />
+			<input type="hidden" id="seltransportMethod" name="transportMethod" value="0" />
 			<c:forEach var="i" begin="1" end="4">	
 			<section class="panel panel-default">
 				<div class="panel-heading">
 					<dt>
 						<dd>
-							<strong>Bucket ${i} <c:choose><c:when test="${i==1}">(Sender Information)</c:when><c:when test="${i==2}">(Recipient Information)</c:when><c:when test="${i==3}">(Patient Information)</c:when><c:when test="${i==4}">(Other)</c:when></c:choose></strong>
+							<strong>Bucket ${i} <c:choose><c:when test="${i==1}"> (Sender Information)</c:when><c:when test="${i==2}"> (Recipient Information)</c:when><c:when test="${i==3}"> (Patient Information)</c:when><c:when test="${i==4}"> (Other)</c:when></c:choose></strong>
 						</dd>
 					</dt>
 				</div>
@@ -71,10 +101,11 @@
 											<td scope="row" class="center-text">
 												<input type="hidden" name="fields[${field.index}].id" value="${mappings.id}" />
 												<input type="hidden" class="configId" name="fields[${field.index}].configId" value="${mappings.configId}" />
+												<input type="hidden" name="fields[${field.index}].transportDetailId" value="${mappings.transportDetailId}" />
 												<input type="hidden" class="fieldNo" name="fields[${field.index}].fieldNo" value="${mappings.fieldNo}" />
 												<input type="hidden" name="fields[${field.index}].bucketNo" value="${mappings.bucketNo}" />
 												<input type="hidden" name="fields[${field.index}].messageTypeFieldId" value="${mappings.messageTypeFieldId}" />
-												<input type="checkbox" class="useFields" name="fields[${field.index}].useField" value="true" <c:if test="${mappings.useField == true}">checked</c:if>  />
+												<input type="checkbox" class="useFields" name="fields[${field.index}].useField" value="true" checked="${mappings.useField == true ? true : false}" />
 											</td>
 											<td >
 												<c:if test="${mappings.bucketNo == 1}">
@@ -145,16 +176,19 @@
 
 		//Function that will check off all 'use field' checkboxes
 		$(document).on('click', '#selectAllFields',function() {
-			$('.useFields').attr('checked', true);
-			$(this).attr('id','unselectAllFields');
-			$(this).attr('value','Unselect All Fields');
+			$('.useFields').prop("checked", !$('.useFields').prop("checked"));
 		});
 
-		//Function that will uncheck off all 'use field' checkboxes
-		$(document).on('click', '#unselectAllFields',function() {
-			$('.useFields').attr('checked', false);
-			$(this).attr('id','selectAllFields');
-			$(this).attr('value','Use All Fields');
+		//function that will get the field mappings for the selected transport method
+		$('.changeTransportMethod').click(function() {
+			var selTransportMethod = $('#transportMethod').val();
+
+			if(selTransportMethod == "") {
+				$('#transportMethodDiv').addClass("has-error");
+			}
+			else {
+				window.location.href='mappings?i='+selTransportMethod;
+			}
 		});
 
 		
@@ -184,6 +218,7 @@
 		//This function will save the messgae type field mappings
 		$('#saveDetails').click(function(event) {
 			$('#action').val('save');
+			$('#seltransportMethod').val($('#transportMethod').val());
 			
 			//Need to make sure all required fields are marked if empty.
 			var hasErrors = 0;
