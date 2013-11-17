@@ -38,7 +38,7 @@ DROP INDEX `ffrefTableColId_idx` ,
 DROP INDEX `ffrefTableId_idx` ;
 
 ALTER TABLE `universalTranslator`.`configurationFormFields` 
-ADD COLUMN `fieldDesc` VARCHAR(255) NULL DEFAULT NULL AFTER `fieldNo`;
+ADD COLUMN `fieldDesc` VARCHAR(255) NULL DEFAULT NULL AFTER `fieldNo`,
 ADD COLUMN `messageTypeFieldId` INT NOT NULL DEFAULT 0 AFTER `id`;
 
 ALTER TABLE `universalTranslator`.`configurationTransportDetails` 
