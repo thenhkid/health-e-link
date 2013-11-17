@@ -1,0 +1,2 @@
+Notes (Grace 11162013) 
+A reminder for when we set up a client, we need to create the bowlink root folder and associated folders (libraryFiles, libraryFiles/crosswalks)
