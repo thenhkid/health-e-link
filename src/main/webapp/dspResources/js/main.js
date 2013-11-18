@@ -14,6 +14,12 @@ require.config({
 });
 
 require(['jquery',  'bootstrap', 'responsive-tables', 'mediaModal'], function ($) {
+	
+	// tooltip demo
+	$(document).tooltip({
+		selector: "[data-toggle=tooltip]",
+		container: "body"
+	})
 
 	// modify bootstrap modal to handle spacing for scroll bars more elegantly
 	$(document).on('show.bs.modal',  '.modal', function () {

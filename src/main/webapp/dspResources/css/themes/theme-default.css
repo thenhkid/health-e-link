@@ -198,3 +198,14 @@ h3 {
 body#login {
   background-color: #efefef;
 }
+.btn-secondary {
+  background-color: #ffffff;
+  border: 1px solid #ccc;
+  color: #0096ff;
+}
+.btn-secondary:hover,
+.btn-secondary:focus,
+.btn-secondary:active {
+  background-color: #efefef;
+  color: #0096ff;
+}
