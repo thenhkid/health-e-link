@@ -40,7 +40,7 @@
 								<th scope="col">Look Up Tables</th>
 								<th scope="col" class="center-text">Number of Columns</th>
 								<th scope="col" class="center-text">Number of Rows</th>
-								<th scope="col">Description</th>
+								<%--<th scope="col">Description</th> --%>
 								<th scope="col"></th>
 							</tr>
 						</thead>
@@ -54,7 +54,7 @@
 											</td>
 											<td class="center-text">${tableInfo.columnNum}</td>
 											<td class="center-text">${tableInfo.rowNum}</td>
-											<td class="center-text">${tableInfo.description}</td>
+											<%--<td class="center-text">${tableInfo.description}</td> --%>
 											<td class="actions-col">
 												<a href="details?i=${tableInfo.tableName}" class="btn btn-link" title="Edit this message type">
 													<span class="glyphicon glyphicon-edit"></span>
