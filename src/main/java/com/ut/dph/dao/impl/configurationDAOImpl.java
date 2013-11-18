@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ut.dph.dao.configurationDAO;
 import com.ut.dph.model.Organization;
 import com.ut.dph.model.configuration;
-import com.ut.dph.model.configurationTransport;
+import com.ut.dph.model.configurationDataTranslations;
 import com.ut.dph.model.messageType;
 
 @Service
@@ -142,8 +142,29 @@ public class configurationDAOImpl implements configurationDAO {
 	      List<configuration> configurationList = query.list(); 
 	      return configurationList;	
   	}
+	
+	/**
+	* The 'getDataTranslations' function will return a list of data translations saved
+	* for the passed in configuration/transport method.
+	* 
+	* @param	configId	The id of the configuration we want to return associated translations
+	* 						for.
+	* @param	transportMethod	The selected transport method for the configuration
+	* 
+	* @return	This function will return a list of translations
+	*/
+	@SuppressWarnings("unchecked")
+	@Override
+	@Transactional
+	public List<configurationDataTranslations> getDataTranslations(int configId, int transportMethod) {
+		Query query = sessionFactory.getCurrentSession().createQuery("from configurationDataTranslations where configId = :configId and transportMethod = :transportMethod order by processOrder asc");
+			  query.setParameter("configId",configId);
+			  query.setParameter("transportMethod",transportMethod);
+		
+		return query.list();
+	}
 	  
-	 /**
+	/**
 	 * The 'findConfigurations' function will return a list of configurations based on a 
 	 * search term passed in. The function will search configurations on the following fields
 	 * configName, orgName and messageTypeName
@@ -300,6 +321,42 @@ public class configurationDAOImpl implements configurationDAO {
 		Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT id, fileType FROM ref_fileTypes order by fileType asc");
 		
 		return query.list();
+	}
+	
+	/**
+	 * The 'getFieldName' function will return the name of a field based on the fieldId passed in.
+	 * This is used for display purposes to show the actual field lable instead of a field name.
+	 * 
+	 * @param fieldId	This will hold the id of the field to retrieve
+	 * 
+	 * @Return This function will return a string (field name)
+	 */
+	@Override
+	@Transactional
+	public String getFieldName(int fieldId) {
+		Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT fieldDesc FROM configurationFormFields where id = :fieldId")
+				.setParameter("fieldId", fieldId);
+			
+		String fieldName = (String) query.uniqueResult();
+		
+		return fieldName;
+	}
+	
+	/**
+	* The 'deleteDataTranslations' function will remove all data translations for the
+	* passed in configuration / transport method.
+	* 
+	* @param	configId		The id of the configuration to remove associated translations
+	* @param	transportMethod	The transport method for the configuration
+	* 
+	*/
+	@Override
+	@Transactional
+	public void deleteDataTranslations(int configId, int transportMethod) {
+		Query deleteTranslations = sessionFactory.getCurrentSession().createQuery("delete from configurationDataTranslations where configId = :configId and transportMethod = :transportMethod");
+		deleteTranslations.setParameter("configId",configId);
+		deleteTranslations.setParameter("transportMethod",transportMethod);
+		deleteTranslations.executeUpdate();
 	}
 
 }

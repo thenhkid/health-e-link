@@ -3,6 +3,7 @@ package com.ut.dph.dao;
 import java.util.List;
 
 import com.ut.dph.model.configuration;
+import com.ut.dph.model.configurationDataTranslations;
 
 public interface configurationDAO {
 	
@@ -31,6 +32,9 @@ public interface configurationDAO {
   @SuppressWarnings("rawtypes")
   List getFileTypes();
   
+  List<configurationDataTranslations> getDataTranslations(int configId, int transportMethod);
   
+  String getFieldName(int fieldId);
   
+  void deleteDataTranslations(int configId, int transportMethod);
 }

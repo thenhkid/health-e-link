@@ -352,7 +352,7 @@ public class adminLibController {
 		mav.addObject("fields",fields);
 		
 		//Return a list of available crosswalks
-		List<Crosswalks> crosswalks = messagetypemanager.getCrosswalks(1,0);
+		List<Crosswalks> crosswalks = messagetypemanager.getCrosswalks(1,0,0);
 		mav.addObject("crosswalks",crosswalks);
 		
 		return mav;
@@ -384,25 +384,35 @@ public class adminLibController {
 	 * @Return list of crosswalks
 	 */
 	 @RequestMapping(value="/getCrosswalks.do", method = RequestMethod.GET)
-	 public @ResponseBody ModelAndView getCrosswalks(@RequestParam(value="page", required=false) Integer page) throws Exception {
+	 public @ResponseBody ModelAndView getCrosswalks(@RequestParam(value="page", required=false) Integer page, @RequestParam(value="orgId", required=false) Integer orgId, @RequestParam(value="maxCrosswalks", required=false) Integer maxCrosswalks) throws Exception {
 		 
 		if(page == null){
 		     page = 1;
 	    }
 		
+		if(orgId == null) {
+			orgId = 0;
+		}
+		
+		if(maxCrosswalks == null) {
+			double maxCrosswalkVal = 4;
+		}
+		else {
+			double maxCrosswalkVal = maxCrosswalks;
+		}
+		
 		ModelAndView mav = new ModelAndView(); 
-		mav.setViewName("/administrator/messageTypeLibrary/crosswalks");	 
+		mav.setViewName("/administrator/messageTypeLibrary/crosswalks");
+		mav.addObject("orgId", orgId);
 		
 		//Need to return a list of crosswalks
-		List<Crosswalks> crosswalks = messagetypemanager.getCrosswalks(page,4);
+		List<Crosswalks> crosswalks = messagetypemanager.getCrosswalks(page,maxCrosswalks,orgId);
 		mav.addObject("availableCrosswalks", crosswalks);
 		
 		//Find out the total number of crosswalks
 		Long totalCrosswalks = messagetypemanager.findTotalCrosswalks();
 		
-		double maxCrosswalks = 4;
-		
-		Integer totalPages = (int) Math.round(totalCrosswalks/maxCrosswalks);
+		Integer totalPages = (int) Math.round(totalCrosswalks/maxCrosswalkVal);
         mav.addObject("totalPages",totalPages);
         mav.addObject("currentPage",page);
 		
@@ -459,14 +469,19 @@ public class adminLibController {
 	 *
 	 */
 	 @RequestMapping(value="/newCrosswalk", method= RequestMethod.GET)
-	 public @ResponseBody ModelAndView newCrosswalk() throws Exception {
-		 
+	 public @ResponseBody ModelAndView newCrosswalk(@RequestParam(value="orgId", required=false) Integer orgId) throws Exception {
+		
+		if(orgId == null) {
+			 orgId = 0;
+		}
+		
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("/administrator/messageTypeLibrary/crosswalkDetails");	
 		
 		Crosswalks crosswalkDetails = new Crosswalks();
 		mav.addObject("crosswalkDetails",crosswalkDetails);
 		mav.addObject("btnValue","Create");
+		mav.addObject("orgId", orgId);
 		
 		//Get the list of available file delimiters
 		@SuppressWarnings("rawtypes")
@@ -483,8 +498,9 @@ public class adminLibController {
 	 * 		   redirect to the data translation page.
 	 */
 	 @RequestMapping(value="/createCrosswalk", method = RequestMethod.POST)
-	 public @ResponseBody ModelAndView createCrosswalk(@ModelAttribute(value="crosswalkDetails") Crosswalks crosswalkDetails, BindingResult result, RedirectAttributes redirectAttr) throws Exception {
+	 public @ResponseBody ModelAndView createCrosswalk(@ModelAttribute(value="crosswalkDetails") Crosswalks crosswalkDetails, BindingResult result, RedirectAttributes redirectAttr, @RequestParam int orgId) throws Exception {
 		int lastId = 0;
+		crosswalkDetails.setOrgId(orgId);
 		lastId = messagetypemanager.createCrosswalk(crosswalkDetails);
 		
 		if(lastId == 0) {
@@ -493,17 +509,30 @@ public class adminLibController {
 		else {
 			redirectAttr.addFlashAttribute("savedStatus", "created");
 		}
-		ModelAndView mav = new ModelAndView(new RedirectView("translations"));
-		return mav;	
+		
+		//if orgId > 0 then need to send back to the configurations page
+		//otherwise send back to the message type libarary translation page.
+		if(orgId > 0) {
+			ModelAndView mav = new ModelAndView(new RedirectView("../configurations/translations"));
+			return mav;	
+		}
+		else {
+			ModelAndView mav = new ModelAndView(new RedirectView("translations"));
+			return mav;	
+		}
 	}
 	 
 	/**
 	* 
 	*/
 	@RequestMapping(value="/checkCrosswalkName.do", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-	public @ResponseBody Long checkCrosswalkName(@RequestParam(value="name", required=true) String name) throws Exception {
+	public @ResponseBody Long checkCrosswalkName(@RequestParam(value="name", required=true) String name, @RequestParam(value="orgId", required = false) Integer orgId) throws Exception {
 		
-		Long nameExists = (Long) messagetypemanager.checkCrosswalkName(name);
+		if(orgId == null) {
+			orgId = 0;
+		}
+		
+		Long nameExists = (Long) messagetypemanager.checkCrosswalkName(name, orgId);
 		
 		return nameExists;
 		
@@ -532,8 +561,12 @@ public class adminLibController {
 		List crosswalkData = messagetypemanager.getCrosswalkData(cwId);
 		mav.addObject("crosswalkData", crosswalkData);
 		
-		return mav;
+		//Get the list of available file delimiters
+		@SuppressWarnings("rawtypes")
+		List delimiters = messagetypemanager.getDelimiters();
+		mav.addObject("delimiters", delimiters);
 		
+		return mav;
 	}
 	
 	/**

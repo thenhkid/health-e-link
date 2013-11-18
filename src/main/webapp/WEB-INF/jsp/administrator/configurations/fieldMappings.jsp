@@ -15,6 +15,9 @@
 					</div>
 				</c:when>
 			</c:choose>
+			<div id="saveMsgDiv" class="alert alert-danger" style="display:none;">
+				<strong>You must click SAVE above to submit the mapping changes!</strong>
+			</div>
 			<section class="panel panel-default">
 				<div class="panel-heading">
                     <h3 class="panel-title">Choose a Transport Method</h3>
@@ -89,7 +92,7 @@
 											 			<input type="checkbox" disabled="disabled" <c:if test="${mappings.required == true}">checked</c:if>  />
 											 		</td>
 											 		<td class="center-text">
-											 			<select name="fields[${field.index}].messageTypeFieldId" id="matchingField_${mappings.fieldNo}">
+											 			<select name="fields[${field.index}].messageTypeFieldId" id="matchingField_${mappings.fieldNo}" class="formField">
 											 				<option value="0">-</option>
 											 				<c:forEach var="tField" items="${templateFields}">
 											 					<option value="${tField.id}" <c:if test="${mappings.messageTypeFieldId == tField.id}">selected</c:if>>${tField.fieldNo}</option>
@@ -160,6 +163,12 @@
 			$('.alert').delay(2000).fadeOut(1000);
 		}
 
+		//If any field changes need to show the message in red that nothign
+		//will be saved unless teh "Saved" button is pressed
+		$(document).on('change','.formField',function() {
+			$('#saveMsgDiv').show();
+		});
+
 		//function that will get the field mappings for the selected transport method
 		$('.changeTransportMethod').click(function() {
 			var selTransportMethod = $('#transportMethod').val();
@@ -180,7 +189,6 @@
 			
 			//Need to make sure all required fields are marked if empty.
 			var hasErrors = 0;
-			//hasErrors = checkFormFields();
 			
 			if(hasErrors == 0) {
 				$('#formFields').attr('action','saveFields');
@@ -192,7 +200,6 @@
 			$('#action').val('next');
 			
 			var hasErrors = 0;
-			//hasErrors = checkFormFields();
 			
 			if(hasErrors == 0) {
 				$('#formFields').attr('action','saveFields');
@@ -205,6 +212,7 @@
 		//field select box to the appropiate template field
 		$(document).on('click', '#meetsStandard',function() {
 			var fieldNo = null;
+			$('#saveMsgDiv').show();
 			
 			$('.uFieldRow').each(function() {
 				fieldNo = $(this).attr('rel');
@@ -215,6 +223,8 @@
 				});
 			});
 
+			$(this).children("span").addClass("glyphicon-ok");
+			
 			$(this).val("Clear Fields");
 			$(this).attr('id','clearFields');
 		});
@@ -222,26 +232,20 @@
 		//Clicking the "Clear Fields" button will unselect the matching
 		//field select box.
 		$(document).on('click', '#clearFields',function() {
+			$('#saveMsgDiv').show();
+
 			$('.uFieldRow').each(function() {
 				fieldNo = $(this).attr('rel');
 				$('#matchingField_'+fieldNo).val("0");
 			});
 
+			$(this).children("span").removeClass("glyphicon-ok");
+			
 			$(this).val("Meets Standard");
 			$(this).attr('id','meetsStandard');
 		});
 		
 	});
 
-	function removeVariableFromURL(url_string, variable_name) {
-		var URL = String(url_string);
-	    var regex = new RegExp( "\\?" + variable_name + "=[^&]*&?", "gi");
-	    URL = URL.replace(regex,'?');
-	    regex = new RegExp( "\\&" + variable_name + "=[^&]*&?", "gi");
-	    URL = URL.replace(regex,'&');
-	    URL = URL.replace(/(\?|&)$/,'');
-	    regex = null;
-	    return URL;
-	}
 
 </script>

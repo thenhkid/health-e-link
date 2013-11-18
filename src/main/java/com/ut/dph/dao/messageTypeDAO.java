@@ -47,11 +47,11 @@ public interface messageTypeDAO {
 	
 	Long getTotalFields(int messageTypeId);
 	
-	List<Crosswalks> getCrosswalks(int page, int maxResults);
+	List<Crosswalks> getCrosswalks(int page, int maxResults, int orgId);
 	
 	Integer createCrosswalk(Crosswalks crosswalkDetails);
 	
-	Long checkCrosswalkName(String name);
+	Long checkCrosswalkName(String name, int orgId);
 	
 	Long findTotalCrosswalks();
 	

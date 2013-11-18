@@ -15,7 +15,7 @@
 				<c:forEach items="${availableCrosswalks}" var="crosswalk" varStatus="pStatus">
 				<tr>
 					<td scope="row">
-						${availableCrosswalks[pStatus.index].name} 
+						${availableCrosswalks[pStatus.index].name} <c:choose><c:when test="${availableCrosswalks[pStatus.index].orgId == 0}"> (generic)</c:when><c:otherwise> (Org Specific)</c:otherwise></c:choose>
 					</td>
 					<td class="center-text"><fmt:formatDate value="${availableCrosswalks[pStatus.index].dateCreated}" type="date" pattern="M/dd/yyyy" /></td>
 					<td class="center-text">

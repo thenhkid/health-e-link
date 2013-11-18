@@ -26,8 +26,10 @@ import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 
 import com.ut.dph.dao.messageTypeDAO;
+import com.ut.dph.dao.organizationDAO;
 import com.ut.dph.service.messageTypeManager;
 import com.ut.dph.model.Crosswalks;
+import com.ut.dph.model.Organization;
 import com.ut.dph.model.messageType;
 import com.ut.dph.model.messageTypeDataTranslations;
 import com.ut.dph.model.messageTypeFormFields;
@@ -41,6 +43,9 @@ public class messageTypeManagerImpl implements messageTypeManager {
 	
 	@Autowired
 	private SessionFactory sessionFactory;
+	
+	@Autowired
+	private organizationDAO organizationDAO;
 	
 	@Override
 	@Transactional
@@ -224,8 +229,8 @@ public class messageTypeManagerImpl implements messageTypeManager {
 	
 	@Override
 	@Transactional
-	public List<Crosswalks> getCrosswalks(int page, int maxResults) {
-		return messageTypeDAO.getCrosswalks(page, maxResults);
+	public List<Crosswalks> getCrosswalks(int page, int maxResults, int orgId) {
+		return messageTypeDAO.getCrosswalks(page, maxResults, orgId);
 	}
 	
 	@SuppressWarnings("rawtypes")
@@ -249,14 +254,15 @@ public class messageTypeManagerImpl implements messageTypeManager {
 	
 	@Override
 	@Transactional
-	public Long checkCrosswalkName(String name) {
-		return messageTypeDAO.checkCrosswalkName(name);
+	public Long checkCrosswalkName(String name, int orgId) {
+		return messageTypeDAO.checkCrosswalkName(name, orgId);
 	}
 	
 	@Override
 	@Transactional
 	public Integer createCrosswalk(Crosswalks crosswalkDetails) {
 		Integer lastId = null;
+		String cleanURL = null;
 		
 		MultipartFile file = crosswalkDetails.getFile(); 
 		String fileName = file.getOriginalFilename();
@@ -264,8 +270,17 @@ public class messageTypeManagerImpl implements messageTypeManager {
 		InputStream inputStream = null;  
 		OutputStream outputStream = null;  
 		fileSystem dir = new fileSystem();
-		//Set the directory to save the uploaded message type template to
-		 dir.setMessageTypeCrosswalksDir("libraryFiles");
+		
+		if(crosswalkDetails.getOrgId() > 0) {
+			Organization orgDetails = organizationDAO.getOrganizationById(crosswalkDetails.getOrgId());
+			cleanURL = orgDetails.getcleanURL();
+			dir.setDir(cleanURL, "crosswalks");
+		}
+		else {
+			//Set the directory to save the uploaded message type template to
+			dir.setMessageTypeCrosswalksDir("libraryFiles");
+		}
+		
 		 File newFile = null; 
 		 newFile = new File(dir.getDir() + fileName);
 		
@@ -297,7 +312,6 @@ public class messageTypeManagerImpl implements messageTypeManager {
 		
 		//Check to make sure the file contains the selected delimiter
 		//Set the directory that holds the crosswalk files
-		dir.setMessageTypeCrosswalksDir("libraryFiles");
 		int delimCount = (Integer) dir.checkFileDelimiter(dir,fileName,delimChar);
 		
 		if(delimCount > 0) {
@@ -306,7 +320,7 @@ public class messageTypeManagerImpl implements messageTypeManager {
 			
 			//Call the function that will load the content of the crosswalk text file
 			//into the rel_crosswalkData table
-			loadCrosswalkContents(lastId, fileName,delimChar);
+			loadCrosswalkContents(lastId, fileName,delimChar, cleanURL);
 			
 			return lastId;
 		}
@@ -317,7 +331,6 @@ public class messageTypeManagerImpl implements messageTypeManager {
 			//Need to return an error
 			return 0;
 		}
-	
 	}
 	
 	@Override
@@ -355,11 +368,17 @@ public class messageTypeManagerImpl implements messageTypeManager {
 	 * @param delim			delim: the delimiter used in the file
 	 * 
 	 */
-	public void loadCrosswalkContents(int id, String fileName, String delim) {
+	public void loadCrosswalkContents(int id, String fileName, String delim, String cleanURL) {
 		
 		//Set the directory that holds the crosswalk files
 		fileSystem dir = new fileSystem();
-		dir.setMessageTypeCrosswalksDir("libraryFiles");
+		
+		if(cleanURL == null) {
+			dir.setMessageTypeCrosswalksDir("libraryFiles");
+		}
+		else {
+			dir.setDir(cleanURL, "crosswalks");
+		}
 		
 		FileInputStream file = null;
 		String[] lineValue = null;

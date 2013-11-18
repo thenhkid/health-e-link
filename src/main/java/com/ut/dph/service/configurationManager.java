@@ -3,6 +3,7 @@ package com.ut.dph.service;
 import java.util.List;
 
 import com.ut.dph.model.configuration;
+import com.ut.dph.model.configurationDataTranslations;
 import com.ut.dph.model.configurationTransport;
 
 public interface configurationManager {
@@ -31,5 +32,11 @@ public interface configurationManager {
   
   @SuppressWarnings("rawtypes")
   List getFileTypes();
+  
+  List<configurationDataTranslations> getDataTranslations(int configId, int transportMethod);
+  
+  String getFieldName(int fieldId);
+  
+  void deleteDataTranslations(int configId, int transportMethod);
  
 }

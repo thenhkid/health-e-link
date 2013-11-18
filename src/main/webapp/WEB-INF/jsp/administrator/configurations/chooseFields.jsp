@@ -35,6 +35,9 @@
 					</div>
 				</c:when>
 			</c:choose>
+			<div id="saveMsgDiv" class="alert alert-danger" style="display:none;">
+				<strong>You must click SAVE above to submit the mapping changes!</strong>
+			</div>
 			<section class="panel panel-default">
 				<div class="panel-heading">
                     <h3 class="panel-title">Choose a Transport Method</h3>
@@ -122,7 +125,7 @@
 															<c:set var="endDspPostLoop" value="${totalFieldsBucket4}" />
 														</c:if>
 														<input type="hidden" id="endDspPostLoop_${mappings.bucketNo}" value="${endDspPostLoop}" />
-														<select rel="${mappings.bucketNo}" rel2="${mappings.bucketDspPos}" name="fields[${field.index}].bucketDspPos" class="form-control half dspPos dspPos_${mappings.bucketNo}">
+														<select rel="${mappings.bucketNo}" rel2="${mappings.bucketDspPos}" name="fields[${field.index}].bucketDspPos" class="form-control half dspPos dspPos_${mappings.bucketNo} formField">
 														     <option value="" label=" - Select - " ></option>
 														     <c:forEach begin="1" end="${endDspPostLoop}" var="t">
 														     	<option value="${t}" <c:if test="${mappings.bucketDspPos == t}">selected</c:if>>${t}</option>
@@ -135,15 +138,15 @@
 													</td>
 													<td>
 														<div id="fieldLabel_${field.index}" class="form-group ${status.error ? 'has-error' : '' }">
-															<input type="text" name="fields[${field.index}].fieldLabel"  value="${mappings.fieldLabel}" rel="${field.index}" class="form-control fieldLabel" />
+															<input type="text" name="fields[${field.index}].fieldLabel"  value="${mappings.fieldLabel}" rel="${field.index}" class="form-control fieldLabel formField" />
 															<span id="fieldLabelMsg_${field.index}" class="control-label"></span>
 														</div>
 													</td>
 													<td class="center-text">
-														<input type="checkbox" name="fields[${field.index}].required" value="true" <c:if test="${mappings.required == true}">checked</c:if>  />
+														<input type="checkbox" name="fields[${field.index}].required" value="true" <c:if test="${mappings.required == true}">checked</c:if> class="formField"  />
 													</td>
 													<td class="validationTypes">
-														<select name="fields[${field.index}].validationType" class="form-control half">
+														<select name="fields[${field.index}].validationType" class="form-control half formField">
 														     <option value="0" label=" - Select - " ></option>
 														     <c:forEach items="${validationTypes}"  var="fieldvalidationtypes" varStatus="vtype">
 														          <option value="${validationTypes[vtype.index][0]}" <c:if test="${mappings.validationType == validationTypes[vtype.index][0]}">selected</c:if>>${validationTypes[vtype.index][1]}</option>
@@ -179,9 +182,23 @@
 			$('.alert').delay(2000).fadeOut(1000);
 		};
 
+		//If any field changes need to show the message in red that nothign
+		//will be saved unless teh "Saved" button is pressed
+		$(document).on('change','.formField',function() {
+			$('#saveMsgDiv').show();
+		});
+
 		//Function that will check off all 'use field' checkboxes
 		$(document).on('click', '#selectAllFields',function() {
 			$('.useFields').prop("checked", !$('.useFields').prop("checked"));
+
+			if($('.useFields').prop("checked") == true) {
+				$(this).children("span").addClass("glyphicon-ok");
+			}
+			else {
+				$(this).children("span").removeClass("glyphicon-ok");
+			}
+			$('#saveMsgDiv').show();
 		});
 
 		//function that will get the field mappings for the selected transport method

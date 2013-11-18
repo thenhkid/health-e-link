@@ -363,15 +363,27 @@ public class messageTypeDAOImpl implements messageTypeDAO {
 	 * message types to. This function will only return crosswalks not associated to a specific
 	 * organization.
 	 * 
+	 * @param 	page	The current crosswalk page
+	 * @param	maxResults	The maximum number of crosswalks to return from each query
+	 * @param	orgId	The organization id (default 0) 
+	 * 
 	 * @Table	crosswalks
 	 * 
 	 * @Return	This function will return a list of crosswalks
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public List<Crosswalks>  getCrosswalks(int page, int maxResults) {
+	public List<Crosswalks>  getCrosswalks(int page, int maxResults, int orgId) {
 		
-		Query query = sessionFactory.getCurrentSession().createQuery("from Crosswalks where orgId = 0 order by name asc");
+		Query query = null;
+		
+		if(orgId == 0) {
+			query = sessionFactory.getCurrentSession().createQuery("from Crosswalks where orgId = 0 order by name asc");
+		}
+		else {
+			query = sessionFactory.getCurrentSession().createQuery("from Crosswalks where (orgId = 0 or orgId = :orgId) order by name asc");
+			query.setParameter("orgId", orgId);
+		}
 		
 		int firstResult = 0;
 		
@@ -397,9 +409,18 @@ public class messageTypeDAOImpl implements messageTypeDAO {
 	 */
 	@Override
 	@Transactional
-	public Long checkCrosswalkName(String name) {
-		Query query = sessionFactory.getCurrentSession().createQuery("select count(id) as total from Crosswalks where name = :name");
-			  query.setParameter("name",name);
+	public Long checkCrosswalkName(String name, int orgId) {
+		Query query = null;
+		
+		if(orgId > 0) {
+			query = sessionFactory.getCurrentSession().createQuery("select count(id) as total from Crosswalks where name = :name and orgId = :orgId");
+			query.setParameter("name", name);
+			query.setParameter("orgId", orgId);
+		}
+		else {
+			query = sessionFactory.getCurrentSession().createQuery("select count(id) as total from Crosswalks where name = :name");
+			query.setParameter("name",name);
+		}
 		
 	    Long cwId = (Long) query.uniqueResult();
 		

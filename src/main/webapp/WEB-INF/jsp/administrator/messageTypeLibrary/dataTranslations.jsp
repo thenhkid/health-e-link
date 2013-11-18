@@ -1,4 +1,3 @@
-
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %> 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -21,7 +20,6 @@
 					<c:choose>
 						<c:when test="${param.msg == 'updated'}">The data translations have been successfully updated!</c:when>
 						<c:when test="${param.msg == 'created'}">The crosswalk has been successfully added!</c:when>
-						<c:when test="${param.msg == 'deleted'}">The address has been successfully removed!</c:when>
 					</c:choose>
 				</div>
 			</c:when>
@@ -225,8 +223,9 @@
 			//Need to make sure the crosswalk name doesn't already exist.
 			$.ajax({  
 		        url: 'checkCrosswalkName.do',  
-		        type: "POST",  
-		        data: { 'name' : $('#name').val() },
+		        type: "POST", 
+		        async: false,  
+		        data: { 'name' : $('#name').val(), 'orgId' : 0 },
 		        success: function(data) {  
 		           if(data == 1) {
 		        		$('#crosswalkNameDiv').addClass("has-error");

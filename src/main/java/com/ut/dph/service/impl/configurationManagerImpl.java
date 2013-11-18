@@ -2,12 +2,14 @@ package com.ut.dph.service.impl;
 
 import java.util.List;
 
+import org.hibernate.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ut.dph.dao.configurationDAO;
 import com.ut.dph.model.configuration;
+import com.ut.dph.model.configurationDataTranslations;
 import com.ut.dph.service.configurationManager;
 
 @Service
@@ -90,5 +92,23 @@ public class configurationManagerImpl implements configurationManager {
 	  public List getFileTypes() {
 		  return configurationDAO.getFileTypes();
 	  }
+	  
+	  @Override
+	  @Transactional
+	  public List<configurationDataTranslations> getDataTranslations(int configId, int transportMethod) {
+		  return configurationDAO.getDataTranslations(configId, transportMethod);
+	  }
+	  
+	 @Override
+	 @Transactional
+	 public String getFieldName(int fieldId) {
+		return configurationDAO.getFieldName(fieldId);
+	 }
+	 
+	@Override
+	@Transactional
+	public void deleteDataTranslations(int configId, int transportMethod) {
+		configurationDAO.deleteDataTranslations(configId, transportMethod);
+	}
 
 }

@@ -17,10 +17,15 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
+import com.ut.dph.model.Crosswalks;
 import com.ut.dph.model.configuration;
+import com.ut.dph.model.configurationDataTranslations;
 import com.ut.dph.model.configurationFormFields;
+import com.ut.dph.model.messageTypeDataTranslations;
 import com.ut.dph.model.messageTypeFormFields;
 import com.ut.dph.service.configurationManager;
 import com.ut.dph.model.Organization;
@@ -61,6 +66,8 @@ public class adminConfigController {
 	 * list page.
 	 */
 	private static int maxResults = 20;
+	
+	private static List<configurationDataTranslations> translations = null;
 	
 	/**
 	 *  The '/list' GET request will serve up the existing list of configurations
@@ -488,6 +495,11 @@ public class adminConfigController {
 		//If online form is selected then show the choose fields page
 		if(selTransportMethod == 2) {
 			mav.setViewName("/administrator/configurations/chooseFields");
+			
+			//Get the list of available field validation types
+			List validationTypes = messagetypemanager.getValidationTypes();
+			mav.addObject("validationTypes", validationTypes);
+			
 		}
 		//for everything else we need to show the mappings page.
 		else {
@@ -548,6 +560,9 @@ public class adminConfigController {
 				if(formfield.getmessageTypeFieldId() == 0) {
 					formfield.setUseField(false);
 				}
+				else {
+					formfield.setUseField(true);
+				}
 				//Update each field
 				configurationTransportManager.updateConfigurationFormFields(formfield);
 			}
@@ -567,4 +582,218 @@ public class adminConfigController {
 		
 	}
 
+	
+	/**
+	 * The '/translations' GET request will display the data translations page for the
+	 * selected transport Method
+	 */
+	@SuppressWarnings("rawtypes")
+	@RequestMapping(value="/translations", method = RequestMethod.GET)
+	public ModelAndView getConfigurationTranslations(@RequestParam(value="i", required=false) Integer transportMethod) throws Exception {
+		int selTransportMethod = 2;
+		
+		if(transportMethod != null) {
+			selTransportMethod = transportMethod;
+		}
+		
+		//Set the data translations array to get ready to hold data
+	    translations = new CopyOnWriteArrayList<configurationDataTranslations>();
+		
+		//Get the completed steps for the selected configuration;
+		configuration configurationDetails = configurationmanager.getConfigurationById(configId);
+		
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/configurations/translations");
+		mav.addObject("id",configId);
+		mav.addObject("completedSteps",configurationDetails.getstepsCompleted());
+		
+		
+		//Get a list of all transport details
+		List<configurationTransport> allTransportDetails = configurationTransportManager.getTransportDetails(configId);
+		
+		//Get the transport details by configid and selected transport method
+		configurationTransport transportDetails = configurationTransportManager.getTransportDetailsByTransportMethod(configId, selTransportMethod);
+		
+		//Get the transport fields
+		List<configurationFormFields> fields = configurationTransportManager.getConfigurationFields(configId, transportDetails.getId());
+		transportDetails.setFields(fields);
+		
+		mav.addObject("fields",fields);
+		mav.addObject("selTransportMethod", selTransportMethod);
+		
+		//Return a list of available crosswalks
+		List<Crosswalks> crosswalks = messagetypemanager.getCrosswalks(1,0,configurationDetails.getorgId());
+		mav.addObject("crosswalks",crosswalks);
+		mav.addObject("orgId", configurationDetails.getorgId());
+		
+		//Get the list of available transport methods
+		List transportMethods = configurationTransportManager.getTransportMethods();
+		mav.addObject("transportMethods", transportMethods);
+		
+		//Set a list of transport methods already set up for the configuration
+		List <Integer> transportList = new ArrayList<Integer>();
+		
+		for(configurationTransport details : allTransportDetails) {
+			transportList.add(details.gettransportMethod());
+		}
+		mav.addObject("availTransportMethods",transportList);
+		
+		return mav;
+		
+	}
+	
+	/**
+	 * The '/translations' POST request will submit the selected data translations
+	 * and save it to the data base.
+	 * 
+	 */
+	 @RequestMapping(value="/translations", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	 public @ResponseBody Integer submitDataTranslations(@RequestParam(value="transportMethod", required=true) Integer transportMethod) throws Exception {
+		 
+		 //Delete all the data translations before creating
+		 //This will help with the jquery removing translations
+		 configurationmanager.deleteDataTranslations(configId, transportMethod);
+		 
+		 //Loop through the list of translations
+		 for(configurationDataTranslations translation : translations) {
+			 configurationmanager.saveDataTranslations(translation);
+		 }
+		
+		 return 1;
+	 }
+	
+	/**
+	 * The '/getTranslations.do' function will return the list of existing translations
+	 * set up for the selected configuration/transportMethod.
+	 * 
+	 * @Return list of translations
+	 */
+	 @RequestMapping(value="/getTranslations.do", method = RequestMethod.GET)
+	 public @ResponseBody ModelAndView getTranslations(@RequestParam(value="reload", required=true) boolean reload, @RequestParam(value="transportMethod", required = true) int transportMethod) throws Exception {
+		 
+		ModelAndView mav = new ModelAndView(); 
+		mav.setViewName("/administrator/configurations/existingTranslations");	 
+		
+		//only get the saved translations if reload == 0
+		//We only want to retrieve the saved ones on initial load
+		if(reload == false) {
+			//Need to get a list of existing translations
+			List<configurationDataTranslations> existingTranslations = configurationmanager.getDataTranslations(configId, transportMethod);
+			
+			for(configurationDataTranslations translation : existingTranslations) {
+				//Get the field name by id
+				String fieldName = configurationmanager.getFieldName(translation.getFieldId());
+				translation.setfieldName(fieldName);
+				
+				//Get the crosswalk name by id
+				String crosswalkName = messagetypemanager.getCrosswalkName(translation.getCrosswalkId());		
+				translation.setcrosswalkName(crosswalkName);
+				
+				translations.add(translation);
+			}
+		}
+		
+		mav.addObject("dataTranslations",translations);	
+		
+		return mav;
+		
+	 }
+	 
+	 /**
+	* The '/setTranslations{params}' function will handle taking in a selected field
+	* and a selected crosswalk and add it to an array of translations. This array
+	* will be used when the form is submitted to associate to the existing configuration / 
+	* trasnort method combination.
+	* 
+	* @param f	This will hold the id of the selected field
+	* 		cw		This will hold the id of the selected crosswalk
+	* 		fText	This will hold the text value of the selected field (used for display purposes)
+	* 		CWText	This will hold the text value of the selected crosswalk (used for display purposes)
+	* 
+	* @Return	This function will return the existing translations view that will display the table of
+	* 			newly selected translations
+	*/
+	@RequestMapping(value="/setTranslations{params}", method = RequestMethod.GET)
+	public @ResponseBody ModelAndView setTranslations(@RequestParam(value="f", required=true) Integer field, @RequestParam(value="cw", required=true) Integer cwId, @RequestParam(value="fText", required=true) String fieldText, @RequestParam(value="CWText", required=true) String cwText, @RequestParam(value="transportMethod", required = true) int transportMethod) throws Exception {
+		
+		int processOrder = translations.size()+1;
+		
+		configurationDataTranslations translation = new configurationDataTranslations();
+		translation.setconfigId(configId);
+		translation.settransportMethod(transportMethod);
+		translation.setFieldId(field);
+		translation.setfieldName(fieldText);
+		translation.setCrosswalkId(cwId);
+		translation.setcrosswalkName(cwText);
+		translation.setProcessOrder(processOrder);
+		
+		translations.add(translation);
+		
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/configurations/existingTranslations");	
+		mav.addObject("dataTranslations",translations);
+		
+		return mav;
+		
+	}
+	
+	/**
+	* The 'removeTranslations{params}' function will handle removing a translation from
+	* translations array.
+	* 
+	* @param	fieldId 		This will hold the field that is being removed
+	* @param	processOrder	This will hold the process order of the field to be
+	* 							removed so we remove the correct field number as the 
+	* 							same field could be in the list with different crosswalks
+	* 
+	* @Return	1	The function will simply return a 1 back to the ajax call
+	*/
+	@RequestMapping(value="/removeTranslations{params}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody Integer removeTranslation(@RequestParam(value="fieldId", required=true) Integer fieldId, @RequestParam(value="processOrder", required=true) Integer processOrder) throws Exception {
+		
+		Iterator<configurationDataTranslations> it = translations.iterator();
+		int currProcessOrder;
+		
+		while(it.hasNext()) {
+			configurationDataTranslations translation = it.next();
+			if(translation.getFieldId() == fieldId && translation.getProcessOrder() == processOrder) {
+				translations.remove(translation);
+			}
+			else if(translation.getProcessOrder() > processOrder) {
+				currProcessOrder = translation.getProcessOrder();
+				translation.setProcessOrder(currProcessOrder-1);
+			}
+		}
+		
+		return 1;
+	}
+	
+	/**
+	* The 'updateTranslationProcessOrder{params}' function will handle removing a translation from
+	* translations array.
+	* 
+	* @param	fieldId 		This will hold the field that is being removed
+	* @param	processOrder	This will hold the process order of the field to be
+	* 							removed so we remove the correct field number as the 
+	* 							same field could be in the list with different crosswalks
+	* 
+	* @Return	1	The function will simply return a 1 back to the ajax call
+	*/
+	@RequestMapping(value="/updateTranslationProcessOrder{params}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+	public @ResponseBody Integer updateTranslationProcessOrder(@RequestParam(value="currProcessOrder", required=true) Integer currProcessOrder, @RequestParam(value="newProcessOrder", required=true) Integer newProcessOrder) throws Exception {
+		
+		Iterator<configurationDataTranslations> it = translations.iterator();
+		
+		while(it.hasNext()) {
+			configurationDataTranslations translation = it.next();
+			if(translation.getProcessOrder() == currProcessOrder) {
+				translation.setProcessOrder(newProcessOrder);
+			}
+			else if(translation.getProcessOrder() == newProcessOrder) {
+				translation.setProcessOrder(currProcessOrder);
+			}
+		}
+		
+		return 1;
+	}
 }

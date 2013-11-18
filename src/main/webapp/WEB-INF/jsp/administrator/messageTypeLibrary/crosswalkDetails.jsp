@@ -14,6 +14,7 @@
 			<form:form id="crosswalkdetailsform" commandName="crosswalkDetails" modelAttribute="crosswalkDetails" enctype="multipart/form-data" method="post" role="form">
 				<form:hidden path="id" id="id" />
 				<form:hidden path="dateCreated" />
+				<input type="hidden" name="orgId" value="${orgId}" />
 				<div class="form-container">
 					<spring:bind path="name">
 						<div id="crosswalkNameDiv" class="form-group ${status.error ? 'has-error' : '' }">
@@ -32,13 +33,22 @@
 					<spring:bind path="fileDelimiter">
 						<div id="crosswalkDelimDiv" class="form-group ${status.error ? 'has-error' : '' }">
 							<label class="control-label" for="name">Delimiter *</label>
-							<form:select path="fileDelimiter" id="delimiter" class="form-control half">
-								<option value="">- Select -</option>
-								<c:forEach items="${delimiters}" var="cwalk" varStatus="dStatus">
-									<option value="${delimiters[dStatus.index][0]}">${delimiters[dStatus.index][1]} </option>
-								</c:forEach>
-							</form:select>
-							<span id="crosswalkDelimMsg" class="control-label"></span>
+							<c:choose>
+								<c:when test="${crosswalkDetails.id > 0 }">
+									<c:forEach items="${delimiters}" var="cwalk" varStatus="dStatus">
+										<c:if test="${delimiters[dStatus.index][0] == crosswalkDetails.fileDelimiter}"><br />${delimiters[dStatus.index][1]}</c:if>
+									</c:forEach>
+								</c:when>
+								<c:otherwise>
+									<form:select path="fileDelimiter" id="delimiter" class="form-control half">
+										<option value="">- Select -</option>
+										<c:forEach items="${delimiters}" var="cwalk" varStatus="dStatus">
+											<option value="${delimiters[dStatus.index][0]}">${delimiters[dStatus.index][1]} </option>
+										</c:forEach>
+									</form:select>
+									<span id="crosswalkDelimMsg" class="control-label"></span>
+								</c:otherwise>
+							</c:choose>
 						</div>
 					</spring:bind>
 					<spring:bind path="file">

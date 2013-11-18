@@ -47,7 +47,7 @@ public interface messageTypeManager {
 	
 	Long getTotalFields(int messageTypeId);
 	
-	List<Crosswalks> getCrosswalks(int page, int maxResults);
+	List<Crosswalks> getCrosswalks(int page, int maxResults, int orgId);
 	
 	Integer createCrosswalk(Crosswalks crosswalkDetails);
 	
@@ -66,7 +66,7 @@ public interface messageTypeManager {
 	
 	String getCrosswalkName(int cwId);
 	
-	Long checkCrosswalkName(String name);
+	Long checkCrosswalkName(String name, int orgId);
 	
 	void deleteDataTranslations(int messageTypeId);
 

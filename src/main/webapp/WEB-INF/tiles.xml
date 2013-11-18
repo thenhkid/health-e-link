@@ -41,7 +41,7 @@
 	     <definition name="/administrator/configurations/transport" extends="base.definition">
 	        <put-attribute name="title" value="Administrator - Manage Configurations" />
 	        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=config" />
-	        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/configurations/actionBar.jsp?page=configDetails" />
+	        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/configurations/actionBar.jsp?page=transport" />
 	        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/configurations/menu.jsp?page=transport" />
 	        <put-attribute name="body" value="/WEB-INF/jsp/administrator/configurations/transport.jsp" />
 	        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
@@ -62,6 +62,15 @@
 	        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/configurations/actionBar.jsp?page=mappings" />
 	        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/configurations/menu.jsp?page=mappings" />
 	        <put-attribute name="body" value="/WEB-INF/jsp/administrator/configurations/fieldMappings.jsp" />
+	        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
+	    </definition>
+	    
+	    <definition name="/administrator/configurations/translations" extends="base.definition">
+	        <put-attribute name="title" value="Administrator - Manage Configurations" />
+	        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=config" />
+	        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/configurations/actionBar.jsp?page=translations" />
+	        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/configurations/menu.jsp?page=translations" />
+	        <put-attribute name="body" value="/WEB-INF/jsp/administrator/configurations/dataTranslations.jsp" />
 	        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
 	    </definition>
 	    

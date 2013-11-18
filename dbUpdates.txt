@@ -60,5 +60,20 @@ ADD CONSTRAINT `formtransportDetailId`
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
   
+  /* Chad 11-18-2013 */
+  ALTER TABLE `universalTranslator`.`rel_configurationDataTranslations` 
+CHANGE COLUMN `fieldNo` `fieldId` INT(11) NOT NULL ;
+ ADD COLUMN `transportMethod` INT NOT NULL AFTER `configId`;
+
+ALTER TABLE `universalTranslator`.`rel_configurationDataTranslations` 
+ADD INDEX `dtFieldId_idx` (`fieldId` ASC);
+ALTER TABLE `universalTranslator`.`rel_configurationDataTranslations` 
+ADD CONSTRAINT `dtFieldId`
+  FOREIGN KEY (`fieldId`)
+  REFERENCES `universalTranslator`.`configurationFormFields` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+  
 
 
