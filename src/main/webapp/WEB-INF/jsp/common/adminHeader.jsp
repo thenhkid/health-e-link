@@ -24,6 +24,8 @@
 					<li class="${param['sect'] == 'config' ? 'active' : 'none'}"><a href="<c:url value='/administrator/configurations/list' />" title="Configuration Manager">Configurations</a><c:if test="${param['sect'] == 'config'}"><span class="indicator-active arrow-up"></span></c:if></li>
 					<li class="${param['sect'] == 'lib' ? 'active' : 'none'}"><a href="<c:url value='/administrator/library/list' />" title="Message Type Library Manager">Message Type Library</a><c:if test="${param['sect'] == 'lib'}"><span class="indicator-active arrow-up"></span></c:if></li>
 					<li class="${param['sect'] == 'sched' ? 'active' : 'none'}"><a href="" title="Scheduler">Scheduler</a><c:if test="${param['sect'] == 'sched'}"><span class="indicator-active arrow-up"></span></c:if></li>
+					<li class="${param['sect'] == 'sysadmin' ? 'active' : 'none'}"><a href="<c:url value='/administrator/sysadmin/list' />" title="System Administration">System Administration</a><c:if test="${param['sect'] == 'sysadmin'}"><span class="indicator-active arrow-up"></span></c:if></li>
+				
 				</ul>
 				<ul class="nav navbar-nav navbar-right" id="secondary-nav">
 					<li><a title="log out" href="<c:url value='/logout' />">Log out</a></li>
