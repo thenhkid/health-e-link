@@ -1,5 +1,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="s" uri="http://www.springframework.org/tags" %>
 
@@ -50,7 +51,7 @@
 								    <c:forEach var="tableInfo" items="${tableList}">
 										<tr id="tableInfoRow" style="cursor: pointer">
 											<td scope="row">
-												<a href="details?i=${tableInfo.tableName}" title="Edit this table">${tableInfo.tableName}</a>
+												<a href="details?i=${tableInfo.tableName}" title="Edit this table">${fn:replace(tableInfo.tableName,'lu_','')}</a>
 											</td>
 											<td class="center-text">${tableInfo.columnNum}</td>
 											<td class="center-text">${tableInfo.rowNum}</td>
