@@ -85,7 +85,15 @@ public class sysAdminDAOImpl implements sysAdminDAO {
 	@Transactional
 	@SuppressWarnings("unchecked")
 	public List<LookUpTable> findLookUpTables(String searchTerm) {
-		searchTerm = "lu_%" + searchTerm + "%";				 
+		/** 
+		 * all look up tables must begin with lu_
+		 * **/
+		if (!searchTerm.toLowerCase().startsWith("lu_")){
+			searchTerm = "lu_%" + searchTerm + "%";				 
+		} else {
+			searchTerm = searchTerm  + '%';
+		}
+		
 		Query query= 
 				sessionFactory.getCurrentSession().createSQLQuery( "select  "
 						+ "infoc.TABLE_NAME as \"tableName\","
