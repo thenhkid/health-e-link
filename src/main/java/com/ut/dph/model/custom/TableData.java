@@ -1,7 +1,6 @@
 package com.ut.dph.model.custom;
 
 import java.util.Date;
-import javax.persistence.Entity;
 import org.hibernate.validator.constraints.NotEmpty;
 
 
@@ -9,10 +8,9 @@ import org.hibernate.validator.constraints.NotEmpty;
  * This is a custom object as it is not tied to any tables.  
  * 90% of our look up tables have the same format, 
  * we don't want to have a million objects that we probably don't need.
- * 
  * **/
 
-public class LookUpTableItems {
+public class TableData {
 	
 	//item belong to a table
 	@NotEmpty
@@ -24,7 +22,6 @@ public class LookUpTableItems {
 	@NotEmpty
 	private String displayText;
 	
-	@NotEmpty
 	private String description;
 	
 	@NotEmpty
@@ -35,7 +32,12 @@ public class LookUpTableItems {
 	
 	private Date dateCreated;
 	private Date dateModified;
-	
+	public String getTableName() {
+		return tableName;
+	}
+	public void setTableName(String tableName) {
+		this.tableName = tableName;
+	}
 	public int getId() {
 		return id;
 	}
@@ -78,6 +80,7 @@ public class LookUpTableItems {
 	public void setDateModified(Date dateModified) {
 		this.dateModified = dateModified;
 	}
+	
 	
 
 }

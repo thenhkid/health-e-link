@@ -1,15 +1,15 @@
 package com.ut.dph.controller;
 
-import java.math.BigInteger;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.ut.dph.service.sysAdminManager;
-import com.ut.dph.model.messageType;
 import com.ut.dph.model.custom.LookUpTable;
+import com.ut.dph.model.custom.TableData;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,7 +27,7 @@ public class adminSysAdminController {
 	 * The private maxResults variable will hold the number of results to show per
 	 * list page.
 	 */
-	private static int maxResults = 10;
+	private static int maxResults = 20;
 	
 	
 	/**
@@ -54,7 +54,7 @@ public class adminSysAdminController {
         /**
          * we query list of tables for display
          **/
-         List <LookUpTable> tableList = sysAdminManager.getTableLits(maxResults, page);
+         List <LookUpTable> tableList = sysAdminManager.getTableList(maxResults, page);
         mav.addObject("tableList", tableList);
        
         //Return the total list of look up table
@@ -77,7 +77,7 @@ public class adminSysAdminController {
 	 * 
 	 * @Objects				(1) An object will be returned holding the requested search term used to 
 	 * 							populate the search box
-	 * 						(3) An object containing the found look up tables
+	 * 						(2) An object containing the found look up tables
 	 * @throws Exception
 	 */
 	@RequestMapping(value="/list", method = RequestMethod.POST)
@@ -94,5 +94,48 @@ public class adminSysAdminController {
  
 	}
 
+	/**
+	 *  The '/list' GET request will serve up the existing list of lu_ tables in the system
+	 *  
+	 * @param page			The page parameter will hold the page to view when pagination 
+	 * 						is built.
+	 * @return				The list of look up tables
+	 * 
+	 * @Objects				(1) An object containing all the found look up tables
+	 * 				
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/std/data/{urlId}", method = RequestMethod.GET)
+	public ModelAndView listDataInTable(@RequestParam(value="page", required=false) Integer page,  @PathVariable String urlId) throws Exception {
+		
+		if(page == null){
+	        page = 1;
+	    }
+ 
+		ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/sysadmin/std/data");
+        
+        /**
+         * we query list of tables for display
+         **/
+         List <TableData> dataList = sysAdminManager.getDataList(maxResults, page, urlId, "%");
+         mav.addObject("dataList", dataList);
+         mav.addObject("tableName", urlId);
+        //Return the total list of look up table
+        /**
+        int totalLookUpTables = sysAdminManager.findTotalDataRows(tableName);
+        int totalPages = Math.round(totalLookUpTables/maxResults);
+        mav.addObject("totalPages",totalPages);
+        mav.addObject("currentPage",page);
+        **/
+        return mav;
+ 
+	}
+	
+	
+	
+	
+	
+	
 }
 

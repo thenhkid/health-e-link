@@ -15,7 +15,13 @@ public class LookUpTable {
 	
 	//item belong to a table Table_Name
 	@NotEmpty
+	private String utTableName;
+	
+	@NotEmpty
 	private String tableName;
+	
+	@NotEmpty
+	private String urlId;
 	
 	@NotEmpty
 	private int columnNum;
@@ -28,12 +34,28 @@ public class LookUpTable {
 	@NotEmpty
 	private int rowNum;
 
+	public String getUtTableName() {
+		return utTableName;
+	}
+
+	public void setUtTableName(String utTableName) {
+		this.utTableName = utTableName;
+	}
+
 	public String getTableName() {
 		return tableName;
 	}
 
 	public void setTableName(String tableName) {
 		this.tableName = tableName;
+	}
+
+	public String getUrlId() {
+		return urlId;
+	}
+
+	public void setUrlId(String urlId) {
+		this.urlId = urlId;
 	}
 
 	public int getColumnNum() {

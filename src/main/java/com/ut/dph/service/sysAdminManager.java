@@ -3,7 +3,7 @@ package com.ut.dph.service;
 import java.math.BigInteger;
 import java.util.List;
 
-import com.ut.dph.model.custom.LookUpTableItems;
+import com.ut.dph.model.custom.TableData;
 import com.ut.dph.model.custom.LookUpTable;
 
 
@@ -23,11 +23,15 @@ public interface sysAdminManager {
 
 	 */
 	
-	List <LookUpTable> getTableLits(int maxResults, int page);
+	List <LookUpTable> getTableList(int maxResults, int page);
 	
 	Integer findTotalLookUpTable();
 	
 	List <LookUpTable> findLookUpTables(String searchTerm);
+	
+	List <TableData> getDataList(int maxResults, int page, String tableName, String searchTerm);
+	
+	Integer findTotalDataRows(String tableName);
 	
 }
 
