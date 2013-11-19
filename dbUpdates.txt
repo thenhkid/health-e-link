@@ -75,5 +75,33 @@ ADD CONSTRAINT `dtFieldId`
   ON UPDATE NO ACTION;
 
   
+/* Grace 11-18-2013 */
+DROP TABLE IF EXISTS `lookUpTables`;
+CREATE TABLE `lookUpTables` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `utTableName` varchar(45) NOT NULL,
+  `displayText` varchar(45) DEFAULT NULL,
+  `description` varchar(45) DEFAULT NULL,
+  `urlId` varchar(45) DEFAULT NULL,
+  `dateCreated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `dateModified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `utTableName_UNIQUE` (`utTableName`),
+  UNIQUE KEY `urlId_UNIQUE` (`urlId`)
+) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `lookUpTables`
+--
+
+LOCK TABLES `lookUpTables` WRITE;
+/*!40000 ALTER TABLE `lookUpTables` DISABLE KEYS */;
+INSERT INTO `lookUpTables` VALUES (1,'lu_BestTimeToCall','Best Time To Call',NULL,'698Bes4054all','2013-11-18 23:54:00','2013-11-18 23:54:00'),(2,'lu_BrandNames','Brand Name',NULL,'585Bra6556mes','2013-11-18 23:54:00','2013-11-18 23:54:00'),(3,'lu_Consents','Consent',NULL,'1101Con9058nts','2013-11-18 23:54:00','2013-11-18 23:54:00'),(4,'lu_Contraceptives','Contraceptives',NULL,'3836Con1560ves','2013-11-18 23:54:00','2013-11-18 23:54:00'),(5,'lu_Counties','County',NULL,'3467Cou4061ies','2013-11-18 23:54:00','2013-11-18 23:54:00'),(6,'lu_Genders','Gender',NULL,'3540Gen6563ers','2013-11-18 23:54:00','2013-11-18 23:54:00'),(7,'lu_GeneralHealthStatuses','General Health Status',NULL,'6087Gen9065ses','2013-11-18 23:54:00','2013-11-18 23:54:00'),(8,'lu_GeneralHealths','General Health',NULL,'4627Gen1567ths','2013-11-18 23:54:00','2013-11-18 23:54:00'),(9,'lu_HealthStatuses','Health Status',NULL,'2544Hea4069ses','2013-11-18 23:54:00','2013-11-18 23:54:00'),(10,'lu_Hispanics','Hispanic',NULL,'6786His6571ics','2013-11-18 23:54:00','2013-11-18 23:54:00'),(11,'lu_Immunizations','Immunization',NULL,'5994Imm9072ons','2013-11-18 23:54:00','2013-11-18 23:54:00'),(12,'lu_Languages','Lauguage',NULL,'8263Lan1574ges','2013-11-18 23:54:00','2013-11-18 23:54:00'),(13,'lu_Manufacturers','Manufacturer',NULL,'10508Man4076ers','2013-11-18 23:54:00','2013-11-18 23:54:00'),(14,'lu_MartialStatuses','Marital Status',NULL,'13663Mar6578ses','2013-11-18 23:54:00','2013-11-18 23:54:00'),(15,'lu_MedicalConditionStatuses','Medical Condition Status',NULL,'6817Med9080ses','2013-11-18 23:54:00','2013-11-18 23:54:00'),(16,'lu_MedicalConditionTypes','Medical Condition Type',NULL,'5516Med1582pes','2013-11-18 23:54:00','2013-11-18 23:54:00'),(17,'lu_MedicalConditions','Medical Condition',NULL,'6127Med4083ons','2013-11-18 23:54:00','2013-11-18 23:54:00'),(18,'lu_Medications','Medication',NULL,'13819Med6585ons','2013-11-18 23:54:00','2013-11-18 23:54:00'),(19,'lu_PatientStatuses','Patient Status',NULL,'14389Pat9087ses','2013-11-18 23:54:00','2013-11-18 23:54:00'),(20,'lu_PayerTypes','Payer Type',NULL,'9670Pay1589pes','2013-11-18 23:54:00','2013-11-18 23:54:00'),(21,'lu_PhoneTypes','Phone Type',NULL,'3055Pho4091pes','2013-11-18 23:54:00','2013-11-18 23:54:00'),(22,'lu_ProcedureStatuses','Procedure Status',NULL,'6091Pro6592ses','2013-11-18 23:54:00','2013-11-18 23:54:00'),(23,'lu_Procedures','Procedure',NULL,'21804Pro9094res','2013-11-18 23:54:00','2013-11-18 23:54:00'),(24,'lu_Races','Race',NULL,'21825Rac1596ces','2013-11-18 23:54:00','2013-11-18 23:54:00'),(25,'lu_TestResultsTypes','Test Results',NULL,'17571Tes4098pes','2013-11-18 23:54:00','2013-11-18 23:54:00'),(26,'lu_TestStatuses','Test Status',NULL,'20438Tes6600ses','2013-11-18 23:54:00','2013-11-18 23:54:00'),(27,'lu_Tests','Test',NULL,'22192Tes9102sts','2013-11-18 23:54:00','2013-11-18 23:54:00');
+/*!40000 ALTER TABLE `lookUpTables` ENABLE KEYS */;
+UNLOCK TABLES;
+
+
+
 
 
