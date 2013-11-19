@@ -47,7 +47,7 @@
 								    <c:forEach var="config" items="${configurationList}">
 										<tr id="configRow" rel="${config.id}" style="cursor: pointer">
 											<td>
-												${config.orgName}
+												<a href="javascript:void(0);" class="btn btn-link" title="Edit this configuration">${config.orgName}</a>
 											</td>
 											<td>
 												${config.messageTypeName}
@@ -57,7 +57,7 @@
 											</td>
 											<td class="center-text"><fmt:formatDate value="${config.dateCreated}" type="date" pattern="M/dd/yyyy" /></td>
 											<td class="actions-col">
-												<a href="javascript:void(0);" class="btn btn-link" title="Edit this organization">
+												<a href="javascript:void(0);" class="btn btn-link" title="Edit this configuration">
 													<span class="glyphicon glyphicon-edit"></span>
 													Edit	
 												</a>

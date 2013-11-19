@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ut.dph.dao.configurationDAO;
+import com.ut.dph.model.Connections;
+import com.ut.dph.model.Macros;
 import com.ut.dph.model.Organization;
 import com.ut.dph.model.configuration;
 import com.ut.dph.model.configurationDataTranslations;
@@ -357,6 +359,50 @@ public class configurationDAOImpl implements configurationDAO {
 		deleteTranslations.setParameter("configId",configId);
 		deleteTranslations.setParameter("transportMethod",transportMethod);
 		deleteTranslations.executeUpdate();
+	}
+	
+	/**
+	* The 'saveDataTranslations' function will save the submitted translations
+	* for the selected message type
+	* 
+	* @param translations	the configurationDataTranslations object
+	* 
+	*/
+	@Override
+	@Transactional
+	public void saveDataTranslations(configurationDataTranslations translations) {
+		sessionFactory.getCurrentSession().save(translations);
+	}
+	
+	/**
+	 * The 'getMacros' function will return a list of available system macros.
+	 * 
+	 * @return list of macros
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	@Transactional
+	public  List<Macros> getMacros() {
+		Query query = sessionFactory.getCurrentSession().createQuery("from Macros order by name asc");
+	    return query.list(); 
+	}
+	
+	/**
+	 * The 'getConnections' function will return a list of connections associated to the passed
+	 * in configuration id
+	 * 
+	 * @param configId	The id of the selected configuration
+	 * 
+	 * @return 	This function will return a list of connection objects
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	@Transactional
+	public List<Connections> getConnections(int configId) {
+		Query query = sessionFactory.getCurrentSession().createQuery("from Connections where configId = :configId order by dateCreated desc");
+			  query.setParameter("configId", configId);
+			  
+		return query.list();
 	}
 
 }

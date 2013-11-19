@@ -21,7 +21,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import com.ut.dph.model.Connections;
 import com.ut.dph.model.Crosswalks;
+import com.ut.dph.model.Macros;
 import com.ut.dph.model.configuration;
 import com.ut.dph.model.configurationDataTranslations;
 import com.ut.dph.model.configurationFormFields;
@@ -626,6 +628,10 @@ public class adminConfigController {
 		mav.addObject("crosswalks",crosswalks);
 		mav.addObject("orgId", configurationDetails.getorgId());
 		
+		//Return a list of available macros
+		List<Macros> macros = configurationmanager.getMacros();
+		mav.addObject("macros", macros);  
+		
 		//Get the list of available transport methods
 		List transportMethods = configurationTransportManager.getTransportMethods();
 		mav.addObject("transportMethods", transportMethods);
@@ -649,6 +655,12 @@ public class adminConfigController {
 	 */
 	 @RequestMapping(value="/translations", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
 	 public @ResponseBody Integer submitDataTranslations(@RequestParam(value="transportMethod", required=true) Integer transportMethod) throws Exception {
+		 
+		//Update the configuration completed step
+		configuration configurationDetails = configurationmanager.getConfigurationById(configId);
+		if(configurationDetails.getstepsCompleted() < 4) {
+			configurationmanager.updateCompletedSteps(configId, 4);
+		}
 		 
 		 //Delete all the data translations before creating
 		 //This will help with the jquery removing translations
@@ -714,18 +726,40 @@ public class adminConfigController {
 	* 			newly selected translations
 	*/
 	@RequestMapping(value="/setTranslations{params}", method = RequestMethod.GET)
-	public @ResponseBody ModelAndView setTranslations(@RequestParam(value="f", required=true) Integer field, @RequestParam(value="cw", required=true) Integer cwId, @RequestParam(value="fText", required=true) String fieldText, @RequestParam(value="CWText", required=true) String cwText, @RequestParam(value="transportMethod", required = true) int transportMethod) throws Exception {
+	public @ResponseBody ModelAndView setTranslations(
+			@RequestParam(value="f", required=true) Integer field, @RequestParam(value="cw", required=true) Integer cwId, @RequestParam(value="fText", required=true) String fieldText, 
+			@RequestParam(value="CWText", required=true) String cwText, @RequestParam(value="transportMethod", required = true) int transportMethod, 
+			@RequestParam(value="macroId", required=true) Integer macroId, @RequestParam(value="macroName", required=true) String macroName,
+			@RequestParam(value="fieldA", required=false) String fieldA, @RequestParam(value="fieldB") String fieldB, @RequestParam(value="constant1") String constant1,
+			@RequestParam(value="constant2", required=false) String constant2, @RequestParam(value="passClear") Integer passClear
+			) throws Exception {
 		
 		int processOrder = translations.size()+1;
+		
+		if(macroId == null) {
+			macroId = 0;
+			macroName = null;
+		}
+		if(cwId == null) {
+			cwId = 0;
+			cwText = null;
+		}
 		
 		configurationDataTranslations translation = new configurationDataTranslations();
 		translation.setconfigId(configId);
 		translation.settransportMethod(transportMethod);
 		translation.setFieldId(field);
 		translation.setfieldName(fieldText);
+		translation.setMacroId(macroId);
+		translation.setMacroName(macroName);
 		translation.setCrosswalkId(cwId);
 		translation.setcrosswalkName(cwText);
+		translation.setFieldA(fieldA);
+		translation.setFieldB(fieldB);
+		translation.setConstant1(constant1);
+		translation.setConstant2(constant2);
 		translation.setProcessOrder(processOrder);
+		translation.setPassClear(passClear);
 		
 		translations.add(translation);
 		
@@ -734,7 +768,6 @@ public class adminConfigController {
 		mav.addObject("dataTranslations",translations);
 		
 		return mav;
-		
 	}
 	
 	/**
@@ -795,5 +828,42 @@ public class adminConfigController {
 		}
 		
 		return 1;
+	}
+	
+	/**
+	 * 
+	 */
+	@RequestMapping(value="/connections", method = RequestMethod.GET)
+	public ModelAndView getConnections() throws Exception {
+		
+		//Get the completed steps for the selected configuration;
+		configuration configurationDetails = configurationmanager.getConfigurationById(configId);
+		
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/configurations/connections");
+		mav.addObject("id",configId);
+		mav.addObject("completedSteps",configurationDetails.getstepsCompleted());
+		
+		//Return a list of all active organizations
+		List<Organization> organizations = organizationmanager.getAllActiveOrganizations();
+		mav.addObject("organizations", organizations);
+		
+		//Return a list of associated connections
+		List<Connections> connections = configurationmanager.getConnections(configId);
+		mav.addObject("connections", connections);
+		
+		//Set a list of organizations already used
+		List <Integer> usedOrgs = new ArrayList<Integer>();
+		
+		for(Connections connection : connections) {
+			usedOrgs.add(connection.getorgId());
+		}
+		
+		//Add the organization id the configuration is being set up for.
+		usedOrgs.add(configurationDetails.getorgId());
+		
+		mav.addObject("usedOrgs",usedOrgs);
+		
+		return mav;
 	}
 }

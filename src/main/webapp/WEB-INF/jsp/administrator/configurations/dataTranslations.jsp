@@ -56,7 +56,7 @@
 				</div>
 				<div class="panel-body">
 					<div class="form-container">
-						<div class="form-group">
+						<div id="fieldDiv" class="form-group ${status.error ? 'has-error' : '' }">
 							<label class="control-label" for="fieldNumber">Field</label>
 							<select id="field" class="form-control half">
 								<option value="">- Select -</option>
@@ -82,8 +82,9 @@
 									<option value="${fields[fStatus.index].id}">${fields[fStatus.index].fieldDesc} </option>
 								</c:forEach>
 							</select>
+							<span id="fieldMsg" class="control-label"></span>
 						</div>
-						<div class="form-group">
+						<div id="crosswalkDiv" class="form-group ${status.error ? 'has-error' : '' }">
 							<label class="control-label" for="fieldNumber">Crosswalk</label>
 							<select id="crosswalk" class="form-control half">
 								<option value="">- Select -</option>
@@ -91,15 +92,17 @@
 									<option value="${crosswalks[cStatus.index].id}">${crosswalks[cStatus.index].name} <c:choose><c:when test="${crosswalks[cStatus.index].orgId == 0}"> (generic)</c:when><c:otherwise> (Org Specific)</c:otherwise></c:choose></option>
 								</c:forEach>
 							</select>
+							<span id="crosswalkMsg" class="control-label"></span>
 						</div>
-						<div class="form-group">
+						<div id="macroDiv" class="form-group ${status.error ? 'has-error' : '' }">
 							<label class="control-label" for=""macro"">Macro</label>
 							<select id="macro" class="form-control half">
 								<option value="">- Select -</option>
-								<c:forEach items="${crosswalks}" var="cwalk" varStatus="cStatus">
-									<option value="${crosswalks[cStatus.index].id}">${crosswalks[cStatus.index].name} <c:choose><c:when test="${crosswalks[cStatus.index].orgId == 0}"> (generic)</c:when><c:otherwise> (Org Specific)</c:otherwise></c:choose></option>
+								<c:forEach items="${macros}" var="macro" varStatus="mStatus">
+									<option value="${macros[mStatus.index].id}">${macros[mStatus.index].name}</option>
 								</c:forEach>
 							</select>
+							<span id="macroMsg" class="control-label"></span>
 						</div>
 						<div class="form-group">
 							<label class="control-label" for="passclear">Pass/Clear Error</label>
@@ -108,7 +111,7 @@
 									<input type="radio" id="passclear" value="1" checked />Pass Error 
 								</label>
 								<label class="radio-inline">
-									<input type="radio" id="passclear" value="2"/>Clear Error
+									<input type="radio" id="passclear" value="2" />Clear Error
 								</label>
 							</div>
 						</div>
@@ -229,6 +232,21 @@
 		    }); 
 		});
 
+		//The function that will be called when the "Save" button
+		//is clicked
+		$('#next').click(function(event) {
+			var transportMethod = $('#transportMethod').val();
+
+			$.ajax({  
+		        url: 'translations',  
+		        type: "POST",
+		        data: {'transportMethod' : transportMethod},
+		        success: function(data) { 
+			       window.location.href="connections";
+		        }	
+		    }); 
+		});
+
 		//This function will launch the crosswalk overlay with the selected
 		//crosswalk details
 		$(document).on('click','.viewCrosswalk',function() {
@@ -330,24 +348,57 @@
 	    $(document).on('click','#submitTranslationButton', function() {
 		    var selectedField = $('#field').val();
 		    var selectedFieldText = $('#field').find(":selected").text();
-		    var selectedCW = $(this).val();
-		    var selectedCWText = $(this).find(":selected").text();
+		    var selectedCW = $('#crosswalk').val();
+		    var selectedCWText = $('#crosswalk').find(":selected").text();
 		    var transportMethod = $('#transportMethod').val();
+		    var selectedMacro = $('#macro').val();
+		    var selectedMacroText = $('#macro').find(":selected").text();
 
-		    if(selectedField != "" && selectedCW != "") {
+		    //Remove all error classes and error messages
+		    $('div').removeClass("has-error");
+		    $('span').html("");
+
+		    var errorFound = 0;
+
+		    if(selectedField == "") {
+		    	$('#fieldDiv').addClass("has-error");
+				$('#fieldMsg').addClass("has-error");
+				$('#fieldMsg').html('A field must be selected!');
+				errorFound = 1;
+			}
+		    if(selectedCW == "" && selectedMacro == "") {
+		    	$('#crosswalkDiv').addClass("has-error");
+				$('#crosswalkMsg').addClass("has-error");
+				$('#crosswalkMsg').html('Either a macro or crosswalk must be selected!');
+				$('#macroDiv').addClass("has-error");
+				$('#macroMsg').addClass("has-error");
+				$('#macroMsg').html('Either a macro or crosswalk must be selected!'); 
+				errorFound = 1;
+			}
+			
+		    if(errorFound == 0) {
 		    	$.ajax({  
 			        url: "setTranslations",  
 			        type: "GET",  
-			        data: {'f' : selectedField, 'fText' : selectedFieldText, 'cw' : selectedCW, 'CWText' : selectedCWText, 'transportMethod' : transportMethod},
+			        data: {'f' : selectedField, 'fText' : selectedFieldText, 'cw' : selectedCW, 'CWText' : selectedCWText, 'transportMethod' : transportMethod, 'macroId' : selectedMacro
+				        , 'macroName' : selectedMacroText, 'fieldA' :  $('#fieldA').val(), 'fieldB' : $('#fieldB').val(), 'constant1' : $('#constant1').val(), 'constant2' : $('#constant2').val()
+				        , 'passClear' : $('#passclear').val()},
 			        success: function(data) {  
 				        $('#translationMsgDiv').show();
 			            $("#existingTranslations").html(data);   
 			            //Need to clear out the select boxes
 			            $('#field option:eq("")').prop('selected',true);  
-			            $('#crosswalk option:eq("")').prop('selected',true);      
+			            $('#crosswalk option:eq("")').prop('selected',true);    
+			            $('#macro option:eq("")').prop('selected', true);
+			            //Need to clear out fields
+			            $('#fieldA').val("");
+			            $('#fieldB').val("");
+			            $('#constant1').val("");
+			            $('#constant2').val("");
 			        }  
-			    });
+			    }); 
 			}
+
 		});
 		
 	    //Function that will handle changing a process order and

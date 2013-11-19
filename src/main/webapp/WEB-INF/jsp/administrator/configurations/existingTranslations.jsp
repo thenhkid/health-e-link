@@ -8,7 +8,7 @@
 			<th scope="col">Field</th>
 			<th scope="col">Marco</th>
 			<th scope="col">Crosswalk</th>
-			<th scope="col">Pass/Clear Error</th>
+			<th scope="col" class="center-text">Pass/Clear Error</th>
 			<th scope="col">Field A</th>
 			<th scope="col">Field B</th>
 			<th scope="col">Constant 1</th>
@@ -26,7 +26,25 @@
 						${dataTranslations[tStatus.index].fieldName} 
 					</td>
 					<td>
+						${dataTranslations[tStatus.index].macroName} 
+					</td>
+					<td>
 						${dataTranslations[tStatus.index].crosswalkName} 
+					</td>
+					<td class="center-text">
+						<c:choose><c:when test="${dataTranslations[tStatus.index].passClear == 1}">Pass</c:when><c:otherwise>Clear</c:otherwise></c:choose>
+					</td>
+					<td>
+						${dataTranslations[tStatus.index].fieldA} 
+					</td>
+					<td>
+						${dataTranslations[tStatus.index].fieldB} 
+					</td>
+					<td>
+						${dataTranslations[tStatus.index].constant1} 
+					</td>
+					<td>
+						${dataTranslations[tStatus.index].constant2} 
 					</td>
 					<td>
 						<select rel="${dataTranslations[tStatus.index].processOrder}" name="processOrder" class="processOrder">

@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ut.dph.dao.configurationDAO;
+import com.ut.dph.model.Connections;
+import com.ut.dph.model.Macros;
 import com.ut.dph.model.configuration;
 import com.ut.dph.model.configurationDataTranslations;
 import com.ut.dph.service.configurationManager;
@@ -109,6 +111,24 @@ public class configurationManagerImpl implements configurationManager {
 	@Transactional
 	public void deleteDataTranslations(int configId, int transportMethod) {
 		configurationDAO.deleteDataTranslations(configId, transportMethod);
+	}
+	
+	@Override
+	@Transactional
+	public void saveDataTranslations(configurationDataTranslations translations) {
+		configurationDAO.saveDataTranslations(translations);
+	}
+	
+	@Override
+	@Transactional
+	public  List<Macros> getMacros() {
+		return configurationDAO.getMacros();
+	}
+	
+	@Override
+	@Transactional
+	public List<Connections> getConnections(int configId) {
+		return configurationDAO.getConnections(configId);
 	}
 
 }
