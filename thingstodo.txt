@@ -1,2 +1,5 @@
 Notes (Grace 11162013) 
 A reminder for when we set up a client, we need to create the bowlink root folder and associated folders (libraryFiles, libraryFiles/crosswalks)
+
+(Chad 11/19/13)
+When you set up an organization (client) it checks for the org folder inside the main bowlink, if not found it creates it with all needed folders.
