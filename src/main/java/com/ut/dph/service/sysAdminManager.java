@@ -1,6 +1,5 @@
 package com.ut.dph.service;
 
-import java.math.BigInteger;
 import java.util.List;
 
 import com.ut.dph.model.custom.TableData;
@@ -18,20 +17,22 @@ import com.ut.dph.model.custom.LookUpTable;
 public interface sysAdminManager {
 
 	/** 
-	 * about 90% of our tables falls into the standard table category, which is
+	 * about 90% of our tables fall into the standard table category, which is
 	 * id, displayText, description, status and isCustom) 
 
 	 */
 	
-	List <LookUpTable> getTableList(int maxResults, int page);
+	List <LookUpTable> getTableList(int maxResults, int page, String searchTerm);
 	
 	Integer findTotalLookUpTable();
 	
-	List <LookUpTable> findLookUpTables(String searchTerm);
+	LookUpTable getTableInfo(String urlId);
 	
-	List <TableData> getDataList(int maxResults, int page, String tableName, String searchTerm);
+	List <TableData> getDataList(int maxResults, int page, String utTableName, String searchTerm);
 	
 	Integer findTotalDataRows(String tableName);
+	
+	void deleteDataItem (String utTableName, int id);
 	
 }
 

@@ -1,5 +1,7 @@
 package com.ut.dph.model.custom;
 
+import java.util.Date;
+
 import org.hibernate.validator.constraints.NotEmpty;
 
 
@@ -17,22 +19,21 @@ public class LookUpTable {
 	@NotEmpty
 	private String utTableName;
 	
+	/** display table name **/
 	@NotEmpty
 	private String tableName;
 	
 	@NotEmpty
 	private String urlId;
 	
-	@NotEmpty
 	private int columnNum;
-	
-	/** this will be good to have but there is no field in MySQL for collecting this once **/
-	@NotEmpty
+
 	private String description;  
 
 	/** this is good to have, # of items in that table **/
-	@NotEmpty
 	private int rowNum;
+	
+	private Date dateCreated;
 
 	public String getUtTableName() {
 		return utTableName;
@@ -80,6 +81,14 @@ public class LookUpTable {
 
 	public void setRowNum(int rowNum) {
 		this.rowNum = rowNum;
+	}
+
+	public Date getDateCreated() {
+		return dateCreated;
+	}
+
+	public void setDateCreated(Date dateCreated) {
+		this.dateCreated = dateCreated;
 	}
 
 	

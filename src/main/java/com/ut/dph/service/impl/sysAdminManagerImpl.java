@@ -26,9 +26,9 @@ public class sysAdminManagerImpl implements sysAdminManager {
 	
 
 	@Override
-	public List<LookUpTable> getTableList(int maxResults, int page) {
+	public List<LookUpTable> getTableList(int maxResults, int page, String searchTerm) {
 		/** this calls DAO to get a list of tables**/ 
-		return sysAdminDAO.getLookUpTables(page, maxResults);
+		return sysAdminDAO.getLookUpTables(page, maxResults, searchTerm);
 	}
 
 	@Override
@@ -36,20 +36,27 @@ public class sysAdminManagerImpl implements sysAdminManager {
 		return sysAdminDAO.findTotalLookUpTable();		
 	}
 
-	@Override
-	public List<LookUpTable> findLookUpTables(String searchTerm) {
-		return sysAdminDAO.findLookUpTables(searchTerm);
-	
-	}
 
 	@Override
-	public List<TableData> getDataList(int maxResults, int page, String tableName, String searchTerm) {
-		return sysAdminDAO.getDataList(page, maxResults, tableName, searchTerm);
+	public List<TableData> getDataList(int maxResults, int page, String utTableName, String searchTerm) {
+		return sysAdminDAO.getDataList(page, maxResults, utTableName, searchTerm);
 	}
 
 	@Override
 	public Integer findTotalDataRows(String tableName) {
 		return sysAdminDAO.findTotalDataRows(tableName);
+	}
+
+	@Override
+	public LookUpTable getTableInfo(String urlId) {
+		return sysAdminDAO.getTableInfo(urlId);
+		
+	}
+
+	@Override
+	public void deleteDataItem(String utTableName, int id) {
+		sysAdminDAO.deleteDataItem (utTableName, id);
+		
 	}
 
 }

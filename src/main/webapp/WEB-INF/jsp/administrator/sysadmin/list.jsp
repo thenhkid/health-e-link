@@ -7,18 +7,6 @@
 
 <div class="main clearfix full-width" role="main">
 	<div class="col-md-12">
-		
-		<c:if test="${not empty savedStatus}" >
-			<div class="alert alert-success">
-				<strong>Success!</strong> 
-				<c:choose>
-					<c:when test="${savedStatus == 'updated'}">The field has been successfully updated!</c:when>
-					<c:when test="${savedStatus == 'created'}">The field has been successfully added!</c:when>
-					<c:when test="${savedStatus == 'deleted'}">The field has been successfully removed!</c:when>
-				</c:choose>
-			</div>
-		</c:if>
-	
 		<section class="panel panel-default">
 			<div class="panel-body">
 				<div class="table-actions">
@@ -51,17 +39,19 @@
 								    <c:forEach var="tableInfo" items="${tableList}">
 										<tr id="tableInfoRow" style="cursor: pointer">
 											<td scope="row">
-												<a href="std/data/${tableInfo.urlId}" title="Edit this table">${tableInfo.tableName}</a>
+												<a href="std/data/${tableInfo.urlId}" title="View Data">${tableInfo.tableName}</a>
 											</td>
 											<td class="center-text">${tableInfo.columnNum}</td>
 											<td class="center-text">${tableInfo.rowNum}</td>
 											<td class="center-text">${tableInfo.description}</td>
+											<%-- not sure if we should let users edit our look up tables--%> 
 											<td class="actions-col">
-												<a href="details?i=${tableInfo.tableName}" class="btn btn-link" title="Edit this message type">
+												<a href="std/data/${tableInfo.urlId}" class="btn btn-link" title="Edit data for this table">
 													<span class="glyphicon glyphicon-edit"></span>
-													Edit	
+													View Data	
 												</a>
 											</td>
+											
 										</tr>
 									</c:forEach>
 								  </c:when>

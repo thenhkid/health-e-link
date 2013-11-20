@@ -19,22 +19,22 @@
 		</c:if>
 		<section class="panel panel-default">
 			<div class="panel-heading">
-				<h3 class="panel-title"><c:if test="${not empty tableName}">${tableName}</c:if></h3>
+				<h3 class="panel-title"><c:if test="${not empty tableInfo}">${tableInfo.tableName}</c:if></h3>
 			</div>
 			<div class="panel-body">
 				<div class="table-actions">
 					<div class="form form-inline pull-left">
-						<form:form class="form form-inline" action="/administrator/sysadmin/std/list" method="post">
+						<form:form class="form form-inline" action="" method="post">
 							<div class="form-group">
 								<label class="sr-only" for="searchTerm">Search</label>
-								<input type="text" name="searchTerm" id="searchTerm" value="${searchTerm}" class="form-control" id="search-providers" placeholder="Search"/>
+								<input type="text" name="searchTerm" id="searchTerm" value="${searchTerm}" class="form-control" id="search-dataItems" placeholder="Search"/>
 							</div>
-							<button id="searchProviderBtn" class="btn btn-primary btn-sm">
+							<button id="searchdataItemBtn" class="btn btn-primary btn-sm">
 								<span class="glyphicon glyphicon-search"></span>
 							</button>
 						</form:form>
 					</div>
-					<a href="provider.create"  class="btn btn-primary btn-sm pull-right" title="Create a new provider">
+					<a href="dataItem.create"  class="btn btn-primary btn-sm pull-right" title="Add data">
 						<span class="glyphicon glyphicon-plus"></span>
 					</a>
 				</div>
@@ -43,6 +43,7 @@
 					<table class="table table-striped table-hover table-default">
 						<thead>
 							<tr>
+								<th scope="col">Universal Translator<br/>Crosswalk Value</th>
 								<th scope="col">Display Text</th>
 								<th scope="col">Description</th>
 								<th scope="col" class="center-text">Date Created</th>
@@ -51,23 +52,22 @@
 						</thead>
 						<tbody>
 							<c:choose>
-								  <c:when test="${not empty providerList}">
-								    <c:forEach var="provider" items="${providerList}">
-										<tr id="userRow">
-											<td scope="row"><a href="provider.${provider.firstName}${provider.lastName}?i=${provider.id}"  title="Edit this provider">${provider.firstName} ${provider.lastName}</a><br />(<c:choose><c:when test="${provider.status == true}">active</c:when><c:otherwise>inactive</c:otherwise></c:choose>)</td>
+								  <c:when test="${not empty dataList}">
+								    <c:forEach var="dataItem" items="${dataList}">
+										<tr id="dataRow">
+											<td>${dataItem.id}</td>
+											<td scope="row"><a href="${tableInfo.urlId}/dataItem.${dataItem.displayText}?i=${dataItem.id}"  title="Edit this data">${dataItem.displayText}</a>
+											<br />(<c:choose><c:when test="${dataItem.status == true}">active</c:when><c:otherwise>inactive</c:otherwise></c:choose><c:if test="${dataItem.custom == true}">, custom data</c:if>)</td>
 											<td>
-											    <c:if test="${not empty provider.email}">${provider.email}<br /></c:if>
-											    (p) ${provider.phone1}
-											    <c:if test="${not empty provider.phone2}"><br />(c) ${provider.phone2}</c:if>
-											    <c:if test="${not empty provider.fax}"><br />(f) ${provider.fax}</c:if>
+											    ${dataItem.description}
 											</td>
-											<td class="center-text"><fmt:formatDate value="${provider.dateCreated}" type="date" pattern="M/dd/yyyy" /></td>
+											<td class="center-text"><fmt:formatDate value="${dataItem.dateCreated}" type="date" pattern="M/dd/yyyy" /></td>
 											<td class="actions-col">
-												<a href="provider.${provider.firstName}${provider.lastName}?i=${provider.id}"  class="btn btn-link" title="Edit this provider">
+												<a href="dataItem.${dataItem.displayText}?i=${dataItem.id}"  class="btn btn-link" title="Edit this data">
 												     <span class="glyphicon glyphicon-edit"></span>
 												     Edit	
 												</a>
-												<a href="javascript:void(0);" rel="${provider.id}" class="btn btn-link providerDelete" title="Delete this provider">
+												<a href="javascript:void(0);" rel="${dataItem.id}" class="btn btn-link dataItemDelete" title="Delete this row">
 													<span class="glyphicon glyphicon-remove"></span>
 													Delete
 												</a>
@@ -76,7 +76,7 @@
 									</c:forEach>
 								  </c:when>
 								  <c:otherwise>
-								   	<tr><td colspan="5" class="center-text">There where no providers found</td></tr>
+								   	<tr><td colspan="5" class="center-text">There where no items found for this table.</td></tr>
 								  </c:otherwise>
 							</c:choose>
 						</tbody>
@@ -111,70 +111,75 @@
 				
 	    $("input:text,form").attr("autocomplete","off");
 
-	    //This function will launch the new provider overlay with a blank screen
-	    $(document).on('click','#createNewProvider',function() {
+	    //This function will launch the new dataItem overlay with a blank screen
+	    $(document).on('click','#createNewdataItem',function() {
 		   $.ajax({  
-		        url: 'newProvider',  
+		        url: 'newdataItem',  
 		        type: "GET",  
 		        success: function(data) {  
-		            $("#systemProvidersModal").html(data);           
+		            $("#systemdataItemsModal").html(data);           
 		        }  
 		    });  
 		});
 
-
-		//This function will remvoe the clicked provider 
-		$(document).on('click','.providerDelete',function() {
-
-			var confirmed = confirm("Are you sure you want to remove this provider?");
-
-			if(confirmed) {
-				var id = $(this).attr('rel');
-				window.location.href="providerDelete/delete?i="+id;
-			}
-		});
-
-		$('#searchProviderBtn').click(function() {
+	    //this function will send them to table view
+	    $('#searchdataItemBtn').click(function() {
 			$('#searchForm').submit();
 		});
 
+		//This function will remove the clicked dataItem 
+		$(document).on('click','.dataItemDelete',function() {
 
-		//Function to submit the changes to an existing provider or 
-		//submit the new provider fields from the modal window.
+			var confirmed = confirm("Are you sure you want to remove this data?");
+
+			if(confirmed) {
+				var id = $(this).attr('rel');
+				var path = window.location.href + "/delete?i="+id;
+				window.location.href= path;
+			}
+		});
+
+		$('#tableDetailsLink').click(function() {
+			window.location.href=window.location.href.replace("data/", "");
+		});
+
+
+		//Function to submit the changes to an existing dataItem or 
+		//submit the new dataItem fields from the modal window.
 		$(document).on('click', '#submitButton',function(event) {
 			var currentPage = $('#currentPageHolder').attr('rel');
 			
-			var formData = $("#providerdetailsform").serialize();  
+			var formData = $("#dataItemdetailsform").serialize();  
 
 			var actionValue = $(this).attr('rel').toLowerCase();
 			
 			$.ajax({  
-		        url: actionValue+'Provider',  
+		        url: actionValue+'dataItem',  
 		        data: formData,  
 		        type: "POST",  
 		        async: false,
 		        success: function(data) { 
 			       
-			        if(data.indexOf('providerUpdated') != -1) {
+			        if(data.indexOf('dataItemUpdated') != -1) {
 				        if(currentPage > 0) {
-				        	window.location.href="providers?msg=updated&page="+currentPage;
+				        	window.location.href="dataItems?msg=updated&page="+currentPage;
 						}
 				        else {
-				        	window.location.href="providers?msg=updated";
+				        	window.location.href="dataItems?msg=updated";
 						}
 						
 					}
-			        else if(data.indexOf('providerCreated') != -1) {
+			        else if(data.indexOf('dataItemCreated') != -1) {
 			        	if(currentPage > 0) {
-				        	window.location.href="providers?msg=created&page="+currentPage;
+				        	window.location.href="dataItems?msg=created&page="+currentPage;
 						}
 				        else {
-				        	window.location.href="providers?msg=created";
+				        	window.location.href="dataItems?msg=created";
 						}
 						
 					}
 			        else {
-		        		$("#systemProvidersModal").html(data);
+		        		$("#systemdataItemsModal").html(data);
 			        }
 		        }  
 		    });  
@@ -184,16 +189,6 @@
 		});
 		
 	});
-
-	/*function orglookup() {
-		if(searchTimeout) {clearTimeout(searchTimeout);}
-
-		var term = $('#searchTerm').val().toLowerCase();
-
-		if(term.length >= 3 || term.length == 0) {
-			$('#searchForm').submit();
-		}
-	}*/
 
 	
 </script>

@@ -8,13 +8,21 @@ import com.ut.dph.model.custom.LookUpTable;
 
 public interface sysAdminDAO {
 	
-	List <LookUpTable> getLookUpTables(int page, int maxResults);
+	/**
+	 * @param page
+	 * @param maxResults
+	 * @param searchTerm
+	 * @return
+	 */
+	List <LookUpTable> getLookUpTables(int page, int maxResults, String searchTerm);
 	
 	Integer findTotalLookUpTable();
 	
-	List <LookUpTable> findLookUpTables(String searchTerm);
-	
-	List <TableData> getDataList(int page, int maxResults, String tableName, String searchTerm);
+	List <TableData> getDataList(int page, int maxResults, String utTableName, String searchTerm);
 	
 	Integer findTotalDataRows(String tableName);
+	
+	LookUpTable  getTableInfo(String urlId);
+	
+	void deleteDataItem (String utTableName, int id);
 }

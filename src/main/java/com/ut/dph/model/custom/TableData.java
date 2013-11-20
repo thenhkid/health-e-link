@@ -13,8 +13,6 @@ import org.hibernate.validator.constraints.NotEmpty;
 public class TableData {
 	
 	//item belong to a table
-	@NotEmpty
-	private String tableName;
 
 	@NotEmpty
 	private int id;
@@ -32,12 +30,7 @@ public class TableData {
 	
 	private Date dateCreated;
 	private Date dateModified;
-	public String getTableName() {
-		return tableName;
-	}
-	public void setTableName(String tableName) {
-		this.tableName = tableName;
-	}
+	
 	public int getId() {
 		return id;
 	}
