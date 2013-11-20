@@ -93,6 +93,11 @@ public class providerDAOImpl implements providerDAO {
 		deleteAddresses.setParameter("providerId",providerId);
 		deleteAddresses.executeUpdate();
 		
+		//delete provider ids
+		Query deleteProviderIds = sessionFactory.getCurrentSession().createQuery("delete from providerIdNum where providerId = :providerId)");
+		deleteProviderIds.setParameter("providerId",providerId);
+		deleteProviderIds.executeUpdate();
+		
 		Query deletProvider = sessionFactory.getCurrentSession().createQuery("delete from Provider where id = :providerId");
 		deletProvider.setParameter("providerId",providerId);
 		deletProvider.executeUpdate();
