@@ -3,3 +3,9 @@ A reminder for when we set up a client, we need to create the bowlink root folde
 
 (Chad 11/19/13)
 When you set up an organization (client) it checks for the org folder inside the main bowlink, if not found it creates it with all needed folders.
+
+(Grace 11/19/13)
+I meant the library folders for overall application and not for individual organization. I had errors when adding a
+library crosswalk because I didn't have the folders - /bowlink/libraryFiles /bowlink/crosswalks 
+However, it doesn't matter as those will be our library and when we go live, all library material will be in be copied over.
+You can clear this file when it is all set. I will start using bugHub. Thank you!
