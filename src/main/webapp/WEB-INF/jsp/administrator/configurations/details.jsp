@@ -56,6 +56,7 @@
 										<option value="${organizations[oStatus.index].id}" <c:if test="${configurationDetails.orgId == organizations[oStatus.index].id}">selected</c:if>>${organizations[oStatus.index].orgName} </option>
 									</c:forEach>
 								</form:select>
+                                                                <c:if test="${configurationDetails.id > 0}"><form:hidden path="orgId"/></c:if>           
 							</div>
 						</spring:bind>
 						<spring:bind path="messageTypeId">
@@ -67,6 +68,7 @@
 										<option value="${messageTypes[mStatus.index].id}" <c:if test="${configurationDetails.messageTypeId == messageTypes[mStatus.index].id}">selected</c:if>>${messageTypes[mStatus.index].name} </option>
 									</c:forEach>
 								</form:select>
+                                                                <c:if test="${configurationDetails.id > 0}"><form:hidden path="messageTypeId"/></c:if>  
 							</div>
 						</spring:bind>
 					</div>
