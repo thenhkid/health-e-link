@@ -27,7 +27,6 @@ import com.ut.dph.model.Macros;
 import com.ut.dph.model.configuration;
 import com.ut.dph.model.configurationDataTranslations;
 import com.ut.dph.model.configurationFormFields;
-import com.ut.dph.model.messageTypeDataTranslations;
 import com.ut.dph.model.messageTypeFormFields;
 import com.ut.dph.service.configurationManager;
 import com.ut.dph.model.Organization;
@@ -67,7 +66,7 @@ public class adminConfigController {
 	 * The private maxResults variable will hold the number of results to show per
 	 * list page.
 	 */
-	private static int maxResults = 20;
+	private static final int maxResults = 20;
 	
 	private static List<configurationDataTranslations> translations = null;
 	
@@ -96,8 +95,8 @@ public class adminConfigController {
         List<configuration> configurations = configurationmanager.getConfigurations(page,maxResults);
         mav.addObject("configurationList", configurations);	
         
-        Organization org = null;
-        messageType messagetype = null;
+        Organization org;
+        messageType messagetype;
         
         for(configuration config : configurations) {
         	org = organizationmanager.getOrganizationById(config.getorgId());
@@ -106,8 +105,7 @@ public class adminConfigController {
         	messagetype = messagetypemanager.getMessageTypeById(config.getMessageTypeId());
         	config.setMessageTypeName(messagetype.getName());
         	
-        	Long totalConnections = null;
-    		totalConnections = (Long) configurationmanager.getTotalConnections(configId);
+        	Long totalConnections = (Long) configurationmanager.getTotalConnections(configId);
     		config.setTotalConnections(totalConnections);
     		
         }
@@ -144,8 +142,8 @@ public class adminConfigController {
         mav.addObject("searchTerm",searchTerm);
         mav.addObject("configurationList", configurations);		
         
-        Organization org = null;
-        messageType messagetype = null;
+        Organization org;
+        messageType messagetype;
         
         for(configuration config : configurations) {
         	org = organizationmanager.getOrganizationById(config.getorgId());
@@ -154,8 +152,7 @@ public class adminConfigController {
         	messagetype = messagetypemanager.getMessageTypeById(config.getMessageTypeId());
         	config.setMessageTypeName(messagetype.getName());
         	
-        	Long totalConnections = null;
-    		totalConnections = (Long) configurationmanager.getTotalConnections(configId);
+                Long totalConnections = (Long) configurationmanager.getTotalConnections(configId);
     		config.setTotalConnections(totalConnections);
         }
         
@@ -226,8 +223,7 @@ public class adminConfigController {
 			return mav;
 		}
 		
-		Integer id = null;
-		id = (Integer) configurationmanager.createConfiguration(configurationDetails);
+		Integer id = (Integer) configurationmanager.createConfiguration(configurationDetails);
 		
 		configId = id;
 		

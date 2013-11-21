@@ -38,7 +38,7 @@ public class adminLibController {
 	 * The private maxResults variable will hold the number of results to show per
 	 * list page.
 	 */
-	private static int maxResults = 10;
+	private static final int maxResults = 10;
 	
 	/**
 	 * The private variable messageTypeId will hold the messageTypeId when viewing a message type
@@ -160,8 +160,7 @@ public class adminLibController {
 			return mav;	
         }
 		 
-		Integer id = null;
-		id = (Integer) messagetypemanager.createMessageType(messageTypeDetails);
+		Integer id = (Integer) messagetypemanager.createMessageType(messageTypeDetails);
 		
 		redirectAttr.addFlashAttribute("savedStatus", "created");
 		
@@ -260,8 +259,8 @@ public class adminLibController {
 		messageType messageTypeDetails = messagetypemanager.getMessageTypeById(messageTypeId);
 		
 		//Need to return a list of associated fields for the selected message type
-		List<messageTypeFormFields> fields = messagetypemanager.getMessageTypeFields(messageTypeId);
-		messageTypeDetails.setFields(fields);
+		List<messageTypeFormFields> fieldList = messagetypemanager.getMessageTypeFields(messageTypeId);
+		messageTypeDetails.setFields(fieldList);
 		
 		mav.addObject("messageTypeDetails", messageTypeDetails);
 		
@@ -293,12 +292,12 @@ public class adminLibController {
 	 */
 	 @RequestMapping(value="/mappings", method = RequestMethod.POST)
 	 public ModelAndView submitFieldMappings(@ModelAttribute(value="messageTypeDetails") messageType messageTypeDetails, RedirectAttributes redirectAttr) throws Exception {
-		List<messageTypeFormFields> fields = messageTypeDetails.getFields();
+		List<messageTypeFormFields> fieldList = messageTypeDetails.getFields();
 	
-		if(null != fields && fields.size() > 0) {
-			adminLibController.fields = fields;
+		if(null != fieldList && fieldList.size() > 0) {
+			adminLibController.fields = fieldList;
 			
-			for(messageTypeFormFields formfield : fields) {
+			for(messageTypeFormFields formfield : fieldList) {
 				//Update each mappings
 				messagetypemanager.updateMessageTypeFields(formfield);
 			}
@@ -348,8 +347,8 @@ public class adminLibController {
 		mav.addObject("id",messageTypeId);
 		
 		//Need to return a list of associated fields for the selected message type
-		List<messageTypeFormFields> fields = messagetypemanager.getMessageTypeFields(messageTypeId);
-		mav.addObject("fields",fields);
+		List<messageTypeFormFields> fieldList = messagetypemanager.getMessageTypeFields(messageTypeId);
+		mav.addObject("fields",fieldList);
 		
 		//Return a list of available crosswalks
 		List<Crosswalks> crosswalks = messagetypemanager.getCrosswalks(1,0,0);
@@ -497,9 +496,9 @@ public class adminLibController {
 	 */
 	 @RequestMapping(value="/createCrosswalk", method = RequestMethod.POST)
 	 public @ResponseBody ModelAndView createCrosswalk(@ModelAttribute(value="crosswalkDetails") Crosswalks crosswalkDetails, BindingResult result, RedirectAttributes redirectAttr, @RequestParam int orgId) throws Exception {
-		int lastId = 0;
-		crosswalkDetails.setOrgId(orgId);
-		lastId = messagetypemanager.createCrosswalk(crosswalkDetails);
+		
+                crosswalkDetails.setOrgId(orgId);
+		int lastId = messagetypemanager.createCrosswalk(crosswalkDetails);
 		
 		if(lastId == 0) {
 			redirectAttr.addFlashAttribute("savedStatus", "error");
