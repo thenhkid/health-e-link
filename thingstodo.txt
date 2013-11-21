@@ -4,4 +4,4 @@ testing a change
 
 Chad update to this file
 
-another line
+this line should cause conflict.
