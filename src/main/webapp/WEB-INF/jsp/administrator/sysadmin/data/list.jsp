@@ -9,17 +9,21 @@
 		
 		<c:if test="${not empty savedStatus}" >
 			<div class="alert alert-success">
+			<c:if test="${savedStatus != 'notDeleted'}" >
 				<strong>Success!</strong> 
+			</c:if>
 				<c:choose>
 					<c:when test="${savedStatus == 'updated'}">Data has been successfully updated!</c:when>
 					<c:when test="${savedStatus == 'created'}">Data has been successfully added!</c:when>
 					<c:when test="${savedStatus == 'deleted'}">Data has been successfully removed!</c:when>
+					<c:when test="${savedStatus == 'notDeleted'}">The data is in use and cannot be deleted.  Please set the status to inactive instead.</c:when>
 				</c:choose>
 			</div>
 		</c:if>
+		
 		<section class="panel panel-default">
 			<div class="panel-heading">
-				<h3 class="panel-title"><c:if test="${not empty tableInfo}">${tableInfo.tableName}</c:if></h3>
+				<h3 class="panel-title"><c:if test="${not empty tableInfo}">Data for "${tableInfo.tableName}" Table</c:if></h3>
 			</div>
 			<div class="panel-body">
 				<div class="table-actions">
@@ -34,7 +38,7 @@
 							</button>
 						</form:form>
 					</div>
-					<a href="dataItem.create"  class="btn btn-primary btn-sm pull-right" title="Add data">
+					<a href="${tableInfo.urlId}/dataItem.create"  class="btn btn-primary btn-sm pull-right" title="Add data">
 						<span class="glyphicon glyphicon-plus"></span>
 					</a>
 				</div>
@@ -106,15 +110,16 @@
 
 		//Fade out the updated/created message after being displayed.
 		if($('.alert').length >0) {
-			$('.alert').delay(2000).fadeOut(1000);
+			$('.alert').delay(2000).fadeOut(5000);
 		}
 				
 	    $("input:text,form").attr("autocomplete","off");
 
 	    //This function will launch the new dataItem overlay with a blank screen
 	    $(document).on('click','#createNewdataItem',function() {
+	    	alert("here");
 		   $.ajax({  
-		        url: 'newdataItem',  
+		        url: '../../std/data/${tableInfo.urlId}',  
 		        type: "GET",  
 		        success: function(data) {  
 		            $("#systemdataItemsModal").html(data);           
