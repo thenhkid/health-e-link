@@ -32,7 +32,7 @@ public interface sysAdminManager {
 	
 	Integer findTotalDataRows(String tableName);
 	
-	void deleteDataItem (String utTableName, int id);
+	boolean deleteDataItem (String utTableName, int id);
 	
 }
 

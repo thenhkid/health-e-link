@@ -24,5 +24,5 @@ public interface sysAdminDAO {
 	
 	LookUpTable  getTableInfo(String urlId);
 	
-	void deleteDataItem (String utTableName, int id);
+	boolean deleteDataItem (String utTableName, int id);
 }
