@@ -942,7 +942,7 @@ public class adminConfigController {
      * 
      */
     @RequestMapping(value = "/scheduling", method = RequestMethod.POST)
-    public ModelAndView submitConfigurationSchedules(@ModelAttribute(value = "scheduleDetails") configurationSchedules scheduleDetails) throws Exception {
+    public ModelAndView submitConfigurationSchedules(@ModelAttribute(value = "scheduleDetails") configurationSchedules scheduleDetails, RedirectAttributes redirectAttr) throws Exception {
        
        //Set default values based on what schedule type is selected
        //This will help in case the user was switching around selecting
@@ -981,16 +981,15 @@ public class adminConfigController {
        configurationmanager.saveSchedule(scheduleDetails);
        
        //Update the configuration completed step
-        configuration configurationDetails = configurationmanager.getConfigurationById(configId);
+       configuration configurationDetails = configurationmanager.getConfigurationById(configId);
         if (configurationDetails.getstepsCompleted() < 6) {
             configurationmanager.updateCompletedSteps(configId, 6);
         }
        
-       ModelAndView mav = new ModelAndView();
-       mav.setViewName("/administrator/configurations/schedule");
-       mav.addObject("id", configId);
-       mav.addObject("success", "updated");
+       redirectAttr.addFlashAttribute("savedStatus", "updated");
+
+       ModelAndView mav = new ModelAndView(new RedirectView("scheduling"));
        return mav;
-        
+    
     }
 }

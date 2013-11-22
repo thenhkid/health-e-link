@@ -90,6 +90,7 @@
                     <form:form id="schedulingSpecs" modelAttribute="scheduleDetails" action="scheduling" method="post" role="form">
                         <form:hidden path="transportMethod" value="${scheduleDetails.transportMethod}" />
                         <form:hidden path="configId" value="${scheduleDetails.configId}" />
+                        <form:hidden path="type" id="type" />
                         <div class="form-group specFormFields" id="processingTypeDiv" style="display:none">
                             <label for="status">Type of Processing</label>
                             <div>
@@ -103,12 +104,12 @@
                         </div>
                        <div class="form-group specFormFields" id="newfilecheckDiv" style="display:none">
                             <label for="status">How often to check for a new file</label>
-                            <select path="newfileCheck" id="newfilecheck" class="form-control">
-                                <option value="">- Select -</option>
+                            <form:select path="newfileCheck" id="newfilecheck" class="form-control">
+                                <option value="0">- Select -</option>
                                 <c:forEach begin="5" end="60" var="m" step="5">
                                     <option value="${m}" <c:if test="${scheduleDetails.newfileCheck == m}">selected</c:if>>Every ${m} Minutes</option>
                                 </c:forEach>
-                           </select>
+                           </form:select>
                         </div>          
                         <div class="form-group specFormFields" id="processingDayDiv" style="display:none">
                             <label for="status">Process on what Day</label>
@@ -138,12 +139,12 @@
                         </div> 
                         <div class="form-group specFormFields" id="processingTimeDiv" style="display:none">
                             <label for="status">Time of Day to process files</label>
-                            <select path="processingTime" class="form-control">
-                                <option value="">- Select -</option>
+                            <form:select id="processingTime" path="processingTime" class="form-control">
+                                <option value="0">- Select -</option>
                                 <c:forEach begin="1" end="23" var="i">
                                     <option value="${i}" <c:if test="${scheduleDetails.processingTime == i}">selected</c:if>><c:choose><c:when test="${i < 12}">${i} AM</c:when><c:when test="${i == 12}">12 PM</c:when><c:otherwise>${i-12} PM</c:otherwise></c:choose></option>
                                 </c:forEach>
-                           </select>
+                           </form:select>
                         </div>       
                     </form:form>
                     </div>
@@ -206,7 +207,7 @@
     
     function showScheduleForm() {
         var type = $('.processMethod:checked').val();
-        
+        $('#type').val(type);
         if(type !== "1" && type !== "5") {
             $('#specs').show();
 
