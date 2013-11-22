@@ -62,7 +62,7 @@ ADD CONSTRAINT `formtransportDetailId`
   
   /* Chad 11-18-2013 */
   ALTER TABLE `universalTranslator`.`rel_configurationDataTranslations` 
-CHANGE COLUMN `fieldNo` `fieldId` INT(11) NOT NULL ;
+CHANGE COLUMN `fieldNo` `fieldId` INT(11) NOT NULL ,
  ADD COLUMN `transportMethod` INT NOT NULL AFTER `configId`;
 
 ALTER TABLE `universalTranslator`.`rel_configurationDataTranslations` 
@@ -101,6 +101,11 @@ INSERT INTO `lookUpTables` VALUES (1,'lu_BestTimeToCall','Best Time To Call',NUL
 /*!40000 ALTER TABLE `lookUpTables` ENABLE KEYS */;
 UNLOCK TABLES;
 
+
+/* Chad 11-22-2013 */
+
+ALTER TABLE `universalTranslator`.`configurationSchedule` 
+ADD COLUMN `transportMethod` INT NOT NULL AFTER `configId`;
 
 
 
