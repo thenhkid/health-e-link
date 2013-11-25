@@ -107,6 +107,126 @@ UNLOCK TABLES;
 ALTER TABLE `universalTranslator`.`configurationSchedule` 
 ADD COLUMN `transportMethod` INT NOT NULL AFTER `configId`;
 
+/* Grace 11-25-2013 **/
+CREATE TABLE `universalTranslator`.`message_To` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `messageId` INT NOT NULL COMMENT 'This is the messageId from message_Details table.',
+  `messageTypeId` INT NOT NULL,
+  `orgId` INT NOT NULL,
+  `name` VARCHAR(45) NULL,
+  `address1` VARCHAR(45) NULL,
+  `address2` VARCHAR(45) NULL,
+  `city` VARCHAR(45) NULL,
+  `state` VARCHAR(2) NULL,
+  `postalCode` VARCHAR(45) NULL,
+  `county` VARCHAR(45) NULL,
+  `phone` VARCHAR(45) NULL,
+  `fax` VARCHAR(45) NULL,
+  `dateCreated` DATETIME NOT NULL DEFAULT current_timestamp,
+  PRIMARY KEY (`id`));
 
 
+ALTER TABLE `universalTranslator`.`message_ToOrg` 
+ADD INDEX `FKMessToMessId_idx` (`messageId` ASC),
+ADD INDEX `FKMessToOrgId_idx` (`orgId` ASC),
+ADD INDEX `FKMessToMessageTypeId_idx` (`messageTypeId` ASC);
+ALTER TABLE `universalTranslator`.`message_ToOrg` 
+ADD CONSTRAINT `FKMessToMessId`
+  FOREIGN KEY (`messageId`)
+  REFERENCES `universalTranslator`.`message_Details` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION,
+ADD CONSTRAINT `FKMessToOrgId`
+  FOREIGN KEY (`orgId`)
+  REFERENCES `universalTranslator`.`organizations` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION,
+ADD CONSTRAINT `FKMessToMessageTypeId`
+  FOREIGN KEY (`messageTypeId`)
+  REFERENCES `universalTranslator`.`messagetypes` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
 
+CREATE TABLE `message_ToProvider` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `messageId` int(11) NOT NULL COMMENT 'This is the messageId from message_Details table.',
+  `messageTypeId` int(11) NOT NULL,
+  `providerId` int(11) NOT NULL,
+  `name` varchar(45) DEFAULT NULL,
+  `address1` varchar(45) DEFAULT NULL,
+  `address2` varchar(45) DEFAULT NULL,
+  `city` varchar(45) DEFAULT NULL,
+  `state` varchar(2) DEFAULT NULL,
+  `postalCode` varchar(45) DEFAULT NULL,
+  `county` varchar(45) DEFAULT NULL,
+  `phone` varchar(45) DEFAULT NULL,
+  `fax` varchar(45) DEFAULT NULL,
+  `dateCreated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `FKMessToPMessId_idx` (`messageId`),
+  KEY `FKMessToPMessageTypeId_idx` (`messageTypeId`),
+  CONSTRAINT `FKMessToPMessId` FOREIGN KEY (`messageId`) REFERENCES `message_Details` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `FKMessToPMessageTypeId` FOREIGN KEY (`messageTypeId`) REFERENCES `messagetypes` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+ALTER TABLE `universalTranslator`.`message_ToProvider` 
+ADD INDEX `FKMessToPProviderId_idx` (`providerId` ASC);
+ALTER TABLE `universalTranslator`.`message_ToProvider` 
+ADD CONSTRAINT `FKMessToPProviderId`
+  FOREIGN KEY (`providerId`)
+  REFERENCES `universalTranslator`.`info_providers` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+  CREATE TABLE `message_FromOrg` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `messageId` int(11) NOT NULL COMMENT 'This is the messageId from message_Details table.',
+  `messageTypeId` int(11) NOT NULL,
+  `orgId` int(11) NOT NULL,
+  `name` varchar(45) DEFAULT NULL,
+  `address1` varchar(45) DEFAULT NULL,
+  `address2` varchar(45) DEFAULT NULL,
+  `city` varchar(45) DEFAULT NULL,
+  `state` varchar(2) DEFAULT NULL,
+  `postalCode` varchar(45) DEFAULT NULL,
+  `county` varchar(45) DEFAULT NULL,
+  `phone` varchar(45) DEFAULT NULL,
+  `fax` varchar(45) DEFAULT NULL,
+  `dateCreated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `FKMessFromMessId_idx` (`messageId`),
+  KEY `FKMessFromOrgId_idx` (`orgId`),
+  KEY `FKMessFromMessageTypeId_idx` (`messageTypeId`),
+  CONSTRAINT `FKMessFromMessId` FOREIGN KEY (`messageId`) REFERENCES `message_Details` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `FKMessFromOrgId` FOREIGN KEY (`orgId`) REFERENCES `organizations` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `FKMessFromMessageTypeId` FOREIGN KEY (`messageTypeId`) REFERENCES `messagetypes` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  
+CREATE TABLE `message_FromProvider` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `messageId` int(11) NOT NULL COMMENT 'This is the messageId from message_Details table.',
+  `messageTypeId` int(11) NOT NULL,
+  `providerId` int(11) NOT NULL,
+  `name` varchar(45) DEFAULT NULL,
+  `address1` varchar(45) DEFAULT NULL,
+  `address2` varchar(45) DEFAULT NULL,
+  `city` varchar(45) DEFAULT NULL,
+  `state` varchar(2) DEFAULT NULL,
+  `postalCode` varchar(45) DEFAULT NULL,
+  `county` varchar(45) DEFAULT NULL,
+  `phone` varchar(45) DEFAULT NULL,
+  `fax` varchar(45) DEFAULT NULL,
+  `dateCreated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `FKMessFromPMessId_idx` (`messageId`),
+  KEY `FKMessFromPMessageTypeId_idx` (`messageTypeId`),
+  KEY `FKMessFromPProviderId_idx` (`providerId`),
+  CONSTRAINT `FKMessFromPProviderId` FOREIGN KEY (`providerId`) REFERENCES `info_providers` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `FKMessFromPMessageTypeId` FOREIGN KEY (`messageTypeId`) REFERENCES `messagetypes` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `FKMessFromPMessId` FOREIGN KEY (`messageId`) REFERENCES `message_Details` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  
+  
+  
+  /* end grace 11.25.13 */
