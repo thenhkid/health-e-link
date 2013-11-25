@@ -428,8 +428,7 @@ public class adminLibController {
     @RequestMapping(value = "/getCrosswalks.do", method = RequestMethod.GET)
     public @ResponseBody
     ModelAndView getCrosswalks(@RequestParam(value = "page", required = false) Integer page, @RequestParam(value = "orgId", required = false) Integer orgId, @RequestParam(value = "maxCrosswalks", required = false) Integer maxCrosswalks) throws Exception {
-        double maxCrosswalkVal = 4;
-
+       
         if (page == null) {
             page = 1;
         }
@@ -437,11 +436,13 @@ public class adminLibController {
         if (orgId == null) {
             orgId = 0;
         }
-
-        if (maxCrosswalks != null) {
-            maxCrosswalkVal = maxCrosswalks;
+        
+        if(maxCrosswalks == null) {
+            maxCrosswalks = 4;
         }
 
+        double maxCrosswalkVal = maxCrosswalks;
+       
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/messageTypeLibrary/crosswalks");
         mav.addObject("orgId", orgId);
