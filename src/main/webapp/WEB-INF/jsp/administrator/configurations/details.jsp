@@ -30,7 +30,7 @@
                             <label for="status">Status *</label>
                             <div>
                                 <label class="radio-inline">
-                                    <form:radiobutton id="status" path="status" value="1" disabled="${stepsCompleted < 5 ? 'false' : 'true' }" />Active 
+                                  <form:radiobutton id="status" path="status" value="1" disabled="${completedSteps != 6 ? 'true' : 'false' }" />Active 
                                 </label>
                                 <label class="radio-inline">
                                     <form:radiobutton id="status" path="status" value="0"/>Inactive

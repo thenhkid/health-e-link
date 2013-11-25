@@ -48,7 +48,7 @@
                 <c:otherwise>
                     <li><a href="javascript:void(0);" id="saveDetails" title="Save this Organization"><span class="glyphicon glyphicon-ok icon-stacked"></span> Save </a></li>
                     <c:if test="${not empty id && param['page'] != 'schedule'}"><li><a href="javascript:void(0);" id="next" title="Save and Proceed to the Next Step"><span class="glyphicon glyphicon-forward icon-stacked"></span>Next Step</a></li></c:if>
-                    <c:if test="${not empty id}"><li><a href="#confirmationOrgDelete" data-toggle="modal" rel="${id}" title="Delete this Configuration"><span class="glyphicon glyphicon-remove icon-stacked"></span>Delete</a></li></c:if>
+                    <%--<c:if test="${not empty id}"><li><a href="#confirmationOrgDelete" data-toggle="modal" rel="${id}" title="Delete this Configuration"><span class="glyphicon glyphicon-remove icon-stacked"></span>Delete</a></li></c:if>--%>
                     <li><a href="<c:url value='/administrator/configurations/list' />" title="Cancel"><span class="glyphicon icon-stacked custom-icon icon-cancel"></span>Cancel</a></li>
                </c:otherwise>
            </c:choose>
