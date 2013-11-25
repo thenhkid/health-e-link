@@ -29,23 +29,22 @@
         <c:if test="${not empty savedStatus}" >
             <div class="alert alert-success">
                 <strong>Success!</strong> 
-                <c:choose><c:when test="${savedStatus == 'updated'}">The field mappings have been successfully updated!</c:when><c:when test="${savedStatus == 'created'}">The message type has been successfully created!</c:when></c:choose>
-                    </div>
+                <c:choose><c:when test="${savedStatus == 'updated'}">The field mappings have been successfully updated!</c:when><c:when test="${savedStatus == 'created'}">The message type has been successfully created!</c:when><c:when test="${savedStatus == 'fieldcreated'}">The new form field has been successfully created!</c:when></c:choose>
+            </div>
         </c:if>
 
         <form:form id="fieldMappings" modelAttribute="messageTypeDetails" method="post" role="form">
             <c:forEach var="i" begin="1" end="4">	
                 <section class="panel panel-default">
                     <div class="panel-heading">
-                        <dt>
-                        <dd>
-                            <strong>Bucket ${i} <c:choose><c:when test="${i==1}"> (Sender Information)</c:when><c:when test="${i==2}"> (Recipient Information)</c:when><c:when test="${i==3}"> (Patient Information)</c:when><c:when test="${i==4}"> (Other)</c:when></c:choose></strong>
-                                </dd>
-                                </dt>
-                            </div>
-                            <div class="panel-body">
-                                <div class="form-container scrollable">
-                                <table class="table table-striped table-hover bucketTable_${i}">
+                        <div class="pull-right">
+                            <a href="#newFieldModal" data-toggle="modal" class="btn btn-primary btn-xs btn-action" id="addNewField" rel="${i}" title="Add new field to bucket ${i}">Add New Field</a>
+                        </div>
+                        <h3 class="panel-title"><strong>Bucket ${i} <c:choose><c:when test="${i==1}"> (Sender Information)</c:when><c:when test="${i==2}"> (Recipient Information)</c:when><c:when test="${i==3}"> (Patient Information)</c:when><c:when test="${i==4}"> (Other)</c:when></c:choose></strong></h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="form-container scrollable">
+                           <table class="table table-striped table-hover bucketTable_${i}">
                                 <thead>
                                     <tr>
                                         <th scope="col" style="width:150px; min-width:150px">Display POS</th>
@@ -133,13 +132,15 @@
                             </table>
                         </div>
                     </div>
-
-
                 </section>
             </c:forEach>
         </form:form>
     </div>
 </div>
+
+<!-- Brochure Form modal -->
+<div class="modal fade" id="newFieldModal" role="dialog" tabindex="-1" aria-labeledby="New Field" aria-hidden="true" aria-describedby="New Field"></div>
+
 
 <script type="text/javascript">
 
@@ -152,8 +153,22 @@
         if ($('.alert').length > 0) {
             $('.alert').delay(2000).fadeOut(1000);
         }
-        ;
-
+        
+        //Function that will display the new field module
+        $(document).on('click', '#addNewField', function() {
+            var bucketNo = $(this).attr('rel');
+            var displayPos = $('.dspPos_'+bucketNo+':last').val();
+            var fieldNo = $('.fieldNo:last').val();
+           
+           $.ajax({
+                url: 'addNewField',
+                type: "GET",
+                data: {'bucketNo' : bucketNo, 'displayPOS' : displayPos, 'maxfieldNo' : fieldNo},
+                success: function(data) {
+                    $("#newFieldModal").html(data);
+                }
+            });
+        });
 
         //Function that will handle changing a display position and
         //making sure another field in the same bucket does not have
@@ -181,7 +196,7 @@
         $('.tableName').each(function() {
             var row = $(this).attr('rel');
             var tableName = $(this).val();
-            if (tableName != "") {
+            if (tableName !== "") {
                 populateTableColumns(tableName, row);
             }
         });

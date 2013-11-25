@@ -172,7 +172,7 @@ public class configurationDAOImpl implements configurationDAO {
     @SuppressWarnings("unchecked")
     public List<configuration> findConfigurations(String searchTerm) {
 
-        if (searchTerm != "") {
+        if (!"".equals(searchTerm)) {
             //get a list of organization id's that match the term passed in
             List<Integer> orgIdList = new ArrayList<Integer>();
             Criteria findOrgs = sessionFactory.getCurrentSession().createCriteria(Organization.class);
@@ -195,10 +195,10 @@ public class configurationDAOImpl implements configurationDAO {
 
             Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configuration.class);
 
-            if (orgIdList.size() == 0) {
+            if (orgIdList.isEmpty()) {
                 orgIdList.add(0);
             }
-            if (msgTypeIdList.size() == 0) {
+            if (msgTypeIdList.isEmpty()) {
                 msgTypeIdList.add(0);
             }
 
@@ -382,12 +382,12 @@ public class configurationDAOImpl implements configurationDAO {
 
         return query.list();
     }
-    
+
     /**
      * The 'saveConnection' function will save the configuration connection into the system.
-     * 
-     * @param   newConnection The connections object for the new connection
-     * 
+     *
+     * @param newConnection The connections object for the new connection
+     *
      * @return This function will not return anything
      */
     @Override
@@ -395,57 +395,53 @@ public class configurationDAOImpl implements configurationDAO {
     public void saveConnection(Connections newConnection) {
         sessionFactory.getCurrentSession().save(newConnection);
     }
-    
+
     /**
-     * The 'getConnection' function will return the connection details for the 
-     * passed in connection id.
-     * 
-     * @param   connectionId    The value of the connection to retrieve details
-     * 
-     * @return  connection object
+     * The 'getConnection' function will return the connection details for the passed in connection id.
+     *
+     * @param connectionId The value of the connection to retrieve details
+     *
+     * @return connection object
      */
     public Connections getConnection(int connectionId) {
-         return (Connections) sessionFactory.getCurrentSession().get(Connections.class, connectionId);
+        return (Connections) sessionFactory.getCurrentSession().get(Connections.class, connectionId);
     }
-    
+
     /**
      * The 'updateConnection' function will update the status of the passed in connection.
-     * 
-     * @param   connection   The Connections object that will hold the connection to be updated
-     * 
+     *
+     * @param connection The Connections object that will hold the connection to be updated
+     *
      */
     public void updateConnection(Connections connection) {
         sessionFactory.getCurrentSession().update(connection);
     }
-    
+
     /**
-     * The 'getScheduleDetails' function will return the details of the schedule for the passed in
-     * configuration id and transport method.
-     * 
-     * @param   configId        The id for the configuration
-     * @param   transportMethod The transport method
-     * 
-     * @return  The function will return a configurationSchedules object containing the details
-     *          for the schedule.
+     * The 'getScheduleDetails' function will return the details of the schedule for the passed in configuration id and transport method.
+     *
+     * @param configId The id for the configuration
+     * @param transportMethod The transport method
+     *
+     * @return The function will return a configurationSchedules object containing the details for the schedule.
      */
     public configurationSchedules getScheduleDetails(int configId, int transportMethod) {
-         Query query = sessionFactory.getCurrentSession().createQuery("from configurationSchedules where configId = :configId and transportMethod = :transportMethod");
-               query.setParameter("configId", configId);
-               query.setParameter("transportMethod", transportMethod);
-        
-         configurationSchedules scheduleDetails = (configurationSchedules) query.uniqueResult();
-         
-         return scheduleDetails;
+        Query query = sessionFactory.getCurrentSession().createQuery("from configurationSchedules where configId = :configId and transportMethod = :transportMethod");
+        query.setParameter("configId", configId);
+        query.setParameter("transportMethod", transportMethod);
+
+        configurationSchedules scheduleDetails = (configurationSchedules) query.uniqueResult();
+
+        return scheduleDetails;
 
     }
-    
+
     /**
-     * The 'saveSchedule' function will create or update the configuration
-     * schedule passed in.
-     * 
-     * @param   scheduleDetails The object that holds the configuration schedule
-     * 
-     * @return  This function does not return anything.
+     * The 'saveSchedule' function will create or update the configuration schedule passed in.
+     *
+     * @param scheduleDetails The object that holds the configuration schedule
+     *
+     * @return This function does not return anything.
      */
     public void saveSchedule(configurationSchedules scheduleDetails) {
         sessionFactory.getCurrentSession().saveOrUpdate(scheduleDetails);
