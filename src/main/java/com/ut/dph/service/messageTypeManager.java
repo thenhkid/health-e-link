@@ -32,6 +32,8 @@ public interface messageTypeManager {
 	List<messageTypeFormFields> getMessageTypeFields(int messageTypeId);
 	
 	void updateMessageTypeFields(messageTypeFormFields formField);
+        
+        void saveMessageTypeFields(messageTypeFormFields formField);
 	
 	@SuppressWarnings("rawtypes")
 	List getInformationTables();

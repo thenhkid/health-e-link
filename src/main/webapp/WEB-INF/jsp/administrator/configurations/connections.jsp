@@ -7,10 +7,10 @@
 
     <div class="col-md-12">
 
-       <div class="alert alert-success" style="display:none;">
-           <strong>Success!</strong> 
-           <div id="saveStatus"></div>
-       </div>
+        <div class="alert alert-success" style="display:none;">
+            <strong>Success!</strong> 
+            <div id="saveStatus"></div>
+        </div>
 
         <div class="row-fluid">
             <div class="col-md-4">
@@ -71,7 +71,7 @@
                                                 <c:forEach items="${connections}" var="connect" varStatus="cStatus">
                                                     <tr>
                                                         <td scope="row">
-                                                           ${connect.orgName}
+                                                            ${connect.orgName}
                                                         </td>
                                                         <td class="center-text"><fmt:formatDate value="${connect.dateCreated}" type="date" pattern="M/dd/yyyy" /></td>
                                                         <td class="center-text">
@@ -82,14 +82,14 @@
                                                                 <c:otherwise>
                                                                     <a href="javascript:void(0)" class="connectionStatus" rel2="${connect.id}" rel="0" title="Enable this connection!">Enable</a>
                                                                 </c:otherwise>
-                                                           </c:choose>
+                                                            </c:choose>
                                                         </td>
                                                     </tr>
-                                            </c:forEach>
-                                        </c:when>
-                                        <c:otherwise><tr><td scope="row" colspan="3" style="text-align:center">No connections Found</td></c:otherwise>
-                                        </c:choose>
-                                        </tbody>
+                                                </c:forEach>
+                                            </c:when>
+                                            <c:otherwise><tr><td scope="row" colspan="3" style="text-align:center">No connections Found</td></c:otherwise>
+                                            </c:choose>
+                                    </tbody>
                                 </table>
                             </div>
                         </div>
@@ -108,7 +108,7 @@
     });
 
     $(function() {
-       
+
         //Add a new organization to the existing connection
         $('.addOrganization').click(function() {
             var selOrg = $('#organization').val();
@@ -129,42 +129,42 @@
                 });
             }
         });
-        
+
         //Update the status of the connection
         $('.connectionStatus').click(function() {
-           var currStatus = $(this).attr('rel'); //1 = enabled 0 = disabled
-           var newStatusVal = null;
-           var newStatus = null;
-           var statusTitle = null;
-           var connectionId = $(this).attr('rel2');
-          
-           if(currStatus === '1') {
-               newStatusVal = false;
-               newStatus = 'Enable';
-               statusTitle = 'Enable this Connection!';
-           }
-           else {
-               newStatusVal = true;
-               newStatus = 'Disable';
-               statusTitle = 'Disable this Connection!';
-           }
-           $(this).attr('rel',newStatusVal);
-           $(this).attr('title',statusTitle);
-           $(this).html(newStatus);
-           
+            var currStatus = $(this).attr('rel'); //1 = enabled 0 = disabled
+            var newStatusVal = null;
+            var newStatus = null;
+            var statusTitle = null;
+            var connectionId = $(this).attr('rel2');
+
+            if (currStatus === '1') {
+                newStatusVal = false;
+                newStatus = 'Enable';
+                statusTitle = 'Enable this Connection!';
+            }
+            else {
+                newStatusVal = true;
+                newStatus = 'Disable';
+                statusTitle = 'Disable this Connection!';
+            }
+            $(this).attr('rel', newStatusVal);
+            $(this).attr('title', statusTitle);
+            $(this).html(newStatus);
+
             $.ajax({
                 url: 'changeConnectionStatus.do',
                 type: "POST",
-                data: {'statusVal': newStatusVal, 'connectionId' : connectionId},
+                data: {'statusVal': newStatusVal, 'connectionId': connectionId},
                 success: function(data) {
                     if (data === 1) {
-                      $('.alert').show();
-                      $('#saveStatus').html('The connection status has been successfully changed!'); 
-                      fadeAlert();
+                        $('.alert').show();
+                        $('#saveStatus').html('The connection status has been successfully changed!');
+                        fadeAlert();
                     }
                 }
             });
-           
+
         });
 
         //This function will save the messgae type field mappings
@@ -175,14 +175,14 @@
         });
 
         $('#next').click(function() {
-           window.location.href = "scheduling";
+            window.location.href = "scheduling";
 
         });
 
     });
-    
+
     function fadeAlert() {
-         $('.alert').delay(2000).fadeOut(1000);
+        $('.alert').delay(2000).fadeOut(1000);
     }
 
 </script>

@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ut.dph.dao.messageTypeDAO;
 import com.ut.dph.model.Crosswalks;
+import com.ut.dph.model.configuration;
 import com.ut.dph.model.messageType;
 import com.ut.dph.model.messageTypeDataTranslations;
 import com.ut.dph.model.messageTypeFormFields;
@@ -268,6 +269,46 @@ public class messageTypeDAOImpl implements messageTypeDAO {
 	public void updateMessageTypeFields(messageTypeFormFields formField) {
 		sessionFactory.getCurrentSession().update(formField);
 	}
+        
+        /**
+         * The 'saveMessageTypeFields' function will save a new message type field. The 
+         * function will also search for all configurations that is using this message type
+         * and add the field as NOT USED in the online form transport method. It would be up
+         * to the administrator to go in and mark the field as USED for what ever configuration
+         * will be using this new field.
+         * 
+         * @Table messageTypeFormFields
+         * 
+         * @Return This function does not return anything
+         */
+        @Override
+        @Transactional
+        public void saveMessageTypeFields(messageTypeFormFields formField) {
+            Integer lastId = (Integer) sessionFactory.getCurrentSession().save(formField);
+            
+            //Need to find out all configurations that use this message type and add the new
+            //form field to the online form configuration.
+            Query query = sessionFactory.getCurrentSession().createQuery("from configuration where messageTypeId = :messageTypeId");
+                  query.setParameter("messageTypeId", formField.getMessageTypeId());
+            
+            List<configuration> configurations = query.list();
+            
+            for (configuration configuration : configurations) {
+                //Need to get the transport detail id
+                Query transportDetails = sessionFactory.getCurrentSession().createQuery("select id from configurationTransport where configId = :configId and transportMethod = 2");
+                      transportDetails.setParameter("configId", configuration.getId());
+                
+                Integer transportDetailId = (Integer) transportDetails.uniqueResult();
+                
+                //Bulk insert the new fieldinto the configurationTransportDetails table for the online form
+                Query bulkInsert = sessionFactory.getCurrentSession().createSQLQuery("INSERT INTO configurationFormFields (messageTypeFieldId, configId, transportDetailId, fieldNo, fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, useField) SELECT id, :configId, :transportDetailId, fieldNo,  fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, 0 FROM messageTypeFormFields where id = :newfieldId");
+                      bulkInsert.setParameter("configId", configuration.getId());
+                      bulkInsert.setParameter("transportDetailId", transportDetailId);
+                      bulkInsert.setParameter("newfieldId", lastId);    
+                
+                      bulkInsert.executeUpdate();
+            }
+        }
 	
 	/**
 	* The 'getInformationTables' function will return a list of all available information tables where we
