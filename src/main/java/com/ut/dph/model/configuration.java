@@ -37,7 +37,7 @@ public class configuration {
     @Column(name = "ID", nullable = false)
     private int id;
 
-    @NotNull
+    @NotNull(message = "The organization is a required field!")
     @Column(name = "orgId", nullable = false)
     private int orgId;
 
@@ -50,7 +50,7 @@ public class configuration {
     @Column(name = "TYPE", nullable = false)
     private int type = 1;
 
-    @NotNull
+    @NotNull(message = "The message type is a required field!")
     @Column(name = "MESSAGETYPEID", nullable = false)
     private int messageTypeId = 0;
 

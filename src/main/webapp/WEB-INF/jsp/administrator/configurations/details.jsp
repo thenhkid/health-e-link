@@ -57,7 +57,7 @@
                                         <option value="${organizations[oStatus.index].id}" <c:if test="${configurationDetails.orgId == organizations[oStatus.index].id}">selected</c:if>>${organizations[oStatus.index].orgName} </option>
                                     </c:forEach>
                                 </form:select>
-                                <c:if test="${configurationDetails.id > 0}"><form:hidden path="orgId"/></c:if>           
+                                <c:if test="${configurationDetails.id > 0}"><form:hidden path="orgId"/></c:if>     
                                 </div>
                         </spring:bind>
                         <spring:bind path="messageTypeId">
@@ -65,11 +65,8 @@
                                 <label class="control-label" for="messageTypeId">Message Type *</label>
                                 <form:select path="messageTypeId" id="messageTypeId" class="form-control half" disabled="${configurationDetails.id == 0 ? 'false' : 'true' }">
                                     <option value="">- Select -</option>
-                                    <c:forEach items="${messageTypes}" var="msgType" varStatus="mStatus">
-                                        <option value="${messageTypes[mStatus.index].id}" <c:if test="${configurationDetails.messageTypeId == messageTypes[mStatus.index].id}">selected</c:if>>${messageTypes[mStatus.index].name} </option>
-                                    </c:forEach>
                                 </form:select>
-                                <c:if test="${configurationDetails.id > 0}"><form:hidden path="messageTypeId"/></c:if>  
+                                <c:if test="${configurationDetails.id > 0}"><form:hidden path="messageTypeId"/></c:if> 
                                 </div>
                         </spring:bind>
                     </div>
@@ -90,7 +87,24 @@
         if ($('.alert').length > 0) {
             $('.alert').delay(2000).fadeOut(1000);
         }
-        ;
+        
+        //Populate the available message types when a organization is selected
+        $('#organization').change(function() {
+           var orgId = $(this).val();
+           
+           if(orgId !== "") {
+               $.getJSON('getAvailableMessageTypes.do', {
+                    orgId: orgId, ajax: true
+                }, function(data) {
+                    var html = '<option value="">- Select - </option>';
+                    var len = data.length;
+                    for (var i = 0; i < len; i++) {
+                        html += '<option value="' + data[i][0] + '">' + data[i][1] + '</option>';
+                    }
+                    $('#messageTypeId').html(html);
+                });
+           }
+        });
 
         $('#saveDetails').click(function(event) {
             $('#action').val('save');

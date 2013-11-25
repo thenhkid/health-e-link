@@ -177,6 +177,23 @@ public class adminConfigController {
         return mav;
 
     }
+    
+    /**
+     * The '/getAvailableMessageTypes.do' function will return a list of message types
+     * that have not been already set up for the passed in organization.
+     * 
+     * @param   orgId   The organization selected in the drop down
+     * 
+     * @return  messageTypes    The available message types
+     */
+    @SuppressWarnings("rawtypes")
+    @RequestMapping(value= "/getAvailableMessageTypes.do", method = RequestMethod.GET)
+    public @ResponseBody List<messageType> getMessageTypes(@RequestParam(value = "orgId", required = true) int orgId) {
+        
+        List<messageType> messageTypes = messagetypemanager.getAvailableMessageTypes(orgId);
+        
+        return messageTypes;
+    } 
 
     /**
      * The '/create' POST request will submit the new configuration once all required fields are checked, the system will also check to make sure the configuration name is not already in use.

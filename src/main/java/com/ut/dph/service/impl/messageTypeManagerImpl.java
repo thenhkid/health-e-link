@@ -122,6 +122,12 @@ public class messageTypeManagerImpl implements messageTypeManager {
     public List<messageType> getMessageTypes(int page, int maxResults) {
         return messageTypeDAO.getMessageTypes(page, maxResults);
     }
+    
+    @Override
+    @Transactional
+    public List<messageType> getAvailableMessageTypes(int orgId) {
+        return messageTypeDAO.getAvailableMessageTypes(orgId);
+    }
 
     @Override
     @Transactional
