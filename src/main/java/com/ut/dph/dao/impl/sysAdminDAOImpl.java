@@ -161,15 +161,21 @@ public class sysAdminDAOImpl implements sysAdminDAO {
 
 	}
 
+	/** this method deletes the data item in the table**/ 
 	@Override
 	@Transactional
-	public void deleteDataItem(String utTableName, int id) {
-				//delete the data items.
+	public boolean deleteDataItem(String utTableName, int id) {
 				String sql  = "delete from " + utTableName + " where id = :id";
 				System.out.println(sql);
 				Query deleteTable = sessionFactory.getCurrentSession().createSQLQuery(sql)
 						.addScalar("id",StandardBasicTypes.INTEGER ).setParameter("id", id);
-				deleteTable.executeUpdate();
+				try {
+					deleteTable.executeUpdate();
+					return true;
+				} catch (Throwable ex) {
+	                System.err.println("deleteDataItem failed." + ex);
+	                return false;
+	                	
+				}
 	}
-
 }

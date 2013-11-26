@@ -2,6 +2,8 @@ package com.ut.dph.controller;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.ut.dph.service.sysAdminManager;
@@ -9,6 +11,8 @@ import com.ut.dph.model.custom.LookUpTable;
 import com.ut.dph.model.custom.TableData;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -51,7 +55,7 @@ public class adminSysAdminController {
 	    }
  
 		ModelAndView mav = new ModelAndView();
-        mav.setViewName("/administrator/sysadmin/list");
+        mav.setViewName("/administrator/sysadmin/tableList");
         
         /**
          * we query list of tables for display
@@ -207,17 +211,95 @@ public class adminSysAdminController {
 			@PathVariable String urlId, RedirectAttributes redirectAttr) throws Exception {
 		 
 		LookUpTable tableInfo = sysAdminManager.getTableInfo(urlId);
-        sysAdminManager.deleteDataItem(tableInfo.getUtTableName(), dataId);
         
+        boolean suceeded = sysAdminManager.deleteDataItem(tableInfo.getUtTableName(), dataId);
+        String returnMessage = "deleted";
+        
+        if (!suceeded) {
+        	returnMessage = "notDeleted";
+        }
         //This variable will be used to display the message on the details form
-		redirectAttr.addFlashAttribute("savedStatus", "deleted");	
-		//e.g. administrator/sysadmin/std/data/3540Gen6563ers/delete?i=1
+		redirectAttr.addFlashAttribute("savedStatus", returnMessage);	
+		
 		ModelAndView mav = new ModelAndView(new RedirectView("../" + urlId));
 		return mav;	
      
 	}	
 	
 	
+	/**
+	 *  The '/{urlId}/data.create' GET request will be used to create a new data for selected table
+	 *  
+	 */
+	@RequestMapping(value="/std/data/{urlId}/dataItem.create", method = RequestMethod.GET)
+	public ModelAndView newDataForm(@PathVariable String urlId) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/sysadmin/std/details");	
+		
+		LookUpTable tableInfo = sysAdminManager.getTableInfo(urlId);
+		//create a table data
+		TableData tableData = new TableData();
+		tableData.setUrlId(tableInfo.getUrlId());
+		tableData.setId(0);
+		mav.addObject("tableDataDetails",tableData);
+		mav.addObject("tableInfo",tableInfo);
+		return mav;
+	}
+	
+	/**
+	 * The '/{urlId}/data.create' POST request will handle submitting the new provider.
+	 * 
+	 * @param tableDataForm		The object containing the tableData form fields
+	 * @param result			The validation result
+	 * @param redirectAttr		The variable that will hold values that can be read after the redirect
+	 * @param action			The variable that holds which button was pressed
+	 * 
+	 * @return					Will return the table's data page on "Save & Close"
+	 * 							Will return the data details page on "Save"
+	 * 							Will return the data create page on error
+	 * 
+	 * @Objects					(1) The object containing all the information for the new data item
+	 * 							(2) We will extract table from web address
+	 * @throws Exception
+	 */
+	@RequestMapping(value="/std/data/{urlId}/dataItem.create", method = RequestMethod.POST)
+	public ModelAndView createProvider(@Valid @ModelAttribute(value="tableDataDetails") TableData tableData, 
+			BindingResult result, RedirectAttributes redirectAttr,
+			@RequestParam String action, @PathVariable String urlId) throws Exception {
+		
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/sysadmin/std/details");
+		return mav;
+		
+		/** check for error 
+		if(result.hasErrors()) {
+			ModelAndView mav = new ModelAndView();
+			mav.setViewName("/administrator/sysadmin/std/details");
+			return mav;
+		}
+		
+		//Create the provider
+		Integer dataId = sysAdminManager.createTableDate(tableData);
+	
+		//If the "Save" button was pressed 
+		if(action.equals("save")) {
+			//This variable will be used to display the message on the details form
+			redirectAttr.addFlashAttribute("savedStatus", "created");
+			ModelAndView mav = new ModelAndView(new RedirectView("provider."+providerdetails.getFirstName()+providerdetails.getLastName()+"?i="+providerId));
+			return mav;
+		}
+		//If the "Save & Close" button was pressed.
+		else {
+			//This variable will be used to display the message on the details form
+			redirectAttr.addFlashAttribute("savedStatus", "created");
+			
+			ModelAndView mav = new ModelAndView(new RedirectView("providers"));
+			return mav;			
+		}
+		**/
+	
+	}
+		
 	
 }
 

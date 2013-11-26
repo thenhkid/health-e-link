@@ -6,6 +6,7 @@ import com.ut.dph.model.Connections;
 import com.ut.dph.model.Macros;
 import com.ut.dph.model.configuration;
 import com.ut.dph.model.configurationDataTranslations;
+import com.ut.dph.model.configurationSchedules;
 
 public interface configurationDAO {
 	
@@ -45,4 +46,14 @@ public interface configurationDAO {
   List<Macros> getMacros();
   
   List<Connections> getConnections(int configId);
+  
+  void saveConnection(Connections newConnection);
+  
+  Connections getConnection(int connectionId);
+  
+  void updateConnection(Connections connection);
+  
+  configurationSchedules getScheduleDetails(int configId, int transportMethod);
+  
+  void saveSchedule(configurationSchedules scheduleDetails);
 }

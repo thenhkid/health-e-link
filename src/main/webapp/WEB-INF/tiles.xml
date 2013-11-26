@@ -3,7 +3,9 @@
        "-//Apache Software Foundation//DTD Tiles Configuration 2.0//EN"
        "http://tiles.apache.org/dtds/tiles-config_2_0.dtd">
 <tiles-definitions>
-    <definition name="base.definition" template="/WEB-INF/tiles/layout.jsp">
+    
+    <!-- Admin Definitions -->
+    <definition name="base.definition.admin" template="/WEB-INF/tiles/layout.jsp">
         <put-attribute name="title" value="" />
         <put-attribute name="header" value="" />
         <put-attribute name="actions" value="" />
@@ -12,186 +14,262 @@
         <put-attribute name="footer" value="" />
     </definition>
     
-    <!-- Admin Definitions -->
-	    <definition name="/administrator/dashboard" extends="base.definition">
-	        <put-attribute name="title" value="Administrator" />
-	        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp" />
-	        <put-attribute name="body" value="/WEB-INF/jsp/administrator/index.jsp" />
-	        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
-	    </definition>
+   <!-- Login -->
+   <definition name="/login" extends="base.definition.admin">
+        <put-attribute name="page-id" value="login-details" />
+        <put-attribute name="page-section" value="section-login" />
+        <put-attribute name="title" value="Universal Translator Account Login" />
+        <put-attribute name="header" value="" />
+        <put-attribute name="body" value="/WEB-INF/jsp/login.jsp" />
+        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
+    </definition>
+    
+   <!-- Admin Dashboard -->
+    <definition name="/administrator/dashboard" extends="base.definition.admin">
+        <put-attribute name="page-id" value="dashboard-details" />
+        <put-attribute name="page-section" value="section-dashboard" />
+        <put-attribute name="title" value="Administrator" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp" />
+        <put-attribute name="body" value="/WEB-INF/jsp/administrator/index.jsp" />
+        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
+    </definition>
     	
-    	<!-- Admin Configuration Definitions -->
-    	<definition name="/administrator/configurations/list" extends="base.definition">
-	        <put-attribute name="title" value="Administrator - Manage Configurations" />
-	        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=config" />
-	        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/configurations/actionBar.jsp?page=listConfigs" />
-	        <put-attribute name="body" value="/WEB-INF/jsp/administrator/configurations/list.jsp" />
-	        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
-	    </definition>
+    <!-- Admin Configuration Definitions -->
+    <definition name="/administrator/configurations/list" extends="base.definition.admin">
+        <put-attribute name="page-id" value="configuration-list" />
+        <put-attribute name="page-section" value="section-configurations" />
+        <put-attribute name="title" value="Administrator - Manage Configurations" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=config" />
+        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/configurations/actionBar.jsp?page=listConfigs" />
+        <put-attribute name="body" value="/WEB-INF/jsp/administrator/configurations/list.jsp" />
+        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
+    </definition>
 	    
-	    <definition name="/administrator/configurations/details" extends="base.definition">
-	        <put-attribute name="title" value="Administrator - Manage Configurations" />
-	        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=config" />
-	        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/configurations/actionBar.jsp?page=configDetails" />
-	        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/configurations/menu.jsp?page=details" />
-	        <put-attribute name="body" value="/WEB-INF/jsp/administrator/configurations/details.jsp" />
-	        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
-	    </definition>
+    <definition name="/administrator/configurations/details" extends="base.definition.admin">
+        <put-attribute name="page-id" value="configuration-details" />
+        <put-attribute name="page-section" value="section-configurations" />
+        <put-attribute name="title" value="Administrator - Manage Configurations" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=config" />
+        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/configurations/actionBar.jsp?page=configDetails" />
+        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/configurations/menu.jsp?page=details" />
+        <put-attribute name="body" value="/WEB-INF/jsp/administrator/configurations/details.jsp" />
+        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
+    </definition>
 	    
-	     <definition name="/administrator/configurations/transport" extends="base.definition">
-	        <put-attribute name="title" value="Administrator - Manage Configurations" />
-	        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=config" />
-	        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/configurations/actionBar.jsp?page=transport" />
-	        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/configurations/menu.jsp?page=transport" />
-	        <put-attribute name="body" value="/WEB-INF/jsp/administrator/configurations/transport.jsp" />
-	        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
-	    </definition>
+    <definition name="/administrator/configurations/transport" extends="base.definition.admin">
+        <put-attribute name="page-id" value="configuration-transport" />
+        <put-attribute name="page-section" value="section-configurations" />
+        <put-attribute name="title" value="Administrator - Manage Configurations" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=config" />
+        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/configurations/actionBar.jsp?page=transport" />
+        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/configurations/menu.jsp?page=transport" />
+        <put-attribute name="body" value="/WEB-INF/jsp/administrator/configurations/transport.jsp" />
+        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
+    </definition>
 	    
-	    <definition name="/administrator/configurations/chooseFields" extends="base.definition">
-	        <put-attribute name="title" value="Administrator - Manage Configurations" />
-	        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=config" />
-	        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/configurations/actionBar.jsp?page=chooseFields" />
-	        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/configurations/menu.jsp?page=mappings" />
-	        <put-attribute name="body" value="/WEB-INF/jsp/administrator/configurations/chooseFields.jsp" />
-	        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
-	    </definition>
+    <definition name="/administrator/configurations/chooseFields" extends="base.definition.admin">
+        <put-attribute name="page-id" value="configuration-chooseFields" />
+        <put-attribute name="page-section" value="section-configurations" />
+        <put-attribute name="title" value="Administrator - Manage Configurations" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=config" />
+        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/configurations/actionBar.jsp?page=chooseFields" />
+        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/configurations/menu.jsp?page=mappings" />
+        <put-attribute name="body" value="/WEB-INF/jsp/administrator/configurations/chooseFields.jsp" />
+        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
+    </definition>
 	    
-	    <definition name="/administrator/configurations/mappings" extends="base.definition">
-	        <put-attribute name="title" value="Administrator - Manage Configurations" />
-	        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=config" />
-	        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/configurations/actionBar.jsp?page=mappings" />
-	        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/configurations/menu.jsp?page=mappings" />
-	        <put-attribute name="body" value="/WEB-INF/jsp/administrator/configurations/fieldMappings.jsp" />
-	        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
-	    </definition>
+    <definition name="/administrator/configurations/mappings" extends="base.definition.admin">
+        <put-attribute name="page-id" value="configuration-mappings" />
+        <put-attribute name="page-section" value="section-configurations" />
+        <put-attribute name="title" value="Administrator - Manage Configurations" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=config" />
+        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/configurations/actionBar.jsp?page=mappings" />
+        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/configurations/menu.jsp?page=mappings" />
+        <put-attribute name="body" value="/WEB-INF/jsp/administrator/configurations/fieldMappings.jsp" />
+        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
+    </definition>
 	    
-	    <definition name="/administrator/configurations/translations" extends="base.definition">
-	        <put-attribute name="title" value="Administrator - Manage Configurations" />
-	        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=config" />
-	        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/configurations/actionBar.jsp?page=translations" />
-	        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/configurations/menu.jsp?page=translations" />
-	        <put-attribute name="body" value="/WEB-INF/jsp/administrator/configurations/dataTranslations.jsp" />
-	        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
-	    </definition>
+    <definition name="/administrator/configurations/translations" extends="base.definition.admin">
+        <put-attribute name="page-id" value="configuration-translations" />
+        <put-attribute name="page-section" value="section-configurations" />
+        <put-attribute name="title" value="Administrator - Manage Configurations" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=config" />
+        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/configurations/actionBar.jsp?page=translations" />
+        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/configurations/menu.jsp?page=translations" />
+        <put-attribute name="body" value="/WEB-INF/jsp/administrator/configurations/dataTranslations.jsp" />
+        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
+    </definition>
 	    
-	    <definition name="/administrator/configurations/connections" extends="base.definition">
-	        <put-attribute name="title" value="Administrator - Manage Configurations" />
-	        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=config" />
-	        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/configurations/actionBar.jsp?page=connections" />
-	        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/configurations/menu.jsp?page=connections" />
-	        <put-attribute name="body" value="/WEB-INF/jsp/administrator/configurations/connections.jsp" />
-	        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
-	    </definition>
+    <definition name="/administrator/configurations/connections" extends="base.definition.admin">
+        <put-attribute name="page-id" value="configuration-connections" />
+        <put-attribute name="page-section" value="section-configurations" />
+        <put-attribute name="title" value="Administrator - Manage Configurations" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=config" />
+        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/configurations/actionBar.jsp?page=connections" />
+        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/configurations/menu.jsp?page=connections" />
+        <put-attribute name="body" value="/WEB-INF/jsp/administrator/configurations/connections.jsp" />
+        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
+    </definition>
+            
+    <definition name="/administrator/configurations/schedule" extends="base.definition.admin">
+        <put-attribute name="page-id" value="configuration-schedule" />
+        <put-attribute name="page-section" value="section-configurations" />
+        <put-attribute name="title" value="Administrator - Manage Configurations" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=config" />
+        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/configurations/actionBar.jsp?page=schedule" />
+        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/configurations/menu.jsp?page=schedule" />
+        <put-attribute name="body" value="/WEB-INF/jsp/administrator/configurations/schedule.jsp" />
+        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
+    </definition>
 	    
-	    <!-- Admin Organization Definitions -->
-	    <definition name="/administrator/organizations/listOrganizations" extends="base.definition">
-	        <put-attribute name="title" value="Administrator - Manage Organizations" />
-	        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=org" />
-	        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/organizations/actionBar.jsp?page=listOrgs" />
-	        <put-attribute name="body" value="/WEB-INF/jsp/administrator/organizations/listOrganizations.jsp" />
-	        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
-	    </definition>
+    <!-- Admin Organization Definitions -->
+    <definition name="/administrator/organizations/listOrganizations" extends="base.definition.admin">
+        <put-attribute name="page-id" value="organization-list" />
+        <put-attribute name="page-section" value="section-organizations" />
+        <put-attribute name="title" value="Administrator - Manage Organizations" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=org" />
+        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/organizations/actionBar.jsp?page=listOrgs" />
+        <put-attribute name="body" value="/WEB-INF/jsp/administrator/organizations/listOrganizations.jsp" />
+        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
+    </definition>
 	    
-	    <definition name="/administrator/organizations/organizationDetails" extends="base.definition">
-	        <put-attribute name="title" value="Administrator - Manage Organizations" />
-	        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=org" />
-	        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/organizations/actionBar.jsp?page=orgDetails" />
-	        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/organizations/menu.jsp?page=details" />
-	        <put-attribute name="body" value="/WEB-INF/jsp/administrator/organizations/organizationDetails.jsp" />
-	        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
-	    </definition>
+    <definition name="/administrator/organizations/organizationDetails" extends="base.definition.admin">
+        <put-attribute name="page-id" value="organization-details" />
+        <put-attribute name="page-section" value="section-organizations" />
+        <put-attribute name="title" value="Administrator - Manage Organizations" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=org" />
+        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/organizations/actionBar.jsp?page=orgDetails" />
+        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/organizations/menu.jsp?page=details" />
+        <put-attribute name="body" value="/WEB-INF/jsp/administrator/organizations/organizationDetails.jsp" />
+        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
+    </definition>
 	    
-	    <definition name="/administrator/organizations/users" extends="base.definition">
-	        <put-attribute name="title" value="Administrator - Manage Organizations" />
-	        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=org" />
-	        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/organizations/actionBar.jsp?page=orgUsers" />
-	        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/organizations/menu.jsp?page=users" />
-	        <put-attribute name="body" value="/WEB-INF/jsp/administrator/organizations/users/list.jsp" />
-	        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
-	    </definition>
+    <definition name="/administrator/organizations/users" extends="base.definition.admin">
+        <put-attribute name="page-id" value="organization-users" />
+        <put-attribute name="page-section" value="section-organizations" />
+        <put-attribute name="title" value="Administrator - Manage Organizations" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=org" />
+        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/organizations/actionBar.jsp?page=orgUsers" />
+        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/organizations/menu.jsp?page=users" />
+        <put-attribute name="body" value="/WEB-INF/jsp/administrator/organizations/users/list.jsp" />
+        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
+    </definition>
 	    
-	    <definition name="/administrator/organizations/providers/list" extends="base.definition">
-	        <put-attribute name="title" value="Administrator - Manage Organizations" />
-	        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=org" />
-	        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/organizations/actionBar.jsp?page=orgProviders" />
-	        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/organizations/menu.jsp?page=providers" />
-	        <put-attribute name="body" value="/WEB-INF/jsp/administrator/organizations/providers/list.jsp" />
-	        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
-	    </definition>
+    <definition name="/administrator/organizations/providers/list" extends="base.definition.admin">
+        <put-attribute name="page-id" value="organization-providerlist" />
+        <put-attribute name="page-section" value="section-organizations" />
+        <put-attribute name="title" value="Administrator - Manage Organizations" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=org" />
+        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/organizations/actionBar.jsp?page=orgProviders" />
+        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/organizations/menu.jsp?page=providers" />
+        <put-attribute name="body" value="/WEB-INF/jsp/administrator/organizations/providers/list.jsp" />
+        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
+    </definition>
 	    
-	     <definition name="/administrator/organizations/providers/details" extends="base.definition">
-	        <put-attribute name="title" value="Administrator - Manage Organizations" />
-	        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=org" />
-	        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/organizations/actionBar.jsp?page=providerDetails" />
-	        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/organizations/menu.jsp?page=providers" />
-	        <put-attribute name="body" value="/WEB-INF/jsp/administrator/organizations/providers/details.jsp" />
-	        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
-	    </definition>
+    <definition name="/administrator/organizations/providers/details" extends="base.definition.admin">
+        <put-attribute name="page-id" value="organization-providerdetails" />
+        <put-attribute name="page-section" value="section-organizations" />
+        <put-attribute name="title" value="Administrator - Manage Organizations" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=org" />
+        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/organizations/actionBar.jsp?page=providerDetails" />
+        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/organizations/menu.jsp?page=providers" />
+        <put-attribute name="body" value="/WEB-INF/jsp/administrator/organizations/providers/details.jsp" />
+        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
+    </definition>
 	    
-	    <definition name="/administrator/organizations/brochures" extends="base.definition">
-	        <put-attribute name="title" value="Administrator - Manage Organizations" />
-	        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=org" />
-	        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/organizations/actionBar.jsp?page=orgBrochures" />
-	        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/organizations/menu.jsp?page=brochures" />
-	        <put-attribute name="body" value="/WEB-INF/jsp/administrator/organizations/brochures/list.jsp" />
-	        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
-	    </definition>
+    <definition name="/administrator/organizations/brochures" extends="base.definition.admin">
+        <put-attribute name="page-id" value="organization-brochurelist" />
+        <put-attribute name="page-section" value="section-organizations" />
+        <put-attribute name="title" value="Administrator - Manage Organizations" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=org" />
+        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/organizations/actionBar.jsp?page=orgBrochures" />
+        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/organizations/menu.jsp?page=brochures" />
+        <put-attribute name="body" value="/WEB-INF/jsp/administrator/organizations/brochures/list.jsp" />
+        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
+    </definition>
 	    
-	    <!-- Admin Message Type Library Definitions -->
-    	<definition name="/administrator/messageTypeLibrary/list" extends="base.definition">
-	        <put-attribute name="title" value="Administrator - Manage Message Type Library" />
-	        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=lib" />
-	        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/messageTypeLibrary/actionBar.jsp?page=list" />
-	        <put-attribute name="body" value="/WEB-INF/jsp/administrator/messageTypeLibrary/list.jsp" />
-	        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
-	    </definition>
+    <!-- Admin Message Type Library Definitions -->
+    <definition name="/administrator/messageTypeLibrary/list" extends="base.definition.admin">
+        <put-attribute name="page-id" value="library-list" />
+        <put-attribute name="page-section" value="section-library" />
+        <put-attribute name="title" value="Administrator - Manage Message Type Library" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=lib" />
+        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/messageTypeLibrary/actionBar.jsp?page=list" />
+        <put-attribute name="body" value="/WEB-INF/jsp/administrator/messageTypeLibrary/list.jsp" />
+        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
+    </definition>
 	    
-	    <definition name="/administrator/messageTypeLibrary/details" extends="base.definition">
-	        <put-attribute name="title" value="Administrator - Manage Message Type Library" />
-	        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=lib" />
-	        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/messageTypeLibrary/actionBar.jsp?page=details" />
-	        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/messageTypeLibrary/menu.jsp?page=details" />
-	        <put-attribute name="body" value="/WEB-INF/jsp/administrator/messageTypeLibrary/details.jsp" />
-	        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
-	    </definition>
+    <definition name="/administrator/messageTypeLibrary/details" extends="base.definition.admin">
+        <put-attribute name="page-id" value="library-details" />
+        <put-attribute name="page-section" value="section-library" />
+        <put-attribute name="title" value="Administrator - Manage Message Type Library" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=lib" />
+        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/messageTypeLibrary/actionBar.jsp?page=details" />
+        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/messageTypeLibrary/menu.jsp?page=details" />
+        <put-attribute name="body" value="/WEB-INF/jsp/administrator/messageTypeLibrary/details.jsp" />
+        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
+    </definition>
 	    
-	    <definition name="/administrator/messageTypeLibrary/mappings" extends="base.definition">
-	        <put-attribute name="title" value="Administrator - Manage Message Type Library" />
-	        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=lib" />
-	        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/messageTypeLibrary/actionBar.jsp?page=mappings" />
-	        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/messageTypeLibrary/menu.jsp?page=mappings" />
-	        <put-attribute name="body" value="/WEB-INF/jsp/administrator/messageTypeLibrary/fieldMappings.jsp" />
-	        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
-	    </definition>
+    <definition name="/administrator/messageTypeLibrary/mappings" extends="base.definition.admin">
+        <put-attribute name="page-id" value="library-mappings" />
+        <put-attribute name="page-section" value="section-library" />
+        <put-attribute name="title" value="Administrator - Manage Message Type Library" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=lib" />
+        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/messageTypeLibrary/actionBar.jsp?page=mappings" />
+        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/messageTypeLibrary/menu.jsp?page=mappings" />
+        <put-attribute name="body" value="/WEB-INF/jsp/administrator/messageTypeLibrary/fieldMappings.jsp" />
+        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
+    </definition>
 	    
-	    <definition name="/administrator/messageTypeLibrary/translations" extends="base.definition">
-	        <put-attribute name="title" value="Administrator - Manage Message Type Library" />
-	        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=lib" />
-	        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/messageTypeLibrary/actionBar.jsp?page=translations" />
-	        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/messageTypeLibrary/menu.jsp?page=translations" />
-	        <put-attribute name="body" value="/WEB-INF/jsp/administrator/messageTypeLibrary/dataTranslations.jsp" />
-	        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
-	    </definition>
+    <definition name="/administrator/messageTypeLibrary/translations" extends="base.definition.admin">
+        <put-attribute name="page-id" value="library-translations" />
+        <put-attribute name="page-section" value="section-library" />
+        <put-attribute name="title" value="Administrator - Manage Message Type Library" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=lib" />
+        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/messageTypeLibrary/actionBar.jsp?page=translations" />
+        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/messageTypeLibrary/menu.jsp?page=translations" />
+        <put-attribute name="body" value="/WEB-INF/jsp/administrator/messageTypeLibrary/dataTranslations.jsp" />
+        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
+    </definition>
 	   
     <!--  End Admin Definitions -->
     
     <!-- start sysadmin definitions -->
-    	<definition name="/administrator/sysadmin/list" extends="base.definition">
-	        <put-attribute name="title" value="Administrator - Manage Look Up Tables" />
-	        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=sysadmin" />
-	        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/sysadmin/actionBar.jsp?page=list" />
-	        <put-attribute name="body" value="/WEB-INF/jsp/administrator/sysadmin/list.jsp" />
-	        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
-	    </definition>
+    <definition name="/administrator/sysadmin/tableList" extends="base.definition.admin">
+        <put-attribute name="page-id" value="sysadmin-tablelist" />
+        <put-attribute name="page-section" value="section-sysadmin" />
+        <put-attribute name="title" value="Administrator - Manage Look Up Tables" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=sysadmin" />
+        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/sysadmin/actionBar.jsp?page=list" />
+        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/sysadmin/menu.jsp?page=table" />
+        <put-attribute name="body" value="/WEB-INF/jsp/administrator/sysadmin/data/tableList.jsp" />
+        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
+    </definition>
 	    
-	<!--  this lists data rows for look up tables -->    
-	     <definition name="/administrator/sysadmin/std/data" extends="base.definition">
-	        <put-attribute name="title" value="Administrator - Manage Look Up Tables" />
-	        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=sysadmin" />
-	        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/sysadmin/actionBar.jsp?page=details" />
-	        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/sysadmin/menu.jsp?page=data" />
-	        <put-attribute name="body" value="/WEB-INF/jsp/administrator/sysadmin/data/list.jsp" />
-	        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
-	    </definition>
- 	<!--  end sysadmin definitions -->
+    <!--  this lists data rows for look up tables -->    
+    <definition name="/administrator/sysadmin/std/data" extends="base.definition.admin">
+        <put-attribute name="page-id" value="sysadmin-stddata" />
+        <put-attribute name="page-section" value="section-sysadmin" />
+        <put-attribute name="title" value="Administrator - Manage Look Up Tables" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=sysadmin" />
+        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/sysadmin/actionBar.jsp?page=data" />
+        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/sysadmin/menu.jsp?page=table" />
+        <put-attribute name="body" value="/WEB-INF/jsp/administrator/sysadmin/data/list.jsp" />
+        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
+    </definition>
+	    
+    <definition name="/administrator/sysadmin/std/details" extends="base.definition.admin">
+        <put-attribute name="page-id" value="sysadmin-stddetails" />
+        <put-attribute name="page-section" value="section-sysadmin" />
+        <put-attribute name="title" value="Administrator - System Administrations" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=sysadmin" />
+        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/sysadmin/actionBar.jsp?page=dataDetails" />
+        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/sysadmin/menu.jsp?page=table" />
+        <put-attribute name="body" value="/WEB-INF/jsp/administrator/sysadmin/data/details.jsp" />
+        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
+    </definition>
+	    
+    <!--  detail for a data table element -->   
+	
+    <!--  end sysadmin definitions -->
 </tiles-definitions>

@@ -1,17 +1,16 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %> 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <div class="main clearfix" role="main">
 
     <div class="col-md-12">
 
-        <c:if test="${not empty savedStatus}" >
-            <div class="alert alert-success">
-                <strong>Success!</strong> 
-                <c:choose><c:when test="${savedStatus == 'updated'}">The configuration connections have been successfully updated!</c:when></c:choose>
-                    </div>
-        </c:if>
+        <div class="alert alert-success" style="display:none;">
+            <strong>Success!</strong> 
+            <div id="saveStatus"></div>
+        </div>
 
         <div class="row-fluid">
             <div class="col-md-4">
@@ -72,18 +71,25 @@
                                                 <c:forEach items="${connections}" var="connect" varStatus="cStatus">
                                                     <tr>
                                                         <td scope="row">
-                                                            ${connections[cStatus.index].name}
+                                                            ${connect.orgName}
                                                         </td>
-                                                        <td class="center-text"><fmt:formatDate value="${connections[cStatus.index].dateCreated}" type="date" pattern="M/dd/yyyy" /></td>
-                                                <td class="center-text">
-                                                    <c:choose><c:when test="${connections[cStatus.index].status == 1}">Disable</c:when><c:otherwise>Enable</c:otherwise></c:choose>
+                                                        <td class="center-text"><fmt:formatDate value="${connect.dateCreated}" type="date" pattern="M/dd/yyyy" /></td>
+                                                        <td class="center-text">
+                                                            <c:choose>
+                                                                <c:when test="${connections[cStatus.index].status == true}">
+                                                                    <a href="javascript:void(0)" class="connectionStatus" rel2="${connect.id}" rel="1" title="Disable this connection!">Disable</a>
+                                                                </c:when>
+                                                                <c:otherwise>
+                                                                    <a href="javascript:void(0)" class="connectionStatus" rel2="${connect.id}" rel="0" title="Enable this connection!">Enable</a>
+                                                                </c:otherwise>
+                                                            </c:choose>
                                                         </td>
-                                                        </tr>
-                                            </c:forEach>
-                                        </c:when>
-                                        <c:otherwise><tr><td scope="row" colspan="3" style="text-align:center">No connections Found</td></c:otherwise>
-                                        </c:choose>
-                                        </tbody>
+                                                    </tr>
+                                                </c:forEach>
+                                            </c:when>
+                                            <c:otherwise><tr><td scope="row" colspan="3" style="text-align:center">No connections Found</td></c:otherwise>
+                                            </c:choose>
+                                    </tbody>
                                 </table>
                             </div>
                         </div>
@@ -102,132 +108,81 @@
     });
 
     $(function() {
-        //Fade out the updated/created message after being displayed.
-        if ($('.alert').length > 0) {
-            $('.alert').delay(2000).fadeOut(1000);
-        }
-        ;
 
-        //Add a new transport method
-        $('.addTransportMethod').click(function() {
-            var configId = $('#configId').last().val();
-            var selMethod = $('#transportMethod').val();
+        //Add a new organization to the existing connection
+        $('.addOrganization').click(function() {
+            var selOrg = $('#organization').val();
 
-            if (selMethod == '') {
-                $('#transportMethodDiv').addClass("has-error");
+            if (selOrg === '') {
+                $('#organizationDiv').addClass("has-error");
             }
             else {
                 $.ajax({
-                    url: 'addTransportMethod.do',
+                    url: 'addConnection.do',
                     type: "POST",
-                    data: {'configId': configId, 'transportMethod': selMethod},
+                    data: {'org': selOrg},
                     success: function(data) {
-                        if (data == 1) {
-                            window.location.href = "transport";
+                        if (data === 1) {
+                            window.location.href = "connections";
                         }
                     }
                 });
             }
         });
 
-        //This function will save the messgae type field mappings
-        $('#saveDetails').click(function(event) {
-            $('#action').val('save');
+        //Update the status of the connection
+        $('.connectionStatus').click(function() {
+            var currStatus = $(this).attr('rel'); //1 = enabled 0 = disabled
+            var newStatusVal = null;
+            var newStatus = null;
+            var statusTitle = null;
+            var connectionId = $(this).attr('rel2');
 
-            //Need to make sure all required fields are marked if empty.
-            var hasErrors = 0;
-            hasErrors = checkFormFields();
-
-            if (hasErrors == 0) {
-                $('#transportMethods').submit();
+            if (currStatus === '1') {
+                newStatusVal = false;
+                newStatus = 'Enable';
+                statusTitle = 'Enable this Connection!';
             }
+            else {
+                newStatusVal = true;
+                newStatus = 'Disable';
+                statusTitle = 'Disable this Connection!';
+            }
+            $(this).attr('rel', newStatusVal);
+            $(this).attr('title', statusTitle);
+            $(this).html(newStatus);
+
+            $.ajax({
+                url: 'changeConnectionStatus.do',
+                type: "POST",
+                data: {'statusVal': newStatusVal, 'connectionId': connectionId},
+                success: function(data) {
+                    if (data === 1) {
+                        $('.alert').show();
+                        $('#saveStatus').html('The connection status has been successfully changed!');
+                        fadeAlert();
+                    }
+                }
+            });
+
         });
 
-        $('#next').click(function(event) {
-            $('#action').val('next');
+        //This function will save the messgae type field mappings
+        $('#saveDetails').click(function() {
+            $('.alert').show();
+            $('#saveStatus').html('The connection has been successfully saved!');
+            fadeAlert();
+        });
 
-            var hasErrors = 0;
-            hasErrors = checkFormFields();
+        $('#next').click(function() {
+            window.location.href = "scheduling";
 
-            if (hasErrors == 0) {
-                $('#transportMethods').submit();
-            }
         });
 
     });
 
-    function checkFormFields() {
-        var hasErrors = 0;
-
-        //Remove all has-error class
-        $('div.form-group').removeClass("has-error");
-        $('span.control-label').removeClass("has-error");
-        $('span.control-label').html("");
-
-        //Loop through each transport method chosen
-        $('.transportMethod').each(function() {
-            var sectionVal = $(this).attr('rel');
-
-            //Validate the File Upload fields
-            if (sectionVal == 1 || sectionVal == 3) {
-                var headVal = "";
-                if (sectionVal == 3) {
-                    headVal = "FTP";
-                }
-
-                if ($('#' + headVal + 'currFile').val() != '') {
-                    if ($('#' + headVal + 'templateFile').val() != '' && $('#' + headVal + 'templateFile').val().indexOf('.xlsx') == -1) {
-                        $('#templateFileDiv').addClass("has-error");
-                        $('#templateFileMsg').addClass("has-error");
-                        $('#templateFileMsg').html('The template file must be an excel file (.xlsx format).');
-                        hasErrors = 1;
-                    }
-                }
-                else {
-                    if ($('#' + headVal + 'templateFile').val() == '' || $('#' + headVal + 'templateFile').val().indexOf('.xlsx') == -1) {
-                        $('#' + headVal + 'templateFileDiv').addClass("has-error");
-                        $('#' + headVal + 'templateFileMsg').addClass("has-error");
-                        $('#' + headVal + 'templateFileMsg').html('The template file must be an excel file (.xlsx format).');
-                        hasErrors = 1;
-                    }
-                }
-
-                //Make sure a valid field no is entered
-                if (!$.isNumeric($('#' + headVal + 'targetOrgColNo').val())) {
-                    $('#' + headVal + 'targetOrgColNoDiv').addClass("has-error");
-                    $('#' + headVal + 'targetOrgColNoMsg').addClass("has-error");
-                    $('#' + headVal + 'targetOrgColNoMsg').html('The target organziation field No must be a numeric value!');
-                    hasErrors = 1;
-                }
-                if (!$.isNumeric($('#' + headVal + 'messageTypeColNo').val())) {
-                    $('#' + headVal + 'messageTypeColNoDiv').addClass("has-error");
-                    $('#' + headVal + 'messageTypeColNoMsg').addClass("has-error");
-                    $('#' + headVal + 'messageTypeColNoMsg').html('The message type field No must be a numeric value!');
-                    hasErrors = 1;
-                }
-
-                //Make sure the file type and delimiter is selected
-                if ($('#' + headVal + 'fileType').val() == '') {
-                    $('#' + headVal + 'fileTypeDiv').addClass("has-error");
-                    $('#' + headVal + 'fileTypeMsg').addClass("has-error");
-                    $('#' + headVal + 'ileTypeMsg').html('The file type is a required field!');
-                    hasErrors = 1;
-                }
-                if ($('#' + headVal + 'delimiter').val() == '') {
-                    $('#' + headVal + 'fileDelimDiv').addClass("has-error");
-                    $('#' + headVal + 'fileDelimMsg').addClass("has-error");
-                    $('#' + headVal + 'fileDelimMsg').html('The file delimiter is a required field!');
-                    hasErrors = 1;
-                }
-                if (hasErrors == 1) {
-                    $('#collapse' + sectionVal).show();
-                }
-            }
-
-        });
-
-        return hasErrors;
+    function fadeAlert() {
+        $('.alert').delay(2000).fadeOut(1000);
     }
-
 
 </script>

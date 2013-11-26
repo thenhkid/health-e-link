@@ -54,8 +54,8 @@ public class sysAdminManagerImpl implements sysAdminManager {
 	}
 
 	@Override
-	public void deleteDataItem(String utTableName, int id) {
-		sysAdminDAO.deleteDataItem (utTableName, id);
+	public boolean deleteDataItem(String utTableName, int id) {
+		return sysAdminDAO.deleteDataItem (utTableName, id);
 		
 	}
 

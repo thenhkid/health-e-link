@@ -24,6 +24,8 @@ public interface messageTypeManager {
 	List<messageType> getLatestMessageTypes(int maxResults);
 	
 	List<messageType> getActiveMessageTypes();
+        
+        List<messageType> getAvailableMessageTypes(int orgId);
 	  
 	List<messageType> findMessageTypes(String searchTerm);
 	
@@ -32,6 +34,8 @@ public interface messageTypeManager {
 	List<messageTypeFormFields> getMessageTypeFields(int messageTypeId);
 	
 	void updateMessageTypeFields(messageTypeFormFields formField);
+        
+        void saveMessageTypeFields(messageTypeFormFields formField);
 	
 	@SuppressWarnings("rawtypes")
 	List getInformationTables();

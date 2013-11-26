@@ -30,6 +30,7 @@ import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.messageTypeFormFields;
 import com.ut.dph.service.configurationManager;
 import com.ut.dph.model.Organization;
+import com.ut.dph.model.configurationSchedules;
 import com.ut.dph.service.organizationManager;
 import com.ut.dph.model.messageType;
 import com.ut.dph.service.messageTypeManager;
@@ -176,6 +177,23 @@ public class adminConfigController {
         return mav;
 
     }
+    
+    /**
+     * The '/getAvailableMessageTypes.do' function will return a list of message types
+     * that have not been already set up for the passed in organization.
+     * 
+     * @param   orgId   The organization selected in the drop down
+     * 
+     * @return  messageTypes    The available message types
+     */
+    @SuppressWarnings("rawtypes")
+    @RequestMapping(value= "/getAvailableMessageTypes.do", method = RequestMethod.GET)
+    public @ResponseBody List<messageType> getMessageTypes(@RequestParam(value = "orgId", required = true) int orgId) {
+        
+        List<messageType> messageTypes = messagetypemanager.getAvailableMessageTypes(orgId);
+        
+        return messageTypes;
+    } 
 
     /**
      * The '/create' POST request will submit the new configuration once all required fields are checked, the system will also check to make sure the configuration name is not already in use.
@@ -214,7 +232,7 @@ public class adminConfigController {
 
         configId = id;
 
-		//Need to set up the online form transport method
+	//Need to set up the online form transport method
         //setupOnlineForm(configId,messageTypeId)
         configurationTransportManager.setupOnlineForm(configId, configurationDetails.getMessageTypeId());
 
@@ -781,9 +799,9 @@ public class adminConfigController {
      * The '/connections' function will handle displaying the configuration connections screen.
      * The function will pass the existing connection objects for the selected configuration.
      * 
-     * @Return the conntection view and the following objects.
+     * @Return the connection view and the following objects.
      * 
-     *         organizations - list of available active organiztions to connect to
+     *         organizations - list of available active organizations to connect to
      *                         this list will not contain any currently associated
      *                         organizations.
      *         
@@ -806,14 +824,21 @@ public class adminConfigController {
 
         //Return a list of associated connections
         List<Connections> connections = configurationmanager.getConnections(configId);
-        mav.addObject("connections", connections);
+        
 
         //Set a list of organizations already used
         List<Integer> usedOrgs = new ArrayList<Integer>();
 
         for (Connections connection : connections) {
             usedOrgs.add(connection.getorgId());
+            
+            //Need to get the org name;
+            Organization orgDetails = organizationmanager.getOrganizationById(connection.getorgId());
+            connection.setorgName(orgDetails.getOrgName());
         }
+        
+        //Set the object to hold the existing connections
+        mav.addObject("connections", connections);
 
         //Add the organization id the configuration is being set up for.
         usedOrgs.add(configurationDetails.getorgId());
@@ -821,5 +846,167 @@ public class adminConfigController {
         mav.addObject("usedOrgs", usedOrgs);
 
         return mav;
+    }
+    
+     /**
+     * The '/addConnection.do' POST request will create the connection between the passed in organization
+     * and the configuration.
+     *
+     * @param	org	The organization that to connect to
+     *
+     * @return	The method will return a 1 back to the calling ajax function which will handle the page load.
+     */
+    @RequestMapping(value = "/addConnection.do", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody Integer addConnection(@RequestParam int org) throws Exception {
+        
+        //Update the configuration completed step
+        configuration configurationDetails = configurationmanager.getConfigurationById(configId);
+        if (configurationDetails.getstepsCompleted() < 5) {
+            configurationmanager.updateCompletedSteps(configId, 5);
+        }
+
+        Connections newConnection = new Connections();
+        newConnection.setorgId(org);
+        newConnection.setconfigId(configId);
+
+        configurationmanager.saveConnection(newConnection);
+
+        return 1;
+    }
+    
+    /**
+     * The '/changeConnectionStatus.do' POST request will update the passed in connection status.
+     * 
+     * @param connectionId  The id for the connection to update the status for
+     * @param statusVal     The new status for the connection
+     * 
+     * @return  The method will return a 1 back to the calling ajax function.
+     */
+    @RequestMapping(value= "/changeConnectionStatus.do", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody Integer changeConnectionStatus(@RequestParam boolean statusVal, @RequestParam int connectionId) throws Exception {
+        
+        Connections connection = configurationmanager.getConnection(connectionId);
+        connection.setstatus(statusVal);
+        configurationmanager.updateConnection(connection);
+        
+        return 1;
+    }
+    
+    
+    /**
+     * The '/scheduling' GET request will display the scheduling page for the selected transport Method
+     */
+    @SuppressWarnings("rawtypes")
+    @RequestMapping(value = "/scheduling", method = RequestMethod.GET)
+    public ModelAndView getConfigurationSchedules(@RequestParam(value = "i", required = false) Integer transportMethod) throws Exception {
+        //Default the transport method to online form
+        int selTransportMethod = 2;
+
+        if (transportMethod != null) {
+            selTransportMethod = transportMethod;
+        }
+
+        //Get the completed steps for the selected configuration;
+        configuration configurationDetails = configurationmanager.getConfigurationById(configId);
+
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/configurations/schedule");
+        mav.addObject("id", configId);
+        mav.addObject("completedSteps", configurationDetails.getstepsCompleted());
+        
+        //Get the schedule for the configuration and selected transport method
+        configurationSchedules scheduleDetails = configurationmanager.getScheduleDetails(configId, selTransportMethod);
+        
+        if(scheduleDetails == null) {
+            configurationSchedules emptySchedule = new configurationSchedules();
+            emptySchedule.setconfigId(configId);
+            emptySchedule.settransportMethod(selTransportMethod);
+            emptySchedule.settype(1);
+            
+            //set the selected type
+            mav.addObject("type", "1");
+            mav.addObject("scheduleDetails", emptySchedule);  
+        }
+        else {
+           //set the selected type
+           mav.addObject("type", scheduleDetails.gettype());
+
+           mav.addObject("scheduleDetails", scheduleDetails);  
+        }
+        
+        //Get the list of available transport methods
+        List transportMethods = configurationTransportManager.getTransportMethods();
+        mav.addObject("transportMethods", transportMethods);
+        
+        //pass back the selected transport method
+        mav.addObject("selTransportMethod", selTransportMethod);
+        
+        //Set a list of transport methods already set up for the configuration
+        List<Integer> transportList = new ArrayList<Integer>();
+        
+        //Get a list of all transport details
+        List<configurationTransport> allTransportDetails = configurationTransportManager.getTransportDetails(configId);
+
+        for (configurationTransport details : allTransportDetails) {
+            transportList.add(details.gettransportMethod());
+        }
+        mav.addObject("availTransportMethods", transportList);
+
+        return mav;
+    }
+    
+    /**
+     * 
+     */
+    @RequestMapping(value = "/scheduling", method = RequestMethod.POST)
+    public ModelAndView submitConfigurationSchedules(@ModelAttribute(value = "scheduleDetails") configurationSchedules scheduleDetails, RedirectAttributes redirectAttr) throws Exception {
+       
+       //Set default values based on what schedule type is selected
+       //This will help in case the user was switching around selecting
+       //values before they saved
+        
+       //Manually
+       if(scheduleDetails.gettype() == 1 || scheduleDetails.gettype() == 5) {
+           scheduleDetails.setprocessingType(0);
+           scheduleDetails.setnewfileCheck(0);
+           scheduleDetails.setprocessingDay(0);
+           scheduleDetails.setprocessingTime(0);
+       }
+       //Daily
+       else if (scheduleDetails.gettype() == 2) {
+           scheduleDetails.setprocessingDay(0);
+           if(scheduleDetails.getprocessingType() == 1) {
+               scheduleDetails.setnewfileCheck(0);
+           }
+           else {
+               scheduleDetails.setprocessingTime(0);
+           }
+       }
+       //Weekly
+       else if(scheduleDetails.gettype() == 3) {
+           scheduleDetails.setprocessingType(0);
+           scheduleDetails.setnewfileCheck(0);
+       }
+       //Monthly
+       else if(scheduleDetails.gettype() == 3) {
+           scheduleDetails.setprocessingType(0);
+           scheduleDetails.setnewfileCheck(0);
+           scheduleDetails.setprocessingDay(0);
+       }
+        
+       
+       configurationmanager.saveSchedule(scheduleDetails);
+       
+       //Update the configuration completed step
+       configuration configurationDetails = configurationmanager.getConfigurationById(configId);
+        if (configurationDetails.getstepsCompleted() < 6) {
+            configurationmanager.updateCompletedSteps(configId, 6);
+        }
+       
+       redirectAttr.addFlashAttribute("savedStatus", "updated");
+
+       ModelAndView mav = new ModelAndView(new RedirectView("scheduling"));
+       return mav;
+    
     }
 }

@@ -6,6 +6,7 @@ import com.ut.dph.model.Connections;
 import com.ut.dph.model.Macros;
 import com.ut.dph.model.configuration;
 import com.ut.dph.model.configurationDataTranslations;
+import com.ut.dph.model.configurationSchedules;
 import com.ut.dph.model.configurationTransport;
 
 public interface configurationManager {
@@ -46,5 +47,15 @@ public interface configurationManager {
   List<Macros> getMacros();
   
   List<Connections> getConnections(int configId);
+  
+  void saveConnection(Connections newConnection);
+  
+  Connections getConnection(int connectionId);
+  
+  void updateConnection(Connections connection);
+  
+  configurationSchedules getScheduleDetails(int configId, int transportMethod);
+  
+  void saveSchedule(configurationSchedules scheduleDetails);
  
 }

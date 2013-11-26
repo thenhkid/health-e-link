@@ -13,6 +13,9 @@ import org.hibernate.validator.constraints.NotEmpty;
 public class TableData {
 	
 	//item belong to a table
+	private String utTableName;
+	
+	private String urlId; /**table's urlId **/
 
 	@NotEmpty
 	private int id;
@@ -72,6 +75,18 @@ public class TableData {
 	}
 	public void setDateModified(Date dateModified) {
 		this.dateModified = dateModified;
+	}
+	public String getUtTableName() {
+		return utTableName;
+	}
+	public void setUtTableName(String utTableName) {
+		this.utTableName = utTableName;
+	}
+	public String getUrlId() {
+		return urlId;
+	}
+	public void setUrlId(String urlId) {
+		this.urlId = urlId;
 	}
 	
 	
