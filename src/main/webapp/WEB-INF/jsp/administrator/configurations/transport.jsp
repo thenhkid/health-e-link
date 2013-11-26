@@ -48,7 +48,7 @@
                     <form:form id="transportMethods" modelAttribute="configurationDetails" enctype="multipart/form-data" method="post" role="form">
                         <input type="hidden" id="action" name="action" value="save" />
                         <input type="hidden" id="configId" value="${configurationDetails.id}" />
-
+                        <form:hidden path="stepsCompleted" />
                         <c:forEach items="${configurationDetails.transportDetails}" var="details" varStatus="tStatus">
                             <c:choose>
                                 <c:when test="${details.transportMethod == 2}">
