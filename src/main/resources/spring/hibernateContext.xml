@@ -30,7 +30,7 @@
 	        <prop key="hibernate.show_sql">true</prop>
 	      </props>
 	    </property>
-	    <property name="packagesToScan" value="com.ut.dph.model" />
+	    <property name="packagesToScan" value="com.ut.dph.model, com.ut.dph.model.custom" />
 	</bean>
 
     <tx:annotation-driven transaction-manager="transactionManager"/>
