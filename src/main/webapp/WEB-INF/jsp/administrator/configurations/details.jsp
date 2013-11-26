@@ -65,6 +65,11 @@
                                 <label class="control-label" for="messageTypeId">Message Type *</label>
                                 <form:select path="messageTypeId" id="messageTypeId" class="form-control half" disabled="${configurationDetails.id == 0 ? 'false' : 'true' }">
                                     <option value="">- Select -</option>
+                                    <c:if test="${configurationDetails.id > 0}">
+                                        <c:forEach items="${messageTypes}" var="messageType" varStatus="mStatus">
+                                            <option value="${messageType.id}" <c:if test="${messageType.id == configurationDetails.messageTypeId}">selected</c:if>>${messageType.name}</option>
+                                        </c:forEach>
+                                    </c:if>
                                 </form:select>
                                 <c:if test="${configurationDetails.id > 0}"><form:hidden path="messageTypeId"/></c:if> 
                                 </div>
