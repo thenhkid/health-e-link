@@ -107,8 +107,12 @@ UNLOCK TABLES;
 ALTER TABLE `universalTranslator`.`configurationSchedule` 
 ADD COLUMN `transportMethod` INT NOT NULL AFTER `configId`;
 
+
 /* Grace 11-25-2013 **/
-CREATE TABLE `universalTranslator`.`message_To` (
+
+drop table message_To;
+
+CREATE TABLE `universalTranslator`.`message_ToOrg` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `messageId` INT NOT NULL COMMENT 'This is the messageId from message_Details table.',
   `messageTypeId` INT NOT NULL,
