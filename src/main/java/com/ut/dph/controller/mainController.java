@@ -46,11 +46,10 @@ public class mainController {
      * @throws Exception
      */
     @RequestMapping(value = "/loginfailed", method = RequestMethod.GET)
-    public ModelAndView loginerror(HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
+    public ModelAndView loginerror(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("login");
+        mav.setViewName("/login");
         mav.addObject("error", "true");
         return mav;
 
@@ -65,10 +64,9 @@ public class mainController {
      * @throws Exception
      */
     @RequestMapping(value = "/logout", method = RequestMethod.GET)
-    public ModelAndView logout(HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
+    public ModelAndView logout(HttpServletRequest request,  HttpServletResponse response) throws Exception {
 
-        return new ModelAndView("login");
+        return new ModelAndView("/login");
 
     }
 
