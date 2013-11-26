@@ -110,8 +110,6 @@ ADD COLUMN `transportMethod` INT NOT NULL AFTER `configId`;
 
 /* Grace 11-25-2013 **/
 
-drop table message_To;
-
 CREATE TABLE `universalTranslator`.`message_ToOrg` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `messageId` INT NOT NULL COMMENT 'This is the messageId from message_Details table.',
@@ -307,11 +305,14 @@ INSERT `Macro_Names` (`ID`, `Category`, `Macro_Name`, `Macro_Short_Name`, `Ref_N
 INSERT `Macro_Names` (`ID`, `Category`, `Macro_Name`, `Macro_Short_Name`, `Ref_Number`, `Date_Display`, `Formula`, `Invalid_When`, `FieldA_Question`, `FieldB_Question`, `Con1_Question`, `Con2_Question`) VALUES (65, N'MAPLINK SPECS', N'Reverse text phrases', N'SWAP TEXT', 62, NULL, N'LookupValue = dbo.ufn_SwapText(SourceValue, ''@C1'')', N'dbo.ufn_CountChar(fd.@Src, ''@C1'') <> 1', NULL, NULL, N'Please enter the value that is used as the delimiter in the text.', NULL);
 INSERT `Macro_Names` (`ID`, `Category`, `Macro_Name`, `Macro_Short_Name`, `Ref_Number`, `Date_Display`, `Formula`, `Invalid_When`, `FieldA_Question`, `FieldB_Question`, `Con1_Question`, `Con2_Question`) VALUES (66, N'MAPLINK SPECS', N'Replace range of constants with SF1', N'REPLACE RANGE', 63, NULL, N'LookupValue = CASE WHEN CAST(SourceValue AS INT)  @C1 THEN  ''@C2'' ELSE SourceValue END', N'', N'', NULL, N'Please enter the range of values to change as  BETWEEN x AND y.', N'Please enter the replacement value for the range.');
 INSERT `Macro_Names` (`ID`, `Category`, `Macro_Name`, `Macro_Short_Name`, `Ref_Number`, `Date_Display`, `Formula`, `Invalid_When`, `FieldA_Question`, `FieldB_Question`, `Con1_Question`, `Con2_Question`) VALUES (62, N'MAPLINK SPECS', N'Replace target with @C1 + @C2 + SF1', N'TAPPEND FIELD TO CONSTANT', 59, NULL, N'@F2 = ''@C1'' + ''@C2'' + fd.@F1', NULL, N'Please enter the field number of the value to be inserted.', N'Please enter the target field number where the result is kept.', N'Please enter the constant value to be prefixed to the value of the field.', N'Please enter the value that will be used to separate the two values.');
-INSERT `Macro_Names` (`ID`, `Category`, `Macro_Name`, `Macro_Short_Name`, `Ref_Number`, `Date_Display`, `Formula`, `Invalid_When`, `FieldA_Question`, `FieldB_Question`, `Con1_Question`, `Con2_Question`) VALUES (63, N'MAPLINK SPECS', N'Check numeric range', N'CHECK NUMBER', 60, NULL, N'LookupValue = LookupValue', N'ISNUMERIC(SourceValue) = 0 OR ISNUMERIC(''@C1'') = 0 OR ISNUMERIC(''@C2'') = 0 OR fd.@Src < @C1 OR fd.@Src > @C2', N' ', N' ', N'Please enter the lowest valid number.', N'Please enter the largest valid number.')
+INSERT `Macro_Names` (`ID`, `Category`, `Macro_Name`, `Macro_Short_Name`, `Ref_Number`, `Date_Display`, `Formula`, `Invalid_When`, `FieldA_Question`, `FieldB_Question`, `Con1_Question`, `Con2_Question`) VALUES (63, N'MAPLINK SPECS', N'Check numeric range', N'CHECK NUMBER', 60, NULL, N'LookupValue = LookupValue', N'ISNUMERIC(SourceValue) = 0 OR ISNUMERIC(''@C1'') = 0 OR ISNUMERIC(''@C2'') = 0 OR fd.@Src < @C1 OR fd.@Src > @C2', N' ', N' ', N'Please enter the lowest valid number.', N'Please enter the largest valid number.');
+
 
 
 /* Chad 11-26-2013 */
+ALTER TABLE `universalTranslator`.`rel_configurationDataTranslations` 
+DROP FOREIGN KEY `dtmacroId`;
+
 DROP TABLE `universalTranslator`.`ref_macros`;
 
-ALTER TABLE `universalTranslator`.`rel_configurationDataTranslations` 
-DROP FOREIGN KEY `fkcrosswalkId`;
+
