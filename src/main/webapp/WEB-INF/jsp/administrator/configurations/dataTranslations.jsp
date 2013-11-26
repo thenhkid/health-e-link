@@ -99,7 +99,16 @@
                             <select id="macro" class="form-control half">
                                 <option value="">- Select -</option>
                                 <c:forEach items="${macros}" var="macro" varStatus="mStatus">
-                                    <option value="${macros[mStatus.index].id}">${macros[mStatus.index].name}</option>
+                                    <option value="${macro.id}">
+                                        <c:choose> 
+                                            <c:when test="${macro.macroShortName.contains('DATE')}">
+                                                ${macro.macroShortName} (${macro.dateDisplay})
+                                            </c:when>
+                                            <c:otherwise>
+                                                ${macro.macroShortName}
+                                            </c:otherwise>  
+                                        </c:choose>
+                                    </option>
                                 </c:forEach>
                             </select>
                             <span id="macroMsg" class="control-label"></span>
@@ -179,10 +188,11 @@
     </div>
 </div>
 <input type="hidden" id="orgId" value="${orgId}" />
+<input type="hidden" id="macroLookUpList" value="${macroLookUpList}" />
 
 <!-- Provider Address modal -->
 <div class="modal fade" id="crosswalkModal" role="dialog" tabindex="-1" aria-labeledby="Message Crosswalks" aria-hidden="true" aria-describedby="Message Crosswalks"></div>
-
+<div class="modal fade" id="macroModal" role="dialog" tabindex="-1" aria-labeledby="Macro Details" aria-hidden="true" aria-describedby="Macro Details"></div>
 
 <script type="text/javascript">
 
@@ -208,6 +218,57 @@
             else {
                 window.location.href = 'translations?i=' + selTransportMethod;
             }
+        });
+        
+        //Function that will check the selected macro and determine if a module
+        //should be launched to ask questions.
+        $('#macro').change(function() {
+           var selMacro = $(this).val();
+           var list = $('#macroLookUpList').val();
+           
+           if(list.indexOf(selMacro) !== -1) {
+              $.ajax({
+                    url: 'getMacroDetails.do',
+                    type: "GET",
+                    data: {'macroId': selMacro},
+                    success: function(data) {
+                        $('#macroModal').html(data);
+                        $('#macroModal').modal('toggle');
+                        $('#macroModal').modal('show');
+                    }
+                });
+           }
+        });
+        
+        //Function that will take in the macro details
+        $(document).on('click','.submitMacroDetailsButton', function() {
+            var fieldA = $('#fieldAQuestion').val();
+            var fieldB = $('#fieldBQuestion').val();
+            var con1 = $('#Con1Question').val();
+            var con2 = $('#Con2Question').val();
+            
+            //Clear all fields
+            $('#fieldA').val("");
+            $('#fieldB').val("");
+            $('#constant1').val("");
+            $('#constant2').val("");
+            
+            if(fieldA) {
+                $('#fieldA').val(fieldA);
+            }
+            if(fieldB) {
+                $('#fieldB').val(fieldB);
+            }
+            if(con1) {
+                $('#constant1').val(con1);
+            }
+            if(con2) {
+                $('#constant2').val(con2);
+            }
+            
+            //Close the modal window
+            $('#macroModal').modal('toggle');
+            $('#macroModal').modal('hide');
         });
 
 
