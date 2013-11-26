@@ -311,7 +311,7 @@ INSERT `Macro_Names` (`ID`, `Category`, `Macro_Name`, `Macro_Short_Name`, `Ref_N
 
 /* Chad 11-26-2013 */
 ALTER TABLE `universalTranslator`.`rel_configurationDataTranslations` 
-DROP FOREIGN KEY `fkcrosswalkId`;
+DROP FOREIGN KEY `dtmacroId`;
 
 DROP TABLE `universalTranslator`.`ref_macros`;
 
