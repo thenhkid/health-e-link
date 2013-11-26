@@ -2,8 +2,8 @@ package com.ut.dph.service;
 
 import java.util.List;
 
-import com.ut.dph.model.custom.TableData;
 import com.ut.dph.model.custom.LookUpTable;
+import com.ut.dph.model.custom.TableData;
 
 
 /** 
@@ -30,9 +30,15 @@ public interface sysAdminManager {
 	
 	List <TableData> getDataList(int maxResults, int page, String utTableName, String searchTerm);
 	
-	Integer findTotalDataRows(String tableName);
+	Integer findTotalDataRows(String utTableName);
 	
 	boolean deleteDataItem (String utTableName, int id);
+	
+	TableData getTableData(Integer id, String utTableName);
+	
+	Integer createTableData (TableData tableData, String utTableName);
+	
+	boolean updateTableData (TableData tableData, String utTableName);
 	
 }
 

@@ -14,13 +14,11 @@
 		</c:if>
 	
 		<form:form id="tableDataForm" commandName="tableData" modelAttribute="tableDataDetails"  method="post" role="form">
-			<input type="hidden" id="action" name="action" value="save" />
-			<form:hidden path="urlId" id="urlId" />
-			
+			<input type="hidden" id="action" name="action" value="save" />	
 			<section class="panel panel-default">
 				
 				<div class="panel-heading">
-					<h3 class="panel-title"><c:if test="${tableDataDetails.id == 0}">Add </c:if>Data for "${tableInfo.tableName}" Table</h3>
+					<h3 class="panel-title"><c:if test="${tableDataDetails.id == 0}">Add </c:if>Data for "${tableInfo.displayName}" Table</h3>
 				</div>
 				<div class="panel-body">
 					<div class="form-container">
@@ -47,16 +45,15 @@
 							</div>
 						</div>
 						<spring:bind path="displayText">
-							<div class="form-group ${status.error ? 'has-error' : '' } ${not empty esistingOrg ? 'has-error' : ''}">
+							<div class="form-group ${status.error ? 'has-error' : '' }">
 								<label class="control-label" for="displayText">Display Text *</label>
 								<form:input path="displayText" id="displayText" class="form-control" type="text" maxLength="45" />
 								<form:errors path="displayText" cssClass="control-label" element="label" />
-								<c:if test="${not empty existingOrg}">${existingOrg}</c:if>
 							</div>
 						</spring:bind>
 						<spring:bind path="description">
 							<div class="form-group ${status.error ? 'has-error' : '' }">
-								<label class="control-label" for="description">description *</label>
+								<label class="control-label" for="description">Description</label>
 								<form:input path="description" id="description" class="form-control" type="text" maxLength="255" />
 								<form:errors path="description" cssClass="control-label" element="label" />
 							</div>

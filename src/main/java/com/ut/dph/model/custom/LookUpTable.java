@@ -1,7 +1,6 @@
 package com.ut.dph.model.custom;
 
 import java.util.Date;
-
 import org.hibernate.validator.constraints.NotEmpty;
 
 
@@ -21,7 +20,7 @@ public class LookUpTable {
 	
 	/** display table name **/
 	@NotEmpty
-	private String tableName;
+	private String displayName;
 	
 	@NotEmpty
 	private String urlId;
@@ -43,12 +42,12 @@ public class LookUpTable {
 		this.utTableName = utTableName;
 	}
 
-	public String getTableName() {
-		return tableName;
+	public String getDisplayName() {
+		return displayName;
 	}
 
-	public void setTableName(String tableName) {
-		this.tableName = tableName;
+	public void setDisplayName(String displayName) {
+		this.displayName = displayName;
 	}
 
 	public String getUrlId() {
@@ -91,6 +90,4 @@ public class LookUpTable {
 		this.dateCreated = dateCreated;
 	}
 
-	
-	
 }

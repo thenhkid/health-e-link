@@ -39,7 +39,7 @@
 								    <c:forEach var="tableInfo" items="${tableList}">
 										<tr id="tableInfoRow" style="cursor: pointer">
 											<td scope="row">
-												<a href="std/data/${tableInfo.urlId}" title="View Data">${tableInfo.tableName}</a>
+												<a href="std/data/${tableInfo.urlId}" title="View Data">${tableInfo.displayName}</a>
 											</td>
 											<td class="center-text">${tableInfo.columnNum}</td>
 											<td class="center-text">${tableInfo.rowNum}</td>
