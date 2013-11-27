@@ -11,7 +11,7 @@
     </c:if>
     <div class="login clearfix">
         <header class="login-header">
-            <div class="login-header-content"><span class="logo" alt="{Company Name Logo}"></span></div>
+            <div class="login-header-content"><a href="<c:url value='/' />" title="Return to home page."><span class="logo" alt="{Company Name Logo}"></span></a></div>
         </header>
         <form role="form" name='f' action="<c:url value='j_spring_security_check' />" method='POST'>
             <div class="form-group ${not empty error ? 'has-error' : '' }">

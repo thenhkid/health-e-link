@@ -281,6 +281,20 @@
     
     <!-- Home Page -->
     <definition name="/home" extends="base.definition.frontEnd">
-         <put-attribute name="body" value="/WEB-INF/jsp/home.jsp" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page=home" />
+        <put-attribute name="body" value="/WEB-INF/jsp/home.jsp" />
     </definition>
+    
+    <!-- Information Pages -->
+    <definition name="/productSuite" extends="base.definition.frontEnd">
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page=productSuite" />
+        <put-attribute name="body" value="/WEB-INF/jsp/informationPages/productSuite.jsp" />
+    </definition>
+    
+    <!-- Profile (Account) Pages -->
+    <definition name="/profile/index" extends="base.definition.frontEnd">
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page=profileIndex" />
+        <put-attribute name="body" value="/WEB-INF/jsp/profile/index.jsp" />
+    </definition>
+    
 </tiles-definitions>

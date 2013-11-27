@@ -80,5 +80,16 @@ public class mainController {
     public ModelAndView welcome(HttpServletRequest request,  HttpServletResponse response) throws Exception {
         return new ModelAndView("/home");
     }
-
+    
+    /**
+     * The '/product-suite' request will display the product suite information page.
+     */
+    @RequestMapping(value="/product-suite", method = RequestMethod.GET)
+    public ModelAndView productSuite() throws Exception {
+        
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/productSuite");
+        mav.addObject("pageTitle","Product Suite");
+        return mav;
+    }
 }

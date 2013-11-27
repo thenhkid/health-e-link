@@ -29,7 +29,7 @@
     <script type="text/javascript" src="<%=request.getContextPath()%>/dspResources/js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
     <script data-main="<%=request.getContextPath()%>/dspResources/js/main" src="<%=request.getContextPath()%>/dspResources/js/vendor/require.js"></script>
 </head>
-<body class="home theme-health-e-link">
+<body <c:if test="${param['page']== 'home'}">class="home theme-health-e-link"</c:if>>
     <div class="wrap">
         <tiles:insertAttribute name="header" /> 
         <tiles:insertAttribute name="body" />

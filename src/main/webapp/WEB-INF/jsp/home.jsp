@@ -60,19 +60,4 @@
     </div>
 </div>
 
-<div class="module email-list-signup">
-    <div class="container">
-        <form class="form-inline">
-            <h4 class="pull-left">Join Our Email List</h4>
-            <div class="form-group">
-                <label class="sr-only">Join our email list</label>
-                <input class="form-control" type="text" placeholder="Email Address">
-            </div>
-            <input type="submit" class="btn btn-secondary" value="Submit" />
-            <div class="radio">
-                <label><input type="radio"/>
-                    Unsubscribe</label>
-            </div>
-        </form>
-    </div>
-</div>
+
