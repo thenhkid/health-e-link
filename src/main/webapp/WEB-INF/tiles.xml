@@ -11,7 +11,7 @@
         <put-attribute name="actions" value="" />
         <put-attribute name="menu" value="" />
         <put-attribute name="body" value="" />
-        <put-attribute name="footer" value="" />
+        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
     </definition>
     
    <!-- Login -->
@@ -21,7 +21,6 @@
         <put-attribute name="title" value="Universal Translator Account Login" />
         <put-attribute name="header" value="" />
         <put-attribute name="body" value="/WEB-INF/jsp/login.jsp" />
-        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
     </definition>
     
    <!-- Admin Dashboard -->
@@ -31,7 +30,6 @@
         <put-attribute name="title" value="Administrator" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp" />
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/index.jsp" />
-        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
     </definition>
     	
     <!-- Admin Configuration Definitions -->
@@ -42,7 +40,7 @@
         <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=config" />
         <put-attribute name="actions" value="/WEB-INF/jsp/administrator/configurations/actionBar.jsp?page=listConfigs" />
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/configurations/list.jsp" />
-        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/admin/configuration/list.js" />
     </definition>
 	    
     <definition name="/administrator/configurations/details" extends="base.definition.admin">
@@ -53,7 +51,7 @@
         <put-attribute name="actions" value="/WEB-INF/jsp/administrator/configurations/actionBar.jsp?page=configDetails" />
         <put-attribute name="menu" value="/WEB-INF/jsp/administrator/configurations/menu.jsp?page=details" />
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/configurations/details.jsp" />
-        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/admin/configuration/details.js" />
     </definition>
 	    
     <definition name="/administrator/configurations/transport" extends="base.definition.admin">
@@ -64,7 +62,7 @@
         <put-attribute name="actions" value="/WEB-INF/jsp/administrator/configurations/actionBar.jsp?page=transport" />
         <put-attribute name="menu" value="/WEB-INF/jsp/administrator/configurations/menu.jsp?page=transport" />
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/configurations/transport.jsp" />
-        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/admin/configuration/transport.js" />
     </definition>
 	    
     <definition name="/administrator/configurations/chooseFields" extends="base.definition.admin">
@@ -75,7 +73,7 @@
         <put-attribute name="actions" value="/WEB-INF/jsp/administrator/configurations/actionBar.jsp?page=chooseFields" />
         <put-attribute name="menu" value="/WEB-INF/jsp/administrator/configurations/menu.jsp?page=mappings" />
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/configurations/chooseFields.jsp" />
-        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/admin/configuration/chooseFields.js" />
     </definition>
 	    
     <definition name="/administrator/configurations/mappings" extends="base.definition.admin">
@@ -86,7 +84,7 @@
         <put-attribute name="actions" value="/WEB-INF/jsp/administrator/configurations/actionBar.jsp?page=mappings" />
         <put-attribute name="menu" value="/WEB-INF/jsp/administrator/configurations/menu.jsp?page=mappings" />
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/configurations/fieldMappings.jsp" />
-        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/admin/configuration/fieldMappings.js" />
     </definition>
 	    
     <definition name="/administrator/configurations/translations" extends="base.definition.admin">
@@ -97,7 +95,7 @@
         <put-attribute name="actions" value="/WEB-INF/jsp/administrator/configurations/actionBar.jsp?page=translations" />
         <put-attribute name="menu" value="/WEB-INF/jsp/administrator/configurations/menu.jsp?page=translations" />
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/configurations/dataTranslations.jsp" />
-        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/admin/configuration/dataTranslations.js" />
     </definition>
 	    
     <definition name="/administrator/configurations/connections" extends="base.definition.admin">
@@ -108,7 +106,7 @@
         <put-attribute name="actions" value="/WEB-INF/jsp/administrator/configurations/actionBar.jsp?page=connections" />
         <put-attribute name="menu" value="/WEB-INF/jsp/administrator/configurations/menu.jsp?page=connections" />
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/configurations/connections.jsp" />
-        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/admin/configuration/connections.js" />
     </definition>
             
     <definition name="/administrator/configurations/schedule" extends="base.definition.admin">
@@ -119,7 +117,7 @@
         <put-attribute name="actions" value="/WEB-INF/jsp/administrator/configurations/actionBar.jsp?page=schedule" />
         <put-attribute name="menu" value="/WEB-INF/jsp/administrator/configurations/menu.jsp?page=schedule" />
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/configurations/schedule.jsp" />
-        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/admin/configuration/schedule.js" />
     </definition>
 	    
     <!-- Admin Organization Definitions -->
@@ -130,7 +128,7 @@
         <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=org" />
         <put-attribute name="actions" value="/WEB-INF/jsp/administrator/organizations/actionBar.jsp?page=listOrgs" />
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/organizations/listOrganizations.jsp" />
-        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/admin/organization/list.js" />
     </definition>
 	    
     <definition name="/administrator/organizations/organizationDetails" extends="base.definition.admin">
@@ -141,7 +139,7 @@
         <put-attribute name="actions" value="/WEB-INF/jsp/administrator/organizations/actionBar.jsp?page=orgDetails" />
         <put-attribute name="menu" value="/WEB-INF/jsp/administrator/organizations/menu.jsp?page=details" />
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/organizations/organizationDetails.jsp" />
-        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/admin/organization/orgDetails.js" />
     </definition>
 	    
     <definition name="/administrator/organizations/users" extends="base.definition.admin">
@@ -152,7 +150,7 @@
         <put-attribute name="actions" value="/WEB-INF/jsp/administrator/organizations/actionBar.jsp?page=orgUsers" />
         <put-attribute name="menu" value="/WEB-INF/jsp/administrator/organizations/menu.jsp?page=users" />
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/organizations/users/list.jsp" />
-        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/admin/organization/users.js" />
     </definition>
 	    
     <definition name="/administrator/organizations/providers/list" extends="base.definition.admin">
@@ -163,7 +161,7 @@
         <put-attribute name="actions" value="/WEB-INF/jsp/administrator/organizations/actionBar.jsp?page=orgProviders" />
         <put-attribute name="menu" value="/WEB-INF/jsp/administrator/organizations/menu.jsp?page=providers" />
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/organizations/providers/list.jsp" />
-        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/admin/organization/providers.js" />
     </definition>
 	    
     <definition name="/administrator/organizations/providers/details" extends="base.definition.admin">
@@ -174,7 +172,7 @@
         <put-attribute name="actions" value="/WEB-INF/jsp/administrator/organizations/actionBar.jsp?page=providerDetails" />
         <put-attribute name="menu" value="/WEB-INF/jsp/administrator/organizations/menu.jsp?page=providers" />
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/organizations/providers/details.jsp" />
-        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/admin/organization/providerDetails.js" />
     </definition>
 	    
     <definition name="/administrator/organizations/brochures" extends="base.definition.admin">
@@ -185,7 +183,7 @@
         <put-attribute name="actions" value="/WEB-INF/jsp/administrator/organizations/actionBar.jsp?page=orgBrochures" />
         <put-attribute name="menu" value="/WEB-INF/jsp/administrator/organizations/menu.jsp?page=brochures" />
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/organizations/brochures/list.jsp" />
-        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/admin/organization/brochures.js" />
     </definition>
 	    
     <!-- Admin Message Type Library Definitions -->
@@ -196,7 +194,7 @@
         <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=lib" />
         <put-attribute name="actions" value="/WEB-INF/jsp/administrator/messageTypeLibrary/actionBar.jsp?page=list" />
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/messageTypeLibrary/list.jsp" />
-        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/admin/library/list.js" />
     </definition>
 	    
     <definition name="/administrator/messageTypeLibrary/details" extends="base.definition.admin">
@@ -207,7 +205,7 @@
         <put-attribute name="actions" value="/WEB-INF/jsp/administrator/messageTypeLibrary/actionBar.jsp?page=details" />
         <put-attribute name="menu" value="/WEB-INF/jsp/administrator/messageTypeLibrary/menu.jsp?page=details" />
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/messageTypeLibrary/details.jsp" />
-        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/admin/library/details.js" />
     </definition>
 	    
     <definition name="/administrator/messageTypeLibrary/mappings" extends="base.definition.admin">
@@ -218,7 +216,7 @@
         <put-attribute name="actions" value="/WEB-INF/jsp/administrator/messageTypeLibrary/actionBar.jsp?page=mappings" />
         <put-attribute name="menu" value="/WEB-INF/jsp/administrator/messageTypeLibrary/menu.jsp?page=mappings" />
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/messageTypeLibrary/fieldMappings.jsp" />
-        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/admin/library/mappings.js" />
     </definition>
 	    
     <definition name="/administrator/messageTypeLibrary/translations" extends="base.definition.admin">
@@ -229,7 +227,7 @@
         <put-attribute name="actions" value="/WEB-INF/jsp/administrator/messageTypeLibrary/actionBar.jsp?page=translations" />
         <put-attribute name="menu" value="/WEB-INF/jsp/administrator/messageTypeLibrary/menu.jsp?page=translations" />
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/messageTypeLibrary/dataTranslations.jsp" />
-        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/admin/library/translations.js" />
     </definition>
 	   
     <!--  End Admin Definitions -->
@@ -243,7 +241,7 @@
         <put-attribute name="actions" value="/WEB-INF/jsp/administrator/sysadmin/actionBar.jsp?page=list" />
         <put-attribute name="menu" value="/WEB-INF/jsp/administrator/sysadmin/menu.jsp?page=table" />
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/sysadmin/data/tableList.jsp" />
-        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/admin/sysadmin/tableList.js" />
     </definition>
 	    
     <!--  this lists data rows for look up tables -->    
@@ -255,7 +253,7 @@
         <put-attribute name="actions" value="/WEB-INF/jsp/administrator/sysadmin/actionBar.jsp?page=data" />
         <put-attribute name="menu" value="/WEB-INF/jsp/administrator/sysadmin/menu.jsp?page=table" />
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/sysadmin/data/list.jsp" />
-        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/admin/sysadmin/list.js" />
     </definition>
 	    
     <definition name="/administrator/sysadmin/std/details" extends="base.definition.admin">
@@ -266,7 +264,7 @@
         <put-attribute name="actions" value="/WEB-INF/jsp/administrator/sysadmin/actionBar.jsp?page=dataDetails" />
         <put-attribute name="menu" value="/WEB-INF/jsp/administrator/sysadmin/menu.jsp?page=table" />
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/sysadmin/data/details.jsp" />
-        <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/admin/sysadmin/details.js" />
     </definition>
 	    
     <!--  detail for a data table element -->   
