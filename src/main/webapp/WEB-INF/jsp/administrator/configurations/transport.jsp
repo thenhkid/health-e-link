@@ -48,7 +48,7 @@
                     <form:form id="transportMethods" modelAttribute="configurationDetails" enctype="multipart/form-data" method="post" role="form">
                         <input type="hidden" id="action" name="action" value="save" />
                         <input type="hidden" id="configId" value="${configurationDetails.id}" />
-
+                        <form:hidden path="stepsCompleted" />
                         <c:forEach items="${configurationDetails.transportDetails}" var="details" varStatus="tStatus">
                             <c:choose>
                                 <c:when test="${details.transportMethod == 2}">
@@ -66,7 +66,7 @@
                                         <input type="hidden" name="transportDetails[${tStatus.index}].id" value="${details.id}" />
                                         <input type="hidden" name="transportDetails[${tStatus.index}].configId" value="${details.configId}" />
                                         <input type="hidden" name="transportDetails[${tStatus.index}].transportMethod" value="${details.transportMethod}" />
-                                        <input type="hidden" id="currFile" value="${details.fileName}" />
+                                        <input type="hidden" name="transportDetails[${tStatus.index}].fileName" id="currFile" value="${details.fileName}" />
                                         <div class="panel-heading">
                                             <h3 class="panel-title"><a data-toggle="collapse" data-parent="#accordion" href="#collapse1">File Upload Configuration</a></h3>
                                         </div>

@@ -17,7 +17,7 @@ public class sysAdminManagerImpl implements sysAdminManager {
 	 * about 90% of our tables falls into the standard table category, which is
 	 * id, displayText, description, status and isCustom) 
 	 * 
-	 * @param tableName
+	 * @param utTableName
 	 * @param tableId
 	 */
 	@Autowired
@@ -43,8 +43,8 @@ public class sysAdminManagerImpl implements sysAdminManager {
 	}
 
 	@Override
-	public Integer findTotalDataRows(String tableName) {
-		return sysAdminDAO.findTotalDataRows(tableName);
+	public Integer findTotalDataRows(String utTableName) {
+		return sysAdminDAO.findTotalDataRows(utTableName);
 	}
 
 	@Override
@@ -56,7 +56,22 @@ public class sysAdminManagerImpl implements sysAdminManager {
 	@Override
 	public boolean deleteDataItem(String utTableName, int id) {
 		return sysAdminDAO.deleteDataItem (utTableName, id);
-		
 	}
+
+	@Override
+	public TableData getTableData(Integer id, String utTableName) {
+		return sysAdminDAO.getTableData(id, utTableName);
+	}
+
+	@Override
+	public Integer createTableData(TableData tableData, String utTableName) {
+		return sysAdminDAO.createTableData (tableData, utTableName);
+	}
+
+	@Override
+	public boolean updateTableData(TableData tableData, String utTableName) {
+		return sysAdminDAO.updateTableData (tableData, utTableName);	
+	}
+
 
 }

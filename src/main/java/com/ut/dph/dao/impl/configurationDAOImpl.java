@@ -362,8 +362,19 @@ public class configurationDAOImpl implements configurationDAO {
     @Override
     @Transactional
     public List<Macros> getMacros() {
-        Query query = sessionFactory.getCurrentSession().createQuery("from Macros order by name asc");
+        Query query = sessionFactory.getCurrentSession().createQuery("from Macros order by macro_short_name asc");
         return query.list();
+    }
+    
+    /**
+     * The 'getMacroById' function will return the macro details for the passed in macro id.
+     *
+     * @param macroId The value of the macro to retrieve details
+     *
+     * @return macros object
+     */
+    public Macros getMacroById(int macroId) {
+        return (Macros) sessionFactory.getCurrentSession().get(Macros.class, macroId);
     }
 
     /**

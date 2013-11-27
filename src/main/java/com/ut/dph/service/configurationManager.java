@@ -46,6 +46,8 @@ public interface configurationManager {
   
   List<Macros> getMacros();
   
+  Macros getMacroById(int macroId);
+  
   List<Connections> getConnections(int configId);
   
   void saveConnection(Connections newConnection);

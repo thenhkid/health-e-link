@@ -121,7 +121,7 @@ public class adminSysAdminController {
 	 * @throws Exception
 	 */
 	@RequestMapping(value="/std/data/{urlId}", method = RequestMethod.GET)
-	public ModelAndView listDataInTable(@RequestParam(value="page", required=false) Integer page,  @PathVariable String urlId) throws Exception {
+	public ModelAndView listTableData(@RequestParam(value="page", required=false) Integer page,  @PathVariable String urlId) throws Exception {
 		
 		if(page == null){
 	        page = 1;
@@ -207,7 +207,7 @@ public class adminSysAdminController {
 	 * @throws Exception
 	 */
 	@RequestMapping(value="/std/data/{urlId}/delete", method = RequestMethod.GET)
-	public ModelAndView deleteDataInTable(@RequestParam(value="i", required=true) int dataId, 
+	public ModelAndView deleteTableData(@RequestParam(value="i", required=true) int dataId, 
 			@PathVariable String urlId, RedirectAttributes redirectAttr) throws Exception {
 		 
 		LookUpTable tableInfo = sysAdminManager.getTableInfo(urlId);
@@ -232,14 +232,13 @@ public class adminSysAdminController {
 	 *  
 	 */
 	@RequestMapping(value="/std/data/{urlId}/dataItem.create", method = RequestMethod.GET)
-	public ModelAndView newDataForm(@PathVariable String urlId) throws Exception {
+	public ModelAndView newTableDataForm(@PathVariable String urlId) throws Exception {
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("/administrator/sysadmin/std/details");	
 		
 		LookUpTable tableInfo = sysAdminManager.getTableInfo(urlId);
 		//create a table data
 		TableData tableData = new TableData();
-		tableData.setUrlId(tableInfo.getUrlId());
 		tableData.setId(0);
 		mav.addObject("tableDataDetails",tableData);
 		mav.addObject("tableInfo",tableInfo);
@@ -263,43 +262,95 @@ public class adminSysAdminController {
 	 * @throws Exception
 	 */
 	@RequestMapping(value="/std/data/{urlId}/dataItem.create", method = RequestMethod.POST)
-	public ModelAndView createProvider(@Valid @ModelAttribute(value="tableDataDetails") TableData tableData, 
+	public ModelAndView createTableData(
+			@Valid @ModelAttribute(value="tableDataDetails") TableData tableData, 
 			BindingResult result, RedirectAttributes redirectAttr,
 			@RequestParam String action, @PathVariable String urlId) throws Exception {
 		
-		ModelAndView mav = new ModelAndView();
-		mav.setViewName("/administrator/sysadmin/std/details");
-		return mav;
+		LookUpTable tableInfo = sysAdminManager.getTableInfo(urlId);
 		
-		/** check for error 
+		ModelAndView mav = new ModelAndView();
+		/** check for error **/
 		if(result.hasErrors()) {
-			ModelAndView mav = new ModelAndView();
+			mav.addObject("tableInfo",tableInfo);
 			mav.setViewName("/administrator/sysadmin/std/details");
 			return mav;
 		}
 		
-		//Create the provider
-		Integer dataId = sysAdminManager.createTableDate(tableData);
-	
-		//If the "Save" button was pressed 
-		if(action.equals("save")) {
-			//This variable will be used to display the message on the details form
-			redirectAttr.addFlashAttribute("savedStatus", "created");
-			ModelAndView mav = new ModelAndView(new RedirectView("provider."+providerdetails.getFirstName()+providerdetails.getLastName()+"?i="+providerId));
-			return mav;
-		}
-		//If the "Save & Close" button was pressed.
-		else {
-			//This variable will be used to display the message on the details form
-			redirectAttr.addFlashAttribute("savedStatus", "created");
-			
-			ModelAndView mav = new ModelAndView(new RedirectView("providers"));
-			return mav;			
-		}
-		**/
-	
-	}
+		//now we save
+		Integer dataId = sysAdminManager.createTableData(tableData, tableInfo.getUtTableName());
 		
+		//This variable will be used to display the message on the details form
+        if (dataId == 0) {// we have an error!
+        	redirectAttr.addFlashAttribute("savedStatus", "error");
+        } else {
+        	redirectAttr.addFlashAttribute("savedStatus", "created");
+        }
+        //If the "Save" button was pressed 
+        if (action.equals("save")) {
+           //send them page to proper page with model data but with data id
+           mav = new ModelAndView(new RedirectView("../" + urlId +"/tableData" + "?i=" + dataId));
+           return mav;
+        } //If the "Save & Close" button was pressed.
+        else {
+            //This variable will be used to display the message on the details form
+            mav = new ModelAndView(new RedirectView("../" + urlId));
+            return mav;
+        }
+	}
+	
+	/**
+	 *  The '/std/data/{urlId}/tableData?i=' GET request will be used to create a new data for selected table
+	 *  
+	 */
+	@RequestMapping(value="/std/data/{urlId}/tableData", method = RequestMethod.GET)
+	public ModelAndView viewTableData(@PathVariable String urlId, @RequestParam(value="i", required=false) Integer i) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/sysadmin/std/details");	
+		
+		LookUpTable tableInfo = sysAdminManager.getTableInfo(urlId);
+		TableData tableData = sysAdminManager.getTableData(i, tableInfo.getUtTableName());
+		mav.addObject("tableDataDetails",tableData);
+		mav.addObject("tableInfo",tableInfo);
+		return mav;
+	}
+	
+	/**
+	 * The '/std/data/{urlId}/tableData?i=' GET request will be used to create a
+	 * new data for selected table
+	 * 
+	 */
+	@RequestMapping(value = "/std/data/{urlId}/tableData", method = RequestMethod.POST)
+	public ModelAndView updateTableData(
+			@Valid @ModelAttribute(value = "tableDataDetails") TableData tableData,
+			BindingResult result, RedirectAttributes redirectAttr,
+			@RequestParam String action, @PathVariable String urlId)
+			throws Exception {
+
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/sysadmin/std/details");
+		LookUpTable tableInfo = sysAdminManager.getTableInfo(urlId);
+
+		// now we update
+		boolean updated = sysAdminManager.updateTableData(tableData, tableInfo.getUtTableName());
+		
+		// This variable will be used to display the message on the details
+		if (updated) {
+			redirectAttr.addFlashAttribute("savedStatus", "updated");
+		} else {
+			redirectAttr.addFlashAttribute("savedStatus", "error");
+		}
+		// If the "Save" button was pressed
+		if (action.equals("save")) {
+			// send them page to proper page with model data but with data id
+			mav = new ModelAndView(new RedirectView("../" + urlId + "/tableData" + "?i=" + tableData.getId()));
+		} // If the "Save & Close" button was pressed.
+		else {
+			// This variable will be used to display the message on the details
+			mav = new ModelAndView(new RedirectView("../" + urlId));
+		}
+		return mav;
+	}
 	
 }
 

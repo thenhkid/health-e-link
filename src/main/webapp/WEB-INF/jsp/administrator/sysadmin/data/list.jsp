@@ -23,7 +23,7 @@
 		
 		<section class="panel panel-default">
 			<div class="panel-heading">
-				<h3 class="panel-title"><c:if test="${not empty tableInfo}">Data for "${tableInfo.tableName}" Table</c:if></h3>
+				<h3 class="panel-title"><c:if test="${not empty tableInfo}">Data for "${tableInfo.displayName}" Table</c:if></h3>
 			</div>
 			<div class="panel-body">
 				<div class="table-actions">
@@ -60,14 +60,14 @@
 								    <c:forEach var="dataItem" items="${dataList}">
 										<tr id="dataRow">
 											<td>${dataItem.id}</td>
-											<td scope="row"><a href="${tableInfo.urlId}/dataItem.${dataItem.displayText}?i=${dataItem.id}"  title="Edit this data">${dataItem.displayText}</a>
+											<td scope="row"><a href="${tableInfo.urlId}/tableData.${dataItem.displayText}?i=${dataItem.id}"  title="Edit this data">${dataItem.displayText}</a>
 											<br />(<c:choose><c:when test="${dataItem.status == true}">active</c:when><c:otherwise>inactive</c:otherwise></c:choose><c:if test="${dataItem.custom == true}">, custom data</c:if>)</td>
 											<td>
 											    ${dataItem.description}
 											</td>
 											<td class="center-text"><fmt:formatDate value="${dataItem.dateCreated}" type="date" pattern="M/dd/yyyy" /></td>
 											<td class="actions-col">
-												<a href="dataItem.${dataItem.displayText}?i=${dataItem.id}"  class="btn btn-link" title="Edit this data">
+												<a href="${tableInfo.urlId}/tableData.${dataItem.displayText}?i=${dataItem.id}"  class="btn btn-link" title="Edit this data">
 												     <span class="glyphicon glyphicon-edit"></span>
 												     Edit	
 												</a>

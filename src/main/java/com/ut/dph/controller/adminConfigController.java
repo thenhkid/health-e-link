@@ -608,6 +608,16 @@ public class adminConfigController {
         //Return a list of available macros
         List<Macros> macros = configurationmanager.getMacros();
         mav.addObject("macros", macros);
+        
+        //Loop through list of macros to mark the ones that need
+        //fields filled in
+        List<Integer> macroLookUpList = new ArrayList<Integer>();
+        for(Macros macro : macros) {
+            if(macro.getfieldAQuestion() != null || macro.getfieldBQuestion() != null || macro.getcon1Question() != null || macro.getcon2Question() != null) {
+                macroLookUpList.add(macro.getId());
+            }
+        }
+        mav.addObject("macroLookUpList", macroLookUpList);
 
         //Get the list of available transport methods
         List transportMethods = configurationTransportManager.getTransportMethods();
@@ -624,14 +634,36 @@ public class adminConfigController {
         return mav;
 
     }
+    
+    /**
+     * The '/getMacroDetails.do' function will display the modal window for the 
+     * selected macro form.
+     * 
+     * @param   macroId     The id of the selected macro
+     * 
+     */
+    @RequestMapping(value = "/getMacroDetails.do", method = RequestMethod.GET)
+    public @ResponseBody ModelAndView getMacroDetails(@RequestParam(value = "macroId", required = true) Integer macroId) throws Exception {
+        
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/configurations/macroDetails");
+        
+        Macros macroDetails = configurationmanager.getMacroById(macroId);
+        
+        mav.addObject("fieldA_Question", macroDetails.getfieldAQuestion());
+        mav.addObject("fieldB_Question", macroDetails.getfieldBQuestion());
+        mav.addObject("Con1_Question", macroDetails.getcon1Question());
+        mav.addObject("Con2_Question", macroDetails.getcon2Question());
+        
+        return mav;
+    }
 
     /**
      * The '/translations' POST request will submit the selected data translations and save it to the data base.
      *
      */
     @RequestMapping(value = "/translations", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody
-    Integer submitDataTranslations(@RequestParam(value = "transportMethod", required = true) Integer transportMethod) throws Exception {
+    public @ResponseBody Integer submitDataTranslations(@RequestParam(value = "transportMethod", required = true) Integer transportMethod) throws Exception {
 
         //Update the configuration completed step
         configuration configurationDetails = configurationmanager.getConfigurationById(configId);
@@ -657,8 +689,7 @@ public class adminConfigController {
      * @Return list of translations
      */
     @RequestMapping(value = "/getTranslations.do", method = RequestMethod.GET)
-    public @ResponseBody
-    ModelAndView getTranslations(@RequestParam(value = "reload", required = true) boolean reload, @RequestParam(value = "transportMethod", required = true) int transportMethod) throws Exception {
+    public @ResponseBody ModelAndView getTranslations(@RequestParam(value = "reload", required = true) boolean reload, @RequestParam(value = "transportMethod", required = true) int transportMethod) throws Exception {
 
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/configurations/existingTranslations");
@@ -677,6 +708,14 @@ public class adminConfigController {
                 //Get the crosswalk name by id
                 String crosswalkName = messagetypemanager.getCrosswalkName(translation.getCrosswalkId());
                 translation.setcrosswalkName(crosswalkName);
+                
+                //Get the macro name by id
+                Macros macroDetails = configurationmanager.getMacroById(translation.getMacroId());
+                String macroName = macroDetails.getmacroShortName();
+                if(macroName.contains("DATE")) {
+                    macroName = macroDetails.getmacroShortName() + " " + macroDetails.getdateDisplay();
+                }
+                translation.setMacroName(macroName);
 
                 translations.add(translation);
             }

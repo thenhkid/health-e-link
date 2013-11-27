@@ -124,6 +124,12 @@ public class configurationManagerImpl implements configurationManager {
     public List<Macros> getMacros() {
         return configurationDAO.getMacros();
     }
+    
+    @Override
+    @Transactional
+    public Macros getMacroById(int macroId) {
+        return configurationDAO.getMacroById(macroId);
+    }
 
     @Override
     @Transactional

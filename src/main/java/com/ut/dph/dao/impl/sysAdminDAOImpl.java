@@ -11,8 +11,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ut.dph.dao.sysAdminDAO;
-import com.ut.dph.model.custom.TableData;
 import com.ut.dph.model.custom.LookUpTable;
+import com.ut.dph.model.custom.TableData;
 
 /**
  * @see com.ut.dph.dao.sysAdminDAO
@@ -45,12 +45,12 @@ public class sysAdminDAOImpl implements sysAdminDAO {
 				.getCurrentSession()
 				.createSQLQuery(
 						"select  "
-								+ "displayText as \"tableName\","
-								+ "utTableName as \"utTableName\","
-								+ "count(COLUMN_NAME) as \"columnNum\", "
-								+ "urlId as \"urlId\", "
-								+ "TABLE_ROWS as \"rowNum\", "
-								+ "description as \"description\" "
+								+ "displayText as displayName,"
+								+ "utTableName,"
+								+ "count(COLUMN_NAME) as columnNum, "
+								+ "urlId as urlId, "
+								+ "TABLE_ROWS as rowNum, "
+								+ "description "
 								+ "from information_schema.tables infoT, "
 								+ "information_schema.COLUMNS infoc, lookUpTables "
 								+ "where infoc.TABLE_SCHEMA = :schemaName "
@@ -60,7 +60,7 @@ public class sysAdminDAOImpl implements sysAdminDAO {
 								+ "and infoc.TABLE_NAME = infot.TABLE_NAME "
 								+ "and infoc.TABLE_NAME like :searchTerm "
 								+ "group by infoc.TABLE_NAME order by infoc.TABLE_NAME")
-				.addScalar("tableName", StandardBasicTypes.STRING)
+				.addScalar("displayName", StandardBasicTypes.STRING)
 				.addScalar("utTableName", StandardBasicTypes.STRING)
 				.addScalar("urlId", StandardBasicTypes.STRING)
 				.addScalar("columnNum", StandardBasicTypes.INTEGER)
@@ -127,8 +127,8 @@ public class sysAdminDAOImpl implements sysAdminDAO {
 
 	@Override
 	@Transactional
-	public Integer findTotalDataRows(String tableName) {
-		String sql = "select count(*) as rowCount from " + tableName;
+	public Integer findTotalDataRows(String utTableName) {
+		String sql = "select count(*) as rowCount from " + utTableName;
 		Query query = sessionFactory
 				.getCurrentSession()
 				.createSQLQuery(sql).addScalar("rowCount", StandardBasicTypes.INTEGER);
@@ -142,12 +142,13 @@ public class sysAdminDAOImpl implements sysAdminDAO {
 	public LookUpTable getTableInfo(String urlId) {
 	
 		LookUpTable lookUpTable = new LookUpTable();
-		Query query = sessionFactory.getCurrentSession().createSQLQuery("select utTableName as \"utTableName\", "
-				+ "displayText as \"tableName\", "
-				+ "urlId as \"urlId\", description as \"description\", "
-				+ "dateCreated as \"dateCreated\" from lookUpTables where urlId = :urlId")
+		Query query = sessionFactory.getCurrentSession().createSQLQuery(""
+				+ "select utTableName, "
+				+ "displayText as displayName, "
+				+ "urlId, description, "
+				+ "dateCreated from lookUpTables where urlId = :urlId")
 				.addScalar("utTableName",StandardBasicTypes.STRING )
-				.addScalar("tableName",StandardBasicTypes.STRING )
+				.addScalar("displayName",StandardBasicTypes.STRING )
 				.addScalar("urlId",StandardBasicTypes.STRING )
 				.addScalar("description",StandardBasicTypes.STRING)
 				.addScalar("dateCreated",StandardBasicTypes.DATE).setResultTransformer(
@@ -166,7 +167,6 @@ public class sysAdminDAOImpl implements sysAdminDAO {
 	@Transactional
 	public boolean deleteDataItem(String utTableName, int id) {
 				String sql  = "delete from " + utTableName + " where id = :id";
-				System.out.println(sql);
 				Query deleteTable = sessionFactory.getCurrentSession().createSQLQuery(sql)
 						.addScalar("id",StandardBasicTypes.INTEGER ).setParameter("id", id);
 				try {
@@ -177,5 +177,85 @@ public class sysAdminDAOImpl implements sysAdminDAO {
 	                return false;
 	                	
 				}
+	}
+
+	@Override
+	@Transactional
+	public TableData getTableData (Integer id, String utTableName) {
+		//we create sql, we transform
+		TableData tableData = new TableData();
+		String sql = ("select id, displayText, description, isCustom as custom, "
+				+ "status "
+				+ " from " + utTableName + " where id = :id");
+		Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
+				.addScalar("id",StandardBasicTypes.INTEGER)
+				.addScalar("displayText",StandardBasicTypes.STRING)
+				.addScalar("description",StandardBasicTypes.STRING)
+				.addScalar("custom",StandardBasicTypes.BOOLEAN)
+				.addScalar("status",StandardBasicTypes.BOOLEAN).setResultTransformer(
+						Transformers.aliasToBean(TableData.class)).setParameter("id", id);
+		
+		if (query.list().size() == 1) {
+			tableData = (TableData) query.list().get(0);
+		}
+		return tableData;
+
+	}
+
+	@Override
+	@Transactional
+	public Integer createTableData(TableData tableData, String utTableName) {
+		Integer tableDataId= 0;
+		String sql  = "insert into " + utTableName + " (displayText, description, isCustom, status) "
+				+ "values (:displayText, :description, :isCustom, :status)";
+		Query insertData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+				.addScalar("displayText",StandardBasicTypes.STRING)
+				.addScalar("description",StandardBasicTypes.STRING)
+				.addScalar("isCustom", StandardBasicTypes.BOOLEAN)
+				.addScalar("status", StandardBasicTypes.BOOLEAN)
+				.setParameter("displayText", tableData.getDisplayText())
+				.setParameter("description", tableData.getDescription())
+				.setParameter("isCustom", tableData.isCustom())
+				.setParameter("status", tableData.isStatus())		
+				;
+		try {
+			tableDataId = insertData.executeUpdate();
+		} catch (Throwable ex) {
+            System.err.println("insert table data failed." + ex);
+		}
+		return tableDataId;
+	}
+
+	@Override
+	@Transactional
+	public boolean updateTableData(TableData tableData, String utTableName) {
+		boolean updated = false;
+		String sql  = "update " + utTableName
+				+ " set displayText = :displayText, "
+				+ "description = :description, "
+				+ "status = :status, "
+				+ "isCustom = :isCustom, "
+				+ "where id = :id ";
+		System.out.println(sql);
+		Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+				.addScalar("displayText",StandardBasicTypes.STRING)
+				.addScalar("description",StandardBasicTypes.STRING)
+				.addScalar("isCustom", StandardBasicTypes.BOOLEAN)
+				.addScalar("status", StandardBasicTypes.BOOLEAN)
+				.addScalar("id",StandardBasicTypes.INTEGER)
+				.setParameter("displayText", tableData.getDisplayText())
+				.setParameter("description", tableData.getDescription())
+				.setParameter("isCustom", tableData.isCustom())
+				.setParameter("status", tableData.isStatus())	
+				.setParameter("id", tableData.getId())
+				;
+		try {
+			updateData.executeUpdate();
+			updated =true;
+		} catch (Throwable ex) {
+            System.err.println("update table data failed." + ex);
+		}
+		return updated;
+		
 	}
 }
