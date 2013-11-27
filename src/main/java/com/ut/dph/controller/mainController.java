@@ -50,7 +50,7 @@ public class mainController {
             HttpServletResponse response) throws Exception {
 
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("login");
+        mav.setViewName("/login");
         mav.addObject("error", "true");
         return mav;
 

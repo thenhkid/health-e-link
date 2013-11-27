@@ -27,7 +27,7 @@
                 <li class="${param['sect'] == 'sysadmin' ? 'active' : 'none'}"><a href="<c:url value='/administrator/sysadmin/list' />" title="System Administration">System Administration</a><c:if test="${param['sect'] == 'sysadmin'}"><span class="indicator-active arrow-up"></span></c:if></li>
            </ul>
            <ul class="nav navbar-nav navbar-right" id="secondary-nav">
-              <li><a title="log out" href="<c:url value='/logout' />">Log out</a></li>
+              <li><a title="log out" class="logout" href="<c:url value='/logout' />">Log out</a></li>
             </ul>
         </div>
     </nav>

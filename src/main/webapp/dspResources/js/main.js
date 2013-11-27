@@ -14,7 +14,7 @@ require.config({
 });
 
 require(['jquery',  'bootstrap', 'responsive-tables', 'mediaModal'], function ($) {
-	
+
 	// tooltip demo
 	$(document).tooltip({
 		selector: "[data-toggle=tooltip]",
@@ -32,4 +32,18 @@ require(['jquery',  'bootstrap', 'responsive-tables', 'mediaModal'], function ($
 			$(document.body).removeClass('modal-open');
 		}
 	});
+
+	// Log out confirmation
+	$('.logout').on('click', function (e) {
+		var r = confirm('Are you sure you want to log out?');
+		if (r){
+			return true;
+		}
+		else
+		{
+			e.preventDefault();
+			return false;
+		}
+	})
+
 });

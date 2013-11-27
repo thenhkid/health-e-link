@@ -11,24 +11,28 @@
     </c:if>
     <div class="login clearfix">
         <header class="login-header">
-            <div class="login-header-content"><span class="logo" alt="{Company Name Logo}"></span></div>
+            <!-- TODO[implement]:  Make company name dynamic -->
+            <!-- TODO[implement]:  Add message on log out -->
+            <div class="login-header-content"><span class="logo ir">Company Name</span></div>
         </header>
-        <form role="form" name='f' action="<c:url value='j_spring_security_check' />" method='POST'>
-            <div class="form-group ${not empty error ? 'has-error' : '' }">
-                <label class="control-label" for="Username">Username</label>
-                <input id="username" name='j_username' class="form-control" type="text" value="admin" />
-            </div>
-            <div class="form-group ${not empty error ? 'has-error' : '' }">
-                <label class="control-label" for="Password">Password</label>
-                <input id="password" name='j_password' class="form-control" type="password" value="!admin!" />
-            </div>
-            <input type="submit" value="Login" class="btn btn-primary pull-right"/>
-            <!--<label for="remember-me" class="pull-left"><input id="j_remember" name="_spring_security_remember_me" type="checkbox" value="1">&nbsp;Remember Me</label>-->
+        <form role="form" id="form-admin-login" name='f' action="<c:url value='j_spring_security_check' />" method='POST'>
+            <fieldset name="login-fields" form="form-admin-login" class="basic-clearfix">
+                <div class="form-group ${not empty error ? 'has-error' : '' }">
+                    <label class="control-label" for="username">Username</label>
+                    <input id="username" name='j_username' class="form-control" type="text" value="admin" />
+                </div>
+                <div class="form-group ${not empty error ? 'has-error' : '' }">
+                    <label class="control-label" for="password">Password</label>
+                    <input id="password" name='j_password' class="form-control" type="password" value="!admin!" />
+                </div>
+                <input type="submit" value="Login" class="btn btn-primary pull-right"/>
+                <!--<label for="remember-me" class="pull-left"><input id="j_remember" name="_spring_security_remember_me" type="checkbox" value="1">&nbsp;Remember Me</label>-->
+            </fieldset>
         </form>
     </div>
-    <p class="login-note"><a href="" title="">Forgot Password</a></p>
+    <p class="login-note"><a href="">Forgot Password?</a></p>
 </div>
-                
+
 <script type="text/javascript">
     $(document).ready(function() {
         document.f.j_username.focus();
