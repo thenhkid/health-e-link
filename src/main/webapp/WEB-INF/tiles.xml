@@ -270,4 +270,17 @@
     <!--  detail for a data table element -->   
 	
     <!--  end sysadmin definitions -->
+    
+    <!-- Front End Definitions -->
+    <definition name="base.definition.frontEnd" template="/WEB-INF/tiles/frontEndLayout.jsp">
+        <put-attribute name="title" value="Universal Translator" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp" />
+        <put-attribute name="body" value="" />
+        <put-attribute name="footer" value="/WEB-INF/jsp/common/footer.jsp" />
+    </definition>
+    
+    <!-- Home Page -->
+    <definition name="/home" extends="base.definition.frontEnd">
+         <put-attribute name="body" value="/WEB-INF/jsp/home.jsp" />
+    </definition>
 </tiles-definitions>
