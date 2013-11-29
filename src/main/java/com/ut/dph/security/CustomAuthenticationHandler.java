@@ -14,28 +14,26 @@ import java.util.Set;
 
 import com.ut.dph.service.userManager;
 
-
 public class CustomAuthenticationHandler extends SimpleUrlAuthenticationSuccessHandler {
-	
-	@Autowired
-    private userManager usermanager;
-	 
-	 @Override
-	 public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws ServletException, IOException {
-	      String userTargetUrl = "/profile";
-	      String adminTargetUrl = "/administrator";
-	      Set <String>roles = AuthorityUtils.authorityListToSet(authentication.getAuthorities());
-	      
-	      usermanager.setLastLogin(authentication.getName());
-	      
-	      if (roles.contains("ROLE_ADMIN")) {
-	         getRedirectStrategy().sendRedirect(request, response, adminTargetUrl);
-	      } else if (roles.contains("ROLE_USER")) {
-	         getRedirectStrategy().sendRedirect(request, response, userTargetUrl);
-	      } else {
-	         super.onAuthenticationSuccess(request, response, authentication);
-	         return;
-	      }
-	   }
-	}
 
+    @Autowired
+    private userManager usermanager;
+
+    @Override
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws ServletException, IOException {
+        String userTargetUrl = "/profile";
+        String adminTargetUrl = "/administrator";
+        Set<String> roles = AuthorityUtils.authorityListToSet(authentication.getAuthorities());
+
+        usermanager.setLastLogin(authentication.getName());
+
+        if (roles.contains("ROLE_ADMIN")) {
+            getRedirectStrategy().sendRedirect(request, response, adminTargetUrl);
+        } else if (roles.contains("ROLE_USER")) {
+            getRedirectStrategy().sendRedirect(request, response, userTargetUrl);
+        } else {
+            super.onAuthenticationSuccess(request, response, authentication);
+            return;
+        }
+    }
+}

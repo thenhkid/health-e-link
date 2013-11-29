@@ -5,9 +5,11 @@
 <div class="login-container">
     <div class="login clearfix">
         <header class="login-header" role="banner">
-            <!-- TODO [Implement]:  Make company name dynamic -->
-            <!-- TODO [Implement]:  Add message on log out -->
-            <div class="login-header-content"><span class="logo">Company Name</span></div>
+            <div class="login-header-content">
+                <a href="<c:url value='/' />" title="Return to home page.">
+                    <span class="logo" alt="{Company Name Logo}"></span>
+                </a>
+            </div>
         </header>
         <c:if test="${not empty error}">
             <div class="alert alert-danger center-text" role="alert">

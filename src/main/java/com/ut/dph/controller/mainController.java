@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
- * The mainController class will handle all URL requestions that fall outside of specific user or admin controllers
+ * The mainController class will handle all URL requests that fall outside of specific user or admin controllers
  *
  * eg. login, logout, about, etc
  *
@@ -65,9 +65,7 @@ public class mainController {
      */
     @RequestMapping(value = "/logout", method = RequestMethod.GET)
     public ModelAndView logout(HttpServletRequest request,  HttpServletResponse response) throws Exception {
-
         return new ModelAndView("/login");
-
     }
 
     /**
@@ -79,11 +77,19 @@ public class mainController {
      * @throws Exception
      */
     @RequestMapping(value = "/", method = RequestMethod.GET)
-    public ModelAndView welcome(HttpServletRequest request,
-            HttpServletResponse response) throws Exception {
-
-        return new ModelAndView("home");
-
+    public ModelAndView welcome(HttpServletRequest request,  HttpServletResponse response) throws Exception {
+        return new ModelAndView("/home");
     }
-
+    
+    /**
+     * The '/product-suite' request will display the product suite information page.
+     */
+    @RequestMapping(value="/product-suite", method = RequestMethod.GET)
+    public ModelAndView productSuite() throws Exception {
+        
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/productSuite");
+        mav.addObject("pageTitle","Product Suite");
+        return mav;
+    }
 }
