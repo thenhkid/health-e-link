@@ -35,8 +35,8 @@ require(['jquery',  'bootstrap', 'responsive-tables', 'mediaModal'], function ($
 
 	// Log out confirmation
 	$('.logout').on('click', function (e) {
-		var r = confirm('Are you sure you want to log out?');
-		if (r){
+		var confirmed = confirm('Are you sure you want to log out?');
+		if (confirmed){
 			return true;
 		}
 		else

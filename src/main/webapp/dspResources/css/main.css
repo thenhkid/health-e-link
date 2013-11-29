@@ -6207,14 +6207,19 @@ body {
   margin-right: -20px;
   margin-top: -20px;
   margin-bottom: 20px;
+  text-align: center;
 }
 .login-container .login .login-header-content {
   padding: 15px 20px;
   width: 100%;
   height: 100%;
+  font-weight: bold;
 }
 .login-container .login .logo {
   margin: auto;
+  display: block;
+  overflow: hidden;
+  text-indent: -99em;
 }
 .login-container .login-note {
   text-align: center;
@@ -6245,6 +6250,9 @@ body {
   display: block;
   text-indent: -9999px;
   overflow: hidden;
+}
+.center-text {
+  text-align: center;
 }
 .basic-clearfix {
   overflow: hidden;

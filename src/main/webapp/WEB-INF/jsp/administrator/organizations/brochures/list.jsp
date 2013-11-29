@@ -87,8 +87,8 @@
                     </div>
                 </div>
             </section>
-        </div>		
-    </div>	
+        </div>
+    </div>
     <p rel="${currentPage}" id="currentPageHolder" style="display:none"></p>
 
 <!-- Brochure Form modal -->

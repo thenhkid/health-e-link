@@ -3,18 +3,18 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 <div class="login-container">
-    <c:if test="${not empty error}">
-        <p class="login-error">
-            Your login attempt was not successful, try again.<br /> Caused :
-            ${sessionScope["SPRING_SECURITY_LAST_EXCEPTION"].message}
-        </p>
-    </c:if>
     <div class="login clearfix">
-        <header class="login-header">
-            <!-- TODO[implement]:  Make company name dynamic -->
-            <!-- TODO[implement]:  Add message on log out -->
-            <div class="login-header-content"><span class="logo ir">Company Name</span></div>
+        <header class="login-header" role="banner">
+            <!-- TODO [Implement]:  Make company name dynamic -->
+            <!-- TODO [Implement]:  Add message on log out -->
+            <div class="login-header-content"><span class="logo">Company Name</span></div>
         </header>
+        <c:if test="${not empty error}">
+            <div class="alert alert-danger center-text" role="alert">
+                Your login attempt was unsuccssful.<br />
+                - ${sessionScope["SPRING_SECURITY_LAST_EXCEPTION"].message} -
+            </div>
+        </c:if>
         <form role="form" id="form-admin-login" name='f' action="<c:url value='j_spring_security_check' />" method='POST'>
             <fieldset name="login-fields" form="form-admin-login" class="basic-clearfix">
                 <div class="form-group ${not empty error ? 'has-error' : '' }">
@@ -25,7 +25,7 @@
                     <label class="control-label" for="password">Password</label>
                     <input id="password" name='j_password' class="form-control" type="password" value="!admin!" />
                 </div>
-                <input type="submit" value="Login" class="btn btn-primary pull-right"/>
+                <input type="submit" value="Login" class="btn btn-primary pull-right" role="button"/>
                 <!--<label for="remember-me" class="pull-left"><input id="j_remember" name="_spring_security_remember_me" type="checkbox" value="1">&nbsp;Remember Me</label>-->
             </fieldset>
         </form>
