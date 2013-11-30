@@ -58,17 +58,17 @@
 
 
                     <div class="central-graphic-image image-a">
-                        <img src="<%=request.getContextPath()%>/dspResources/img/health-e-link/img-example.png" />
+                        <img src="<%=request.getContextPath()%>/dspResources/img/front-end/health-e-link/img-example.png" />
                         <div class="caret"></div>
                     </div>
 
                     <div class="central-graphic-image image-b">
-                        <img src="<%=request.getContextPath()%>/dspResources/img/health-e-link/img-example.png" />
+                        <img src="<%=request.getContextPath()%>/dspResources/img/front-end/health-e-link/img-example.png" />
                         <div class="caret"></div>
                     </div>
 
                     <div class="central-graphic-image image-c">
-                        <img src="<%=request.getContextPath()%>/dspResources/img/health-e-link/img-example.png" />
+                        <img src="<%=request.getContextPath()%>/dspResources/img/front-end/health-e-link/img-example.png" />
                         <div class="caret"></div>
                     </div>
 

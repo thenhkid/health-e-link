@@ -88,7 +88,7 @@ h3 {
 }
 .secondary-nav .nav li.active a {
   color: #ffffff;
-  background-image: url('../../img/sp-common.png');
+  background-image: url('../../../img/admin/sp-common.png');
   background-repeat: no-repeat;
   background-position: right 8px;
 }
@@ -158,12 +158,12 @@ h3 {
   font-weight: bold;
 }
 .arrow-left {
-  background-image: url('../../img/sp-common.png');
+  background-image: url('../../../img/admin/sp-common.png');
   background-repeat: no-repeat;
   background-position: -20px 0;
 }
 .arrow-up {
-  background-image: url('../../img/sp-common.png');
+  background-image: url('../../../img/admin/sp-common.png');
   background-repeat: no-repeat;
   background-position: 0 0;
 }
@@ -173,7 +173,7 @@ h3 {
   color: #666666;
 }
 .icon-cancel {
-  background-image: url('../../img/sp-common.png');
+  background-image: url('../../../img/admin/sp-common.png');
   background-repeat: no-repeat;
   background-position: -80px 0;
 }
@@ -211,7 +211,7 @@ body#login {
   color: #0096ff;
 }
 .header {
-  background-image: url('../../img/health-e-link/bg-header.jpg');
+  background-image: url('../../../img/admin/health-e-link/bg-header.jpg');
 }
 .primary-nav {
   background-color: rgba(0, 0, 0, 0.4);
@@ -220,12 +220,12 @@ body#login {
   border-right: 0;
 }
 .logo {
-  background-image: url('../../img/health-e-link/sp-health-e-link-admin.png');
+  background-image: url('../../../img/admin/health-e-link/sp-health-e-link.png');
   background-repeat: no-repeat;
   background-position: 0 0;
 }
 .login-header {
-  background-image: url('../../img/health-e-link/bg-header.jpg');
+  background-image: url('../../../img/admin/health-e-link/bg-header.jpg');
 }
 .login-header-content {
   background-color: rgba(0, 0, 0, 0.4);

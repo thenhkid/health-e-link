@@ -88,7 +88,7 @@ h3 {
 }
 .secondary-nav .nav li.active a {
   color: #ffffff;
-  background-image: url('../../img/sp-common.png');
+  background-image: url('../../../img/front-end/sp-common.png');
   background-repeat: no-repeat;
   background-position: right 8px;
 }
@@ -158,12 +158,12 @@ h3 {
   font-weight: bold;
 }
 .arrow-left {
-  background-image: url('../../img/sp-common.png');
+  background-image: url('../../../img/front-end/sp-common.png');
   background-repeat: no-repeat;
   background-position: -20px 0;
 }
 .arrow-up {
-  background-image: url('../../img/sp-common.png');
+  background-image: url('../../../img/front-end/sp-common.png');
   background-repeat: no-repeat;
   background-position: 0 0;
 }
@@ -173,7 +173,7 @@ h3 {
   color: #666666;
 }
 .icon-cancel {
-  background-image: url('../../img/sp-common.png');
+  background-image: url('../../../img/front-end/sp-common.png');
   background-repeat: no-repeat;
   background-position: -80px 0;
 }

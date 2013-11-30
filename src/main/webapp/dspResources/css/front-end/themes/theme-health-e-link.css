@@ -181,7 +181,7 @@ h3 {
   font-weight: bold;
 }
 .secondary-nav .nav .nav li.active > a {
-  background-image: url('../../img/sp-common.png');
+  background-image: url('../../../img/front-end/img/sp-common.png');
   background-repeat: no-repeat;
   background-position: -100px 7px;
 }
@@ -301,12 +301,12 @@ h3 {
   color: #003366;
 }
 .arrow-left {
-  background-image: url('../../img/sp-common.png');
+  background-image: url('../../../img/front-end/img/sp-common.png');
   background-repeat: no-repeat;
   background-position: -20px 0;
 }
 .arrow-up {
-  background-image: url('../../img/sp-common.png');
+  background-image: url('../../../img/front-end/img/sp-common.png');
   background-repeat: no-repeat;
   background-position: 0 0;
 }
@@ -316,7 +316,7 @@ h3 {
   border-collapse: collapse;
 }
 .icon-cancel {
-  background-image: url('../../img/sp-common.png');
+  background-image: url('../../../img/front-end/img/sp-common.png');
   background-repeat: no-repeat;
   background-position: -80px 0;
 }
@@ -353,22 +353,22 @@ h3 {
   border-bottom: 1px solid #cccccc;
 }
 .icon-social {
-  background-image: url('../../img/sp-common.png');
+  background-image: url('../../../img/front-end/img/sp-common.png');
   background-repeat: no-repeat;
   background-position: 0 -20px;
 }
 .icon-linked-in {
-  background-image: url('../../img/sp-common.png');
+  background-image: url('../../../img/front-end/img/sp-common.png');
   background-repeat: no-repeat;
   background-position: 0 -20px;
 }
 .icon-facebook {
-  background-image: url('../../img/sp-common.png');
+  background-image: url('../../../img/front-end/img/sp-common.png');
   background-repeat: no-repeat;
   background-position: -40px -20px;
 }
 .icon-twitter {
-  background-image: url('../../img/sp-common.png');
+  background-image: url('../../../img/front-end/img/sp-common.png');
   background-repeat: no-repeat;
   background-position: -80px -20px;
 }
@@ -376,21 +376,21 @@ h3 {
   background-color: #666;
 }
 .header {
-  background-image: url('../../img/health-e-link/bg-header.jpg');
+  background-image: url('../../../img/front-end/health-e-link/bg-header.jpg');
 }
 .header-inner {
-  background-image: url('../../img/health-e-link/bg-page-title.png');
+  background-image: url('../../../img/front-end/health-e-link/bg-page-title.png');
   background-position: right bottom;
   background-repeat: no-repeat;
   background-color: transparent;
 }
 .home .header {
   height: 609px;
-  background-image: url('../../img/health-e-link/bg-header-home.jpg');
+  background-image: url('../../../img/front-end/health-e-link/bg-header-home.jpg');
 }
 .home .header-inner {
   height: 100%;
-  background-image: url('../../img/health-e-link/bg-home-central-graphic.png');
+  background-image: url('../../../img/front-end/health-e-link/bg-home-central-graphic.png');
   background-position: center bottom;
   background-repeat: no-repeat;
 }
@@ -403,7 +403,7 @@ h3 {
   line-height: 21px;
 }
 .page-title-icon {
-  background-image: url('../../img/health-e-link/sp-health-e-link.png');
+  background-image: url('../../../img/front-end/health-e-link/sp-health-e-link.png');
   background-repeat: no-repeat;
   background-position: 0 -220px;
 }
@@ -424,27 +424,27 @@ h3 {
   color: #95c0e5;
 }
 .icon-product {
-  background-image: url('../../img/health-e-link/sp-health-e-link.png');
+  background-image: url('../../../img/front-end/health-e-link/sp-health-e-link.png');
   background-repeat: no-repeat;
   background-position: 0 -100px;
 }
 .icon-health-e-data {
-  background-image: url('../../img/health-e-link/sp-health-e-link.png');
+  background-image: url('../../../img/front-end/health-e-link/sp-health-e-link.png');
   background-repeat: no-repeat;
   background-position: -120px -100px;
 }
 .icon-health-e-web {
-  background-image: url('../../img/health-e-link/sp-health-e-link.png');
+  background-image: url('../../../img/front-end/health-e-link/sp-health-e-link.png');
   background-repeat: no-repeat;
   background-position: -240px -100px;
 }
 .icon-play {
-  background-image: url('../../img/health-e-link/sp-health-e-link.png');
+  background-image: url('../../../img/front-end/health-e-link/sp-health-e-link.png');
   background-repeat: no-repeat;
   background-position: -40px -60px;
 }
 .icon-health-e-link {
-  background-image: url('../../img/health-e-link/sp-health-e-link.png');
+  background-image: url('../../../img/front-end/health-e-link/sp-health-e-link.png');
   background-repeat: no-repeat;
   background-position: 0px -60px;
 }
@@ -579,7 +579,7 @@ h3 {
   color: #4d4d4d;
 }
 .logo {
-  background-image: url('../../img/health-e-link/sp-health-e-link.png');
+  background-image: url('../../../img/front-end/health-e-link/sp-health-e-link.png');
   background-repeat: no-repeat;
   background-position: 0 0;
 }

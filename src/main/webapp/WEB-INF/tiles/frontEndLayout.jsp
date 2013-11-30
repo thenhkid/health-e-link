@@ -17,23 +17,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <title><tiles:insertAttribute name="title" /></title>
     <!%-- main css compiled from main.less --%>
-    <link rel="stylesheet" href="<%=request.getContextPath()%>/dspResources/css/main-fe.css?v=2">
+    <link rel="stylesheet" href="<%=request.getContextPath()%>/dspResources/css/front-end/main.css?v=2">
 
     <!%-- Health-e-link theme --%>
-    <link rel="stylesheet" href="<%=request.getContextPath()%>/dspResources/css/themes/theme-health-e-link-fe.css">
+    <link rel="stylesheet" href="<%=request.getContextPath()%>/dspResources/css/front-end/themes/theme-health-e-link.css">
     <jsp:text><![CDATA[<!--[if lte IE 9]>]]></jsp:text>
             <link rel="stylesheet" href="<%=request.getContextPath()%>/dspResources/css/ie.css">
     <jsp:text><![CDATA[<![endif]-->]]></jsp:text>
     <script src="<%=request.getContextPath()%>/dspResources/js/vendor/jquery-1.10.1.min.js"></script>
     <!%-- moderizer: for ie8 compatibility --%>
     <script type="text/javascript" src="<%=request.getContextPath()%>/dspResources/js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
-    <script data-main="<%=request.getContextPath()%>/dspResources/js/main" src="<%=request.getContextPath()%>/dspResources/js/vendor/require.js"></script>
+    <script data-main="<%=request.getContextPath()%>/dspResources/js/front-end/main" src="<%=request.getContextPath()%>/dspResources/js/vendor/require.js"></script>
 </head>
-<body <c:if test="${param['page']== 'home'}">class="home theme-health-e-link"</c:if>>
+<body id="<tiles:insertAttribute name='page-id' ignore='true' />" class="<tiles:insertAttribute name='page-section' ignore='true' /> " >
     <div class="wrap">
         <tiles:insertAttribute name="header" /> 
         <tiles:insertAttribute name="body" />
         <tiles:insertAttribute name="footer" />
     </div>
+
+<!-- media modal skeleton -->
+<div class="modal fade modal-media" id="mediaModal" role="dialog" tabindex="-1" aria-labeledby="" aria-hidden="true" aria-describedby="">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h3 class="panel-title"></h3>
+            </div>
+            <div class="modal-body">
+            </div>
+        </div>
+    </div>
+</div>
+
+
 </body>
 </html>

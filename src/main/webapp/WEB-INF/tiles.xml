@@ -290,6 +290,8 @@
     
     <!-- Home Page -->
     <definition name="/home" extends="base.definition.frontEnd">
+        <put-attribute name="page-id" value="home" />
+        <put-attribute name="page-section" value="home" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page=home" />
         <put-attribute name="body" value="/WEB-INF/jsp/home.jsp" />
     </definition>

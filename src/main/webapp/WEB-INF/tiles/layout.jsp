@@ -12,17 +12,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <title><tiles:insertAttribute name="title" /></title>
     <!%-- main css compiled from main.less --%>
-    <link rel="stylesheet" href="<%=request.getContextPath()%>/dspResources/css/main.css?v=2">
+    <link rel="stylesheet" href="<%=request.getContextPath()%>/dspResources/css/admin/main.css?v=2">
 
     <!%-- Health-e-link theme --%>
-    <link rel="stylesheet" href="<%=request.getContextPath()%>/dspResources/css/themes/theme-health-e-link.css">
+    <link rel="stylesheet" href="<%=request.getContextPath()%>/dspResources/css/admin/themes/theme-health-e-link.css">
     <jsp:text><![CDATA[<!--[if lte IE 9]>]]></jsp:text>
-            <link rel="stylesheet" href="<%=request.getContextPath()%>/dspResources/css/ie.css">
+            <link rel="stylesheet" href="<%=request.getContextPath()%>/dspResources/css/admin/ie.css">
     <jsp:text><![CDATA[<![endif]-->]]></jsp:text>
     <script src="<%=request.getContextPath()%>/dspResources/js/vendor/jquery-1.10.1.min.js"></script>
     <!%-- moderizer: for ie8 compatibility --%>
     <script type="text/javascript" src="<%=request.getContextPath()%>/dspResources/js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
-    <script data-main="<%=request.getContextPath()%>/dspResources/js/main" src="<%=request.getContextPath()%>/dspResources/js/vendor/require.js"></script>
+    <script data-main="<%=request.getContextPath()%>/dspResources/js/admin/main" src="<%=request.getContextPath()%>/dspResources/js/vendor/require.js"></script>
 </head>
 <body id="<tiles:insertAttribute name='page-id' ignore='true' />" class="<tiles:insertAttribute name='page-section' ignore='true' />" >
     <jsp:text><![CDATA[<!--[if lte IE 7]>]]></jsp:text>
