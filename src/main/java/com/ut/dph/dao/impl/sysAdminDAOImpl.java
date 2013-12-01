@@ -1,5 +1,10 @@
 package com.ut.dph.dao.impl;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 
 import org.hibernate.Query;
@@ -11,6 +16,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ut.dph.dao.sysAdminDAO;
+import com.ut.dph.dao.UtilitiesDAO;
+
 import com.ut.dph.model.custom.LookUpTable;
 import com.ut.dph.model.custom.TableData;
 
@@ -22,10 +29,25 @@ import com.ut.dph.model.custom.TableData;
 public class sysAdminDAOImpl implements sysAdminDAO {
 
 	@Autowired
+	private UtilitiesDAO udao;
+
+	
+	@Autowired
 	private SessionFactory sessionFactory;
 
 	private String schemaName = "universalTranslator";
 
+	// JDBC driver name and database URL
+	
+	static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";  
+	/*
+	static final String DB_URL = "jdbc:mysql://localhost:3306/universalTranslator";
+
+	//  Database credentials
+    static final String USER = "root";
+	static final String PASS = "UTCloud!";
+	*/
+	
 	/** this gets a list of Lookup tables **/
 	@Override
 	@Transactional
@@ -202,27 +224,63 @@ public class sysAdminDAOImpl implements sysAdminDAO {
 
 	}
 
+	/** 
+	 * need table name to be dynamic but java complies and hibernate will not allow 
+	 * dynamic table name. 
+	 * Need to accurately return the id generated and select (max) or sql = 'inserted display text'
+	 * is not a good idea.
+	 * For inserts that are dynamic, we will use old fashion JDBC sql 
+	 * 
+	 * */
+	
+
 	@Override
-	@Transactional
 	public Integer createTableData(TableData tableData, String utTableName) {
 		Integer tableDataId= 0;
-		String sql  = "insert into " + utTableName + " (displayText, description, isCustom, status) "
-				+ "values (:displayText, :description, :isCustom, :status)";
-		Query insertData = sessionFactory.getCurrentSession().createSQLQuery(sql)
-				.addScalar("displayText",StandardBasicTypes.STRING)
-				.addScalar("description",StandardBasicTypes.STRING)
-				.addScalar("isCustom", StandardBasicTypes.BOOLEAN)
-				.addScalar("status", StandardBasicTypes.BOOLEAN)
-				.setParameter("displayText", tableData.getDisplayText())
-				.setParameter("description", tableData.getDescription())
-				.setParameter("isCustom", tableData.isCustom())
-				.setParameter("status", tableData.isStatus())		
-				;
+		
+		   Connection conn = null;
+		   PreparedStatement pst = null;
+		   ResultSet rs = null;
+		   
+		     
 		try {
-			tableDataId = insertData.executeUpdate();
-		} catch (Throwable ex) {
+			conn = udao.getConnection();
+			String sql  = "insert into " + utTableName + 
+				" (displayText, description, isCustom, status) "
+				+ "values (?, ?,?, ?)";
+		
+			pst =
+				conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+			pst.setString(1, tableData.getDisplayText());
+			pst.setString(2, tableData.getDescription());
+			pst.setBoolean(3, tableData.isCustom());
+			pst.setBoolean(4, tableData.isStatus());
+			
+			pst.executeUpdate();
+			rs = pst.getGeneratedKeys();			
+			if (rs.next()) {
+				tableDataId = rs.getInt(1);
+			} 
+			
+		} catch (Exception ex) {
             System.err.println("insert table data failed." + ex);
 		}
+		finally
+	    {
+			try
+			{
+			if(rs!=null)
+				rs.close();
+			if(pst!=null)
+				pst.close();
+			if(conn!=null)
+				conn.close();
+			}
+	        catch ( SQLException e ) {
+	          System.out.println("Error: createData: - close connection: " + e);
+	        }
+	    }
+		
 		return tableDataId;
 	}
 
@@ -234,7 +292,7 @@ public class sysAdminDAOImpl implements sysAdminDAO {
 				+ " set displayText = :displayText, "
 				+ "description = :description, "
 				+ "status = :status, "
-				+ "isCustom = :isCustom, "
+				+ "isCustom = :isCustom "
 				+ "where id = :id ";
 		System.out.println(sql);
 		Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)

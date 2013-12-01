@@ -31,4 +31,5 @@ public interface sysAdminDAO {
 	Integer createTableData (TableData tableData, String utTableName);
 	
 	boolean updateTableData (TableData tableData, String utTableName);
+
 }

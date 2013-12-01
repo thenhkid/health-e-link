@@ -16,7 +16,7 @@
         <form:form id="tableDataForm" commandName="tableData" modelAttribute="tableDataDetails"  method="post" role="form">
             <input type="hidden" id="action" name="action" value="save" />	
             <section class="panel panel-default">
-
+			<form:hidden path="id" id="id" />
                 <div class="panel-heading">
                     <h3 class="panel-title"><c:if test="${tableDataDetails.id == 0}">Add </c:if>Data for "${tableInfo.displayName}" Table</h3>
                     </div>
