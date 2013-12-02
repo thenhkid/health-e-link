@@ -2,38 +2,29 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %> 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
-<div class="main clearfix" role="main">
-
-    <div class="col-md-12">
-
-        <c:if test="${not empty savedStatus}" >
-            <div class="alert alert-success">
-                <strong>Success!</strong> 
-                <c:choose><c:when test="${savedStatus == 'updated'}">The data has been successfully updated!</c:when><c:otherwise>The organization has been successfully created!</c:otherwise></c:choose>
-                    </div>
-        </c:if>
-
-        <form:form id="tableDataForm" commandName="tableData" modelAttribute="tableDataDetails"  method="post" role="form">
-            <input type="hidden" id="action" name="action" value="save" />	
-            <section class="panel panel-default">
-			<form:hidden path="id" id="id" />
-                <div class="panel-heading">
-                    <h3 class="panel-title"><c:if test="${tableDataDetails.id == 0}">Add </c:if>Data for "${tableInfo.displayName}" Table</h3>
-                    </div>
-                    <div class="panel-body">
-                        <div class="form-container">
-                            <div class="form-group">
-                                <label for="status">Status *</label>
-                                <div>
-                                    <label class="radio-inline">
-                                    <form:radiobutton id="status" path="status" value="true"/>Active 
-                                </label>
-                                <label class="radio-inline">
-                                    <form:radiobutton id="status" path="status" value="false"/>Inactive
-                                </label>
-                            </div>
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h3 class="panel-title"><c:choose><c:when test="${btnValue == 'Update'}">Update</c:when><c:when test="${btnValue == 'Create'}">Add</c:when></c:choose> Look Up Data ${success}</h3>
+                </div>
+                <div class="modal-body">
+            <form:form id="tabledataform" commandName="tableData" modelAttribute="tableDataDetails"  method="post" role="form">
+                <form:hidden path="id" id="id" />
+                <form:hidden path="urlId" id="urlId"/>
+                <div class="form-container">
+                    <div class="form-group">
+                        <label for="status">Status *</label>
+                        <div>
+                            <label class="radio-inline">
+                                <form:radiobutton id="status" path="status" value="true" /> Active
+                            </label>
+                            <label class="radio-inline">
+                                <form:radiobutton id="status" path="status" value="false" /> Inactive
+                            </label>
                         </div>
-                        <div class="form-group">
+                    </div>
+                   <div class="form-group">
                             <label for="custom">Viewable *</label>
                             <div>
                                 <label class="radio-inline">
@@ -58,9 +49,18 @@
                                 <form:errors path="description" cssClass="control-label" element="label" />
                             </div>
                         </spring:bind>
+                    <div class="form-group">
+                        <input type="button" id="submitButton" rel="${btnValue}" class="btn btn-primary" value="${btnValue}"/>
                     </div>
                 </div>
-            </section>
-        </form:form>
+            </form:form>
+        </div>
     </div>
 </div>
+
+<script type="text/javascript">
+
+    $(document).ready(function() {
+        $("input:text,form").attr("autocomplete", "off");
+    });
+</script>

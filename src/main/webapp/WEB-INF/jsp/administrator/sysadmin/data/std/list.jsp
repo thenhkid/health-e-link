@@ -6,21 +6,10 @@
 
 <div class="main clearfix" role="main" rel="dataForTable">
     <div class="col-md-12">
-
-        <c:if test="${not empty savedStatus}" >
-            <div class="alert alert-success">
-                <c:if test="${savedStatus != 'notDeleted'}" >
-                    <strong>Success!</strong> 
-                </c:if>
-                <c:choose>
-                    <c:when test="${savedStatus == 'updated'}">Data has been successfully updated!</c:when>
-                    <c:when test="${savedStatus == 'created'}">Data has been successfully added!</c:when>
-                    <c:when test="${savedStatus == 'deleted'}">Data has been successfully removed!</c:when>
-                    <c:when test="${savedStatus == 'notDeleted'}">The data is in use and cannot be deleted.  Please set the status to inactive instead.</c:when>
-                </c:choose>
+			<div class="alert alert-success">
+               <c:choose><c:when test="${param.msg == 'updated'}">The look up date has been successfully updated!</c:when><c:when test="${param.msg == 'created'}">The look up data has been successfully added!</c:when></c:choose>
             </div>
-        </c:if>
-
+       
         <section class="panel panel-default">
             <div class="panel-heading">
                 <h3 class="panel-title"><c:if test="${not empty tableInfo}">Data for "${tableInfo.displayName}" Table</c:if></h3>
@@ -38,7 +27,7 @@
                             </button>
                         </form:form>
                     </div>
-                    <a href="${tableInfo.urlId}/dataItem.create"  class="btn btn-primary btn-sm pull-right" title="Add data">
+                     <a href="#addLUDataModal" id="createNewdataItem" data-toggle="modal" class="btn btn-primary btn-sm pull-right" title="Add look up data">  
                         <span class="glyphicon glyphicon-plus"></span>
                     </a>
                 </div>
@@ -60,14 +49,14 @@
                                     <c:forEach var="dataItem" items="${dataList}">
                                         <tr id="dataRow">
                                             <td>${dataItem.id}</td>
-                                            <td scope="row"><a href="${tableInfo.urlId}/tableData.${dataItem.displayText}?i=${dataItem.id}"  title="Edit this data">${dataItem.displayText}</a>
+                                            <td scope="row"><a href="#addLUDataModal" data-toggle="modal" rel="${tableInfo.urlId}/tableData?i=${dataItem.id}" class="dataEdit" title="Edit this user">${dataItem.displayText}</a>
                                                 <br />(<c:choose><c:when test="${dataItem.status == true}">active</c:when><c:otherwise>inactive</c:otherwise></c:choose><c:if test="${dataItem.custom == true}">, custom data</c:if>)</td>
                                                     <td>
                                                 ${dataItem.description}
                                             </td>
                                             <td class="center-text"><fmt:formatDate value="${dataItem.dateCreated}" type="date" pattern="M/dd/yyyy" /></td>
                                             <td class="actions-col">
-                                                <a href="${tableInfo.urlId}/tableData.${dataItem.displayText}?i=${dataItem.id}"  class="btn btn-link" title="Edit this data">
+                                                <a href="#addLUDataModal" data-toggle="modal" rel="${tableInfo.urlId}/tableData?i=${dataItem.id}" class="dataEdit" title="Edit this user">
                                                     <span class="glyphicon glyphicon-edit"></span>
                                                     Edit	
                                                 </a>
@@ -98,5 +87,8 @@
     </div>		
 </div>	
 <p rel="${currentPage}" id="currentPageHolder" style="display:none"></p>
+<p rel="${tableInfo.urlId}" id="urlIdInfo" style="display:none"></p>
+<!-- Providers modal -->
+<div class="modal fade" id="addLUDataModal" role="dialog" tabindex="-1" aria-labeledby="Add look up data" aria-hidden="true" aria-describedby="Add look up data"></div>
 
 

@@ -23,6 +23,8 @@ public class TableData {
 	
 	private boolean status = true;
 	
+	private String urlId;
+	
 	private Date dateCreated;
 	private Date dateModified;
 	
@@ -67,6 +69,12 @@ public class TableData {
 	}
 	public void setDateModified(Date dateModified) {
 		this.dateModified = dateModified;
+	}
+	public String getUrlId() {
+		return urlId;
+	}
+	public void setUrlId(String urlId) {
+		this.urlId = urlId;
 	}
 
 	

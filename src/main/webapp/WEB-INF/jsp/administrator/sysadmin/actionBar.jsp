@@ -27,15 +27,6 @@
 			</h1>
 		</div>
 		<ul class="nav navbar-nav navbar-right navbar-actions">
-			<c:choose>
-				<c:when test="${param['page'] == 'dataDetails'}">
-				<li><a href="javascript:void(0);" id="saveDetails" title="Save Data"><span class="glyphicon glyphicon-ok icon-stacked"></span> Save </a></li>
-				<li><a href="javascript:void(0);" id="saveCloseDetails" title="Save And Close"><span class="glyphicon glyphicon-floppy-disk icon-stacked"></span> Save &amp; Close</a></li>
-				<c:if test="${tableDataDetails.id > 0}"><li><a href="javascript:void(0);" id=detailDataDelete rel="${tableDataDetails.id}" title="Delete this data item"><span class="glyphicon glyphicon-remove icon-stacked"></span>Delete</a></li></c:if>
-				<li><a href="<c:url value='/administrator/sysadmin/std/data/${tableInfo.urlId}' />" title="Cancel"><span class="glyphicon icon-stacked custom-icon icon-cancel"></span>Cancel</a></li>
-				
-				</c:when>
-			</c:choose>
 		</ul>
 	</div>
 </nav>

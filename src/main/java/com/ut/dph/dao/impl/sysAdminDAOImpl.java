@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ut.dph.dao.sysAdminDAO;
 import com.ut.dph.dao.UtilitiesDAO;
-
 import com.ut.dph.model.custom.LookUpTable;
 import com.ut.dph.model.custom.TableData;
 
@@ -316,4 +315,28 @@ public class sysAdminDAOImpl implements sysAdminDAO {
 		return updated;
 		
 	}
+
+		@Override
+		@Transactional
+		public void createTableDataHibernate(TableData tableData, String utTableName) {
+		
+			String sql  = "insert into " + utTableName + " (displayText, description, isCustom, status) "
+					+ "values (:displayText, :description, :isCustom, :status)";
+			Query insertData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+					.addScalar("displayText",StandardBasicTypes.STRING)
+					.addScalar("description",StandardBasicTypes.STRING)
+					.addScalar("isCustom", StandardBasicTypes.BOOLEAN)
+					.addScalar("status", StandardBasicTypes.BOOLEAN)
+					.setParameter("displayText", tableData.getDisplayText())
+					.setParameter("description", tableData.getDescription())
+					.setParameter("isCustom", tableData.isCustom())
+					.setParameter("status", tableData.isStatus())		
+					;
+			try {
+				insertData.executeUpdate();
+			} catch (Throwable ex) {
+	            System.err.println("insert table data failed." + ex);
+			}
+		}
+	
 }
