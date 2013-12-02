@@ -10,7 +10,7 @@
 					<c:when test="${param['page'] == 'dataDetails'}">
 						<a href="javascript:void(0);" title="Table Details" class="unstyled-link">
 							<c:choose>
-								<c:when test="${not empty id}">
+								<c:when test="${tableDataDetails.id > 0}">
 									Edit Look Up Table Data
 								</c:when>
 								<c:otherwise>
