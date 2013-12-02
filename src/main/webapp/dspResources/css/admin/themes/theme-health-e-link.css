@@ -196,7 +196,8 @@ h3 {
   background-color: #fff;
   font-size: 14px;
 }
-body#login {
+body#login,
+body#notFound {
   background-color: #efefef;
 }
 .btn-secondary {

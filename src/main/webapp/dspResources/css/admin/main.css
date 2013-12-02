@@ -6225,6 +6225,30 @@ body {
   text-align: center;
   margin-top: 10px;
 }
+.login-container.notFound {
+  width: 640px;
+  margin-left: -320px;
+  text-align: center;
+}
+.login-container.notFound h1 {
+  font-size: 42px;
+  font-weight: bold;
+}
+@media (max-width: 768px) {
+  .login-container.notFound {
+    width: 90%;
+    position: relative;
+    text-align: center;
+    margin: 0 auto;
+    left: 0;
+    top: 20px;
+    min-width: 300px;
+  }
+  .login-container.notFound h1 {
+    font-size: 24px;
+    font-weight: bold;
+  }
+}
 .actions-col {
   text-align: right;
 }
