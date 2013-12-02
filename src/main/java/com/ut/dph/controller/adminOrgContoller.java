@@ -32,8 +32,12 @@ import com.ut.dph.model.siteSections;
 import com.ut.dph.model.Provider;
 import com.ut.dph.service.providerManager;
 import com.ut.dph.model.Brochure;
+import com.ut.dph.model.configuration;
+import com.ut.dph.model.messageType;
 import com.ut.dph.service.brochureManager;
 import com.ut.dph.reference.USStateList;
+import com.ut.dph.service.configurationManager;
+import com.ut.dph.service.messageTypeManager;
 
 /**
  * The adminOrgController class will handle all URL requests that fall inside of the '/administrator/organizations' url path.
@@ -58,6 +62,12 @@ public class adminOrgContoller {
 
     @Autowired
     private brochureManager brochureManager;
+    
+    @Autowired
+    private configurationManager configurationmanager;
+    
+    @Autowired
+    private messageTypeManager messagetypemanager;
 
     /**
      * The private variable orgId will hold the orgId when viewing an organization this will be used when on a organization subsection like users, etc. We will use this private variable so we don't have to go fetch the id or the organization based on the url.
@@ -329,11 +339,93 @@ public class adminOrgContoller {
         ModelAndView mav = new ModelAndView(new RedirectView("../list"));
         return mav;
     }
+    
+    /**
+     * *********************************************************
+     * ORGANIZATION CONFIGUARATION FUNCTIONS 
+     *********************************************************
+     */
+    
+    /**
+     * The '/{cleanURL/configurations' GET request will display the list of configurations set up for the selected organization.
+     *
+     * @param cleanURL	The variable that holds the organization that is being viewed
+     *
+     * @return	Will return the organization configuration list page
+     *
+     * @Objects	(1) An object that holds configurations found for the organization 
+     *          (2) The orgId used for the menu and action bar
+     *
+     * @throws Exception
+     */
+    @RequestMapping(value = "/{cleanURL}/configurations", method = RequestMethod.GET)
+    public ModelAndView listOrganizationConfigs(@PathVariable String cleanURL) throws Exception {
+
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/organizations/configurations");
+
+         List<configuration> configurations = configurationmanager.getConfigurationsByOrgId(orgId,null);
+        mav.addObject("id", orgId);
+        mav.addObject("configs", configurations);
+        
+        messageType messagetype;
+        
+        for (configuration config : configurations) {
+            messagetype = messagetypemanager.getMessageTypeById(config.getMessageTypeId());
+            config.setMessageTypeName(messagetype.getName());
+
+            Long totalConnections = (Long) configurationmanager.getTotalConnections(config.getId());
+            config.setTotalConnections(totalConnections);
+        }
+
+        return mav;
+    }
+    
+    /**
+     * The '/{cleanURL/configurations' POST request will display the list of configurations set up for the selected organization
+     * by organization id and configuration name.
+     *
+     * @param cleanURL      The variable that holds the organization that is being viewed
+     * @param searchTerm    The term that will be used to narrow down the organization configs
+     *
+     * @return	Will return the organization configuration list page
+     *
+     * @Objects	(1) An object that holds configurations found for the organization 
+     *          (2) The orgId used for the menu and action bar
+     *
+     * @throws Exception
+     */
+    @RequestMapping(value = "/{cleanURL}/configurations", method = RequestMethod.POST)
+    public ModelAndView findOrganizationConfigs(@RequestParam String searchTerm, @PathVariable String cleanURL) throws Exception {
+
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/organizations/configurations");
+        mav.addObject("searchTerm", searchTerm);
+
+        List<configuration> configurations = configurationmanager.getConfigurationsByOrgId(orgId,searchTerm);
+        mav.addObject("id", orgId);
+        mav.addObject("configs", configurations);
+        
+        messageType messagetype;
+
+        for (configuration config : configurations) {
+            messagetype = messagetypemanager.getMessageTypeById(config.getMessageTypeId());
+            config.setMessageTypeName(messagetype.getName());
+
+            Long totalConnections = (Long) configurationmanager.getTotalConnections(config.getId());
+            config.setTotalConnections(totalConnections);
+        }
+
+        return mav;
+    }
+    
 
     /**
      * *********************************************************
-     * ORGANIZATION USER FUNCTIONS *********************************************************
+     * ORGANIZATION USER FUNCTIONS 
+     *********************************************************
      */
+    
     /**
      * The '/{cleanURL/users' GET request will display the list of system users for the selected organization.
      *

@@ -86,10 +86,31 @@ public class configurationDAOImpl implements configurationDAO {
      */
     @Override
     @SuppressWarnings("unchecked")
-    public List<configuration> getConfigurationsByOrgId(int orgId) {
-        Query query = sessionFactory.getCurrentSession().createQuery("from configuration where orgId = :orgId order by dateCreated desc");
-        query.setParameter("orgId", orgId);
-        return query.list();
+    public List<configuration> getConfigurationsByOrgId(int orgId, String searchTerm) {
+        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configuration.class);
+        criteria.add(Restrictions.eq("orgId", orgId));
+        
+        if (searchTerm != null) {
+             //get a list of message type id's that match the term passed in
+            List<Integer> msgTypeIdList = new ArrayList<Integer>();
+            Criteria findMsgTypes = sessionFactory.getCurrentSession().createCriteria(messageType.class);
+            findMsgTypes.add(Restrictions.like("name", "%" + searchTerm + "%"));
+            List<messageType> msgTypes = findMsgTypes.list();
+
+            for (messageType msgType : msgTypes) {
+                msgTypeIdList.add(msgType.getId());
+            }
+            
+            if (msgTypeIdList.isEmpty()) {
+                msgTypeIdList.add(0);
+            }
+
+            criteria.add(Restrictions.in("messageTypeId", msgTypeIdList));
+        }
+        
+        criteria.addOrder(Order.desc("dateCreated"));
+        
+        return criteria.list();
     }
 
     /**

@@ -16,27 +16,27 @@
     
     <mvc:resources mapping="/dspResources/**" location="/dspResources/" /> 
     
-     <!-- This resource variable will hold the location to the main bowlink organization resource
-	folder on the server. This will allow us to use /orgFolders when viewing files upload by
-	specific organizations -->
+    <!-- This resource variable will hold the location to the main bowlink organization resource
+    folder on the server. This will allow us to use /orgFolders when viewing files upload by
+    specific organizations -->
     <mvc:resources mapping="/orgFolders/**" location="file:c:/bowlink/"/>
     
     <bean id="viewResolver" class="org.springframework.web.servlet.view.UrlBasedViewResolver">
-	    <property name="viewClass">
-	        <value>
-	            org.springframework.web.servlet.view.tiles2.TilesView
-	        </value>
-	    </property>
-	</bean>
+        <property name="viewClass">
+            <value>
+                org.springframework.web.servlet.view.tiles2.TilesView
+            </value>
+        </property>
+    </bean>
     
     <bean id="tilesConfigurer"
-	    class="org.springframework.web.servlet.view.tiles2.TilesConfigurer">
-	    <property name="definitions">
-	        <list>
-	            <value>/WEB-INF/tiles.xml</value>
-	        </list>
-	    </property>
-	</bean>
+          class="org.springframework.web.servlet.view.tiles2.TilesConfigurer">
+        <property name="definitions">
+            <list>
+                <value>/WEB-INF/tiles.xml</value>
+            </list>
+        </property>
+    </bean>
 
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         <property name="prefix" value="/WEB-INF/jsp/" />
@@ -45,13 +45,13 @@
    
     
     <!-- bind your messages.properties -->
-	<bean class="org.springframework.context.support.ResourceBundleMessageSource" id="messageSource">
-		<property name="basename" value="messages" />
-	</bean>
+    <bean class="org.springframework.context.support.ResourceBundleMessageSource" id="messageSource">
+        <property name="basename" value="messages" />
+    </bean>
 	
-	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
-    	<!-- one of the properties available; the maximum file size in bytes -->
-    	<!--<property name="maxUploadSize" value="200000"/>-->
-	</bean>
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <!-- one of the properties available; the maximum file size in bytes -->
+        <!--<property name="maxUploadSize" value="200000"/>-->
+    </bean>
 	
 </beans>

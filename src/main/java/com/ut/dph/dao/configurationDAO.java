@@ -16,7 +16,7 @@ public interface configurationDAO {
   
   configuration getConfigurationById(int configId);
   
-  List<configuration> getConfigurationsByOrgId(int orgId);
+  List<configuration> getConfigurationsByOrgId(int orgId, String searchTerm);
   
   List<configuration> findConfigurations(String searchTerm);
   

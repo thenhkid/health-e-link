@@ -150,6 +150,17 @@
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/organizations/organizationDetails.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/admin/organization/orgDetails.js" />
     </definition>
+    
+    <definition name="/administrator/organizations/configurations" extends="base.definition.admin">
+        <put-attribute name="page-id" value="organization-configs" />
+        <put-attribute name="page-section" value="section-organizations" />
+        <put-attribute name="title" value="Administrator - Manage Organizations" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=org" />
+        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/organizations/actionBar.jsp?page=orgConfigs" />
+        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/organizations/menu.jsp?page=config" />
+        <put-attribute name="body" value="/WEB-INF/jsp/administrator/organizations/configurations/list.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/admin/organization/configs.js" />
+    </definition>
 	    
     <definition name="/administrator/organizations/users" extends="base.definition.admin">
         <put-attribute name="page-id" value="organization-users" />
