@@ -242,7 +242,14 @@
     <!--  End Admin Definitions -->
     
     <!-- start sysadmin definitions -->
-    <definition name="/administrator/sysadmin/tableList" extends="base.definition.admin">
+    <definition name="/administrator/sysadmin/dashboard" extends="base.definition.admin">
+        <put-attribute name="page-id" value="dashboard-details" />
+        <put-attribute name="page-section" value="section-dashboard" />
+        <put-attribute name="title" value="Administrator" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=sysadmin" />
+        <put-attribute name="body" value="/WEB-INF/jsp/administrator/sysadmin/index.jsp" />
+    </definition>
+    <definition name="/administrator/sysadmin/data/tableList" extends="base.definition.admin">
         <put-attribute name="page-id" value="sysadmin-tablelist" />
         <put-attribute name="page-section" value="section-sysadmin" />
         <put-attribute name="title" value="Administrator - Manage Look Up Tables" />
@@ -250,34 +257,21 @@
         <put-attribute name="actions" value="/WEB-INF/jsp/administrator/sysadmin/actionBar.jsp?page=list" />
         <put-attribute name="menu" value="/WEB-INF/jsp/administrator/sysadmin/menu.jsp?page=table" />
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/sysadmin/data/tableList.jsp" />
-        <put-attribute name="jscript" value="/dspResources/js/admin/sysadmin/tableList.js" />
+        <put-attribute name="jscript" value="/dspResources/js/admin/sysadmin/data/tableList.js" />
     </definition>
 	    
     <!--  this lists data rows for look up tables -->    
-    <definition name="/administrator/sysadmin/std/data" extends="base.definition.admin">
+    <definition name="/administrator/sysadmin/data/std" extends="base.definition.admin">
         <put-attribute name="page-id" value="sysadmin-stddata" />
         <put-attribute name="page-section" value="section-sysadmin" />
-        <put-attribute name="title" value="Administrator - Manage Look Up Tables" />
+        <put-attribute name="title" value="Administrator - Manage Look Up Table Data" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=sysadmin" />
         <put-attribute name="actions" value="/WEB-INF/jsp/administrator/sysadmin/actionBar.jsp?page=data" />
         <put-attribute name="menu" value="/WEB-INF/jsp/administrator/sysadmin/menu.jsp?page=table" />
-        <put-attribute name="body" value="/WEB-INF/jsp/administrator/sysadmin/data/list.jsp" />
-        <put-attribute name="jscript" value="/dspResources/js/admin/sysadmin/list.js" />
+        <put-attribute name="body" value="/WEB-INF/jsp/administrator/sysadmin/data/std/list.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/admin/sysadmin/data/list.js" />
     </definition>
-	    
-    <definition name="/administrator/sysadmin/std/details" extends="base.definition.admin">
-        <put-attribute name="page-id" value="sysadmin-stddetails" />
-        <put-attribute name="page-section" value="section-sysadmin" />
-        <put-attribute name="title" value="Administrator - System Administrations" />
-        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=sysadmin" />
-        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/sysadmin/actionBar.jsp?page=dataDetails" />
-        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/sysadmin/menu.jsp?page=table" />
-        <put-attribute name="body" value="/WEB-INF/jsp/administrator/sysadmin/data/details.jsp" />
-        <put-attribute name="jscript" value="/dspResources/js/admin/sysadmin/details.js" />
-    </definition>
-	    
-    <!--  detail for a data table element -->   
-	
+    
     <!--  end sysadmin definitions -->
     
     <!-- Front End Definitions -->
