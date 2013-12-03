@@ -35,8 +35,8 @@
                 </ul>
                <ul class="nav navbar-nav navbar-right" id="secondary-nav">
                   <li><a class="logout" href="<c:url value='/logout' />">Log out</a></li>
-            </ul>
-        </div>
+               </ul>
+            </div>
     </nav>
     <!-- // End Primary Nav -->
 </header>

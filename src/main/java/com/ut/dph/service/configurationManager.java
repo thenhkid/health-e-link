@@ -7,7 +7,6 @@ import com.ut.dph.model.Macros;
 import com.ut.dph.model.configuration;
 import com.ut.dph.model.configurationDataTranslations;
 import com.ut.dph.model.configurationSchedules;
-import com.ut.dph.model.configurationTransport;
 
 public interface configurationManager {
 	
@@ -17,7 +16,7 @@ public interface configurationManager {
   
   configuration getConfigurationById(int configId);
   
-  List<configuration> getConfigurationsByOrgId(int orgId);
+  List<configuration> getConfigurationsByOrgId(int orgId, String searchTerm);
   
   List<configuration> getConfigurationByName(String configName);
   

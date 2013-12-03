@@ -10,7 +10,7 @@
         <section class="panel panel-default">
             <div class="panel-body">
                 <div class="table-actions">
-                    <form:form class="form form-inline" action="/administrator/sysadmin/list" method="post">
+                    <form:form class="form form-inline" method="post">
 
                         <div class="form-group">
                             <label class="sr-only" for="searchTerm">Search</label>
@@ -39,14 +39,14 @@
                                     <c:forEach var="tableInfo" items="${tableList}">
                                         <tr id="tableInfoRow" style="cursor: pointer">
                                             <td scope="row">
-                                                <a href="std/data/${tableInfo.urlId}" title="View Data">${tableInfo.displayName}</a>
+                                                <a href="data/std/${tableInfo.urlId}" title="View Data">${tableInfo.displayName}</a>
                                             </td>
                                             <td class="center-text">${tableInfo.columnNum}</td>
                                             <td class="center-text">${tableInfo.rowNum}</td>
                                             <td class="center-text">${tableInfo.description}</td>
                                             <%-- not sure if we should let users edit our look up tables--%> 
                                             <td class="actions-col">
-                                                <a href="std/data/${tableInfo.urlId}" class="btn btn-link" title="Edit data for this table">
+                                                <a href="data/std/${tableInfo.urlId}" class="btn btn-link" title="Edit data for this table">
                                                     <span class="glyphicon glyphicon-edit"></span>
                                                     View Data	
                                                 </a>

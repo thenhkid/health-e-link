@@ -2,11 +2,18 @@ package com.ut.dph.controller;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.ut.dph.service.sysAdminManager;
+import com.ut.dph.model.Organization;
+import com.ut.dph.model.User;
+import com.ut.dph.model.configuration;
+import com.ut.dph.model.messageType;
+import com.ut.dph.model.siteSections;
 import com.ut.dph.model.custom.LookUpTable;
 import com.ut.dph.model.custom.TableData;
 
@@ -35,7 +42,21 @@ public class adminSysAdminController {
 	 */
 	private static int maxResults = 20;
 	
-	
+    /**
+     * The '/administrator' request will serve up the administrator dashboard after a successful login.
+     *
+     * @param request
+     * @param response
+     * @return	the administrator dashboard view
+     * @throws Exception
+     */
+    @RequestMapping(value = "/", method = RequestMethod.GET)
+    public ModelAndView dashboard(HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/sysadmin/dashboard");
+        return mav;
+    }
 	/**
 	 *  The '/list' GET request will serve up the existing list of lu_ tables in the system
 	 *  
@@ -47,7 +68,7 @@ public class adminSysAdminController {
 	 * 				
 	 * @throws Exception
 	 */
-	@RequestMapping(value="/list", method = RequestMethod.GET)
+	@RequestMapping(value="/data", method = RequestMethod.GET)
 	public ModelAndView listLookUpTables(@RequestParam(value="page", required=false) Integer page) throws Exception {
 		
 		if(page == null){
@@ -55,7 +76,7 @@ public class adminSysAdminController {
 	    }
  
 		ModelAndView mav = new ModelAndView();
-        mav.setViewName("/administrator/sysadmin/tableList");
+        mav.setViewName("/administrator/sysadmin/data/tableList");
         
         /**
          * we query list of tables for display
@@ -75,7 +96,7 @@ public class adminSysAdminController {
 
 	
 	/**
-	 * The '/list' POST request will be used to search look up tables from the search form on the
+	 * The '/data' POST request will be used to search look up tables from the search form on the
 	 * list page.
 	 * 
 	 * @param searchTerm	The searchTerm parameter will hold the string to search on
@@ -86,7 +107,7 @@ public class adminSysAdminController {
 	 * 						(2) An object containing the found look up tables
 	 * @throws Exception
 	 */
-	@RequestMapping(value="/list", method = RequestMethod.POST)
+	@RequestMapping(value="/data", method = RequestMethod.POST)
 	public ModelAndView searchForLookUpTable(@RequestParam String searchTerm, @RequestParam(value="page", required=false) Integer page) 
 			throws Exception {
 		
@@ -95,17 +116,16 @@ public class adminSysAdminController {
 	    }
 		
 		ModelAndView mav = new ModelAndView();
-        mav.setViewName("/administrator/sysadmin/list");
-        List<LookUpTable> tableList = sysAdminManager.getTableList(maxResults, page, searchTerm);;
+		 mav.setViewName("/administrator/sysadmin/data/tableList");
+        List<LookUpTable> tableList = sysAdminManager.getTableList(maxResults, page, searchTerm);
         mav.addObject("searchTerm",searchTerm);
         mav.addObject("tableList", tableList);		
-        
         return mav;
  
 	}
 
 	/**
-	 *  The '/std/data/{urlId}' GET request will serve up the date for a look up table
+	 *  The '/data/std/{urlId}' GET request will serve up the date for a look up table
 	 *  
 	 * @param page			The page parameter will hold the page to view when pagination 
 	 * 						is built.
@@ -120,7 +140,7 @@ public class adminSysAdminController {
 	 * 				
 	 * @throws Exception
 	 */
-	@RequestMapping(value="/std/data/{urlId}", method = RequestMethod.GET)
+	@RequestMapping(value="/data/std/{urlId}", method = RequestMethod.GET)
 	public ModelAndView listTableData(@RequestParam(value="page", required=false) Integer page,  @PathVariable String urlId) throws Exception {
 		
 		if(page == null){
@@ -128,7 +148,7 @@ public class adminSysAdminController {
 	    }
  
 		ModelAndView mav = new ModelAndView();
-        mav.setViewName("/administrator/sysadmin/std/data");
+        mav.setViewName("/administrator/sysadmin/data/std");
         
         /**
          * we query data for look up table, this view returns all data from table, hence the search term will be %
@@ -148,7 +168,7 @@ public class adminSysAdminController {
 	}
 	
 	/**
-	 *  The '/std/data/{urlId}' Post request will serve up the date for a look up table
+	 *  The '/data/std/{urlId}' Post request will serve up the date for a look up table
 	 *  
 	 * @param page			The page parameter will hold the page to view when pagination 
 	 * 						is built.
@@ -163,7 +183,7 @@ public class adminSysAdminController {
 	 * 				
 	 * @throws Exception
 	 */
-	@RequestMapping(value="/std/data/{urlId}", method = RequestMethod.POST)
+	@RequestMapping(value="/data/std/{urlId}", method = RequestMethod.POST)
 	public ModelAndView listSearchDataInTable(@RequestParam String searchTerm,@RequestParam(value="page", required=false) Integer page,  @PathVariable String urlId) throws Exception {
 		
 		if(page == null){
@@ -171,7 +191,7 @@ public class adminSysAdminController {
 	    }
  
 		ModelAndView mav = new ModelAndView();
-        mav.setViewName("/administrator/sysadmin/std/data");
+        mav.setViewName("/administrator/sysadmin/data/std");
         
         /**
          * we query data for look up table, this view returns all data from table, hence the search term will be %
@@ -191,7 +211,7 @@ public class adminSysAdminController {
 	}
 	
 	/**
-	 *  The '/std/data/{urlId}/delete?i=' Post request will serve up the date for a look up table
+	 *  The '/data/std/{urlId}/delete?i=' Post request will serve up the date for a look up table
 	 *  
 	 * @param page			The page parameter will hold the page to view when pagination 
 	 * 						is built.
@@ -206,7 +226,7 @@ public class adminSysAdminController {
 	 * 				
 	 * @throws Exception
 	 */
-	@RequestMapping(value="/std/data/{urlId}/delete", method = RequestMethod.GET)
+	@RequestMapping(value="/data/std/{urlId}/delete", method = RequestMethod.GET)
 	public ModelAndView deleteTableData(@RequestParam(value="i", required=true) int dataId, 
 			@PathVariable String urlId, RedirectAttributes redirectAttr) throws Exception {
 		 
@@ -231,124 +251,108 @@ public class adminSysAdminController {
 	 *  The '/{urlId}/data.create' GET request will be used to create a new data for selected table
 	 *  
 	 */
-	@RequestMapping(value="/std/data/{urlId}/dataItem.create", method = RequestMethod.GET)
+	@RequestMapping(value="/data/std/{urlId}/create", method = RequestMethod.GET)
 	public ModelAndView newTableDataForm(@PathVariable String urlId) throws Exception {
 		ModelAndView mav = new ModelAndView();
-		mav.setViewName("/administrator/sysadmin/std/details");	
+		mav.setViewName("/administrator/sysadmin/data/std/details");	
 		
 		LookUpTable tableInfo = sysAdminManager.getTableInfo(urlId);
 		//create a table data
 		TableData tableData = new TableData();
 		tableData.setId(0);
+		tableData.setUrlId(urlId);
 		mav.addObject("tableDataDetails",tableData);
 		mav.addObject("tableInfo",tableInfo);
+		mav.addObject("btnValue", "Create");
 		return mav;
 	}
 	
 	/**
-	 * The '/{urlId}/data.create' POST request will handle submitting the new provider.
+	 * The '/{urlId}/create' POST request will handle submitting the new provider.
 	 * 
 	 * @param tableDataForm		The object containing the tableData form fields
 	 * @param result			The validation result
 	 * @param redirectAttr		The variable that will hold values that can be read after the redirect
-	 * @param action			The variable that holds which button was pressed
-	 * 
-	 * @return					Will return the table's data page on "Save & Close"
-	 * 							Will return the data details page on "Save"
-	 * 							Will return the data create page on error
-	 * 
 	 * @Objects					(1) The object containing all the information for the new data item
 	 * 							(2) We will extract table from web address
 	 * @throws Exception
 	 */
-	@RequestMapping(value="/std/data/{urlId}/dataItem.create", method = RequestMethod.POST)
+	@RequestMapping(value="/data/std/create", method = RequestMethod.POST)
+	
 	public ModelAndView createTableData(
 			@Valid @ModelAttribute(value="tableDataDetails") TableData tableData, 
-			BindingResult result, RedirectAttributes redirectAttr,
-			@RequestParam String action, @PathVariable String urlId) throws Exception {
+			BindingResult result, RedirectAttributes redirectAttr
+			) throws Exception {
 		
-		LookUpTable tableInfo = sysAdminManager.getTableInfo(urlId);
+		LookUpTable tableInfo = sysAdminManager.getTableInfo(tableData.getUrlId());
 		
 		ModelAndView mav = new ModelAndView();
 		/** check for error **/
 		if(result.hasErrors()) {
 			mav.addObject("tableInfo",tableInfo);
-			mav.setViewName("/administrator/sysadmin/std/details");
+			mav.setViewName("/administrator/sysadmin/data/std/details");
+			mav.addObject("btnValue", "Create");
 			return mav;
 		}
 		
 		//now we save
-		Integer dataId = sysAdminManager.createTableData(tableData, tableInfo.getUtTableName());
-		
-		//This variable will be used to display the message on the details form
-        if (dataId == 0) {// we have an error!
-        	redirectAttr.addFlashAttribute("savedStatus", "error");
-        } else {
-        	redirectAttr.addFlashAttribute("savedStatus", "created");
-        }
-        //If the "Save" button was pressed 
-        if (action.equals("save")) {
-           //send them page to proper page with model data but with data id
-           mav = new ModelAndView(new RedirectView("../" + urlId +"/tableData" + "?i=" + dataId));
-           return mav;
-        } //If the "Save & Close" button was pressed.
-        else {
-            //This variable will be used to display the message on the details form
-            mav = new ModelAndView(new RedirectView("../" + urlId));
-            return mav;
-        }
-	}
-	
-	/**
-	 *  The '/std/data/{urlId}/tableData?i=' GET request will be used to create a new data for selected table
-	 *  
-	 */
-	@RequestMapping(value="/std/data/{urlId}/tableData", method = RequestMethod.GET)
-	public ModelAndView viewTableData(@PathVariable String urlId, @RequestParam(value="i", required=false) Integer i) throws Exception {
-		ModelAndView mav = new ModelAndView();
-		mav.setViewName("/administrator/sysadmin/std/details");	
-		
-		LookUpTable tableInfo = sysAdminManager.getTableInfo(urlId);
-		TableData tableData = sysAdminManager.getTableData(i, tableInfo.getUtTableName());
-		mav.addObject("tableDataDetails",tableData);
-		mav.addObject("tableInfo",tableInfo);
+		sysAdminManager.createTableDataHibernate(tableData, tableInfo.getUtTableName());
+		mav.addObject("success", "dataCreated");
+		mav.addObject("btnValue", "Update");
+		mav.setViewName("/administrator/sysadmin/data/std/details");
 		return mav;
 	}
 	
 	/**
-	 * The '/std/data/{urlId}/tableData?i=' GET request will be used to create a
+	 *  The '/data/std/{urlId}/tableData?i=' GET request will be used to create a new data for selected table
+	 *  
+	 */
+	@RequestMapping(value="/data/std/{urlId}/tableData", method = RequestMethod.GET)
+	public ModelAndView viewTableData(@PathVariable String urlId, @RequestParam(value="i", required=false) Integer i) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/sysadmin/data/std/details");	
+		
+		LookUpTable tableInfo = sysAdminManager.getTableInfo(urlId);
+		TableData tableData = sysAdminManager.getTableData(i, tableInfo.getUtTableName());
+		tableData.setUrlId(urlId);
+		mav.addObject("tableDataDetails",tableData);
+		mav.addObject("tableInfo",tableInfo);
+		mav.addObject("btnValue", "Update");
+		return mav;		
+	}
+	
+	/**
+	 * The '/data/std/{urlId}/tableData?i=' GET request will be used to create a
 	 * new data for selected table
 	 * 
 	 */
-	@RequestMapping(value = "/std/data/{urlId}/tableData", method = RequestMethod.POST)
+	@RequestMapping(value = "/data/std/update", method = RequestMethod.POST)
 	public ModelAndView updateTableData(
 			@Valid @ModelAttribute(value = "tableDataDetails") TableData tableData,
-			BindingResult result, RedirectAttributes redirectAttr,
-			@RequestParam String action, @PathVariable String urlId)
+			BindingResult result, RedirectAttributes redirectAttr)
 			throws Exception {
 
 		ModelAndView mav = new ModelAndView();
-		mav.setViewName("/administrator/sysadmin/std/details");
-		LookUpTable tableInfo = sysAdminManager.getTableInfo(urlId);
+		mav.setViewName("/administrator/sysadmin/data/std/details");
+		LookUpTable tableInfo = sysAdminManager.getTableInfo(tableData.getUrlId());
 
+		/** check for error **/
+		if(result.hasErrors()) {
+			mav.addObject("tableInfo",tableInfo);
+			mav.addObject("btnValue", "Update");
+			return mav;
+		}
+		
 		// now we update
 		boolean updated = sysAdminManager.updateTableData(tableData, tableInfo.getUtTableName());
 		
 		// This variable will be used to display the message on the details
 		if (updated) {
-			redirectAttr.addFlashAttribute("savedStatus", "updated");
+			mav.addObject("success", "dataUpdated");
 		} else {
-			redirectAttr.addFlashAttribute("savedStatus", "error");
+			mav.addObject("success", "- There is an error.");
 		}
-		// If the "Save" button was pressed
-		if (action.equals("save")) {
-			// send them page to proper page with model data but with data id
-			mav = new ModelAndView(new RedirectView("../" + urlId + "/tableData" + "?i=" + tableData.getId()));
-		} // If the "Save & Close" button was pressed.
-		else {
-			// This variable will be used to display the message on the details
-			mav = new ModelAndView(new RedirectView("../" + urlId));
-		}
+		mav.addObject("btnValue", "Update");
 		return mav;
 	}
 	

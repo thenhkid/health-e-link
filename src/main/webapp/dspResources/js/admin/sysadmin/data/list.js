@@ -15,15 +15,16 @@ jQuery(document).ready(function($) {
 
     //This function will launch the new dataItem overlay with a blank screen
     $(document).on('click', '#createNewdataItem', function() {
-        alert("here");
-        $.ajax({
-            url: '../../std/data/${tableInfo.urlId}',
+       
+    	$.ajax({
+        	url: $('#urlIdInfo').attr('rel') + '/create',
             type: "GET",
             success: function(data) {
-                $("#systemdataItemsModal").html(data);
+                $("#addLUDataModal").html(data);
             }
         });
     });
+    
 
     //this function will send them to table view
     $('#searchdataItemBtn').click(function() {
@@ -37,52 +38,49 @@ jQuery(document).ready(function($) {
 
         if (confirmed) {
             var id = $(this).attr('rel');
-            var path = window.location.href + "/delete?i=" + id;
+            var path = $('#urlIdInfo').attr('rel') + "/delete?i=" + id;
             window.location.href = path;
         }
     });
 
-    $('#tableDetailsLink').click(function() {
-        window.location.href = window.location.href.replace("data/", "");
-    });
-
-
-    //Function to submit the changes to an existing dataItem or 
-    //submit the new dataItem fields from the modal window.
-    $(document).on('click', '#submitButton', function(event) {
-        var currentPage = $('#currentPageHolder').attr('rel');
-
-        var formData = $("#dataItemdetailsform").serialize();
-
-        var actionValue = $(this).attr('rel').toLowerCase();
-
+    //This function will launch the edit data item overlay populating the fields
+    //with the data of the clicked user.
+    $(document).on('click', '.dataEdit', function() {
+        var dataDetailsAction = $(this).attr('rel');
         $.ajax({
-            url: actionValue + 'dataItem',
+            url: dataDetailsAction,
+            type: "GET",
+            success: function(data) {
+                $("#addLUDataModal").html(data);
+            }
+        });
+    });
+    
+    $(document).on('click', '#submitButton', function(event) {
+    	var currentPage = $('#currentPageHolder').attr('rel');
+    	var formData = $("#tabledataform").serialize();
+        var actionValue = $(this).attr('rel').toLowerCase();
+        $.ajax({
+            url: actionValue,
             data: formData,
             type: "POST",
             async: false,
             success: function(data) {
-
-                if (data.indexOf('dataItemUpdated') != -1) {
+            	/**now add codes to refresh window and close modal window**/
+            	if (data.indexOf('dataUpdated') != -1) {
+            		var goToUrl = $('#urlId').val() + "?msg=updated";
+            		if (currentPage > 0) {
+                        goToUrl = goToUrl + "&page=" + currentPage;
+                    }
+            		window.location.href = goToUrl;
+                } else if (data.indexOf('dataCreated') != -1) {
+                	var goToUrl = $('#urlId').val() + "?msg=created";
                     if (currentPage > 0) {
-                        window.location.href = "dataItems?msg=updated&page=" + currentPage;
+                        goToUrl = goToUrl + "&page=" + currentPage;
                     }
-                    else {
-                        window.location.href = "dataItems?msg=updated";
-                    }
-
-                }
-                else if (data.indexOf('dataItemCreated') != -1) {
-                    if (currentPage > 0) {
-                        window.location.href = "dataItems?msg=created&page=" + currentPage;
-                    }
-                    else {
-                        window.location.href = "dataItems?msg=created";
-                    }
-
-                }
-                else {
-                    $("#systemdataItemsModal").html(data);
+                    window.location.href = goToUrl;
+                } else {
+                	$("#addLUDataModal").html(data);
                 }
             }
         });
@@ -90,6 +88,7 @@ jQuery(document).ready(function($) {
         return false;
 
     });
+    
 
 });
 

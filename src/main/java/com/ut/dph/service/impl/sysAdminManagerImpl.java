@@ -73,5 +73,10 @@ public class sysAdminManagerImpl implements sysAdminManager {
 		return sysAdminDAO.updateTableData (tableData, utTableName);	
 	}
 
+	@Override
+	public void createTableDataHibernate(TableData tableData, String utTableName) {
+		sysAdminDAO.createTableDataHibernate (tableData, utTableName);
+	}
+
 
 }

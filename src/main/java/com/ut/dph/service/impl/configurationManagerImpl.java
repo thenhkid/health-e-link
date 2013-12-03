@@ -42,8 +42,8 @@ public class configurationManagerImpl implements configurationManager {
 
     @Override
     @Transactional
-    public List<configuration> getConfigurationsByOrgId(int configId) {
-        return configurationDAO.getConfigurationsByOrgId(configId);
+    public List<configuration> getConfigurationsByOrgId(int configId, String searchTerm) {
+        return configurationDAO.getConfigurationsByOrgId(configId, searchTerm);
     }
 
     @Override
