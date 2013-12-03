@@ -699,19 +699,23 @@ public class adminConfigController {
         if (reload == false) {
             //Need to get a list of existing translations
             List<configurationDataTranslations> existingTranslations = configurationmanager.getDataTranslations(configId, transportMethod);
+            
+            String fieldName;
+            String crosswalkName;
+            String macroName;
 
             for (configurationDataTranslations translation : existingTranslations) {
                 //Get the field name by id
-                String fieldName = configurationmanager.getFieldName(translation.getFieldId());
+                fieldName = configurationmanager.getFieldName(translation.getFieldId());
                 translation.setfieldName(fieldName);
 
                 //Get the crosswalk name by id
-                String crosswalkName = messagetypemanager.getCrosswalkName(translation.getCrosswalkId());
+                crosswalkName = messagetypemanager.getCrosswalkName(translation.getCrosswalkId());
                 translation.setcrosswalkName(crosswalkName);
                 
                 //Get the macro name by id
                 Macros macroDetails = configurationmanager.getMacroById(translation.getMacroId());
-                String macroName = macroDetails.getmacroShortName();
+                macroName = macroDetails.getmacroShortName();
                 if(macroName.contains("DATE")) {
                     macroName = macroDetails.getmacroShortName() + " " + macroDetails.getdateDisplay();
                 }

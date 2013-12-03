@@ -369,12 +369,13 @@ public class adminOrgContoller {
         mav.addObject("configs", configurations);
         
         messageType messagetype;
+        Long totalConnections;
         
         for (configuration config : configurations) {
             messagetype = messagetypemanager.getMessageTypeById(config.getMessageTypeId());
             config.setMessageTypeName(messagetype.getName());
 
-            Long totalConnections = (Long) configurationmanager.getTotalConnections(config.getId());
+            totalConnections = (Long) configurationmanager.getTotalConnections(config.getId());
             config.setTotalConnections(totalConnections);
         }
 
@@ -407,12 +408,13 @@ public class adminOrgContoller {
         mav.addObject("configs", configurations);
         
         messageType messagetype;
+        Long totalConnections;
 
         for (configuration config : configurations) {
             messagetype = messagetypemanager.getMessageTypeById(config.getMessageTypeId());
             config.setMessageTypeName(messagetype.getName());
 
-            Long totalConnections = (Long) configurationmanager.getTotalConnections(config.getId());
+            totalConnections = (Long) configurationmanager.getTotalConnections(config.getId());
             config.setTotalConnections(totalConnections);
         }
 

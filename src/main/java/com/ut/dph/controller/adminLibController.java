@@ -479,14 +479,17 @@ public class adminLibController {
         if (reload == false) {
             //Need to get a list of existing translations
             List<messageTypeDataTranslations> existingTranslations = messagetypemanager.getMessageTypeTranslations(messageTypeId);
-
+            
+            String fieldName;
+            String crosswalkName;
+            
             for (messageTypeDataTranslations translation : existingTranslations) {
                 //Get the field name by id
-                String fieldName = messagetypemanager.getFieldName(translation.getFieldId());
+                 fieldName = messagetypemanager.getFieldName(translation.getFieldId());
                 translation.setfieldName(fieldName);
 
                 //Get the crosswalk name by id
-                String crosswalkName = messagetypemanager.getCrosswalkName(translation.getCrosswalkId());
+                crosswalkName = messagetypemanager.getCrosswalkName(translation.getCrosswalkId());
                 translation.setcrosswalkName(crosswalkName);
 
                 translations.add(translation);
