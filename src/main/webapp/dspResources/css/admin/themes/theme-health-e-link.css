@@ -133,6 +133,9 @@ h3 {
 .primary-nav .navbar-nav li:last-child > a {
   border-right: 0;
 }
+.icon-bar {
+  background-color: #ffffff;
+}
 .navbar-brand,
 .navbar-brand:hover {
   color: #ffffff;
