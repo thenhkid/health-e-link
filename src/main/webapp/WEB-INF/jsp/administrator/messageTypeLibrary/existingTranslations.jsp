@@ -39,7 +39,7 @@
                     </tr>
                 </c:forEach>
             </c:when>
-            <c:otherwise><tr><td scope="row" colspan="4" style="text-align:center">No Existing Translations Found</td></c:otherwise>
+            <c:otherwise><tr><td scope="row" colspan="4" style="text-align:center">No Existing Field Specs Found</td></c:otherwise>
             </c:choose>
     </tbody>
 </table>

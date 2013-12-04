@@ -9,7 +9,7 @@
         <c:choose>
             <c:when test="${not empty savedStatus}" >
                 <c:choose>
-                    <c:when test="${savedStatus == 'updated'}"><div class="alert alert-success"><strong>Success!</strong> The message type data translations have been successfully updated!</div></c:when>
+                    <c:when test="${savedStatus == 'updated'}"><div class="alert alert-success"><strong>Success!</strong> The message type field specs have been successfully updated!</div></c:when>
                     <c:when test="${savedStatus == 'created'}"><div class="alert alert-success"><strong>Success!</strong> The crosswalk has been successfully created!</div></c:when>
                     <c:when test="${savedStatus == 'error'}"><div class="alert alert-danger"><strong>Error!</strong> The uploaded crosswalk did not have the correct delimiter!</div></c:when>
                 </c:choose>
@@ -18,7 +18,7 @@
                 <div class="alert alert-success">
                     <strong>Success!</strong> 
                     <c:choose>
-                        <c:when test="${param.msg == 'updated'}">The data translations have been successfully updated!</c:when>
+                        <c:when test="${param.msg == 'updated'}">The field specs have been successfully updated!</c:when>
                         <c:when test="${param.msg == 'created'}">The crosswalk has been successfully added!</c:when>
                     </c:choose>
                 </div>
@@ -30,7 +30,7 @@
 
         <section class="panel panel-default">
             <div class="panel-heading">
-                <h3 class="panel-title">New Data Translation</h3>
+                <h3 class="panel-title">New Field Spec</h3>
             </div>
             <div class="panel-body">
                 <div class="form-container">
@@ -99,11 +99,11 @@
     <div class="col-md-12">
         <section class="panel panel-default">
             <div class="panel-heading">
-                <h3 class="panel-title">Existing Data Translations</h3>
+                <h3 class="panel-title">Existing Field Specs</h3>
             </div>
             <div class="panel-body">
                 <div id="translationMsgDiv"  rel="${id}" class="alert alert-danger" style="display:none;">
-                    <strong>You must click SAVE above to submit the data translations listed below!</strong>
+                    <strong>You must click SAVE above to submit the field specs listed below!</strong>
                 </div>
                 <div class="form-container scrollable" id="existingTranslations"></div>
             </div>

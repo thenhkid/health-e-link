@@ -10,9 +10,17 @@
             <div class="alert alert-success">
                 <strong>Success!</strong> 
                 <c:choose><c:when test="${savedStatus == 'updated'}">The configuration transport details have been successfully updated!</c:when></c:choose>
-                    </div>
+            </div>
         </c:if>
-
+        <section class="panel panel-default">
+            <div class="panel-body">
+                <dt>
+                    <dt>Configuration Summary:</dt>
+                    <dd><strong>Organization:</strong> ${configurationDetails.orgName}</dd>
+                    <dd><strong>Message Type:</strong> ${configurationDetails.messageTypeName}</dd>
+                </dt>
+            </div>
+        </section>
         <div class="row-fluid">
             <div class="col-md-4">
                 <section class="panel panel-default">

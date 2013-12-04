@@ -73,13 +73,13 @@
                     </table>
                     <ul class="pagination pull-right" role="navigation" aria-labelledby="Paging ">
                         <c:if test="${currentPage > 1}"><li><a href="?page=${currentPage-1}">&laquo;</a></li></c:if>
-                            <c:forEach var="i" begin="1" end="${totalPages}">
+                         <c:forEach var="i" begin="1" end="${totalPages}">
                             <li><a href="?page=${i}">${i}</a></li>
-                            </c:forEach>
-                            <c:if test="${currentPage < totalPages}"><li><a href="?page=${currentPage+1}">&raquo;</a></li></c:if>
+                         </c:forEach>
+                        <c:if test="${currentPage < totalPages}"><li><a href="?page=${currentPage+1}">&raquo;</a></li></c:if>
                     </ul>
                 </div>
             </div>
         </section>
     </div>		
-</div>	
+</div>

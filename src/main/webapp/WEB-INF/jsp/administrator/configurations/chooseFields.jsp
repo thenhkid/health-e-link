@@ -39,6 +39,15 @@
                 <strong>You must click SAVE above to submit the mapping changes!</strong>
             </div>
             <section class="panel panel-default">
+                <div class="panel-body">
+                    <dt>
+                        <dt>Configuration Summary:</dt>
+                        <dd><strong>Organization:</strong> ${configurationDetails.orgName}</dd>
+                        <dd><strong>Message Type:</strong> ${configurationDetails.messageTypeName}</dd>
+                    </dt>
+                </div>
+            </section>
+            <section class="panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">Choose a Transport Method</h3>
                 </div>

@@ -12,7 +12,7 @@
                 <c:choose><c:when test="${savedStatus == 'updated'}">The configuration has been successfully updated!</c:when><c:otherwise>The configuration has been successfully created!</c:otherwise></c:choose>
                     </div>
         </c:if>
-
+        
         <form:form id="configuration" commandName="configurationDetails" modelAttribute="configurationDetails" method="post" enctype="multipart/form-data" role="form">
             <input type="hidden" id="action" name="action" value="save" />
             <form:hidden path="id" id="id" />

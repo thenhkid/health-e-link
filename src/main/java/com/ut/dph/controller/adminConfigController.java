@@ -365,6 +365,9 @@ public class adminConfigController {
         configuration configurationDetails = configurationmanager.getConfigurationById(configId);
         configurationDetails.setTransportDetails(transportDetails);
 
+        configurationDetails.setOrgName(organizationmanager.getOrganizationById(configurationDetails.getorgId()).getOrgName());
+        configurationDetails.setMessageTypeName(messagetypemanager.getMessageTypeById(configurationDetails.getMessageTypeId()).getName());
+        
         //pass the configuration detail object back to the page.
         mav.addObject("configurationDetails", configurationDetails);
 
@@ -469,6 +472,13 @@ public class adminConfigController {
 
         //Get the completed steps for the selected configuration;
         configuration configurationDetails = configurationmanager.getConfigurationById(configId);
+        
+        configurationDetails.setOrgName(organizationmanager.getOrganizationById(configurationDetails.getorgId()).getOrgName());
+        configurationDetails.setMessageTypeName(messagetypemanager.getMessageTypeById(configurationDetails.getMessageTypeId()).getName());
+        
+        //pass the configuration detail object back to the page.
+        mav.addObject("configurationDetails", configurationDetails);
+        
         mav.addObject("completedSteps", configurationDetails.getstepsCompleted());
 
         //Get a list of all transport details
@@ -581,11 +591,18 @@ public class adminConfigController {
 
         //Get the completed steps for the selected configuration;
         configuration configurationDetails = configurationmanager.getConfigurationById(configId);
-
+       
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/configurations/translations");
         mav.addObject("id", configId);
         mav.addObject("completedSteps", configurationDetails.getstepsCompleted());
+        
+        configurationDetails.setOrgName(organizationmanager.getOrganizationById(configurationDetails.getorgId()).getOrgName());
+        configurationDetails.setMessageTypeName(messagetypemanager.getMessageTypeById(configurationDetails.getMessageTypeId()).getName());
+        
+        //pass the configuration detail object back to the page.
+        mav.addObject("configurationDetails", configurationDetails);
+
 
         //Get a list of all transport details
         List<configurationTransport> allTransportDetails = configurationTransportManager.getTransportDetails(configId);
@@ -855,11 +872,17 @@ public class adminConfigController {
 
         //Get the completed steps for the selected configuration;
         configuration configurationDetails = configurationmanager.getConfigurationById(configId);
-
+        
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/configurations/connections");
         mav.addObject("id", configId);
         mav.addObject("completedSteps", configurationDetails.getstepsCompleted());
+        
+        configurationDetails.setOrgName(organizationmanager.getOrganizationById(configurationDetails.getorgId()).getOrgName());
+        configurationDetails.setMessageTypeName(messagetypemanager.getMessageTypeById(configurationDetails.getMessageTypeId()).getName());
+        
+        //pass the configuration detail object back to the page.
+        mav.addObject("configurationDetails", configurationDetails);
 
         //Return a list of all active organizations
         List<Organization> organizations = organizationmanager.getAllActiveOrganizations();
@@ -867,7 +890,6 @@ public class adminConfigController {
 
         //Return a list of associated connections
         List<Connections> connections = configurationmanager.getConnections(configId);
-        
 
         //Set a list of organizations already used
         List<Integer> usedOrgs = new ArrayList<Integer>();
@@ -956,6 +978,12 @@ public class adminConfigController {
         mav.setViewName("/administrator/configurations/schedule");
         mav.addObject("id", configId);
         mav.addObject("completedSteps", configurationDetails.getstepsCompleted());
+        
+        configurationDetails.setOrgName(organizationmanager.getOrganizationById(configurationDetails.getorgId()).getOrgName());
+        configurationDetails.setMessageTypeName(messagetypemanager.getMessageTypeById(configurationDetails.getMessageTypeId()).getName());
+        
+        //pass the configuration detail object back to the page.
+        mav.addObject("configurationDetails", configurationDetails);
         
         //Get the schedule for the configuration and selected transport method
         configurationSchedules scheduleDetails = configurationmanager.getScheduleDetails(configId, selTransportMethod);
