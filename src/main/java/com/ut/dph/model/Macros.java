@@ -138,6 +138,94 @@ public class Macros {
 
     public void setcon2Question(String con2Question) {
         this.con2Question = con2Question;
-    } 
+    }
+
+	public String getCategory() {
+		return category;
+	}
+
+	public void setCategory(String category) {
+		this.category = category;
+	}
+
+	public String getMacroName() {
+		return macroName;
+	}
+
+	public void setMacroName(String macroName) {
+		this.macroName = macroName;
+	}
+
+	public String getMacroShortName() {
+		return macroShortName;
+	}
+
+	public void setMacroShortName(String macroShortName) {
+		this.macroShortName = macroShortName;
+	}
+
+	public int getRefNumber() {
+		return refNumber;
+	}
+
+	public void setRefNumber(int refNumber) {
+		this.refNumber = refNumber;
+	}
+
+	public String getDateDisplay() {
+		return dateDisplay;
+	}
+
+	public void setDateDisplay(String dateDisplay) {
+		this.dateDisplay = dateDisplay;
+	}
+
+	public String getFormula() {
+		return formula;
+	}
+
+	public void setFormula(String formula) {
+		this.formula = formula;
+	}
+
+	public String getInvalidWhen() {
+		return invalidWhen;
+	}
+
+	public void setInvalidWhen(String invalidWhen) {
+		this.invalidWhen = invalidWhen;
+	}
+
+	public String getFieldAQuestion() {
+		return fieldAQuestion;
+	}
+
+	public void setFieldAQuestion(String fieldAQuestion) {
+		this.fieldAQuestion = fieldAQuestion;
+	}
+
+	public String getFieldBQuestion() {
+		return fieldBQuestion;
+	}
+
+	public void setFieldBQuestion(String fieldBQuestion) {
+		this.fieldBQuestion = fieldBQuestion;
+	}
+
+	public String getCon1Question() {
+		return con1Question;
+	}
+
+	public void setCon1Question(String con1Question) {
+		this.con1Question = con1Question;
+	}
+
+	public String getCon2Question() {
+		return con2Question;
+	}
+
+	public void setCon2Question(String con2Question) {
+		this.con2Question = con2Question;
+	} 
 
 }
