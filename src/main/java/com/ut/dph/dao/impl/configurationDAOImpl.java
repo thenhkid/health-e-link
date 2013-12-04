@@ -248,7 +248,7 @@ public class configurationDAOImpl implements configurationDAO {
      */
     @Override
     public Long findTotalConfigs() {
-        Query query = sessionFactory.getCurrentSession().createQuery("select count(*) as totalConfigs from configuration where status = 1");
+        Query query = sessionFactory.getCurrentSession().createQuery("select count(*) as totalConfigs from configuration");
 
         Long totalConfigs = (Long) query.uniqueResult();
 

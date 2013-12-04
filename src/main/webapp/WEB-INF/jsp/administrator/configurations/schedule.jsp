@@ -69,19 +69,19 @@
                             <label for="status">Process Configuration</label>
                             <div>
                                 <label class="radio-inline">
-                                    <input type="radio" class="processMethod" name="processMethod" value="1" <c:if test="${type == 1}">checked="checked"</c:if> <c:if test="${selTransportMethod == 2}">disabled="true"</c:if> /> Manual 
+                                    <input type="radio" class="processMethod" name="processMethod" value="1" <c:if test="${scheduleDetails.type == 1}">checked="checked"</c:if> <c:if test="${(configurationDetails.type == 1 && selTransportMethod != 3)}">disabled="true"</c:if> /> Manual 
                                 </label>
                                 <label class="radio-inline">
-                                    <input type="radio" class="processMethod" name="processMethod" value="2" <c:if test="${type == 2}">checked="checked"</c:if> <c:if test="${selTransportMethod == 2}">disabled="true"</c:if> /> Daily 
+                                    <input type="radio" class="processMethod" name="processMethod" value="2" <c:if test="${scheduleDetails.type == 2}">checked="checked"</c:if> <c:if test="${(configurationDetails.type == 1 && selTransportMethod != 3)}">disabled="true"</c:if> /> Daily 
                                 </label>
                                 <label class="radio-inline">
-                                    <input type="radio" class="processMethod" name="processMethod" value="3" <c:if test="${type == 3}">checked="checked"</c:if> <c:if test="${selTransportMethod == 2}">disabled="true"</c:if> /> Weekly 
+                                    <input type="radio" class="processMethod" name="processMethod" value="3" <c:if test="${scheduleDetails.type == 3}">checked="checked"</c:if> <c:if test="${(configurationDetails.type == 1 && selTransportMethod != 3)}">disabled="true"</c:if> /> Weekly 
                                 </label>
                                 <label class="radio-inline">
-                                    <input type="radio" class="processMethod" name="processMethod" value="4" <c:if test="${type == 4}">checked="checked"</c:if> <c:if test="${selTransportMethod == 2}">disabled="true"</c:if> /> Monthly 
+                                    <input type="radio" class="processMethod" name="processMethod" value="4" <c:if test="${scheduleDetails.type == 4}">checked="checked"</c:if> <c:if test="${(configurationDetails.type == 1 && selTransportMethod != 3)}">disabled="true"</c:if> /> Monthly 
                                 </label>
                                 <label class="radio-inline">
-                                    <input type="radio" class="processMethod" name="processMethod" value="5" <c:if test="${type == 5}">checked="checked"</c:if> /> Never 
+                                    <input type="radio" class="processMethod" name="processMethod" value="5" <c:if test="${scheduleDetails.type == 5}">checked="checked"</c:if> /> Automatically 
                                 </label>
                             </div>
                         </div>

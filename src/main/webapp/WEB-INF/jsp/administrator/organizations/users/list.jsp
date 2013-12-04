@@ -52,7 +52,7 @@
                                 <c:when test="${not empty userList}">
                                     <c:forEach var="user" items="${userList}">
                                         <tr id="userRow">
-                                            <td scope="row"><a href="#systemUsersModal" data-toggle="modal" rel="${user.firstName}${user.lastName}?i=${user.id}" class="userEdit" title="Edit this user">${user.firstName} ${user.lastName}</a><br />(<c:choose><c:when test="${user.status == true}">active</c:when><c:otherwise>inactive</c:otherwise></c:choose>)</td>
+                                            <td scope="row"><a href="#systemUsersModal" data-toggle="modal" rel="${user.firstName}${user.lastName}?i=${user.id}" class="userEdit" title="Edit this user">${user.firstName}&nbsp;${user.lastName}</a><br />(<c:choose><c:when test="${user.status == true}">active</c:when><c:otherwise>inactive</c:otherwise></c:choose>)</td>
                                             <td class="center-text"><fmt:formatDate value="${user.dateCreated}" type="date" pattern="M/dd/yyyy" /></td>
                                             <td class="center-text">
                                                 <c:if test="${user.mainContact == 1}">X</c:if><c:if test="${user.mainContact != 1}">--</c:if>

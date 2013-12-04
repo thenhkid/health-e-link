@@ -62,7 +62,7 @@ public class adminConfigController {
     /**
      * The private maxResults variable will hold the number of results to show per list page.
      */
-    private static final int maxResults = 20;
+    private static int maxResults = 20;
 
     private static List<configurationDataTranslations> translations = null;
 
@@ -107,7 +107,7 @@ public class adminConfigController {
         //Return the total list of configurations
         Long totalConfigs = configurationmanager.findTotalConfigs();
 
-        Integer totalPages = (int)Math.ceil((double)totalConfigs / maxResults);
+        Integer totalPages = (int) Math.ceil((double)totalConfigs / maxResults);
         mav.addObject("totalPages", totalPages);
         mav.addObject("currentPage", page);
         return mav;
@@ -992,7 +992,7 @@ public class adminConfigController {
             configurationSchedules emptySchedule = new configurationSchedules();
             emptySchedule.setconfigId(configId);
             emptySchedule.settransportMethod(selTransportMethod);
-            emptySchedule.settype(1);
+            emptySchedule.settype(5);
             
             //set the selected type
             mav.addObject("type", "1");
