@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.ut.dph.model.custom.LookUpTable;
 import com.ut.dph.model.custom.TableData;
-
+import com.ut.dph.model.Macros;
 
 /** 
  * 1. sysAdminManager should handle the adding, deleting and modifying lu_ table items
@@ -39,6 +39,20 @@ public interface sysAdminManager {
 	Integer createTableData (TableData tableData, String utTableName);
 	void createTableDataHibernate (TableData tableData, String utTableName);
 	boolean updateTableData (TableData tableData, String utTableName);
+	
+	List <Macros> getMarcoList(int maxResults, int page, String searchTerm);
+	
+	Long findTotalMacroRows();
+	
+	String addWildCardSearch(String searchTerm);
+	
+	String addWildCardLUSearch(String searchTerm);
+	
+	boolean deleteMacro (int id);
+	
+	void createMacro (Macros macro);
+	
+	
 	
 }
 

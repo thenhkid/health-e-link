@@ -9,11 +9,7 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.ut.dph.service.sysAdminManager;
-import com.ut.dph.model.Organization;
-import com.ut.dph.model.User;
-import com.ut.dph.model.configuration;
-import com.ut.dph.model.messageType;
-import com.ut.dph.model.siteSections;
+import com.ut.dph.model.Macros;
 import com.ut.dph.model.custom.LookUpTable;
 import com.ut.dph.model.custom.TableData;
 
@@ -35,21 +31,18 @@ public class adminSysAdminController {
 	
 	@Autowired 
 	private sysAdminManager sysAdminManager;
-	
+
 	/**
 	 * The private maxResults variable will hold the number of results to show per
 	 * list page.
 	 */
 	private static int maxResults = 20;
-	
-    /**
-     * The '/administrator' request will serve up the administrator dashboard after a successful login.
-     *
-     * @param request
-     * @param response
-     * @return	the administrator dashboard view
-     * @throws Exception
-     */
+	private static int nonPagingMax = 999999;
+	private static int startPage = 1;
+
+	/**
+	 * This shows a dashboard with info for sysadmin components.
+	 * **/
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public ModelAndView dashboard(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
@@ -57,6 +50,7 @@ public class adminSysAdminController {
         mav.setViewName("/administrator/sysadmin/dashboard");
         return mav;
     }
+    
 	/**
 	 *  The '/list' GET request will serve up the existing list of lu_ tables in the system
 	 *  
@@ -72,7 +66,7 @@ public class adminSysAdminController {
 	public ModelAndView listLookUpTables(@RequestParam(value="page", required=false) Integer page) throws Exception {
 		
 		if(page == null){
-	        page = 1;
+	        page = startPage;
 	    }
  
 		ModelAndView mav = new ModelAndView();
@@ -81,12 +75,12 @@ public class adminSysAdminController {
         /**
          * we query list of tables for display
          **/
-         List <LookUpTable> tableList = sysAdminManager.getTableList(maxResults, page, "");
+         List <LookUpTable> tableList = sysAdminManager.getTableList(maxResults, page, "%");
         mav.addObject("tableList", tableList);
        
         //Return the total list of look up table
         int totalLookUpTables = sysAdminManager.findTotalLookUpTable();
-        int totalPages = Math.round(totalLookUpTables/maxResults);
+        double totalPages = Math.ceil((float)totalLookUpTables/maxResults);
         mav.addObject("totalPages",totalPages);
         mav.addObject("currentPage",page);
        
@@ -108,16 +102,13 @@ public class adminSysAdminController {
 	 * @throws Exception
 	 */
 	@RequestMapping(value="/data", method = RequestMethod.POST)
-	public ModelAndView searchForLookUpTable(@RequestParam String searchTerm, @RequestParam(value="page", required=false) Integer page) 
+	public ModelAndView searchForLookUpTable(@RequestParam String searchTerm) 
 			throws Exception {
 		
-		if(page == null){
-	        page = 1;
-	    }
 		
 		ModelAndView mav = new ModelAndView();
 		 mav.setViewName("/administrator/sysadmin/data/tableList");
-        List<LookUpTable> tableList = sysAdminManager.getTableList(maxResults, page, searchTerm);
+        List<LookUpTable> tableList = sysAdminManager.getTableList(nonPagingMax, 1, searchTerm);
         mav.addObject("searchTerm",searchTerm);
         mav.addObject("tableList", tableList);		
         return mav;
@@ -125,7 +116,7 @@ public class adminSysAdminController {
 	}
 
 	/**
-	 *  The '/data/std/{urlId}' GET request will serve up the date for a look up table
+	 *  The '/data/std/{urlId}' GET request will serve up the data for a standardize look up table
 	 *  
 	 * @param page			The page parameter will hold the page to view when pagination 
 	 * 						is built.
@@ -144,7 +135,7 @@ public class adminSysAdminController {
 	public ModelAndView listTableData(@RequestParam(value="page", required=false) Integer page,  @PathVariable String urlId) throws Exception {
 		
 		if(page == null){
-	        page = 1;
+	        page = startPage;
 	    }
  
 		ModelAndView mav = new ModelAndView();
@@ -159,7 +150,7 @@ public class adminSysAdminController {
          mav.addObject("tableInfo", tableInfo);
                
         int totalDataRows = sysAdminManager.findTotalDataRows(tableInfo.getUtTableName());
-        int totalPages = Math.round(totalDataRows/maxResults);
+        double totalPages = Math.ceil((float)totalDataRows/maxResults);
         mav.addObject("totalPages",totalPages);
         mav.addObject("currentPage",page);
      
@@ -184,12 +175,8 @@ public class adminSysAdminController {
 	 * @throws Exception
 	 */
 	@RequestMapping(value="/data/std/{urlId}", method = RequestMethod.POST)
-	public ModelAndView listSearchDataInTable(@RequestParam String searchTerm,@RequestParam(value="page", required=false) Integer page,  @PathVariable String urlId) throws Exception {
+	public ModelAndView listSearchDataInTable(@RequestParam String searchTerm,  @PathVariable String urlId) throws Exception {
 		
-		if(page == null){
-	        page = 1;
-	    }
- 
 		ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/sysadmin/data/std");
         
@@ -197,15 +184,11 @@ public class adminSysAdminController {
          * we query data for look up table, this view returns all data from table, hence the search term will be %
          **/
          LookUpTable tableInfo = sysAdminManager.getTableInfo(urlId);
-         List <TableData> dataList = sysAdminManager.getDataList(maxResults, page, tableInfo.getUtTableName(), searchTerm);
+         List <TableData> dataList = sysAdminManager.getDataList(nonPagingMax, startPage, tableInfo.getUtTableName(), searchTerm);
          mav.addObject("dataList", dataList);
          mav.addObject("tableInfo", tableInfo);
-               
-        int totalDataRows = sysAdminManager.findTotalDataRows(tableInfo.getUtTableName());
-        int totalPages = Math.round(totalDataRows/maxResults);
-        mav.addObject("totalPages",totalPages);
-        mav.addObject("currentPage",page);
-     
+         mav.addObject("searchTerm",searchTerm);
+       
         return mav;
  
 	}
@@ -278,11 +261,9 @@ public class adminSysAdminController {
 	 * @throws Exception
 	 */
 	@RequestMapping(value="/data/std/create", method = RequestMethod.POST)
-	
 	public ModelAndView createTableData(
 			@Valid @ModelAttribute(value="tableDataDetails") TableData tableData, 
-			BindingResult result, RedirectAttributes redirectAttr
-			) throws Exception {
+			BindingResult result) throws Exception {
 		
 		LookUpTable tableInfo = sysAdminManager.getTableInfo(tableData.getUrlId());
 		
@@ -308,7 +289,8 @@ public class adminSysAdminController {
 	 *  
 	 */
 	@RequestMapping(value="/data/std/{urlId}/tableData", method = RequestMethod.GET)
-	public ModelAndView viewTableData(@PathVariable String urlId, @RequestParam(value="i", required=false) Integer i) throws Exception {
+	public ModelAndView viewTableData(@PathVariable String urlId, 
+			@RequestParam(value="i", required=false) Integer i) throws Exception {
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("/administrator/sysadmin/data/std/details");	
 		
@@ -322,14 +304,13 @@ public class adminSysAdminController {
 	}
 	
 	/**
-	 * The '/data/std/{urlId}/tableData?i=' GET request will be used to create a
-	 * new data for selected table
+	 * The '/data/std/update' POST request will be used to update a look up data item
 	 * 
 	 */
 	@RequestMapping(value = "/data/std/update", method = RequestMethod.POST)
 	public ModelAndView updateTableData(
 			@Valid @ModelAttribute(value = "tableDataDetails") TableData tableData,
-			BindingResult result, RedirectAttributes redirectAttr)
+			BindingResult result)
 			throws Exception {
 
 		ModelAndView mav = new ModelAndView();
@@ -355,6 +336,99 @@ public class adminSysAdminController {
 		mav.addObject("btnValue", "Update");
 		return mav;
 	}
+
+	@RequestMapping(value="/macros", method = RequestMethod.GET)
+	public ModelAndView listMacros(@RequestParam(value="page", required=false) Integer page) throws Exception {
+		
+		if(page == null){
+	        page = 1;
+	    }
+ 
+		ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/sysadmin/macros");
+        
+      //Return a list of available macros
+        List<Macros> macroList = sysAdminManager.getMarcoList(maxResults, page, "%");
+        mav.addObject("macroList", macroList);   
+        
+        /**need to handle paging**/
+        Long totalMacroRows = sysAdminManager.findTotalMacroRows();
+        double totalPages = Math.ceil((float)totalMacroRows/maxResults);
+        mav.addObject("totalPages",totalPages);
+        mav.addObject("currentPage",page);
+     
+        return mav;
+ 
+	}
 	
+	@RequestMapping(value="/macros", method = RequestMethod.POST)
+	public ModelAndView listMacrosSearch(@RequestParam String searchTerm) throws Exception {
+		
+		ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/sysadmin/macros");
+      //Return a list of available macros
+        List<Macros> macroList = sysAdminManager.getMarcoList(999999, startPage, searchTerm);
+        mav.addObject("macroList", macroList);  
+        mav.addObject("searchTerm",searchTerm);
+        return mav;
+ 
+	}
+
+	@RequestMapping(value="/macros/delete", method = RequestMethod.GET)
+	public ModelAndView deleteMacro(@RequestParam(value="i", required=true) int macroId, 
+	RedirectAttributes redirectAttr) throws Exception {
+		
+	
+        boolean suceeded = sysAdminManager.deleteMacro(macroId);
+        String returnMessage = "deleted";
+        
+        if (!suceeded) {
+        	returnMessage = "notDeleted";
+        }
+        //This variable will be used to display the message on the details form
+		redirectAttr.addFlashAttribute("savedStatus", returnMessage);	
+		
+		ModelAndView mav = new ModelAndView(new RedirectView("../macros"));
+		return mav;	
+	}
+	
+	
+	/**
+	 *  The '/{urlId}/data.create' GET request will be used to create a new data for selected table
+	 *  
+	 */
+	@RequestMapping(value="/macros/create", method = RequestMethod.GET)
+	public ModelAndView newMacroForm() throws Exception {
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/sysadmin/macro/details");	
+		
+		//create a macro
+		Macros macro = new Macros();
+		macro.setId(0);
+		mav.addObject("macroDetails",macro);
+		mav.addObject("btnValue", "Create");
+		return mav;
+	}
+	
+	
+	@RequestMapping(value="/macros/create", method = RequestMethod.POST)
+	public ModelAndView createMacro(
+			@Valid @ModelAttribute(value="macroDetails") Macros macroDetails, 
+			BindingResult result) throws Exception {
+		
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/sysadmin/macro/details");	
+		/** check for error **/
+		if(result.hasErrors()) {
+			mav.addObject("macroDetails",macroDetails);
+			mav.addObject("btnValue", "Create");
+			return mav;
+		}	
+		//now we save
+		sysAdminManager.createMacro(macroDetails);
+		mav.addObject("success", "dataCreated");
+		mav.addObject("btnValue", "Update");
+		return mav;
+	}
 }
 

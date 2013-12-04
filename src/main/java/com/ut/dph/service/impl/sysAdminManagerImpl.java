@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.ut.dph.dao.sysAdminDAO;
 import com.ut.dph.model.custom.LookUpTable;
 import com.ut.dph.model.custom.TableData;
+import com.ut.dph.model.Macros;
 import com.ut.dph.service.sysAdminManager;
 
 @Service
@@ -28,7 +29,7 @@ public class sysAdminManagerImpl implements sysAdminManager {
 	@Override
 	public List<LookUpTable> getTableList(int maxResults, int page, String searchTerm) {
 		/** this calls DAO to get a list of tables**/ 
-		return sysAdminDAO.getLookUpTables(page, maxResults, searchTerm);
+		return sysAdminDAO.getLookUpTables(page, maxResults, addWildCardSearch(searchTerm));
 	}
 
 	@Override
@@ -39,7 +40,7 @@ public class sysAdminManagerImpl implements sysAdminManager {
 
 	@Override
 	public List<TableData> getDataList(int maxResults, int page, String utTableName, String searchTerm) {
-		return sysAdminDAO.getDataList(page, maxResults, utTableName, searchTerm);
+		return sysAdminDAO.getDataList(page, maxResults, utTableName, addWildCardSearch(searchTerm));
 	}
 
 	@Override
@@ -76,6 +77,56 @@ public class sysAdminManagerImpl implements sysAdminManager {
 	@Override
 	public void createTableDataHibernate(TableData tableData, String utTableName) {
 		sysAdminDAO.createTableDataHibernate (tableData, utTableName);
+	}
+
+	@Override
+	public List<Macros> getMarcoList(int maxResults, int page, String searchTerm) {
+		return sysAdminDAO.getMarcoList(maxResults, page, addWildCardSearch(searchTerm));
+	}
+
+	@Override
+	public Long findTotalMacroRows() {
+		return sysAdminDAO.findTotalMacroRows();
+	}
+
+	@Override
+	public String addWildCardSearch(String searchTerm) {
+		
+		if (!searchTerm.startsWith("%")) {
+			searchTerm = "%" + searchTerm ;
+		}
+		if (!searchTerm.endsWith("%")) {
+			searchTerm =  searchTerm + "%";
+		}
+		
+		return searchTerm;
+	}
+
+	@Override
+	public String addWildCardLUSearch(String searchTerm) {
+		/**
+		 * all look up tables must begin with lu_
+		 * **/
+		if (searchTerm.toLowerCase().startsWith("%")) {
+			searchTerm = "lu_" + searchTerm;
+		} else if (!searchTerm.toLowerCase().startsWith("lu_")) {
+			searchTerm = "lu_%" + searchTerm;
+		}
+		if (!searchTerm.endsWith("%")) {
+			searchTerm = searchTerm+ "%";
+		}
+		return searchTerm;
+	}
+
+	@Override
+	public boolean deleteMacro(int id) {
+		return sysAdminDAO.deleteMacro (id);
+	}
+
+	@Override
+	public void createMacro(Macros macro) {
+		sysAdminDAO.createMacro(macro);
+		
 	}
 
 

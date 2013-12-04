@@ -4,16 +4,10 @@ import java.util.List;
 
 import com.ut.dph.model.custom.LookUpTable;
 import com.ut.dph.model.custom.TableData;
-
+import com.ut.dph.model.Macros;
 
 public interface sysAdminDAO {
 	
-	/**
-	 * @param page
-	 * @param maxResults
-	 * @param searchTerm
-	 * @return
-	 */
 	List <LookUpTable> getLookUpTables(int page, int maxResults, String searchTerm);
 	
 	Integer findTotalLookUpTable();
@@ -33,5 +27,13 @@ public interface sysAdminDAO {
 	void createTableDataHibernate (TableData tableData, String utTableName);
 	
 	boolean updateTableData (TableData tableData, String utTableName);
-
+	
+	List <Macros> getMarcoList(int maxResults, int page, String searchTerm);
+	
+	Long findTotalMacroRows();
+	
+	boolean deleteMacro (int id);
+	
+	void createMacro(Macros macro);
+	
 }

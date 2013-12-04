@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ut.dph.dao.sysAdminDAO;
 import com.ut.dph.dao.UtilitiesDAO;
+import com.ut.dph.model.Macros;
 import com.ut.dph.model.custom.LookUpTable;
 import com.ut.dph.model.custom.TableData;
 
@@ -29,39 +30,17 @@ public class sysAdminDAOImpl implements sysAdminDAO {
 
 	@Autowired
 	private UtilitiesDAO udao;
-
 	
 	@Autowired
 	private SessionFactory sessionFactory;
 
 	private String schemaName = "universalTranslator";
 
-	// JDBC driver name and database URL
-	
-	static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";  
-	/*
-	static final String DB_URL = "jdbc:mysql://localhost:3306/universalTranslator";
-
-	//  Database credentials
-    static final String USER = "root";
-	static final String PASS = "UTCloud!";
-	*/
-	
 	/** this gets a list of Lookup tables **/
 	@Override
 	@Transactional
 	@SuppressWarnings("unchecked")
-	public List<LookUpTable> getLookUpTables(int page, int maxResults,
-			String searchTerm) {
-		/**
-		 * all look up tables must begin with lu_
-		 * **/
-		if (!searchTerm.toLowerCase().startsWith("lu_")) {
-			searchTerm = "lu_%" + searchTerm + "%";
-		} else {
-			searchTerm = searchTerm + '%';
-		}
-
+	public List<LookUpTable> getLookUpTables(int page, int maxResults, String searchTerm) {
 		Query query = sessionFactory
 				.getCurrentSession()
 				.createSQLQuery(
@@ -79,7 +58,7 @@ public class sysAdminDAOImpl implements sysAdminDAO {
 								+ "and lookUpTables.utTableName = infoc.TABLE_NAME "
 								+ "and infoc.TABLE_SCHEMA = infot.TABLE_SCHEMA "
 								+ "and infoc.TABLE_NAME = infot.TABLE_NAME "
-								+ "and infoc.TABLE_NAME like :searchTerm "
+								+ "and displayText like :searchTerm "
 								+ "group by infoc.TABLE_NAME order by infoc.TABLE_NAME")
 				.addScalar("displayName", StandardBasicTypes.STRING)
 				.addScalar("utTableName", StandardBasicTypes.STRING)
@@ -91,11 +70,23 @@ public class sysAdminDAOImpl implements sysAdminDAO {
 						Transformers.aliasToBean(LookUpTable.class))
 				.setParameter("schemaName", schemaName)
 				.setParameter("searchTerm", searchTerm);
-
-		List<LookUpTable> tableList = query.list();
-		// TODO
+		
+		//By default we want to return the first result
+	    int firstResult = 0;
+		
+		//If viewing a page other than the first we then need to figure out
+	    //which result to start with
+		if(page > 1) {
+			firstResult = (maxResults*(page-1));
+		}
+		
 		/** add codes for paging **/
-
+		query.setFirstResult(firstResult);
+		//Set the max results to display
+		query.setMaxResults(maxResults);
+		
+		List<LookUpTable> tableList = query.list();
+		
 		return tableList;
 
 	}
@@ -124,7 +115,6 @@ public class sysAdminDAOImpl implements sysAdminDAO {
 	@SuppressWarnings("unchecked")
 	public List<TableData> getDataList(int page, int maxResults, String utTableName, String searchTerm) {
 		
-		searchTerm = "%" + searchTerm + "%";
 		String sql = "select id, displayText, description, "
 				+ " isCustom as custom, status as status, dateCreated as dateCreated from "
 				+ utTableName +  " where (displayText like :searchTerm or description like :searchTerm) order by id";
@@ -137,6 +127,19 @@ public class sysAdminDAOImpl implements sysAdminDAO {
 		.addScalar("dateCreated",StandardBasicTypes.DATE)
 		.setResultTransformer(Transformers.aliasToBean(TableData.class))
 		.setParameter("searchTerm",searchTerm);
+		
+		//By default we want to return the first result
+	    int firstResult = 0;
+		
+		//If viewing a page other than the first we then need to figure out
+	    //which result to start with
+		if(page > 1) {
+			firstResult = (maxResults*(page-1));
+		}
+		/** add codes for paging **/
+		query.setFirstResult(firstResult);
+		//Set the max results to display
+		query.setMaxResults(maxResults);
 		
 		List<TableData> dataList = query.list();
 		// TODO
@@ -293,7 +296,6 @@ public class sysAdminDAOImpl implements sysAdminDAO {
 				+ "status = :status, "
 				+ "isCustom = :isCustom "
 				+ "where id = :id ";
-		System.out.println(sql);
 		Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
 				.addScalar("displayText",StandardBasicTypes.STRING)
 				.addScalar("description",StandardBasicTypes.STRING)
@@ -338,5 +340,66 @@ public class sysAdminDAOImpl implements sysAdminDAO {
 	            System.err.println("insert table data failed." + ex);
 			}
 		}
+
+		 @SuppressWarnings("unchecked")
+		 @Override
+		 @Transactional
+		public List<Macros> getMarcoList(int maxResults, int page, String searchTerm) {
+			 
+			Query query = sessionFactory.getCurrentSession().createQuery("from Macros where "
+					+ "macro_short_name like :searchTerm "
+					+ "order by category asc");
+			query.setParameter("searchTerm",searchTerm);
+			
+			//By default we want to return the first result
+		    int firstResult = 0;
+			
+			//If viewing a page other than the first we then need to figure out
+		    //which result to start with
+			if(page > 1) {
+				firstResult = (maxResults*(page-1));
+			}
+			/** codes for paging **/
+			query.setFirstResult(firstResult);
+			//Set the max results to display
+			query.setMaxResults(maxResults);
+			return query.list();
+		}
+
+		@Override
+		@Transactional
+		public Long findTotalMacroRows() {
+			Query query = sessionFactory.getCurrentSession().createQuery("select count(*) as totalMacros from Macros");
+			Long totalMacros = (Long) query.uniqueResult();
+			return totalMacros;
+		}
 	
+		/** this method deletes the macro in the table**/ 
+		@Override
+		@Transactional
+		public boolean deleteMacro(int id) {
+			Query deletMarco = sessionFactory.getCurrentSession().createQuery("delete from Macros where id = :macroId)");
+			deletMarco.setParameter("macroId", id);
+			deletMarco.executeUpdate();
+					try {
+						deletMarco.executeUpdate();
+						return true;
+					} catch (Throwable ex) {
+		                System.err.println("delete macro failed." + ex);
+		                return false;  	
+					}
+		}
+		
+		/** this method adds a macro**/ 
+		@Override
+		@Transactional
+		public void createMacro(Macros macro) {
+				try {
+						sessionFactory.getCurrentSession().save(macro);						
+					} catch (Throwable ex) {
+		                System.err.println("create macro failed." + ex);
+		             	
+					}
+		}
+		
 }

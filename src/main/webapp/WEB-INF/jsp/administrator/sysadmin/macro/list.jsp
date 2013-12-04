@@ -2,17 +2,16 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="s" uri="http://www.springframework.org/tags" %>
-
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
 <div class="main clearfix" role="main" rel="dataForTable">
     <div class="col-md-12">
 			<div class="alert alert-success">
-               <c:choose><c:when test="${param.msg == 'updated'}">The look up data has been successfully updated!</c:when><c:when test="${param.msg == 'created'}">The look up data has been successfully added!</c:when></c:choose>
+               <c:choose><c:when test="${param.msg == 'updated'}">The macro has been successfully updated!</c:when><c:when test="${param.msg == 'created'}">The macro has been successfully added!</c:when></c:choose>
             </div>
-       
         <section class="panel panel-default">
             <div class="panel-heading">
-                <h3 class="panel-title"><c:if test="${not empty tableInfo}">Data for "${tableInfo.displayName}" Table</c:if></h3>
+                <h3 class="panel-title">Macros</h3>
                 </div>
                 <div class="panel-body">
                     <div class="table-actions">
@@ -20,14 +19,14 @@
                         <form:form class="form form-inline" action="" method="post">
                             <div class="form-group">
                                 <label class="sr-only" for="searchTerm">Search</label>
-                                <input type="text" name="searchTerm" id="searchTerm" value="${searchTerm}" class="form-control" id="search-dataItems" placeholder="Search"/>
+                                <input type="text" name="searchTerm" id="searchTerm" value="${searchTerm}" class="form-control" id="search-marcos" placeholder="Search"/>
                             </div>
-                            <button id="searchdataItemBtn" class="btn btn-primary btn-sm">
+                            <button id="searchmarcoBtn" class="btn btn-primary btn-sm">
                                 <span class="glyphicon glyphicon-search"></span>
                             </button>
                         </form:form>
                     </div>
-                     <a href="#addLUDataModal" id="createNewdataItem" data-toggle="modal" class="btn btn-primary btn-sm pull-right" title="Add look up data">  
+                     <a href="#macroModal" id="createNewMacro" data-toggle="modal" class="btn btn-primary btn-sm pull-right" title="Create new macro">  
                         <span class="glyphicon glyphicon-plus"></span>
                     </a>
                 </div>
@@ -36,31 +35,47 @@
                     <table class="table table-striped table-hover table-default">
                         <thead>
                             <tr>
-                                <th scope="col">Universal Translator<br/>Crosswalk Value</th>
-                                <th scope="col">Display Text</th>
-                                <th scope="col">Description</th>
-                                <th scope="col" class="center-text">Date Created</th>
+                           		<th scope="col">Category</th>
+                                <th scope="col">Macro Short Name</th>
+                                <th scope="col">Macro Name</th>
+                                <th scope="col">Formula</th>
                                 <th scope="col"></th>
                             </tr>
                         </thead>
                         <tbody>
                             <c:choose>
-                                <c:when test="${not empty dataList}">
-                                    <c:forEach var="dataItem" items="${dataList}">
+                                <c:when test="${not empty macroList}">
+                                    <c:forEach var="macro" items="${macroList}">
                                         <tr id="dataRow">
-                                            <td>${dataItem.id}</td>
-                                            <td scope="row"><a href="#addLUDataModal" data-toggle="modal" rel="${tableInfo.urlId}/tableData?i=${dataItem.id}" class="dataEdit" title="Edit this data">${dataItem.displayText}</a>
-                                                <br />(<c:choose><c:when test="${dataItem.status == true}">active</c:when><c:otherwise>inactive</c:otherwise></c:choose><c:if test="${dataItem.custom == true}">, custom data</c:if>)</td>
-                                                    <td>
-                                                ${dataItem.description}
+                                            <td>${macro.category}</td>
+                                            <td scope="row"><a href="#macroModal" data-toggle="modal" rel="macroDetail?i=${macro.id}" class="macroEdit" title="Edit this macro">${macro.macroShortName}</a>
                                             </td>
-                                            <td class="center-text"><fmt:formatDate value="${dataItem.dateCreated}" type="date" pattern="M/dd/yyyy" /></td>
+                                            <td>
+                                             <c:choose>
+                                             <c:when test="${fn:length(macro.macroName) > 45}">
+                                             	${fn:substring(macro.macroName,0,44)}...
+                                             </c:when>
+                                             <c:otherwise>
+                                                ${macro.macroName}
+                                             </c:otherwise>
+                                             </c:choose>
+                                            </td>
+                                            <td>
+                                             <c:choose>
+                                             <c:when test="${fn:length(macro.formula) > 45}">
+                                             	${fn:substring(macro.formula,0,44)}...
+                                             </c:when>
+                                             <c:otherwise>
+                                                ${macro.formula}
+                                             </c:otherwise>
+                                             </c:choose>
+                                            </td>
                                             <td class="actions-col">
-                                                <a href="#addLUDataModal" data-toggle="modal" rel="${tableInfo.urlId}/tableData?i=${dataItem.id}" class="dataEdit" title="Edit this data">
+                                                <a href="#macroModal" data-toggle="modal" rel="macro/macroData?i=${macro.id}" class="macroEdit" title="Edit this macro">
                                                     <span class="glyphicon glyphicon-edit"></span>
                                                     Edit	
                                                 </a>
-                                                <a href="javascript:void(0);" rel="${dataItem.id}" class="btn btn-link dataItemDelete" title="Delete this row">
+                                                <a href="javascript:void(0);" rel="${macro.id}" class="btn btn-link marcoDelete" title="Delete this row">
                                                     <span class="glyphicon glyphicon-remove"></span>
                                                     Delete
                                                 </a>
@@ -69,7 +84,7 @@
                                     </c:forEach>
                                 </c:when>
                                 <c:otherwise>
-                                    <tr><td colspan="5" class="center-text">There where no items found for this table.</td></tr>
+                                    <tr><td colspan="5" class="center-text">There where no macros in the system.</td></tr>
                                 </c:otherwise>
                             </c:choose>
                         </tbody>
@@ -87,8 +102,7 @@
     </div>		
 </div>	
 <p rel="${currentPage}" id="currentPageHolder" style="display:none"></p>
-<p rel="${tableInfo.urlId}" id="urlIdInfo" style="display:none"></p>
 <!-- Providers modal -->
-<div class="modal fade" id="addLUDataModal" role="dialog" tabindex="-1" aria-labeledby="Add look up data" aria-hidden="true" aria-describedby="Add look up data"></div>
+<div class="modal fade" id="macroModal" role="dialog" tabindex="-1" aria-labeledby="Add/ Edit Macros" aria-hidden="true" aria-describedby="Add/Edit Macros"></div>
 
 

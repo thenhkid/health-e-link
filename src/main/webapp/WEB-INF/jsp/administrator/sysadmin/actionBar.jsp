@@ -7,22 +7,12 @@
 					<c:when test="${param['page'] == 'list'}">
 						<a href="javascript:void(0);" title="Look Up Tables" class="unstyled-link">Look Up Tables</a>
 					</c:when>
-					<c:when test="${param['page'] == 'dataDetails'}">
-						<a href="javascript:void(0);" title="Table Details" class="unstyled-link">
-							<c:choose>
-								<c:when test="${tableDataDetails.id > 0}">
-									Edit Look Up Table Data
-								</c:when>
-								<c:otherwise>
-									Add Look Up Table Data
-								</c:otherwise>
-							</c:choose>
-						</a>
-					</c:when>
 					<c:when test="${param['page'] == 'data'}">
 						<a href="javascript:void(0);" title="Table Data" class="unstyled-link">Look Up Table Data</a>
 					</c:when>
-					
+					<c:when test="${param['page'] == 'macros'}">
+						<a href="javascript:void(0);" title="Table Data" class="unstyled-link">Manage System Macros</a>
+					</c:when>
 				</c:choose>
 			</h1>
 		</div>
