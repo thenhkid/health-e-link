@@ -37,7 +37,7 @@ public class adminLibController {
     /**
      * The private maxResults variable will hold the number of results to show per list page.
      */
-    private static final int maxResults = 10;
+    private static int maxResults = 10;
 
     /**
      * The private variable messageTypeId will hold the messageTypeId when viewing a message type this will be used when on the message type subsection like mapping fields and data translations, etc. We will use this private variable so we don't have to go fetch the id or the messageTypeId based on the url.
