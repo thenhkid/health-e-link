@@ -73,8 +73,8 @@ public class adminLibController {
 
         //Return the total list of message types
         Long totalMessageTypes = messagetypemanager.findTotalMessageTypes();
-
-        Integer totalPages = Math.round(totalMessageTypes / maxResults);
+        
+        Integer totalPages = (int)Math.ceil((double)totalMessageTypes / maxResults);
         mav.addObject("totalPages", totalPages);
         mav.addObject("currentPage", page);
         return mav;
@@ -454,7 +454,7 @@ public class adminLibController {
         //Find out the total number of crosswalks
         Long totalCrosswalks = messagetypemanager.findTotalCrosswalks();
 
-        Integer totalPages = (int) Math.round(totalCrosswalks / maxCrosswalkVal);
+        Integer totalPages = (int) Math.ceil((double)totalCrosswalks / maxCrosswalkVal);
         mav.addObject("totalPages", totalPages);
         mav.addObject("currentPage", page);
 

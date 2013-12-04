@@ -80,7 +80,7 @@ public class adminSysAdminController {
        
         //Return the total list of look up table
         int totalLookUpTables = sysAdminManager.findTotalLookUpTable();
-        double totalPages = Math.ceil((float)totalLookUpTables/maxResults);
+        Integer totalPages = (int) Math.ceil((double)totalLookUpTables/maxResults);
         mav.addObject("totalPages",totalPages);
         mav.addObject("currentPage",page);
        
@@ -150,7 +150,7 @@ public class adminSysAdminController {
          mav.addObject("tableInfo", tableInfo);
                
         int totalDataRows = sysAdminManager.findTotalDataRows(tableInfo.getUtTableName());
-        double totalPages = Math.ceil((float)totalDataRows/maxResults);
+        Integer totalPages = (int) Math.ceil((double)totalDataRows/maxResults);
         mav.addObject("totalPages",totalPages);
         mav.addObject("currentPage",page);
      
@@ -353,7 +353,7 @@ public class adminSysAdminController {
         
         /**need to handle paging**/
         Long totalMacroRows = sysAdminManager.findTotalMacroRows();
-        double totalPages = Math.ceil((float)totalMacroRows/maxResults);
+        Integer totalPages = (int) Math.ceil((double)totalMacroRows/maxResults);
         mav.addObject("totalPages",totalPages);
         mav.addObject("currentPage",page);
      

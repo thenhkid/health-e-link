@@ -108,7 +108,8 @@ public class adminOrgContoller {
         //Return the total list of organizations
         Long totalOrgs = organizationManager.findTotalOrgs();
 
-        Integer totalPages = Math.round(totalOrgs / maxResults);
+        Integer totalPages = (int) Math.ceil((double)totalOrgs / maxResults);
+        
         mav.addObject("totalPages", totalPages);
         mav.addObject("currentPage", page);
         return mav;
@@ -457,7 +458,7 @@ public class adminOrgContoller {
         //Return the total list of users for the organization
         Long totalUsers = organizationManager.findTotalUsers(orgId);
 
-        Integer totalPages = Math.round(totalUsers / maxResults);
+        Integer totalPages = (int)Math.ceil((double)totalUsers / maxResults);
         mav.addObject("totalPages", totalPages);
         mav.addObject("currentPage", page);
 
@@ -676,7 +677,7 @@ public class adminOrgContoller {
         //Return the total list of providers for the organization
         Long totalProviders = organizationManager.findTotalProviders(orgId);
 
-        Integer totalPages = Math.round(totalProviders / maxResults);
+        Integer totalPages = (int)Math.ceil((double)totalProviders / maxResults);
         mav.addObject("totalPages", totalPages);
         mav.addObject("currentPage", page);
 
@@ -1193,7 +1194,7 @@ public class adminOrgContoller {
         //Return the total list of brochures for the organization
         Long totalBrochures = organizationManager.findTotalBrochures(orgId);
 
-        Integer totalPages = Math.round(totalBrochures / maxResults);
+        Integer totalPages = (int)Math.ceil((double)totalBrochures / maxResults);
         mav.addObject("totalPages", totalPages);
         mav.addObject("currentPage", page);
 

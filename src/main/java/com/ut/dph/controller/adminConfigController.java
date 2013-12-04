@@ -107,7 +107,7 @@ public class adminConfigController {
         //Return the total list of configurations
         Long totalConfigs = configurationmanager.findTotalConfigs();
 
-        Integer totalPages = Math.round(totalConfigs / maxResults);
+        Integer totalPages = (int)Math.ceil((double)totalConfigs / maxResults);
         mav.addObject("totalPages", totalPages);
         mav.addObject("currentPage", page);
         return mav;
