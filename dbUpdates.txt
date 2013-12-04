@@ -315,4 +315,12 @@ DROP FOREIGN KEY `dtmacroId`;
 
 DROP TABLE `universalTranslator`.`ref_macros`;
 
+/** Grace 12-03-2013**/
+
+ALTER TABLE `universalTranslator`.`rel_configurationDataTranslations` 
+ADD CONSTRAINT `dtmacroId`
+  FOREIGN KEY (`macroId`)
+  REFERENCES `universalTranslator`.`Macro_Names` (`ID`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
 
