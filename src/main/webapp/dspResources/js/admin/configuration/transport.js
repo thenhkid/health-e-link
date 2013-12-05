@@ -34,7 +34,7 @@ $(function() {
     //This function will save the messgae type field mappings
     $('#saveDetails').click(function(event) {
         $('#action').val('save');
-
+        
         //Need to make sure all required fields are marked if empty.
         var hasErrors = 0;
         hasErrors = checkFormFields();
@@ -92,19 +92,22 @@ function checkFormFields() {
                     hasErrors = 1;
                 }
             }
+            
+            if($('#configType').val() === 1) {
 
-            //Make sure a valid field no is entered
-            if (!$.isNumeric($('#' + headVal + 'targetOrgColNo').val())) {
-                $('#' + headVal + 'targetOrgColNoDiv').addClass("has-error");
-                $('#' + headVal + 'targetOrgColNoMsg').addClass("has-error");
-                $('#' + headVal + 'targetOrgColNoMsg').html('The target organziation field No must be a numeric value!');
-                hasErrors = 1;
-            }
-            if (!$.isNumeric($('#' + headVal + 'messageTypeColNo').val())) {
-                $('#' + headVal + 'messageTypeColNoDiv').addClass("has-error");
-                $('#' + headVal + 'messageTypeColNoMsg').addClass("has-error");
-                $('#' + headVal + 'messageTypeColNoMsg').html('The message type field No must be a numeric value!');
-                hasErrors = 1;
+                //Make sure a valid field no is entered
+                if (!$.isNumeric($('#' + headVal + 'targetOrgColNo').val())) {
+                    $('#' + headVal + 'targetOrgColNoDiv').addClass("has-error");
+                    $('#' + headVal + 'targetOrgColNoMsg').addClass("has-error");
+                    $('#' + headVal + 'targetOrgColNoMsg').html('The target organziation field No must be a numeric value!');
+                    hasErrors = 1;
+                }
+                if (!$.isNumeric($('#' + headVal + 'messageTypeColNo').val())) {
+                    $('#' + headVal + 'messageTypeColNoDiv').addClass("has-error");
+                    $('#' + headVal + 'messageTypeColNoMsg').addClass("has-error");
+                    $('#' + headVal + 'messageTypeColNoMsg').html('The message type field No must be a numeric value!');
+                    hasErrors = 1;
+                }
             }
 
             //Make sure the file type and delimiter is selected

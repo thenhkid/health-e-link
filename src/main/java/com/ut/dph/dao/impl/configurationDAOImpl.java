@@ -478,4 +478,26 @@ public class configurationDAOImpl implements configurationDAO {
     public void saveSchedule(configurationSchedules scheduleDetails) {
         sessionFactory.getCurrentSession().saveOrUpdate(scheduleDetails);
     }
+    
+    /**
+     * The 'getTargetConnections' will return the list of organizations that are set up
+     * to send data to the passed in organization for the passed in message type.
+     * 
+     * @param messageTypeId The message type the configuration is for
+     * @param orgId The target organization the configuration is being set up for
+     * 
+     * @return This function will return a list or organizations
+     */
+    public List<Connections> getTargetConnections(int messageTypeId, int orgId) {
+         
+        Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT id from configurationConnections where orgId = :orgId and configId in (select id from configurations where messageTypeid = :messageTypeId)")
+               .setParameter("messageTypeId", messageTypeId)
+               .setParameter("orgId", orgId);
+         
+         
+        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Connections.class).add(Restrictions.in("id", query.list()));
+         
+        return criteria.list();
+
+    }
 }

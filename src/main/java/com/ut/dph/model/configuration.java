@@ -56,7 +56,10 @@ public class configuration {
 
     @Column(name = "STEPSCOMPLETED", nullable = false)
     private int stepsCompleted = 0;
-
+    
+    @Column(name = "CLEARFIELDS", nullable = true)
+    private boolean clearFields = false;
+    
     public int getId() {
         return id;
     }
@@ -151,5 +154,13 @@ public class configuration {
 
     public void setTransportDetails(List<configurationTransport> transportDetails) {
         this.transportDetails = transportDetails;
+    }
+    
+    public boolean getclearFields() {
+        return clearFields;
+    }
+
+    public void setclearFields(boolean clearFields) {
+        this.clearFields = clearFields;
     }
 }

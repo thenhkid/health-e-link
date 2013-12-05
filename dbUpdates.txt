@@ -324,3 +324,35 @@ ADD CONSTRAINT `dtmacroId`
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
 
+
+/** Chad 12-5-2013 **/
+ALTER TABLE `universalTranslator`.`configurationTransportDetails` 
+ADD COLUMN `reportableField1` INT NULL DEFAULT 0 AFTER `containsHeader`,
+ADD COLUMN `reportableField2` INT NULL DEFAULT 0 AFTER `reportableField1`,
+ADD COLUMN `reportableField3` INT NULL DEFAULT 0 AFTER `reportableField2`,
+ADD COLUMN `reportableField4` INT NULL DEFAULT 0 AFTER `reportableField3`;
+
+ALTER TABLE `universalTranslator`.`configurations` 
+ADD COLUMN `clearFields` BIT NULL DEFAULT 0 AFTER `stepsCompleted`;
+
+ALTER TABLE `universalTranslator`.`rel_TransportFTPDetails` 
+ADD COLUMN `method` SMALLINT NULL DEFAULT 1 COMMENT '1 = Push\n2 = Get' AFTER `password`;
+
+ALTER TABLE `universalTranslator`.`rel_TransportFTPDetails` 
+CHANGE COLUMN `usename` `username` VARCHAR(45) NOT NULL ;
+
+ALTER TABLE `universalTranslator`.`rel_TransportFTPDetails` 
+CHANGE COLUMN `IP` `IP` VARCHAR(45) NULL ,
+CHANGE COLUMN `directory` `directory` VARCHAR(255) NULL ,
+CHANGE COLUMN `username` `username` VARCHAR(45) NULL ,
+CHANGE COLUMN `password` `password` VARCHAR(45) NULL ,
+CHANGE COLUMN `method` `method` SMALLINT(6) NOT NULL DEFAULT '1' COMMENT '1 = Push\n2 = Get' ;
+
+ALTER TABLE `universalTranslator`.`configurationTransportDetails` 
+ADD COLUMN `status` BIT NULL DEFAULT 1 AFTER `reportableField4`;
+
+ALTER TABLE `universalTranslator`.`configurationTransportDetails` 
+ADD COLUMN `targetFileName` VARCHAR(255) NULL AFTER `status`,
+ADD COLUMN `appendDateTime` BIT NULL DEFAULT 0 AFTER `targetFileName`;
+
+

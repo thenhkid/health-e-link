@@ -48,6 +48,17 @@
                                 </label>
                             </div>
                         </div>
+                        <div class="form-group">
+                            <label for="type">Clear fields after Delivery *</label>
+                            <div>
+                                <label class="radio-inline">
+                                    <form:radiobutton id="clearFields" path="clearFields" value="1" /> Yes
+                                </label>
+                                <label class="radio-inline">
+                                    <form:radiobutton id="clearFields" path="clearFields" value="0" /> No
+                                </label>
+                            </div>
+                        </div>        
                         <spring:bind path="orgId">
                             <div class="form-group ${status.error ? 'has-error' : '' }">
                                 <label class="control-label" for="organization">Organization *</label>

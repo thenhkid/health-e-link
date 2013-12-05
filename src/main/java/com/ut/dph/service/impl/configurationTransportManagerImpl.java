@@ -27,6 +27,7 @@ import com.ut.dph.dao.configurationDAO;
 import com.ut.dph.dao.organizationDAO;
 import com.ut.dph.model.Organization;
 import com.ut.dph.model.configuration;
+import com.ut.dph.model.configurationFTPFields;
 import com.ut.dph.reference.fileSystem;
 import com.ut.dph.service.configurationTransportManager;
 
@@ -67,15 +68,14 @@ public class configurationTransportManagerImpl implements configurationTransport
 
     @Override
     @Transactional
-    public void updateTransportDetails(configurationTransport transportDetails) {
+    public Integer updateTransportDetails(configurationTransport transportDetails) {
         boolean processFile = false;
         String fileName = null;
         String cleanURL = null;
         int transportDetailId = 0;
         int clearFields = 0;
-
+       
         MultipartFile file = transportDetails.getFile();
-
         //If a file is uploaded
         if (file != null && !file.isEmpty()) {
             processFile = true;
@@ -127,12 +127,14 @@ public class configurationTransportManagerImpl implements configurationTransport
                 e.printStackTrace();
             }
         }
-
+        
         transportDetailId = (Integer) configurationTransportDAO.updateTransportDetails(transportDetails, clearFields);
-
+      
         if (processFile == true) {
             loadExcelContents(transportDetails.getconfigId(), transportDetailId, fileName, cleanURL);
         }
+        
+        return transportDetailId;
 
     }
 
@@ -151,6 +153,18 @@ public class configurationTransportManagerImpl implements configurationTransport
     @Transactional
     public void updateConfigurationFormFields(configurationFormFields formField) {
         configurationTransportDAO.updateConfigurationFormFields(formField);
+    }
+    
+    @Override
+    @Transactional
+    public List<configurationFTPFields> getTransportFTPDetails(int transportDetailId) {
+        return configurationTransportDAO.getTransportFTPDetails(transportDetailId);
+    }
+    
+    @Override
+    @Transactional
+    public void saveTransportFTP(configurationFTPFields FTPFields) {
+        configurationTransportDAO.saveTransportFTP(FTPFields);
     }
 
     /**

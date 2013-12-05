@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ut.dph.dao.configurationDAO;
 import com.ut.dph.model.Connections;
 import com.ut.dph.model.Macros;
+import com.ut.dph.model.Organization;
 import com.ut.dph.model.configuration;
 import com.ut.dph.model.configurationDataTranslations;
 import com.ut.dph.model.configurationSchedules;
@@ -165,6 +166,12 @@ public class configurationManagerImpl implements configurationManager {
     @Transactional
     public void saveSchedule(configurationSchedules scheduleDetails) {
         configurationDAO.saveSchedule(scheduleDetails);
+    }
+    
+    @Override
+    @Transactional
+    public List<Connections> getTargetConnections(int messageTypeId, int orgId) {
+        return configurationDAO.getTargetConnections(messageTypeId, orgId);
     }
 
 }

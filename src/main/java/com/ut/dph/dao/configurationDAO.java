@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.ut.dph.model.Connections;
 import com.ut.dph.model.Macros;
+import com.ut.dph.model.Organization;
 import com.ut.dph.model.configuration;
 import com.ut.dph.model.configurationDataTranslations;
 import com.ut.dph.model.configurationSchedules;
@@ -58,4 +59,6 @@ public interface configurationDAO {
   configurationSchedules getScheduleDetails(int configId, int transportMethod);
   
   void saveSchedule(configurationSchedules scheduleDetails);
+  
+  List<Connections> getTargetConnections(int messageTypeId, int orgId);
 }

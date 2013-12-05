@@ -30,6 +30,7 @@ import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.messageTypeFormFields;
 import com.ut.dph.service.configurationManager;
 import com.ut.dph.model.Organization;
+import com.ut.dph.model.configurationFTPFields;
 import com.ut.dph.model.configurationSchedules;
 import com.ut.dph.service.organizationManager;
 import com.ut.dph.model.messageType;
@@ -357,6 +358,12 @@ public class adminConfigController {
 
         //Get the transport details
         List<configurationTransport> transportDetails = configurationTransportManager.getTransportDetails(configId);
+        
+        //Need to get FTP information
+        for(configurationTransport transport : transportDetails) {
+            List<configurationFTPFields> FTPFields = configurationTransportManager.getTransportFTPDetails(transport.getId());
+            transport.setFTPFields(FTPFields);
+        }
 
         //Set the variable id to hold the current configuration id
         mav.addObject("id", configId);
@@ -414,8 +421,21 @@ public class adminConfigController {
         transportDetails.setconfigId(configId);
         transportDetails.settransportMethod(transportMethod);
         transportDetails.setFile(null);
-
-        configurationTransportManager.updateTransportDetails(transportDetails);
+        
+        Integer transportId = configurationTransportManager.updateTransportDetails(transportDetails);
+        
+        //If FTP transport method is chosen,  need to create the default FTP information
+        if(transportMethod == 3) {
+            configurationFTPFields FTPGETFields = new configurationFTPFields();
+            FTPGETFields.settransportId(transportId);
+            FTPGETFields.setmethod(2);
+            configurationTransportManager.saveTransportFTP(FTPGETFields); 
+            
+            configurationFTPFields FTPPUSHFields = new configurationFTPFields();
+            FTPPUSHFields.settransportId(transportId);
+            FTPPUSHFields.setmethod(1);
+            configurationTransportManager.saveTransportFTP(FTPPUSHFields); 
+        }
 
         return 1;
     }
@@ -440,6 +460,14 @@ public class adminConfigController {
         for (configurationTransport transport : details) {
             //submit the updates
             configurationTransportManager.updateTransportDetails(transport);
+           
+            //Submit FTP Changes
+            if(transport.gettransportMethod() == 3) {
+             
+                for(configurationFTPFields FTPFields : transport.getFTPFields()) {
+                    configurationTransportManager.saveTransportFTP(FTPFields);
+                }
+            }
         }
 
         redirectAttr.addFlashAttribute("savedStatus", "updated");
@@ -888,20 +916,31 @@ public class adminConfigController {
         List<Organization> organizations = organizationmanager.getAllActiveOrganizations();
         mav.addObject("organizations", organizations);
 
-        //Return a list of associated connections
-        List<Connections> connections = configurationmanager.getConnections(configId);
-
+        List<Connections> connections = null;
         //Set a list of organizations already used
         List<Integer> usedOrgs = new ArrayList<Integer>();
-
-        for (Connections connection : connections) {
-            usedOrgs.add(connection.getorgId());
+        if(configurationDetails.getType() == 2) {
+            connections = configurationmanager.getTargetConnections(configurationDetails.getMessageTypeId(), configurationDetails.getorgId());
             
-            //Need to get the org name;
-            Organization orgDetails = organizationmanager.getOrganizationById(connection.getorgId());
-            connection.setorgName(orgDetails.getOrgName());
+            for (Connections connection : connections) {
+                //Need to get the org name;
+                Organization orgDetails = organizationmanager.getOrganizationById(configurationmanager.getConfigurationById(connection.getconfigId()).getorgId());
+                connection.setorgName(orgDetails.getOrgName());
+            }
         }
-        
+        else {
+            //Return a list of associated connections
+            connections = configurationmanager.getConnections(configId);
+            
+            for (Connections connection : connections) {
+                usedOrgs.add(connection.getorgId());
+
+                //Need to get the org name;
+                Organization orgDetails = organizationmanager.getOrganizationById(connection.getorgId());
+                connection.setorgName(orgDetails.getOrgName());
+            }
+        }
+
         //Set the object to hold the existing connections
         mav.addObject("connections", connections);
 

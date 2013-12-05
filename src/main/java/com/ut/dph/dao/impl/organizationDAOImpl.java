@@ -115,10 +115,10 @@ public class organizationDAOImpl implements organizationDAO {
         Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Organization.class)
                 .add(Restrictions.not(Restrictions.eq("cleanURL", "")))
                 .add(Restrictions.or(
-                                Restrictions.like("orgName", "%" + searchTerm + "%"),
-                                Restrictions.like("city", "%" + searchTerm + "%"),
-                                Restrictions.like("address", "%" + searchTerm + "%")
-                        )
+                    Restrictions.like("orgName", "%" + searchTerm + "%"),
+                    Restrictions.like("city", "%" + searchTerm + "%"),
+                    Restrictions.like("address", "%" + searchTerm + "%")
+                 )
                 );
 
         return criteria.list();
