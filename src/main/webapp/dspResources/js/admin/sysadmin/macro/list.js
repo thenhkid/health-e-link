@@ -41,12 +41,14 @@ jQuery(document).ready(function($) {
     });
     
     
-    /**
+  
 //This function will launch the edit macro item overlay populating the fields
-    $(document).on('click', '.dataEdit', function() {
-        var dataDetailsAction = $(this).attr('rel');
+    $(document).on('click', '.macroEdit', function() {
+    
+        var macroDetailsAction = "macros/view?i=" + $(this).attr('rel');
+        
         $.ajax({
-            url: dataDetailsAction,
+            url: macroDetailsAction,
             type: "GET",
             success: function(data) {
                 $("#macroModal").html(data);
@@ -54,24 +56,26 @@ jQuery(document).ready(function($) {
         });
     });
     
+     
     $(document).on('click', '#submitButton', function(event) {
     	var currentPage = $('#currentPageHolder').attr('rel');
-    	var formData = $("#tabledataform").serialize();
-        var actionValue = $(this).attr('rel').toLowerCase();
+    	var formData = $("#macroform").serialize();
+        var actionValue = "macros/" + $(this).attr('rel').toLowerCase();
         $.ajax({
             url: actionValue,
             data: formData,
             type: "POST",
             async: false,
             success: function(data) {
-            	if (data.indexOf('dataUpdated') != -1) {
-            		var goToUrl = $('#urlId').val() + "?msg=updated";
+            	/** **/
+            	if (data.indexOf('macroUpdated') != -1) {
+            		var goToUrl = "macros?msg=updated";
             		if (currentPage > 0) {
                         goToUrl = goToUrl + "&page=" + currentPage;
                     }
             		window.location.href = goToUrl;
-                } else if (data.indexOf('dataCreated') != -1) {
-                	var goToUrl = $('#urlId').val() + "?msg=created";
+                } else if (data.indexOf('macroCreated') != -1) {
+                	var goToUrl = "macros?msg=created";
                     if (currentPage > 0) {
                         goToUrl = goToUrl + "&page=" + currentPage;
                     }
@@ -79,14 +83,15 @@ jQuery(document).ready(function($) {
                 } else {
                 	$("#macroModal").html(data);
                 }
+               
             }
+            
         });
         event.preventDefault();
         return false;
 
     });
-    
-**/
+
 });
 
 

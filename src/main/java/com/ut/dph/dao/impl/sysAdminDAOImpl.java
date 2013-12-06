@@ -402,4 +402,16 @@ public class sysAdminDAOImpl implements sysAdminDAO {
 					}
 		}
 		
+		@Override
+		@Transactional
+		public boolean updateMacro(Macros macro) {
+				try {
+					sessionFactory.getCurrentSession().update(macro);
+					return true;
+					} catch (Throwable ex) {
+		                System.err.println("update macro failed." + ex);
+		                return false;
+		            }
+		}
+		
 }

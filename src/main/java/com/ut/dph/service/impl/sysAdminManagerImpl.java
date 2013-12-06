@@ -126,6 +126,11 @@ public class sysAdminManagerImpl implements sysAdminManager {
 	@Override
 	public void createMacro(Macros macro) {
 		sysAdminDAO.createMacro(macro);
+	}
+	
+	@Override
+	public boolean updateMacro(Macros macro) {
+		return sysAdminDAO.updateMacro(macro);
 		
 	}
 

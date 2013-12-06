@@ -52,7 +52,7 @@ public interface sysAdminManager {
 	
 	void createMacro (Macros macro);
 	
-	
+	boolean updateMacro (Macros macro);
 	
 }
 

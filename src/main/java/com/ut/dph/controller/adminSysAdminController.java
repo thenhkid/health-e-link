@@ -8,6 +8,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.ut.dph.service.configurationManager;
 import com.ut.dph.service.sysAdminManager;
 import com.ut.dph.model.Macros;
 import com.ut.dph.model.custom.LookUpTable;
@@ -31,6 +32,9 @@ public class adminSysAdminController {
 	
 	@Autowired 
 	private sysAdminManager sysAdminManager;
+
+	@Autowired
+    private configurationManager configurationmanager;
 
 	/**
 	 * The private maxResults variable will hold the number of results to show per
@@ -426,9 +430,54 @@ public class adminSysAdminController {
 		}	
 		//now we save
 		sysAdminManager.createMacro(macroDetails);
-		mav.addObject("success", "dataCreated");
+		mav.addObject("success", "macroCreated");
 		mav.addObject("btnValue", "Update");
 		return mav;
 	}
+	
+	/**
+	 *  The '/macros/view' GET request will be used to create a new data for selected table
+	 *  
+	 */
+	@RequestMapping(value="/macros/view", method = RequestMethod.GET)
+	public ModelAndView viewMacroDetails(@RequestParam(value="i", required=false) Integer i) throws Exception {
+		
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/sysadmin/macro/details");	
+		//get macro info here
+		Macros macroDetails = configurationmanager.getMacroById(i);
+		mav.addObject("macroDetails",macroDetails);
+		mav.addObject("btnValue", "Update");
+		return mav;		
+	}	
+	
+	
+	@RequestMapping(value="/macros/update", method = RequestMethod.POST)
+	public ModelAndView updateMacro(
+			@Valid @ModelAttribute(value="macroDetails") Macros macroDetails, 
+			BindingResult result) throws Exception {	
+		
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/sysadmin/macro/details");	
+		
+		if(result.hasErrors()) {
+			mav.addObject("macroDetails",macroDetails);
+			mav.addObject("btnValue", "Update");
+			return mav;
+		} 
+		
+		//get macro info here
+		boolean updated = sysAdminManager.updateMacro(macroDetails);
+		
+		if (updated) {
+			mav.addObject("success", "macroUpdated");
+		} else {
+			mav.addObject("success", "Error!");
+		}
+		mav.addObject("macroDetails",macroDetails);
+		mav.addObject("btnValue", "Update");
+		return mav;		
+	}
+	
 }
 

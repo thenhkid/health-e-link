@@ -48,7 +48,7 @@
                                     <c:forEach var="macro" items="${macroList}">
                                         <tr id="dataRow">
                                             <td>${macro.category}</td>
-                                            <td scope="row"><a href="#macroModal" data-toggle="modal" rel="macroDetail?i=${macro.id}" class="macroEdit" title="Edit this macro">${macro.macroShortName}</a>
+                                            <td scope="row"><a href="#macroModal" data-toggle="modal" rel="${macro.id}" class="macroEdit" title="Edit this macro">${macro.macroShortName}</a>
                                             </td>
                                             <td>
                                              <c:choose>
@@ -71,7 +71,7 @@
                                              </c:choose>
                                             </td>
                                             <td class="actions-col">
-                                                <a href="#macroModal" data-toggle="modal" rel="macro/macroData?i=${macro.id}" class="macroEdit" title="Edit this macro">
+                                                <a href="#macroModal" data-toggle="modal" rel="${macro.id}" class="macroEdit" title="Edit this macro">
                                                     <span class="glyphicon glyphicon-edit"></span>
                                                     Edit	
                                                 </a>

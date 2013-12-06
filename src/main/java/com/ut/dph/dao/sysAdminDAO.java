@@ -36,4 +36,6 @@ public interface sysAdminDAO {
 	
 	void createMacro(Macros macro);
 	
+	boolean updateMacro(Macros macro);
+	
 }
