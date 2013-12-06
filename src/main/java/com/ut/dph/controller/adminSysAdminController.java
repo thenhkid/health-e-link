@@ -52,6 +52,12 @@ public class adminSysAdminController {
 
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/sysadmin/dashboard");
+        /**set totals**/
+        int totalLookUpTables = sysAdminManager.findTotalLookUpTable();
+        Long totalMacroRows = sysAdminManager.findTotalMacroRows();
+        mav.addObject("totalLookUpTables",totalLookUpTables);
+        mav.addObject("totalMacroRows",totalMacroRows);
+        
         return mav;
     }
     

@@ -18,7 +18,7 @@
         <div class="col-md-12">
             <section class="panel panel-default panel-intro">
                 <div class="panel-body" >
-                    <h2>Welcome <c:out value="${pageContext.request.userPrincipal.name}" />!</h2>
+                    <h2>Welcome to system administration <c:out value="${pageContext.request.userPrincipal.name}" />!</h2>
                 </div>
             </section>
         </div>
@@ -28,7 +28,7 @@
         <div class="col-md-3 col-sm-3 col-xs-6">
             <section class="panel panel-default panel-stats">
                 <div class="panel-body">
-                    <span class="stat-number"><a href="data" title="Total number of look up tables">#</a></span>
+                    <span class="stat-number"><a href="data" title="Total number of look up tables">${totalLookUpTables}</a></span>
                     <h3>Look Up Tables</h3>
                     <a href="<c:url value='data' />" title="Look Up Tables" class="btn btn-primary btn-small" role="button">View all</a>
                 </div>
@@ -38,7 +38,7 @@
         <div class="col-md-3 col-sm-3 col-xs-6">
             <section class="panel panel-default panel-stats">
                 <div class="panel-body">
-                    <span class="stat-number"><a href="macros" title="Total number of macros">#</a></span>
+                    <span class="stat-number"><a href="macros" title="Total number of macros">${totalMacroRows}</a></span>
                     <h3>Macros</h3>
                     <a href="macros" title="Macros" class="btn btn-primary btn-small" role="button">View all</a>
                 </div>
