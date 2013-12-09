@@ -627,16 +627,16 @@ CREATE TABLE `batchUploadRecords` (
 
 
 /**grace 12.9.2013**/
-ALTER TABLE `universalTranslator`.`message_Details` 
-DROP COLUMN `batchUploadsId`,
-DROP COLUMN `batchUploadRecordsId`;
+ALTER TABLE `universaltranslator`.`message_details` 
+DROP COLUMN `messageBatchId`,
+DROP COLUMN `utIncomingMessageId`;
 
 
 CREATE TABLE `universalTranslator`.`message_BatchInfo` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `messageId` INT NOT NULL,
   `batchUploadsId` INT NOT NULL,
-  `batchRecordId` int NOT NULL,
+  `batchRecordsId` int NOT NULL,
   `dateCreated` DATETIME NOT NULL DEFAULT current_timestamp,
   `dateModified` DATETIME NOT NULL DEFAULT current_timestamp,
   PRIMARY KEY (`id`));
