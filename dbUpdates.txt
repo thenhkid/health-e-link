@@ -632,11 +632,11 @@ DROP COLUMN `batchUploadsId`,
 DROP COLUMN `batchUploadRecordsId`;
 
 
-CREATE TABLE `universalTranslator`.`message_batchInfo` (
+CREATE TABLE `universalTranslator`.`message_BatchInfo` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `messageId` INT NOT NULL,
   `batchUploadsId` INT NOT NULL,
-  `message_batchInfocol` VARCHAR(45) NOT NULL,
+  `batchRecordId` int NOT NULL,
   `dateCreated` DATETIME NOT NULL DEFAULT current_timestamp,
   `dateModified` DATETIME NOT NULL DEFAULT current_timestamp,
   PRIMARY KEY (`id`));
@@ -649,5 +649,6 @@ ADD CONSTRAINT `messBatchFK`
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
   
+
 
 
