@@ -80,6 +80,9 @@ public class configurationTransport {
     
     @Column(name = "APPENDDATETIME", nullable = false)
     private boolean appendDateTime = false;
+    
+    @Column(name = "MAXFILESIZE", nullable = false)
+    private int maxFileSize = 0;
 
     public int getId() {
         return id;
@@ -233,12 +236,20 @@ public class configurationTransport {
         this.targetFileName = targetFileName;
     }
     
-     public boolean getappendDateTime() {
+    public boolean getappendDateTime() {
         return appendDateTime;
     }
 
     public void setappendDateTime(boolean appendDateTime) {
         this.appendDateTime = appendDateTime;
+    }
+    
+    public int getmaxFileSize() {
+        return maxFileSize;
+    }
+    
+    public void setmaxFileSize(int maxFileSize) {
+        this.maxFileSize = maxFileSize;
     }
 
 }

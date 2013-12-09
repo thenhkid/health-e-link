@@ -328,6 +328,7 @@ public class adminConfigController {
             mav.addObject("messageTypes", messageTypes);
             mav.addObject("id", configId);
             mav.addObject("savedStatus", "updated");
+             mav.addObject("completedSteps", configurationDetails.getstepsCompleted());
 
             return mav;
         } //If the "Next Step" button was pressed.
@@ -882,7 +883,7 @@ public class adminConfigController {
 
         return 1;
     }
-
+   
     /**
      * The '/connections' function will handle displaying the configuration connections screen.
      * The function will pass the existing connection objects for the selected configuration.
@@ -1066,7 +1067,11 @@ public class adminConfigController {
     }
     
     /**
+     * The '/scheduling' POST request will submit the scheduling settings for the selected configuration.
      * 
+     * @param scheduleDetails   The object that will hold the scheduling form fields
+     * 
+     * @return This method will redirect the user back to the scheduling form page.
      */
     @RequestMapping(value = "/scheduling", method = RequestMethod.POST)
     public ModelAndView submitConfigurationSchedules(@ModelAttribute(value = "scheduleDetails") configurationSchedules scheduleDetails, RedirectAttributes redirectAttr) throws Exception {

@@ -36,6 +36,7 @@
                             <tr>
                                 <th scope="col">Organization</th>
                                 <th scope="col">Message Type</th>
+                                <th scope="col">Configuration Type</th>
                                 <th scope="col" class="center-text">Connections</th>
                                 <th scope="col" class="center-text">Date Created</th>
                                 <th scope="col"></th>
@@ -46,11 +47,15 @@
                                 <c:when test="${not empty configurationList}">
                                     <c:forEach var="config" items="${configurationList}">
                                         <tr id="configRow" rel="${config.id}" style="cursor: pointer">
-                                            <td>
-                                                <a href="javascript:void(0);" class="btn btn-link" title="Edit this configuration">${config.orgName}</a>
+                                            <td scope="row">
+                                                <a href="javascript:void(0);"  title="Edit this configuration">${config.orgName}</a>
+                                                 <br />(<c:choose><c:when test="${config.status == true}">active</c:when><c:otherwise>inactive</c:otherwise></c:choose>)
                                             </td>
                                             <td>
                                                 ${config.messageTypeName}
+                                            </td>
+                                            <td>
+                                                <c:choose><c:when test="${config.type == 1}">Source Configuration</c:when><c:otherwise>Target Configuration</c:otherwise></c:choose>
                                             </td>
                                             <td class="center-text">
                                                 ${config.totalConnections}
@@ -66,7 +71,7 @@
                                     </c:forEach>
                                 </c:when>
                                 <c:otherwise>
-                                    <tr><td colspan="5" class="center-text">There are currently no configurations set up.</td></tr>
+                                    <tr><td colspan="6" class="center-text">There are currently no configurations set up.</td></tr>
                                 </c:otherwise>
                             </c:choose>
                         </tbody>

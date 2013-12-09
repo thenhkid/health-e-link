@@ -159,6 +159,11 @@
                                                 </div>   
                                             </c:if>
                                             <c:if test="${configurationDetails.type == 1}">
+                                                <div id="maxFileSizeDiv" class="form-group ${status.error ? 'has-error' : '' }">
+                                                    <label class="control-label" for="maxFileSize">Max File Size (MB) *</label>
+                                                    <input id="maxFileSize" name="transportDetails[${tStatus.index}].maxFileSize" value="${details.maxFileSize}" class="form-control" maxLength="4" type="text" />
+                                                    <span id="maxFileSizeMsg" class="control-label"></span>
+                                                </div>
                                                 <div id="messageTypeColNoDiv" class="form-group ${status.error ? 'has-error' : '' }">
                                                     <label class="control-label" for="messageTypeColNo">Column that will have the message type *</label>
                                                     <input id="messageTypeColNo" name="transportDetails[${tStatus.index}].messageTypeColNo" value="${details.messageTypeColNo}" class="form-control" maxLength="4" type="text" />
@@ -325,6 +330,11 @@
                                                 </div>    
                                             </c:if> 
                                             <c:if test="${configurationDetails.type == 1}">
+                                                <div id="maxFileSizeDiv" class="form-group ${status.error ? 'has-error' : '' }">
+                                                    <label class="control-label" for="maxFileSize">Max File Size (MB) *</label>
+                                                    <input id="maxFileSize" name="transportDetails[${tStatus.index}].maxFileSize" value="${details.maxFileSize}" class="form-control" maxLength="4" type="text" />
+                                                    <span id="maxFileSizeMsg" class="control-label"></span>
+                                                </div>
                                                 <div id="FTPmessageTypeColNoDiv" class="form-group ${status.error ? 'has-error' : '' }">
                                                     <label class="control-label" for="messageTypeColNo">Column that will have the message type *</label>
                                                     <input id="FTPmessageTypeColNo" name="transportDetails[${tStatus.index}].messageTypeColNo" value="${details.messageTypeColNo}" class="form-control" maxLength="4" type="text" />

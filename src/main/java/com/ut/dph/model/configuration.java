@@ -60,6 +60,9 @@ public class configuration {
     @Column(name = "CLEARFIELDS", nullable = true)
     private boolean clearFields = false;
     
+    @Column(name = "REJECTONERROR", nullable = false)
+    private int rejectOnError = 1;
+    
     public int getId() {
         return id;
     }
@@ -162,5 +165,13 @@ public class configuration {
 
     public void setclearFields(boolean clearFields) {
         this.clearFields = clearFields;
+    }
+    
+    public int getrejectOnError() {
+        return rejectOnError;
+    }
+    
+    public void setrejectOnError(int rejectOnError) {
+        this.rejectOnError = rejectOnError;
     }
 }
