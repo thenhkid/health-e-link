@@ -626,4 +626,28 @@ CREATE TABLE `batchUploadRecords` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
+/**grace 12.9.2013**/
+ALTER TABLE `universalTranslator`.`message_Details` 
+DROP COLUMN `batchUploadsId`,
+DROP COLUMN `batchUploadRecordsId`;
+
+
+CREATE TABLE `universalTranslator`.`message_batchInfo` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `messageId` INT NOT NULL,
+  `batchUploadsId` INT NOT NULL,
+  `message_batchInfocol` VARCHAR(45) NOT NULL,
+  `dateCreated` DATETIME NOT NULL DEFAULT current_timestamp,
+  `dateModified` DATETIME NOT NULL DEFAULT current_timestamp,
+  PRIMARY KEY (`id`));
+  
+  
+ALTER TABLE `universalTranslator`.`message_batchInfo` 
+ADD CONSTRAINT `messBatchFK`
+  FOREIGN KEY (`id`)
+  REFERENCES `universalTranslator`.`message_Details` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+  
+
 
