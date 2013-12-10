@@ -137,7 +137,7 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
      */
     @Transactional
     public void copyMessageTypeFields(int configId, int messageTypeId, int transportDetailId) {
-        Query query = sessionFactory.getCurrentSession().createSQLQuery("INSERT INTO configurationFormFields (messageTypeFieldId, configId, transportDetailId, fieldNo, fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, useField) SELECT id, :configId, :transportDetailId, fieldNo,  fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, 1 FROM messageTypeFormFields where messageTypeId = :messageTypeId");
+        Query query = sessionFactory.getCurrentSession().createSQLQuery("INSERT INTO configurationFormFields (messageTypeFieldId, configId, transportDetailId, fieldNo, fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, useField, saveToTableName, saveToTableCol) SELECT id, :configId, :transportDetailId, fieldNo,  fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, 1, saveToTableName, saveToTableCol FROM messageTypeFormFields where messageTypeId = :messageTypeId");
         query.setParameter("configId", configId);
         query.setParameter("transportDetailId", transportDetailId);
         query.setParameter("messageTypeId", messageTypeId);

@@ -682,3 +682,7 @@ ADD CONSTRAINT `messId`
 ALTER TABLE `universalTranslator`.`message_FromProvider` 
 CHANGE COLUMN `name` `firstname` VARCHAR(45) NULL DEFAULT NULL ,
 ADD COLUMN `lastname` VARCHAR(45) NULL AFTER `firstname`;
+
+ALTER TABLE `universalTranslator`.`configurationFormFields` 
+ADD COLUMN `saveToTableName` VARCHAR(255) NULL AFTER `useField`,
+ADD COLUMN `saveToTableCol` VARCHAR(255) NULL AFTER `saveToTableName`;

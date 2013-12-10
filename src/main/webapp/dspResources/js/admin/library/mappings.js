@@ -68,6 +68,8 @@ $(function() {
         //Need to make sure all required fields are marked if empty.
         var errorsFound = 0;
         var row = 0;
+        
+         $('#mappingErrorMsgDiv').hide();
 
         //Check field labels
         $('.fieldLabel').each(function() {
@@ -112,6 +114,9 @@ $(function() {
 
         if (errorsFound == 0) {
             $("#fieldMappings").submit();
+        }
+        else {
+            $('#mappingErrorMsgDiv').show();
         }
 
     });

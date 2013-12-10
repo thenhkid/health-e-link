@@ -30,8 +30,11 @@
             <div class="alert alert-success">
                 <strong>Success!</strong> 
                 <c:choose><c:when test="${savedStatus == 'updated'}">The field mappings have been successfully updated!</c:when><c:when test="${savedStatus == 'created'}">The message type has been successfully created!</c:when><c:when test="${savedStatus == 'fieldcreated'}">The new form field has been successfully created!</c:when></c:choose>
-                    </div>
+            </div>
         </c:if>
+        <div id="mappingErrorMsgDiv" class="alert alert-danger" style="display:none;">
+            <strong>There is an error with your Field Mappings, scroll to find the highlighted field!</strong>
+        </div>
 
         <form:form id="fieldMappings" modelAttribute="messageTypeDetails" method="post" role="form">
             <c:forEach var="i" begin="1" end="4">	
