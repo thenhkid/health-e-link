@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.ut.dph.dao.sysAdminDAO;
 import com.ut.dph.model.custom.LookUpTable;
 import com.ut.dph.model.custom.TableData;
+import com.ut.dph.model.lutables.lu_Counties;
 import com.ut.dph.model.Macros;
 import com.ut.dph.service.sysAdminManager;
 
@@ -132,6 +133,11 @@ public class sysAdminManagerImpl implements sysAdminManager {
 	public boolean updateMacro(Macros macro) {
 		return sysAdminDAO.updateMacro(macro);
 		
+	}
+
+	@Override
+	public void createCounty(lu_Counties luc) {
+		sysAdminDAO.createCounty(luc);	
 	}
 
 

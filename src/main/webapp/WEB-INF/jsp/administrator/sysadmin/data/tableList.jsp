@@ -37,16 +37,22 @@
                             <c:choose>
                                 <c:when test="${not empty tableList}">
                                     <c:forEach var="tableInfo" items="${tableList}">
+                                    		<c:if test="${tableInfo.columnNum > 7}">
+                                            		<c:set var="link" value="data/nstd/${tableInfo.urlId}"/>
+                                             </c:if>
+                                             <c:if test="${tableInfo.columnNum <= 7}">
+                                            		 <c:set var="link" value="data/std/${tableInfo.urlId}"/>
+                                             </c:if> 
                                         <tr id="tableInfoRow" style="cursor: pointer">
                                             <td scope="row">
-                                                <a href="data/std/${tableInfo.urlId}" title="View Data">${tableInfo.displayName}</a>
+                                                <a href="${link}" title="View Data">${tableInfo.displayName}</a>
                                             </td>
                                             <td class="center-text">${tableInfo.columnNum}</td>
                                             <td class="center-text">${tableInfo.rowNum}</td>
                                             <td class="center-text">${tableInfo.description}</td>
                                             <%-- not sure if we should let users edit our look up tables--%> 
                                             <td class="actions-col">
-                                                <a href="data/std/${tableInfo.urlId}" class="btn btn-link" title="Edit data for this table">
+                                                <a href="${link}" class="btn btn-link" title="Edit data for this table">
                                                     <span class="glyphicon glyphicon-edit"></span>
                                                     View Data	
                                                 </a>

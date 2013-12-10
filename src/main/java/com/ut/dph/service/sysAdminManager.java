@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.ut.dph.model.custom.LookUpTable;
 import com.ut.dph.model.custom.TableData;
+import com.ut.dph.model.lutables.lu_Counties;
 import com.ut.dph.model.Macros;
 
 /** 
@@ -53,6 +54,8 @@ public interface sysAdminManager {
 	void createMacro (Macros macro);
 	
 	boolean updateMacro (Macros macro);
+	
+	void createCounty (lu_Counties luc);
 	
 }
 

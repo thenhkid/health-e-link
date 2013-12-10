@@ -7,7 +7,12 @@
 <div class="main clearfix" role="main" rel="dataForTable">
     <div class="col-md-12">
 			<div class="alert alert-success">
-               <c:choose><c:when test="${param.msg == 'updated'}">The look up data has been successfully updated!</c:when><c:when test="${param.msg == 'created'}">The look up data has been successfully added!</c:when></c:choose>
+               <c:choose>
+               <c:when test="${param.msg == 'updated'}">The look up data has been successfully updated!</c:when>
+               <c:when test="${param.msg == 'created'}">The look up data has been successfully added!</c:when>
+               <c:when test="${savedStatus == 'deleted'}">The look up data has been successfully deleted!</c:when>
+               <c:when test="${savedStatus == 'notDeleted'}">The look up data has NOT been deleted, please try again.</c:when>
+               </c:choose>
             </div>
        
         <section class="panel panel-default">
@@ -87,7 +92,8 @@
     </div>		
 </div>	
 <p rel="${currentPage}" id="currentPageHolder" style="display:none"></p>
-<p rel="${tableInfo.urlId}" id="urlIdInfo" style="display:none"></p>
+<p rel="${urlIdInfo}" id="urlIdInfo" style="display:none"></p>
+
 <!-- Providers modal -->
 <div class="modal fade" id="addLUDataModal" role="dialog" tabindex="-1" aria-labeledby="Add look up data" aria-hidden="true" aria-describedby="Add look up data"></div>
 

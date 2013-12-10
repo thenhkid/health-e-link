@@ -20,6 +20,7 @@ import com.ut.dph.dao.UtilitiesDAO;
 import com.ut.dph.model.Macros;
 import com.ut.dph.model.custom.LookUpTable;
 import com.ut.dph.model.custom.TableData;
+import com.ut.dph.model.lutables.lu_Counties;
 
 /**
  * @see com.ut.dph.dao.sysAdminDAO
@@ -412,6 +413,18 @@ public class sysAdminDAOImpl implements sysAdminDAO {
 		                System.err.println("update macro failed." + ex);
 		                return false;
 		            }
+		}
+
+		@Override
+		@Transactional
+		public void createCounty(lu_Counties luc) {
+			try {
+				sessionFactory.getCurrentSession().save(luc);						
+			} catch (Throwable ex) {
+                System.err.println("create county failed." + ex);
+             	
+			}
+			
 		}
 		
 }

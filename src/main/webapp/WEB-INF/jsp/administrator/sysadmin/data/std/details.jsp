@@ -9,9 +9,11 @@
             <h3 class="panel-title"><c:choose><c:when test="${btnValue == 'Update'}">Update</c:when><c:when test="${btnValue == 'Create'}">Add</c:when></c:choose> Look Up Data ${success}</h3>
                 </div>
                 <div class="modal-body">
-            <form:form id="tabledataform" commandName="tableData" modelAttribute="tableDataDetails"  method="post" role="form">
+            <form:form id="${formId}" commandName="${ojectType}" modelAttribute="tableDataDetails"  method="post" role="form">
                 <form:hidden path="id" id="id" />
-                <form:hidden path="urlId" id="urlId"/>
+                <c:if test="${not empty stdForm}">
+                	<form:hidden path="urlId" id="urlId"/>
+                </c:if>
                 <div class="form-container">
                     <div class="form-group">
                         <label for="status">Status *</label>
@@ -49,8 +51,22 @@
                                 <form:errors path="description" cssClass="control-label" element="label" />
                             </div>
                         </spring:bind>
+                        <c:if test='${ojectType=="lu_Counties"}'>
+                         <spring:bind path="state">
+                            <div class="form-group ${status.error ? 'has-error' : '' }">
+                                <label class="control-label" for="state">State *</label>
+                                <form:select id="state" path="state" cssClass="form-control half">
+                                    <option value="" label=" - Select - " ></option>
+                                    <form:options items="${stateList}"/>
+                                </form:select>
+                                <form:errors path="state" cssClass="control-label" element="label" />
+                            </div>
+                        </spring:bind>
+                        </c:if>
+                        
+                        
                     <div class="form-group">
-                        <input type="button" id="submitButton" rel="${btnValue}" class="btn btn-primary" value="${btnValue}"/>
+                        <input type="button" id="submitButton" rel="${btnValue}" class="btn btn-primary" value="${submitBtnValue}"/>
                     </div>
                 </div>
             </form:form>
