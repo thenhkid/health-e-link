@@ -7,7 +7,7 @@
 <div class="main clearfix full-width" role="main">
     <div class="col-md-12">
         <c:if test="${not empty savedStatus}" >
-            <div class="alert alert-success">
+            <div class="alert alert-success" role="alert">
                 <strong>Success!</strong> 
                 <c:choose>
                     <c:when test="${savedStatus == 'updated'}">The organization has been successfully updated!</c:when>
@@ -20,7 +20,7 @@
         <section class="panel panel-default">
             <div class="panel-body">
                 <div class="table-actions">
-                    <form:form class="form form-inline" action="/administrator/organizations/list" method="post" role="form">
+                    <form:form class="form form-inline" action="/administrator/organizations/list" method="post" role="search">
                         <div class="form-group">
                             <label class="sr-only" for="searchTerm">Search</label>
                             <input type="text" name="searchTerm" id="searchTerm" value="${searchTerm}" class="form-control" id="search-organizations" placeholder="Search"/>
@@ -37,10 +37,10 @@
                             <tr>
                                 <th scope="col">Organization Name ${result}</th>
                                 <th scope="col">Contact Information</th>
-                                <th scope="col" style="text-align:center"># of Users</th>
-                                <th scope="col" style="text-align:center"># of Configurations</th>
-                                <th scope="col" style="text-align:center">Date Created</th>
-                                <th scope="col" style="text-align:center">Access Level</th>
+                                <th scope="col" class="center-text"># of Users</th>
+                                <th scope="col" class="center-text"># of Configurations</th>
+                                <th scope="col" class="center-text">Date Created</th>
+                                <th scope="col" class="center-text">Access Level</th>
                                 <th scope="col"></th>
                             </tr>
                         </thead>
@@ -75,7 +75,7 @@
                                                 </c:choose>
                                             </td>
                                             <td class="actions-col">
-                                                <a href="javascript:void(0);" class="btn btn-link" title="Edit this organization">
+                                                <a href="javascript:void(0);" class="btn btn-link" title="Edit this organization" role="button">
                                                     <span class="glyphicon glyphicon-edit"></span>
                                                     Edit
                                                 </a>

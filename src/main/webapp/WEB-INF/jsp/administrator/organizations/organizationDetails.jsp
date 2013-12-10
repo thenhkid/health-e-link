@@ -27,12 +27,12 @@
                 <div class="panel-body">
                     <div class="form-container">
                         <div class="form-group">
-                            <label for="status">Status *</label>
+                            <label for="status">Status * </label>
                             <div>
-                                <label class="radio-inline">
+                                <label class="radio-inline" for="status">
                                     <form:radiobutton id="status" path="status" value="true"/>Active 
                                 </label>
-                                <label class="radio-inline">
+                                <label class="radio-inline" for="status">
                                     <form:radiobutton id="status" path="status" value="false"/>Inactive
                                 </label>
                             </div>

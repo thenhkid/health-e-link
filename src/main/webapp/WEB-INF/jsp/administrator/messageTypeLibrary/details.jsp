@@ -41,7 +41,7 @@
                         </div>
                         <spring:bind path="name">
                             <div class="form-group ${status.error ? 'has-error' : '' } ${not empty existingType ? 'has-error' : ''}">
-                                <label class="control-label" for=name>Name *</label>
+                                <label class="control-label" for="name">Name *</label>
                                 <form:input path="name" id="name" class="form-control" type="text" maxLength="255" />
                                 <form:errors path="name" cssClass="control-label" element="label" />
                                 <c:if test="${not empty existingType}"><span class="control-label has-error">${existingType}</span></c:if>
@@ -51,7 +51,7 @@
                             <c:when test="${empty id}">
                                 <spring:bind path="file">
                                     <div id="templateFileDiv" class="form-group ${status.error ? 'has-error' : '' }">
-                                        <label class="control-label" for="templateFile">Template File *</label>
+                                        <label class="control-label" for="templateFile">Template File * <span class="badge badge-help"  data-toggle="tooltip" data-placement="top" title="" data-original-title="Explain the file types and etc">?</span></label>
                                         <form:input path="file" id="templateFile" type="file" />
                                         <span id="templateFileMsg" class="control-label"></span>
                                     </div>

@@ -38,7 +38,8 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="type">Configuration Type *</label>
+                            <label for="type">Configuration Type * 
+                            <span class="badge badge-help" data-placement="top" title="" data-original-title="This field may need an explanation">?</span></label>
                             <div>
                                 <label class="radio-inline">
                                     <form:radiobutton id="type" path="type" value="1" disabled="${configurationDetails.id == 0 ? 'false' : 'true' }"/> For Source Organization 

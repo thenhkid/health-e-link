@@ -214,3 +214,19 @@ body#notFound {
   background-color: #efefef;
   color: #0096ff;
 }
+.badge-help {
+  color: #0096ff;
+  background-color: #fff;
+  border: 1px solid #0096ff;
+  text-align: center;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+}
+.badge-help:hover {
+  background-color: #0096ff;
+  color: #fff;
+}
+label .badge-help {
+  margin-left: 3px;
+}

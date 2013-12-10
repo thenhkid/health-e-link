@@ -5989,6 +5989,10 @@ body {
   height: 30px;
   display: block;
 }
+input[type="radio"],
+input[type="checkbox"] {
+  margin-top: 0;
+}
 .form-control + .form-group-note {
   margin-top: 5px;
   display: block;
@@ -6274,6 +6278,13 @@ body {
 .table td ul {
   margin-left: 0;
   padding-left: 20px;
+}
+.badge-help {
+  padding: 3px 3px;
+  width: 18px;
+  height: 18px;
+  box-sizing: border-box;
+  vertical-align: baseline;
 }
 .filler:after {
   background-color: inherit;

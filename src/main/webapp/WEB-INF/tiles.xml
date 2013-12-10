@@ -3,7 +3,7 @@
        "-//Apache Software Foundation//DTD Tiles Configuration 2.0//EN"
        "http://tiles.apache.org/dtds/tiles-config_2_0.dtd">
 <tiles-definitions>
-    
+
     <!-- Admin Definitions -->
     <definition name="base.definition.admin" template="/WEB-INF/tiles/layout.jsp">
         <put-attribute name="title" value="" />
@@ -31,7 +31,7 @@
         <put-attribute name="header" value="" />
         <put-attribute name="body" value="/WEB-INF/jsp/login.jsp" />
     </definition>
-    
+
    <!-- Admin Dashboard -->
     <definition name="/administrator/dashboard" extends="base.definition.admin">
         <put-attribute name="page-id" value="dashboard-details" />
@@ -40,7 +40,7 @@
         <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp" />
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/index.jsp" />
     </definition>
-    	
+
     <!-- Admin Configuration Definitions -->
     <definition name="/administrator/configurations/list" extends="base.definition.admin">
         <put-attribute name="page-id" value="configuration-list" />
@@ -51,7 +51,7 @@
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/configurations/list.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/admin/configuration/list.js" />
     </definition>
-	    
+
     <definition name="/administrator/configurations/details" extends="base.definition.admin">
         <put-attribute name="page-id" value="configuration-details" />
         <put-attribute name="page-section" value="section-configurations" />
@@ -62,7 +62,7 @@
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/configurations/details.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/admin/configuration/details.js" />
     </definition>
-	    
+
     <definition name="/administrator/configurations/transport" extends="base.definition.admin">
         <put-attribute name="page-id" value="configuration-transport" />
         <put-attribute name="page-section" value="section-configurations" />
@@ -73,7 +73,7 @@
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/configurations/transport.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/admin/configuration/transport.js" />
     </definition>
-	    
+
     <definition name="/administrator/configurations/chooseFields" extends="base.definition.admin">
         <put-attribute name="page-id" value="configuration-chooseFields" />
         <put-attribute name="page-section" value="section-configurations" />
@@ -84,7 +84,7 @@
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/configurations/chooseFields.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/admin/configuration/chooseFields.js" />
     </definition>
-	    
+
     <definition name="/administrator/configurations/mappings" extends="base.definition.admin">
         <put-attribute name="page-id" value="configuration-mappings" />
         <put-attribute name="page-section" value="section-configurations" />
@@ -95,7 +95,7 @@
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/configurations/fieldMappings.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/admin/configuration/fieldMappings.js" />
     </definition>
-	    
+
     <definition name="/administrator/configurations/translations" extends="base.definition.admin">
         <put-attribute name="page-id" value="configuration-translations" />
         <put-attribute name="page-section" value="section-configurations" />
@@ -106,7 +106,7 @@
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/configurations/dataTranslations.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/admin/configuration/dataTranslations.js" />
     </definition>
-	    
+
     <definition name="/administrator/configurations/connections" extends="base.definition.admin">
         <put-attribute name="page-id" value="configuration-connections" />
         <put-attribute name="page-section" value="section-configurations" />
@@ -117,7 +117,7 @@
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/configurations/connections.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/admin/configuration/connections.js" />
     </definition>
-            
+
     <definition name="/administrator/configurations/schedule" extends="base.definition.admin">
         <put-attribute name="page-id" value="configuration-schedule" />
         <put-attribute name="page-section" value="section-configurations" />
@@ -128,7 +128,7 @@
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/configurations/schedule.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/admin/configuration/schedule.js" />
     </definition>
-	    
+
     <!-- Admin Organization Definitions -->
     <definition name="/administrator/organizations/listOrganizations" extends="base.definition.admin">
         <put-attribute name="page-id" value="organization-list" />
@@ -139,7 +139,7 @@
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/organizations/listOrganizations.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/admin/organization/list.js" />
     </definition>
-	    
+
     <definition name="/administrator/organizations/organizationDetails" extends="base.definition.admin">
         <put-attribute name="page-id" value="organization-details" />
         <put-attribute name="page-section" value="section-organizations" />
@@ -150,7 +150,7 @@
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/organizations/organizationDetails.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/admin/organization/orgDetails.js" />
     </definition>
-    
+
     <definition name="/administrator/organizations/configurations" extends="base.definition.admin">
         <put-attribute name="page-id" value="organization-configs" />
         <put-attribute name="page-section" value="section-organizations" />
@@ -161,7 +161,7 @@
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/organizations/configurations/list.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/admin/organization/configs.js" />
     </definition>
-	    
+
     <definition name="/administrator/organizations/users" extends="base.definition.admin">
         <put-attribute name="page-id" value="organization-users" />
         <put-attribute name="page-section" value="section-organizations" />
@@ -172,7 +172,7 @@
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/organizations/users/list.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/admin/organization/users.js" />
     </definition>
-	    
+
     <definition name="/administrator/organizations/providers/list" extends="base.definition.admin">
         <put-attribute name="page-id" value="organization-providerlist" />
         <put-attribute name="page-section" value="section-organizations" />
@@ -183,7 +183,7 @@
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/organizations/providers/list.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/admin/organization/providers.js" />
     </definition>
-	    
+
     <definition name="/administrator/organizations/providers/details" extends="base.definition.admin">
         <put-attribute name="page-id" value="organization-providerdetails" />
         <put-attribute name="page-section" value="section-organizations" />
@@ -194,7 +194,7 @@
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/organizations/providers/details.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/admin/organization/providerDetails.js" />
     </definition>
-	    
+
     <definition name="/administrator/organizations/brochures" extends="base.definition.admin">
         <put-attribute name="page-id" value="organization-brochurelist" />
         <put-attribute name="page-section" value="section-organizations" />
@@ -205,7 +205,7 @@
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/organizations/brochures/list.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/admin/organization/brochures.js" />
     </definition>
-	    
+
     <!-- Admin Message Type Library Definitions -->
     <definition name="/administrator/messageTypeLibrary/list" extends="base.definition.admin">
         <put-attribute name="page-id" value="library-list" />
@@ -216,7 +216,7 @@
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/messageTypeLibrary/list.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/admin/library/list.js" />
     </definition>
-	    
+
     <definition name="/administrator/messageTypeLibrary/details" extends="base.definition.admin">
         <put-attribute name="page-id" value="library-details" />
         <put-attribute name="page-section" value="section-library" />
@@ -227,7 +227,7 @@
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/messageTypeLibrary/details.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/admin/library/details.js" />
     </definition>
-	    
+
     <definition name="/administrator/messageTypeLibrary/mappings" extends="base.definition.admin">
         <put-attribute name="page-id" value="library-mappings" />
         <put-attribute name="page-section" value="section-library" />
@@ -238,7 +238,7 @@
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/messageTypeLibrary/fieldMappings.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/admin/library/mappings.js" />
     </definition>
-	    
+
     <definition name="/administrator/messageTypeLibrary/translations" extends="base.definition.admin">
         <put-attribute name="page-id" value="library-translations" />
         <put-attribute name="page-section" value="section-library" />
@@ -249,9 +249,9 @@
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/messageTypeLibrary/dataTranslations.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/admin/library/translations.js" />
     </definition>
-	   
+
     <!--  End Admin Definitions -->
-    
+
     <!-- start sysadmin definitions -->
     <definition name="/administrator/sysadmin/dashboard" extends="base.definition.admin">
         <put-attribute name="page-id" value="dashboard-details" />
@@ -270,7 +270,7 @@
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/sysadmin/data/tableList.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/admin/sysadmin/data/tableList.js" />
     </definition>
-	    
+
     <!--  this lists data rows for look up tables -->    
     <definition name="/administrator/sysadmin/data/std" extends="base.definition.admin">
         <put-attribute name="page-id" value="sysadmin-stddata" />
@@ -282,7 +282,7 @@
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/sysadmin/data/std/list.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/admin/sysadmin/data/list.js" />
     </definition>
-    
+
      <!--  this lists data rows for macros -->    
     <definition name="/administrator/sysadmin/macros" extends="base.definition.admin">
         <put-attribute name="page-id" value="sysadmin-macros" />
@@ -294,11 +294,10 @@
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/sysadmin/macro/list.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/admin/sysadmin/macro/list.js" />
     </definition>
-       
-    
-    
+
+
     <!--  end sysadmin definitions -->
-    
+
     <!-- Front End Definitions -->
     <definition name="base.definition.frontEnd" template="/WEB-INF/tiles/frontEndLayout.jsp">
         <put-attribute name="title" value="Universal Translator" />
@@ -306,7 +305,7 @@
         <put-attribute name="body" value="" />
         <put-attribute name="footer" value="/WEB-INF/jsp/common/footer.jsp" />
     </definition>
-    
+
     <!-- Home Page -->
     <definition name="/home" extends="base.definition.frontEnd">
         <put-attribute name="page-id" value="home" />
@@ -314,17 +313,17 @@
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page=home" />
         <put-attribute name="body" value="/WEB-INF/jsp/home.jsp" />
     </definition>
-    
+
     <!-- Information Pages -->
     <definition name="/productSuite" extends="base.definition.frontEnd">
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page=productSuite" />
         <put-attribute name="body" value="/WEB-INF/jsp/informationPages/productSuite.jsp" />
     </definition>
-    
+
     <!-- Profile (Account) Pages -->
     <definition name="/profile/index" extends="base.definition.frontEnd">
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page=profileIndex" />
         <put-attribute name="body" value="/WEB-INF/jsp/profile/index.jsp" />
     </definition>
-    
+
 </tiles-definitions>

@@ -3,7 +3,7 @@ require.config({
 	urlArgs: "bust=" + (new Date()).getTime(),
 	paths: {
 		'jquery' : '../vendor/jquery-1.10.1.min',
-		'bootstrap' : '../vendor/bootstrap.min',
+		'bootstrap' : '../vendor/bootstrap',
 		'responsive-tables' : '../vendor/responsive-tables',
 		'mediaModal' : '../mediaModal'
 	},
@@ -32,6 +32,12 @@ require(['jquery',  'bootstrap', 'responsive-tables', 'mediaModal'], function ($
 			$(document.body).removeClass('modal-open');
 		}
 	});
+
+	// initalize popovers
+	$('[data-toggle=popover]').popover();
+
+	// initalize tooltips
+	$('.badge-help').tooltip();
 
 	// Log out confirmation
 	$('.logout').on('click', function (e) {
