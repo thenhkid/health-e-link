@@ -89,6 +89,30 @@
                     </div>
                 </div>
             </section>
+            <section class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Error Handling</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="form-container">
+                        <div class="form-group">
+                            <label for="status">If Error *</label>
+                            <div>
+                                <label class="radio-inline">
+                                    <form:radiobutton id="rejectOnError" path="rejectOnError" value="1"/>Set Record to Pending Status
+                                </label>
+                                <label class="radio-inline">
+                                  <form:radiobutton id="rejectOnError" path="rejectOnError" value="2" />Reject Record 
+                                </label>
+                                <label class="radio-inline">
+                                    <form:radiobutton id="rejectOnError" path="rejectOnError" value="3"/>Reject all Records with same Message Type
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>                    
         </form:form>
+                        
     </div>
 </div>

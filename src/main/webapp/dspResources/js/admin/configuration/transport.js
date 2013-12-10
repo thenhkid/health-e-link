@@ -93,6 +93,14 @@ function checkFormFields() {
                 }
             }
             
+            //Make sure a valid max file size is entered
+            if (!$.isNumeric($('#' + headVal + 'maxFileSize').val()) || $('#' + headVal + 'maxFileSize').val() == 0) {
+                $('#' + headVal + 'maxFileSizeDiv').addClass("has-error");
+                $('#' + headVal + 'maxFileSizeMsg').addClass("has-error");
+                $('#' + headVal + 'maxFileSizeMsg').html('The max file size must be a numeric value greater than 0!');
+                hasErrors = 1;
+            }
+            
             if($('#configType').val() === 1) {
 
                 //Make sure a valid field no is entered

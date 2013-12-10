@@ -106,7 +106,11 @@
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/configurations/dataTranslations.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/admin/configuration/dataTranslations.js" />
     </definition>
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> 60b1fe2aa5cbace0d57830abbac41d8db848cc68
     <definition name="/administrator/configurations/connections" extends="base.definition.admin">
         <put-attribute name="page-id" value="configuration-connections" />
         <put-attribute name="page-section" value="section-configurations" />
