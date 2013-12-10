@@ -676,3 +676,9 @@ ADD CONSTRAINT `messId`
   REFERENCES `universalTranslator`.`message_Details` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
+
+
+/* Chad 12/10/2013 */
+ALTER TABLE `universalTranslator`.`message_FromProvider` 
+CHANGE COLUMN `name` `firstname` VARCHAR(45) NULL DEFAULT NULL ,
+ADD COLUMN `lastname` VARCHAR(45) NULL AFTER `firstname`;

@@ -647,7 +647,8 @@ public class adminOrgContoller {
 
     /**
      * *********************************************************
-     * ORGANIZATION PROVIDER FUNCTIONS *********************************************************
+     * ORGANIZATION PROVIDER FUNCTIONS 
+     * *********************************************************
      */
     /**
      * The '/{cleanURL/providers' GET request will display the list of providers for the selected organization.
@@ -886,8 +887,7 @@ public class adminOrgContoller {
      *
      */
     @RequestMapping(value = "/{cleanURL}/providerAddress/{address}", method = RequestMethod.GET)
-    @ResponseBody
-    public ModelAndView viewAddressDetails(@RequestParam(value = "i", required = true) Integer addressId) throws Exception {
+    public @ResponseBody ModelAndView viewAddressDetails(@RequestParam(value = "i", required = true) Integer addressId) throws Exception {
 
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/organizations/providers/addressDetails");
@@ -919,8 +919,7 @@ public class adminOrgContoller {
      * @throws Exception
      */
     @RequestMapping(value = "/{cleanURL}/address/update", method = RequestMethod.POST)
-    public @ResponseBody
-    ModelAndView updateProviderAddress(@Valid @ModelAttribute(value = "addressDetails") providerAddress addressDetails, BindingResult result) throws Exception {
+    public @ResponseBody ModelAndView updateProviderAddress(@Valid @ModelAttribute(value = "addressDetails") providerAddress addressDetails, BindingResult result) throws Exception {
 
         if (result.hasErrors()) {
             ModelAndView mav = new ModelAndView("/administrator/organizations/providers/addressDetails");
