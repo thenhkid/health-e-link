@@ -650,5 +650,29 @@ ADD CONSTRAINT `messBatchFK`
   ON UPDATE NO ACTION;
   
 
+ALTER TABLE `universalTranslator`.`message_Details` 
+DROP FOREIGN KEY `patientFK`;
+ALTER TABLE `universalTranslator`.`message_Details` 
+DROP COLUMN `patientId`,
+DROP INDEX `patientFK_idx` ;
 
 
+ALTER TABLE `universalTranslator`.`info_Patients` 
+CHANGE COLUMN `englishProficient` `englishProficient` BIT(1) NULL COMMENT '1 for True, 2 for False' ,
+ADD COLUMN `messageId` INT NULL AFTER `id`, RENAME TO  `universalTranslator`.`message_Patients` ;
+
+
+ALTER TABLE `universalTranslator`.`info_PatientAddresses` 
+DROP FOREIGN KEY `patAddFK`;
+ALTER TABLE `universalTranslator`.`info_PatientAddresses` 
+RENAME TO  `universalTranslator`.`message_PatientAddresses` ;
+
+
+ALTER TABLE `universalTranslator`.`message_PatientAddresses` 
+CHANGE COLUMN `patientId` `messageId` INT(11) NOT NULL COMMENT 'This is the id from message_details table.' ;
+ALTER TABLE `universalTranslator`.`message_PatientAddresses` 
+ADD CONSTRAINT `messId`
+  FOREIGN KEY (`messageId`)
+  REFERENCES `universalTranslator`.`message_Details` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
