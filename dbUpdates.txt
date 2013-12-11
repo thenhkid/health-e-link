@@ -1326,7 +1326,8 @@ ADD CONSTRAINT `msgTypeId`
 ALTER TABLE `universalTranslator`.`transactionTarget` 
 CHANGE COLUMN `id` `id` INT(11) NOT NULL AUTO_INCREMENT ,
 ADD COLUMN `providerId` INT NULL AFTER `orgId`;
-  
 
-
+ALTER TABLE `universalTranslator`.`message_VisitDetails` 
+CHANGE COLUMN `grossWklyIncome` `income` FLOAT NULL DEFAULT NULL ,
+ADD COLUMN `incomeUnit` INT NULL COMMENT 'This could be monthly, weekly, daily, annually, etc' AFTER `incomeReported`, RENAME TO  `universalTranslator`.`message_PatientDetails` ;
 
