@@ -1287,3 +1287,17 @@ ADD CONSTRAINT `transFK`
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
 
+
+/**12.10.2013 Grace **/
+
+ALTER TABLE `universalTranslator`.`configurations` 
+DROP FOREIGN KEY `mtid`;
+
+ALTER TABLE `universalTranslator`.`configurations` 
+ADD CONSTRAINT `mtid`
+  FOREIGN KEY (`messageTypeId`)
+  REFERENCES `universalTranslator`.`messagetypes` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+
