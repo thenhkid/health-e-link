@@ -1321,6 +1321,12 @@ ADD CONSTRAINT `msgTypeId`
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
   
+  
+  /**12.11.2013**/
+ALTER TABLE `universalTranslator`.`transactionTarget` 
+CHANGE COLUMN `id` `id` INT(11) NOT NULL AUTO_INCREMENT ,
+ADD COLUMN `providerId` INT NULL AFTER `orgId`;
+  
 
 
 
