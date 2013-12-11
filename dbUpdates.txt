@@ -1331,3 +1331,20 @@ ALTER TABLE `universalTranslator`.`message_VisitDetails`
 CHANGE COLUMN `grossWklyIncome` `income` FLOAT NULL DEFAULT NULL ,
 ADD COLUMN `incomeUnit` INT NULL COMMENT 'This could be monthly, weekly, daily, annually, etc' AFTER `income`, RENAME TO  `universalTranslator`.`message_PatientDetails` ;
 
+/** dropping dateModified as it is not useful **/
+alter table 	`message_Allergies`	drop column `dateModified`	;
+alter table 	`message_BestTimeToCall`	drop column `dateModified`	;
+alter table 	`message_Exercises`	drop column `dateModified`	;
+alter table 	`message_FamilyMembers`	drop column `dateModified`	;
+alter table 	`message_FamMemMedicalConditions`	drop column `dateModified`	;
+alter table 	`message_GeneralHealths`	drop column `dateModified`	;
+alter table 	`message_HealthcareTeams`	drop column `dateModified`	;
+alter table 	`message_Immunizations`	drop column `dateModified`	;
+alter table 	`message_MedicalConditions`	drop column `dateModified`	;
+alter table 	`message_Medications`	drop column `dateModified`	;
+alter table 	`message_Payers`	drop column `dateModified`	;
+alter table 	`message_Procedures`	drop column `dateModified`	;
+alter table 	`message_SocialHistories`	drop column `dateModified`	;
+alter table 	`message_TestResults`	drop column `dateModified`	;
+alter table 	`message_PatientAddresses`	drop column `dateModified`	;
+alter table 	`message_Patients`	drop column `dateModified`	;
