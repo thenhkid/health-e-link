@@ -86,12 +86,12 @@ public class adminConfigController {
 
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/configurations/list");
-
+        
         List<configuration> configurations = configurationmanager.getConfigurations(page, maxResults);
-        mav.addObject("configurationList", configurations);
-
+        
         Organization org;
         messageType messagetype;
+        Long totalConnections;
 
         for (configuration config : configurations) {
             org = organizationmanager.getOrganizationById(config.getorgId());
@@ -99,11 +99,19 @@ public class adminConfigController {
 
             messagetype = messagetypemanager.getMessageTypeById(config.getMessageTypeId());
             config.setMessageTypeName(messagetype.getName());
-
-            Long totalConnections = (Long) configurationmanager.getTotalConnections(configId);
-            config.setTotalConnections(totalConnections);
-
+            
+            if(config.getType() == 1) {
+                totalConnections = configurationmanager.getTotalConnections(config.getId());
+                config.setTotalConnections(totalConnections);
+            }
+            else {
+                List<Connections> targetConnections = configurationmanager.getTargetConnections(config.getMessageTypeId(),config.getorgId());
+                totalConnections = (long) targetConnections.size();
+                config.setTotalConnections(totalConnections);
+            }
         }
+        
+        mav.addObject("configurationList", configurations);
 
         //Return the total list of configurations
         Long totalConfigs = configurationmanager.findTotalConfigs();

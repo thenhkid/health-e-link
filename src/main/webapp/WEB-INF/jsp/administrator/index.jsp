@@ -74,55 +74,31 @@
                 </div>
                 <div class="panel-body" >
                     <h4>Latest Configurations:</h4>
-                    <table class="table table-striped table-hover table-default">
-                        <tbody>
-                            <tr>
-                                <td><a href="" title=""><strong>St. Joes Weight Loss</strong></a>
-                                    <br/> <strong>Source:</strong> St. Joes Hospital
-                                    <br/> <strong>Message Type:</strong>  Weight Loss
-                                </td>
-                                <td>
-                                    8/20/2013
-                                </td>
-                                <td class="actions-col">
-                                    <a href="?page=configurations-edit-details" class="btn btn-link" role="button">
-                                        <span class="glyphicon glyphicon-edit"></span>
-                                        Edit
-                                    </a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><a href="" title=""><strong>St. Joes Weight Loss</strong></a>
-                                    <br/> <strong>Source:</strong> St. Joes Hospital
-                                    <br/> <strong>Message Type:</strong>  Weight Loss
-                                </td>
-                                <td>
-                                    8/20/2013
-                                </td>
-                                <td class="actions-col">
-                                    <a href="?page=configurations-edit-details" class="btn btn-link" role="button">
-                                        <span class="glyphicon glyphicon-edit"></span>
-                                        Edit
-                                    </a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><a href="" title=""><strong>St. Joes Weight Loss</strong></a>
-                                    <br/> <strong>Source:</strong> St. Joes Hospital
-                                    <br/> <strong>Message Type:</strong>  Weight Loss
-                                </td>
-                                <td>
-                                    8/20/2013
-                                </td>
-                                <td class="actions-col">
-                                    <a href="?page=configurations-edit-details" class="btn btn-link" role="button">
-                                        <span class="glyphicon glyphicon-edit"></span>
-                                        Edit
-                                    </a>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <c:if test="${not empty latestConfigs}"> 
+                        <table class="table table-striped table-hover table-default">
+                            <tbody>
+                                <c:forEach var="config" items="${latestConfigs}">
+                                    <tr>
+                                        <td>
+                                            <a href="administrator/configurations/details?i=${config.id}" title="Edit this Configuration"><strong>${config.orgName}</strong></a>
+                                            <br/> <strong>Configuration Type:</strong> <c:choose><c:when test="${config.type == 1}">Source Configuration</c:when><c:otherwise>Target Configuration</c:otherwise></c:choose>
+                                            <br/> <strong>Message Type:</strong>  ${config.messageTypeName}
+                                            <br/> <strong>Status:</strong>  <c:choose><c:when test="${config.status == true}">active</c:when><c:otherwise>inactive</c:otherwise></c:choose>
+                                        </td>
+                                        <td>
+                                            <fmt:formatDate value="${config.dateCreated}" type="date" pattern="M/dd/yyyy" />
+                                        </td>
+                                        <td class="actions-col">
+                                            <a href="administrator/configurations/details?i=${config.id}" class="btn btn-link" title="Edit this Configuration" role="button">
+                                                <span class="glyphicon glyphicon-edit"></span>
+                                                Edit
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </c:forEach>
+                            </tbody>
+                        </table>
+                    </c:if>
                 </div>
             </section>
         </div>
@@ -145,14 +121,6 @@
                                                 ${org.address} <c:if test="${not empty org.address2}"><br />${org.address2}</c:if>
                                                 <br />${org.city} ${org.state}, ${org.postalCode}
                                             </address>
-                                            <strong>Access Level:</strong> <c:choose>
-                                                <c:when test="${org.publicOrg == true}">
-                                                    Public
-                                                </c:when>
-                                                <c:otherwise>
-                                                    Private
-                                                </c:otherwise>
-                                            </c:choose>
                                         </td>
                                         <td>
                                             <fmt:formatDate value="${org.dateCreated}" type="date" pattern="M/dd/yyyy" />

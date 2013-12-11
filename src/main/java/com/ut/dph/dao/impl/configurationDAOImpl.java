@@ -267,7 +267,7 @@ public class configurationDAOImpl implements configurationDAO {
     @Override
     @SuppressWarnings("unchecked")
     public List<configuration> getLatestConfigurations(int maxResults) {
-        Query query = sessionFactory.getCurrentSession().createQuery("from configuration where status = 1 order by dateCreated desc");
+        Query query = sessionFactory.getCurrentSession().createQuery("from configuration order by dateCreated desc");
 
         //Set the max results to display
         query.setMaxResults(maxResults);

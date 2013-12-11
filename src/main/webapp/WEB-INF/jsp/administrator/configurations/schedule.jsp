@@ -99,6 +99,7 @@
                     <form:form id="schedulingSpecs" modelAttribute="scheduleDetails" action="scheduling" method="post" role="form">
                         <form:hidden path="transportMethod" value="${scheduleDetails.transportMethod}" />
                         <form:hidden path="configId" value="${scheduleDetails.configId}" />
+                        <form:hidden path="id" value="${scheduleDetails.id}" />
                         <form:hidden path="type" id="type" />
                         <div class="form-group specFormFields" id="processingTypeDiv" style="display:none">
                             <label for="status">Type of Processing</label>

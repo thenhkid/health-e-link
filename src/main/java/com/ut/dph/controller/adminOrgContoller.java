@@ -32,6 +32,7 @@ import com.ut.dph.model.siteSections;
 import com.ut.dph.model.Provider;
 import com.ut.dph.service.providerManager;
 import com.ut.dph.model.Brochure;
+import com.ut.dph.model.Connections;
 import com.ut.dph.model.configuration;
 import com.ut.dph.model.messageType;
 import com.ut.dph.service.brochureManager;
@@ -375,9 +376,16 @@ public class adminOrgContoller {
         for (configuration config : configurations) {
             messagetype = messagetypemanager.getMessageTypeById(config.getMessageTypeId());
             config.setMessageTypeName(messagetype.getName());
-
-            totalConnections = (Long) configurationmanager.getTotalConnections(config.getId());
-            config.setTotalConnections(totalConnections);
+ 
+            if(config.getType() == 1) {
+                totalConnections = configurationmanager.getTotalConnections(config.getId());
+                config.setTotalConnections(totalConnections);
+            }
+            else {
+                List<Connections> targetConnections = configurationmanager.getTargetConnections(config.getMessageTypeId(),config.getorgId());
+                totalConnections = (long) targetConnections.size();
+                config.setTotalConnections(totalConnections);
+            }
         }
 
         return mav;

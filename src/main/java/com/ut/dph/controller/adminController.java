@@ -77,6 +77,17 @@ public class adminController {
         //Return the latest configurations
         List<configuration> configurations = configurationmanager.getLatestConfigurations(maxResults);
         mav.addObject("latestConfigs", configurations);
+        
+        Organization org;
+        messageType messagetype;
+        
+        for (configuration config : configurations) {
+            org = organizationManager.getOrganizationById(config.getorgId());
+            config.setOrgName(org.getOrgName());
+
+            messagetype = messagetypemanager.getMessageTypeById(config.getMessageTypeId());
+            config.setMessageTypeName(messagetype.getName());
+        }
 
         return mav;
     }

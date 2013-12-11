@@ -58,7 +58,7 @@
                                                 <c:choose><c:when test="${config.type == 1}">Source Configuration</c:when><c:otherwise>Target Configuration</c:otherwise></c:choose>
                                             </td>
                                             <td class="center-text">
-                                                ${config.totalConnections}
+                                               ${config.totalConnections}
                                             </td>
                                             <td class="center-text"><fmt:formatDate value="${config.dateCreated}" type="date" pattern="M/dd/yyyy" /></td>
                                             <td class="actions-col">
