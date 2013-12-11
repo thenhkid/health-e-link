@@ -1301,3 +1301,26 @@ ADD CONSTRAINT `mtid`
   ON UPDATE NO ACTION;
 
 
+ALTER TABLE `universalTranslator`.`messageTypeFormFields` 
+DROP FOREIGN KEY `messageTypeId`;
+
+ALTER TABLE `universalTranslator`.`messageTypeFormFields` 
+ADD CONSTRAINT `messageTypeId`
+  FOREIGN KEY (`messageTypeId`)
+  REFERENCES `universalTranslator`.`messagetypes` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+  
+ ALTER TABLE `universalTranslator`.`rel_messageTypeDataTranslations` 
+DROP FOREIGN KEY `msgTypeId`;
+  
+  ALTER TABLE `universalTranslator`.`rel_messageTypeDataTranslations` 
+ADD CONSTRAINT `msgTypeId`
+  FOREIGN KEY (`messageTypeId`)
+  REFERENCES `universalTranslator`.`messagetypes` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+  
+
+
+
