@@ -17,7 +17,7 @@ jQuery(document).ready(function($) {
     $(document).on('click', '#createNewdataItem', function() {
        
     	$.ajax({
-        	url: $('#urlIdInfo').attr('rel') + '/create',
+        	url: $('#goToURL').attr('rel') + '/create',
             type: "GET",
             success: function(data) {
                 $("#addLUDataModal").html(data);
@@ -46,7 +46,7 @@ jQuery(document).ready(function($) {
     //This function will launch the edit data item overlay populating the fields
     //with the data of the clicked user.
     $(document).on('click', '.dataEdit', function() {
-        var dataDetailsAction = $(this).attr('rel');
+        var dataDetailsAction = $('#goToURL').attr('rel') + "/tableData?i=" + $(this).attr('rel');
         $.ajax({
             url: dataDetailsAction,
             type: "GET",
@@ -60,6 +60,7 @@ jQuery(document).ready(function($) {
     	var currentPage = $('#currentPageHolder').attr('rel');
     	var formData = $("#tabledataform").serialize();
         var actionValue = $(this).attr('rel').toLowerCase();
+        var goToUrl = $('#urlIdInfo').attr('rel');
         $.ajax({
             url: actionValue,
             data: formData,
@@ -68,13 +69,13 @@ jQuery(document).ready(function($) {
             success: function(data) {
             	/**now add codes to refresh window and close modal window**/
             	if (data.indexOf('dataUpdated') != -1) {
-            		var goToUrl = $('#urlId').val() + "?msg=updated";
+            			goToUrl = goToUrl + "?msg=updated";
             		if (currentPage > 0) {
                         goToUrl = goToUrl + "&page=" + currentPage;
                     }
             		window.location.href = goToUrl;
                 } else if (data.indexOf('dataCreated') != -1) {
-                	var goToUrl = $('#urlId').val() + "?msg=created";
+                		goToUrl = goToUrl+ "?msg=created";
                     if (currentPage > 0) {
                         goToUrl = goToUrl + "&page=" + currentPage;
                     }

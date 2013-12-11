@@ -17,7 +17,6 @@ import com.ut.dph.model.custom.TableData;
 import com.ut.dph.model.lutables.lu_Counties;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -166,6 +165,7 @@ public class adminSysAdminController {
         Integer totalPages = (int) Math.ceil((double)totalDataRows/maxResults);
         mav.addObject("totalPages",totalPages);
         mav.addObject("currentPage",page);
+        mav.addObject("goToURL", tableInfo.getUrlId());
         mav.addObject("urlIdInfo", tableInfo.getUrlId());
         return mav;
  
@@ -201,6 +201,7 @@ public class adminSysAdminController {
          mav.addObject("dataList", dataList);
          mav.addObject("tableInfo", tableInfo);
          mav.addObject("searchTerm",searchTerm);
+         mav.addObject("goToURL", tableInfo.getUrlId());
          mav.addObject("urlIdInfo", tableInfo.getUrlId());
          return mav;
  
@@ -342,13 +343,15 @@ public class adminSysAdminController {
 		mav.setViewName("/administrator/sysadmin/data/std/details");
 		mav.addObject("ojectType","tableData");
 		mav.addObject("formId","tabledataform");
+		mav.addObject("submitBtnValue", "Update");
+		mav.addObject("btnValue", "Update");
+		
 		LookUpTable tableInfo = sysAdminManager.getTableInfo(tableData.getUrlId());
 
 		/** check for error **/
 		if(result.hasErrors()) {
 			mav.addObject("tableInfo",tableInfo);
 			mav.addObject("stdForm", "stdForm");
-			mav.addObject("btnValue", "Update");
 			return mav;
 		}
 		
@@ -361,10 +364,161 @@ public class adminSysAdminController {
 		} else {
 			mav.addObject("success", "- There is an error.");
 		}
-		mav.addObject("btnValue", "Update");
+
 		return mav;
 	}
 
+	
+
+	/** 
+	 * here we have the views for the look up tables that do not have the standard 7 columns,
+	 * these have models in UT
+	 * 
+	 */
+	
+	@RequestMapping(value="/data/nstd/{urlId}", method = RequestMethod.GET)
+	public ModelAndView listTableDataNStd(@RequestParam(value="page", required=false) Integer page,  @PathVariable String urlId) throws Exception {
+		
+		if(page == null){
+	        page = startPage;
+	    }
+ 
+		ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/sysadmin/data/std");
+        
+        /**
+         * we query data for look up table, this view returns all data from table, hence the search term will be %
+         **/
+         LookUpTable tableInfo = sysAdminManager.getTableInfo(urlId);
+         List <TableData> dataList = sysAdminManager.getDataList(maxResults, page, tableInfo.getUtTableName(), "%");
+         mav.addObject("dataList", dataList);
+         mav.addObject("tableInfo", tableInfo);
+               
+        int totalDataRows = sysAdminManager.findTotalDataRows(tableInfo.getUtTableName());
+        Integer totalPages = (int) Math.ceil((double)totalDataRows/maxResults);
+        mav.addObject("totalPages",totalPages);
+        mav.addObject("currentPage",page);
+        mav.addObject("goToURL", tableInfo.getUtTableName());
+        mav.addObject("urlIdInfo", tableInfo.getUrlId());
+        return mav;
+	}
+	
+	
+	@RequestMapping(value="/data/nstd/{urlId}", method = RequestMethod.POST)
+	public ModelAndView listSearchDataForNStd(@RequestParam String searchTerm,  @PathVariable String urlId) throws Exception {
+		
+		ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/sysadmin/data/std");
+        
+        /**
+         * we query data for look up table, this view returns all data from table, hence the search term will be %
+         **/
+         LookUpTable tableInfo = sysAdminManager.getTableInfo(urlId);
+         List <TableData> dataList = sysAdminManager.getDataList(nonPagingMax, startPage, tableInfo.getUtTableName(), searchTerm);
+         mav.addObject("dataList", dataList);
+         mav.addObject("tableInfo", tableInfo);
+         mav.addObject("searchTerm",searchTerm);
+         mav.addObject("goToURL", tableInfo.getUtTableName());
+         mav.addObject("urlIdInfo", tableInfo.getUrlId());
+         
+         return mav;
+	}
+	
+	
+	@RequestMapping(value="/data/nstd/{urlId}/delete", method = RequestMethod.GET)
+	public ModelAndView deleteCountyData(@RequestParam(value="i", required=true) int dataId, 
+			@PathVariable String urlId, RedirectAttributes redirectAttr) throws Exception {
+		 
+		LookUpTable tableInfo = sysAdminManager.getTableInfo(urlId);
+        
+        boolean suceeded = sysAdminManager.deleteDataItem(tableInfo.getUtTableName(), dataId);
+        String returnMessage = "deleted";
+        
+        if (!suceeded) {
+        	returnMessage = "notDeleted";
+        }
+        //This variable will be used to display the message on the details form
+		redirectAttr.addFlashAttribute("savedStatus", returnMessage);	
+		
+		ModelAndView mav = new ModelAndView(new RedirectView("../" + urlId));
+		return mav;	
+     
+	}	
+	
+	
+	@RequestMapping(value="/data/nstd/lu_Counties/create", method = RequestMethod.GET)
+	public ModelAndView newCountyForm() throws Exception {
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/sysadmin/data/std/details");	
+		
+		//Get a list of states
+        USStateList stateList = new USStateList();
+
+		//create a lu_Counties
+		lu_Counties luc = new lu_Counties();
+		luc.setId(0);
+		mav.addObject("tableDataDetails",luc);
+		mav.addObject("ojectType","lu_Counties");
+		mav.addObject("formId","tabledataform");
+		mav.addObject("stateList", stateList.getStates());
+		mav.addObject("btnValue", "lu_counties/create");
+		mav.addObject("submitBtnValue", "Create");
+		return mav;
+	}
+	
+	@RequestMapping(value="/data/nstd/lu_counties/create", method = RequestMethod.POST)
+	public ModelAndView createCounties(
+			@Valid @ModelAttribute(value="tableDataDetails") lu_Counties luc, 
+			BindingResult result) throws Exception {
+		
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/sysadmin/data/std/details");
+		mav.addObject("ojectType","lu_Counties");
+		mav.addObject("formId","tabledataform");
+		/** check for error **/
+		if(result.hasErrors()) {
+			mav.addObject("btnValue", "lu_counties/create");
+			 //Get a list of states
+            USStateList stateList = new USStateList();
+            //Get the object that will hold the states
+            mav.addObject("stateList", stateList.getStates());
+			mav.addObject("submitBtnValue", "Create");
+			return mav;
+		}
+		
+		//now we save
+		sysAdminManager.createCounty(luc);
+		mav.addObject("success", "dataCreated");
+		mav.addObject("btnValue", "lu_counties/update");
+		mav.addObject("submitBtnValue", "Update");
+		return mav;
+	}
+	
+	
+	/**update a county
+	@RequestMapping(value="/data/std/lu_counties/tableData", method = RequestMethod.GET)
+	public ModelAndView viewCountyData(@RequestParam(value="i", required=false) Integer i) throws Exception {
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/sysadmin/data/std/details");	
+		
+		TableData tableData = sysAdminManager.getTableData(i, tableInfo.getUtTableName());
+		tableData.setUrlId(urlId);
+		mav.addObject("tableDataDetails",tableData);
+		mav.addObject("tableInfo",tableInfo);
+		mav.addObject("ojectType","tableData");
+		mav.addObject("stdForm", "stdForm");
+		mav.addObject("formId","tabledataform");
+		mav.addObject("btnValue", "Update");
+		mav.addObject("submitBtnValue", "Update");
+		return mav;		
+	}
+	
+	**/
+	
+	
+	/**
+	 * MACROS 
+	 * **/
 	@RequestMapping(value="/macros", method = RequestMethod.GET)
 	public ModelAndView listMacros(@RequestParam(value="page", required=false) Integer page) throws Exception {
 		
@@ -475,7 +629,9 @@ public class adminSysAdminController {
 		return mav;		
 	}	
 	
-	
+	/**
+	 * UPDATE macros
+	 * **/
 	@RequestMapping(value="/macros/update", method = RequestMethod.POST)
 	public ModelAndView updateMacro(
 			@Valid @ModelAttribute(value="macroDetails") Macros macroDetails, 
@@ -502,105 +658,11 @@ public class adminSysAdminController {
 		mav.addObject("btnValue", "Update");
 		return mav;		
 	}
-
-	/** 
-	 * here we have the views for the look up tables that do not have the standard 7 columns,
-	 * these have models in UT
-	 * 
-	 */
 	
-	@RequestMapping(value="/data/nstd/{urlId}", method = RequestMethod.GET)
-	public ModelAndView listTableDataNStd(@RequestParam(value="page", required=false) Integer page,  @PathVariable String urlId) throws Exception {
-		
-		if(page == null){
-	        page = startPage;
-	    }
- 
-		ModelAndView mav = new ModelAndView();
-        mav.setViewName("/administrator/sysadmin/data/std");
-        
-        /**
-         * we query data for look up table, this view returns all data from table, hence the search term will be %
-         **/
-         LookUpTable tableInfo = sysAdminManager.getTableInfo(urlId);
-         List <TableData> dataList = sysAdminManager.getDataList(maxResults, page, tableInfo.getUtTableName(), "%");
-         mav.addObject("dataList", dataList);
-         mav.addObject("tableInfo", tableInfo);
-               
-        int totalDataRows = sysAdminManager.findTotalDataRows(tableInfo.getUtTableName());
-        Integer totalPages = (int) Math.ceil((double)totalDataRows/maxResults);
-        mav.addObject("totalPages",totalPages);
-        mav.addObject("currentPage",page);
-        mav.addObject("urlIdInfo", tableInfo.getUtTableName());
-        return mav;
-	}
+	/**
+	 * END MACROS
+	 * **/
 	
-	
-	@RequestMapping(value="/data/nstd/{urlId}", method = RequestMethod.POST)
-	public ModelAndView listSearchDataForNStd(@RequestParam String searchTerm,  @PathVariable String urlId) throws Exception {
-		
-		ModelAndView mav = new ModelAndView();
-        mav.setViewName("/administrator/sysadmin/data/std");
-        
-        /**
-         * we query data for look up table, this view returns all data from table, hence the search term will be %
-         **/
-         LookUpTable tableInfo = sysAdminManager.getTableInfo(urlId);
-         List <TableData> dataList = sysAdminManager.getDataList(nonPagingMax, startPage, tableInfo.getUtTableName(), searchTerm);
-         mav.addObject("dataList", dataList);
-         mav.addObject("tableInfo", tableInfo);
-         mav.addObject("searchTerm",searchTerm);
-         mav.addObject("urlIdInfo", tableInfo.getUtTableName());
-         return mav;
-	}
-	
-	@RequestMapping(value="/data/nstd/lu_Counties/create", method = RequestMethod.GET)
-	public ModelAndView newCountyForm() throws Exception {
-		ModelAndView mav = new ModelAndView();
-		mav.setViewName("/administrator/sysadmin/data/std/details");	
-		
-		//Get a list of states
-        USStateList stateList = new USStateList();
-
-		//create a lu_Counties
-		lu_Counties luc = new lu_Counties();
-		luc.setId(0);
-		mav.addObject("tableDataDetails",luc);
-		mav.addObject("ojectType","lu_Counties");
-		mav.addObject("formId","tabledataform");
-		mav.addObject("stateList", stateList.getStates());
-		mav.addObject("btnValue", "lu_counties/create");
-		mav.addObject("submitBtnValue", "Create");
-		return mav;
-	}
-	
-	@RequestMapping(value="/data/nstd/lu_counties/create", method = RequestMethod.POST)
-	public ModelAndView createCounties(
-			@Valid @ModelAttribute(value="tableDataDetails") lu_Counties luc, 
-			BindingResult result) throws Exception {
-		
-		ModelAndView mav = new ModelAndView();
-		mav.setViewName("/administrator/sysadmin/data/std/details");
-		mav.addObject("ojectType","lu_Counties");
-		mav.addObject("formId","tabledataform");
-		/** check for error **/
-		if(result.hasErrors()) {
-			mav.addObject("btnValue", "lu_counties/create");
-			 //Get a list of states
-            USStateList stateList = new USStateList();
-            //Get the object that will hold the states
-            mav.addObject("stateList", stateList.getStates());
-			mav.addObject("submitBtnValue", "Create");
-			return mav;
-		}
-		
-		//now we save
-		sysAdminManager.createCounty(luc);
-		mav.addObject("success", "dataCreated");
-		mav.addObject("btnValue", "Update");
-		mav.addObject("submitBtnValue", "Update");
-		return mav;
-	}
 	
 }
 

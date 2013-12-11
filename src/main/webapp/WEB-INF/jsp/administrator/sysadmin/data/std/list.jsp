@@ -11,7 +11,7 @@
                <c:when test="${param.msg == 'updated'}">The look up data has been successfully updated!</c:when>
                <c:when test="${param.msg == 'created'}">The look up data has been successfully added!</c:when>
                <c:when test="${savedStatus == 'deleted'}">The look up data has been successfully deleted!</c:when>
-               <c:when test="${savedStatus == 'notDeleted'}">The look up data has NOT been deleted, please try again.</c:when>
+               <c:when test="${savedStatus == 'notDeleted'}">The look up data has NOT been deleted!  Please try again.</c:when>
                </c:choose>
             </div>
        
@@ -54,14 +54,14 @@
                                     <c:forEach var="dataItem" items="${dataList}">
                                         <tr id="dataRow">
                                             <td>${dataItem.id}</td>
-                                            <td scope="row"><a href="#addLUDataModal" data-toggle="modal" rel="${tableInfo.urlId}/tableData?i=${dataItem.id}" class="dataEdit" title="Edit this data">${dataItem.displayText}</a>
+                                            <td scope="row"><a href="#addLUDataModal" data-toggle="modal" rel="${dataItem.id}" class="dataEdit" title="Edit this data">${dataItem.displayText}</a>
                                                 <br />(<c:choose><c:when test="${dataItem.status == true}">active</c:when><c:otherwise>inactive</c:otherwise></c:choose><c:if test="${dataItem.custom == true}">, custom data</c:if>)</td>
                                                     <td>
                                                 ${dataItem.description}
                                             </td>
                                             <td class="center-text"><fmt:formatDate value="${dataItem.dateCreated}" type="date" pattern="M/dd/yyyy" /></td>
                                             <td class="actions-col">
-                                                <a href="#addLUDataModal" data-toggle="modal" rel="${tableInfo.urlId}/tableData?i=${dataItem.id}" class="dataEdit" title="Edit this data">
+                                                <a href="#addLUDataModal" data-toggle="modal" rel="${dataItem.id}" class="dataEdit" title="Edit this data">
                                                     <span class="glyphicon glyphicon-edit"></span>
                                                     Edit	
                                                 </a>
@@ -92,6 +92,7 @@
     </div>		
 </div>	
 <p rel="${currentPage}" id="currentPageHolder" style="display:none"></p>
+<p rel="${goToURL}" id="goToURL" style="display:none"></p>
 <p rel="${urlIdInfo}" id="urlIdInfo" style="display:none"></p>
 
 <!-- Providers modal -->
