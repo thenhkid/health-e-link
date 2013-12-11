@@ -16,6 +16,7 @@ import com.ut.dph.model.configurationFTPFields;
 import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.configurationSchedules;
 import com.ut.dph.model.configurationTransport;
+import java.util.Iterator;
 
 @Service
 public class configurationTransportDAOImpl implements configurationTransportDAO {
@@ -77,7 +78,7 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
         configurationSchedules schedule = new configurationSchedules();
         schedule.setconfigId(configId);
         schedule.settransportMethod(2);
-        schedule.settype(0);
+        schedule.settype(5);
         
         sessionFactory.getCurrentSession().save(schedule);
         
@@ -131,19 +132,61 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
     /**
      * The 'copyMessageTypeFields' function will copy the form fields for the selected message type for the selected configuration.
      *
-     * @param	configId	The id of the selected configuration messageTypeId	The id of the selected message type to copy the form fields
+     * @param	configId	The id of the selected configuration 
+     * @param   messageTypeId	The id of the selected message type to copy the form fields
      *
      * @return	This function does not return anything
      */
     @Transactional
     public void copyMessageTypeFields(int configId, int messageTypeId, int transportDetailId) {
-        Query query = sessionFactory.getCurrentSession().createSQLQuery("INSERT INTO configurationFormFields (messageTypeFieldId, configId, transportDetailId, fieldNo, fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, useField, saveToTableName, saveToTableCol) SELECT id, :configId, :transportDetailId, fieldNo,  fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, 1, saveToTableName, saveToTableCol FROM messageTypeFormFields where messageTypeId = :messageTypeId");
-        query.setParameter("configId", configId);
-        query.setParameter("transportDetailId", transportDetailId);
-        query.setParameter("messageTypeId", messageTypeId);
+       
+        /* Check to see if there are any data translations for the passed in message type */
+        Query translationQuery = sessionFactory.getCurrentSession().createSQLQuery("SELECT id FROM rel_messageTypeDataTranslations where messageTypeId = :messageTypeId");
+        translationQuery.setParameter("messageTypeId", messageTypeId);
+       
+        if(translationQuery.list().size() > 0) {
+            /* Get all the message type fields */
+            Query messageTypeFields = sessionFactory.getCurrentSession().createSQLQuery("SELECT id, messageTypeId FROM messageTypeFormFields where messageTypeId = :messageTypeId");
+            messageTypeFields.setParameter("messageTypeId", messageTypeId);
+            List fieldList = messageTypeFields.list();
+            
+            Iterator it = fieldList.iterator();
+            int id;
+            int max;
+            while(it.hasNext()) {
+                Object row[] = (Object[]) it.next();
+                id = (Integer) row[0];
+                Query query = sessionFactory.getCurrentSession().createSQLQuery("INSERT INTO configurationFormFields (messageTypeFieldId, configId, transportDetailId, fieldNo, fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, useField, saveToTableName, saveToTableCol) SELECT id, :configId, :transportDetailId, fieldNo,  fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, 1, saveToTableName, saveToTableCol FROM messageTypeFormFields where messageTypeId = :messageTypeId and id = :id");
+                query.setParameter("configId", configId);
+                query.setParameter("transportDetailId", transportDetailId);
+                query.setParameter("messageTypeId", messageTypeId);
+                query.setParameter("id", id);
+                query.executeUpdate();
+                
+                /*Get the max id */
+                Query maxId = sessionFactory.getCurrentSession().createSQLQuery("SELECT max(id), configId FROM configurationFormFields");
+                List queryList = maxId.list();
+                Iterator maxIt = queryList.iterator();
+                while(maxIt.hasNext()) {
+                    Object maxrow[] = (Object[]) maxIt.next();
+                    max = (Integer) maxrow[0]; 
+                    /* Check to see if there is a data translation for the current row */
+                    Query copyTranslations = sessionFactory.getCurrentSession().createSQLQuery("INSERT INTO rel_configurationDataTranslations (configId, transportMethod, fieldId, crosswalkId, macroId, processOrder) SELECT :configId, 2, :fieldId, crosswalkId, 0, processOrder FROM rel_messageTypeDataTranslations where fieldId = :fieldId2");
+                    copyTranslations.setParameter("configId",configId);
+                    copyTranslations.setParameter("fieldId",max);
+                    copyTranslations.setParameter("fieldId2",id);
+                    copyTranslations.executeUpdate();
+                }   
+            }
+        }
+        else {
+            Query query = sessionFactory.getCurrentSession().createSQLQuery("INSERT INTO configurationFormFields (messageTypeFieldId, configId, transportDetailId, fieldNo, fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, useField, saveToTableName, saveToTableCol) SELECT id, :configId, :transportDetailId, fieldNo,  fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, 1, saveToTableName, saveToTableCol FROM messageTypeFormFields where messageTypeId = :messageTypeId");
+            query.setParameter("configId", configId);
+            query.setParameter("transportDetailId", transportDetailId);
+            query.setParameter("messageTypeId", messageTypeId);
 
-        query.executeUpdate();
-
+            query.executeUpdate();
+        }
     }
 
     /**
@@ -208,7 +251,5 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
     public void saveTransportFTP(configurationFTPFields FTPFields) {
         sessionFactory.getCurrentSession().saveOrUpdate(FTPFields);
     }
-
-   
 
 }

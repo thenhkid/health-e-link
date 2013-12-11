@@ -328,7 +328,7 @@ public class adminConfigController {
             mav.addObject("messageTypes", messageTypes);
             mav.addObject("id", configId);
             mav.addObject("savedStatus", "updated");
-             mav.addObject("completedSteps", configurationDetails.getstepsCompleted());
+            mav.addObject("completedSteps", configurationDetails.getstepsCompleted());
 
             return mav;
         } //If the "Next Step" button was pressed.
@@ -760,12 +760,14 @@ public class adminConfigController {
                 translation.setcrosswalkName(crosswalkName);
                 
                 //Get the macro name by id
-                Macros macroDetails = configurationmanager.getMacroById(translation.getMacroId());
-                macroName = macroDetails.getmacroShortName();
-                if(macroName.contains("DATE")) {
-                    macroName = macroDetails.getmacroShortName() + " " + macroDetails.getdateDisplay();
+                if(translation.getMacroId() > 0) {
+                    Macros macroDetails = configurationmanager.getMacroById(translation.getMacroId());
+                    macroName = macroDetails.getmacroShortName();
+                    if(macroName.contains("DATE")) {
+                        macroName = macroDetails.getmacroShortName() + " " + macroDetails.getdateDisplay();
+                    }
+                    translation.setMacroName(macroName);
                 }
-                translation.setMacroName(macroName);
 
                 translations.add(translation);
             }

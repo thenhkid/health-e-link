@@ -43,7 +43,7 @@
                         <div class="pull-right">
                             <a href="#newFieldModal" data-toggle="modal" class="btn btn-primary btn-xs btn-action" id="addNewField" rel="${i}" title="Add new field to bucket ${i}">Add New Field</a>
                         </div>
-                        <h3 class="panel-title"><strong>Bucket ${i} <c:choose><c:when test="${i==1}"> (Sender Information)</c:when><c:when test="${i==2}"> (Recipient Information)</c:when><c:when test="${i==3}"> (Patient Information)</c:when><c:when test="${i==4}"> (Other)</c:when></c:choose></strong></h3>
+                        <h3 class="panel-title"><strong><c:choose><c:when test="${i==1}"> (Sender Information)</c:when><c:when test="${i==2}"> (Recipient Information)</c:when><c:when test="${i==3}"> (Patient Information)</c:when><c:when test="${i==4}"> (Other)</c:when></c:choose></strong></h3>
                             </div>
                             <div class="panel-body">
                                 <div class="form-container scrollable">

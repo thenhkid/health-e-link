@@ -44,16 +44,16 @@
                                     <c:set var="currentBucket" value="${fields[fStatus.index].bucketNo}" />
                                     <c:choose>
                                         <c:when test="${currentBucket == 1}">
-                                            <optgroup label="Bucket 1 (Sender Information)">
+                                            <optgroup label="(Sender Information)">
                                             </c:when>
                                             <c:when test="${currentBucket == 2}">
-                                            <optgroup label="Bucket 2 (Recipient Information)">
+                                            <optgroup label="(Recipient Information)">
                                             </c:when>
                                             <c:when test="${currentBucket == 3}">
-                                            <optgroup label="Bucket 3 (Patient Information)">
+                                            <optgroup label="(Patient Information)">
                                             </c:when>
                                             <c:when test="${currentBucket == 4}">
-                                            <optgroup label="Bucket 4 (Other)">
+                                            <optgroup label="(Details)">
                                             </c:when>
                                         </c:choose>
                                     </c:if>

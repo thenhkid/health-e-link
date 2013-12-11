@@ -90,7 +90,7 @@
                                     <div class="panel-heading">
                                         <dt>
                                         <dd>
-                                            <strong>Bucket ${i} <c:choose><c:when test="${i==1}"> (Sender Information)</c:when><c:when test="${i==2}"> (Recipient Information)</c:when><c:when test="${i==3}"> (Patient Information)</c:when><c:when test="${i==4}"> (Other)</c:when></c:choose></strong>
+                                            <strong><c:choose><c:when test="${i==1}"> (Sender Information)</c:when><c:when test="${i==2}"> (Recipient Information)</c:when><c:when test="${i==3}"> (Patient Information)</c:when><c:when test="${i==4}"> (Details)</c:when></c:choose></strong>
                                                 </dd>
                                                 </dt>
                                             </div>

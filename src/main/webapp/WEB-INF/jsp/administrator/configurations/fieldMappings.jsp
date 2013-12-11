@@ -77,7 +77,7 @@
                                 <tbody>
                                     <c:forEach var="i" begin="1" end="4">
                                         <tr>
-                                            <td colspan="4"><strong>Bucket ${i} <c:choose><c:when test="${i==1}"> (Sender Information)</c:when><c:when test="${i==2}"> (Recipient Information)</c:when><c:when test="${i==3}"> (Patient Information)</c:when><c:when test="${i==4}"> (Other)</c:when></c:choose></strong></td>
+                                            <td colspan="4"><strong><c:choose><c:when test="${i==1}"> (Sender Information)</c:when><c:when test="${i==2}"> (Recipient Information)</c:when><c:when test="${i==3}"> (Patient Information)</c:when><c:when test="${i==4}"> (Details)</c:when></c:choose></strong></td>
                                                 </tr>
                                         <c:forEach items="${transportDetails.fields}" var="mappings" varStatus="field">
                                             <c:if test="${mappings.bucketNo == i}">
