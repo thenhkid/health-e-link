@@ -1329,5 +1329,5 @@ ADD COLUMN `providerId` INT NULL AFTER `orgId`;
 
 ALTER TABLE `universalTranslator`.`message_VisitDetails` 
 CHANGE COLUMN `grossWklyIncome` `income` FLOAT NULL DEFAULT NULL ,
-ADD COLUMN `incomeUnit` INT NULL COMMENT 'This could be monthly, weekly, daily, annually, etc' AFTER `incomeReported`, RENAME TO  `universalTranslator`.`message_PatientDetails` ;
+ADD COLUMN `incomeUnit` INT NULL COMMENT 'This could be monthly, weekly, daily, annually, etc' AFTER `income`, RENAME TO  `universalTranslator`.`message_PatientDetails` ;
 
