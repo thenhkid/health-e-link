@@ -349,7 +349,7 @@ public class messageTypeDAOImpl implements messageTypeDAO {
     @SuppressWarnings("rawtypes")
     @Transactional
     public List getValidationTypes() {
-        Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT id, validationType FROM ref_validationTypes order by validationType asc");
+        Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT id, validationType FROM ref_validationTypes order by id asc");
 
         return query.list();
     }

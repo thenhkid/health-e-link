@@ -52,7 +52,7 @@ public class configurationTransport {
     private int targetOrgColNo = 0;
 
     @Column(name = "FILETYPE", nullable = true)
-    private int fileType = 0;
+    private int fileType = 1;
 
     @Column(name = "FILEDELIMITER", nullable = true)
     private int fileDelimiter = 0;

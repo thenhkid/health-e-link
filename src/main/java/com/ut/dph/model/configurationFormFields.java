@@ -38,7 +38,7 @@ public class configurationFormFields {
     private String fieldLabel;
 
     @Column(name = "VALIDATIONTYPE", nullable = true)
-    private int validationType = 0;
+    private int validationType = 1;
 
     @Column(name = "REQUIRED", nullable = false)
     private boolean required = false;

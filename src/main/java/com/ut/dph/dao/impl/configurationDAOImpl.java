@@ -323,7 +323,7 @@ public class configurationDAOImpl implements configurationDAO {
     @Override
     @Transactional
     public List getFileTypes() {
-        Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT id, fileType FROM ref_fileTypes order by fileType asc");
+        Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT id, fileType FROM ref_fileTypes order by id asc");
 
         return query.list();
     }

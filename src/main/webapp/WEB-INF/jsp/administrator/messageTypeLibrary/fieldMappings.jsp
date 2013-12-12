@@ -103,7 +103,6 @@
                                             </td>
                                             <td class="validationTypes">
                                                 <select name="fields[${field.index}].validationType" class="form-control half">
-                                                <option value="0" label=" - Select - " ></option>
                                                 <c:forEach items="${validationTypes}"  var="fieldvalidationtypes" varStatus="vtype">
                                                     <option value="${validationTypes[vtype.index][0]}" <c:if test="${mappings.validationType == validationTypes[vtype.index][0]}">selected</c:if>>${validationTypes[vtype.index][1]}</option>
                                                 </c:forEach>

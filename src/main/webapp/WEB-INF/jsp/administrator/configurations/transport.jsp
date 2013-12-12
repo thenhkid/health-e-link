@@ -199,7 +199,6 @@
                                                 <label class="control-label" for="fileType">File Type *</label>
                                                 <div>
                                                     <select id="fileType" name="transportDetails[${tStatus.index}].fileType" class="form-control half">
-                                                        <option value="">- Select -</option>
                                                         <c:forEach items="${fileTypes}" var="type" varStatus="fStatus">
                                                             <option value="${fileTypes[fStatus.index][0]}" <c:if test="${details.fileType == fileTypes[fStatus.index][0]}">selected</c:if>>${fileTypes[fStatus.index][1]} </option>
                                                         </c:forEach>
@@ -370,7 +369,6 @@
                                                 <label class="control-label" for="fileType">File Type *</label>
                                                 <div>
                                                     <select id="FTPfileType" name="transportDetails[${tStatus.index}].fileType" class="form-control half">
-                                                        <option value="">- Select -</option>
                                                         <c:forEach items="${fileTypes}" var="type" varStatus="fStatus">
                                                             <option value="${fileTypes[fStatus.index][0]}" <c:if test="${details.fileType == fileTypes[fStatus.index][0]}">selected</c:if>>${fileTypes[fStatus.index][1]} </option>
                                                         </c:forEach>
