@@ -1,30 +1,43 @@
 /** grace 12.11.2013**/
 
-ALTER TABLE `universalTranslator1`.`transactionInRecords` 
+ALTER TABLE `universalTranslator`.`transactionInRecords` 
 ADD INDEX `tirFK_idx` (`transactionInId` ASC);
-ALTER TABLE `universalTranslator1`.`transactionInRecords` 
+ALTER TABLE `universalTranslator`.`transactionInRecords` 
 ADD CONSTRAINT `tirFK`
   FOREIGN KEY (`transactionInId`)
-  REFERENCES `universalTranslator1`.`transactionIn` (`id`)
+  REFERENCES `universalTranslator`.`transactionIn` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
 
-  ALTER TABLE `universalTranslator1`.`transactionIn` 
+  ALTER TABLE `universalTranslator`.`transactionIn` 
 ADD INDEX `uploadFK_idx` (`transactionUploadId` ASC);
-ALTER TABLE `universalTranslator1`.`transactionIn` 
+ALTER TABLE `universalTranslator`.`transactionIn` 
 ADD CONSTRAINT `uploadFK`
   FOREIGN KEY (`transactionUploadId`)
-  REFERENCES `universalTranslator1`.`transactionUploads` (`id`)
+  REFERENCES `universalTranslator`.`transactionUploads` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
   
   
-  ALTER TABLE `universalTranslator1`.`transactionTarget` 
+  ALTER TABLE `universalTranslator`.`transactionTarget` 
 ADD INDEX `ttargetInFK_idx` (`transactionInId` ASC);
-ALTER TABLE `universalTranslator1`.`transactionTarget` 
+ALTER TABLE `universalTranslator`.`transactionTarget` 
 ADD CONSTRAINT `ttargetInFK`
   FOREIGN KEY (`transactionInId`)
-  REFERENCES `universalTranslator1`.`transactionIn` (`id`)
+  REFERENCES `universalTranslator`.`transactionIn` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
+  
+  ALTER TABLE `universalTranslator`.`message_MedicalConditions` 
+CHANGE COLUMN `conditionType` `conditionTypeId` INT(11) NULL DEFAULT NULL COMMENT 'this will define if it is a problem in ccr - values could be diagnosis' ;
+  
+  ALTER TABLE `universalTranslator`.`message_MedicalConditions` 
+ADD INDEX `mcTypeFK_idx` (`conditionTypeId` ASC);
+ALTER TABLE `universalTranslator`.`message_MedicalConditions` 
+ADD CONSTRAINT `mcTypeFK`
+  FOREIGN KEY (`conditionTypeId`)
+  REFERENCES `universalTranslator`.`message_MedicalConditions` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+  
   
