@@ -1,0 +1,30 @@
+/** grace 12.11.2013**/
+
+ALTER TABLE `universalTranslator1`.`transactionInRecords` 
+ADD INDEX `tirFK_idx` (`transactionInId` ASC);
+ALTER TABLE `universalTranslator1`.`transactionInRecords` 
+ADD CONSTRAINT `tirFK`
+  FOREIGN KEY (`transactionInId`)
+  REFERENCES `universalTranslator1`.`transactionIn` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+  ALTER TABLE `universalTranslator1`.`transactionIn` 
+ADD INDEX `uploadFK_idx` (`transactionUploadId` ASC);
+ALTER TABLE `universalTranslator1`.`transactionIn` 
+ADD CONSTRAINT `uploadFK`
+  FOREIGN KEY (`transactionUploadId`)
+  REFERENCES `universalTranslator1`.`transactionUploads` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+  
+  
+  ALTER TABLE `universalTranslator1`.`transactionTarget` 
+ADD INDEX `ttargetInFK_idx` (`transactionInId` ASC);
+ALTER TABLE `universalTranslator1`.`transactionTarget` 
+ADD CONSTRAINT `ttargetInFK`
+  FOREIGN KEY (`transactionInId`)
+  REFERENCES `universalTranslator1`.`transactionIn` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+  
