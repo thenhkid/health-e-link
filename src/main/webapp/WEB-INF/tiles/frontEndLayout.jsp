@@ -49,7 +49,9 @@
         </div>
     </div>
 </div>
-
-
 </body>
+<tiles:importAttribute name="jscript" toName="script" ignore="true" />
+<c:if test="${not empty script}">
+<script src="<%=request.getContextPath()%><tiles:getAsString name='jscript' ignore='true' />" language="javascript"></script>
+</c:if>
 </html>

@@ -112,6 +112,25 @@ public class configurationDAOImpl implements configurationDAO {
         
         return criteria.list();
     }
+    
+    /**
+     * The 'getActiveConfigurationsByOrgId' function will return a list of active configurations for the organization id passed in
+     *
+     * @Table configurations
+     *
+     * @param	orgId	This will hold the organization id to find
+     *
+     * @return	This function will return a list of configuration object
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<configuration> getActiveConfigurationsByOrgId(int orgId) {
+        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configuration.class);
+        criteria.add(Restrictions.eq("orgId", orgId));
+        criteria.add(Restrictions.eq("status", true));
+        
+        return criteria.list();
+    }
 
     /**
      * The 'getOrganizationByName' function will return a single organization based on the name passed in.
