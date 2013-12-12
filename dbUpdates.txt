@@ -41,3 +41,53 @@ ADD CONSTRAINT `mcTypeFK`
   ON UPDATE NO ACTION;
   
   
+  ALTER TABLE `universalTranslator`.`message_FamMemMedicalConditions` 
+DROP FOREIGN KEY `fmmcConditionType`;
+ALTER TABLE `universalTranslator`.`message_FamMemMedicalConditions` 
+CHANGE COLUMN `conditionType` `conditionTypeId` INT(11) NULL DEFAULT NULL COMMENT 'Id from lu_MedicalConditonTypes' ;
+ALTER TABLE `universalTranslator`.`message_FamMemMedicalConditions` 
+ADD CONSTRAINT `fmmcConditionType`
+  FOREIGN KEY (`conditionTypeId`)
+  REFERENCES `universalTranslator`.`lu_MedicalConditionTypes` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+  
+  /**transport method missing key to rel_configurationTranslations**/
+  ALTER TABLE `universalTranslator`.`rel_configurationDataTranslations` 
+ADD INDEX `fkTransportMethod_idx` (`transportMethod` ASC);
+ALTER TABLE `universalTranslator`.`rel_configurationDataTranslations` 
+ADD CONSTRAINT `fkTransportMethod`
+  FOREIGN KEY (`transportMethod`)
+  REFERENCES `universalTranslator`.`ref_transportMethods` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+  
+  /**file type**/
+  ALTER TABLE `universalTranslator`.`configurationTransportDetails` 
+ADD CONSTRAINT `fkFileType`
+  FOREIGN KEY (`fileType`)
+  REFERENCES `universalTranslator`.`ref_fileTypes` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+  
+  /**transport method**/
+  ALTER TABLE `universalTranslator`.`configurationTransportDetails` 
+ADD CONSTRAINT `fkTransport`
+  FOREIGN KEY (`transportMethod`)
+  REFERENCES `universalTranslator`.`ref_transportMethods` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+  
+  
+  /**validation type **/
+  ALTER TABLE `universalTranslator`.`configurationFormFields` 
+ADD INDEX `fkValidationType_idx` (`validationType` ASC);
+ALTER TABLE `universalTranslator`.`configurationFormFields` 
+ADD CONSTRAINT `fkValidationType`
+  FOREIGN KEY (`validationType`)
+  REFERENCES `universalTranslator`.`ref_validationTypes` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+  
+  
+  
