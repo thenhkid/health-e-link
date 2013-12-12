@@ -178,5 +178,29 @@ ADD CONSTRAINT `transportMethodFK`
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
 
+/* grace 12.12.13 10:49AM */
+CREATE TABLE `universalTranslator`.`ref_transactionStatus` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `status` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`id`));
+  
+  ALTER TABLE `universalTranslator`.`transactionIn` 
+CHANGE COLUMN `recordStatus` `transactionStatusId` INT NOT NULL COMMENT 'Id from ref_transactionStatus\n\nCould be Rejected\nPending\nReleased\nError,\netc' ;
+  
+ALTER TABLE `universalTranslator`.`transactionIn` 
+ADD INDEX `statusFK_idx` (`transactionStatusId` ASC);
+ALTER TABLE `universalTranslator`.`transactionIn` 
+ADD CONSTRAINT `statusFK`
+  FOREIGN KEY (`transactionStatusId`)
+  REFERENCES `universalTranslator`.`ref_transactionStatus` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+INSERT INTO `universalTranslator`.`ref_transactionStatus` (`status`) VALUES ('Error');
+INSERT INTO `universalTranslator`.`ref_transactionStatus` (`status`) VALUES ('Pending Release');
+INSERT INTO `universalTranslator`.`ref_transactionStatus` (`status`) VALUES ('Released');
+INSERT INTO `universalTranslator`.`ref_transactionStatus` (`status`) VALUES ('Downloaded');
+INSERT INTO `universalTranslator`.`ref_transactionStatus` (`status`) VALUES ('Rejected');
+  
 
   
