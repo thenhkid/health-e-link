@@ -90,4 +90,76 @@ ADD CONSTRAINT `fkValidationType`
   ON UPDATE NO ACTION;
   
   
+  /** Grace 12.12.2013 **/
+ALTER TABLE `universalTranslator`.`message_Patients` 
+DROP FOREIGN KEY `phoneType2FK`,
+DROP FOREIGN KEY `phoneType1FK`;
+
+ALTER TABLE `universalTranslator`.`message_Patients` 
+DROP COLUMN `phone2`,
+DROP COLUMN `phoneTypeId2`,
+DROP COLUMN `phone1`,
+DROP COLUMN `phoneTypeId1`,
+DROP INDEX `phoneType2FK_idx` ,
+DROP INDEX `phoneType1FK_idx` ;
+  
+ALTER TABLE `universalTranslator`.`message_PatientAddresses` 
+DROP FOREIGN KEY `paPhoneType1FK`,
+DROP FOREIGN KEY `paPhoneType2FK`;
+
+ALTER TABLE `universalTranslator`.`message_PatientAddresses` 
+CHANGE COLUMN `phoneTypeId1` `phoneType1` VARCHAR(25) NULL DEFAULT NULL COMMENT 'id related to lu_PhoneTypes Tables' ,
+CHANGE COLUMN `phoneTypeId2` `phoneType2` VARCHAR(45) NULL DEFAULT NULL COMMENT 'id related to lu_PhoneTypes Tables' ;
+
+ALTER TABLE `universalTranslator`.`info_ProviderAddresses` DROP COLUMN `dateModified`;
+ALTER TABLE `universalTranslator`.`info_providerids` drop column `dateModified`;
+ALTER TABLE `universalTranslator`.`lookUpTables` drop column `dateModified`;
+ALTER TABLE `universalTranslator`.`lu_BestTimeToCall` drop column `dateModified`;
+ALTER TABLE `universalTranslator`.`lu_BrandNames` drop column `dateModified`;
+ALTER TABLE `universalTranslator`.`lu_Consents` drop column `dateModified`;
+ALTER TABLE `universalTranslator`.`lu_Contraceptives` drop column `dateModified`;
+ALTER TABLE `universalTranslator`.`lu_Counties` drop column `dateModified`;
+ALTER TABLE `universalTranslator`.`lu_Genders` drop column `dateModified`;
+ALTER TABLE `universalTranslator`.`lu_GeneralHealthStatuses` drop column `dateModified`;
+ALTER TABLE `universalTranslator`.`lu_GeneralHealths` drop column `dateModified`;
+ALTER TABLE `universalTranslator`.`lu_HealthStatuses` drop column `dateModified`;
+ALTER TABLE `universalTranslator`.`lu_Hispanics` drop column `dateModified`;
+ALTER TABLE `universalTranslator`.`lu_Immunizations` drop column `dateModified`;
+ALTER TABLE `universalTranslator`.`lu_Languages` drop column `dateModified`;
+ALTER TABLE `universalTranslator`.`lu_Manufacturers` drop column `dateModified`;
+ALTER TABLE `universalTranslator`.`lu_MartialStatuses` drop column `dateModified`;
+ALTER TABLE `universalTranslator`.`lu_MedicalConditionStatuses` drop column `dateModified`;
+ALTER TABLE `universalTranslator`.`lu_MedicalConditionTypes` drop column `dateModified`;
+ALTER TABLE `universalTranslator`.`lu_MedicalConditions` drop column `dateModified`;
+ALTER TABLE `universalTranslator`.`lu_Medications` drop column `dateModified`;
+ALTER TABLE `universalTranslator`.`lu_PatientStatuses` drop column `dateModified`;
+ALTER TABLE `universalTranslator`.`lu_PayerTypes` drop column `dateModified`;
+ALTER TABLE `universalTranslator`.`lu_PhoneTypes` drop column `dateModified`;
+ALTER TABLE `universalTranslator`.`lu_ProcedureStatuses` drop column `dateModified`;
+ALTER TABLE `universalTranslator`.`lu_Procedures` drop column `dateModified`;
+ALTER TABLE `universalTranslator`.`lu_Races` drop column `dateModified`;
+ALTER TABLE `universalTranslator`.`lu_TestResultsTypes` drop column `dateModified`;
+ALTER TABLE `universalTranslator`.`lu_TestStatuses` drop column `dateModified`;
+ALTER TABLE `universalTranslator`.`lu_Tests` drop column `dateModified`;
+ALTER TABLE `universalTranslator`.`message_PatientDetails` drop column `dateModified`;
+  
+INSERT INTO `universalTranslator`.`ref_fileTypes` (`id`, `fileType`) VALUES ('10', 'doc');
+UPDATE `universalTranslator`.`ref_fileTypes` SET `fileType`='xml' WHERE `id`='9';
+UPDATE `universalTranslator`.`ref_fileTypes` SET `fileType`='xls' WHERE `id`='8';
+UPDATE `universalTranslator`.`ref_fileTypes` SET `fileType`='odbc' WHERE `id`='7';
+UPDATE `universalTranslator`.`ref_fileTypes` SET `fileType`='pdf' WHERE `id`='6';
+UPDATE `universalTranslator`.`ref_fileTypes` SET `fileType`='mdb' WHERE `id`='5';
+UPDATE `universalTranslator`.`ref_fileTypes` SET `fileType`='hl7' WHERE `id`='4';
+UPDATE `universalTranslator`.`ref_fileTypes` SET `fileType`='csv' WHERE `id`='3';
+UPDATE `universalTranslator`.`ref_fileTypes` SET `fileType`='txt' WHERE `id`='2';
+UPDATE `universalTranslator`.`ref_fileTypes` SET `fileType`='Does not apply' WHERE `id`='1';
+
+
+INSERT INTO `universalTranslator`.`ref_validationTypes` (`validationType`) VALUES ('URL');
+UPDATE `universalTranslator`.`ref_validationTypes` SET `validationType`='Date' WHERE `id`='4';
+UPDATE `universalTranslator`.`ref_validationTypes` SET `validationType`='Numeric' WHERE `id`='5';
+UPDATE `universalTranslator`.`ref_validationTypes` SET `validationType`='Email' WHERE `id`='2';
+UPDATE `universalTranslator`.`ref_validationTypes` SET `validationType`='Phone Number' WHERE `id`='3';
+UPDATE `universalTranslator`.`ref_validationTypes` SET `validationType`='' WHERE `id`='1';
+
   
