@@ -148,6 +148,12 @@ public class configurationTransportManagerImpl implements configurationTransport
     public List<configurationFormFields> getConfigurationFields(int configId, int transportDetailId) {
         return configurationTransportDAO.getConfigurationFields(configId, transportDetailId);
     }
+    
+    @Override
+    @Transactional
+    public List<configurationFormFields> getConfigurationFieldsByBucket(int configId, int transportDetailId, int bucket) {
+        return configurationTransportDAO.getConfigurationFieldsByBucket(configId, transportDetailId, bucket);
+    }
 
     @Override
     @Transactional

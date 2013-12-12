@@ -193,6 +193,7 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
      * The 'getConfigurationFields' function will return a list of saved form fields for the selected configuration.
      *
      * @param	configId	Will hold the id of the configuration we want to return fields for
+     * @param transporetDetailId    The id of the selected transport method
      *
      * @return	This function will return a list of configuration form fields
      */
@@ -204,6 +205,27 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
                 .add(Restrictions.eq("configId", configId))
                 .add(Restrictions.eq("transportDetailId", transportDetailId))
                 .addOrder(Order.asc("bucketNo"))
+                .addOrder(Order.asc("bucketDspPos"));
+
+        return criteria.list();
+    }
+    
+    /**
+     * The 'getConfigurationFieldsByBucket' function will return a list of form fields for the selected configuration
+     * and selected Bucket (Section 1-4)
+     * 
+     * @param configId              The id of the selected configuration
+     * @param transporetDetailId    The id of the selected transport method
+     * @param buckt                 The integer value of the bucket (Section) you want to return fields for (must be 1-4)
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    @Transactional
+    public List<configurationFormFields> getConfigurationFieldsByBucket(int configId, int transportDetailId, int bucket) {
+        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configurationFormFields.class)
+                .add(Restrictions.eq("configId", configId))
+                .add(Restrictions.eq("transportDetailId", transportDetailId))
+                .add(Restrictions.eq("bucketNo", bucket))
                 .addOrder(Order.asc("bucketDspPos"));
 
         return criteria.list();

@@ -6,12 +6,16 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
 @Entity
 @Table(name = "CONFIGURATIONFORMFIELDS")
 public class configurationFormFields {
+    
+    @Transient
+    private String fieldValue = null;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -146,6 +150,14 @@ public class configurationFormFields {
 
     public void setUseField(boolean useField) {
         this.useField = useField;
+    }
+    
+    public String getfieldValue() {
+        return fieldValue;
+    }
+    
+    public void setfieldValue(String fieldValue) {
+        this.fieldValue = fieldValue;
     }
 
 }

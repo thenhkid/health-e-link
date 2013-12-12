@@ -15,6 +15,8 @@ public interface configurationTransportManager {
     Integer updateTransportDetails(configurationTransport transportDetails);
 
     List<configurationFormFields> getConfigurationFields(int configId, int transportDetailId);
+    
+    List<configurationFormFields> getConfigurationFieldsByBucket(int configId, int transportDetailId, int bucket);
 
     void updateConfigurationFormFields(configurationFormFields formField);
 
