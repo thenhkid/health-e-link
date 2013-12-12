@@ -162,4 +162,5 @@ UPDATE `universalTranslator`.`ref_validationTypes` SET `validationType`='Email' 
 UPDATE `universalTranslator`.`ref_validationTypes` SET `validationType`='Phone Number' WHERE `id`='3';
 UPDATE `universalTranslator`.`ref_validationTypes` SET `validationType`='' WHERE `id`='1';
 
+UPDATE `universalTranslator`.`ref_validationTypes` SET `validationType`='None' WHERE `id`='1';
   
