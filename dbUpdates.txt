@@ -163,4 +163,20 @@ UPDATE `universalTranslator`.`ref_validationTypes` SET `validationType`='Phone N
 UPDATE `universalTranslator`.`ref_validationTypes` SET `validationType`='' WHERE `id`='1';
 
 UPDATE `universalTranslator`.`ref_validationTypes` SET `validationType`='None' WHERE `id`='1';
+
+
+ALTER TABLE `universalTranslator`.`transactionUploads` 
+ADD COLUMN `transportMethodId` INT NOT NULL AFTER `batchName`;
+ALTER TABLE `universalTranslator`.`transactionUploads` 
+CHANGE COLUMN `transportMethodId` `transportMethodId` INT(11) NOT NULL COMMENT 'we need to know how a file was uploaded as they might change the mapping, for example, in\norg1 might have F5 as messageTypeId in FTP but F6 for messageTypeId in JSON files' ;
+ALTER TABLE `universalTranslator`.`transactionUploads` 
+ADD INDEX `transportMethodFK_idx` (`transportMethodId` ASC);
+ALTER TABLE `universalTranslator`.`transactionUploads` 
+ADD CONSTRAINT `transportMethodFK`
+  FOREIGN KEY (`transportMethodId`)
+  REFERENCES `universalTranslator`.`ref_transportMethods` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+
   
