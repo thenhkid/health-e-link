@@ -1,6 +1,6 @@
 CREATE DATABASE  IF NOT EXISTS `universalTranslator` /*!40100 DEFAULT CHARACTER SET latin1 */;
 USE `universalTranslator`;
--- MySQL dump 10.13  Distrib 5.6.11, for osx10.6 (i386)
+-- MySQL dump 10.13  Distrib 5.6.13, for osx10.6 (i386)
 --
 -- Host: 127.0.0.1    Database: universalTranslator
 -- ------------------------------------------------------
@@ -18,34 +18,37 @@ USE `universalTranslator`;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `batchUploads`
+-- Table structure for table `Macro_Names`
 --
 
-DROP TABLE IF EXISTS `batchUploads`;
+DROP TABLE IF EXISTS `Macro_Names`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `batchUploads` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `orgId` int(11) NOT NULL,
-  `userId` int(11) DEFAULT NULL,
-  `batchName` varchar(255) NOT NULL,
-  `dateSubmitted` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `statusId` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `btchStatusId_idx` (`statusId`),
-  KEY `btchOrgId_idx` (`orgId`),
-  CONSTRAINT `btchOrgId` FOREIGN KEY (`orgId`) REFERENCES `organizations` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `btchStatusId` FOREIGN KEY (`statusId`) REFERENCES `ref_batchStatus` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+CREATE TABLE `Macro_Names` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `Category` varchar(50) CHARACTER SET utf8 DEFAULT NULL,
+  `Macro_Name` varchar(100) CHARACTER SET utf8 DEFAULT NULL,
+  `Macro_Short_Name` varchar(50) CHARACTER SET utf8 DEFAULT NULL,
+  `Ref_Number` int(11) DEFAULT NULL,
+  `Date_Display` char(10) DEFAULT NULL,
+  `Formula` varchar(255) CHARACTER SET utf8 DEFAULT NULL,
+  `Invalid_When` varchar(255) CHARACTER SET utf8 DEFAULT NULL,
+  `FieldA_Question` varchar(255) CHARACTER SET utf8 DEFAULT NULL,
+  `FieldB_Question` varchar(255) CHARACTER SET utf8 DEFAULT NULL,
+  `Con1_Question` varchar(255) CHARACTER SET utf8 DEFAULT NULL,
+  `Con2_Question` varchar(255) CHARACTER SET utf8 DEFAULT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=67 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `batchUploads`
+-- Dumping data for table `Macro_Names`
 --
 
-LOCK TABLES `batchUploads` WRITE;
-/*!40000 ALTER TABLE `batchUploads` DISABLE KEYS */;
-/*!40000 ALTER TABLE `batchUploads` ENABLE KEYS */;
+LOCK TABLES `Macro_Names` WRITE;
+/*!40000 ALTER TABLE `Macro_Names` DISABLE KEYS */;
+INSERT INTO `Macro_Names` VALUES (1,'DO NOT PASS','If Source Field = Constant, do not pass record.','IF SF = CON1 NOPASS',1,NULL,'fd.@Src = \'@C1\' ',NULL,NULL,NULL,'Please enter the constant value that will be compared to the current field.',NULL),(2,'DO NOT PASS','If Source Field = Field A, do not pass record.','IF SF = SFA NOPASS',2,NULL,'fd.@Src = fd.@F1 ',NULL,'Please enter the field number of the field to be compared to the current field.',NULL,NULL,NULL),(3,'DO NOT PASS','If Source Field > Field A, do not pass record.','IF SF > SFA NOPASS',3,NULL,'fd.@Src > fd.@F1',NULL,'Please enter the field number of the field to be compared to the current field.',NULL,NULL,NULL),(4,'DO NOT PASS','If Source Field < Field A, do not pass record.','IF SF < SFA NOPASS',4,NULL,'fd.@Src < fd.@F1 ',NULL,'Please enter the field number of the field to be compared to the current field.',NULL,NULL,NULL),(5,'MAPLINK SPECS','Insert today\'s date into Source Field.','INSERTDATE',5,NULL,'LookupValue = LEFT(CONVERT(CHAR, GETDATE(), 112), 8)',NULL,NULL,NULL,NULL,NULL),(6,'MAPLINK SPECS','Concatenate - Source Field = Field A + Field B','CAT SF = SFA + SFB',6,NULL,'LookupValue = LEFT(ISNULL(fd.@F1, \'\') + \'@C1\' + ISNULL(fd.@F2, \'\'), 200)',NULL,'Please enter the field number of the first field to be concatenated.','Please enter the field number of the  field to be appended.','Please enter the constant value that will separate the concatenated values.',NULL),(8,'MAPLINK SPECS','Concatenate - Source Field = Constant + Field A','CAT SF = CON1 + SFA',7,NULL,'LookupValue = LEFT(RTRIM(\'@C1\' + \'@C2\') + fd.@F1, 200)',NULL,'Please enter the field number of the field to be appended to the constant.',NULL,'Please enter the constant value to be concatenated.','Please enter the constant value that will separate the concatenated values.'),(9,'MAPLINK SPECS','Concatenate - Source Field = Field A + CON','CAT SF = SFA + CON1',8,NULL,'LookupValue = LEFT(fd.@F1 + \'@C2\'+ \'@C1\', 200)',NULL,'Please enter the field number of the field to be concatenated.',NULL,'Please enter the constant value to be appended to the field.','Please enter the constant value  that will separate the concatenated values.'),(10,'MAPLINK SPECS','Remove Constant Substring from Source Field','DEL SUBSTRING',9,NULL,'LookupValue = dbo.ufn_DeleteString(SourceValue, \'@C1\', \'@C2\')',NULL,'',NULL,'Please enter the text string to be removed from the current field.','Please enter where to search in the current field (A=anywhere, E=end, S=start)'),(11,'MAPLINK SPECS','Convert case of Source Field to all upper case','UPPER CASE',10,NULL,'LookupValue = UPPER(SourceValue)',NULL,NULL,NULL,'',NULL),(12,'MAPLINK SPECS','Convert case of Source Field to all lower case','LOWER CASE',11,NULL,'LookupValue = LOWER(SourceValue)',NULL,NULL,NULL,NULL,NULL),(13,'MAPLINK SPECS','Source Field = Field A + Field B','ADD FIELDS',12,NULL,'LookupValue = STR(CAST(fd.@F1 AS DECIMAL(15,5)) + CAST(fd.@F2 AS DECIMAL(15,5)), 10, CASE WHEN LEN(\'@C1\') = 0 THEN 0 ELSE @C1 END)','ISNUMERIC(fd.@F1) = 0 OR ISNUMERIC(fd.@F2) = 0 OR CHARINDEX(\'$\', fd.@F1) <> 0 OR CHARINDEX(\'$\', fd.@F2) <> 0','Please enter the field number of the first field to be added.','Please enter the field number of the field to be added to the first field.','Please indicate the number of places to the right of the decimal point in the result.',NULL),(14,'MAPLINK SPECS','Source Field = Field A - Field B','SUBTRACT  FIELDS',13,NULL,'LookupValue = STR(CAST(fd.@F1 AS DECIMAL(15,5)) - CAST(fd.@F2 AS DECIMAL(15,5)), 10, CASE WHEN LEN(\'@C1\') = 0 THEN 0 ELSE @C1 END)','ISNUMERIC(fd.@F1) = 0 OR ISNUMERIC(fd.@F2) = 0 OR CHARINDEX(\'$\', fd.@F1) <> 0 OR CHARINDEX(\'$\', fd.@F2) <> 0','Please enter the field number of the first field to be subtracted.','Please enter the field number of the field to be subtracted from the first field.','Please indicate the number of places to the right of the decimal point in the result.',NULL),(15,'MAPLINK SPECS','Source Field = Field A/Field B','DIVIDE FIELDS',14,NULL,'LookupValue = STR(CAST(fd.@F1 AS DECIMAL(15,5)) / CAST(fd.@F2 AS DECIMAL(15,5)), 10, CASE WHEN LEN(\'@C1\') = 0 THEN 0 ELSE @C1 END)','ISNUMERIC(fd.@F1) = 0 OR ISNUMERIC(fd.@F2) = 0 OR fd.@F2 = 0 OR CHARINDEX(\'$\', fd.@F1) <> 0 OR CHARINDEX(\'$\', fd.@F2) <> 0','Please enter the field number of the first field to be divided.','Please enter the field number of the field to be divided into the first field.','Please indicate the number of places to the right of the decimal point in the result.',NULL),(16,'MAPLINK SPECS','Source Field = Field A * Field B','MULTIPLY FIELDS',15,NULL,'LookupValue = STR(CAST(fd.@F1 AS DECIMAL(15,5)) * CAST(fd.@F2 AS DECIMAL(15,5)), 10, CASE WHEN LEN(\'@C1\') = 0 THEN 0 ELSE @C1 END)','ISNUMERIC(fd.@F1) = 0 OR ISNUMERIC(fd.@F2) = 0 OR CHARINDEX(\'$\', fd.@F1) <> 0 OR CHARINDEX(\'$\', fd.@F2) <> 0','Please enter the field number of the first field to be multiplied.','Please enter the field number of the field that the first field will be multiplied by.','Please indicate the number of places to the right of the decimal point in the result.',NULL),(17,'MAPLINK SPECS','Insert constant into Source Field','SCONSTANT',16,NULL,'LookupValue = \'@C1\'',NULL,NULL,NULL,'Please enter the constant value to be inserted into the current feld.',NULL),(20,'MAPLINK SPECS','If Source Field A = Constant1, SF = Constant2','IF SFA = CON1, SF = CON2',19,NULL,'LookupValue = CASE WHEN fd.@F1 = \'@C1\' THEN \'@C2\' ELSE SourceValue END',NULL,'Please enter the field number of the field to be checked.','','Please enter the constant value to be checked in the first field.','Please enter the constant value to be stored in the current field if the conditon is met.'),(21,'MAPLINK SPECS','FPDS Old Race Field to New Race Fields','FPDS RACE',20,NULL,'dbo.sp_SetRace \'FPDS\', \'@Src\', \'@varKey\'',NULL,NULL,NULL,NULL,NULL),(22,'MAPLINK SPECS','mmddyyyy to yyyymmdd','DATE',21,'mmddyyyy','LookupValue = dbo.ufn_TransformDate(SourceValue, 0, YEAR(GETDATE()))','dbo.ufn_CheckDate(fd.@Src, 0, YEAR(GETDATE())) = 0',NULL,NULL,NULL,NULL),(23,'MAPLINK SPECS','mm/dd/yyyy to yyyymmdd','DATE1',22,'mm/dd/yyyy','LookupValue = dbo.ufn_TransformDate(SourceValue, 1, YEAR(GETDATE()))','dbo.ufn_CheckDate(fd.@Src, 1, YEAR(GETDATE())) = 0',NULL,NULL,NULL,NULL),(24,'MAPLINK SPECS','dd-mon-yy to yyyymmdd','DATE2',23,'dd-mon-yy','LookupValue = dbo.ufn_TransformDate(SourceValue, 2, YEAR(GETDATE()))','dbo.ufn_CheckDate(fd.@Src, 2, YEAR(GETDATE())) = 0',NULL,NULL,NULL,NULL),(25,'MAPLINK SPECS','m/d/yyyy (1 or 2 digit D/M) to yyyymmdd','DATE3',24,'m/d/yyyy','LookupValue = dbo.ufn_TransformDate(SourceValue, 3, YEAR(GETDATE()))','dbo.ufn_CheckDate(fd.@Src, 3, YEAR(GETDATE())) = 0',NULL,NULL,NULL,NULL),(26,'MAPLINK SPECS','yyyy-mm-dd to yyyymmdd','DATE4',25,'yyyy-mm-dd','LookupValue = dbo.ufn_TransformDate(SourceValue, 4, YEAR(GETDATE()))','dbo.ufn_CheckDate(fd.@Src, 4, YEAR(GETDATE())) = 0',NULL,NULL,NULL,NULL),(27,'MAPLINK SPECS','Change Female to Rely on Other Method','PPCTRELY',26,'','LookupValue = CASE WHEN \'@Src\' = \'F5\' AND fd.F8 <> \'M\' THEN \'6\' ELSE SourceValue END',NULL,NULL,NULL,NULL,NULL),(28,'MAPLINK SPECS',' yyyymmdd to yyyymmdd','DATE5',27,'yyyymmdd','LookupValue = dbo.ufn_TransformDate(SourceValue, 5, YEAR(GETDATE()))','dbo.ufn_CheckDate(fd.@Src, 5, YEAR(GETDATE())) = 0',NULL,NULL,NULL,NULL),(29,'MAPLINK SPECS','FPDS Find medserv substrings and replace with maplink','FPDS FINDREPLACE',28,NULL,'dbo.sp_FindReplace \'@Src\', \'@varKey\', \'@C2\', \'@C1\', \'CHG\'',NULL,NULL,NULL,'Please enter the value separator (, or ;).','Please enter the name of the crosswalk.'),(30,'MAPLINK SPECS','Find substrings and replace with maplink','MAP FINDREPLACE',29,NULL,'dbo.sp_FindReplace \'@Src\', \'@varKey\', \'@C1\', \',\', \'CHG\'',NULL,NULL,NULL,'Please enter the name of the crosswalk.',NULL),(31,'MAPLINK SPECS','Find substring and replace with constant','CONSTANT FINDREPLACE',30,NULL,'LookupValue = REPLACE(SourceValue, \'@C1\', \'@C2\')',NULL,NULL,NULL,'Please enter the constant value that will be replaced.','Please enter the constant value that will replace the original constant.'),(33,'MAPLINK SPECS','CFHC Old Race Field to New Race Fields','CFHC RACE',31,NULL,'dbo.sp_SetRace \'CFHC\', \'@Src\', \'@varKey\'',NULL,NULL,NULL,NULL,NULL),(35,'MAPLINK SPECS','Source Field = SF * CON1','MULTIPLY CONSTANT',33,NULL,'LookupValue = CASE WHEN LEN(RTRIM(SourceValue)) = 0 THEN SourceValue ELSE STR(CAST(SourceValue AS DECIMAL(15,5)) * @C1, 10, CASE WHEN LEN(\'@C2\') > 0 THEN @C2 ELSE 0 END) END','(LEN(RTRIM(fd.@Src)) > 0 AND ISNUMERIC(fd.@Src) = 0) OR ISNUMERIC(\'@C1\') = 0 OR CHARINDEX(\'$\', fd.@Src) <> 0','',NULL,'Please enter the constant value that the field will be multiplied by.','Please enter the number of places to the right of the decimal point in the result.'),(36,'MAPLINK SPECS','Source Field = SF / CON1','DIVIDE CONSTANT',34,NULL,'LookupValue = CASE WHEN LEN(RTRIM(SourceValue)) = 0 THEN SourceValue ELSE STR(CAST(SourceValue AS DECIMAL(15,5)) / @C1, 10, CASE WHEN LEN(\'@C2\') > 0 THEN @C2 ELSE 0 END) END','(LEN(RTRIM(fd.@Src)) > 0 AND ISNUMERIC(fd.@Src) = 0) OR ISNUMERIC(\'@C1\') = 0 OR  \'@C1\' = \'0\' OR CHARINDEX(\'$\', fd.@Src) <> 0','',NULL,'Please enter the constant value that the field will be divided by.','Please enter the number of places to the right of the decimal point in the result.'),(37,'MAPLINK SPECS','Insert Constant into Target Field','TCONSTANT',35,NULL,'@F1 = \'@C1\'',NULL,'Please enter the field number of the target field.',NULL,'Please enter the constant value to be stored.',NULL),(39,'MAPLINK SPECS','Crosswalk source field to target field','F2F CROSSWALK',37,NULL,'@F2 = dbo.ufn_F2F(RTRIM(fd.@Src), \'@C1\', \'@varKey\', \'@C2\')',NULL,'','Please enter the target field number where the converted value will be stored.','Please enter the name of the crosswalk.','Please enter CLEAR, PASS or the default value to be used if no match is found.'),(40,'MAPLINK SPECS','mddyyyy (1 or 2 dgit month) to yyyymmdd','DATE6',41,'mddyyyy','LookupValue = dbo.ufn_TransformDate(SourceValue, 6, YEAR(GETDATE()))','dbo.ufn_CheckDate(fd.@Src, 6, YEAR(GETDATE())) = 0',NULL,NULL,NULL,NULL),(41,'MAPLINK SPECS','Merge visit records','MERGE',42,NULL,'dbo.sp_Merge \'@F1\', \'@varKey\'',NULL,'Please enter the field number of the field to be merged.','','',''),(42,'MAPLINK SPECS','Default Map','DEFAULT MAP',43,NULL,'LookupValue = dbo.ufn_F2F(SourceValue, \'@C1\', \'@varKey\', \'@C2\')',NULL,NULL,NULL,'Please enter the name of the crosswalk.','Please enter CLEAR, PASS or the default value to be used if no match is found.'),(43,'MAPLINK SPECS','ZIP Code','ZIPCODE',44,NULL,'dbo.sp_SetZipCode \'@Src\', \'@C1\'',NULL,'',NULL,'Please enter the value to be used when an invalid zip code is submitted.',NULL),(44,'MAPLINK SPECS','Poverty Level','TPOVERTY LEVEL',45,NULL,'@F1 = dbo.ufn_GetPovertyLevel(fd.@F2, CAST(@C1 AS INT), @C2, YEAR(GETDATE()))','','Please enter the target field number where the poverty level is kept.','Please enter the field number for the visit date','Please enter the field name (\"fd.Fx\") for the family size','Please enter the field name (\"fd.Fx\") for the weekly income'),(45,'MAPLINK SPECS','yyyymmdd to mm/dd/yyyy','DATE7',45,NULL,'LookupValue = dbo.ufn_TransformDate(SourceValue, 7, YEAR(GETDATE()))','dbo.ufn_CheckDate(fd.@Src, 5, YEAR(GETDATE())) = 0',NULL,NULL,NULL,NULL),(46,'MAPLINK SPECS','If Source Field A = Constant1, Target file B = Constant2','IF SFA = CON1, TFB = CON2',46,NULL,'@F2 = CASE WHEN fd.@F1 = \'@C1\' THEN \'@C2\' ELSE tfd.@F2 END',NULL,'Please enter the field number of the field to be checked.','Please enter the target field number where the result will be stored.','Please enter the constant value to be checked in the first field.','Please enter the constant value to be stored when the test condition is met.'),(47,'MAPLINK SPECS','Find substring and remove maplink target','FINDREMOVE',46,NULL,'dbo.sp_FindReplace \'@Src\', \'@varKey\', \'@C2\', \'@C1\', \'DEL\'',NULL,NULL,NULL,'Please enter the value separator (, or ;).','Please enter the name of the crosswalk.'),(49,'MAPLINK SPECS','Access date to yyyymmdd','DATE8',46,'nnnnn','LookupValue = CONVERT(CHAR(10), DATEADD(dd, CAST(SourceValue AS INT), \'12/30/1899\'), 112)','ISNUMERIC(SourceValue) = 0 ',NULL,NULL,NULL,NULL),(50,'MAPLINK SPECS','mm/dd/yy to yyyymmdd','DATE9',47,'mm/dd/yy','LookupValue = dbo.ufn_TransformDate(SourceValue, 9, YEAR(GETDATE()))','dbo.ufn_CheckDate(fd.@Src, 9, YEAR(GETDATE())) = 0',NULL,NULL,NULL,NULL),(51,'MAPLINK SPECS','Check number of characters ','CHECK LENGTH',48,NULL,'LookupValue = LookupValue','ISNUMERIC(\'@C1\') = 0 OR ISNUMERIC(\'@C2\') = 0 OR LEN(LTRIM(RTRIM(fd.@Src))) NOT BETWEEN @C1 AND @C2',NULL,NULL,'Please enter the minimum length for the value.','Please enter the maximum length for the value.'),(52,'MAPLINK SPECS','Replace blank values with constant','BLANKFILL',49,NULL,'LookupValue = CASE WHEN LEN(RTRIM(SourceValue)) = 0 THEN \'@C1\' ELSE SourceValue END',NULL,NULL,NULL,'Please enter the constant value that will replace blank values.',NULL),(53,'MAPLINK SPECS','If Source >= @C1, \'Y\', \'N\'','OFAGE',50,NULL,'@F1 = CASE WHEN dbo.ufn_AgeInYears(fd.@Src, GETDATE()) >= @C1 THEN \'yes\' ELSE \'no\' END','dbo.ufn_CheckDate(fd.@Src, 1, YEAR(GETDATE())) = 0 OR ISNUMERIC(\'@C1\') = 0','Please enter the field number where the result is kept.',NULL,'Please enter the cutoff age.',NULL),(54,'MAPLINK SPECS','Replace constant value with SF1','SREPLACE',51,NULL,'LookupValue = CASE WHEN SourceValue = \'@C1\' THEN fd.@F1 ELSE SourceValue END',NULL,'Please enter the field number where the replacement value is kept.',NULL,'Please enter the constant value that will be replaced.',NULL),(55,'MAPLINK SPECS','Keep only top ranked value in list','TOPRANKED',52,NULL,'LookupValue = dbo.ufn_FindPriority(SourceValue, \'@C1\', \'@varKey\')',NULL,NULL,NULL,'Please enter the name of the crosswalk that ranks the value.',NULL),(56,'MAPLINK SPECS','Remove duplicate values','DEDUP',53,NULL,'LookupValue = dbo.ufn_Dedup(SourceValue)',NULL,NULL,NULL,NULL,NULL),(57,'MAPLINK SPECS','Append Constant','APPEND CONSTANT',54,NULL,'LookupValue = ISNULL(fd.@Src, \'\') + \'@C2\' + \'@C1\'',NULL,NULL,NULL,'Please enter the constant value to be appended to the current field.','Please enter the value that will be used to separate the two values.'),(58,'MAPLINK SPECS','Prefix Constant','PREFIX CONSTANT',55,NULL,'LookupValue = \'@C1\' + \'@C2\' + ISNULL(fd.@Src, \'\')',NULL,NULL,NULL,'Please enter the constant value to be prefixed to the current field.','Please enter the value that will be used to separate the two values.'),(59,'HL7 MESSAGE','Insert HL7 message element','COMPOSE HL7',56,NULL,NULL,NULL,'Please enter the target field number of the first field to be inserted.','Please enter the target field number of the last field to be inserted.','Please enter the prefix text if needed.','Please enter a line control option if needed (START, NL or END).'),(60,'HL7 MESSAGE ','Insert group sequence numbers','SET HL7 SEQ',57,NULL,NULL,NULL,'Please enter the field number that identifies group members.','Please enter the field number where the sequence number will be stored.','Please enter DISTINCT if you are numbering groups rather than the members of each group.',NULL),(61,'MAPLINK SPECS','Replace target with SF1 + @C2 + @C1','TAPPEND CONSTANT TO FIELD',58,NULL,'@F2 = RTRIM(fd.@F1) + \'@C2\' + \'@C1\'',NULL,'Please enter the field number of the value to be inserted.','Please enter the target field number where the result is kept.','Please enter the constant value to be appended to the value of the field.','Please enter the value that will be used to separate the two values.'),(62,'MAPLINK SPECS','Replace target with @C1 + @C2 + SF1','TAPPEND FIELD TO CONSTANT',59,NULL,'@F2 = \'@C1\' + \'@C2\' + fd.@F1',NULL,'Please enter the field number of the value to be inserted.','Please enter the target field number where the result is kept.','Please enter the constant value to be prefixed to the value of the field.','Please enter the value that will be used to separate the two values.'),(63,'MAPLINK SPECS','Check numeric range','CHECK NUMBER',60,NULL,'LookupValue = LookupValue','ISNUMERIC(SourceValue) = 0 OR ISNUMERIC(\'@C1\') = 0 OR ISNUMERIC(\'@C2\') = 0 OR fd.@Src < @C1 OR fd.@Src > @C2',' ',' ','Please enter the lowest valid number.','Please enter the largest valid number.'),(64,'MAPLINK SPECS','Check alphabetic range','CHECK ALPHA',61,NULL,'LookupValue = LookupValue','(fd.@Src < \'@C1\' OR fd.@Src > \'@C2\')',' ',' ','Please enter the lowest valid text.','Please enter the largest valid text.'),(65,'MAPLINK SPECS','Reverse text phrases','SWAP TEXT',62,NULL,'LookupValue = dbo.ufn_SwapText(SourceValue, \'@C1\')','dbo.ufn_CountChar(fd.@Src, \'@C1\') <> 1',NULL,NULL,'Please enter the value that is used as the delimiter in the text.',NULL),(66,'MAPLINK SPECS','Replace range of constants with SF1','REPLACE RANGE',63,NULL,'LookupValue = CASE WHEN CAST(SourceValue AS INT)  @C1 THEN  \'@C2\' ELSE SourceValue END','','',NULL,'Please enter the range of values to change as  BETWEEN x AND y.','Please enter the replacement value for the range.');
+/*!40000 ALTER TABLE `Macro_Names` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -67,6 +70,14 @@ CREATE TABLE `brochures` (
 ) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
+--
+-- Dumping data for table `brochures`
+--
+
+LOCK TABLES `brochures` WRITE;
+/*!40000 ALTER TABLE `brochures` DISABLE KEYS */;
+/*!40000 ALTER TABLE `brochures` ENABLE KEYS */;
+UNLOCK TABLES;
 
 --
 -- Table structure for table `configurationConnections`
@@ -99,33 +110,6 @@ LOCK TABLES `configurationConnections` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `configurationFieldMappings`
---
-
-DROP TABLE IF EXISTS `configurationFieldMappings`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `configurationFieldMappings` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `configId` int(11) NOT NULL,
-  `sourceFieldNo` int(11) NOT NULL,
-  `targetFieldNo` int(11) NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `configId_idx` (`configId`),
-  CONSTRAINT `configId` FOREIGN KEY (`configId`) REFERENCES `configurations` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `configurationFieldMappings`
---
-
-LOCK TABLES `configurationFieldMappings` WRITE;
-/*!40000 ALTER TABLE `configurationFieldMappings` DISABLE KEYS */;
-/*!40000 ALTER TABLE `configurationFieldMappings` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `configurationFormFields`
 --
 
@@ -134,20 +118,24 @@ DROP TABLE IF EXISTS `configurationFormFields`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `configurationFormFields` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
+  `messageTypeFieldId` int(11) NOT NULL DEFAULT '0',
   `configId` int(11) NOT NULL,
+  `transportDetailId` int(11) NOT NULL,
   `fieldNo` int(11) NOT NULL,
+  `fieldDesc` varchar(255) DEFAULT NULL,
   `fieldLabel` varchar(500) NOT NULL,
   `validationType` int(11) DEFAULT NULL,
   `required` bit(1) NOT NULL DEFAULT b'0',
-  `saveToTableName` varchar(255) DEFAULT NULL,
-  `saveToTableCol` varchar(255) DEFAULT NULL,
   `bucketNo` int(11) NOT NULL,
   `bucketDspPos` int(11) NOT NULL,
+  `useField` bit(1) NOT NULL DEFAULT b'0',
+  `saveToTableName` varchar(255) DEFAULT NULL,
+  `saveToTableCol` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `configId_idx` (`configId`),
-  KEY `ffrefTableId_idx` (`saveToTableName`),
-  KEY `ffrefTableColId_idx` (`saveToTableCol`),
-  CONSTRAINT `formfieldconfigId` FOREIGN KEY (`configId`) REFERENCES `configurations` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  KEY `formtransportDetailId_idx` (`transportDetailId`),
+  CONSTRAINT `formfieldconfigId` FOREIGN KEY (`configId`) REFERENCES `configurations` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `formtransportDetailId` FOREIGN KEY (`transportDetailId`) REFERENCES `configurationTransportDetails` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -170,6 +158,7 @@ DROP TABLE IF EXISTS `configurationSchedule`;
 CREATE TABLE `configurationSchedule` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `configId` int(11) NOT NULL,
+  `transportMethod` int(11) NOT NULL,
   `type` smallint(6) NOT NULL DEFAULT '0' COMMENT '0 = Never\n1 = Manual\n2 = Daily\n3 = Weekly\n4 = Monthly',
   `processingType` smallint(6) DEFAULT NULL COMMENT '1 = Scheduled\n2 = Continuous',
   `newfilecheck` int(11) DEFAULT NULL COMMENT '5 = Every 5 Mintues\n10 = Every 10 Minutes\netc',
@@ -205,14 +194,20 @@ CREATE TABLE `configurationTransportDetails` (
   `messageTypeColNo` int(11) DEFAULT NULL,
   `messageTypeCustomVal` varchar(45) DEFAULT NULL,
   `targetOrgColNo` int(11) DEFAULT NULL,
-  `fileType` int(11) DEFAULT '0',
+  `fileType` int(11) DEFAULT NULL,
   `fileDelimiter` int(11) DEFAULT NULL,
   `containsHeader` bit(1) DEFAULT b'0',
+  `reportableField1` int(11) DEFAULT '0',
+  `reportableField2` int(11) DEFAULT '0',
+  `reportableField3` int(11) DEFAULT '0',
+  `reportableField4` int(11) DEFAULT '0',
+  `status` bit(1) DEFAULT b'1',
+  `targetFileName` varchar(255) DEFAULT NULL,
+  `appendDateTime` bit(1) DEFAULT b'0',
+  `maxFileSize` int(11) DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `fileDelimId_idx` (`fileDelimiter`),
-  KEY `filetypeId_idx` (`fileType`),
-  CONSTRAINT `fileDelimId` FOREIGN KEY (`fileDelimiter`) REFERENCES `ref_delimiters` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `filetypeId` FOREIGN KEY (`fileType`) REFERENCES `ref_FileTypes` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  KEY `filetypeId_idx` (`fileType`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -235,14 +230,17 @@ DROP TABLE IF EXISTS `configurations`;
 CREATE TABLE `configurations` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `orgId` int(11) NOT NULL,
-  `configName` varchar(55) NOT NULL,
   `status` bit(1) NOT NULL DEFAULT b'0',
   `type` smallint(6) NOT NULL DEFAULT '1' COMMENT '1 = Source Organizations\n2 = Target Organization',
   `messageTypeId` int(11) NOT NULL,
+  `dateCreated` datetime DEFAULT CURRENT_TIMESTAMP,
+  `stepsCompleted` int(11) NOT NULL DEFAULT '0',
+  `clearFields` bit(1) DEFAULT b'0',
+  `rejectOnError` smallint(6) NOT NULL DEFAULT '1' COMMENT '1 = If error set to Pending\n2 = if error reject Record\n3 = if error reject Group',
   PRIMARY KEY (`id`),
   KEY `orgId_idx` (`orgId`),
   KEY `mtID_idx` (`messageTypeId`),
-  CONSTRAINT `mtid` FOREIGN KEY (`messageTypeId`) REFERENCES `messageTypes` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `mtid` FOREIGN KEY (`messageTypeId`) REFERENCES `messagetypes` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `orgId` FOREIGN KEY (`orgId`) REFERENCES `organizations` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -276,119 +274,13 @@ CREATE TABLE `crosswalks` (
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
-
-
 --
--- Table structure for table `info_PatientAddresses`
+-- Dumping data for table `crosswalks`
 --
 
-DROP TABLE IF EXISTS `info_PatientAddresses`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `info_PatientAddresses` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'primary key for table',
-  `patientId` int(11) NOT NULL COMMENT 'This is the id from info_Patients table.',
-  `type` varchar(45) DEFAULT NULL COMMENT 'The type could be vacation, home, office, etc.',
-  `line1` varchar(45) DEFAULT NULL COMMENT 'Address line 1 - e.g. 123 Main Street',
-  `line2` varchar(45) DEFAULT NULL COMMENT 'Address line 2 - e.g. Suite 123',
-  `city` varchar(45) DEFAULT NULL COMMENT 'city - e.g. Beantown',
-  `state` varchar(2) DEFAULT NULL COMMENT 'State - e.g. MA',
-  `postalCode` varchar(15) DEFAULT NULL COMMENT 'zipcode - 02116',
-  `countyId` int(11) DEFAULT NULL,
-  `country` varchar(25) DEFAULT NULL COMMENT 'e.g. USA',
-  `phoneTypeId1` int(11) DEFAULT NULL COMMENT 'id related to lu_PhoneTypes Tables',
-  `phone1` varchar(45) DEFAULT NULL COMMENT 'e.g. 617-111-1111',
-  `phoneTypeId2` int(11) DEFAULT NULL COMMENT 'id related to lu_PhoneTypes Tables',
-  `phone2` varchar(45) DEFAULT NULL COMMENT 'e.g. 123-456-7890\n',
-  `fax` varchar(45) DEFAULT NULL COMMENT 'e.g. 857-123-4567',
-  `addressOrder` int(11) DEFAULT NULL COMMENT 'order of address importance - e.g. 1, 2, 3',
-  `status` varchar(45) DEFAULT NULL COMMENT 'pending, current, future, etc.',
-  `dateCreated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'This is the date that the record was added to UT',
-  `dateModified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'date record is modified',
-  PRIMARY KEY (`id`),
-  KEY `patAddFK` (`patientId`),
-  KEY `coutyFK_idx` (`countyId`),
-  KEY `paPhone1FK_idx` (`phoneTypeId1`),
-  KEY `paPhoneType2FK_idx` (`phoneTypeId2`),
-  CONSTRAINT `paPhoneType2FK` FOREIGN KEY (`phoneTypeId2`) REFERENCES `lu_PhoneTypes` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `coutyFK` FOREIGN KEY (`countyId`) REFERENCES `lu_Counties` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `paPhoneType1FK` FOREIGN KEY (`phoneTypeId1`) REFERENCES `lu_PhoneTypes` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `patAddFK` FOREIGN KEY (`patientId`) REFERENCES `info_Patients` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `info_PatientAddresses`
---
-
-LOCK TABLES `info_PatientAddresses` WRITE;
-/*!40000 ALTER TABLE `info_PatientAddresses` DISABLE KEYS */;
-/*!40000 ALTER TABLE `info_PatientAddresses` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `info_Patients`
---
-
-DROP TABLE IF EXISTS `info_Patients`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `info_Patients` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'primary key for patient, it will serve as our system''s patient Id',
-  `sourcePatientId` varchar(45) NOT NULL COMMENT 'Id assigned to patient by source system - e.g Pat148R-2KD-BOS',
-  `prefix` varchar(45) DEFAULT NULL COMMENT 'e.g. Mr, Dr., Ms, Sir, Princess, Knight, etc',
-  `firstName` varchar(45) DEFAULT NULL COMMENT 'e.g. John',
-  `middleName` varchar(45) DEFAULT NULL COMMENT 'e.g Joshua',
-  `lastName` varchar(45) DEFAULT NULL COMMENT 'e.g. Doe',
-  `suffix` varchar(45) DEFAULT NULL COMMENT 'e.g. Jr, III, IV etc.',
-  `phoneTypeId1` int(11) DEFAULT NULL COMMENT 'Alt phone - id from lookupId',
-  `phone1` varchar(45) DEFAULT NULL COMMENT '123-456-7890',
-  `phoneTypeId2` int(11) DEFAULT NULL COMMENT 'Alt phone - id from lookupId\n',
-  `phone2` varchar(45) DEFAULT NULL COMMENT '617-456-7890',
-  `dob` datetime DEFAULT NULL COMMENT 'Patient''s date of birth 1-1-1912',
-  `genderId` int(11) DEFAULT NULL COMMENT 'Look up value from lu_Genders. Look up field is int and not free hand field because we should have some limits to some fields as what the user can type.  We will add it to our look up table if something creative comes up.  It is also a repetitive field, using int will take up less space and faster when it comes to indexing\nSample equivalent values are - male, female, unknown, transgender, etc.',
-  `raceId` int(11) DEFAULT NULL COMMENT 'Look up Id from lu_Races - equivalent values could be Asian, White, Black, etc.',
-  `hispanicId` int(11) DEFAULT NULL COMMENT 'id from lu_Hispanics\nSample look up values are Yes, No, Not Reported',
-  `primaryLanguageId` int(11) DEFAULT NULL COMMENT 'Id from lu_Languages - Sample look up values - English, Spanish, Polish, Mandarin (Chinese), Cantonese (Chinese) etc.',
-  `englishProficient` bit(1) NOT NULL DEFAULT b'1' COMMENT '1 for True, 2 for False',
-  `maritalStatusId` int(11) DEFAULT NULL COMMENT 'look up from lu_MartialStatuses - Sample look up values are - Single, Married, Divorced, Not Reported, etc.',
-  `initialContraceptiveId` int(11) DEFAULT NULL,
-  `email` varchar(100) DEFAULT NULL COMMENT 'e.g. test@test.com',
-  `url` varchar(100) DEFAULT NULL COMMENT 'e.g. http://test.com',
-  `emergencyContact` varchar(45) DEFAULT NULL COMMENT 'Name of emergency contact - Jane Doe',
-  `emergencyTel` varchar(45) DEFAULT NULL COMMENT '123-456-7890',
-  `patientStatusId` int(11) NOT NULL COMMENT 'id from lu_PatientStatuses - Could be equivalent int value of active, pending, future, expired, etc.',
-  `dateCreated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'This is the date that the record was added to UT',
-  `dateModified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'This is the date that the record was last modified in UT',
-  PRIMARY KEY (`id`),
-  KEY `genderFK_idx` (`genderId`),
-  KEY `raceFK_idx` (`raceId`),
-  KEY `lauguageFK_idx` (`primaryLanguageId`),
-  KEY `martialStatusFK_idx` (`maritalStatusId`),
-  KEY `patientStatuses_idx` (`patientStatusId`),
-  KEY `hispanicFK_idx` (`hispanicId`),
-  KEY `phoneType1FK_idx` (`phoneTypeId1`),
-  KEY `phoneType2FK_idx` (`phoneTypeId2`),
-  KEY `contraFK_idx` (`initialContraceptiveId`),
-  CONSTRAINT `contraFK` FOREIGN KEY (`initialContraceptiveId`) REFERENCES `lu_Contraceptives` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `genderFK` FOREIGN KEY (`genderId`) REFERENCES `lu_Genders` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `hispanicFK` FOREIGN KEY (`hispanicId`) REFERENCES `lu_Hispanics` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `lauguageFK` FOREIGN KEY (`primaryLanguageId`) REFERENCES `lu_Languages` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `martialStatusFK` FOREIGN KEY (`maritalStatusId`) REFERENCES `lu_MartialStatuses` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `patientStatuses` FOREIGN KEY (`patientStatusId`) REFERENCES `lu_PatientStatuses` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `phoneType1FK` FOREIGN KEY (`phoneTypeId1`) REFERENCES `lu_PhoneTypes` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `phoneType2FK` FOREIGN KEY (`phoneTypeId2`) REFERENCES `lu_PhoneTypes` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `raceFK` FOREIGN KEY (`raceId`) REFERENCES `lu_Races` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `info_Patients`
---
-
-LOCK TABLES `info_Patients` WRITE;
-/*!40000 ALTER TABLE `info_Patients` DISABLE KEYS */;
-/*!40000 ALTER TABLE `info_Patients` ENABLE KEYS */;
+LOCK TABLES `crosswalks` WRITE;
+/*!40000 ALTER TABLE `crosswalks` DISABLE KEYS */;
+/*!40000 ALTER TABLE `crosswalks` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -417,7 +309,7 @@ CREATE TABLE `info_ProviderAddresses` (
   `fax` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `providerIdFK_idx` (`providerId`),
-  CONSTRAINT `providerIdFK` FOREIGN KEY (`providerId`) REFERENCES `providers` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `providerIdFK` FOREIGN KEY (`providerId`) REFERENCES `info_providers` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -447,7 +339,7 @@ CREATE TABLE `info_providerids` (
   `dateModified` datetime DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `idproviderIdfk_idx` (`providerId`),
-  CONSTRAINT `idproviderIdfk` FOREIGN KEY (`providerId`) REFERENCES `providers` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `idproviderIdfk` FOREIGN KEY (`providerId`) REFERENCES `info_providers` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -458,6 +350,73 @@ CREATE TABLE `info_providerids` (
 LOCK TABLES `info_providerids` WRITE;
 /*!40000 ALTER TABLE `info_providerids` DISABLE KEYS */;
 /*!40000 ALTER TABLE `info_providerids` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `info_providers`
+--
+
+DROP TABLE IF EXISTS `info_providers`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `info_providers` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `orgId` int(11) NOT NULL,
+  `firstName` varchar(45) NOT NULL,
+  `lastName` varchar(45) NOT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `phone1` varchar(20) DEFAULT NULL,
+  `fax` varchar(20) DEFAULT NULL,
+  `status` bit(1) NOT NULL DEFAULT b'1' COMMENT '1 = Active\n0 = Inactive',
+  `dateCreated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `phone2` varchar(15) DEFAULT NULL,
+  `specialty` varchar(100) DEFAULT NULL,
+  `gender` varchar(45) DEFAULT NULL,
+  `url` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `orgId_idx` (`orgId`),
+  CONSTRAINT `providerOrgId` FOREIGN KEY (`orgId`) REFERENCES `organizations` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `info_providers`
+--
+
+LOCK TABLES `info_providers` WRITE;
+/*!40000 ALTER TABLE `info_providers` DISABLE KEYS */;
+/*!40000 ALTER TABLE `info_providers` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `lookUpTables`
+--
+
+DROP TABLE IF EXISTS `lookUpTables`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `lookUpTables` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `utTableName` varchar(45) NOT NULL,
+  `displayText` varchar(45) DEFAULT NULL,
+  `description` varchar(45) DEFAULT NULL,
+  `urlId` varchar(45) DEFAULT NULL,
+  `dateCreated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `dateModified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `utTableName_UNIQUE` (`utTableName`),
+  UNIQUE KEY `urlId_UNIQUE` (`urlId`)
+) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `lookUpTables`
+--
+
+LOCK TABLES `lookUpTables` WRITE;
+/*!40000 ALTER TABLE `lookUpTables` DISABLE KEYS */;
+INSERT INTO `lookUpTables` VALUES (1,'lu_BestTimeToCall','Best Time To Call',NULL,'698Bes4054all','2013-11-18 23:54:00','2013-11-18 23:54:00'),(2,'lu_BrandNames','Brand Name',NULL,'585Bra6556mes','2013-11-18 23:54:00','2013-11-18 23:54:00'),(3,'lu_Consents','Consent',NULL,'1101Con9058nts','2013-11-18 23:54:00','2013-11-18 23:54:00'),(4,'lu_Contraceptives','Contraceptives',NULL,'3836Con1560ves','2013-11-18 23:54:00','2013-11-18 23:54:00'),(5,'lu_Counties','County',NULL,'3467Cou4061ies','2013-11-18 23:54:00','2013-11-18 23:54:00'),(6,'lu_Genders','Gender',NULL,'3540Gen6563ers','2013-11-18 23:54:00','2013-11-18 23:54:00'),(7,'lu_GeneralHealthStatuses','General Health Status',NULL,'6087Gen9065ses','2013-11-18 23:54:00','2013-11-18 23:54:00'),(8,'lu_GeneralHealths','General Health',NULL,'4627Gen1567ths','2013-11-18 23:54:00','2013-11-18 23:54:00'),(9,'lu_HealthStatuses','Health Status',NULL,'2544Hea4069ses','2013-11-18 23:54:00','2013-11-18 23:54:00'),(10,'lu_Hispanics','Hispanic',NULL,'6786His6571ics','2013-11-18 23:54:00','2013-11-18 23:54:00'),(11,'lu_Immunizations','Immunization',NULL,'5994Imm9072ons','2013-11-18 23:54:00','2013-11-18 23:54:00'),(12,'lu_Languages','Lauguage',NULL,'8263Lan1574ges','2013-11-18 23:54:00','2013-11-18 23:54:00'),(13,'lu_Manufacturers','Manufacturer',NULL,'10508Man4076ers','2013-11-18 23:54:00','2013-11-18 23:54:00'),(14,'lu_MartialStatuses','Marital Status',NULL,'13663Mar6578ses','2013-11-18 23:54:00','2013-11-18 23:54:00'),(15,'lu_MedicalConditionStatuses','Medical Condition Status',NULL,'6817Med9080ses','2013-11-18 23:54:00','2013-11-18 23:54:00'),(16,'lu_MedicalConditionTypes','Medical Condition Type',NULL,'5516Med1582pes','2013-11-18 23:54:00','2013-11-18 23:54:00'),(17,'lu_MedicalConditions','Medical Condition',NULL,'6127Med4083ons','2013-11-18 23:54:00','2013-11-18 23:54:00'),(18,'lu_Medications','Medication',NULL,'13819Med6585ons','2013-11-18 23:54:00','2013-11-18 23:54:00'),(19,'lu_PatientStatuses','Patient Status',NULL,'14389Pat9087ses','2013-11-18 23:54:00','2013-11-18 23:54:00'),(20,'lu_PayerTypes','Payer Type',NULL,'9670Pay1589pes','2013-11-18 23:54:00','2013-11-18 23:54:00'),(21,'lu_PhoneTypes','Phone Type',NULL,'3055Pho4091pes','2013-11-18 23:54:00','2013-11-18 23:54:00'),(22,'lu_ProcedureStatuses','Procedure Status',NULL,'6091Pro6592ses','2013-11-18 23:54:00','2013-11-18 23:54:00'),(23,'lu_Procedures','Procedure',NULL,'21804Pro9094res','2013-11-18 23:54:00','2013-11-18 23:54:00'),(24,'lu_Races','Race',NULL,'21825Rac1596ces','2013-11-18 23:54:00','2013-11-18 23:54:00'),(25,'lu_TestResultsTypes','Test Results',NULL,'17571Tes4098pes','2013-11-18 23:54:00','2013-11-18 23:54:00'),(26,'lu_TestStatuses','Test Status',NULL,'20438Tes6600ses','2013-11-18 23:54:00','2013-11-18 23:54:00'),(27,'lu_Tests','Test',NULL,'22192Tes9102sts','2013-11-18 23:54:00','2013-11-18 23:54:00');
+/*!40000 ALTER TABLE `lookUpTables` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -1292,7 +1251,7 @@ CREATE TABLE `messageTypeFormFields` (
   `bucketDspPos` int(11) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `messageTypeId_idx` (`messageTypeId`),
-  CONSTRAINT `messageTypeId` FOREIGN KEY (`messageTypeId`) REFERENCES `messageTypes` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `messageTypeId` FOREIGN KEY (`messageTypeId`) REFERENCES `messagetypes` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=79 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1314,8 +1273,7 @@ DROP TABLE IF EXISTS `message_Allergies`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `message_Allergies` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `messageId` int(11) NOT NULL COMMENT 'This is the id assigned in message_Details',
-  `patientId` int(11) NOT NULL COMMENT 'This is the id assigned to the patient for the message in info_Patients.  It is here in case we need to run reports in the future.',
+  `transactionInId` int(11) NOT NULL,
   `sourceId` varchar(45) DEFAULT NULL COMMENT 'This is the id that the message source might have assigned to the record. For example, CCR components always has a CCRDataObjectId',
   `sourceDateType` varchar(45) DEFAULT NULL COMMENT 'The date type that the is provided with the record. It can be a date range, exact date, approximate date range, approximately age range, age range, verification date etc. ',
   `sourceDate` varchar(45) DEFAULT NULL COMMENT 'The date that the is provided with the record. e.g. exact time - Nov 11, 2011 11:11AM, age range - age 19-25',
@@ -1323,11 +1281,9 @@ CREATE TABLE `message_Allergies` (
   `reactionSeverity` varchar(45) DEFAULT NULL COMMENT 'Minimal\nMild\nModerate\nSevere\nLIfe Threatening\nCritical',
   `reactionsSymptoms` varchar(45) DEFAULT NULL COMMENT 'e.g. sneezes, coughs, break out in hives, etc.',
   `dateCreated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'This is the date that the record was added to UT',
-  `dateModified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'This is the date that the record was last modified in UT',
   PRIMARY KEY (`id`),
-  KEY `patientKeyFK_idx` (`patientId`),
-  CONSTRAINT `messageIdFK` FOREIGN KEY (`id`) REFERENCES `message_Details` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `patientKeyFK` FOREIGN KEY (`patientId`) REFERENCES `info_Patients` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  KEY `alle_tranId_idx` (`transactionInId`),
+  CONSTRAINT `alle_tranId` FOREIGN KEY (`transactionInId`) REFERENCES `transactionIn` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1349,21 +1305,17 @@ DROP TABLE IF EXISTS `message_BestTimeToCall`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `message_BestTimeToCall` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `messageId` int(11) NOT NULL,
-  `patientId` int(11) NOT NULL,
+  `transactionInId` int(11) NOT NULL,
   `sourceId` varchar(45) DEFAULT NULL,
   `sourceDate` varchar(45) DEFAULT NULL,
   `bestTimeToCallId` int(11) DEFAULT NULL COMMENT 'This is the look up id from lu_BestTIimeToCall.',
   `bestTimeToCallOther` varchar(20) DEFAULT NULL,
   `dateCreated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `dateModified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   KEY `bttcMessFK_idx` (`bestTimeToCallId`),
-  KEY `bttcPatientId_idx` (`patientId`),
-  KEY `bttcMessFK_idx1` (`messageId`),
-  CONSTRAINT `bttcFK` FOREIGN KEY (`bestTimeToCallId`) REFERENCES `lu_BestTimeToCall` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `bttcMessFK` FOREIGN KEY (`messageId`) REFERENCES `message_Details` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `bttcPatientId` FOREIGN KEY (`patientId`) REFERENCES `info_Patients` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  KEY `best_tranId_idx` (`transactionInId`),
+  CONSTRAINT `best_tranId` FOREIGN KEY (`transactionInId`) REFERENCES `transactionIn` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `bttcFK` FOREIGN KEY (`bestTimeToCallId`) REFERENCES `lu_BestTimeToCall` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1377,57 +1329,6 @@ LOCK TABLES `message_BestTimeToCall` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `message_Details`
---
-
-DROP TABLE IF EXISTS `message_Details`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `message_Details` (
-  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'message Id',
-  `utIncomingMessageId` int(11) DEFAULT NULL COMMENT 'the Id from master archive table in UT',
-  `messageBatchId` int(11) NOT NULL COMMENT 'The ID assigned to the batch of messages',
-  `messageDate` datetime NOT NULL COMMENT 'the date the message was submitted',
-  `patientId` int(11) NOT NULL COMMENT 'This is the id assigned to the patient for the message in info_Patients.  It is here in case we need to run reports in the future.',
-  `sourceId` varchar(45) DEFAULT NULL COMMENT 'This is the id that the message source might have assigned to the record. For example, CCR components always has a CCRDataObjectId',
-  `sourceDateType` varchar(45) DEFAULT NULL COMMENT 'The date type that the is provided with the record. It can be a date range, exact date, approximate date range, approximately age range, age range, verification date etc. ',
-  `sourceDate` varchar(45) DEFAULT NULL COMMENT 'The date that the is provided with the record. e.g. exact time - Nov 11, 2011 11:11AM, age range - age 19-25',
-  `consentId` int(11) DEFAULT NULL COMMENT 'look up id from lu_Consents',
-  `purpose` varchar(200) DEFAULT NULL COMMENT 'why the message is submitted',
-  `priorityLevel` varchar(45) DEFAULT NULL COMMENT 'e.g. high, low',
-  `urgency` varchar(45) DEFAULT NULL COMMENT 'e.g. sometime next week, today, this afternoon, etc.',
-  `referralId` varchar(45) DEFAULT NULL COMMENT 'referral id assigned by source - e.g. 123, a45679Pe',
-  `guardianName` varchar(45) DEFAULT NULL COMMENT 'name of guardian - Jane Doe, John Smith',
-  `additonalContactNumber` varchar(45) DEFAULT NULL COMMENT '617-234-5678',
-  `patientOccupation` varchar(45) DEFAULT NULL COMMENT 'patient''s occupation for this visit',
-  `familySize` int(11) DEFAULT NULL,
-  `grossWklyIncome` float DEFAULT NULL,
-  `incomeReported` bit(1) DEFAULT NULL,
-  `contraceptiveId` int(11) DEFAULT NULL COMMENT 'id in lu_Contractives',
-  `status` varchar(45) DEFAULT NULL COMMENT 'pending, current, waiting, closed, etc.',
-  `comments` varchar(200) DEFAULT NULL COMMENT 'Any additional info that source sent',
-  `dateCreated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'This is the date that the record was added to UT',
-  `dateModified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'This is the date that the record was last modified in UT',
-  PRIMARY KEY (`id`),
-  KEY `patientFK_idx` (`patientId`),
-  KEY `consentFK_idx` (`consentId`),
-  KEY `messContraFK_idx` (`contraceptiveId`),
-  CONSTRAINT `messContraFK` FOREIGN KEY (`contraceptiveId`) REFERENCES `lu_Contraceptives` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `consentFK` FOREIGN KEY (`consentId`) REFERENCES `lu_Consents` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `patientFK` FOREIGN KEY (`patientId`) REFERENCES `info_Patients` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `message_Details`
---
-
-LOCK TABLES `message_Details` WRITE;
-/*!40000 ALTER TABLE `message_Details` DISABLE KEYS */;
-/*!40000 ALTER TABLE `message_Details` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `message_Exercises`
 --
 
@@ -1436,8 +1337,7 @@ DROP TABLE IF EXISTS `message_Exercises`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `message_Exercises` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `messageId` int(11) NOT NULL COMMENT 'This is the id assigned in message_Details',
-  `patientId` int(11) NOT NULL COMMENT 'This is the id assigned to the patient for the message in info_Patients.  It is here in case we need to run reports in the future.',
+  `transactionInId` int(11) NOT NULL,
   `sourceId` varchar(45) DEFAULT NULL COMMENT 'This is the id that the message source might have assigned to the record. For example, CCR components always has a CCRDataObjectId',
   `sourceDateType` varchar(45) DEFAULT NULL COMMENT 'The date type that the is provided with the record. It can be a date range, exact date, approximate date range, approximately age range, age range, verification date etc. ',
   `sourceDate` varchar(45) DEFAULT NULL COMMENT 'The date that the is provided with the record. e.g. exact time - Nov 11, 2011 11:11AM, age range - age 19-25',
@@ -1446,12 +1346,9 @@ CREATE TABLE `message_Exercises` (
   `value` float DEFAULT NULL COMMENT '2.5 (for walking)',
   `unit` varchar(45) DEFAULT NULL COMMENT 'miles per minute',
   `dateCreated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'This is the date that the record was added to UT',
-  `dateModified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'This is the date that the record was last modified in UT',
   PRIMARY KEY (`id`),
-  KEY `patFK_idx` (`patientId`),
-  KEY `messFK_idx` (`messageId`),
-  CONSTRAINT `messFK` FOREIGN KEY (`messageId`) REFERENCES `message_Details` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `patFK` FOREIGN KEY (`patientId`) REFERENCES `info_Patients` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  KEY `exercise_tranId_idx` (`transactionInId`),
+  CONSTRAINT `exercise_tranId` FOREIGN KEY (`transactionInId`) REFERENCES `transactionIn` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1473,8 +1370,7 @@ DROP TABLE IF EXISTS `message_FamMemMedicalConditions`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `message_FamMemMedicalConditions` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `messageId` int(11) NOT NULL COMMENT 'This is the id assigned in message_Details',
-  `patientId` int(11) NOT NULL COMMENT 'This is the id assigned to the patient for the message in info_Patients.  It is here in case we need to run reports in the future.',
+  `transactionInId` int(11) NOT NULL,
   `sourceId` varchar(45) DEFAULT NULL COMMENT 'This is the id that the message source might have assigned to the record. For example, CCR components always has a CCRDataObjectId',
   `sourceDateType` varchar(45) DEFAULT NULL COMMENT 'The date type that the is provided with the record. It can be a date range, exact date, approximate date range, approximately age range, age range, verification date etc. ',
   `sourceDate` varchar(45) DEFAULT NULL COMMENT 'The date that the is provided with the record. e.g. exact time - Nov 11, 2011 11:11AM, age range - age 19-25',
@@ -1489,20 +1385,17 @@ CREATE TABLE `message_FamMemMedicalConditions` (
   `codingVersion` varchar(45) DEFAULT NULL COMMENT 'the version of the coding system etc. ICD-9CM''s version might be 2004',
   `comments` varchar(200) DEFAULT NULL COMMENT 'any additional information for the medical condition.',
   `dateCreated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'This is the date that the record was added to UT',
-  `dateModified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'This is the date that the record was last modified in UT',
   PRIMARY KEY (`id`),
-  KEY `fmmcMessFK_idx` (`messageId`),
-  KEY `fmmcPatFK_idx` (`patientId`),
   KEY `fmmcGHStatusFK_idx` (`conditionStatusId`),
   KEY `fmmcIdFK_idx` (`conditionId`),
   KEY `fmmcConditionType_idx` (`conditionType`),
   KEY `fmmcFMId_idx` (`familyMemberId`),
+  KEY `FMM_tranId_idx` (`transactionInId`),
   CONSTRAINT `fmmcConditionType` FOREIGN KEY (`conditionType`) REFERENCES `lu_MedicalConditionTypes` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fmmcFMId` FOREIGN KEY (`familyMemberId`) REFERENCES `message_FamilyMembers` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fmmcIdFK` FOREIGN KEY (`conditionId`) REFERENCES `lu_MedicalConditions` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fmmcMessFK` FOREIGN KEY (`messageId`) REFERENCES `message_Details` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fmmcPatFK` FOREIGN KEY (`patientId`) REFERENCES `info_Patients` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fmmcStatusId` FOREIGN KEY (`conditionStatusId`) REFERENCES `lu_MedicalConditionStatuses` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `fmmcStatusId` FOREIGN KEY (`conditionStatusId`) REFERENCES `lu_MedicalConditionStatuses` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `FMM_tranId` FOREIGN KEY (`transactionInId`) REFERENCES `transactionIn` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1524,8 +1417,7 @@ DROP TABLE IF EXISTS `message_FamilyMembers`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `message_FamilyMembers` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `messageId` int(11) NOT NULL COMMENT 'This is the id assigned in message_Details',
-  `patientId` int(11) NOT NULL COMMENT 'This is the id assigned to the patient for the message in info_Patients.  It is here in case we need to run reports in the future.',
+  `transactionInId` int(11) NOT NULL,
   `utPatientId` int(11) DEFAULT NULL COMMENT 'If the family member is a patient and we know UT''s patient id, we store it here.',
   `sourceId` varchar(45) DEFAULT NULL COMMENT 'This is the id that the message source might have assigned to the record. For example, CCR components always has a CCRDataObjectId',
   `sourceDateType` varchar(45) DEFAULT NULL COMMENT 'The date type that the is provided with the record. It can be a date range, exact date, approximate date range, approximately age range, age range, verification date etc. ',
@@ -1539,15 +1431,11 @@ CREATE TABLE `message_FamilyMembers` (
   `causeOfDeathKnown` varchar(45) DEFAULT NULL COMMENT 'yes, no, unknown, not reported, etc.',
   `causeOfDeath` varchar(45) DEFAULT NULL COMMENT 'Breast Cancer, Choking, Heart Attack etc.',
   `dateCreated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'This is the date that the record was added to UT',
-  `dateModified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'This is the date that the record was last modified in UT',
   PRIMARY KEY (`id`),
-  KEY `patFK_idx` (`patientId`),
-  KEY `messFK_idx` (`messageId`),
   KEY `hsIdFK_idx` (`healthStatusId`),
-  CONSTRAINT `fmMessFK` FOREIGN KEY (`messageId`) REFERENCES `message_Details` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fmPatFK` FOREIGN KEY (`patientId`) REFERENCES `info_Patients` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `hsIdFK` FOREIGN KEY (`healthStatusId`) REFERENCES `lu_HealthStatuses` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `utPatFK` FOREIGN KEY (`patientId`) REFERENCES `info_Patients` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  KEY `FM_tranId_idx` (`transactionInId`),
+  CONSTRAINT `FM_tranId` FOREIGN KEY (`transactionInId`) REFERENCES `transactionIn` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `hsIdFK` FOREIGN KEY (`healthStatusId`) REFERENCES `lu_HealthStatuses` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1561,6 +1449,89 @@ LOCK TABLES `message_FamilyMembers` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `message_FromOrg`
+--
+
+DROP TABLE IF EXISTS `message_FromOrg`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `message_FromOrg` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `transactionInId` int(11) NOT NULL,
+  `messageTypeId` int(11) NOT NULL,
+  `orgId` int(11) NOT NULL,
+  `name` varchar(45) DEFAULT NULL,
+  `address1` varchar(45) DEFAULT NULL,
+  `address2` varchar(45) DEFAULT NULL,
+  `city` varchar(45) DEFAULT NULL,
+  `state` varchar(2) DEFAULT NULL,
+  `postalCode` varchar(45) DEFAULT NULL,
+  `county` varchar(45) DEFAULT NULL,
+  `phone` varchar(45) DEFAULT NULL,
+  `fax` varchar(45) DEFAULT NULL,
+  `dateCreated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `FKMessFromOrgId_idx` (`orgId`),
+  KEY `FKMessFromMessageTypeId_idx` (`messageTypeId`),
+  KEY `FO_tranId_idx` (`transactionInId`),
+  CONSTRAINT `FO_tranId` FOREIGN KEY (`transactionInId`) REFERENCES `transactionIn` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `FKMessFromMessageTypeId` FOREIGN KEY (`messageTypeId`) REFERENCES `messagetypes` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `FKMessFromOrgId` FOREIGN KEY (`orgId`) REFERENCES `organizations` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `message_FromOrg`
+--
+
+LOCK TABLES `message_FromOrg` WRITE;
+/*!40000 ALTER TABLE `message_FromOrg` DISABLE KEYS */;
+/*!40000 ALTER TABLE `message_FromOrg` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `message_FromProvider`
+--
+
+DROP TABLE IF EXISTS `message_FromProvider`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `message_FromProvider` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `transactionInId` int(11) NOT NULL,
+  `messageTypeId` int(11) NOT NULL,
+  `providerId` int(11) NOT NULL,
+  `firstname` varchar(45) DEFAULT NULL,
+  `lastname` varchar(45) DEFAULT NULL,
+  `address1` varchar(45) DEFAULT NULL,
+  `address2` varchar(45) DEFAULT NULL,
+  `city` varchar(45) DEFAULT NULL,
+  `state` varchar(2) DEFAULT NULL,
+  `postalCode` varchar(45) DEFAULT NULL,
+  `county` varchar(45) DEFAULT NULL,
+  `phone` varchar(45) DEFAULT NULL,
+  `fax` varchar(45) DEFAULT NULL,
+  `dateCreated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `FKMessFromPMessageTypeId_idx` (`messageTypeId`),
+  KEY `FKMessFromPProviderId_idx` (`providerId`),
+  KEY `FP_tranId_idx` (`transactionInId`),
+  CONSTRAINT `FP_tranId` FOREIGN KEY (`transactionInId`) REFERENCES `transactionIn` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `FKMessFromPMessageTypeId` FOREIGN KEY (`messageTypeId`) REFERENCES `messagetypes` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `FKMessFromPProviderId` FOREIGN KEY (`providerId`) REFERENCES `info_providers` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `message_FromProvider`
+--
+
+LOCK TABLES `message_FromProvider` WRITE;
+/*!40000 ALTER TABLE `message_FromProvider` DISABLE KEYS */;
+/*!40000 ALTER TABLE `message_FromProvider` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `message_GeneralHealths`
 --
 
@@ -1569,24 +1540,20 @@ DROP TABLE IF EXISTS `message_GeneralHealths`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `message_GeneralHealths` (
   `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'primary key',
-  `messageId` int(11) NOT NULL COMMENT 'This is the id assigned in message_Details',
-  `patientId` int(11) NOT NULL COMMENT 'This is the id assigned to the patient for the message in info_Patients.  It is here in case we need to run reports in the future.',
+  `transactionInId` int(11) NOT NULL,
   `sourceId` varchar(45) DEFAULT NULL COMMENT 'This is the id that the message source might have assigned to the record. For example, CCR components always has a CCRDataObjectId',
   `sourceDateType` varchar(45) DEFAULT NULL COMMENT 'The date type that the is provided with the record. It can be a date range, exact date, approximate date range, approximately age range, age range, verification date etc. ',
   `sourceDate` varchar(45) DEFAULT NULL COMMENT 'The date that the is provided with the record. e.g. exact time - Nov 11, 2011 11:11AM, age range - age 19-25',
   `generalHealthId` int(11) DEFAULT NULL COMMENT 'Id from GeneralHealths table - id from Slow to heal after cuts, Anemia, etc.',
   `generalStatusesId` int(11) DEFAULT NULL COMMENT 'Corresponding Id from GeneralHealthStatuses table - 1, 2, 3 (Yes No Unknown etc. )\n',
   `dateCreated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'This is the date that the record was added to UT',
-  `dateModified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'This is the date that the record was last modified in UT',
   PRIMARY KEY (`id`),
-  KEY `ghPatFK_idx` (`patientId`),
-  KEY `ghMessFK_idx` (`messageId`),
   KEY `ghGHId_idx` (`generalHealthId`),
   KEY `ghGHSId_idx` (`generalStatusesId`),
+  KEY `GH_tranId_idx` (`transactionInId`),
   CONSTRAINT `ghGHId` FOREIGN KEY (`generalHealthId`) REFERENCES `lu_GeneralHealths` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `ghGHSId` FOREIGN KEY (`generalStatusesId`) REFERENCES `lu_GeneralHealthStatuses` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `ghMessFK` FOREIGN KEY (`messageId`) REFERENCES `message_Details` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `ghPatFK` FOREIGN KEY (`patientId`) REFERENCES `info_Patients` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `GH_tranId` FOREIGN KEY (`transactionInId`) REFERENCES `transactionIn` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1608,8 +1575,7 @@ DROP TABLE IF EXISTS `message_HealthcareTeams`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `message_HealthcareTeams` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `messageId` int(11) NOT NULL COMMENT 'This is the id assigned in message_Details',
-  `patientId` int(11) NOT NULL COMMENT 'This is the id assigned to the patient for the message in info_Patients.  It is here in case we need to run reports in the future.',
+  `transactionInId` int(11) NOT NULL,
   `sourceId` varchar(45) DEFAULT NULL COMMENT 'This is the id that the message source might have assigned to the record. For example, CCR components always has a CCRDataObjectId',
   `sourceDateType` varchar(45) DEFAULT NULL COMMENT 'The date type that the is provided with the record. It can be a date range, exact date, approximate date range, approximately age range, age range, verification date etc. ',
   `sourceDate` varchar(45) DEFAULT NULL COMMENT 'The date that the is provided with the record. e.g. exact time - Nov 11, 2011 11:11AM, age range - age 19-25',
@@ -1630,12 +1596,9 @@ CREATE TABLE `message_HealthcareTeams` (
   `fax` varchar(45) DEFAULT NULL COMMENT 'Fax number for health care team member - 617-123-4567',
   `teamOrder` int(11) DEFAULT '1' COMMENT 'order of care provider - 1, 2, 3',
   `dateCreated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'This is the date that the record was added to UT',
-  `dateModified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'This is the date that the record was last modified in UT',
   PRIMARY KEY (`id`),
-  KEY `hcMessFK_idx` (`messageId`),
-  KEY `hcPatFK` (`patientId`),
-  CONSTRAINT `hcMessFK` FOREIGN KEY (`messageId`) REFERENCES `message_Details` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `hcPatFK` FOREIGN KEY (`patientId`) REFERENCES `info_Patients` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  KEY `hct_tranId_idx` (`transactionInId`),
+  CONSTRAINT `hct_tranId` FOREIGN KEY (`transactionInId`) REFERENCES `transactionIn` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1657,22 +1620,18 @@ DROP TABLE IF EXISTS `message_Immunizations`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `message_Immunizations` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `messageId` int(11) NOT NULL COMMENT 'This is the id assigned in message_Details',
-  `patientId` int(11) NOT NULL COMMENT 'This is the id assigned to the patient for the message in info_Patients.  It is here in case we need to run reports in the future.',
+  `transactionInId` int(11) NOT NULL,
   `sourceId` varchar(45) DEFAULT NULL COMMENT 'This is the id that the message source might have assigned to the record. For example, CCR components always has a CCRDataObjectId',
   `sourceDateType` varchar(45) DEFAULT NULL COMMENT 'The date type that the is provided with the record. It can be a date range, exact date, approximate date range, approximately age range, age range, verification date etc. ',
   `sourceDate` varchar(45) DEFAULT NULL COMMENT 'The date that the is provided with the record. e.g. exact time - Nov 11, 2011 11:11AM, age range - age 19-25',
   `immunizationhId` int(11) DEFAULT NULL COMMENT 'Id from lu_Immunizations table',
   `status` varchar(45) DEFAULT NULL COMMENT 'Current, Past, Future, Ordered, etc.\n',
   `dateCreated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'This is the date that the record was added to UT',
-  `dateModified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'This is the date that the record was last modified in UT',
   PRIMARY KEY (`id`),
   KEY `imFK_idx` (`immunizationhId`),
-  KEY `imPatFK_idx` (`patientId`),
-  KEY `imMessFK_idx` (`messageId`),
+  KEY `im_tranId_idx` (`transactionInId`),
   CONSTRAINT `imImmunFK` FOREIGN KEY (`immunizationhId`) REFERENCES `lu_Immunizations` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `imMessFK` FOREIGN KEY (`messageId`) REFERENCES `message_Details` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `imPatFK` FOREIGN KEY (`patientId`) REFERENCES `info_Patients` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `im_tranId` FOREIGN KEY (`transactionInId`) REFERENCES `transactionIn` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1694,8 +1653,7 @@ DROP TABLE IF EXISTS `message_MedicalConditions`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `message_MedicalConditions` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `messageId` int(11) NOT NULL COMMENT 'This is the id assigned in message_Details',
-  `patientId` int(11) NOT NULL COMMENT 'This is the id assigned to the patient for the message in info_Patients.  It is here in case we need to run reports in the future.',
+  `transactionInId` int(11) NOT NULL,
   `sourceId` varchar(45) DEFAULT NULL COMMENT 'This is the id that the message source might have assigned to the record. For example, CCR components always has a CCRDataObjectId',
   `sourceDateType` varchar(45) DEFAULT NULL COMMENT 'The date type that the is provided with the record. It can be a date range, exact date, approximate date range, approximately age range, age range, verification date etc. ',
   `sourceDate` varchar(45) DEFAULT NULL COMMENT 'The date that the is provided with the record. e.g. exact time - Nov 11, 2011 11:11AM, age range - age 19-25',
@@ -1706,16 +1664,13 @@ CREATE TABLE `message_MedicalConditions` (
   `conditionOrder` int(11) DEFAULT NULL COMMENT 'order for conditions - a continuous cough first, then lung cancer, etc.  Values will be 1, 2, 3',
   `comments` varchar(45) DEFAULT NULL COMMENT 'any additional information for the medical condition',
   `dateCreated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'This is the date that the record was added to UT',
-  `dateModified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'This is the date that the record was last modified in UT',
   PRIMARY KEY (`id`),
-  KEY `mcMessFK_idx` (`messageId`),
-  KEY `mcPatFK_idx` (`patientId`),
   KEY `mcGHStatusFK_idx` (`conditionStatusId`),
   KEY `mcIdFK_idx` (`conditionId`),
+  KEY `mc_tranId_idx` (`transactionInId`),
   CONSTRAINT `mcIdFK` FOREIGN KEY (`conditionId`) REFERENCES `lu_MedicalConditions` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `mcMessFK` FOREIGN KEY (`messageId`) REFERENCES `message_Details` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `mcPatFK` FOREIGN KEY (`patientId`) REFERENCES `info_Patients` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `mcStatusId` FOREIGN KEY (`conditionStatusId`) REFERENCES `lu_MedicalConditionStatuses` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `mcStatusId` FOREIGN KEY (`conditionStatusId`) REFERENCES `lu_MedicalConditionStatuses` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `mc_tranId` FOREIGN KEY (`transactionInId`) REFERENCES `transactionIn` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1737,8 +1692,7 @@ DROP TABLE IF EXISTS `message_Medications`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `message_Medications` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `messageId` int(11) NOT NULL COMMENT 'This is the id assigned in message_Details',
-  `patientId` int(11) NOT NULL COMMENT 'This is the id assigned to the patient for the message in info_Patients.  It is here in case we need to run reports in the future.',
+  `transactionInId` int(11) NOT NULL,
   `sourceId` varchar(45) DEFAULT NULL COMMENT 'This is the id that the message source might have assigned to the record. For example, CCR components always has a CCRDataObjectId',
   `sourceDateType` varchar(45) DEFAULT NULL COMMENT 'The date type that the is provided with the record. It can be a date range, exact date, approximate date range, approximately age range, age range, verification date etc. ',
   `sourceDate` varchar(45) DEFAULT NULL COMMENT 'The date that the is provided with the record. e.g. exact time - Nov 11, 2011 11:11AM, age range - age 19-25',
@@ -1757,19 +1711,16 @@ CREATE TABLE `message_Medications` (
   `medGeneralStatusId` int(11) DEFAULT '1' COMMENT 'past, current, future, etc.',
   `medOrder` int(11) DEFAULT NULL COMMENT 'If there are multiple medications for a message, specify the order medications of if needed.',
   `dateCreated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'This is the date that the record was added to UT',
-  `dateModified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'This is the date that the record was last modified in UT',
   PRIMARY KEY (`id`),
   KEY `medFK_idx` (`medicationId`),
   KEY `medStatusFK_idx` (`medGeneralStatusId`),
-  KEY `medPatFK_idx` (`patientId`),
-  KEY `medMessFK_idx` (`messageId`),
   KEY `meDManuFK_idx` (`manufacturerId`),
   KEY `medBrandNameFK_idx` (`brandNameId`),
+  KEY `med_tranId_idx` (`transactionInId`),
   CONSTRAINT `medBrandFK` FOREIGN KEY (`brandNameId`) REFERENCES `lu_BrandNames` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `medFK` FOREIGN KEY (`medicationId`) REFERENCES `lu_Medications` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `meDManuFK` FOREIGN KEY (`manufacturerId`) REFERENCES `lu_Manufacturers` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `medMessFK` FOREIGN KEY (`messageId`) REFERENCES `message_Details` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `medPatFK` FOREIGN KEY (`patientId`) REFERENCES `info_Patients` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `med_tranId` FOREIGN KEY (`transactionInId`) REFERENCES `transactionIn` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1783,6 +1734,170 @@ LOCK TABLES `message_Medications` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `message_PatientAddresses`
+--
+
+DROP TABLE IF EXISTS `message_PatientAddresses`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `message_PatientAddresses` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'primary key for table',
+  `transactionInId` int(11) NOT NULL,
+  `type` varchar(45) DEFAULT NULL COMMENT 'The type could be vacation, home, office, etc.',
+  `line1` varchar(45) DEFAULT NULL COMMENT 'Address line 1 - e.g. 123 Main Street',
+  `line2` varchar(45) DEFAULT NULL COMMENT 'Address line 2 - e.g. Suite 123',
+  `city` varchar(45) DEFAULT NULL COMMENT 'city - e.g. Beantown',
+  `state` varchar(2) DEFAULT NULL COMMENT 'State - e.g. MA',
+  `postalCode` varchar(15) DEFAULT NULL COMMENT 'zipcode - 02116',
+  `countyId` int(11) DEFAULT NULL,
+  `country` varchar(25) DEFAULT NULL COMMENT 'e.g. USA',
+  `phoneTypeId1` int(11) DEFAULT NULL COMMENT 'id related to lu_PhoneTypes Tables',
+  `phone1` varchar(45) DEFAULT NULL COMMENT 'e.g. 617-111-1111',
+  `phoneTypeId2` int(11) DEFAULT NULL COMMENT 'id related to lu_PhoneTypes Tables',
+  `phone2` varchar(45) DEFAULT NULL COMMENT 'e.g. 123-456-7890\n',
+  `fax` varchar(45) DEFAULT NULL COMMENT 'e.g. 857-123-4567',
+  `addressOrder` int(11) DEFAULT NULL COMMENT 'order of address importance - e.g. 1, 2, 3',
+  `status` varchar(45) DEFAULT NULL COMMENT 'pending, current, future, etc.',
+  `dateCreated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'This is the date that the record was added to UT',
+  PRIMARY KEY (`id`),
+  KEY `coutyFK_idx` (`countyId`),
+  KEY `paPhone1FK_idx` (`phoneTypeId1`),
+  KEY `paPhoneType2FK_idx` (`phoneTypeId2`),
+  KEY `padd_tranId_idx` (`transactionInId`),
+  CONSTRAINT `coutyFK` FOREIGN KEY (`countyId`) REFERENCES `lu_Counties` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `padd_tranId` FOREIGN KEY (`transactionInId`) REFERENCES `transactionIn` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `paPhoneType1FK` FOREIGN KEY (`phoneTypeId1`) REFERENCES `lu_PhoneTypes` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `paPhoneType2FK` FOREIGN KEY (`phoneTypeId2`) REFERENCES `lu_PhoneTypes` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `message_PatientAddresses`
+--
+
+LOCK TABLES `message_PatientAddresses` WRITE;
+/*!40000 ALTER TABLE `message_PatientAddresses` DISABLE KEYS */;
+/*!40000 ALTER TABLE `message_PatientAddresses` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `message_PatientDetails`
+--
+
+DROP TABLE IF EXISTS `message_PatientDetails`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `message_PatientDetails` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'message Id',
+  `transactionInId` int(11) NOT NULL,
+  `messageDate` datetime NOT NULL COMMENT 'the date the message was submitted',
+  `sourceId` varchar(45) DEFAULT NULL COMMENT 'This is the id that the message source might have assigned to the record. For example, CCR components always has a CCRDataObjectId',
+  `sourceDateType` varchar(45) DEFAULT NULL COMMENT 'The date type that the is provided with the record. It can be a date range, exact date, approximate date range, approximately age range, age range, verification date etc. ',
+  `sourceDate` varchar(45) DEFAULT NULL COMMENT 'The date that the is provided with the record. e.g. exact time - Nov 11, 2011 11:11AM, age range - age 19-25',
+  `consentId` int(11) DEFAULT NULL COMMENT 'look up id from lu_Consents',
+  `purpose` varchar(200) DEFAULT NULL COMMENT 'why the message is submitted',
+  `priorityLevel` varchar(45) DEFAULT NULL COMMENT 'e.g. high, low',
+  `urgency` varchar(45) DEFAULT NULL COMMENT 'e.g. sometime next week, today, this afternoon, etc.',
+  `referralId` varchar(45) DEFAULT NULL COMMENT 'referral id assigned by source - e.g. 123, a45679Pe',
+  `guardianName` varchar(45) DEFAULT NULL COMMENT 'name of guardian - Jane Doe, John Smith',
+  `additonalContactNumber` varchar(45) DEFAULT NULL COMMENT '617-234-5678',
+  `patientOccupation` varchar(45) DEFAULT NULL COMMENT 'patient''s occupation for this visit',
+  `familySize` int(11) DEFAULT NULL,
+  `income` float DEFAULT NULL,
+  `incomeUnit` int(11) DEFAULT NULL COMMENT 'This could be monthly, weekly, daily, annually, etc',
+  `incomeReported` bit(1) DEFAULT NULL,
+  `contraceptiveId` int(11) DEFAULT NULL COMMENT 'id in lu_Contractives',
+  `status` varchar(45) DEFAULT NULL COMMENT 'pending, current, waiting, closed, etc.',
+  `comments` varchar(200) DEFAULT NULL COMMENT 'Any additional info that source sent',
+  `dateCreated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'This is the date that the record was added to UT',
+  `dateModified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'This is the date that the record was last modified in UT',
+  PRIMARY KEY (`id`),
+  KEY `consentFK_idx` (`consentId`),
+  KEY `messContraFK_idx` (`contraceptiveId`),
+  KEY `mdTransFK_idx` (`transactionInId`),
+  CONSTRAINT `consentFK` FOREIGN KEY (`consentId`) REFERENCES `lu_Consents` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `mdTransFK` FOREIGN KEY (`transactionInId`) REFERENCES `transactionInRecords` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `messContraFK` FOREIGN KEY (`contraceptiveId`) REFERENCES `lu_Contraceptives` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `message_PatientDetails`
+--
+
+LOCK TABLES `message_PatientDetails` WRITE;
+/*!40000 ALTER TABLE `message_PatientDetails` DISABLE KEYS */;
+/*!40000 ALTER TABLE `message_PatientDetails` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `message_Patients`
+--
+
+DROP TABLE IF EXISTS `message_Patients`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `message_Patients` (
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT 'primary key for patient, it will serve as our system''s patient Id',
+  `transactionInId` int(11) NOT NULL,
+  `sourcePatientId` varchar(45) NOT NULL COMMENT 'Id assigned to patient by source system - e.g Pat148R-2KD-BOS',
+  `prefix` varchar(45) DEFAULT NULL COMMENT 'e.g. Mr, Dr., Ms, Sir, Princess, Knight, etc',
+  `firstName` varchar(45) DEFAULT NULL COMMENT 'e.g. John',
+  `middleName` varchar(45) DEFAULT NULL COMMENT 'e.g Joshua',
+  `lastName` varchar(45) DEFAULT NULL COMMENT 'e.g. Doe',
+  `suffix` varchar(45) DEFAULT NULL COMMENT 'e.g. Jr, III, IV etc.',
+  `phoneTypeId1` int(11) DEFAULT NULL COMMENT 'Alt phone - id from lookupId',
+  `phone1` varchar(45) DEFAULT NULL COMMENT '123-456-7890',
+  `phoneTypeId2` int(11) DEFAULT NULL COMMENT 'Alt phone - id from lookupId\n',
+  `phone2` varchar(45) DEFAULT NULL COMMENT '617-456-7890',
+  `dob` datetime DEFAULT NULL COMMENT 'Patient''s date of birth 1-1-1912',
+  `genderId` int(11) DEFAULT NULL COMMENT 'Look up value from lu_Genders. Look up field is int and not free hand field because we should have some limits to some fields as what the user can type.  We will add it to our look up table if something creative comes up.  It is also a repetitive field, using int will take up less space and faster when it comes to indexing\nSample equivalent values are - male, female, unknown, transgender, etc.',
+  `raceId` int(11) DEFAULT NULL COMMENT 'Look up Id from lu_Races - equivalent values could be Asian, White, Black, etc.',
+  `hispanicId` int(11) DEFAULT NULL COMMENT 'id from lu_Hispanics\nSample look up values are Yes, No, Not Reported',
+  `primaryLanguageId` int(11) DEFAULT NULL COMMENT 'Id from lu_Languages - Sample look up values - English, Spanish, Polish, Mandarin (Chinese), Cantonese (Chinese) etc.',
+  `englishProficient` bit(1) DEFAULT NULL COMMENT '1 for True, 2 for False',
+  `maritalStatusId` int(11) DEFAULT NULL COMMENT 'look up from lu_MartialStatuses - Sample look up values are - Single, Married, Divorced, Not Reported, etc.',
+  `initialContraceptiveId` int(11) DEFAULT NULL,
+  `email` varchar(100) DEFAULT NULL COMMENT 'e.g. test@test.com',
+  `url` varchar(100) DEFAULT NULL COMMENT 'e.g. http://test.com',
+  `emergencyContact` varchar(45) DEFAULT NULL COMMENT 'Name of emergency contact - Jane Doe',
+  `emergencyTel` varchar(45) DEFAULT NULL COMMENT '123-456-7890',
+  `patientStatusId` int(11) NOT NULL COMMENT 'id from lu_PatientStatuses - Could be equivalent int value of active, pending, future, expired, etc.',
+  `dateCreated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'This is the date that the record was added to UT',
+  PRIMARY KEY (`id`),
+  KEY `genderFK_idx` (`genderId`),
+  KEY `raceFK_idx` (`raceId`),
+  KEY `lauguageFK_idx` (`primaryLanguageId`),
+  KEY `martialStatusFK_idx` (`maritalStatusId`),
+  KEY `patientStatuses_idx` (`patientStatusId`),
+  KEY `hispanicFK_idx` (`hispanicId`),
+  KEY `phoneType1FK_idx` (`phoneTypeId1`),
+  KEY `phoneType2FK_idx` (`phoneTypeId2`),
+  KEY `contraFK_idx` (`initialContraceptiveId`),
+  KEY `transFK_idx` (`transactionInId`),
+  CONSTRAINT `contraFK` FOREIGN KEY (`initialContraceptiveId`) REFERENCES `lu_Contraceptives` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `genderFK` FOREIGN KEY (`genderId`) REFERENCES `lu_Genders` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `hispanicFK` FOREIGN KEY (`hispanicId`) REFERENCES `lu_Hispanics` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `lauguageFK` FOREIGN KEY (`primaryLanguageId`) REFERENCES `lu_Languages` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `martialStatusFK` FOREIGN KEY (`maritalStatusId`) REFERENCES `lu_MartialStatuses` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `patientStatuses` FOREIGN KEY (`patientStatusId`) REFERENCES `lu_PatientStatuses` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `phoneType1FK` FOREIGN KEY (`phoneTypeId1`) REFERENCES `lu_PhoneTypes` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `phoneType2FK` FOREIGN KEY (`phoneTypeId2`) REFERENCES `lu_PhoneTypes` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `raceFK` FOREIGN KEY (`raceId`) REFERENCES `lu_Races` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `transFK` FOREIGN KEY (`transactionInId`) REFERENCES `transactionIn` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `message_Patients`
+--
+
+LOCK TABLES `message_Patients` WRITE;
+/*!40000 ALTER TABLE `message_Patients` DISABLE KEYS */;
+/*!40000 ALTER TABLE `message_Patients` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `message_Payers`
 --
 
@@ -1791,8 +1906,7 @@ DROP TABLE IF EXISTS `message_Payers`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `message_Payers` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `messageId` int(11) NOT NULL COMMENT 'This is the id assigned in message_Details',
-  `patientId` int(11) NOT NULL COMMENT 'This is the id assigned to the patient for the message in info_Patients.  It is here in case we need to run reports in the future.',
+  `transactionInId` int(11) NOT NULL,
   `sourceId` varchar(45) DEFAULT NULL COMMENT 'This is the id that the message source might have assigned to the record. For example, CCR components always has a CCRDataObjectId',
   `sourceDateType` varchar(45) DEFAULT NULL COMMENT 'The date type that the is provided with the record. It can be a date range, exact date, approximate date range, approximately age range, age range, verification date etc. ',
   `sourceDate` varchar(45) DEFAULT NULL COMMENT 'The date that the is provided with the record. e.g. exact time - Nov 11, 2011 11:11AM, age range - age 19-25',
@@ -1807,14 +1921,11 @@ CREATE TABLE `message_Payers` (
   `status` varchar(45) DEFAULT NULL COMMENT 'if the payment is active, no longer active, etc.',
   `payerOrder` int(11) DEFAULT '1' COMMENT 'payment order, 1, 2, 3 etc.',
   `dateCreated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'This is the date that the record was added to UT',
-  `dateModified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'This is the date that the record was last modified in UT',
   PRIMARY KEY (`id`),
-  KEY `payerPatFK_idx` (`patientId`),
-  KEY `payerMessFK_idx` (`messageId`),
   KEY `payerIdFK_idx` (`payerTypeId`),
+  KEY `payers_tranId_idx` (`transactionInId`),
   CONSTRAINT `payerIdFK` FOREIGN KEY (`payerTypeId`) REFERENCES `lu_PayerTypes` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `payerMessFK` FOREIGN KEY (`messageId`) REFERENCES `message_Details` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `payerPatFK` FOREIGN KEY (`patientId`) REFERENCES `info_Patients` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `payers_tranId` FOREIGN KEY (`transactionInId`) REFERENCES `transactionIn` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1836,8 +1947,7 @@ DROP TABLE IF EXISTS `message_Procedures`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `message_Procedures` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `messageId` int(11) NOT NULL COMMENT 'This is the id assigned in message_Details',
-  `patientId` int(11) NOT NULL COMMENT 'This is the id assigned to the patient for the message in info_Patients.  It is here in case we need to run reports in the future.',
+  `transactionInId` int(11) NOT NULL,
   `sourceId` varchar(45) DEFAULT NULL COMMENT 'This is the id that the message source might have assigned to the record. For example, CCR components always has a CCRDataObjectId',
   `sourceDateType` varchar(45) DEFAULT NULL COMMENT 'The date type that the is provided with the record. It can be a date range, exact date, approximate date range, approximately age range, age range, verification date etc. ',
   `sourceDate` varchar(45) DEFAULT NULL COMMENT 'The date that the is provided with the record. e.g. exact time - Nov 11, 2011 11:11AM, age range - age 19-25',
@@ -1846,15 +1956,12 @@ CREATE TABLE `message_Procedures` (
   `procStatusId` int(11) DEFAULT '1' COMMENT 'id from lu_ProceduresStatuses - equivalent to Cancelled, On Hold, In Progress, Not Completed, present, past, pending, overdue, waiting for approval etc.',
   `comments` varchar(45) DEFAULT NULL,
   `dateCreated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'This is the date that the record was added to UT',
-  `dateModified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'This is the date that the record was last modified in UT',
   PRIMARY KEY (`id`),
-  KEY `proPat_idx` (`patientId`),
-  KEY `proMess_idx` (`messageId`),
   KEY `proId_idx` (`procedureId`),
   KEY `proStatusFK_idx` (`procStatusId`),
+  KEY `proc_tranId_idx` (`transactionInId`),
+  CONSTRAINT `proc_tranId` FOREIGN KEY (`transactionInId`) REFERENCES `transactionIn` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `proId` FOREIGN KEY (`procedureId`) REFERENCES `lu_Procedures` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `proMess` FOREIGN KEY (`messageId`) REFERENCES `message_Details` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `proPat` FOREIGN KEY (`patientId`) REFERENCES `info_Patients` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `proStatusFK` FOREIGN KEY (`procStatusId`) REFERENCES `lu_ProcedureStatuses` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -1877,8 +1984,7 @@ DROP TABLE IF EXISTS `message_SocialHistories`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `message_SocialHistories` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `messageId` int(11) NOT NULL COMMENT 'This is the id assigned in message_Details',
-  `patientId` int(11) NOT NULL COMMENT 'This is the id assigned to the patient for the message in info_Patients.  It is here in case we need to run reports in the future.',
+  `transactionInId` int(11) NOT NULL,
   `sourceId` varchar(45) DEFAULT NULL COMMENT 'This is the id that the message source might have assigned to the record. For example, CCR components always has a CCRDataObjectId',
   `sourceDateType` varchar(45) DEFAULT NULL COMMENT 'The date type that the is provided with the record. It can be a date range, exact date, approximate date range, approximately age range, age range, verification date etc. ',
   `sourceDate` varchar(45) DEFAULT NULL COMMENT 'The date that the is provided with the record. e.g. exact time - Nov 11, 2011 11:11AM, age range - age 19-25',
@@ -1893,13 +1999,9 @@ CREATE TABLE `message_SocialHistories` (
   `drugUsage` varchar(100) DEFAULT NULL COMMENT 'how much drugs patient uses',
   `feelThreatened` varchar(10) DEFAULT NULL COMMENT 'Yes, No, Sometimes, Maybe, Unknown, etc.',
   `dateCreated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'This is the date that the record was added to UT',
-  `dateModified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'This is the date that the record was last modified in UT',
   PRIMARY KEY (`id`),
-  KEY `patFK_idx` (`patientId`),
-  KEY `shPat_idx` (`patientId`),
-  KEY `shMess_idx` (`messageId`),
-  CONSTRAINT `shMess` FOREIGN KEY (`messageId`) REFERENCES `message_Details` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `shPat` FOREIGN KEY (`patientId`) REFERENCES `info_Patients` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  KEY `sh_tranId_idx` (`transactionInId`),
+  CONSTRAINT `sh_tranId` FOREIGN KEY (`transactionInId`) REFERENCES `transactionIn` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1921,8 +2023,7 @@ DROP TABLE IF EXISTS `message_TestResults`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `message_TestResults` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `messageId` int(11) NOT NULL COMMENT 'This is the id assigned in message_Details',
-  `patientId` int(11) NOT NULL COMMENT 'This is the id assigned in info_Patients',
+  `transactionInId` int(11) NOT NULL,
   `sourceId` varchar(45) DEFAULT NULL COMMENT 'This is the id that the message source might have assigned to the record. For example, CCR components always has a CCRDataObjectId',
   `sourceDateType` varchar(45) DEFAULT NULL COMMENT 'The date type that the is provided with the record. It can be a date range, exact date, approximate date range, approximately age range, age range, verification date etc. ',
   `sourceDate` varchar(45) DEFAULT NULL COMMENT 'The date that the is provided with the record. e.g. exact time - Nov 11, 2011 11:11AM, age range - age 19-25',
@@ -1937,18 +2038,15 @@ CREATE TABLE `message_TestResults` (
   `testStatusId` int(11) DEFAULT NULL,
   `testOrder` int(11) NOT NULL DEFAULT '1' COMMENT 'Several test might be perform in a certain order, this field orders them.',
   `dateCreated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'This is the date that the record was added to UT',
-  `dateModified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'This is the date that the record was last modified in UT',
   PRIMARY KEY (`id`),
-  KEY `trPat_idx` (`patientId`),
-  KEY `trMess_idx` (`messageId`),
   KEY `trTestFK_idx` (`relatedTestId`),
   KEY `trTestTypeFK_idx` (`testResultId`),
   KEY `trTestStatusFK_idx` (`testStatusId`),
-  CONSTRAINT `trMess` FOREIGN KEY (`messageId`) REFERENCES `message_Details` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `trPat` FOREIGN KEY (`patientId`) REFERENCES `info_Patients` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  KEY `tr_tranId_idx` (`transactionInId`),
   CONSTRAINT `trTestFK` FOREIGN KEY (`relatedTestId`) REFERENCES `lu_Tests` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `trTestStatusFK` FOREIGN KEY (`testStatusId`) REFERENCES `lu_TestStatuses` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `trTestTypeFK` FOREIGN KEY (`testResultId`) REFERENCES `lu_TestResultsTypes` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `trTestTypeFK` FOREIGN KEY (`testResultId`) REFERENCES `lu_TestResultsTypes` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `tr_tranId` FOREIGN KEY (`transactionInId`) REFERENCES `transactionIn` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1959,6 +2057,88 @@ CREATE TABLE `message_TestResults` (
 LOCK TABLES `message_TestResults` WRITE;
 /*!40000 ALTER TABLE `message_TestResults` DISABLE KEYS */;
 /*!40000 ALTER TABLE `message_TestResults` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `message_ToOrg`
+--
+
+DROP TABLE IF EXISTS `message_ToOrg`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `message_ToOrg` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `transactionInId` int(11) NOT NULL,
+  `messageTypeId` int(11) NOT NULL,
+  `orgId` int(11) NOT NULL,
+  `name` varchar(45) DEFAULT NULL,
+  `address1` varchar(45) DEFAULT NULL,
+  `address2` varchar(45) DEFAULT NULL,
+  `city` varchar(45) DEFAULT NULL,
+  `state` varchar(2) DEFAULT NULL,
+  `postalCode` varchar(45) DEFAULT NULL,
+  `county` varchar(45) DEFAULT NULL,
+  `phone` varchar(45) DEFAULT NULL,
+  `fax` varchar(45) DEFAULT NULL,
+  `dateCreated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `FKMessToOrgId_idx` (`orgId`),
+  KEY `FKMessToMessageTypeId_idx` (`messageTypeId`),
+  KEY `toorg_tranId_idx` (`transactionInId`),
+  CONSTRAINT `toorg_tranId` FOREIGN KEY (`transactionInId`) REFERENCES `transactionIn` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `FKMessToMessageTypeId` FOREIGN KEY (`messageTypeId`) REFERENCES `messagetypes` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `FKMessToOrgId` FOREIGN KEY (`orgId`) REFERENCES `organizations` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `message_ToOrg`
+--
+
+LOCK TABLES `message_ToOrg` WRITE;
+/*!40000 ALTER TABLE `message_ToOrg` DISABLE KEYS */;
+/*!40000 ALTER TABLE `message_ToOrg` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `message_ToProvider`
+--
+
+DROP TABLE IF EXISTS `message_ToProvider`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `message_ToProvider` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `transactionInId` int(11) NOT NULL,
+  `messageTypeId` int(11) NOT NULL,
+  `providerId` int(11) NOT NULL,
+  `name` varchar(45) DEFAULT NULL,
+  `address1` varchar(45) DEFAULT NULL,
+  `address2` varchar(45) DEFAULT NULL,
+  `city` varchar(45) DEFAULT NULL,
+  `state` varchar(2) DEFAULT NULL,
+  `postalCode` varchar(45) DEFAULT NULL,
+  `county` varchar(45) DEFAULT NULL,
+  `phone` varchar(45) DEFAULT NULL,
+  `fax` varchar(45) DEFAULT NULL,
+  `dateCreated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `FKMessToPMessageTypeId_idx` (`messageTypeId`),
+  KEY `FKMessToPProviderId_idx` (`providerId`),
+  KEY `toPro_tranId_idx` (`transactionInId`),
+  CONSTRAINT `toPro_tranId` FOREIGN KEY (`transactionInId`) REFERENCES `transactionIn` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `FKMessToPMessageTypeId` FOREIGN KEY (`messageTypeId`) REFERENCES `messagetypes` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `FKMessToPProviderId` FOREIGN KEY (`providerId`) REFERENCES `info_providers` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `message_ToProvider`
+--
+
+LOCK TABLES `message_ToProvider` WRITE;
+/*!40000 ALTER TABLE `message_ToProvider` DISABLE KEYS */;
+/*!40000 ALTER TABLE `message_ToProvider` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -2018,44 +2198,9 @@ CREATE TABLE `organizations` (
 --
 
 LOCK TABLES `organizations` WRITE;
-/*!40000 ALTER TABLE `organizations` DISABLE KEYS */;INSERT INTO `organizations` VALUES (1,'Universal Transaltor',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'\0','2013-09-24 10:31:38','',''),(2,'org 1','55 West Hollis St','Suite 32','Nashua','NH','03051','333-333-3333','','','2013-10-10 00:00:00','','org1');
+/*!40000 ALTER TABLE `organizations` DISABLE KEYS */;
+INSERT INTO `organizations` VALUES (1,'Universal Transaltor',NULL,NULL,NULL,NULL,NULL,NULL,NULL,'\0','2013-09-24 10:31:38','',''),(2,'org 1','55 West Hollis St','Suite 32','Nashua','NH','03051','333-333-3333','','','2013-10-10 00:00:00','','org1');
 /*!40000 ALTER TABLE `organizations` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `providers`
---
-
-DROP TABLE IF EXISTS `providers`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `providers` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `orgId` int(11) NOT NULL,
-  `firstName` varchar(45) NOT NULL,
-  `lastName` varchar(45) NOT NULL,
-  `email` varchar(255) DEFAULT NULL,
-  `phone1` varchar(20) DEFAULT NULL,
-  `fax` varchar(20) DEFAULT NULL,
-  `status` bit(1) NOT NULL DEFAULT b'1' COMMENT '1 = Active\n0 = Inactive',
-  `dateCreated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `phone2` varchar(15) DEFAULT NULL,
-  `specialty` varchar(100) DEFAULT NULL,
-  `gender` varchar(45) DEFAULT NULL,
-  `url` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `orgId_idx` (`orgId`),
-  CONSTRAINT `providerOrgId` FOREIGN KEY (`orgId`) REFERENCES `organizations` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `providers`
---
-
-LOCK TABLES `providers` WRITE;
-/*!40000 ALTER TABLE `providers` DISABLE KEYS */;
-/*!40000 ALTER TABLE `providers` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -2131,27 +2276,27 @@ INSERT INTO `ref_fileTypes` VALUES (1,'txt'),(2,'csv'),(3,'hl7'),(4,'mdb'),(5,'p
 UNLOCK TABLES;
 
 --
--- Table structure for table `ref_macros`
+-- Table structure for table `ref_transportMethods`
 --
 
-DROP TABLE IF EXISTS `ref_macros`;
+DROP TABLE IF EXISTS `ref_transportMethods`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `ref_macros` (
+CREATE TABLE `ref_transportMethods` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(45) NOT NULL,
-  `scriptName` varchar(255) NOT NULL,
+  `transportMethod` varchar(45) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `ref_macros`
+-- Dumping data for table `ref_transportMethods`
 --
 
-LOCK TABLES `ref_macros` WRITE;
-/*!40000 ALTER TABLE `ref_macros` DISABLE KEYS */;
-/*!40000 ALTER TABLE `ref_macros` ENABLE KEYS */;
+LOCK TABLES `ref_transportMethods` WRITE;
+/*!40000 ALTER TABLE `ref_transportMethods` DISABLE KEYS */;
+INSERT INTO `ref_transportMethods` VALUES (1,'File Upload'),(2,'Online Form'),(3,'Secure FTP'),(4,'JSON');
+/*!40000 ALTER TABLE `ref_transportMethods` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -2188,10 +2333,11 @@ DROP TABLE IF EXISTS `rel_TransportFTPDetails`;
 CREATE TABLE `rel_TransportFTPDetails` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `transportId` int(11) NOT NULL,
-  `IP` varchar(45) NOT NULL,
-  `directory` varchar(255) NOT NULL,
-  `usename` varchar(45) NOT NULL,
-  `password` varchar(45) NOT NULL,
+  `IP` varchar(45) DEFAULT NULL,
+  `directory` varchar(255) DEFAULT NULL,
+  `username` varchar(45) DEFAULT NULL,
+  `password` varchar(45) DEFAULT NULL,
+  `method` smallint(6) NOT NULL DEFAULT '1' COMMENT '1 = Push\n2 = Get',
   PRIMARY KEY (`id`),
   KEY `transportId_idx` (`transportId`),
   CONSTRAINT `transportId` FOREIGN KEY (`transportId`) REFERENCES `configurationTransportDetails` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
@@ -2217,7 +2363,8 @@ DROP TABLE IF EXISTS `rel_configurationDataTranslations`;
 CREATE TABLE `rel_configurationDataTranslations` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `configId` int(11) NOT NULL,
-  `fieldNo` int(11) NOT NULL,
+  `transportMethod` int(11) NOT NULL,
+  `fieldId` int(11) NOT NULL,
   `crosswalkId` int(11) DEFAULT NULL,
   `macroId` int(11) DEFAULT NULL,
   `passClear` smallint(6) DEFAULT '1' COMMENT '1 = Pass Error\n2 = Clear Error',
@@ -2230,8 +2377,10 @@ CREATE TABLE `rel_configurationDataTranslations` (
   KEY `dtconfigId_idx` (`configId`),
   KEY `cwalkId_idx` (`crosswalkId`),
   KEY `dtmacroId_idx` (`macroId`),
+  KEY `dtFieldId_idx` (`fieldId`),
+  CONSTRAINT `dtmacroId` FOREIGN KEY (`macroId`) REFERENCES `Macro_Names` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `dtconfigId` FOREIGN KEY (`configId`) REFERENCES `configurations` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `dtmacroId` FOREIGN KEY (`macroId`) REFERENCES `ref_macros` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `dtFieldId` FOREIGN KEY (`fieldId`) REFERENCES `configurationFormFields` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fkcrosswalkId` FOREIGN KEY (`crosswalkId`) REFERENCES `crosswalks` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -2290,9 +2439,9 @@ CREATE TABLE `rel_messageTypeDataTranslations` (
   KEY `messageTypeId_idx` (`messageTypeId`),
   KEY `cwId_idx` (`crosswalkId`),
   KEY `msgFieldId_idx` (`fieldId`),
+  CONSTRAINT `msgTypeId` FOREIGN KEY (`messageTypeId`) REFERENCES `messagetypes` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `cwId` FOREIGN KEY (`crosswalkId`) REFERENCES `crosswalks` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `msgFieldId` FOREIGN KEY (`fieldId`) REFERENCES `messageTypeFormFields` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `msgTypeId` FOREIGN KEY (`messageTypeId`) REFERENCES `messageTypes` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `msgFieldId` FOREIGN KEY (`fieldId`) REFERENCES `messageTypeFormFields` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -2387,6 +2536,370 @@ LOCK TABLES `rel_userSiteFeatures` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `transactionIn`
+--
+
+DROP TABLE IF EXISTS `transactionIn`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `transactionIn` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `transactionUploadId` int(11) DEFAULT NULL,
+  `messageTypeId` int(11) NOT NULL,
+  `recordStatus` smallint(6) NOT NULL COMMENT '1 = Rejected\n2 = Pending\n3 = Finalized',
+  `dateCreated` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `transactionIn`
+--
+
+LOCK TABLES `transactionIn` WRITE;
+/*!40000 ALTER TABLE `transactionIn` DISABLE KEYS */;
+/*!40000 ALTER TABLE `transactionIn` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `transactionInRecords`
+--
+
+DROP TABLE IF EXISTS `transactionInRecords`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `transactionInRecords` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `transactionInId` int(11) NOT NULL,
+  `f1` varchar(255) DEFAULT NULL,
+  `f2` varchar(255) DEFAULT NULL,
+  `f3` varchar(255) DEFAULT NULL,
+  `f4` varchar(255) DEFAULT NULL,
+  `f5` varchar(255) DEFAULT NULL,
+  `f6` varchar(255) DEFAULT NULL,
+  `f7` varchar(255) DEFAULT NULL,
+  `f8` varchar(255) DEFAULT NULL,
+  `f9` varchar(255) DEFAULT NULL,
+  `f10` varchar(255) DEFAULT NULL,
+  `f11` varchar(255) DEFAULT NULL,
+  `f12` varchar(255) DEFAULT NULL,
+  `f13` varchar(255) DEFAULT NULL,
+  `f14` varchar(255) DEFAULT NULL,
+  `f15` varchar(255) DEFAULT NULL,
+  `f16` varchar(255) DEFAULT NULL,
+  `f17` varchar(255) DEFAULT NULL,
+  `f18` varchar(255) DEFAULT NULL,
+  `f19` varchar(255) DEFAULT NULL,
+  `f20` varchar(255) DEFAULT NULL,
+  `f21` varchar(255) DEFAULT NULL,
+  `f22` varchar(255) DEFAULT NULL,
+  `f23` varchar(255) DEFAULT NULL,
+  `f24` varchar(255) DEFAULT NULL,
+  `f25` varchar(255) DEFAULT NULL,
+  `f26` varchar(255) DEFAULT NULL,
+  `f27` varchar(255) DEFAULT NULL,
+  `f28` varchar(255) DEFAULT NULL,
+  `f29` varchar(255) DEFAULT NULL,
+  `f30` varchar(255) DEFAULT NULL,
+  `f31` varchar(255) DEFAULT NULL,
+  `f32` varchar(255) DEFAULT NULL,
+  `f33` varchar(255) DEFAULT NULL,
+  `f34` varchar(255) DEFAULT NULL,
+  `f35` varchar(255) DEFAULT NULL,
+  `f36` varchar(255) DEFAULT NULL,
+  `f37` varchar(255) DEFAULT NULL,
+  `f38` varchar(255) DEFAULT NULL,
+  `f39` varchar(255) DEFAULT NULL,
+  `f40` varchar(255) DEFAULT NULL,
+  `f41` varchar(255) DEFAULT NULL,
+  `f42` varchar(255) DEFAULT NULL,
+  `f43` varchar(255) DEFAULT NULL,
+  `f44` varchar(255) DEFAULT NULL,
+  `f45` varchar(255) DEFAULT NULL,
+  `f46` varchar(255) DEFAULT NULL,
+  `f47` varchar(255) DEFAULT NULL,
+  `f48` varchar(255) DEFAULT NULL,
+  `f49` varchar(255) DEFAULT NULL,
+  `f50` varchar(255) DEFAULT NULL,
+  `f51` varchar(255) DEFAULT NULL,
+  `f52` varchar(255) DEFAULT NULL,
+  `f53` varchar(255) DEFAULT NULL,
+  `f54` varchar(255) DEFAULT NULL,
+  `f55` varchar(255) DEFAULT NULL,
+  `f56` varchar(255) DEFAULT NULL,
+  `f57` varchar(255) DEFAULT NULL,
+  `f58` varchar(255) DEFAULT NULL,
+  `f59` varchar(255) DEFAULT NULL,
+  `f60` varchar(255) DEFAULT NULL,
+  `f61` varchar(255) DEFAULT NULL,
+  `f62` varchar(255) DEFAULT NULL,
+  `f63` varchar(255) DEFAULT NULL,
+  `f64` varchar(255) DEFAULT NULL,
+  `f65` varchar(255) DEFAULT NULL,
+  `f66` varchar(255) DEFAULT NULL,
+  `f67` varchar(255) DEFAULT NULL,
+  `f68` varchar(255) DEFAULT NULL,
+  `f69` varchar(255) DEFAULT NULL,
+  `f70` varchar(255) DEFAULT NULL,
+  `f71` varchar(255) DEFAULT NULL,
+  `f72` varchar(255) DEFAULT NULL,
+  `f73` varchar(255) DEFAULT NULL,
+  `f74` varchar(255) DEFAULT NULL,
+  `f75` varchar(255) DEFAULT NULL,
+  `f76` varchar(255) DEFAULT NULL,
+  `f77` varchar(255) DEFAULT NULL,
+  `f78` varchar(255) DEFAULT NULL,
+  `f79` varchar(255) DEFAULT NULL,
+  `f80` varchar(255) DEFAULT NULL,
+  `f81` varchar(255) DEFAULT NULL,
+  `f82` varchar(255) DEFAULT NULL,
+  `f83` varchar(255) DEFAULT NULL,
+  `f84` varchar(255) DEFAULT NULL,
+  `f85` varchar(255) DEFAULT NULL,
+  `f86` varchar(255) DEFAULT NULL,
+  `f87` varchar(255) DEFAULT NULL,
+  `f88` varchar(255) DEFAULT NULL,
+  `f89` varchar(255) DEFAULT NULL,
+  `f90` varchar(255) DEFAULT NULL,
+  `f91` varchar(255) DEFAULT NULL,
+  `f92` varchar(255) DEFAULT NULL,
+  `f93` varchar(255) DEFAULT NULL,
+  `f94` varchar(255) DEFAULT NULL,
+  `f95` varchar(255) DEFAULT NULL,
+  `f96` varchar(255) DEFAULT NULL,
+  `f97` varchar(255) DEFAULT NULL,
+  `f98` varchar(255) DEFAULT NULL,
+  `f99` varchar(255) DEFAULT NULL,
+  `f100` varchar(255) DEFAULT NULL,
+  `f101` varchar(255) DEFAULT NULL,
+  `f102` varchar(255) DEFAULT NULL,
+  `f103` varchar(255) DEFAULT NULL,
+  `f104` varchar(255) DEFAULT NULL,
+  `f105` varchar(255) DEFAULT NULL,
+  `f106` varchar(255) DEFAULT NULL,
+  `f107` varchar(255) DEFAULT NULL,
+  `f108` varchar(255) DEFAULT NULL,
+  `f109` varchar(255) DEFAULT NULL,
+  `f110` varchar(255) DEFAULT NULL,
+  `f111` varchar(255) DEFAULT NULL,
+  `f112` varchar(255) DEFAULT NULL,
+  `f113` varchar(255) DEFAULT NULL,
+  `f114` varchar(255) DEFAULT NULL,
+  `f115` varchar(255) DEFAULT NULL,
+  `f116` varchar(255) DEFAULT NULL,
+  `f117` varchar(255) DEFAULT NULL,
+  `f118` varchar(255) DEFAULT NULL,
+  `f119` varchar(255) DEFAULT NULL,
+  `f120` varchar(255) DEFAULT NULL,
+  `f121` varchar(255) DEFAULT NULL,
+  `f122` varchar(255) DEFAULT NULL,
+  `f123` varchar(255) DEFAULT NULL,
+  `f124` varchar(255) DEFAULT NULL,
+  `f125` varchar(255) DEFAULT NULL,
+  `f126` varchar(255) DEFAULT NULL,
+  `f127` varchar(255) DEFAULT NULL,
+  `f128` varchar(255) DEFAULT NULL,
+  `f129` varchar(255) DEFAULT NULL,
+  `f130` varchar(255) DEFAULT NULL,
+  `f131` varchar(255) DEFAULT NULL,
+  `f132` varchar(255) DEFAULT NULL,
+  `f133` varchar(255) DEFAULT NULL,
+  `f134` varchar(255) DEFAULT NULL,
+  `f135` varchar(255) DEFAULT NULL,
+  `f136` varchar(255) DEFAULT NULL,
+  `f137` varchar(255) DEFAULT NULL,
+  `f138` varchar(255) DEFAULT NULL,
+  `f139` varchar(255) DEFAULT NULL,
+  `f140` varchar(255) DEFAULT NULL,
+  `f141` varchar(255) DEFAULT NULL,
+  `f142` varchar(255) DEFAULT NULL,
+  `f143` varchar(255) DEFAULT NULL,
+  `f144` varchar(255) DEFAULT NULL,
+  `f145` varchar(255) DEFAULT NULL,
+  `f146` varchar(255) DEFAULT NULL,
+  `f147` varchar(255) DEFAULT NULL,
+  `f148` varchar(255) DEFAULT NULL,
+  `f149` varchar(255) DEFAULT NULL,
+  `f150` varchar(255) DEFAULT NULL,
+  `f151` varchar(255) DEFAULT NULL,
+  `f152` varchar(255) DEFAULT NULL,
+  `f153` varchar(255) DEFAULT NULL,
+  `f154` varchar(255) DEFAULT NULL,
+  `f155` varchar(255) DEFAULT NULL,
+  `f156` varchar(255) DEFAULT NULL,
+  `f157` varchar(255) DEFAULT NULL,
+  `f158` varchar(255) DEFAULT NULL,
+  `f159` varchar(255) DEFAULT NULL,
+  `f160` varchar(255) DEFAULT NULL,
+  `f161` varchar(255) DEFAULT NULL,
+  `f162` varchar(255) DEFAULT NULL,
+  `f163` varchar(255) DEFAULT NULL,
+  `f164` varchar(255) DEFAULT NULL,
+  `f165` varchar(255) DEFAULT NULL,
+  `f166` varchar(255) DEFAULT NULL,
+  `f167` varchar(255) DEFAULT NULL,
+  `f168` varchar(255) DEFAULT NULL,
+  `f169` varchar(255) DEFAULT NULL,
+  `f170` varchar(255) DEFAULT NULL,
+  `f171` varchar(255) DEFAULT NULL,
+  `f172` varchar(255) DEFAULT NULL,
+  `f173` varchar(255) DEFAULT NULL,
+  `f174` varchar(255) DEFAULT NULL,
+  `f175` varchar(255) DEFAULT NULL,
+  `f176` varchar(255) DEFAULT NULL,
+  `f177` varchar(255) DEFAULT NULL,
+  `f178` varchar(255) DEFAULT NULL,
+  `f179` varchar(255) DEFAULT NULL,
+  `f180` varchar(255) DEFAULT NULL,
+  `f181` varchar(255) DEFAULT NULL,
+  `f182` varchar(255) DEFAULT NULL,
+  `f183` varchar(255) DEFAULT NULL,
+  `f184` varchar(255) DEFAULT NULL,
+  `f185` varchar(255) DEFAULT NULL,
+  `f186` varchar(255) DEFAULT NULL,
+  `f187` varchar(255) DEFAULT NULL,
+  `f188` varchar(255) DEFAULT NULL,
+  `f189` varchar(255) DEFAULT NULL,
+  `f190` varchar(255) DEFAULT NULL,
+  `f191` varchar(255) DEFAULT NULL,
+  `f192` varchar(255) DEFAULT NULL,
+  `f193` varchar(255) DEFAULT NULL,
+  `f194` varchar(255) DEFAULT NULL,
+  `f195` varchar(255) DEFAULT NULL,
+  `f196` varchar(255) DEFAULT NULL,
+  `f197` varchar(255) DEFAULT NULL,
+  `f198` varchar(255) DEFAULT NULL,
+  `f199` varchar(255) DEFAULT NULL,
+  `f200` varchar(255) DEFAULT NULL,
+  `f201` varchar(255) DEFAULT NULL,
+  `f202` varchar(255) DEFAULT NULL,
+  `f203` varchar(255) DEFAULT NULL,
+  `f204` varchar(255) DEFAULT NULL,
+  `f205` varchar(255) DEFAULT NULL,
+  `f206` varchar(255) DEFAULT NULL,
+  `f207` varchar(255) DEFAULT NULL,
+  `f208` varchar(255) DEFAULT NULL,
+  `f209` varchar(255) DEFAULT NULL,
+  `f210` varchar(255) DEFAULT NULL,
+  `f211` varchar(255) DEFAULT NULL,
+  `f212` varchar(255) DEFAULT NULL,
+  `f213` varchar(255) DEFAULT NULL,
+  `f214` varchar(255) DEFAULT NULL,
+  `f215` varchar(255) DEFAULT NULL,
+  `f216` varchar(255) DEFAULT NULL,
+  `f217` varchar(255) DEFAULT NULL,
+  `f218` varchar(255) DEFAULT NULL,
+  `f219` varchar(255) DEFAULT NULL,
+  `f220` varchar(255) DEFAULT NULL,
+  `f221` varchar(255) DEFAULT NULL,
+  `f222` varchar(255) DEFAULT NULL,
+  `f223` varchar(255) DEFAULT NULL,
+  `f224` varchar(255) DEFAULT NULL,
+  `f225` varchar(255) DEFAULT NULL,
+  `f226` varchar(255) DEFAULT NULL,
+  `f227` varchar(255) DEFAULT NULL,
+  `f228` varchar(255) DEFAULT NULL,
+  `f229` varchar(255) DEFAULT NULL,
+  `f230` varchar(255) DEFAULT NULL,
+  `f231` varchar(255) DEFAULT NULL,
+  `f232` varchar(255) DEFAULT NULL,
+  `f233` varchar(255) DEFAULT NULL,
+  `f234` varchar(255) DEFAULT NULL,
+  `f235` varchar(255) DEFAULT NULL,
+  `f236` varchar(255) DEFAULT NULL,
+  `f237` varchar(255) DEFAULT NULL,
+  `f238` varchar(255) DEFAULT NULL,
+  `f239` varchar(255) DEFAULT NULL,
+  `f240` varchar(255) DEFAULT NULL,
+  `f241` varchar(255) DEFAULT NULL,
+  `f242` varchar(255) DEFAULT NULL,
+  `f243` varchar(255) DEFAULT NULL,
+  `f244` varchar(255) DEFAULT NULL,
+  `f245` varchar(255) DEFAULT NULL,
+  `f246` varchar(255) DEFAULT NULL,
+  `f247` varchar(255) DEFAULT NULL,
+  `f248` varchar(255) DEFAULT NULL,
+  `f249` varchar(255) DEFAULT NULL,
+  `f250` varchar(255) DEFAULT NULL,
+  `f251` varchar(255) DEFAULT NULL,
+  `f252` varchar(255) DEFAULT NULL,
+  `f253` varchar(255) DEFAULT NULL,
+  `f254` varchar(255) DEFAULT NULL,
+  `f255` varchar(255) DEFAULT NULL,
+  `dateCreated` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `transactionInRecords`
+--
+
+LOCK TABLES `transactionInRecords` WRITE;
+/*!40000 ALTER TABLE `transactionInRecords` DISABLE KEYS */;
+/*!40000 ALTER TABLE `transactionInRecords` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `transactionTarget`
+--
+
+DROP TABLE IF EXISTS `transactionTarget`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `transactionTarget` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `transactionInId` int(11) NOT NULL,
+  `orgId` int(11) DEFAULT NULL,
+  `providerId` int(11) DEFAULT NULL,
+  `status` smallint(6) DEFAULT NULL COMMENT '1 for exported 2 for pending 3 for reprocess?',
+  `dateCreated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `transactionTarget`
+--
+
+LOCK TABLES `transactionTarget` WRITE;
+/*!40000 ALTER TABLE `transactionTarget` DISABLE KEYS */;
+/*!40000 ALTER TABLE `transactionTarget` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `transactionUploads`
+--
+
+DROP TABLE IF EXISTS `transactionUploads`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `transactionUploads` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `orgId` int(11) NOT NULL,
+  `userId` int(11) DEFAULT NULL,
+  `batchName` varchar(255) NOT NULL,
+  `originalFileName` varchar(255) NOT NULL,
+  `dateSubmitted` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `statusId` int(11) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `btchStatusId_idx` (`statusId`),
+  KEY `btchOrgId_idx` (`orgId`),
+  CONSTRAINT `btchOrgId` FOREIGN KEY (`orgId`) REFERENCES `organizations` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `btchStatusId` FOREIGN KEY (`statusId`) REFERENCES `ref_batchStatus` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `transactionUploads`
+--
+
+LOCK TABLES `transactionUploads` WRITE;
+/*!40000 ALTER TABLE `transactionUploads` DISABLE KEYS */;
+/*!40000 ALTER TABLE `transactionUploads` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `userRoles`
 --
 
@@ -2471,6 +2984,14 @@ LOCK TABLES `utSiteFeatures` WRITE;
 INSERT INTO `utSiteFeatures` VALUES (1,'Health-e-Net'),(2,'Health-e-Data'),(3,'Health-e-Web'),(4,'Health-e-Connect');
 /*!40000 ALTER TABLE `utSiteFeatures` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Dumping events for database 'universalTranslator'
+--
+
+--
+-- Dumping routines for database 'universalTranslator'
+--
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -2481,4 +3002,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2013-11-07 11:38:08
+-- Dump completed on 2013-12-11 17:50:35
