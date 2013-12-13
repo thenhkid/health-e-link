@@ -16,7 +16,8 @@ import com.ut.dph.model.Provider;
 import com.ut.dph.model.User;
 import com.ut.dph.reference.fileSystem;
 import com.ut.dph.service.brochureManager;
-import org.hibernate.HibernateException;
+import org.hibernate.exception.SQLGrammarException;
+
 
 /**
  * The organizationDAOImpl class will implement the DAO access layer to handle queries for an organization
@@ -400,7 +401,7 @@ public class organizationDAOImpl implements organizationDAO {
             deleteProviderAddresses.setParameter("orgId", orgId);
             deleteProviderAddresses.executeUpdate();
         }
-        catch(HibernateException ex){
+        catch(SQLGrammarException ex){
             throw ex;
         };
 
@@ -410,7 +411,7 @@ public class organizationDAOImpl implements organizationDAO {
             deleteProviderIds.setParameter("orgId", orgId);
             deleteProviderIds.executeUpdate(); 
         }
-        catch(HibernateException ex) {
+        catch(SQLGrammarException ex) {
             throw ex;
         }
 
@@ -420,7 +421,7 @@ public class organizationDAOImpl implements organizationDAO {
             deleteProvider.setParameter("orgId", orgId);
             deleteProvider.executeUpdate();
         }
-        catch(HibernateException ex) {
+        catch(SQLGrammarException ex) {
             throw ex;
         }
 
@@ -437,29 +438,36 @@ public class organizationDAOImpl implements organizationDAO {
             try {
               brochureManager.deleteBrochure(brochureId);  
             }
-            catch(HibernateException ex) {
+            catch(SQLGrammarException ex) {
                 throw ex;
             }
         }
 
         //Delete the logins for the users associated to the organization to be deleted.
-        try {
-            Query deleteLogins = sessionFactory.getCurrentSession().createQuery("delete from userLogin where userId in (select id from User where orgId = :orgId");
-            deleteLogins.setParameter("orgId", orgId);
-            deleteLogins.executeUpdate();  
-        }
-        catch(HibernateException ex) {
-            throw ex;
-        }
+        Query findUsers = sessionFactory.getCurrentSession().createQuery("from User where orgId = :orgId");
+        findUsers.setParameter("orgId", orgId);
+        
+        List<User> users = findUsers.list();
+        
+        if(users.size() > 0) {
+            try {
+                Query deleteLogins = sessionFactory.getCurrentSession().createQuery("delete from userLogin where userId in (select id from User where orgId = :orgId");
+                deleteLogins.setParameter("orgId", orgId);
+                deleteLogins.executeUpdate();  
+            }
+            catch(SQLGrammarException ex) {
+                throw ex;
+            }
 
-        //Delete the user access entries for the users associated to the organization to be deleted.
-        try {
-            Query deleteuserFeatures = sessionFactory.getCurrentSession().createQuery("delete from userAccess where userId in (select id from User where orgId = :orgId");
-            deleteuserFeatures.setParameter("orgId", orgId);
-            deleteuserFeatures.executeUpdate();
-        }
-        catch(HibernateException ex) {
-            throw ex;
+            //Delete the user access entries for the users associated to the organization to be deleted.
+            try {
+                Query deleteuserFeatures = sessionFactory.getCurrentSession().createQuery("delete from userAccess where userId in (select id from User where orgId = :orgId");
+                deleteuserFeatures.setParameter("orgId", orgId);
+                deleteuserFeatures.executeUpdate();
+            }
+            catch(SQLGrammarException ex) {
+                throw ex;
+            }
         }
 
         //Delete all users associated to the organization
@@ -468,7 +476,7 @@ public class organizationDAOImpl implements organizationDAO {
             deleteUser.setParameter("orgId", orgId);
             deleteUser.executeUpdate();
         }
-        catch(HibernateException ex) {
+        catch(SQLGrammarException ex) {
             throw ex;
         }
         
@@ -485,7 +493,7 @@ public class organizationDAOImpl implements organizationDAO {
             deleteOrg.setParameter("orgId", orgId);
             deleteOrg.executeUpdate();
         }
-        catch(HibernateException ex) {
+        catch(SQLGrammarException ex) {
             throw ex;
         }
 

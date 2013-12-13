@@ -54,12 +54,28 @@ $(function() {
             populateTableColumns(tableName, row);
         }
     });
+    
+    //Loop through all selected table names to populate the columns
+    $('.autoPopulatetableName').each(function() {
+        var row = $(this).attr('rel');
+        var tableName = $(this).val();
+        if (tableName !== "") {
+            populateAutoTableColumns(tableName, row);
+        }
+    });
 
     //Need to populate the table columns or the selected table
     $(document).on('change', '.tableName', function() {
         var row = $(this).attr('rel');
         var tableName = $(this).val();
         populateTableColumns(tableName, row);
+    });
+    
+    //Need to populate the auto populate table columns or the selected table
+    $(document).on('change', '.autoPopulatetableName', function() {
+        var row = $(this).attr('rel');
+        var tableName = $(this).val();
+        populateAutoTableColumns(tableName, row);
     });
 
     //This function will save the messgae type field mappings
@@ -143,6 +159,30 @@ function populateTableColumns(tableName, row) {
             }
         }
         $('#tableCols' + row).html(html);
+    });
+}
+
+//This functin will be used to populate the autoPopulatetableCols drop down.
+//function takes in the name of the selected table name and the
+//row it is working with.
+function populateAutoTableColumns(tableName, row) {
+    $.getJSON('getTableCols.do', {
+        tableName: tableName, ajax: true
+    }, function(data) {
+        //get value of preselected col
+        var colVal = $('#autoPopulatetableCols' + row).attr('rel2');
+
+        var html = '<option value="">- Select - </option>';
+        var len = data.length;
+        for (var i = 0; i < len; i++) {
+            if (colVal == data[i]) {
+                html += '<option value="' + data[i] + '" selected>' + data[i] + '</option>';
+            }
+            else {
+                html += '<option value="' + data[i] + '">' + data[i] + '</option>';
+            }
+        }
+        $('#autoPopulatetableCols' + row).html(html);
     });
 }
 

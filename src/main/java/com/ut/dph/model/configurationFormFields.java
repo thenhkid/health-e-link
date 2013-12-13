@@ -55,6 +55,12 @@ public class configurationFormFields {
 
     @Column(name = "USEFIELD", nullable = false)
     private boolean useField = false;
+    
+    @Column(name = "SAVETOTABLENAME", nullable = false)
+    private String saveToTableName;
+    
+    @Column(name = "SAVETOTABLECOL", nullable = false)
+    private String saveToTableCol;
 
     public int getId() {
         return id;
@@ -158,6 +164,14 @@ public class configurationFormFields {
     
     public void setfieldValue(String fieldValue) {
         this.fieldValue = fieldValue;
+    }
+    
+    public String getsaveToTableName() {
+        return saveToTableName;
+    }
+    
+    public String getsaveToTableCol() {
+        return saveToTableCol;
     }
 
 }

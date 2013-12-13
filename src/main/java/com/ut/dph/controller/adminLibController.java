@@ -253,6 +253,10 @@ public class adminLibController {
         @SuppressWarnings("rawtypes")
         List infoTables = messagetypemanager.getInformationTables();
         mav.addObject("infoTables", infoTables);
+        
+        //Get the list of available tables to be used to populate the auto populate drop down
+        List allTables = messagetypemanager.getAllTables();
+        mav.addObject("allTables", allTables);
 
         //Get the list of available field validation types
         @SuppressWarnings("rawtypes")

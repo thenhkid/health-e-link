@@ -8,11 +8,17 @@ package com.ut.dph.controller;
 
 import com.ut.dph.model.Connections;
 import com.ut.dph.model.Organization;
+import com.ut.dph.model.Transaction;
 import com.ut.dph.model.configuration;
+import com.ut.dph.model.configurationFormFields;
+import com.ut.dph.model.configurationTransport;
 import com.ut.dph.model.messageType;
+import com.ut.dph.model.transactionRecords;
 import com.ut.dph.service.configurationManager;
+import com.ut.dph.service.configurationTransportManager;
 import com.ut.dph.service.messageTypeManager;
 import com.ut.dph.service.organizationManager;
+import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,10 +28,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.springframework.web.servlet.view.RedirectView;
 
 /**
  *
@@ -43,6 +46,9 @@ public class HealtheWebController {
     
     @Autowired
     private organizationManager organizationmanager;
+    
+    @Autowired
+    private configurationTransportManager configurationTransportManager;
     
     /**
      * The '/inbox' request will serve up the Health-e-Web (ERG) inbox.
@@ -127,23 +133,131 @@ public class HealtheWebController {
      * @return this request will return the messageDetailsForm
      */
     @RequestMapping(value= "/create/details", method = RequestMethod.POST)
-    public ModelAndView showMessageDetailsForm(@RequestParam(value = "configId", required = true) int configId, @RequestParam(value = "targetOrg", required = true) int targetOrg) {
+    public ModelAndView showMessageDetailsForm(@RequestParam(value = "configId", required = true) int configId, @RequestParam(value = "targetOrg", required = true) int targetOrg, HttpSession session) {
         
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/Health-e-Web/messageDetailsForm");
         
-        /* Create new transactionUpload Object */
+        /* Get the configuration details */
+        configuration configDetails = configurationManager.getConfigurationById(configId);
         
-        /* Create new transactionIn Object */
+        /* Get the organization details for the source (Sender) organization */
+        int[] userInfo = (int[])session.getAttribute("userInfo");
+        Organization sendingOrgDetails = organizationmanager.getOrganizationById(userInfo[1]);
+        
+        /* Get the organization details for the target (Receiving) organization */
+        Organization receivingOrgDetails = organizationmanager.getOrganizationById(targetOrg);
+        
+        /* Get a list of form fields */
+        configurationTransport transportDetails = configurationTransportManager.getTransportDetailsByTransportMethod(configId, 2);
+        List<configurationFormFields> senderInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId,transportDetails.getId(),1);
+        List<configurationFormFields> targetInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId,transportDetails.getId(),2);
+        List<configurationFormFields> patientInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId,transportDetails.getId(),3);
+        List<configurationFormFields> detailFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId,transportDetails.getId(),4);
+        
+        /* Create a new transaction */
+        Transaction transaction = new Transaction();
+        transaction.setorgId(userInfo[1]);
+        transaction.settransportMethodId(2);
+        transaction.setmessageTypeId(configDetails.getMessageTypeId());
+        transaction.setuserId(userInfo[0]);
+        transaction.setbatchName(null);
+        transaction.setoriginalFileName(null);
+        transaction.setstatusId(0);
+        transaction.settransactionStatusId(0);
+        transaction.settargetOrgId(targetOrg);
+        
+        /* Create new transaction Records */
+        ArrayList transactionFields = new ArrayList();
+        
+         /* Set all the transaction SOURCE fields */
+        List<transactionRecords> fromFields = new ArrayList<transactionRecords>();
+        
+        for(configurationFormFields fields : senderInfoFormFields) {
+            transactionRecords field = new transactionRecords();
+            field.setfieldNo(fields.getFieldNo());
+            field.setrequired(fields.getRequired());
+            field.setsaveToTable(fields.getsaveToTableName());
+            field.setsaveToTableCol(fields.getsaveToTableCol());
+            field.setfieldLabel(fields.getFieldLabel());
+            
+            /* Get the validation */
+            if(fields.getValidationType() > 1) {
+                field.setvalidation(messagetypemanager.getValidationById(fields.getValidationType()).toString());
+            }
+            
+            /* Get the pre-populated values */
+            
+            fromFields.add(field);
+        }
+        transactionFields.add(fromFields);
         
         
+        /* Set all the transaction TARGET fields */
+        List<transactionRecords> toFields = new ArrayList<transactionRecords>();
+        for(configurationFormFields fields : targetInfoFormFields) {
+            transactionRecords field = new transactionRecords();
+            field.setfieldNo(fields.getFieldNo());
+            field.setrequired(fields.getRequired());
+            field.setsaveToTable(fields.getsaveToTableName());
+            field.setsaveToTableCol(fields.getsaveToTableCol());
+            field.setfieldLabel(fields.getFieldLabel());
+            
+            /* Get the validation */
+            if(fields.getValidationType() > 1) {
+                field.setvalidation(messagetypemanager.getValidationById(fields.getValidationType()).toString());
+            }
+            
+            /* Get the pre-populated values */
+            toFields.add(field);
+        }
+        transactionFields.add(toFields);
+        
+        /* Set all the transaction PATIENT fields */
+        List<transactionRecords> patientFields = new ArrayList<transactionRecords>();
+        for(configurationFormFields fields : patientInfoFormFields) {
+            transactionRecords field = new transactionRecords();
+            field.setfieldNo(fields.getFieldNo());
+            field.setrequired(fields.getRequired());
+            field.setsaveToTable(fields.getsaveToTableName());
+            field.setsaveToTableCol(fields.getsaveToTableCol());
+            field.setfieldLabel(fields.getFieldLabel());
+            
+            /* Get the validation */
+            if(fields.getValidationType() > 1) {
+                field.setvalidation(messagetypemanager.getValidationById(fields.getValidationType()).toString());
+            }
+            
+            patientFields.add(field);
+        }
+        transactionFields.add(patientFields);
+        
+        /* Set all the transaction DETAIL fields */
+        List<transactionRecords> detailFields = new ArrayList<transactionRecords>();
+        for(configurationFormFields fields : detailFormFields) {
+            transactionRecords field = new transactionRecords();
+            field.setfieldNo(fields.getFieldNo());
+            field.setrequired(fields.getRequired());
+            field.setsaveToTable(fields.getsaveToTableName());
+            field.setsaveToTableCol(fields.getsaveToTableCol());
+            field.setfieldLabel(fields.getFieldLabel());
+            
+            /* Get the validation */
+            if(fields.getValidationType() > 1) {
+                field.setvalidation(messagetypemanager.getValidationById(fields.getValidationType()).toString());
+            }
+            
+            detailFields.add(field);
+        }
+        transactionFields.add(detailFields);
         
         
+        /* Save the transaction Fields */
+        transaction.settransactionRecords(transactionFields);
+        
+        mav.addObject(transaction);
         
         
-        
-        mav.addObject("configId",configId);
-        mav.addObject("targetOrg",targetOrg);
         return mav;
     }
     

@@ -207,7 +207,14 @@ public class messageTypeManagerImpl implements messageTypeManager {
     public List getInformationTables() {
         return messageTypeDAO.getInformationTables();
     }
-
+    
+    @SuppressWarnings("rawtypes")
+    @Override
+    @Transactional
+    public List getAllTables() {
+        return messageTypeDAO.getAllTables();
+    }
+    
     @SuppressWarnings("rawtypes")
     @Override
     @Transactional
@@ -221,7 +228,14 @@ public class messageTypeManagerImpl implements messageTypeManager {
     public List getValidationTypes() {
         return messageTypeDAO.getValidationTypes();
     }
-
+    
+    @SuppressWarnings("rawtypes")
+    @Override
+    @Transactional
+    public String getValidationById(int id) {
+        return messageTypeDAO.getValidationById(id);
+    }
+    
     @SuppressWarnings("rawtypes")
     @Override
     @Transactional

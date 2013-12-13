@@ -6,7 +6,7 @@
 <c:set var="endDspPostLoop" value="1" />
 
 <!-- Need to calculate how many fields for current section -->
-<c:set var="totalFieldsBucket1, totalFieldsBucket2, totalFieldsBucket3, totalFieldsBucket4" value="0" />
+<c:set var="totalFieldsBucket1, totalFieldsBucket2, totalFieldsBucket3, totalFieldsBucket4, totalFieldsBucket5, totalFieldsBucket6" value="0" />
 <c:forEach items="${transportDetails.fields}" var="mappings" varStatus="field">
     <c:if test="${mappings.bucketNo == 1}">
         <c:set var="totalFieldsBucket1" value="${totalFieldsBucket1+1}" />
@@ -19,6 +19,12 @@
     </c:if>
     <c:if test="${mappings.bucketNo == 4}">
         <c:set var="totalFieldsBucket4" value="${totalFieldsBucket4+1}" />
+    </c:if>
+    <c:if test="${mappings.bucketNo == 5}">
+        <c:set var="totalFieldsBucket5" value="${totalFieldsBucket5+1}" />
+    </c:if>
+    <c:if test="${mappings.bucketNo == 6}">
+        <c:set var="totalFieldsBucket6" value="${totalFieldsBucket6+1}" />
     </c:if>
 </c:forEach>
 
@@ -85,18 +91,18 @@
                         <form:form id="formFields" modelAttribute="transportDetails" method="post" role="form">
                             <input type="hidden" id="action" name="action" value="save" />
                             <input type="hidden" id="seltransportMethod" name="transportMethod" value="0" />
-                            <c:forEach var="i" begin="1" end="4">	
+                            <c:forEach var="i" begin="1" end="6">	
                                 <section class="panel panel-default">
                                     <div class="panel-heading">
                                         <dt>
                                         <dd>
-                                            <strong><c:choose><c:when test="${i==1}"> (Sender Information)</c:when><c:when test="${i==2}"> (Recipient Information)</c:when><c:when test="${i==3}"> (Patient Information)</c:when><c:when test="${i==4}"> (Details)</c:when></c:choose></strong>
+                                            <strong><c:choose><c:when test="${i==1}"> (Sender Organization Information)</c:when><c:when test="${i==2}"> (Sender Provider Information)</c:when><c:when test="${i==3}"> (Recipient Organization Information)</c:when><c:when test="${i==4}"> (Recipient Provider Information)</c:when><c:when test="${i==5}"> (Patient Information)</c:when><c:when test="${i==6}"> (Details)</c:when></c:choose></strong>
                                                 </dd>
                                                 </dt>
                                             </div>
                                             <div class="panel-body">
                                                 <div class="form-container scrollable">
-                                                                <table class="table table-striped table-hover bucketTable_${i}">
+                                                <table class="table table-striped table-hover bucketTable_${i}">
                                                 <thead>
                                                     <tr>
                                                         <th scope="col" style="width:100px; min-width:100px" class="center-text">Use This Field</th>
@@ -132,6 +138,12 @@
                                                                     </c:if>
                                                                     <c:if test="${mappings.bucketNo == 4}">
                                                                         <c:set var="endDspPostLoop" value="${totalFieldsBucket4}" />
+                                                                    </c:if>
+                                                                    <c:if test="${mappings.bucketNo == 5}">
+                                                                        <c:set var="endDspPostLoop" value="${totalFieldsBucket5}" />
+                                                                    </c:if>
+                                                                    <c:if test="${mappings.bucketNo == 6}">
+                                                                        <c:set var="endDspPostLoop" value="${totalFieldsBucket6}" />
                                                                     </c:if>
                                                                     <input type="hidden" id="endDspPostLoop_${mappings.bucketNo}" value="${endDspPostLoop}" />
                                                                     <select rel="${mappings.bucketNo}" rel2="${mappings.bucketDspPos}" name="fields[${field.index}].bucketDspPos" class="form-control half dspPos dspPos_${mappings.bucketNo} formField">

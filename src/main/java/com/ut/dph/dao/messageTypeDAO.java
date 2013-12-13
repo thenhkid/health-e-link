@@ -39,12 +39,18 @@ public interface messageTypeDAO {
 	
 	@SuppressWarnings("rawtypes")
 	List getInformationTables();
-	
+        
+        @SuppressWarnings("rawtypes")
+	List getAllTables();
+       
 	@SuppressWarnings("rawtypes")
 	List getTableColumns(String tableName);
 	
 	@SuppressWarnings("rawtypes")
 	List getValidationTypes();
+        
+        @SuppressWarnings("rawtypes")
+	String getValidationById(int id);
 	
 	@SuppressWarnings("rawtypes")
 	List getDelimiters();

@@ -326,7 +326,20 @@ public class messageTypeDAOImpl implements messageTypeDAO {
 
         return query.list();
     }
+    
+    /**
+     * The 'getAllTables' function will return a list of all available tables where we can use to select
+     * which table to auto populate a form field.
+     */
+    @Override
+    @SuppressWarnings("rawtypes")
+    @Transactional
+    public List getAllTables() {
+        Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT distinct table_name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'universalTranslator'");
 
+        return query.list();
+    }
+    
     /**
      * The 'getTableColumns' function will return a list of columns from the passed in table name
      *
@@ -352,6 +365,22 @@ public class messageTypeDAOImpl implements messageTypeDAO {
         Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT id, validationType FROM ref_validationTypes order by id asc");
 
         return query.list();
+    }
+    
+    /**
+     * The 'getValidationById' function will return a validation by the passed in Id.
+     * 
+     */
+    @Override
+    @SuppressWarnings("rawtypes")
+    @Transactional
+    public String getValidationById(int id) {
+        Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT validationType FROM ref_validationTypes where id = :id");
+        query.setParameter("id", id);
+
+        String validationType = (String) query.uniqueResult();
+
+        return validationType;
     }
 
     /**

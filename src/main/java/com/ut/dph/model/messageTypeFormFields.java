@@ -48,6 +48,12 @@ public class messageTypeFormFields {
 
     @Column(name = "BUCKETDSPPOS", nullable = false)
     private int bucketDspPos;
+    
+     @Column(name = "AUTOPOPULATETABLENAME", nullable = true)
+    private String autoPopulateTableName;
+
+    @Column(name = "AUTOPOPULATETABLECOL", nullable = true)
+    private String autoPopulateTableCol;
 
     public int getId() {
         return id;
@@ -135,6 +141,22 @@ public class messageTypeFormFields {
 
     public void setBucketDspPos(int bucketDspPos) {
         this.bucketDspPos = bucketDspPos;
+    }
+    
+    public String getautoPopulateTableName() {
+        return autoPopulateTableName;
+    }
+
+    public void setautoPopulateTableName(String autoPopulateTableName) {
+        this.autoPopulateTableName = autoPopulateTableName;
+    }
+
+    public String getautoPopulateTableCol() {
+        return autoPopulateTableCol;
+    }
+
+    public void setautoPopulateTableCol(String autoPopulateTableCol) {
+        this.autoPopulateTableCol = autoPopulateTableCol;
     }
 
 }
