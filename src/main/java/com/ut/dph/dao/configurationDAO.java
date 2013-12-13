@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.ut.dph.model.Connections;
 import com.ut.dph.model.Macros;
-import com.ut.dph.model.Organization;
 import com.ut.dph.model.configuration;
 import com.ut.dph.model.configurationDataTranslations;
 import com.ut.dph.model.configurationSchedules;
@@ -18,6 +17,8 @@ public interface configurationDAO {
   configuration getConfigurationById(int configId);
   
   List<configuration> getConfigurationsByOrgId(int orgId, String searchTerm);
+  
+  List<configuration> getActiveConfigurationsByOrgId(int orgId);
   
   List<configuration> findConfigurations(String searchTerm);
   

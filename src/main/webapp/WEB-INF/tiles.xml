@@ -14,7 +14,7 @@
         <put-attribute name="footer" value="/WEB-INF/jsp/common/adminFooter.jsp" />
     </definition>
 
-   <!-- Login -->
+    <!-- Login -->
     <definition name="/login" extends="base.definition.admin">
         <put-attribute name="page-id" value="login" />
         <put-attribute name="page-section" value="section-login" />
@@ -260,6 +260,7 @@
         <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=sysadmin" />
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/sysadmin/index.jsp" />
     </definition>
+    
     <definition name="/administrator/sysadmin/data/tableList" extends="base.definition.admin">
         <put-attribute name="page-id" value="sysadmin-tablelist" />
         <put-attribute name="page-section" value="section-sysadmin" />
@@ -322,8 +323,36 @@
 
     <!-- Profile (Account) Pages -->
     <definition name="/profile/index" extends="base.definition.frontEnd">
-        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page=profileIndex" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=home&amp;page=profile" />
         <put-attribute name="body" value="/WEB-INF/jsp/profile/index.jsp" />
     </definition>
+    
+    <!-- Health-e-Web (ERG) Pages -->
+    
+    <!-- Inbox -->
+    <definition name="/Health-e-Web/inbox" extends="base.definition.frontEnd">
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Health-e-Web&amp;page=inbox" />
+        <put-attribute name="body" value="/WEB-INF/jsp/Health-e-Web/inbox.jsp" />
+    </definition>
+    
+    <!-- Sent Items -->
+    <definition name="/Health-e-Web/sent" extends="base.definition.frontEnd">
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Health-e-Web&amp;page=sent" />
+        <put-attribute name="body" value="/WEB-INF/jsp/Health-e-Web/sent.jsp" />
+    </definition>
+    
+    <!-- Create New Message List Page -->
+    <definition name="/Health-e-Web/create" extends="base.definition.frontEnd">
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Health-e-Web&amp;page=create" />
+        <put-attribute name="body" value="/WEB-INF/jsp/Health-e-Web/create.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/front-end/Health-e-Web/create.js" />
+    </definition>
+    
+    <definition name="/Health-e-Web/messageDetailsForm" extends="base.definition.frontEnd">
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Health-e-Web&amp;page=create" />
+        <put-attribute name="body" value="/WEB-INF/jsp/Health-e-Web/messageDetailsForm.jsp" />
+    </definition>
+    
+    <!-- Health-e-Connect (Exchange) Pages -->
 
 </tiles-definitions>

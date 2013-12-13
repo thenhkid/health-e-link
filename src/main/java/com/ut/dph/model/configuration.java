@@ -28,6 +28,9 @@ public class configuration {
 
     @Transient
     private List<Organization> connections = null;
+    
+    @Transient
+    private List<Connections> orgConnections = null;
 
     @Transient
     private Long totalConnections = null;
@@ -174,4 +177,14 @@ public class configuration {
     public void setrejectOnError(int rejectOnError) {
         this.rejectOnError = rejectOnError;
     }
+    
+    public List<Connections> getorgConnections() {
+        return orgConnections;
+    }
+
+    public void setorgConnections(List<Connections> orgConnections) {
+        this.orgConnections = orgConnections;
+    }
+    
+    
 }
