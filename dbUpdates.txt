@@ -247,4 +247,13 @@ ADD CONSTRAINT `tTargetProFK`
   ON UPDATE NO ACTION;
 
 DROP TABLE `universalTranslator`.`lu_PhoneTypes`;
+
+/* Chad 12.13.13 @ 4:26 PM */
+ALTER TABLE `universalTranslator`.`messageTypeFormFields` 
+ADD COLUMN `autoPopulateTableName` VARCHAR(255) NULL DEFAULT NULL AFTER `bucketDspPos`,
+ADD COLUMN `autoPopulateTableCol` VARCHAR(255) NULL DEFAULT NULL AFTER `autoPopulateTableName`;
   
+
+ALTER TABLE `universalTranslator`.`message_ToProvider` 
+CHANGE COLUMN `name` `firstname` VARCHAR(45) NULL DEFAULT NULL ,
+ADD COLUMN `lastname` VARCHAR(45) NULL AFTER `firstname`;
