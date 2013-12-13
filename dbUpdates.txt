@@ -257,3 +257,7 @@ ADD COLUMN `autoPopulateTableCol` VARCHAR(255) NULL DEFAULT NULL AFTER `autoPopu
 ALTER TABLE `universalTranslator`.`message_ToProvider` 
 CHANGE COLUMN `name` `firstname` VARCHAR(45) NULL DEFAULT NULL ,
 ADD COLUMN `lastname` VARCHAR(45) NULL AFTER `firstname`;
+
+ALTER TABLE `universalTranslator`.`configurationFormFields` 
+ADD COLUMN `autoPopulateTableName` VARCHAR(255) NULL DEFAULT NULL AFTER `saveToTableCol`,
+ADD COLUMN `autoPopulateTableCol` VARCHAR(255) NULL DEFAULT NULL AFTER `autoPopulateTableName`;
