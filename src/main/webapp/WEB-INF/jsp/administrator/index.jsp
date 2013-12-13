@@ -26,37 +26,37 @@
 
     <div class="row-fluid contain basic-clearfix">
         <div class="col-md-3 col-sm-3 col-xs-6">
-            <section class="panel panel-default panel-stats">
+            <section class="panel panel-default panel-stats" role="widget" aria-labelleby="Number of Organizations">
                 <div class="panel-body">
-                    <span class="stat-number"><a href="?page=organizations" title="Total number of organizations">${totalOrgs}</a></span>
+                    <span class="stat-number"><a href="administrator/organizations/list" title="Total number of organizations">${totalOrgs}</a></span>
                     <h3>Organizations</h3>
-                    <a href="administrator/organizations/list" title="Organization Manager" class="btn btn-primary btn-small" role="button">View all</a>
+                    <a href="administrator/organizations/list" title="Organization Manager" class="btn btn-primary btn-small">View all</a>
                 </div>
             </section>
         </div>
 
         <div class="col-md-3 col-sm-3 col-xs-6">
-            <section class="panel panel-default panel-stats">
+            <section class="panel panel-default panel-stats" role="widget" aria-labelleby="Number of Configurations">
                 <div class="panel-body">
-                    <span class="stat-number"><a href="?page=configurations" title="Total number of configurations">${totalConfigs}</a></span>
+                    <span class="stat-number"><a href="administrator/configurations/list" title="Total number of configurations">${totalConfigs}</a></span>
                     <h3>Configurations</h3>
-                    <a href="administrator/configurations/list" title="Configuration Manager" class="btn btn-primary btn-small" role="button">View all</a>
+                    <a href="administrator/configurations/list" title="Configuration Manager" class="btn btn-primary btn-small">View all</a>
                 </div>
             </section>
         </div>
 
         <div class="col-md-3 col-sm-3 col-xs-6">
-            <section class="panel panel-default panel-stats">
+            <section class="panel panel-default panel-stats" role="widget" aria-labelleby="Number of Message Types">
                 <div class="panel-body">
-                    <span class="stat-number"><a href="?page=configurations" title="Total number of message types">${totalMessageTypes}</a></span>
+                    <span class="stat-number"><a href="administrator/library/list" title="Total number of message types">${totalMessageTypes}</a></span>
                     <h3>Message Types</h3>
-                    <a href="administrator/library/list" title="Message Type Library Manager" class="btn btn-primary btn-small" role="button">View all</a>
+                    <a href="administrator/library/list" title="Message Type Library Manager" class="btn btn-primary btn-small">View all</a>
                 </div>
             </section>
         </div>
 
         <div class="col-md-3 col-sm-3 col-xs-6">
-            <section class="panel panel-default panel-stats">
+            <section class="panel panel-default panel-stats" role="widget" aria-labelleby="Number of Files to Process">
                 <div class="panel-body">
                     <span class="stat-number"><a href="" title="" title="Total number of files to process">0</a></span>
                     <h3>Files to Process</h3>

@@ -20,10 +20,10 @@
                                 <form:radiobutton id="mainContact1" path="mainContact" value="1" /> Primary Contact
                             </label>
                             <label class="radio-inline" for="mainContact2">
-                                <form:radiobutton id="mainContact" path="mainContact" value="2" /> Secondary Contact
+                                <form:radiobutton id="mainContact2" path="mainContact" value="2" /> Secondary Contact
                             </label>
-                            <label class="radio-inline" for="mainContact2">
-                                <form:radiobutton id="mainContact" path="mainContact" value="0" /> Not a Main Contact
+                            <label class="radio-inline" for="mainContact3">
+                                <form:radiobutton id="mainContact3" path="mainContact" value="0" /> Not a Main Contact
                             </label>
                         </div>
                     </div>
@@ -97,7 +97,7 @@
                         </c:forEach>
                     </div>
                     <div class="form-group">
-                        <input type="button" id="submitButton" rel="${btnValue}" class="btn btn-primary" value="${btnValue}"/>
+                        <input type="button" id="submitButton" rel="${btnValue}" role="button" class="btn btn-primary" value="${btnValue}"/>
                     </div>
                 </div>
             </form:form>

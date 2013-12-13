@@ -9,7 +9,7 @@
     <div class="col-md-12">
         <c:choose>
             <c:when test="${not empty savedStatus}" >
-                <div class="alert alert-success">
+                <div class="alert alert-success" role="alert">
                     <strong>Success!</strong> 
                     <c:choose>
                         <c:when test="${savedStatus == 'updated'}">The provider has been successfully updated!</c:when>
@@ -17,7 +17,7 @@
                         </div>
             </c:when>
             <c:when test="${not empty param.msg}" >
-                <div class="alert alert-success">
+                <div class="alert alert-success" role="alert">
                     <strong>Success!</strong> 
                     <c:choose>
                         <c:when test="${param.msg == 'updated'}">The address has been successfully updated!</c:when>

@@ -24,15 +24,17 @@
             <div class="panel-body">
                 <div class="table-actions">
                     <div class="form form-inline pull-left">
-                        <form:form class="form form-inline" action="providers" method="post">
-                            <div class="form-group">
-                                <label class="sr-only" for="searchTerm">Search</label>
-                                <input type="text" name="searchTerm" id="searchTerm" value="${searchTerm}" class="form-control" id="search-providers" placeholder="Search"/>
-                            </div>
-                            <button id="searchProviderBtn" class="btn btn-primary btn-sm">
-                                <span class="glyphicon glyphicon-search"></span>
-                            </button>
-                        </form:form>
+                        <div role="search">
+                            <form:form class="form form-inline" action="providers" method="post">
+                                <div class="form-group">
+                                    <label class="sr-only" for="searchTerm">Search</label>
+                                    <input type="text" name="searchTerm" id="searchTerm" value="${searchTerm}" class="form-control" id="search-providers" placeholder="Search"/>
+                                </div>
+                                <button id="searchProviderBtn" class="btn btn-primary btn-sm">
+                                    <span class="glyphicon glyphicon-search"></span>
+                                </button>
+                            </form:form>
+                        </div>
                     </div>
                     <a href="provider.create"  class="btn btn-primary btn-sm pull-right" title="Create a new provider">
                         <span class="glyphicon glyphicon-plus"></span>

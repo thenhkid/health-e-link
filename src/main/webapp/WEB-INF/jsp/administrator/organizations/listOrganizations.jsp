@@ -3,7 +3,6 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="s" uri="http://www.springframework.org/tags" %>
 
-
 <div class="main clearfix full-width" role="main">
     <div class="col-md-12">
         <c:if test="${not empty savedStatus}" >
@@ -20,15 +19,17 @@
         <section class="panel panel-default">
             <div class="panel-body">
                 <div class="table-actions">
-                    <form:form class="form form-inline" action="/administrator/organizations/list" method="post" role="search">
-                        <div class="form-group">
-                            <label class="sr-only" for="searchTerm">Search</label>
-                            <input type="text" name="searchTerm" id="searchTerm" value="${searchTerm}" class="form-control" id="search-organizations" placeholder="Search"/>
-                        </div>
-                        <button id="searchOrgBtn" class="btn btn-primary btn-sm" title="Search Organizations" role="button">
-                            <span class="glyphicon glyphicon-search"></span>
-                        </button>
-                    </form:form>
+                    <div role="search">
+                        <form:form class="form form-inline" action="/administrator/organizations/list" method="post">
+                            <div class="form-group">
+                                <label class="sr-only" for="searchTerm">Search</label>
+                                <input type="text" name="searchTerm" id="searchTerm" value="${searchTerm}" class="form-control" id="search-organizations" placeholder="Search"/>
+                            </div>
+                            <button id="searchOrgBtn" class="btn btn-primary btn-sm" title="Search Organizations" role="button">
+                                <span class="glyphicon glyphicon-search"></span>
+                            </button>
+                        </form:form>
+                    </div>
                 </div>
 
                 <div class="form-container scrollable">

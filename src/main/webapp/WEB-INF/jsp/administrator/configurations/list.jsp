@@ -19,15 +19,17 @@
         <section class="panel panel-default">
             <div class="panel-body">
                 <div class="table-actions">
-                    <form:form class="form form-inline" action="/administrator/configurations/list" method="post">
-                        <div class="form-group">
-                            <label class="sr-only" for="searchTerm">Search</label>
-                            <input type="text" name="searchTerm" id="searchTerm" value="${searchTerm}" class="form-control" id="search-configurations" placeholder="Search"/>
-                        </div>
-                        <button id="searchConfigBtn" class="btn btn-primary btn-sm" title="Search Configurations">
-                            <span class="glyphicon glyphicon-search"></span>
-                        </button>
-                    </form:form>
+                    <div role="search">
+                        <form:form class="form form-inline" action="/administrator/configurations/list" method="post">
+                            <div class="form-group">
+                                <label class="sr-only" for="searchTerm">Search</label>
+                                <input type="text" name="searchTerm" id="searchTerm" value="${searchTerm}" class="form-control" id="search-configurations" placeholder="Search"/>
+                            </div>
+                            <button id="searchConfigBtn" class="btn btn-primary btn-sm" title="Search Configurations">
+                                <span class="glyphicon glyphicon-search"></span>
+                            </button>
+                        </form:form>
+                    </div>
                 </div>
 
                 <div class="form-container scrollable">

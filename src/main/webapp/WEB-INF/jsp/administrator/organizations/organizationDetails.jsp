@@ -7,7 +7,7 @@
     <div class="col-md-12">
 
         <c:if test="${not empty savedStatus}" >
-            <div class="alert alert-success">
+            <div class="alert alert-success" role="alert">
                 <strong>Success!</strong> 
                 <c:choose><c:when test="${savedStatus == 'updated'}">The organization has been successfully updated!</c:when><c:otherwise>The organization has been successfully created!</c:otherwise></c:choose>
                     </div>
@@ -20,7 +20,6 @@
             <form:hidden path="dateCreated" />
 
             <section class="panel panel-default">
-
                 <div class="panel-heading">
                     <h3 class="panel-title">Details</h3>
                 </div>
@@ -114,26 +113,27 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true" role="button">&times;</button>
                 <h3 class="panel-title">Organization Delete</h3>
             </div>
             <div class="modal-body">
                 <p>
                     Are you <strong>ABSOLUTELY</strong> sure?
-                    <br/><br />
+                </p>
+                <p>
                     This action <strong>CANNOT</strong> be undone. This will delete all associated configurations, system users, providers and uploaded brochures.
                     An alternative would be to make the organization inactive. This will set all system users and configurations to an inactive state.
-                    <br/><br />
-                    Please type in your username to confirm this deletion.
                 </p>
                 <form id="confirmOrgDelete" method="post" role="form" action="delete">
                     <div id="confirmDiv" class="form-group" >
                         <input type="hidden" name="id" value="${id}" />
                         <input type="hidden" id="realUsername" name="realUsername" value="${pageContext.request.userPrincipal.name}" />
-                        <input type="text" id="username" name="username" class="form-control" maxLength="15"  />
-                        <span id="confirmMsg" class="control-label"></span>
+                        <div class="form-group">
+                            <label for="username">Please type in your username to confirm this deletion:</label>
+                            <input type="text" id="username" name="username" class="form-control" maxLength="15"  />
+                            <span id="confirmMsg" class="control-label"></span>
+                        </div>
                     </div>
-                    <br/>
                     <div class="form-group">
                         <input type="button" disabled id="submitButton" class="btn btn-primary" value="I understand the consequences, delete this organization" />
                     </div>

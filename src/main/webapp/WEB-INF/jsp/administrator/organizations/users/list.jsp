@@ -20,15 +20,17 @@
             <div class="panel-body">
                 <div class="table-actions">
                     <div class="form form-inline pull-left">
-                        <form:form class="form form-inline" action="users" method="post">
-                            <div class="form-group">
-                                <label class="sr-only" for="searchTerm">Search</label>
-                                <input type="text" name="searchTerm" id="searchTerm" value="${searchTerm}" class="form-control" id="search-users" placeholder="Search"/>
-                            </div>
-                            <button id="searchOrgBtn" class="btn btn-primary btn-sm">
-                                <span class="glyphicon glyphicon-search"></span>
-                            </button>
-                        </form:form>
+                        <div role="search">
+                            <form:form class="form form-inline" action="users" method="post">
+                                <div class="form-group">
+                                    <label class="sr-only" for="searchTerm">Search</label>
+                                    <input type="text" name="searchTerm" id="searchTerm" value="${searchTerm}" class="form-control" id="search-users" placeholder="Search"/>
+                                </div>
+                                <button id="searchOrgBtn" class="btn btn-primary btn-sm">
+                                    <span class="glyphicon glyphicon-search"></span>
+                                </button>
+                            </form:form>
+                        </div>
                     </div>
                     <a href="#systemUsersModal" id="createNewUser" data-toggle="modal" class="btn btn-primary btn-sm pull-right" title="Create a new system user">
                         <span class="glyphicon glyphicon-plus"></span>
@@ -64,7 +66,7 @@
                                             <td class="actions-col">
                                                 <a href="#systemUsersModal" data-toggle="modal" rel="${user.firstName}${user.lastName}?i=${user.id}" class="btn btn-link userEdit" title="Edit this user">
                                                     <span class="glyphicon glyphicon-edit"></span>
-                                                    Edit	
+                                                    Edit
                                                 </a>
                                             </td>
                                         </tr>
@@ -76,7 +78,7 @@
                             </c:choose>
                         </tbody>
                     </table>
-                    <ul class="pagination pull-right" role="navigation" aria-labelledby="Paging ">
+                    <ul class="pagination pull-right" role="navigation" aria-labelledby="Paging">
                         <c:if test="${currentPage > 1}"><li><a href="?page=${currentPage-1}">&laquo;</a></li></c:if>
                             <c:forEach var="i" begin="1" end="${totalPages}">
                             <li><a href="?page=${i}">${i}</a></li>
@@ -86,8 +88,8 @@
                     </div>
                 </div>
             </section>
-        </div>		
-    </div>	
+        </div>
+    </div>
     <p rel="${currentPage}" id="currentPageHolder" style="display:none"></p>
 
 <!-- Providers modal -->
