@@ -202,5 +202,49 @@ INSERT INTO `universalTranslator`.`ref_transactionStatus` (`status`) VALUES ('Re
 INSERT INTO `universalTranslator`.`ref_transactionStatus` (`status`) VALUES ('Downloaded');
 INSERT INTO `universalTranslator`.`ref_transactionStatus` (`status`) VALUES ('Rejected');
   
+/** Grace 12.12.13 after 10:31PM **/
+ALTER TABLE `universalTranslator`.`message_PatientDetails` 
+RENAME TO  `universalTranslator`.`message_VisitInfo` ;
 
+ALTER TABLE `universalTranslator`.`message_VisitInfo` 
+DROP COLUMN `patientOccupation`,
+DROP COLUMN `additonalContactNumber`,
+DROP COLUMN `guardianName`;
+
+ALTER TABLE `universalTranslator`.`message_Patients` 
+ADD COLUMN `additonalContactNumber` VARCHAR(45) NULL AFTER `email`,
+ADD COLUMN `occupation` VARCHAR(45) NULL AFTER `url`,
+ADD COLUMN `guardianName` VARCHAR(45) NULL COMMENT 'name of guardian - Jane Doe, John Smith' AFTER `occupation`;
+
+ALTER TABLE `universalTranslator`.`message_HealthcareTeams` 
+ADD INDEX `providerIdFKHCT_idx` (`utProviderId` ASC);
+ALTER TABLE `universalTranslator`.`message_HealthcareTeams` 
+ADD CONSTRAINT `providerIdFKHCT`
+  FOREIGN KEY (`utProviderId`)
+  REFERENCES `universalTranslator`.`info_providers` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+CREATE TABLE `message_patientIds` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `transactionInId` int(11) NOT NULL,
+  `idNum` varchar(45) NOT NULL,
+  `type` varchar(45) DEFAULT NULL,
+  `issuedBy` varchar(255) DEFAULT NULL,
+  `dateCreated` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idTransFK_idx` (`transactionInId`),
+  CONSTRAINT `idTransFK` FOREIGN KEY (`transactionInId`) REFERENCES `transactionIn` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+ALTER TABLE `universalTranslator`.`transactionTarget` 
+ADD INDEX `tTargetProFK_idx` (`providerId` ASC);
+ALTER TABLE `universalTranslator`.`transactionTarget` 
+ADD CONSTRAINT `tTargetProFK`
+  FOREIGN KEY (`providerId`)
+  REFERENCES `universalTranslator`.`info_providers` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+DROP TABLE `universalTranslator`.`lu_PhoneTypes`;
   
