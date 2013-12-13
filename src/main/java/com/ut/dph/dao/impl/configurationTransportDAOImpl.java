@@ -226,6 +226,7 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
                 .add(Restrictions.eq("configId", configId))
                 .add(Restrictions.eq("transportDetailId", transportDetailId))
                 .add(Restrictions.eq("bucketNo", bucket))
+                .add(Restrictions.eq("useField", true))
                 .addOrder(Order.asc("bucketDspPos"));
 
         return criteria.list();

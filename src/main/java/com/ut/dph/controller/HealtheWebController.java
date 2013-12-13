@@ -151,9 +151,11 @@ public class HealtheWebController {
         /* Get a list of form fields */
         configurationTransport transportDetails = configurationTransportManager.getTransportDetailsByTransportMethod(configId, 2);
         List<configurationFormFields> senderInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId,transportDetails.getId(),1);
-        List<configurationFormFields> targetInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId,transportDetails.getId(),2);
-        List<configurationFormFields> patientInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId,transportDetails.getId(),3);
-        List<configurationFormFields> detailFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId,transportDetails.getId(),4);
+        List<configurationFormFields> senderProviderFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId,transportDetails.getId(),2);
+        List<configurationFormFields> targetInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId,transportDetails.getId(),3);
+        List<configurationFormFields> targetProviderFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId,transportDetails.getId(),4);
+        List<configurationFormFields> patientInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId,transportDetails.getId(),5);
+        List<configurationFormFields> detailFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId,transportDetails.getId(),6);
         
         /* Create a new transaction */
         Transaction transaction = new Transaction();
@@ -170,7 +172,7 @@ public class HealtheWebController {
         /* Create new transaction Records */
         ArrayList transactionFields = new ArrayList();
         
-         /* Set all the transaction SOURCE fields */
+        /* Set all the transaction SOURCE ORG fields */
         List<transactionRecords> fromFields = new ArrayList<transactionRecords>();
         
         for(configurationFormFields fields : senderInfoFormFields) {
@@ -192,6 +194,26 @@ public class HealtheWebController {
         }
         transactionFields.add(fromFields);
         
+        /* Set all the transaction SOURCE PROVIDER fields */
+        List<transactionRecords> fromProviderFields = new ArrayList<transactionRecords>();
+        
+        for(configurationFormFields fields : senderProviderFormFields) {
+            transactionRecords field = new transactionRecords();
+            field.setfieldNo(fields.getFieldNo());
+            field.setrequired(fields.getRequired());
+            field.setsaveToTable(fields.getsaveToTableName());
+            field.setsaveToTableCol(fields.getsaveToTableCol());
+            field.setfieldLabel(fields.getFieldLabel());
+            
+            /* Get the validation */
+            if(fields.getValidationType() > 1) {
+                field.setvalidation(messagetypemanager.getValidationById(fields.getValidationType()).toString());
+            }
+            
+            fromProviderFields.add(field);
+        }
+        transactionFields.add(fromProviderFields);
+        
         
         /* Set all the transaction TARGET fields */
         List<transactionRecords> toFields = new ArrayList<transactionRecords>();
@@ -212,6 +234,25 @@ public class HealtheWebController {
             toFields.add(field);
         }
         transactionFields.add(toFields);
+        
+        /* Set all the transaction TARGET PROVIDER fields */
+        List<transactionRecords> toProviderFields = new ArrayList<transactionRecords>();
+        for(configurationFormFields fields : targetProviderFormFields) {
+            transactionRecords field = new transactionRecords();
+            field.setfieldNo(fields.getFieldNo());
+            field.setrequired(fields.getRequired());
+            field.setsaveToTable(fields.getsaveToTableName());
+            field.setsaveToTableCol(fields.getsaveToTableCol());
+            field.setfieldLabel(fields.getFieldLabel());
+            
+            /* Get the validation */
+            if(fields.getValidationType() > 1) {
+                field.setvalidation(messagetypemanager.getValidationById(fields.getValidationType()).toString());
+            }
+            
+            toProviderFields.add(field);
+        }
+        transactionFields.add(toProviderFields);
         
         /* Set all the transaction PATIENT fields */
         List<transactionRecords> patientFields = new ArrayList<transactionRecords>();
