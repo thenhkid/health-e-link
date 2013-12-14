@@ -264,3 +264,9 @@ ADD COLUMN `autoPopulateTableCol` VARCHAR(255) NULL DEFAULT NULL AFTER `autoPopu
 
 ALTER TABLE `universalTranslator`.`rel_configurationDataTranslations` 
 DROP FOREIGN KEY `dtmacroId`;
+
+/** 12.13.13**/
+ALTER TABLE `universalTranslator`.`message_VisitInfo` 
+DROP COLUMN `messageDate`,
+ADD COLUMN `visitDate` DATETIME NULL AFTER `transactionInId`;
+
