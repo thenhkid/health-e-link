@@ -270,3 +270,15 @@ ALTER TABLE `universalTranslator`.`message_VisitInfo`
 DROP COLUMN `messageDate`,
 ADD COLUMN `visitDate` DATETIME NULL AFTER `transactionInId`;
 
+/**12.15.2013 **/
+ALTER TABLE `universalTranslator`.`configurationFormFields` 
+DROP FOREIGN KEY `fkValidationType`;
+ALTER TABLE `universalTranslator`.`configurationFormFields` 
+CHANGE COLUMN `validationType` `validationType` INT(11) NULL DEFAULT 1 ;
+ALTER TABLE `universalTranslator`.`configurationFormFields` 
+ADD CONSTRAINT `fkValidationType`
+  FOREIGN KEY (`validationType`)
+  REFERENCES `universalTranslator`.`ref_validationTypes` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
