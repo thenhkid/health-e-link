@@ -74,31 +74,34 @@
                 </div>
                 <div class="panel-body" >
                     <h4>Latest Configurations:</h4>
-                    <c:if test="${not empty latestConfigs}"> 
-                        <table class="table table-striped table-hover table-default">
-                            <tbody>
-                                <c:forEach var="config" items="${latestConfigs}">
-                                    <tr>
-                                        <td>
-                                            <a href="administrator/configurations/details?i=${config.id}" title="Edit this Configuration"><strong>${config.orgName}</strong></a>
-                                            <br/> <strong>Configuration Type:</strong> <c:choose><c:when test="${config.type == 1}">Source Configuration</c:when><c:otherwise>Target Configuration</c:otherwise></c:choose>
-                                            <br/> <strong>Message Type:</strong>  ${config.messageTypeName}
-                                            <br/> <strong>Status:</strong>  <c:choose><c:when test="${config.status == true}">active</c:when><c:otherwise>inactive</c:otherwise></c:choose>
-                                        </td>
-                                        <td>
-                                            <fmt:formatDate value="${config.dateCreated}" type="date" pattern="M/dd/yyyy" />
-                                        </td>
-                                        <td class="actions-col">
-                                            <a href="administrator/configurations/details?i=${config.id}" class="btn btn-link" title="Edit this Configuration" role="button">
-                                                <span class="glyphicon glyphicon-edit"></span>
-                                                Edit
-                                            </a>
-                                        </td>
-                                    </tr>
-                                </c:forEach>
-                            </tbody>
-                        </table>
-                    </c:if>
+                    <c:choose>
+                        <c:when test="${not empty latestConfigs}"> 
+                            <table class="table table-striped table-hover table-default">
+                                <tbody>
+                                    <c:forEach var="config" items="${latestConfigs}">
+                                        <tr>
+                                            <td>
+                                                <a href="administrator/configurations/details?i=${config.id}" title="Edit this Configuration"><strong>${config.orgName}</strong></a>
+                                                <br/> <strong>Configuration Type:</strong> <c:choose><c:when test="${config.type == 1}">Source Configuration</c:when><c:otherwise>Target Configuration</c:otherwise></c:choose>
+                                                <br/> <strong>Message Type:</strong>  ${config.messageTypeName}
+                                                <br/> <strong>Status:</strong>  <c:choose><c:when test="${config.status == true}">active</c:when><c:otherwise>inactive</c:otherwise></c:choose>
+                                            </td>
+                                            <td>
+                                                <fmt:formatDate value="${config.dateCreated}" type="date" pattern="M/dd/yyyy" />
+                                            </td>
+                                            <td class="actions-col">
+                                                <a href="administrator/configurations/details?i=${config.id}" class="btn btn-link" title="Edit this Configuration" role="button">
+                                                    <span class="glyphicon glyphicon-edit"></span>
+                                                    Edit
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </c:forEach>
+                                </tbody>
+                            </table>
+                        </c:when>
+                        <c:otherwise><tr><td colspan="3" class="center-text">There are currently no configurations set up.</td></tr></c:otherwise>
+                    </c:choose>
                 </div>
             </section>
         </div>
@@ -110,7 +113,8 @@
                 </div>
                 <div class="panel-body" >
                     <h4>Latest Organizations:</h4>
-                    <c:if test="${not empty latestOrgs}">
+                    <c:choose>
+                        <c:when test="${not empty latestOrgs}">
                         <table class="table table-striped table-hover table-default">
                             <tbody>
                                 <c:forEach var="org" items="${latestOrgs}">
@@ -145,7 +149,9 @@
                                 </c:forEach>
                             </tbody>
                         </table>
-                    </c:if>
+                        </c:when>
+                        <c:otherwise><tr><td colspan="3" class="center-text">There are currently no organizations set up.</td></tr></c:otherwise>
+                    </c:choose>
                 </div>
             </section>
         </div>
@@ -159,7 +165,8 @@
                 </div>
                 <div class="panel-body" >
                     <h4>Latest Message Types:</h4>
-                    <c:if test="${not empty latestMessageTypes}">
+                    <c:choose>
+                        <c:when test="${not empty latestMessageTypes}">
                         <table class="table table-striped table-hover table-default">
                             <tbody>
                                 <c:forEach var="messageType" items="${latestMessageTypes}">
@@ -181,7 +188,9 @@
                                 </c:forEach>
                             </tbody>
                         </table>
-                    </c:if>
+                        </c:when>
+                        <c:otherwise><tr><td colspan="3" class="center-text">There are currently no message types set up.</td></tr></c:otherwise>
+                    </c:choose>
                 </div>
             </section>
         </div>

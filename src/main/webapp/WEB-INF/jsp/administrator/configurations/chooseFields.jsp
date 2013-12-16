@@ -125,6 +125,10 @@
                                                                     <input type="hidden" name="fields[${field.index}].bucketNo" value="${mappings.bucketNo}" />
                                                                     <input type="hidden" name="fields[${field.index}].messageTypeFieldId" value="${mappings.messageTypeFieldId}" />
                                                                     <input type="checkbox" class="useFields" name="fields[${field.index}].useField" value="true" <c:if test="${mappings.useField == true}">checked="checked"</c:if> />
+                                                                    <input type="hidden" name="fields[${field.index}].saveToTableName" value="${mappings.saveToTableName}" />
+                                                                    <input type="hidden" name="fields[${field.index}].saveToTableCol" value="${mappings.saveToTableCol}" />
+                                                                    <input type="hidden" name="fields[${field.index}].autoPopulateTableName" value="${mappings.autoPopulateTableName}" />
+                                                                    <input type="hidden" name="fields[${field.index}].autoPopulateTableCol" value="${mappings.autoPopulateTableCol}" />
                                                                 </td>
                                                                 <td >
                                                                     <c:if test="${mappings.bucketNo == 1}">

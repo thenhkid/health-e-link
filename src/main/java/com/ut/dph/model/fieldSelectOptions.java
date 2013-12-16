@@ -12,14 +12,14 @@ package com.ut.dph.model;
  */
 public class fieldSelectOptions {
     
-    private int optionValue;
+    private String optionValue;
     private String optionDesc = null;
     
-    public int getoptionValue() {
+    public String getoptionValue() {
         return optionValue;
     }
 
-    public void setoptionValue(int optionValue) {
+    public void setoptionValue(String optionValue) {
         this.optionValue = optionValue;
     }
     

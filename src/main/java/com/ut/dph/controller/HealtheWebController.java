@@ -12,12 +12,14 @@ import com.ut.dph.model.Transaction;
 import com.ut.dph.model.configuration;
 import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.configurationTransport;
+import com.ut.dph.model.fieldSelectOptions;
 import com.ut.dph.model.messageType;
 import com.ut.dph.model.transactionRecords;
 import com.ut.dph.service.configurationManager;
 import com.ut.dph.service.configurationTransportManager;
 import com.ut.dph.service.messageTypeManager;
 import com.ut.dph.service.organizationManager;
+import com.ut.dph.service.transactionInManager;
 import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
@@ -49,6 +51,10 @@ public class HealtheWebController {
     
     @Autowired
     private configurationTransportManager configurationTransportManager;
+    
+    @Autowired
+    private transactionInManager transactionInManager;
+    
     
     /**
      * The '/inbox' request will serve up the Health-e-Web (ERG) inbox.
@@ -174,6 +180,8 @@ public class HealtheWebController {
         
         /* Set all the transaction SOURCE ORG fields */
         List<transactionRecords> fromFields = new ArrayList<transactionRecords>();
+        String tableName = null;
+        String tableCol = null;
         
         for(configurationFormFields fields : senderInfoFormFields) {
             transactionRecords field = new transactionRecords();
@@ -189,6 +197,12 @@ public class HealtheWebController {
             }
             
             /* Get the pre-populated values */
+            tableName = fields.getautoPopulateTableName();
+            tableCol = fields.getautoPopulateTableCol();
+            
+            if(!tableName.isEmpty() && !tableName.isEmpty()) {
+                field.setfieldValue(transactionInManager.getFieldValue(tableName, tableCol, sendingOrgDetails.getId()));
+            }
             
             fromFields.add(field);
         }
@@ -208,6 +222,14 @@ public class HealtheWebController {
             /* Get the validation */
             if(fields.getValidationType() > 1) {
                 field.setvalidation(messagetypemanager.getValidationById(fields.getValidationType()).toString());
+            }
+            
+            /* Get the pre-populated values */
+            tableName = fields.getautoPopulateTableName();
+            tableCol = fields.getautoPopulateTableCol();
+            
+            if(!tableName.isEmpty() && !tableName.isEmpty()) {
+                field.setfieldValue(transactionInManager.getFieldValue(tableName, tableCol, sendingOrgDetails.getId()));
             }
             
             fromProviderFields.add(field);
@@ -231,6 +253,14 @@ public class HealtheWebController {
             }
             
             /* Get the pre-populated values */
+            tableName = fields.getautoPopulateTableName();
+            tableCol = fields.getautoPopulateTableCol();
+            
+            if(!tableName.isEmpty() && !tableName.isEmpty()) {
+                field.setfieldValue(transactionInManager.getFieldValue(tableName, tableCol, receivingOrgDetails.getId()));
+            }
+            
+            /* Get the pre-populated values */
             toFields.add(field);
         }
         transactionFields.add(toFields);
@@ -248,6 +278,14 @@ public class HealtheWebController {
             /* Get the validation */
             if(fields.getValidationType() > 1) {
                 field.setvalidation(messagetypemanager.getValidationById(fields.getValidationType()).toString());
+            }
+            
+            /* Get the pre-populated values */
+            tableName = fields.getautoPopulateTableName();
+            tableCol = fields.getautoPopulateTableCol();
+            
+            if(!tableName.isEmpty() && !tableName.isEmpty()) {
+                field.setfieldValue(transactionInManager.getFieldValue(tableName, tableCol, receivingOrgDetails.getId()));
             }
             
             toProviderFields.add(field);
@@ -269,6 +307,10 @@ public class HealtheWebController {
                 field.setvalidation(messagetypemanager.getValidationById(fields.getValidationType()).toString());
             }
             
+            /* See if any fields have crosswalks associated to it */
+            List<fieldSelectOptions> fieldSelectOptions = transactionInManager.getFieldSelectOptions(fields.getId(),configId,2);
+            field.setfieldSelectOptions(fieldSelectOptions);
+            
             patientFields.add(field);
         }
         transactionFields.add(patientFields);
@@ -287,6 +329,10 @@ public class HealtheWebController {
             if(fields.getValidationType() > 1) {
                 field.setvalidation(messagetypemanager.getValidationById(fields.getValidationType()).toString());
             }
+            
+            /* See if any fields have crosswalks associated to it */
+            List<fieldSelectOptions> fieldSelectOptions = transactionInManager.getFieldSelectOptions(fields.getId(),configId,2);
+            field.setfieldSelectOptions(fieldSelectOptions);
             
             detailFields.add(field);
         }

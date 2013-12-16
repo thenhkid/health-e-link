@@ -61,6 +61,12 @@ public class configurationFormFields {
     
     @Column(name = "SAVETOTABLECOL", nullable = false)
     private String saveToTableCol;
+    
+    @Column(name = "AUTOPOPULATETABLENAME", nullable = false)
+    private String autoPopulateTableName;
+    
+    @Column(name = "AUTOPOPULATETABLECOL", nullable = false)
+    private String autoPopulateTableCol;
 
     public int getId() {
         return id;
@@ -166,12 +172,36 @@ public class configurationFormFields {
         this.fieldValue = fieldValue;
     }
     
+    public void setsaveToTableName(String saveToTableName) {
+        this.saveToTableName = saveToTableName;
+    }
+    
     public String getsaveToTableName() {
         return saveToTableName;
     }
     
+    public void setsaveToTableCol(String saveToTableCol) {
+        this.saveToTableCol = saveToTableCol;
+    }
+    
     public String getsaveToTableCol() {
         return saveToTableCol;
+    }
+    
+    public void setautoPopulateTableName(String autoPopulateTableName) {
+        this.autoPopulateTableName = autoPopulateTableName;
+    }
+    
+    public String getautoPopulateTableName() {
+        return autoPopulateTableName;
+    }
+    
+    public void setautoPopulateTableCol(String autoPopulateTableCol) {
+        this.autoPopulateTableCol = autoPopulateTableCol;
+    }
+    
+    public String getautoPopulateTableCol() {
+        return autoPopulateTableCol;
     }
 
 }
