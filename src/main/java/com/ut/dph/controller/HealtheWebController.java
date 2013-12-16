@@ -355,7 +355,13 @@ public class HealtheWebController {
     @RequestMapping(value= "/submitMessage", method = RequestMethod.POST)
     public void submitMessage(@ModelAttribute(value = "transactionDetails") Transaction transactionDetails, HttpSession session) {
         
+        /* Get the 6 Bucket (Source Org, Source Provider, Target Org, Target Provider, Patient, Details) fields */
+        List<transactionRecords> sourceOrgFields = transactionDetails.getsourceOrgFields();
+        List<transactionRecords> sourceProviderFields = transactionDetails.getsourceProviderFields();
+        List<transactionRecords> targetOrgFields = transactionDetails.gettargetOrgFields();
+        List<transactionRecords> targetProviderFields = transactionDetails.gettargetProviderFields();
         List<transactionRecords> patientFields = transactionDetails.getpatientFields();
+        List<transactionRecords> detailFields = transactionDetails.getdetailFields();
         
         for(transactionRecords field : patientFields) {
             System.out.println(field.getfieldNo() + "-" + field.getfieldValue());

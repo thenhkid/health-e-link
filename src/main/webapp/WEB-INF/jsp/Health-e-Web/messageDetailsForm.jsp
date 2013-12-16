@@ -91,7 +91,7 @@
                                                         </div>
                                                     </c:when>
                                                     <c:when test="${patientInfo.fieldSelectOptions.size() > 0}">
-                                                        <select class="form-control <c:if test="${patientInfo.required == true}"> required</c:if>">
+                                                        <select id="${patientInfo.fieldNo}" name="patientFields[${pfield.index}].fieldValue" class="form-control <c:if test="${patientInfo.required == true}"> required</c:if>">
                                                             <option value="">-Choose-</option>
                                                             <c:forEach items="${patientInfo.fieldSelectOptions}" var="options">
                                                                 <option value="${options.optionValue}">${options.optionDesc}</option>
