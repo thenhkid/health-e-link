@@ -27,6 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -175,13 +176,10 @@ public class HealtheWebController {
         transaction.settransactionStatusId(0);
         transaction.settargetOrgId(targetOrg);
         
-        /* Create new transaction Records */
-        ArrayList transactionFields = new ArrayList();
-        
-        /* Set all the transaction SOURCE ORG fields */
-        List<transactionRecords> fromFields = new ArrayList<transactionRecords>();
-        String tableName = null;
-        String tableCol = null;
+       /* Set all the transaction SOURCE ORG fields */
+       List<transactionRecords> fromFields = new ArrayList<transactionRecords>();
+       String tableName = null;
+       String tableCol = null;
         
         for(configurationFormFields fields : senderInfoFormFields) {
             transactionRecords field = new transactionRecords();
@@ -206,7 +204,7 @@ public class HealtheWebController {
             
             fromFields.add(field);
         }
-        transactionFields.add(fromFields);
+        transaction.setsourceOrgFields(fromFields);
         
         /* Set all the transaction SOURCE PROVIDER fields */
         List<transactionRecords> fromProviderFields = new ArrayList<transactionRecords>();
@@ -234,7 +232,7 @@ public class HealtheWebController {
             
             fromProviderFields.add(field);
         }
-        transactionFields.add(fromProviderFields);
+       transaction.setsourceProviderFields(fromProviderFields);
         
         
         /* Set all the transaction TARGET fields */
@@ -263,7 +261,7 @@ public class HealtheWebController {
             /* Get the pre-populated values */
             toFields.add(field);
         }
-        transactionFields.add(toFields);
+        transaction.settargetOrgFields(toFields);
         
         /* Set all the transaction TARGET PROVIDER fields */
         List<transactionRecords> toProviderFields = new ArrayList<transactionRecords>();
@@ -290,7 +288,7 @@ public class HealtheWebController {
             
             toProviderFields.add(field);
         }
-        transactionFields.add(toProviderFields);
+        transaction.settargetProviderFields(toProviderFields);
         
         /* Set all the transaction PATIENT fields */
         List<transactionRecords> patientFields = new ArrayList<transactionRecords>();
@@ -301,6 +299,7 @@ public class HealtheWebController {
             field.setsaveToTable(fields.getsaveToTableName());
             field.setsaveToTableCol(fields.getsaveToTableCol());
             field.setfieldLabel(fields.getFieldLabel());
+            field.setfieldValue(null);
             
             /* Get the validation */
             if(fields.getValidationType() > 1) {
@@ -313,7 +312,7 @@ public class HealtheWebController {
             
             patientFields.add(field);
         }
-        transactionFields.add(patientFields);
+        transaction.setpatientFields(patientFields);
         
         /* Set all the transaction DETAIL fields */
         List<transactionRecords> detailFields = new ArrayList<transactionRecords>();
@@ -324,6 +323,7 @@ public class HealtheWebController {
             field.setsaveToTable(fields.getsaveToTableName());
             field.setsaveToTableCol(fields.getsaveToTableCol());
             field.setfieldLabel(fields.getFieldLabel());
+            field.setfieldValue(null);
             
             /* Get the validation */
             if(fields.getValidationType() > 1) {
@@ -336,16 +336,33 @@ public class HealtheWebController {
             
             detailFields.add(field);
         }
-        transactionFields.add(detailFields);
-        
-        
-        /* Save the transaction Fields */
-        transaction.settransactionRecords(transactionFields);
+        transaction.setdetailFields(detailFields);
         
         mav.addObject(transaction);
         
         
         return mav;
+    }
+    
+    /**
+     * The '/submitMessage' POST request submit the new message
+     * 
+     * @param configId  The selected configuration
+     * @param targetOrg The selected target organization to receive the new message
+     * 
+     * @return this request will return the messageDetailsForm
+     */
+    @RequestMapping(value= "/submitMessage", method = RequestMethod.POST)
+    public void submitMessage(@ModelAttribute(value = "transactionDetails") Transaction transactionDetails, HttpSession session) {
+        
+        List<transactionRecords> patientFields = transactionDetails.getpatientFields();
+        
+        for(transactionRecords field : patientFields) {
+            System.out.println(field.getfieldNo() + "-" + field.getfieldValue());
+        }
+        
+        
+    
     }
     
 }

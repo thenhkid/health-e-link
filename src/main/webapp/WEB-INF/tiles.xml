@@ -351,6 +351,7 @@
     <definition name="/Health-e-Web/messageDetailsForm" extends="base.definition.frontEnd">
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Health-e-Web&amp;page=create" />
         <put-attribute name="body" value="/WEB-INF/jsp/Health-e-Web/messageDetailsForm.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/front-end/Health-e-Web/messageForm.js" />
     </definition>
     
     <!-- Health-e-Connect (Exchange) Pages -->

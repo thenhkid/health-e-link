@@ -6,7 +6,6 @@
 
 package com.ut.dph.model;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -25,7 +24,13 @@ public class Transaction {
    private int transactionStatusId;
    private int targetOrgId;
    
-   private ArrayList transactionRecords = null;
+   private List<transactionRecords> sourceOrgFields = null;
+   private List<transactionRecords> sourceProviderFields = null;
+   private List<transactionRecords> targetOrgFields = null;
+   private List<transactionRecords> targetProviderFields = null;
+   private List<transactionRecords> patientFields = null;
+   private List<transactionRecords> detailFields = null;
+   
    
    public int getorgId() {
        return orgId;
@@ -90,14 +95,7 @@ public class Transaction {
    public void settransactionStatusId(int transactionStatusId) {
        this.transactionStatusId = transactionStatusId;
    }
-   
-   public ArrayList gettransactionRecords() {
-       return transactionRecords;
-   }
-   
-   public void settransactionRecords(ArrayList transactionRecords) {
-       this.transactionRecords = transactionRecords;
-   }
+  
    
    public int gettargetOrgId() {
        return targetOrgId;
@@ -106,4 +104,53 @@ public class Transaction {
    public void settargetOrgId(int targetOrgId) {
        this.targetOrgId = targetOrgId;
    }
+   
+   public List<transactionRecords> getsourceOrgFields() {
+       return sourceOrgFields;
+   }
+   
+   public void setsourceOrgFields(List<transactionRecords> sourceOrgFields) {
+       this.sourceOrgFields = sourceOrgFields;
+   }
+   
+   public List<transactionRecords> getsourceProviderFields() {
+       return sourceProviderFields;
+   }
+   
+   public void setsourceProviderFields(List<transactionRecords> sourceProviderFields) {
+       this.sourceProviderFields = sourceProviderFields;
+   }
+   
+   public List<transactionRecords> gettargetOrgFields() {
+       return targetOrgFields;
+   }
+   
+   public void settargetOrgFields(List<transactionRecords> targetOrgFields) {
+       this.targetOrgFields = targetOrgFields;
+   }
+   
+   public List<transactionRecords> gettargetProviderFields() {
+       return targetProviderFields;
+   }
+   
+   public void settargetProviderFields(List<transactionRecords> targetProviderFields) {
+       this.targetProviderFields = targetProviderFields;
+   }
+   
+   public List<transactionRecords> getpatientFields() {
+       return patientFields;
+   }
+   
+   public void setpatientFields(List<transactionRecords> patientFields) {
+       this.patientFields = patientFields;
+   }
+   
+   public List<transactionRecords> getdetailFields() {
+       return detailFields;
+   }
+   
+   public void setdetailFields(List<transactionRecords> detailFields) {
+       this.detailFields = detailFields;
+   }
+   
 }

@@ -5,6 +5,7 @@
 --%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <jsp:useBean id="date" class="java.util.Date" />
 <fmt:formatDate value="${date}" pattern="yyyy" var="currentYear" />
 
@@ -19,8 +20,11 @@
             </ol>
 
             <h2 class="form-title">Create New Message</h2>
-            <form role="form" class="form">
-
+            <form:form id="messageForm" action="/Health-e-Web/submitMessage" modelAttribute="transaction" role="form" class="form" method="post">
+                <c:forEach items="${transaction.sourceOrgFields}" varStatus="i">
+                    <form:hidden path="sourceOrgFields[${i.index}].fieldValue" />
+                    <form:hidden path="sourceOrgFields[${i.index}].fieldNo" />
+                </c:forEach>
                 <div class="panel-group form-accordion" id="accordion">
 
                     <div class="panel panel-default panel-form">
@@ -30,36 +34,37 @@
                                     <div class="col-md-6">
                                         <h4 class="form-section-heading">Originating Organization: </h4>
                                         <dl class="vcard">
-                                            <dd class="fn">${transaction.transactionRecords[0][0].fieldValue}</dd>
+                                            <dd class="fn">${transaction.sourceOrgFields[0].fieldValue}</dd>
                                             <dd class="adr">
-                                                <span class="street-address">${transaction.transactionRecords[0][1].fieldValue}</span><br/>
-                                                <c:if test="${not empty transaction.transactionRecords[0][2].fieldValue}"><span class="street-address">${transaction.transactionRecords[0][2].fieldValue}</span><br/></c:if>
-                                                <span class="region">${transaction.transactionRecords[0][3].fieldValue}&nbsp;${transaction.transactionRecords[0][4].fieldValue}</span>, <span class="postal-code">${transaction.transactionRecords[0][5].fieldValue}</span>
+                                                <span class="street-address">${transaction.sourceOrgFields[1].fieldValue}</span><br/>
+                                                <c:if test="${not empty transaction.sourceOrgFields[2].fieldValue}"><span class="street-address">${transaction.sourceOrgFields[2].fieldValue}</span><br/></c:if>
+                                                <span class="region">${transaction.sourceOrgFields[3].fieldValue}&nbsp;${transaction.sourceOrgFields[4].fieldValue}</span>, <span class="postal-code">${transaction.sourceOrgFields[5].fieldValue}</span>
                                             </dd>
-                                            <c:if test="${not empty transaction.transactionRecords[0][6].fieldValue}"><dd>phone: <span class="tel">${transaction.transactionRecords[0][6].fieldValue}</span></dd></c:if>
-                                            <c:if test="${not empty transaction.transactionRecords[0][7].fieldValue}"><dd>fax: <span class="tel">${transaction.transactionRecords[0][7].fieldValue}</span></dd></c:if>
-                                        </dl>
+                                            <c:if test="${not empty transaction.sourceOrgFields[6].fieldValue}"><dd>phone: <span class="tel">${transaction.sourceOrgFields[6].fieldValue}</span></dd></c:if>
+                                            <c:if test="${not empty transaction.sourceOrgFields[7].fieldValue}"><dd>fax: <span class="tel">${transaction.sourceOrgFields[7].fieldValue}</span></dd></c:if>
+                                       </dl>
                                     </div>
                                     <div class="col-md-6">
                                         <h4 class="form-section-heading">Recipient Organization:</h4>
                                         <dl class="vcard">
-                                            <dd class="fn">${transaction.transactionRecords[2][0].fieldValue}</dd>
+                                            <dd class="fn">${transaction.targetOrgFields[0].fieldValue}</dd>
                                             <dd class="adr">
-                                                <span class="street-address">${transaction.transactionRecords[2][1].fieldValue}</span><br/>
-                                                <c:if test="${not empty transaction.transactionRecords[2][2].fieldValue}"><span class="street-address">${transaction.transactionRecords[2][2].fieldValue}</span><br/></c:if>
-                                                <span class="region">${transaction.transactionRecords[2][3].fieldValue}&nbsp;${transaction.transactionRecords[2][4].fieldValue}</span>, <span class="postal-code">${transaction.transactionRecords[2][5].fieldValue}</span>
+                                                <span class="street-address">${transaction.targetOrgFields[1].fieldValue}</span><br/>
+                                                <c:if test="${not empty transaction.targetOrgFields[2].fieldValue}"><span class="street-address">${transaction.targetOrgFields[2].fieldValue}</span><br/></c:if>
+                                                <span class="region">${transaction.targetOrgFields[3].fieldValue}&nbsp;${transaction.targetOrgFields[4].fieldValue}</span>, <span class="postal-code">${transaction.targetOrgFields[5].fieldValue}</span>
                                             </dd>
-                                            <c:if test="${not empty transaction.transactionRecords[2][6].fieldValue}"><dd>phone: <span class="tel">${transaction.transactionRecords[2][6].fieldValue}</span></dd></c:if>
-                                            <c:if test="${not empty transaction.transactionRecords[2][7].fieldValue}"><dd>fax: <span class="tel">${transaction.transactionRecords[2][7].fieldValue}</span></dd></c:if>
+                                            <c:if test="${not empty transaction.targetOrgFields[6].fieldValue}"><dd>phone: <span class="tel">${transaction.targetOrgFields[6].fieldValue}</span></dd></c:if>
+                                            <c:if test="${not empty transaction.targetOrgFields[7].fieldValue}"><dd>fax: <span class="tel">${transaction.targetOrgFields[7].fieldValue}</span></dd></c:if>
                                         </dl>
                                     </div>
                                 </div>
                                 <div class="form-section row">
                                     <div class="col-md-12">
                                         <h4 class="form-section-heading">Patient Information: </h4>
-                                        <c:forEach items="${transaction.transactionRecords[4]}" var="patientInfo">
+                                        <c:forEach items="${transaction.patientFields}" var="patientInfo" varStatus="pfield">
+                                            <input type="hidden" name="patientFields[${pfield.index}].fieldNo" value="${patientInfo.fieldNo}" />
                                             <div class="form-group">
-                                                <label for="fieldA">${patientInfo.fieldLabel} <c:if test="${patientInfo.required == true}">&nbsp;*</c:if></label>
+                                                <label for="${patientInfo.fieldNo}">${patientInfo.fieldLabel} <c:if test="${patientInfo.required == true}">&nbsp;*</c:if></label>
                                                 <c:choose>
                                                     <c:when test="${patientInfo.validation.contains('Date')}">
                                                         <div class="form-inline form-inline-varient">
@@ -94,7 +99,7 @@
                                                         </select>
                                                     </c:when>
                                                     <c:otherwise>
-                                                        <input id="fieldA" class="form-control ${patientInfo.validation.replace(' ','-')} <c:if test="${patientInfo.required == true}"> required</c:if>" type="text">
+                                                        <input id="${patientInfo.fieldNo}" name="patientFields[${pfield.index}].fieldValue" value="${patientInfo.fieldValue}" class="form-control ${patientInfo.validation.replace(' ','-')} <c:if test="${patientInfo.required == true}"> required</c:if>" type="text">
                                                     </c:otherwise>
                                                 </c:choose>
                                             </div>
@@ -105,7 +110,7 @@
                                 <div class="form-section row">
                                     <div class="col-md-12">
                                         <h4 class="form-section-heading">Message Details: </h4>
-                                        <c:forEach items="${transaction.transactionRecords[5]}" var="detailInfo">
+                                        <c:forEach items="${transaction.detailFields}" var="detailInfo" varStatus="dfield">
                                             <div class="form-group">
                                                 <label for="fieldA">${detailInfo.fieldLabel} <c:if test="${detailInfo.required == true}">&nbsp;*</c:if></label>
                                                 <c:choose>
@@ -142,7 +147,7 @@
                                                         </select>
                                                     </c:when>
                                                     <c:otherwise>
-                                                        <input id="fieldA" class="form-control ${detailInfo.validation.replace(' ','-')} <c:if test="${detailInfo.required == true}"> required</c:if>" type="text">
+                                                        <input id="fieldA" name="patientFields[${dfield.index}].fieldValue" class="form-control ${detailInfo.validation.replace(' ','-')} <c:if test="${detailInfo.required == true}"> required</c:if>" type="text">
                                                     </c:otherwise>
                                                 </c:choose>
                                             </div>
@@ -150,16 +155,14 @@
                                     </div>
                                 </div>
 
-
                                 <div class="form-group">
-                                    <input type="submit" class="btn btn-primary btn-action" value="Send Referral"/>
+                                    <input type="button" id="saveReferral" class="btn btn-primary btn-action" value="Save Referral"/>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+           </form:form>
         </div>
-        </form>
-
     </div>
 </div>
