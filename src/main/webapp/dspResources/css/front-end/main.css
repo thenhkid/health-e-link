@@ -1,4 +1,4 @@
-@import '../../css/responsive-tables.css';
+@import 'responsive-tables.css';
 /*!
  * Bootstrap v3.0.0
  *
@@ -6061,6 +6061,9 @@ td.visible-print {
   text-align: center;
   margin-top: 10px;
 }
+.login-container.notFound {
+  width: 640px;
+}
 .central-graphic {
   padding-top: 20px;
   padding-bottom: 20px;
@@ -6314,17 +6317,33 @@ td.visible-print {
   margin-left: 0;
   margin-right: 0;
 }
-.primary-nav .navbar-nav {
-  margin-top: 2px;
+@media (max-width: 991px) {
+  .primary-nav .navbar-nav {
+    margin-top: 8px;
+  }
+  .primary-nav .navbar-nav li {
+    margin-right: 5px;
+  }
+  .primary-nav .navbar-nav li > a {
+    padding: 8px 8px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+  }
 }
-.primary-nav .navbar-nav li {
-  margin-right: 5px;
-}
-.primary-nav .navbar-nav li > a {
-  padding: 10px 15px;
-  -webkit-border-radius: 5px;
-  -moz-border-radius: 5px;
-  border-radius: 5px;
+@media (min-width: 992px) {
+  .primary-nav .navbar-nav {
+    margin-top: 2px;
+  }
+  .primary-nav .navbar-nav li {
+    margin-right: 5px;
+  }
+  .primary-nav .navbar-nav li > a {
+    padding: 10px 18px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+  }
 }
 .primary-nav .navbar-brand {
   padding: 0;
@@ -6471,6 +6490,14 @@ td.visible-print {
   font-weight: bold;
   padding: 30px 0;
   margin: 0;
+}
+@media (max-width: 767px) {
+  .page-title {
+    font-size: 32px;
+    font-weight: bold;
+    padding: 20px 0;
+    margin: 0;
+  }
 }
 .page-title-icon {
   width: 51px;
