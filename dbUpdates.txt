@@ -546,3 +546,54 @@ CREATE TABLE `transactionTranslatedIn` (
   KEY `ttiFK_idx` (`transactionInId`),
   CONSTRAINT `ttiFK` FOREIGN KEY (`transactionInId`) REFERENCES `transactionIn` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+/**12.17.2013*/
+CREATE TABLE `lu_ProcessStatuses` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `displayText` varchar(45) NOT NULL,
+  `description` varchar(200) DEFAULT NULL,
+  `isCustom` bit(1) NOT NULL DEFAULT b'0',
+  `status` bit(1) NOT NULL DEFAULT b'1',
+  `dateCreated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `dateModified` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+UPDATE `universalTranslator`.`lookUpTables` SET `utTableName`='lu_ProcessStatuses', `displayText`='Process Status', `urlId`='3055Pro4091ses' WHERE `id`='21';
+
+CREATE TABLE `universalTranslator`.`transactionErrors` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `transactionUploadId` INT NOT NULL,
+  `transactionInId` INT NOT NULL,
+  `fieldLabel` VARCHAR(45) NULL,
+  `errorColumn` VARCHAR(5) NULL,
+  `errorValue` VARCHAR(255) NOT NULL,
+  `reportField1` VARCHAR(45) NULL,
+  `reportField2` VARCHAR(45) NULL,
+  `reportField3` VARCHAR(45) NULL,
+  `reportField4` VARCHAR(45) NULL,
+  `dateCreated` DATETIME NOT NULL DEFAULT current_timestamp,
+  PRIMARY KEY (`id`));
+
+ALTER TABLE `universalTranslator`.`transactionErrors` 
+ADD INDEX `errRecordFK_idx` (`transactionInId` ASC),
+ADD INDEX `errUploadFK_idx` (`transactionUploadId` ASC);
+ALTER TABLE `universalTranslator`.`transactionErrors` 
+ADD CONSTRAINT `errUploadFK`
+  FOREIGN KEY (`transactionUploadId`)
+  REFERENCES `universalTranslator`.`transactionUploads` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION,
+ADD CONSTRAINT `errRecordFK`
+  FOREIGN KEY (`transactionInId`)
+  REFERENCES `universalTranslator`.`transactionIn` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+INSERT INTO `universalTranslator`.`lu_ProcessStatuses` (`displayText`) VALUES ('Pending Release');
+INSERT INTO `universalTranslator`.`lu_ProcessStatuses` (`displayText`) VALUES ('Release');
+INSERT INTO `universalTranslator`.`lu_ProcessStatuses` (`displayText`) VALUES ('Passed');
+INSERT INTO `universalTranslator`.`lu_ProcessStatuses` (`displayText`) VALUES ('Error');
+INSERT INTO `universalTranslator`.`lu_ProcessStatuses` (`displayText`) VALUES ('Invalid');
+
+
