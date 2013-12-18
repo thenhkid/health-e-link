@@ -282,7 +282,7 @@ ADD CONSTRAINT `fkValidationType`
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
 
-/12.16.2013**/
+/*12.16.2013**/
 CREATE TABLE `transactionTranslatedIn` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `transactionInId` int(11) NOT NULL,
@@ -590,3 +590,207 @@ ADD CONSTRAINT `errRecordFK`
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
 
+/*12.18.2013*/
+ALTER TABLE `universalTranslator`.`lu_ProcessStatuses` 
+DROP COLUMN `dateModified`,
+DROP COLUMN `isCustom`,
+ADD COLUMN `category` VARCHAR(45) NULL AFTER `id`,
+ADD COLUMN `displayCode` VARCHAR(5) NULL AFTER `category`, RENAME TO  `universalTranslator`.`lu_transactionStatuses` ;
+
+ALTER TABLE `universalTranslator`.`lu_transactionStatuses` 
+CHANGE COLUMN `displayText` `shortDesc` VARCHAR(45) NOT NULL ;
+
+
+ALTER TABLE `universalTranslator`.`transactionIn` 
+DROP FOREIGN KEY `statusFK`;
+ALTER TABLE `universalTranslator`.`transactionIn` 
+ADD CONSTRAINT `statusFK`
+  FOREIGN KEY (`transactionStatusId`)
+  REFERENCES `universalTranslator`.`lu_transactionStatuses` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+  
+  DROP TABLE `universalTranslator`.`ref_transactionStatus`;
+ DROP TABLE `universalTranslator`.`ref_batchStatus`;
+  
+  ALTER TABLE `universalTranslator`.`transactionUploads` 
+DROP FOREIGN KEY `btchStatusId`;
+ALTER TABLE `universalTranslator`.`transactionUploads` 
+ADD COLUMN `startDateTime` DATETIME NULL AFTER `statusId`,
+ADD COLUMN `endDateTime` DATETIME NULL AFTER `startDateTime`;
+ALTER TABLE `universalTranslator`.`transactionUploads` 
+ADD CONSTRAINT `btchStatusId`
+  FOREIGN KEY (`statusId`)
+  REFERENCES `universalTranslator`.`lu_transactionStatuses` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+  
+  
+  ALTER TABLE `universalTranslator`.`transactionTarget` 
+ADD COLUMN `statusId` INT NULL AFTER `dateCreated`;
+ALTER TABLE `universalTranslator`.`transactionTarget` 
+ADD CONSTRAINT `ttargetStatusId`
+  FOREIGN KEY (`id`)
+  REFERENCES `universalTranslator`.`lu_transactionStatuses` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+  
+  
+  ALTER TABLE `universalTranslator`.`transactionIn` 
+DROP FOREIGN KEY `statusFK`;
+ALTER TABLE `universalTranslator`.`transactionIn` 
+CHANGE COLUMN `transactionStatusId` `statusId` INT(11) NOT NULL COMMENT 'Id from lu_transactionStatuses\n\nCould be Rejected\nPending\nReleased\nError,\netc' ;
+ALTER TABLE `universalTranslator`.`transactionIn` 
+ADD CONSTRAINT `statusFK`
+  FOREIGN KEY (`statusId`)
+  REFERENCES `universalTranslator`.`lu_transactionStatuses` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+  
+  ALTER TABLE `universalTranslator`.`transactionUploads` 
+ADD COLUMN `totalRecordCount` INT NOT NULL DEFAULT 0 AFTER `endDateTime`,
+ADD COLUMN `deleted` INT NOT NULL DEFAULT 0 AFTER `totalRecordCount`,
+ADD COLUMN `errorRecordCount` INT NOT NULL DEFAULT 0 AFTER `deleted`,
+DROP PRIMARY KEY,
+ADD PRIMARY KEY (`id`, `deleted`, `totalRecordCount`, `errorRecordCount`);
+  
+ALTER TABLE `universalTranslator`.`transactionErrors` 
+CHANGE COLUMN `reportField1` `rptField1Val` VARCHAR(255) NULL DEFAULT NULL ,
+CHANGE COLUMN `reportField2` `rptField2Val` VARCHAR(255) NULL DEFAULT NULL ,
+CHANGE COLUMN `reportField3` `rptField3Label` VARCHAR(255) NULL DEFAULT NULL ,
+CHANGE COLUMN `reportField4` `rpttField4Label` VARCHAR(45) NULL DEFAULT NULL ,
+ADD COLUMN `rpttField1Label` VARCHAR(45) NULL AFTER `errorValue`,
+ADD COLUMN `rptField2Label` VARCHAR(45) NULL AFTER `rptField1Val`,
+ADD COLUMN `rptField3Val` VARCHAR(45) NULL AFTER `rptField2Val`,
+ADD COLUMN `rptField4Val` VARCHAR(255) NULL AFTER `rpttField4Label`;
+  
+ALTER TABLE `universalTranslator`.`transactionTarget` 
+CHANGE COLUMN `status` `status` INT NULL DEFAULT NULL COMMENT '1 for exported 2 for pending 3 for reprocess?' ,
+ADD COLUMN `userId` INT NULL AFTER `providerId`;
+
+
+ALTER TABLE `universalTranslator`.`transactionTarget` 
+ADD INDEX `ttargetUserId_idx` (`userId` ASC),
+ADD INDEX `ttargetOrgId_idx` (`orgId` ASC),
+ADD INDEX `ttargetStatusId_idx` (`statusId` ASC);
+ALTER TABLE `universalTranslator`.`transactionTarget` 
+ADD CONSTRAINT `ttargetUserId`
+  FOREIGN KEY (`userId`)
+  REFERENCES `universalTranslator`.`users` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION,
+ADD CONSTRAINT `ttargetOrgId`
+  FOREIGN KEY (`orgId`)
+  REFERENCES `universalTranslator`.`organizations` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION,
+ADD CONSTRAINT `ttargetStatusId`
+  FOREIGN KEY (`statusId`)
+  REFERENCES `universalTranslator`.`lu_transactionStatuses` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+ALTER TABLE `universalTranslator`.`transactionUploads` 
+RENAME TO  `universalTranslator`.`batchUploads` ;
+
+ALTER TABLE `universalTranslator`.`transactionIn` 
+DROP FOREIGN KEY `uploadFK`;
+ALTER TABLE `universalTranslator`.`transactionIn` 
+CHANGE COLUMN `transactionUploadId` `batchId` INT(11) NULL DEFAULT NULL ;
+ALTER TABLE `universalTranslator`.`transactionIn` 
+ADD CONSTRAINT `uploadFK`
+  FOREIGN KEY (`batchId`)
+  REFERENCES `universalTranslator`.`batchUploads` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+ALTER TABLE `universalTranslator`.`transactionTarget` 
+ADD COLUMN `batchId` INT NULL AFTER `id`;
+
+ALTER TABLE `universalTranslator`.`transactionTarget` 
+ADD INDEX `targetBatchId_idx` (`batchId` ASC);
+ALTER TABLE `universalTranslator`.`transactionTarget` 
+ADD CONSTRAINT `targetBatchId`
+  FOREIGN KEY (`batchId`)
+  REFERENCES `universalTranslator`.`batchUploads` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+  
+  ALTER TABLE `universalTranslator`.`transactionTarget` 
+DROP FOREIGN KEY `targetBatchId`;
+ALTER TABLE `universalTranslator`.`transactionTarget` 
+CHANGE COLUMN `batchId` `batchId` INT(11) NOT NULL ;
+ALTER TABLE `universalTranslator`.`transactionTarget` 
+ADD CONSTRAINT `targetBatchId`
+  FOREIGN KEY (`batchId`)
+  REFERENCES `universalTranslator`.`batchUploads` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+  
+  
+  ALTER TABLE `universalTranslator`.`transactionTarget` 
+DROP FOREIGN KEY `ttargetStatusId`;
+ALTER TABLE `universalTranslator`.`transactionTarget` 
+DROP COLUMN `status`,
+CHANGE COLUMN `statusId` `statusId` INT(11) NOT NULL AFTER `userId`;
+ALTER TABLE `universalTranslator`.`transactionTarget` 
+ADD CONSTRAINT `ttargetStatusId`
+  FOREIGN KEY (`statusId`)
+  REFERENCES `universalTranslator`.`lu_transactionStatuses` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+  
+  ALTER TABLE `universalTranslator`.`batchUploads` 
+ADD INDEX `buUserIdFk_idx` (`userId` ASC);
+ALTER TABLE `universalTranslator`.`batchUploads` 
+ADD CONSTRAINT `buUserIdFk`
+  FOREIGN KEY (`userId`)
+  REFERENCES `universalTranslator`.`users` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+  
+  
+  ALTER TABLE `universalTranslator`.`transactionErrors` 
+DROP FOREIGN KEY `errUploadFK`;
+ALTER TABLE `universalTranslator`.`transactionErrors` 
+CHANGE COLUMN `transactionUploadId` `batchId` INT(11) NOT NULL ;
+ALTER TABLE `universalTranslator`.`transactionErrors` 
+ADD CONSTRAINT `errUploadFK`
+  FOREIGN KEY (`batchId`)
+  REFERENCES `universalTranslator`.`batchuploads` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+  
+  ALTER TABLE `universalTranslator`.`transactionErrors` 
+CHANGE COLUMN `errorColumn` `errorColumn` VARCHAR(5) NULL DEFAULT NULL COMMENT 'F1, F2, F3, etc.' ;
+  
+  
+  ALTER TABLE `universalTranslator`.`transactionIn` 
+ADD INDEX `inMessgeTypeId_idx` (`messageTypeId` ASC);
+ALTER TABLE `universalTranslator`.`transactionIn` 
+ADD CONSTRAINT `inMessgeTypeId`
+  FOREIGN KEY (`messageTypeId`)
+  REFERENCES `universalTranslator`.`messagetypes` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+  
+  
+  ALTER TABLE `universalTranslator`.`transactionIn` 
+DROP FOREIGN KEY `batchIdFK`;
+ALTER TABLE `universalTranslator`.`transactionIn` 
+CHANGE COLUMN `batchId` `batchId` INT(11) NOT NULL ,
+CHANGE COLUMN `dateCreated` `dateCreated` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ;
+ALTER TABLE `universalTranslator`.`transactionIn` 
+ADD CONSTRAINT `batchIdFK`
+  FOREIGN KEY (`batchId`)
+  REFERENCES `universalTranslator`.`batchUploads` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+  
+  ALTER TABLE `universalTranslator`.`transactionInRecords` 
+CHANGE COLUMN `dateCreated` `dateCreated` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ;
+  
+  ALTER TABLE `universalTranslator`.`transactionTranslatedIn` 
+CHANGE COLUMN `dateCreated` `dateCreated` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ;
+  
+  
