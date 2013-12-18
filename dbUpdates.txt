@@ -590,10 +590,3 @@ ADD CONSTRAINT `errRecordFK`
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
 
-INSERT INTO `universalTranslator`.`lu_ProcessStatuses` (`displayText`) VALUES ('Pending Release');
-INSERT INTO `universalTranslator`.`lu_ProcessStatuses` (`displayText`) VALUES ('Release');
-INSERT INTO `universalTranslator`.`lu_ProcessStatuses` (`displayText`) VALUES ('Passed');
-INSERT INTO `universalTranslator`.`lu_ProcessStatuses` (`displayText`) VALUES ('Error');
-INSERT INTO `universalTranslator`.`lu_ProcessStatuses` (`displayText`) VALUES ('Invalid');
-
-
