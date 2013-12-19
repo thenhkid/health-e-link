@@ -595,9 +595,9 @@ ALTER TABLE `universalTranslator`.`lu_ProcessStatuses`
 DROP COLUMN `dateModified`,
 DROP COLUMN `isCustom`,
 ADD COLUMN `category` VARCHAR(45) NULL AFTER `id`,
-ADD COLUMN `displayCode` VARCHAR(5) NULL AFTER `category`, RENAME TO  `universalTranslator`.`lu_transactionStatuses` ;
+ADD COLUMN `displayCode` VARCHAR(5) NULL AFTER `category`, RENAME TO  `universalTranslator`.`lu_TransactionStatuses` ;
 
-ALTER TABLE `universalTranslator`.`lu_transactionStatuses` 
+ALTER TABLE `universalTranslator`.`lu_TransactionStatuses` 
 CHANGE COLUMN `displayText` `shortDesc` VARCHAR(45) NOT NULL ;
 
 
@@ -606,7 +606,7 @@ DROP FOREIGN KEY `statusFK`;
 ALTER TABLE `universalTranslator`.`transactionIn` 
 ADD CONSTRAINT `statusFK`
   FOREIGN KEY (`transactionStatusId`)
-  REFERENCES `universalTranslator`.`lu_transactionStatuses` (`id`)
+  REFERENCES `universalTranslator`.`lu_TransactionStatuses` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
   
@@ -621,7 +621,7 @@ ADD COLUMN `endDateTime` DATETIME NULL AFTER `startDateTime`;
 ALTER TABLE `universalTranslator`.`transactionUploads` 
 ADD CONSTRAINT `btchStatusId`
   FOREIGN KEY (`statusId`)
-  REFERENCES `universalTranslator`.`lu_transactionStatuses` (`id`)
+  REFERENCES `universalTranslator`.`lu_TransactionStatuses` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
   
@@ -631,7 +631,7 @@ ADD COLUMN `statusId` INT NULL AFTER `dateCreated`;
 ALTER TABLE `universalTranslator`.`transactionTarget` 
 ADD CONSTRAINT `ttargetStatusId`
   FOREIGN KEY (`id`)
-  REFERENCES `universalTranslator`.`lu_transactionStatuses` (`id`)
+  REFERENCES `universalTranslator`.`lu_TransactionStatuses` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
   
@@ -639,11 +639,11 @@ ADD CONSTRAINT `ttargetStatusId`
   ALTER TABLE `universalTranslator`.`transactionIn` 
 DROP FOREIGN KEY `statusFK`;
 ALTER TABLE `universalTranslator`.`transactionIn` 
-CHANGE COLUMN `transactionStatusId` `statusId` INT(11) NOT NULL COMMENT 'Id from lu_transactionStatuses\n\nCould be Rejected\nPending\nReleased\nError,\netc' ;
+CHANGE COLUMN `transactionStatusId` `statusId` INT(11) NOT NULL COMMENT 'Id from lu_TransactionStatuses\n\nCould be Rejected\nPending\nReleased\nError,\netc' ;
 ALTER TABLE `universalTranslator`.`transactionIn` 
 ADD CONSTRAINT `statusFK`
   FOREIGN KEY (`statusId`)
-  REFERENCES `universalTranslator`.`lu_transactionStatuses` (`id`)
+  REFERENCES `universalTranslator`.`lu_TransactionStatuses` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
   
@@ -686,7 +686,7 @@ ADD CONSTRAINT `ttargetOrgId`
   ON UPDATE NO ACTION,
 ADD CONSTRAINT `ttargetStatusId`
   FOREIGN KEY (`statusId`)
-  REFERENCES `universalTranslator`.`lu_transactionStatuses` (`id`)
+  REFERENCES `universalTranslator`.`lu_TransactionStatuses` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
 
@@ -736,7 +736,7 @@ CHANGE COLUMN `statusId` `statusId` INT(11) NOT NULL AFTER `userId`;
 ALTER TABLE `universalTranslator`.`transactionTarget` 
 ADD CONSTRAINT `ttargetStatusId`
   FOREIGN KEY (`statusId`)
-  REFERENCES `universalTranslator`.`lu_transactionStatuses` (`id`)
+  REFERENCES `universalTranslator`.`lu_TransactionStatuses` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
   
@@ -792,5 +792,83 @@ CHANGE COLUMN `dateCreated` `dateCreated` DATETIME NOT NULL DEFAULT CURRENT_TIME
   
   ALTER TABLE `universalTranslator`.`transactionTranslatedIn` 
 CHANGE COLUMN `dateCreated` `dateCreated` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ;
+ 
+ /*12.18.2013 PM*/
+ INSERT INTO `universalTranslator`.`lu_TransactionStatuses` (`category`, `displayCode`, `shortDesc`, `description`) VALUES ('batch', 'SFV', 'Submission Failed Validation', 'This error occurs when a submission does not meet basic validation requirements (fiel type, size, delimiters, header row). This is a FINAL status for a submission');
+ INSERT INTO `universalTranslator`.`lu_TransactionStatuses` (`category`, `displayCode`, `shortDesc`, `description`) VALUES ('batch', 'SSA', 'Source Submission Accepted', 'This status occurs when the file is validated but before it is processed');
+INSERT INTO `universalTranslator`.`lu_TransactionStatuses` (`category`, `displayCode`, `shortDesc`, `description`) VALUES ('batch', 'SRJ', 'Submission Rejected', 'This status occurs when \"reject file on error\" is set and an error occurs');
+INSERT INTO `universalTranslator`.`lu_TransactionStatuses` (`category`, `displayCode`, `shortDesc`, `description`) VALUES ('batch', 'DNP', 'Do Not Process', 'This status occurs when a user (or system administrator) doesn\'t want the file to be processed. This is a FINAL status for a submission');
+INSERT INTO `universalTranslator`.`lu_TransactionStatuses` (`category`, `displayCode`, `shortDesc`, `description`) VALUES ('batch', 'SPC', 'Submission Processing Complete', 'This status occurs when a file has completed translation to the destination format and all transactions are in a FINAL status AND user has released the file');
+INSERT INTO `universalTranslator`.`lu_TransactionStatuses` (`category`, `displayCode`, `shortDesc`, `description`) VALUES ('batch', 'SCP', 'Submission Completion Pending', 'This status occurs when a file has complete translation and some number of errors have occurred requiring review by the user; OR zero errors and user hasn\'t released the file');
+INSERT INTO `universalTranslator`.`lu_TransactionStatuses` (`category`, `displayCode`, `shortDesc`, `description`) VALUES ('batch', 'SLT', 'Submission Transfer Locked', 'This status occurs when the first record in a batch is received by the target.');
+INSERT INTO `universalTranslator`.`lu_TransactionStatuses` (`category`, `displayCode`, `shortDesc`, `description`) VALUES ('batch', 'STC', 'Submission Transfer Complete', 'This status occurs when ALL records for a submission are in a FINAL status. This is a FINAL status for a submission.');
+ 
+ ALTER TABLE `universalTranslator`.`lu_TransactionStatuses` 
+CHANGE COLUMN `category` `category` VARCHAR(45) NOT NULL ,
+CHANGE COLUMN `displayCode` `display` VARCHAR(45) NOT NULL ,
+CHANGE COLUMN `shortDesc` `shortDesc` VARCHAR(45) NULL ;
+ 
+INSERT INTO `universalTranslator`.`lu_TransactionStatuses` (`category`, `displayCode`, `shortDesc`) VALUES ('transaction', 'PR', 'Pending Release');
+INSERT INTO `universalTranslator`.`lu_TransactionStatuses` (`category`, `displayCode`, `shortDesc`) VALUES ('transaction', 'P', 'Passed');
+INSERT INTO `universalTranslator`.`lu_TransactionStatuses` (`category`, `displayCode`, `shortDesc`) VALUES ('transaction', 'R', 'Reject');
+INSERT INTO `universalTranslator`.`lu_TransactionStatuses` (`category`, `displayCode`, `shortDesc`) VALUES ('transaction', 'E', 'Error');
+INSERT INTO `universalTranslator`.`lu_TransactionStatuses` (`category`, `displayCode`, `shortDesc`) VALUES ('transaction', 'I', 'Invalid');
+INSERT INTO `universalTranslator`.`lu_transactionStatuses` (`category`, `displayCode`, `shortDesc`) VALUES ('transaction', 'V', 'Viewed');
+INSERT INTO `universalTranslator`.`lu_transactionStatuses` (`category`, `displayCode`, `shortDesc`) VALUES ('transaction', 'D', 'Downloaded');
+INSERT INTO `universalTranslator`.`lu_transactionStatuses` (`category`, `displayCode`, `shortDesc`) VALUES ('transaction', 'PP', 'Pending Pickup');
+UPDATE `universalTranslator`.`lu_transactionStatuses` SET `description`='A transaction has been posted to the CCR and has no errors' WHERE `id`='16';
+INSERT INTO `universalTranslator`.`lu_transactionStatuses` (`category`, `displayCode`, `shortDesc`) VALUES ('transaction', 'REL', 'Released');
+UPDATE `universalTranslator`.`lu_transactionStatuses` SET `displayCode`='RR' WHERE `id`='18';
+UPDATE `universalTranslator`.`lu_transactionStatuses` SET `description`='All transactions for a given submission are in a FINAL status' WHERE `id`='24';
+UPDATE `universalTranslator`.`lu_transactionStatuses` SET `description`='Crosswalks and macros were applied to the record with zero errors' WHERE `id`='16';
+UPDATE `universalTranslator`.`lu_transactionStatuses` SET `description`='When a record does not pass even base line requirements (garbage record) it is flagged as INVALID' WHERE `id`='20';
+UPDATE `universalTranslator`.`lu_transactionStatuses` SET `description`='An error has occurred.' WHERE `id`='19';
+UPDATE `universalTranslator`.`lu_transactionStatuses` SET `description`='An error occurred during translation but \"reject record on error or reject file was set. ' WHERE `id`='18';
+UPDATE `universalTranslator`.`lu_transactionStatuses` SET `description`='An error occurred during translation but \"do not reject errors\" was set' WHERE `id`='17';
+UPDATE `universalTranslator`.`lu_transactionStatuses` SET `description`='When the first user viewed the transaction in ERG.' WHERE `id`='21';
+UPDATE `universalTranslator`.`lu_transactionStatuses` SET `description`='When the file containing the transaction is downloaded.' WHERE `id`='22';
+UPDATE `universalTranslator`.`lu_transactionStatuses` SET `description`='When the transaction has not been viewed in ERG or the target file containing the transaction is generated but the file has not been downloaded.' WHERE `id`='23';
+INSERT INTO `universalTranslator`.`lu_ProcessStatus` (`category`, `displayCode`, `shortDesc`, `description`) VALUES ('batch', 'SBP', 'Submission Being Process', 'This is when a file is locked for process');
+
+
+ALTER TABLE `universalTranslator`.`lu_TransactionStatuses` 
+RENAME TO  `universalTranslator`.`lu_ProcessStatus` ;
+
+ALTER TABLE `universalTranslator`.`batchUploads` 
+DROP PRIMARY KEY,
+ADD PRIMARY KEY (`id`);
+
+ALTER TABLE `universalTranslator`.`transactionTarget` 
+DROP FOREIGN KEY `ttargetOrgId`;
+ALTER TABLE `universalTranslator`.`transactionTarget` 
+CHANGE COLUMN `orgId` `orgId` INT(11) NOT NULL ,
+ADD COLUMN `messageTypeId` INT NOT NULL AFTER `transactionInId`,
+ADD INDEX `targetMessageTypeIdFK_idx` (`messageTypeId` ASC);
+ALTER TABLE `universalTranslator`.`transactionTarget` 
+ADD CONSTRAINT `ttargetOrgId`
+  FOREIGN KEY (`orgId`)
+  REFERENCES `universalTranslator`.`organizations` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION,
+ADD CONSTRAINT `targetMessageTypeIdFK`
+  FOREIGN KEY (`messageTypeId`)
+  REFERENCES `universalTranslator`.`messagetypes` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+ALTER TABLE `universalTranslator`.`transactionErrors` 
+DROP FOREIGN KEY `errUploadFK`;
+ALTER TABLE `universalTranslator`.`transactionErrors` 
+CHANGE COLUMN `batchId` `batchUploadId` INT(11) NOT NULL ,
+ADD COLUMN `batchDownloadId` INT NULL AFTER `batchUploadId`;
+ALTER TABLE `universalTranslator`.`transactionErrors` 
+ADD CONSTRAINT `errUploadFK`
+  FOREIGN KEY (`batchUploadId`)
+  REFERENCES `universalTranslator`.`batchuploads` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+ALTER TABLE `universalTranslator`.`batchUploads` 
+CHANGE COLUMN `deleted` `deleted` BIT NOT NULL DEFAULT 0 ;
   
   
