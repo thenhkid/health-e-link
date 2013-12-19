@@ -16,6 +16,8 @@ public interface userManager {
   
   List<User> findUsers(int orgId, String searchTerm);
   
+  List<User> getUsersByOrganization(int orgId);
+  
   User getUserByUserName(String username);
    
   Long findTotalLogins(int userId);

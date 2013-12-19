@@ -24,9 +24,6 @@ public class configurationSchedules {
     @Column(name = "CONFIGID", nullable = false)
     private int configId;
 
-    @Column(name = "TRANSPORTMETHOD", nullable = false)
-    private int transportMethod;
-
     @Column(name = "TYPE", nullable = false)
     private int type = 0;
 
@@ -58,14 +55,6 @@ public class configurationSchedules {
         this.configId = configId;
     }
 
-    public int gettransportMethod() {
-        return transportMethod;
-    }
-
-    public void settransportMethod(int transportMethod) {
-        this.transportMethod = transportMethod;
-    }
-    
     public int gettype() {
         return type;
     }

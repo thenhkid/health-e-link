@@ -122,7 +122,6 @@ public class HealtheWebController {
                 connection.setorgName(orgDetails.getOrgName());
             }
             
-            config.setorgConnections(connections);
         }
         
         mav.addObject("configurations", configurations);

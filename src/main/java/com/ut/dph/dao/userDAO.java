@@ -7,23 +7,25 @@ import com.ut.dph.model.siteSections;
 import com.ut.dph.model.userAccess;
 
 public interface userDAO {
-	
-	Integer createUser(User user);
-	
-	void updateUser(User user);
-	  
-	User getUserById(int userId);
-	
-	List<User> findUsers(int orgId, String searchTerm);
-	
-	User getUserByUserName(String username);
-	
-	Long findTotalLogins(int orgId);
-	
-	void setLastLogin(String username);
-	
-	List<siteSections> getSections();
-	
-	List<userAccess> getuserSections(int userId);
-	
+
+    Integer createUser(User user);
+
+    void updateUser(User user);
+
+    User getUserById(int userId);
+
+    List<User> findUsers(int orgId, String searchTerm);
+    
+    List<User> getUsersByOrganization(int orgId);
+
+    User getUserByUserName(String username);
+
+    Long findTotalLogins(int orgId);
+
+    void setLastLogin(String username);
+
+    List<siteSections> getSections();
+
+    List<userAccess> getuserSections(int userId);
+
 }

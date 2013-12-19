@@ -30,6 +30,7 @@ import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.messageTypeFormFields;
 import com.ut.dph.service.configurationManager;
 import com.ut.dph.model.Organization;
+import com.ut.dph.model.User;
 import com.ut.dph.model.configurationFTPFields;
 import com.ut.dph.model.configurationSchedules;
 import com.ut.dph.service.organizationManager;
@@ -37,6 +38,7 @@ import com.ut.dph.model.messageType;
 import com.ut.dph.service.messageTypeManager;
 import com.ut.dph.model.configurationTransport;
 import com.ut.dph.service.configurationTransportManager;
+import com.ut.dph.service.userManager;
 
 @Controller
 @RequestMapping("/administrator/configurations")
@@ -51,6 +53,9 @@ public class adminConfigController {
 
     @Autowired
     private messageTypeManager messagetypemanager;
+    
+    @Autowired
+    private userManager userManager;
 
     @Autowired
     private configurationTransportManager configurationTransportManager;
@@ -90,8 +95,8 @@ public class adminConfigController {
         List<configuration> configurations = configurationmanager.getConfigurations(page, maxResults);
         
         Organization org;
+        User user;
         messageType messagetype;
-        Long totalConnections;
 
         for (configuration config : configurations) {
             org = organizationmanager.getOrganizationById(config.getorgId());
@@ -100,15 +105,9 @@ public class adminConfigController {
             messagetype = messagetypemanager.getMessageTypeById(config.getMessageTypeId());
             config.setMessageTypeName(messagetype.getName());
             
-            if(config.getType() == 1) {
-                totalConnections = configurationmanager.getTotalConnections(config.getId());
-                config.setTotalConnections(totalConnections);
-            }
-            else {
-                List<Connections> targetConnections = configurationmanager.getTargetConnections(config.getMessageTypeId(),config.getorgId());
-                totalConnections = (long) targetConnections.size();
-                config.setTotalConnections(totalConnections);
-            }
+            user = userManager.getUserById(config.getuserId());
+            config.setuserName(user.getFirstName() + " " + user.getLastName());
+            
         }
         
         mav.addObject("configurationList", configurations);
@@ -143,6 +142,7 @@ public class adminConfigController {
         mav.addObject("configurationList", configurations);
 
         Organization org;
+        User user;
         messageType messagetype;
 
         for (configuration config : configurations) {
@@ -151,9 +151,9 @@ public class adminConfigController {
 
             messagetype = messagetypemanager.getMessageTypeById(config.getMessageTypeId());
             config.setMessageTypeName(messagetype.getName());
-
-            Long totalConnections = (Long) configurationmanager.getTotalConnections(configId);
-            config.setTotalConnections(totalConnections);
+            
+            user = userManager.getUserById(config.getuserId());
+            config.setuserName(user.getFirstName() + " " + user.getLastName());
         }
 
         return mav;
@@ -188,6 +188,23 @@ public class adminConfigController {
     }
     
     /**
+     * The '/getAvailableUsers.do' function will return a list of users that are associated
+     * to the selected organization.
+     * 
+     * @param orgId The organization selected in the drop down
+     * 
+     * @return users    The available users
+     */
+    @SuppressWarnings("rawtypes")
+    @RequestMapping(value= "/getAvailableUsers.do", method = RequestMethod.GET)
+    public @ResponseBody List<User> getUsers(@RequestParam(value = "orgId", required = true) int orgId) {
+        
+        List<User> users = userManager.getUsersByOrganization(orgId);
+        
+        return users;
+    } 
+    
+    /**
      * The '/getAvailableMessageTypes.do' function will return a list of message types
      * that have not been already set up for the passed in organization.
      * 
@@ -216,38 +233,31 @@ public class adminConfigController {
      * @throws Exception
      */
     @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public ModelAndView saveNewConfiguration(@Valid @ModelAttribute(value = "configurationDetails") configuration configurationDetails, BindingResult result, RedirectAttributes redirectAttr, @RequestParam String action) throws Exception {
-
-        //Need to get a list of active organizations.
-        List<Organization> organizations = organizationmanager.getAllActiveOrganizations();
-
-        //Need to get a list of active message types
-        List<messageType> messageTypes = messagetypemanager.getActiveMessageTypes();
-
-        if (result.hasErrors()) {
-            ModelAndView mav = new ModelAndView();
-            mav.setViewName("/administrator/configurations/details");
-
-            //Need to get a list of active organizations.
-            mav.addObject("organizations", organizations);
-
-            //Need to get a list of active message types
-            mav.addObject("messageTypes", messageTypes);
-
-            return mav;
-        }
+    public ModelAndView saveNewConfiguration(@ModelAttribute(value = "configurationDetails") configuration configurationDetails, BindingResult result, RedirectAttributes redirectAttr, @RequestParam String action) throws Exception {
 
         Integer id = (Integer) configurationmanager.createConfiguration(configurationDetails);
 
         configId = id;
+        
+        //If the "Save" button was pressed 
+        if (action.equals("save")) {
+            redirectAttr.addFlashAttribute("savedStatus", "created");
+            ModelAndView mav = new ModelAndView(new RedirectView("details"));
+            return mav;
+            
+        } //If the "Next Step" button was pressed.
+        else {
+            redirectAttr.addFlashAttribute("savedStatus", "created");
+            ModelAndView mav = new ModelAndView(new RedirectView("transport"));
+            return mav;
+        }
+
 
 	//Need to set up the online form transport method
         //setupOnlineForm(configId,messageTypeId)
-        configurationTransportManager.setupOnlineForm(configId, configurationDetails.getMessageTypeId());
+        //configurationTransportManager.setupOnlineForm(configId, configurationDetails.getMessageTypeId());
 
-        redirectAttr.addFlashAttribute("savedStatus", "created");
-        ModelAndView mav = new ModelAndView(new RedirectView("details"));
-        return mav;
+        
 
     }
 
@@ -284,6 +294,11 @@ public class adminConfigController {
         //Need to get a list of active message types
         List<messageType> messageTypes = messagetypemanager.getActiveMessageTypes();
         mav.addObject("messageTypes", messageTypes);
+        
+        //Need to get a list of organization users 
+        List<User> users = userManager.getUsersByOrganization(configurationDetails.getorgId());
+        mav.addObject("users", users);
+        
         mav.addObject("id", configId);
 
         return mav;
@@ -301,26 +316,16 @@ public class adminConfigController {
      *
      */
     @RequestMapping(value = "/details", method = RequestMethod.POST)
-    public ModelAndView updateConfigurationDetails(@Valid @ModelAttribute(value = "configurationDetails") configuration configurationDetails, BindingResult result, RedirectAttributes redirectAttr, @RequestParam String action) throws Exception {
+    public ModelAndView updateConfigurationDetails(@ModelAttribute(value = "configurationDetails") configuration configurationDetails, BindingResult result, RedirectAttributes redirectAttr, @RequestParam String action) throws Exception {
 
         //Need to get a list of active organizations.
         List<Organization> organizations = organizationmanager.getAllActiveOrganizations();
 
         //Need to get a list of active message types
         List<messageType> messageTypes = messagetypemanager.getActiveMessageTypes();
-
-        if (result.hasErrors()) {
-            ModelAndView mav = new ModelAndView();
-            mav.setViewName("/administrator/configurations/details");
-
-            //Need to get a list of active organizations.
-            mav.addObject("organizations", organizations);
-            //Need to get a list of active message types
-            mav.addObject("messageTypes", messageTypes);
-            mav.addObject("id", configId);
-
-            return mav;
-        }
+        
+        //Need to get a list of organization users 
+        List<User> users = userManager.getUsersByOrganization(configurationDetails.getorgId());
 
         //submit the updates
         configurationmanager.updateConfiguration(configurationDetails);
@@ -330,10 +335,9 @@ public class adminConfigController {
             ModelAndView mav = new ModelAndView();
             mav.setViewName("/administrator/configurations/details");
 
-            //Need to get a list of active organizations.
             mav.addObject("organizations", organizations);
-            //Need to get a list of active message types
             mav.addObject("messageTypes", messageTypes);
+            mav.addObject("users", users);
             mav.addObject("id", configId);
             mav.addObject("savedStatus", "updated");
             mav.addObject("completedSteps", configurationDetails.getstepsCompleted());
@@ -379,8 +383,7 @@ public class adminConfigController {
 
         //Get the configuration details for the selected config
         configuration configurationDetails = configurationmanager.getConfigurationById(configId);
-        configurationDetails.setTransportDetails(transportDetails);
-
+       
         configurationDetails.setOrgName(organizationmanager.getOrganizationById(configurationDetails.getorgId()).getOrgName());
         configurationDetails.setMessageTypeName(messagetypemanager.getMessageTypeById(configurationDetails.getMessageTypeId()).getName());
         
@@ -464,20 +467,6 @@ public class adminConfigController {
             configurationmanager.updateCompletedSteps(configId, 2);
         }
 
-        List<configurationTransport> details = configurationDetails.getTransportDetails();
-
-        for (configurationTransport transport : details) {
-            //submit the updates
-            configurationTransportManager.updateTransportDetails(transport);
-           
-            //Submit FTP Changes
-            if(transport.gettransportMethod() == 3) {
-             
-                for(configurationFTPFields FTPFields : transport.getFTPFields()) {
-                    configurationTransportManager.saveTransportFTP(FTPFields);
-                }
-            }
-        }
 
         redirectAttr.addFlashAttribute("savedStatus", "updated");
 
@@ -817,7 +806,6 @@ public class adminConfigController {
 
         configurationDataTranslations translation = new configurationDataTranslations();
         translation.setconfigId(configId);
-        translation.settransportMethod(transportMethod);
         translation.setFieldId(field);
         translation.setfieldName(fieldText);
         translation.setMacroId(macroId);
@@ -1041,7 +1029,6 @@ public class adminConfigController {
         if(scheduleDetails == null) {
             configurationSchedules emptySchedule = new configurationSchedules();
             emptySchedule.setconfigId(configId);
-            emptySchedule.settransportMethod(selTransportMethod);
             emptySchedule.settype(5);
             
             //set the selected type

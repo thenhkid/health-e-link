@@ -29,9 +29,6 @@ public class configurationDataTranslations {
     @Column(name = "CONFIGID", nullable = false)
     private int configId;
 
-    @Column(name = "TRANSPORTMETHOD", nullable = false)
-    private int transportMethod;
-
     @Column(name = "FIELDID", nullable = false)
     private int fieldId;
 
@@ -73,14 +70,6 @@ public class configurationDataTranslations {
 
     public void setconfigId(int configId) {
         this.configId = configId;
-    }
-
-    public int gettransportMethod() {
-        return transportMethod;
-    }
-
-    public void settransportMethod(int transportMethod) {
-        this.transportMethod = transportMethod;
     }
 
     public int getFieldId() {

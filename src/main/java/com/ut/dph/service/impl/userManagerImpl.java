@@ -13,67 +13,71 @@ import com.ut.dph.model.siteSections;
 import com.ut.dph.model.userAccess;
 
 @Service
-public class userManagerImpl implements userManager{
-	
-	@Autowired
-	private userDAO userDAO;
-	
-	@Override
-	@Transactional
-	public Integer createUser(User user) {
-		Integer lastId = null;
-		lastId = (Integer) userDAO.createUser(user);	
-		return lastId;
-	}
-	  
-	@Override
-	@Transactional
-	public void updateUser(User user) {
-		userDAO.updateUser(user);
-	}
+public class userManagerImpl implements userManager {
 
-	@Override
-	@Transactional
-	public User getUserById(int userId) {
-	  return userDAO.getUserById(userId);
-	}
+    @Autowired
+    private userDAO userDAO;
 
-	@Override
-	@Transactional
-	public List<User> findUsers(int orgId, String searchTerm) {
-		return userDAO.findUsers(orgId, searchTerm);
-	}
-	
-	@Override
-	@Transactional
-	public User getUserByUserName(String username) {
-		return userDAO.getUserByUserName(username);
-	}
-	  
-	
-	@Override
-	@Transactional
-	public Long findTotalLogins(int userId) {
-	  return userDAO.findTotalLogins(userId);
-	}
-	
-	@Override
-	@Transactional
-	public void setLastLogin(String username) {
-		userDAO.setLastLogin(username);
-	}
-	
-	
-	@Override
-	@Transactional
-	public List<siteSections> getSections() {
-		return userDAO.getSections();
-	}
-	
-	@Override
-	@Transactional
-	public List<userAccess> getuserSections(int userId) {
-		return userDAO.getuserSections(userId);
-	}
-	
+    @Override
+    @Transactional
+    public Integer createUser(User user) {
+        Integer lastId = null;
+        lastId = (Integer) userDAO.createUser(user);
+        return lastId;
+    }
+
+    @Override
+    @Transactional
+    public void updateUser(User user) {
+        userDAO.updateUser(user);
+    }
+
+    @Override
+    @Transactional
+    public User getUserById(int userId) {
+        return userDAO.getUserById(userId);
+    }
+
+    @Override
+    @Transactional
+    public List<User> findUsers(int orgId, String searchTerm) {
+        return userDAO.findUsers(orgId, searchTerm);
+    }
+    
+    @Override
+    @Transactional
+    public List<User> getUsersByOrganization(int orgId) {
+        return userDAO.getUsersByOrganization(orgId);
+    }
+
+    @Override
+    @Transactional
+    public User getUserByUserName(String username) {
+        return userDAO.getUserByUserName(username);
+    }
+
+    @Override
+    @Transactional
+    public Long findTotalLogins(int userId) {
+        return userDAO.findTotalLogins(userId);
+    }
+
+    @Override
+    @Transactional
+    public void setLastLogin(String username) {
+        userDAO.setLastLogin(username);
+    }
+
+    @Override
+    @Transactional
+    public List<siteSections> getSections() {
+        return userDAO.getSections();
+    }
+
+    @Override
+    @Transactional
+    public List<userAccess> getuserSections(int userId) {
+        return userDAO.getuserSections(userId);
+    }
+
 }

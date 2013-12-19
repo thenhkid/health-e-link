@@ -1,0 +1,13 @@
+/* Chad 12.19.2013 */
+
+ALTER TABLE `universalTranslator`.`configurations` 
+DROP COLUMN `rejectOnError`,
+DROP COLUMN `clearFields`,
+ADD COLUMN `userId` INT NOT NULL AFTER `orgId`,
+ADD INDEX `configUserIdfk_idx` (`userId` ASC);
+ALTER TABLE `universalTranslator`.`configurations` 
+ADD CONSTRAINT `configUserIdfk`
+  FOREIGN KEY (`userId`)
+  REFERENCES `universalTranslator`.`users` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;

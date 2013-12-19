@@ -60,18 +60,6 @@ public class configurationTransport {
     @Column(name = "CONTAINSHEADER", nullable = false)
     private boolean containsHeader = false;
 
-    @Column(name = "REPORTABLEFIELD1", nullable = false)
-    private int reportableField1 = 0;
-
-    @Column(name = "REPORTABLEFIELD2", nullable = false)
-    private int reportableField2 = 0;
-
-    @Column(name = "REPORTABLEFIELD3", nullable = false)
-    private int reportableField3 = 0;
-    
-    @Column(name = "REPORTABLEFIELD4", nullable = false)
-    private int reportableField4 = 0;
-    
     @Column(name = "STATUS", nullable = false)
     private boolean status = true;
     
@@ -178,38 +166,6 @@ public class configurationTransport {
 
     public void setcontainsHeader(boolean containsHeader) {
         this.containsHeader = containsHeader;
-    }
-    
-    public int getreportableField1() {
-        return reportableField1;
-    }
-
-    public void setreportableField1(int reportableField1) {
-        this.reportableField1 = reportableField1;
-    }
-    
-    public int getreportableField2() {
-        return reportableField2;
-    }
-
-    public void setreportableField2(int reportableField2) {
-        this.reportableField2 = reportableField2;
-    }
-    
-    public int getreportableField3() {
-        return reportableField3;
-    }
-
-    public void setreportableField3(int reportableField3) {
-        this.reportableField3 = reportableField3;
-    }
-    
-    public int getreportableField4() {
-        return reportableField4;
-    }
-
-    public void setreportableField4(int reportableField4) {
-        this.reportableField4 = reportableField4;
     }
     
     public List<configurationFTPFields> getFTPFields() {

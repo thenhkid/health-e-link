@@ -37,9 +37,10 @@
                         <thead>
                             <tr>
                                 <th scope="col">Organization</th>
+                                <th scope="col">Authorized User</th>
                                 <th scope="col">Message Type</th>
                                 <th scope="col">Configuration Type</th>
-                                <th scope="col" class="center-text">Connections</th>
+                                <th scope="col" class="center-text">Status</th>
                                 <th scope="col" class="center-text">Date Created</th>
                                 <th scope="col"></th>
                             </tr>
@@ -50,8 +51,10 @@
                                     <c:forEach var="config" items="${configurationList}">
                                         <tr id="configRow" rel="${config.id}" style="cursor: pointer">
                                             <td scope="row">
-                                                <a href="javascript:void(0);"  title="Edit this configuration">${config.orgName}</a>
-                                                 <br />(<c:choose><c:when test="${config.status == true}">active</c:when><c:otherwise>inactive</c:otherwise></c:choose>)
+                                                ${config.orgName}
+                                            </td>
+                                            <td>
+                                                ${config.userName}
                                             </td>
                                             <td>
                                                 ${config.messageTypeName}
@@ -59,9 +62,7 @@
                                             <td>
                                                 <c:choose><c:when test="${config.type == 1}">Source Configuration</c:when><c:otherwise>Target Configuration</c:otherwise></c:choose>
                                             </td>
-                                            <td class="center-text">
-                                               ${config.totalConnections}
-                                            </td>
+                                            <td class="center-text"><c:choose><c:when test="${config.status == true}">active</c:when><c:otherwise>inactive</c:otherwise></c:choose></td>
                                             <td class="center-text"><fmt:formatDate value="${config.dateCreated}" type="date" pattern="M/dd/yyyy" /></td>
                                             <td class="actions-col">
                                                 <a href="javascript:void(0);" class="btn btn-link" title="Edit this configuration">

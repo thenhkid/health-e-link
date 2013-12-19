@@ -31,7 +31,6 @@ public class providerAddress {
     private String phone2;
     private String fax;
     private Date dateCreated = new Date();
-    private Date dateModified = new Date();
     private int providerId;
 
     @Id
@@ -171,15 +170,6 @@ public class providerAddress {
 
     public void setDateCreated(Date dateCreated) {
         this.dateCreated = dateCreated;
-    }
-
-    @Column(name = "DATEMODIFIED", nullable = true)
-    public Date getDateModified() {
-        return dateModified;
-    }
-
-    public void setDateModified(Date dateModified) {
-        this.dateModified = dateModified;
     }
 
     @Column(name = "PROVIDERID", nullable = false)

@@ -9,33 +9,26 @@
                     </c:when>
                     <c:when test="${param['page'] == 'configDetails'}">
                         <a href="javascript:void(0);" title="Configuration Details" class="unstyled-link">
-                            <c:choose>
-                                <c:when test="${not empty id}">
-                                    Edit Configuration
-                                </c:when>
-                                <c:otherwise>
-                                    Create New Configuration
-                                </c:otherwise>
-                            </c:choose>
+                            Configuration - Initial Setup
                         </a>
                     </c:when>
                     <c:when test="${param['page'] == 'transport'}">
-                        <a href="javascript:void(0);" title="Configuration Transport Details" class="unstyled-link">Configuration Transport Details</a>
+                        <a href="javascript:void(0);" title="Configuration Transport Details" class="unstyled-link">Configuration - Transport Details</a>
                     </c:when>
                     <c:when test="${param['page'] == 'mappings'}">
-                        <a href="javascript:void(0);" title="Configuration Field Mappings" class="unstyled-link">Configuration Field Mappings</a>
+                        <a href="javascript:void(0);" title="Configuration Field Mappings" class="unstyled-link">Configuration - Field Mappings</a>
                     </c:when>
                     <c:when test="${param['page'] == 'chooseFields'}">
-                        <a href="javascript:void(0);" title="Configuration Choose Fields" class="unstyled-link">Configuration Choose Fields</a>
+                        <a href="javascript:void(0);" title="Configuration Choose Fields" class="unstyled-link">Configuration - Choose Fields</a>
                     </c:when>
                     <c:when test="${param['page'] == 'translations'}">
-                        <a href="javascript:void(0);" title="Configuration Data Translations" class="unstyled-link">Configuration Data Translations</a>
+                        <a href="javascript:void(0);" title="Configuration Data Translations" class="unstyled-link">Configuration - Data Translations</a>
                     </c:when>
-                    <c:when test="${param['page'] == 'connections'}">
-                        <a href="javascript:void(0);" title="Configuration Connections" class="unstyled-link">Configuration Connections</a>
+                    <c:when test="${param['page'] == 'specs'}">
+                        <a href="javascript:void(0);" title="Detailed Message Specs" class="unstyled-link">Configuration - Message Specs</a>
                     </c:when>
                     <c:when test="${param['page'] == 'schedule'}">
-                        <a href="javascript:void(0);" title="Configuration Schedule" class="unstyled-link">Configuration Schedule</a>
+                        <a href="javascript:void(0);" title="Configuration Schedule" class="unstyled-link">Configuration - Schedule</a>
                     </c:when>    
                 </c:choose>
             </h1>
@@ -47,7 +40,7 @@
                 </c:when>
                 <c:otherwise>
                     <li><a href="javascript:void(0);" id="saveDetails" title="Save this Organization" role="button"><span class="glyphicon glyphicon-ok icon-stacked"></span> Save </a></li>
-                    <c:if test="${not empty id && param['page'] != 'schedule'}"><li><a href="javascript:void(0);" id="next" title="Save and Proceed to the Next Step"><span class="glyphicon glyphicon-forward icon-stacked" role="button"></span>Next Step</a></li></c:if>
+                    <c:if test="${param['page'] != 'schedule'}"><li><a href="javascript:void(0);" id="next" title="Save and Proceed to the Next Step"><span class="glyphicon glyphicon-forward icon-stacked" role="button"></span>Next Step</a></li></c:if>
                     <%--<c:if test="${not empty id}"><li><a href="#confirmationOrgDelete" data-toggle="modal" rel="${id}" title="Delete this Configuration"><span class="glyphicon glyphicon-remove icon-stacked"></span>Delete</a></li></c:if>--%>
                     <li><a href="<c:url value='/administrator/configurations/list' />" title="Cancel" role="button"><span class="glyphicon icon-stacked custom-icon icon-cancel"></span>Cancel</a></li>
                </c:otherwise>

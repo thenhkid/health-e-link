@@ -1,7 +1,6 @@
 package com.ut.dph.model;
 
 import java.util.Date;
-import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -18,22 +17,13 @@ import javax.validation.constraints.NotNull;
 public class configuration {
 
     @Transient
-    private List<configurationTransport> transportDetails = null;
-
-    @Transient
     private String orgName = null;
+    
+    @Transient
+    private String userName = null;
 
     @Transient
     private String messageTypeName = null;
-
-    @Transient
-    private List<Organization> connections = null;
-    
-    @Transient
-    private List<Connections> orgConnections = null;
-
-    @Transient
-    private Long totalConnections = null;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -43,6 +33,9 @@ public class configuration {
     @NotNull(message = "The organization is a required field!")
     @Column(name = "orgId", nullable = false)
     private int orgId;
+    
+    @Column(name = "userId", nullable = false)
+    private int userId;
 
     @Column(name = "DATECREATED", nullable = true)
     private Date dateCreated = new Date();
@@ -60,11 +53,6 @@ public class configuration {
     @Column(name = "STEPSCOMPLETED", nullable = false)
     private int stepsCompleted = 0;
     
-    @Column(name = "CLEARFIELDS", nullable = true)
-    private boolean clearFields = false;
-    
-    @Column(name = "REJECTONERROR", nullable = false)
-    private int rejectOnError = 1;
     
     public int getId() {
         return id;
@@ -80,6 +68,14 @@ public class configuration {
 
     public void setorgId(int orgId) {
         this.orgId = orgId;
+    }
+    
+    public int getuserId() {
+        return userId;
+    }
+
+    public void setuserId(int userId) {
+        this.userId = userId;
     }
 
     public Date getDateCreated() {
@@ -114,20 +110,20 @@ public class configuration {
         this.messageTypeId = messageTypeId;
     }
 
-    public List<Organization> getConnections() {
-        return connections;
-    }
-
-    public void setConnections(List<Organization> connections) {
-        this.connections = connections;
-    }
-
     public String getOrgName() {
         return orgName;
     }
 
     public void setOrgName(String orgName) {
         this.orgName = orgName;
+    }
+    
+    public String getuserName() {
+        return userName;
+    }
+
+    public void setuserName(String userName) {
+        this.userName = userName;
     }
 
     public String getMessageTypeName() {
@@ -138,13 +134,6 @@ public class configuration {
         this.messageTypeName = messageTypeName;
     }
 
-    public Long getTotalConnections() {
-        return totalConnections;
-    }
-
-    public void setTotalConnections(Long totalConnections) {
-        this.totalConnections = totalConnections;
-    }
 
     public int getstepsCompleted() {
         return stepsCompleted;
@@ -153,38 +142,5 @@ public class configuration {
     public void setstepsCompleted(int stepsCompleted) {
         this.stepsCompleted = stepsCompleted;
     }
-
-    public List<configurationTransport> getTransportDetails() {
-        return transportDetails;
-    }
-
-    public void setTransportDetails(List<configurationTransport> transportDetails) {
-        this.transportDetails = transportDetails;
-    }
-    
-    public boolean getclearFields() {
-        return clearFields;
-    }
-
-    public void setclearFields(boolean clearFields) {
-        this.clearFields = clearFields;
-    }
-    
-    public int getrejectOnError() {
-        return rejectOnError;
-    }
-    
-    public void setrejectOnError(int rejectOnError) {
-        this.rejectOnError = rejectOnError;
-    }
-    
-    public List<Connections> getorgConnections() {
-        return orgConnections;
-    }
-
-    public void setorgConnections(List<Connections> orgConnections) {
-        this.orgConnections = orgConnections;
-    }
-    
     
 }

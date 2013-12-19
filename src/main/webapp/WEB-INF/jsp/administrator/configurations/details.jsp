@@ -38,8 +38,7 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="type">Configuration Type * 
-                            <span class="badge badge-help" data-placement="top" title="" data-original-title="Select &quot;For Source&quot; if this is for sending a message and &quot;For Target&quot; if this is for receiving a message">?</span></label>
+                            <label for="type">Configuration Type * <span class="badge badge-help" data-placement="top" title="" data-original-title="Select &quot;For Source&quot; if this is for sending a message and &quot;For Target&quot; if this is for receiving a message">?</span></label>
                             <div>
                                 <label class="radio-inline">
                                     <form:radiobutton id="type" path="type" value="1" disabled="${configurationDetails.id == 0 ? 'false' : 'true' }"/> For Source Organization 
@@ -49,19 +48,8 @@
                                 </label>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label for="type">Clear fields after Delivery *</label>
-                            <div>
-                                <label class="radio-inline">
-                                    <form:radiobutton id="clearFields" path="clearFields" value="1" /> Yes
-                                </label>
-                                <label class="radio-inline">
-                                    <form:radiobutton id="clearFields" path="clearFields" value="0" /> No
-                                </label>
-                            </div>
-                        </div>        
                         <spring:bind path="orgId">
-                            <div class="form-group ${status.error ? 'has-error' : '' }">
+                            <div id="orgDiv" class="form-group ${status.error ? 'has-error' : '' }">
                                 <label class="control-label" for="organization">Organization *</label>
                                 <form:select path="orgId" id="organization" class="form-control half" disabled="${configurationDetails.id == 0 ? 'false' : 'true' }">
                                     <option value="">- Select -</option>
@@ -69,49 +57,41 @@
                                         <option value="${organizations[oStatus.index].id}" <c:if test="${configurationDetails.orgId == organizations[oStatus.index].id}">selected</c:if>>${organizations[oStatus.index].orgName} </option>
                                     </c:forEach>
                                 </form:select>
-                                <c:if test="${configurationDetails.id > 0}"><form:hidden path="orgId"/></c:if>     
-                                </div>
+                                <c:if test="${configurationDetails.id > 0}"><form:hidden id="organization" path="orgId"/></c:if>  
+                                <span id="configOrgMsg" class="control-label"></span>
+                           </div>
                         </spring:bind>
-                        <spring:bind path="messageTypeId">
-                            <div class="form-group ${status.error ? 'has-error' : '' }">
-                                <label class="control-label" for="messageTypeId">Message Type *</label>
-                                <form:select path="messageTypeId" id="messageTypeId" class="form-control half" disabled="${configurationDetails.id == 0 ? 'false' : 'true' }">
+                        <spring:bind path="userId">
+                            <div id="userDiv" class="form-group ${status.error ? 'has-error' : '' }">
+                                <label class="control-label" for="users">Authorized User *</label>
+                                <form:select path="userId" id="users" class="form-control half" disabled="${configurationDetails.id == 0 ? 'false' : 'true' }">
                                     <option value="">- Select -</option>
                                     <c:if test="${configurationDetails.id > 0}">
-                                        <c:forEach items="${messageTypes}" var="messageType" varStatus="mStatus">
-                                            <option value="${messageType.id}" <c:if test="${messageType.id == configurationDetails.messageTypeId}">selected</c:if>>${messageType.name}</option>
+                                        <c:forEach items="${users}" var="user" varStatus="uStatus">
+                                            <option value="${users[uStatus.index][0]}" <c:if test="${users[uStatus.index][0] == configurationDetails.userId}">selected</c:if>>${users[uStatus.index][1]}&nbsp;${users[uStatus.index][2]}</option>
                                         </c:forEach>
                                     </c:if>
                                 </form:select>
+                                <c:if test="${configurationDetails.id > 0}"><form:hidden id="users" path="userId"/></c:if>  
+                                <span id="configUserMsg" class="control-label"></span>
+                           </div>
+                        </spring:bind>        
+                        <spring:bind path="messageTypeId">
+                            <div id="messageTypeDiv" class="form-group ${status.error ? 'has-error' : '' }">
+                                <label class="control-label" for="messageTypeId">Message Type *</label>
+                                <form:select path="messageTypeId" id="messageTypeId" class="form-control half" disabled="${configurationDetails.id == 0 ? 'false' : 'true' }">
+                                    <option value="">- Select -</option>
+                                    <c:forEach items="${messageTypes}" var="messageType" varStatus="mStatus">
+                                        <option value="${messageType.id}" <c:if test="${messageType.id == configurationDetails.messageTypeId}">selected</c:if>>${messageType.name}</option>
+                                    </c:forEach>
+                                </form:select>
                                 <c:if test="${configurationDetails.id > 0}"><form:hidden path="messageTypeId"/></c:if> 
-                                </div>
+                                <span id="configMessageTypeMsg" class="control-label"></span>
+                            </div>
                         </spring:bind>
                     </div>
                 </div>
-            </section>
-            <section class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Error Handling</h3>
-                </div>
-                <div class="panel-body">
-                    <div class="form-container">
-                        <div class="form-group">
-                            <label for="status">If Error *</label>
-                            <div>
-                                <label class="radio-inline">
-                                    <form:radiobutton id="rejectOnError" path="rejectOnError" value="1"/>Set Record to Pending Status
-                                </label>
-                                <label class="radio-inline">
-                                  <form:radiobutton id="rejectOnError" path="rejectOnError" value="2" />Reject Record 
-                                </label>
-                                <label class="radio-inline">
-                                    <form:radiobutton id="rejectOnError" path="rejectOnError" value="3"/>Reject all Records with same Message Type
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>                    
+            </section>   
         </form:form>
                         
     </div>

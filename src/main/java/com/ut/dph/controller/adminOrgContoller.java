@@ -377,15 +377,6 @@ public class adminOrgContoller {
             messagetype = messagetypemanager.getMessageTypeById(config.getMessageTypeId());
             config.setMessageTypeName(messagetype.getName());
  
-            if(config.getType() == 1) {
-                totalConnections = configurationmanager.getTotalConnections(config.getId());
-                config.setTotalConnections(totalConnections);
-            }
-            else {
-                List<Connections> targetConnections = configurationmanager.getTargetConnections(config.getMessageTypeId(),config.getorgId());
-                totalConnections = (long) targetConnections.size();
-                config.setTotalConnections(totalConnections);
-            }
         }
 
         return mav;
@@ -423,8 +414,6 @@ public class adminOrgContoller {
             messagetype = messagetypemanager.getMessageTypeById(config.getMessageTypeId());
             config.setMessageTypeName(messagetype.getName());
 
-            totalConnections = (Long) configurationmanager.getTotalConnections(config.getId());
-            config.setTotalConnections(totalConnections);
         }
 
         return mav;
