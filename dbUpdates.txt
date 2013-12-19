@@ -23,7 +23,7 @@ DROP COLUMN `messageTypeCustomVal`,
 DROP COLUMN `messageTypeColNo`,
 ADD COLUMN `clearRecords` BIT NULL DEFAULT False AFTER `maxFileSize`,
 ADD COLUMN `fileLocation` VARCHAR(255) NULL DEFAULT NULL AFTER `clearRecords`,
-ADD COLUMN `autoRelease` BIT NULL DEFAULT False AFTER `fileLocation`,
+ADD COLUMN `autoRelease` BIT NULL DEFAULT True AFTER `fileLocation`,
 ADD COLUMN `errorHandling` SMALLINT NOT NULL DEFAULT 1 COMMENT '1 = Post errors to ERG\n2 = Reject record on error\n3 = Reject submission on error\n4 = Pass through errors' AFTER `autoRelease`,
 ADD COLUMN `mergeBatches` BIT NULL DEFAULT True AFTER `errorHandling`;
 
@@ -58,3 +58,5 @@ ADD CONSTRAINT `fkTransport`
   REFERENCES `universalTranslator`.`ref_transportMethods` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
+
+UPDATE `universalTranslator`.`ref_transportMethods` SET `transportMethod`='ERG' WHERE `id`='2';

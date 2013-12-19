@@ -69,6 +69,12 @@ public class adminConfigController {
      * The private maxResults variable will hold the number of results to show per list page.
      */
     private static int maxResults = 20;
+    
+    /** 
+     * The stepsCompleted variable will hold the number of steps the configuration has gone 
+     * through
+     */
+    private static int stepsCompleted = 0;
 
     private static List<configurationDataTranslations> translations = null;
 
@@ -285,7 +291,8 @@ public class adminConfigController {
         mav.addObject("configurationDetails", configurationDetails);
 
         //Set the variable to hold the number of completed steps for this configuration;
-        mav.addObject("completedSteps", configurationDetails.getstepsCompleted());
+        stepsCompleted = configurationDetails.getstepsCompleted();
+        mav.addObject("stepsCompleted", stepsCompleted);
 
         //Need to get a list of active organizations.
         List<Organization> organizations = organizationmanager.getAllActiveOrganizations();
@@ -329,6 +336,8 @@ public class adminConfigController {
 
         //submit the updates
         configurationmanager.updateConfiguration(configurationDetails);
+        
+        stepsCompleted = 1;
 
         //If the "Save" button was pressed 
         if (action.equals("save")) {
@@ -340,7 +349,7 @@ public class adminConfigController {
             mav.addObject("users", users);
             mav.addObject("id", configId);
             mav.addObject("savedStatus", "updated");
-            mav.addObject("completedSteps", configurationDetails.getstepsCompleted());
+            mav.addObject("stepsCompleted", stepsCompleted);
 
             return mav;
         } //If the "Next Step" button was pressed.
@@ -368,16 +377,16 @@ public class adminConfigController {
 
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/configurations/transport");
-
-        //Get the transport details
-        List<configurationTransport> transportDetails = configurationTransportManager.getTransportDetails(configId);
         
-        //Need to get FTP information
-        for(configurationTransport transport : transportDetails) {
-            List<configurationFTPFields> FTPFields = configurationTransportManager.getTransportFTPDetails(transport.getId());
-            transport.setFTPFields(FTPFields);
+        configurationTransport transportDetails = configurationTransportManager.getTransportDetails(configId);
+        if(transportDetails == null) {
+            transportDetails = new configurationTransport();
         }
-
+        
+        transportDetails.setconfigId(configId);
+        mav.addObject("transportDetails", transportDetails);
+        
+        
         //Set the variable id to hold the current configuration id
         mav.addObject("id", configId);
 
@@ -386,24 +395,17 @@ public class adminConfigController {
        
         configurationDetails.setOrgName(organizationmanager.getOrganizationById(configurationDetails.getorgId()).getOrgName());
         configurationDetails.setMessageTypeName(messagetypemanager.getMessageTypeById(configurationDetails.getMessageTypeId()).getName());
+        configurationDetails.setuserName(userManager.getUserById(configurationDetails.getuserId()).getFirstName() + " " + userManager.getUserById(configurationDetails.getuserId()).getLastName());
         
         //pass the configuration detail object back to the page.
         mav.addObject("configurationDetails", configurationDetails);
 
         //Set the variable to hold the number of completed steps for this configuration;
-        mav.addObject("completedSteps", configurationDetails.getstepsCompleted());
+        mav.addObject("stepsCompleted", stepsCompleted);
 
         //Get the list of available transport methods
         List transportMethods = configurationTransportManager.getTransportMethods();
         mav.addObject("transportMethods", transportMethods);
-
-        //Set a list of transport methods already set up for the configuration
-        List<Integer> transportList = new ArrayList<Integer>();
-
-        for (configurationTransport details : transportDetails) {
-            transportList.add(details.gettransportMethod());
-        }
-        mav.addObject("usedTransportMethods", transportList);
 
         //Get the list of available file delimiters
         List delimiters = messagetypemanager.getDelimiters();
@@ -414,44 +416,8 @@ public class adminConfigController {
         mav.addObject("fileTypes", fileTypes);
 
         return mav;
-
     }
-
-    /**
-     * The 'addTransportMethod.do' POST request will associate the configuration to the selected transport Method.
-     *
-     * @param	configId	The configId will hold the id of the current configuration
-     * @param	transportMethod	The transportMethod will hold the selected transport method
-     *
-     * @return	The method will return a 1 back to the calling ajax function which will handle the page load.
-     */
-    @RequestMapping(value = "/addTransportMethod.do", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody
-    Integer addNewTransportMethod(@RequestParam int configId, @RequestParam int transportMethod, RedirectAttributes redirectAttr) throws Exception {
-
-        configurationTransport transportDetails = new configurationTransport();
-        transportDetails.setconfigId(configId);
-        transportDetails.settransportMethod(transportMethod);
-        transportDetails.setFile(null);
-        
-        Integer transportId = configurationTransportManager.updateTransportDetails(transportDetails);
-        
-        //If FTP transport method is chosen,  need to create the default FTP information
-        if(transportMethod == 3) {
-            configurationFTPFields FTPGETFields = new configurationFTPFields();
-            FTPGETFields.settransportId(transportId);
-            FTPGETFields.setmethod(2);
-            configurationTransportManager.saveTransportFTP(FTPGETFields); 
-            
-            configurationFTPFields FTPPUSHFields = new configurationFTPFields();
-            FTPPUSHFields.settransportId(transportId);
-            FTPPUSHFields.setmethod(1);
-            configurationTransportManager.saveTransportFTP(FTPPUSHFields); 
-        }
-
-        return 1;
-    }
-
+    
     /**
      * The '/transport' POST request will submit the transport details
      *
@@ -460,11 +426,30 @@ public class adminConfigController {
      * @return	This function will either return to the transport details screen or redirect to the next step (Field Mappings)
      */
     @RequestMapping(value = "/transport", method = RequestMethod.POST)
-    public ModelAndView updateTransportDetails(@Valid @ModelAttribute(value = "transportDetails") configuration configurationDetails, BindingResult result, RedirectAttributes redirectAttr, @RequestParam String action) throws Exception {
+    public ModelAndView updateTransportDetails(@Valid @ModelAttribute(value = "transportDetails") configurationTransport transportDetails, BindingResult result, RedirectAttributes redirectAttr, @RequestParam String action) throws Exception {
 
-        //Need to update the configuration completed step
-        if (configurationDetails.getstepsCompleted() < 2) {
+        /**
+         * Need to update the configuration completed step
+         * Get the configuration details for the selected config
+         *
+        */
+        if (stepsCompleted < 2) {
             configurationmanager.updateCompletedSteps(configId, 2);
+            stepsCompleted = 2;
+        }
+        
+        //submit the updates
+        Integer transportId = (Integer) configurationTransportManager.updateTransportDetails(transportDetails);
+        
+        /**
+         * if transport method = ERG (2) then set up the online form
+         * OR
+         * if transport method is not ERG but the error handling is set
+         * to fix errors via ERG set up the online form
+         */
+        if(transportDetails.gettransportMethodId() == 2 || transportDetails.geterrorHandling() == 1) {
+            configuration configurationDetails = configurationmanager.getConfigurationById(configId);
+            configurationTransportManager.setupOnlineForm(transportId, configId, configurationDetails.getMessageTypeId());
         }
 
 
@@ -480,6 +465,7 @@ public class adminConfigController {
         }
 
     }
+
 
     /**
      * The '/mappings' GET request will determine based on the selected transport method what page to display. Either the choose fields page if 'online form' is selected or 'mappings' if a custom file is being uploaded.
@@ -508,7 +494,7 @@ public class adminConfigController {
         mav.addObject("completedSteps", configurationDetails.getstepsCompleted());
 
         //Get a list of all transport details
-        List<configurationTransport> allTransportDetails = configurationTransportManager.getTransportDetails(configId);
+        //List<configurationTransport> allTransportDetails = configurationTransportManager.getTransportDetails(configId);
 
         //Get the transport details by configid and selected transport method
         configurationTransport transportDetails = configurationTransportManager.getTransportDetailsByTransportMethod(configId, selTransportMethod);
@@ -545,9 +531,9 @@ public class adminConfigController {
         //Set a list of transport methods already set up for the configuration
         List<Integer> transportList = new ArrayList<Integer>();
 
-        for (configurationTransport details : allTransportDetails) {
-            transportList.add(details.gettransportMethod());
-        }
+        //for (configurationTransport details : allTransportDetails) {
+           // transportList.add(details.gettransportMethod());
+       // }
         mav.addObject("availTransportMethods", transportList);
 
         return mav;
@@ -631,7 +617,7 @@ public class adminConfigController {
 
 
         //Get a list of all transport details
-        List<configurationTransport> allTransportDetails = configurationTransportManager.getTransportDetails(configId);
+        //List<configurationTransport> allTransportDetails = configurationTransportManager.getTransportDetails(configId);
 
         //Get the transport details by configid and selected transport method
         configurationTransport transportDetails = configurationTransportManager.getTransportDetailsByTransportMethod(configId, selTransportMethod);
@@ -669,9 +655,9 @@ public class adminConfigController {
         //Set a list of transport methods already set up for the configuration
         List<Integer> transportList = new ArrayList<Integer>();
 
-        for (configurationTransport details : allTransportDetails) {
-            transportList.add(details.gettransportMethod());
-        }
+       // for (configurationTransport details : allTransportDetails) {
+           // transportList.add(details.gettransportMethod());
+        //}
         mav.addObject("availTransportMethods", transportList);
 
         return mav;
@@ -1053,11 +1039,11 @@ public class adminConfigController {
         List<Integer> transportList = new ArrayList<Integer>();
         
         //Get a list of all transport details
-        List<configurationTransport> allTransportDetails = configurationTransportManager.getTransportDetails(configId);
+        //List<configurationTransport> allTransportDetails = configurationTransportManager.getTransportDetails(configId);
 
-        for (configurationTransport details : allTransportDetails) {
-            transportList.add(details.gettransportMethod());
-        }
+        //for (configurationTransport details : allTransportDetails) {
+            //transportList.add(details.gettransportMethod());
+       // }
         mav.addObject("availTransportMethods", transportList);
 
         return mav;

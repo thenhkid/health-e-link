@@ -9,7 +9,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-import javax.validation.constraints.Digits;
 
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
@@ -34,31 +33,17 @@ public class configurationTransport {
     @Column(name = "CONFIGID", nullable = false)
     private int configId;
 
-    @Column(name = "TRANSPORTMETHOD", nullable = false)
-    private int transportMethod;
+    @Column(name = "TRANSPORTMETHODID", nullable = false)
+    private int transportMethodId;
 
     @Column(name = "FILENAME", nullable = true)
     private String fileName = null;
-
-    @Digits(integer = 4, fraction = 0, message = "Wrong Number")
-    @Column(name = "MESSAGETYPECOLNO", nullable = true)
-    private int messageTypeColNo = 0;
-
-    @Column(name = "MESSAGETYPECUSTOMVAL", nullable = true)
-    private String messageTypeCustomVal = null;
-
-    @Digits(integer = 4, fraction = 0, message = "Wrong Number")
-    @Column(name = "TARGETORGCOLNO", nullable = true)
-    private int targetOrgColNo = 0;
 
     @Column(name = "FILETYPE", nullable = true)
     private int fileType = 1;
 
     @Column(name = "FILEDELIMITER", nullable = true)
     private int fileDelimiter = 0;
-
-    @Column(name = "CONTAINSHEADER", nullable = false)
-    private boolean containsHeader = false;
 
     @Column(name = "STATUS", nullable = false)
     private boolean status = true;
@@ -71,6 +56,21 @@ public class configurationTransport {
     
     @Column(name = "MAXFILESIZE", nullable = false)
     private int maxFileSize = 0;
+    
+    @Column(name = "CLEARRECORDS", nullable = false)
+    private boolean clearRecords = false;
+    
+    @Column(name = "FILELOCATION", nullable = true)
+    private String fileLocation = null;
+    
+    @Column(name = "AUTORELEASE", nullable = false)
+    private boolean autoRelease = true;
+    
+    @Column(name = "ERRORHANDLING", nullable = false)
+    private int errorHandling = 1;
+    
+    @Column(name = "MERGEBATCHES", nullable = false)
+    private boolean mergeBatches = true;
 
     public int getId() {
         return id;
@@ -87,37 +87,13 @@ public class configurationTransport {
     public void setconfigId(int configId) {
         this.configId = configId;
     }
-
-    public int gettransportMethod() {
-        return transportMethod;
+    
+    public int gettransportMethodId() {
+        return transportMethodId;
     }
 
-    public void settransportMethod(int transportMethod) {
-        this.transportMethod = transportMethod;
-    }
-
-    public int getmessageTypeColNo() {
-        return messageTypeColNo;
-    }
-
-    public void setmessageTypeColNo(int messageTypeColNo) {
-        this.messageTypeColNo = messageTypeColNo;
-    }
-
-    public String getmessageTypeCustomVal() {
-        return messageTypeCustomVal;
-    }
-
-    public void setmessageTypeCustomVal(String messageTypeCustomVal) {
-        this.messageTypeCustomVal = messageTypeCustomVal;
-    }
-
-    public int gettargetOrgColNo() {
-        return targetOrgColNo;
-    }
-
-    public void settargetOrgColNo(int targetOrgColNo) {
-        this.targetOrgColNo = targetOrgColNo;
+    public void settransportMethodId(int transportMethodId) {
+        this.transportMethodId = transportMethodId;
     }
 
     public int getfileType() {
@@ -159,15 +135,7 @@ public class configurationTransport {
     public void setFields(List<configurationFormFields> fields) {
         this.fields = fields;
     }
-
-    public boolean getcontainsHeader() {
-        return containsHeader;
-    }
-
-    public void setcontainsHeader(boolean containsHeader) {
-        this.containsHeader = containsHeader;
-    }
-    
+  
     public List<configurationFTPFields> getFTPFields() {
         return FTPfields;
     }
@@ -206,6 +174,46 @@ public class configurationTransport {
     
     public void setmaxFileSize(int maxFileSize) {
         this.maxFileSize = maxFileSize;
+    }
+    
+    public boolean getclearRecords() {
+        return clearRecords;
+    }
+
+    public void setclearRecords(boolean clearRecords) {
+        this.clearRecords = clearRecords;
+    }
+    
+    public String getfileLocation() {
+        return fileLocation;
+    }
+
+    public void setfileLocation(String fileLocation) {
+        this.fileLocation = fileLocation;
+    }
+    
+    public boolean getautoRelease() {
+        return autoRelease;
+    }
+
+    public void setautoRelease(boolean autoRelease) {
+        this.autoRelease = autoRelease;
+    }
+    
+    public int geterrorHandling() {
+        return errorHandling;
+    }
+    
+    public void seterrorHandling(int errorHandling) {
+        this.errorHandling = errorHandling;
+    }
+    
+    public boolean getmergeBatches() {
+        return mergeBatches;
+    }
+
+    public void setmergeBatches(boolean mergeBatches) {
+        this.mergeBatches = mergeBatches;
     }
 
 }

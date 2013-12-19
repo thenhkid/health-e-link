@@ -32,10 +32,11 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
      * @Return	This function will return a list of configurationTransport objects
      */
     @SuppressWarnings("unchecked")
-    public List<configurationTransport> getTransportDetails(int configId) {
+    public configurationTransport getTransportDetails(int configId) {
         Query query = sessionFactory.getCurrentSession().createQuery("from configurationTransport where configId = :configId");
         query.setParameter("configId", configId);
-        return query.list();
+        
+         return (configurationTransport) query.uniqueResult();
     }
 
     /**
@@ -63,24 +64,8 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
      * @Return	This function does not return anything
      */
     @Override
-    public void setupOnlineForm(int configId, int messageTypeId) {
-        int transportId = 0;
-
-        configurationTransport transportDetails = new configurationTransport();
-        transportDetails.settransportMethod(2);
-        transportDetails.setconfigId(configId);
-
-        transportId = (Integer) sessionFactory.getCurrentSession().save(transportDetails);
-
-        copyMessageTypeFields(configId, messageTypeId);
-        
-        //Call the function that will automatically create the schedule for the online form.
-        configurationSchedules schedule = new configurationSchedules();
-        schedule.setconfigId(configId);
-        schedule.settype(5);
-        
-        sessionFactory.getCurrentSession().save(schedule);
-        
+    public void setupOnlineForm(int transportId, int configId, int messageTypeId) {
+        copyMessageTypeFields(transportId, configId, messageTypeId);
     }
 
     /**
@@ -131,13 +116,14 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
     /**
      * The 'copyMessageTypeFields' function will copy the form fields for the selected message type for the selected configuration.
      *
+     * @param   transportId     The id of the configured transport method
      * @param	configId	The id of the selected configuration 
      * @param   messageTypeId	The id of the selected message type to copy the form fields
      *
      * @return	This function does not return anything
      */
     @Transactional
-    public void copyMessageTypeFields(int configId, int messageTypeId) {
+    public void copyMessageTypeFields(int transportId, int configId, int messageTypeId) {
        
         /* Check to see if there are any data translations for the passed in message type */
         Query translationQuery = sessionFactory.getCurrentSession().createSQLQuery("SELECT id FROM rel_messageTypeDataTranslations where messageTypeId = :messageTypeId");
@@ -155,9 +141,10 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
             while(it.hasNext()) {
                 Object row[] = (Object[]) it.next();
                 id = (Integer) row[0];
-                Query query = sessionFactory.getCurrentSession().createSQLQuery("INSERT INTO configurationFormFields (messageTypeFieldId, configId, fieldNo, fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, useField, saveToTableName, saveToTableCol, autoPopulateTableName, autoPopulateTableCol) SELECT id, :configId, fieldNo,  fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, 1, saveToTableName, saveToTableCol, autoPopulateTableName, autoPopulateTableCol FROM messageTypeFormFields where messageTypeId = :messageTypeId and id = :id");
+                Query query = sessionFactory.getCurrentSession().createSQLQuery("INSERT INTO configurationFormFields (messageTypeFieldId, configId, transportDetailId, fieldNo, fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, useField, saveToTableName, saveToTableCol, autoPopulateTableName, autoPopulateTableCol) SELECT id, :configId, :transportDetailId, fieldNo,  fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, 1, saveToTableName, saveToTableCol, autoPopulateTableName, autoPopulateTableCol FROM messageTypeFormFields where messageTypeId = :messageTypeId and id = :id");
                 query.setParameter("configId", configId);
                 query.setParameter("messageTypeId", messageTypeId);
+                query.setParameter("transportDetailId", transportId);
                 query.setParameter("id", id);
                 query.executeUpdate();
                 
@@ -169,7 +156,7 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
                     Object maxrow[] = (Object[]) maxIt.next();
                     max = (Integer) maxrow[0]; 
                     /* Check to see if there is a data translation for the current row */
-                    Query copyTranslations = sessionFactory.getCurrentSession().createSQLQuery("INSERT INTO rel_configurationDataTranslations (configId, transportMethod, fieldId, crosswalkId, macroId, processOrder) SELECT :configId, 2, :fieldId, crosswalkId, 0, processOrder FROM rel_messageTypeDataTranslations where fieldId = :fieldId2");
+                    Query copyTranslations = sessionFactory.getCurrentSession().createSQLQuery("INSERT INTO configurationDataTranslations (configId, transportMethod, fieldId, crosswalkId, macroId, processOrder) SELECT :configId, 2, :fieldId, crosswalkId, 0, processOrder FROM rel_messageTypeDataTranslations where fieldId = :fieldId2");
                     copyTranslations.setParameter("configId",configId);
                     copyTranslations.setParameter("fieldId",max);
                     copyTranslations.setParameter("fieldId2",id);
@@ -178,9 +165,10 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
             }
         }
         else {
-            Query query = sessionFactory.getCurrentSession().createSQLQuery("INSERT INTO configurationFormFields (messageTypeFieldId, configId, fieldNo, fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, useField, saveToTableName, saveToTableCol, autoPopulateTableName, autoPopulateTableCol) SELECT id, :configId, fieldNo,  fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, 1, saveToTableName, saveToTableCol, autoPopulateTableName, autoPopulateTableCol FROM messageTypeFormFields where messageTypeId = :messageTypeId");
+            Query query = sessionFactory.getCurrentSession().createSQLQuery("INSERT INTO configurationFormFields (messageTypeFieldId, configId, transportDetailId, fieldNo, fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, useField, saveToTableName, saveToTableCol, autoPopulateTableName, autoPopulateTableCol) SELECT id, :configId, :transportDetailId, fieldNo,  fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, 1, saveToTableName, saveToTableCol, autoPopulateTableName, autoPopulateTableCol FROM messageTypeFormFields where messageTypeId = :messageTypeId");
             query.setParameter("configId", configId);
             query.setParameter("messageTypeId", messageTypeId);
+            query.setParameter("transportDetailId", transportId);
 
             query.executeUpdate();
         }

@@ -1,5 +1,15 @@
 $(document).ready(function() {
     $("input:text,form").attr("autocomplete", "off");
+    
+    var selMethodId = $('#transportMethod').val() 
+    //Show file/download/FTP fields
+    if(selMethodId === "1" || selMethodId === "3") {
+        $('#upload-downloadDiv').show();
+    }
+
+    if(selMethodId === "3") {
+        $('#additionalFTPDiv').show();
+    }
 });
 
 $(function() {
@@ -7,40 +17,45 @@ $(function() {
     if ($('.alert').length > 0) {
         $('.alert').delay(2000).fadeOut(1000);
     }
-    ;
-
-    //Add a new transport method
-    $('.addTransportMethod').click(function() {
-        var configId = $('#configId').last().val();
-        var selMethod = $('#transportMethod').val();
-
-        if (selMethod == '') {
-            $('#transportMethodDiv').addClass("has-error");
+    
+    $('#transportMethod').change(function() {
+       var methodId = $(this).val();
+       
+       //hide all section divs
+       $('.methodDiv').hide();
+      
+       //Show file/download/FTP fields
+       if(methodId === "1" || methodId === "3") {
+           $('#upload-downloadDiv').show();
+       }
+       
+       if(methodId === "3") {
+           $('#additionalFTPDiv').show();
+       }
+        
+    });
+    
+    $('#useSource').click(function() {
+        if($('#useSource').is(":checked")) {
+            $('#fileName').val("USE SOURCE FILE");
         }
         else {
-            $.ajax({
-                url: 'addTransportMethod.do',
-                type: "POST",
-                data: {'configId': configId, 'transportMethod': selMethod},
-                success: function(data) {
-                    if (data == 1) {
-                        window.location.href = "transport";
-                    }
-                }
-            });
+            $('#fileName').val("");
         }
     });
 
+    
+
     //This function will save the messgae type field mappings
-    $('#saveDetails').click(function(event) {
+    $('#saveDetails').click(function() {
         $('#action').val('save');
         
         //Need to make sure all required fields are marked if empty.
         var hasErrors = 0;
         hasErrors = checkFormFields();
 
-        if (hasErrors == 0) {
-            $('#transportMethods').submit();
+        if (hasErrors == 0) { 
+            $('#transportDetails').submit();
         }
     });
 
@@ -51,7 +66,7 @@ $(function() {
         hasErrors = checkFormFields();
 
         if (hasErrors == 0) {
-            $('#transportMethods').submit();
+            $('#transportDetails').submit();
         }
     });
 
@@ -64,79 +79,21 @@ function checkFormFields() {
     $('div.form-group').removeClass("has-error");
     $('span.control-label').removeClass("has-error");
     $('span.control-label').html("");
-
-    //Loop through each transport method chosen
-    $('.transportMethod').each(function() {
-        var sectionVal = $(this).attr('rel');
-
-        //Validate the File Upload fields
-        if (sectionVal == 1 || sectionVal == 3) {
-            var headVal = "";
-            if (sectionVal == 3) {
-                headVal = "FTP";
-            }
-
-            if ($('#' + headVal + 'currFile').val() != '') {
-                if ($('#' + headVal + 'templateFile').val() != '' && $('#' + headVal + 'templateFile').val().indexOf('.xlsx') == -1) {
-                    $('#templateFileDiv').addClass("has-error");
-                    $('#templateFileMsg').addClass("has-error");
-                    $('#templateFileMsg').html('The template file must be an excel file (.xlsx format).');
-                    hasErrors = 1;
-                }
-            }
-            else {
-                if ($('#' + headVal + 'templateFile').val() == '' || $('#' + headVal + 'templateFile').val().indexOf('.xlsx') == -1) {
-                    $('#' + headVal + 'templateFileDiv').addClass("has-error");
-                    $('#' + headVal + 'templateFileMsg').addClass("has-error");
-                    $('#' + headVal + 'templateFileMsg').html('The template file must be an excel file (.xlsx format).');
-                    hasErrors = 1;
-                }
-            }
-            
-            //Make sure a valid max file size is entered
-            if (!$.isNumeric($('#' + headVal + 'maxFileSize').val()) || $('#' + headVal + 'maxFileSize').val() == 0) {
-                $('#' + headVal + 'maxFileSizeDiv').addClass("has-error");
-                $('#' + headVal + 'maxFileSizeMsg').addClass("has-error");
-                $('#' + headVal + 'maxFileSizeMsg').html('The max file size must be a numeric value greater than 0!');
-                hasErrors = 1;
-            }
-            
-            if($('#configType').val() === 1) {
-
-                //Make sure a valid field no is entered
-                if (!$.isNumeric($('#' + headVal + 'targetOrgColNo').val())) {
-                    $('#' + headVal + 'targetOrgColNoDiv').addClass("has-error");
-                    $('#' + headVal + 'targetOrgColNoMsg').addClass("has-error");
-                    $('#' + headVal + 'targetOrgColNoMsg').html('The target organziation field No must be a numeric value!');
-                    hasErrors = 1;
-                }
-                if (!$.isNumeric($('#' + headVal + 'messageTypeColNo').val())) {
-                    $('#' + headVal + 'messageTypeColNoDiv').addClass("has-error");
-                    $('#' + headVal + 'messageTypeColNoMsg').addClass("has-error");
-                    $('#' + headVal + 'messageTypeColNoMsg').html('The message type field No must be a numeric value!');
-                    hasErrors = 1;
-                }
-            }
-
-            //Make sure the file type and delimiter is selected
-            if ($('#' + headVal + 'fileType').val() == '') {
-                $('#' + headVal + 'fileTypeDiv').addClass("has-error");
-                $('#' + headVal + 'fileTypeMsg').addClass("has-error");
-                $('#' + headVal + 'ileTypeMsg').html('The file type is a required field!');
-                hasErrors = 1;
-            }
-            if ($('#' + headVal + 'delimiter').val() == '') {
-                $('#' + headVal + 'fileDelimDiv').addClass("has-error");
-                $('#' + headVal + 'fileDelimMsg').addClass("has-error");
-                $('#' + headVal + 'fileDelimMsg').html('The file delimiter is a required field!');
-                hasErrors = 1;
-            }
-            if (hasErrors == 1) {
-                $('#collapse' + sectionVal).show();
-            }
-        }
-
-    });
+    
+    var selMethodId = $('#transportMethod').val() 
+    
+    //Make sure a transport method is chosen
+    if($('#transportMethod').val() === "") {
+       $('#transportMethodDiv').addClass("has-error");
+       $('#transportMethodMsg').addClass("has-error");
+       $('#transportMethodMsg').html('The transport method is a required field.');
+       hasErrors = 1;
+    }
+    
+    if (selMethodId === "1" || selMethodId === "3") {
+       
+    }
+ 
 
     return hasErrors;
 }

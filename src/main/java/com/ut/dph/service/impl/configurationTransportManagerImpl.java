@@ -50,7 +50,7 @@ public class configurationTransportManagerImpl implements configurationTransport
 
     @Override
     @Transactional
-    public List<configurationTransport> getTransportDetails(int configId) {
+    public configurationTransport getTransportDetails(int configId) {
         return configurationTransportDAO.getTransportDetails(configId);
     }
 
@@ -62,8 +62,8 @@ public class configurationTransportManagerImpl implements configurationTransport
 
     @Override
     @Transactional
-    public void setupOnlineForm(int configId, int messageTypeId) {
-        configurationTransportDAO.setupOnlineForm(configId, messageTypeId);
+    public void setupOnlineForm(int transportId, int configId, int messageTypeId) {
+        configurationTransportDAO.setupOnlineForm(transportId, configId, messageTypeId);
     }
 
     @Override
