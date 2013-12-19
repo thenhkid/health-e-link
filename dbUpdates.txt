@@ -47,3 +47,14 @@ CREATE TABLE `universalTranslator`.`configurationTransportMessageTypes` (
 
 ALTER TABLE `universalTranslator`.`rel_configurationDataTranslations` 
 RENAME TO  `universalTranslator`.`configurationDataTranslations` ;
+
+ALTER TABLE `universalTranslator`.`configurationTransportDetails` 
+DROP FOREIGN KEY `fkTransport`;
+ALTER TABLE `universalTranslator`.`configurationTransportDetails` 
+CHANGE COLUMN `transportMethod` `transportMethodId` INT(11) NOT NULL ;
+ALTER TABLE `universalTranslator`.`configurationTransportDetails` 
+ADD CONSTRAINT `fkTransport`
+  FOREIGN KEY (`transportMethodId`)
+  REFERENCES `universalTranslator`.`ref_transportMethods` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
