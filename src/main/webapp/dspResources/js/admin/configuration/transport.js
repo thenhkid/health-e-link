@@ -92,6 +92,30 @@ function checkFormFields() {
     
     if (selMethodId === "1" || selMethodId === "3") {
        
+       //Make sure the file size is numeric and greate than 0
+       if($('#maxFileSize').val() <= 0 || !$.isNumeric($('#maxFileSize').val())) {
+           $('#maxFileSizeDiv').addClass("has-error");
+           $('#maxFileSizeMsg').addClass("has-error");
+           $('#maxFileSizeMsg').html('The max file size is a required field and must be a numeric value.');
+           hasErrors = 1;
+       }
+       
+       //Make sure the file type is selected
+       if($('#fileType').val() === "") {
+           $('#fileTypeDiv').addClass("has-error");
+           $('#fileTypeMsg').addClass("has-error");
+           $('#fileTypeMsg').html('The file type is a required field.');
+           hasErrors = 1;
+       }
+       
+       //Make sure the file delimiter is selected
+       if($('#fileDelimiter').val() === "") {
+           $('#fileDelimiterDiv').addClass("has-error");
+           $('#fileDelimiterMsg').addClass("has-error");
+           $('#fileDelimiterMsg').html('The file delimiter is a required field.');
+           hasErrors = 1;
+       }
+       
     }
  
 

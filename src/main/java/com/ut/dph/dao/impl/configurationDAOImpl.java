@@ -472,14 +472,12 @@ public class configurationDAOImpl implements configurationDAO {
      * The 'getScheduleDetails' function will return the details of the schedule for the passed in configuration id and transport method.
      *
      * @param configId The id for the configuration
-     * @param transportMethod The transport method
      *
      * @return The function will return a configurationSchedules object containing the details for the schedule.
      */
-    public configurationSchedules getScheduleDetails(int configId, int transportMethod) {
-        Query query = sessionFactory.getCurrentSession().createQuery("from configurationSchedules where configId = :configId and transportMethod = :transportMethod");
+    public configurationSchedules getScheduleDetails(int configId) {
+        Query query = sessionFactory.getCurrentSession().createQuery("from configurationSchedules where configId = :configId");
         query.setParameter("configId", configId);
-        query.setParameter("transportMethod", transportMethod);
 
         configurationSchedules scheduleDetails = (configurationSchedules) query.uniqueResult();
 

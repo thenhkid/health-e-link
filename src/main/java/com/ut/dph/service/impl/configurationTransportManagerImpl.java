@@ -82,4 +82,10 @@ public class configurationTransportManagerImpl implements configurationTransport
     public void saveTransportFTP(configurationFTPFields FTPFields) {
         configurationTransportDAO.saveTransportFTP(FTPFields);
     }
+    
+    @Override
+    @Transactional
+    public String getTransportMethodById(int Id) {
+        return configurationTransportDAO.getTransportMethodById(Id);
+    }
 }

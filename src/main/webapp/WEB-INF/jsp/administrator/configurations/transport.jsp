@@ -19,6 +19,7 @@
                         <dd><strong>Organization:</strong> ${configurationDetails.orgName}</dd>
                         <dd><strong>Authorized User</strong> ${configurationDetails.userName}</dd>
                         <dd><strong>Message Type:</strong> ${configurationDetails.messageTypeName}</dd>
+                        <dd><strong>Transport Method:</strong> ${configurationDetails.transportMethod}</dd>
                     </dt>
                 </div>
             </section>
@@ -54,28 +55,32 @@
                             <spring:bind path="transportMethodId">
                                 <div id="transportMethodDiv" class="form-group ${status.error ? 'has-error' : '' }">
                                     <label class="control-label" for="transportMethod">Transport Method *</label>
-                                    <form:select path="transportMethodId" id="transportMethod" class="form-control">
+                                    <form:select path="transportMethodId" id="transportMethod" class="form-control" disabled="${transportDetails.id > 0 ? 'true' : 'false'}">
                                         <option value="">- Select -</option>
                                         <c:forEach items="${transportMethods}" var="transMethod" varStatus="tStatus">
                                             <option value="${transportMethods[tStatus.index][0]}" <c:if test="${transportDetails.transportMethodId == transportMethods[tStatus.index][0]}">selected</c:if>><c:choose><c:when test="${transportMethods[tStatus.index][0] == 1}"><c:choose><c:when test="${configurationDetails.type == 1}">File Upload</c:when><c:otherwise>File Download</c:otherwise></c:choose></c:when><c:otherwise>${transportMethods[tStatus.index][1]}</c:otherwise></c:choose></option>
                                         </c:forEach>
                                     </form:select>
                                     <span id="transportMethodMsg" class="control-label"></span>
+                                    <c:if test="${transportDetails.id > 0}">
+                                        <form:hidden path="transportMethodId" />
+                                    </c:if>
                                 </div>
                             </spring:bind>
                             <div id="upload-downloadDiv" class="methodDiv" style="display:none">
-                                <spring:bind path="fileLocation">
+                                <%--<spring:bind path="fileLocation">
                                     <div class="form-group ${status.error ? 'has-error' : '' }">
                                         <label class="control-label" for="fileLocation">File Location *</label>
                                         <form:input path="fileLocation" id="fileLocation" class="form-control" type="text" maxLength="255" />
                                         <form:errors path="fileLocation" cssClass="control-label" element="label" />
                                    </div>
-                                </spring:bind>
+                                </spring:bind>--%>
                                 <spring:bind path="maxFileSize">
-                                    <div class="form-group ${status.error ? 'has-error' : '' }">
-                                        <label class="control-label" for="maxFileSize">Max File Size *</label>
-                                        <form:input path="maxFileSize" id="fileLocation" class="form-control" type="text" maxLength="11" />
+                                    <div id="maxFileSizeDiv" class="form-group ${status.error ? 'has-error' : '' }">
+                                        <label class="control-label" for="maxFileSize">Max File Size (mb) *</label>
+                                        <form:input path="maxFileSize" id="maxFileSize" class="form-control" type="text" maxLength="11" />
                                         <form:errors path="maxFileSize" cssClass="control-label" element="label" />
+                                        <span id="maxFileSizeMsg" class="control-label"></span>
                                    </div>
                                 </spring:bind>
                                 <spring:bind path="fileType">

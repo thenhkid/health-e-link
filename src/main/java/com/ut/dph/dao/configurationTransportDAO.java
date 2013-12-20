@@ -28,5 +28,7 @@ public interface configurationTransportDAO {
     List<configurationFTPFields> getTransportFTPDetails(int transportDetailId);
     
     void saveTransportFTP(configurationFTPFields FTPFields);
+    
+    String getTransportMethodById(int Id);
 
 }

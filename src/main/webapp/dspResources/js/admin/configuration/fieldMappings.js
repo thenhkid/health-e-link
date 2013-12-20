@@ -30,7 +30,6 @@ $(function() {
     //This function will save the messgae type field mappings
     $('#saveDetails').click(function(event) {
         $('#action').val('save');
-        $('#seltransportMethod').val($('#transportMethod').val());
 
         //Need to make sure all required fields are marked if empty.
         var hasErrors = 0;

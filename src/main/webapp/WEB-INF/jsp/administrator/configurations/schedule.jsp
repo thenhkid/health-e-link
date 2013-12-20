@@ -29,30 +29,10 @@
                     <dt>
                         <dt>Configuration Summary:</dt>
                         <dd><strong>Organization:</strong> ${configurationDetails.orgName}</dd>
+                        <dd><strong>Authorized User</strong> ${configurationDetails.userName}</dd>
                         <dd><strong>Message Type:</strong> ${configurationDetails.messageTypeName}</dd>
+                        <dd><strong>Transport Method:</strong> ${configurationDetails.transportMethod}</dd>
                     </dt>
-                </div>
-            </section>
-            <section class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Choose a Transport Method</h3>
-                </div>
-                <div class="panel-body basic-clearfix">
-                    <div class="form-inline">
-                        <div id="transportMethodDiv" class="form-group half mb0 ${status.error ? 'has-error' : '' }">
-                            <label class="sr-only" for="transportMethod">Transport Method *</label>
-                            <select id="transportMethod" class="form-control">
-                                <option value="">- Select -</option>
-                                <c:forEach items="${transportMethods}" var="transMethod" varStatus="tStatus">
-                                    <c:if test="${availTransportMethods.contains(transportMethods[tStatus.index][0])}">
-                                        <option value="${transportMethods[tStatus.index][0]}" <c:if test="${selTransportMethod == transportMethods[tStatus.index][0]}">selected</c:if>>${transportMethods[tStatus.index][1]} </option>
-                                    </c:if>
-                                </c:forEach>
-                            </select>
-                            <span id="transportMethodMsg" class="control-label"></span>
-                        </div>
-                        <button class="btn btn-primary changeTransportMethod">Go</button>
-                    </div>
                 </div>
             </section>
         </div>
@@ -69,19 +49,19 @@
                             <label for="status">Process Configuration</label>
                             <div>
                                 <label class="radio-inline">
-                                    <input type="radio" class="processMethod" name="processMethod" value="1" <c:if test="${scheduleDetails.type == 1}">checked="checked"</c:if> <c:if test="${(configurationDetails.type == 1 && selTransportMethod != 3)}">disabled="true"</c:if> /> Manual 
+                                    <input type="radio" class="processMethod" name="processMethod" value="1" <c:if test="${scheduleDetails.type == 1}">checked="checked"</c:if> /> Manual 
                                 </label>
                                 <label class="radio-inline">
-                                    <input type="radio" class="processMethod" name="processMethod" value="2" <c:if test="${scheduleDetails.type == 2}">checked="checked"</c:if> <c:if test="${(configurationDetails.type == 1 && selTransportMethod != 3)}">disabled="true"</c:if> /> Daily 
+                                    <input type="radio" class="processMethod" name="processMethod" value="2" <c:if test="${scheduleDetails.type == 2}">checked="checked"</c:if> /> Daily 
                                 </label>
                                 <label class="radio-inline">
-                                    <input type="radio" class="processMethod" name="processMethod" value="3" <c:if test="${scheduleDetails.type == 3}">checked="checked"</c:if> <c:if test="${(configurationDetails.type == 1 && selTransportMethod != 3)}">disabled="true"</c:if> /> Weekly 
+                                    <input type="radio" class="processMethod" name="processMethod" value="3" <c:if test="${scheduleDetails.type == 3}">checked="checked"</c:if>  /> Weekly 
                                 </label>
                                 <label class="radio-inline">
-                                    <input type="radio" class="processMethod" name="processMethod" value="4" <c:if test="${scheduleDetails.type == 4}">checked="checked"</c:if> <c:if test="${(configurationDetails.type == 1 && selTransportMethod != 3)}">disabled="true"</c:if> /> Monthly 
+                                    <input type="radio" class="processMethod" name="processMethod" value="4" <c:if test="${scheduleDetails.type == 4}">checked="checked"</c:if>  /> Monthly 
                                 </label>
                                 <label class="radio-inline">
-                                    <input type="radio" class="processMethod" name="processMethod" value="5" <c:if test="${scheduleDetails.type == 5}">checked="checked"</c:if> /> Automatically 
+                                    <input type="radio" class="processMethod" name="processMethod" value="5" <c:if test="${scheduleDetails.type == 5 || scheduleDetails.type == 0}">checked="checked"</c:if> /> Automatically 
                                 </label>
                             </div>
                         </div>
@@ -97,7 +77,6 @@
                 <div class="panel-body">
                     <div class="form-container scrollable">
                     <form:form id="schedulingSpecs" modelAttribute="scheduleDetails" action="scheduling" method="post" role="form">
-                        <form:hidden path="transportMethod" value="${scheduleDetails.transportMethod}" />
                         <form:hidden path="configId" value="${scheduleDetails.configId}" />
                         <form:hidden path="id" value="${scheduleDetails.id}" />
                         <form:hidden path="type" id="type" />

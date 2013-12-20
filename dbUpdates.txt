@@ -890,3 +890,7 @@ DROP FOREIGN KEY `fkTransportMethod`;
 ALTER TABLE `universalTranslator`.`configurationDataTranslations` 
 DROP COLUMN `transportMethod`,
 DROP INDEX `fkTransportMethod_idx` ;
+
+/* Chad 12.20.13 @ 10:40 AM */
+ALTER TABLE `universalTranslator`.`configurationSchedule` 
+DROP COLUMN `transportMethod`;

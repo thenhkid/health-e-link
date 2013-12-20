@@ -58,7 +58,7 @@ public interface configurationManager {
   
   void updateConnection(Connections connection);
   
-  configurationSchedules getScheduleDetails(int configId, int transportMethod);
+  configurationSchedules getScheduleDetails(int configId);
   
   void saveSchedule(configurationSchedules scheduleDetails);
   

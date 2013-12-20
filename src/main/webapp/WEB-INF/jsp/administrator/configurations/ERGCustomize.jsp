@@ -51,6 +51,7 @@
                         <dd><strong>Organization:</strong> ${configurationDetails.orgName}</dd>
                         <dd><strong>Authorized User</strong> ${configurationDetails.userName}</dd>
                         <dd><strong>Message Type:</strong> ${configurationDetails.messageTypeName}</dd>
+                        <dd><strong>Transport Method:</strong> ${configurationDetails.transportMethod}</dd>
                     </dt>
                 </div>
             </section>

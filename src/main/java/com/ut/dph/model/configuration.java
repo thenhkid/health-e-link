@@ -25,6 +25,9 @@ public class configuration {
     @Transient
     private String messageTypeName = null;
 
+    @Transient
+    private String transportMethod = null;
+    
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID", nullable = false)
@@ -141,6 +144,14 @@ public class configuration {
 
     public void setstepsCompleted(int stepsCompleted) {
         this.stepsCompleted = stepsCompleted;
+    }
+    
+    public String gettransportMethod() {
+        return transportMethod;
+    }
+    
+    public void settransportMethod(String transportMethod) {
+        this.transportMethod = transportMethod;
     }
     
 }

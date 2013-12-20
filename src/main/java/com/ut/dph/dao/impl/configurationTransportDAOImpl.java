@@ -247,5 +247,23 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
     public void saveTransportFTP(configurationFTPFields FTPFields) {
         sessionFactory.getCurrentSession().saveOrUpdate(FTPFields);
     }
+    
+    /**
+     * The 'getTransportMethodById' function will return the name of a transport method based on the id passed in.
+     *
+     * @param Id	This will hold the id of the transport method to retrieve
+     *
+     * @Return This function will return a string (transport Method).
+     */
+    @Override
+    @Transactional
+    public String getTransportMethodById(int Id) {
+        Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT transportMethod FROM ref_transportMethods where id = :Id")
+                .setParameter("Id", Id);
+
+        String transportMethod = (String) query.uniqueResult();
+
+        return transportMethod;
+    }
 
 }

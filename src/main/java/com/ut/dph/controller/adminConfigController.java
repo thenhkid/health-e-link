@@ -114,6 +114,7 @@ public class adminConfigController {
         Organization org;
         User user;
         messageType messagetype;
+        configurationTransport transportDetails;
 
         for (configuration config : configurations) {
             org = organizationmanager.getOrganizationById(config.getorgId());
@@ -124,6 +125,9 @@ public class adminConfigController {
             
             user = userManager.getUserById(config.getuserId());
             config.setuserName(user.getFirstName() + " " + user.getLastName());
+            
+            transportDetails = configurationTransportManager.getTransportDetails(config.getId());
+            config.settransportMethod(configurationTransportManager.getTransportMethodById(transportDetails.gettransportMethodId()));
             
         }
         
@@ -427,6 +431,7 @@ public class adminConfigController {
         configurationDetails.setOrgName(organizationmanager.getOrganizationById(configurationDetails.getorgId()).getOrgName());
         configurationDetails.setMessageTypeName(messagetypemanager.getMessageTypeById(configurationDetails.getMessageTypeId()).getName());
         configurationDetails.setuserName(userManager.getUserById(configurationDetails.getuserId()).getFirstName() + " " + userManager.getUserById(configurationDetails.getuserId()).getLastName());
+        configurationDetails.settransportMethod(configurationTransportManager.getTransportMethodById(transportDetails.gettransportMethodId()));
         
         //pass the configuration detail object back to the page.
         mav.addObject("configurationDetails", configurationDetails);
@@ -546,6 +551,7 @@ public class adminConfigController {
         configurationDetails.setOrgName(organizationmanager.getOrganizationById(configurationDetails.getorgId()).getOrgName());
         configurationDetails.setMessageTypeName(messagetypemanager.getMessageTypeById(configurationDetails.getMessageTypeId()).getName());
         configurationDetails.setuserName(userManager.getUserById(configurationDetails.getuserId()).getFirstName() + " " + userManager.getUserById(configurationDetails.getuserId()).getLastName());
+        configurationDetails.settransportMethod(configurationTransportManager.getTransportMethodById(transportDetails.gettransportMethodId()));
         
         //pass the configuration detail object back to the page.
         mav.addObject("configurationDetails", configurationDetails);
@@ -637,6 +643,7 @@ public class adminConfigController {
         configurationDetails.setOrgName(organizationmanager.getOrganizationById(configurationDetails.getorgId()).getOrgName());
         configurationDetails.setMessageTypeName(messagetypemanager.getMessageTypeById(configurationDetails.getMessageTypeId()).getName());
         configurationDetails.setuserName(userManager.getUserById(configurationDetails.getuserId()).getFirstName() + " " + userManager.getUserById(configurationDetails.getuserId()).getLastName());
+        configurationDetails.settransportMethod(configurationTransportManager.getTransportMethodById(transportDetails.gettransportMethodId()));
         
         //pass the configuration detail object back to the page.
         mav.addObject("configurationDetails", configurationDetails);
@@ -669,16 +676,16 @@ public class adminConfigController {
         //Get the completed steps for the selected configuration;
         configuration configurationDetails = configurationmanager.getConfigurationById(configId);
         
+        //Get the transport details by configid and selected transport method
+        configurationTransport transportDetails = configurationTransportManager.getTransportDetails(configId);
+        
         configurationDetails.setOrgName(organizationmanager.getOrganizationById(configurationDetails.getorgId()).getOrgName());
         configurationDetails.setMessageTypeName(messagetypemanager.getMessageTypeById(configurationDetails.getMessageTypeId()).getName());
         configurationDetails.setuserName(userManager.getUserById(configurationDetails.getuserId()).getFirstName() + " " + userManager.getUserById(configurationDetails.getuserId()).getLastName());
+        configurationDetails.settransportMethod(configurationTransportManager.getTransportMethodById(transportDetails.gettransportMethodId()));
         
         //pass the configuration detail object back to the page.
         mav.addObject("configurationDetails", configurationDetails);
-        
-
-        //Get the transport details by configid and selected transport method
-        configurationTransport transportDetails = configurationTransportManager.getTransportDetails(configId);
 
         //Get the transport fields
         List<configurationFormFields> fields = configurationTransportManager.getConfigurationFields(configId, transportDetails.getId());
@@ -763,23 +770,24 @@ public class adminConfigController {
         //Set the data translations array to get ready to hold data
         translations = new CopyOnWriteArrayList<configurationDataTranslations>();
 
-        //Get the completed steps for the selected configuration;
-        configuration configurationDetails = configurationmanager.getConfigurationById(configId);
-       
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/configurations/translations");
         mav.addObject("id", configId);
         mav.addObject("mappings", mappings);
         
+        //Get the completed steps for the selected configuration;
+        configuration configurationDetails = configurationmanager.getConfigurationById(configId);
+        
+        //Get the transport details by configid and selected transport method
+        configurationTransport transportDetails = configurationTransportManager.getTransportDetails(configId);
+        
         configurationDetails.setOrgName(organizationmanager.getOrganizationById(configurationDetails.getorgId()).getOrgName());
         configurationDetails.setMessageTypeName(messagetypemanager.getMessageTypeById(configurationDetails.getMessageTypeId()).getName());
         configurationDetails.setuserName(userManager.getUserById(configurationDetails.getuserId()).getFirstName() + " " + userManager.getUserById(configurationDetails.getuserId()).getLastName());
+        configurationDetails.settransportMethod(configurationTransportManager.getTransportMethodById(transportDetails.gettransportMethodId()));
         
         //pass the configuration detail object back to the page.
         mav.addObject("configurationDetails", configurationDetails);
-
-        //Get the transport details by configid and selected transport method
-        configurationTransport transportDetails = configurationTransportManager.getTransportDetails(configId);
 
         //Get the transport fields
         List<configurationFormFields> fields = configurationTransportManager.getConfigurationFields(configId, transportDetails.getId());
@@ -924,9 +932,9 @@ public class adminConfigController {
     public @ResponseBody
     ModelAndView setTranslations(
             @RequestParam(value = "f", required = true) Integer field, @RequestParam(value = "cw", required = true) Integer cwId, @RequestParam(value = "fText", required = true) String fieldText,
-            @RequestParam(value = "CWText", required = true) String cwText, @RequestParam(value = "transportMethod", required = true) int transportMethod,
-            @RequestParam(value = "macroId", required = true) Integer macroId, @RequestParam(value = "macroName", required = true) String macroName,
-            @RequestParam(value = "fieldA", required = false) String fieldA, @RequestParam(value = "fieldB") String fieldB, @RequestParam(value = "constant1") String constant1,
+            @RequestParam(value = "CWText", required = true) String cwText, @RequestParam(value = "macroId", required = true) Integer macroId, 
+            @RequestParam(value = "macroName", required = true) String macroName, @RequestParam(value = "fieldA", required = false) String fieldA, 
+            @RequestParam(value = "fieldB") String fieldB, @RequestParam(value = "constant1") String constant1,
             @RequestParam(value = "constant2", required = false) String constant2, @RequestParam(value = "passClear") Integer passClear
     ) throws Exception {
 
@@ -1138,64 +1146,38 @@ public class adminConfigController {
      */
     @SuppressWarnings("rawtypes")
     @RequestMapping(value = "/scheduling", method = RequestMethod.GET)
-    public ModelAndView getConfigurationSchedules(@RequestParam(value = "i", required = false) Integer transportMethod) throws Exception {
-        //Default the transport method to online form
-        int selTransportMethod = 2;
-
-        if (transportMethod != null) {
-            selTransportMethod = transportMethod;
-        }
-
-        //Get the completed steps for the selected configuration;
-        configuration configurationDetails = configurationmanager.getConfigurationById(configId);
+    public ModelAndView getConfigurationSchedules() throws Exception {
 
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/configurations/schedule");
         mav.addObject("id", configId);
-        mav.addObject("completedSteps", configurationDetails.getstepsCompleted());
+        mav.addObject("mappings", mappings);
+        
+        //Get the completed steps for the selected configuration;
+        configuration configurationDetails = configurationmanager.getConfigurationById(configId);
+        
+        //Get the transport details by configid and selected transport method
+        configurationTransport transportDetails = configurationTransportManager.getTransportDetails(configId);
         
         configurationDetails.setOrgName(organizationmanager.getOrganizationById(configurationDetails.getorgId()).getOrgName());
         configurationDetails.setMessageTypeName(messagetypemanager.getMessageTypeById(configurationDetails.getMessageTypeId()).getName());
+        configurationDetails.setuserName(userManager.getUserById(configurationDetails.getuserId()).getFirstName() + " " + userManager.getUserById(configurationDetails.getuserId()).getLastName());
+        configurationDetails.settransportMethod(configurationTransportManager.getTransportMethodById(transportDetails.gettransportMethodId()));
         
         //pass the configuration detail object back to the page.
         mav.addObject("configurationDetails", configurationDetails);
         
         //Get the schedule for the configuration and selected transport method
-        configurationSchedules scheduleDetails = configurationmanager.getScheduleDetails(configId, selTransportMethod);
+        configurationSchedules scheduleDetails = configurationmanager.getScheduleDetails(configId);
         
         if(scheduleDetails == null) {
-            configurationSchedules emptySchedule = new configurationSchedules();
-            emptySchedule.setconfigId(configId);
-            emptySchedule.settype(5);
-            
-            //set the selected type
-            mav.addObject("type", "1");
-            mav.addObject("scheduleDetails", emptySchedule);  
+            scheduleDetails = new configurationSchedules();
+            scheduleDetails.setconfigId(configId);
         }
-        else {
-           //set the selected type
-           mav.addObject("type", scheduleDetails.gettype());
-
-           mav.addObject("scheduleDetails", scheduleDetails);  
-        }
+        mav.addObject("scheduleDetails", scheduleDetails);  
         
-        //Get the list of available transport methods
-        List transportMethods = configurationTransportManager.getTransportMethods();
-        mav.addObject("transportMethods", transportMethods);
-        
-        //pass back the selected transport method
-        mav.addObject("selTransportMethod", selTransportMethod);
-        
-        //Set a list of transport methods already set up for the configuration
-        List<Integer> transportList = new ArrayList<Integer>();
-        
-        //Get a list of all transport details
-        //List<configurationTransport> allTransportDetails = configurationTransportManager.getTransportDetails(configId);
-
-        //for (configurationTransport details : allTransportDetails) {
-            //transportList.add(details.gettransportMethod());
-       // }
-        mav.addObject("availTransportMethods", transportList);
+        //Set the variable to hold the number of completed steps for this configuration;
+        mav.addObject("stepsCompleted", stepsCompleted);
 
         return mav;
     }

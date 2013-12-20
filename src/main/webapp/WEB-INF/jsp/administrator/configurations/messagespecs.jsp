@@ -19,6 +19,7 @@
                         <dd><strong>Organization:</strong> ${configurationDetails.orgName}</dd>
                         <dd><strong>Authorized User</strong> ${configurationDetails.userName}</dd>
                         <dd><strong>Message Type:</strong> ${configurationDetails.messageTypeName}</dd>
+                        <dd><strong>Transport Method:</strong> ${configurationDetails.transportMethod}</dd>
                     </dt>
                 </div>
             </section>
@@ -42,14 +43,15 @@
                             <c:if test="${transportType != 2}">
                                 <c:if test="${not empty messageSpecs.templateFile}">
                                     <div class="form-group">
-                                        <label class="control-label" for="currentFile">Current File</label>
-                                        <input type="text" disabled class="form-control" value="${messageSpecs.templateFile}" />
+                                        <label class="control-label" for="templateFile">Current File</label>
+                                        <form:hidden path="templateFile" />
+                                        <br />${messageSpecs.templateFile}
                                     </div>
                                 </c:if>
                                 <spring:bind path="file">
                                     <div id="templateFileDiv" class="form-group ${status.error ? 'has-error' : '' }">
-                                        <label class="control-label" for="templateFile"><c:if test="${not empty messageSpecs.templateFile}">New</c:if> File *</label>
-                                        <form:input path="file" id="templateFile" type="file"  />
+                                        <label class="control-label" for="file"><c:if test="${not empty messageSpecs.templateFile}">New</c:if> File *</label>
+                                        <form:input path="file" id="file" type="file"  />
                                         <span id="templateFileMsg" class="control-label"></span>
                                     </div>
                                 </spring:bind>
@@ -58,18 +60,18 @@
                             <c:if test="${configurationDetails.type == 1}">
                                 <%-- Non ERG options only --%>
                                 <c:if test="${transportType != 2}">
-                                    <spring:bind path="messagTypeCol">
+                                    <spring:bind path="messageTypeCol">
                                         <div class="form-group ${status.error ? 'has-error' : '' }">
-                                            <label class="control-label" for="messagTypeCol">Column containing the message type *</label>
-                                            <form:input path="messagTypeCol" id="messagTypeCol" class="form-control" type="text" maxLength="3" />
-                                            <form:errors path="messagTypeCol" cssClass="control-label" element="label" />
+                                            <label class="control-label" for="messageTypeCol">Column containing the message type *</label>
+                                            <form:input path="messageTypeCol" id="messageTypeCol" class="form-control" type="text" maxLength="3" />
+                                            <form:errors path="messageTypeCol" cssClass="control-label" element="label" />
                                        </div>
                                     </spring:bind>
-                                    <spring:bind path="messagTypeVal">
+                                    <spring:bind path="messageTypeVal">
                                         <div class="form-group ${status.error ? 'has-error' : '' }">
-                                            <label class="control-label" for="messagTypeVal">Message Type Value</label>
-                                            <form:input path="messagTypeVal" id="messagTypeVal" class="form-control" type="text" maxLength="45" />
-                                            <form:errors path="messagTypeVal" cssClass="control-label" element="label" />
+                                            <label class="control-label" for="messageTypeVal">Message Type Value</label>
+                                            <form:input path="messageTypeVal" id="messageTypeVal" class="form-control" type="text" maxLength="45" />
+                                            <form:errors path="messageTypeVal" cssClass="control-label" element="label" />
                                        </div>
                                     </spring:bind>
                                     <spring:bind path="targetOrgCol">

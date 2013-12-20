@@ -25,7 +25,7 @@ public class configurationSchedules {
     private int configId;
 
     @Column(name = "TYPE", nullable = false)
-    private int type = 0;
+    private int type = 5;
 
     @Column(name = "PROCESSINGTYPE", nullable = false)
     private int processingType = 0;

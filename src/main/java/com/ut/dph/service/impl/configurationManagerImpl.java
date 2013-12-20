@@ -187,8 +187,8 @@ public class configurationManagerImpl implements configurationManager {
     
     @Override
     @Transactional
-    public configurationSchedules getScheduleDetails(int configId, int transportMethod) {
-        return configurationDAO.getScheduleDetails(configId, transportMethod);
+    public configurationSchedules getScheduleDetails(int configId) {
+        return configurationDAO.getScheduleDetails(configId);
     }
     
     @Override
@@ -361,7 +361,7 @@ public class configurationManagerImpl implements configurationManager {
 
                     //Need to insert all the fields into the message type Form Fields table
                     Query query = sessionFactory.getCurrentSession().createSQLQuery("INSERT INTO configurationFormFields (configId, transportDetailId, fieldNo, fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, useField)"
-                            + "VALUES (:configId, :transportDetailId, :fieldNo, :fieldDesc, :fieldLabel, 0, :required, :bucketNo, :bucketDspPos, 1)")
+                            + "VALUES (:configId, :transportDetailId, :fieldNo, :fieldDesc, :fieldLabel, 1, :required, :bucketNo, :bucketDspPos, 1)")
                             .setParameter("configId", id)
                             .setParameter("transportDetailId", transportDetailId)
                             .setParameter("fieldNo", fieldNo)

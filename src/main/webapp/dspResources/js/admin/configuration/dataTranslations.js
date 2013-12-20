@@ -10,18 +10,6 @@ $(function() {
         $('.alert').delay(2000).fadeOut(1000);
     }
 
-    //function that will get the field mappings for the selected transport method
-    $('.changeTransportMethod').click(function() {
-        var selTransportMethod = $('#transportMethod').val();
-
-        if (selTransportMethod === "") {
-            $('#transportMethodDiv').addClass("has-error");
-        }
-        else {
-            window.location.href = 'translations?i=' + selTransportMethod;
-        }
-    });
-
     //Function that will check the selected macro and determine if a module
     //should be launched to ask questions.
     $('#macro').change(function() {
@@ -87,7 +75,7 @@ $(function() {
             url: 'translations',
             type: "POST",
             success: function(data) {
-                window.location.href = "translations&msg=updated";
+                window.location.href = "translations?msg=updated";
             }
         });
     });
@@ -207,7 +195,6 @@ $(function() {
         var selectedFieldText = $('#field').find(":selected").text();
         var selectedCW = $('#crosswalk').val();
         var selectedCWText = $('#crosswalk').find(":selected").text();
-        var transportMethod = $('#transportMethod').val();
         var selectedMacro = $('#macro').val();
         var selectedMacroText = $('#macro').find(":selected").text();
 
@@ -237,7 +224,7 @@ $(function() {
             $.ajax({
                 url: "setTranslations",
                 type: "GET",
-                data: {'f': selectedField, 'fText': selectedFieldText, 'cw': selectedCW, 'CWText': selectedCWText, 'transportMethod': transportMethod, 'macroId': selectedMacro
+                data: {'f': selectedField, 'fText': selectedFieldText, 'cw': selectedCW, 'CWText': selectedCWText, 'macroId': selectedMacro
                     , 'macroName': selectedMacroText, 'fieldA': $('#fieldA').val(), 'fieldB': $('#fieldB').val(), 'constant1': $('#constant1').val(), 'constant2': $('#constant2').val()
                     , 'passClear': $('#passclear').val()},
                 success: function(data) {

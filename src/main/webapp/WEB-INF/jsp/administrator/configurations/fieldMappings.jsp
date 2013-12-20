@@ -25,6 +25,7 @@
                         <dd><strong>Organization:</strong> ${configurationDetails.orgName}</dd>
                         <dd><strong>Authorized User</strong> ${configurationDetails.userName}</dd>
                         <dd><strong>Message Type:</strong> ${configurationDetails.messageTypeName}</dd>
+                        <dd><strong>Transport Method:</strong> ${configurationDetails.transportMethod}</dd>
                     </dt>
                 </div>
             </section>
@@ -54,10 +55,10 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <c:forEach var="i" begin="1" end="4">
+                                    <c:forEach var="i" begin="1" end="6">
                                         <tr>
-                                            <td colspan="4"><strong><c:choose><c:when test="${i==1}"> (Sender Information)</c:when><c:when test="${i==2}"> (Recipient Information)</c:when><c:when test="${i==3}"> (Patient Information)</c:when><c:when test="${i==4}"> (Details)</c:when></c:choose></strong></td>
-                                                </tr>
+                                            <td colspan="4"><strong><c:choose><c:when test="${i==1}"> (Sender Organization Information)</c:when><c:when test="${i==2}"> (Sender Provider Information)</c:when><c:when test="${i==3}">(Recipient Organization Information)</c:when><c:when test="${i==4}">(Recipient Provider Information)</c:when><c:when test="${i==5}"> (Patient Information)</c:when><c:when test="${i==6}"> (Details)</c:when></c:choose></strong></td>
+                                        </tr>
                                         <c:forEach items="${transportDetails.fields}" var="mappings" varStatus="field">
                                             <c:if test="${mappings.bucketNo == i}">
                                                 <tr class="uFieldRow" rel="${mappings.fieldNo}">
@@ -114,10 +115,10 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <c:forEach var="i" begin="1" end="4">
+                                <c:forEach var="i" begin="1" end="6">
                                     <tr>
-                                        <td colspan="3"><strong>Bucket ${i} <c:choose><c:when test="${i==1}"> (Sender Information)</c:when><c:when test="${i==2}"> (Recipient Information)</c:when><c:when test="${i==3}"> (Patient Information)</c:when><c:when test="${i==4}"> (Other)</c:when></c:choose></strong></td>
-                                            </tr>
+                                        <td colspan="3"><strong><c:choose><c:when test="${i==1}"> (Sender Organization Information)</c:when><c:when test="${i==2}"> (Sender Provider Information)</c:when><c:when test="${i==3}">(Recipient Organization Information)</c:when><c:when test="${i==4}">(Recipient Provider Information)</c:when><c:when test="${i==5}"> (Patient Information)</c:when><c:when test="${i==6}"> (Details)</c:when></c:choose></strong></td>
+                                     </tr>
                                     <c:forEach var="tField" items="${templateFields}">
                                         <c:if test="${tField.bucketNo == i}">
                                             <tr>
