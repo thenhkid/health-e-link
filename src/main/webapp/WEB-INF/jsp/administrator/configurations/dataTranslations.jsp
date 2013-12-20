@@ -29,32 +29,11 @@
                     <dt>
                         <dt>Configuration Summary:</dt>
                         <dd><strong>Organization:</strong> ${configurationDetails.orgName}</dd>
+                        <dd><strong>Authorized User</strong> ${configurationDetails.userName}</dd>
                         <dd><strong>Message Type:</strong> ${configurationDetails.messageTypeName}</dd>
                     </dt>
                 </div>
-            </section>            
-            <section class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Choose a Transport Method</h3>
-                </div>
-                <div class="panel-body basic-clearfix">
-                    <div class="form-inline">
-                        <div id="transportMethodDiv" class="form-group half mb0 ${status.error ? 'has-error' : '' }">
-                            <label class="sr-only" for="transportMethod">Transport Method *</label>
-                            <select id="transportMethod" class="form-control">
-                                <option value="">- Select -</option>
-                                <c:forEach items="${transportMethods}" var="transMethod" varStatus="tStatus">
-                                    <c:if test="${availTransportMethods.contains(transportMethods[tStatus.index][0])}">
-                                        <option value="${transportMethods[tStatus.index][0]}" <c:if test="${selTransportMethod == transportMethods[tStatus.index][0]}">selected</c:if>>${transportMethods[tStatus.index][1]} </option>
-                                    </c:if>
-                                </c:forEach>
-                            </select>
-                            <span id="transportMethodMsg" class="control-label"></span>
-                        </div>
-                        <button class="btn btn-primary changeTransportMethod">Go</button>
-                    </div>
-                </div>
-            </section>
+            </section>   
         </div>
     </div>
     <div class="row-fluid">
@@ -94,7 +73,7 @@
                                                 </c:when>
                                             </c:choose>
                                         </c:if>
-                                        <option value="${fields[fStatus.index].id}">${fields[fStatus.index].fieldDesc} </option>
+                                        <option value="${fields[fStatus.index].id}">${fields[fStatus.index].fieldLabel} </option>
                                     </c:forEach>
                             </select>
                             <span id="fieldMsg" class="control-label"></span>

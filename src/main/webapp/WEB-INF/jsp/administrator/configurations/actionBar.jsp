@@ -18,8 +18,8 @@
                     <c:when test="${param['page'] == 'mappings'}">
                         <a href="javascript:void(0);" title="Configuration Field Mappings" class="unstyled-link">Configuration - Field Mappings</a>
                     </c:when>
-                    <c:when test="${param['page'] == 'chooseFields'}">
-                        <a href="javascript:void(0);" title="Configuration Choose Fields" class="unstyled-link">Configuration - Choose Fields</a>
+                    <c:when test="${param['page'] == 'ERGCustomize'}">
+                        <a href="javascript:void(0);" title="Configuration ERG Customization" class="unstyled-link">Configuration - ERG Customization</a>
                     </c:when>
                     <c:when test="${param['page'] == 'translations'}">
                         <a href="javascript:void(0);" title="Configuration Data Translations" class="unstyled-link">Configuration - Data Translations</a>

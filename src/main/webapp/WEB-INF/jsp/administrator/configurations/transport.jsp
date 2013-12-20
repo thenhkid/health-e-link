@@ -106,11 +106,11 @@
                                 </spring:bind>
                                 <%-- Target File Download options only --%>
                                 <c:if test="${configurationDetails.type == 2}">
-                                    <spring:bind path="fileName">
+                                    <spring:bind path="targetFileName">
                                         <div class="form-group ${status.error ? 'has-error' : '' }">
-                                            <label class="control-label" for="fileName">File Name * <input id="useSource" type="checkbox"> Use Source File Name</label>
-                                            <form:input path="fileName" id="fileName" class="form-control" type="text" maxLength="255" />
-                                            <form:errors path="fileName" cssClass="control-label" element="label" />
+                                            <label class="control-label" for="targetFileName">File Name * <input id="useSource" type="checkbox"> Use Source File Name</label>
+                                            <form:input path="targetFileName" id="targetFileName" class="form-control" type="text" maxLength="255" />
+                                            <form:errors path="targetFileName" cssClass="control-label" element="label" />
                                        </div>
                                     </spring:bind>
                                     <spring:bind path="appendDateTime">

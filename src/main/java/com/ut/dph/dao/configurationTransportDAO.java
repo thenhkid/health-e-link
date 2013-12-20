@@ -10,7 +10,7 @@ public interface configurationTransportDAO {
 
     configurationTransport getTransportDetails(int configId);
 
-    Integer updateTransportDetails(configurationTransport transportDetails, int clearFields);
+    Integer updateTransportDetails(configurationTransport transportDetails);
 
     configurationTransport getTransportDetailsByTransportMethod(int configId, int transportMethod);
 

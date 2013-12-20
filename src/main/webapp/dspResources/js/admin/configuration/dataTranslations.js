@@ -82,28 +82,22 @@ $(function() {
 
     //The function that will be called when the "Save" button
     //is clicked
-    $('#saveDetails').click(function(event) {
-        var transportMethod = $('#transportMethod').val();
-
-        $.ajax({
+    $('#saveDetails').click(function() {
+       $.ajax({
             url: 'translations',
             type: "POST",
-            data: {'transportMethod': transportMethod},
             success: function(data) {
-                window.location.href = "translations?i=" + transportMethod + "&msg=updated";
+                window.location.href = "translations&msg=updated";
             }
         });
     });
 
     //The function that will be called when the "Save" button
     //is clicked
-    $('#next').click(function(event) {
-        var transportMethod = $('#transportMethod').val();
-
-        $.ajax({
+    $('#next').click(function() {
+         $.ajax({
             url: 'translations',
             type: "POST",
-            data: {'transportMethod': transportMethod},
             success: function(data) {
                 window.location.href = "connections";
             }
@@ -316,12 +310,11 @@ $(function() {
 });
 
 function populateExistingTranslations(reload) {
-    var transportMethod = $('#transportMethod').val();
-
+    
     $.ajax({
         url: 'getTranslations.do',
         type: "GET",
-        data: {'reload': reload, 'transportMethod': transportMethod},
+        data: {'reload': reload},
         success: function(data) {
             $("#existingTranslations").html(data);
         }

@@ -884,3 +884,9 @@ CHANGE COLUMN `templateFile` `templateFile` VARCHAR(255) NULL DEFAULT NULL ;
 
 ALTER TABLE `universalTranslator`.`configurationTransportDetails` 
 DROP COLUMN `fileName`;
+
+ALTER TABLE `universalTranslator`.`configurationDataTranslations` 
+DROP FOREIGN KEY `fkTransportMethod`;
+ALTER TABLE `universalTranslator`.`configurationDataTranslations` 
+DROP COLUMN `transportMethod`,
+DROP INDEX `fkTransportMethod_idx` ;

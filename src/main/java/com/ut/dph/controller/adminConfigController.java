@@ -31,7 +31,7 @@ import com.ut.dph.model.messageTypeFormFields;
 import com.ut.dph.service.configurationManager;
 import com.ut.dph.model.Organization;
 import com.ut.dph.model.User;
-import com.ut.dph.model.configurationFTPFields;
+import com.ut.dph.model.configurationMessageSpecs;
 import com.ut.dph.model.configurationSchedules;
 import com.ut.dph.service.organizationManager;
 import com.ut.dph.model.messageType;
@@ -69,6 +69,17 @@ public class adminConfigController {
      * The private maxResults variable will hold the number of results to show per list page.
      */
     private static int maxResults = 20;
+    
+    /** 
+     * The private mappings variable will hold the value to determine if the left menu
+     * will activate the mappings link, ERG Customization link or both.
+     * 
+     * 0 = Both Mappings link and ERG Customization link are inactive
+     * 1 = Mappings link only
+     * 2 = ERG Customization link only
+     * 3 = Both Mappings link and ERG Customization link are active
+     */
+    private static int mappings = 0;
     
     /** 
      * The stepsCompleted variable will hold the number of steps the configuration has gone 
@@ -258,13 +269,6 @@ public class adminConfigController {
             return mav;
         }
 
-
-	//Need to set up the online form transport method
-        //setupOnlineForm(configId,messageTypeId)
-        //configurationTransportManager.setupOnlineForm(configId, configurationDetails.getMessageTypeId());
-
-        
-
     }
 
     /**
@@ -307,6 +311,24 @@ public class adminConfigController {
         mav.addObject("users", users);
         
         mav.addObject("id", configId);
+        
+        configurationTransport transportDetails = configurationTransportManager.getTransportDetails(configId);
+        if(transportDetails != null) {
+            //Need to set the mappings static variable
+            if(transportDetails.gettransportMethodId() == 2) {
+                mappings = 2;
+            }
+            else {
+                if(transportDetails.geterrorHandling() == 1) {
+                    mappings = 3;
+                }
+                else {
+                    mappings = 1;
+                }
+            }
+        }
+        
+        mav.addObject("mappings", mappings);
 
         return mav;
 
@@ -337,8 +359,15 @@ public class adminConfigController {
         //submit the updates
         configurationmanager.updateConfiguration(configurationDetails);
         
-        stepsCompleted = 1;
-
+        /**
+         * Need to update the configuration completed step
+         *
+        */
+        if (stepsCompleted < 1) {
+            configurationmanager.updateCompletedSteps(configId, 1);
+            stepsCompleted = 1;
+        }
+        
         //If the "Save" button was pressed 
         if (action.equals("save")) {
             ModelAndView mav = new ModelAndView();
@@ -348,6 +377,7 @@ public class adminConfigController {
             mav.addObject("messageTypes", messageTypes);
             mav.addObject("users", users);
             mav.addObject("id", configId);
+            mav.addObject("mappings", mappings);
             mav.addObject("savedStatus", "updated");
             mav.addObject("stepsCompleted", stepsCompleted);
 
@@ -389,6 +419,7 @@ public class adminConfigController {
         
         //Set the variable id to hold the current configuration id
         mav.addObject("id", configId);
+        mav.addObject("mappings", mappings);
 
         //Get the configuration details for the selected config
         configuration configurationDetails = configurationmanager.getConfigurationById(configId);
@@ -430,7 +461,6 @@ public class adminConfigController {
 
         /**
          * Need to update the configuration completed step
-         * Get the configuration details for the selected config
          *
         */
         if (stepsCompleted < 2) {
@@ -447,11 +477,23 @@ public class adminConfigController {
          * if transport method is not ERG but the error handling is set
          * to fix errors via ERG set up the online form
          */
-        if(transportDetails.gettransportMethodId() == 2 || transportDetails.geterrorHandling() == 1) {
+        if(transportDetails.getId() == 0 && (transportDetails.gettransportMethodId() == 2 || transportDetails.geterrorHandling() == 1)) {
             configuration configurationDetails = configurationmanager.getConfigurationById(configId);
             configurationTransportManager.setupOnlineForm(transportId, configId, configurationDetails.getMessageTypeId());
         }
-
+        
+        //Need to set the mappings static variable
+        if(transportDetails.gettransportMethodId() == 2) {
+            mappings = 2;
+        }
+        else {
+            if(transportDetails.geterrorHandling() == 1) {
+                mappings = 3;
+            }
+            else {
+                mappings = 1;
+            }
+        }
 
         redirectAttr.addFlashAttribute("savedStatus", "updated");
 
@@ -460,44 +502,183 @@ public class adminConfigController {
             ModelAndView mav = new ModelAndView(new RedirectView("transport"));
             return mav;
         } else {
-            ModelAndView mav = new ModelAndView(new RedirectView("mappings"));
+            ModelAndView mav = new ModelAndView(new RedirectView("messagespecs"));
             return mav;
         }
 
     }
 
+    /**
+     * The '/messagespecs' GET request will display the configuration message specs form.
+     *
+     * @return	Will return the configuration message spec details form
+     *
+     * @Objects	transportDetails will hold a empty object or an object containing the existing transport details for the selected configuration
+     *
+     * @throws Exception
+     *
+     */
+    @SuppressWarnings("rawtypes")
+    @RequestMapping(value = "/messagespecs", method = RequestMethod.GET)
+    public ModelAndView viewMessageSpecDetails() throws Exception {
+
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/configurations/messagespecs");
+        
+        configurationMessageSpecs messageSpecs = configurationmanager.getMessageSpecs(configId);
+        if(messageSpecs == null) {
+            messageSpecs = new configurationMessageSpecs();
+            messageSpecs.setconfigId(configId);
+        }
+        mav.addObject("messageSpecs", messageSpecs);
+        
+        //Need to pass the selected transport Type
+        configurationTransport transportDetails = configurationTransportManager.getTransportDetails(configId);
+        mav.addObject("transportType", transportDetails.gettransportMethodId());
+        
+        //Set the variable id to hold the current configuration id
+        mav.addObject("id", configId);
+        mav.addObject("mappings", mappings);
+
+        //Get the configuration details for the selected config
+        configuration configurationDetails = configurationmanager.getConfigurationById(configId);
+       
+        configurationDetails.setOrgName(organizationmanager.getOrganizationById(configurationDetails.getorgId()).getOrgName());
+        configurationDetails.setMessageTypeName(messagetypemanager.getMessageTypeById(configurationDetails.getMessageTypeId()).getName());
+        configurationDetails.setuserName(userManager.getUserById(configurationDetails.getuserId()).getFirstName() + " " + userManager.getUserById(configurationDetails.getuserId()).getLastName());
+        
+        //pass the configuration detail object back to the page.
+        mav.addObject("configurationDetails", configurationDetails);
+
+        //Set the variable to hold the number of completed steps for this configuration;
+        mav.addObject("stepsCompleted", stepsCompleted);
+
+
+        return mav;
+    }
+    
+    /**
+     * The '/messagespecs' POST request submit all the configuration message specs.
+     *
+     * @param messageSpecs  Will contain the contents of the configuration message spec form.
+     * 
+     * @return	This function will either return to the message spec details screen or redirect to the next step (Field Mappings)
+     *
+     * @throws Exception
+     *
+     */
+    @SuppressWarnings("rawtypes")
+    @RequestMapping(value = "/messagespecs", method = RequestMethod.POST)
+    public ModelAndView updateMessageSpecs(@Valid @ModelAttribute(value = "messageSpecs") configurationMessageSpecs messageSpecs, BindingResult result, RedirectAttributes redirectAttr, @RequestParam String action) throws Exception {
+
+        /**
+         * Need to update the configuration completed step
+         *
+        */
+        if (stepsCompleted < 3) {
+            configurationmanager.updateCompletedSteps(configId, 3);
+            stepsCompleted = 3;
+        }
+        
+        /** Need to pass the selected transport Type */
+        configurationTransport transportDetails = configurationTransportManager.getTransportDetails(configId);
+        
+        /** Save/Update the configuration message specs */
+        configurationmanager.updateMessageSpecs(messageSpecs, transportDetails.getId());
+        
+        redirectAttr.addFlashAttribute("savedStatus", "updated");
+
+        /** If the "Save" button was pressed */
+        if (action.equals("save")) {
+            ModelAndView mav = new ModelAndView(new RedirectView("messagespecs"));
+            return mav;
+        } 
+        else {
+            /** If transport method is ERG send to the ERG Cutomization page */
+            if(transportDetails.gettransportMethodId() == 2) {
+                ModelAndView mav = new ModelAndView(new RedirectView("ERGCustomize"));
+                return mav;
+            }
+            /** Otherwise send to the field mappings page */
+            else {
+                ModelAndView mav = new ModelAndView(new RedirectView("mappings"));
+                return mav;
+            }
+            
+        }
+        
+    }
+    
+    /** 
+     * The '/ERGCustomize' GET request will display the configuration ERG Customization form.
+     * 
+     */
+    @SuppressWarnings("rawtypes")
+    @RequestMapping(value = "/ERGCustomize", method = RequestMethod.GET)
+    public ModelAndView viewERGCustomization() throws Exception {
+        
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/configurations/ERGCustomize");
+        mav.addObject("id", configId);
+        mav.addObject("mappings", mappings);
+        
+        //Get the configuration details for the selected config
+        configuration configurationDetails = configurationmanager.getConfigurationById(configId);
+        
+        //Get the transport details by configid and selected transport method
+        configurationTransport transportDetails = configurationTransportManager.getTransportDetails(configId);
+
+        //Get the transport fields
+        List<configurationFormFields> fields = configurationTransportManager.getConfigurationFields(configId, transportDetails.getId());
+        transportDetails.setFields(fields);
+
+        mav.addObject("transportDetails", transportDetails);
+       
+        configurationDetails.setOrgName(organizationmanager.getOrganizationById(configurationDetails.getorgId()).getOrgName());
+        configurationDetails.setMessageTypeName(messagetypemanager.getMessageTypeById(configurationDetails.getMessageTypeId()).getName());
+        configurationDetails.setuserName(userManager.getUserById(configurationDetails.getuserId()).getFirstName() + " " + userManager.getUserById(configurationDetails.getuserId()).getLastName());
+        
+        //pass the configuration detail object back to the page.
+        mav.addObject("configurationDetails", configurationDetails);
+
+        //Set the variable to hold the number of completed steps for this configuration;
+        mav.addObject("stepsCompleted", stepsCompleted);
+        
+         //Get the list of available field validation types
+        List validationTypes = messagetypemanager.getValidationTypes();
+        mav.addObject("validationTypes", validationTypes);
+
+        
+        return mav;
+    }
+    
 
     /**
-     * The '/mappings' GET request will determine based on the selected transport method what page to display. Either the choose fields page if 'online form' is selected or 'mappings' if a custom file is being uploaded.
+     * The '/mappings' GET request will determine based on the selected transport method what page to display. 
+     * Either the choose fields page if 'online form' is selected or 'mappings' if a custom file is being uploaded.
      */
     @SuppressWarnings("rawtypes")
     @RequestMapping(value = "/mappings", method = RequestMethod.GET)
-    public ModelAndView getConfigurationMappings(@RequestParam(value = "i", required = false) Integer transportMethod) throws Exception {
-        int selTransportMethod = 2;
-
-        if (transportMethod != null) {
-            selTransportMethod = transportMethod;
-        }
-
+    public ModelAndView getConfigurationMappings() throws Exception {
+       
         ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/configurations/mappings");
         mav.addObject("id", configId);
+        mav.addObject("mappings", mappings);
 
         //Get the completed steps for the selected configuration;
         configuration configurationDetails = configurationmanager.getConfigurationById(configId);
         
         configurationDetails.setOrgName(organizationmanager.getOrganizationById(configurationDetails.getorgId()).getOrgName());
         configurationDetails.setMessageTypeName(messagetypemanager.getMessageTypeById(configurationDetails.getMessageTypeId()).getName());
+        configurationDetails.setuserName(userManager.getUserById(configurationDetails.getuserId()).getFirstName() + " " + userManager.getUserById(configurationDetails.getuserId()).getLastName());
         
         //pass the configuration detail object back to the page.
         mav.addObject("configurationDetails", configurationDetails);
         
-        mav.addObject("completedSteps", configurationDetails.getstepsCompleted());
-
-        //Get a list of all transport details
-        //List<configurationTransport> allTransportDetails = configurationTransportManager.getTransportDetails(configId);
 
         //Get the transport details by configid and selected transport method
-        configurationTransport transportDetails = configurationTransportManager.getTransportDetailsByTransportMethod(configId, selTransportMethod);
+        configurationTransport transportDetails = configurationTransportManager.getTransportDetails(configId);
 
         //Get the transport fields
         List<configurationFormFields> fields = configurationTransportManager.getConfigurationFields(configId, transportDetails.getId());
@@ -505,36 +686,14 @@ public class adminConfigController {
 
         mav.addObject("transportDetails", transportDetails);
 
-        //If online form is selected then show the choose fields page
-        if (selTransportMethod == 2) {
-            mav.setViewName("/administrator/configurations/chooseFields");
-
-            //Get the list of available field validation types
-            List validationTypes = messagetypemanager.getValidationTypes();
-            mav.addObject("validationTypes", validationTypes);
-
-        } //for everything else we need to show the mappings page.
-        else {
-
-            //Need to get the template fields
-            List<messageTypeFormFields> templateFields = messagetypemanager.getMessageTypeFields(configurationDetails.getMessageTypeId());
-            mav.addObject("templateFields", templateFields);
-
-            mav.setViewName("/administrator/configurations/mappings");
-        }
-        mav.addObject("selTransportMethod", selTransportMethod);
-
-        //Get the list of available transport methods
-        List transportMethods = configurationTransportManager.getTransportMethods();
-        mav.addObject("transportMethods", transportMethods);
-
-        //Set a list of transport methods already set up for the configuration
-        List<Integer> transportList = new ArrayList<Integer>();
-
-        //for (configurationTransport details : allTransportDetails) {
-           // transportList.add(details.gettransportMethod());
-       // }
-        mav.addObject("availTransportMethods", transportList);
+        //Need to get the template fields
+        List<messageTypeFormFields> templateFields = messagetypemanager.getMessageTypeFields(configurationDetails.getMessageTypeId());
+        mav.addObject("templateFields", templateFields);
+        
+        mav.addObject("selTransportMethod", transportDetails.gettransportMethodId());
+        
+        //Set the variable to hold the number of completed steps for this configuration;
+        mav.addObject("stepsCompleted", stepsCompleted);
 
         return mav;
     }
@@ -549,12 +708,13 @@ public class adminConfigController {
     @RequestMapping(value = "/saveFields", method = RequestMethod.POST)
     public ModelAndView saveFormFields(@Valid @ModelAttribute(value = "transportDetails") configurationTransport transportDetails, RedirectAttributes redirectAttr, @RequestParam String action, @RequestParam int transportMethod) throws Exception {
 
-        //Get the configuration details for the selected config
-        configuration configurationDetails = configurationmanager.getConfigurationById(configId);
-
-        //Update the configuration completed step
-        if (configurationDetails.getstepsCompleted() < 3) {
-            configurationmanager.updateCompletedSteps(configId, 3);
+        /**
+         * Need to update the configuration completed step
+         *
+        */
+        if (stepsCompleted < 4) {
+            configurationmanager.updateCompletedSteps(configId, 4);
+            stepsCompleted = 4;
         }
 
         //Get the list of fields
@@ -577,8 +737,15 @@ public class adminConfigController {
 
         //If the "Save" button was pressed 
         if (action.equals("save")) {
-            ModelAndView mav = new ModelAndView(new RedirectView("mappings?i=" + transportMethod));
-            return mav;
+            if(transportMethod == 2) {
+                ModelAndView mav = new ModelAndView(new RedirectView("ERGCustomize"));
+                return mav;
+            }
+            else {
+                ModelAndView mav = new ModelAndView(new RedirectView("mappings"));
+                return mav;
+            }
+            
         } else {
             ModelAndView mav = new ModelAndView(new RedirectView("translations"));
             return mav;
@@ -591,13 +758,8 @@ public class adminConfigController {
      */
     @SuppressWarnings("rawtypes")
     @RequestMapping(value = "/translations", method = RequestMethod.GET)
-    public ModelAndView getConfigurationTranslations(@RequestParam(value = "i", required = false) Integer transportMethod) throws Exception {
-        int selTransportMethod = 2;
-
-        if (transportMethod != null) {
-            selTransportMethod = transportMethod;
-        }
-
+    public ModelAndView getConfigurationTranslations() throws Exception {
+      
         //Set the data translations array to get ready to hold data
         translations = new CopyOnWriteArrayList<configurationDataTranslations>();
 
@@ -607,27 +769,23 @@ public class adminConfigController {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/configurations/translations");
         mav.addObject("id", configId);
-        mav.addObject("completedSteps", configurationDetails.getstepsCompleted());
+        mav.addObject("mappings", mappings);
         
         configurationDetails.setOrgName(organizationmanager.getOrganizationById(configurationDetails.getorgId()).getOrgName());
         configurationDetails.setMessageTypeName(messagetypemanager.getMessageTypeById(configurationDetails.getMessageTypeId()).getName());
+        configurationDetails.setuserName(userManager.getUserById(configurationDetails.getuserId()).getFirstName() + " " + userManager.getUserById(configurationDetails.getuserId()).getLastName());
         
         //pass the configuration detail object back to the page.
         mav.addObject("configurationDetails", configurationDetails);
 
-
-        //Get a list of all transport details
-        //List<configurationTransport> allTransportDetails = configurationTransportManager.getTransportDetails(configId);
-
         //Get the transport details by configid and selected transport method
-        configurationTransport transportDetails = configurationTransportManager.getTransportDetailsByTransportMethod(configId, selTransportMethod);
+        configurationTransport transportDetails = configurationTransportManager.getTransportDetails(configId);
 
         //Get the transport fields
         List<configurationFormFields> fields = configurationTransportManager.getConfigurationFields(configId, transportDetails.getId());
         transportDetails.setFields(fields);
 
         mav.addObject("fields", fields);
-        mav.addObject("selTransportMethod", selTransportMethod);
 
         //Return a list of available crosswalks
         List<Crosswalks> crosswalks = messagetypemanager.getCrosswalks(1, 0, configurationDetails.getorgId());
@@ -647,21 +805,11 @@ public class adminConfigController {
             }
         }
         mav.addObject("macroLookUpList", macroLookUpList);
-
-        //Get the list of available transport methods
-        List transportMethods = configurationTransportManager.getTransportMethods();
-        mav.addObject("transportMethods", transportMethods);
-
-        //Set a list of transport methods already set up for the configuration
-        List<Integer> transportList = new ArrayList<Integer>();
-
-       // for (configurationTransport details : allTransportDetails) {
-           // transportList.add(details.gettransportMethod());
-        //}
-        mav.addObject("availTransportMethods", transportList);
+        
+        //Set the variable to hold the number of completed steps for this configuration;
+        mav.addObject("stepsCompleted", stepsCompleted);
 
         return mav;
-
     }
     
     /**
@@ -692,17 +840,20 @@ public class adminConfigController {
      *
      */
     @RequestMapping(value = "/translations", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody Integer submitDataTranslations(@RequestParam(value = "transportMethod", required = true) Integer transportMethod) throws Exception {
+    public @ResponseBody Integer submitDataTranslations() throws Exception {
 
-        //Update the configuration completed step
-        configuration configurationDetails = configurationmanager.getConfigurationById(configId);
-        if (configurationDetails.getstepsCompleted() < 4) {
-            configurationmanager.updateCompletedSteps(configId, 4);
+        /**
+         * Need to update the configuration completed step
+         *
+        */
+        if (stepsCompleted < 5) {
+            configurationmanager.updateCompletedSteps(configId, 5);
+            stepsCompleted = 5;
         }
 
-		 //Delete all the data translations before creating
+	//Delete all the data translations before creating
         //This will help with the jquery removing translations
-        configurationmanager.deleteDataTranslations(configId, transportMethod);
+        configurationmanager.deleteDataTranslations(configId);
 
         //Loop through the list of translations
         for (configurationDataTranslations translation : translations) {
@@ -718,7 +869,7 @@ public class adminConfigController {
      * @Return list of translations
      */
     @RequestMapping(value = "/getTranslations.do", method = RequestMethod.GET)
-    public @ResponseBody ModelAndView getTranslations(@RequestParam(value = "reload", required = true) boolean reload, @RequestParam(value = "transportMethod", required = true) int transportMethod) throws Exception {
+    public @ResponseBody ModelAndView getTranslations(@RequestParam(value = "reload", required = true) boolean reload) throws Exception {
 
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/configurations/existingTranslations");
@@ -727,7 +878,7 @@ public class adminConfigController {
         //We only want to retrieve the saved ones on initial load
         if (reload == false) {
             //Need to get a list of existing translations
-            List<configurationDataTranslations> existingTranslations = configurationmanager.getDataTranslations(configId, transportMethod);
+            List<configurationDataTranslations> existingTranslations = configurationmanager.getDataTranslations(configId);
             
             String fieldName;
             String crosswalkName;

@@ -76,19 +76,7 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
      *
      * @return	this function does not return anything
      */
-    public Integer updateTransportDetails(configurationTransport transportDetails, int clearFields) {
-
-	//if clearFields == 1 then we need to clear out the configuration form fields, mappings and data
-        //translations. This will allow the admin to change the configuration transport method after
-        //one was previously selected. This will only be available while the configuration is not active.
-        if (clearFields == 1) {
-            //Delete the existing form fields
-            Query deleteFields = sessionFactory.getCurrentSession().createSQLQuery("DELETE from configurationFormFields where configId = :configId and transportDetailId = :transportDetailId");
-            deleteFields.setParameter("configId", transportDetails.getconfigId());
-            deleteFields.setParameter("transportDetailId", transportDetails.getId());
-            deleteFields.executeUpdate();
-
-        }
+    public Integer updateTransportDetails(configurationTransport transportDetails) {
 
         if (transportDetails.getId() > 0) {
             sessionFactory.getCurrentSession().update(transportDetails);

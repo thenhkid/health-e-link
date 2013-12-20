@@ -19,6 +19,7 @@ import com.ut.dph.model.Macros;
 import com.ut.dph.model.Organization;
 import com.ut.dph.model.configuration;
 import com.ut.dph.model.configurationDataTranslations;
+import com.ut.dph.model.configurationMessageSpecs;
 import com.ut.dph.model.configurationSchedules;
 import com.ut.dph.model.messageType;
 
@@ -27,6 +28,7 @@ public class configurationDAOImpl implements configurationDAO {
 
     @Autowired
     private SessionFactory sessionFactory;
+   
 
     /**
      * The 'createConfiguration' function will create a new configuration
@@ -191,10 +193,9 @@ public class configurationDAOImpl implements configurationDAO {
     @SuppressWarnings("unchecked")
     @Override
     @Transactional
-    public List<configurationDataTranslations> getDataTranslations(int configId, int transportMethod) {
-        Query query = sessionFactory.getCurrentSession().createQuery("from configurationDataTranslations where configId = :configId and transportMethod = :transportMethod order by processOrder asc");
+    public List<configurationDataTranslations> getDataTranslations(int configId) {
+        Query query = sessionFactory.getCurrentSession().createQuery("from configurationDataTranslations where configId = :configId order by processOrder asc");
         query.setParameter("configId", configId);
-        query.setParameter("transportMethod", transportMethod);
 
         return query.list();
     }
@@ -374,10 +375,9 @@ public class configurationDAOImpl implements configurationDAO {
      */
     @Override
     @Transactional
-    public void deleteDataTranslations(int configId, int transportMethod) {
-        Query deleteTranslations = sessionFactory.getCurrentSession().createQuery("delete from configurationDataTranslations where configId = :configId and transportMethod = :transportMethod");
+    public void deleteDataTranslations(int configId) {
+        Query deleteTranslations = sessionFactory.getCurrentSession().createQuery("delete from configurationDataTranslations where configId = :configId");
         deleteTranslations.setParameter("configId", configId);
-        deleteTranslations.setParameter("transportMethod", transportMethod);
         deleteTranslations.executeUpdate();
     }
 
@@ -518,5 +518,49 @@ public class configurationDAOImpl implements configurationDAO {
          
         return criteria.list();
 
+    }
+    
+    /**
+     * The 'getMessageSpecs' function will return the message specs for the passing configuration
+     * ID.
+     * 
+     * @param configId  The configuration Id to find message specs for
+     * 
+     * @return  This function will return the configuartionMessageSpec object.
+     */
+    @Override
+    public configurationMessageSpecs getMessageSpecs(int configId) {
+        Query query = sessionFactory.getCurrentSession().createQuery("from configurationMessageSpecs where configId = :configId");
+        query.setParameter("configId", configId);
+        
+         return (configurationMessageSpecs) query.uniqueResult();
+    }
+    
+    /**
+     * The 'updateMessageSpecs' function will save/update the configuration message
+     * specs.
+     * 
+     * @param   messageSpecs The object that will hold the values from the message spec form
+     * @param   clearField   The value that will determine to clear out existing form fields
+     *                       if a new file is uploaded.
+     * 
+     * @return This function does not return anything.
+     */
+    @Override
+    public void updateMessageSpecs(configurationMessageSpecs messageSpecs, int transportDetailId, int clearFields) {
+        
+        //if clearFields == 1 then we need to clear out the configuration form fields, mappings and data
+        //translations. This will allow the admin to change the configuration transport method after
+        //one was previously selected. This will only be available while the configuration is not active.
+        if (clearFields == 1) {
+            //Delete the existing form fields
+            Query deleteFields = sessionFactory.getCurrentSession().createSQLQuery("DELETE from configurationFormFields where configId = :configId and transportDetailId = :transportDetailId");
+            deleteFields.setParameter("configId", messageSpecs.getconfigId());
+            deleteFields.setParameter("transportDetailId", transportDetailId);
+            deleteFields.executeUpdate();
+        }
+        
+        sessionFactory.getCurrentSession().saveOrUpdate(messageSpecs);
+        
     }
 }

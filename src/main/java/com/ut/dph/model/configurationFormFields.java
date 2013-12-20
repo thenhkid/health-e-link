@@ -28,6 +28,9 @@ public class configurationFormFields {
     @Column(name = "CONFIGID", nullable = false)
     private int configId;
     
+    @Column(name = "TRANSPORTDETAILID" , nullable = false)
+    private int transportDetailId;
+    
     @Column(name = "FIELDNO", nullable = false)
     private int fieldNo;
 
@@ -88,7 +91,15 @@ public class configurationFormFields {
     public void setconfigId(int configId) {
         this.configId = configId;
     }
+    
+    public int gettransportDetailId() {
+        return transportDetailId;
+    }
 
+    public void settransportDetailId(int transportDetailId) {
+        this.transportDetailId = transportDetailId;
+    }
+   
     public int getFieldNo() {
         return fieldNo;
     }

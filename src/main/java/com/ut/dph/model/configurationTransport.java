@@ -20,9 +20,6 @@ public class configurationTransport {
     private List<configurationFormFields> fields = null;
 
     @Transient
-    private CommonsMultipartFile file = null;
-    
-    @Transient
     private List<configurationFTPFields> FTPfields = null;
 
     @Id
@@ -35,9 +32,6 @@ public class configurationTransport {
 
     @Column(name = "TRANSPORTMETHODID", nullable = false)
     private int transportMethodId;
-
-    @Column(name = "FILENAME", nullable = true)
-    private String fileName = null;
 
     @Column(name = "FILETYPE", nullable = true)
     private int fileType = 1;
@@ -110,22 +104,6 @@ public class configurationTransport {
 
     public void setfileDelimiter(int fileDelimiter) {
         this.fileDelimiter = fileDelimiter;
-    }
-
-    public String getfileName() {
-        return fileName;
-    }
-
-    public void setfileName(String fileName) {
-        this.fileName = fileName;
-    }
-
-    public CommonsMultipartFile getFile() {
-        return file;
-    }
-
-    public void setFile(CommonsMultipartFile file) {
-        this.file = file;
     }
 
     public List<configurationFormFields> getFields() {

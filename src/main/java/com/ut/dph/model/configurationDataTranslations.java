@@ -9,7 +9,7 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 @Entity
-@Table(name = "REL_CONFIGURATIONDATATRANSLATIONS")
+@Table(name = "CONFIGURATIONDATATRANSLATIONS")
 public class configurationDataTranslations {
 
     @Transient

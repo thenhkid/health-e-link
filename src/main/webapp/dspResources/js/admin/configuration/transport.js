@@ -37,10 +37,10 @@ $(function() {
     
     $('#useSource').click(function() {
         if($('#useSource').is(":checked")) {
-            $('#fileName').val("USE SOURCE FILE");
+            $('#targetFileName').val("USE SOURCE FILE");
         }
         else {
-            $('#fileName').val("");
+            $('#targetFileName').val("");
         }
     });
 

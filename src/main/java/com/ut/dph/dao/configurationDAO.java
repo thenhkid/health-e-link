@@ -6,6 +6,7 @@ import com.ut.dph.model.Connections;
 import com.ut.dph.model.Macros;
 import com.ut.dph.model.configuration;
 import com.ut.dph.model.configurationDataTranslations;
+import com.ut.dph.model.configurationMessageSpecs;
 import com.ut.dph.model.configurationSchedules;
 
 public interface configurationDAO {
@@ -37,11 +38,11 @@ public interface configurationDAO {
   @SuppressWarnings("rawtypes")
   List getFileTypes();
   
-  List<configurationDataTranslations> getDataTranslations(int configId, int transportMethod);
+  List<configurationDataTranslations> getDataTranslations(int configId);
   
   String getFieldName(int fieldId);
   
-  void deleteDataTranslations(int configId, int transportMethod);
+  void deleteDataTranslations(int configId);
   
   void saveDataTranslations(configurationDataTranslations translations);
   
@@ -62,4 +63,8 @@ public interface configurationDAO {
   void saveSchedule(configurationSchedules scheduleDetails);
   
   List<Connections> getTargetConnections(int messageTypeId, int orgId);
+  
+  configurationMessageSpecs getMessageSpecs(int configId);
+  
+  void updateMessageSpecs(configurationMessageSpecs messageSpecs, int transportDetailId, int clearFields);
 }
