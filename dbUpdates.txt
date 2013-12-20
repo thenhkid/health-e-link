@@ -894,3 +894,9 @@ DROP INDEX `fkTransportMethod_idx` ;
 /* Chad 12.20.13 @ 10:40 AM */
 ALTER TABLE `universalTranslator`.`configurationSchedule` 
 DROP COLUMN `transportMethod`;
+
+
+/* grace 12.20.13 */
+ALTER TABLE `universalTranslator`.`lu_ProcessStatus` 
+CHANGE COLUMN `shortDesc` `displayText` VARCHAR(45) NULL DEFAULT NULL ,
+ADD COLUMN `isCustom` BIT NOT NULL DEFAULT 0 AFTER `status`;
