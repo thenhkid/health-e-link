@@ -11,14 +11,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
 <!-- main css compiled from main.less -->
-<link rel="stylesheet" href="css/front-end/main.css?v=2">
+<link rel="stylesheet" href="<%=request.getContextPath()%>/dspResources/css/admin/main.css?v=2">
 
 <!-- default theme
 <link rel="stylesheet" href="css/themes/theme-default.css">
 -->
 
 <!-- Health-e-link theme -->
-<link rel="stylesheet" href="css/front-end/themes/theme-health-e-link.css">
+<link rel="stylesheet" href="<%=request.getContextPath()%>/dspResources/css/admin/themes/theme-health-e-link.css">
 
 
 <!--[if lt IE 9]>
@@ -33,27 +33,25 @@
 	    <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
 	<![endif]-->
 
-	<div class="container main-container" role="main">
-		<div class="row">
-			<div class="col-md-12 page-content">
-				<div class="login-container notFound">
-					<span class="logo ir" alt="{Company Name Logo}">Comany Name</span>
-					<div class="login clearfix">
-						<h1>Oops! 404</h1>
-						<p>Sorry, the page you have requested was not found. Pleas try again.</p>
-					</div>
-					<p class="login-note"><a href="" title="">Go Back</a></p>
-				</div>
+	<div class="wrap">
+		<div class="login-container notFound">
+			<div class="login">
+			<header class="login-header">
+				<div class="login-header-content"><span class="logo ir" alt="{Company Name Logo}">Comany Name</span></div>
+			</header>
+					<h1>404 Page Not Found</h1>
+					<p>Sorry, the page you have requested was not found.</p>
+				<p class="login-note"><a href="" id="back-btn" title="" class="btn btn-primary">Go Back</a></p>
 			</div>
 		</div>
 	</div>
 
-
-
-	<!--
-	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
-	<script>window.jQuery || document.write('<script src="js/vendor/jquery-1.10.1.min.js"><\/script>')</script>
-	-->
+	<script>
+		var backBtn = document.getElementById('back-btn');
+		backBtn.addEventListener('click', function () {
+			window.history.back();
+		}, true)
+	</script>
 
 <script data-main="js/main" src="js/vendor/require.js"></script>
 </body>

@@ -86,20 +86,20 @@
                         <spring:bind path="postalCode">
                             <div class="form-group ${status.error ? 'has-error' : '' }">
                                 <label class="control-label" for="postalCode">Postal Code *</label>
-                                <form:input path="postalCode" id="postalCode" class="form-control" type="text" maxLength="15" />
+                                <form:input path="postalCode" id="postalCode" class="form-control xs-input" type="text" maxLength="15" />
                                 <form:errors path="postalCode" cssClass="control-label" element="label" />
                             </div>
                         </spring:bind>
                         <spring:bind path="phone">
                             <div class="form-group ${status.error ? 'has-error' : '' }">
                                 <label class="control-label" for="phone">Phone *</label>
-                                <form:input path="phone" id="phone" class="form-control" type="text" maxLength="45" />
+                                <form:input path="phone" id="phone" class="form-control sm-input" type="text" maxLength="45" />
                                 <form:errors path="phone" cssClass="control-label" element="label" />
                             </div>
                         </spring:bind>
                         <div class="form-group">
                             <label for="fax">Fax</label>
-                            <form:input path="fax" class="form-control" type="text" maxLength="45" />
+                            <form:input path="fax" class="form-control sm-input" type="text" maxLength="45" />
                         </div>
                     </div>
                 </div>

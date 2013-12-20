@@ -120,9 +120,11 @@ h3 {
 .primary-nav .navbar-nav li.active > a:hover {
   background-color: rgba(0, 0, 0, 0.3);
 }
-.primary-nav .navbar-nav li > a {
-  border-right: 0px solid rgba(0, 0, 0, 0.4);
-  border-left: 0px solid rgba(26, 26, 26, 0.4);
+@media (min-width: 768px) {
+  .primary-nav .navbar-nav li > a {
+    border-right: 1px solid rgba(0, 0, 0, 0.2);
+    border-left: 1px solid rgba(255, 255, 255, 0.25);
+  }
 }
 .primary-nav .navbar-nav li > a:hover {
   background-color: rgba(0, 0, 0, 0.1);

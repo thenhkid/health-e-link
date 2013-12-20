@@ -181,7 +181,7 @@ h3 {
   font-weight: bold;
 }
 .secondary-nav .nav .nav li.active > a {
-  background-image: url('../../../img/front-end/sp-common.png');
+  background-image: url('../../img/sp-common.png');
   background-repeat: no-repeat;
   background-position: -100px 7px;
 }
@@ -301,12 +301,12 @@ h3 {
   color: #333333;
 }
 .arrow-left {
-  background-image: url('../../../img/front-end/sp-common.png');
+  background-image: url('../../img/sp-common.png');
   background-repeat: no-repeat;
   background-position: -20px 0;
 }
 .arrow-up {
-  background-image: url('../../../img/front-end/sp-common.png');
+  background-image: url('../../img/sp-common.png');
   background-repeat: no-repeat;
   background-position: 0 0;
 }
@@ -316,7 +316,7 @@ h3 {
   border-collapse: collapse;
 }
 .icon-cancel {
-  background-image: url('../../../img/front-end/sp-common.png');
+  background-image: url('../../img/sp-common.png');
   background-repeat: no-repeat;
   background-position: -80px 0;
 }
@@ -345,6 +345,7 @@ h3 {
   font-size: 16px;
   font-family: Georgia, Times, "Times New Roman", serif;
   font-style: italic;
+  line-height: 26px;
 }
 .content-inset {
   width: 200px;
@@ -353,22 +354,22 @@ h3 {
   border-bottom: 1px solid #cccccc;
 }
 .icon-social {
-  background-image: url('../../../img/front-end/sp-common.png');
+  background-image: url('../../img/sp-common.png');
   background-repeat: no-repeat;
   background-position: 0 -20px;
 }
 .icon-linked-in {
-  background-image: url('../../../img/front-end/sp-common.png');
+  background-image: url('../../img/sp-common.png');
   background-repeat: no-repeat;
   background-position: 0 -20px;
 }
 .icon-facebook {
-  background-image: url('../../../img/front-end/sp-common.png');
+  background-image: url('../../img/sp-common.png');
   background-repeat: no-repeat;
   background-position: -40px -20px;
 }
 .icon-twitter {
-  background-image: url('../../../img/front-end/sp-common.png');
+  background-image: url('../../img/sp-common.png');
   background-repeat: no-repeat;
   background-position: -80px -20px;
 }

@@ -5933,8 +5933,27 @@ body {
 	margin:auto;
 	*/
 }
-.form-group .half {
+.form-group .half,
+.form-group .medium-input {
   width: 50%;
+}
+.form-group .sm-input {
+  width: 25%;
+}
+.form-group .xs-input {
+  width: 15%;
+}
+@media (max-width: 767px) {
+  .form-group .half,
+  .form-group .medium-input {
+    width: 50%;
+  }
+  .form-group .sm-input {
+    width: 75%;
+  }
+  .form-group .xs-input {
+    width: 50%;
+  }
 }
 .table th {
   white-space: nowrap;
@@ -6149,6 +6168,24 @@ input[type="checkbox"] {
   padding-left: 10px;
   padding-right: 10px;
 }
+@media (min-width: 768px) and (max-width: 991px) {
+  .primary-nav .nav > li > a {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+}
+@media (min-width: 992px) and (max-width: 1199px) {
+  .primary-nav .nav > li > a {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
+@media (min-width: 1200px) {
+  .primary-nav .nav > li > a {
+    padding-left: 30px;
+    padding-right: 30px;
+  }
+}
 .section-title {
   margin-top: 0;
   margin-bottom: 0;
@@ -6285,6 +6322,9 @@ input[type="checkbox"] {
   height: 18px;
   box-sizing: border-box;
   vertical-align: baseline;
+}
+.alert {
+  overflow: hidden;
 }
 .filler:after {
   background-color: inherit;

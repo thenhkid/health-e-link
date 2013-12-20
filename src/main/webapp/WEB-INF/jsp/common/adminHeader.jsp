@@ -32,7 +32,7 @@
                     <li role="menuitem" class="${param['sect'] == 'config' ? 'active' : 'none'}"><a href="<c:url value='/administrator/configurations/list' />" title="Configuration Manager">Configurations</a><c:if test="${param['sect'] == 'config'}"><span class="indicator-active arrow-up"></span></c:if></li>
                     <li role="menuitem" class="${param['sect'] == 'connect' ? 'active' : 'none'}"><a href="<c:url value='/administrator/configurations/connections' />" title="Configuration Connection Manager">Connections</a><c:if test="${param['sect'] == 'connect'}"><span class="indicator-active arrow-up"></span></c:if></li>
                     <li role="menuitem" class="${param['sect'] == 'sched' ? 'active' : 'none'}"><a href="" title="Scheduler">Scheduler</a><c:if test="${param['sect'] == 'sched'}"><span class="indicator-active arrow-up"></span></c:if></li>
-                    <li role="menuitem" class="${param['sect'] == 'sysadmin' ? 'active' : 'none'}"><a href="<c:url value='/administrator/sysadmin/' />" title="System Administration">System Administration</a><c:if test="${param['sect'] == 'sysadmin'}"><span class="indicator-active arrow-up"></span></c:if></li>
+                    <li role="menuitem" class="${param['sect'] == 'sysadmin' ? 'active' : 'none'}"><a href="<c:url value='/administrator/sysadmin/' />" title="System Administration">System Admin</a><c:if test="${param['sect'] == 'sysadmin'}"><span class="indicator-active arrow-up"></span></c:if></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right" id="secondary-nav">
                   <li><a class="logout" href="<c:url value='/logout' />">Log out</a></li>

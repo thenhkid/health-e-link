@@ -32,7 +32,7 @@
         </c:choose>
     </div>
 
-    <div class="col-md-6">
+    <div class="col-md-12">
 
         <section class="panel panel-default">
             <div class="panel-heading">
@@ -92,21 +92,21 @@
                             <spring:bind path="phone1">
                                 <div class="form-group ${status.error ? 'has-error' : '' }">
                                     <label class="control-label" for="phone1">Main Phone *</label>
-                                    <form:input path="phone1" id="phone1" class="form-control" type="text" maxLength="20" />
+                                    <form:input path="phone1" id="phone1" class="form-control sm-input" type="text" maxLength="20" />
                                     <form:errors path="phone1" cssClass="control-label" element="label" />
                                 </div>
                             </spring:bind>
                             <spring:bind path="phone2">
                                 <div class="form-group ${status.error ? 'has-error' : '' }">
                                     <label class="control-label" for="phone2">Cell</label>
-                                    <form:input path="phone2" id="phone2" class="form-control" type="text" maxLength="20" />
+                                    <form:input path="phone2" id="phone2" class="form-control sm-input" type="text" maxLength="20" />
                                     <form:errors path="phone2" cssClass="control-label" element="label" />
                                 </div>
                             </spring:bind>
                             <spring:bind path="fax">
                                 <div class="form-group ${status.error ? 'has-error' : '' }">
                                     <label class="control-label" for="fax">Fax</label>
-                                    <form:input path="fax" id="fax" class="form-control" type="text" maxLength="20" />
+                                    <form:input path="fax" id="fax" class="form-control sm-input" type="text" maxLength="20" />
                                     <form:errors path="fax" cssClass="control-label" element="label" />
                                 </div>
                             </spring:bind>
