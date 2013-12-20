@@ -426,5 +426,17 @@ public class sysAdminDAOImpl implements sysAdminDAO {
 			}
 			
 		}
+
+		@Override
+		@Transactional
+		public lu_Counties getCountyById(int id) {
+			return (lu_Counties) sessionFactory.getCurrentSession().get(lu_Counties.class, id);
+		}
+
+		@Override
+		@Transactional
+		public void updateCounty(lu_Counties luc) {
+			 sessionFactory.getCurrentSession().update(luc);
+		}
 		
 }

@@ -41,4 +41,9 @@ public interface sysAdminDAO {
 	
 	void createCounty(lu_Counties luc);
 	
+	lu_Counties getCountyById (int id);
+	
+	void updateCounty (lu_Counties luc);
+	
+	
 }

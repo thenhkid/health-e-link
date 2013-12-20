@@ -140,5 +140,15 @@ public class sysAdminManagerImpl implements sysAdminManager {
 		sysAdminDAO.createCounty(luc);	
 	}
 
+	@Override
+	public lu_Counties getCountyById(int id) {
+		return sysAdminDAO.getCountyById(id);	
+	}
+
+	@Override
+	public void updateCounty(lu_Counties luc) {
+		 sysAdminDAO.updateCounty(luc);
+	}
+
 
 }

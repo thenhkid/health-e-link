@@ -37,10 +37,10 @@
                             <c:choose>
                                 <c:when test="${not empty tableList}">
                                     <c:forEach var="tableInfo" items="${tableList}">
-                                    		<c:if test="${tableInfo.columnNum > 7}">
+                                    		<c:if test="${tableInfo.columnNum > 6}">
                                             		<c:set var="link" value="data/nstd/${tableInfo.urlId}"/>
                                              </c:if>
-                                             <c:if test="${tableInfo.columnNum <= 7}">
+                                             <c:if test="${tableInfo.columnNum <= 6}">
                                             		 <c:set var="link" value="data/std/${tableInfo.urlId}"/>
                                              </c:if> 
                                         <tr id="tableInfoRow" style="cursor: pointer">

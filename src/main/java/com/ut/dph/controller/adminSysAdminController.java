@@ -63,6 +63,154 @@ public class adminSysAdminController {
         return mav;
     }
     
+    
+    /**
+	 * MACROS 
+	 * **/
+	@RequestMapping(value="/macros", method = RequestMethod.GET)
+	public ModelAndView listMacros(@RequestParam(value="page", required=false) Integer page) throws Exception {
+		
+		if(page == null){
+	        page = 1;
+	    }
+ 
+		ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/sysadmin/macros");
+        
+      //Return a list of available macros
+        List<Macros> macroList = sysAdminManager.getMarcoList(maxResults, page, "%");
+        mav.addObject("macroList", macroList);   
+        
+        /**need to handle paging**/
+        Long totalMacroRows = sysAdminManager.findTotalMacroRows();
+        Integer totalPages = (int) Math.ceil((double)totalMacroRows/maxResults);
+        mav.addObject("totalPages",totalPages);
+        mav.addObject("currentPage",page);
+     
+        return mav;
+ 
+	}
+	
+	@RequestMapping(value="/macros", method = RequestMethod.POST)
+	public ModelAndView listMacrosSearch(@RequestParam String searchTerm) throws Exception {
+		
+		ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/sysadmin/macros");
+      //Return a list of available macros
+        List<Macros> macroList = sysAdminManager.getMarcoList(999999, startPage, searchTerm);
+        mav.addObject("macroList", macroList);  
+        mav.addObject("searchTerm",searchTerm);
+        return mav;
+ 
+	}
+
+	@RequestMapping(value="/macros/delete", method = RequestMethod.GET)
+	public ModelAndView deleteMacro(@RequestParam(value="i", required=true) int macroId, 
+	RedirectAttributes redirectAttr) throws Exception {
+		
+	
+        boolean suceeded = sysAdminManager.deleteMacro(macroId);
+        String returnMessage = "deleted";
+        
+        if (!suceeded) {
+        	returnMessage = "notDeleted";
+        }
+        //This variable will be used to display the message on the details form
+		redirectAttr.addFlashAttribute("savedStatus", returnMessage);	
+		
+		ModelAndView mav = new ModelAndView(new RedirectView("../macros"));
+		return mav;	
+	}
+	
+	
+	/**
+	 *  The '/{urlId}/data.create' GET request will be used to create a new data for selected table
+	 *  
+	 */
+	@RequestMapping(value="/macros/create", method = RequestMethod.GET)
+	public ModelAndView newMacroForm() throws Exception {
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/sysadmin/macro/details");	
+		
+		//create a macro
+		Macros macro = new Macros();
+		macro.setId(0);
+		mav.addObject("macroDetails",macro);
+		mav.addObject("btnValue", "Create");
+		return mav;
+	}
+	
+	
+	@RequestMapping(value="/macros/create", method = RequestMethod.POST)
+	public ModelAndView createMacro(
+			@Valid @ModelAttribute(value="macroDetails") Macros macroDetails, 
+			BindingResult result) throws Exception {
+		
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/sysadmin/macro/details");	
+		/** check for error **/
+		if(result.hasErrors()) {
+			mav.addObject("macroDetails",macroDetails);
+			mav.addObject("btnValue", "Create");
+			return mav;
+		}	
+		//now we save
+		sysAdminManager.createMacro(macroDetails);
+		mav.addObject("success", "macroCreated");
+		mav.addObject("btnValue", "Update");
+		return mav;
+	}
+	
+	/**
+	 *  The '/macros/view' GET request will be used to create a new data for selected table
+	 *  
+	 */
+	@RequestMapping(value="/macros/view", method = RequestMethod.GET)
+	public ModelAndView viewMacroDetails(@RequestParam(value="i", required=false) Integer i) throws Exception {
+		
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/sysadmin/macro/details");	
+		//get macro info here
+		Macros macroDetails = configurationmanager.getMacroById(i);
+		mav.addObject("macroDetails",macroDetails);
+		mav.addObject("btnValue", "Update");
+		return mav;		
+	}	
+	
+	/**
+	 * UPDATE macros
+	 * **/
+	@RequestMapping(value="/macros/update", method = RequestMethod.POST)
+	public ModelAndView updateMacro(
+			@Valid @ModelAttribute(value="macroDetails") Macros macroDetails, 
+			BindingResult result) throws Exception {	
+		
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/sysadmin/macro/details");	
+		
+		if(result.hasErrors()) {
+			mav.addObject("macroDetails",macroDetails);
+			mav.addObject("btnValue", "Update");
+			return mav;
+		} 
+		
+		//get macro info here
+		boolean updated = sysAdminManager.updateMacro(macroDetails);
+		
+		if (updated) {
+			mav.addObject("success", "macroUpdated");
+		} else {
+			mav.addObject("success", "Error!");
+		}
+		mav.addObject("macroDetails",macroDetails);
+		mav.addObject("btnValue", "Update");
+		return mav;		
+	}
+	
+	/**
+	 * END MACROS
+	 * **/
+    
 	/**
 	 *  The '/list' GET request will serve up the existing list of lu_ tables in the system
 	 *  
@@ -495,173 +643,57 @@ public class adminSysAdminController {
 	}
 	
 	
-	/**update a county
-	@RequestMapping(value="/data/std/lu_counties/tableData", method = RequestMethod.GET)
-	public ModelAndView viewCountyData(@RequestParam(value="i", required=false) Integer i) throws Exception {
+	/**view a county's data	data/nstd/lu_Counties/tableData**/
+	@RequestMapping(value="/data/nstd/lu_Counties/tableData", method = RequestMethod.GET)
+	public ModelAndView viewCountyData(@RequestParam(value="i", required=false) Integer i) 
+			throws Exception {
+		
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("/administrator/sysadmin/data/std/details");	
 		
-		TableData tableData = sysAdminManager.getTableData(i, tableInfo.getUtTableName());
-		tableData.setUrlId(urlId);
-		mav.addObject("tableDataDetails",tableData);
-		mav.addObject("tableInfo",tableInfo);
-		mav.addObject("ojectType","tableData");
-		mav.addObject("stdForm", "stdForm");
+		USStateList stateList = new USStateList();
+	
+		lu_Counties luc = sysAdminManager.getCountyById(i);
+		mav.addObject("tableDataDetails",luc);
+        //Get the object that will hold the states
+        mav.addObject("stateList", stateList.getStates());
+        mav.addObject("ojectType","lu_Counties");
 		mav.addObject("formId","tabledataform");
-		mav.addObject("btnValue", "Update");
+		mav.addObject("btnValue", "lu_counties/update");
 		mav.addObject("submitBtnValue", "Update");
 		return mav;		
 	}
 	
-	**/
-	
-	
-	/**
-	 * MACROS 
-	 * **/
-	@RequestMapping(value="/macros", method = RequestMethod.GET)
-	public ModelAndView listMacros(@RequestParam(value="page", required=false) Integer page) throws Exception {
-		
-		if(page == null){
-	        page = 1;
-	    }
- 
-		ModelAndView mav = new ModelAndView();
-        mav.setViewName("/administrator/sysadmin/macros");
-        
-      //Return a list of available macros
-        List<Macros> macroList = sysAdminManager.getMarcoList(maxResults, page, "%");
-        mav.addObject("macroList", macroList);   
-        
-        /**need to handle paging**/
-        Long totalMacroRows = sysAdminManager.findTotalMacroRows();
-        Integer totalPages = (int) Math.ceil((double)totalMacroRows/maxResults);
-        mav.addObject("totalPages",totalPages);
-        mav.addObject("currentPage",page);
-     
-        return mav;
- 
-	}
-	
-	@RequestMapping(value="/macros", method = RequestMethod.POST)
-	public ModelAndView listMacrosSearch(@RequestParam String searchTerm) throws Exception {
-		
-		ModelAndView mav = new ModelAndView();
-        mav.setViewName("/administrator/sysadmin/macros");
-      //Return a list of available macros
-        List<Macros> macroList = sysAdminManager.getMarcoList(999999, startPage, searchTerm);
-        mav.addObject("macroList", macroList);  
-        mav.addObject("searchTerm",searchTerm);
-        return mav;
- 
-	}
 
-	@RequestMapping(value="/macros/delete", method = RequestMethod.GET)
-	public ModelAndView deleteMacro(@RequestParam(value="i", required=true) int macroId, 
-	RedirectAttributes redirectAttr) throws Exception {
-		
-	
-        boolean suceeded = sysAdminManager.deleteMacro(macroId);
-        String returnMessage = "deleted";
-        
-        if (!suceeded) {
-        	returnMessage = "notDeleted";
-        }
-        //This variable will be used to display the message on the details form
-		redirectAttr.addFlashAttribute("savedStatus", returnMessage);	
-		
-		ModelAndView mav = new ModelAndView(new RedirectView("../macros"));
-		return mav;	
-	}
-	
-	
-	/**
-	 *  The '/{urlId}/data.create' GET request will be used to create a new data for selected table
-	 *  
-	 */
-	@RequestMapping(value="/macros/create", method = RequestMethod.GET)
-	public ModelAndView newMacroForm() throws Exception {
-		ModelAndView mav = new ModelAndView();
-		mav.setViewName("/administrator/sysadmin/macro/details");	
-		
-		//create a macro
-		Macros macro = new Macros();
-		macro.setId(0);
-		mav.addObject("macroDetails",macro);
-		mav.addObject("btnValue", "Create");
-		return mav;
-	}
-	
-	
-	@RequestMapping(value="/macros/create", method = RequestMethod.POST)
-	public ModelAndView createMacro(
-			@Valid @ModelAttribute(value="macroDetails") Macros macroDetails, 
+	@RequestMapping(value="/data/nstd/lu_counties/update", method = RequestMethod.POST)
+	public ModelAndView updateCounty(
+			@Valid @ModelAttribute(value="tableDataDetails") lu_Counties luc, 
 			BindingResult result) throws Exception {
 		
 		ModelAndView mav = new ModelAndView();
-		mav.setViewName("/administrator/sysadmin/macro/details");	
+		mav.setViewName("/administrator/sysadmin/data/std/details");
+		mav.addObject("ojectType","lu_Counties");
+		mav.addObject("formId","tabledataform");
 		/** check for error **/
 		if(result.hasErrors()) {
-			mav.addObject("macroDetails",macroDetails);
-			mav.addObject("btnValue", "Create");
+			mav.addObject("btnValue", "lu_counties/update");
+			 //Get a list of states
+            USStateList stateList = new USStateList();
+            //Get the object that will hold the states
+            mav.addObject("stateList", stateList.getStates());
+			mav.addObject("submitBtnValue", "Update");
 			return mav;
-		}	
+		}
+		
 		//now we save
-		sysAdminManager.createMacro(macroDetails);
-		mav.addObject("success", "macroCreated");
-		mav.addObject("btnValue", "Update");
+		sysAdminManager.updateCounty(luc);
+		mav.addObject("success", "dataUpdated");
+		mav.addObject("btnValue", "lu_counties/update");
+		mav.addObject("submitBtnValue", "Update");
 		return mav;
 	}
 	
-	/**
-	 *  The '/macros/view' GET request will be used to create a new data for selected table
-	 *  
-	 */
-	@RequestMapping(value="/macros/view", method = RequestMethod.GET)
-	public ModelAndView viewMacroDetails(@RequestParam(value="i", required=false) Integer i) throws Exception {
-		
-		ModelAndView mav = new ModelAndView();
-		mav.setViewName("/administrator/sysadmin/macro/details");	
-		//get macro info here
-		Macros macroDetails = configurationmanager.getMacroById(i);
-		mav.addObject("macroDetails",macroDetails);
-		mav.addObject("btnValue", "Update");
-		return mav;		
-	}	
 	
-	/**
-	 * UPDATE macros
-	 * **/
-	@RequestMapping(value="/macros/update", method = RequestMethod.POST)
-	public ModelAndView updateMacro(
-			@Valid @ModelAttribute(value="macroDetails") Macros macroDetails, 
-			BindingResult result) throws Exception {	
-		
-		ModelAndView mav = new ModelAndView();
-		mav.setViewName("/administrator/sysadmin/macro/details");	
-		
-		if(result.hasErrors()) {
-			mav.addObject("macroDetails",macroDetails);
-			mav.addObject("btnValue", "Update");
-			return mav;
-		} 
-		
-		//get macro info here
-		boolean updated = sysAdminManager.updateMacro(macroDetails);
-		
-		if (updated) {
-			mav.addObject("success", "macroUpdated");
-		} else {
-			mav.addObject("success", "Error!");
-		}
-		mav.addObject("macroDetails",macroDetails);
-		mav.addObject("btnValue", "Update");
-		return mav;		
-	}
-	
-	/**
-	 * END MACROS
-	 * **/
 	
 	
 }
