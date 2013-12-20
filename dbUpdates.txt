@@ -731,4 +731,133 @@ ADD CONSTRAINT `bdStatusFK`
   CONSTRAINT `ttoFK` FOREIGN KEY (`transactionTargetId`) REFERENCES `transactionTarget` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
   
+/**
+grace 12.19.2013 PM removing null from message_ fields as we don't know what could be a required field**/  
+ALTER TABLE `universalTranslator`.`message_FamilyMembers` 
+CHANGE COLUMN `relationToPatient` `relationToPatient` VARCHAR(45) NULL COMMENT 'e.g. father, mother, sister, cousin, etc. ' ;
+
+ALTER TABLE `universalTranslator`.`message_FamilyMembers` 
+DROP FOREIGN KEY `hsIdFK`;
+ALTER TABLE `universalTranslator`.`message_FamilyMembers` 
+CHANGE COLUMN `healthStatusId` `healthStatusId` INT(11) NULL DEFAULT NULL COMMENT 'id from lu_HealthStatuses, corresponding to Alive And Well\nIn Remission\nSymptom Free\nChronically Ill\nSeverely Ill\nDisabled\nSeverely Disabled\nDeceased, unknown, etc.' ;
+ALTER TABLE `universalTranslator`.`message_FamilyMembers` 
+ADD CONSTRAINT `hsIdFK`
+  FOREIGN KEY (`healthStatusId`)
+  REFERENCES `universalTranslator`.`lu_HealthStatuses` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+ALTER TABLE `universalTranslator`.`message_FromOrg` 
+DROP FOREIGN KEY `FKMessFromMessageTypeId`;
+ALTER TABLE `universalTranslator`.`message_FromOrg` 
+CHANGE COLUMN `messageTypeId` `configId` INT(11) NOT NULL ;
+ALTER TABLE `universalTranslator`.`message_FromOrg` 
+ADD CONSTRAINT `FKMessFromMessageTypeId`
+  FOREIGN KEY (`configId`)
+  REFERENCES `universalTranslator`.`messagetypes` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+ALTER TABLE `universalTranslator`.`message_FromOrg` 
+DROP FOREIGN KEY `FKMessFromMessageTypeId`;
+ALTER TABLE `universalTranslator`.`message_FromOrg` 
+DROP INDEX `FKMessFromMessageTypeId_idx` ;
+
+ALTER TABLE `universalTranslator`.`message_FromProvider` 
+DROP FOREIGN KEY `FKMessFromPMessageTypeId`;
+ALTER TABLE `universalTranslator`.`message_FromProvider` 
+CHANGE COLUMN `messageTypeId` `configId` INT(11) NOT NULL ;
+ALTER TABLE `universalTranslator`.`message_FromProvider` 
+ADD CONSTRAINT `FKMessFromPMessageTypeId`
+  FOREIGN KEY (`configId`)
+  REFERENCES `universalTranslator`.`messagetypes` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+ALTER TABLE `universalTranslator`.`message_FromProvider` 
+DROP FOREIGN KEY `FKMessFromPMessageTypeId`;
+ALTER TABLE `universalTranslator`.`message_FromProvider` 
+DROP INDEX `FKMessFromPMessageTypeId_idx` ;
+
+ALTER TABLE `universalTranslator`.`message_MedicalConditions` 
+DROP FOREIGN KEY `mcStatusId`;
+ALTER TABLE `universalTranslator`.`message_MedicalConditions` 
+CHANGE COLUMN `conditionStatusId` `conditionStatusId` INT(11) NULL DEFAULT NULL COMMENT 'id from lu_MedicalConditionStatuses table' ;
+ALTER TABLE `universalTranslator`.`message_MedicalConditions` 
+ADD CONSTRAINT `mcStatusId`
+  FOREIGN KEY (`conditionStatusId`)
+  REFERENCES `universalTranslator`.`lu_MedicalConditionStatuses` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+ALTER TABLE `universalTranslator`.`message_Medications` 
+CHANGE COLUMN `medGeneralStatusId` `medGeneralStatusId` INT(11) NULL DEFAULT NULL COMMENT 'past, current, future, etc.' ;
+
+ALTER TABLE `universalTranslator`.`message_patientIds` 
+CHANGE COLUMN `idNum` `idNum` VARCHAR(45) NULL ;
+
+ALTER TABLE `universalTranslator`.`message_Patients` 
+DROP FOREIGN KEY `patientStatuses`;
+ALTER TABLE `universalTranslator`.`message_Patients` 
+CHANGE COLUMN `sourcePatientId` `sourcePatientId` VARCHAR(45) NULL COMMENT 'Id assigned to patient by source system - e.g Pat148R-2KD-BOS' ,
+CHANGE COLUMN `patientStatusId` `patientStatusId` INT(11) NULL DEFAULT NULL COMMENT 'id from lu_PatientStatuses - Could be equivalent int value of active, pending, future, expired, etc.' ;
+ALTER TABLE `universalTranslator`.`message_Patients` 
+ADD CONSTRAINT `patientStatuses`
+  FOREIGN KEY (`patientStatusId`)
+  REFERENCES `universalTranslator`.`lu_PatientStatuses` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+ALTER TABLE `universalTranslator`.`message_Procedures` 
+DROP FOREIGN KEY `proStatusFK`;
+ALTER TABLE `universalTranslator`.`message_Procedures` 
+CHANGE COLUMN `procStatusId` `procStatusId` INT(11) NULL DEFAULT NULL COMMENT 'id from lu_ProceduresStatuses - equivalent to Cancelled, On Hold, In Progress, Not Completed, present, past, pending, overdue, waiting for approval etc.' ;
+ALTER TABLE `universalTranslator`.`message_Procedures` 
+ADD CONSTRAINT `proStatusFK`
+  FOREIGN KEY (`procStatusId`)
+  REFERENCES `universalTranslator`.`lu_ProcedureStatuses` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+ALTER TABLE `universalTranslator`.`message_SocialHistories` 
+ADD COLUMN `smokingSince` VARCHAR(45) NULL DEFAULT NULL AFTER `smoker`;
+
+ALTER TABLE `universalTranslator`.`message_TestResults` 
+CHANGE COLUMN `testOrder` `testOrder` INT(11) NULL DEFAULT NULL COMMENT 'Several test might be perform in a certain order, this field orders them.' ;
+
+ALTER TABLE `universalTranslator`.`message_ToOrg` 
+DROP FOREIGN KEY `FKMessToMessageTypeId`;
+ALTER TABLE `universalTranslator`.`message_ToOrg` 
+CHANGE COLUMN `messageTypeId` `configId` INT(11) NOT NULL ;
+ALTER TABLE `universalTranslator`.`message_ToOrg` 
+ADD CONSTRAINT `FKMessToMessageTypeId`
+  FOREIGN KEY (`configId`)
+  REFERENCES `universalTranslator`.`messagetypes` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+ALTER TABLE `universalTranslator`.`message_ToOrg` 
+DROP FOREIGN KEY `FKMessToMessageTypeId`;
+ALTER TABLE `universalTranslator`.`message_ToOrg` 
+DROP INDEX `FKMessToMessageTypeId_idx` ;
+
+ALTER TABLE `universalTranslator`.`message_ToProvider` 
+DROP FOREIGN KEY `FKMessToPMessageTypeId`;
+ALTER TABLE `universalTranslator`.`message_ToProvider` 
+CHANGE COLUMN `messageTypeId` `configId` INT(11) NOT NULL ;
+ALTER TABLE `universalTranslator`.`message_ToProvider` 
+ADD CONSTRAINT `FKMessToPMessageTypeId`
+  FOREIGN KEY (`configId`)
+  REFERENCES `universalTranslator`.`messagetypes` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+  
+ALTER TABLE `universalTranslator`.`message_ToProvider` 
+DROP FOREIGN KEY `FKMessToPMessageTypeId`;
+
+ALTER TABLE `universalTranslator`.`message_ToProvider` 
+DROP INDEX `FKMessToPMessageTypeId_idx` ;
+
+
+  
   
