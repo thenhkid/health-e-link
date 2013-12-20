@@ -730,7 +730,7 @@ ADD CONSTRAINT `bdStatusFK`
   KEY `ttoFK_idx` (`transactionTargetId`),
   CONSTRAINT `ttoFK` FOREIGN KEY (`transactionTargetId`) REFERENCES `transactionTarget` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-  
+
 /**
 grace 12.19.2013 PM removing null from message_ fields as we don't know what could be a required field**/  
 ALTER TABLE `universalTranslator`.`message_FamilyMembers` 
@@ -857,7 +857,30 @@ DROP FOREIGN KEY `FKMessToPMessageTypeId`;
 
 ALTER TABLE `universalTranslator`.`message_ToProvider` 
 DROP INDEX `FKMessToPMessageTypeId_idx` ;
-
-
   
-  
+  /* chad 12.19.13 @ 8:30 PM */
+CREATE TABLE `universalTranslator`.`configurationMessageSpecs` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `configId` INT NOT NULL,
+  `templateFile` VARCHAR(255) NOT NULL,
+  `messageTypeCol` INT NOT NULL DEFAULT 0,
+  `messageTypeVal` VARCHAR(45) NULL DEFAULT NULL,
+  `targetOrgCol` INT NOT NULL DEFAULT 0,
+  `containsHeaderRow` BIT NOT NULL DEFAULT 0,
+  `rptField1` INT NOT NULL DEFAULT 0,
+  `rptField2` INT NOT NULL DEFAULT 0 COMMENT '	',
+  `rptField3` INT NOT NULL DEFAULT 0,
+  `rptField4` INT NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`),
+  INDEX `specConfigIdFk_idx` (`configId` ASC),
+  CONSTRAINT `specConfigIdFk`
+    FOREIGN KEY (`configId`)
+    REFERENCES `universalTranslator`.`configurations` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+ALTER TABLE `universalTranslator`.`configurationMessageSpecs` 
+CHANGE COLUMN `templateFile` `templateFile` VARCHAR(255) NULL DEFAULT NULL ;
+
+ALTER TABLE `universalTranslator`.`configurationTransportDetails` 
+DROP COLUMN `fileName`;
