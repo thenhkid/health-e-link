@@ -37,6 +37,7 @@ import com.ut.dph.service.organizationManager;
 import com.ut.dph.model.messageType;
 import com.ut.dph.service.messageTypeManager;
 import com.ut.dph.model.configurationTransport;
+import com.ut.dph.model.configurationTransportMessageTypes;
 import com.ut.dph.service.configurationTransportManager;
 import com.ut.dph.service.userManager;
 
@@ -127,7 +128,9 @@ public class adminConfigController {
             config.setuserName(user.getFirstName() + " " + user.getLastName());
             
             transportDetails = configurationTransportManager.getTransportDetails(config.getId());
-            config.settransportMethod(configurationTransportManager.getTransportMethodById(transportDetails.gettransportMethodId()));
+            if(transportDetails != null) {
+             config.settransportMethod(configurationTransportManager.getTransportMethodById(transportDetails.gettransportMethodId()));
+            }
             
         }
         
@@ -165,6 +168,7 @@ public class adminConfigController {
         Organization org;
         User user;
         messageType messagetype;
+        configurationTransport transportDetails;
 
         for (configuration config : configurations) {
             org = organizationmanager.getOrganizationById(config.getorgId());
@@ -175,6 +179,11 @@ public class adminConfigController {
             
             user = userManager.getUserById(config.getuserId());
             config.setuserName(user.getFirstName() + " " + user.getLastName());
+            
+            transportDetails = configurationTransportManager.getTransportDetails(config.getId());
+            if(transportDetails != null) {
+             config.settransportMethod(configurationTransportManager.getTransportMethodById(transportDetails.gettransportMethodId()));
+            }
         }
 
         return mav;
@@ -412,10 +421,40 @@ public class adminConfigController {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/configurations/transport");
         
+        //Get the configuration details for the selected config
+        configuration configurationDetails = configurationmanager.getConfigurationById(configId);
+        
         configurationTransport transportDetails = configurationTransportManager.getTransportDetails(configId);
         if(transportDetails == null) {
             transportDetails = new configurationTransport();
         }
+        else {
+            //Need to set the associated message types
+            List<configurationTransportMessageTypes> messageTypes = configurationTransportManager.getTransportMessageTypes(transportDetails.getId());
+            List<Integer> assocMessageTypes = new ArrayList<Integer>();
+            if(messageTypes != null) {
+                for(configurationTransportMessageTypes messageType : messageTypes) {
+                    assocMessageTypes.add(messageType.getconfigId());
+                }
+                transportDetails.setmessageTypes(assocMessageTypes);
+            }
+        }
+        
+        //Need to get a list of all configurations for the current organization
+        List<configuration> configurations = configurationmanager.getConfigurationsByOrgId(configurationDetails.getorgId(),null);
+
+        for(configuration config : configurations) {
+            configurationTransport transDetails = configurationTransportManager.getTransportDetails(config.getId());
+            config.setMessageTypeName(messagetypemanager.getMessageTypeById(config.getMessageTypeId()).getName());
+            config.setuserName(userManager.getUserById(config.getuserId()).getFirstName() + " " + userManager.getUserById(config.getuserId()).getLastName());
+            
+            if(transDetails != null) {
+                config.settransportDetailId(transDetails.getId());
+                config.settransportMethod(configurationTransportManager.getTransportMethodById(transDetails.gettransportMethodId()));
+            }
+
+        }
+        mav.addObject("availConfigurations", configurations);
         
         transportDetails.setconfigId(configId);
         mav.addObject("transportDetails", transportDetails);
@@ -425,9 +464,6 @@ public class adminConfigController {
         mav.addObject("id", configId);
         mav.addObject("mappings", mappings);
 
-        //Get the configuration details for the selected config
-        configuration configurationDetails = configurationmanager.getConfigurationById(configId);
-       
         configurationDetails.setOrgName(organizationmanager.getOrganizationById(configurationDetails.getorgId()).getOrgName());
         configurationDetails.setMessageTypeName(messagetypemanager.getMessageTypeById(configurationDetails.getMessageTypeId()).getName());
         configurationDetails.setuserName(userManager.getUserById(configurationDetails.getuserId()).getFirstName() + " " + userManager.getUserById(configurationDetails.getuserId()).getLastName());
@@ -452,6 +488,19 @@ public class adminConfigController {
         mav.addObject("fileTypes", fileTypes);
 
         return mav;
+    }
+    
+    /**
+     * The '/copyExistingTransportMethod.do' POST request will copy the existing transport
+     * settings for the passed transport method to the new configuration passed in.
+     * 
+     */
+    @RequestMapping(value = "/copyExistingTransportMethod.do", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody Integer copyExistingTransportMethod(@RequestParam(value = "detailId", required = true) Integer detailId, @RequestParam(value = "configId", required = true) Integer configId) throws Exception {
+        
+        configurationTransportManager.copyExistingTransportMethod(detailId, configId);
+        
+        return 1;
     }
     
     /**
@@ -499,7 +548,28 @@ public class adminConfigController {
                 mappings = 1;
             }
         }
-
+        
+        /**
+         * Need to set the associated messages types
+         * 
+         * step 1: Remove all associations
+         * step 2: Loop through the selected message Types
+         */
+        
+        /** Step 1: */ 
+        configurationTransportManager.deleteTransportMessageTypes(transportId);
+        
+        /** Step 2: */
+        if(transportDetails.getmessageTypes() != null) {
+            configurationTransportMessageTypes messageType;
+            for(Integer selconfigId : transportDetails.getmessageTypes()) {
+                messageType = new configurationTransportMessageTypes();
+                messageType.setconfigId(selconfigId);
+                messageType.setconfigTransportId(transportId);
+                configurationTransportManager.saveTransportMessageTypes(messageType);
+            }
+        }
+        
         redirectAttr.addFlashAttribute("savedStatus", "updated");
 
         //If the "Save" button was pressed 

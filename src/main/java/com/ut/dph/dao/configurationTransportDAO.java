@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.configurationTransport;
+import com.ut.dph.model.configurationTransportMessageTypes;
 
 public interface configurationTransportDAO {
 
@@ -30,5 +31,13 @@ public interface configurationTransportDAO {
     void saveTransportFTP(configurationFTPFields FTPFields);
     
     String getTransportMethodById(int Id);
+    
+    List<configurationTransportMessageTypes> getTransportMessageTypes(int configTransportId);
+    
+    void deleteTransportMessageTypes(int configTransportId);
+     
+    void saveTransportMessageTypes(configurationTransportMessageTypes messageType);
+    
+    void copyExistingTransportMethod(int configTransportId, int configId);
 
 }

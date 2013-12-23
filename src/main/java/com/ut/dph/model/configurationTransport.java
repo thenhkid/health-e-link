@@ -10,8 +10,6 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.springframework.web.multipart.commons.CommonsMultipartFile;
-
 @Entity
 @Table(name = "CONFIGURATIONTRANSPORTDETAILS")
 public class configurationTransport {
@@ -21,6 +19,9 @@ public class configurationTransport {
 
     @Transient
     private List<configurationFTPFields> FTPfields = null;
+    
+    @Transient
+    private List<Integer> messageTypes = null;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -65,6 +66,9 @@ public class configurationTransport {
     
     @Column(name = "MERGEBATCHES", nullable = false)
     private boolean mergeBatches = true;
+    
+    @Column(name = "COPIEDTRANSPORTID", nullable = false)
+    private int copiedTransportId = 0;
 
     public int getId() {
         return id;
@@ -192,6 +196,22 @@ public class configurationTransport {
 
     public void setmergeBatches(boolean mergeBatches) {
         this.mergeBatches = mergeBatches;
+    }
+    
+    public List<Integer> getmessageTypes() {
+        return messageTypes;
+    }
+
+    public void setmessageTypes(List<Integer> messageTypes) {
+        this.messageTypes = messageTypes;
+    }
+    
+    public int getcopiedTransportId() {
+        return copiedTransportId;
+    }
+
+    public void setcopiedTransportId(int copiedTransportId) {
+        this.copiedTransportId = copiedTransportId;
     }
 
 }

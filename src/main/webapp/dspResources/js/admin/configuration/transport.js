@@ -69,6 +69,23 @@ $(function() {
             $('#transportDetails').submit();
         }
     });
+    
+    $('#existingtransportMethod').change(function() {
+       var detailId = $(this).val();
+       var configId = $('#configId').val();
+       
+       if(detailId > 0) {
+            $.ajax({
+                url: 'copyExistingTransportMethod.do',
+                type: "POST",
+                data: {'detailId': detailId, 'configId': configId},
+                success: function(data) {
+                     window.location.href = "transport";
+                }
+            });
+        }
+        
+    });
 
 });
 
@@ -79,6 +96,7 @@ function checkFormFields() {
     $('div.form-group').removeClass("has-error");
     $('span.control-label').removeClass("has-error");
     $('span.control-label').html("");
+    $('.alert-danger').hide();
     
     var selMethodId = $('#transportMethod').val() 
     
@@ -116,6 +134,14 @@ function checkFormFields() {
            hasErrors = 1;
        }
        
+    }
+    
+    //Make sure at least one message type is selected
+    var $messageTypes = $('#transportDetails').find('input[class="availMessageTypes"]:checked');
+    
+    if(!$messageTypes.length) {
+        $('.alert-danger').show();
+        hasErrors = 1;
     }
  
 

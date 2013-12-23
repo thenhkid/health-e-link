@@ -17,6 +17,7 @@ import com.ut.dph.dao.configurationDAO;
 import com.ut.dph.model.Connections;
 import com.ut.dph.model.Macros;
 import com.ut.dph.model.Organization;
+import com.ut.dph.model.User;
 import com.ut.dph.model.configuration;
 import com.ut.dph.model.configurationDataTranslations;
 import com.ut.dph.model.configurationMessageSpecs;
@@ -223,6 +224,16 @@ public class configurationDAOImpl implements configurationDAO {
             for (Organization org : orgs) {
                 orgIdList.add(org.getId());
             }
+            
+            //get a list of user id's that match the term passed in
+            List<Integer> userIdList = new ArrayList<Integer>();
+            Criteria findUsers = sessionFactory.getCurrentSession().createCriteria(User.class);
+            findUsers.add(Restrictions.like("lastName", "%" + searchTerm + "%"));
+            List<User> users = findUsers.list();
+
+            for (User user : users) {
+                userIdList.add(user.getId());
+            }
 
             //get a list of message type id's that match the term passed in
             List<Integer> msgTypeIdList = new ArrayList<Integer>();
@@ -239,12 +250,16 @@ public class configurationDAOImpl implements configurationDAO {
             if (orgIdList.isEmpty()) {
                 orgIdList.add(0);
             }
+            if (userIdList.isEmpty()) {
+                userIdList.add(0);
+            }
             if (msgTypeIdList.isEmpty()) {
                 msgTypeIdList.add(0);
             }
 
             criteria.add(Restrictions.or(
                     Restrictions.in("orgId", orgIdList),
+                    Restrictions.in("userId", userIdList),
                     Restrictions.in("messageTypeId", msgTypeIdList)
             )
             )

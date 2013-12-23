@@ -900,3 +900,7 @@ DROP COLUMN `transportMethod`;
 ALTER TABLE `universalTranslator`.`lu_ProcessStatus` 
 CHANGE COLUMN `shortDesc` `displayText` VARCHAR(45) NULL DEFAULT NULL ,
 ADD COLUMN `isCustom` BIT NOT NULL DEFAULT 0 AFTER `status`;
+
+/* Chad 12.23.13 */
+ALTER TABLE `universalTranslator`.`configurationTransportDetails` 
+ADD COLUMN `copiedTransportId` INT NULL DEFAULT 0 AFTER `mergeBatches`;

@@ -28,6 +28,9 @@ public class configuration {
     @Transient
     private String transportMethod = null;
     
+    @Transient
+    private Integer transportDetailId = 0;
+    
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID", nullable = false)
@@ -153,5 +156,13 @@ public class configuration {
     public void settransportMethod(String transportMethod) {
         this.transportMethod = transportMethod;
     }
+    
+    public int gettransportDetailId() {
+        return transportDetailId;
+    }
+
+    public void settransportDetailId(int transportDetailId) {
+        this.transportDetailId = transportDetailId;
+    }        
     
 }

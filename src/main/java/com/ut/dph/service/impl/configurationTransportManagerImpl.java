@@ -9,6 +9,7 @@ import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.configurationTransport;
 import com.ut.dph.dao.configurationTransportDAO;
 import com.ut.dph.model.configurationFTPFields;
+import com.ut.dph.model.configurationTransportMessageTypes;
 import com.ut.dph.service.configurationTransportManager;
 
 import org.springframework.stereotype.Service;
@@ -87,5 +88,29 @@ public class configurationTransportManagerImpl implements configurationTransport
     @Transactional
     public String getTransportMethodById(int Id) {
         return configurationTransportDAO.getTransportMethodById(Id);
+    }
+    
+    @Override
+    @Transactional
+    public List<configurationTransportMessageTypes> getTransportMessageTypes(int configTransportId) {
+        return configurationTransportDAO.getTransportMessageTypes(configTransportId);
+    }
+    
+    @Override
+    @Transactional
+    public void deleteTransportMessageTypes(int configTransportId) {
+        configurationTransportDAO.deleteTransportMessageTypes(configTransportId);
+    }
+    
+    @Override
+    @Transactional
+    public void saveTransportMessageTypes(configurationTransportMessageTypes messageType) {
+        configurationTransportDAO.saveTransportMessageTypes(messageType);
+    }
+    
+    @Override
+    @Transactional
+    public void copyExistingTransportMethod(int configTransportId, int configId) {
+        configurationTransportDAO.copyExistingTransportMethod(configTransportId, configId);
     }
 }

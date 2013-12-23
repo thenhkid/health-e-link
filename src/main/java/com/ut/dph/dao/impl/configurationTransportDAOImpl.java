@@ -14,8 +14,8 @@ import org.hibernate.criterion.Restrictions;
 import com.ut.dph.dao.configurationTransportDAO;
 import com.ut.dph.model.configurationFTPFields;
 import com.ut.dph.model.configurationFormFields;
-import com.ut.dph.model.configurationSchedules;
 import com.ut.dph.model.configurationTransport;
+import com.ut.dph.model.configurationTransportMessageTypes;
 import java.util.Iterator;
 
 @Service
@@ -264,6 +264,71 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
         String transportMethod = (String) query.uniqueResult();
 
         return transportMethod;
+    }
+    
+    /**
+     * The 'getTransportMessageTypes' function will return a list of configurations the current transport is configured
+     * to accept message types for.
+     * 
+     * @param configTransportId The current transport id to search on
+     * 
+     * @return  This function will return a list of configurationTransportMessageType objects.
+     */
+    @Override
+    @Transactional
+    public List<configurationTransportMessageTypes> getTransportMessageTypes(int configTransportId) {
+        Query query = sessionFactory.getCurrentSession().createQuery("FROM configurationTransportMessageTypes where configTransportId = :configTransportId");
+        query.setParameter("configTransportId", configTransportId);
+
+        return query.list();
+    }
+    
+    /**
+     * The 'deleteTransportMessageTypes' function will remove all associated message types for the passed in
+     * transport method;
+     * 
+     * @param   configTransportId   The id for the selected config transport
+     * 
+     * @retuern This function does not return anything.
+     */
+    @Override
+    @Transactional
+    public void deleteTransportMessageTypes(int configTransportId) {
+        Query query = sessionFactory.getCurrentSession().createQuery("DELETE FROM configurationTransportMessageTypes where configTransportId = :configTransportId");
+        query.setParameter("configTransportId", configTransportId);
+        
+        query.executeUpdate();
+    }
+    
+    /**
+     * The 'saveTransportMessageTypes' function will save the association between configuration
+     * transport and message types.
+     * 
+     * @param   messageType The configurationTransportMessageTypes object
+     * 
+     * @return  This function does not return anything.
+     */
+    public void saveTransportMessageTypes(configurationTransportMessageTypes messageType) {
+        sessionFactory.getCurrentSession().save(messageType);
+    }
+    
+    /**
+     * The 'copyExistingTransportMethod' function will copy the existing transport settings
+     * from the passed in transportId to the new configuration.
+     * 
+     * @param   configTransportId   The id for the existing transport method to copy from
+     * @param   configId            The id for the new configuration to copy to
+     * 
+     * @return This function does not return anything.
+     */
+    public void copyExistingTransportMethod(int configTransportId, int configId) {
+        
+        Query query = sessionFactory.getCurrentSession().createSQLQuery("INSERT INTO configurationTransportDetails (configId, transportMethodId, fileType, fileDelimiter, status, targetFileName, appendDateTime, maxFileSize, clearRecords, fileLocation, autoRelease, errorHandling, mergeBatches, copiedTransportId) select :configId, transportMethodId, fileType, fileDelimiter, status, targetFileName, appendDateTime, maxFileSize, clearRecords, fileLocation, autoRelease, errorHandling, mergeBatches, :configTransportId FROM configurationTransportDetails where id = :configTransportId");
+        query.setParameter("configId", configId);
+        query.setParameter("configTransportId", configTransportId);
+        
+        query.executeUpdate();
+        
     }
 
 }
