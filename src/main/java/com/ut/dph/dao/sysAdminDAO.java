@@ -5,6 +5,7 @@ import java.util.List;
 import com.ut.dph.model.custom.LookUpTable;
 import com.ut.dph.model.custom.TableData;
 import com.ut.dph.model.lutables.lu_Counties;
+import com.ut.dph.model.lutables.lu_GeneralHealths;
 import com.ut.dph.model.Macros;
 
 public interface sysAdminDAO {
@@ -44,6 +45,12 @@ public interface sysAdminDAO {
 	lu_Counties getCountyById (int id);
 	
 	void updateCounty (lu_Counties luc);
+	
+	void createGeneralHealth(lu_GeneralHealths lu);
+
+	lu_GeneralHealths getGeneralHealthById (int id);
+	
+	void updateGeneralHealth (lu_GeneralHealths lu);
 	
 	
 }

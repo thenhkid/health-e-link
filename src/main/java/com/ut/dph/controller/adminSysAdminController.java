@@ -15,6 +15,7 @@ import com.ut.dph.model.Macros;
 import com.ut.dph.model.custom.LookUpTable;
 import com.ut.dph.model.custom.TableData;
 import com.ut.dph.model.lutables.lu_Counties;
+import com.ut.dph.model.lutables.lu_GeneralHealths;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -693,7 +694,91 @@ public class adminSysAdminController {
 		return mav;
 	}
 	
+	/** general health **/
+	@RequestMapping(value="/data/nstd/lu_GeneralHealths/create", method = RequestMethod.GET)
+	public ModelAndView newGeneralHealthForm() throws Exception {
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/sysadmin/data/std/details");	
+		
+		//create a lu_Counties
+		lu_GeneralHealths lu = new lu_GeneralHealths();
+		lu.setId(0);
+		mav.addObject("tableDataDetails",lu);
+		mav.addObject("ojectType","lu_GeneralHealths");
+		mav.addObject("formId","tabledataform");
+		mav.addObject("btnValue", "lu_generalhealths/create");
+		mav.addObject("submitBtnValue", "Create");
+		return mav;
+	}
 	
+	
+
+	@RequestMapping(value="/data/nstd/lu_generalhealths/create", method = RequestMethod.POST)
+	public ModelAndView createGeneralHealth(
+			@Valid @ModelAttribute(value="tableDataDetails") lu_GeneralHealths lu, 
+			BindingResult result) throws Exception {
+		
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/sysadmin/data/std/details");
+		mav.addObject("ojectType","lu_GeneralHealths");
+		mav.addObject("formId","tabledataform");
+		// check for error
+		if(result.hasErrors()) {
+			mav.addObject("btnValue", "lu_generalhealths/create");
+			mav.addObject("submitBtnValue", "Create");
+			return mav;
+		}
+		
+		//now we save
+		sysAdminManager.createGeneralHealth(lu);
+		mav.addObject("success", "dataCreated");
+		mav.addObject("btnValue", "lu_generalhealths/update");
+		mav.addObject("submitBtnValue", "Update");
+		return mav;
+	}
+	
+
+	@RequestMapping(value="/data/nstd/lu_GeneralHealths/tableData", method = RequestMethod.GET)
+	public ModelAndView viewGeneralHealth(@RequestParam(value="i", required=false) Integer i) 
+			throws Exception {
+		
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/sysadmin/data/std/details");	
+		
+		lu_GeneralHealths lu = sysAdminManager.getGeneralHealthById(i);
+		mav.addObject("tableDataDetails",lu);
+        //Get the object that will hold the states
+        mav.addObject("ojectType","lu_GeneralHealths");
+		mav.addObject("formId","tabledataform");
+		mav.addObject("btnValue", "lu_generalhealths/update");
+		mav.addObject("submitBtnValue", "Update");
+		return mav;		
+	}
+	
+
+	@RequestMapping(value="/data/nstd/lu_generalhealths/update", method = RequestMethod.POST)
+	public ModelAndView updateGeneralHealth(
+			@Valid @ModelAttribute(value="tableDataDetails") lu_GeneralHealths lu, 
+			BindingResult result) throws Exception {
+		
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/sysadmin/data/std/details");
+		mav.addObject("ojectType","lu_GeneralHealths");
+		mav.addObject("formId","tabledataform");
+		/** check for error **/
+		if(result.hasErrors()) {
+			mav.addObject("btnValue", "lu_generalhealths/update");
+			mav.addObject("submitBtnValue", "Update");
+			return mav;
+		}
+		
+		//now we save
+		sysAdminManager.updateGeneralHealth(lu);
+		mav.addObject("success", "dataUpdated");
+		mav.addObject("btnValue", "lu_generalhealths/update");
+		mav.addObject("submitBtnValue", "Update");
+		return mav;
+	}
 	
 	
 }

@@ -63,6 +63,29 @@
                             </div>
                         </spring:bind>
                         </c:if>
+                        <c:if test='${ojectType=="lu_GeneralHealths"}'>
+                         <spring:bind path="codeValue">
+                            <div class="form-group ${status.error ? 'has-error' : '' }">
+                                <label class="control-label" for="codeValue">Code Value</label>
+                                <form:input path="codeValue" id="codeValue" class="form-control" type="text" maxLength="45" />
+                                <form:errors path="codeValue" cssClass="control-label" element="label" />
+                            </div>
+                        </spring:bind>
+                         <spring:bind path="codeSystem">
+                            <div class="form-group ${status.error ? 'has-error' : '' }">
+                                <label class="control-label" for="codeSystem">Code System</label>
+                                <form:input path="codeSystem" id="codeSystem" class="form-control" type="text" maxLength="45" />
+                                <form:errors path="codeSystem" cssClass="control-label" element="label" />
+                            </div>
+                        </spring:bind>
+                         <spring:bind path="codeVersion">
+                            <div class="form-group ${status.error ? 'has-error' : '' }">
+                                <label class="control-label" for="codeVersion">Code Version</label>
+                                <form:input path="codeVersion" id="codeVersion" class="form-control" type="text" maxLength="45" />
+                                <form:errors path="codeVersion" cssClass="control-label" element="label" />
+                            </div>
+                        </spring:bind>
+                        </c:if>
                         
                         
                     <div class="form-group">

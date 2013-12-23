@@ -21,6 +21,7 @@ import com.ut.dph.model.Macros;
 import com.ut.dph.model.custom.LookUpTable;
 import com.ut.dph.model.custom.TableData;
 import com.ut.dph.model.lutables.lu_Counties;
+import com.ut.dph.model.lutables.lu_GeneralHealths;
 
 /**
  * @see com.ut.dph.dao.sysAdminDAO
@@ -437,6 +438,37 @@ public class sysAdminDAOImpl implements sysAdminDAO {
 		@Transactional
 		public void updateCounty(lu_Counties luc) {
 			 sessionFactory.getCurrentSession().update(luc);
+		}
+
+		@Override
+		@Transactional
+		public void createGeneralHealth(lu_GeneralHealths lu) {
+			try {
+				sessionFactory.getCurrentSession().save(lu);						
+			} catch (Throwable ex) {
+                System.err.println("create general health failed." + ex);
+			}
+		}
+
+		@Override
+		@Transactional
+		public lu_GeneralHealths getGeneralHealthById(int id) {
+			try {
+				return (lu_GeneralHealths) sessionFactory.getCurrentSession().get(lu_GeneralHealths.class, id);						
+			} catch (Throwable ex) {
+                System.err.println("get general health failed." + ex);
+                return null;
+			}
+		}
+
+		@Override
+		@Transactional
+		public void updateGeneralHealth(lu_GeneralHealths lu) {
+			try {
+				sessionFactory.getCurrentSession().update(lu);							
+			} catch (Throwable ex) {
+                System.err.println("update general health failed." + ex);
+			}
 		}
 		
 }
