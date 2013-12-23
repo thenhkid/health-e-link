@@ -31,7 +31,7 @@
             
             <form:form id="transportDetails" commandName="transportDetails" modelAttribute="transportDetails" method="post" role="form">
             
-                <c:if test="${(transportDetails.id == 0 && availConfigurations.size() > 1) || transportDetails.copiedTransportId > 0}">
+                <c:if test="${(transportDetails.id == 0 && fn:length(availConfigurations) > 1) || transportDetails.copiedTransportId > 0}">
                     <section class="panel panel-default">
                         <div class="panel-heading">
                             <h3 class="panel-title">Existing Transport Methods</h3>
