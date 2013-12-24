@@ -24,7 +24,7 @@ public class lu_MedicalConditions {
 	@Column(name="displayText", nullable = false)
 	private String displayText;
 	
-	@Column(name="description", nullable = false)
+	@Column(name="description", nullable = true)
 	private String description;
 	
 	@Column(name="DATECREATED", nullable = true)
@@ -36,13 +36,13 @@ public class lu_MedicalConditions {
 	@Column(name="status", nullable = true)
 	private boolean status = true;
 
-	@Column(name="codeSystem", nullable = false)
+	@Column(name="codeSystem", nullable = true)
 	private String codeSystem;
 
-	@Column(name="codeValue", nullable = false)
+	@Column(name="codeValue", nullable = true)
 	private String codeValue;
 	
-	@Column(name="codeVersion", nullable = false)
+	@Column(name="codeVersion", nullable = true)
 	private String codeVersion;
 
 	public int getId() {

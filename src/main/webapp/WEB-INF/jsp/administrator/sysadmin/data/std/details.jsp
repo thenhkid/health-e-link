@@ -98,7 +98,9 @@
                         <c:if test='${objectType=="lu_Manufacturers"}'>
                         	<%@ include file="lu_Manufacturers.jsp" %>
                         </c:if>
-                        
+                        <c:if test='${objectType=="lu_Medications"}'>
+                        	<%@ include file="lu_Medications.jsp" %>
+                        </c:if>
                         
                     <div class="form-group">
                         <input type="button" id="submitButton" rel="${btnValue}" class="btn btn-primary" value="${submitBtnValue}"/>

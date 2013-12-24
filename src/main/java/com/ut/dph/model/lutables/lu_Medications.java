@@ -11,9 +11,10 @@ import javax.persistence.Table;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
+
 @Entity
-@Table(name="lu_Counties")
-public class lu_Counties {
+@Table(name="lu_Medications")
+public class lu_Medications {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -24,12 +25,8 @@ public class lu_Counties {
 	@Column(name="displayText", nullable = false)
 	private String displayText;
 	
-	@Column(name="description", nullable = true)
+	@Column(name="description", nullable = false)
 	private String description;
-	
-	@NotEmpty
-	@Column(name="state", nullable = false)
-	private String state;
 	
 	@Column(name="DATECREATED", nullable = true)
 	private Date dateCreated = new Date();
@@ -39,6 +36,18 @@ public class lu_Counties {
 	
 	@Column(name="status", nullable = true)
 	private boolean status = true;
+
+	@Column(name="form", nullable = true)
+	private String form;
+
+	@Column(name="concentration", nullable = true)
+	private float concentration;
+	
+	@Column(name="concentrationUnit", nullable = true)
+	private String concentrationUnit;
+	
+	@Column(name="medSize", nullable = true)
+	private String medSize;
 
 	public int getId() {
 		return id;
@@ -62,14 +71,6 @@ public class lu_Counties {
 
 	public void setDescription(String description) {
 		this.description = description;
-	}
-
-	public String getState() {
-		return state;
-	}
-	
-	public void setState(String state) {
-		this.state = state;
 	}
 
 	public Date getDateCreated() {
@@ -96,5 +97,37 @@ public class lu_Counties {
 		this.status = status;
 	}
 
+	public String getForm() {
+		return form;
+	}
 
+	public void setForm(String form) {
+		this.form = form;
+	}
+
+	public float getConcentration() {
+		return concentration;
+	}
+
+	public void setConcentration(float concentration) {
+		this.concentration = concentration;
+	}
+
+	public String getConcentrationUnit() {
+		return concentrationUnit;
+	}
+
+	public void setConcentrationUnit(String concentrationUnit) {
+		this.concentrationUnit = concentrationUnit;
+	}
+
+	public String getMedSize() {
+		return medSize;
+	}
+
+	public void setMedSize(String medSize) {
+		this.medSize = medSize;
+	}
+
+	
 }

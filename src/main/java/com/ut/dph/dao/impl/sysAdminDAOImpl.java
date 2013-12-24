@@ -26,6 +26,7 @@ import com.ut.dph.model.lutables.lu_GeneralHealths;
 import com.ut.dph.model.lutables.lu_Immunizations;
 import com.ut.dph.model.lutables.lu_Manufacturers;
 import com.ut.dph.model.lutables.lu_MedicalConditions;
+import com.ut.dph.model.lutables.lu_Medications;
 
 /**
  * @see com.ut.dph.dao.sysAdminDAO
@@ -596,6 +597,37 @@ public class sysAdminDAOImpl implements sysAdminDAO {
 				sessionFactory.getCurrentSession().update(lu);							
 			} catch (Throwable ex) {
                 System.err.println("update Medical Condition failed." + ex);
+			}
+		}
+		
+		@Override
+		@Transactional
+		public void createMedication(lu_Medications lu) {
+			try {
+				sessionFactory.getCurrentSession().save(lu);						
+			} catch (Throwable ex) {
+                System.err.println("create Medication failed." + ex);
+			}
+		}
+
+		@Override
+		@Transactional
+		public lu_Medications getMedicationById(int id) {
+			try {
+				return (lu_Medications) sessionFactory.getCurrentSession().get(lu_Medications.class, id);						
+			} catch (Throwable ex) {
+                System.err.println("get Medication failed." + ex);
+                return null;
+			}
+		}
+
+		@Override
+		@Transactional
+		public void updateMedication(lu_Medications lu) {
+			try {
+				sessionFactory.getCurrentSession().update(lu);							
+			} catch (Throwable ex) {
+                System.err.println("update Medication failed." + ex);
 			}
 		}
 		

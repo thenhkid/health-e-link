@@ -14,6 +14,7 @@ import com.ut.dph.model.lutables.lu_GeneralHealths;
 import com.ut.dph.model.lutables.lu_Immunizations;
 import com.ut.dph.model.lutables.lu_Manufacturers;
 import com.ut.dph.model.lutables.lu_MedicalConditions;
+import com.ut.dph.model.lutables.lu_Medications;
 import com.ut.dph.model.Macros;
 import com.ut.dph.service.sysAdminManager;
 
@@ -233,6 +234,22 @@ public class sysAdminManagerImpl implements sysAdminManager {
 	@Override
 	public void updateMedicalCondition(lu_MedicalConditions lu) {
 		sysAdminDAO.updateMedicalCondition(lu);
+	}
+
+	@Override
+	public void createMedication(lu_Medications lu) {
+		sysAdminDAO.createMedication(lu);
+		
+	}
+
+	@Override
+	public lu_Medications getMedicationById(int id) {
+		return sysAdminDAO.getMedicationById(id);
+	}
+
+	@Override
+	public void updateMedication(lu_Medications lu) {
+		sysAdminDAO.updateMedication(lu);
 	}
 
 

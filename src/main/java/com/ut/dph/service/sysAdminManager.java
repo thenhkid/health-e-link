@@ -10,6 +10,7 @@ import com.ut.dph.model.lutables.lu_GeneralHealths;
 import com.ut.dph.model.lutables.lu_Immunizations;
 import com.ut.dph.model.lutables.lu_Manufacturers;
 import com.ut.dph.model.lutables.lu_MedicalConditions;
+import com.ut.dph.model.lutables.lu_Medications;
 import com.ut.dph.model.Macros;
 
 /** 
@@ -95,5 +96,11 @@ public interface sysAdminManager {
 	lu_MedicalConditions getMedicalConditionById (int id);
 	
 	void updateMedicalCondition(lu_MedicalConditions lu);
+	
+	void createMedication (lu_Medications lu);
+	
+	lu_Medications getMedicationById (int id);
+	
+	void updateMedication(lu_Medications lu);
 }
 

@@ -24,10 +24,10 @@ public class lu_GeneralHealthStatuses {
 	@Column(name="displayText", nullable = false)
 	private String displayText;
 	
-	@Column(name="description", nullable = false)
+	@Column(name="description", nullable = true)
 	private String description;
 	
-	@Column(name="category", nullable = false)
+	@Column(name="category", nullable = true)
 	private String category;
 	
 	@Column(name="DATECREATED", nullable = true)

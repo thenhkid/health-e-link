@@ -26,7 +26,7 @@ public class lu_Manufacturers {
 	@Column(name="displayText", nullable = false)
 	private String displayText;
 	
-	@Column(name="description", nullable = false)
+	@Column(name="description", nullable = true)
 	private String description;
 	
 	@Column(name="DATECREATED", nullable = true)
@@ -38,46 +38,46 @@ public class lu_Manufacturers {
 	@Column(name="status", nullable = true)
 	private boolean status = true;
 
-	@Column(name="contactName", nullable = false)
+	@Column(name="contactName", nullable = true)
 	private String contactName;
 	
-	@Column(name="addressType", nullable = false)
+	@Column(name="addressType", nullable = true)
 	private String addressType;
 	
-	@Column(name="line1", nullable = false)
+	@Column(name="line1", nullable = true)
 	private String line1;
 	
-	@Column(name="line2", nullable = false)
+	@Column(name="line2", nullable = true)
 	private String line2;
 	
-	@Column(name="city", nullable = false)
+	@Column(name="city", nullable = true)
 	private String city;
 	
-	@Column(name="state", nullable = false)
+	@Column(name="state", nullable = true)
 	private String state;
 	
-	@Column(name="zip", nullable = false)
+	@Column(name="zip", nullable = true)
 	private String zip;
 	
-	@Column(name="country", nullable = false)
+	@Column(name="country", nullable = true)
 	private String country;
 	
-	@Column(name="phone1Type", nullable = false)
+	@Column(name="phone1Type", nullable = true)
 	private String phone1Type;
 	
 	@Phone
-	@Column(name="phone1", nullable = false)
+	@Column(name="phone1", nullable = true)
 	private String phone1;
 	
-	@Column(name="phone2Type", nullable = false)
+	@Column(name="phone2Type", nullable = true)
 	private String phone2Type;
 	
 	@Phone
-	@Column(name="phone2", nullable = false)
+	@Column(name="phone2", nullable = true)
 	private String phone2;
 	
 	@Phone
-	@Column(name="fax", nullable = false)
+	@Column(name="fax", nullable = true)
 	private String fax;
 
 	public int getId() {
