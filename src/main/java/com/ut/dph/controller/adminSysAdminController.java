@@ -15,6 +15,7 @@ import com.ut.dph.model.Macros;
 import com.ut.dph.model.custom.LookUpTable;
 import com.ut.dph.model.custom.TableData;
 import com.ut.dph.model.lutables.lu_Counties;
+import com.ut.dph.model.lutables.lu_GeneralHealthStatuses;
 import com.ut.dph.model.lutables.lu_GeneralHealths;
 
 import org.springframework.stereotype.Controller;
@@ -700,7 +701,7 @@ public class adminSysAdminController {
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("/administrator/sysadmin/data/std/details");	
 		
-		//create a lu_Counties
+		//create the object
 		lu_GeneralHealths lu = new lu_GeneralHealths();
 		lu.setId(0);
 		mav.addObject("tableDataDetails",lu);
@@ -779,7 +780,92 @@ public class adminSysAdminController {
 		mav.addObject("submitBtnValue", "Update");
 		return mav;
 	}
+	/** end of general health **/
+	
+	/** start of general health statuses **/
+	@RequestMapping(value="/data/nstd/lu_GeneralHealthStatuses/create", method = RequestMethod.GET)
+	public ModelAndView newGeneralHealthStatusForm() throws Exception {
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/sysadmin/data/std/details");	
+		
+		//create the object
+		lu_GeneralHealthStatuses lu = new lu_GeneralHealthStatuses();
+		lu.setId(0);
+		mav.addObject("tableDataDetails",lu);
+		mav.addObject("ojectType","lu_GeneralHealthStatuses");
+		mav.addObject("formId","tabledataform");
+		mav.addObject("btnValue", "lu_GeneralHealthStatuses/create");
+		mav.addObject("submitBtnValue", "Create");
+		return mav;
+	}
 	
 	
+
+	@RequestMapping(value="/data/nstd/lu_generalhealthstatuses/create", method = RequestMethod.POST)
+	public ModelAndView createGeneralHealthStatuses(
+			@Valid @ModelAttribute(value="tableDataDetails") lu_GeneralHealthStatuses lu, 
+			BindingResult result) throws Exception {
+		
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/sysadmin/data/std/details");
+		mav.addObject("ojectType","lu_GeneralHealthStatuses");
+		mav.addObject("formId","tabledataform");
+		// check for error
+		if(result.hasErrors()) {
+			mav.addObject("btnValue", "lu_GeneralHealthStatuses/create");
+			mav.addObject("submitBtnValue", "Create");
+			return mav;
+		}
+		
+		//now we save
+		sysAdminManager.createGeneralHealthStatus(lu);
+		mav.addObject("success", "dataCreated");
+		mav.addObject("btnValue", "lu_GeneralHealthStatuses/update");
+		mav.addObject("submitBtnValue", "Update");
+		return mav;
+	}
+	
+
+	@RequestMapping(value="/data/nstd/lu_GeneralHealthStatuses/tableData", method = RequestMethod.GET)
+	public ModelAndView viewGeneralHealthStatus(@RequestParam(value="i", required=false) Integer i) 
+			throws Exception {
+		
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/sysadmin/data/std/details");	
+		
+		lu_GeneralHealthStatuses lu = sysAdminManager.getGeneralHealthStatusById(i);
+		mav.addObject("tableDataDetails",lu);
+        //Get the object that will hold the states
+        mav.addObject("ojectType","lu_GeneralHealthStatuses");
+		mav.addObject("formId","tabledataform");
+		mav.addObject("btnValue", "lu_GeneralHealthStatuses/update");
+		mav.addObject("submitBtnValue", "Update");
+		return mav;		
+	}
+	
+
+	@RequestMapping(value="/data/nstd/lu_generalhealthstatuses/update", method = RequestMethod.POST)
+	public ModelAndView updateGeneralHealth(
+			@Valid @ModelAttribute(value="tableDataDetails") lu_GeneralHealthStatuses lu, 
+			BindingResult result) throws Exception {
+		
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/sysadmin/data/std/details");
+		mav.addObject("ojectType","lu_GeneralHealthStatuses");
+		mav.addObject("formId","tabledataform");
+		/** check for error **/
+		if(result.hasErrors()) {
+			mav.addObject("btnValue", "lu_GeneralHealthStatuses/update");
+			mav.addObject("submitBtnValue", "Update");
+			return mav;
+		}
+		
+		//now we save
+		sysAdminManager.updateGeneralHealthStatus(lu);
+		mav.addObject("success", "dataUpdated");
+		mav.addObject("btnValue", "lu_eneralHealthStatuses/update");
+		mav.addObject("submitBtnValue", "Update");
+		return mav;
+	}
 }
 

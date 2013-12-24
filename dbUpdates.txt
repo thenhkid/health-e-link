@@ -904,3 +904,8 @@ ADD COLUMN `isCustom` BIT NOT NULL DEFAULT 0 AFTER `status`;
 /* Chad 12.23.13 */
 ALTER TABLE `universalTranslator`.`configurationTransportDetails` 
 ADD COLUMN `copiedTransportId` INT NULL DEFAULT 0 AFTER `mergeBatches`;
+
+/*Grace 12.24.13*/
+ALTER TABLE `universalTranslator`.`lu_GeneralHealthStatuses` 
+CHANGE COLUMN `groupById` `category` VARCHAR(45) NULL DEFAULT NULL COMMENT 'for some cases, users might want to display - Yes, No, Unknown or Current, Past, Future so if we have a category it will be easier for use to select out what to display.' AFTER `description`;
+

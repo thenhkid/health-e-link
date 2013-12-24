@@ -9,6 +9,7 @@ import com.ut.dph.dao.sysAdminDAO;
 import com.ut.dph.model.custom.LookUpTable;
 import com.ut.dph.model.custom.TableData;
 import com.ut.dph.model.lutables.lu_Counties;
+import com.ut.dph.model.lutables.lu_GeneralHealthStatuses;
 import com.ut.dph.model.lutables.lu_GeneralHealths;
 import com.ut.dph.model.Macros;
 import com.ut.dph.service.sysAdminManager;
@@ -165,6 +166,23 @@ public class sysAdminManagerImpl implements sysAdminManager {
 	@Override
 	public void updateGeneralHealth(lu_GeneralHealths lu) {
 		sysAdminDAO.updateGeneralHealth(lu);
+		
+	}
+	
+	@Override
+	public void createGeneralHealthStatus(lu_GeneralHealthStatuses lu) {
+		sysAdminDAO.createGeneralHealthStatus(lu);
+		
+	}
+
+	@Override
+	public lu_GeneralHealthStatuses getGeneralHealthStatusById(int id) {
+		return sysAdminDAO.getGeneralHealthStatusById(id);
+	}
+
+	@Override
+	public void updateGeneralHealthStatus(lu_GeneralHealthStatuses lu) {
+		sysAdminDAO.updateGeneralHealthStatus(lu);
 		
 	}
 
