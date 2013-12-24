@@ -932,3 +932,6 @@ CREATE TABLE `universalTranslator`.`configurationConnections` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION);
 
+/** Grace 12.24.13 **/
+ALTER TABLE `universalTranslator`.`lu_Medications` 
+CHANGE COLUMN `conenctration` `concentration` FLOAT NULL DEFAULT NULL COMMENT 'e.g. 600' ;
