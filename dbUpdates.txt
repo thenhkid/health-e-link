@@ -909,3 +909,26 @@ ADD COLUMN `copiedTransportId` INT NULL DEFAULT 0 AFTER `mergeBatches`;
 ALTER TABLE `universalTranslator`.`lu_GeneralHealthStatuses` 
 CHANGE COLUMN `groupById` `category` VARCHAR(45) NULL DEFAULT NULL COMMENT 'for some cases, users might want to display - Yes, No, Unknown or Current, Past, Future so if we have a category it will be easier for use to select out what to display.' AFTER `description`;
 
+/* Chad 12.24.13 */
+DROP TABLE `universalTranslator`.`configurationConnections`;
+
+CREATE TABLE `universalTranslator`.`configurationConnections` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `sourceConfigId` INT NOT NULL,
+  `targetConfigId` INT NOT NULL,
+  `status` BIT NOT NULL DEFAULT 1 COMMENT '0 = inactive\n1 = active',
+  `dateCreated` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  INDEX `connectSrcConfigIdfk_idx` (`sourceConfigId` ASC),
+  INDEX `connectTgtConfigIdfk_idx` (`targetConfigId` ASC),
+  CONSTRAINT `connectSrcConfigIdfk`
+    FOREIGN KEY (`sourceConfigId`)
+    REFERENCES `universalTranslator`.`configurations` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `connectTgtConfigIdfk`
+    FOREIGN KEY (`targetConfigId`)
+    REFERENCES `universalTranslator`.`configurations` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
