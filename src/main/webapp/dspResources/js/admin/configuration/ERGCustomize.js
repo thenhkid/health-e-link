@@ -7,7 +7,7 @@ $(function() {
     if ($('.alert').length > 0) {
         $('.alert').delay(2000).fadeOut(1000);
     }
-    ;
+    
 
     //If any field changes need to show the message in red that nothign
     //will be saved unless teh "Saved" button is pressed

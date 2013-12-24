@@ -29,7 +29,13 @@
                     </c:when>
                     <c:when test="${param['page'] == 'schedule'}">
                         <a href="javascript:void(0);" title="Configuration Schedule" class="unstyled-link">Configuration - Schedule</a>
-                    </c:when>    
+                    </c:when>  
+                    <c:when test="${param['page'] == 'connections'}">
+                        <a href="javascript:void(0);" title="Configuration Connection List" class="unstyled-link">Configuration Connections</a>
+                    </c:when> 
+                    <c:when test="${param['page'] == 'createConnection'}">
+                        <a href="javascript:void(0);" title="Create Configuration Connection" class="unstyled-link">Create Configuration Connection</a>
+                    </c:when>     
                 </c:choose>
             </h1>
         </div>
@@ -38,8 +44,14 @@
                 <c:when test="${param['page'] == 'listConfigs'}">
                     <li><a href="create" title="Create New Configuration" role="button"><span class="glyphicon icon-stacked glyphicon glyphicon-plus"></span>Create New</a></li>
                 </c:when>
+                <c:when test="${param['page'] == 'connections'}">
+                    <li><a href="createConnection" title="Create New Configuration Connection" role="button"><span class="glyphicon icon-stacked glyphicon glyphicon-plus"></span>Create New</a></li>
+                </c:when>  
+                <c:when test="${param['page'] == 'createConnection'}">
+                    <li><a href="javascript:void(0);" id="saveDetails" title="Save this Configuration Connection" role="button"><span class="glyphicon glyphicon-ok icon-stacked"></span> Save </a></li>
+                </c:when>     
                 <c:otherwise>
-                    <li><a href="javascript:void(0);" id="saveDetails" title="Save this Organization" role="button"><span class="glyphicon glyphicon-ok icon-stacked"></span> Save </a></li>
+                    <li><a href="javascript:void(0);" id="saveDetails" title="Save this Configuration initial setup" role="button"><span class="glyphicon glyphicon-ok icon-stacked"></span> Save </a></li>
                     <c:if test="${param['page'] != 'schedule'}"><li><a href="javascript:void(0);" id="next" title="Save and Proceed to the Next Step"><span class="glyphicon glyphicon-forward icon-stacked" role="button"></span>Next Step</a></li></c:if>
                     <%--<c:if test="${not empty id}"><li><a href="#confirmationOrgDelete" data-toggle="modal" rel="${id}" title="Delete this Configuration"><span class="glyphicon glyphicon-remove icon-stacked"></span>Delete</a></li></c:if>--%>
                     <li><a href="<c:url value='/administrator/configurations/list' />" title="Cancel" role="button"><span class="glyphicon icon-stacked custom-icon icon-cancel"></span>Cancel</a></li>

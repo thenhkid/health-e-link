@@ -121,12 +121,21 @@
     <definition name="/administrator/configurations/connections" extends="base.definition.admin">
         <put-attribute name="page-id" value="configuration-connections" />
         <put-attribute name="page-section" value="section-configurations" />
-        <put-attribute name="title" value="Administrator - Manage Configurations" />
-        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=config" />
+        <put-attribute name="title" value="Administrator - Manage Configuration Connections" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=connect" />
         <put-attribute name="actions" value="/WEB-INF/jsp/administrator/configurations/actionBar.jsp?page=connections" />
-        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/configurations/menu.jsp?page=connections" />
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/configurations/connections.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/admin/configuration/connections.js" />
+    </definition>
+    
+    <definition name="/administrator/configurations/createConnection" extends="base.definition.admin">
+        <put-attribute name="page-id" value="configuration-connections" />
+        <put-attribute name="page-section" value="section-configurations" />
+        <put-attribute name="title" value="Administrator - Create new Configuration Connection" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=connect" />
+        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/configurations/actionBar.jsp?page=createConnection" />
+        <put-attribute name="body" value="/WEB-INF/jsp/administrator/configurations/createConnection.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/admin/configuration/createConnection.js" />
     </definition>
 
     <definition name="/administrator/configurations/schedule" extends="base.definition.admin">

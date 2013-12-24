@@ -11,7 +11,7 @@
             <c:if test="${not empty savedStatus}" >
                 <div class="alert alert-success">
                     <strong>Success!</strong> 
-                    <c:choose><c:when test="${savedStatus == 'updated'}">The configuration transport details have been successfully updated!</c:when></c:choose>
+                    <c:choose><c:when test="${savedStatus == 'updated'}">The configuration transport details have been successfully updated!</c:when><c:otherwise>The configuration initial setup has been saved!</c:otherwise></c:choose>
                 </div>
             </c:if>
             <section class="panel panel-default">

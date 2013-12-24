@@ -114,13 +114,13 @@ public class HealtheWebController {
             messagetype = messagetypemanager.getMessageTypeById(config.getMessageTypeId());
             config.setMessageTypeName(messagetype.getName());
             
-            List<Connections> connections = configurationManager.getConnections(config.getId());
+            /*List<Connections> connections = configurationManager.getConnections(config.getId());
             
             for (Connections connection : connections) {
                 //Need to get the org name;
                 Organization orgDetails = organizationmanager.getOrganizationById(connection.getorgId());
                 connection.setorgName(orgDetails.getOrgName());
-            }
+            }*/
             
         }
         

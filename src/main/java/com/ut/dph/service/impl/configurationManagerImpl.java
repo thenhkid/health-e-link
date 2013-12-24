@@ -8,10 +8,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ut.dph.dao.configurationDAO;
 import com.ut.dph.dao.organizationDAO;
-import com.ut.dph.model.Connections;
 import com.ut.dph.model.Macros;
 import com.ut.dph.model.Organization;
 import com.ut.dph.model.configuration;
+import com.ut.dph.model.configurationConnection;
 import com.ut.dph.model.configurationDataTranslations;
 import com.ut.dph.model.configurationMessageSpecs;
 import com.ut.dph.model.configurationSchedules;
@@ -160,31 +160,31 @@ public class configurationManagerImpl implements configurationManager {
     public Macros getMacroById(int macroId) {
         return configurationDAO.getMacroById(macroId);
     }
-
+    
     @Override
     @Transactional
-    public List<Connections> getConnections(int configId) {
-        return configurationDAO.getConnections(configId);
+    public List<configurationConnection> getAllConnections(int page, int maxResults) {
+        return configurationDAO.getAllConnections(page, maxResults);
     }
     
     @Override
     @Transactional
-    public void saveConnection(Connections newConnection) {
-        configurationDAO.saveConnection(newConnection);
+    public void saveConnection(configurationConnection connection) {
+        configurationDAO.saveConnection(connection);
     }
     
     @Override
     @Transactional
-    public Connections getConnection(int connectionId) {
+    public configurationConnection getConnection(int connectionId) {
         return configurationDAO.getConnection(connectionId);
     }
     
     @Override
     @Transactional
-    public void updateConnection(Connections connection) {
+    public void updateConnection(configurationConnection connection) {
         configurationDAO.updateConnection(connection);
     }
-    
+
     @Override
     @Transactional
     public configurationSchedules getScheduleDetails(int configId) {
@@ -196,13 +196,7 @@ public class configurationManagerImpl implements configurationManager {
     public void saveSchedule(configurationSchedules scheduleDetails) {
         configurationDAO.saveSchedule(scheduleDetails);
     }
-    
-    @Override
-    @Transactional
-    public List<Connections> getTargetConnections(int messageTypeId, int orgId) {
-        return configurationDAO.getTargetConnections(messageTypeId, orgId);
-    }
-    
+   
     @Override
     @Transactional
     public configurationMessageSpecs getMessageSpecs(int configId) {

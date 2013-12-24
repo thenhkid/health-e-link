@@ -14,11 +14,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ut.dph.dao.configurationDAO;
-import com.ut.dph.model.Connections;
 import com.ut.dph.model.Macros;
 import com.ut.dph.model.Organization;
 import com.ut.dph.model.User;
 import com.ut.dph.model.configuration;
+import com.ut.dph.model.configurationConnection;
 import com.ut.dph.model.configurationDataTranslations;
 import com.ut.dph.model.configurationMessageSpecs;
 import com.ut.dph.model.configurationSchedules;
@@ -157,7 +157,8 @@ public class configurationDAOImpl implements configurationDAO {
      *
      * @Table	configurations
      *
-     * @param	page	This will hold the value of page being viewed (used for pagination) maxResults	This will hold the value of the maximum number of results we want to send back to the list page
+     * @param	page	This will hold the value of page being viewed (used for pagination) 
+     * @param    maxResults	This will hold the value of the maximum number of results we want to send back to the list page
      *
      * @Return	This function will return a list of configuration objects
      */
@@ -228,7 +229,10 @@ public class configurationDAOImpl implements configurationDAO {
             //get a list of user id's that match the term passed in
             List<Integer> userIdList = new ArrayList<Integer>();
             Criteria findUsers = sessionFactory.getCurrentSession().createCriteria(User.class);
-            findUsers.add(Restrictions.like("lastName", "%" + searchTerm + "%"));
+            findUsers.add(Restrictions.or(
+                    Restrictions.like("lastName", "%" + searchTerm + "%"),
+                    Restrictions.like("firstName", "%" + searchTerm + "%")
+                 ));
             List<User> users = findUsers.list();
 
             for (User user : users) {
@@ -431,57 +435,83 @@ public class configurationDAOImpl implements configurationDAO {
     public Macros getMacroById(int macroId) {
         return (Macros) sessionFactory.getCurrentSession().get(Macros.class, macroId);
     }
-
+    
     /**
-     * The 'getConnections' function will return a list of connections associated to the passed in configuration id
+     * The 'getAllConnections' function will return the list of configuration connections
+     * in the system.
      *
-     * @param configId	The id of the selected configuration
+     * @Table	configurationConnections
      *
-     * @return This function will return a list of connection objects
+     * @param	page        This will hold the value of page being viewed (used for pagination) 
+     * @param   maxResults  This will hold the value of the maximum number of results we want to send back to the list page
+     *
+     * @Return	This function will return a list of configurationConnection objects
      */
     @SuppressWarnings("unchecked")
     @Override
     @Transactional
-    public List<Connections> getConnections(int configId) {
-        Query query = sessionFactory.getCurrentSession().createQuery("from Connections where configId = :configId order by dateCreated desc");
-        query.setParameter("configId", configId);
+    public List<configurationConnection> getAllConnections(int page, int maxResults) {
+        Query query = sessionFactory.getCurrentSession().createQuery("from configurationConnection order by dateCreated desc");
 
-        return query.list();
+        //By default we want to return the first result
+        int firstResult = 0;
+
+        //If viewing a page other than the first we then need to figure out
+        //which result to start with
+        if (page > 1) {
+            firstResult = (maxResults * (page - 1));
+        }
+        query.setFirstResult(firstResult);
+
+        //Set the max results to display
+        query.setMaxResults(maxResults);
+
+        List<configurationConnection> connections = query.list();
+        return connections;
     }
-
+    
     /**
-     * The 'saveConnection' function will save the configuration connection into the system.
-     *
-     * @param newConnection The connections object for the new connection
-     *
-     * @return This function will not return anything
+     * The 'saveConnection' function will save the new connection
+     * 
+     * @param connection    The object holding the new connection
+     * 
+     * @return This function does not return anything.
      */
     @Override
     @Transactional
-    public void saveConnection(Connections newConnection) {
-        sessionFactory.getCurrentSession().save(newConnection);
+    public void saveConnection(configurationConnection connection) {
+        sessionFactory.getCurrentSession().save(connection);
     }
-
+    
     /**
-     * The 'getConnection' function will return the connection details for the passed in connection id.
+     * The 'getConnection' function will return a connection based on the id passed in.
      *
-     * @param connectionId The value of the connection to retrieve details
+     * @Table configurationConnections
      *
-     * @return connection object
+     * @param	connectionid	This will hold the connection id to find
+     *
+     * @return	This function will return a single connection object
      */
-    public Connections getConnection(int connectionId) {
-        return (Connections) sessionFactory.getCurrentSession().get(Connections.class, connectionId);
+    @Override
+    public configurationConnection getConnection(int connectionId) {
+        return (configurationConnection) sessionFactory.getCurrentSession().get(configurationConnection.class, connectionId);
     }
-
+    
     /**
-     * The 'updateConnection' function will update the status of the passed in connection.
-     *
-     * @param connection The Connections object that will hold the connection to be updated
-     *
+     * The 'updateConnection' function will update the status of the
+     * passed in connection
+     * 
+     * @param connection    The object holding the connection
+     * 
+     * @return This function does not return anything.
      */
-    public void updateConnection(Connections connection) {
+    @Override
+    @Transactional
+    public void updateConnection(configurationConnection connection) {
         sessionFactory.getCurrentSession().update(connection);
     }
+
+
 
     /**
      * The 'getScheduleDetails' function will return the details of the schedule for the passed in configuration id and transport method.
@@ -511,27 +541,6 @@ public class configurationDAOImpl implements configurationDAO {
         sessionFactory.getCurrentSession().saveOrUpdate(scheduleDetails);
     }
     
-    /**
-     * The 'getTargetConnections' will return the list of organizations that are set up
-     * to send data to the passed in organization for the passed in message type.
-     * 
-     * @param messageTypeId The message type the configuration is for
-     * @param orgId The target organization the configuration is being set up for
-     * 
-     * @return This function will return a list or organizations
-     */
-    public List<Connections> getTargetConnections(int messageTypeId, int orgId) {
-         
-        Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT id from configurationConnections where orgId = :orgId and configId in (select id from configurations where messageTypeid = :messageTypeId)")
-               .setParameter("messageTypeId", messageTypeId)
-               .setParameter("orgId", orgId);
-         
-         
-        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Connections.class).add(Restrictions.in("id", query.list()));
-         
-        return criteria.list();
-
-    }
     
     /**
      * The 'getMessageSpecs' function will return the message specs for the passing configuration

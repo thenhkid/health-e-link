@@ -31,6 +31,7 @@ import com.ut.dph.model.messageTypeFormFields;
 import com.ut.dph.service.configurationManager;
 import com.ut.dph.model.Organization;
 import com.ut.dph.model.User;
+import com.ut.dph.model.configurationConnection;
 import com.ut.dph.model.configurationMessageSpecs;
 import com.ut.dph.model.configurationSchedules;
 import com.ut.dph.service.organizationManager;
@@ -269,6 +270,8 @@ public class adminConfigController {
 
         configId = id;
         
+        stepsCompleted = 1;
+        
         //If the "Save" button was pressed 
         if (action.equals("save")) {
             redirectAttr.addFlashAttribute("savedStatus", "created");
@@ -281,7 +284,7 @@ public class adminConfigController {
             ModelAndView mav = new ModelAndView(new RedirectView("transport"));
             return mav;
         }
-
+        
     }
 
     /**
@@ -512,17 +515,10 @@ public class adminConfigController {
      */
     @RequestMapping(value = "/transport", method = RequestMethod.POST)
     public ModelAndView updateTransportDetails(@Valid @ModelAttribute(value = "transportDetails") configurationTransport transportDetails, BindingResult result, RedirectAttributes redirectAttr, @RequestParam String action) throws Exception {
-
-        /**
-         * Need to update the configuration completed step
-         *
-        */
-        if (stepsCompleted < 2) {
-            configurationmanager.updateCompletedSteps(configId, 2);
-            stepsCompleted = 2;
-        }
         
-        //submit the updates
+        Integer currTransportId = transportDetails.getId();
+        
+        /* submit the updates */
         Integer transportId = (Integer) configurationTransportManager.updateTransportDetails(transportDetails);
         
         /**
@@ -531,12 +527,12 @@ public class adminConfigController {
          * if transport method is not ERG but the error handling is set
          * to fix errors via ERG set up the online form
          */
-        if(transportDetails.getId() == 0 && (transportDetails.gettransportMethodId() == 2 || transportDetails.geterrorHandling() == 1)) {
-            configuration configurationDetails = configurationmanager.getConfigurationById(configId);
+        configuration configurationDetails = configurationmanager.getConfigurationById(configId);
+        if(currTransportId == 0 && (transportDetails.gettransportMethodId() == 2 || transportDetails.geterrorHandling() == 1)) {
             configurationTransportManager.setupOnlineForm(transportId, configId, configurationDetails.getMessageTypeId());
         }
         
-        //Need to set the mappings static variable
+        /* Need to set the mappings static variable */
         if(transportDetails.gettransportMethodId() == 2) {
             mappings = 2;
         }
@@ -574,12 +570,60 @@ public class adminConfigController {
 
         //If the "Save" button was pressed 
         if (action.equals("save")) {
-            ModelAndView mav = new ModelAndView(new RedirectView("transport"));
-            return mav;
+           /**
+            * Need to update the configuration completed step
+            *
+           */
+           if (stepsCompleted < 2) {
+               configurationmanager.updateCompletedSteps(configId, 2);
+               stepsCompleted = 2;
+           }
+           ModelAndView mav = new ModelAndView(new RedirectView("transport"));
+           return mav;
         } else {
-            ModelAndView mav = new ModelAndView(new RedirectView("messagespecs"));
-            return mav;
+            //If the type of configuration is for a source then send to message specs
+            if(configurationDetails.getType() == 1) {
+                /**
+                * Need to update the configuration completed step
+                *
+                */
+                if (stepsCompleted < 2) {
+                   configurationmanager.updateCompletedSteps(configId, 2);
+                   stepsCompleted = 2;
+                }
+                ModelAndView mav = new ModelAndView(new RedirectView("messagespecs"));
+                return mav;
+            }
+            else {
+                /** If transport method is ERG send to the ERG Customization page */
+                if(transportDetails.gettransportMethodId() == 2) {
+                    /**
+                     * Need to update the configuration completed step
+                     *
+                    */
+                    if (stepsCompleted < 2) {
+                       configurationmanager.updateCompletedSteps(configId, 3);
+                       stepsCompleted = 3;
+                    }
+                    ModelAndView mav = new ModelAndView(new RedirectView("ERGCustomize"));
+                    return mav;
+                }
+                /** Otherwise send to the field mappings page */
+                else {
+                    /**
+                     * Need to update the configuration completed step
+                     *
+                    */
+                    if (stepsCompleted < 2) {
+                       configurationmanager.updateCompletedSteps(configId, 3);
+                       stepsCompleted = 3;
+                    }
+                    ModelAndView mav = new ModelAndView(new RedirectView("mappings"));
+                    return mav;
+                } 
+            }
         }
+        
 
     }
 
@@ -1110,83 +1154,132 @@ public class adminConfigController {
      *         connections  - list of currently associated organizations
      */
     @RequestMapping(value = "/connections", method = RequestMethod.GET)
-    public ModelAndView getConnections() throws Exception {
-
-        //Get the completed steps for the selected configuration;
-        configuration configurationDetails = configurationmanager.getConfigurationById(configId);
+    public ModelAndView getConnections(@RequestParam(value = "page", required = false) Integer page) throws Exception {
         
+        if (page == null) {
+            page = 1;
+        }
+
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/configurations/connections");
         mav.addObject("id", configId);
-        mav.addObject("completedSteps", configurationDetails.getstepsCompleted());
+        mav.addObject("mappings", mappings);
         
-        configurationDetails.setOrgName(organizationmanager.getOrganizationById(configurationDetails.getorgId()).getOrgName());
-        configurationDetails.setMessageTypeName(messagetypemanager.getMessageTypeById(configurationDetails.getMessageTypeId()).getName());
+        /* get a list of all connections in the sysetm */
+        List<configurationConnection> connections = configurationmanager.getAllConnections(page, maxResults);
         
-        //pass the configuration detail object back to the page.
-        mav.addObject("configurationDetails", configurationDetails);
-
-        //Return a list of all active organizations
-        List<Organization> organizations = organizationmanager.getAllActiveOrganizations();
-        mav.addObject("organizations", organizations);
-
-        List<Connections> connections = null;
-        //Set a list of organizations already used
-        List<Integer> usedOrgs = new ArrayList<Integer>();
-        if(configurationDetails.getType() == 2) {
-            connections = configurationmanager.getTargetConnections(configurationDetails.getMessageTypeId(), configurationDetails.getorgId());
-            
-            for (Connections connection : connections) {
-                //Need to get the org name;
-                Organization orgDetails = organizationmanager.getOrganizationById(configurationmanager.getConfigurationById(connection.getconfigId()).getorgId());
-                connection.setorgName(orgDetails.getOrgName());
+        Long totalConnections = (long) 0;
+        
+        /* Loop over the connections to get the configuration details */
+        if(connections != null) {
+            for(configurationConnection connection : connections) {
+                configuration srcconfigDetails = configurationmanager.getConfigurationById(connection.getsourceConfigId());
+                configurationTransport srctransportDetails = configurationTransportManager.getTransportDetails(srcconfigDetails.getId());
+                
+                srcconfigDetails.setOrgName(organizationmanager.getOrganizationById(srcconfigDetails.getorgId()).getOrgName());
+                srcconfigDetails.setMessageTypeName(messagetypemanager.getMessageTypeById(srcconfigDetails.getMessageTypeId()).getName());
+                srcconfigDetails.setuserName(userManager.getUserById(srcconfigDetails.getuserId()).getFirstName() + " " + userManager.getUserById(srcconfigDetails.getuserId()).getLastName());
+                srcconfigDetails.settransportMethod(configurationTransportManager.getTransportMethodById(srctransportDetails.gettransportMethodId()));
+                
+                connection.setsrcConfigDetails(srcconfigDetails);
+                
+                configuration tgtconfigDetails = configurationmanager.getConfigurationById(connection.gettargetConfigId());
+                configurationTransport tgttransportDetails = configurationTransportManager.getTransportDetails(tgtconfigDetails.getId());
+                
+                tgtconfigDetails.setOrgName(organizationmanager.getOrganizationById(tgtconfigDetails.getorgId()).getOrgName());
+                tgtconfigDetails.setMessageTypeName(messagetypemanager.getMessageTypeById(tgtconfigDetails.getMessageTypeId()).getName());
+                tgtconfigDetails.setuserName(userManager.getUserById(tgtconfigDetails.getuserId()).getFirstName() + " " + userManager.getUserById(tgtconfigDetails.getuserId()).getLastName());
+                tgtconfigDetails.settransportMethod(configurationTransportManager.getTransportMethodById(tgttransportDetails.gettransportMethodId()));
+                
+                
+                connection.settgtConfigDetails(tgtconfigDetails);
             }
-        }
-        else {
-            //Return a list of associated connections
-            connections = configurationmanager.getConnections(configId);
             
-            for (Connections connection : connections) {
-                usedOrgs.add(connection.getorgId());
-
-                //Need to get the org name;
-                Organization orgDetails = organizationmanager.getOrganizationById(connection.getorgId());
-                connection.setorgName(orgDetails.getOrgName());
-            }
+            /* Return the total list of connections */
+            totalConnections = (long) connections.size();
         }
-
-        //Set the object to hold the existing connections
+        
         mav.addObject("connections", connections);
-
-        //Add the organization id the configuration is being set up for.
-        usedOrgs.add(configurationDetails.getorgId());
-
-        mav.addObject("usedOrgs", usedOrgs);
+        
+        Integer totalPages = (int) Math.ceil((double)totalConnections / maxResults);
+        
+        mav.addObject("totalPages", totalPages);
+        mav.addObject("currentPage", page);
+       
+        /* Set the variable to hold the number of completed steps for this configuration */
+        mav.addObject("stepsCompleted", stepsCompleted);
 
         return mav;
     }
+    
+    /**
+     * The '/createConnection' function will handle displaying the create configuration connection screen.
+     * 
+     * 
+     */
+    @RequestMapping(value = "/createConnection", method = RequestMethod.GET)
+    public ModelAndView createNewConnectionForm() throws Exception {
+        
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/configurations/createConnection");
+        mav.addObject("id", configId);
+        mav.addObject("mappings", mappings);
+        
+        //Need to get a list of active organizations.
+        List<Organization> organizations = organizationmanager.getAllActiveOrganizations();
+        mav.addObject("organizations", organizations);
+        
+        /* Set the variable to hold the number of completed steps for this configuration */
+        mav.addObject("stepsCompleted", stepsCompleted);
+        
+        return mav;
+    }
+    
+    /**
+     * The '/getAvailableConfigurations.do' function will return a list of configuration that have been
+     * set up for the passed in organization.
+     * 
+     * @param   orgId   The organization selected in the drop down
+     * 
+     * @return  configurations  The available configurations
+     */
+    @SuppressWarnings("rawtypes")
+    @RequestMapping(value= "/getAvailableConfigurations.do", method = RequestMethod.GET)
+    public @ResponseBody List<configuration> getAvailableConfigurations(@RequestParam(value = "orgId", required = true) int orgId) {
+        
+        List<configuration> configurations = configurationmanager.getActiveConfigurationsByOrgId(orgId);
+        
+        if(configurations != null) {
+            for(configuration configuration : configurations) {
+                configurationTransport transportDetails = configurationTransportManager.getTransportDetails(configuration.getId());
+                
+                configuration.setOrgName(organizationmanager.getOrganizationById(configuration.getorgId()).getOrgName());
+                configuration.setMessageTypeName(messagetypemanager.getMessageTypeById(configuration.getMessageTypeId()).getName());
+                configuration.setuserName(userManager.getUserById(configuration.getuserId()).getFirstName() + " " + userManager.getUserById(configuration.getuserId()).getLastName());
+                configuration.settransportMethod(configurationTransportManager.getTransportMethodById(transportDetails.gettransportMethodId()));
+            }
+        }
+        
+        return configurations;
+    } 
     
      /**
      * The '/addConnection.do' POST request will create the connection between the passed in organization
      * and the configuration.
      *
-     * @param	org	The organization that to connect to
+     * @param	srcConfig     The selected source configuration
+     * @param   tgtConfig     The selected target configuration
      *
      * @return	The method will return a 1 back to the calling ajax function which will handle the page load.
      */
     @RequestMapping(value = "/addConnection.do", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody Integer addConnection(@RequestParam int org) throws Exception {
+    public @ResponseBody Integer addConnection(@RequestParam(value = "srcConfig", required = true) int srcConfig, @RequestParam(value = "tgtConfig", required = true) int tgtConfig) throws Exception {
+       
+        configurationConnection newConnection = new configurationConnection();
+        newConnection.setStatus(true);
+        newConnection.setsourceConfigId(srcConfig);
+        newConnection.settargetConfigId(tgtConfig);
         
-        //Update the configuration completed step
-        configuration configurationDetails = configurationmanager.getConfigurationById(configId);
-        if (configurationDetails.getstepsCompleted() < 5) {
-            configurationmanager.updateCompletedSteps(configId, 5);
-        }
-
-        Connections newConnection = new Connections();
-        newConnection.setorgId(org);
-        newConnection.setconfigId(configId);
-
         configurationmanager.saveConnection(newConnection);
 
         return 1;
@@ -1203,11 +1296,11 @@ public class adminConfigController {
     @RequestMapping(value= "/changeConnectionStatus.do", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody Integer changeConnectionStatus(@RequestParam boolean statusVal, @RequestParam int connectionId) throws Exception {
         
-        Connections connection = configurationmanager.getConnection(connectionId);
-        connection.setstatus(statusVal);
-        configurationmanager.updateConnection(connection);
+       configurationConnection connection = configurationmanager.getConnection(connectionId);
+       connection.setStatus(statusVal);
+       configurationmanager.updateConnection(connection);
         
-        return 1;
+       return 1;
     }
     
     

@@ -144,7 +144,7 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
                     Object maxrow[] = (Object[]) maxIt.next();
                     max = (Integer) maxrow[0]; 
                     /* Check to see if there is a data translation for the current row */
-                    Query copyTranslations = sessionFactory.getCurrentSession().createSQLQuery("INSERT INTO configurationDataTranslations (configId, transportMethod, fieldId, crosswalkId, macroId, processOrder) SELECT :configId, 2, :fieldId, crosswalkId, 0, processOrder FROM rel_messageTypeDataTranslations where fieldId = :fieldId2");
+                    Query copyTranslations = sessionFactory.getCurrentSession().createSQLQuery("INSERT INTO configurationDataTranslations (configId, fieldId, crosswalkId, macroId, processOrder) SELECT :configId, :fieldId, crosswalkId, 0, processOrder FROM rel_messageTypeDataTranslations where fieldId = :fieldId2");
                     copyTranslations.setParameter("configId",configId);
                     copyTranslations.setParameter("fieldId",max);
                     copyTranslations.setParameter("fieldId2",id);

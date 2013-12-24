@@ -5,6 +5,7 @@ import java.util.List;
 import com.ut.dph.model.Connections;
 import com.ut.dph.model.Macros;
 import com.ut.dph.model.configuration;
+import com.ut.dph.model.configurationConnection;
 import com.ut.dph.model.configurationDataTranslations;
 import com.ut.dph.model.configurationMessageSpecs;
 import com.ut.dph.model.configurationSchedules;
@@ -50,19 +51,17 @@ public interface configurationManager {
   
   Macros getMacroById(int macroId);
   
-  List<Connections> getConnections(int configId);
+  List<configurationConnection> getAllConnections(int page, int maxResults);
   
-  void saveConnection(Connections newConnection);
+  void saveConnection(configurationConnection connection);
   
-  Connections getConnection(int connectionId);
+  configurationConnection getConnection(int connectionId);
   
-  void updateConnection(Connections connection);
-  
+  void updateConnection(configurationConnection connection);
+ 
   configurationSchedules getScheduleDetails(int configId);
   
   void saveSchedule(configurationSchedules scheduleDetails);
-  
-  List<Connections> getTargetConnections(int messageTypeId, int orgId);
   
   configurationMessageSpecs getMessageSpecs(int configId);
   
