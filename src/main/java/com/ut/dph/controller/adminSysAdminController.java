@@ -17,6 +17,9 @@ import com.ut.dph.model.custom.TableData;
 import com.ut.dph.model.lutables.lu_Counties;
 import com.ut.dph.model.lutables.lu_GeneralHealthStatuses;
 import com.ut.dph.model.lutables.lu_GeneralHealths;
+import com.ut.dph.model.lutables.lu_Immunizations;
+import com.ut.dph.model.lutables.lu_Manufacturers;
+import com.ut.dph.model.lutables.lu_MedicalConditions;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -411,7 +414,7 @@ public class adminSysAdminController {
 		mav.addObject("stdForm", "stdForm");
 		mav.addObject("tableDataDetails",tableData);
 		mav.addObject("tableInfo",tableInfo);
-		mav.addObject("ojectType","tableData");
+		mav.addObject("objectType","tableData");
 		mav.addObject("formId","tabledataform");
 		mav.addObject("btnValue", "Create");
 		mav.addObject("submitBtnValue", "Create");
@@ -437,7 +440,7 @@ public class adminSysAdminController {
 		
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("/administrator/sysadmin/data/std/details");
-		mav.addObject("ojectType","tableData");
+		mav.addObject("objectType","tableData");
 		mav.addObject("formId","tabledataform");
 		/** check for error **/
 		if(result.hasErrors()) {
@@ -471,7 +474,7 @@ public class adminSysAdminController {
 		tableData.setUrlId(urlId);
 		mav.addObject("tableDataDetails",tableData);
 		mav.addObject("tableInfo",tableInfo);
-		mav.addObject("ojectType","tableData");
+		mav.addObject("objectType","tableData");
 		mav.addObject("stdForm", "stdForm");
 		mav.addObject("formId","tabledataform");
 		mav.addObject("btnValue", "Update");
@@ -491,7 +494,7 @@ public class adminSysAdminController {
 
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("/administrator/sysadmin/data/std/details");
-		mav.addObject("ojectType","tableData");
+		mav.addObject("objectType","tableData");
 		mav.addObject("formId","tabledataform");
 		mav.addObject("submitBtnValue", "Update");
 		mav.addObject("btnValue", "Update");
@@ -608,7 +611,7 @@ public class adminSysAdminController {
 		lu_Counties luc = new lu_Counties();
 		luc.setId(0);
 		mav.addObject("tableDataDetails",luc);
-		mav.addObject("ojectType","lu_Counties");
+		mav.addObject("objectType","lu_Counties");
 		mav.addObject("formId","tabledataform");
 		mav.addObject("stateList", stateList.getStates());
 		mav.addObject("btnValue", "lu_counties/create");
@@ -623,7 +626,7 @@ public class adminSysAdminController {
 		
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("/administrator/sysadmin/data/std/details");
-		mav.addObject("ojectType","lu_Counties");
+		mav.addObject("objectType","lu_Counties");
 		mav.addObject("formId","tabledataform");
 		/** check for error **/
 		if(result.hasErrors()) {
@@ -659,7 +662,7 @@ public class adminSysAdminController {
 		mav.addObject("tableDataDetails",luc);
         //Get the object that will hold the states
         mav.addObject("stateList", stateList.getStates());
-        mav.addObject("ojectType","lu_Counties");
+        mav.addObject("objectType","lu_Counties");
 		mav.addObject("formId","tabledataform");
 		mav.addObject("btnValue", "lu_counties/update");
 		mav.addObject("submitBtnValue", "Update");
@@ -674,7 +677,7 @@ public class adminSysAdminController {
 		
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("/administrator/sysadmin/data/std/details");
-		mav.addObject("ojectType","lu_Counties");
+		mav.addObject("objectType","lu_Counties");
 		mav.addObject("formId","tabledataform");
 		/** check for error **/
 		if(result.hasErrors()) {
@@ -705,7 +708,7 @@ public class adminSysAdminController {
 		lu_GeneralHealths lu = new lu_GeneralHealths();
 		lu.setId(0);
 		mav.addObject("tableDataDetails",lu);
-		mav.addObject("ojectType","lu_GeneralHealths");
+		mav.addObject("objectType","lu_GeneralHealths");
 		mav.addObject("formId","tabledataform");
 		mav.addObject("btnValue", "lu_generalhealths/create");
 		mav.addObject("submitBtnValue", "Create");
@@ -721,7 +724,7 @@ public class adminSysAdminController {
 		
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("/administrator/sysadmin/data/std/details");
-		mav.addObject("ojectType","lu_GeneralHealths");
+		mav.addObject("objectType","lu_GeneralHealths");
 		mav.addObject("formId","tabledataform");
 		// check for error
 		if(result.hasErrors()) {
@@ -748,8 +751,8 @@ public class adminSysAdminController {
 		
 		lu_GeneralHealths lu = sysAdminManager.getGeneralHealthById(i);
 		mav.addObject("tableDataDetails",lu);
-        //Get the object that will hold the states
-        mav.addObject("ojectType","lu_GeneralHealths");
+        
+        mav.addObject("objectType","lu_GeneralHealths");
 		mav.addObject("formId","tabledataform");
 		mav.addObject("btnValue", "lu_generalhealths/update");
 		mav.addObject("submitBtnValue", "Update");
@@ -764,7 +767,7 @@ public class adminSysAdminController {
 		
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("/administrator/sysadmin/data/std/details");
-		mav.addObject("ojectType","lu_GeneralHealths");
+		mav.addObject("objectType","lu_GeneralHealths");
 		mav.addObject("formId","tabledataform");
 		/** check for error **/
 		if(result.hasErrors()) {
@@ -783,6 +786,8 @@ public class adminSysAdminController {
 	/** end of general health **/
 	
 	/** start of general health statuses **/
+	
+	// this method creates the form for the object
 	@RequestMapping(value="/data/nstd/lu_GeneralHealthStatuses/create", method = RequestMethod.GET)
 	public ModelAndView newGeneralHealthStatusForm() throws Exception {
 		ModelAndView mav = new ModelAndView();
@@ -792,7 +797,7 @@ public class adminSysAdminController {
 		lu_GeneralHealthStatuses lu = new lu_GeneralHealthStatuses();
 		lu.setId(0);
 		mav.addObject("tableDataDetails",lu);
-		mav.addObject("ojectType","lu_GeneralHealthStatuses");
+		mav.addObject("objectType","lu_GeneralHealthStatuses");
 		mav.addObject("formId","tabledataform");
 		mav.addObject("btnValue", "lu_GeneralHealthStatuses/create");
 		mav.addObject("submitBtnValue", "Create");
@@ -800,7 +805,7 @@ public class adminSysAdminController {
 	}
 	
 	
-
+	//this method saves the object
 	@RequestMapping(value="/data/nstd/lu_generalhealthstatuses/create", method = RequestMethod.POST)
 	public ModelAndView createGeneralHealthStatuses(
 			@Valid @ModelAttribute(value="tableDataDetails") lu_GeneralHealthStatuses lu, 
@@ -808,7 +813,7 @@ public class adminSysAdminController {
 		
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("/administrator/sysadmin/data/std/details");
-		mav.addObject("ojectType","lu_GeneralHealthStatuses");
+		mav.addObject("objectType","lu_GeneralHealthStatuses");
 		mav.addObject("formId","tabledataform");
 		// check for error
 		if(result.hasErrors()) {
@@ -825,7 +830,7 @@ public class adminSysAdminController {
 		return mav;
 	}
 	
-
+	// this method queries and displays the object data
 	@RequestMapping(value="/data/nstd/lu_GeneralHealthStatuses/tableData", method = RequestMethod.GET)
 	public ModelAndView viewGeneralHealthStatus(@RequestParam(value="i", required=false) Integer i) 
 			throws Exception {
@@ -835,15 +840,15 @@ public class adminSysAdminController {
 		
 		lu_GeneralHealthStatuses lu = sysAdminManager.getGeneralHealthStatusById(i);
 		mav.addObject("tableDataDetails",lu);
-        //Get the object that will hold the states
-        mav.addObject("ojectType","lu_GeneralHealthStatuses");
+       
+        mav.addObject("objectType","lu_GeneralHealthStatuses");
 		mav.addObject("formId","tabledataform");
 		mav.addObject("btnValue", "lu_GeneralHealthStatuses/update");
 		mav.addObject("submitBtnValue", "Update");
 		return mav;		
 	}
 	
-
+	//this method updates the object
 	@RequestMapping(value="/data/nstd/lu_generalhealthstatuses/update", method = RequestMethod.POST)
 	public ModelAndView updateGeneralHealth(
 			@Valid @ModelAttribute(value="tableDataDetails") lu_GeneralHealthStatuses lu, 
@@ -851,7 +856,7 @@ public class adminSysAdminController {
 		
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("/administrator/sysadmin/data/std/details");
-		mav.addObject("ojectType","lu_GeneralHealthStatuses");
+		mav.addObject("objectType","lu_GeneralHealthStatuses");
 		mav.addObject("formId","tabledataform");
 		/** check for error **/
 		if(result.hasErrors()) {
@@ -863,9 +868,292 @@ public class adminSysAdminController {
 		//now we save
 		sysAdminManager.updateGeneralHealthStatus(lu);
 		mav.addObject("success", "dataUpdated");
-		mav.addObject("btnValue", "lu_eneralHealthStatuses/update");
+		mav.addObject("btnValue", "lu_GeneralHealthStatuses/update");
 		mav.addObject("submitBtnValue", "Update");
 		return mav;
 	}
+	
+	/** end of general health status **/
+	
+	/** start of Immunizations **/
+	// this method creates the form for the object
+	@RequestMapping(value="/data/nstd/lu_Immunizations/create", method = RequestMethod.GET)
+	public ModelAndView newImmunizationsForm() throws Exception {
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/sysadmin/data/std/details");	
+		
+		//create the object
+		lu_Immunizations lu = new lu_Immunizations();
+		lu.setId(0);
+		mav.addObject("tableDataDetails",lu);
+		mav.addObject("objectType","lu_Immunizations");
+		mav.addObject("formId","tabledataform");
+		mav.addObject("btnValue", "lu_Immunizations/create");
+		mav.addObject("submitBtnValue", "Create");
+		return mav;
+	}
+	
+	
+	//this method saves the object
+	@RequestMapping(value="/data/nstd/lu_immunizations/create", method = RequestMethod.POST)
+	public ModelAndView createImmunization(
+			@Valid @ModelAttribute(value="tableDataDetails") lu_Immunizations lu, 
+			BindingResult result) throws Exception {
+		
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/sysadmin/data/std/details");
+		mav.addObject("objectType","lu_Immunizations");
+		mav.addObject("formId","tabledataform");
+		// check for error
+		if(result.hasErrors()) {
+			mav.addObject("btnValue", "lu_Immunizations/create");
+			mav.addObject("submitBtnValue", "Create");
+			return mav;
+		}
+		
+		//now we save
+		sysAdminManager.createImmunization(lu);
+		mav.addObject("success", "dataCreated");
+		mav.addObject("btnValue", "lu_Immunizations/update");
+		mav.addObject("submitBtnValue", "Update");
+		return mav;
+	}
+	
+	// this method queries and displays the object data
+	@RequestMapping(value="/data/nstd/lu_Immunizations/tableData", method = RequestMethod.GET)
+	public ModelAndView viewImmunization(@RequestParam(value="i", required=false) Integer i) 
+			throws Exception {
+		
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/sysadmin/data/std/details");	
+		
+		lu_Immunizations lu = sysAdminManager.getImmunizationById(i);
+		mav.addObject("tableDataDetails",lu);
+        mav.addObject("objectType","lu_Immunizations");
+		mav.addObject("formId","tabledataform");
+		mav.addObject("btnValue", "lu_Immunizations/update");
+		mav.addObject("submitBtnValue", "Update");
+		return mav;		
+	}
+	
+	//this method updates the object
+	@RequestMapping(value="/data/nstd/lu_immunizations/update", method = RequestMethod.POST)
+	public ModelAndView updateImmunization(
+			@Valid @ModelAttribute(value="tableDataDetails") lu_Immunizations lu, 
+			BindingResult result) throws Exception {
+		
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/sysadmin/data/std/details");
+		mav.addObject("objectType","lu_Immunizations");
+		mav.addObject("formId","tabledataform");
+		/** check for error **/
+		if(result.hasErrors()) {
+			mav.addObject("btnValue", "lu_Immunizations/update");
+			mav.addObject("submitBtnValue", "Update");
+			return mav;
+		}
+		
+		//now we save
+		sysAdminManager.updateImmunization(lu);
+		mav.addObject("success", "dataUpdated");
+		mav.addObject("btnValue", "lu_immunizations/update");
+		mav.addObject("submitBtnValue", "Update");
+		return mav;
+	}
+	
+	/** end of Immunizations **/
+	
+	/** start of Manufacturers **/
+	// this method creates the form for the object
+	@RequestMapping(value="/data/nstd/lu_Manufacturers/create", method = RequestMethod.GET)
+	public ModelAndView newManufacturerForm() throws Exception {
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/sysadmin/data/std/details");	
+		
+		//create the object
+		lu_Manufacturers lu = new lu_Manufacturers();
+		lu.setId(0);
+		 //Get a list of states
+        USStateList stateList = new USStateList();
+        //Get the object that will hold the states
+        mav.addObject("stateList", stateList.getStates());
+		mav.addObject("tableDataDetails",lu);
+		mav.addObject("objectType","lu_Manufacturers");
+		mav.addObject("formId","tabledataform");
+		mav.addObject("btnValue", "lu_Manufacturers/create");
+		mav.addObject("submitBtnValue", "Create");
+		return mav;
+	}
+	
+	
+	//this method saves the object
+	@RequestMapping(value="/data/nstd/lu_manufacturers/create", method = RequestMethod.POST)
+	public ModelAndView createManufacturer(
+			@Valid @ModelAttribute(value="tableDataDetails") lu_Manufacturers lu, 
+			BindingResult result) throws Exception {
+		
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/sysadmin/data/std/details");
+		mav.addObject("objectType","lu_Manufacturers");
+		mav.addObject("formId","tabledataform");
+		// check for error
+		if(result.hasErrors()) {
+			 //Get a list of states
+            USStateList stateList = new USStateList();
+            //Get the object that will hold the states
+            mav.addObject("stateList", stateList.getStates());
+			mav.addObject("btnValue", "lu_Manufacturers/create");
+			mav.addObject("submitBtnValue", "Create");
+			return mav;
+		}
+		
+		//now we save
+		sysAdminManager.createManufacturer(lu);
+		mav.addObject("success", "dataCreated");
+		mav.addObject("btnValue", "lu_Manufacturers/update");
+		mav.addObject("submitBtnValue", "Update");
+		return mav;
+	}
+	
+	// this method queries and displays the object data
+	@RequestMapping(value="/data/nstd/lu_Manufacturers/tableData", method = RequestMethod.GET)
+	public ModelAndView viewManufacturer(@RequestParam(value="i", required=false) Integer i) 
+			throws Exception {
+		
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/sysadmin/data/std/details");	
+		
+		lu_Manufacturers lu = sysAdminManager.getManufacturerById(i);
+		mav.addObject("tableDataDetails",lu);
+        mav.addObject("objectType","lu_Manufacturers");
+		mav.addObject("formId","tabledataform");
+		mav.addObject("btnValue", "lu_Manufacturers/update");
+		mav.addObject("submitBtnValue", "Update");
+		 //Get a list of states
+        USStateList stateList = new USStateList();
+        //Get the object that will hold the states
+        mav.addObject("stateList", stateList.getStates());
+		return mav;		
+	}
+	
+	//this method updates the object
+	@RequestMapping(value="/data/nstd/lu_manufacturers/update", method = RequestMethod.POST)
+	public ModelAndView updateManufacturer(
+			@Valid @ModelAttribute(value="tableDataDetails") lu_Manufacturers lu, 
+			BindingResult result) throws Exception {
+		
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/sysadmin/data/std/details");
+		mav.addObject("objectType","lu_Manufacturers");
+		mav.addObject("formId","tabledataform");
+		/** check for error **/
+		if(result.hasErrors()) {
+			 //Get a list of states
+            USStateList stateList = new USStateList();
+            //Get the object that will hold the states
+            mav.addObject("stateList", stateList.getStates());
+			mav.addObject("btnValue", "lu_Manufacturers/update");
+			mav.addObject("submitBtnValue", "Update");
+			return mav;
+		}
+		
+		//now we save
+		sysAdminManager.updateManufacturer(lu);
+		mav.addObject("success", "dataUpdated");
+		mav.addObject("btnValue", "lu_Manufacturers/update");
+		mav.addObject("submitBtnValue", "Update");
+		return mav;
+	}
+	
+	/** end of Manufacturers **/
+	
+	/** medical conditions **/
+	
+	@RequestMapping(value="/data/nstd/lu_MedicalConditions/create", method = RequestMethod.GET)
+	public ModelAndView newMedicalConditionForm() throws Exception {
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/sysadmin/data/std/details");	
+		
+		//create the object
+		lu_MedicalConditions lu = new lu_MedicalConditions();
+		lu.setId(0);
+		mav.addObject("tableDataDetails",lu);
+		mav.addObject("objectType","lu_MedicalConditions");
+		mav.addObject("formId","tabledataform");
+		mav.addObject("btnValue", "lu_MedicalConditions/create");
+		mav.addObject("submitBtnValue", "Create");
+		return mav;
+	}
+	
+	
+
+	@RequestMapping(value="/data/nstd/lu_medicalconditions/create", method = RequestMethod.POST)
+	public ModelAndView createGeneralHealth(
+			@Valid @ModelAttribute(value="tableDataDetails") lu_MedicalConditions lu, 
+			BindingResult result) throws Exception {
+		
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/sysadmin/data/std/details");
+		mav.addObject("objectType","lu_MedicalConditions");
+		mav.addObject("formId","tabledataform");
+		// check for error
+		if(result.hasErrors()) {
+			mav.addObject("btnValue", "lu_MedicalConditions/create");
+			mav.addObject("submitBtnValue", "Create");
+			return mav;
+		}
+		
+		//now we save
+		sysAdminManager.createMedicalCondition(lu);
+		mav.addObject("success", "dataCreated");
+		mav.addObject("btnValue", "lu_MedicalConditions/update");
+		mav.addObject("submitBtnValue", "Update");
+		return mav;
+	}
+	
+
+	@RequestMapping(value="/data/nstd/lu_MedicalConditions/tableData", method = RequestMethod.GET)
+	public ModelAndView viewMedicalCondition(@RequestParam(value="i", required=false) Integer i) 
+			throws Exception {
+		
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/sysadmin/data/std/details");	
+		
+		lu_MedicalConditions lu = sysAdminManager.getMedicalConditionById(i);
+		mav.addObject("tableDataDetails",lu);
+        
+        mav.addObject("objectType","lu_MedicalConditions");
+		mav.addObject("formId","tabledataform");
+		mav.addObject("btnValue", "lu_MedicalConditions/update");
+		mav.addObject("submitBtnValue", "Update");
+		return mav;		
+	}
+	
+
+	@RequestMapping(value="/data/nstd/lu_medicalconditions/update", method = RequestMethod.POST)
+	public ModelAndView updateGeneralHealth(
+			@Valid @ModelAttribute(value="tableDataDetails") lu_MedicalConditions lu, 
+			BindingResult result) throws Exception {
+		
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/sysadmin/data/std/details");
+		mav.addObject("objectType","lu_MedicalConditions");
+		mav.addObject("formId","tabledataform");
+		/** check for error **/
+		if(result.hasErrors()) {
+			mav.addObject("btnValue", "lu_MedicalConditions/update");
+			mav.addObject("submitBtnValue", "Update");
+			return mav;
+		}
+		
+		//now we save
+		sysAdminManager.updateMedicalCondition(lu);
+		mav.addObject("success", "dataUpdated");
+		mav.addObject("btnValue", "lu_MedicalConditions/update");
+		mav.addObject("submitBtnValue", "Update");
+		return mav;
+	}
+	
+	/** end of medical conditions **/
 }
 

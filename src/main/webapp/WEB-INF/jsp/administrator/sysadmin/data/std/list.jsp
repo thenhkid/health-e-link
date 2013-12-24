@@ -96,6 +96,6 @@
 <p rel="${urlIdInfo}" id="urlIdInfo" style="display:none"></p>
 
 <!-- Providers modal -->
-<div class="modal fade" id="addLUDataModal" role="dialog" tabindex="-1" aria-labeledby="Add look up data" aria-hidden="true" aria-describedby="Add look up data"></div>
+<div class="modal fade" id="addLUDataModal" role="dialog" tabindex="-1" aria-labeledby="Add look up data" aria-hidden="true" aria-describedby="Add look up data" rel="${tableInfo.displayName}"></div>
 
 

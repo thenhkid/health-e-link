@@ -6,10 +6,10 @@
     <div class="modal-content">
         <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-            <h3 class="panel-title"><c:choose><c:when test="${btnValue == 'Update'}">Update</c:when><c:when test="${btnValue == 'Create'}">Add</c:when></c:choose> Look Up Data ${success}</h3>
+            <h3 class="panel-title"><c:choose><c:when test="${btnValue == 'Update'}">Update</c:when><c:when test="${btnValue == 'Create'}">Add</c:when></c:choose> Look Up Data for <span id="tableNameDisplay"></span>${success}</h3>
                 </div>
                 <div class="modal-body">
-            <form:form id="${formId}" commandName="${ojectType}" modelAttribute="tableDataDetails"  method="post" role="form">
+            <form:form id="${formId}" commandName="${objectType}" modelAttribute="tableDataDetails"  method="post" role="form">
                 <form:hidden path="id" id="id" />
                 <c:if test="${not empty stdForm}">
                 	<form:hidden path="urlId" id="urlId"/>
@@ -51,7 +51,7 @@
                                 <form:errors path="description" cssClass="control-label" element="label" />
                             </div>
                         </spring:bind>
-                        <c:if test='${ojectType=="lu_Counties"}'>
+                        <c:if test='${objectType=="lu_Counties"}'>
                          <spring:bind path="state">
                             <div class="form-group ${status.error ? 'has-error' : '' }">
                                 <label class="control-label" for="state">State *</label>
@@ -63,7 +63,7 @@
                             </div>
                         </spring:bind>
                         </c:if>
-                        <c:if test='${ojectType=="lu_GeneralHealths"}'>
+                        <c:if test='${objectType=="lu_GeneralHealths" || objectType=="lu_Immunizations" || objectType=="lu_MedicalConditions"}'>
 	                         <spring:bind path="codeValue">
 	                            <div class="form-group ${status.error ? 'has-error' : '' }">
 	                                <label class="control-label" for="codeValue">Code Value</label>
@@ -86,7 +86,7 @@
 	                            </div>
 	                        </spring:bind>
                         </c:if>
-                        <c:if test='${ojectType=="lu_GeneralHealthStatuses"}'>
+                        <c:if test='${objectType=="lu_GeneralHealthStatuses"}'>
 	                         <spring:bind path="category">
 	                            <div class="form-group ${status.error ? 'has-error' : '' }">
 	                                <label class="control-label" for="category">Category</label>
@@ -94,6 +94,9 @@
 	                                <form:errors path="category" cssClass="control-label" element="label" />
 	                            </div>
 	                        </spring:bind>
+                        </c:if>
+                        <c:if test='${objectType=="lu_Manufacturers"}'>
+                        	<%@ include file="lu_Manufacturers.jsp" %>
                         </c:if>
                         
                         
@@ -107,8 +110,8 @@
 </div>
 
 <script type="text/javascript">
-
     $(document).ready(function() {
+    	$("#tableNameDisplay").text($('#addLUDataModal').attr('rel'));
         $("input:text,form").attr("autocomplete", "off");
     });
 </script>

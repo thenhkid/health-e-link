@@ -11,6 +11,9 @@ import com.ut.dph.model.custom.TableData;
 import com.ut.dph.model.lutables.lu_Counties;
 import com.ut.dph.model.lutables.lu_GeneralHealthStatuses;
 import com.ut.dph.model.lutables.lu_GeneralHealths;
+import com.ut.dph.model.lutables.lu_Immunizations;
+import com.ut.dph.model.lutables.lu_Manufacturers;
+import com.ut.dph.model.lutables.lu_MedicalConditions;
 import com.ut.dph.model.Macros;
 import com.ut.dph.service.sysAdminManager;
 
@@ -184,6 +187,52 @@ public class sysAdminManagerImpl implements sysAdminManager {
 	public void updateGeneralHealthStatus(lu_GeneralHealthStatuses lu) {
 		sysAdminDAO.updateGeneralHealthStatus(lu);
 		
+	}
+
+	@Override
+	public void createImmunization(lu_Immunizations lu) {
+		sysAdminDAO.createImmunization(lu);
+	}
+
+	@Override
+	public lu_Immunizations getImmunizationById(int id) {
+		return sysAdminDAO.getImmunizationById(id);
+	}
+
+	@Override
+	public void updateImmunization(lu_Immunizations lu) {
+		sysAdminDAO.updateImmunization(lu);
+	}
+
+	@Override
+	public void createManufacturer(lu_Manufacturers lu) {
+		sysAdminDAO.createManufacturer(lu);
+		
+	}
+
+	@Override
+	public lu_Manufacturers getManufacturerById(int id) {
+		return sysAdminDAO.getManufacturerById(id);
+	}
+
+	@Override
+	public void updateManufacturer(lu_Manufacturers lu) {
+		sysAdminDAO.updateManufacturer(lu);
+	}
+
+	@Override
+	public void createMedicalCondition(lu_MedicalConditions lu) {
+		sysAdminDAO.createMedicalCondition(lu);
+	}
+
+	@Override
+	public lu_MedicalConditions getMedicalConditionById(int id) {
+		return sysAdminDAO.getMedicalConditionById(id);
+	}
+
+	@Override
+	public void updateMedicalCondition(lu_MedicalConditions lu) {
+		sysAdminDAO.updateMedicalCondition(lu);
 	}
 
 

@@ -23,6 +23,9 @@ import com.ut.dph.model.custom.TableData;
 import com.ut.dph.model.lutables.lu_Counties;
 import com.ut.dph.model.lutables.lu_GeneralHealthStatuses;
 import com.ut.dph.model.lutables.lu_GeneralHealths;
+import com.ut.dph.model.lutables.lu_Immunizations;
+import com.ut.dph.model.lutables.lu_Manufacturers;
+import com.ut.dph.model.lutables.lu_MedicalConditions;
 
 /**
  * @see com.ut.dph.dao.sysAdminDAO
@@ -479,8 +482,7 @@ public class sysAdminDAOImpl implements sysAdminDAO {
 				sessionFactory.getCurrentSession().save(lu);						
 			} catch (Throwable ex) {
                 System.err.println("create general health status failed." + ex);
-			}
-			
+			}	
 		}
 
 		@Override
@@ -501,8 +503,100 @@ public class sysAdminDAOImpl implements sysAdminDAO {
 				sessionFactory.getCurrentSession().update(lu);							
 			} catch (Throwable ex) {
                 System.err.println("update general health status failed." + ex);
+			}	
+		}
+
+		@Override
+		@Transactional
+		public void createImmunization(lu_Immunizations lu) {
+			try {
+				sessionFactory.getCurrentSession().save(lu);						
+			} catch (Throwable ex) {
+                System.err.println("create Immunization failed." + ex);
 			}
-			
+		}
+
+		@Override
+		@Transactional
+		public lu_Immunizations getImmunizationById(int id) {
+			try {
+				return (lu_Immunizations) sessionFactory.getCurrentSession().get(lu_Immunizations.class, id);						
+			} catch (Throwable ex) {
+                System.err.println("get Immunization failed." + ex);
+                return null;
+			}
+		}
+
+		@Override
+		@Transactional
+		public void updateImmunization(lu_Immunizations lu) {
+			try {
+				sessionFactory.getCurrentSession().update(lu);							
+			} catch (Throwable ex) {
+                System.err.println("update Immunization failed." + ex);
+			}
+		}
+
+		@Override
+		@Transactional
+		public void createManufacturer(lu_Manufacturers lu) {
+			try {
+				sessionFactory.getCurrentSession().save(lu);						
+			} catch (Throwable ex) {
+                System.err.println("create Manufacturer failed." + ex);
+			}
+		}
+
+		@Override
+		@Transactional
+		public lu_Manufacturers getManufacturerById(int id) {
+			try {
+				return (lu_Manufacturers) sessionFactory.getCurrentSession().get(lu_Manufacturers.class, id);						
+			} catch (Throwable ex) {
+                System.err.println("get Manufacturers failed." + ex);
+                return null;
+			}
+		}
+
+		@Override
+		@Transactional
+		public void updateManufacturer(lu_Manufacturers lu) {
+			try {
+				sessionFactory.getCurrentSession().update(lu);							
+			} catch (Throwable ex) {
+                System.err.println("update Manufacturers failed." + ex);
+			}
+		}
+		
+		@Override
+		@Transactional
+		public void createMedicalCondition(lu_MedicalConditions lu) {
+			try {
+				sessionFactory.getCurrentSession().save(lu);						
+			} catch (Throwable ex) {
+                System.err.println("create medical condition failed." + ex);
+			}
+		}
+
+		@Override
+		@Transactional
+		public lu_MedicalConditions getMedicalConditionById(int id) {
+			try {
+				return (lu_MedicalConditions) sessionFactory.getCurrentSession().get(lu_MedicalConditions.class, id);						
+			} catch (Throwable ex) {
+                System.err.println("get Medical Condition failed." + ex);
+                return null;
+			}
+		}
+
+		@Override
+		@Transactional
+		public void updateMedicalCondition(lu_MedicalConditions lu) {
+			try {
+				sessionFactory.getCurrentSession().update(lu);							
+			} catch (Throwable ex) {
+                System.err.println("update Medical Condition failed." + ex);
+			}
 		}
 		
 }

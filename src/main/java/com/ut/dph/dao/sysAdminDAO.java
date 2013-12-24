@@ -7,6 +7,9 @@ import com.ut.dph.model.custom.TableData;
 import com.ut.dph.model.lutables.lu_Counties;
 import com.ut.dph.model.lutables.lu_GeneralHealthStatuses;
 import com.ut.dph.model.lutables.lu_GeneralHealths;
+import com.ut.dph.model.lutables.lu_Immunizations;
+import com.ut.dph.model.lutables.lu_Manufacturers;
+import com.ut.dph.model.lutables.lu_MedicalConditions;
 import com.ut.dph.model.Macros;
 
 public interface sysAdminDAO {
@@ -58,6 +61,24 @@ public interface sysAdminDAO {
 	lu_GeneralHealthStatuses getGeneralHealthStatusById (int id);
 	
 	void updateGeneralHealthStatus (lu_GeneralHealthStatuses lu);
+	
+	void createImmunization (lu_Immunizations lu);
+	
+	lu_Immunizations getImmunizationById (int id);
+	
+	void updateImmunization (lu_Immunizations lu);
+	
+	void createManufacturer(lu_Manufacturers lu);
+
+	lu_Manufacturers getManufacturerById (int id);
+	
+	void updateManufacturer (lu_Manufacturers lu);
+	
+	void createMedicalCondition (lu_MedicalConditions lu);
+	
+	lu_MedicalConditions getMedicalConditionById (int id);
+	
+	void updateMedicalCondition(lu_MedicalConditions lu);
 	
 	
 }
