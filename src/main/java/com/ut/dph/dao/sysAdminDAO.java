@@ -11,6 +11,8 @@ import com.ut.dph.model.lutables.lu_Immunizations;
 import com.ut.dph.model.lutables.lu_Manufacturers;
 import com.ut.dph.model.lutables.lu_MedicalConditions;
 import com.ut.dph.model.lutables.lu_Medications;
+import com.ut.dph.model.lutables.lu_Procedures;
+import com.ut.dph.model.lutables.lu_Tests;
 import com.ut.dph.model.Macros;
 
 public interface sysAdminDAO {
@@ -86,4 +88,16 @@ public interface sysAdminDAO {
 	lu_Medications getMedicationById (int id);
 	
 	void updateMedication(lu_Medications lu);
+	
+	void createProcedure (lu_Procedures lu);
+	
+	lu_Procedures getProcedureById (int id);
+	
+	void updateProcedure(lu_Procedures lu);
+	
+	void createTest (lu_Tests lu);
+	
+	lu_Tests getTestById (int id);
+	
+	void updateTest(lu_Tests lu);
 }

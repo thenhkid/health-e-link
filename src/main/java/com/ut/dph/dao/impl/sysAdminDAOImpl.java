@@ -27,6 +27,8 @@ import com.ut.dph.model.lutables.lu_Immunizations;
 import com.ut.dph.model.lutables.lu_Manufacturers;
 import com.ut.dph.model.lutables.lu_MedicalConditions;
 import com.ut.dph.model.lutables.lu_Medications;
+import com.ut.dph.model.lutables.lu_Procedures;
+import com.ut.dph.model.lutables.lu_Tests;
 
 /**
  * @see com.ut.dph.dao.sysAdminDAO
@@ -628,6 +630,68 @@ public class sysAdminDAOImpl implements sysAdminDAO {
 				sessionFactory.getCurrentSession().update(lu);							
 			} catch (Throwable ex) {
                 System.err.println("update Medication failed." + ex);
+			}
+		}
+		
+		@Override
+		@Transactional
+		public void createProcedure(lu_Procedures lu) {
+			try {
+				sessionFactory.getCurrentSession().save(lu);						
+			} catch (Throwable ex) {
+                System.err.println("create Procedure failed." + ex);
+			}
+		}
+
+		@Override
+		@Transactional
+		public lu_Procedures getProcedureById(int id) {
+			try {
+				return (lu_Procedures) sessionFactory.getCurrentSession().get(lu_Procedures.class, id);						
+			} catch (Throwable ex) {
+                System.err.println("get Procedure failed." + ex);
+                return null;
+			}
+		}
+
+		@Override
+		@Transactional
+		public void updateProcedure(lu_Procedures lu) {
+			try {
+				sessionFactory.getCurrentSession().update(lu);							
+			} catch (Throwable ex) {
+                System.err.println("update Procedure failed." + ex);
+			}
+		}
+		
+		@Override
+		@Transactional
+		public void createTest(lu_Tests lu) {
+			try {
+				sessionFactory.getCurrentSession().save(lu);						
+			} catch (Throwable ex) {
+                System.err.println("create Test failed." + ex);
+			}
+		}
+
+		@Override
+		@Transactional
+		public lu_Tests getTestById(int id) {
+			try {
+				return (lu_Tests) sessionFactory.getCurrentSession().get(lu_Tests.class, id);						
+			} catch (Throwable ex) {
+                System.err.println("get Test failed." + ex);
+                return null;
+			}
+		}
+
+		@Override
+		@Transactional
+		public void updateTest(lu_Tests lu) {
+			try {
+				sessionFactory.getCurrentSession().update(lu);							
+			} catch (Throwable ex) {
+                System.err.println("update Test failed." + ex);
 			}
 		}
 		

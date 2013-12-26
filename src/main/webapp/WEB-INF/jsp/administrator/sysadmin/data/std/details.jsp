@@ -63,7 +63,35 @@
                             </div>
                         </spring:bind>
                         </c:if>
-                        <c:if test='${objectType=="lu_GeneralHealths" || objectType=="lu_Immunizations" || objectType=="lu_MedicalConditions"}'>
+                       <c:if test='${objectType=="lu_Tests"}'>
+	                        <div class="form-group">
+                            	<label for="vitalSign">Is this a vital sign?</label>
+                            <div>
+                                <label class="radio-inline">
+                                    <form:radiobutton id="vitalSign" path="vitalSign" value="true"/>Yes
+                                </label>
+                                <label class="radio-inline">
+                                    <form:radiobutton id="vitalSign" path="vitalSign" value="false"/>No
+                                </label>
+                            </div>
+                        </div>
+	                         <spring:bind path="normalRange">
+	                            <div class="form-group ${status.error ? 'has-error' : '' }">
+	                                <label class="control-label" for="normalRange">Please enter the acceptable range for this test.</label>
+	                                <form:input path="normalRange" id="normalRange" class="form-control" type="text" maxLength="45" />
+	                                <form:errors path="normalRange" cssClass="control-label" element="label" />
+	                            </div>
+	                        </spring:bind>
+	                         <spring:bind path="normalRangeUnit">
+	                            <div class="form-group ${status.error ? 'has-error' : '' }">
+	                                <label class="control-label" for="normalRangeUnit">Please enter the unit used for this test.</label>
+	                                <form:input path="normalRangeUnit" id="normalRangeUnit" class="form-control" type="text" maxLength="45" />
+	                                <form:errors path="normalRangeUnit" cssClass="control-label" element="label" />
+	                            </div>
+	                        </spring:bind>
+                        </c:if>
+                       
+                        <c:if test='${objectType=="lu_GeneralHealths" || objectType=="lu_Immunizations" || objectType=="lu_MedicalConditions" || objectType=="lu_Procedures" || objectType=="lu_Tests"}'>
 	                         <spring:bind path="codeValue">
 	                            <div class="form-group ${status.error ? 'has-error' : '' }">
 	                                <label class="control-label" for="codeValue">Code Value</label>

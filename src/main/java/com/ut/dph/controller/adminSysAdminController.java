@@ -21,6 +21,8 @@ import com.ut.dph.model.lutables.lu_Immunizations;
 import com.ut.dph.model.lutables.lu_Manufacturers;
 import com.ut.dph.model.lutables.lu_MedicalConditions;
 import com.ut.dph.model.lutables.lu_Medications;
+import com.ut.dph.model.lutables.lu_Procedures;
+import com.ut.dph.model.lutables.lu_Tests;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -1249,7 +1251,183 @@ public class adminSysAdminController {
 	
 	/** end of medication **/
 	
+	/** Procedures **/
+	
+	@RequestMapping(value="/data/nstd/lu_Procedures/create", method = RequestMethod.GET)
+	public ModelAndView newProcedureForm() throws Exception {
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/sysadmin/data/std/details");	
+		
+		//create the object
+		lu_Procedures lu = new lu_Procedures();
+		lu.setId(0);
+		mav.addObject("tableDataDetails",lu);
+		mav.addObject("objectType","lu_Procedures");
+		mav.addObject("formId","tabledataform");
+		mav.addObject("btnValue", "lu_Procedures/create");
+		mav.addObject("submitBtnValue", "Create");
+		return mav;
+	}
 	
 	
+
+	@RequestMapping(value="/data/nstd/lu_procedures/create", method = RequestMethod.POST)
+	public ModelAndView createProcedure(
+			@Valid @ModelAttribute(value="tableDataDetails") lu_Procedures lu, 
+			BindingResult result) throws Exception {
+		
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/sysadmin/data/std/details");
+		mav.addObject("objectType","lu_Procedures");
+		mav.addObject("formId","tabledataform");
+		// check for error
+		if(result.hasErrors()) {
+			mav.addObject("btnValue", "lu_Procedures/create");
+			mav.addObject("submitBtnValue", "Create");
+			return mav;
+		}
+		
+		//now we save
+		sysAdminManager.createProcedure(lu);
+		mav.addObject("success", "dataCreated");
+		mav.addObject("btnValue", "lu_Procedures/update");
+		mav.addObject("submitBtnValue", "Update");
+		return mav;
+	}
+	
+
+	@RequestMapping(value="/data/nstd/lu_Procedures/tableData", method = RequestMethod.GET)
+	public ModelAndView viewProcedure(@RequestParam(value="i", required=false) Integer i) 
+			throws Exception {
+		
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/sysadmin/data/std/details");	
+		
+		lu_Procedures lu = sysAdminManager.getProcedureById(i);
+		mav.addObject("tableDataDetails",lu);
+        
+        mav.addObject("objectType","lu_Procedures");
+		mav.addObject("formId","tabledataform");
+		mav.addObject("btnValue", "lu_Procedures/update");
+		mav.addObject("submitBtnValue", "Update");
+		return mav;		
+	}
+	
+
+	@RequestMapping(value="/data/nstd/lu_procedures/update", method = RequestMethod.POST)
+	public ModelAndView updateProcedure(
+			@Valid @ModelAttribute(value="tableDataDetails") lu_Procedures lu, 
+			BindingResult result) throws Exception {
+		
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/sysadmin/data/std/details");
+		mav.addObject("objectType","lu_Procedures");
+		mav.addObject("formId","tabledataform");
+		/** check for error **/
+		if(result.hasErrors()) {
+			mav.addObject("btnValue", "lu_Procedures/update");
+			mav.addObject("submitBtnValue", "Update");
+			return mav;
+		}
+		
+		//now we save
+		sysAdminManager.updateProcedure(lu);
+		mav.addObject("success", "dataUpdated");
+		mav.addObject("btnValue", "lu_Procedures/update");
+		mav.addObject("submitBtnValue", "Update");
+		return mav;
+	}
+	
+	/**End of procedures**/
+	
+	
+	/** Start of Tests **/
+	
+	@RequestMapping(value="/data/nstd/lu_Tests/create", method = RequestMethod.GET)
+	public ModelAndView newTestForm() throws Exception {
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/sysadmin/data/std/details");	
+		
+		//create the object
+		lu_Tests lu = new lu_Tests();
+		lu.setId(0);
+		mav.addObject("tableDataDetails",lu);
+		mav.addObject("objectType","lu_Tests");
+		mav.addObject("formId","tabledataform");
+		mav.addObject("btnValue", "lu_Tests/create");
+		mav.addObject("submitBtnValue", "Create");
+		return mav;
+	}
+	
+	
+
+	@RequestMapping(value="/data/nstd/lu_tests/create", method = RequestMethod.POST)
+	public ModelAndView createTest(
+			@Valid @ModelAttribute(value="tableDataDetails") lu_Tests lu, 
+			BindingResult result) throws Exception {
+		
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/sysadmin/data/std/details");
+		mav.addObject("objectType","lu_Tests");
+		mav.addObject("formId","tabledataform");
+		// check for error
+		if(result.hasErrors()) {
+			mav.addObject("btnValue", "lu_Tests/create");
+			mav.addObject("submitBtnValue", "Create");
+			return mav;
+		}
+		
+		//now we save
+		sysAdminManager.createTest(lu);
+		mav.addObject("success", "dataCreated");
+		mav.addObject("btnValue", "lu_Tests/update");
+		mav.addObject("submitBtnValue", "Update");
+		return mav;
+	}
+	
+
+	@RequestMapping(value="/data/nstd/lu_Tests/tableData", method = RequestMethod.GET)
+	public ModelAndView viewTest(@RequestParam(value="i", required=false) Integer i) 
+			throws Exception {
+		
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/sysadmin/data/std/details");	
+		
+		lu_Tests lu = sysAdminManager.getTestById(i);
+		mav.addObject("tableDataDetails",lu);
+        
+        mav.addObject("objectType","lu_Tests");
+		mav.addObject("formId","tabledataform");
+		mav.addObject("btnValue", "lu_Tests/update");
+		mav.addObject("submitBtnValue", "Update");
+		return mav;		
+	}
+	
+
+	@RequestMapping(value="/data/nstd/lu_tests/update", method = RequestMethod.POST)
+	public ModelAndView updateTest(
+			@Valid @ModelAttribute(value="tableDataDetails") lu_Tests lu, 
+			BindingResult result) throws Exception {
+		
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/sysadmin/data/std/details");
+		mav.addObject("objectType","lu_Tests");
+		mav.addObject("formId","tabledataform");
+		/** check for error **/
+		if(result.hasErrors()) {
+			mav.addObject("btnValue", "lu_Tests/update");
+			mav.addObject("submitBtnValue", "Update");
+			return mav;
+		}
+		
+		//now we save
+		sysAdminManager.updateTest(lu);
+		mav.addObject("success", "dataUpdated");
+		mav.addObject("btnValue", "lu_Tests/update");
+		mav.addObject("submitBtnValue", "Update");
+		return mav;
+	}
+	
+	/**End of Tests**/
 }
 

@@ -15,6 +15,8 @@ import com.ut.dph.model.lutables.lu_Immunizations;
 import com.ut.dph.model.lutables.lu_Manufacturers;
 import com.ut.dph.model.lutables.lu_MedicalConditions;
 import com.ut.dph.model.lutables.lu_Medications;
+import com.ut.dph.model.lutables.lu_Procedures;
+import com.ut.dph.model.lutables.lu_Tests;
 import com.ut.dph.model.Macros;
 import com.ut.dph.service.sysAdminManager;
 
@@ -251,6 +253,37 @@ public class sysAdminManagerImpl implements sysAdminManager {
 	public void updateMedication(lu_Medications lu) {
 		sysAdminDAO.updateMedication(lu);
 	}
+	
+	@Override
+	public void createProcedure(lu_Procedures lu) {
+		sysAdminDAO.createProcedure(lu);
+		
+	}
 
+	@Override
+	public lu_Procedures getProcedureById(int id) {
+		return sysAdminDAO.getProcedureById(id);
+	}
+
+	@Override
+	public void updateProcedure(lu_Procedures lu) {
+		sysAdminDAO.updateProcedure(lu);
+	}
+
+	@Override
+	public void createTest(lu_Tests lu) {
+		sysAdminDAO.createTest(lu);
+		
+	}
+
+	@Override
+	public lu_Tests getTestById(int id) {
+		return sysAdminDAO.getTestById(id);
+	}
+
+	@Override
+	public void updateTest(lu_Tests lu) {
+		sysAdminDAO.updateTest(lu);
+	}
 
 }
