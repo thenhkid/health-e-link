@@ -935,3 +935,8 @@ CREATE TABLE `universalTranslator`.`configurationConnections` (
 /** Grace 12.24.13 **/
 ALTER TABLE `universalTranslator`.`lu_Medications` 
 CHANGE COLUMN `conenctration` `concentration` FLOAT NULL DEFAULT NULL COMMENT 'e.g. 600' ;
+
+/** Grace 12.26.13**/
+ALTER TABLE `universalTranslator`.`lu_Tests` 
+CHANGE COLUMN `codeVesion` `codeVersion` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the version of the coding system' ;
+
