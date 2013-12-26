@@ -34,18 +34,18 @@
                                         <td>
                                             <div id="row_${config.id}" class="form-group">
                                             <c:choose>
-                                                <c:when test="${config.orgConnections.size() > 1}">
+                                                <c:when test="${config.connections.size() > 1}">
                                                     <select id="targetOrg_${config.id}" class="form-control">
                                                         <option value="">- Select Target Organization -</option>
-                                                        <c:forEach items="${config.orgConnections}" var="connection" varStatus="cStatus">
-                                                            <option value="${connection.orgId}">${connection.orgName}</option>
+                                                        <c:forEach items="${config.connections}" var="connection" varStatus="cStatus">
+                                                            <option value="${connection.targetOrgId}">${connection.targetOrgName}</option>
                                                         </c:forEach> 
                                                     </select>    
                                                 </c:when>
                                                 <c:otherwise>
-                                                    <c:forEach items="${config.orgConnections}" var="connection" varStatus="cStatus">
-                                                        <input type="hidden" id="targetOrg_${config.id}" value="${connection.orgId}" />
-                                                        ${connection.orgName}
+                                                    <c:forEach items="${config.connections}" var="connection" varStatus="cStatus">
+                                                        <input type="hidden" id="targetOrg_${config.id}" value="${connection.targetOrgId}" />
+                                                        ${connection.targetOrgName}
                                                     </c:forEach> 
                                                 </c:otherwise>
                                             </c:choose>

@@ -32,8 +32,8 @@ public class transactionInManagerImpl implements transactionInManager {
     
     @Override
     @Transactional
-    public List<fieldSelectOptions> getFieldSelectOptions(int fieldId, int configId, int transportMethod) {
-        return transactionInDAO.getFieldSelectOptions(fieldId, configId, transportMethod);
+    public List<fieldSelectOptions> getFieldSelectOptions(int fieldId, int configId) {
+        return transactionInDAO.getFieldSelectOptions(fieldId, configId);
     }
     
 }

@@ -169,6 +169,12 @@ public class configurationManagerImpl implements configurationManager {
     
     @Override
     @Transactional
+    public List<configurationConnection> getConnectionsByConfiguration(int configId) {
+        return configurationDAO.getConnectionsByConfiguration(configId);
+    }
+    
+    @Override
+    @Transactional
     public void saveConnection(configurationConnection connection) {
         configurationDAO.saveConnection(connection);
     }
@@ -201,6 +207,12 @@ public class configurationManagerImpl implements configurationManager {
     @Transactional
     public configurationMessageSpecs getMessageSpecs(int configId) {
         return configurationDAO.getMessageSpecs(configId);
+    }
+    
+    @Override
+    @Transactional
+    public List<configuration> getActiveERGConfigurationsByUserId(int userId) {
+        return configurationDAO.getActiveERGConfigurationsByUserId(userId);
     }
     
     @Override

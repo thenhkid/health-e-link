@@ -22,6 +22,7 @@ import com.ut.dph.model.configurationConnection;
 import com.ut.dph.model.configurationDataTranslations;
 import com.ut.dph.model.configurationMessageSpecs;
 import com.ut.dph.model.configurationSchedules;
+import com.ut.dph.model.configurationTransport;
 import com.ut.dph.model.messageType;
 
 @Service
@@ -471,6 +472,24 @@ public class configurationDAOImpl implements configurationDAO {
     }
     
     /**
+     * The 'getConnectionsByConfiguration' will return a list of target connections
+     * for a passed in configuration;
+     * 
+     * @param configId  The id of the configuration to search connections for.
+     * 
+     * @return This function will return a list of configurationConnection objects
+     */
+    @Override
+    @Transactional
+    public List<configurationConnection> getConnectionsByConfiguration(int configId) {
+        Query query = sessionFactory.getCurrentSession().createQuery("from configurationConnection where sourceConfigId = :configId");
+        query.setParameter("configId", configId);
+        
+        List<configurationConnection> connections = query.list();
+        return connections;
+    }
+    
+    /**
      * The 'saveConnection' function will save the new connection
      * 
      * @param connection    The object holding the new connection
@@ -583,6 +602,45 @@ public class configurationDAOImpl implements configurationDAO {
         }
         
         sessionFactory.getCurrentSession().saveOrUpdate(messageSpecs);
+        
+    }
+    
+    /**
+     * The 'getActiveConfigurationByUserId' function will return a list of configurations
+     * set up for ERG and for the passed in userId
+     * 
+     * @param   userId  
+     * 
+     * @return This function will return a list of ERG configurations.
+     */
+    @Override
+    public List<configuration> getActiveERGConfigurationsByUserId(int userId) {
+        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configuration.class);
+        criteria.add(Restrictions.eq("userId", userId));
+        criteria.add(Restrictions.eq("status", true));
+        
+        List<Integer> ergConfigList = new ArrayList<Integer>();
+        Criteria findERGConfigs = sessionFactory.getCurrentSession().createCriteria(configurationTransport.class);
+        findERGConfigs.add(Restrictions.or(
+                Restrictions.eq("transportMethodId",2),
+                Restrictions.eq("errorHandling",1)
+        )); 
+        
+        List<configurationTransport> ergConfigs = findERGConfigs.list();
+
+        for (configurationTransport config : ergConfigs) {
+            ergConfigList.add(config.getconfigId());
+        }
+        
+        if (ergConfigList.isEmpty()) {
+            ergConfigList.add(0);
+        }
+
+        criteria.add(Restrictions.or(
+                Restrictions.in("id", ergConfigList)
+        ));
+        
+        return criteria.list();
         
     }
 }

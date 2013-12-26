@@ -21,7 +21,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import com.ut.dph.model.Connections;
 import com.ut.dph.model.Crosswalks;
 import com.ut.dph.model.Macros;
 import com.ut.dph.model.configuration;

@@ -48,7 +48,7 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
      * @Return	This function will return a configurationTransport object
      */
     public configurationTransport getTransportDetailsByTransportMethod(int configId, int transportMethod) {
-        Query query = sessionFactory.getCurrentSession().createQuery("from configurationTransport where configId = :configId and transportMethod = :transportMethod");
+        Query query = sessionFactory.getCurrentSession().createQuery("from configurationTransport where configId = :configId and transportMethodId = :transportMethod");
         query.setParameter("configId", configId);
         query.setParameter("transportMethod", transportMethod);
 

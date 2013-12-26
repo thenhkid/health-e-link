@@ -6,14 +6,13 @@
 
 package com.ut.dph.controller;
 
-import com.ut.dph.model.Connections;
 import com.ut.dph.model.Organization;
 import com.ut.dph.model.Transaction;
 import com.ut.dph.model.configuration;
+import com.ut.dph.model.configurationConnection;
 import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.configurationTransport;
 import com.ut.dph.model.fieldSelectOptions;
-import com.ut.dph.model.messageType;
 import com.ut.dph.model.transactionRecords;
 import com.ut.dph.service.configurationManager;
 import com.ut.dph.service.configurationTransportManager;
@@ -107,20 +106,22 @@ public class HealtheWebController {
         
         /** Need to get all the message types set up for the user */
         int[] userInfo = (int[])session.getAttribute("userInfo");
-        List<configuration> configurations = configurationManager.getActiveConfigurationsByOrgId(userInfo[1]);
+        List<configuration> configurations = configurationManager.getActiveERGConfigurationsByUserId(userInfo[0]);
         
-        messageType messagetype;
+        
         for (configuration config : configurations) {
-            messagetype = messagetypemanager.getMessageTypeById(config.getMessageTypeId());
-            config.setMessageTypeName(messagetype.getName());
+            config.setMessageTypeName(messagetypemanager.getMessageTypeById(config.getMessageTypeId()).getName());
             
-            /*List<Connections> connections = configurationManager.getConnections(config.getId());
+            /** Get a list of connections */
+            List<configurationConnection> connections = configurationManager.getConnectionsByConfiguration(config.getId());
             
-            for (Connections connection : connections) {
-                //Need to get the org name;
-                Organization orgDetails = organizationmanager.getOrganizationById(connection.getorgId());
-                connection.setorgName(orgDetails.getOrgName());
-            }*/
+            for(configurationConnection connection : connections) {
+                configuration configDetails = configurationManager.getConfigurationById(connection.gettargetConfigId());
+                connection.settargetOrgName(organizationmanager.getOrganizationById(configDetails.getorgId()).getOrgName());
+                connection.settargetOrgId(configDetails.getorgId());
+            }
+            
+            config.setconnections(connections);
             
         }
         
@@ -177,8 +178,8 @@ public class HealtheWebController {
         
        /* Set all the transaction SOURCE ORG fields */
        List<transactionRecords> fromFields = new ArrayList<transactionRecords>();
-       String tableName = null;
-       String tableCol = null;
+       String tableName;
+       String tableCol;
         
         for(configurationFormFields fields : senderInfoFormFields) {
             transactionRecords field = new transactionRecords();
@@ -306,7 +307,7 @@ public class HealtheWebController {
             }
             
             /* See if any fields have crosswalks associated to it */
-            List<fieldSelectOptions> fieldSelectOptions = transactionInManager.getFieldSelectOptions(fields.getId(),configId,2);
+            List<fieldSelectOptions> fieldSelectOptions = transactionInManager.getFieldSelectOptions(fields.getId(),configId);
             field.setfieldSelectOptions(fieldSelectOptions);
             
             patientFields.add(field);
@@ -330,7 +331,7 @@ public class HealtheWebController {
             }
             
             /* See if any fields have crosswalks associated to it */
-            List<fieldSelectOptions> fieldSelectOptions = transactionInManager.getFieldSelectOptions(fields.getId(),configId,2);
+            List<fieldSelectOptions> fieldSelectOptions = transactionInManager.getFieldSelectOptions(fields.getId(),configId);
             field.setfieldSelectOptions(fieldSelectOptions);
             
             detailFields.add(field);
@@ -353,6 +354,9 @@ public class HealtheWebController {
      */
     @RequestMapping(value= "/submitMessage", method = RequestMethod.POST)
     public void submitMessage(@ModelAttribute(value = "transactionDetails") Transaction transactionDetails, HttpSession session) {
+        
+        /* Submit a new batch */
+        
         
         /* Get the 6 Bucket (Source Org, Source Provider, Target Org, Target Provider, Patient, Details) fields */
         List<transactionRecords> sourceOrgFields = transactionDetails.getsourceOrgFields();

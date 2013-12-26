@@ -17,6 +17,6 @@ public interface transactionInDAO {
     
     String getFieldValue(String tableName, String tableCol, int idValue);
     
-    List<fieldSelectOptions> getFieldSelectOptions(int fieldId, int configId, int transportMethod);
+    List<fieldSelectOptions> getFieldSelectOptions(int fieldId, int configId);
     
 }

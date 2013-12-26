@@ -1,6 +1,7 @@
 package com.ut.dph.model;
 
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -30,6 +31,9 @@ public class configuration {
     
     @Transient
     private Integer transportDetailId = 0;
+    
+    @Transient
+    private List<configurationConnection> connections = null;
     
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -163,6 +167,16 @@ public class configuration {
 
     public void settransportDetailId(int transportDetailId) {
         this.transportDetailId = transportDetailId;
-    }        
+    }  
+    
+    public List<configurationConnection> getconnections() {
+        return connections;
+    }
+    
+    public void setconnections(List<configurationConnection> connections) {
+        this.connections = connections;
+    }
+    
+    
     
 }

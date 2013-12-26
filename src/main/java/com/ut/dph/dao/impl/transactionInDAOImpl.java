@@ -60,14 +60,13 @@ public class transactionInDAOImpl implements transactionInDAO {
      * @return The function will return a list of select box options
      */
     @Override
-    public List<fieldSelectOptions> getFieldSelectOptions(int fieldId, int configId, int transportMethod) {
+    public List<fieldSelectOptions> getFieldSelectOptions(int fieldId, int configId) {
         
         List<fieldSelectOptions> fieldSelectOptions = new ArrayList<fieldSelectOptions>();
        
-        Query findCrosswalks = sessionFactory.getCurrentSession().createSQLQuery("SELECT crosswalkId, id FROM rel_configurationDataTranslations where configId = :configId and fieldId = :fieldId and transportMethod = :transportMethod");
+        Query findCrosswalks = sessionFactory.getCurrentSession().createSQLQuery("SELECT crosswalkId, id FROM configurationDataTranslations where configId = :configId and fieldId = :fieldId");
         findCrosswalks.setParameter("configId", configId);
         findCrosswalks.setParameter("fieldId", fieldId);
-        findCrosswalks.setParameter("transportMethod", transportMethod);
         List crosswalks = findCrosswalks.list();
         
         Iterator it = crosswalks.iterator();

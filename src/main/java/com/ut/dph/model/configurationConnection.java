@@ -24,10 +24,16 @@ import javax.persistence.Transient;
 public class configurationConnection {
     
     @Transient
-    configuration srcConfigDetails = null;
+    private configuration srcConfigDetails = null;
     
     @Transient
-    configuration tgtConfigDetails = null;
+    private configuration tgtConfigDetails = null;
+    
+    @Transient
+    private String targetOrgName = null;
+    
+    @Transient
+    private int targetOrgId = 0;
     
     
     @Id
@@ -102,6 +108,22 @@ public class configurationConnection {
     
     public void settgtConfigDetails(configuration tgtConfigDetails) {
         this.tgtConfigDetails = tgtConfigDetails;
+    }
+    
+    public String gettargetOrgName() {
+        return targetOrgName;
+    }
+    
+    public void settargetOrgName(String targetOrgName) {
+        this.targetOrgName = targetOrgName;
+    }
+    
+    public int gettargetOrgId() {
+        return targetOrgId;
+    }
+    
+    public void settargetOrgId(int targetOrgId) {
+        this.targetOrgId = targetOrgId;
     }
     
 }

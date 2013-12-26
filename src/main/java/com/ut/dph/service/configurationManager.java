@@ -2,7 +2,6 @@ package com.ut.dph.service;
 
 import java.util.List;
 
-import com.ut.dph.model.Connections;
 import com.ut.dph.model.Macros;
 import com.ut.dph.model.configuration;
 import com.ut.dph.model.configurationConnection;
@@ -53,6 +52,8 @@ public interface configurationManager {
   
   List<configurationConnection> getAllConnections(int page, int maxResults);
   
+  List<configurationConnection> getConnectionsByConfiguration(int configId);
+  
   void saveConnection(configurationConnection connection);
   
   configurationConnection getConnection(int connectionId);
@@ -66,5 +67,7 @@ public interface configurationManager {
   configurationMessageSpecs getMessageSpecs(int configId);
   
   void updateMessageSpecs(configurationMessageSpecs messageSpecs, int transportDetailId);
+  
+  List<configuration> getActiveERGConfigurationsByUserId(int userId);
  
 }
