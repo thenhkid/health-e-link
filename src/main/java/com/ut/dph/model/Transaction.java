@@ -16,6 +16,7 @@ public class Transaction {
     
    private int orgId;
    private int userId;
+   private int configId;
    private String batchName = null;
    private int transportMethodId;
    private String originalFileName = null;
@@ -46,6 +47,14 @@ public class Transaction {
 
    public void setuserId(int userId) {
        this.userId = userId;
+   }
+   
+   public int getconfigId() {
+       return configId;
+   }
+
+   public void setconfigId(int configId) {
+       this.configId = configId;
    }
    
    public String getbatchName() {

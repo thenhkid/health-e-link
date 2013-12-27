@@ -7,7 +7,10 @@
 package com.ut.dph.service.impl;
 
 import com.ut.dph.dao.transactionInDAO;
+import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.fieldSelectOptions;
+import com.ut.dph.model.transactionIn;
+import com.ut.dph.model.transactionInRecords;
 import org.springframework.stereotype.Service;
 import com.ut.dph.service.transactionInManager;
 import java.util.List;
@@ -34,6 +37,24 @@ public class transactionInManagerImpl implements transactionInManager {
     @Transactional
     public List<fieldSelectOptions> getFieldSelectOptions(int fieldId, int configId) {
         return transactionInDAO.getFieldSelectOptions(fieldId, configId);
+    }
+    
+    @Override
+    @Transactional
+    public Integer submitBatchUpload(batchUploads batchUpload) {
+        return transactionInDAO.submitBatchUpload(batchUpload);
+    }
+    
+    @Override
+    @Transactional
+    public Integer submitTransactionIn(transactionIn transactionIn) {
+        return transactionInDAO.submitTransactionIn(transactionIn);
+    }
+    
+    @Override
+    @Transactional
+    public Integer submitTransactionInRecords(transactionInRecords records) {
+        return transactionInDAO.submitTransactionInRecords(records);
     }
     
 }

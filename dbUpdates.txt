@@ -940,3 +940,16 @@ CHANGE COLUMN `conenctration` `concentration` FLOAT NULL DEFAULT NULL COMMENT 'e
 ALTER TABLE `universalTranslator`.`lu_Tests` 
 CHANGE COLUMN `codeVesion` `codeVersion` VARCHAR(45) NULL DEFAULT NULL COMMENT 'the version of the coding system' ;
 
+/** Chad 12.27.13 **/
+ALTER TABLE `universalTranslator`.`batchUploads` 
+DROP FOREIGN KEY `btchStatusId`;
+ALTER TABLE `universalTranslator`.`batchUploads` 
+ADD CONSTRAINT `btchStatusId`
+  FOREIGN KEY (`statusId`)
+  REFERENCES `universalTranslator`.`lu_ProcessStatus` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+ALTER TABLE `universalTranslator`.`batchUploads` 
+DROP FOREIGN KEY `bFKProvider`;
+

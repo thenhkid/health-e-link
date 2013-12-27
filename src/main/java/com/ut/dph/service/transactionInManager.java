@@ -6,7 +6,10 @@
 
 package com.ut.dph.service;
 
+import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.fieldSelectOptions;
+import com.ut.dph.model.transactionIn;
+import com.ut.dph.model.transactionInRecords;
 import java.util.List;
 
 /**
@@ -19,5 +22,10 @@ public interface transactionInManager {
     
     List<fieldSelectOptions> getFieldSelectOptions(int fieldId, int configId);
     
+    Integer submitBatchUpload(batchUploads batchUpload);
+    
+    Integer submitTransactionIn(transactionIn transactionIn);
+    
+    Integer submitTransactionInRecords(transactionInRecords records);
     
 }

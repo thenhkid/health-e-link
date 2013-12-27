@@ -8,22 +8,32 @@ package com.ut.dph.controller;
 
 import com.ut.dph.model.Organization;
 import com.ut.dph.model.Transaction;
+import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.configuration;
 import com.ut.dph.model.configurationConnection;
 import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.configurationTransport;
 import com.ut.dph.model.fieldSelectOptions;
+import com.ut.dph.model.transactionIn;
+import com.ut.dph.model.transactionInRecords;
 import com.ut.dph.model.transactionRecords;
 import com.ut.dph.service.configurationManager;
 import com.ut.dph.service.configurationTransportManager;
 import com.ut.dph.service.messageTypeManager;
 import com.ut.dph.service.organizationManager;
 import com.ut.dph.service.transactionInManager;
+import java.lang.reflect.InvocationTargetException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -175,6 +185,7 @@ public class HealtheWebController {
         transaction.setstatusId(0);
         transaction.settransactionStatusId(0);
         transaction.settargetOrgId(targetOrg);
+        transaction.setconfigId(configId);
         
        /* Set all the transaction SOURCE ORG fields */
        List<transactionRecords> fromFields = new ArrayList<transactionRecords>();
@@ -355,7 +366,32 @@ public class HealtheWebController {
     @RequestMapping(value= "/submitMessage", method = RequestMethod.POST)
     public void submitMessage(@ModelAttribute(value = "transactionDetails") Transaction transactionDetails, HttpSession session) {
         
+        int[] userInfo = (int[])session.getAttribute("userInfo");
+        
+        /* Create the batch name (OrgId+MessageTypeId+Date/Time) */
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+        Date date = new Date();
+        String batchName = new StringBuilder().append(transactionDetails.getorgId()).append(transactionDetails.getmessageTypeId()).append(dateFormat.format(date)).toString();
+        
         /* Submit a new batch */
+        batchUploads batchUpload = new batchUploads();
+        batchUpload.setOrgId(transactionDetails.getorgId());
+        batchUpload.setuserId(userInfo[0]);
+        batchUpload.setutBatchName(batchName);
+        batchUpload.settransportMethodId(2);
+        batchUpload.setoriginalFileName(batchName);
+        batchUpload.setstatusId(2);
+        batchUpload.settotalRecordCount(1);
+        
+        Integer batchId = (Integer) transactionInManager.submitBatchUpload(batchUpload); 
+        
+        /* Submit a new Transaction In record */
+        transactionIn transactionIn = new transactionIn();
+        transactionIn.setbatchId(batchId);
+        transactionIn.setconfigId(transactionDetails.getconfigId());
+        transactionIn.setstatusId(2);
+        
+        Integer transactionId = (Integer) transactionInManager.submitTransactionIn(transactionIn);
         
         
         /* Get the 6 Bucket (Source Org, Source Provider, Target Org, Target Provider, Patient, Details) fields */
@@ -366,11 +402,77 @@ public class HealtheWebController {
         List<transactionRecords> patientFields = transactionDetails.getpatientFields();
         List<transactionRecords> detailFields = transactionDetails.getdetailFields();
         
-        for(transactionRecords field : patientFields) {
-            System.out.println(field.getfieldNo() + "-" + field.getfieldValue());
+        transactionInRecords records = new transactionInRecords();
+        records.setTransactionInId(transactionId);
+        
+        String colName;
+        for(transactionRecords field : sourceOrgFields) {
+            colName = new StringBuilder().append("f").append(field.getfieldNo()).toString();
+            try {
+                BeanUtils.setProperty(records, colName, field.getfieldValue());
+            } catch (IllegalAccessException ex) {
+                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InvocationTargetException ex) {
+                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         
+        for(transactionRecords field : sourceProviderFields) {
+            colName = new StringBuilder().append("f").append(field.getfieldNo()).toString();
+            try {
+                BeanUtils.setProperty(records, colName, field.getfieldValue());
+            } catch (IllegalAccessException ex) {
+                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InvocationTargetException ex) {
+                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
         
+        for(transactionRecords field : targetOrgFields) {
+            colName = new StringBuilder().append("f").append(field.getfieldNo()).toString();
+            try {
+                BeanUtils.setProperty(records, colName, field.getfieldValue());
+            } catch (IllegalAccessException ex) {
+                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InvocationTargetException ex) {
+                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        
+        for(transactionRecords field : targetProviderFields) {
+            colName = new StringBuilder().append("f").append(field.getfieldNo()).toString();
+            try {
+                BeanUtils.setProperty(records, colName, field.getfieldValue());
+            } catch (IllegalAccessException ex) {
+                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InvocationTargetException ex) {
+                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        
+        for(transactionRecords field : patientFields) {
+            colName = new StringBuilder().append("f").append(field.getfieldNo()).toString();
+            try {
+                BeanUtils.setProperty(records, colName, field.getfieldValue());
+            } catch (IllegalAccessException ex) {
+                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InvocationTargetException ex) {
+                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        
+        for(transactionRecords field : detailFields) {
+            colName = new StringBuilder().append("f").append(field.getfieldNo()).toString();
+            try {
+                BeanUtils.setProperty(records, colName, field.getfieldValue());
+            } catch (IllegalAccessException ex) {
+                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InvocationTargetException ex) {
+                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        
+        Integer transactionRecordId = (Integer) transactionInManager.submitTransactionInRecords(records);
     
     }
     

@@ -7,22 +7,6 @@
 $(document).ready(function() {
     $("input:text,form").attr("autocomplete", "off");
     
-    $('.dateField').change(function() {
-       var idVal = $(this).attr('rel');
-       var monthVal = $('#dateMonth_'+idVal).val();
-       var dayVal = $('#dateDay_'+idVal).val();
-       var yearVal = $('#dateYear_'+idVal).val();
-       
-       if(monthVal == '' || dayVal == '' || yearVal == '') {
-           $('#'+idVal).val('');
-       }
-       else {
-           var selDate = new Date(yearVal, eval(monthVal-1), dayVal);
-           $('#'+idVal).val(selDate);
-       }
-    });
-    
-    
     $('#saveReferral').click(function() {
        var errorsFound = 0;
        
@@ -123,6 +107,23 @@ function checkFormFields() {
         }
     });
     
+    //Look at all Date validation types
+    $('.Date').each(function() {
+        var fieldNo = $(this).attr('id');
+        var dateVal = $(this).val();
+        
+        if(dateVal != '') {
+            var DateValidated = validateDate(dateVal);
+
+            if(DateValidated === false) {
+                $('#fieldDiv_'+fieldNo).addClass("has-error");
+                $('#errorMsg_'+fieldNo).addClass("has-error");
+                $('#errorMsg_'+fieldNo).html('This is not a valid Date, format should be mm/dd/yyyy.');
+                errorFound = 1;
+            }
+        }
+    });
+    
     return errorFound;
 }
 
@@ -159,6 +160,16 @@ function validateNumericValue($fieldVal) {
 function validateURL($URL) {
     var URLReg = /(http|ftp|https):\/\/[\w\-_]+(\.[\w\-_]+)+([\w\-\.,@?^=%&amp;:/~\+#]*[\w\-\@?^=%&amp;/~\+#])?/;
     if( !URLReg.test( $URL ) ) {
+      return false;
+    } 
+    else {
+      return true;
+    }
+}
+
+function validateDate($date) {
+    var DateReg = /\b\d{1,2}[\/-]\d{1,2}[\/-]\d{4}\b/;
+    if( !DateReg.test( $date ) ) {
       return false;
     } 
     else {

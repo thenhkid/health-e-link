@@ -6,7 +6,10 @@
 
 package com.ut.dph.dao;
 
+import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.fieldSelectOptions;
+import com.ut.dph.model.transactionIn;
+import com.ut.dph.model.transactionInRecords;
 import java.util.List;
 
 /**
@@ -18,5 +21,11 @@ public interface transactionInDAO {
     String getFieldValue(String tableName, String tableCol, int idValue);
     
     List<fieldSelectOptions> getFieldSelectOptions(int fieldId, int configId);
+    
+    Integer submitBatchUpload(batchUploads batchUpload);
+    
+    Integer submitTransactionIn(transactionIn transactionIn);
+    
+    Integer submitTransactionInRecords(transactionInRecords records);
     
 }

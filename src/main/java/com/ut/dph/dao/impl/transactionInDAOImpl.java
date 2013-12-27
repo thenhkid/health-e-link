@@ -7,7 +7,10 @@
 package com.ut.dph.dao.impl;
 
 import com.ut.dph.dao.transactionInDAO;
+import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.fieldSelectOptions;
+import com.ut.dph.model.transactionIn;
+import com.ut.dph.model.transactionInRecords;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -15,6 +18,7 @@ import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
@@ -98,6 +102,59 @@ public class transactionInDAOImpl implements transactionInDAO {
         }
         
         return fieldSelectOptions;
+    }
+    
+    /**
+     * The 'submitBatchUpload' function will submit the new batch.
+     * 
+     * @param   batchUpload     The object that will hold the new batch info
+     * 
+     * @table   batchUploads
+     * 
+     * @return  This function returns the batchId for the newly inserted batch
+     */
+    @Override
+    @Transactional
+    public Integer submitBatchUpload(batchUploads batchUpload) {
+        
+        Integer batchId = null;
+
+        batchId = (Integer) sessionFactory.getCurrentSession().save(batchUpload);
+
+        return batchId;
+        
+    }
+    
+    /**
+     * The 'submitTransactionIn' function will submit the new transaction for the batch.
+     * 
+     * @param   transactionIn     The object that will hold the new transaction info
+     * 
+     * @table   transactionIn
+     * 
+     * @return  This function returns the transactioInId for the newly inserted transaction
+     */
+    @Override
+    @Transactional
+    public Integer submitTransactionIn(transactionIn transactionIn) {
+        Integer transactioInId = null;
+
+        transactioInId = (Integer) sessionFactory.getCurrentSession().save(transactionIn);
+
+        return transactioInId;
+    }
+    
+    /**
+     * The 'submitTransactionInRecords'
+     */
+    @Override
+    @Transactional
+    public Integer submitTransactionInRecords(transactionInRecords records) {
+        Integer transactioInRecordId = null;
+
+        transactioInRecordId = (Integer) sessionFactory.getCurrentSession().save(records);
+
+        return transactioInRecordId;
     }
     
 }

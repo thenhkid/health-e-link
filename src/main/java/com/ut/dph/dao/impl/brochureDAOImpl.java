@@ -42,11 +42,11 @@ public class brochureDAOImpl implements brochureDAO {
 	 */
 	@Override
 	public Integer createBrochure(Brochure brochure) {
-		Integer lastId = null;
-			
-		lastId = (Integer) sessionFactory.getCurrentSession().save(brochure);
-		
-		return lastId;
+            Integer lastId = null;
+
+            lastId = (Integer) sessionFactory.getCurrentSession().save(brochure);
+
+            return lastId;
 	}
 	
 	
