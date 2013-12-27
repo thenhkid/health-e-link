@@ -57,4 +57,22 @@ public class transactionInManagerImpl implements transactionInManager {
         return transactionInDAO.submitTransactionInRecords(records);
     }
     
+    @Override
+    @Transactional
+    public void submitTransactionTranslatedInRecords(int transactionRecordId) {
+        transactionInDAO.submitTransactionTranslatedInRecords(transactionRecordId);
+    }
+    
+    @Override
+    @Transactional
+    public List<transactionIn> getpendingTransactions(int orgId) {
+        return transactionInDAO.getpendingTransactions(orgId);
+    }
+    
+    @Override
+    @Transactional
+    public batchUploads getUploadBatch(int batchId) {
+        return transactionInDAO.getUploadBatch(batchId);
+    }
+    
 }

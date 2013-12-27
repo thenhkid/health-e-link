@@ -28,4 +28,10 @@ public interface transactionInManager {
     
     Integer submitTransactionInRecords(transactionInRecords records);
     
+    void submitTransactionTranslatedInRecords(int transactionRecordId);
+    
+    List<transactionIn> getpendingTransactions(int orgId);
+    
+    batchUploads getUploadBatch(int batchId);
+    
 }

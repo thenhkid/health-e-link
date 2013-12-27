@@ -24,6 +24,7 @@
                 <form:hidden path="orgId" />
                 <form:hidden path="configId" />
                 <form:hidden path="messageTypeId" />
+                <input type="hidden" id="action" name="action" value="save" />
                 <c:forEach items="${transaction.sourceOrgFields}" varStatus="i">
                     <form:hidden path="sourceOrgFields[${i.index}].fieldValue" />
                     <form:hidden path="sourceOrgFields[${i.index}].fieldNo" />
@@ -150,7 +151,16 @@
                                 </div>
 
                                 <div class="form-group">
-                                    <input type="button" id="saveReferral" class="btn btn-primary btn-action" value="Save Referral"/>
+                                    <input type="button" id="save" class="btn btn-primary btn-action submitMessage" value="Save Referral"/>
+                                    <c:choose>
+                                        <c:when test="${transaction.autoRelease == true}">
+                                            <input type="button" id="send" class="btn btn-primary btn-action submitMessage" value="Send Referral"/>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <input type="button" id="release" class="btn btn-primary btn-action submitMessage" value="Release"/>
+                                        </c:otherwise>
+                                    </c:choose>
+                                    
                                 </div>
                             </div>
                         </div>

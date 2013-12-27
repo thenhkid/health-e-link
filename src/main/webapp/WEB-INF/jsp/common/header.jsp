@@ -108,6 +108,7 @@
                         <ul class="nav navbar-nav navbar-actions">
                             <li ${param['page'] == 'inbox' ? 'class="active"' : ''}><a href="<c:url value='/Health-e-Web/inbox'/>" title="Inbox" class="btn btn-link"><span class="glyphicon glyphicon-inbox"></span>&nbsp; Inbox</a><span class="indicator-active arrow-up"></span></li>
                             <li ${param['page'] == 'sent' ? 'class="active"' : ''}><a href="<c:url value='/Health-e-Web/sent'/>" title="Sent Items" class="btn btn-link"><span class="glyphicon glyphicon-send"></span>&nbsp; Sent</a><span class="indicator-active arrow-up"></span></li>
+                            <li ${param['page'] == 'pending' ? 'class="active"' : ''}><a href="<c:url value='/Health-e-Web/pending'/>" title="Pending Items" class="btn btn-link"><span class="glyphicon glyphicon-send"></span>&nbsp; Pending</a><span class="indicator-active arrow-up"></span></li>
                             <li ${param['page'] == 'history' ? 'class="active"' : ''}><a href="<c:url value='/Health-e-Web/history'/>" title="History" class="btn btn-link"><span class="glyphicon glyphicon-time"></span>&nbsp; History</a><span class="indicator-active arrow-up"></span></li>
                         </ul>
                         <ul class="nav navbar-nav navbar-right navbar-actions">

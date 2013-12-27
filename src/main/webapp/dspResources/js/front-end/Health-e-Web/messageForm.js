@@ -7,8 +7,11 @@
 $(document).ready(function() {
     $("input:text,form").attr("autocomplete", "off");
     
-    $('#saveReferral').click(function() {
+    $('.submitMessage').click(function() {
        var errorsFound = 0;
+       var clickedBtn = $(this).attr('id');
+       
+       $('#action').val(clickedBtn);
        
        errorsFound = checkFormFields();
         

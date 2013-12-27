@@ -150,7 +150,7 @@ public class HealtheWebController {
      * @return this request will return the messageDetailsForm
      */
     @RequestMapping(value= "/create/details", method = RequestMethod.POST)
-    public ModelAndView showMessageDetailsForm(@RequestParam(value = "configId", required = true) int configId, @RequestParam(value = "targetOrg", required = true) int targetOrg, HttpSession session) {
+    public ModelAndView showMessageDetailsForm(@RequestParam(value = "configId", required = true) int configId, @RequestParam(value = "targetOrg", required = false) int targetOrg, @RequestParam(value = "transactionId", required = false) int transactionId, HttpSession session) {
         
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/Health-e-Web/messageDetailsForm");
@@ -186,6 +186,7 @@ public class HealtheWebController {
         transaction.settransactionStatusId(0);
         transaction.settargetOrgId(targetOrg);
         transaction.setconfigId(configId);
+        transaction.setautoRelease(transportDetails.getautoRelease());
         
        /* Set all the transaction SOURCE ORG fields */
        List<transactionRecords> fromFields = new ArrayList<transactionRecords>();
@@ -358,13 +359,12 @@ public class HealtheWebController {
     /**
      * The '/submitMessage' POST request submit the new message
      * 
-     * @param configId  The selected configuration
-     * @param targetOrg The selected target organization to receive the new message
+     * @param transactionDetails  The details of the new message form
      * 
      * @return this request will return the messageDetailsForm
      */
     @RequestMapping(value= "/submitMessage", method = RequestMethod.POST)
-    public void submitMessage(@ModelAttribute(value = "transactionDetails") Transaction transactionDetails, HttpSession session) {
+    public void submitMessage(@ModelAttribute(value = "transactionDetails") Transaction transactionDetails, HttpSession session, @RequestParam String action) {
         
         int[] userInfo = (int[])session.getAttribute("userInfo");
         
@@ -380,7 +380,15 @@ public class HealtheWebController {
         batchUpload.setutBatchName(batchName);
         batchUpload.settransportMethodId(2);
         batchUpload.setoriginalFileName(batchName);
-        batchUpload.setstatusId(2);
+        
+        /* If the "Send" button was pressed */
+        if (action.equals("send")) {
+            batchUpload.setstatusId(2);
+        }
+        /* If the "Save" or "Release" button was pressed */
+        else {
+            batchUpload.setstatusId(6);
+        }
         batchUpload.settotalRecordCount(1);
         
         Integer batchId = (Integer) transactionInManager.submitBatchUpload(batchUpload); 
@@ -389,8 +397,16 @@ public class HealtheWebController {
         transactionIn transactionIn = new transactionIn();
         transactionIn.setbatchId(batchId);
         transactionIn.setconfigId(transactionDetails.getconfigId());
-        transactionIn.setstatusId(2);
         
+        /* If the "Send" button was pressed */
+        if (action.equals("send")) {
+            transactionIn.setstatusId(17);
+        }
+        /* If the "Save" or "Release" button was pressed */
+        else {
+            transactionIn.setstatusId(9);
+        }
+       
         Integer transactionId = (Integer) transactionInManager.submitTransactionIn(transactionIn);
         
         
@@ -473,7 +489,67 @@ public class HealtheWebController {
         }
         
         Integer transactionRecordId = (Integer) transactionInManager.submitTransactionInRecords(records);
+        
+        
+        /* 
+            If the "Send" button is pressed then we need to populate the transactionTranslatedIn
+            table so we can continue to process all the fields and continue to insert the translated
+            values into the CCR tables
+        */
+        if (action.equals("send")) {
+            transactionInManager.submitTransactionTranslatedInRecords(transactionRecordId);
+        }
     
+    }
+    
+    /**
+     * The '/pending' request will serve up the Health-e-Web (ERG) page that will list all pending
+     * messages.
+     *
+     * @param request
+     * @param response
+     * @return	the health-e-web pending message list view
+     * @throws Exception
+     */
+    @RequestMapping(value = "/pending", method = RequestMethod.GET)
+    public ModelAndView pendingMessages(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
+        
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/Health-e-Web/pending");
+        
+        /* Need to get all the message types set up for the user */
+        int[] userInfo = (int[])session.getAttribute("userInfo");
+        
+        /* Need to get a list of all pending transactions */
+        List<transactionIn> pendingTransactions = transactionInManager.getpendingTransactions(userInfo[1]);
+        
+        List<Transaction> transactionList = new ArrayList<Transaction>();
+        
+        configuration configDetails;
+        
+        if(pendingTransactions != null) {
+           
+            for(transactionIn transactionRecord : pendingTransactions) {
+                batchUploads batchInfo = transactionInManager.getUploadBatch(transactionRecord.getbatchId());
+                
+                Transaction transactionDetails = new Transaction();
+                transactionDetails.setbatchName(batchInfo.getutBatchName());
+                transactionDetails.setconfigId(transactionRecord.getconfigId());
+                transactionDetails.setdateSubmitted(batchInfo.getdateSubmitted());
+                transactionDetails.settransactionRecordId(transactionRecord.getId());
+                
+                /* get the message type name */
+                configDetails = configurationManager.getConfigurationById(transactionRecord.getconfigId());
+                transactionDetails.setmessageTypeName(messagetypemanager.getMessageTypeById(configDetails.getMessageTypeId()).getName());
+                
+                transactionList.add(transactionDetails);
+            }
+        }
+        
+        mav.addObject("pendingTransactions", transactionList);
+        
+        
+        return mav;
     }
     
 }

@@ -69,6 +69,10 @@ public class batchUploads {
     @Column(name = "ERRORRECORDCOUNT", nullable = false)
     private int errorRecordCount = 0;
     
+    @Column(name = "DATESUBMITTED", nullable = false)
+    @Temporal(javax.persistence.TemporalType.DATE)
+    private Date dateSubmitted = new Date();
+    
     public int getId() {
         return id;
     }
@@ -180,4 +184,9 @@ public class batchUploads {
     public void seterrorRecordCount(int errorRecordCount) {
         this.errorRecordCount = errorRecordCount;
     }
+    
+    public Date getdateSubmitted() {
+       return dateSubmitted;
+   }
+   
 }

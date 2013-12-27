@@ -6,6 +6,7 @@
 
 package com.ut.dph.model;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -24,6 +25,10 @@ public class Transaction {
    private int messageTypeId;
    private int transactionStatusId;
    private int targetOrgId;
+   private boolean autoRelease = true;
+   private Date dateSubmitted = null;
+   private String messageTypeName = null;
+   private int transactionRecordId = 0;
    
    private List<transactionRecords> sourceOrgFields = null;
    private List<transactionRecords> sourceProviderFields = null;
@@ -162,4 +167,35 @@ public class Transaction {
        this.detailFields = detailFields;
    }
    
+   public boolean getautoRelease() {
+       return autoRelease;
+   }
+   
+   public void setautoRelease(boolean autoRelease) {
+       this.autoRelease = autoRelease;
+   }
+   
+   public Date getdateSubmitted() {
+       return dateSubmitted;
+   }
+   
+   public void setdateSubmitted(Date dateSubmitted) {
+       this.dateSubmitted = dateSubmitted;
+   }
+   
+   public String getmessageTypeName() {
+       return messageTypeName;
+   }
+   
+   public void setmessageTypeName(String messageTypeName) {
+       this.messageTypeName = messageTypeName;
+   }
+   
+   public int gettransactionRecordId() {
+       return transactionRecordId;
+   }
+   
+   public void settransactionRecordId(int transactionRecordId) {
+       this.transactionRecordId = transactionRecordId;
+   }
 }

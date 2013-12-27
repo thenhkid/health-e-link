@@ -6,12 +6,14 @@
 
 package com.ut.dph.model;
 
+import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
 
 /**
  *
@@ -34,6 +36,10 @@ public class transactionIn {
     
     @Column(name = "STATUSID", nullable = false)
     private int statusId;
+    
+    @Column(name = "DATECREATED", nullable = false)
+    @Temporal(javax.persistence.TemporalType.DATE)
+    private Date dateCreated = new Date();
     
     public int getId() {
         return id;
@@ -65,6 +71,14 @@ public class transactionIn {
 
     public void setstatusId(int statusId) {
         this.statusId = statusId;
+    }
+    
+    public Date getdateCreated() {
+        return dateCreated;
+    }
+    
+    public void setdateCreated(Date dateCreated) {
+        this.dateCreated = dateCreated;
     }
     
 }

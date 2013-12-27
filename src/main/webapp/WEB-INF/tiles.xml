@@ -374,6 +374,11 @@
         <put-attribute name="jscript" value="/dspResources/js/front-end/Health-e-Web/messageForm.js" />
     </definition>
     
+    <definition name="/Health-e-Web/pending" extends="base.definition.frontEnd">
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Health-e-Web&amp;page=pending" />
+        <put-attribute name="body" value="/WEB-INF/jsp/Health-e-Web/pending.jsp" />
+    </definition>
+    
     <!-- Health-e-Connect (Exchange) Pages -->
 
 </tiles-definitions>
