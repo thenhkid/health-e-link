@@ -150,7 +150,15 @@ public class HealtheWebController {
      * @return this request will return the messageDetailsForm
      */
     @RequestMapping(value= "/create/details", method = RequestMethod.POST)
-    public ModelAndView showMessageDetailsForm(@RequestParam(value = "configId", required = true) int configId, @RequestParam(value = "targetOrg", required = false) int targetOrg, @RequestParam(value = "transactionId", required = false) int transactionId, HttpSession session) {
+    public ModelAndView showMessageDetailsForm(@RequestParam(value = "configId", required = true) int configId, @RequestParam(value = "targetOrg", required = false) Integer targetOrg, @RequestParam(value = "transactionId", required = false) Integer transactionId, HttpSession session) throws NoSuchMethodException {
+        
+        if(transactionId == null) {
+            transactionId = 0;
+        }
+        
+        if(targetOrg == null) {
+            targetOrg = 0;
+        }
         
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/Health-e-Web/messageDetailsForm");
@@ -174,26 +182,52 @@ public class HealtheWebController {
         List<configurationFormFields> patientInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId,transportDetails.getId(),5);
         List<configurationFormFields> detailFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId,transportDetails.getId(),6);
         
-        /* Create a new transaction */
         Transaction transaction = new Transaction();
-        transaction.setorgId(userInfo[1]);
-        transaction.settransportMethodId(2);
-        transaction.setmessageTypeId(configDetails.getMessageTypeId());
-        transaction.setuserId(userInfo[0]);
-        transaction.setbatchName(null);
-        transaction.setoriginalFileName(null);
-        transaction.setstatusId(0);
-        transaction.settransactionStatusId(0);
-        transaction.settargetOrgId(targetOrg);
-        transaction.setconfigId(configId);
-        transaction.setautoRelease(transportDetails.getautoRelease());
+        transactionInRecords records = null;
+        
+        if(transactionId > 0) {
+            transactionIn transactionInfo = transactionInManager.getTransactionDetails(transactionId);
+            batchUploads batchInfo = transactionInManager.getUploadBatch(transactionInfo.getbatchId());
+            
+            transaction.setorgId(batchInfo.getOrgId());
+            transaction.settransportMethodId(2);
+            transaction.setmessageTypeId(configDetails.getMessageTypeId());
+            transaction.setuserId(batchInfo.getuserId());
+            transaction.setbatchName(batchInfo.getutBatchName());
+            transaction.setoriginalFileName(batchInfo.getoriginalFileName());
+            transaction.setstatusId(batchInfo.getstatusId());
+            transaction.settransactionStatusId(transactionInfo.getstatusId());
+            transaction.settargetOrgId(0);
+            transaction.setconfigId(transactionInfo.getconfigId());
+            transaction.setautoRelease(transportDetails.getautoRelease());
+            transaction.setbatchId(batchInfo.getId());
+            transaction.settransactionId(transactionId);
+            
+            records = transactionInManager.getTransactionRecords(transactionId);
+            transaction.settransactionRecordId(records.getId());
+        }
+        else {
+            /* Create a new transaction */
+            transaction.setorgId(userInfo[1]);
+            transaction.settransportMethodId(2);
+            transaction.setmessageTypeId(configDetails.getMessageTypeId());
+            transaction.setuserId(userInfo[0]);
+            transaction.setbatchName(null);
+            transaction.setoriginalFileName(null);
+            transaction.setstatusId(0);
+            transaction.settransactionStatusId(0);
+            transaction.settargetOrgId(targetOrg);
+            transaction.setconfigId(configId);
+            transaction.setautoRelease(transportDetails.getautoRelease());
+        }
         
        /* Set all the transaction SOURCE ORG fields */
        List<transactionRecords> fromFields = new ArrayList<transactionRecords>();
        String tableName;
        String tableCol;
-        
-        for(configurationFormFields fields : senderInfoFormFields) {
+       String colName;
+       
+       for(configurationFormFields fields : senderInfoFormFields) {
             transactionRecords field = new transactionRecords();
             field.setfieldNo(fields.getFieldNo());
             field.setrequired(fields.getRequired());
@@ -206,12 +240,26 @@ public class HealtheWebController {
                 field.setvalidation(messagetypemanager.getValidationById(fields.getValidationType()).toString());
             }
             
-            /* Get the pre-populated values */
-            tableName = fields.getautoPopulateTableName();
-            tableCol = fields.getautoPopulateTableCol();
+            /* If editing an existing transaction pull the already entered values */
+            if(transactionId > 0) {
+                colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
+                try {
+                    field.setfieldValue(BeanUtils.getProperty(records, colName));
+                } catch (IllegalAccessException ex) {
+                    Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (InvocationTargetException ex) {
+                    Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            else {
             
-            if(!tableName.isEmpty() && !tableName.isEmpty()) {
-                field.setfieldValue(transactionInManager.getFieldValue(tableName, tableCol, sendingOrgDetails.getId()));
+                /* Get the pre-populated values */
+                tableName = fields.getautoPopulateTableName();
+                tableCol = fields.getautoPopulateTableCol();
+
+                if(!tableName.isEmpty() && !tableName.isEmpty()) {
+                    field.setfieldValue(transactionInManager.getFieldValue(tableName, tableCol, sendingOrgDetails.getId()));
+                }
             }
             
             fromFields.add(field);
@@ -234,12 +282,25 @@ public class HealtheWebController {
                 field.setvalidation(messagetypemanager.getValidationById(fields.getValidationType()).toString());
             }
             
-            /* Get the pre-populated values */
-            tableName = fields.getautoPopulateTableName();
-            tableCol = fields.getautoPopulateTableCol();
-            
-            if(!tableName.isEmpty() && !tableName.isEmpty()) {
-                field.setfieldValue(transactionInManager.getFieldValue(tableName, tableCol, sendingOrgDetails.getId()));
+            /* If editing an existing transaction pull the already entered values */
+            if(transactionId > 0) {
+                colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
+                try {
+                    field.setfieldValue(BeanUtils.getProperty(records, colName));
+                } catch (IllegalAccessException ex) {
+                    Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (InvocationTargetException ex) {
+                    Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            else {
+                /* Get the pre-populated values */
+                tableName = fields.getautoPopulateTableName();
+                tableCol = fields.getautoPopulateTableCol();
+
+                if(!tableName.isEmpty() && !tableName.isEmpty()) {
+                    field.setfieldValue(transactionInManager.getFieldValue(tableName, tableCol, sendingOrgDetails.getId()));
+                }
             }
             
             fromProviderFields.add(field);
@@ -262,12 +323,25 @@ public class HealtheWebController {
                 field.setvalidation(messagetypemanager.getValidationById(fields.getValidationType()).toString());
             }
             
-            /* Get the pre-populated values */
-            tableName = fields.getautoPopulateTableName();
-            tableCol = fields.getautoPopulateTableCol();
-            
-            if(!tableName.isEmpty() && !tableName.isEmpty()) {
-                field.setfieldValue(transactionInManager.getFieldValue(tableName, tableCol, receivingOrgDetails.getId()));
+            /* If editing an existing transaction pull the already entered values */
+            if(transactionId > 0) {
+                colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
+                try {
+                    field.setfieldValue(BeanUtils.getProperty(records, colName));
+                } catch (IllegalAccessException ex) {
+                    Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (InvocationTargetException ex) {
+                    Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            else {
+                /* Get the pre-populated values */
+                tableName = fields.getautoPopulateTableName();
+                tableCol = fields.getautoPopulateTableCol();
+
+                if(!tableName.isEmpty() && !tableName.isEmpty()) {
+                    field.setfieldValue(transactionInManager.getFieldValue(tableName, tableCol, receivingOrgDetails.getId()));
+                }
             }
             
             /* Get the pre-populated values */
@@ -290,12 +364,25 @@ public class HealtheWebController {
                 field.setvalidation(messagetypemanager.getValidationById(fields.getValidationType()).toString());
             }
             
-            /* Get the pre-populated values */
-            tableName = fields.getautoPopulateTableName();
-            tableCol = fields.getautoPopulateTableCol();
-            
-            if(!tableName.isEmpty() && !tableName.isEmpty()) {
-                field.setfieldValue(transactionInManager.getFieldValue(tableName, tableCol, receivingOrgDetails.getId()));
+            /* If editing an existing transaction pull the already entered values */
+            if(transactionId > 0) {
+                colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
+                try {
+                    field.setfieldValue(BeanUtils.getProperty(records, colName));
+                } catch (IllegalAccessException ex) {
+                    Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (InvocationTargetException ex) {
+                    Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            else {
+                /* Get the pre-populated values */
+                tableName = fields.getautoPopulateTableName();
+                tableCol = fields.getautoPopulateTableCol();
+
+                if(!tableName.isEmpty() && !tableName.isEmpty()) {
+                    field.setfieldValue(transactionInManager.getFieldValue(tableName, tableCol, receivingOrgDetails.getId()));
+                }
             }
             
             toProviderFields.add(field);
@@ -316,6 +403,18 @@ public class HealtheWebController {
             /* Get the validation */
             if(fields.getValidationType() > 1) {
                 field.setvalidation(messagetypemanager.getValidationById(fields.getValidationType()).toString());
+            }
+            
+            /* If editing an existing transaction pull the already entered values */
+            if(transactionId > 0) {
+                colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
+                try {
+                    field.setfieldValue(BeanUtils.getProperty(records, colName));
+                } catch (IllegalAccessException ex) {
+                    Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (InvocationTargetException ex) {
+                    Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
             
             /* See if any fields have crosswalks associated to it */
@@ -340,6 +439,18 @@ public class HealtheWebController {
             /* Get the validation */
             if(fields.getValidationType() > 1) {
                 field.setvalidation(messagetypemanager.getValidationById(fields.getValidationType()).toString());
+            }
+            
+            /* If editing an existing transaction pull the already entered values */
+            if(transactionId > 0) {
+                colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
+                try {
+                    field.setfieldValue(BeanUtils.getProperty(records, colName));
+                } catch (IllegalAccessException ex) {
+                    Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (InvocationTargetException ex) {
+                    Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
             
             /* See if any fields have crosswalks associated to it */
@@ -367,48 +478,100 @@ public class HealtheWebController {
     public void submitMessage(@ModelAttribute(value = "transactionDetails") Transaction transactionDetails, HttpSession session, @RequestParam String action) {
         
         int[] userInfo = (int[])session.getAttribute("userInfo");
+        Integer currBatchId = transactionDetails.getbatchId();
+        Integer currTransactionId = transactionDetails.gettransactionId();
+        Integer currRecordId = transactionDetails.gettransactionRecordId();
+        Integer batchId;
+        Integer transactionId;
+        Integer transactionRecordId;
         
-        /* Create the batch name (OrgId+MessageTypeId+Date/Time) */
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-        Date date = new Date();
-        String batchName = new StringBuilder().append(transactionDetails.getorgId()).append(transactionDetails.getmessageTypeId()).append(dateFormat.format(date)).toString();
+        /* If currBatchId == 0 then create a new batch */
+        if(currBatchId == 0) {
         
-        /* Submit a new batch */
-        batchUploads batchUpload = new batchUploads();
-        batchUpload.setOrgId(transactionDetails.getorgId());
-        batchUpload.setuserId(userInfo[0]);
-        batchUpload.setutBatchName(batchName);
-        batchUpload.settransportMethodId(2);
-        batchUpload.setoriginalFileName(batchName);
+            /* Create the batch name (OrgId+MessageTypeId+Date/Time) */
+            DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+            Date date = new Date();
+            String batchName = new StringBuilder().append(transactionDetails.getorgId()).append(transactionDetails.getmessageTypeId()).append(dateFormat.format(date)).toString();
+
+            /* Submit a new batch */
+            batchUploads batchUpload = new batchUploads();
+            batchUpload.setOrgId(transactionDetails.getorgId());
+            batchUpload.setuserId(userInfo[0]);
+            batchUpload.setutBatchName(batchName);
+            batchUpload.settransportMethodId(2);
+            batchUpload.setoriginalFileName(batchName);
         
-        /* If the "Send" button was pressed */
-        if (action.equals("send")) {
-            batchUpload.setstatusId(2);
+            /* If the "Send" button was pressed */
+            if (action.equals("send")) {
+                batchUpload.setstatusId(2);
+            }
+            /* If the "Save" or "Release" button was pressed */
+            else {
+                batchUpload.setstatusId(6);
+            }
+            batchUpload.settotalRecordCount(1);
+
+            batchId = (Integer) transactionInManager.submitBatchUpload(batchUpload); 
         }
-        /* If the "Save" or "Release" button was pressed */
+        
+        /* Otherwise update existing batch */
         else {
-            batchUpload.setstatusId(6);
+            batchId = currBatchId;
+            
+            /* Get the details of the batch */
+            batchUploads batchUpload = transactionInManager.getUploadBatch(batchId);
+            
+            /* If the "Send" button was pressed */
+            if (action.equals("send")) {
+                batchUpload.setstatusId(2);
+            }
+            /* If the "Save" or "Release" button was pressed */
+            else {
+                batchUpload.setstatusId(6);
+            }
+            
+            transactionInManager.submitBatchUploadChanges(batchUpload); 
+            
+            
         }
-        batchUpload.settotalRecordCount(1);
         
-        Integer batchId = (Integer) transactionInManager.submitBatchUpload(batchUpload); 
+        /* If currTransactionId == 0 then create a new transaction */
+        if(currTransactionId == 0) {
         
-        /* Submit a new Transaction In record */
-        transactionIn transactionIn = new transactionIn();
-        transactionIn.setbatchId(batchId);
-        transactionIn.setconfigId(transactionDetails.getconfigId());
-        
-        /* If the "Send" button was pressed */
-        if (action.equals("send")) {
-            transactionIn.setstatusId(17);
+            /* Submit a new Transaction In record */
+            transactionIn transactionIn = new transactionIn();
+            transactionIn.setbatchId(batchId);
+            transactionIn.setconfigId(transactionDetails.getconfigId());
+
+            /* If the "Send" button was pressed */
+            if (action.equals("send")) {
+                transactionIn.setstatusId(17);
+            }
+            /* If the "Save" or "Release" button was pressed */
+            else {
+                transactionIn.setstatusId(9);
+            }
+
+            transactionId = (Integer) transactionInManager.submitTransactionIn(transactionIn);
         }
-        /* If the "Save" or "Release" button was pressed */
+        
+        /* Otherwise update existing batch */
         else {
-            transactionIn.setstatusId(9);
+            transactionId =   currTransactionId;  
+            
+            transactionIn transactionIn = transactionInManager.getTransactionDetails(transactionId);
+            
+            /* If the "Send" button was pressed */
+            if (action.equals("send")) {
+                transactionIn.setstatusId(17);
+            }
+            /* If the "Save" or "Release" button was pressed */
+            else {
+                transactionIn.setstatusId(9);
+            }
+            
+            transactionInManager.submitTransactionInChanges(transactionIn);
         }
-       
-        Integer transactionId = (Integer) transactionInManager.submitTransactionIn(transactionIn);
-        
         
         /* Get the 6 Bucket (Source Org, Source Provider, Target Org, Target Provider, Patient, Details) fields */
         List<transactionRecords> sourceOrgFields = transactionDetails.getsourceOrgFields();
@@ -418,8 +581,14 @@ public class HealtheWebController {
         List<transactionRecords> patientFields = transactionDetails.getpatientFields();
         List<transactionRecords> detailFields = transactionDetails.getdetailFields();
         
-        transactionInRecords records = new transactionInRecords();
-        records.setTransactionInId(transactionId);
+        transactionInRecords records;
+        if(currRecordId == 0) {
+            records = new transactionInRecords();
+        }
+        else {
+            records = transactionInManager.getTransactionRecord(currRecordId);
+        }
+        
         
         String colName;
         for(transactionRecords field : sourceOrgFields) {
@@ -488,7 +657,13 @@ public class HealtheWebController {
             }
         }
         
-        Integer transactionRecordId = (Integer) transactionInManager.submitTransactionInRecords(records);
+        if(currRecordId == 0) {
+            transactionRecordId = (Integer) transactionInManager.submitTransactionInRecords(records);
+        }
+        else {
+            transactionRecordId = currRecordId;
+            transactionInManager.submitTransactionInRecordsUpdates(records);
+        }
         
         
         /* 

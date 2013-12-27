@@ -21,10 +21,15 @@
 
             <h2 class="form-title">Create New Message</h2>
             <form:form id="messageForm" action="/Health-e-Web/submitMessage" modelAttribute="transaction" role="form" class="form" method="post">
+                <input type="hidden" id="action" name="action" value="save" />
                 <form:hidden path="orgId" />
                 <form:hidden path="configId" />
                 <form:hidden path="messageTypeId" />
-                <input type="hidden" id="action" name="action" value="save" />
+                <form:hidden path="batchName" />
+                <form:hidden path="originalFileName" />
+                <form:hidden path="transactionRecordId" />
+                <form:hidden path="batchId" />
+                <form:hidden path="transactionId" />
                 <c:forEach items="${transaction.sourceOrgFields}" varStatus="i">
                     <form:hidden path="sourceOrgFields[${i.index}].fieldValue" />
                     <form:hidden path="sourceOrgFields[${i.index}].fieldNo" />
@@ -86,7 +91,7 @@
                                                         <select id="${patientInfo.fieldNo}" name="patientFields[${pfield.index}].fieldValue" class="form-control <c:if test="${patientInfo.required == true}"> required</c:if>">
                                                             <option value="">-Choose-</option>
                                                             <c:forEach items="${patientInfo.fieldSelectOptions}" var="options">
-                                                                <option value="${options.optionValue}">${options.optionDesc}</option>
+                                                                <option value="${options.optionValue}" <c:if test="${patientInfo.fieldValue == options.optionValue}">selected</c:if>>${options.optionDesc}</option>
                                                             </c:forEach>
                                                         </select>
                                                     </c:when>
@@ -108,40 +113,16 @@
                                             <div id="fieldDiv_${detailInfo.fieldNo}" class="form-group">
                                                 <label class="control-label" for="fieldA">${detailInfo.fieldLabel} <c:if test="${detailInfo.required == true}">&nbsp;*</c:if></label>
                                                 <c:choose>
-                                                    <c:when test="${detailInfo.validation.contains('Date')}">
-                                                        <div class="form-inline form-inline-varient">
-                                                            <div class="form-group">
-                                                                <select class="form-control dateField">
-                                                                    <option value="">-m-</option>
-                                                                    <c:forEach begin="1" end="12" var="m"><option value="${m}">${m}</option></c:forEach>
-                                                                </select>
-                                                            </div>
-                                                            <div class="form-group">
-                                                                <select class="form-control dateField">
-                                                                    <option value="">-d-</option>
-                                                                    <c:forEach begin="1" end="31" var="d"><option value="${d}">${d}</option></c:forEach>
-                                                                </select>
-                                                            </div>
-                                                            <div class="form-group">
-                                                                <select class="form-control dateField">
-                                                                    <option value="">-y-</option>
-                                                                    <c:forEach begin="1900" end="${currentYear}" var="y">
-                                                                        <option value="${y}">${y}</option>
-                                                                    </c:forEach>
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                    </c:when>
                                                     <c:when test="${detailInfo.fieldSelectOptions.size() > 0}">
                                                         <select id="${detailInfo.fieldNo}" name="detailFields[${dfield.index}].fieldValue" class="form-control <c:if test="${detailInfo.required == true}"> required</c:if>">
                                                             <option value="">-Choose-</option>
                                                             <c:forEach items="${detailInfo.fieldSelectOptions}" var="options">
-                                                                <option value="${options.optionValue}">${options.optionDesc}</option>
+                                                                <option value="${options.optionValue}" <c:if test="${detailInfo.fieldValue == options.optionValue}">selected</c:if>>${options.optionDesc}</option>
                                                             </c:forEach>
                                                         </select>
                                                     </c:when>
                                                     <c:otherwise>
-                                                        <input id="${detailInfo.fieldNo}" name="detailFields[${dfield.index}].fieldValue" class="form-control ${detailInfo.validation.replace(' ','-')} <c:if test="${detailInfo.required == true}"> required</c:if>" type="text">
+                                                        <input id="${detailInfo.fieldNo}" name="detailFields[${dfield.index}].fieldValue" value="${detailInfo.fieldValue}" class="form-control ${detailInfo.validation.replace(' ','-')} <c:if test="${detailInfo.required == true}"> required</c:if>" type="text">
                                                     </c:otherwise>
                                                 </c:choose>
                                                 <span id="errorMsg_${detailInfo.fieldNo}" class="control-label"></span>                

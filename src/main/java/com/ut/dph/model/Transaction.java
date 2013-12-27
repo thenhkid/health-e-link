@@ -28,6 +28,8 @@ public class Transaction {
    private boolean autoRelease = true;
    private Date dateSubmitted = null;
    private String messageTypeName = null;
+   private int batchId = 0;
+   private int transactionId = 0;
    private int transactionRecordId = 0;
    
    private List<transactionRecords> sourceOrgFields = null;
@@ -197,5 +199,21 @@ public class Transaction {
    
    public void settransactionRecordId(int transactionRecordId) {
        this.transactionRecordId = transactionRecordId;
+   }
+   
+   public int getbatchId() {
+       return batchId;
+   }
+   
+   public void setbatchId(int batchId) {
+       this.batchId = batchId;
+   }
+   
+   public int gettransactionId() {
+       return transactionId;
+   }
+   
+   public void settransactionId(int transactionId) {
+       this.transactionId = transactionId;
    }
 }

@@ -24,14 +24,26 @@ public interface transactionInManager {
     
     Integer submitBatchUpload(batchUploads batchUpload);
     
+    void submitBatchUploadChanges(batchUploads batchUpload);
+    
     Integer submitTransactionIn(transactionIn transactionIn);
     
+    void submitTransactionInChanges(transactionIn transactionIn);
+    
     Integer submitTransactionInRecords(transactionInRecords records);
+    
+    void submitTransactionInRecordsUpdates(transactionInRecords records);
     
     void submitTransactionTranslatedInRecords(int transactionRecordId);
     
     List<transactionIn> getpendingTransactions(int orgId);
     
     batchUploads getUploadBatch(int batchId);
+    
+    transactionIn getTransactionDetails(int transactionId);
+    
+    transactionInRecords getTransactionRecords(int transactionId);
+    
+    transactionInRecords getTransactionRecord(int recordId);
     
 }

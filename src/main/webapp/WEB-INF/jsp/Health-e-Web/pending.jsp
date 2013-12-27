@@ -13,7 +13,7 @@
                 <li><a href="<c:url value='/profile'/>">My Account</a></li>
                 <li class="active">Pending Messages</li>
             </ol>
-            <form action="create/details" id="createMessageForm" method="post">
+            <form action="create/details" id="viewMessageForm" method="post">
                 <input type="hidden" id="configId" name="configId" value="" />
                 <input type="hidden" id="transactionId" name="transactionId" value="" />
             </form>    
@@ -38,7 +38,7 @@
                                         </td>
                                         <td class="center-text"><fmt:formatDate value="${transaction.dateSubmitted}" type="date" pattern="M/dd/yyyy" /></td>
                                         <td class="actions-col" style="width:200px;">
-                                            <a href="javascript:void(0);" rel2="${transaction.configId}" rel="${transaction.transactionRecordId}" class="btn btn-link createLink">
+                                            <a href="javascript:void(0);" rel2="${transaction.configId}" rel="${transaction.transactionRecordId}" class="btn btn-link viewLink">
                                                 <span class="glyphicon glyphicon-edit"></span>
                                                 View
                                             </a>

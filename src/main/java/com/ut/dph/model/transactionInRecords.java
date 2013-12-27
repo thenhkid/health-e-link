@@ -39,6 +39,9 @@ public class transactionInRecords {
     private String f3 = null;
     
     @Column(name = "F4", nullable = true)
+    private String f4 = null;
+    
+    @Column(name = "F5", nullable = true)
     private String f5 = null;
     
     @Column(name = "F6", nullable = true)
@@ -830,6 +833,15 @@ public class transactionInRecords {
     public void setF3(String f3) {
         this.f3 = f3;
     }
+    
+    public String getF4() {
+        return f4;
+    }
+
+    public void setF4(String f4) {
+        this.f4 = f4;
+    }
+
 
     public String getF5() {
         return f5;

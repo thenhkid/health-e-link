@@ -47,14 +47,32 @@ public class transactionInManagerImpl implements transactionInManager {
     
     @Override
     @Transactional
+    public void submitBatchUploadChanges(batchUploads batchUpload) {
+        transactionInDAO.submitBatchUploadChanges(batchUpload);
+    }
+    
+    @Override
+    @Transactional
     public Integer submitTransactionIn(transactionIn transactionIn) {
         return transactionInDAO.submitTransactionIn(transactionIn);
     }
     
     @Override
     @Transactional
+    public  void submitTransactionInChanges(transactionIn transactionIn) {
+        transactionInDAO.submitTransactionInChanges(transactionIn);
+    }
+   
+    @Override
+    @Transactional
     public Integer submitTransactionInRecords(transactionInRecords records) {
         return transactionInDAO.submitTransactionInRecords(records);
+    }
+    
+    @Override
+    @Transactional
+    public void submitTransactionInRecordsUpdates(transactionInRecords records) {
+        transactionInDAO.submitTransactionInRecords(records);
     }
     
     @Override
@@ -75,4 +93,21 @@ public class transactionInManagerImpl implements transactionInManager {
         return transactionInDAO.getUploadBatch(batchId);
     }
     
+    @Override
+    @Transactional
+    public transactionIn getTransactionDetails(int transactionId) {
+        return transactionInDAO.getTransactionDetails(transactionId);
+    }
+    
+    @Override
+    @Transactional
+    public transactionInRecords getTransactionRecords(int transactionId) {
+        return transactionInDAO.getTransactionRecords(transactionId);
+    }
+    
+    @Override
+    @Transactional
+    public transactionInRecords getTransactionRecord(int recordId) {
+        return transactionInDAO.getTransactionRecord(recordId);
+    }
 }

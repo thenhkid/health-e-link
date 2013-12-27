@@ -129,6 +129,22 @@ public class transactionInDAOImpl implements transactionInDAO {
     }
     
     /**
+     * The 'submitBatchUploadChanges' function will submit the batch changes.
+     * 
+     * @param   batchUpload     The object that will hold the new batch info
+     * 
+     * @table   batchUploads
+     * 
+     * @return  This function does not return anything
+     */
+    @Override
+    @Transactional
+    public void submitBatchUploadChanges(batchUploads batchUpload) {
+       sessionFactory.getCurrentSession().update(batchUpload);
+    }
+    
+    
+    /**
      * The 'submitTransactionIn' function will submit the new transaction for the batch.
      * 
      * @param   transactionIn     The object that will hold the new transaction info
@@ -148,6 +164,21 @@ public class transactionInDAOImpl implements transactionInDAO {
     }
     
     /**
+     * The 'submitTransactionInChanges' function will submit the  transaction changes for the batch.
+     * 
+     * @param   transactionIn     The object that will hold the new transaction info
+     * 
+     * @table   transactionIn
+     * 
+     * @return  This function does not return anything
+     */
+    @Override
+    @Transactional
+    public void submitTransactionInChanges(transactionIn transactionIn) {
+        sessionFactory.getCurrentSession().update(transactionIn);
+    }
+    
+    /**
      * The 'submitTransactionInRecords'
      */
     @Override
@@ -158,6 +189,15 @@ public class transactionInDAOImpl implements transactionInDAO {
         transactioInRecordId = (Integer) sessionFactory.getCurrentSession().save(records);
 
         return transactioInRecordId;
+    }
+    
+    /**
+     * The 'submitTransactionInRecordsUpdates'
+     */
+    @Override
+    @Transactional
+    public void submitTransactionInRecordsUpdates(transactionInRecords records) {
+        sessionFactory.getCurrentSession().update(records);
     }
     
     /**
@@ -245,5 +285,50 @@ public class transactionInDAOImpl implements transactionInDAO {
          return (batchUploads) sessionFactory.getCurrentSession().get(batchUploads.class, batchId);
         
     }
+    
+    /**
+     * The 'getTransactionDetails' function will return the transaction IN details for the
+     * passed in transactionId.
+     * 
+     * @param transactionId The id of the transaction to return
+     * 
+     */
+    @Override
+    @Transactional
+    public transactionIn getTransactionDetails(int transactionId) {
+       return (transactionIn) sessionFactory.getCurrentSession().get(transactionIn.class, transactionId); 
+    }
+    
+    /**
+     * The 'getTransactionRecords' function will return the transaction IN records for the
+     * passed in transactionId.
+     * 
+     * @param transactionId The id of the transaction records to return
+     * 
+     */
+    @Override
+    @Transactional
+    public transactionInRecords getTransactionRecords(int transactionId) {
+       Query query = sessionFactory.getCurrentSession().createQuery("from transactionInRecords where transactionInId = :transactionId");
+       query.setParameter("transactionId", transactionId);
+
+       transactionInRecords records = (transactionInRecords) query.uniqueResult();
+
+       return records;
+    }
+    
+    /**
+     * The 'getTransactionRecord' function will return the transaction IN record for the
+     * passed in recordId.
+     * 
+     * @param recordId The id of the  records to return
+     * 
+     */
+    @Override
+    @Transactional
+    public transactionInRecords getTransactionRecord(int recordId) {
+       return (transactionInRecords) sessionFactory.getCurrentSession().get(transactionInRecords.class, recordId); 
+    }
+    
     
 }
