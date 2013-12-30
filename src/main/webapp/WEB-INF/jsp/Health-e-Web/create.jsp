@@ -15,6 +15,7 @@
             <form action="create/details" id="createMessageForm" method="post">
                 <input type="hidden" id="configId" name="configId" value="" />
                 <input type="hidden" id="targetOrg" name="targetOrg" value="" />
+                <input type="hidden" id="targetConfig" name="targetConfig" value="" />
             </form>
             <div class="form-container scrollable">
                 <table class="table table-striped table-hover table-default">
@@ -38,13 +39,13 @@
                                                     <select id="targetOrg_${config.id}" class="form-control">
                                                         <option value="">- Select Target Organization -</option>
                                                         <c:forEach items="${config.connections}" var="connection" varStatus="cStatus">
-                                                            <option value="${connection.targetOrgId}">${connection.targetOrgName}</option>
+                                                            <option value="${connection.targetConfigId}-${connection.targetOrgId}">${connection.targetOrgName}</option>
                                                         </c:forEach> 
                                                     </select>    
                                                 </c:when>
                                                 <c:otherwise>
                                                     <c:forEach items="${config.connections}" var="connection" varStatus="cStatus">
-                                                        <input type="hidden" id="targetOrg_${config.id}" value="${connection.targetOrgId}" />
+                                                        <input type="hidden" id="targetOrg_${config.id}" value="${connection.targetConfigId}-${connection.targetOrgId}" />
                                                         ${connection.targetOrgName}
                                                     </c:forEach> 
                                                 </c:otherwise>

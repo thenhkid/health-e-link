@@ -11,6 +11,7 @@ import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.fieldSelectOptions;
 import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionInRecords;
+import com.ut.dph.model.transactionTarget;
 import org.springframework.stereotype.Service;
 import com.ut.dph.service.transactionInManager;
 import java.util.List;
@@ -72,19 +73,25 @@ public class transactionInManagerImpl implements transactionInManager {
     @Override
     @Transactional
     public void submitTransactionInRecordsUpdates(transactionInRecords records) {
-        transactionInDAO.submitTransactionInRecords(records);
+        transactionInDAO.submitTransactionInRecordsUpdates(records);
     }
     
     @Override
     @Transactional
-    public void submitTransactionTranslatedInRecords(int transactionRecordId) {
-        transactionInDAO.submitTransactionTranslatedInRecords(transactionRecordId);
+    public void submitTransactionTranslatedInRecords(int transactionId, int transactionRecordId) {
+        transactionInDAO.submitTransactionTranslatedInRecords(transactionId, transactionRecordId);
     }
     
     @Override
     @Transactional
     public List<transactionIn> getpendingTransactions(int orgId) {
         return transactionInDAO.getpendingTransactions(orgId);
+    }
+    
+    @Override
+    @Transactional
+    public List<transactionIn> getsentTransactions(int orgId) {
+        return transactionInDAO.getsentTransactions(orgId);
     }
     
     @Override
@@ -109,5 +116,29 @@ public class transactionInManagerImpl implements transactionInManager {
     @Transactional
     public transactionInRecords getTransactionRecord(int recordId) {
         return transactionInDAO.getTransactionRecord(recordId);
+    }
+    
+    @Override
+    @Transactional
+    public Integer submitTransactionTarget(transactionTarget transactionTarget){
+        return transactionInDAO.submitTransactionTarget(transactionTarget);
+    }
+    
+    @Override
+    @Transactional
+    public transactionTarget getTransactionTargetDetails(int transactionTargetId) {
+        return transactionInDAO.getTransactionTargetDetails(transactionTargetId);
+    }
+    
+    @Override
+    @Transactional
+    public void submitTransactionTargetChanges(transactionTarget transactionTarget) {
+        transactionInDAO.submitTransactionTargetChanges(transactionTarget);
+    }
+    
+    @Override
+    @Transactional
+    public transactionTarget getTransactionTarget(int batchUploadId, int transactionInId) {
+        return transactionInDAO.getTransactionTarget(batchUploadId, transactionInId);
     }
 }

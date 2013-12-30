@@ -73,6 +73,7 @@ public class batchUploads {
     @Temporal(javax.persistence.TemporalType.DATE)
     private Date dateSubmitted = new Date();
     
+    
     public int getId() {
         return id;
     }
@@ -188,5 +189,6 @@ public class batchUploads {
     public Date getdateSubmitted() {
        return dateSubmitted;
    }
+  
    
 }

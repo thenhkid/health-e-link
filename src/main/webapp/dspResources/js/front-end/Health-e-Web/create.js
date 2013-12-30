@@ -14,11 +14,15 @@ $(function() {
     $('.createLink').click(function() {
        var configId = $(this).attr('rel');
        var selTarget = $('#targetOrg_'+configId).val();
-       
-       if(selTarget > 0) {
+       selTarget = selTarget.split('-');
+       var tConfigId = selTarget[0];
+       var tOrgId = selTarget[1];
+      
+       if(tOrgId > 0) {
            $('#configId').val(configId);
-           $('#targetOrg').val(selTarget);
-           $('#createMessageForm').submit();
+           $('#targetOrg').val(tOrgId);
+           $('#targetConfig').val(tConfigId);
+          // $('#createMessageForm').submit();
        }
        else {
            $('#row_'+configId).addClass("has-error");

@@ -11,6 +11,7 @@ import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.fieldSelectOptions;
 import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionInRecords;
+import com.ut.dph.model.transactionTarget;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -179,7 +180,13 @@ public class transactionInDAOImpl implements transactionInDAO {
     }
     
     /**
-     * The 'submitTransactionInRecords'
+     * The 'submitTransactionInRecords' function will submit the transaction records
+     * 
+     * @param   records The object that will hold the transaction record info
+     * 
+     * @table transactionInRecords
+     * 
+     * @return This function will return the generated transaction record id
      */
     @Override
     @Transactional
@@ -192,7 +199,14 @@ public class transactionInDAOImpl implements transactionInDAO {
     }
     
     /**
-     * The 'submitTransactionInRecordsUpdates'
+     * The 'submitTransactionInRecordsUpdates' function will submit the transaction record changes
+     * for the batch
+     * 
+     * @param records   The object that will hold the transaction record info
+     * 
+     * @table transactionInRecords
+     * 
+     * @return  This function does not return anything
      */
     @Override
     @Transactional
@@ -211,7 +225,12 @@ public class transactionInDAOImpl implements transactionInDAO {
      */
     @Override
     @Transactional
-    public void submitTransactionTranslatedInRecords(int transactionRecordId) {
+    public void submitTransactionTranslatedInRecords(int transactionInId, int transactionRecordId) {
+        
+        /* Always clear this table out for the passed in transactionId */
+        Query clearRecords = sessionFactory.getCurrentSession().createSQLQuery("DELETE from transactionTranslatedIn where transactionInId = :transactionInId");
+        clearRecords.executeUpdate();
+        
         Query query = sessionFactory.getCurrentSession().createSQLQuery("INSERT INTO transactionTranslatedIn (" +
                 "transactionInId, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16, f17, f18, f19, f20, f21, f22, f23, f24, f25, f26, f27, f28, f29, f30, f31," +
                 "f32, f33, f34, f35, f36, f37, f38, f39, f40, f41, f42, f43, f44, f45, f46, f47, f48, f49, f50, f51, f52, f53, f54, f55, f56, f57, f58, f59, f60, f61, f62, f63, f64," +
@@ -255,6 +274,43 @@ public class transactionInDAOImpl implements transactionInDAO {
         Criteria findBatches = sessionFactory.getCurrentSession().createCriteria(batchUploads.class);
         findBatches.add(Restrictions.eq("orgId", orgId));
         findBatches.add(Restrictions.eq("statusId", 6));
+        
+        List<batchUploads> batches = findBatches.list();
+
+        for (batchUploads batch : batches) {
+            batchList.add(batch.getId());
+        }
+
+        if (batchList.isEmpty()) {
+            batchList.add(0);
+        }
+        
+        criteria.add(Restrictions.in("batchId", batchList));
+        
+        criteria.addOrder(Order.desc("dateCreated"));
+        
+        return criteria.list();
+    }
+    
+    /**
+     * The 'getsentTransactions' function will return a list of sent
+     * transactions for the organization passed in.
+     * 
+     * @param orgId The organization Id to find pending transactions for.
+     * 
+     * @return The function will return a list of sent transactions
+     */
+    @Override
+    @Transactional
+    public List<transactionIn> getsentTransactions(int orgId) {
+        
+        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(transactionIn.class);
+        criteria.add(Restrictions.eq("statusId", 17));
+        
+        List<Integer> batchList = new ArrayList<Integer>();
+        Criteria findBatches = sessionFactory.getCurrentSession().createCriteria(batchUploads.class);
+        findBatches.add(Restrictions.eq("orgId", orgId));
+        findBatches.add(Restrictions.eq("statusId", 2));
         
         List<batchUploads> batches = findBatches.list();
 
@@ -328,6 +384,77 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Transactional
     public transactionInRecords getTransactionRecord(int recordId) {
        return (transactionInRecords) sessionFactory.getCurrentSession().get(transactionInRecords.class, recordId); 
+    }
+    
+    /**
+     * The 'submitTransactionTarget' function will submit the transaction target
+     * 
+     * @param   transactionTarget The object that will hold the transaction target info
+     * 
+     * @table transactionTarget
+     * 
+     * @return This function will return the generated transaction target id
+     */
+    @Override
+    @Transactional
+    public Integer submitTransactionTarget(transactionTarget transactionTarget) {
+        Integer transactioTargetId = null;
+
+        transactioTargetId = (Integer) sessionFactory.getCurrentSession().save(transactionTarget);
+
+        return transactioTargetId;
+    }
+    
+    /**
+     * The 'getTransactionTargetDetails' function will return the transaction TARGET details for the
+     * passed in transactionTargetId.
+     * 
+     * @param transactionTargetId The id of the transaction target to return
+     * 
+     * @table transactionTarget
+     * 
+     */
+    @Override
+    @Transactional
+    public transactionTarget getTransactionTargetDetails(int transactionTargetId) {
+       return (transactionTarget) sessionFactory.getCurrentSession().get(transactionTarget.class, transactionTargetId); 
+    }
+    
+    /**
+     * The 'submitTransactionTargetChanges' function will submit the transaction target changes
+     * 
+     * @param   transactionTarget The object that will hold the transaction target info
+     * 
+     * @table transactionTarget
+     * 
+     * @return This function will not return anything
+     */
+    @Override
+    @Transactional
+    public void submitTransactionTargetChanges(transactionTarget transactionTarget) {
+       sessionFactory.getCurrentSession().update(transactionTarget);
+    }
+    
+    /**
+     * The 'getTransactionTarget' function will return the transaction TARGET records for the
+     * passed in transactionId and batchId.
+     * 
+     * @param batchUploadId The id of the transaction batch to return
+     * @param transactionId The id of the transaction to return
+     * 
+     * @table transactionTarget
+     * 
+     */
+    @Override
+    @Transactional
+    public transactionTarget getTransactionTarget(int batchUploadId, int transactionInId) {
+       Query query = sessionFactory.getCurrentSession().createQuery("from transactionTarget where batchUploadId = :batchUploadId and transactionInId = :transactionId");
+       query.setParameter("batchUploadId", batchUploadId);
+       query.setParameter("transactionId", transactionInId);
+
+       transactionTarget target = (transactionTarget) query.uniqueResult();
+
+       return target;
     }
     
     

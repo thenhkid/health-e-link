@@ -25,12 +25,14 @@ public class Transaction {
    private int messageTypeId;
    private int transactionStatusId;
    private int targetOrgId;
+   private int targetConfigId;
    private boolean autoRelease = true;
    private Date dateSubmitted = null;
    private String messageTypeName = null;
    private int batchId = 0;
    private int transactionId = 0;
    private int transactionRecordId = 0;
+   private int transactionTargetId = 0;
    
    private List<transactionRecords> sourceOrgFields = null;
    private List<transactionRecords> sourceProviderFields = null;
@@ -112,13 +114,20 @@ public class Transaction {
        this.transactionStatusId = transactionStatusId;
    }
   
-   
    public int gettargetOrgId() {
        return targetOrgId;
    }
 
    public void settargetOrgId(int targetOrgId) {
        this.targetOrgId = targetOrgId;
+   }
+   
+   public int gettargetConfigId() {
+       return targetConfigId;
+   }
+   
+   public void settargetConfigId(int targetConfigId) {
+       this.targetConfigId = targetConfigId;
    }
    
    public List<transactionRecords> getsourceOrgFields() {
@@ -215,5 +224,13 @@ public class Transaction {
    
    public void settransactionId(int transactionId) {
        this.transactionId = transactionId;
+   }
+   
+   public int gettransactionTargetId() {
+       return transactionTargetId;
+   }
+   
+   public void settransactionTargetId(int transactionTargetId) {
+       this.transactionTargetId = transactionTargetId;
    }
 }

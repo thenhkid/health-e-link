@@ -9,6 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
@@ -48,6 +49,7 @@ public class configuration {
     private int userId;
 
     @Column(name = "DATECREATED", nullable = true)
+    @Temporal(javax.persistence.TemporalType.DATE)
     private Date dateCreated = new Date();
 
     @Column(name = "STATUS", nullable = false)

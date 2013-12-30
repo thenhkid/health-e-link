@@ -10,6 +10,7 @@ import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.fieldSelectOptions;
 import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionInRecords;
+import com.ut.dph.model.transactionTarget;
 import java.util.List;
 
 /**
@@ -34,9 +35,11 @@ public interface transactionInManager {
     
     void submitTransactionInRecordsUpdates(transactionInRecords records);
     
-    void submitTransactionTranslatedInRecords(int transactionRecordId);
+    void submitTransactionTranslatedInRecords(int transactionId, int transactionRecordId);
     
     List<transactionIn> getpendingTransactions(int orgId);
+    
+    List<transactionIn> getsentTransactions(int orgId);
     
     batchUploads getUploadBatch(int batchId);
     
@@ -45,5 +48,13 @@ public interface transactionInManager {
     transactionInRecords getTransactionRecords(int transactionId);
     
     transactionInRecords getTransactionRecord(int recordId);
+    
+    Integer submitTransactionTarget(transactionTarget transactionTarget);
+    
+    transactionTarget getTransactionTargetDetails(int transactionTargetId);
+    
+    void submitTransactionTargetChanges(transactionTarget transactionTarget);
+    
+    transactionTarget getTransactionTarget(int batchUploadId, int transactionInId);
     
 }

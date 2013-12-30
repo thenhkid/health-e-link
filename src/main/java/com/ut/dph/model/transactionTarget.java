@@ -20,16 +20,22 @@ import javax.persistence.Temporal;
  * @author chadmccue
  */
 @Entity
-@Table(name = "TRANSACTIONIN")
-public class transactionIn {
+@Table(name = "TRANSACTIONTARGET")
+public class transactionTarget {
     
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID", nullable = false)
     private int id;
     
-    @Column(name = "BATCHID", nullable = false)
-    private int batchId;
+    @Column(name = "BATCHUPLOADID", nullable = false)
+    private int batchUploadId;
+    
+    @Column(name = "TRANSACTIONINID", nullable = false)
+    private int transactionInId;
+    
+    @Column(name = "BATCHDLID", nullable = true)
+    private int batchDLId = 0;
     
     @Column(name = "CONFIGID", nullable = false)
     private int configId;
@@ -49,12 +55,28 @@ public class transactionIn {
         this.id = id;
     }
 
-    public int getbatchId() {
-        return batchId;
+    public int getbatchUploadId() {
+        return batchUploadId;
     }
 
-    public void setbatchId(int batchId) {
-        this.batchId = batchId;
+    public void setbatchUploadId(int batchUploadId) {
+        this.batchUploadId = batchUploadId;
+    }
+    
+    public int gettransactionInId() {
+        return transactionInId;
+    }
+
+    public void settransactionInId(int transactionInId) {
+        this.transactionInId = transactionInId;
+    }
+    
+    public int getbatchDLId() {
+        return batchDLId;
+    }
+
+    public void setbatchDLId(int batchDLId) {
+        this.batchDLId = batchDLId;
     }
     
     public int getconfigId() {
@@ -80,5 +102,4 @@ public class transactionIn {
     public void setdateCreated(Date dateCreated) {
         this.dateCreated = dateCreated;
     }
-  
 }
