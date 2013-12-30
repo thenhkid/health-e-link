@@ -188,7 +188,7 @@ public class batchUploads {
     
     public Date getdateSubmitted() {
        return dateSubmitted;
-   }
+    }
   
    
 }
