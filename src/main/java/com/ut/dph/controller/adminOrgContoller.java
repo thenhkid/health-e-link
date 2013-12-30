@@ -535,6 +535,8 @@ public class adminOrgContoller {
         if (result.hasErrors()) {
             ModelAndView mav = new ModelAndView();
             mav.setViewName("/administrator/organizations/users/details");
+            List<siteSections> sections = userManager.getSections();
+            mav.addObject("sections", sections);
             mav.addObject("btnValue", "Create");
             return mav;
         }
@@ -544,6 +546,8 @@ public class adminOrgContoller {
         if (existing != null) {
             ModelAndView mav = new ModelAndView();
             mav.setViewName("/administrator/organizations/users/details");
+            List<siteSections> sections = userManager.getSections();
+            mav.addObject("sections", sections);
             mav.addObject("btnValue", "Create");
             mav.addObject("existingUsername", "Username " + userdetails.getUsername().trim() + " already exists.");
             return mav;
@@ -574,6 +578,8 @@ public class adminOrgContoller {
 
         if (result.hasErrors()) {
             ModelAndView mav = new ModelAndView();
+            List<siteSections> sections = userManager.getSections();
+            mav.addObject("sections", sections);
             mav.setViewName("/administrator/organizations/users/details");
             mav.addObject("btnValue", "Update");
             return mav;
@@ -586,6 +592,8 @@ public class adminOrgContoller {
             if (existing != null) {
                 ModelAndView mav = new ModelAndView();
                 mav.setViewName("/administrator/organizations/users/details");
+                List<siteSections> sections = userManager.getSections();
+                mav.addObject("sections", sections);
                 mav.addObject("btnValue", "Update");
                 mav.addObject("existingUsername", "Username " + userdetails.getUsername().trim() + " already exists.");
                 return mav;
