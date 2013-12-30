@@ -953,3 +953,67 @@ ADD CONSTRAINT `btchStatusId`
 ALTER TABLE `universalTranslator`.`batchUploads` 
 DROP FOREIGN KEY `bFKProvider`;
 
+/** 12.30.2013 Grace **/
+
+ALTER TABLE `universalTranslator`.`transactionIn` 
+ADD INDEX `configIdFK_idx` (`configId` ASC);
+ALTER TABLE `universalTranslator`.`transactionIn` 
+ADD CONSTRAINT `configIdFK`
+  FOREIGN KEY (`configId`)
+  REFERENCES `universalTranslator`.`configurations` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+  ALTER TABLE `universalTranslator`.`transactionTarget` 
+DROP FOREIGN KEY `ttargetStatusId`;
+ALTER TABLE `universalTranslator`.`transactionTarget` 
+ADD INDEX `ttargetConfigIdFK_idx` (`configId` ASC);
+ALTER TABLE `universalTranslator`.`transactionTarget` 
+ADD CONSTRAINT `ttargetStatusId`
+  FOREIGN KEY (`statusId`)
+  REFERENCES `universalTranslator`.`lu_ProcessStatus` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION,
+ADD CONSTRAINT `ttargetConfigIdFK`
+  FOREIGN KEY (`configId`)
+  REFERENCES `universalTranslator`.`configurations` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+  
+  ALTER TABLE `universalTranslator`.`batchUploads` 
+DROP FOREIGN KEY `btchStatusId`;
+ALTER TABLE `universalTranslator`.`batchUploads` 
+ADD CONSTRAINT `btchStatusId`
+  FOREIGN KEY (`statusId`)
+  REFERENCES `universalTranslator`.`lu_ProcessStatus` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+  
+  ALTER TABLE `universalTranslator`.`transactionIn` 
+DROP FOREIGN KEY `statusFK`;
+  
+ALTER TABLE `universalTranslator`.`transactionIn` 
+ADD CONSTRAINT `statusFK`
+  FOREIGN KEY (`statusId`)
+  REFERENCES `universalTranslator`.`lu_ProcessStatus` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+  
+  ALTER TABLE `universalTranslator`.`transactionIn` 
+DROP FOREIGN KEY `uploadFK`,
+DROP FOREIGN KEY `batchIdFK`;
+ALTER TABLE `universalTranslator`.`transactionIn` 
+DROP INDEX `uploadFK_idx` ;
+  
+
+ALTER TABLE `universalTranslator`.`transactionIn` 
+ADD INDEX `batchFK_idx` (`batchId` ASC);
+ALTER TABLE `universalTranslator`.`transactionIn` 
+ADD CONSTRAINT `batchFK`
+  FOREIGN KEY (`batchId`)
+  REFERENCES `universalTranslator`.`batchUploads` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+  
+  
