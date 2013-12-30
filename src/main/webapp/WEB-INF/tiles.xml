@@ -359,7 +359,14 @@
     <definition name="/Health-e-Web/sent" extends="base.definition.frontEnd">
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Health-e-Web&amp;page=sent" />
         <put-attribute name="body" value="/WEB-INF/jsp/Health-e-Web/sent.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/front-end/Health-e-Web/sent.js" />
     </definition>
+    
+    <definition name="/Health-e-Web/sentmessageDetails" extends="base.definition.frontEnd">
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Health-e-Web&amp;page=sent" />
+        <put-attribute name="body" value="/WEB-INF/jsp/Health-e-Web/sentmessageDetails.jsp" />
+    </definition>
+    
     
     <!-- Create New Message List Page -->
     <definition name="/Health-e-Web/create" extends="base.definition.frontEnd">

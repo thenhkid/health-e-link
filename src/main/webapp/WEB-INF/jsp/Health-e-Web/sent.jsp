@@ -23,7 +23,10 @@
                     </c:choose>
                 </div>
             </c:if>  
-                
+            
+            <form action="sent/messageDetails" id="viewMessageDetails" method="POST">
+                <input type="hidden" id="transactionId" name="transactionId" value="" />
+            </form>     
             <div class="form-container scrollable">
                 <table class="table table-striped table-hover table-default">
                     <thead>
@@ -63,7 +66,7 @@
                                         <td class="center-text"><fmt:formatDate value="${transaction.dateSubmitted}" type="date" pattern="M/dd/yyyy" /></td>
                                         <td class="center-text"></td>
                                         <td class="actions-col" style="width:200px;">
-                                            <a href="javascript:void(0);" rel2="${transaction.configId}" rel="${transaction.transactionRecordId}" class="btn btn-link viewLink">
+                                            <a href="javascript:void(0);" rel="${transaction.transactionRecordId}" class="btn btn-link viewLink">
                                                 <span class="glyphicon glyphicon-edit"></span>
                                                 View
                                             </a>

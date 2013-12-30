@@ -16,6 +16,7 @@
             <ol class="breadcrumb">
                 <li><a href="<c:url value='/profile'/>">My Account</a></li>
                 <li><a href="#">eRG</a></li>
+                <c:if test="${pageHeader == 'pending'}"><li><a href="<c:url value='/Health-e-Web/pending'/>">Pending Messages</a></li></c:if>
                 <li class="active"><c:choose><c:when test="${pageHeader == 'create'}">Create New Message</c:when><c:otherwise>Message Details</c:otherwise></c:choose></li>
             </ol>
 
@@ -83,56 +84,56 @@
                                 </div>
                                 <div class="form-section row">
                                     <div class="col-md-12"><h4 class="form-section-heading">Patient Information:</h4></div>
-                                        <c:forEach items="${transaction.patientFields}" var="patientInfo" varStatus="pfield">
-                                            <input type="hidden" name="patientFields[${pfield.index}].fieldNo" value="${patientInfo.fieldNo}" />
-                                             <div class="col-md-6">
-                                                <div id="fieldDiv_${patientInfo.fieldNo}" class="form-group">
-                                                    <label class="control-label" for="${patientInfo.fieldNo}">${patientInfo.fieldLabel} <c:if test="${patientInfo.required == true}">&nbsp;*</c:if></label>
-                                                    <c:choose>
-                                                        <c:when test="${patientInfo.fieldSelectOptions.size() > 0}">
-                                                            <select id="${patientInfo.fieldNo}" name="patientFields[${pfield.index}].fieldValue" class="form-control <c:if test="${patientInfo.required == true}"> required</c:if>">
-                                                                <option value="">-Choose-</option>
-                                                                <c:forEach items="${patientInfo.fieldSelectOptions}" var="options">
-                                                                    <option value="${options.optionValue}" <c:if test="${patientInfo.fieldValue == options.optionValue}">selected</c:if>>${options.optionDesc}</option>
-                                                                </c:forEach>
-                                                            </select>
-                                                        </c:when>
-                                                        <c:otherwise>
-                                                            <input id="${patientInfo.fieldNo}" name="patientFields[${pfield.index}].fieldValue" value="${patientInfo.fieldValue}" class="form-control ${patientInfo.validation.replace(' ','-')} <c:if test="${patientInfo.required == true}"> required</c:if>" type="text">
-                                                       </c:otherwise>
-                                                    </c:choose>
-                                                    <span id="errorMsg_${patientInfo.fieldNo}" class="control-label"></span>        
-                                                </div>
-                                             </div>
-                                        </c:forEach>
-                                    </div>
+                                    <c:forEach items="${transaction.patientFields}" var="patientInfo" varStatus="pfield">
+                                        <input type="hidden" name="patientFields[${pfield.index}].fieldNo" value="${patientInfo.fieldNo}" />
+                                         <div class="col-md-6">
+                                            <div id="fieldDiv_${patientInfo.fieldNo}" class="form-group">
+                                                <label class="control-label" for="${patientInfo.fieldNo}">
+                                                    ${patientInfo.fieldLabel}&nbsp;<c:if test="${patientInfo.required == true}">*&nbsp;</c:if>
+                                                    <span id="errorMsg_${patientInfo.fieldNo}" class="control-label"></span>  
+                                                </label>
+                                                <c:choose>
+                                                    <c:when test="${patientInfo.fieldSelectOptions.size() > 0}">
+                                                        <select id="${patientInfo.fieldNo}" name="patientFields[${pfield.index}].fieldValue" class="form-control <c:if test="${patientInfo.required == true}"> required</c:if>">
+                                                            <option value="">-Choose-</option>
+                                                            <c:forEach items="${patientInfo.fieldSelectOptions}" var="options">
+                                                                <option value="${options.optionValue}" <c:if test="${patientInfo.fieldValue == options.optionValue}">selected</c:if>>${options.optionDesc}</option>
+                                                            </c:forEach>
+                                                        </select>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <input id="${patientInfo.fieldNo}" name="patientFields[${pfield.index}].fieldValue" value="${patientInfo.fieldValue}" class="form-control ${patientInfo.validation.replace(' ','-')} <c:if test="${patientInfo.required == true}"> required</c:if>" type="text">
+                                                   </c:otherwise>
+                                                </c:choose>
+                                            </div>
+                                         </div>
+                                    </c:forEach>
                                 </div>
 
                                 <div class="form-section row">
                                     <div class="col-md-12"><h4 class="form-section-heading">Message Details: </h4></div>
-                                        <c:forEach items="${transaction.detailFields}" var="detailInfo" varStatus="dfield">
-                                             <input type="hidden" name="detailFields[${dfield.index}].fieldNo" value="${detailInfo.fieldNo}" />
-                                             <div class="col-md-6">
-                                                <div id="fieldDiv_${detailInfo.fieldNo}" class="form-group">
-                                                    <label class="control-label" for="fieldA">${detailInfo.fieldLabel} <c:if test="${detailInfo.required == true}">&nbsp;*</c:if></label>
-                                                    <c:choose>
-                                                        <c:when test="${detailInfo.fieldSelectOptions.size() > 0}">
-                                                            <select id="${detailInfo.fieldNo}" name="detailFields[${dfield.index}].fieldValue" class="form-control <c:if test="${detailInfo.required == true}"> required</c:if>">
-                                                                <option value="">-Choose-</option>
-                                                                <c:forEach items="${detailInfo.fieldSelectOptions}" var="options">
-                                                                    <option value="${options.optionValue}" <c:if test="${detailInfo.fieldValue == options.optionValue}">selected</c:if>>${options.optionDesc}</option>
-                                                                </c:forEach>
-                                                            </select>
-                                                        </c:when>
-                                                        <c:otherwise>
-                                                            <input id="${detailInfo.fieldNo}" name="detailFields[${dfield.index}].fieldValue" value="${detailInfo.fieldValue}" class="form-control ${detailInfo.validation.replace(' ','-')} <c:if test="${detailInfo.required == true}"> required</c:if>" type="text">
-                                                        </c:otherwise>
-                                                    </c:choose>
-                                                    <span id="errorMsg_${detailInfo.fieldNo}" class="control-label"></span>                
-                                                </div>
-                                             </div>
-                                        </c:forEach>
-                                    </div>
+                                    <c:forEach items="${transaction.detailFields}" var="detailInfo" varStatus="dfield">
+                                         <input type="hidden" name="detailFields[${dfield.index}].fieldNo" value="${detailInfo.fieldNo}" />
+                                         <div class="col-md-6">
+                                            <div id="fieldDiv_${detailInfo.fieldNo}" class="form-group">
+                                                <label class="control-label" for="fieldA">${detailInfo.fieldLabel} <c:if test="${detailInfo.required == true}">&nbsp;*</c:if></label>
+                                                <c:choose>
+                                                    <c:when test="${detailInfo.fieldSelectOptions.size() > 0}">
+                                                        <select id="${detailInfo.fieldNo}" name="detailFields[${dfield.index}].fieldValue" class="form-control <c:if test="${detailInfo.required == true}"> required</c:if>">
+                                                            <option value="">-Choose-</option>
+                                                            <c:forEach items="${detailInfo.fieldSelectOptions}" var="options">
+                                                                <option value="${options.optionValue}" <c:if test="${detailInfo.fieldValue == options.optionValue}">selected</c:if>>${options.optionDesc}</option>
+                                                            </c:forEach>
+                                                        </select>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <input id="${detailInfo.fieldNo}" name="detailFields[${dfield.index}].fieldValue" value="${detailInfo.fieldValue}" class="form-control ${detailInfo.validation.replace(' ','-')} <c:if test="${detailInfo.required == true}"> required</c:if>" type="text">
+                                                    </c:otherwise>
+                                                </c:choose>
+                                                <span id="errorMsg_${detailInfo.fieldNo}" class="control-label"></span>                
+                                            </div>
+                                         </div>
+                                    </c:forEach>
                                 </div>
 
                                 <div class="form-group">
@@ -145,7 +146,6 @@
                                             <input type="button" id="release" class="btn btn-primary btn-action submitMessage" value="Release"/>
                                         </c:otherwise>
                                     </c:choose>
-                                    
                                 </div>
                             </div>
                         </div>
