@@ -13,10 +13,16 @@ $(document).ready(function() {
        
        $('#action').val(clickedBtn);
        
-       errorsFound = checkFormFields();
-        
-       if(errorsFound == 0) {
-           $('#messageForm').submit(); 
+       //Only check form fields if Sending or Releasing the message
+       if(clickedBtn != 'save') {
+            errorsFound = checkFormFields();
+            
+            if(errorsFound == 0) {
+                $('#messageForm').submit(); 
+            }
+       }
+       else {
+            $('#messageForm').submit(); 
        }
     });
 

@@ -120,8 +120,8 @@ public class transactionInManagerImpl implements transactionInManager {
     
     @Override
     @Transactional
-    public Integer submitTransactionTarget(transactionTarget transactionTarget){
-        return transactionInDAO.submitTransactionTarget(transactionTarget);
+    public void submitTransactionTarget(transactionTarget transactionTarget){
+         transactionInDAO.submitTransactionTarget(transactionTarget);
     }
     
     @Override

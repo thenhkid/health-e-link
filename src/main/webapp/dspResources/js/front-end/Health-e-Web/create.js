@@ -22,7 +22,7 @@ $(function() {
            $('#configId').val(configId);
            $('#targetOrg').val(tOrgId);
            $('#targetConfig').val(tConfigId);
-          // $('#createMessageForm').submit();
+           $('#createMessageForm').submit();
        }
        else {
            $('#row_'+configId).addClass("has-error");

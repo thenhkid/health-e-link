@@ -49,7 +49,7 @@ public interface transactionInDAO {
     
     transactionInRecords getTransactionRecord(int recordId);
      
-    Integer submitTransactionTarget(transactionTarget transactionTarget);
+    void submitTransactionTarget(transactionTarget transactionTarget);
     
     transactionTarget getTransactionTargetDetails(int transactionTargetId);
     

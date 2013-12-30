@@ -585,6 +585,7 @@ public class HealtheWebController {
         transactionInRecords records;
         if(currRecordId == 0) {
             records = new transactionInRecords();
+            records.setTransactionInId(transactionId);
         }
         else {
             records = transactionInManager.getTransactionRecord(currRecordId);
@@ -687,7 +688,7 @@ public class HealtheWebController {
                 transactiontarget.setstatusId(9);
             }
 
-            transactionTargetId = (Integer) transactionInManager.submitTransactionTarget(transactiontarget);
+            transactionInManager.submitTransactionTarget(transactiontarget);
         }
         
         /* Otherwise update existing batch */
