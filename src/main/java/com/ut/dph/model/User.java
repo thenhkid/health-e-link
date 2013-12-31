@@ -9,6 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
 import javax.persistence.Transient;
 import javax.validation.constraints.Size;
 
@@ -64,6 +65,7 @@ public class User {
     private String email;
 
     @Column(name = "DATECREATED", nullable = true)
+    @Temporal(javax.persistence.TemporalType.DATE)
     private Date dateCreated = new Date();
 
     public int getId() {

@@ -6,7 +6,6 @@
 
 package com.ut.dph.controller;
 
-import com.ut.dph.model.Crosswalks;
 import com.ut.dph.model.Organization;
 import com.ut.dph.model.Transaction;
 import com.ut.dph.model.batchUploads;
@@ -1187,10 +1186,10 @@ public class HealtheWebController {
     }
     
     /**
-     * The '/viewStatus{params}' function will return the details of the selected status. 
+     * The '/viewStatus{statusId}' function will return the details of the selected status. 
      * The results will be displayed in the overlay.
      *
-     * @Param	i   This will hold the id of the selected status
+     * @Param	statusId   This will hold the id of the selected status
      *
      * @Return	This function will return the status details view.
      */
@@ -1201,7 +1200,7 @@ public class HealtheWebController {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/Health-e-Web/statusDetails");
 
-        //Get the details of the selected status
+        /* Get the details of the selected status */ 
         lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(statusId);
         mav.addObject("statusDetails", processStatus);
 
