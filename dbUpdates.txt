@@ -1021,5 +1021,23 @@ INSERT INTO `universalTranslator`.`lu_processstatus` (`category`, `displayCode`,
 ALTER TABLE `universalTranslator`.`transactionTarget` 
 ADD COLUMN `statusTime` DATETIME NULL DEFAULT current_Timestamp AFTER `dateCreated`;
 
+/** Chad 12.31.13 */
+CREATE TABLE `universalTranslator`.`lu_Urgency` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `displayText` VARCHAR(45) NOT NULL,
+  `description` VARCHAR(200) NULL DEFAULT NULL,
+  `isCustom` BIT NOT NULL DEFAULT b'0',
+  `status` BIT NOT NULL DEFAULT b'1',
+  `dateCreated` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`));
+
+INSERT INTO `universalTranslator`.`lu_urgency` (`displayText`, `isCustom`, `status`) VALUES ('NLT Today', 0, 1);
+INSERT INTO `universalTranslator`.`lu_urgency` (`displayText`, `isCustom`, `status`) VALUES ('NLT Tomorrow', 0, 1);
+INSERT INTO `universalTranslator`.`lu_urgency` (`displayText`, `isCustom`, `status`) VALUES ('Within two Days', 0, 1);
+INSERT INTO `universalTranslator`.`lu_urgency` (`displayText`, `isCustom`, `status`) VALUES ('Within five Days', 0, 1);
+INSERT INTO `universalTranslator`.`lu_urgency` (`displayText`, `isCustom`, `status`) VALUES ('Within one Week', 0, 1);
+INSERT INTO `universalTranslator`.`lu_urgency` (`displayText`, `isCustom`) VALUES ('Within two Weeks', 0);
+
+
   
   
