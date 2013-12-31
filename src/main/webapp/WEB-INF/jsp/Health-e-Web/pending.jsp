@@ -5,7 +5,7 @@
 --%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-
+<c:set var="urgencyVal" value="Not Reported" />
 <div class="container main-container" role="main">
     <div class="row">
         <div class="col-md-12 page-content">
@@ -35,6 +35,7 @@
                             <th scope="col">Message Type</th>
                             <th scope="col">Patient Info</th>
                             <th scope="col">Target Organization</th>
+                            <th scope="col" class="center-text">Urgency</th>
                             <th scope="col" class="center-text">Date Submitted</th>
                             <th scope="col"></th>
                         </tr>
@@ -62,6 +63,10 @@
                                             </dd>
                                             <c:if test="${not empty transaction.targetOrgFields[6].fieldValue}"><dd>phone: <span class="tel">${transaction.targetOrgFields[6].fieldValue}</span></dd></c:if>
                                             <c:if test="${not empty transaction.targetOrgFields[7].fieldValue}"><dd>fax: <span class="tel">${transaction.targetOrgFields[7].fieldValue}</span></dd></c:if>
+                                        </td>
+                                        <td class="center-text">
+                                            <c:forEach items="${transaction.detailFields}" var="detailInfo" varStatus="dfield"><c:if test="${detailInfo.fieldLabel == 'urgency'}"><c:set var="urgencyVal" value="${detailInfo.fieldValue}" /></c:if></c:forEach>
+                                            ${urgencyVal}
                                         </td>
                                         <td class="center-text"><fmt:formatDate value="${transaction.dateSubmitted}" type="date" pattern="M/dd/yyyy" /></td>
                                         <td class="actions-col" style="width:200px;">

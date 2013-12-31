@@ -280,7 +280,9 @@ public class messageTypeDAOImpl implements messageTypeDAO {
     }
 
     /**
-     * The 'saveMessageTypeFields' function will save a new message type field. The function will also search for all configurations that is using this message type and add the field as NOT USED in the online form transport method. It would be up to the administrator to go in and mark the field as USED for what ever configuration will be using this new field.
+     * The 'saveMessageTypeFields' function will save a new message type field. The function will also search for all configurations 
+     * that is using this message type and add the field as NOT USED in the online form transport method. It would be up to the administrator to go in 
+     * and mark the field as USED for what ever configuration will be using this new field.
      *
      * @Table messageTypeFormFields
      *
@@ -300,13 +302,13 @@ public class messageTypeDAOImpl implements messageTypeDAO {
 
         for (configuration configuration : configurations) {
             //Need to get the transport detail id
-            Query transportDetails = sessionFactory.getCurrentSession().createQuery("select id from configurationTransport where configId = :configId and transportMethod = 2");
+            Query transportDetails = sessionFactory.getCurrentSession().createQuery("select id from configurationTransport where configId = :configId");
             transportDetails.setParameter("configId", configuration.getId());
 
             Integer transportDetailId = (Integer) transportDetails.uniqueResult();
 
             //Bulk insert the new fieldinto the configurationTransportDetails table for the online form
-            Query bulkInsert = sessionFactory.getCurrentSession().createSQLQuery("INSERT INTO configurationFormFields (messageTypeFieldId, configId, transportDetailId, fieldNo, fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, useField) SELECT id, :configId, :transportDetailId, fieldNo,  fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, 0 FROM messageTypeFormFields where id = :newfieldId");
+            Query bulkInsert = sessionFactory.getCurrentSession().createSQLQuery("INSERT INTO configurationFormFields (messageTypeFieldId, configId, transportDetailId, fieldNo, fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, useField, saveToTableName, saveToTableCol) SELECT id, :configId, :transportDetailId, fieldNo,  fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, 0, saveToTableName, saveToTableCol FROM messageTypeFormFields where id = :newfieldId");
             bulkInsert.setParameter("configId", configuration.getId());
             bulkInsert.setParameter("transportDetailId", transportDetailId);
             bulkInsert.setParameter("newfieldId", lastId);

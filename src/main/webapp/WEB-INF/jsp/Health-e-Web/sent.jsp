@@ -5,7 +5,7 @@
 --%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-
+<c:set var="urgencyVal" value="Not Reported" />
 <div class="container main-container" role="main">
     <div class="row">
         <div class="col-md-12 page-content">
@@ -34,8 +34,9 @@
                             <th scope="col">Message Type</th>
                             <th scope="col">Patient Info</th>
                             <th scope="col">Sent To</th>
-                            <th scope="col" class="center-text">Date Sent</th>
                             <th scope="col" class="center-text">Status</th>
+                            <th scope="col" class="center-text">Urgency</th>
+                            <th scope="col" class="center-text">Date Sent</th>
                             <th scope="col"></th>
                         </tr>
                     </thead>
@@ -63,8 +64,12 @@
                                             <c:if test="${not empty transaction.targetOrgFields[6].fieldValue}"><dd>phone: <span class="tel">${transaction.targetOrgFields[6].fieldValue}</span></dd></c:if>
                                             <c:if test="${not empty transaction.targetOrgFields[7].fieldValue}"><dd>fax: <span class="tel">${transaction.targetOrgFields[7].fieldValue}</span></dd></c:if>
                                         </td>
-                                        <td class="center-text"><fmt:formatDate value="${transaction.dateSubmitted}" type="date" pattern="M/dd/yyyy" /></td>
                                         <td class="center-text"></td>
+                                        <td class="center-text">
+                                            <c:forEach items="${transaction.detailFields}" var="detailInfo" varStatus="dfield"><c:if test="${detailInfo.fieldLabel == 'urgency'}"><c:set var="urgencyVal" value="${detailInfo.fieldValue}" /></c:if></c:forEach>
+                                            ${urgencyVal}
+                                        </td>
+                                        <td class="center-text"><fmt:formatDate value="${transaction.dateSubmitted}" type="date" pattern="M/dd/yyyy" /></td>
                                         <td class="actions-col" style="width:200px;">
                                             <a href="javascript:void(0);" rel="${transaction.transactionRecordId}" class="btn btn-link viewLink">
                                                 <span class="glyphicon glyphicon-edit"></span>
@@ -75,7 +80,7 @@
                                 </c:forEach>
                             </c:when>
                             <c:otherwise>
-                                <tr><td colspan="6" class="center-text">You currently have no sent messages</td></tr>
+                                <tr><td colspan="7" class="center-text">You currently have no sent messages</td></tr>
                             </c:otherwise>
                         </c:choose>    
                     </tbody>

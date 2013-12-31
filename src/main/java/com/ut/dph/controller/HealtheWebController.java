@@ -13,6 +13,7 @@ import com.ut.dph.model.configuration;
 import com.ut.dph.model.configurationConnection;
 import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.configurationTransport;
+import com.ut.dph.model.custom.TableData;
 import com.ut.dph.model.fieldSelectOptions;
 import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionInRecords;
@@ -22,6 +23,7 @@ import com.ut.dph.service.configurationManager;
 import com.ut.dph.service.configurationTransportManager;
 import com.ut.dph.service.messageTypeManager;
 import com.ut.dph.service.organizationManager;
+import com.ut.dph.service.sysAdminManager;
 import com.ut.dph.service.transactionInManager;
 import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
@@ -68,6 +70,9 @@ public class HealtheWebController {
     
     @Autowired
     private transactionInManager transactionInManager;
+    
+    @Autowired
+    private sysAdminManager sysAdminManager;
     
     
     /**
@@ -773,6 +778,7 @@ public class HealtheWebController {
                 configurationTransport transportDetails = configurationTransportManager.getTransportDetailsByTransportMethod(transactionRecord.getconfigId(), 2);
                 List<configurationFormFields> targetInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionRecord.getconfigId(),transportDetails.getId(),3);
                 List<configurationFormFields> patientInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionRecord.getconfigId(),transportDetails.getId(),5);
+                List<configurationFormFields> detailFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionRecord.getconfigId(),transportDetails.getId(),6);
                 
                 /* Set all the transaction TARGET fields */
                 List<transactionRecords> toFields = new ArrayList<transactionRecords>();
@@ -810,6 +816,27 @@ public class HealtheWebController {
                     patientFields.add(field);
                 }
                 transactionDetails.setpatientFields(patientFields);
+                
+                /* Set all the transaction DETAIL fields */
+                List<transactionRecords> detailFields = new ArrayList<transactionRecords>();
+                for(configurationFormFields fields : detailFormFields) {
+                    transactionRecords field = new transactionRecords();
+                    field.setfieldLabel(fields.getFieldDesc()); 
+                   
+                    colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
+                    String fieldValue = BeanUtils.getProperty(records, colName);
+                    
+                    if(fields.getFieldDesc().equals("urgency")) {
+                        int id = Integer.parseInt(fieldValue);
+                        TableData  tableData = sysAdminManager.getTableData(id, "lu_Urgency");
+                        fieldValue = tableData.getDisplayText();
+                    }
+                    
+                   field.setfieldValue(fieldValue);
+                   
+                   detailFields.add(field);
+                }
+                transactionDetails.setdetailFields(detailFields);
                 
                 
                 /* get the message type name */
@@ -869,6 +896,7 @@ public class HealtheWebController {
                 configurationTransport transportDetails = configurationTransportManager.getTransportDetailsByTransportMethod(transactionRecord.getconfigId(), 2);
                 List<configurationFormFields> targetInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionRecord.getconfigId(),transportDetails.getId(),3);
                 List<configurationFormFields> patientInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionRecord.getconfigId(),transportDetails.getId(),5);
+                List<configurationFormFields> detailFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionRecord.getconfigId(),transportDetails.getId(),6);
                 
                 /* Set all the transaction TARGET fields */
                 List<transactionRecords> toFields = new ArrayList<transactionRecords>();
@@ -906,6 +934,27 @@ public class HealtheWebController {
                     patientFields.add(field);
                 }
                 transactionDetails.setpatientFields(patientFields);
+                
+                /* Set all the transaction DETAIL fields */
+                List<transactionRecords> detailFields = new ArrayList<transactionRecords>();
+                for(configurationFormFields fields : detailFormFields) {
+                    transactionRecords field = new transactionRecords();
+                    field.setfieldLabel(fields.getFieldDesc()); 
+                   
+                    colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
+                    String fieldValue = BeanUtils.getProperty(records, colName);
+                    
+                    if(fields.getFieldDesc().equals("urgency")) {
+                        int id = Integer.parseInt(fieldValue);
+                        TableData  tableData = sysAdminManager.getTableData(id, "lu_Urgency");
+                        fieldValue = tableData.getDisplayText();
+                    }
+                    
+                   field.setfieldValue(fieldValue);
+                   
+                   detailFields.add(field);
+                }
+                transactionDetails.setdetailFields(detailFields);
                 
                 
                 /* get the message type name */
