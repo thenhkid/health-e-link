@@ -1015,7 +1015,7 @@ ADD CONSTRAINT `batchFK`
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
 
-/**12.31.2013 */
+/**12.31.2013 Grace */
 INSERT INTO `universalTranslator`.`lu_processstatus` (`category`, `displayCode`, `displayText`, `description`) VALUES ('batch', 'SAT', 'Submission Awaiting Transfer', 'This is when a batch of submission is completed and will be deliver to target organization in a timely manner.');
 
 ALTER TABLE `universalTranslator`.`transactionTarget` 
@@ -1037,6 +1037,12 @@ INSERT INTO `universalTranslator`.`lu_urgency` (`displayText`, `isCustom`, `stat
 INSERT INTO `universalTranslator`.`lu_urgency` (`displayText`, `isCustom`, `status`) VALUES ('Within five Days', 0, 1);
 INSERT INTO `universalTranslator`.`lu_urgency` (`displayText`, `isCustom`, `status`) VALUES ('Within one Week', 0, 1);
 INSERT INTO `universalTranslator`.`lu_urgency` (`displayText`, `isCustom`) VALUES ('Within two Weeks', 0);
+
+
+/**12.31.2013 Grace **/
+UPDATE `universalTranslator`.`lookuptables` SET `utTableName`='lu_ProcessStatus' WHERE `id`='21';
+
+INSERT INTO `universalTranslator`.`lookUpTables` (`utTableName`, `displayText`) VALUES ('lu_urgency', 'Urgency');
 
 
   

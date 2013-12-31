@@ -28,6 +28,7 @@ import com.ut.dph.model.lutables.lu_Manufacturers;
 import com.ut.dph.model.lutables.lu_MedicalConditions;
 import com.ut.dph.model.lutables.lu_Medications;
 import com.ut.dph.model.lutables.lu_Procedures;
+import com.ut.dph.model.lutables.lu_ProcessStatus;
 import com.ut.dph.model.lutables.lu_Tests;
 
 /**
@@ -692,6 +693,38 @@ public class sysAdminDAOImpl implements sysAdminDAO {
 				sessionFactory.getCurrentSession().update(lu);							
 			} catch (Throwable ex) {
                 System.err.println("update Test failed." + ex);
+			}
+		}
+		
+		
+		@Override
+		@Transactional
+		public void createProcessStatus(lu_ProcessStatus lu) {
+			try {
+				sessionFactory.getCurrentSession().save(lu);						
+			} catch (Throwable ex) {
+                System.err.println("create ProcessStatus failed." + ex);
+			}
+		}
+
+		@Override
+		@Transactional
+		public lu_ProcessStatus getProcessStatusById(int id) {
+			try {
+				return (lu_ProcessStatus) sessionFactory.getCurrentSession().get(lu_ProcessStatus.class, id);						
+			} catch (Throwable ex) {
+                System.err.println("get ProcessStatus failed." + ex);
+                return null;
+			}
+		}
+
+		@Override
+		@Transactional
+		public void updateProcessStatus(lu_ProcessStatus lu) {
+			try {
+				sessionFactory.getCurrentSession().update(lu);							
+			} catch (Throwable ex) {
+                System.err.println("update ProcessStatus failed." + ex);
 			}
 		}
 		

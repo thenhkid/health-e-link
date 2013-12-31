@@ -12,6 +12,7 @@ import com.ut.dph.model.lutables.lu_Manufacturers;
 import com.ut.dph.model.lutables.lu_MedicalConditions;
 import com.ut.dph.model.lutables.lu_Medications;
 import com.ut.dph.model.lutables.lu_Procedures;
+import com.ut.dph.model.lutables.lu_ProcessStatus;
 import com.ut.dph.model.lutables.lu_Tests;
 import com.ut.dph.model.Macros;
 
@@ -116,5 +117,11 @@ public interface sysAdminManager {
 	lu_Tests getTestById (int id);
 	
 	void updateTest(lu_Tests lu);
+	
+	void createProcessStatus(lu_ProcessStatus lu);
+	
+	lu_ProcessStatus getProcessStatusById (int id);
+	
+	void updateProcessStatus(lu_ProcessStatus lu);
 }
 

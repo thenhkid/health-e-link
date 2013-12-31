@@ -16,6 +16,7 @@ import com.ut.dph.model.lutables.lu_Manufacturers;
 import com.ut.dph.model.lutables.lu_MedicalConditions;
 import com.ut.dph.model.lutables.lu_Medications;
 import com.ut.dph.model.lutables.lu_Procedures;
+import com.ut.dph.model.lutables.lu_ProcessStatus;
 import com.ut.dph.model.lutables.lu_Tests;
 import com.ut.dph.model.Macros;
 import com.ut.dph.service.sysAdminManager;
@@ -286,4 +287,19 @@ public class sysAdminManagerImpl implements sysAdminManager {
 		sysAdminDAO.updateTest(lu);
 	}
 
+	@Override
+	public void createProcessStatus(lu_ProcessStatus lu) {
+		sysAdminDAO.createProcessStatus(lu);
+		
+	}
+
+	@Override
+	public lu_ProcessStatus getProcessStatusById(int id) {
+		return sysAdminDAO.getProcessStatusById(id);
+	}
+
+	@Override
+	public void updateProcessStatus(lu_ProcessStatus lu) {
+		sysAdminDAO.updateProcessStatus(lu);
+	}
 }

@@ -9,6 +9,7 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.ut.dph.reference.USStateList;
+import com.ut.dph.reference.ProcessCategoryList;
 import com.ut.dph.service.configurationManager;
 import com.ut.dph.service.sysAdminManager;
 import com.ut.dph.model.Macros;
@@ -22,6 +23,7 @@ import com.ut.dph.model.lutables.lu_Manufacturers;
 import com.ut.dph.model.lutables.lu_MedicalConditions;
 import com.ut.dph.model.lutables.lu_Medications;
 import com.ut.dph.model.lutables.lu_Procedures;
+import com.ut.dph.model.lutables.lu_ProcessStatus;
 import com.ut.dph.model.lutables.lu_Tests;
 
 import org.springframework.stereotype.Controller;
@@ -1429,5 +1431,103 @@ public class adminSysAdminController {
 	}
 	
 	/**End of Tests**/
+	
+/** Start of ProcessStatus **/
+	
+	@RequestMapping(value="/data/nstd/lu_ProcessStatus/create", method = RequestMethod.GET)
+	public ModelAndView newProcessStatusForm() throws Exception {
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/sysadmin/data/std/details");	
+		
+		//create the object
+		lu_ProcessStatus lu = new lu_ProcessStatus();
+		lu.setId(0);
+		mav.addObject("tableDataDetails",lu);
+		//Get a list of process status categories
+        ProcessCategoryList categoryList = new ProcessCategoryList();
+        mav.addObject("categoryList", categoryList.getCategories());
+		mav.addObject("objectType","lu_ProcessStatus");
+		mav.addObject("formId","tabledataform");
+		mav.addObject("btnValue", "lu_ProcessStatus/create");
+		mav.addObject("submitBtnValue", "Create");
+		return mav;
+	}
+	
+	
+
+	@RequestMapping(value="/data/nstd/lu_processstatus/create", method = RequestMethod.POST)
+	public ModelAndView createProcessStatus(
+			@Valid @ModelAttribute(value="tableDataDetails") lu_ProcessStatus lu, 
+			BindingResult result) throws Exception {
+		
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/sysadmin/data/std/details");
+		mav.addObject("objectType","lu_ProcessStatus");
+		//Get a list of process status categories
+        ProcessCategoryList categoryList = new ProcessCategoryList();
+        mav.addObject("categoryList", categoryList.getCategories());
+		mav.addObject("formId","tabledataform");
+		// check for error
+		if(result.hasErrors()) {
+			mav.addObject("btnValue", "lu_ProcessStatus/create");
+			mav.addObject("submitBtnValue", "Create");
+			return mav;
+		}
+		
+		//now we save
+		sysAdminManager.createProcessStatus(lu);
+		mav.addObject("success", "dataCreated");
+		mav.addObject("btnValue", "lu_ProcessStatus/update");
+		mav.addObject("submitBtnValue", "Update");
+		return mav;
+	}
+	
+
+	@RequestMapping(value="/data/nstd/lu_ProcessStatus/tableData", method = RequestMethod.GET)
+	public ModelAndView viewProcessStatus(@RequestParam(value="i", required=false) Integer i) 
+			throws Exception {
+		
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/sysadmin/data/std/details");	
+		
+		lu_ProcessStatus lu = sysAdminManager.getProcessStatusById(i);
+		mav.addObject("tableDataDetails",lu);
+		ProcessCategoryList categoryList = new ProcessCategoryList();
+        mav.addObject("categoryList", categoryList.getCategories());
+        mav.addObject("objectType","lu_ProcessStatus");
+		mav.addObject("formId","tabledataform");
+		mav.addObject("btnValue", "lu_ProcessStatus/update");
+		mav.addObject("submitBtnValue", "Update");
+		return mav;		
+	}
+	
+
+	@RequestMapping(value="/data/nstd/lu_processstatus/update", method = RequestMethod.POST)
+	public ModelAndView updateProcessStatus(
+			@Valid @ModelAttribute(value="tableDataDetails") lu_ProcessStatus lu, 
+			BindingResult result) throws Exception {
+		
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("/administrator/sysadmin/data/std/details");
+		mav.addObject("objectType","lu_ProcessStatus");
+		mav.addObject("formId","tabledataform");
+		ProcessCategoryList categoryList = new ProcessCategoryList();
+        mav.addObject("categoryList", categoryList.getCategories());
+		/** check for error **/
+		if(result.hasErrors()) {
+			mav.addObject("btnValue", "lu_ProcessStatus/update");
+			mav.addObject("submitBtnValue", "Update");
+			return mav;
+		}
+		
+		//now we save
+		sysAdminManager.updateProcessStatus(lu);
+		mav.addObject("success", "dataUpdated");
+		mav.addObject("btnValue", "lu_ProcessStatus/update");
+		mav.addObject("submitBtnValue", "Update");
+		return mav;
+	}
+	
+	/**End of ProcessStatus**/
 }
 

@@ -37,6 +37,25 @@
                                 </label>
                             </div>
                         </div>
+                        <c:if test='${objectType=="lu_ProcessStatus"}'>
+                         <spring:bind path="category">
+                            <div class="form-group ${status.error ? 'has-error' : '' }">
+                                <label class="control-label" for="category">Category *</label>
+                                <form:select id="state" path="category" cssClass="form-control half">
+                                    <option value="" label=" - Select - " ></option>
+                                    <form:options items="${categoryList}"/>
+                                </form:select>
+                                <form:errors path="category" cssClass="control-label" element="label" />
+                            </div>
+                        </spring:bind>
+                        <spring:bind path="displayCode">
+	                            <div class="form-group ${status.error ? 'has-error' : '' }">
+	                                <label class="control-label" for="displayCode">Display Code *</label>
+	                                <form:input path="displayCode" id="displayCode" class="form-control" type="text" maxLength="45" />
+	                                <form:errors path="displayCode" cssClass="control-label" element="label" />
+	                            </div>
+	                        </spring:bind>
+                        </c:if>
                         <spring:bind path="displayText">
                             <div class="form-group ${status.error ? 'has-error' : '' }">
                                 <label class="control-label" for="displayText">Display Text *</label>
@@ -51,7 +70,10 @@
                                 <form:errors path="description" cssClass="control-label" element="label" />
                             </div>
                         </spring:bind>
-                        <c:if test='${objectType=="lu_Counties"}'>
+                       
+                      
+      					
+      					<c:if test='${objectType=="lu_Counties"}'>
                          <spring:bind path="state">
                             <div class="form-group ${status.error ? 'has-error' : '' }">
                                 <label class="control-label" for="state">State *</label>
