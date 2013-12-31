@@ -1043,6 +1043,7 @@ INSERT INTO `universalTranslator`.`lu_urgency` (`displayText`, `isCustom`) VALUE
 UPDATE `universalTranslator`.`lookuptables` SET `utTableName`='lu_ProcessStatus' WHERE `id`='21';
 
 INSERT INTO `universalTranslator`.`lookUpTables` (`utTableName`, `displayText`) VALUES ('lu_urgency', 'Urgency');
+UPDATE `universalTranslator`.`lookUpTables` SET `urlId`='32456Urg295848ncy' WHERE `id`='28';
 
 
   
