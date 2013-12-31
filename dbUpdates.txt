@@ -1015,7 +1015,11 @@ ADD CONSTRAINT `batchFK`
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
 
+/**12.31.2013 */
+INSERT INTO `universalTranslator`.`lu_processstatus` (`category`, `displayCode`, `displayText`, `description`) VALUES ('batch', 'SAT', 'Submission Awaiting Transfer', 'This is when a batch of submission is completed and will be deliver to target organization in a timely manner.');
 
+ALTER TABLE `universalTranslator`.`transactionTarget` 
+ADD COLUMN `statusTime` DATETIME NULL DEFAULT current_Timestamp AFTER `dateCreated`;
 
   
   
