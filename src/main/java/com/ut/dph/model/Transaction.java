@@ -22,6 +22,7 @@ public class Transaction {
    private int transportMethodId;
    private String originalFileName = null;
    private int statusId;
+   private String statusValue;
    private int messageTypeId;
    private int transactionStatusId;
    private int targetOrgId;
@@ -96,6 +97,14 @@ public class Transaction {
 
    public void setstatusId(int statusId) {
        this.statusId = statusId;
+   }
+   
+   public String getstatusValue() {
+       return statusValue;
+   }
+   
+   public void setstatusValue(String statusValue) {
+       this.statusValue = statusValue;
    }
    
    public int getmessageTypeId() {

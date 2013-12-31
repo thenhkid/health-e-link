@@ -6,6 +6,7 @@
 
 package com.ut.dph.controller;
 
+import com.ut.dph.model.Crosswalks;
 import com.ut.dph.model.Organization;
 import com.ut.dph.model.Transaction;
 import com.ut.dph.model.batchUploads;
@@ -15,6 +16,7 @@ import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.configurationTransport;
 import com.ut.dph.model.custom.TableData;
 import com.ut.dph.model.fieldSelectOptions;
+import com.ut.dph.model.lutables.lu_ProcessStatus;
 import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionInRecords;
 import com.ut.dph.model.transactionRecords;
@@ -44,6 +46,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
@@ -771,6 +774,10 @@ public class HealtheWebController {
                 transactionDetails.setconfigId(transactionRecord.getconfigId());
                 transactionDetails.setdateSubmitted(batchInfo.getdateSubmitted());
                 transactionDetails.settransactionRecordId(transactionRecord.getId());
+                transactionDetails.setstatusId(transactionRecord.getstatusId());
+                
+                lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(transactionRecord.getstatusId());
+                transactionDetails.setstatusValue(processStatus.getDisplayCode());
                 
                 records = transactionInManager.getTransactionRecords(transactionRecord.getId());
                 
@@ -889,6 +896,10 @@ public class HealtheWebController {
                 transactionDetails.setbatchName(batchInfo.getutBatchName());
                 transactionDetails.setconfigId(transactionRecord.getconfigId());
                 transactionDetails.settransactionRecordId(transactionRecord.getId());
+                transactionDetails.setstatusId(transactionRecord.getstatusId());
+                
+                lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(transactionRecord.getstatusId());
+                transactionDetails.setstatusValue(processStatus.getDisplayCode());
                 
                 records = transactionInManager.getTransactionRecords(transactionRecord.getId());
                 
@@ -1172,6 +1183,28 @@ public class HealtheWebController {
         
         mav.addObject("transactionDetails", transaction);
         
+        return mav;
+    }
+    
+    /**
+     * The '/viewStatus{params}' function will return the details of the selected status. 
+     * The results will be displayed in the overlay.
+     *
+     * @Param	i   This will hold the id of the selected status
+     *
+     * @Return	This function will return the status details view.
+     */
+    @RequestMapping(value = "/viewStatus{statusId}", method = RequestMethod.GET)
+    public @ResponseBody
+    ModelAndView viewStatus(@PathVariable int statusId) throws Exception {
+
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/Health-e-Web/statusDetails");
+
+        //Get the details of the selected status
+        lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(statusId);
+        mav.addObject("statusDetails", processStatus);
+
         return mav;
     }
     

@@ -118,5 +118,5 @@
 
 </div>
 
-<!-- Provider Address modal -->
+<!-- Crosswalk Details modal -->
 <div class="modal fade" id="crosswalkModal" role="dialog" tabindex="-1" aria-labeledby="Message Crosswalks" aria-hidden="true" aria-describedby="Message Crosswalks"></div>

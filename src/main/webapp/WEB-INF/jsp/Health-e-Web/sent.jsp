@@ -34,8 +34,8 @@
                             <th scope="col">Message Type</th>
                             <th scope="col">Patient Info</th>
                             <th scope="col">Sent To</th>
-                            <th scope="col" class="center-text">Status</th>
                             <th scope="col" class="center-text">Urgency</th>
+                            <th scope="col" class="center-text">Status</th>
                             <th scope="col" class="center-text">Date Sent</th>
                             <th scope="col"></th>
                         </tr>
@@ -64,13 +64,15 @@
                                             <c:if test="${not empty transaction.targetOrgFields[6].fieldValue}"><dd>phone: <span class="tel">${transaction.targetOrgFields[6].fieldValue}</span></dd></c:if>
                                             <c:if test="${not empty transaction.targetOrgFields[7].fieldValue}"><dd>fax: <span class="tel">${transaction.targetOrgFields[7].fieldValue}</span></dd></c:if>
                                         </td>
-                                        <td class="center-text"></td>
                                         <td class="center-text">
                                             <c:forEach items="${transaction.detailFields}" var="detailInfo" varStatus="dfield"><c:if test="${detailInfo.fieldLabel == 'urgency'}"><c:set var="urgencyVal" value="${detailInfo.fieldValue}" /></c:if></c:forEach>
                                             ${urgencyVal}
                                         </td>
+                                        <td class="center-text">
+                                            <a href="#statusModal" data-toggle="modal" class="btn btn-link viewStatus" rel="${transaction.statusId}" title="View this Status">${transaction.statusValue}&nbsp;<span class="badge badge-help" data-placement="top" title="" data-original-title="">?</span></a>
+                                        </td>
                                         <td class="center-text"><fmt:formatDate value="${transaction.dateSubmitted}" type="date" pattern="M/dd/yyyy" /></td>
-                                        <td class="actions-col" style="width:200px;">
+                                        <td class="actions-col" style="width:50px;">
                                             <a href="javascript:void(0);" rel="${transaction.transactionRecordId}" class="btn btn-link viewLink">
                                                 <span class="glyphicon glyphicon-edit"></span>
                                                 View
@@ -87,6 +89,7 @@
                 </table>
             </div>
         </div>
-
     </div>
 </div>
+<!-- Status Definition modal -->
+<div class="modal fade" id="statusModal" role="dialog" tabindex="-1" aria-labeledby="Status Details" aria-hidden="true" aria-describedby="Status Details"></div>
