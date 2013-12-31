@@ -27,9 +27,9 @@
                         <thead>
                             <tr>
                                 <th scope="col">Table Name</th>
-                                <th scope="col" class="center-text">Number of Columns</th>
+                                <%--<th scope="col" class="center-text">Number of Columns</th> 
+                                <th scope="col">Description</th>--%>
                                 <th scope="col" class="center-text">Number of Rows</th>
-                                <th scope="col">Description</th>
                                 <th scope="col"></th>
                             </tr>
                         </thead>
@@ -47,9 +47,10 @@
                                             <td scope="row">
                                                 <a href="${link}" title="View Data">${tableInfo.displayName}</a>
                                             </td>
-                                            <td class="center-text">${tableInfo.columnNum}</td>
+                                            <%--<td class="center-text">${tableInfo.columnNum}</td> 
+                                             <td class="center-text">${tableInfo.description}</td>--%>
                                             <td class="center-text">${tableInfo.rowNum}</td>
-                                            <td class="center-text">${tableInfo.description}</td>
+                                           
                                             <%-- not sure if we should let users edit our look up tables--%> 
                                             <td class="actions-col">
                                                 <a href="${link}" class="btn btn-link" title="Edit data for this table">
