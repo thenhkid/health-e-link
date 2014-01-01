@@ -87,7 +87,7 @@ $(function() {
             url: 'translations',
             type: "POST",
             success: function(data) {
-                window.location.href = "connections";
+                window.location.href = "translations?msg=updated";
             }
         });
     });

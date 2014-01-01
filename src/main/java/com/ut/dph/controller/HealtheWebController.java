@@ -722,7 +722,7 @@ public class HealtheWebController {
                 Send the user to the "Sent" items page
             */
             redirectAttr.addFlashAttribute("savedStatus", "sent");
-            ModelAndView mav = new ModelAndView(new RedirectView("/Health-e-Web/sent"));
+            ModelAndView mav = new ModelAndView(new RedirectView("sent"));
             return mav;
         }
         else {
@@ -730,7 +730,7 @@ public class HealtheWebController {
                 Sent the user to the "Pending" items page
             */
             redirectAttr.addFlashAttribute("savedStatus", "saved");
-            ModelAndView mav = new ModelAndView(new RedirectView("/Health-e-Web/pending"));
+            ModelAndView mav = new ModelAndView(new RedirectView("pending"));
             return mav;
         }
     
@@ -832,7 +832,7 @@ public class HealtheWebController {
                     colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
                     String fieldValue = BeanUtils.getProperty(records, colName);
                     
-                    if(fields.getFieldDesc().equals("urgency")) {
+                    if(fields.getFieldDesc().equals("urgency") && !fieldValue.equals("")) {
                         int id = Integer.parseInt(fieldValue);
                         TableData  tableData = sysAdminManager.getTableData(id, "lu_Urgency");
                         fieldValue = tableData.getDisplayText();
@@ -954,7 +954,7 @@ public class HealtheWebController {
                     colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
                     String fieldValue = BeanUtils.getProperty(records, colName);
                     
-                    if(fields.getFieldDesc().equals("urgency")) {
+                    if(fields.getFieldDesc().equals("urgency") && !fieldValue.equals("")) {
                         int id = Integer.parseInt(fieldValue);
                         TableData  tableData = sysAdminManager.getTableData(id, "lu_Urgency");
                         fieldValue = tableData.getDisplayText();
