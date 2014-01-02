@@ -11,7 +11,7 @@
             <div class="alert alert-success">
                 <strong>Success!</strong> 
                 <c:choose><c:when test="${param.msg == 'updated'}">The system user has been successfully updated!</c:when><c:when test="${param.msg == 'created'}">The system user has been successfully added!</c:when></c:choose>
-                    </div>
+            </div>
         </c:if>
         <section class="panel panel-default">
             <div class="panel-heading">
@@ -79,18 +79,18 @@
                         </tbody>
                     </table>
                     <ul class="pagination pull-right" role="navigation" aria-labelledby="Paging">
-                        <c:if test="${currentPage > 1}"><li><a href="?page=${currentPage-1}">&laquo;</a></li></c:if>
-                            <c:forEach var="i" begin="1" end="${totalPages}">
-                            <li><a href="?page=${i}">${i}</a></li>
-                            </c:forEach>
-                            <c:if test="${currentPage < totalPages}"><li><a href="?page=${currentPage+1}">&raquo;</a></li></c:if>
-                        </ul>
-                    </div>
+                    <c:if test="${currentPage > 1}"><li><a href="?page=${currentPage-1}">&laquo;</a></li></c:if>
+                        <c:forEach var="i" begin="1" end="${totalPages}">
+                        <li><a href="?page=${i}">${i}</a></li>
+                        </c:forEach>
+                        <c:if test="${currentPage < totalPages}"><li><a href="?page=${currentPage+1}">&raquo;</a></li></c:if>
+                    </ul>
                 </div>
-            </section>
-        </div>
+            </div>
+        </section>
     </div>
-    <p rel="${currentPage}" id="currentPageHolder" style="display:none"></p>
+</div>
+<p rel="${currentPage}" id="currentPageHolder" style="display:none"></p>
 
 <!-- Providers modal -->
 <div class="modal fade" id="systemUsersModal" role="dialog" tabindex="-1" aria-labeledby="Add System Users" aria-hidden="true" aria-describedby="Add new system users"></div>

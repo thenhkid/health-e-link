@@ -40,7 +40,7 @@
                                 <th scope="col">Authorized User</th>
                                 <th scope="col">Message Type</th>
                                 <th scope="col">Configuration Type</th>
-                                <th scope="col">Transport Method</th>
+                                <th scope="col" class="center-text">Transport Method</th>
                                 <th scope="col" class="center-text">Status</th>
                                 <th scope="col" class="center-text">Date Created</th>
                                 <th scope="col"></th>
@@ -63,7 +63,7 @@
                                             <td>
                                                 <c:choose><c:when test="${config.type == 1}">Source Configuration</c:when><c:otherwise>Target Configuration</c:otherwise></c:choose>
                                             </td>
-                                            <td>
+                                            <td class="center-text">
                                                 ${config.transportMethod}
                                             </td>
                                             <td class="center-text"><c:choose><c:when test="${config.status == true}">active</c:when><c:otherwise>inactive</c:otherwise></c:choose></td>

@@ -17,6 +17,14 @@
                 </c:choose>
             </div>
         </c:if>
+        <c:if test="${not empty param.msg}" >
+            <div class="alert alert-success">
+                <strong>Success!</strong> 
+                <c:choose>
+                    <c:when test="${param.msg == 'created'}">The provider has been successfully added!</c:when>
+                </c:choose>
+            </div>
+        </c:if>
         <section class="panel panel-default">
             <div class="panel-heading">
                 <h3 class="panel-title">Providers</h3>
@@ -36,7 +44,7 @@
                             </form:form>
                         </div>
                     </div>
-                    <a href="provider.create"  class="btn btn-primary btn-sm pull-right" title="Create a new provider">
+                    <a href="#providersModal" id="createNewProvider" data-toggle="modal" class="btn btn-primary btn-sm pull-right" title="Create a new provider">
                         <span class="glyphicon glyphicon-plus"></span>
                     </a>
                 </div>
@@ -96,4 +104,7 @@
   </div>		
 </div>	
 <p rel="${currentPage}" id="currentPageHolder" style="display:none"></p>
+                        
+<!-- Providers modal -->
+<div class="modal fade" id="providersModal" role="dialog" tabindex="-1" aria-labeledby="Add Organization Provider" aria-hidden="true" aria-describedby="Add new organization provider"></div>
 

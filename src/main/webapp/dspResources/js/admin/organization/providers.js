@@ -22,10 +22,10 @@ jQuery(document).ready(function($) {
     //This function will launch the new provider overlay with a blank screen
     $(document).on('click', '#createNewProvider', function() {
         $.ajax({
-            url: 'newProvider',
+            url: 'provider.create',
             type: "GET",
             success: function(data) {
-                $("#systemProvidersModal").html(data);
+                $("#providersModal").html(data);
             }
         });
     });
@@ -62,17 +62,8 @@ jQuery(document).ready(function($) {
             type: "POST",
             async: false,
             success: function(data) {
-
-                if (data.indexOf('providerUpdated') != -1) {
-                    if (currentPage > 0) {
-                        window.location.href = "providers?msg=updated&page=" + currentPage;
-                    }
-                    else {
-                        window.location.href = "providers?msg=updated";
-                    }
-
-                }
-                else if (data.indexOf('providerCreated') != -1) {
+                
+                if (data.indexOf('providerCreated') != -1) {
                     if (currentPage > 0) {
                         window.location.href = "providers?msg=created&page=" + currentPage;
                     }
@@ -82,7 +73,7 @@ jQuery(document).ready(function($) {
 
                 }
                 else {
-                    $("#systemProvidersModal").html(data);
+                    $("#providersModal").html(data);
                 }
             }
         });

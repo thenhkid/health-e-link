@@ -91,11 +91,22 @@ public class configurationDAOImpl implements configurationDAO {
     @Override
     @SuppressWarnings("unchecked")
     public List<configuration> getConfigurationsByOrgId(int orgId, String searchTerm) {
-        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configuration.class);
-        criteria.add(Restrictions.eq("orgId", orgId));
         
-        if (searchTerm != null) {
-             //get a list of message type id's that match the term passed in
+        if (!"".equals(searchTerm)) {
+            //get a list of user id's that match the term passed in
+            List<Integer> userIdList = new ArrayList<Integer>();
+            Criteria findUsers = sessionFactory.getCurrentSession().createCriteria(User.class);
+            findUsers.add(Restrictions.or(
+                    Restrictions.like("lastName", "%" + searchTerm + "%"),
+                    Restrictions.like("firstName", "%" + searchTerm + "%")
+                 ));
+            List<User> users = findUsers.list();
+
+            for (User user : users) {
+                userIdList.add(user.getId());
+            }
+
+            //get a list of message type id's that match the term passed in
             List<Integer> msgTypeIdList = new ArrayList<Integer>();
             Criteria findMsgTypes = sessionFactory.getCurrentSession().createCriteria(messageType.class);
             findMsgTypes.add(Restrictions.like("name", "%" + searchTerm + "%"));
@@ -104,17 +115,32 @@ public class configurationDAOImpl implements configurationDAO {
             for (messageType msgType : msgTypes) {
                 msgTypeIdList.add(msgType.getId());
             }
-            
+
+            Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configuration.class);
+
+            if (userIdList.isEmpty()) {
+                userIdList.add(0);
+            }
             if (msgTypeIdList.isEmpty()) {
                 msgTypeIdList.add(0);
             }
 
-            criteria.add(Restrictions.in("messageTypeId", msgTypeIdList));
+            criteria.add(Restrictions.eq("orgId", orgId));
+            criteria.add(Restrictions.or(
+                    Restrictions.in("userId", userIdList),
+                    Restrictions.in("messageTypeId", msgTypeIdList)
+                )
+            )
+            .addOrder(Order.desc("dateCreated"));
+
+            return criteria.list();
+        } 
+        else {
+            Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configuration.class);
+            criteria.add(Restrictions.eq("orgId", orgId));
+            criteria.addOrder(Order.desc("dateCreated"));
+            return criteria.list();
         }
-        
-        criteria.addOrder(Order.desc("dateCreated"));
-        
-        return criteria.list();
     }
     
     /**

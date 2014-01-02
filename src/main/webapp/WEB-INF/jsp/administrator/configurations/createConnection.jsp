@@ -5,13 +5,18 @@
 --%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
-<div class="main clearfix full-width" role="main">
-    <div class="row-fluid">
-        <div class="col-md-12">		
+
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h3 class="panel-title">Create New Configuration Connection</h3>
+         </div>
+         <div class="modal-body">
             <section class="panel panel-default">
                 <div class="panel-heading">
                    <h3 class="panel-title">Source Configuration</h3>
-                </div>
+                </div> 
                 <div class="panel-body">
                     <div class="form-container scrollable">
                         <div id="srcorgDiv" class="form-group ${status.error ? 'has-error' : '' }">
@@ -34,7 +39,7 @@
                     </div>
                 </div>
             </section>
-           <section class="panel panel-default">
+            <section class="panel panel-default">
                 <div class="panel-heading">
                    <h3 class="panel-title">Target Configuration</h3>
                 </div>
@@ -59,7 +64,10 @@
                         </div>         
                     </div>
                 </div>
-            </section>                 
+            </section> 
+           <div class="form-group">
+                <input type="button" id="submitButton" rel="Create" role="button" class="btn btn-primary" value="Create Connection"/>
+            </div>                 
         </div>
     </div>
 </div>                       

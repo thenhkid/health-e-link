@@ -33,10 +33,12 @@ import com.ut.dph.model.Provider;
 import com.ut.dph.service.providerManager;
 import com.ut.dph.model.Brochure;
 import com.ut.dph.model.configuration;
+import com.ut.dph.model.configurationTransport;
 import com.ut.dph.model.messageType;
 import com.ut.dph.service.brochureManager;
 import com.ut.dph.reference.USStateList;
 import com.ut.dph.service.configurationManager;
+import com.ut.dph.service.configurationTransportManager;
 import com.ut.dph.service.messageTypeManager;
 
 /**
@@ -68,6 +70,9 @@ public class adminOrgContoller {
     
     @Autowired
     private messageTypeManager messagetypemanager;
+    
+    @Autowired
+    private configurationTransportManager configurationTransportManager;
 
     /**
      * The private variable orgId will hold the orgId when viewing an organization this will be used when on a organization subsection like users, etc. We will use this private variable so we don't have to go fetch the id or the organization based on the url.
@@ -81,7 +86,7 @@ public class adminOrgContoller {
 
     @Autowired
     private SessionFactory sessionFactory;
-
+    
     /**
      * The '/list' GET request will serve up the existing list of organizations in the system
      *
@@ -365,17 +370,26 @@ public class adminOrgContoller {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/organizations/configurations");
 
-         List<configuration> configurations = configurationmanager.getConfigurationsByOrgId(orgId,null);
+        List<configuration> configurations = configurationmanager.getConfigurationsByOrgId(orgId,"");
+        
         mav.addObject("id", orgId);
         mav.addObject("configs", configurations);
         
+        User user;
         messageType messagetype;
-        Long totalConnections;
+        configurationTransport transportDetails;
         
         for (configuration config : configurations) {
             messagetype = messagetypemanager.getMessageTypeById(config.getMessageTypeId());
             config.setMessageTypeName(messagetype.getName());
- 
+            
+            user = userManager.getUserById(config.getuserId());
+            config.setuserName(user.getFirstName() + " " + user.getLastName());
+            
+            transportDetails = configurationTransportManager.getTransportDetails(config.getId());
+            if(transportDetails != null) {
+             config.settransportMethod(configurationTransportManager.getTransportMethodById(transportDetails.gettransportMethodId()));
+            }
         }
 
         return mav;
@@ -406,13 +420,21 @@ public class adminOrgContoller {
         mav.addObject("id", orgId);
         mav.addObject("configs", configurations);
         
+        User user;
         messageType messagetype;
-        Long totalConnections;
-
+        configurationTransport transportDetails;
+        
         for (configuration config : configurations) {
             messagetype = messagetypemanager.getMessageTypeById(config.getMessageTypeId());
             config.setMessageTypeName(messagetype.getName());
-
+            
+            user = userManager.getUserById(config.getuserId());
+            config.setuserName(user.getFirstName() + " " + user.getLastName());
+            
+            transportDetails = configurationTransportManager.getTransportDetails(config.getId());
+            if(transportDetails != null) {
+             config.settransportMethod(configurationTransportManager.getTransportMethodById(transportDetails.gettransportMethodId()));
+            }
         }
 
         return mav;
@@ -722,9 +744,10 @@ public class adminOrgContoller {
      * @Objects (1) An object that will hold the blank provider
      */
     @RequestMapping(value = "/{cleanURL}/provider.create", method = RequestMethod.GET)
+    @ResponseBody
     public ModelAndView newProviderForm() throws Exception {
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("/administrator/organizations/providers/details");
+        mav.setViewName("/administrator/organizations/providers/newProvider");
 
         //Create a new blank provider.
         Provider providerDetails = new Provider();
@@ -734,13 +757,14 @@ public class adminOrgContoller {
         providerDetails.setOrgId(orgId);
 
         mav.addObject("id", orgId);
+        mav.addObject("btnValue", "Create");
         mav.addObject("providerdetails", providerDetails);
 
         return mav;
     }
 
     /**
-     * The '/{cleanURL}/provider.create' POST request will handle submitting the new provider.
+     * The '/{cleanURL}/createProvider' POST request will handle submitting the new provider.
      *
      * @param providerdetails	The object containing the provider form fields
      * @param result	The validation result
@@ -752,35 +776,25 @@ public class adminOrgContoller {
      * @Objects	(1) The object containing all the information for the new provider (2) The 'id' of the clicked org that will be used in the menu and action bar
      * @throws Exception
      */
-    @RequestMapping(value = "/{cleanURL}/provider.create", method = RequestMethod.POST)
+    @RequestMapping(value = "/{cleanURL}/createProvider", method = RequestMethod.POST)
     public ModelAndView createProvider(@Valid @ModelAttribute(value = "providerdetails") Provider providerdetails, BindingResult result, RedirectAttributes redirectAttr, @RequestParam String action) throws Exception {
 
         if (result.hasErrors()) {
             ModelAndView mav = new ModelAndView();
-            mav.setViewName("/administrator/organizations/providers/details");
-            mav.addObject("providerId", providerdetails.getId());
-            mav.addObject("id", orgId);
+            mav.setViewName("/administrator/organizations/providers/newProvider");
+            mav.addObject("btnValue", "Create");
             return mav;
         }
-
+        
         //Create the provider
         Integer providerId = providerManager.createProvider(providerdetails);
 
-        //If the "Save" button was pressed 
-        if (action.equals("save")) {
-            //This variable will be used to display the message on the details form
-            redirectAttr.addFlashAttribute("savedStatus", "created");
-            ModelAndView mav = new ModelAndView(new RedirectView("provider." + providerdetails.getFirstName() + providerdetails.getLastName() + "?i=" + providerId));
-            return mav;
-        } //If the "Save & Close" button was pressed.
-        else {
-            //This variable will be used to display the message on the details form
-            redirectAttr.addFlashAttribute("savedStatus", "created");
-
-            ModelAndView mav = new ModelAndView(new RedirectView("providers"));
-            return mav;
-        }
-
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/organizations/providers/newProvider");
+        mav.addObject("success", "providerCreated");
+        
+        return mav;
+        
     }
 
     /**

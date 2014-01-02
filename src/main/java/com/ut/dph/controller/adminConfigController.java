@@ -1217,7 +1217,7 @@ public class adminConfigController {
      * 
      */
     @RequestMapping(value = "/createConnection", method = RequestMethod.GET)
-    public ModelAndView createNewConnectionForm() throws Exception {
+    public @ResponseBody ModelAndView createNewConnectionForm() throws Exception {
         
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/configurations/createConnection");

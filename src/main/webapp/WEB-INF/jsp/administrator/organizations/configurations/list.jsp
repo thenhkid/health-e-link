@@ -25,8 +25,9 @@
                         <thead>
                             <tr>
                                 <th scope="col">Message Type</th>
+                                <th scope="col">Authorized User</th>
                                 <th scope="col">Configuration Type</th>
-                                <th scope="col" class="center-text">Connections</th>
+                                <th scope="col" class="center-text">Transport Method</th>
                                 <th scope="col" class="center-text">Date Created</th>
                                 <th scope="col"></th>
                             </tr>
@@ -37,26 +38,29 @@
                                     <c:forEach var="config" items="${configs}">
                                         <tr style="cursor: pointer">
                                             <td>
-                                                <a href="<c:url value='/administrator/configurations/details?i=${config.id}' />" class="btn btn-link" title="Edit this configuration">${config.messageTypeName}</a>
+                                                ${config.messageTypeName}
+                                            </td>
+                                            <td>
+                                                 ${config.userName}
                                             </td>
                                             <td>
                                                 <c:choose><c:when test="${config.type == 1}">Source Configuration</c:when><c:otherwise>Target Configuration</c:otherwise></c:choose>
                                             </td>
                                             <td class="center-text">
-                                                ${config.totalConnections}
+                                                ${config.transportMethod}
                                             </td>
                                             <td class="center-text"><fmt:formatDate value="${config.dateCreated}" type="date" pattern="M/dd/yyyy" /></td>
                                             <td class="actions-col">
                                                 <a href="<c:url value='/administrator/configurations/details?i=${config.id}' />" class="btn btn-link" title="Edit this configuration">
                                                     <span class="glyphicon glyphicon-edit"></span>
-                                                    Edit	
+                                                    View	
                                                 </a>
                                             </td>
                                         </tr>
                                     </c:forEach>
                                 </c:when>
                                 <c:otherwise>
-                                    <tr><td colspan="5" class="center-text">There are currently no configurations set up for this organization.</td></tr>
+                                    <tr><td colspan="7" class="center-text">There are currently no configurations set up for this organization.</td></tr>
                                 </c:otherwise>
                             </c:choose>
                         </tbody>

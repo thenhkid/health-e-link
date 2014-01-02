@@ -18,17 +18,22 @@
         <section class="panel panel-default">
             <div class="panel-body">
                 <div class="table-actions">
-                    <div role="search">
-                        <form:form class="form form-inline" action="/administrator/configuration/connections" method="post">
-                            <div class="form-group">
-                                <label class="sr-only" for="searchTerm">Search</label>
-                                <input type="text" name="searchTerm" id="searchTerm" value="${searchTerm}" class="form-control" id="search-organizations" placeholder="Search"/>
-                            </div>
-                            <button id="searchOrgBtn" class="btn btn-primary btn-sm" title="Search Connections" role="button">
-                                <span class="glyphicon glyphicon-search"></span>
-                            </button>
-                        </form:form>
+                    <div class="form form-inline pull-left">
+                        <div role="search">
+                            <form:form class="form form-inline" action="/administrator/configuration/connections" method="post">
+                                <div class="form-group">
+                                    <label class="sr-only" for="searchTerm">Search</label>
+                                    <input type="text" name="searchTerm" id="searchTerm" value="${searchTerm}" class="form-control" id="search-organizations" placeholder="Search"/>
+                                </div>
+                                <button id="searchOrgBtn" class="btn btn-primary btn-sm" title="Search Connections" role="button">
+                                    <span class="glyphicon glyphicon-search"></span>
+                                </button>
+                            </form:form>
+                        </div>
                     </div>
+                    <a href="#connectionsModal" id="createNewConnection" data-toggle="modal" class="btn btn-primary btn-sm pull-right" title="Create Configuration Connection">
+                        <span class="glyphicon glyphicon-plus"></span>
+                    </a>
                 </div>
                 <div class="form-container scrollable">
                     <table class="table table-striped table-hover table-default">
@@ -99,3 +104,6 @@
         </section>
     </div>
 </div>
+                    
+<!-- Connections modal -->
+<div class="modal fade" id="connectionsModal" role="dialog" tabindex="-1" aria-labeledby="Add Configuration Connection" aria-hidden="true" aria-describedby="Add Configuration Connection"></div>

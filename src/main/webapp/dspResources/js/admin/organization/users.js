@@ -75,6 +75,7 @@ jQuery(document).ready(function($) {
                 type: "POST",
                 async: false,
                 success: function(data) {
+                    
                     if (data.indexOf('userUpdated') != -1) {
                         if (currentPage > 0) {
                             window.location.href = "users?msg=updated&page=" + currentPage;
