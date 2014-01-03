@@ -16,6 +16,7 @@ import com.ut.dph.model.configurationTransport;
 import com.ut.dph.model.custom.TableData;
 import com.ut.dph.model.fieldSelectOptions;
 import com.ut.dph.model.lutables.lu_ProcessStatus;
+import com.ut.dph.model.transactionAttachment;
 import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionInRecords;
 import com.ut.dph.model.transactionRecords;
@@ -39,6 +40,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -46,6 +48,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
@@ -483,7 +486,7 @@ public class HealtheWebController {
      * @return this request will return the messageDetailsForm
      */
     @RequestMapping(value= "/submitMessage", method = RequestMethod.POST)
-    public ModelAndView submitMessage(@ModelAttribute(value = "transactionDetails") Transaction transactionDetails, HttpSession session, @RequestParam String action, RedirectAttributes redirectAttr) {
+    public ModelAndView submitMessage(@ModelAttribute(value = "transactionDetails") Transaction transactionDetails, HttpSession session, @RequestParam String action, RedirectAttributes redirectAttr, @RequestParam List<Integer> attachmentIds) {
         
         int[] userInfo = (int[])session.getAttribute("userInfo");
         Integer currBatchId = transactionDetails.getbatchId();
@@ -579,6 +582,18 @@ public class HealtheWebController {
             }
             
             transactionInManager.submitTransactionInChanges(transactionIn);
+        }
+        
+        /* See if any attachments were uploaded */
+        if(!attachmentIds.isEmpty()) {
+            
+            for(Integer attachmentId: attachmentIds) {
+                transactionAttachment attachment = transactionInManager.getAttachmentById(attachmentId);
+                attachment.setTransactionInId(transactionId);
+                
+                transactionInManager.submitAttachmentChanges(attachment);
+            }
+            
         }
         
         /* Get the 6 Bucket (Source Org, Source Provider, Target Org, Target Provider, Patient, Details) fields */
@@ -1194,8 +1209,7 @@ public class HealtheWebController {
      * @Return	This function will return the status details view.
      */
     @RequestMapping(value = "/viewStatus{statusId}", method = RequestMethod.GET)
-    public @ResponseBody
-    ModelAndView viewStatus(@PathVariable int statusId) throws Exception {
+    public @ResponseBody ModelAndView viewStatus(@PathVariable int statusId) throws Exception {
 
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/Health-e-Web/statusDetails");
@@ -1205,6 +1219,65 @@ public class HealtheWebController {
         mav.addObject("statusDetails", processStatus);
 
         return mav;
+    }
+    
+    /**
+     * The 'uploadMessageAttachment' will use jquery to upload a new attachment to the message
+     * 
+     */
+    @RequestMapping(value = "/uploadMessageAttachment", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody Integer uploadMessageAttachment(@RequestParam(value = "fileUpload", required = true) MultipartFile fileUpload, @RequestParam(value = "title", required = false) String title, HttpSession session) throws Exception {
+        
+        /* Get the organization details for the source (Sender) organization */
+        int[] userInfo = (int[])session.getAttribute("userInfo");
+        Organization sendingOrgDetails = organizationmanager.getOrganizationById(userInfo[1]);
+        
+        /* Upload the attachment */
+        String fileName = transactionInManager.uploadAttachment(fileUpload, sendingOrgDetails.getcleanURL());
+        
+        /* Create a new attachment */
+        transactionAttachment attachment = new transactionAttachment();
+        attachment.setTransactionInId(0);
+        attachment.setfileLocation("/"+sendingOrgDetails.getcleanURL()+"/attachments/");
+        attachment.setfileName(fileName);
+        attachment.settitle(title);
+        
+        Integer attachmentId = transactionInManager.submitAttachment(attachment);
+        
+        return attachmentId;
+    }
+    
+    /**
+     * 
+     */
+    @RequestMapping(value= "/populateExistingAttachments.do", method = RequestMethod.GET)
+    public @ResponseBody ModelAndView getMessageAttachments(@RequestParam(value = "transactionId", required = false) Integer transactionId, @RequestParam(value = "newattachmentIdList", required = false) List<Integer> newattachmentIdList) {
+        
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/Health-e-Web/existingAttachments");
+        
+        List<transactionAttachment> attachments = new ArrayList<transactionAttachment>();
+        
+        if(transactionId > 0) {
+            List<transactionAttachment> existingAttachments = transactionInManager.getAttachmentsByTransactionId(transactionId);
+            
+            for(transactionAttachment attachment : existingAttachments) {
+                attachments.add(attachment);
+            }
+            
+        }
+        
+        if(newattachmentIdList != null && !newattachmentIdList.isEmpty()) {
+            for(Integer attachmentId : newattachmentIdList) {
+                transactionAttachment attachment = transactionInManager.getAttachmentById(attachmentId);
+                attachments.add(attachment);
+            }
+        }
+        
+        mav.addObject("attachments", attachments);
+        
+        return mav;
+        
     }
     
 }

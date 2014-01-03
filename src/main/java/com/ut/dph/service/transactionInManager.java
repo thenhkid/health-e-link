@@ -8,10 +8,12 @@ package com.ut.dph.service;
 
 import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.fieldSelectOptions;
+import com.ut.dph.model.transactionAttachment;
 import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionInRecords;
 import com.ut.dph.model.transactionTarget;
 import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
@@ -56,5 +58,15 @@ public interface transactionInManager {
     void submitTransactionTargetChanges(transactionTarget transactionTarget);
     
     transactionTarget getTransactionTarget(int batchUploadId, int transactionInId);
+    
+    String uploadAttachment(MultipartFile fileUpload, String orgName);
+    
+    Integer submitAttachment(transactionAttachment attachment);
+    
+    transactionAttachment getAttachmentById(int attachmentId);
+    
+    void submitAttachmentChanges(transactionAttachment attachment);
+    
+    List<transactionAttachment> getAttachmentsByTransactionId(int transactionInId);
     
 }

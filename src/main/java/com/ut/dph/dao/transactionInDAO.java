@@ -8,6 +8,7 @@ package com.ut.dph.dao;
 
 import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.fieldSelectOptions;
+import com.ut.dph.model.transactionAttachment;
 import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionInRecords;
 import com.ut.dph.model.transactionTarget;
@@ -56,4 +57,12 @@ public interface transactionInDAO {
     void submitTransactionTargetChanges(transactionTarget transactionTarget);
     
     transactionTarget getTransactionTarget(int batchUploadId, int transactionInId);
+    
+    Integer submitAttachment(transactionAttachment attachment);
+    
+    transactionAttachment getAttachmentById(int attachmentId);
+    
+    void submitAttachmentChanges(transactionAttachment attachment);
+    
+    List<transactionAttachment> getAttachmentsByTransactionId(int transactionInId);
 }

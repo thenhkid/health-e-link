@@ -9,6 +9,7 @@ package com.ut.dph.dao.impl;
 import com.ut.dph.dao.transactionInDAO;
 import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.fieldSelectOptions;
+import com.ut.dph.model.transactionAttachment;
 import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionInRecords;
 import com.ut.dph.model.transactionTarget;
@@ -454,5 +455,66 @@ public class transactionInDAOImpl implements transactionInDAO {
        return target;
     }
     
+    /**
+     * The 'submitAttachment' will save the attachment to the database
+     * 
+     * @param attachment The object that will hold the attachment details
+     * 
+     * @return THis function will return the id of the saved attachment. 
+     */
+    @Override
+    @Transactional
+    public Integer submitAttachment(transactionAttachment attachment) {
+        Integer attachmentId = null;
+
+        attachmentId = (Integer) sessionFactory.getCurrentSession().save(attachment);
+
+        return attachmentId;   
+    }
+    
+    /**
+     * The 'getAttachmentById' function will return the details of an attachment
+     * for the passed in Id.
+     * 
+     * @param  attachmentId The id of the attachment to get the details for
+     * 
+     * @return This function will return a transactionAttachment object
+     */
+    @Override
+    @Transactional
+    public transactionAttachment getAttachmentById(int attachmentId) {
+        return (transactionAttachment) sessionFactory.getCurrentSession().get(transactionAttachment.class, attachmentId);
+    }
+    
+    /**
+     * The 'submitAttachmentChanges' function will update the attachment details
+     * for the passed in attachment.
+     * 
+     * @param attachment The attachment object that contains the details
+     * 
+     * @return This function does not return anything.
+     */
+    @Override
+    @Transactional
+    public void submitAttachmentChanges(transactionAttachment attachment) {
+        sessionFactory.getCurrentSession().update(attachment);
+    }
+    
+    /**
+     * The 'getAttachmentsByTransactionId' function will return a list of attachments
+     * for the passed in transaction.
+     * 
+     * @param transactionInId   The id of the transaction to search on
+     * 
+     * @return This function will return a list of transactionAttachment objects
+     */
+    @Override
+    @Transactional
+    public List<transactionAttachment> getAttachmentsByTransactionId(int transactionInId) {
+        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(transactionAttachment.class);
+        criteria.add(Restrictions.eq("transactionInId", transactionInId));
+        
+        return criteria.list();
+    }
     
 }
