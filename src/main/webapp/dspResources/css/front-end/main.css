@@ -1,4 +1,4 @@
-@import 'responsive-tables.css';
+@import '../../css/responsive-tables.css';
 /*!
  * Bootstrap v3.0.0
  *
@@ -6588,6 +6588,9 @@ td.visible-print {
   display: inline-block;
   text-indent: -9999px;
   overflow: hidden;
+}
+.cb {
+  clear: both;
 }
 .center-text {
   text-align: center;
