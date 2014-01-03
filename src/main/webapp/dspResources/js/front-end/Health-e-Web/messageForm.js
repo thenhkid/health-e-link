@@ -7,6 +7,8 @@
 $(document).ready(function() {
     $("input:text,form").attr("autocomplete", "off");
     
+    populateExistingAttachments();
+    
     $('.submitMessage').click(function() {
        var errorsFound = 0;
        var clickedBtn = $(this).attr('id');
@@ -25,10 +27,54 @@ $(document).ready(function() {
             $('#messageForm').submit(); 
        }
     });
+    
+    
+    //Function to upload an attachment to the message
+    new AjaxUpload('attachmentFileUpload', {
+        action: '../uploadMessageAttachment',
+        name: 'fileUpload',
+        onSubmit: function(file, extension){
+            this.setData({title: getTitle()});
+        },
+        onComplete: function(file, response) {
+           var currentIdList = $('#attachmentIds').val();
+           
+           if(currentIdList == '') {
+               $('#attachmentIds').val(response);
+           }
+           else {
+               currentIdList = currentIdList + ',' + response;
+               $('#attachmentIds').val(currentIdList);
+           }
+           
+           $('#attachmentTitle').val('');
+           
+           populateExistingAttachments();
+           
+        }
+    });
 
 
 });
 
+function getTitle(){
+   var titleval = $('#attachmentTitle').val();
+   return titleval;
+}
+
+function populateExistingAttachments() {
+    var transactionId = $('#transactionId').val();
+    var currentIdList = $('#attachmentIds').val();
+    
+    $.ajax({
+        url: '../populateExistingAttachments.do',
+        type: 'GET',
+        data: {'transactionId': transactionId, 'newattachmentIdList': currentIdList},
+        success: function(data) {
+            $("#existingAttachments").html(data);
+        }
+    });
+}
 
 function checkFormFields() {
     var errorFound = 0;

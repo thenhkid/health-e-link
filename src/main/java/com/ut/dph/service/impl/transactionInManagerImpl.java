@@ -9,14 +9,22 @@ package com.ut.dph.service.impl;
 import com.ut.dph.dao.transactionInDAO;
 import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.fieldSelectOptions;
+import com.ut.dph.model.transactionAttachment;
 import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionInRecords;
 import com.ut.dph.model.transactionTarget;
+import com.ut.dph.reference.fileSystem;
 import org.springframework.stereotype.Service;
 import com.ut.dph.service.transactionInManager;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
@@ -140,5 +148,86 @@ public class transactionInManagerImpl implements transactionInManager {
     @Transactional
     public transactionTarget getTransactionTarget(int batchUploadId, int transactionInId) {
         return transactionInDAO.getTransactionTarget(batchUploadId, transactionInId);
+    }
+    
+    /** 
+     * The 'uploadAttachment' function will take in the file and orgName and upload the file
+     * to the appropriate file on the file system.
+     * 
+     * @param fileUpload The file to be uploaded
+     * @param orgName    The organization name that is uploading the file. This will be the
+     *                   folder where to save the file to.
+     */
+    @Override
+    public String uploadAttachment(MultipartFile fileUpload, String orgName) {
+         
+        MultipartFile file = fileUpload;
+        String fileName = file.getOriginalFilename();
+        
+        InputStream inputStream = null;
+        OutputStream outputStream = null;
+        
+         try {
+            inputStream = file.getInputStream();
+            File newFile = null;
+
+            //Set the directory to save the brochures to
+            fileSystem dir = new fileSystem();
+            dir.setDir(orgName, "attachments");
+
+            newFile = new File(dir.getDir() + fileName);
+
+            if (newFile.exists()) {
+                int i = 1;
+                while (newFile.exists()) {
+                    int iDot = fileName.lastIndexOf(".");
+                    newFile = new File(dir.getDir() + fileName.substring(0, iDot) + "_(" + ++i + ")" + fileName.substring(iDot));
+                }
+                fileName = newFile.getName();
+            } else {
+                newFile.createNewFile();
+            }
+
+            outputStream = new FileOutputStream(newFile);
+            int read = 0;
+            byte[] bytes = new byte[1024];
+
+            while ((read = inputStream.read(bytes)) != -1) {
+                outputStream.write(bytes, 0, read);
+            }
+            outputStream.close();
+
+            //Save the attachment
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+         
+        return fileName;
+    }
+    
+    
+    @Override
+    @Transactional
+    public Integer submitAttachment(transactionAttachment attachment) {
+        return transactionInDAO.submitAttachment(attachment);
+    }
+    
+    @Override
+    @Transactional
+    public transactionAttachment getAttachmentById(int attachmentId) {
+        return transactionInDAO.getAttachmentById(attachmentId);
+    }
+    
+    @Override
+    @Transactional
+    public void submitAttachmentChanges(transactionAttachment attachment) {
+        transactionInDAO.submitAttachmentChanges(attachment);
+    }
+    
+    @Override
+    @Transactional
+    public List<transactionAttachment> getAttachmentsByTransactionId(int transactionInId) {
+        return transactionInDAO.getAttachmentsByTransactionId(transactionInId);
     }
 }

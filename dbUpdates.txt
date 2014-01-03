@@ -1045,6 +1045,23 @@ UPDATE `universalTranslator`.`lookuptables` SET `utTableName`='lu_ProcessStatus'
 INSERT INTO `universalTranslator`.`lookUpTables` (`utTableName`, `displayText`) VALUES ('lu_urgency', 'Urgency');
 UPDATE `universalTranslator`.`lookUpTables` SET `urlId`='32456Urg295848ncy' WHERE `id`='28';
 
+/** Chad 1.2.13 */
+CREATE TABLE `universalTranslator`.`transactionAttachments` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `transactionInId` INT NOT NULL,
+  `fileName` VARCHAR(45) NULL DEFAULT NULL,
+  `fileLocation` VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `transInIdfk_idx` (`transactionInId` ASC),
+  CONSTRAINT `transInIdfk`
+    FOREIGN KEY (`transactionInId`)
+    REFERENCES `universalTranslator`.`transactionIn` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+ALTER TABLE `universalTranslator`.`transactionAttachments` 
+CHANGE COLUMN `fileName` `fileName` VARCHAR(45) NOT NULL ,
+ADD COLUMN `title` VARCHAR(255) NULL DEFAULT NULL AFTER `fileLocation`;
 
   
   

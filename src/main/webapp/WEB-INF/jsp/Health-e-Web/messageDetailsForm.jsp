@@ -30,9 +30,10 @@
                 <form:hidden path="originalFileName" />
                 <form:hidden path="transactionRecordId" />
                 <form:hidden path="batchId" />
-                <form:hidden path="transactionId" />
+                <form:hidden path="transactionId" id="transactionId" />
                 <form:hidden path="targetConfigId" />
                 <form:hidden path="transactionTargetId" />
+                <input type="hidden" id="attachmentIds" name="attachmentIds" value="" />
                 <c:forEach items="${transaction.sourceOrgFields}" varStatus="i">
                     <form:hidden path="sourceOrgFields[${i.index}].fieldValue" />
                     <form:hidden path="sourceOrgFields[${i.index}].fieldNo" />
@@ -134,6 +135,29 @@
                                             </div>
                                          </div>
                                     </c:forEach>
+                                </div>
+                                        
+                                <%-- Existing Message Attachments --%>
+                                <div class="form-section row">
+                                    <div class="col-md-12"><h4 class="form-section-heading">Existing Attachments:</h4></div>
+                                    <div class="col-md-12" id="existingAttachments"></div>
+                                </div>     
+                                    
+                                <%-- New Message Attachment --%>
+                                <div class="form-section row">
+                                    <div class="col-md-12"><h4 class="form-section-heading">Upload New Attachment:</h4></div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label" for="attachmentTitle">Attachment Title</label>
+                                            <input id="attachmentTitle" class="form-control" />
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label" for="attachmentFile">Attachment File</label>
+                                            <input name="fileUpload" id="attachmentFileUpload" type="file" class="form-control" />
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div class="form-group">

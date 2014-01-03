@@ -26,7 +26,7 @@ public class organizationManagerImpl implements organizationManager {
         Integer lastId = null;
         lastId = (Integer) organizationDAO.createOrganization(organization);
 
-		//Need to create the directory structure for the new organization
+	//Need to create the directory structure for the new organization
         //Use the cleanURL (name without spaces) for the directory name
         //First get the operating system
         fileSystem dir = new fileSystem();
@@ -41,7 +41,7 @@ public class organizationManagerImpl implements organizationManager {
     public void updateOrganization(Organization organization) {
         organizationDAO.updateOrganization(organization);
 
-		//Need to make sure all folders are created for
+	//Need to make sure all folders are created for
         //the organization
         fileSystem dir = new fileSystem();
 
