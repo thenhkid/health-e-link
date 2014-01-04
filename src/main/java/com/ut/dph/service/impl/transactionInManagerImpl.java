@@ -230,4 +230,23 @@ public class transactionInManagerImpl implements transactionInManager {
     public List<transactionAttachment> getAttachmentsByTransactionId(int transactionInId) {
         return transactionInDAO.getAttachmentsByTransactionId(transactionInId);
     }
+    
+    @Override
+    @Transactional
+    public void removeAttachmentById(int attachmentId) {
+        
+        /* Need to get the file name of the attachment */
+        transactionAttachment attachment =  getAttachmentById(attachmentId);
+        
+        /* Need to remove the attachment */
+        fileSystem currdir = new fileSystem();
+        currdir.setDirByName(attachment.getfileLocation());
+        File currFile = new File(currdir.getDir() + attachment.getfileName());
+        currFile.delete();
+        
+        
+        /* Now remove the attachment from the database */
+        transactionInDAO.removeAttachmentById(attachmentId);
+        
+    }
 }

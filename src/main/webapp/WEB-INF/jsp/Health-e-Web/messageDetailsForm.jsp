@@ -87,12 +87,10 @@
                                     <div class="col-md-12"><h4 class="form-section-heading">Patient Information:</h4></div>
                                     <c:forEach items="${transaction.patientFields}" var="patientInfo" varStatus="pfield">
                                         <input type="hidden" name="patientFields[${pfield.index}].fieldNo" value="${patientInfo.fieldNo}" />
-                                         <div class="col-md-6">
+                                        <div class="col-md-6 ${pfield.index != 0 ? '' : 'cb'}">
                                             <div id="fieldDiv_${patientInfo.fieldNo}" class="form-group">
                                                 <label class="control-label" for="${patientInfo.fieldNo}">
-                                                    ${patientInfo.fieldLabel}&nbsp;<c:if test="${patientInfo.required == true}">*&nbsp;</c:if>
-                                                    <span id="errorMsg_${patientInfo.fieldNo}" class="control-label"></span>  
-                                                </label>
+                                                    ${patientInfo.fieldLabel}&nbsp;<c:if test="${patientInfo.required == true}">*&nbsp;</c:if></label>
                                                 <c:choose>
                                                     <c:when test="${patientInfo.fieldSelectOptions.size() > 0}">
                                                         <select id="${patientInfo.fieldNo}" name="patientFields[${pfield.index}].fieldValue" class="form-control <c:if test="${patientInfo.required == true}"> required</c:if>">
@@ -106,6 +104,7 @@
                                                         <input id="${patientInfo.fieldNo}" name="patientFields[${pfield.index}].fieldValue" value="${patientInfo.fieldValue}" class="form-control ${patientInfo.validation.replace(' ','-')} <c:if test="${patientInfo.required == true}"> required</c:if>" type="text">
                                                    </c:otherwise>
                                                 </c:choose>
+                                                <span id="errorMsg_${patientInfo.fieldNo}" class="control-label"></span>  
                                             </div>
                                          </div>
                                     </c:forEach>
@@ -115,7 +114,7 @@
                                     <div class="col-md-12"><h4 class="form-section-heading">Message Details: </h4></div>
                                     <c:forEach items="${transaction.detailFields}" var="detailInfo" varStatus="dfield">
                                          <input type="hidden" name="detailFields[${dfield.index}].fieldNo" value="${detailInfo.fieldNo}" />
-                                         <div class="col-md-6">
+                                         <div class="col-md-6 ${dfield.index != 0 ? '' : 'cb'}">
                                             <div id="fieldDiv_${detailInfo.fieldNo}" class="form-group">
                                                 <label class="control-label" for="fieldA">${detailInfo.fieldLabel} <c:if test="${detailInfo.required == true}">&nbsp;*</c:if></label>
                                                 <c:choose>

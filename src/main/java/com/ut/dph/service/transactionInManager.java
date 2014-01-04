@@ -69,4 +69,6 @@ public interface transactionInManager {
     
     List<transactionAttachment> getAttachmentsByTransactionId(int transactionInId);
     
+    void removeAttachmentById(int attachmentId);
+    
 }

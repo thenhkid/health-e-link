@@ -517,4 +517,23 @@ public class transactionInDAOImpl implements transactionInDAO {
         return criteria.list();
     }
     
+    /**
+     * The 'removeAttachmentById' function will remove the attachment from the Database.
+     * 
+     * @param attachmentId  The id of the attachment to be removed
+     * 
+     * @table transactionAttachments
+     * 
+     * @return This function will not return anything.
+     */
+    @Override
+    @Transactional
+    public void removeAttachmentById(int attachmentId) {
+        
+        Query deletAttachment = sessionFactory.getCurrentSession().createQuery("delete from transactionAttachment where id = :attachmentId");
+        deletAttachment.setParameter("attachmentId", attachmentId);
+        deletAttachment.executeUpdate();
+        
+    }
+    
 }

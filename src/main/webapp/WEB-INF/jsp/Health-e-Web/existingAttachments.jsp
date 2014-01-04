@@ -14,7 +14,7 @@
         <c:choose>
             <c:when test="${attachments.size() > 0}">
                 <c:forEach items="${attachments}" var="attachment" varStatus="tStatus">
-                    <tr>
+                    <tr id="attachmentRow-${attachment.id}">
                         <td scope="row">
                             ${tStatus.index+1}.&nbsp;<c:choose><c:when test="${not empty attachment.title}">${attachment.title}</c:when><c:otherwise>${attachment.fileName}</c:otherwise></c:choose>
                         </td>

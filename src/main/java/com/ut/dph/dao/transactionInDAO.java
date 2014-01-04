@@ -65,4 +65,6 @@ public interface transactionInDAO {
     void submitAttachmentChanges(transactionAttachment attachment);
     
     List<transactionAttachment> getAttachmentsByTransactionId(int transactionInId);
+    
+    void removeAttachmentById(int attachmentId);
 }

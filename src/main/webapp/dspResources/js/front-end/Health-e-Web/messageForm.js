@@ -53,6 +53,29 @@ $(document).ready(function() {
            
         }
     });
+    
+    $(document).on('click', '.removeAttachment', function() {
+       
+        var confirmed = confirm("Are you sure you want to remove this attachment?");
+        
+        if(confirmed) {
+            
+            var attachmentId = $(this).attr('rel');
+            
+            $.ajax({
+                url: '../removeAttachment.do',
+                type: 'POST',
+                data: {'attachmentId': attachmentId},
+                success: function(data) {
+                   $('#attachmentRow-'+attachmentId).remove();
+                }
+            });
+            
+        }
+        
+    });
+    
+    
 
 
 });

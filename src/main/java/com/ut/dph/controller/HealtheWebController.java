@@ -1248,7 +1248,16 @@ public class HealtheWebController {
     }
     
     /**
+     * The 'populateExistingAttachments' function will look to see if any attachments exist
+     * for the transaction.
      * 
+     * @param   transactionId   The id of the selected transaction (only passed when viewing an
+     *                          existing transaction)
+     * 
+     * @param   newattachmentIdList the list of attachments added to a transaction (only passed
+     *                              when a new attachment is added to a transaction)
+     * 
+     * @return  This function will return the transaction attachment list page.
      */
     @RequestMapping(value= "/populateExistingAttachments.do", method = RequestMethod.GET)
     public @ResponseBody ModelAndView getMessageAttachments(@RequestParam(value = "transactionId", required = false) Integer transactionId, @RequestParam(value = "newattachmentIdList", required = false) List<Integer> newattachmentIdList) {
@@ -1277,6 +1286,22 @@ public class HealtheWebController {
         mav.addObject("attachments", attachments);
         
         return mav;
+        
+    }
+    
+    /**
+     * The 'removeAttachment.do' function will remove the selected attachment.
+     * 
+     * @param attachmentId  The id of the attachment to remove
+     * 
+     * @return This function will simply return a 1.
+     */
+    @RequestMapping(value= "/removeAttachment.do", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody Integer removeMessageAttachment(@RequestParam(value = "attachmentId", required = false) Integer attachmentId) {
+        
+        transactionInManager.removeAttachmentById(attachmentId);
+       
+        return 1;
         
     }
     

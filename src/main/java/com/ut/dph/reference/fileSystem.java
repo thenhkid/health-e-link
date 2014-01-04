@@ -60,7 +60,19 @@ public class fileSystem {
         else if (os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0 || os.indexOf("aix") >= 0 || os.indexOf("sunos") >= 0) {
             this.dir = unixDirectoryPath + orgName + "/" + folderName + "/";
         }
-
+    }
+    
+    public void setDirByName(String dirName) {
+        //Windows
+        if (os.indexOf("win") >= 0) {
+            this.dir = winDirectoryPath + dirName;
+        } //Mac
+        else if (os.indexOf("mac") >= 0) {
+            this.dir = macDirectoryPath + dirName;
+        } //Unix or Linux or Solarix
+        else if (os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0 || os.indexOf("aix") >= 0 || os.indexOf("sunos") >= 0) {
+            this.dir = unixDirectoryPath + dirName;
+        }
     }
 
     public void deleteOrgDirectories(String orgName) {
