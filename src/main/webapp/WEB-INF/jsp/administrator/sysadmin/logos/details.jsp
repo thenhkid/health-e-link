@@ -24,7 +24,7 @@
                 </div>
                 <div class="form-group">
                      <label class="control-label" for="templateImage">Current Front End Logo
-                     	<img src="../../dspResources/img/front-end/health-e-link/${logoDetails.frontEndLogoName}" border="10"/>
+                     	<img src="../../dspResources/img/front-end/health-e-link/${logoDetails.frontEndLogoName}" border="0"/>
                      </label>
                      
                 </div>
