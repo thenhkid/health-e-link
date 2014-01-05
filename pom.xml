@@ -9,12 +9,13 @@
   <url>http://maven.apache.org</url>
   
   <properties>
-        <org.springframework.version>3.2.1.RELEASE</org.springframework.version>
+        <org.springframework.version>3.2.6.RELEASE</org.springframework.version>
         <org.spring.security.version>3.1.2.RELEASE</org.spring.security.version>
         <org.slf4j.version>1.6.1</org.slf4j.version>
         <org.apache.tiles.version>2.2.1</org.apache.tiles.version>
   </properties>
   
+ 
   <dependencies>
   
        <!--  Spring  -->
