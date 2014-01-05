@@ -48,9 +48,9 @@
         <div class="col-md-3 col-sm-3 col-xs-6">
             <section class="panel panel-default panel-stats">
                 <div class="panel-body">
-                    <span class="stat-number"><a href="logo" title="Configure Logo">#</a></span>
-                    <h3>Logo</h3>
-                    <a href="logo" title="Configure Logo" class="btn btn-primary btn-small" role="button">View Logo</a>
+                    <span class="stat-number"><a href="logos" title="Configure Logos">2</a></span>
+                    <h3>Logos</h3>
+                    <a href="logos" title="Configure Logos" class="btn btn-primary btn-small" role="button">View Logos</a>
                 </div>
             </section>
         </div>

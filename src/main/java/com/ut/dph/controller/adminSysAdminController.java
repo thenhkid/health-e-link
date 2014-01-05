@@ -2,6 +2,7 @@ package com.ut.dph.controller;
 
 import java.util.List;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -12,7 +13,9 @@ import com.ut.dph.reference.USStateList;
 import com.ut.dph.reference.ProcessCategoryList;
 import com.ut.dph.service.configurationManager;
 import com.ut.dph.service.sysAdminManager;
+import com.ut.dph.model.Brochure;
 import com.ut.dph.model.Macros;
+import com.ut.dph.model.custom.LogoInfo;
 import com.ut.dph.model.custom.LookUpTable;
 import com.ut.dph.model.custom.TableData;
 import com.ut.dph.model.lutables.lu_Counties;
@@ -33,6 +36,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
@@ -45,9 +49,10 @@ public class adminSysAdminController {
 	@Autowired 
 	private sysAdminManager sysAdminManager;
 
-	@Autowired
-    private configurationManager configurationmanager;
-
+	@Autowired 
+	private configurationManager configurationmanager;
+	
+	@Autowired private ServletContext servletContext;
 	/**
 	 * The private maxResults variable will hold the number of results to show per
 	 * list page.
@@ -72,8 +77,7 @@ public class adminSysAdminController {
         
         return mav;
     }
-    
-    
+  
     /**
 	 * MACROS 
 	 * **/
@@ -1529,5 +1533,38 @@ public class adminSysAdminController {
 	}
 	
 	/**End of ProcessStatus**/
+
+
+    /**
+     * Logos
+     */
+    @RequestMapping(value = "/logos", method = RequestMethod.GET)
+    public @ResponseBody
+    ModelAndView updateLogosForm(HttpServletRequest request) throws Exception {
+    	
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/sysadmin/logos");
+        LogoInfo logoDetails = sysAdminManager.getLogoInfo();
+        /** we had a logo from before **/
+        if (logoDetails.getBackEndLogoName().indexOf("backEndLogo") == 0) {
+        	sysAdminManager.copyBELogo(request, logoDetails);
+        }
+        if (logoDetails.getFrontEndLogoName().indexOf("frontEndLogo") == 0) {
+        	sysAdminManager.copyFELogo(request, logoDetails);
+        }
+        mav.addObject("btnValue", "Update");
+        mav.addObject("logoDetails", logoDetails);
+        return mav;
+    }
+
+    @RequestMapping(value = "/logos", method = RequestMethod.POST)
+    public ModelAndView updateLogos(@ModelAttribute(value = "logoDetails") LogoInfo logoDetails, 
+    		RedirectAttributes redirectAttr) throws Exception {
+
+    	sysAdminManager.updateLogoInfo(logoDetails);
+        ModelAndView mav = new ModelAndView(new RedirectView("logos?msg=updated"));
+        redirectAttr.addFlashAttribute("savedStatus", "updated");
+        return mav;
+    }
 }
 

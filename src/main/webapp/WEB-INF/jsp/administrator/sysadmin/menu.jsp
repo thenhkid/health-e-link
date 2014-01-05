@@ -4,7 +4,7 @@
 		<ul class="nav nav-pills nav-stacked">
 			<li ${param['page'] == 'table' ? 'class="active"' : ''}><a href="<c:url value='/administrator/sysadmin/data'/>" title="Table Data">Look Up Tables</a></li>
 			<li ${param['page'] == 'macroList' ? 'class="active"' : ''}><a href="<c:url value='/administrator/sysadmin/macros'/>" title="Macros">Macros</a></li>
-			<li ${param['page'] == 'logo' ? 'class="active"' : ''}><a href="<c:url value='/administrator/sysadmin/logo'/>" title="Logo">Logo</a></li>
+			<li ${param['page'] == 'logos' ? 'class="active"' : ''}><a href="<c:url value='/administrator/sysadmin/logos'/>" title="Logo">Logos</a></li>
 		</ul>
 	</nav>
 </aside>

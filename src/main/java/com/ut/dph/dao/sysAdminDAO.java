@@ -2,6 +2,7 @@ package com.ut.dph.dao;
 
 import java.util.List;
 
+import com.ut.dph.model.custom.LogoInfo;
 import com.ut.dph.model.custom.LookUpTable;
 import com.ut.dph.model.custom.TableData;
 import com.ut.dph.model.lutables.lu_Counties;
@@ -107,4 +108,8 @@ public interface sysAdminDAO {
 	lu_ProcessStatus getProcessStatusById (int id);
 	
 	void updateProcessStatus(lu_ProcessStatus lu);
+	
+	LogoInfo getLogoInfo();
+	
+	void updateLogoInfo(LogoInfo logoDetails);
 }

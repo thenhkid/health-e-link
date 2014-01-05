@@ -305,6 +305,18 @@
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/sysadmin/macro/list.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/admin/sysadmin/macro/list.js" />
     </definition>
+    
+    <!--  this page let user modify front end and admin logos -->    
+    <definition name="/administrator/sysadmin/logos" extends="base.definition.admin">
+        <put-attribute name="page-id" value="sysadmin-logos" />
+        <put-attribute name="page-section" value="section-sysadmin" />
+        <put-attribute name="title" value="Administrator - Manage Logos" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=sysadmin" />
+        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/sysadmin/actionBar.jsp?page=logos" />
+        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/sysadmin/menu.jsp?page=logos" />
+        <put-attribute name="body" value="/WEB-INF/jsp/administrator/sysadmin/logos/details.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/admin/sysadmin/logos/details.js" />
+    </definition>
 
 
     <!--  end sysadmin definitions -->

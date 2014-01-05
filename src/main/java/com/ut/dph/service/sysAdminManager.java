@@ -1,7 +1,11 @@
 package com.ut.dph.service;
 
+import java.io.InputStream;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
+import com.ut.dph.model.custom.LogoInfo;
 import com.ut.dph.model.custom.LookUpTable;
 import com.ut.dph.model.custom.TableData;
 import com.ut.dph.model.lutables.lu_Counties;
@@ -123,5 +127,25 @@ public interface sysAdminManager {
 	lu_ProcessStatus getProcessStatusById (int id);
 	
 	void updateProcessStatus(lu_ProcessStatus lu);
+	
+	boolean logoExists(String fileName);	
+	
+	LogoInfo getLogoInfo();
+	
+	boolean updateLogoInfo(LogoInfo logoDetails);
+	
+	boolean writeFile(String path, InputStream inputStream, String directory);
+	
+	void copyFELogo (HttpServletRequest request, LogoInfo logoInfo);
+	
+	void copyBELogo (HttpServletRequest request, LogoInfo logoInfo);
+	
+	String getBowlinkLogoPath ();
+
+	String getDeployedPath(HttpServletRequest request);
+	
+	String getFrontEndLogoPath();
+	
+	String getBackEndLogoPath();
 }
 

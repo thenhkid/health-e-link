@@ -7,8 +7,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
+import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.StandardBasicTypes;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ut.dph.dao.sysAdminDAO;
 import com.ut.dph.dao.UtilitiesDAO;
 import com.ut.dph.model.Macros;
+import com.ut.dph.model.User;
+import com.ut.dph.model.custom.LogoInfo;
 import com.ut.dph.model.custom.LookUpTable;
 import com.ut.dph.model.custom.TableData;
 import com.ut.dph.model.lutables.lu_Counties;
@@ -725,6 +729,33 @@ public class sysAdminDAOImpl implements sysAdminDAO {
 				sessionFactory.getCurrentSession().update(lu);							
 			} catch (Throwable ex) {
                 System.err.println("update ProcessStatus failed." + ex);
+			}
+		}
+
+		@Override
+		@Transactional
+		@SuppressWarnings("unchecked")
+		public LogoInfo getLogoInfo() {
+			LogoInfo logoInfo = new LogoInfo();
+			try {
+				Query logos = sessionFactory.getCurrentSession().createQuery("from LogoInfo order by id desc ").setMaxResults(1);
+	            List<LogoInfo> li = logos.list();
+	            if (li.size() != 0) {
+	            	logoInfo = li.get(0);
+	            }
+	        } catch (Throwable ex) {
+                System.err.println("get LogoInfo failed." + ex);  
+			}
+			 return logoInfo;
+		}
+
+		@Override
+		@Transactional
+		public void updateLogoInfo(LogoInfo logoDetails) {
+			try {
+				sessionFactory.getCurrentSession().update(logoDetails);							
+			} catch (Throwable ex) {
+                System.err.println("update LogoInfo failed." + ex);
 			}
 		}
 		

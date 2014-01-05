@@ -237,5 +237,15 @@ public class fileSystem {
 
         return delimCount;
     }
+    
+    public boolean isWinMachine() {
+    	
+    	boolean winMachine = false;
+        //Windows
+        if (os.indexOf("win") >= 0) {
+        	winMachine =  true;
+        } 
+        return winMachine;
+    }
 
 }
