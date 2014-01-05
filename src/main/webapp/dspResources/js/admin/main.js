@@ -5,7 +5,9 @@ require.config({
 		'jquery' : '../vendor/jquery-1.10.1.min',
 		'bootstrap' : '../vendor/bootstrap',
 		'responsive-tables' : '../vendor/responsive-tables',
-		'mediaModal' : '../mediaModal'
+		'mediaModal' : '../mediaModal',
+		'overlay' : '../overlay',
+		'sprintf' : '../vendor/sprintf'
 	},
 	shim: {
 		'bootstrap': ['jquery'],
@@ -13,7 +15,7 @@ require.config({
 	}
 });
 
-require(['jquery',  'bootstrap', 'responsive-tables', 'mediaModal'], function ($) {
+require(['jquery',  'bootstrap', 'responsive-tables', 'mediaModal', 'overlay'], function ($) {
 
 	// tooltip demo
 	$(document).tooltip({
@@ -50,6 +52,18 @@ require(['jquery',  'bootstrap', 'responsive-tables', 'mediaModal'], function ($
 			e.preventDefault();
 			return false;
 		}
-	})
+	});
+
+	// overlay example:
+	// show overlay:
+	/*
+		$('body').overlay({
+			glyphicon : 'floppy-disk',
+			message : 'Saving...'
+		});
+	*/
+
+	// hide overlay:
+	// $('body').overlay('hide');
 
 });
