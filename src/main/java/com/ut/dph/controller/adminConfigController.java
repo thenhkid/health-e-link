@@ -443,7 +443,7 @@ public class adminConfigController {
         }
         
         //Need to get a list of all configurations for the current organization
-        List<configuration> configurations = configurationmanager.getConfigurationsByOrgId(configurationDetails.getorgId(),null);
+        List<configuration> configurations = configurationmanager.getConfigurationsByOrgId(configurationDetails.getorgId(),"");
 
         for(configuration config : configurations) {
             configurationTransport transDetails = configurationTransportManager.getTransportDetails(config.getId());
