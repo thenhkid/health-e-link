@@ -25,6 +25,29 @@
                                 <label class="sr-only" for="searchTerm">Search</label>
                                 <input type="text" name="searchTerm" id="searchTerm" value="${searchTerm}" class="form-control" id="search-organizations" placeholder="Search"/>
                             </div>
+
+                            <div class="form-group">
+                                <label>
+                                    <input type="radio" />
+                                    Target
+                                </label>
+                            </div>
+
+                           <div class="form-group">
+                                <label>
+                                    <input type="radio" />
+                                    Source
+                                </label>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="sr-only">Source</label>
+                                <select class="form-control">
+                                    <option>Target</option>
+                                    <option>Source</option>
+                                </select>
+                            </div>
+
                             <button id="searchOrgBtn" class="btn btn-primary btn-sm" title="Search Organizations" role="button">
                                 <span class="glyphicon glyphicon-search"></span>
                             </button>

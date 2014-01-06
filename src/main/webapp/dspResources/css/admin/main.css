@@ -5996,6 +5996,9 @@ body {
   overflow: hidden;
   margin-bottom: 10px;
 }
+.table-actions .form label {
+  font-weight: normal;
+}
 .table > tbody > tr.table-section-title > td {
   border-top: 0;
   padding-top: 20px;
