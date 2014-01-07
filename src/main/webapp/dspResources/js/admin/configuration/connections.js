@@ -1,6 +1,7 @@
 
 $(function() {
     
+    
     //Fade out the updated/created message after being displayed.
     if ($('.alert').length > 0) {
         $('.alert').delay(2000).fadeOut(1000);
@@ -28,6 +29,19 @@ $(function() {
         $.ajax({
             url: 'createConnection',
             type: "GET",
+            success: function(data) {
+                $("#connectionsModal").html(data);
+            }
+        });
+    });
+    
+    //This function will launch the edit connection overlay
+    $(document).on('click', '.connectionEdit', function() {
+        var connectionId = $(this).attr('rel');
+        $.ajax({
+            url: 'editConnection',
+            type: "GET",
+            data: {'connectionId':connectionId},
             success: function(data) {
                 $("#connectionsModal").html(data);
             }
@@ -84,32 +98,29 @@ $(function() {
             $('#tgtConfigDiv').addClass("has-error");
             hasErrors = 1;
         }
-        
-        if (srcUsers === '') {
+       
+        if (srcUsers === '' || srcUsers == null) {
             $('#srcUsersDiv').addClass("has-error");
             hasErrors = 1;
         }
         
-        if (tgtUsers === '') {
+        if (tgtUsers === '' || tgtUsers == null) {
             $('#tgtUsersDiv').addClass("has-error");
             hasErrors = 1;
         }
         
         if(hasErrors == 0) {
-             $.ajax({
-                url: 'addConnection.do',
-                type: "POST",
-                data: {'srcConfig': srcConfig, 'tgtConfig': tgtConfig, 'srcUsers' : srcUsers, 'tgtUsers' : tgtUsers},
-                success: function(data) {
-                    window.location.href='connections?msg=created'
-                }
-            });
+            
+            $('#connectionForm').submit();
         }
         
     });
 });
 
 function populateConfigurations(orgId, selectBoxId) {
+    
+    var currConfigId = $('#'+selectBoxId).attr('rel');
+   
     $.ajax({
         url: 'getAvailableConfigurations.do',
         type: "GET",
@@ -118,8 +129,14 @@ function populateConfigurations(orgId, selectBoxId) {
             //get value of preselected col
             var html = '<option value="">- Select - </option>';
             var len = data.length;
+            
             for (var i = 0; i < len; i++) {
-               html += '<option value="' + data[i].id + '">' + data[i].messageTypeName + '&nbsp;&#149;&nbsp;' + data[i].transportMethod + '</option>';
+              if(data[i].id == currConfigId) {
+                 html += '<option value="' + data[i].id + '" selected>' + data[i].messageTypeName + '&nbsp;&#149;&nbsp;' + data[i].transportMethod + '</option>';
+              }
+              else {
+                 html += '<option value="' + data[i].id + '">' + data[i].messageTypeName + '&nbsp;&#149;&nbsp;' + data[i].transportMethod + '</option>'; 
+              }
             }
             $('#'+selectBoxId).html(html);
         }
@@ -127,6 +144,9 @@ function populateConfigurations(orgId, selectBoxId) {
 }
 
 function populateUsers(orgId, selectBoxId) {
+    
+    var users = $('#'+selectBoxId).attr('rel');
+    
     $.ajax({
         url: 'getAvailableUsers.do',
         type: "GET",
@@ -135,8 +155,21 @@ function populateUsers(orgId, selectBoxId) {
             //get value of preselected col
             var html = '<option value="">- Select - </option>';
             var len = data.length;
+            
+            if(len > 1) {
+                $('#'+selectBoxId+'Found').html("(" + len + " users found)");
+            }
+            else {
+                $('#'+selectBoxId+'Found').html("(" + len + " user found)"); 
+            }
+            
             for (var i = 0; i < len; i++) {
-               html += '<option value="' + data[i].id + '">' + data[i].firstName + ' ' + data[i].lastName + '</option>';
+                if(users != '' && users.indexOf(data[i][0]) != -1) {
+                    html += '<option value="' + data[i][0]+ '" selected>' + data[i][1] + ' ' + data[i][2] + '</option>';
+                }
+                else {
+                    html += '<option value="' + data[i][0]+ '">' + data[i][1] + ' ' + data[i][2] + '</option>';
+                }
             }
             $('#'+selectBoxId).html(html);
         }

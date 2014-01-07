@@ -45,7 +45,7 @@ public class configurationDAOImpl implements configurationDAO {
      */
     @Override
     public Integer createConfiguration(configuration configuration) {
-        Integer lastId = null;
+        Integer lastId;
 
         lastId = (Integer) sessionFactory.getCurrentSession().save(configuration);
 
@@ -526,8 +526,45 @@ public class configurationDAOImpl implements configurationDAO {
      */
     @Override
     @Transactional
-    public void saveConnection(configurationConnection connection) {
-        sessionFactory.getCurrentSession().save(connection);
+    public Integer saveConnection(configurationConnection connection) {
+        Integer connectionId;
+
+        connectionId = (Integer) sessionFactory.getCurrentSession().save(connection);
+
+        return connectionId;
+        
+    }
+    
+    /**
+     * The 'saveConnectionSenders' function will save the list of users selected
+     * to be authorized to send transactions for a configuration connection.
+     * 
+     * @table configurationConnectionSenders
+     * 
+     * @param senders The configurationConnectionSenders object
+     * 
+     * @return This function does not return anything
+     */
+    @Override
+    @Transactional
+    public void saveConnectionSenders(configurationConnectionSenders senders) {
+        sessionFactory.getCurrentSession().save(senders);
+    }
+  
+    /**
+     * The 'saveConnectionReceivers' function will save the list of users selected
+     * to be authorized to receive transactions for a configuration connection.
+     * 
+     * @table configurationConnectionReceivers
+     * 
+     * @param receivers The configurationConnectionSenders object
+     * 
+     * @return This function does not return anything
+     */
+    @Override
+    @Transactional
+    public void saveConnectionReceivers(configurationConnectionReceivers receivers) {
+        sessionFactory.getCurrentSession().save(receivers);
     }
     
     /**
@@ -576,6 +613,38 @@ public class configurationDAOImpl implements configurationDAO {
         criteria.add(Restrictions.eq("connectionId", connectionId));
         
         return criteria.list();
+    }
+    
+    /**
+     * The 'removeConnectionSenders' function will remove the authorized senders for the passed in connectionId.
+     * 
+     * @param connectionId The connection Id to remove senders for
+     * 
+     * @return THis function does not return anything
+     */
+    @Override
+    @Transactional
+    public void removeConnectionSenders(int connectionId) {
+        Query query = sessionFactory.getCurrentSession().createSQLQuery("DELETE from configurationConnectionSenders where connectionId = :connectionId")
+                .setParameter("connectionId", connectionId);
+
+        query.executeUpdate();
+    }
+  
+    /**
+     * The 'removeConnectionReceivers' function will remove the authorized receivers for the passed in connectionId.
+     * 
+     * @param connectionId The connection Id to remove receivers for
+     * 
+     * @return THis function does not return anything
+     */
+    @Override
+    @Transactional
+    public void removeConnectionReceivers(int connectionId) {
+        Query query = sessionFactory.getCurrentSession().createSQLQuery("DELETE from configurationConnectionReceivers where connectionId = :connectionId")
+                .setParameter("connectionId", connectionId);
+
+        query.executeUpdate();
     }
     
     /**

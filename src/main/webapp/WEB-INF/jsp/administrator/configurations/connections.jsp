@@ -5,13 +5,19 @@
 
 <div class="main clearfix full-width" role="main">
     <div class="col-md-12">
-        <c:if test="${not empty param.msg}" >
+        <c:if test="${not empty savedStatus}" >
             <div class="alert alert-success">
                 <strong>Success!</strong> 
                 <c:choose>
-                    <c:when test="${param.msg == 'created'}">The configuration connection has been successfully created!</c:when>
-                    <c:when test="${param.msg == 'updated'}">The configuration connection status has been successfully updated!</c:when>
+                    <c:when test="${savedStatus == 'created'}">The configuration connection has been successfully created!</c:when>
+                    <c:when test="${savedStatus == 'updated'}">The configuration connection has been successfully updated!</c:when>
                 </c:choose>
+            </div>
+        </c:if>
+        <c:if test="${not empty param['msg']}" >
+            <div class="alert alert-success">
+                <strong>Success!</strong> 
+                The configuration connection status has been successfully updated!
             </div>
         </c:if>
 
@@ -20,7 +26,7 @@
                 <div class="table-actions">
                     <div class="form form-inline pull-left">
                         <div role="search">
-                            <form:form class="form form-inline" action="/administrator/configuration/connections" method="post">
+                            <form:form class="form form-inline" action="connections" method="post">
                                 <div class="form-group">
                                     <label class="sr-only" for="searchTerm">Search</label>
                                     <input type="text" name="searchTerm" id="searchTerm" value="${searchTerm}" class="form-control" id="search-organizations" placeholder="Search"/>
@@ -46,6 +52,7 @@
                                 <th scope="col" class="center-text">Target Transport Method</th>
                                 <th scope="col" class="center-text">Date Created</th>
                                 <th scope="col" class="center-text">Status</th>
+                                <th scope="col" class="center-text"></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -55,8 +62,10 @@
                                         <tr>
                                             <td scope="row">
                                                 <strong>${connection.srcConfigDetails.getOrgName()}</strong>
-                                                <br />
-                                                Authorized User: ${connection.srcConfigDetails.getuserName()}
+                                                <br />Authorized User(s): <br />
+                                                <c:forEach items="${connection.connectionSenders}" var="sender" varStatus="sIndex">
+                                                    ${sIndex.index+1}. ${sender.firstName}&nbsp;${sender.lastName} (<c:choose><c:when test="${sender.userType == 1}">Manager</c:when><c:otherwise>Staff Member</c:otherwise></c:choose>)<br />
+                                                </c:forEach>
                                             </td>
                                             <td>
                                                ${connection.srcConfigDetails.getMessageTypeName()}
@@ -66,15 +75,17 @@
                                             </td>
                                             <td scope="row">
                                                 <strong>${connection.tgtConfigDetails.getOrgName()}</strong>
-                                                <br />
-                                                Authorized User: ${connection.tgtConfigDetails.getuserName()}
+                                                <br />Authorized User(s): <br />
+                                                <c:forEach items="${connection.connectionReceivers}" var="receiver" varStatus="rIndex">
+                                                    ${rIndex.index+1}. ${receiver.firstName}&nbsp;${receiver.lastName} (<c:choose><c:when test="${receiver.userType == 1}">Manager</c:when><c:otherwise>Staff Member</c:otherwise></c:choose>)<br />
+                                                </c:forEach>
                                             </td>
                                             <td class="center-text">
                                                ${connection.tgtConfigDetails.gettransportMethod()}
                                             </td>
                                             <td class="center-text"><fmt:formatDate value="${connection.dateCreated}" type="date" pattern="M/dd/yyyy" /></td>
                                             <td class="center-text actions-col">
-                                                <c:choose>
+                                               <c:choose>
                                                     <c:when test="${connection.status == true}">
                                                         <a href="javascript:void(0);" class="btn btn-link changeStatus" rel2="false" rel="${connection.id}" title="Make this connection inactive" role="button">Active</a>
                                                     </c:when>
@@ -82,6 +93,12 @@
                                                         <a href="javascript:void(0);" class="btn btn-link changeStatus" rel2="true" rel="${connection.id}" title="Make this connection active" role="button">Inactive</a>
                                                     </c:otherwise>
                                                 </c:choose>
+                                            </td>
+                                            <td class="center-text actions-col">
+                                                <a href="#connectionsModal" data-toggle="modal" rel="${connection.id}" class="btn btn-link connectionEdit" title="Edit this connection">
+                                                    <span class="glyphicon glyphicon-edit"></span>
+                                                    Edit
+                                                </a>
                                             </td>
                                         </tr>
                                     </c:forEach>

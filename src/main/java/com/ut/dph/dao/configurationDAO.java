@@ -56,7 +56,7 @@ public interface configurationDAO {
   
   List<configurationConnection> getConnectionsByConfiguration(int configId);
   
-  void saveConnection(configurationConnection connection);
+  Integer saveConnection(configurationConnection connection);
   
   configurationConnection getConnection(int connectionId);
   
@@ -75,4 +75,12 @@ public interface configurationDAO {
   List<configurationConnectionSenders> getConnectionSenders(int connectionId);
   
   List<configurationConnectionReceivers> getConnectionReceivers(int connectionId);
+  
+  void saveConnectionSenders(configurationConnectionSenders senders);
+  
+  void saveConnectionReceivers(configurationConnectionReceivers receivers);
+  
+  void removeConnectionSenders(int connectionId);
+  
+  void removeConnectionReceivers(int connectionId);
 }

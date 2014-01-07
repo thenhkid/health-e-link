@@ -1244,16 +1244,67 @@ public class adminConfigController {
     public @ResponseBody ModelAndView createNewConnectionForm() throws Exception {
         
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("/administrator/configurations/createConnection");
-        mav.addObject("id", configId);
-        mav.addObject("mappings", mappings);
+        mav.setViewName("/administrator/configurations/connectionDetails");
+        
+        configurationConnection connectionDetails = new configurationConnection();
+        mav.addObject("connectionDetails", connectionDetails);
         
         //Need to get a list of active organizations.
         List<Organization> organizations = organizationmanager.getAllActiveOrganizations();
         mav.addObject("organizations", organizations);
         
-        /* Set the variable to hold the number of completed steps for this configuration */
-        mav.addObject("stepsCompleted", stepsCompleted);
+        return mav;
+    }
+    
+    /**
+     * The '/editConnection' funtion will handle displaying the edit configuration connection screen.
+     * 
+     * @param connectionId The id of the clicked configuration connection
+     * 
+     * @return This function will disp;ay the edit connection overlay
+     */
+    @RequestMapping(value = "/editConnection", method = RequestMethod.GET)
+    public @ResponseBody ModelAndView editConnectionForm(@RequestParam(value = "connectionId", required = true) int connectionId) throws Exception {
+        
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/configurations/connectionDetails");
+        
+        configurationConnection connectionDetails = configurationmanager.getConnection(connectionId);
+        
+        configuration srcconfigDetails = configurationmanager.getConfigurationById(connectionDetails.getsourceConfigId());
+        srcconfigDetails.setorgId(organizationmanager.getOrganizationById(srcconfigDetails.getorgId()).getId());
+        connectionDetails.setsrcConfigDetails(srcconfigDetails);
+        
+        configuration tgtconfigDetails = configurationmanager.getConfigurationById(connectionDetails.gettargetConfigId());
+        tgtconfigDetails.setorgId(organizationmanager.getOrganizationById(tgtconfigDetails.getorgId()).getId());
+        connectionDetails.settgtConfigDetails(tgtconfigDetails);
+        
+        List<configurationConnectionSenders> senders = configurationmanager.getConnectionSenders(connectionId);
+        
+        /* Array to holder the users */
+        List<User> connectionSenders = new ArrayList<User>();
+        List<User> connectonReceivers = new ArrayList<User>();
+                
+        for(configurationConnectionSenders sender : senders) {
+            User userDetail = userManager.getUserById(sender.getuserId());
+            connectionSenders.add(userDetail);
+        }
+        connectionDetails.setconnectionSenders(connectionSenders);
+
+        /* Get the list of connection receivers */
+        List<configurationConnectionReceivers> receivers = configurationmanager.getConnectionReceivers(connectionId);
+
+        for(configurationConnectionReceivers receiver : receivers) {
+            User userDetail = userManager.getUserById(receiver.getuserId());
+            connectonReceivers.add(userDetail);
+        }
+        connectionDetails.setconnectionReceivers(connectonReceivers);
+        
+        mav.addObject("connectionDetails", connectionDetails);
+        
+        //Need to get a list of active organizations.
+        List<Organization> organizations = organizationmanager.getAllActiveOrganizations();
+        mav.addObject("organizations", organizations);
         
         return mav;
     }
@@ -1295,17 +1346,44 @@ public class adminConfigController {
      *
      * @return	The method will return a 1 back to the calling ajax function which will handle the page load.
      */
-    @RequestMapping(value = "/addConnection.do", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody Integer addConnection(@RequestParam(value = "srcConfig", required = true) int srcConfig, @RequestParam(value = "tgtConfig", required = true) int tgtConfig) throws Exception {
+    @RequestMapping(value = "/addConnection.do", method = RequestMethod.POST)
+    public ModelAndView addConnection (@ModelAttribute(value = "connectionDetails") configurationConnection connectionDetails, @RequestParam List<Integer> srcUsers, @RequestParam List<Integer> tgtUsers, RedirectAttributes redirectAttr) throws Exception {
        
-        configurationConnection newConnection = new configurationConnection();
-        newConnection.setStatus(true);
-        newConnection.setsourceConfigId(srcConfig);
-        newConnection.settargetConfigId(tgtConfig);
+        connectionDetails.setStatus(true);
+        Integer connectionId;
         
-        configurationmanager.saveConnection(newConnection);
-
-        return 1;
+        if(connectionDetails.getId() == 0) {
+            connectionId = configurationmanager.saveConnection(connectionDetails);
+            redirectAttr.addFlashAttribute("savedStatus", "created");
+        }
+        else {
+            connectionId = connectionDetails.getId();
+            configurationmanager.updateConnection(connectionDetails);
+            
+            /* Delete existing senders and receivers */
+            configurationmanager.removeConnectionSenders(connectionId);
+            configurationmanager.removeConnectionReceivers(connectionId);
+            redirectAttr.addFlashAttribute("savedStatus", "updated");
+        }
+        
+        for(Integer sender : srcUsers) {
+            configurationConnectionSenders senderInfo = new configurationConnectionSenders();
+            senderInfo.setconnectionId(connectionId);
+            senderInfo.setuserId(sender);
+            configurationmanager.saveConnectionSenders(senderInfo);
+        }
+        
+        for(Integer receiver : tgtUsers) {
+            configurationConnectionReceivers receiverInfo = new configurationConnectionReceivers();
+            receiverInfo.setconnectionId(connectionId);
+            receiverInfo.setuserId(receiver);
+            configurationmanager.saveConnectionReceivers(receiverInfo);
+        }
+        
+       ModelAndView mav = new ModelAndView(new RedirectView("connections"));
+       
+       return mav;
+        
     }
     
     /**

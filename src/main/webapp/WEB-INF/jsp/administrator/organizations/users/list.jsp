@@ -11,7 +11,7 @@
             <div class="alert alert-success">
                 <strong>Success!</strong> 
                 <c:choose><c:when test="${param.msg == 'updated'}">The system user has been successfully updated!</c:when><c:when test="${param.msg == 'created'}">The system user has been successfully added!</c:when></c:choose>
-            </div>
+                    </div>
         </c:if>
         <section class="panel panel-default">
             <div class="panel-heading">
@@ -60,11 +60,11 @@
                                             <td class="center-text"><fmt:formatDate value="${user.dateCreated}" type="date" pattern="M/dd/yyyy" /></td>
                                             <td class="center-text">
                                                 <c:if test="${user.mainContact == 1}">X</c:if><c:if test="${user.mainContact != 1}">--</c:if>
-                                                </td>
-                                                <td class="center-text">
+                                            </td>
+                                            <td class="center-text">
                                                 <c:if test="${user.mainContact == 2}">X</c:if><c:if test="${user.mainContact != 2}">--</c:if>
-                                                </td>
-                                                    <td class="center-text">${userFunctions.findTotalLogins(user.id)}</td>
+                                            </td>
+                                            <td class="center-text">${userFunctions.findTotalLogins(user.id)}</td>
                                             <td class="actions-col">
                                                 <a href="#systemUsersModal" data-toggle="modal" rel="${user.firstName}${user.lastName}?i=${user.id}" class="btn btn-link userEdit" title="Edit this user">
                                                     <span class="glyphicon glyphicon-edit"></span>
@@ -81,18 +81,18 @@
                         </tbody>
                     </table>
                     <ul class="pagination pull-right" role="navigation" aria-labelledby="Paging">
-                    <c:if test="${currentPage > 1}"><li><a href="?page=${currentPage-1}">&laquo;</a></li></c:if>
-                        <c:forEach var="i" begin="1" end="${totalPages}">
-                        <li><a href="?page=${i}">${i}</a></li>
-                        </c:forEach>
-                        <c:if test="${currentPage < totalPages}"><li><a href="?page=${currentPage+1}">&raquo;</a></li></c:if>
-                    </ul>
+                        <c:if test="${currentPage > 1}"><li><a href="?page=${currentPage-1}">&laquo;</a></li></c:if>
+                            <c:forEach var="i" begin="1" end="${totalPages}">
+                            <li><a href="?page=${i}">${i}</a></li>
+                            </c:forEach>
+                            <c:if test="${currentPage < totalPages}"><li><a href="?page=${currentPage+1}">&raquo;</a></li></c:if>
+                        </ul>
+                    </div>
                 </div>
-            </div>
-        </section>
+            </section>
+        </div>
     </div>
-</div>
-<p rel="${currentPage}" id="currentPageHolder" style="display:none"></p>
+    <p rel="${currentPage}" id="currentPageHolder" style="display:none"></p>
 
 <!-- Providers modal -->
 <div class="modal fade" id="systemUsersModal" role="dialog" tabindex="-1" aria-labeledby="Add System Users" aria-hidden="true" aria-describedby="Add new system users"></div>

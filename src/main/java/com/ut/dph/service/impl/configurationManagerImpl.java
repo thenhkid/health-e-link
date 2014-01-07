@@ -177,8 +177,8 @@ public class configurationManagerImpl implements configurationManager {
     
     @Override
     @Transactional
-    public void saveConnection(configurationConnection connection) {
-        configurationDAO.saveConnection(connection);
+    public Integer saveConnection(configurationConnection connection) {
+        return configurationDAO.saveConnection(connection);
     }
     
     @Override
@@ -227,6 +227,30 @@ public class configurationManagerImpl implements configurationManager {
     @Transactional
     public List<configurationConnectionReceivers> getConnectionReceivers(int connectionId) {
         return configurationDAO.getConnectionReceivers(connectionId);
+    }
+    
+    @Override
+    @Transactional
+    public void saveConnectionSenders(configurationConnectionSenders senders) {
+        configurationDAO.saveConnectionSenders(senders);
+    }
+  
+    @Override
+    @Transactional
+    public void saveConnectionReceivers(configurationConnectionReceivers receivers) {
+        configurationDAO.saveConnectionReceivers(receivers);
+    }
+    
+    @Override
+    @Transactional
+    public void removeConnectionSenders(int connectionId) {
+        configurationDAO.removeConnectionSenders(connectionId);
+    }
+  
+    @Override
+    @Transactional
+    public void removeConnectionReceivers(int connectionId) {
+        configurationDAO.removeConnectionReceivers(connectionId);
     }
     
     @Override
