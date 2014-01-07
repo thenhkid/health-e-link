@@ -10,7 +10,7 @@
             <div class="alert alert-success" role="alert">
                 <strong>Success!</strong> 
                 <c:choose><c:when test="${savedStatus == 'updated'}">The organization has been successfully updated!</c:when><c:otherwise>The organization has been successfully created!</c:otherwise></c:choose>
-                    </div>
+            </div>
         </c:if>
 
         <form:form commandName="organization"  method="post" role="form">
@@ -18,7 +18,7 @@
             <form:hidden path="id" id="orgId" />
             <form:hidden path="cleanURL" id="cleanURL" />
             <form:hidden path="dateCreated" />
-            
+
             <section class="panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">Details</h3>

@@ -25,7 +25,6 @@
                         <thead>
                             <tr>
                                 <th scope="col">Message Type</th>
-                                <th scope="col">Authorized User</th>
                                 <th scope="col">Configuration Type</th>
                                 <th scope="col" class="center-text">Transport Method</th>
                                 <th scope="col" class="center-text">Date Created</th>
@@ -39,9 +38,6 @@
                                         <tr style="cursor: pointer">
                                             <td>
                                                 ${config.messageTypeName}
-                                            </td>
-                                            <td>
-                                                 ${config.userName}
                                             </td>
                                             <td>
                                                 <c:choose><c:when test="${config.type == 1}">Source Configuration</c:when><c:otherwise>Target Configuration</c:otherwise></c:choose>
@@ -60,7 +56,7 @@
                                     </c:forEach>
                                 </c:when>
                                 <c:otherwise>
-                                    <tr><td colspan="7" class="center-text">There are currently no configurations set up for this organization.</td></tr>
+                                    <tr><td colspan="6" class="center-text">There are currently no configurations set up for this organization.</td></tr>
                                 </c:otherwise>
                             </c:choose>
                         </tbody>

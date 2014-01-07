@@ -1157,13 +1157,13 @@ public class adminConfigController {
         
         Long totalConnections = (long) 0;
         
-        /* Array to holder the users */
-        List<User> connectionSenders = new ArrayList<User>();
-        List<User> connectonReceivers = new ArrayList<User>();
-        
         /* Loop over the connections to get the configuration details */
         if(connections != null) {
             for(configurationConnection connection : connections) {
+                /* Array to holder the users */
+                List<User> connectionSenders = new ArrayList<User>();
+                List<User> connectonReceivers = new ArrayList<User>();
+                
                 configuration srcconfigDetails = configurationmanager.getConfigurationById(connection.getsourceConfigId());
                 configurationTransport srctransportDetails = configurationTransportManager.getTransportDetails(srcconfigDetails.getId());
                 

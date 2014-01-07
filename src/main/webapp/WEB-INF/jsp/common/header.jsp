@@ -34,14 +34,15 @@
                         <li ${param['page-id'] == 'profile' ? 'class="active"': ''}>
                             <c:choose>
                                 <c:when test="${not empty pageContext.request.userPrincipal.name}">
-                                    <a href="<c:url value='/profile'/>" title="My Account" data-toggle="dropdown">My Account <b class="caret"></b></a>
+                                    <a href="javascript:void(0);" title="My Account" data-toggle="dropdown">My Account <b class="caret"></b></a>
                                     <ul class="dropdown-menu" role="menu" aria-labelledby="My account dropdown">
+                                        <li><a href="<c:url value='/profile'/>" title="My Account">My Account</a></li>
                                         <c:if test="${not empty userAccess}">
                                             <c:forEach items="${userAccess}" var="sections" varStatus="aStatus">
                                                 <li>
                                                     <c:choose>
-                                                        <c:when test="${sections.featureId == 3}"><a href="<c:url value='/Health-e-Web/inbox'/>" title="">Health-e-Web</a></c:when>
-                                                        <c:when test="${sections.featureId == 4}"><a href="<c:url value='/Health-e-Connect'/>" title="">Health-e-Connect</a></c:when>
+                                                        <c:when test="${sections.featureId == 3}"><a href="<c:url value='/Health-e-Web/inbox'/>" title="Health-e-Web">Health-e-Web</a></c:when>
+                                                        <c:when test="${sections.featureId == 4}"><a href="<c:url value='/Health-e-Connect'/>" title="Health-e-Connect">Health-e-Connect</a></c:when>
                                                     </c:choose>
                                                 </li>
                                             </c:forEach> 

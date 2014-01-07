@@ -95,19 +95,7 @@ public class configurationDAOImpl implements configurationDAO {
     public List<configuration> getConfigurationsByOrgId(int orgId, String searchTerm) {
         
         if (!"".equals(searchTerm)) {
-            //get a list of user id's that match the term passed in
-            List<Integer> userIdList = new ArrayList<Integer>();
-            Criteria findUsers = sessionFactory.getCurrentSession().createCriteria(User.class);
-            findUsers.add(Restrictions.or(
-                    Restrictions.like("lastName", "%" + searchTerm + "%"),
-                    Restrictions.like("firstName", "%" + searchTerm + "%")
-                 ));
-            List<User> users = findUsers.list();
-
-            for (User user : users) {
-                userIdList.add(user.getId());
-            }
-
+           
             //get a list of message type id's that match the term passed in
             List<Integer> msgTypeIdList = new ArrayList<Integer>();
             Criteria findMsgTypes = sessionFactory.getCurrentSession().createCriteria(messageType.class);
@@ -120,16 +108,12 @@ public class configurationDAOImpl implements configurationDAO {
 
             Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configuration.class);
 
-            if (userIdList.isEmpty()) {
-                userIdList.add(0);
-            }
-            if (msgTypeIdList.isEmpty()) {
+             if (msgTypeIdList.isEmpty()) {
                 msgTypeIdList.add(0);
             }
 
             criteria.add(Restrictions.eq("orgId", orgId));
             criteria.add(Restrictions.or(
-                    Restrictions.in("userId", userIdList),
                     Restrictions.in("messageTypeId", msgTypeIdList)
                 )
             )
@@ -255,18 +239,6 @@ public class configurationDAOImpl implements configurationDAO {
                 orgIdList.add(org.getId());
             }
             
-            //get a list of user id's that match the term passed in
-            List<Integer> userIdList = new ArrayList<Integer>();
-            Criteria findUsers = sessionFactory.getCurrentSession().createCriteria(User.class);
-            findUsers.add(Restrictions.or(
-                    Restrictions.like("lastName", "%" + searchTerm + "%"),
-                    Restrictions.like("firstName", "%" + searchTerm + "%")
-                 ));
-            List<User> users = findUsers.list();
-
-            for (User user : users) {
-                userIdList.add(user.getId());
-            }
 
             //get a list of message type id's that match the term passed in
             List<Integer> msgTypeIdList = new ArrayList<Integer>();
@@ -283,16 +255,12 @@ public class configurationDAOImpl implements configurationDAO {
             if (orgIdList.isEmpty()) {
                 orgIdList.add(0);
             }
-            if (userIdList.isEmpty()) {
-                userIdList.add(0);
-            }
             if (msgTypeIdList.isEmpty()) {
                 msgTypeIdList.add(0);
             }
 
             criteria.add(Restrictions.or(
                     Restrictions.in("orgId", orgIdList),
-                    Restrictions.in("userId", userIdList),
                     Restrictions.in("messageTypeId", msgTypeIdList)
             )
             )
@@ -746,16 +714,47 @@ public class configurationDAOImpl implements configurationDAO {
      */
     @Override
     public List<configuration> getActiveERGConfigurationsByUserId(int userId) {
-        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configuration.class);
-        criteria.add(Restrictions.eq("userId", userId));
-        criteria.add(Restrictions.eq("status", true));
         
+        /* Find all SENDER connections for the passed in user */
+        Criteria findAuthConnections = sessionFactory.getCurrentSession().createCriteria(configurationConnectionSenders.class);
+        findAuthConnections.add(Restrictions.eq("userId", userId));
+        
+        /* This variables (senderConnections) will hold the list of authorized connections */
+        List<configurationConnectionSenders> senderConnections = findAuthConnections.list();
+        
+        /* 
+        Create an emtpy array that will hold the list of configurations associated to the
+        found connections.
+        */
+        List<Integer> senderConfigList = new ArrayList<Integer>();
+        
+        if (senderConnections.isEmpty()) {
+            senderConfigList.add(0);
+        }
+        else {
+            /* Search the connections by connectionId to pull the sourceConfigId */
+            for(configurationConnectionSenders connection : senderConnections) {
+               Criteria findConnectionDetails = sessionFactory.getCurrentSession().createCriteria(configurationConnection.class);
+               findConnectionDetails.add(Restrictions.eq("id", connection.getconnectionId()));
+               configurationConnection connectionDetails = (configurationConnection) findConnectionDetails.uniqueResult();
+               
+               /* Add the sourceConfigId to the array */
+               senderConfigList.add(connectionDetails.getsourceConfigId());
+               findConnectionDetails = null;
+            }
+        }
+        
+        /* 
+        Query to get a list of all ERG configurations that the logged in
+        user is authorized to create
+        */
         List<Integer> ergConfigList = new ArrayList<Integer>();
         Criteria findERGConfigs = sessionFactory.getCurrentSession().createCriteria(configurationTransport.class);
         findERGConfigs.add(Restrictions.or(
                 Restrictions.eq("transportMethodId",2),
                 Restrictions.eq("errorHandling",1)
-        )); 
+        )).add(Restrictions.and(Restrictions.in("configId",senderConfigList))); 
+       
         
         List<configurationTransport> ergConfigs = findERGConfigs.list();
 
@@ -766,8 +765,14 @@ public class configurationDAOImpl implements configurationDAO {
         if (ergConfigList.isEmpty()) {
             ergConfigList.add(0);
         }
-
-        criteria.add(Restrictions.or(
+        
+        /*
+        Finally query the configuration table to get all configurations in the authorized list
+        of configuration Ids.
+        */
+        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configuration.class);
+        criteria.add(Restrictions.eq("status", true));
+        criteria.add(Restrictions.and(
                 Restrictions.in("id", ergConfigList)
         ));
         

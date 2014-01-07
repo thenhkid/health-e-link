@@ -211,7 +211,7 @@ public class adminOrgContoller {
         //Get the organization name that was just added
         Organization latestorg = organizationManager.getOrganizationById(id);
 
-        redirectAttr.addFlashAttribute("savedStatus", "success");
+        redirectAttr.addFlashAttribute("savedStatus", "created");
 
         if (action.equals("save")) {
             /**
@@ -375,7 +375,6 @@ public class adminOrgContoller {
         mav.addObject("id", orgId);
         mav.addObject("configs", configurations);
         
-        User user;
         messageType messagetype;
         configurationTransport transportDetails;
         
@@ -417,7 +416,6 @@ public class adminOrgContoller {
         mav.addObject("id", orgId);
         mav.addObject("configs", configurations);
         
-        User user;
         messageType messagetype;
         configurationTransport transportDetails;
         

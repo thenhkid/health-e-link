@@ -192,32 +192,32 @@
                                         </div>
                                     </spring:bind>
                                 </c:if>
+                                <spring:bind path="errorHandling">
+                                    <div class="form-group">
+                                        <label class="control-label" for="errorHandling">Error Handling *</label>
+                                        <div>
+                                            <label class="radio-inline">
+                                              <form:radiobutton id="errorHandling" path="errorHandling" value="1" disabled="${transportDetails.copiedTransportId > 0 ? 'true' : 'false'}" /> Post errors to ERG 
+                                            </label>
+                                            <label class="radio-inline">
+                                                <form:radiobutton id="errorHandling" path="errorHandling" value="2" disabled="${transportDetails.copiedTransportId > 0 ? 'true' : 'false'}" /> Reject record on error
+                                            </label>
+                                            <label class="radio-inline">
+                                                <form:radiobutton id="errorHandling" path="errorHandling" value="3" disabled="${transportDetails.copiedTransportId > 0 ? 'true' : 'false'}" /> Reject submission on error
+                                            </label>
+                                            <label class="radio-inline">
+                                                <form:radiobutton id="errorHandling" path="errorHandling" value="4" disabled="${transportDetails.copiedTransportId > 0 ? 'true' : 'false'}" /> Pass through errors
+                                            </label>
+                                        </div>
+                                        <c:if test="${transportDetails.copiedTransportId > 0}">
+                                            <form:hidden path="errorHandling" />
+                                        </c:if>      
+                                    </div>
+                                </spring:bind>
                             </div>
                             <div id="additionalFTPDiv" class="methodDiv" style="display:none">
                             
                             </div>
-                            <spring:bind path="errorHandling">
-                                <div class="form-group">
-                                    <label class="control-label" for="errorHandling">Error Handling *</label>
-                                    <div>
-                                        <label class="radio-inline">
-                                          <form:radiobutton id="errorHandling" path="errorHandling" value="1" disabled="${transportDetails.copiedTransportId > 0 ? 'true' : 'false'}" /> Post errors to ERG 
-                                        </label>
-                                        <label class="radio-inline">
-                                            <form:radiobutton id="errorHandling" path="errorHandling" value="2" disabled="${transportDetails.copiedTransportId > 0 ? 'true' : 'false'}" /> Reject record on error
-                                        </label>
-                                        <label class="radio-inline">
-                                            <form:radiobutton id="errorHandling" path="errorHandling" value="3" disabled="${transportDetails.copiedTransportId > 0 ? 'true' : 'false'}" /> Reject submission on error
-                                        </label>
-                                        <label class="radio-inline">
-                                            <form:radiobutton id="errorHandling" path="errorHandling" value="4" disabled="${transportDetails.copiedTransportId > 0 ? 'true' : 'false'}" /> Pass through errors
-                                        </label>
-                                    </div>
-                                    <c:if test="${transportDetails.copiedTransportId > 0}">
-                                        <form:hidden path="errorHandling" />
-                                    </c:if>      
-                                </div>
-                            </spring:bind>
                             <spring:bind path="autoRelease">
                                 <div class="form-group">
                                     <label class="control-label" for="autoRelease">Release Records *</label>
@@ -251,7 +251,6 @@
                                 <thead>
                                     <tr>
                                         <th scope="col">Use?</th>
-                                        <th scope="col">Authorized User</th>
                                         <th scope="col">Message Type</th>
                                         <th scope="col" class="center-text">Date Created</th>
                                     </tr>
@@ -261,9 +260,6 @@
                                         <tr id="configRow" rel="${config.id}" style="cursor: pointer">
                                             <td scope="row">
                                                <form:checkbox class="availMessageTypes" path="messageTypes" value="${configs.getId()}" />
-                                            </td>
-                                            <td>
-                                                ${configs.getuserName()}
                                             </td>
                                             <td>
                                                 ${configs.getMessageTypeName()}

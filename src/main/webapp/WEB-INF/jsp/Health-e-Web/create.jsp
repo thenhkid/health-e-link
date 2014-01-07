@@ -62,6 +62,9 @@
                                     </tr>
                                 </c:forEach>
                            </c:when>
+                            <c:otherwise>
+                                <tr><td colspan="3" class="center-text">There are no configurations set up for your account.</td>
+                            </c:otherwise>
                       </c:choose>                  
                     </tbody>
                 </table>
