@@ -12,6 +12,8 @@ import com.ut.dph.model.Macros;
 import com.ut.dph.model.Organization;
 import com.ut.dph.model.configuration;
 import com.ut.dph.model.configurationConnection;
+import com.ut.dph.model.configurationConnectionReceivers;
+import com.ut.dph.model.configurationConnectionSenders;
 import com.ut.dph.model.configurationDataTranslations;
 import com.ut.dph.model.configurationMessageSpecs;
 import com.ut.dph.model.configurationSchedules;
@@ -213,6 +215,18 @@ public class configurationManagerImpl implements configurationManager {
     @Transactional
     public List<configuration> getActiveERGConfigurationsByUserId(int userId) {
         return configurationDAO.getActiveERGConfigurationsByUserId(userId);
+    }
+    
+    @Override
+    @Transactional
+    public List<configurationConnectionSenders> getConnectionSenders(int connectionId) {
+        return configurationDAO.getConnectionSenders(connectionId);
+    }
+  
+    @Override
+    @Transactional
+    public List<configurationConnectionReceivers> getConnectionReceivers(int connectionId) {
+        return configurationDAO.getConnectionReceivers(connectionId);
     }
     
     @Override

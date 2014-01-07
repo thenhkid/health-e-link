@@ -5,6 +5,8 @@ import java.util.List;
 import com.ut.dph.model.Macros;
 import com.ut.dph.model.configuration;
 import com.ut.dph.model.configurationConnection;
+import com.ut.dph.model.configurationConnectionReceivers;
+import com.ut.dph.model.configurationConnectionSenders;
 import com.ut.dph.model.configurationDataTranslations;
 import com.ut.dph.model.configurationMessageSpecs;
 import com.ut.dph.model.configurationSchedules;
@@ -69,5 +71,9 @@ public interface configurationManager {
   void updateMessageSpecs(configurationMessageSpecs messageSpecs, int transportDetailId);
   
   List<configuration> getActiveERGConfigurationsByUserId(int userId);
+  
+  List<configurationConnectionSenders> getConnectionSenders(int connectionId);
+  
+  List<configurationConnectionReceivers> getConnectionReceivers(int connectionId);
  
 }

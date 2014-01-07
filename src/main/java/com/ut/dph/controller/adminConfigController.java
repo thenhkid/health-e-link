@@ -31,6 +31,8 @@ import com.ut.dph.service.configurationManager;
 import com.ut.dph.model.Organization;
 import com.ut.dph.model.User;
 import com.ut.dph.model.configurationConnection;
+import com.ut.dph.model.configurationConnectionReceivers;
+import com.ut.dph.model.configurationConnectionSenders;
 import com.ut.dph.model.configurationMessageSpecs;
 import com.ut.dph.model.configurationSchedules;
 import com.ut.dph.service.organizationManager;
@@ -1169,6 +1171,10 @@ public class adminConfigController {
         
         Long totalConnections = (long) 0;
         
+        /* Array to holder the users */
+        List<User> connectionSenders = new ArrayList<User>();
+        List<User> connectonReceivers = new ArrayList<User>();
+        
         /* Loop over the connections to get the configuration details */
         if(connections != null) {
             for(configurationConnection connection : connections) {
@@ -1189,6 +1195,24 @@ public class adminConfigController {
                 tgtconfigDetails.setMessageTypeName(messagetypemanager.getMessageTypeById(tgtconfigDetails.getMessageTypeId()).getName());
                 tgtconfigDetails.setuserName(userManager.getUserById(tgtconfigDetails.getuserId()).getFirstName() + " " + userManager.getUserById(tgtconfigDetails.getuserId()).getLastName());
                 tgtconfigDetails.settransportMethod(configurationTransportManager.getTransportMethodById(tgttransportDetails.gettransportMethodId()));
+                
+                /* Get the list of connection senders */
+                List<configurationConnectionSenders> senders = configurationmanager.getConnectionSenders(connection.getId());
+                
+                for(configurationConnectionSenders sender : senders) {
+                    User userDetail = userManager.getUserById(sender.getuserId());
+                    connectionSenders.add(userDetail);
+                }
+                connection.setconnectionSenders(connectionSenders);
+                
+                /* Get the list of connection receivers */
+                List<configurationConnectionReceivers> receivers = configurationmanager.getConnectionReceivers(connection.getId());
+                
+                for(configurationConnectionReceivers receiver : receivers) {
+                    User userDetail = userManager.getUserById(receiver.getuserId());
+                    connectonReceivers.add(userDetail);
+                }
+                connection.setconnectionReceivers(connectonReceivers);
                 
                 
                 connection.settgtConfigDetails(tgtconfigDetails);
@@ -1214,7 +1238,7 @@ public class adminConfigController {
     /**
      * The '/createConnection' function will handle displaying the create configuration connection screen.
      * 
-     * 
+     * @return This function will display the new connection overlay
      */
     @RequestMapping(value = "/createConnection", method = RequestMethod.GET)
     public @ResponseBody ModelAndView createNewConnectionForm() throws Exception {

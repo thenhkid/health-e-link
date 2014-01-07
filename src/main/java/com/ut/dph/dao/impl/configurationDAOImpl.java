@@ -19,6 +19,8 @@ import com.ut.dph.model.Organization;
 import com.ut.dph.model.User;
 import com.ut.dph.model.configuration;
 import com.ut.dph.model.configurationConnection;
+import com.ut.dph.model.configurationConnectionReceivers;
+import com.ut.dph.model.configurationConnectionSenders;
 import com.ut.dph.model.configurationDataTranslations;
 import com.ut.dph.model.configurationMessageSpecs;
 import com.ut.dph.model.configurationSchedules;
@@ -540,6 +542,40 @@ public class configurationDAOImpl implements configurationDAO {
     @Override
     public configurationConnection getConnection(int connectionId) {
         return (configurationConnection) sessionFactory.getCurrentSession().get(configurationConnection.class, connectionId);
+    }
+    
+    /**
+     * The 'getConnectionSenders' function will return a list of authorized users who are set up
+     * to create new messages for the passed in connectionId
+     * 
+     * @param connectionId The id of the configuration connection to get a list of users
+     * 
+     * @return This function will return a list of configurationConnectionSenders objects
+     */
+    @Override
+    @Transactional
+    public List<configurationConnectionSenders> getConnectionSenders(int connectionId) {
+        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configurationConnectionSenders.class);
+        criteria.add(Restrictions.eq("connectionId", connectionId));
+        
+        return criteria.list();
+    }
+  
+    /**
+     * The 'getConnectionReceivers' function will return a list of authorized users who are set up
+     * to receive messages for the passed in connectionId
+     * 
+     * @param connectionId The id of the configuration connection to get a list of users
+     * 
+     * @return This function will return a list of configurationConnectionSenders objects
+     */
+    @Override
+    @Transactional
+    public List<configurationConnectionReceivers> getConnectionReceivers(int connectionId) {
+        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configurationConnectionReceivers.class);
+        criteria.add(Restrictions.eq("connectionId", connectionId));
+        
+        return criteria.list();
     }
     
     /**

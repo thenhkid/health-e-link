@@ -7,6 +7,7 @@
 package com.ut.dph.model;
 
 import java.util.Date;
+import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -36,6 +37,11 @@ public class configurationConnection {
     @Transient
     private int targetOrgId = 0;
     
+    @Transient
+    private List<User> connectionSenders = null;
+    
+    @Transient
+    private List<User> connectionReceivers = null;
     
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -126,6 +132,22 @@ public class configurationConnection {
     
     public void settargetOrgId(int targetOrgId) {
         this.targetOrgId = targetOrgId;
+    }
+    
+    public List<User> getconnectionSenders() {
+        return connectionSenders;
+    }
+    
+    public void setconnectionSenders(List<User> senders) {
+        this.connectionSenders = senders;
+    }
+    
+    public List<User> getconnectionReceivers() {
+        return connectionReceivers;
+    }
+    
+    public void setconnectionReceivers(List<User> receivers) {
+        this.connectionReceivers = receivers;
     }
     
 }
