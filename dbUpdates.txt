@@ -1,0 +1,6 @@
+
+/** 01.07.2014 Grace **/
+UPDATE `universaltranslator`.`lookuptables` SET `utTableName`='lu_ProcedureStatus' WHERE `id`='22';
+INSERT INTO `universaltranslator`.`lookuptables` (`utTableName`, `displayText`, `urlId`) VALUES ('lu_Urgency', 'Urgency', '34567Urg45677');
+
+UPDATE `universalTranslator`.`lookUpTables` SET `utTableName`='lu_ProcessStatus' WHERE `id`='21';
