@@ -20,10 +20,7 @@ public class configuration {
 
     @Transient
     private String orgName = null;
-    
-    @Transient
-    private String userName = null;
-
+   
     @Transient
     private String messageTypeName = null;
 
@@ -45,9 +42,6 @@ public class configuration {
     @Column(name = "orgId", nullable = false)
     private int orgId;
     
-    @Column(name = "userId", nullable = false)
-    private int userId;
-
     @DateTimeFormat(pattern = "dd/MM/yyyy hh:mm:ss")
     @Column(name = "DATECREATED", nullable = true)
     private Date dateCreated = new Date();
@@ -81,15 +75,7 @@ public class configuration {
     public void setorgId(int orgId) {
         this.orgId = orgId;
     }
-    
-    public int getuserId() {
-        return userId;
-    }
-
-    public void setuserId(int userId) {
-        this.userId = userId;
-    }
-
+   
     public Date getDateCreated() {
         return dateCreated;
     }
@@ -129,15 +115,7 @@ public class configuration {
     public void setOrgName(String orgName) {
         this.orgName = orgName;
     }
-    
-    public String getuserName() {
-        return userName;
-    }
-
-    public void setuserName(String userName) {
-        this.userName = userName;
-    }
-
+   
     public String getMessageTypeName() {
         return messageTypeName;
     }

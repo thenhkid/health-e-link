@@ -37,7 +37,6 @@
                         <thead>
                             <tr>
                                 <th scope="col">Organization</th>
-                                <th scope="col">Authorized User</th>
                                 <th scope="col">Message Type</th>
                                 <th scope="col">Configuration Type</th>
                                 <th scope="col" class="center-text">Transport Method</th>
@@ -53,9 +52,6 @@
                                         <tr id="configRow" rel="${config.id}" style="cursor: pointer">
                                             <td scope="row">
                                                 ${config.orgName}
-                                            </td>
-                                            <td>
-                                                ${config.userName}
                                             </td>
                                             <td>
                                                 ${config.messageTypeName}
@@ -78,7 +74,7 @@
                                     </c:forEach>
                                 </c:when>
                                 <c:otherwise>
-                                    <tr><td colspan="8" class="center-text">There are currently no configurations set up.</td></tr>
+                                    <tr><td colspan="7" class="center-text">There are currently no configurations set up.</td></tr>
                                 </c:otherwise>
                             </c:choose>
                         </tbody>

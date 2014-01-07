@@ -61,21 +61,6 @@
                                 <span id="configOrgMsg" class="control-label"></span>
                            </div>
                         </spring:bind>
-                        <spring:bind path="userId">
-                            <div id="userDiv" class="form-group ${status.error ? 'has-error' : '' }">
-                                <label class="control-label" for="users">Authorized User *</label>
-                                <form:select path="userId" id="users" class="form-control half" disabled="${configurationDetails.id == 0 ? 'false' : 'true' }">
-                                    <option value="">- Select -</option>
-                                    <c:if test="${configurationDetails.id > 0}">
-                                        <c:forEach items="${users}" var="user" varStatus="uStatus">
-                                            <option value="${users[uStatus.index][0]}" <c:if test="${users[uStatus.index][0] == configurationDetails.userId}">selected</c:if>>${users[uStatus.index][1]}&nbsp;${users[uStatus.index][2]}</option>
-                                        </c:forEach>
-                                    </c:if>
-                                </form:select>
-                                <c:if test="${configurationDetails.id > 0}"><form:hidden id="users" path="userId"/></c:if>  
-                                <span id="configUserMsg" class="control-label"></span>
-                           </div>
-                        </spring:bind>        
                         <spring:bind path="messageTypeId">
                             <div id="messageTypeDiv" class="form-group ${status.error ? 'has-error' : '' }">
                                 <label class="control-label" for="messageTypeId">Message Type *</label>

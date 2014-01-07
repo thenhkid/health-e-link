@@ -115,7 +115,6 @@ public class adminConfigController {
         List<configuration> configurations = configurationmanager.getConfigurations(page, maxResults);
         
         Organization org;
-        User user;
         messageType messagetype;
         configurationTransport transportDetails;
 
@@ -125,9 +124,6 @@ public class adminConfigController {
 
             messagetype = messagetypemanager.getMessageTypeById(config.getMessageTypeId());
             config.setMessageTypeName(messagetype.getName());
-            
-            user = userManager.getUserById(config.getuserId());
-            config.setuserName(user.getFirstName() + " " + user.getLastName());
             
             transportDetails = configurationTransportManager.getTransportDetails(config.getId());
             if(transportDetails != null) {
@@ -168,7 +164,6 @@ public class adminConfigController {
         mav.addObject("configurationList", configurations);
 
         Organization org;
-        User user;
         messageType messagetype;
         configurationTransport transportDetails;
 
@@ -178,9 +173,6 @@ public class adminConfigController {
 
             messagetype = messagetypemanager.getMessageTypeById(config.getMessageTypeId());
             config.setMessageTypeName(messagetype.getName());
-            
-            user = userManager.getUserById(config.getuserId());
-            config.setuserName(user.getFirstName() + " " + user.getLastName());
             
             transportDetails = configurationTransportManager.getTransportDetails(config.getId());
             if(transportDetails != null) {
@@ -450,7 +442,6 @@ public class adminConfigController {
         for(configuration config : configurations) {
             configurationTransport transDetails = configurationTransportManager.getTransportDetails(config.getId());
             config.setMessageTypeName(messagetypemanager.getMessageTypeById(config.getMessageTypeId()).getName());
-            config.setuserName(userManager.getUserById(config.getuserId()).getFirstName() + " " + userManager.getUserById(config.getuserId()).getLastName());
             
             if(transDetails != null) {
                 config.settransportDetailId(transDetails.getId());
@@ -470,7 +461,6 @@ public class adminConfigController {
 
         configurationDetails.setOrgName(organizationmanager.getOrganizationById(configurationDetails.getorgId()).getOrgName());
         configurationDetails.setMessageTypeName(messagetypemanager.getMessageTypeById(configurationDetails.getMessageTypeId()).getName());
-        configurationDetails.setuserName(userManager.getUserById(configurationDetails.getuserId()).getFirstName() + " " + userManager.getUserById(configurationDetails.getuserId()).getLastName());
         configurationDetails.settransportMethod(configurationTransportManager.getTransportMethodById(transportDetails.gettransportMethodId()));
         
         //pass the configuration detail object back to the page.
@@ -665,7 +655,6 @@ public class adminConfigController {
        
         configurationDetails.setOrgName(organizationmanager.getOrganizationById(configurationDetails.getorgId()).getOrgName());
         configurationDetails.setMessageTypeName(messagetypemanager.getMessageTypeById(configurationDetails.getMessageTypeId()).getName());
-        configurationDetails.setuserName(userManager.getUserById(configurationDetails.getuserId()).getFirstName() + " " + userManager.getUserById(configurationDetails.getuserId()).getLastName());
         configurationDetails.settransportMethod(configurationTransportManager.getTransportMethodById(transportDetails.gettransportMethodId()));
         
         //pass the configuration detail object back to the page.
@@ -757,7 +746,6 @@ public class adminConfigController {
        
         configurationDetails.setOrgName(organizationmanager.getOrganizationById(configurationDetails.getorgId()).getOrgName());
         configurationDetails.setMessageTypeName(messagetypemanager.getMessageTypeById(configurationDetails.getMessageTypeId()).getName());
-        configurationDetails.setuserName(userManager.getUserById(configurationDetails.getuserId()).getFirstName() + " " + userManager.getUserById(configurationDetails.getuserId()).getLastName());
         configurationDetails.settransportMethod(configurationTransportManager.getTransportMethodById(transportDetails.gettransportMethodId()));
         
         //pass the configuration detail object back to the page.
@@ -796,7 +784,6 @@ public class adminConfigController {
         
         configurationDetails.setOrgName(organizationmanager.getOrganizationById(configurationDetails.getorgId()).getOrgName());
         configurationDetails.setMessageTypeName(messagetypemanager.getMessageTypeById(configurationDetails.getMessageTypeId()).getName());
-        configurationDetails.setuserName(userManager.getUserById(configurationDetails.getuserId()).getFirstName() + " " + userManager.getUserById(configurationDetails.getuserId()).getLastName());
         configurationDetails.settransportMethod(configurationTransportManager.getTransportMethodById(transportDetails.gettransportMethodId()));
         
         //pass the configuration detail object back to the page.
@@ -898,7 +885,6 @@ public class adminConfigController {
         
         configurationDetails.setOrgName(organizationmanager.getOrganizationById(configurationDetails.getorgId()).getOrgName());
         configurationDetails.setMessageTypeName(messagetypemanager.getMessageTypeById(configurationDetails.getMessageTypeId()).getName());
-        configurationDetails.setuserName(userManager.getUserById(configurationDetails.getuserId()).getFirstName() + " " + userManager.getUserById(configurationDetails.getuserId()).getLastName());
         configurationDetails.settransportMethod(configurationTransportManager.getTransportMethodById(transportDetails.gettransportMethodId()));
         
         //pass the configuration detail object back to the page.
@@ -1183,7 +1169,6 @@ public class adminConfigController {
                 
                 srcconfigDetails.setOrgName(organizationmanager.getOrganizationById(srcconfigDetails.getorgId()).getOrgName());
                 srcconfigDetails.setMessageTypeName(messagetypemanager.getMessageTypeById(srcconfigDetails.getMessageTypeId()).getName());
-                srcconfigDetails.setuserName(userManager.getUserById(srcconfigDetails.getuserId()).getFirstName() + " " + userManager.getUserById(srcconfigDetails.getuserId()).getLastName());
                 srcconfigDetails.settransportMethod(configurationTransportManager.getTransportMethodById(srctransportDetails.gettransportMethodId()));
                 
                 connection.setsrcConfigDetails(srcconfigDetails);
@@ -1193,7 +1178,6 @@ public class adminConfigController {
                 
                 tgtconfigDetails.setOrgName(organizationmanager.getOrganizationById(tgtconfigDetails.getorgId()).getOrgName());
                 tgtconfigDetails.setMessageTypeName(messagetypemanager.getMessageTypeById(tgtconfigDetails.getMessageTypeId()).getName());
-                tgtconfigDetails.setuserName(userManager.getUserById(tgtconfigDetails.getuserId()).getFirstName() + " " + userManager.getUserById(tgtconfigDetails.getuserId()).getLastName());
                 tgtconfigDetails.settransportMethod(configurationTransportManager.getTransportMethodById(tgttransportDetails.gettransportMethodId()));
                 
                 /* Get the list of connection senders */
@@ -1329,7 +1313,6 @@ public class adminConfigController {
                 
                 configuration.setOrgName(organizationmanager.getOrganizationById(configuration.getorgId()).getOrgName());
                 configuration.setMessageTypeName(messagetypemanager.getMessageTypeById(configuration.getMessageTypeId()).getName());
-                configuration.setuserName(userManager.getUserById(configuration.getuserId()).getFirstName() + " " + userManager.getUserById(configuration.getuserId()).getLastName());
                 configuration.settransportMethod(configurationTransportManager.getTransportMethodById(transportDetails.gettransportMethodId()));
             }
         }
@@ -1425,7 +1408,6 @@ public class adminConfigController {
         
         configurationDetails.setOrgName(organizationmanager.getOrganizationById(configurationDetails.getorgId()).getOrgName());
         configurationDetails.setMessageTypeName(messagetypemanager.getMessageTypeById(configurationDetails.getMessageTypeId()).getName());
-        configurationDetails.setuserName(userManager.getUserById(configurationDetails.getuserId()).getFirstName() + " " + userManager.getUserById(configurationDetails.getuserId()).getLastName());
         configurationDetails.settransportMethod(configurationTransportManager.getTransportMethodById(transportDetails.gettransportMethodId()));
         
         //pass the configuration detail object back to the page.

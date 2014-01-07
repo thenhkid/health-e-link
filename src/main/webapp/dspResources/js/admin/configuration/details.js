@@ -41,14 +41,6 @@ function checkform() {
         errorFound = 1;
     }
     
-    //Check to make sure an authorized user is selected
-    if($('#users').val() === '') {
-        $('#userDiv').addClass("has-error");
-        $('#configUserMsg').addClass("has-error");
-        $('#configUserMsg').html('The authorized user is a required field.');
-        errorFound = 1;
-    }
-    
     //Check to make sure a message type is selected
     if($('#messageTypeId').val() === '') {
         $('#messageTypeDiv').addClass("has-error");

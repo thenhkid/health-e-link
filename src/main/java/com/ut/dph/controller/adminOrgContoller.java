@@ -383,9 +383,6 @@ public class adminOrgContoller {
             messagetype = messagetypemanager.getMessageTypeById(config.getMessageTypeId());
             config.setMessageTypeName(messagetype.getName());
             
-            user = userManager.getUserById(config.getuserId());
-            config.setuserName(user.getFirstName() + " " + user.getLastName());
-            
             transportDetails = configurationTransportManager.getTransportDetails(config.getId());
             if(transportDetails != null) {
              config.settransportMethod(configurationTransportManager.getTransportMethodById(transportDetails.gettransportMethodId()));
@@ -427,9 +424,6 @@ public class adminOrgContoller {
         for (configuration config : configurations) {
             messagetype = messagetypemanager.getMessageTypeById(config.getMessageTypeId());
             config.setMessageTypeName(messagetype.getName());
-            
-            user = userManager.getUserById(config.getuserId());
-            config.setuserName(user.getFirstName() + " " + user.getLastName());
             
             transportDetails = configurationTransportManager.getTransportDetails(config.getId());
             if(transportDetails != null) {

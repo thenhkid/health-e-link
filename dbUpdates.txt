@@ -1125,5 +1125,13 @@ CREATE TABLE `universalTranslator`.`configurationConnectionReceivers` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION);
 
+/** Chad 1.7.2014 @ 1:09 PM */
+ALTER TABLE `universalTranslator`.`configurations` 
+DROP FOREIGN KEY `configUserIdfk`;
+ALTER TABLE `universalTranslator`.`configurations` 
+DROP COLUMN `userId`,
+DROP INDEX `configUserIdfk_idx` ;
+
+
 
   
