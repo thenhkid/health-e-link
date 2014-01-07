@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.format.annotation.DateTimeFormat;
 
 @Entity
 @Table(name="REL_USERLOGINS")
@@ -24,7 +25,8 @@ public class userLogin {
 	@Column(name="USERID", nullable = false)
 	private int userId;	 
 	
-	@Column(name="DATECREATED", nullable = true)
+	@DateTimeFormat(pattern = "dd/MM/yyyy hh:mm:ss")
+        @Column(name="DATECREATED", nullable = true)
 	private Date dateCreated = new Date();
 	
 	public int getId() {

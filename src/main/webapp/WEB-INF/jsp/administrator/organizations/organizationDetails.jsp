@@ -18,7 +18,7 @@
             <form:hidden path="id" id="orgId" />
             <form:hidden path="cleanURL" id="cleanURL" />
             <form:hidden path="dateCreated" />
-
+            
             <section class="panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">Details</h3>

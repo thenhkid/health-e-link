@@ -9,9 +9,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
+import org.springframework.format.annotation.DateTimeFormat;
 
 
 @Entity
@@ -48,8 +48,8 @@ public class configuration {
     @Column(name = "userId", nullable = false)
     private int userId;
 
+    @DateTimeFormat(pattern = "dd/MM/yyyy hh:mm:ss")
     @Column(name = "DATECREATED", nullable = true)
-    @Temporal(javax.persistence.TemporalType.DATE)
     private Date dateCreated = new Date();
 
     @Column(name = "STATUS", nullable = false)

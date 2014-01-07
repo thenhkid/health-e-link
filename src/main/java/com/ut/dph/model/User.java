@@ -9,12 +9,12 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
 import javax.persistence.Transient;
 import javax.validation.constraints.Size;
 
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.format.annotation.DateTimeFormat;
 
 @Entity
 @Table(name = "USERS")
@@ -64,9 +64,15 @@ public class User {
     @Column(name = "EMAIL", nullable = false)
     private String email;
 
+    @DateTimeFormat(pattern = "dd/MM/yyyy hh:mm:ss")
     @Column(name = "DATECREATED", nullable = true)
-    @Temporal(javax.persistence.TemporalType.DATE)
     private Date dateCreated = new Date();
+    
+    @Column(name = "USERTYPE", nullable = false)
+    private int userType = 1;
+    
+    @Column(name = "DELIVERAUTHORITY", nullable = false)
+    private boolean deliverAuthority = false;
 
     public int getId() {
         return id;
@@ -170,5 +176,21 @@ public class User {
 
     public void setsectionList(List<Integer> sectionList) {
         this.sectionList = sectionList;
+    }
+    
+    public int getuserType() {
+        return userType;
+    }
+    
+    public void setuserType(int userType) {
+        this.userType = userType;
+    }
+    
+    public boolean getdeliverAuthority() {
+        return deliverAuthority;
+    }
+    
+    public void setdeliverAuthority(boolean deliverAuthority) {
+        this.deliverAuthority = deliverAuthority;
     }
 }

@@ -7,8 +7,8 @@
         <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
             <h3 class="panel-title"><c:choose><c:when test="${btnValue == 'Update'}">Update</c:when><c:when test="${btnValue == 'Create'}">Add</c:when></c:choose> System User ${success}</h3>
-                </div>
-                <div class="modal-body">
+        </div>
+        <div class="modal-body">
             <form:form id="userdetailsform" commandName="userdetails" modelAttribute="userdetails"  method="post" role="form">
                 <form:hidden path="id" id="id" />
                 <form:hidden path="orgId" id="orgId" />
@@ -43,6 +43,28 @@
                             </label>
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label for="status">User Type *</label>
+                        <div>
+                            <label class="radio-inline">
+                                <form:radiobutton id="userType" path="userType" value="1" /> Manager
+                            </label>
+                            <label class="radio-inline">
+                                <form:radiobutton id="userType" path="userType" value="2" /> Staff Member
+                            </label>
+                        </div>
+                    </div> 
+                    <div class="form-group">
+                        <label for="status">Can this user deliver messages? *</label>
+                        <div>
+                            <label class="radio-inline">
+                                <form:radiobutton id="deliverAuthority" path="deliverAuthority" value="true" /> Yes
+                            </label>
+                            <label class="radio-inline">
+                                <form:radiobutton id="deliverAuthority" path="deliverAuthority" value="false" /> No
+                            </label>
+                        </div>
+                    </div>        
                     <spring:bind path="firstName">
                         <div class="form-group ${status.error ? 'has-error' : '' }">
                             <label class="control-label" for="firstName">First Name *</label>

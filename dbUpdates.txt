@@ -1083,4 +1083,8 @@ ADD COLUMN `dateModified` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER `dat
 /** Chad 1.6.2013 */
 ALTER TABLE `universalTranslator`.`configurationDataTranslations` 
 DROP FOREIGN KEY `fkcrosswalkId`;
+
+ALTER TABLE `universalTranslator`.`users` 
+ADD COLUMN `userType` SMALLINT NOT NULL DEFAULT '1' COMMENT '1 = Manager\n2 = Staff Member' AFTER `email`,
+ADD COLUMN `deliverAuthority` BIT NOT NULL DEFAULT b'0' AFTER `userType`;
   

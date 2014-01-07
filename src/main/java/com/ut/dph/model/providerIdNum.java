@@ -10,6 +10,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.format.annotation.DateTimeFormat;
 
 @Entity
 @Table(name = "INFO_PROVIDERIDS")
@@ -62,6 +63,7 @@ public class providerIdNum {
         this.issuedBy = issuedBy;
     }
 
+    @DateTimeFormat(pattern = "dd/MM/yyyy hh:mm:ss")
     @Column(name = "DATECREATED", nullable = true)
     public Date getDateCreated() {
         return dateCreated;

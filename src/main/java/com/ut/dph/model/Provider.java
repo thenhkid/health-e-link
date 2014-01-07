@@ -15,6 +15,7 @@ import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import com.ut.dph.validator.Phone;
+import org.springframework.format.annotation.DateTimeFormat;
 
 @Entity
 @Table(name = "INFO_PROVIDERS")
@@ -168,6 +169,7 @@ public class Provider {
         this.status = status;
     }
 
+    @DateTimeFormat(pattern = "dd/MM/yyyy hh:mm:ss")
     @Column(name = "DATECREATED", nullable = true)
     private Date dateCreated = new Date();
 

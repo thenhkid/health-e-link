@@ -12,6 +12,7 @@ import javax.persistence.Table;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import com.ut.dph.validator.Phone;
+import org.springframework.format.annotation.DateTimeFormat;
 
 @Entity
 @Table(name = "INFO_PROVIDERADDRESSES")
@@ -163,6 +164,7 @@ public class providerAddress {
         this.status = status;
     }
 
+    @DateTimeFormat(pattern = "dd/MM/yyyy hh:mm:ss")
     @Column(name = "DATECREATED", nullable = true)
     public Date getDateCreated() {
         return dateCreated;

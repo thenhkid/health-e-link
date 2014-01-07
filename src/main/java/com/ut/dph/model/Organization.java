@@ -12,6 +12,7 @@ import javax.persistence.Table;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import com.ut.dph.validator.Phone;
+import org.springframework.format.annotation.DateTimeFormat;
 
 @Entity
 @Table(name = "ORGANIZATIONS")
@@ -55,7 +56,8 @@ public class Organization {
 
     @Column(name = "PUBLIC", nullable = false)
     private boolean publicOrg = true;
-
+    
+    @DateTimeFormat(pattern = "dd/MM/yyyy hh:mm:ss")
     @Column(name = "DATECREATED", nullable = true)
     private Date dateCreated = new Date();
 

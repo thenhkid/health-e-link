@@ -13,7 +13,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
+import org.springframework.format.annotation.DateTimeFormat;
 
 /**
  *
@@ -43,8 +43,8 @@ public class transactionTarget {
     @Column(name = "STATUSID", nullable = false)
     private int statusId;
     
+    @DateTimeFormat(pattern = "dd/MM/yyyy hh:mm:ss")
     @Column(name = "DATECREATED", nullable = false)
-    @Temporal(javax.persistence.TemporalType.DATE)
     private Date dateCreated = new Date();
     
     public int getId() {

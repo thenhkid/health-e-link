@@ -13,7 +13,6 @@ import com.ut.dph.reference.USStateList;
 import com.ut.dph.reference.ProcessCategoryList;
 import com.ut.dph.service.configurationManager;
 import com.ut.dph.service.sysAdminManager;
-import com.ut.dph.model.Brochure;
 import com.ut.dph.model.Macros;
 import com.ut.dph.model.custom.LogoInfo;
 import com.ut.dph.model.custom.LookUpTable;

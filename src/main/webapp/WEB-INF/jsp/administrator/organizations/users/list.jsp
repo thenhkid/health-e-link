@@ -42,10 +42,11 @@
                         <thead>
                             <tr>
                                 <th scope="col">Name</th>
-                                <th scope="col" style="text-align:center">Date Created</th>
-                                <th scope="col" style="text-align:center">Primary</th>
-                                <th scope="col" style="text-align:center">Secondary</th>
-                                <th scope="col" style="text-align:center">Times Logged In</th>
+                                <th scope="col" class="center-text">User Type</th>
+                                <th scope="col" class="center-text">Date Created</th>
+                                <th scope="col" class="center-text">Primary</th>
+                                <th scope="col" class="center-text">Secondary</th>
+                                <th scope="col" class="center-text">Times Logged In</th>
                                 <th scope="col"></th>
                             </tr>
                         </thead>
@@ -55,6 +56,7 @@
                                     <c:forEach var="user" items="${userList}">
                                         <tr id="userRow">
                                             <td scope="row"><a href="#systemUsersModal" data-toggle="modal" rel="${user.firstName}${user.lastName}?i=${user.id}" class="userEdit" title="Edit this user">${user.firstName}&nbsp;${user.lastName}</a><br />(<c:choose><c:when test="${user.status == true}">active</c:when><c:otherwise>inactive</c:otherwise></c:choose>)</td>
+                                            <td class="center-text"><c:choose><c:when test="${user.userType == 1}">Manager</c:when><c:otherwise>Staff Member</c:otherwise></c:choose></td>
                                             <td class="center-text"><fmt:formatDate value="${user.dateCreated}" type="date" pattern="M/dd/yyyy" /></td>
                                             <td class="center-text">
                                                 <c:if test="${user.mainContact == 1}">X</c:if><c:if test="${user.mainContact != 1}">--</c:if>

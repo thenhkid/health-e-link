@@ -14,6 +14,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import org.springframework.format.annotation.DateTimeFormat;
 
 /**
  *
@@ -47,6 +48,7 @@ public class configurationConnection {
     @Column(name = "TARGETCONFIGID", nullable = false)
     private int targetConfigId;
     
+    @DateTimeFormat(pattern = "dd/MM/yyyy hh:mm:ss")
     @Column(name = "DATECREATED", nullable = true)
     private Date dateCreated = new Date();
 

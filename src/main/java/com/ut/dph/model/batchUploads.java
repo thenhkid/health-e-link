@@ -13,7 +13,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
+import org.springframework.format.annotation.DateTimeFormat;
 
 /**
  *
@@ -53,11 +53,9 @@ public class batchUploads {
     private int statusId;
     
     @Column(name = "STARTDATETIME", nullable = true)
-    @Temporal(javax.persistence.TemporalType.DATE)
     private Date startDateTime = null;
     
     @Column(name = "ENDDATETIME", nullable = true)
-    @Temporal(javax.persistence.TemporalType.DATE)
     private Date endDateTime = null;
     
     @Column(name = "TOTALRECORDCOUNT", nullable = false)
@@ -69,10 +67,9 @@ public class batchUploads {
     @Column(name = "ERRORRECORDCOUNT", nullable = false)
     private int errorRecordCount = 0;
     
+    @DateTimeFormat(pattern = "dd/MM/yyyy hh:mm:ss")
     @Column(name = "DATESUBMITTED", nullable = false)
-    @Temporal(javax.persistence.TemporalType.DATE)
     private Date dateSubmitted = new Date();
-    
     
     public int getId() {
         return id;
