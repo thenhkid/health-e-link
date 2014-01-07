@@ -1080,4 +1080,7 @@ INSERT INTO `universalTranslator`.`LogoInfo` (`frontEndLogoName`, `backEndLogoNa
 CHANGE COLUMN `dateCreated` `dateCreated` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ,
 ADD COLUMN `dateModified` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP AFTER `dateCreated`;
   
+/** Chad 1.6.2013 */
+ALTER TABLE `universalTranslator`.`configurationDataTranslations` 
+DROP FOREIGN KEY `fkcrosswalkId`;
   
