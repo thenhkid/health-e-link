@@ -42,22 +42,11 @@ $(function() {
             $('#srcorgDiv').addClass("has-error");
         }
         else {
-            $.ajax({
-                url: 'getAvailableConfigurations.do',
-                type: "GET",
-                data: {'orgId': selOrg},
-                success: function(data) {
-                    //get value of preselected col
-                    var html = '<option value="">- Select - </option>';
-                    var len = data.length;
-                    for (var i = 0; i < len; i++) {
-                       html += '<option value="' + data[i].id + '">' + data[i].messageTypeName + '&nbsp;&#149;&nbsp;' + data[i].userName + '&nbsp;&#149;&nbsp;' + data[i].transportMethod + '</option>';
-                    }
-                    $('#srcConfig').html(html);
-                }
-            });
+            populateConfigurations(selOrg, 'srcConfig');
+            populateUsers(selOrg, 'srcUsers');
         }
     });
+    
     
     //Go get the existing message types for the selected organization
     $(document).on('change', '.seltgtOrganization', function() {
@@ -67,30 +56,19 @@ $(function() {
             $('#tgtorgDiv').addClass("has-error");
         }
         else {
-            $.ajax({
-                url: 'getAvailableConfigurations.do',
-                type: "GET",
-                data: {'orgId': selOrg},
-                success: function(data) {
-                    //get value of preselected col
-                    var html = '<option value="">- Select - </option>';
-                    var len = data.length;
-                    for (var i = 0; i < len; i++) {
-                       html += '<option value="' + data[i].id + '">' + data[i].messageTypeName + '&nbsp;&#149;&nbsp;' + data[i].userName + '&nbsp;&#149;&nbsp;' + data[i].transportMethod + '</option>';
-                    }
-                    $('#tgtConfig').html(html);
-                }
-            });
+            populateConfigurations(selOrg, 'tgtConfig');
+            populateUsers(selOrg, 'tgtUsers');
         }
     });
 
     
-
     //This function will save the messgae type field mappings
     $(document).on('click', '#submitButton', function() {
         var hasErrors = 0;
         var srcConfig = $('#srcConfig').val();
         var tgtConfig = $('#tgtConfig').val();
+        var srcUsers = $('#srcUsers').val();
+        var tgtUsers = $('#tgtUsers').val();
         
         $('div.form-group').removeClass("has-error");
         $('span.control-label').removeClass("has-error");
@@ -107,11 +85,21 @@ $(function() {
             hasErrors = 1;
         }
         
+        if (srcUsers === '') {
+            $('#srcUsersDiv').addClass("has-error");
+            hasErrors = 1;
+        }
+        
+        if (tgtUsers === '') {
+            $('#tgtUsersDiv').addClass("has-error");
+            hasErrors = 1;
+        }
+        
         if(hasErrors == 0) {
              $.ajax({
                 url: 'addConnection.do',
                 type: "POST",
-                data: {'srcConfig': srcConfig, 'tgtConfig': tgtConfig},
+                data: {'srcConfig': srcConfig, 'tgtConfig': tgtConfig, 'srcUsers' : srcUsers, 'tgtUsers' : tgtUsers},
                 success: function(data) {
                     window.location.href='connections?msg=created'
                 }
@@ -120,3 +108,37 @@ $(function() {
         
     });
 });
+
+function populateConfigurations(orgId, selectBoxId) {
+    $.ajax({
+        url: 'getAvailableConfigurations.do',
+        type: "GET",
+        data: {'orgId': orgId},
+        success: function(data) {
+            //get value of preselected col
+            var html = '<option value="">- Select - </option>';
+            var len = data.length;
+            for (var i = 0; i < len; i++) {
+               html += '<option value="' + data[i].id + '">' + data[i].messageTypeName + '&nbsp;&#149;&nbsp;' + data[i].transportMethod + '</option>';
+            }
+            $('#'+selectBoxId).html(html);
+        }
+    });
+}
+
+function populateUsers(orgId, selectBoxId) {
+    $.ajax({
+        url: 'getAvailableUsers.do',
+        type: "GET",
+        data: {'orgId': orgId},
+        success: function(data) {
+            //get value of preselected col
+            var html = '<option value="">- Select - </option>';
+            var len = data.length;
+            for (var i = 0; i < len; i++) {
+               html += '<option value="' + data[i].id + '">' + data[i].firstName + ' ' + data[i].lastName + '</option>';
+            }
+            $('#'+selectBoxId).html(html);
+        }
+    });
+}

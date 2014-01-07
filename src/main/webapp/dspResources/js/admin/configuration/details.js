@@ -8,24 +8,6 @@ $(function() {
         $('.alert').delay(2000).fadeOut(1000);
     }
 
-    //Populate the available users when a organization is selected
-    $('#organization').change(function() {
-        var orgId = $(this).val();
-
-        if (orgId !== "") {
-           
-            $.getJSON('getAvailableUsers.do', {
-                orgId: orgId, ajax: true
-            }, function(data) {
-                var html = '<option value="">- Select - </option>';
-                var len = data.length;
-                for (var i = 0; i < len; i++) {
-                    html += '<option value="' + data[i][0] + '">' + data[i][1] + ' ' + data[i][2] + '</option>';
-                }
-                $('#users').html(html);
-            });
-        }
-    });
 
     $('#saveDetails').click(function(event) {
         $('#action').val('save');

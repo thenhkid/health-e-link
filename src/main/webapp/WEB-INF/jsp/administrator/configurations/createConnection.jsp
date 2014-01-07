@@ -35,7 +35,14 @@
                                 <option value="">- Select -</option>
                             </select>
                             <span id="srcConfigMsg" class="control-label"></span>
-                        </div>         
+                        </div>   
+                        <div id="srcUsersDiv" class="form-group ${status.error ? 'has-error' : '' }">
+                            <label class="control-label" for="srcUsers">Authorized User(s) *</label>
+                            <form:select multiple="true" id="srcUsers" class="form-control half" >
+                                <option value="">- Select -</option>
+                            </form:select>
+                            <span id="srcUsersMsg" class="control-label"></span>
+                       </div>         
                     </div>
                 </div>
             </section>
@@ -61,7 +68,14 @@
                                 <option value="">- Select -</option>
                             </select>
                             <span id="tgtConfigMsg" class="control-label"></span>
-                        </div>         
+                        </div> 
+                        <div id="tgtUsersDiv" class="form-group ${status.error ? 'has-error' : '' }">
+                            <label class="control-label" for="tgtUsers">Authorized User(s) *</label>
+                            <form:select multiple="true" id="tgtUsers" class="form-control half" >
+                                <option value="">- Select -</option>
+                            </form:select>
+                            <span id="tgtUsersMsg" class="control-label"></span>
+                       </div>      
                     </div>
                 </div>
             </section> 
@@ -70,4 +84,5 @@
             </div>                 
         </div>
     </div>
-</div>                       
+</div>         
+
