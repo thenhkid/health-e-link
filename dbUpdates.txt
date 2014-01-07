@@ -1087,4 +1087,43 @@ DROP FOREIGN KEY `fkcrosswalkId`;
 ALTER TABLE `universalTranslator`.`users` 
 ADD COLUMN `userType` SMALLINT NOT NULL DEFAULT '1' COMMENT '1 = Manager\n2 = Staff Member' AFTER `email`,
 ADD COLUMN `deliverAuthority` BIT NOT NULL DEFAULT b'0' AFTER `userType`;
+
+/** Chad 1.6.2013 @ 11:10 PM */
+CREATE TABLE `universalTranslator`.`configurationConnectionSenders` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `connectionId` INT NOT NULL,
+  `userId` INT NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `connectionidfk_idx` (`connectionId` ASC),
+  INDEX `connectionuseridfk_idx` (`userId` ASC),
+  CONSTRAINT `connectionidfk`
+    FOREIGN KEY (`connectionId`)
+    REFERENCES `universalTranslator`.`configurationConnections` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `connectionuseridfk`
+    FOREIGN KEY (`userId`)
+    REFERENCES `universalTranslator`.`users` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+CREATE TABLE `universalTranslator`.`configurationConnectionReceivers` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `connectionId` INT NOT NULL,
+  `userId` INT NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `recconnectionIdfk_idx` (`connectionId` ASC),
+  INDEX `reuserIdfk_idx` (`userId` ASC),
+  CONSTRAINT `recconnectionIdfk`
+    FOREIGN KEY (`connectionId`)
+    REFERENCES `universalTranslator`.`configurationConnections` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `reuserIdfk`
+    FOREIGN KEY (`userId`)
+    REFERENCES `universalTranslator`.`users` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+
   
