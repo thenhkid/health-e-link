@@ -95,30 +95,147 @@
                                     </spring:bind>
                                 </c:if>
                                 <spring:bind path="rptField1">
-                                    <div class="form-group ${status.error ? 'has-error' : '' }">
+                                    <div class="form-group rtpField ${status.error ? 'has-error' : '' }">
+                                        <span id="rptFieldMsg" class="control-label"></span>
                                         <label class="control-label" for="rptField1">Reportable Field 1 *</label>
-                                        <form:input path="rptField1" id="rptField1" class="form-control" type="text" maxLength="3" />
+                                        <form:select path="rptField1" id="rptField1" class="form-control half">
+                                            <option value="0">- Select -</option>
+                                            <c:forEach items="${availableFields}" var="field" varStatus="fStatus">
+                                                <c:if test="${currentBucket != availableFields[fStatus.index].bucketNo}">
+                                                    <c:if test="${currentBucket > 0}"></optgroup></c:if>
+                                                    <c:set var="currentBucket" value="${availableFields[fStatus.index].bucketNo}" />
+                                                    <c:choose>
+                                                        <c:when test="${currentBucket == 1}">
+                                                        <optgroup label="(Sender Organiation Information)">
+                                                        </c:when>
+                                                        <c:when test="${currentBucket == 2}">
+                                                        <optgroup label="(Sender Provider Information)">
+                                                        </c:when>     
+                                                        <c:when test="${currentBucket == 3}">
+                                                        <optgroup label="(Recipient Organization Information)">
+                                                        </c:when>
+                                                        <c:when test="${currentBucket == 4}">
+                                                        <optgroup label="(Recipient Provider Information)">
+                                                        </c:when>
+                                                        <c:when test="${currentBucket == 5}">
+                                                        <optgroup label="(Patient Information)">
+                                                        </c:when>
+                                                        <c:when test="${currentBucket == 6}">
+                                                        <optgroup label="(Details)">
+                                                        </c:when>
+                                                    </c:choose>
+                                                </c:if>
+                                                            <option value="${availableFields[fStatus.index].id}" <c:if test="${messageSpecs.rptField1 == availableFields[fStatus.index].id}">selected</c:if>>${availableFields[fStatus.index].fieldLabel} </option>
+                                            </c:forEach>
+                                        </form:select>
                                         <form:errors path="rptField1" cssClass="control-label" element="label" />
                                    </div>
                                 </spring:bind>
                                 <spring:bind path="rptField2">
-                                    <div class="form-group ${status.error ? 'has-error' : '' }">
+                                    <div class="form-group rtpField ${status.error ? 'has-error' : '' }">
                                         <label class="control-label" for="rptField2">Reportable Field 2 *</label>
-                                        <form:input path="rptField2" id="rptField2" class="form-control" type="text" maxLength="3" />
+                                        <form:select path="rptField2" id="rptField2" class="form-control half">
+                                            <option value="0">- Select -</option>
+                                            <c:forEach items="${availableFields}" var="field" varStatus="fStatus">
+                                                <c:if test="${currentBucket != availableFields[fStatus.index].bucketNo}">
+                                                    <c:if test="${currentBucket > 0}"></optgroup></c:if>
+                                                    <c:set var="currentBucket" value="${availableFields[fStatus.index].bucketNo}" />
+                                                    <c:choose>
+                                                        <c:when test="${currentBucket == 1}">
+                                                        <optgroup label="(Sender Organiation Information)">
+                                                        </c:when>
+                                                        <c:when test="${currentBucket == 2}">
+                                                        <optgroup label="(Sender Provider Information)">
+                                                        </c:when>     
+                                                        <c:when test="${currentBucket == 3}">
+                                                        <optgroup label="(Recipient Organization Information)">
+                                                        </c:when>
+                                                        <c:when test="${currentBucket == 4}">
+                                                        <optgroup label="(Recipient Provider Information)">
+                                                        </c:when>
+                                                        <c:when test="${currentBucket == 5}">
+                                                        <optgroup label="(Patient Information)">
+                                                        </c:when>
+                                                        <c:when test="${currentBucket == 6}">
+                                                        <optgroup label="(Details)">
+                                                        </c:when>
+                                                    </c:choose>
+                                                </c:if>
+                                                <option value="${availableFields[fStatus.index].id}" <c:if test="${messageSpecs.rptField2 == availableFields[fStatus.index].id}">selected</c:if>>${availableFields[fStatus.index].fieldLabel} </option>
+                                            </c:forEach>
+                                        </form:select>
                                         <form:errors path="rptField2" cssClass="control-label" element="label" />
                                    </div>
                                 </spring:bind>
                                 <spring:bind path="rptField3">
-                                    <div class="form-group ${status.error ? 'has-error' : '' }">
+                                    <div class="form-group rtpField ${status.error ? 'has-error' : '' }">
                                         <label class="control-label" for="rptField3">Reportable Field 3 *</label>
-                                        <form:input path="rptField3" id="rptField3" class="form-control" type="text" maxLength="3" />
+                                        <form:select path="rptField3" id="rptField3" class="form-control half">
+                                            <option value="0">- Select -</option>
+                                            <c:forEach items="${availableFields}" var="field" varStatus="fStatus">
+                                                <c:if test="${currentBucket != availableFields[fStatus.index].bucketNo}">
+                                                    <c:if test="${currentBucket > 0}"></optgroup></c:if>
+                                                    <c:set var="currentBucket" value="${availableFields[fStatus.index].bucketNo}" />
+                                                    <c:choose>
+                                                        <c:when test="${currentBucket == 1}">
+                                                        <optgroup label="(Sender Organiation Information)">
+                                                        </c:when>
+                                                        <c:when test="${currentBucket == 2}">
+                                                        <optgroup label="(Sender Provider Information)">
+                                                        </c:when>     
+                                                        <c:when test="${currentBucket == 3}">
+                                                        <optgroup label="(Recipient Organization Information)">
+                                                        </c:when>
+                                                        <c:when test="${currentBucket == 4}">
+                                                        <optgroup label="(Recipient Provider Information)">
+                                                        </c:when>
+                                                        <c:when test="${currentBucket == 5}">
+                                                        <optgroup label="(Patient Information)">
+                                                        </c:when>
+                                                        <c:when test="${currentBucket == 6}">
+                                                        <optgroup label="(Details)">
+                                                        </c:when>
+                                                    </c:choose>
+                                                </c:if>
+                                                <option value="${availableFields[fStatus.index].id}" <c:if test="${messageSpecs.rptField3 == availableFields[fStatus.index].id}">selected</c:if>>${availableFields[fStatus.index].fieldLabel} </option>
+                                            </c:forEach>
+                                        </form:select>
                                         <form:errors path="rptField3" cssClass="control-label" element="label" />
                                    </div>
                                 </spring:bind>
                                 <spring:bind path="rptField4">
-                                    <div class="form-group ${status.error ? 'has-error' : '' }">
+                                    <div class="form-group rtpField ${status.error ? 'has-error' : '' }">
                                         <label class="control-label" for="rptField4">Reportable Field 4 *</label>
-                                        <form:input path="rptField4" id="rptField4" class="form-control" type="text" maxLength="3" />
+                                        <form:select path="rptField4" id="rptField4" class="form-control half">
+                                            <option value="0">- Select -</option>
+                                            <c:forEach items="${availableFields}" var="field" varStatus="fStatus">
+                                                <c:if test="${currentBucket != availableFields[fStatus.index].bucketNo}">
+                                                    <c:if test="${currentBucket > 0}"></optgroup></c:if>
+                                                    <c:set var="currentBucket" value="${availableFields[fStatus.index].bucketNo}" />
+                                                    <c:choose>
+                                                        <c:when test="${currentBucket == 1}">
+                                                        <optgroup label="(Sender Organiation Information)">
+                                                        </c:when>
+                                                        <c:when test="${currentBucket == 2}">
+                                                        <optgroup label="(Sender Provider Information)">
+                                                        </c:when>     
+                                                        <c:when test="${currentBucket == 3}">
+                                                        <optgroup label="(Recipient Organization Information)">
+                                                        </c:when>
+                                                        <c:when test="${currentBucket == 4}">
+                                                        <optgroup label="(Recipient Provider Information)">
+                                                        </c:when>
+                                                        <c:when test="${currentBucket == 5}">
+                                                        <optgroup label="(Patient Information)">
+                                                        </c:when>
+                                                        <c:when test="${currentBucket == 6}">
+                                                        <optgroup label="(Details)">
+                                                        </c:when>
+                                                    </c:choose>
+                                                </c:if>
+                                                <option value="${availableFields[fStatus.index].id}" <c:if test="${messageSpecs.rptField4 == availableFields[fStatus.index].id}">selected</c:if>>${availableFields[fStatus.index].fieldLabel} </option>
+                                            </c:forEach>
+                                        </form:select>
                                         <form:errors path="rptField4" cssClass="control-label" element="label" />
                                    </div>
                                 </spring:bind>

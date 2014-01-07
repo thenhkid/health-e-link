@@ -98,18 +98,6 @@ public class Provider {
         this.website = website;
     }
 
-    @NotEmpty
-    @Column(name = "GENDER", nullable = true)
-    private String gender;
-
-    public String getGender() {
-        return gender;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
-
     @Column(name = "SPECIALTY", nullable = true)
     private String specialty;
 

@@ -51,30 +51,30 @@
                                 <c:forEach items="${fields}" var="field" varStatus="fStatus">
                                     <c:if test="${currentBucket != fields[fStatus.index].bucketNo}">
                                         <c:if test="${currentBucket > 0}"></optgroup></c:if>
-                                            <c:set var="currentBucket" value="${fields[fStatus.index].bucketNo}" />
-                                            <c:choose>
-                                                <c:when test="${currentBucket == 1}">
-                                                <optgroup label="(Sender Organiation Information)">
-                                                </c:when>
-                                                <c:when test="${currentBucket == 2}">
-                                                <optgroup label="(Sender Provider Information)">
-                                                </c:when>     
-                                                <c:when test="${currentBucket == 3}">
-                                                <optgroup label="(Recipient Organization Information)">
-                                                </c:when>
-                                                <c:when test="${currentBucket == 4}">
-                                                <optgroup label="(Recipient Provider Information)">
-                                                </c:when>
-                                                <c:when test="${currentBucket == 5}">
-                                                <optgroup label="(Patient Information)">
-                                                </c:when>
-                                                <c:when test="${currentBucket == 6}">
-                                                <optgroup label="(Details)">
-                                                </c:when>
-                                            </c:choose>
-                                        </c:if>
-                                        <option value="${fields[fStatus.index].id}">${fields[fStatus.index].fieldLabel} </option>
-                                    </c:forEach>
+                                        <c:set var="currentBucket" value="${fields[fStatus.index].bucketNo}" />
+                                        <c:choose>
+                                            <c:when test="${currentBucket == 1}">
+                                            <optgroup label="(Sender Organiation Information)">
+                                            </c:when>
+                                            <c:when test="${currentBucket == 2}">
+                                            <optgroup label="(Sender Provider Information)">
+                                            </c:when>     
+                                            <c:when test="${currentBucket == 3}">
+                                            <optgroup label="(Recipient Organization Information)">
+                                            </c:when>
+                                            <c:when test="${currentBucket == 4}">
+                                            <optgroup label="(Recipient Provider Information)">
+                                            </c:when>
+                                            <c:when test="${currentBucket == 5}">
+                                            <optgroup label="(Patient Information)">
+                                            </c:when>
+                                            <c:when test="${currentBucket == 6}">
+                                            <optgroup label="(Details)">
+                                            </c:when>
+                                        </c:choose>
+                                    </c:if>
+                                    <option value="${fields[fStatus.index].id}">${fields[fStatus.index].fieldLabel} </option>
+                                </c:forEach>
                             </select>
                             <span id="fieldMsg" class="control-label"></span>
                         </div>

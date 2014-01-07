@@ -37,6 +37,24 @@ $(function() {
 function checkFormFields() {
     var hasErrors = 0;
     
+    //Remove all has-error class
+    $('div.form-group').removeClass("has-error");
+    $('span.control-label').removeClass("has-error");
+    $('span.control-label').html("");
+    
+    //Make sure at least one reportable field is selected
+    var rptField1 = $('#rptField1').val();
+    var rptField2 = $('#rptField2').val();
+    var rptField3 = $('#rptField3').val();
+    var rptField4 = $('#rptField4').val();
+    
+    if(rptField1 == 0 && rptField2 == 0 && rptField3 == 0 && rptField4 == 0) {
+        $('.rtpField').addClass("has-error");
+        $('#rptFieldMsg').addClass("has-error");
+        $('#rptFieldMsg').html('At least one reportable field must be selected.<br />');
+        hasErrors = 1;
+    }
+    
     return hasErrors;
 }
 

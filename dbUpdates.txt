@@ -1132,6 +1132,8 @@ ALTER TABLE `universalTranslator`.`configurations`
 DROP COLUMN `userId`,
 DROP INDEX `configUserIdfk_idx` ;
 
+ALTER TABLE `universalTranslator`.`info_providers` 
+DROP COLUMN `gender`;
 
 
   

@@ -659,11 +659,14 @@ public class adminConfigController {
         
         //pass the configuration detail object back to the page.
         mav.addObject("configurationDetails", configurationDetails);
+        
+        //Need to get all available fields that can be used for the reportable fields
+        List<configurationFormFields> fields = configurationTransportManager.getConfigurationFields(configId, transportDetails.getId());
+        mav.addObject("availableFields",fields);
 
         //Set the variable to hold the number of completed steps for this configuration;
         mav.addObject("stepsCompleted", stepsCompleted);
-
-
+        
         return mav;
     }
     
