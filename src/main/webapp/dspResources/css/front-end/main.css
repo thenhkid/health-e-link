@@ -6472,6 +6472,9 @@ td.visible-print {
   padding-top: 15px;
   padding-bottom: 15px;
 }
+.navbar-actions .badge {
+  padding: 2px 5px;
+}
 .arrow-left {
   width: 10px;
   height: 20px;

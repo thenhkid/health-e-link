@@ -1,3 +1,6 @@
+.btn:focus {
+  outline: 0;
+}
 *.unstyled-link {
   color: #666666;
 }
@@ -199,13 +202,7 @@ h3 {
 .primary-nav .navbar-nav li.open > a:hover,
 .primary-nav .navbar-nav li.active > a,
 .primary-nav .navbar-nav li > a:focus {
-  background-color: #333333;
-}
-.primary-nav .navbar-nav li.open > a:hover,
-.primary-nav .navbar-nav li.open > a:hover:hover,
-.primary-nav .navbar-nav li.active > a:hover,
-.primary-nav .navbar-nav li > a:focus:hover {
-  background-color: #333333;
+  background-color: #ffffff;
 }
 .primary-nav .navbar-nav li > a {
   border-right: 0px solid #404040;
@@ -222,6 +219,11 @@ h3 {
   border-top-color: #ffffff;
   border-bottom-color: #ffffff;
 }
+.primary-nav .navbar-nav li.active a:hover,
+.primary-nav .navbar-nav li.active a:active,
+.primary-nav .navbar-nav li.active a:focus {
+  background-color: #ffffff;
+}
 .primary-nav .navbar-nav li:first-child > a {
   border-left: 0;
 }
@@ -231,10 +233,13 @@ h3 {
 .primary-nav .navbar-nav .dropdown-menu {
   border: 0;
   border-top-left-radius: 5px;
-  background-color: #333333;
+  background-color: #ffffff;
 }
 .primary-nav .navbar-nav .dropdown-menu li {
   margin-right: 0;
+}
+.primary-nav .navbar-nav .dropdown-menu a:hover {
+  color: #333333;
 }
 .primary-nav .icon-bar {
   background-color: #000;

@@ -32,28 +32,32 @@
                             <form:checkbox id="sendEmailAlert" path="sendEmailAlert" value="true" /> Alert me via email on any new message my organization receives.
                         </label>
                     </div>
-                    <div class="form-group">
-                        <label for="status">Status *</label>
-                        <div>
-                            <label class="radio-inline">
-                                <form:radiobutton id="status" path="status" value="true" /> Active
-                            </label>
-                            <label class="radio-inline">
-                                <form:radiobutton id="status" path="status" value="false" /> Inactive
-                            </label>
+
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label for="status">Status *</label>
+                            <div>
+                                <label class="radio-inline">
+                                    <form:radiobutton id="status" path="status" value="true" /> Active
+                                </label>
+                                <label class="radio-inline">
+                                    <form:radiobutton id="status" path="status" value="false" /> Inactive
+                                </label>
+                            </div>
                         </div>
+                        <div class="form-group col-md-6">
+                            <label for="status">User Type *</label>
+                            <div>
+                                <label class="radio-inline">
+                                    <form:radiobutton id="userType" path="userType" value="1" /> Manager
+                                </label>
+                                <label class="radio-inline">
+                                    <form:radiobutton id="userType" path="userType" value="2" /> Staff Member
+                                </label>
+                            </div>
+                        </div> 
                     </div>
-                    <div class="form-group">
-                        <label for="status">User Type *</label>
-                        <div>
-                            <label class="radio-inline">
-                                <form:radiobutton id="userType" path="userType" value="1" /> Manager
-                            </label>
-                            <label class="radio-inline">
-                                <form:radiobutton id="userType" path="userType" value="2" /> Staff Member
-                            </label>
-                        </div>
-                    </div> 
+
                     <div class="form-group">
                         <label for="status">Can this user deliver messages? *</label>
                         <div>
