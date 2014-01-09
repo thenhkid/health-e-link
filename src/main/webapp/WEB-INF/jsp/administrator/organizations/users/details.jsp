@@ -32,20 +32,19 @@
                             <form:checkbox id="sendEmailAlert" path="sendEmailAlert" value="true" /> Alert me via email on any new message my organization receives.
                         </label>
                     </div>
-
-                    <div class="row">
-                        <div class="form-group col-md-6">
-                            <label for="status">Status *</label>
-                            <div>
-                                <label class="radio-inline">
-                                    <form:radiobutton id="status" path="status" value="true" /> Active
-                                </label>
-                                <label class="radio-inline">
-                                    <form:radiobutton id="status" path="status" value="false" /> Inactive
-                                </label>
-                            </div>
+                    <div class="form-group">
+                        <label for="status">Status *</label>
+                        <div>
+                            <label class="radio-inline">
+                                <form:radiobutton id="status" path="status" value="true" /> Active
+                            </label>
+                            <label class="radio-inline">
+                                <form:radiobutton id="status" path="status" value="false" /> Inactive
+                            </label>
                         </div>
-                        <div class="form-group col-md-6">
+                    </div>
+                   <div class="row">
+                       <div class="form-group col-md-6">
                             <label for="status">User Type *</label>
                             <div>
                                 <label class="radio-inline">
@@ -56,19 +55,18 @@
                                 </label>
                             </div>
                         </div> 
-                    </div>
-
-                    <div class="form-group">
-                        <label for="status">Can this user deliver messages? *</label>
-                        <div>
-                            <label class="radio-inline">
-                                <form:radiobutton id="deliverAuthority" path="deliverAuthority" value="true" /> Yes
-                            </label>
-                            <label class="radio-inline">
-                                <form:radiobutton id="deliverAuthority" path="deliverAuthority" value="false" /> No
-                            </label>
-                        </div>
-                    </div>        
+                        <div class="form-group  col-md-6">
+                            <label for="status">Can this user deliver messages? *</label>
+                            <div>
+                                <label class="radio-inline">
+                                    <form:radiobutton id="deliverAuthority" path="deliverAuthority" value="true" /> Yes
+                                </label>
+                                <label class="radio-inline">
+                                    <form:radiobutton id="deliverAuthority" path="deliverAuthority" value="false" /> No
+                                </label>
+                            </div>
+                        </div> 
+                   </div>
                     <spring:bind path="firstName">
                         <div class="form-group ${status.error ? 'has-error' : '' }">
                             <label class="control-label" for="firstName">First Name *</label>
