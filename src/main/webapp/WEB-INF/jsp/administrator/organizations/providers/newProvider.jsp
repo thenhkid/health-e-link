@@ -26,17 +26,6 @@
                             </label>
                         </div>
                     </div>
-                    <spring:bind path="gender">
-                        <div class="form-group ${status.error ? 'has-error' : '' }">
-                            <label class="control-label" for="gender">Gender *</label>
-                            <form:select path="gender" id="gender" class="form-control half">
-                                <form:option value="">- Choose Gender -</form:option>
-                                <form:option value="Female">Female</form:option>
-                                <form:option value="Male">Male</form:option>
-                            </form:select>
-                            <form:errors path="gender" cssClass="control-label" element="label" />
-                        </div>
-                    </spring:bind>
                     <spring:bind path="firstName">
                         <div class="form-group ${status.error ? 'has-error' : '' }">
                             <label class="control-label" for="firstName">First Name *</label>
