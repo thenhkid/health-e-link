@@ -4,3 +4,29 @@ UPDATE `universaltranslator`.`lookuptables` SET `utTableName`='lu_ProcedureStatu
 INSERT INTO `universaltranslator`.`lookuptables` (`utTableName`, `displayText`, `urlId`) VALUES ('lu_Urgency', 'Urgency', '34567Urg45677');
 
 UPDATE `universalTranslator`.`lookUpTables` SET `utTableName`='lu_ProcessStatus' WHERE `id`='21';
+
+/** 01.10.2014 **/
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `description`=NULL WHERE `id`='1';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `description`=NULL WHERE `id`='2';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayCode`='SSL', `displayText`='Source Submission Loaded', `description`=NULL WHERE `id`='3';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayCode`='SBP', `displayText`='Submission Being Processed', `description`=NULL WHERE `id`='4';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayCode`='SRP', `displayText`='Submission Release Pending', `description`=NULL WHERE `id`='5';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayCode`='SR', `displayText`='Submission Released', `description`=NULL WHERE `id`='6';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayCode`='SRJ', `displayText`='Submission Rejected', `description`=NULL WHERE `id`='7';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayText`='Submission Saved', `description`=NULL WHERE `id`='8';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayCode`='L', `displayText`='Loaded' WHERE `id`='9';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayCode`='RP', `displayText`='Release Pending' WHERE `id`='10';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayCode`='I', `displayText`='Invalid' WHERE `id`='11';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayCode`='REL', `displayText`='Released' WHERE `id`='12';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayCode`='RJ', `displayText`='Rejected' WHERE `id`='13';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayCode`='E', `displayText`='Error' WHERE `id`='14';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayCode`='S', `displayText`='Saved' WHERE `id`='15';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayCode`='P', `displayText`='Passed', `description`=NULL WHERE `id`='16';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `category`='transaction', `displayCode`='PP', `displayText`='Pending Pickup', `description`=NULL WHERE `id`='18';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayCode`='C', `displayText`='Closed' WHERE `id`='17';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `description`=NULL WHERE `id`='19';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `category`='transaction', `displayCode`='REC', `displayText`='Received', `description`=NULL WHERE `id`='20';
+INSERT INTO `universaltranslator`.`lu_ProcessStatus` (`category`, `displayCode`, `displayText`) VALUES ('batch', 'DNP', 'Do Not Process');
+INSERT INTO `universaltranslator`.`lu_ProcessStatus` (`category`, `displayCode`, `displayText`) VALUES ('batch', 'SDL', 'Submission Delivery Locked');
+INSERT INTO `universaltranslator`.`lu_ProcessStatus` (`category`, `displayCode`, `displayText`) VALUES ('batch', 'SDC', 'Submission Delivery Completed');
+INSERT INTO `universaltranslator`.`lu_ProcessStatus` (`category`, `displayCode`, `displayText`) VALUES ('batch', 'SPC', 'Submission Processing Completed');
