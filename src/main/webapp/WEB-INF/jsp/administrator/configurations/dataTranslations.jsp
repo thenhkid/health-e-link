@@ -150,13 +150,13 @@
         <div class="col-md-6">
             <section class="panel panel-default">
                 <div class="panel-heading">
+                    <div class="pull-right">
+                        <a href="#crosswalkModal" data-toggle="modal" class="btn btn-primary btn-xs btn-action" id="createNewCrosswalk"  title="Create a new Crosswalk"><span class="glyphicon glyphicon-plus"></span></a>
+                    </div>
                     <h3 class="panel-title">Available Crosswalks</h3>
                 </div>
                 <div class="panel-body">
                     <div class="form-container scrollable">
-                        <a href="#crosswalkModal" id="createNewCrosswalk" data-toggle="modal" class="btn btn-primary btn-sm pull-right" title="Create a new Crosswalk">
-                            <span class="glyphicon glyphicon-plus"></span>
-                        </a>
                         <div id="crosswalksTable"></div>
                     </div>
                 </div>

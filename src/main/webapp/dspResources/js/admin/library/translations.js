@@ -67,7 +67,7 @@ $(function() {
 
     //This function will launch the new crosswalk overlay with a blank form
     $(document).on('click', '#createNewCrosswalk', function() {
-        $.ajax({
+       $.ajax({
             url: 'newCrosswalk',
             type: "GET",
             success: function(data) {
