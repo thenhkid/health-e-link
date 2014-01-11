@@ -30,3 +30,69 @@ INSERT INTO `universaltranslator`.`lu_ProcessStatus` (`category`, `displayCode`,
 INSERT INTO `universaltranslator`.`lu_ProcessStatus` (`category`, `displayCode`, `displayText`) VALUES ('batch', 'SDL', 'Submission Delivery Locked');
 INSERT INTO `universaltranslator`.`lu_ProcessStatus` (`category`, `displayCode`, `displayText`) VALUES ('batch', 'SDC', 'Submission Delivery Completed');
 INSERT INTO `universaltranslator`.`lu_ProcessStatus` (`category`, `displayCode`, `displayText`) VALUES ('batch', 'SPC', 'Submission Processing Completed');
+
+
+/** Grace 01.11.2014 **/
+
+drop table transactionErrors;
+
+CREATE TABLE `transactionInErrors` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `batchUploadId` int(11) NOT NULL,
+  `transactionId` int(11) NOT NULL,
+  `fieldLabel` varchar(45) DEFAULT NULL,
+  `errorColumn` varchar(5) DEFAULT NULL COMMENT 'F1, F2, F3, etc.',
+  `errorValue` varchar(255) NOT NULL,
+  `rpttField1Label` varchar(45) DEFAULT NULL,
+  `rptField1Val` varchar(255) DEFAULT NULL,
+  `rptField2Label` varchar(45) DEFAULT NULL,
+  `rptField2Val` varchar(255) DEFAULT NULL,
+  `rptField3Val` varchar(45) DEFAULT NULL,
+  `rptField3Label` varchar(255) DEFAULT NULL,
+  `rpttField4Label` varchar(45) DEFAULT NULL,
+  `rptField4Val` varchar(255) DEFAULT NULL,
+  `dateCreated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `uploadType` varchar(1) DEFAULT 'u' COMMENT 'U for Upload and D for download',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+CREATE TABLE `transactionOutErrors` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `BatchDownloads` int(11) NOT NULL,
+  `transactionTargetId` int(11) NOT NULL,
+  `fieldLabel` varchar(45) DEFAULT NULL,
+  `errorColumn` varchar(5) DEFAULT NULL COMMENT 'F1, F2, F3, etc.',
+  `errorValue` varchar(255) NOT NULL,
+  `rpttField1Label` varchar(45) DEFAULT NULL,
+  `rptField1Val` varchar(255) DEFAULT NULL,
+  `rptField2Label` varchar(45) DEFAULT NULL,
+  `rptField2Val` varchar(255) DEFAULT NULL,
+  `rptField3Val` varchar(45) DEFAULT NULL,
+  `rptField3Label` varchar(255) DEFAULT NULL,
+  `rpttField4Label` varchar(45) DEFAULT NULL,
+  `rptField4Val` varchar(255) DEFAULT NULL,
+  `dateCreated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `downloadType` varchar(1) DEFAULT 'u' COMMENT 'U for Upload and D for download',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+ALTER TABLE `universalTranslator`.`transactionInErrors` 
+CHANGE COLUMN `transactionId` `transactionInId` INT(11) NOT NULL ,
+ADD INDEX `batchUploadIdFK_idx` (`batchUploadId` ASC);
+ALTER TABLE `universalTranslator`.`transactionInErrors` 
+ADD CONSTRAINT `batchUploadIdFK`
+  FOREIGN KEY (`batchUploadId`)
+  REFERENCES `universalTranslator`.`batchUploads` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+  ALTER TABLE `universalTranslator`.`transactionOutErrors` 
+CHANGE COLUMN `BatchDownloads` `BatchDownloadId` INT(11) NOT NULL ,
+ADD INDEX `batchDLFK_idx` (`BatchDownloadId` ASC);
+ALTER TABLE `universalTranslator`.`transactionOutErrors` 
+ADD CONSTRAINT `batchDLFK`
+  FOREIGN KEY (`BatchDownloadId`)
+  REFERENCES `universalTranslator`.`BatchDownloads` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+  
