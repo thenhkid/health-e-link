@@ -71,4 +71,6 @@ public interface transactionInManager {
     
     void removeAttachmentById(int attachmentId);
     
+    boolean processTransactions(int batchUploadId);
+    
 }
