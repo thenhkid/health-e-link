@@ -96,3 +96,30 @@ ADD CONSTRAINT `batchDLFK`
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
   
+  
+ /** Grace 01.13.2014 **/
+ ALTER TABLE `universalTranslator`.`transactionTranslatedIn` 
+ADD COLUMN `configId` INT NOT NULL AFTER `transactionInId`;
+ 
+ALTER TABLE `universalTranslator`.`transactionIn` 
+CHANGE COLUMN `configId` `configId` INT(11) NULL ;
+
+ALTER TABLE `universalTranslator`.`transactionIn` 
+DROP FOREIGN KEY `configIdFK`;
+
+/** READ ME
+
+this will fail if you have data in transactionTranslatedIn as configId is now 0,
+please update your configId or delete the rows first
+ 
+**/
+
+ALTER TABLE `universalTranslator`.`transactionTranslatedIn` 
+ADD INDEX `ttiConfigId_idx` (`configId` ASC);
+ALTER TABLE `universalTranslator`.`transactionTranslatedIn` 
+ADD CONSTRAINT `ttiConfigId`
+  FOREIGN KEY (`configId`)
+  REFERENCES `universalTranslator`.`configurations` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
