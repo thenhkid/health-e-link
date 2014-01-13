@@ -122,4 +122,57 @@ ADD CONSTRAINT `ttiConfigId`
   REFERENCES `universalTranslator`.`configurations` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
+  
+  
+  
+/** 01.13.2014 PM**/
+ALTER TABLE `universalTranslator`.`transactionInErrors` 
+DROP COLUMN `uploadType`,
+DROP COLUMN `rptField4Val`,
+DROP COLUMN `rpttField4Label`,
+DROP COLUMN `rptField3Label`,
+DROP COLUMN `rptField3Val`,
+DROP COLUMN `rptField2Val`,
+DROP COLUMN `rptField2Label`,
+DROP COLUMN `rptField1Val`,
+DROP COLUMN `rpttField1Label`,
+DROP COLUMN `errorValue`,
+DROP COLUMN `errorColumn`,
+CHANGE COLUMN `fieldLabel` `configurationFormFieldsId` INT NOT NULL ;
+  
+
+ALTER TABLE `universalTranslator`.`transactionInErrors` 
+ADD INDEX `configFFFKId_idx` (`configurationFormFieldsId` ASC);
+ALTER TABLE `universalTranslator`.`transactionInErrors` 
+ADD CONSTRAINT `configFFFKId`
+  FOREIGN KEY (`configurationFormFieldsId`)
+  REFERENCES `universalTranslator`.`configurationFormFields` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+  
+  
+  ALTER TABLE `universalTranslator`.`transactionOutErrors` 
+DROP COLUMN `downloadType`,
+DROP COLUMN `rptField4Val`,
+DROP COLUMN `rpttField4Label`,
+DROP COLUMN `rptField3Label`,
+DROP COLUMN `rptField3Val`,
+DROP COLUMN `rptField2Val`,
+DROP COLUMN `rptField2Label`,
+DROP COLUMN `rptField1Val`,
+DROP COLUMN `rpttField1Label`,
+DROP COLUMN `errorValue`,
+DROP COLUMN `errorColumn`,
+CHANGE COLUMN `fieldLabel` `configurationFormFieldsId` INT NULL DEFAULT NULL ;
+  
+  
+  ALTER TABLE `universalTranslator`.`transactionOutErrors` 
+ADD INDEX `configFFIdFK_idx` (`configurationFormFieldsId` ASC);
+ALTER TABLE `universalTranslator`.`transactionOutErrors` 
+ADD CONSTRAINT `configFFIdFK`
+  FOREIGN KEY (`configurationFormFieldsId`)
+  REFERENCES `universalTranslator`.`configurationFormFields` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+  
 
