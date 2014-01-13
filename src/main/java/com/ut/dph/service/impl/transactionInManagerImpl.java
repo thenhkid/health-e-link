@@ -251,35 +251,7 @@ public class transactionInManagerImpl implements transactionInManager {
     }
 
     
-    /** 
-     * ERROR report - look up batch Id
-     * 
-     * this method takes in a batchUploadId and translates records with it
-     * 1.  If overall process is success, we return true.
-     * 2.  If anything hangs, we leave the status as SBP so that admin can see that it hung
-     * 3.  If false is returned, an email will go out to the admin with error stack trace.
-     * 
-     * ERG - look at who at who sent it off because manager can be the one sending the
-     * file off 
-     * 
-     * We need to know who did what in the system
-     * 
-     * This method will
-     * 1. Take in a batchId
-     * 2. Query out distinct configurations for batch
-     * 3. Check for R/O fields
-     * 4. Insert errors into TransactionInErrors
-     * 5. Get crosswalks and macros and order them
-     * 6. Apply them in order
-     * 7. Note the ones that have errors
-     * 8. Insert the ones without errors to messageTables 
-     * 	a. be mindful of pairing data - for example - 
-     * test name = walking, value of 6 unit of miles/hr need to stay together in one row
-     * 9 update status of transactionIn, batchUpload
-     *  
-     * 
-     * 
-     * **/
+
 	@Override
 	public boolean processTransactions(int batchUploadId) {
 		// TODO Auto-generated method stub
