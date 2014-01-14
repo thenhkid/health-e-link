@@ -34,8 +34,6 @@ INSERT INTO `universaltranslator`.`lu_ProcessStatus` (`category`, `displayCode`,
 
 /** Grace 01.11.2014 **/
 
-drop table transactionErrors;
-
 CREATE TABLE `transactionInErrors` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `batchUploadId` int(11) NOT NULL,
@@ -175,4 +173,6 @@ ADD CONSTRAINT `configFFIdFK`
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
   
+/** grace 11.14.14**/
+drop table `universalTranslator`.`transactionErrors`;
 
