@@ -259,6 +259,28 @@ public class adminConfigController {
     @RequestMapping(value = "/create", method = RequestMethod.POST)
     public ModelAndView saveNewConfiguration(@ModelAttribute(value = "configurationDetails") configuration configurationDetails, BindingResult result, RedirectAttributes redirectAttr, @RequestParam String action) throws Exception {
 
+        /* Need to make sure the name isn't already taken for the org selected */
+        configuration existing = configurationmanager.getConfigurationByName(configurationDetails.getconfigName(), configurationDetails.getorgId());
+        
+        if (existing != null) {
+            ModelAndView mav = new ModelAndView();
+            mav.setViewName("/administrator/configurations/details");
+            
+            mav.addObject("configurationDetails", configurationDetails);
+            
+            //Need to get a list of active organizations.
+            List<Organization> organizations = organizationmanager.getAllActiveOrganizations();
+            mav.addObject("organizations", organizations);
+
+            //Need to get a list of active message types
+            List<messageType> messageTypes = messagetypemanager.getActiveMessageTypes();
+            mav.addObject("messageTypes", messageTypes);
+            
+            mav.addObject("existingName", "The configuration name " + configurationDetails.getconfigName().trim() + " already exists.");
+            return mav;
+        }
+        
+        
         Integer id = (Integer) configurationmanager.createConfiguration(configurationDetails);
 
         configId = id;

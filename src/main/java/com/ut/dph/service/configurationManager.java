@@ -23,7 +23,7 @@ public interface configurationManager {
   
   List<configuration> getActiveConfigurationsByOrgId(int orgId);
   
-  List<configuration> getConfigurationByName(String configName);
+  configuration getConfigurationByName(String configName, int orgId);
   
   List<configuration> findConfigurations(String searchTerm);
   

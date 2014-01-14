@@ -149,21 +149,23 @@ public class configurationDAOImpl implements configurationDAO {
     }
 
     /**
-     * The 'getOrganizationByName' function will return a single organization based on the name passed in.
+     * The 'getConfigurationByName' function will return a single configuration based on the name passed in.
      *
-     * @Table	organizations
+     * @Table	configurations
      *
-     * @param	cleanURL	Will hold the 'clean' organization name from the url
+     * @param	configName	Will hold the configuration name to search on
      *
-     * @return	This function will return a single organization object
+     * @return	This function will return a single configuration object
      */
     @Override
     @SuppressWarnings("unchecked")
-    public List<configuration> getConfigurationByName(String configName) {
+    public configuration getConfigurationByName(String configName, int orgId) {
         Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configuration.class);
         criteria.add(Restrictions.like("configName", configName));
-        return criteria.list();
-    }
+        criteria.add(Restrictions.eq("orgId", orgId));
+        
+        return (configuration) criteria.uniqueResult();
+    }    
 
     /**
      * The 'getConfigurations' function will return a list of the configurations in the system

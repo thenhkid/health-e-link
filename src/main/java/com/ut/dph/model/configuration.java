@@ -59,6 +59,9 @@ public class configuration {
     @Column(name = "STEPSCOMPLETED", nullable = false)
     private int stepsCompleted = 0;
     
+    @Column(name = "CONFIGNAME", nullable = false)
+    private String configName;
+    
     
     public int getId() {
         return id;
@@ -157,6 +160,12 @@ public class configuration {
         this.connections = connections;
     }
     
+    public void setconfigName(String configName) {
+        this.configName = configName;
+    }
     
+    public String getconfigName() {
+        return configName;
+    }
     
 }

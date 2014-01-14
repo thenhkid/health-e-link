@@ -25,7 +25,7 @@ public interface configurationDAO {
   
   List<configuration> findConfigurations(String searchTerm);
   
-  List<configuration> getConfigurationByName(String configName);
+  configuration getConfigurationByName(String configName, int orgId);
   
   List<configuration> getConfigurations(int page, int maxResults);
   
