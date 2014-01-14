@@ -111,7 +111,7 @@ public class userDAOImpl implements userDAO {
      */
     @Override
     public List<User> getUsersByOrganization(int orgId) {
-        Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT id, firstName, lastName FROM users where status = 1 and orgId = :orgId order by lastName asc, firstName asc");
+        Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT id, firstName, lastName, userType FROM users where status = 1 and orgId = :orgId order by lastName asc, firstName asc");
               query.setParameter("orgId", orgId);
               
         return query.list();

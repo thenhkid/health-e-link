@@ -695,6 +695,11 @@ public class configurationDAOImpl implements configurationDAO {
         //translations. This will allow the admin to change the configuration transport method after
         //one was previously selected. This will only be available while the configuration is not active.
         if (clearFields == 1) {
+            //Delete the existing data translactions
+            Query deleteTranslations = sessionFactory.getCurrentSession().createSQLQuery("DELETE from configurationDataTranslations where configId = :configId");
+            deleteTranslations.setParameter("configId", messageSpecs.getconfigId());
+            deleteTranslations.executeUpdate();
+            
             //Delete the existing form fields
             Query deleteFields = sessionFactory.getCurrentSession().createSQLQuery("DELETE from configurationFormFields where configId = :configId and transportDetailId = :transportDetailId");
             deleteFields.setParameter("configId", messageSpecs.getconfigId());

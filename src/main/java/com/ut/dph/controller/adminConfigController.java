@@ -445,6 +445,20 @@ public class adminConfigController {
         configurationTransport transportDetails = configurationTransportManager.getTransportDetails(configId);
         if(transportDetails == null) {
             transportDetails = new configurationTransport();
+            
+            /* Get organization directory name */
+            Organization orgDetails = organizationmanager.getOrganizationById(configurationDetails.getorgId());
+            if(configurationDetails.getType() == 1) {
+                transportDetails.setfileLocation("/bowlink/"+orgDetails.getcleanURL()+"/input files/");
+            }
+            else {
+               transportDetails.setfileLocation("/bowlink/"+orgDetails.getcleanURL()+"/output files/"); 
+            }
+            
+            List<Integer> assocMessageTypes = new ArrayList<Integer>();
+            assocMessageTypes.add(configurationDetails.getId());
+            transportDetails.setmessageTypes(assocMessageTypes);
+            
         }
         else {
             //Need to set the associated message types

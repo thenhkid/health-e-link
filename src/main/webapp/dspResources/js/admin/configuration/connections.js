@@ -165,10 +165,20 @@ function populateUsers(orgId, selectBoxId) {
             
             for (var i = 0; i < len; i++) {
                 if(users != '' && users.indexOf(data[i][0]) != -1) {
-                    html += '<option value="' + data[i][0]+ '" selected>' + data[i][1] + ' ' + data[i][2] + '</option>';
+                    if(data[i][3] == 1) {
+                        html += '<option value="' + data[i][0]+ '" selected>' + data[i][1] + ' ' + data[i][2] +' (Manager) </option>';
+                    }
+                    else {
+                       html += '<option value="' + data[i][0]+ '" selected>' + data[i][1] + ' ' + data[i][2] +' (Staff Member) </option>'; 
+                    }
                 }
                 else {
-                    html += '<option value="' + data[i][0]+ '">' + data[i][1] + ' ' + data[i][2] + '</option>';
+                    if(data[i][3] == 1) {
+                        html += '<option value="' + data[i][0]+ '">' + data[i][1] + ' ' + data[i][2] +' (Manager) </option>';
+                    }
+                    else {
+                        html += '<option value="' + data[i][0]+ '">' + data[i][1] + ' ' + data[i][2] +' (Staff Member) </option>'; 
+                    }
                 }
             }
             $('#'+selectBoxId).html(html);

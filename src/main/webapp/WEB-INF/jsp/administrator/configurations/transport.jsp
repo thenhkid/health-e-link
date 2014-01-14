@@ -19,6 +19,7 @@
                     <dt>
                         <dt>Configuration Summary:</dt>
                         <dd><strong>Organization:</strong> ${configurationDetails.orgName}</dd>
+                        <dd><strong>Configuration Name:</strong> ${configurationDetails.configName}</dd>
                         <dd><strong>Message Type:</strong> ${configurationDetails.messageTypeName}</dd>
                         <dd><strong>Transport Method:</strong> ${configurationDetails.transportMethod}</dd>
                     </dt>
@@ -38,14 +39,14 @@
                         <div class="panel-body">
                             <div class="form-container">
                                 <div id="existingtransportMethodDiv" class="form-group ${status.error ? 'has-error' : '' }">
-                                    <select id="existingtransportMethod" class="form-control" disabled="${transportDetails.copiedTransportId > 0 ? 'true' : 'false'}">
+                                    <form:select path="copiedTransportId" id="existingtransportMethod" class="form-control" disabled="${transportDetails.copiedTransportId > 0 ? 'true' : 'false'}">
                                         <option value="">- Select -</option>
                                         <c:forEach items="${availConfigurations}" var="config">
                                             <c:if test="${config.getId() != transportDetails.configId}">
-                                                <option value="${config.gettransportDetailId()}" <c:if test="${config.gettransportDetailId() == transportDetails.copiedTransportId}">selected</c:if>>${config.getMessageTypeName()}&nbsp;&#149;&nbsp;Transport Method: ${config.gettransportMethod()} (${config.getuserName()})</option>
+                                                <option value="${config.gettransportDetailId()}" <c:if test="${config.gettransportDetailId() == transportDetails.copiedTransportId}">selected</c:if>>${config.getconfigName()}&nbsp;&#149;&nbsp;${config.getMessageTypeName()}&nbsp;&#149;&nbsp;${config.gettransportMethod()}</option>
                                             </c:if>
                                         </c:forEach>
-                                    </select>
+                                    </form:select>
                                 </div>
                             </div>  
                         </div>
@@ -65,22 +66,6 @@
                     </div>
                     <div class="panel-body">
                         <div class="form-container">
-                            <spring:bind path="clearRecords">
-                                <div class="form-group">
-                                    <label class="control-label" for="status">Clear Records after Delivery *</label>
-                                    <div>
-                                        <label class="radio-inline">
-                                          <form:radiobutton id="clearRecords" path="clearRecords" value="1" disabled="${transportDetails.copiedTransportId > 0 ? 'true' : 'false'}" /> Yes 
-                                        </label>
-                                        <label class="radio-inline">
-                                            <form:radiobutton id="clearRecords" path="clearRecords" value="0" disabled="${transportDetails.copiedTransportId > 0 ? 'true' : 'false'}"/> No
-                                        </label>
-                                    </div>
-                                    <c:if test="${transportDetails.copiedTransportId > 0}">
-                                        <form:hidden path="clearRecords" />
-                                    </c:if>
-                                </div>
-                            </spring:bind>
                             <spring:bind path="transportMethodId">
                                 <div id="transportMethodDiv" class="form-group ${status.error ? 'has-error' : '' }">
                                     <label class="control-label" for="transportMethod">Transport Method *</label>
@@ -97,13 +82,29 @@
                                 </div>
                             </spring:bind>
                             <div id="upload-downloadDiv" class="methodDiv" style="display:none">
-                                <%--<spring:bind path="fileLocation">
+                                <spring:bind path="clearRecords">
+                                    <div class="form-group">
+                                        <label class="control-label" for="status">Clear Records after Delivery *</label>
+                                        <div>
+                                            <label class="radio-inline">
+                                              <form:radiobutton id="clearRecords" path="clearRecords" value="1" disabled="${transportDetails.copiedTransportId > 0 ? 'true' : 'false'}" /> Yes 
+                                            </label>
+                                            <label class="radio-inline">
+                                                <form:radiobutton id="clearRecords" path="clearRecords" value="0" disabled="${transportDetails.copiedTransportId > 0 ? 'true' : 'false'}"/> No
+                                            </label>
+                                        </div>
+                                        <c:if test="${transportDetails.copiedTransportId > 0}">
+                                            <form:hidden path="clearRecords" />
+                                        </c:if>
+                                    </div>
+                                </spring:bind>
+                                <spring:bind path="fileLocation">
                                     <div class="form-group ${status.error ? 'has-error' : '' }">
                                         <label class="control-label" for="fileLocation">File Location *</label>
                                         <form:input path="fileLocation" id="fileLocation" class="form-control" type="text" maxLength="255" />
                                         <form:errors path="fileLocation" cssClass="control-label" element="label" />
                                    </div>
-                                </spring:bind>--%>
+                                </spring:bind>
                                 <spring:bind path="maxFileSize">
                                     <div id="maxFileSizeDiv" class="form-group ${status.error ? 'has-error' : '' }">
                                         <label class="control-label" for="maxFileSize">Max File Size (mb) *</label>
@@ -241,7 +242,7 @@
                <div class="alert alert-danger" style="display:none;">
                     At least one message type must be selected!
                </div>                 
-               <section class="panel panel-default">
+               <section class="panel panel-default assocMessageTypes" style="display:none;">
                     <div class="panel-heading">
                         <h3 class="panel-title">Associated Message Types</h3>
                     </div>
@@ -251,6 +252,7 @@
                                 <thead>
                                     <tr>
                                         <th scope="col">Use?</th>
+                                        <th scope="col">Configuration Name</th>
                                         <th scope="col">Message Type</th>
                                         <th scope="col" class="center-text">Date Created</th>
                                     </tr>
@@ -261,6 +263,8 @@
                                             <td scope="row">
                                                <form:checkbox class="availMessageTypes" path="messageTypes" value="${configs.getId()}" />
                                             </td>
+                                            <td>
+                                                ${configs.getconfigName()}
                                             <td>
                                                 ${configs.getMessageTypeName()}
                                             </td>
