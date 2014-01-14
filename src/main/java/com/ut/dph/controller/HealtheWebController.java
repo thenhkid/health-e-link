@@ -513,14 +513,20 @@ public class HealtheWebController {
             batchUpload.setutBatchName(batchName);
             batchUpload.settransportMethodId(2);
             batchUpload.setoriginalFileName(batchName);
-        
-            /* If the "Send" button was pressed */
-            if (action.equals("send")) {
-                batchUpload.setstatusId(2);
+            
+            /* 
+            If the "Save" button was pressed set the
+            status to "Submission Saved"
+            */
+            if(action.equals("save")) {
+                batchUpload.setstatusId(8);
             }
-            /* If the "Save" or "Release" button was pressed */
+            /* 
+            If the "Send" or "Release" button was pressed 
+            set the status to "Submission Release Pending"
+            */
             else {
-                batchUpload.setstatusId(6);
+                batchUpload.setstatusId(5);
             }
             batchUpload.settotalRecordCount(1);
 
@@ -534,13 +540,19 @@ public class HealtheWebController {
             /* Get the details of the batch */
             batchUploads batchUpload = transactionInManager.getUploadBatch(batchId);
             
-            /* If the "Send" button was pressed */
-            if (action.equals("send")) {
-                batchUpload.setstatusId(2);
+            /* 
+            If the "Save" button was pressed set the
+            status to "Submission Saved"
+            */
+            if(action.equals("save")) {
+                batchUpload.setstatusId(8);
             }
-            /* If the "Save" or "Release" button was pressed */
+            /* 
+            If the "Send" or "Release" button was pressed 
+            set the status to "Submission Release Pending"
+            */
             else {
-                batchUpload.setstatusId(6);
+                batchUpload.setstatusId(5);
             }
             
             transactionInManager.submitBatchUploadChanges(batchUpload);
@@ -554,13 +566,19 @@ public class HealtheWebController {
             transactionIn.setbatchId(batchId);
             transactionIn.setconfigId(transactionDetails.getconfigId());
 
-            /* If the "Send" button was pressed */
-            if (action.equals("send")) {
-                transactionIn.setstatusId(17);
+            /* 
+            If the "Save" button was pressed set the
+            status to "Saved"
+            */
+            if(action.equals("save")) {
+                transactionIn.setstatusId(15);
             }
-            /* If the "Save" or "Release" button was pressed */
+            /* 
+            If the "Send" or "Release" button was pressed 
+            set the status to "Release Pending"
+            */
             else {
-                transactionIn.setstatusId(9);
+                transactionIn.setstatusId(10);
             }
 
             transactionId = (Integer) transactionInManager.submitTransactionIn(transactionIn);
@@ -572,13 +590,19 @@ public class HealtheWebController {
             
             transactionIn transactionIn = transactionInManager.getTransactionDetails(transactionId);
             
-            /* If the "Send" button was pressed */
-            if (action.equals("send")) {
-                transactionIn.setstatusId(17);
+            /* 
+            If the "Save" button was pressed set the
+            status to "Saved"
+            */
+            if(action.equals("save")) {
+                transactionIn.setstatusId(15);
             }
-            /* If the "Save" or "Release" button was pressed */
+            /* 
+            If the "Send" or "Release" button was pressed 
+            set the status to "Release Pending"
+            */
             else {
-                transactionIn.setstatusId(9);
+                transactionIn.setstatusId(10);
             }
             
             transactionInManager.submitTransactionInChanges(transactionIn);
@@ -690,7 +714,7 @@ public class HealtheWebController {
             transactionInManager.submitTransactionInRecordsUpdates(records);
         }
         
-        transactionInManager.submitTransactionTranslatedInRecords(transactionId, transactionRecordId);
+        transactionInManager.submitTransactionTranslatedInRecords(transactionId, transactionRecordId, transactionDetails.getconfigId());
         
         /* Need to populate the transaction Target */
         if(currTransactionTargetId == 0) {
@@ -701,13 +725,19 @@ public class HealtheWebController {
             transactiontarget.settransactionInId(transactionId);
             transactiontarget.setconfigId(transactionDetails.gettargetConfigId());
             
-            /* If the "Send" button was pressed */
-            if (action.equals("send")) {
-                transactiontarget.setstatusId(16);
+            /* 
+            If the "Save" button was pressed set the
+            status to "Saved"
+            */
+            if(action.equals("save")) {
+                transactiontarget.setstatusId(8);
             }
-            /* If the "Save" or "Release" button was pressed */
+            /* 
+            If the "Send" or "Release" button was pressed 
+            set the status to "Release Pending"
+            */
             else {
-                transactiontarget.setstatusId(9);
+                transactiontarget.setstatusId(6);
             }
 
             transactionInManager.submitTransactionTarget(transactiontarget);
@@ -717,22 +747,37 @@ public class HealtheWebController {
         else {
             transactionTargetId =  currTransactionTargetId;  
             
-            transactionTarget transactionTarget = transactionInManager.getTransactionTargetDetails(transactionTargetId);
+            transactionTarget transactiontarget = transactionInManager.getTransactionTargetDetails(transactionTargetId);
             
-            /* If the "Send" button was pressed */
-            if (action.equals("send")) {
-                transactionTarget.setstatusId(16);
+            /* 
+            If the "Save" button was pressed set the
+            status to "Saved"
+            */
+            if(action.equals("save")) {
+                transactiontarget.setstatusId(8);
             }
-            /* If the "Save" or "Release" button was pressed */
+            /* 
+            If the "Send" or "Release" button was pressed 
+            set the status to "Release Pending"
+            */
             else {
-                transactionTarget.setstatusId(9);
+                transactiontarget.setstatusId(6);
             }
             
-            transactionInManager.submitTransactionTargetChanges(transactionTarget);
+            transactionInManager.submitTransactionTargetChanges(transactiontarget);
         }
         
         
         if (action.equals("send")) {
+            
+            /*
+            Once the "Send" button is pressed we will send the batch off to the processTransactions
+            method to handle all the processing and saving to the final messages_ tables. This method
+            will return true if successfully received and false otherwise.
+            */
+            boolean transactionSentToProcess = transactionInManager.processTransactions(batchId);
+            
+            
             /*
                 Send the user to the "Sent" items page
             */

@@ -36,7 +36,7 @@ public interface transactionInDAO {
     
     void submitTransactionInRecordsUpdates(transactionInRecords records);
     
-    void submitTransactionTranslatedInRecords(int transactionId, int transactionRecordId);
+    void submitTransactionTranslatedInRecords(int transactionId, int transactionRecordId, int configId);
     
     List<transactionIn> getpendingTransactions(int orgId);
     

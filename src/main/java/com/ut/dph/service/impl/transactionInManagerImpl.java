@@ -86,8 +86,8 @@ public class transactionInManagerImpl implements transactionInManager {
     
     @Override
     @Transactional
-    public void submitTransactionTranslatedInRecords(int transactionId, int transactionRecordId) {
-        transactionInDAO.submitTransactionTranslatedInRecords(transactionId, transactionRecordId);
+    public void submitTransactionTranslatedInRecords(int transactionId, int transactionRecordId, int configId) {
+        transactionInDAO.submitTransactionTranslatedInRecords(transactionId, transactionRecordId, configId);
     }
     
     @Override

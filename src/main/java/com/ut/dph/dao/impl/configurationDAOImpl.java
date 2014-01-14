@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ut.dph.dao.configurationDAO;
 import com.ut.dph.model.Macros;
 import com.ut.dph.model.Organization;
-import com.ut.dph.model.User;
 import com.ut.dph.model.configuration;
 import com.ut.dph.model.configurationConnection;
 import com.ut.dph.model.configurationConnectionReceivers;
