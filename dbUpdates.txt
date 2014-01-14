@@ -176,3 +176,7 @@ ADD CONSTRAINT `configFFIdFK`
 /** grace 11.14.14**/
 drop table `universalTranslator`.`transactionErrors`;
 
+/* Chad 10.14.2014 @ 10:25 AM */
+ALTER TABLE `universalTranslator`.`configurations` 
+ADD COLUMN `configName` VARCHAR(45) NOT NULL AFTER `stepsCompleted`;
+
