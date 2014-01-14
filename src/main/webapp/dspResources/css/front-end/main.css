@@ -5935,6 +5935,11 @@ td.visible-print {
   color: #fff;
   color: #ccc;
 }
+.navbar {
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  border-radius: 0;
+}
 .contain {
   max-width: 1170px;
   margin: auto;
@@ -6354,6 +6359,14 @@ td.visible-print {
   margin-left: 0;
   margin-right: 0;
 }
+.primary-nav.fixed {
+  background-color: #fff;
+  border-bottom: 1px solid #ccc;
+  width: 100%;
+  top: 0;
+  left: 0;
+  position: fixed;
+}
 @media (max-width: 991px) {
   .primary-nav .navbar-nav {
     margin-top: 8px;
@@ -6438,6 +6451,12 @@ td.visible-print {
 .actions-nav .navbar-brand {
   padding-top: 21px;
   padding-bottom: 22px;
+}
+.actions-nav.fixed {
+  background-color: #333;
+  width: 100%;
+  left: 0;
+  position: fixed !important;
 }
 .actions-nav .indicator-active {
   position: absolute;

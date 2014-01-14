@@ -5938,6 +5938,11 @@ td.visible-print {
   color: #fff;
   color: #ccc;
 }
+.navbar {
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  border-radius: 0;
+}
 html,
 body {
   height: 100%;

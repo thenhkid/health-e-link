@@ -6,7 +6,8 @@ require.config({
 		'responsive-tables' : '../vendor/responsive-tables',
 		'mediaModal' : '../mediaModal',
 		'overlay' : '../overlay',
-		'sprintf' : '../vendor/sprintf'
+		'sprintf' : '../vendor/sprintf',
+		'fixed-header' : '../fixed-header'
 	},
 	shim: {
 		'bootstrap': ['jquery'],
@@ -14,7 +15,7 @@ require.config({
 	}
 });
 
-require(['jquery','bootstrap', 'responsive-tables', 'mediaModal', 'overlay'], function ($) {
+require(['jquery', 'fixed-header','bootstrap', 'responsive-tables', 'mediaModal', 'overlay'], function ($, fixedHeader) {
 
 	// left nav fixed nav bar
 	$('.fixed-region').affix({
@@ -55,5 +56,8 @@ require(['jquery','bootstrap', 'responsive-tables', 'mediaModal', 'overlay'], fu
 
 	// left nav scrollspy
 	$('body').scrollspy({ target: '#active-page-nav' });
+
+	// initialized fixed header
+	fixedHeader.init();
 
 });
