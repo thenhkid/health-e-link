@@ -1,5 +1,5 @@
 a new file can you see this
 
-new line with changes
+new line with changes.
 
 another new line
