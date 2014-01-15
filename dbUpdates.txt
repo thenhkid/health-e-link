@@ -180,3 +180,8 @@ drop table `universalTranslator`.`transactionErrors`;
 ALTER TABLE `universalTranslator`.`configurations` 
 ADD COLUMN `configName` VARCHAR(45) NOT NULL AFTER `stepsCompleted`;
 
+/* Chad 10.15.2014 @ 11:43 AM */
+ALTER TABLE `universaltranslator`.`users` 
+ADD COLUMN `editAuthority` BIT(1) NOT NULL DEFAULT b'0' AFTER `deliverAuthority`;
+
+
