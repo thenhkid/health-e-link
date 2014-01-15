@@ -73,6 +73,9 @@ public class User {
     
     @Column(name = "DELIVERAUTHORITY", nullable = false)
     private boolean deliverAuthority = false;
+    
+    @Column(name = "EDITAUTHORITY", nullable = false)
+    private boolean editAuthority = false;
 
     public int getId() {
         return id;
@@ -192,5 +195,13 @@ public class User {
     
     public void setdeliverAuthority(boolean deliverAuthority) {
         this.deliverAuthority = deliverAuthority;
+    }
+    
+    public boolean geteditAuthority() {
+        return editAuthority;
+    }
+    
+    public void seteditAuthority(boolean editAuthority) {
+        this.editAuthority = editAuthority;
     }
 }
