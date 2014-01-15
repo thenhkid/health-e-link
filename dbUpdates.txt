@@ -184,4 +184,52 @@ ADD COLUMN `configName` VARCHAR(45) NOT NULL AFTER `stepsCompleted`;
 ALTER TABLE `universaltranslator`.`users` 
 ADD COLUMN `editAuthority` BIT(1) NOT NULL DEFAULT b'0' AFTER `deliverAuthority`;
 
+/* Chad 10.15.14 @ 3:05 PM */
+CREATE TABLE `universalTranslator`.`batchUploadSummary` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `batchId` INT NOT NULL,
+  `transactionInId` INT NOT NULL,
+  `sourceOrgId` INT NOT NULL,
+  `targetOrgId` INT NOT NULL,
+  `messageTypeId` INT NOT NULL,
+  `sourceConfigId` INT NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `sumBatchIdfk_idx` (`batchId` ASC),
+  INDEX `sumTransactionIdfk_idx` (`transactionInId` ASC),
+  INDEX `sumSourceOrgIdfk_idx` (`sourceOrgId` ASC),
+  INDEX `sumTargetOrgIdfk_idx` (`targetOrgId` ASC),
+  INDEX `sumMessageTypeIdfk_idx` (`messageTypeId` ASC),
+  INDEX `sumConfigIdfk_idx` (`sourceConfigId` ASC),
+  CONSTRAINT `sumBatchIdfk`
+    FOREIGN KEY (`batchId`)
+    REFERENCES `universalTranslator`.`batchUploads` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `sumTransactionIdfk`
+    FOREIGN KEY (`transactionInId`)
+    REFERENCES `universalTranslator`.`transactionIn` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `sumSourceOrgIdfk`
+    FOREIGN KEY (`sourceOrgId`)
+    REFERENCES `universalTranslator`.`organizations` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `sumTargetOrgIdfk`
+    FOREIGN KEY (`targetOrgId`)
+    REFERENCES `universalTranslator`.`organizations` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `sumMessageTypeIdfk`
+    FOREIGN KEY (`messageTypeId`)
+    REFERENCES `universalTranslator`.`messagetypes` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `sumConfigIdfk`
+    FOREIGN KEY (`sourceConfigId`)
+    REFERENCES `universalTranslator`.`configurations` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+
 

@@ -32,19 +32,19 @@
                             <form:checkbox id="sendEmailAlert" path="sendEmailAlert" value="true" /> Alert me via email on any new message my organization receives.
                         </label>
                     </div>
-                    <div class="form-group">
-                        <label for="status">Status *</label>
-                        <div>
-                            <label class="radio-inline">
-                                <form:radiobutton id="status" path="status" value="true" /> Active
-                            </label>
-                            <label class="radio-inline">
-                                <form:radiobutton id="status" path="status" value="false" /> Inactive
-                            </label>
-                        </div>
-                    </div>
-                   <div class="row">
+                    <div class="row">
                        <div class="form-group col-md-6">
+                            <label for="status">Status *</label>
+                            <div>
+                                <label class="radio-inline">
+                                    <form:radiobutton id="status" path="status" value="true" /> Active
+                                </label>
+                                <label class="radio-inline">
+                                    <form:radiobutton id="status" path="status" value="false" /> Inactive
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-6">
                             <label for="status">User Type *</label>
                             <div>
                                 <label class="radio-inline">
@@ -52,6 +52,19 @@
                                 </label>
                                 <label class="radio-inline">
                                     <form:radiobutton id="userType" path="userType" value="2" /> Staff Member
+                                </label>
+                            </div>
+                        </div> 
+                    </div>
+                   <div class="row">
+                       <div class="form-group col-md-6">
+                            <label for="status">Can this user edit from the Audit Report? *</label>
+                            <div>
+                                <label class="radio-inline">
+                                    <form:radiobutton id="editAuthority" path="editAuthority" value="true" /> Yes
+                                </label>
+                                <label class="radio-inline">
+                                    <form:radiobutton id="editAuthority" path="editAuthority" value="false" /> No
                                 </label>
                             </div>
                         </div> 
