@@ -6,6 +6,7 @@
 
 package com.ut.dph.dao;
 
+import com.ut.dph.model.batchUploadSummary;
 import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.fieldSelectOptions;
 import com.ut.dph.model.transactionAttachment;
@@ -25,6 +26,8 @@ public interface transactionInDAO {
     List<fieldSelectOptions> getFieldSelectOptions(int fieldId, int configId);
     
     Integer submitBatchUpload(batchUploads batchUpload);
+    
+    void submitBatchUploadSummary(batchUploadSummary summary);
     
     void submitBatchUploadChanges(batchUploads batchUpload);
     

@@ -7,6 +7,7 @@
 package com.ut.dph.dao.impl;
 
 import com.ut.dph.dao.transactionInDAO;
+import com.ut.dph.model.batchUploadSummary;
 import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.fieldSelectOptions;
 import com.ut.dph.model.transactionAttachment;
@@ -128,6 +129,24 @@ public class transactionInDAOImpl implements transactionInDAO {
 
         return batchId;
         
+    }
+    
+    /**
+     * The 'submitBatchUploadSummary' function will submit an entry that
+     * will contain specific information for transactions within the submitted
+     * batch. This will be used when trying to find out which batches a user
+     * has access to when logged into the ERG.
+     * 
+     * @param   summary The object that will hold the batch summary information
+     * 
+     * @table batchUploadSummary
+     * 
+     * @return This function does not return anything.
+     */
+    @Override
+    @Transactional
+    public void submitBatchUploadSummary(batchUploadSummary summary) {
+        sessionFactory.getCurrentSession().save(summary);
     }
     
     /**

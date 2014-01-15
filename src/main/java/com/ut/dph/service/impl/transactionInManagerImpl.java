@@ -7,6 +7,7 @@
 package com.ut.dph.service.impl;
 
 import com.ut.dph.dao.transactionInDAO;
+import com.ut.dph.model.batchUploadSummary;
 import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.fieldSelectOptions;
 import com.ut.dph.model.transactionAttachment;
@@ -52,6 +53,12 @@ public class transactionInManagerImpl implements transactionInManager {
     @Transactional
     public Integer submitBatchUpload(batchUploads batchUpload) {
         return transactionInDAO.submitBatchUpload(batchUpload);
+    }
+    
+    @Override
+    @Transactional
+    public void submitBatchUploadSummary(batchUploadSummary summary) {
+        transactionInDAO.submitBatchUploadSummary(summary);
     }
     
     @Override

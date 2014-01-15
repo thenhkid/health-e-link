@@ -8,6 +8,7 @@ package com.ut.dph.controller;
 
 import com.ut.dph.model.Organization;
 import com.ut.dph.model.Transaction;
+import com.ut.dph.model.batchUploadSummary;
 import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.configuration;
 import com.ut.dph.model.configurationConnection;
@@ -582,6 +583,18 @@ public class HealtheWebController {
             }
 
             transactionId = (Integer) transactionInManager.submitTransactionIn(transactionIn);
+            
+            /* Need to populate the batchUploadSummary table */
+            batchUploadSummary summary = new batchUploadSummary();
+            summary.setbatchId(batchId);
+            summary.settransactionInId(transactionId);
+            summary.setsourceOrgId(transactionDetails.getorgId());
+            summary.settargetOrgId(transactionDetails.gettargetOrgId());
+            summary.setmessageTypeId(transactionDetails.getmessageTypeId());
+            summary.setsourceConfigId(transactionDetails.getconfigId());
+            
+            transactionInManager.submitBatchUploadSummary(summary);
+            
         }
         
         /* Otherwise update existing batch */
@@ -766,6 +779,8 @@ public class HealtheWebController {
             
             transactionInManager.submitTransactionTargetChanges(transactiontarget);
         }
+        
+        
         
         
         if (action.equals("send")) {
