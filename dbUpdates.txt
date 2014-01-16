@@ -173,18 +173,18 @@ ADD CONSTRAINT `configFFIdFK`
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
   
-/** grace 11.14.14**/
+/** grace 01.14.14**/
 drop table `universalTranslator`.`transactionErrors`;
 
-/* Chad 10.14.2014 @ 10:25 AM */
+/* Chad 01.14.2014 @ 10:25 AM */
 ALTER TABLE `universalTranslator`.`configurations` 
 ADD COLUMN `configName` VARCHAR(45) NOT NULL AFTER `stepsCompleted`;
 
-/* Chad 10.15.2014 @ 11:43 AM */
+/* Chad 01.15.2014 @ 11:43 AM */
 ALTER TABLE `universaltranslator`.`users` 
 ADD COLUMN `editAuthority` BIT(1) NOT NULL DEFAULT b'0' AFTER `deliverAuthority`;
 
-/* Chad 10.15.14 @ 3:05 PM */
+/* Chad 01.15.14 @ 3:05 PM */
 CREATE TABLE `universalTranslator`.`batchUploadSummary` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `batchId` INT NOT NULL,
@@ -230,6 +230,20 @@ CREATE TABLE `universalTranslator`.`batchUploadSummary` (
     REFERENCES `universalTranslator`.`configurations` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION);
+
+/*Grace 01.16.14 */
+ ALTER TABLE `universalTranslator`.`transactionTranslatedOut` 
+ADD COLUMN `configId` INT NOT NULL AFTER `transactionTargetId`;
+
+ALTER TABLE `universalTranslator`.`transactionTranslatedOut` 
+ADD INDEX `ttoConfigFK_idx` (`configId` ASC);
+ALTER TABLE `universalTranslator`.`transactionTranslatedOut` 
+ADD CONSTRAINT `ttoConfigFK`
+  FOREIGN KEY (`configId`)
+  REFERENCES `universalTranslator`.`configurations` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
 
 
 
