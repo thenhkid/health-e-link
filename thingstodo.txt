@@ -2,4 +2,4 @@ a new file can you see this
 
 new line with changes.
 
-another new line.
+another new line
