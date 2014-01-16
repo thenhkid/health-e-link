@@ -99,8 +99,14 @@ public class transactionInManagerImpl implements transactionInManager {
     
     @Override
     @Transactional
-    public List<transactionIn> getpendingTransactions(int orgId) {
-        return transactionInDAO.getpendingTransactions(orgId);
+    public List<batchUploads> getpendingBatches(int userId, int orgId) {
+        return transactionInDAO.getpendingBatches(userId, orgId);
+    }
+    
+    @Override
+    @Transactional
+    public List<transactionIn> getBatchTransactions(int batchId, int userId) {
+        return transactionInDAO.getBatchTransactions(batchId, userId);
     }
     
     @Override

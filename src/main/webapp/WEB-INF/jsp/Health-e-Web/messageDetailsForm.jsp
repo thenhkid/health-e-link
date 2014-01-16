@@ -33,6 +33,7 @@
                 <form:hidden path="transactionId" id="transactionId" />
                 <form:hidden path="targetConfigId" />
                 <form:hidden path="transactionTargetId" />
+                <form:hidden path="targetOrgId" />
                 <input type="hidden" id="attachmentIds" name="attachmentIds" value="" />
                 <c:forEach items="${transaction.sourceOrgFields}" varStatus="i">
                     <form:hidden path="sourceOrgFields[${i.index}].fieldValue" />

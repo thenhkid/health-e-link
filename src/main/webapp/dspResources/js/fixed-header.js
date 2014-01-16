@@ -59,10 +59,10 @@ define(['jquery'], function ($) {
 				if(scrollPosition > (actionsNavPosition - primaryNav.outerHeight())){
 					actionsNav.css('top', primaryNavHeight + 1).addClass('fixed');
 				}
-				console.log(isFixed + scrollPosition);
+				
 				if ( (scrollPosition <= (actionsNavPosition - primaryNav.outerHeight())) && isFixed)
 				{
-					console.log('reset');
+					
 					fixedHeader.resetActionNavPosition()
 				}
 			}

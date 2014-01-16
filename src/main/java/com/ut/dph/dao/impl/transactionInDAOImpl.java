@@ -9,6 +9,9 @@ package com.ut.dph.dao.impl;
 import com.ut.dph.dao.transactionInDAO;
 import com.ut.dph.model.batchUploadSummary;
 import com.ut.dph.model.batchUploads;
+import com.ut.dph.model.configuration;
+import com.ut.dph.model.configurationConnection;
+import com.ut.dph.model.configurationConnectionSenders;
 import com.ut.dph.model.fieldSelectOptions;
 import com.ut.dph.model.transactionAttachment;
 import com.ut.dph.model.transactionIn;
@@ -278,41 +281,171 @@ public class transactionInDAOImpl implements transactionInDAO {
     }
     
     /**
-     * The 'getpendingTransactions' function will return a list of pending
-     * transactions for the organization passed in.
+     * The 'getpendingBatches' function will return a list of batches that have a 
+     * status of "Error" or "Release Pending". The batches returned will only be the
+     * ones the current user has access to viewing.
      * 
-     * @param orgId The organization Id to find pending transactions for.
+     * @param userId    The id of the logged in user trying to view pending batches
+     * @param orgId     The id of the organization the user belongs to
      * 
-     * @return The function will return a list of pending transactions
+     * @return The function will return a list of pending batches
      */
     @Override
     @Transactional
-    public List<transactionIn> getpendingTransactions(int orgId) {
+    @SuppressWarnings("UnusedAssignment")
+    public List<batchUploads> getpendingBatches(int userId, int orgId) {
         
-        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(transactionIn.class);
-        criteria.add(Restrictions.eq("statusId", 9));
+        /* Get a list of connections the user has access to */
+        Criteria connections = sessionFactory.getCurrentSession().createCriteria(configurationConnectionSenders.class);
+        connections.add(Restrictions.eq("userId", userId));
+        List <configurationConnectionSenders> userConnections = connections.list();
         
-        List<Integer> batchList = new ArrayList<Integer>();
+        List<Integer> messageTypeList = new ArrayList<Integer>();
+        List<Integer> targetOrgList = new ArrayList<Integer>();
+        
+        if(userConnections.isEmpty()) {
+            messageTypeList.add(0);
+            targetOrgList.add(0);
+        }
+        else {
+            
+            for(configurationConnectionSenders userConnection : userConnections) {
+                Criteria connection = sessionFactory.getCurrentSession().createCriteria(configurationConnection.class);
+                connection.add(Restrictions.eq("id", userConnection.getconnectionId()));
+                
+                configurationConnection connectionInfo = (configurationConnection) connection.uniqueResult();
+                
+                /* Get the message type for the configuration */
+                Criteria sourceconfigurationQuery = sessionFactory.getCurrentSession().createCriteria(configuration.class);
+                sourceconfigurationQuery.add(Restrictions.eq("id", connectionInfo.getsourceConfigId()));
+                
+                configuration configDetails = (configuration) sourceconfigurationQuery.uniqueResult();
+                
+                /* Add the message type to the message type list */
+                messageTypeList.add(configDetails.getMessageTypeId());
+                
+                /* Get the list of target orgs */
+                Criteria targetconfigurationQuery = sessionFactory.getCurrentSession().createCriteria(configuration.class);
+                targetconfigurationQuery.add(Restrictions.eq("id", connectionInfo.gettargetConfigId()));
+                configuration targetconfigDetails = (configuration) targetconfigurationQuery.uniqueResult();
+                
+                /* Add the target org to the target organization list */
+                targetOrgList.add(targetconfigDetails.getorgId());
+            }
+        }
+        
+        
+        /* Get a list of available batches */
+        Criteria batchSummaries = sessionFactory.getCurrentSession().createCriteria(batchUploadSummary.class);
+        batchSummaries.add(Restrictions.eq("sourceOrgId", orgId));
+        batchSummaries.add(Restrictions.in("messageTypeId", messageTypeList));
+        batchSummaries.add(Restrictions.in("targetOrgId", targetOrgList));
+        List <batchUploadSummary> batchUploadSummaryList = batchSummaries.list();
+        
+        List<Integer> batchIdList = new ArrayList<Integer>();
+        
+        if(batchUploadSummaryList.isEmpty()) {
+            batchIdList.add(0);
+        }
+        else {
+            
+            for(batchUploadSummary summary : batchUploadSummaryList) {
+                batchIdList.add(summary.getbatchId());
+            }
+            
+        }
+        
         Criteria findBatches = sessionFactory.getCurrentSession().createCriteria(batchUploads.class);
-        findBatches.add(Restrictions.eq("orgId", orgId));
-        findBatches.add(Restrictions.eq("statusId", 6));
+        findBatches.add(Restrictions.in("id", batchIdList));
+        findBatches.add(Restrictions.or(
+                Restrictions.eq("statusId", 8),
+                Restrictions.eq("statusId", 5)
+            )
+        );
+        findBatches.addOrder(Order.desc("dateSubmitted"));
         
-        List<batchUploads> batches = findBatches.list();
-
-        for (batchUploads batch : batches) {
-            batchList.add(batch.getId());
-        }
-
-        if (batchList.isEmpty()) {
-            batchList.add(0);
-        }
-        
-        criteria.add(Restrictions.in("batchId", batchList));
-        
-        criteria.addOrder(Order.desc("dateCreated"));
-        
-        return criteria.list();
+        return findBatches.list();
     }
+    
+    /** 
+     * The 'getBatchTransactions' function will return a list of transactions within
+     * a batch. The list of transactions will only be the ones the passed in user has
+     * access to.
+     * 
+     * @param   batchId The id of the selected batch
+     * @param   userId  The id of the logged in user
+     * 
+     * @return The function will return a list of transactionIn objects
+     */
+    @Override
+    @Transactional
+    public List<transactionIn> getBatchTransactions(int batchId, int userId) {
+        /* Get a list of connections the user has access to */
+        Criteria connections = sessionFactory.getCurrentSession().createCriteria(configurationConnectionSenders.class);
+        connections.add(Restrictions.eq("userId", userId));
+        List <configurationConnectionSenders> userConnections = connections.list();
+        
+        List<Integer> messageTypeList = new ArrayList<Integer>();
+        List<Integer> targetOrgList = new ArrayList<Integer>();
+        
+        if(userConnections.isEmpty()) {
+            messageTypeList.add(0);
+            targetOrgList.add(0);
+        }
+        else {
+            
+            for(configurationConnectionSenders userConnection : userConnections) {
+                Criteria connection = sessionFactory.getCurrentSession().createCriteria(configurationConnection.class);
+                connection.add(Restrictions.eq("id", userConnection.getconnectionId()));
+                
+                configurationConnection connectionInfo = (configurationConnection) connection.uniqueResult();
+                
+                /* Get the message type for the configuration */
+                Criteria sourceconfigurationQuery = sessionFactory.getCurrentSession().createCriteria(configuration.class);
+                sourceconfigurationQuery.add(Restrictions.eq("id", connectionInfo.getsourceConfigId()));
+                configuration configDetails = (configuration) sourceconfigurationQuery.uniqueResult();
+                
+                /* Add the message type to the message type list */
+                messageTypeList.add(configDetails.getMessageTypeId());
+                
+                /* Get the list of target orgs */
+                Criteria targetconfigurationQuery = sessionFactory.getCurrentSession().createCriteria(configuration.class);
+                targetconfigurationQuery.add(Restrictions.eq("id", connectionInfo.gettargetConfigId()));
+                configuration targetconfigDetails = (configuration) targetconfigurationQuery.uniqueResult();
+                
+                /* Add the target org to the target organization list */
+                targetOrgList.add(targetconfigDetails.getorgId());
+            }
+        }
+        
+        
+        /* Get a list of available batches */
+        Criteria batchSummaries = sessionFactory.getCurrentSession().createCriteria(batchUploadSummary.class);
+        batchSummaries.add(Restrictions.eq("batchId", batchId));
+        batchSummaries.add(Restrictions.in("messageTypeId", messageTypeList));
+        batchSummaries.add(Restrictions.in("targetOrgId", targetOrgList));
+        List <batchUploadSummary> batchUploadSummaryList = batchSummaries.list();
+        
+        List<Integer> transactionInIdList = new ArrayList<Integer>();
+        
+        if(batchUploadSummaryList.isEmpty()) {
+            transactionInIdList.add(0);
+        }
+        else {
+            
+            for(batchUploadSummary summary : batchUploadSummaryList) {
+                transactionInIdList.add(summary.gettransactionInId());
+            }
+            
+        }
+        
+        Criteria findTransactions = sessionFactory.getCurrentSession().createCriteria(transactionIn.class);
+        findTransactions.add(Restrictions.in("id", transactionInIdList));
+        findTransactions.addOrder(Order.desc("dateCreated"));
+        
+        return findTransactions.list();
+    }
+    
     
     /**
      * The 'getsentTransactions' function will return a list of sent

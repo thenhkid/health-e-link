@@ -8,6 +8,7 @@ package com.ut.dph.controller;
 
 import com.ut.dph.model.Organization;
 import com.ut.dph.model.Transaction;
+import com.ut.dph.model.User;
 import com.ut.dph.model.batchUploadSummary;
 import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.configuration;
@@ -28,6 +29,7 @@ import com.ut.dph.service.messageTypeManager;
 import com.ut.dph.service.organizationManager;
 import com.ut.dph.service.sysAdminManager;
 import com.ut.dph.service.transactionInManager;
+import com.ut.dph.service.userManager;
 import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -79,6 +81,9 @@ public class HealtheWebController {
     
     @Autowired
     private sysAdminManager sysAdminManager;
+    
+    @Autowired
+    private userManager usermanager;
     
     
     /**
@@ -207,7 +212,7 @@ public class HealtheWebController {
             transaction.setoriginalFileName(batchInfo.getoriginalFileName());
             transaction.setstatusId(batchInfo.getstatusId());
             transaction.settransactionStatusId(transactionInfo.getstatusId());
-            transaction.settargetOrgId(0);
+            transaction.settargetOrgId(targetOrg);
             transaction.setconfigId(transactionInfo.getconfigId());
             transaction.setautoRelease(transportDetails.getautoRelease());
             transaction.setbatchId(batchInfo.getId());
@@ -821,7 +826,7 @@ public class HealtheWebController {
      * @throws Exception
      */
     @RequestMapping(value = "/pending", method = RequestMethod.GET)
-    public ModelAndView pendingMessages(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
+    public ModelAndView pendingBatches(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
         
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/Health-e-Web/pending");
@@ -829,106 +834,24 @@ public class HealtheWebController {
         /* Need to get all the message types set up for the user */
         int[] userInfo = (int[])session.getAttribute("userInfo");
         
-        /* Need to get a list of all pending transactions */
-        List<transactionIn> pendingTransactions = transactionInManager.getpendingTransactions(userInfo[1]);
+        /* Need to get a list of all pending batches */
+        List<batchUploads> pendingBatches = transactionInManager.getpendingBatches(userInfo[0], userInfo[1]);
         
-        List<Transaction> transactionList = new ArrayList<Transaction>();
-        
-        configuration configDetails;
-        String colName;
-        transactionInRecords records = null;
-        
-        if(pendingTransactions != null) {
-           
-            for(transactionIn transactionRecord : pendingTransactions) {
-                batchUploads batchInfo = transactionInManager.getUploadBatch(transactionRecord.getbatchId());
+        if(!pendingBatches.isEmpty()) {
+            for(batchUploads batch : pendingBatches) {
+                List<transactionIn> batchTransactions = transactionInManager.getBatchTransactions(batch.getId(), userInfo[0]);
+                batch.settotalTransactions(batchTransactions.size());
                 
-                Transaction transactionDetails = new Transaction();
-                transactionDetails.setbatchName(batchInfo.getutBatchName());
-                transactionDetails.setconfigId(transactionRecord.getconfigId());
-                transactionDetails.setdateSubmitted(batchInfo.getdateSubmitted());
-                transactionDetails.settransactionRecordId(transactionRecord.getId());
-                transactionDetails.setstatusId(transactionRecord.getstatusId());
+                lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
+                batch.setstatusValue(processStatus.getDisplayCode());
                 
-                lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(transactionRecord.getstatusId());
-                transactionDetails.setstatusValue(processStatus.getDisplayCode());
-                
-                records = transactionInManager.getTransactionRecords(transactionRecord.getId());
-                
-                /* Get a list of form fields */
-                configurationTransport transportDetails = configurationTransportManager.getTransportDetailsByTransportMethod(transactionRecord.getconfigId(), 2);
-                List<configurationFormFields> targetInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionRecord.getconfigId(),transportDetails.getId(),3);
-                List<configurationFormFields> patientInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionRecord.getconfigId(),transportDetails.getId(),5);
-                List<configurationFormFields> detailFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionRecord.getconfigId(),transportDetails.getId(),6);
-                
-                /* Set all the transaction TARGET fields */
-                List<transactionRecords> toFields = new ArrayList<transactionRecords>();
-                for(configurationFormFields fields : targetInfoFormFields) {
-                    transactionRecords field = new transactionRecords();
-                    
-                    colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
-                    try {
-                        field.setfieldValue(BeanUtils.getProperty(records, colName));
-                    } catch (IllegalAccessException ex) {
-                        Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
-                    } catch (InvocationTargetException ex) {
-                        Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-
-                    /* Get the pre-populated values */
-                    toFields.add(field);
-                }
-                transactionDetails.settargetOrgFields(toFields);
-                
-                /* Set all the transaction PATIENT fields */
-                List<transactionRecords> patientFields = new ArrayList<transactionRecords>();
-                for(configurationFormFields fields : patientInfoFormFields) {
-                    transactionRecords field = new transactionRecords();
-                    
-                    colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
-                    try {
-                        field.setfieldValue(BeanUtils.getProperty(records, colName));
-                    } catch (IllegalAccessException ex) {
-                        Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
-                    } catch (InvocationTargetException ex) {
-                        Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-
-                    patientFields.add(field);
-                }
-                transactionDetails.setpatientFields(patientFields);
-                
-                /* Set all the transaction DETAIL fields */
-                List<transactionRecords> detailFields = new ArrayList<transactionRecords>();
-                for(configurationFormFields fields : detailFormFields) {
-                    transactionRecords field = new transactionRecords();
-                    field.setfieldLabel(fields.getFieldDesc()); 
-                   
-                    colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
-                    String fieldValue = BeanUtils.getProperty(records, colName);
-                    
-                    if(fields.getFieldDesc().equals("urgency") && !fieldValue.equals("")) {
-                        int id = Integer.parseInt(fieldValue);
-                        TableData  tableData = sysAdminManager.getTableData(id, "lu_Urgency");
-                        fieldValue = tableData.getDisplayText();
-                    }
-                    
-                   field.setfieldValue(fieldValue);
-                   
-                   detailFields.add(field);
-                }
-                transactionDetails.setdetailFields(detailFields);
-                
-                
-                /* get the message type name */
-                configDetails = configurationManager.getConfigurationById(transactionRecord.getconfigId());
-                transactionDetails.setmessageTypeName(messagetypemanager.getMessageTypeById(configDetails.getMessageTypeId()).getName());
-                
-                transactionList.add(transactionDetails);
+                User userDetails = usermanager.getUserById(batch.getuserId());
+                String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
+                batch.setusersName(usersName);
             }
         }
         
-        mav.addObject("pendingTransactions", transactionList);
+        mav.addObject("pendingBatches", pendingBatches);
         
         
         return mav;
