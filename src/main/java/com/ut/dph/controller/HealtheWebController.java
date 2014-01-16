@@ -118,8 +118,8 @@ public class HealtheWebController {
         mav.setViewName("/Health-e-Web/create");
         
         /** Need to get all the message types set up for the user */
-        int[] userInfo = (int[])session.getAttribute("userInfo");
-        List<configuration> configurations = configurationManager.getActiveERGConfigurationsByUserId(userInfo[0]);
+        User userInfo = (User)session.getAttribute("userDetails");
+        List<configuration> configurations = configurationManager.getActiveERGConfigurationsByUserId(userInfo.getId());
         
         
         for (configuration config : configurations) {
@@ -181,8 +181,8 @@ public class HealtheWebController {
         configuration configDetails = configurationManager.getConfigurationById(configId);
         
         /* Get the organization details for the source (Sender) organization */
-        int[] userInfo = (int[])session.getAttribute("userInfo");
-        Organization sendingOrgDetails = organizationmanager.getOrganizationById(userInfo[1]);
+        User userInfo = (User)session.getAttribute("userDetails");
+        Organization sendingOrgDetails = organizationmanager.getOrganizationById(userInfo.getOrgId());
         
         /* Get the organization details for the target (Receiving) organization */
         Organization receivingOrgDetails = organizationmanager.getOrganizationById(targetOrg);
@@ -224,10 +224,10 @@ public class HealtheWebController {
         }
         else {
             /* Create a new transaction */
-            transaction.setorgId(userInfo[1]);
+            transaction.setorgId(userInfo.getOrgId());
             transaction.settransportMethodId(2);
             transaction.setmessageTypeId(configDetails.getMessageTypeId());
-            transaction.setuserId(userInfo[0]);
+            transaction.setuserId(userInfo.getId());
             transaction.setbatchName(null);
             transaction.setoriginalFileName(null);
             transaction.setstatusId(0);
@@ -494,7 +494,7 @@ public class HealtheWebController {
     @RequestMapping(value= "/submitMessage", method = RequestMethod.POST)
     public ModelAndView submitMessage(@ModelAttribute(value = "transactionDetails") Transaction transactionDetails, HttpSession session, @RequestParam String action, RedirectAttributes redirectAttr, @RequestParam List<Integer> attachmentIds) {
         
-        int[] userInfo = (int[])session.getAttribute("userInfo");
+        User userInfo = (User)session.getAttribute("userDetails");
         Integer currBatchId = transactionDetails.getbatchId();
         Integer currTransactionId = transactionDetails.gettransactionId();
         Integer currRecordId = transactionDetails.gettransactionRecordId();
@@ -515,7 +515,7 @@ public class HealtheWebController {
             /* Submit a new batch */
             batchUploads batchUpload = new batchUploads();
             batchUpload.setOrgId(transactionDetails.getorgId());
-            batchUpload.setuserId(userInfo[0]);
+            batchUpload.setuserId(userInfo.getId());
             batchUpload.setutBatchName(batchName);
             batchUpload.settransportMethodId(2);
             batchUpload.setoriginalFileName(batchName);
@@ -832,14 +832,14 @@ public class HealtheWebController {
         mav.setViewName("/Health-e-Web/pending");
         
         /* Need to get all the message types set up for the user */
-        int[] userInfo = (int[])session.getAttribute("userInfo");
+        User userInfo = (User)session.getAttribute("userDetails");
         
         /* Need to get a list of all pending batches */
-        List<batchUploads> pendingBatches = transactionInManager.getpendingBatches(userInfo[0], userInfo[1]);
+        List<batchUploads> pendingBatches = transactionInManager.getpendingBatches(userInfo.getId(), userInfo.getOrgId());
         
         if(!pendingBatches.isEmpty()) {
             for(batchUploads batch : pendingBatches) {
-                List<transactionIn> batchTransactions = transactionInManager.getBatchTransactions(batch.getId(), userInfo[0]);
+                List<transactionIn> batchTransactions = transactionInManager.getBatchTransactions(batch.getId(), userInfo.getId());
                 batch.settotalTransactions(batchTransactions.size());
                 
                 lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
@@ -873,10 +873,10 @@ public class HealtheWebController {
         mav.setViewName("/Health-e-Web/sent");
         
         /* Need to get all the message types set up for the user */
-        int[] userInfo = (int[])session.getAttribute("userInfo");
+        User userInfo = (User)session.getAttribute("userDetails");
         
         /* Need to get a list of all pending transactions */
-        List<transactionIn> sentTransactions = transactionInManager.getsentTransactions(userInfo[1]);
+        List<transactionIn> sentTransactions = transactionInManager.getsentTransactions(userInfo.getOrgId());
         
         List<Transaction> transactionList = new ArrayList<Transaction>();
         
@@ -1001,8 +1001,8 @@ public class HealtheWebController {
         configuration configDetails = configurationManager.getConfigurationById(transactionInfo.getconfigId());
         
         /* Get the organization details for the source (Sender) organization */
-        int[] userInfo = (int[])session.getAttribute("userInfo");
-        Organization sendingOrgDetails = organizationmanager.getOrganizationById(userInfo[1]);
+        User userInfo = (User)session.getAttribute("userDetails");
+        Organization sendingOrgDetails = organizationmanager.getOrganizationById(userInfo.getOrgId());
         
         /* Get the organization details for the target (Receiving) organization */
         transactionTarget targetInfo = transactionInManager.getTransactionTarget(transactionInfo.getbatchId(), transactionInfo.getId());
@@ -1212,8 +1212,8 @@ public class HealtheWebController {
     public @ResponseBody Integer uploadMessageAttachment(@RequestParam(value = "fileUpload", required = true) MultipartFile fileUpload, @RequestParam(value = "title", required = false) String title, HttpSession session) throws Exception {
         
         /* Get the organization details for the source (Sender) organization */
-        int[] userInfo = (int[])session.getAttribute("userInfo");
-        Organization sendingOrgDetails = organizationmanager.getOrganizationById(userInfo[1]);
+        User userInfo = (User)session.getAttribute("userDetails");
+        Organization sendingOrgDetails = organizationmanager.getOrganizationById(userInfo.getOrgId());
         
         /* Upload the attachment */
         String fileName = transactionInManager.uploadAttachment(fileUpload, sendingOrgDetails.getcleanURL());

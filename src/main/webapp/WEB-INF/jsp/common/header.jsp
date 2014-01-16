@@ -112,12 +112,14 @@
                             <li ${param['page'] == 'pending' ? 'class="active"' : ''}><a href="<c:url value='/Health-e-Web/pending'/>" title="Pending Items" class="btn btn-link"><span class="glyphicon glyphicon-time"></span>&nbsp; Pending</a><span class="indicator-active arrow-up"></span></li>
                             <li ${param['page'] == 'history' ? 'class="active"' : ''}><a href="<c:url value='/Health-e-Web/history'/>" title="History" class="btn btn-link"><span class="glyphicon glyphicon-calendar"></span>&nbsp; History</a><span class="indicator-active arrow-up"></span></li>
                         </ul>
-                        <ul class="nav navbar-nav navbar-right navbar-actions">
-                            <li ${param['page'] == 'create' ? 'class="active"' : ''}>
-                                <a href="<c:url value='/Health-e-Web/create'/>" title="Create a new message" >Create New Message</a>
-                                <span class="indicator-active arrow-up"></span>
-                            </li>
-                        </ul>
+                        <c:if test="${userDetails.createAuthority == true}">
+                            <ul class="nav navbar-nav navbar-right navbar-actions">
+                                <li ${param['page'] == 'create' ? 'class="active"' : ''}>
+                                    <a href="<c:url value='/Health-e-Web/create'/>" title="Create a new message" >Create New Message</a>
+                                    <span class="indicator-active arrow-up"></span>
+                                </li>
+                            </ul>
+                        </c:if>
                     </div>
                 </nav>
             </c:when>

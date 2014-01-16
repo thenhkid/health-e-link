@@ -43,10 +43,8 @@ public class CustomAuthenticationHandler extends SimpleUrlAuthenticationSuccessH
             HttpSession session = request.getSession();
             session.setAttribute("userAccess" , userAccess);
             
-            /* Create an user array to hold different information about the user */
-            /* {userId, orgId} */
-            int[] userArray = {userDetails.getId(),userDetails.getOrgId()};
-            session.setAttribute("userInfo", userArray);
+            /* Need to store the user object in session */
+            session.setAttribute("userDetails", userDetails);
             
             
             getRedirectStrategy().sendRedirect(request, response, userTargetUrl);
