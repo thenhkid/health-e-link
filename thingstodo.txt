@@ -1,7 +1,5 @@
 a new file can you see this
 
-new line with changes.
-
-another new line
-
 new line added 1/16 by chad
+
+
