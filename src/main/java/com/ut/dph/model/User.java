@@ -76,6 +76,12 @@ public class User {
     
     @Column(name = "EDITAUTHORITY", nullable = false)
     private boolean editAuthority = false;
+    
+    @Column(name = "CREATEAUTHORITY", nullable = false)
+    private boolean createAuthority = false;
+    
+    @Column(name = "CANCELAUTHORITY", nullable = false)
+    private boolean cancelAuthority = false;
 
     public int getId() {
         return id;
@@ -203,5 +209,21 @@ public class User {
     
     public void seteditAuthority(boolean editAuthority) {
         this.editAuthority = editAuthority;
+    }
+    
+    public boolean getcreateAuthority() {
+        return createAuthority;
+    }
+    
+    public void setcreateAuthority(boolean createAuthority) {
+        this.createAuthority = createAuthority;
+    }
+    
+    public boolean getcancelAuthority() {
+        return cancelAuthority;
+    }
+    
+    public void setcancelAuthority(boolean cancelAuthority) {
+        this.cancelAuthority = cancelAuthority;
     }
 }

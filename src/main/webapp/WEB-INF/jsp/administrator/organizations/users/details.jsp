@@ -58,27 +58,51 @@
                     </div>
                    <div class="row">
                        <div class="form-group col-md-6">
-                            <label for="status">Can this user edit from the Audit Report? *</label>
+                            <label for="status">Create Capability? *</label>
                             <div>
                                 <label class="radio-inline">
-                                    <form:radiobutton id="editAuthority" path="editAuthority" value="true" /> Yes
+                                    <form:radiobutton id="createAuthority" path="createAuthority" value="true" /> Enabled
                                 </label>
                                 <label class="radio-inline">
-                                    <form:radiobutton id="editAuthority" path="editAuthority" value="false" /> No
+                                    <form:radiobutton id="createAuthority" path="createAuthority" value="false" /> Disabled
                                 </label>
                             </div>
                         </div> 
+                        <div class="form-group col-md-6">
+                            <label for="status">Edit Capability? *</label>
+                            <div>
+                                <label class="radio-inline">
+                                    <form:radiobutton id="editAuthority" path="editAuthority" value="true" /> Enabled
+                                </label>
+                                <label class="radio-inline">
+                                    <form:radiobutton id="editAuthority" path="editAuthority" value="false" /> Disabled
+                                </label>
+                            </div>
+                        </div> 
+                   </div>
+                   <div class="row">
                         <div class="form-group  col-md-6">
-                            <label for="status">Can this user deliver messages? *</label>
+                            <label for="status">Send Capability? *</label>
                             <div>
                                 <label class="radio-inline">
-                                    <form:radiobutton id="deliverAuthority" path="deliverAuthority" value="true" /> Yes
+                                    <form:radiobutton id="deliverAuthority" path="deliverAuthority" value="true" /> Enabled
                                 </label>
                                 <label class="radio-inline">
-                                    <form:radiobutton id="deliverAuthority" path="deliverAuthority" value="false" /> No
+                                    <form:radiobutton id="deliverAuthority" path="deliverAuthority" value="false" /> Disabled
                                 </label>
                             </div>
                         </div> 
+                        <div class="form-group col-md-6">
+                            <label for="status">Cancel Capability? *</label>
+                            <div>
+                                <label class="radio-inline">
+                                    <form:radiobutton id="cancelAuthority" path="cancelAuthority" value="true" /> Enabled
+                                </label>
+                                <label class="radio-inline">
+                                    <form:radiobutton id="cancelAuthority" path="cancelAuthority" value="false" /> Disabled
+                                </label>
+                            </div>
+                        </div>          
                    </div>
                     <spring:bind path="firstName">
                         <div class="form-group ${status.error ? 'has-error' : '' }">

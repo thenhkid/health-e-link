@@ -244,6 +244,11 @@ ADD CONSTRAINT `ttoConfigFK`
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
 
+/* Chad 1.16.14 @ 11:09 AM */
+ALTER TABLE `universalTranslator`.`users` 
+ADD COLUMN `createAuthority` BIT(1) NOT NULL DEFAULT b'0' AFTER `editAuthority`,
+ADD COLUMN `cancelAuthority` BIT(1) NOT NULL DEFAULT b'0' AFTER `createAuthority`;
+
 
 
 
