@@ -24,9 +24,9 @@
                 </div>
             </c:if>    
                 
-            <form action="pending/details" id="viewMessageForm" method="post">
-                <input type="hidden" id="configId" name="configId" value="" />
-                <input type="hidden" id="transactionId" name="transactionId" value="" />
+            <form action="batch/transactions" id="viewBatchTransactions" method="post">
+                <input type="hidden" id="batchId" name="batchId" value="" />
+                <input type="hidden" name="fromPage" value="pending" />
             </form>    
             <div class="form-container scrollable">
                 <table class="table table-striped table-hover table-default">

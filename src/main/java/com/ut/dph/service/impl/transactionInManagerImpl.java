@@ -117,8 +117,8 @@ public class transactionInManagerImpl implements transactionInManager {
     
     @Override
     @Transactional
-    public batchUploads getUploadBatch(int batchId) {
-        return transactionInDAO.getUploadBatch(batchId);
+    public batchUploads getBatchDetails(int batchId) {
+        return transactionInDAO.getBatchDetails(batchId);
     }
     
     @Override

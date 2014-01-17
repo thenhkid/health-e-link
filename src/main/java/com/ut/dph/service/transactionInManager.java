@@ -48,7 +48,7 @@ public interface transactionInManager {
     
     List<transactionIn> getsentTransactions(int orgId);
     
-    batchUploads getUploadBatch(int batchId);
+    batchUploads getBatchDetails(int batchId);
     
     transactionIn getTransactionDetails(int transactionId);
     
