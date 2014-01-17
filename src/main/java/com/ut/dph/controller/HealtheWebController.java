@@ -85,6 +85,30 @@ public class HealtheWebController {
     @Autowired
     private userManager usermanager;
     
+    private int inboxTotal = 0;
+    private int pendingTotal = 0;
+    
+    /**
+     * The 'findTotals' function will set the total number of
+     * inbox messages and total number of pending messages 
+     */
+    public void setTotals(int inboxTotal, int totalPending, HttpSession session) {
+        
+        User userInfo = (User)session.getAttribute("userDetails");
+        
+        /* Need to get a list of all pending batches */
+        if(totalPending == 0) {
+            List<batchUploads> pendingBatches = transactionInManager.getpendingBatches(userInfo.getId(), userInfo.getOrgId());
+            pendingTotal = pendingBatches.size();
+        }
+        else {
+            pendingTotal = totalPending;
+        }
+        
+       
+        inboxTotal = 0;
+    }
+    
     
     /**
      * The '/inbox' request will serve up the Health-e-Web (ERG) inbox.
@@ -95,10 +119,16 @@ public class HealtheWebController {
      * @throws Exception
      */
     @RequestMapping(value = "/inbox", method = RequestMethod.GET)
-    public ModelAndView viewinbox(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public ModelAndView viewinbox(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
         
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/Health-e-Web/inbox");
+        
+        /* Set the header totals */
+        setTotals(0,0,session);
+        
+        mav.addObject("pendingTotal", pendingTotal);
+        mav.addObject("inboxTotal", inboxTotal);
         
         return mav;
     }
@@ -139,6 +169,12 @@ public class HealtheWebController {
         }
         
         mav.addObject("configurations", configurations);
+        
+        /* Set the header totals */
+        setTotals(0,0,session);
+        
+        mav.addObject("pendingTotal", pendingTotal);
+        mav.addObject("inboxTotal", inboxTotal);
         
         return mav;
     }
@@ -487,6 +523,11 @@ public class HealtheWebController {
         
         mav.addObject(transaction);
         
+        /* Set the header totals */
+        setTotals(0,0,session);
+        
+        mav.addObject("pendingTotal", pendingTotal);
+        mav.addObject("inboxTotal", inboxTotal);
         
         return mav;
     }
@@ -792,9 +833,6 @@ public class HealtheWebController {
             transactionInManager.submitTransactionTargetChanges(transactiontarget);
         }
         
-        
-        
-        
         if (action.equals("send")) {
             
             /*
@@ -835,6 +873,7 @@ public class HealtheWebController {
     @RequestMapping(value = "/pending", method = RequestMethod.GET)
     public ModelAndView pendingBatches(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
         
+        
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/Health-e-Web/pending");
         
@@ -859,7 +898,12 @@ public class HealtheWebController {
         }
         
         mav.addObject("pendingBatches", pendingBatches);
+       
+        /* Set the header totals */
+        setTotals(0,pendingBatches.size(),session);
         
+        mav.addObject("pendingTotal", pendingTotal);
+        mav.addObject("inboxTotal", inboxTotal);
         
         return mav;
     }
@@ -982,6 +1026,11 @@ public class HealtheWebController {
         
         mav.addObject("sentTransactions", transactionList);
         
+        /* Set the header totals */
+        setTotals(0,0,session);
+        
+        mav.addObject("pendingTotal", pendingTotal);
+        mav.addObject("inboxTotal", inboxTotal);
         
         return mav;
     }
@@ -1103,6 +1152,12 @@ public class HealtheWebController {
         
         mav.addObject("transactions", transactionList);
         mav.addObject("fromPage", fromPage);
+        
+        /* Set the header totals */
+        setTotals(0,0,session);
+        
+        mav.addObject("pendingTotal", pendingTotal);
+        mav.addObject("inboxTotal", inboxTotal);
         
         return mav;
         
@@ -1315,6 +1370,12 @@ public class HealtheWebController {
         transaction.setdetailFields(detailFields);
         
         mav.addObject("transactionDetails", transaction);
+        
+        /* Set the header totals */
+        setTotals(0,0,session);
+        
+        mav.addObject("pendingTotal", pendingTotal);
+        mav.addObject("inboxTotal", inboxTotal);
         
         return mav;
     }
