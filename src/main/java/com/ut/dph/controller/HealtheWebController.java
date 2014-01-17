@@ -7,6 +7,7 @@
 package com.ut.dph.controller;
 
 import com.ut.dph.model.Organization;
+import com.ut.dph.model.Provider;
 import com.ut.dph.model.Transaction;
 import com.ut.dph.model.User;
 import com.ut.dph.model.batchUploadSummary;
@@ -27,6 +28,7 @@ import com.ut.dph.service.configurationManager;
 import com.ut.dph.service.configurationTransportManager;
 import com.ut.dph.service.messageTypeManager;
 import com.ut.dph.service.organizationManager;
+import com.ut.dph.service.providerManager;
 import com.ut.dph.service.sysAdminManager;
 import com.ut.dph.service.transactionInManager;
 import com.ut.dph.service.userManager;
@@ -84,6 +86,9 @@ public class HealtheWebController {
     
     @Autowired
     private userManager usermanager;
+    
+    @Autowired
+    private providerManager providermanager;
     
     private int inboxTotal = 0;
     private int pendingTotal = 0;
@@ -522,6 +527,10 @@ public class HealtheWebController {
         transaction.setdetailFields(detailFields);
         
         mav.addObject(transaction);
+        
+        /* Get a list of organization providers */
+        List<Provider> providers = organizationmanager.getOrganizationProviders(configDetails.getorgId(), 1, 0);
+        mav.addObject("providers", providers);
         
         /* Set the header totals */
         setTotals(0,0,session);
@@ -1482,6 +1491,18 @@ public class HealtheWebController {
         transactionInManager.removeAttachmentById(attachmentId);
        
         return 1;
+        
+    }
+    
+    /**
+     * 
+     */
+    @RequestMapping(value="/populateProvider.do", method = RequestMethod.GET)
+    public @ResponseBody Provider populateProvider(@RequestParam(value = "providerId", required = true) int providerId) {
+        
+        Provider providerDetails = providermanager.getProviderById(providerId);
+        
+        return providerDetails;
         
     }
     

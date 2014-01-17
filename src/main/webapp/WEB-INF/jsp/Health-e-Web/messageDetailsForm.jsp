@@ -68,10 +68,6 @@
                     <form:hidden path="sourceOrgFields[${i.index}].fieldValue" />
                     <form:hidden path="sourceOrgFields[${i.index}].fieldNo" />
                 </c:forEach>
-                <c:forEach items="${transaction.sourceProviderFields}" varStatus="sp">
-                    <form:hidden path="sourceProviderFields[${sp.index}].fieldValue" />
-                    <form:hidden path="sourceProviderFields[${sp.index}].fieldNo" />
-                </c:forEach>
                 <c:forEach items="${transaction.targetOrgFields}" varStatus="t">
                     <form:hidden path="targetOrgFields[${t.index}].fieldValue" />
                     <form:hidden path="targetOrgFields[${t.index}].fieldNo" />
@@ -98,6 +94,25 @@
                                             <c:if test="${not empty transaction.sourceOrgFields[6].fieldValue}"><dd>phone: <span class="tel">${transaction.sourceOrgFields[6].fieldValue}</span></dd></c:if>
                                             <c:if test="${not empty transaction.sourceOrgFields[7].fieldValue}"><dd>fax: <span class="tel">${transaction.sourceOrgFields[7].fieldValue}</span></dd></c:if>
                                        </dl>
+                                        <c:choose>
+                                            <c:when test="${not empty providers}">
+                                                <dl>
+                                                    <dd>
+                                                        Choose Provider: 
+                                                        <select class="form-control" id="orgProvider">
+                                                            <option value="">-Choose-</option>
+                                                             <c:forEach items="${providers}" var="provider">
+                                                                     <option value="${provider.id}">${provider.firstName}&nbsp;${provider.lastName}</option>
+                                                             </c:forEach>
+                                                        </select>
+                                                    </dd>
+                                                </dl>
+                                            </c:when>
+                                        </c:choose>
+                                        <c:forEach items="${transaction.sourceProviderFields}" var="providerInfo" varStatus="sp">
+                                            <form:hidden id="provider_${providerInfo.fieldNo}" path="sourceProviderFields[${sp.index}].fieldValue" value="" />
+                                            <form:hidden path="sourceProviderFields[${sp.index}].fieldNo" />
+                                        </c:forEach>
                                     </div>
                                     <div class="col-md-6">
                                         <h4 class="form-section-heading">Recipient Organization:</h4>

@@ -88,6 +88,31 @@ $(document).ready(function() {
         });
     });
     
+    
+    //Function to go get providers as the user types in letters
+    $(document).on('change', '#orgProvider', function() {
+        
+        $.ajax({
+            url: '../populateProvider.do',
+            type: 'GET',
+            data: {'providerId': $(this).val()},
+            success: function(data) {
+                //fields 9 - 18
+                $('#provider_9').val(data.firstName);
+                $('#provider_10').val(data.lastName);
+                $('#provider_11').val("");//Provider ID
+                $('#provider_12').val("");//Provider Address
+                $('#provider_13').val("");//Provider Address 2
+                $('#provider_14').val("");//Provider City
+                $('#provider_15').val("");//Provider State
+                $('#provider_16').val("");//Provider Zip
+                $('#provider_17').val("");//Provider Phone
+                $('#provider_18').val("");//Provider Fax
+            }
+        });
+        
+    });
+    
 
 
 });

@@ -328,7 +328,10 @@ public class organizationDAOImpl implements organizationDAO {
         }
         query.setFirstResult(firstResult);
         //Set the max results to display
-        query.setMaxResults(maxResults);
+        
+        if(maxResults > 0) {
+            query.setMaxResults(maxResults);
+        }
 
         return query.list();
 
