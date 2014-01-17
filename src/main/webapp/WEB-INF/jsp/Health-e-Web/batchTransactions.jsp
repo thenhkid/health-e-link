@@ -25,9 +25,10 @@
                 </div>
             </c:if>    
                 
-            <form action="batch/transactions" id="viewBatchTransactions" method="post">
-                <input type="hidden" id="batchId" name="batchId" value="" />
+            <form action="" id="viewTransactionDetails" method="post">
+                <input type="hidden" id="transactionId" name="transactionId" value="" />
                 <input type="hidden" name="fromPage" value="pending" />
+                <input type="hidden" id="configId" name="configId" value="" />
             </form>    
             <div class="form-container scrollable">
                 <table class="table table-striped table-hover table-default">
@@ -70,7 +71,7 @@
                                         </td>
                                         <td class="center-text"><fmt:formatDate value="${transaction.dateSubmitted}" type="date" pattern="M/dd/yyyy" /></td>
                                         <td class="actions-col" style="width:50px;">
-                                            <a href="javascript:void(0);" rel="${transaction.transactionRecordId}" class="btn btn-link viewLink">
+                                            <a href="javascript:void(0);" rel="${transaction.transactionRecordId}" rel3="${userDetails.editAuthority}" rel2="${transaction.configId}" class="btn btn-link viewLink">
                                                 <span class="glyphicon glyphicon-edit"></span>
                                                 View
                                             </a>

@@ -76,6 +76,18 @@ $(document).ready(function() {
     });
     
     
+    //This function will launch the status detail overlay with the selected
+    //status
+    $(document).on('click', '.viewStatus', function() {
+        $.ajax({
+            url: '../viewStatus' + $(this).attr('rel'),
+            type: "GET",
+            success: function(data) {
+                $("#statusModal").html(data);
+            }
+        });
+    });
+    
 
 
 });

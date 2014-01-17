@@ -16,11 +16,40 @@
             <ol class="breadcrumb">
                 <li><a href="<c:url value='/profile'/>">My Account</a></li>
                 <li><a href="#">eRG</a></li>
-                <c:if test="${pageHeader == 'pending'}"><li><a href="<c:url value='/Health-e-Web/pending'/>">Pending Messages</a></li></c:if>
-                <li class="active"><c:choose><c:when test="${pageHeader == 'create'}">Create New Message</c:when><c:otherwise>Message Details</c:otherwise></c:choose></li>
+                <c:if test="${pageHeader == 'pending'}"><li><a href="<c:url value='/Health-e-Web/pending'/>">Pending Batches</a></li></c:if>
+                <li class="active"><c:choose><c:when test="${pageHeader == 'create'}">Create New Message</c:when><c:otherwise>Referral #${transaction.batchName}</c:otherwise></c:choose></li>
             </ol>
+            
+            <c:choose>
+                <c:when test="${transaction.transactionId > 0}">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h3>${transaction.messageTypeName} Transaction</h3>
+                            <dl>
+                                <dd><strong>Date Submitted:</strong> <fmt:formatDate value="${transaction.dateSubmitted}" type="both" dateStyle="long" timeStyle="long" /></dd>
+                                <dd><strong>System ID:</strong> ${transaction.batchName}</dd>
+                                <dd><strong>Status:</strong> <a href="#statusModal" data-toggle="modal" class="btn btn-link viewStatus" rel="${transaction.statusId}" title="View this Status">${transaction.statusValue}&nbsp;<span class="badge badge-help" data-placement="top" title="" data-original-title="">?</span></a></dd>
+                            </dl>
+                        </div>
+                        <div class="col-md-6"></div>
+                    </div>
+                    <div class="well">
+                        <div class="row form-inline">
+                            <div class="form-group col-sm-4">
+                                  
+                            </div>
+                            <div class="form-group col-sm-4 col-sm-offset-4">
+                                    <label class="sr-only">Select Action</label>
+                                    <select class="form-control"><option>Select Action</option></select>
+                            </div>
+                        </div>
+                    </div>
+                </c:when>
+                <c:otherwise>
+                    <h2 class="form-title">Create New Message</h2>
+                </c:otherwise>
+            </c:choose>
 
-            <h2 class="form-title"><c:choose><c:when test="${pageHeader == 'create'}">Create New Message</c:when><c:otherwise>Message Details</c:otherwise></c:choose></h2>
             <form:form id="messageForm" action="/Health-e-Web/submitMessage" modelAttribute="transaction" role="form" class="form" method="post">
                 <input type="hidden" id="action" name="action" value="save" />
                 <form:hidden path="orgId" />
@@ -179,3 +208,5 @@
         </div>
     </div>
 </div>
+<!-- Status Definition modal -->
+<div class="modal fade" id="statusModal" role="dialog" tabindex="-1" aria-labeledby="Status Details" aria-hidden="true" aria-describedby="Status Details"></div>

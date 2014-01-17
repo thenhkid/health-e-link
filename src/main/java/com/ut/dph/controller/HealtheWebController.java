@@ -205,12 +205,12 @@ public class HealtheWebController {
             transactionTarget transactionTarget = transactionInManager.getTransactionTarget(transactionInfo.getbatchId(), transactionId);
             
             transaction.setorgId(batchInfo.getOrgId());
-            transaction.settransportMethodId(2);
+            transaction.settransportMethodId(transportDetails.gettransportMethodId());
             transaction.setmessageTypeId(configDetails.getMessageTypeId());
             transaction.setuserId(batchInfo.getuserId());
             transaction.setbatchName(batchInfo.getutBatchName());
             transaction.setoriginalFileName(batchInfo.getoriginalFileName());
-            transaction.setstatusId(batchInfo.getstatusId());
+            transaction.setstatusId(transactionInfo.getstatusId());
             transaction.settransactionStatusId(transactionInfo.getstatusId());
             transaction.settargetOrgId(targetOrg);
             transaction.setconfigId(transactionInfo.getconfigId());
@@ -218,6 +218,13 @@ public class HealtheWebController {
             transaction.setbatchId(batchInfo.getId());
             transaction.settransactionId(transactionId);
             transaction.settransactionTargetId(transactionTarget.getId());
+            transaction.setdateSubmitted(transactionInfo.getdateCreated());
+            
+            lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(transaction.getstatusId());
+            transaction.setstatusValue(processStatus.getDisplayCode());
+            
+            /* get the message type name */
+            transaction.setmessageTypeName(messagetypemanager.getMessageTypeById(configDetails.getMessageTypeId()).getName());
             
             records = transactionInManager.getTransactionRecords(transactionId);
             transaction.settransactionRecordId(records.getId());
@@ -1014,6 +1021,7 @@ public class HealtheWebController {
             transactionDetails.settransactionRecordId(transaction.getId());
             transactionDetails.setstatusId(transaction.getstatusId());
             transactionDetails.setdateSubmitted(transaction.getdateCreated());
+            transactionDetails.setconfigId(transaction.getconfigId());
 
             lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(transaction.getstatusId());
             transactionDetails.setstatusValue(processStatus.getDisplayCode());
@@ -1112,10 +1120,14 @@ public class HealtheWebController {
      * @return this request will return the messageDetailsForm
      */
     @RequestMapping(value="/sent/messageDetails", method = RequestMethod.POST)
-    public ModelAndView showMessageDetails(@RequestParam(value = "transactionId", required = true) Integer transactionId, HttpSession session) throws NoSuchMethodException {
+    public ModelAndView showMessageDetails(@RequestParam(value = "transactionId", required = true) Integer transactionId, @RequestParam(value = "fromPage", required = false) String fromPage, HttpSession session) throws NoSuchMethodException {
        
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/Health-e-Web/sentmessageDetails");
+        
+        if(fromPage != null) {
+            mav.addObject("fromPage", fromPage);
+        }
         
         transactionIn transactionInfo = transactionInManager.getTransactionDetails(transactionId);
           
@@ -1161,6 +1173,10 @@ public class HealtheWebController {
         transaction.setbatchId(batchInfo.getId());
         transaction.settransactionId(transactionId);
         transaction.settransactionTargetId(transactionTarget.getId());
+        transaction.setdateSubmitted(transactionInfo.getdateCreated());
+            
+        /* get the message type name */
+        transaction.setmessageTypeName(messagetypemanager.getMessageTypeById(configDetails.getMessageTypeId()).getName());
 
         records = transactionInManager.getTransactionRecords(transactionId);
         transaction.settransactionRecordId(records.getId());
@@ -1168,16 +1184,13 @@ public class HealtheWebController {
         
         /* Set all the transaction SOURCE ORG fields */
         List<transactionRecords> fromFields = new ArrayList<transactionRecords>();
-        String tableName;
-        String tableCol;
-        String colName;
-       
+        
         for(configurationFormFields fields : senderInfoFormFields) {
             transactionRecords field = new transactionRecords();
             field.setfieldNo(fields.getFieldNo());
             field.setfieldLabel(fields.getFieldLabel());
             
-            colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
+            String colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
             try {
                 field.setfieldValue(BeanUtils.getProperty(records, colName));
             } catch (IllegalAccessException ex) {
@@ -1198,7 +1211,7 @@ public class HealtheWebController {
             field.setfieldNo(fields.getFieldNo());
             field.setfieldLabel(fields.getFieldLabel());
             
-            colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
+            String colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
             try {
                 field.setfieldValue(BeanUtils.getProperty(records, colName));
             } catch (IllegalAccessException ex) {
@@ -1219,7 +1232,7 @@ public class HealtheWebController {
             field.setfieldNo(fields.getFieldNo());
             field.setfieldLabel(fields.getFieldLabel());
             
-            colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
+            String colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
             try {
                 field.setfieldValue(BeanUtils.getProperty(records, colName));
             } catch (IllegalAccessException ex) {
@@ -1240,7 +1253,7 @@ public class HealtheWebController {
             field.setfieldNo(fields.getFieldNo());
             field.setfieldLabel(fields.getFieldLabel());
             
-            colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
+            String colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
             try {
                 field.setfieldValue(BeanUtils.getProperty(records, colName));
             } catch (IllegalAccessException ex) {
@@ -1260,7 +1273,7 @@ public class HealtheWebController {
             field.setfieldNo(fields.getFieldNo());
             field.setfieldLabel(fields.getFieldLabel());
             
-            colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
+            String colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
             try {
                 field.setfieldValue(BeanUtils.getProperty(records, colName));
             } catch (IllegalAccessException ex) {
@@ -1284,7 +1297,7 @@ public class HealtheWebController {
             field.setfieldNo(fields.getFieldNo());
             field.setfieldLabel(fields.getFieldLabel());
             
-            colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
+            String colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
             try {
                 field.setfieldValue(BeanUtils.getProperty(records, colName));
             } catch (IllegalAccessException ex) {

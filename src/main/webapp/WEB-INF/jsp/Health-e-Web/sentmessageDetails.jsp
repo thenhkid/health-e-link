@@ -16,11 +16,31 @@
             <ol class="breadcrumb">
                 <li><a href="<c:url value='/profile'/>">My Account</a></li>
                 <li><a href="#">eRG</a></li>
-                <li><a href="<c:url value='/Health-e-Web/sent'/>">Sent Messages</a></li>
-                <li class="active">Message: ${transactionDetails.batchName}</li>
+                <li><c:choose><c:when test="${fromPage == 'pending'}"><a href="<c:url value='/Health-e-Web/pending'/>">Pending Batches</a></c:when><c:otherwise><a href="<c:url value='/Health-e-Web/sent'/>">Sent Messages</a></c:otherwise></c:choose></li>
+                <li class="active">Batch #${transactionDetails.batchName}</li>
             </ol>
 
-            <h2 class="form-title">Message Details</h2>
+            <div class="row">
+                <div class="col-md-6">
+                    <h3>${transactionDetails.messageTypeName} Transaction</h3>
+                    <dl>
+                    <dd><strong>Date Submitted:</strong> <fmt:formatDate value="${transactionDetails.dateSubmitted}" type="both" dateStyle="long" timeStyle="long" /></dd>
+                    <dd><strong>System ID:</strong> ${transactionDetails.batchName}</dd>
+                    </dl>
+                </div>
+                <div class="col-md-6"></div>
+            </div>
+            <div class="well">
+                <div class="row form-inline">
+                    <div class="form-group col-sm-4">
+                            
+                    </div>
+                    <div class="form-group col-sm-4 col-sm-offset-4">
+                            <label class="sr-only">Select Action</label>
+                            <select class="form-control"><option>Select Action</option></select>
+                    </div>
+                </div>
+            </div>        
             <form:form id="messageForm" action="/Health-e-Web/submitMessage" modelAttribute="transactionDetails" role="form" class="form" method="post">
                 <div class="panel-group form-accordion" id="accordion">
                     <div class="panel panel-default panel-form">
