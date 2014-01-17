@@ -6488,12 +6488,40 @@ td.visible-print {
   width: 18px;
   height: 18px;
 }
+.navbar-actions {
+  /* always float action nav items left;
+	// override default bootstrap styles;
+	@media (min-width: 0) and (max-width: @screen-xs-max) {
+		&.navbar-nav {
+			float:	left;
+		}
+		li {
+			float:	left;
+		}
+		li.active .indicator-active {
+			display:none;
+		}
+
+		&.navbar-right {
+			float:right;
+		}
+	}
+	*/
+}
 .navbar-actions.navbar-nav li > a {
   padding-top: 15px;
   padding-bottom: 15px;
 }
 .navbar-actions .badge {
   padding: 2px 5px;
+}
+@media (min-width: 0) and (max-width: 767px) {
+  .navbar-actions a {
+    text-align: left;
+  }
+  .navbar-actions li.active .indicator-active {
+    display: none;
+  }
 }
 .arrow-left {
   width: 10px;

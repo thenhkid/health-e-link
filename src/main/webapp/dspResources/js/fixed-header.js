@@ -1,11 +1,10 @@
 define(['jquery'], function ($) {
 
-	var headerHeight = $('header').outerHeight();
 	var actionsNav = $('.actions-nav');
 	var primaryNav = $('.primary-nav');
 	var primaryNavHeight = primaryNav.outerHeight();
 	var scrollPosition = $(this).scrollTop();
-	var isFied = false;
+	var isFixed = false;
 
 	// Fixed Headers
 	// TODO[Implement] : Create jQuery plugin.
@@ -20,14 +19,16 @@ define(['jquery'], function ($) {
 
 		updateHeaderPosition : function () {
 
+			primaryNavHeight = primaryNav.outerHeight();
+
 			scrollPosition = $(this).scrollTop();
 
 			// if scroll top is greater than the header height, fix the position of primary nav and actions nav
 			if (scrollPosition > primaryNavHeight) {
 
-				if ($('.placeholder').length == 0)
+				if ($('.placeholder').length === 0)
 				{
-					$('.header-inner').prepend('<div class="placeholder" style="height:'+primaryNavHeight+'px; position:relative; width:100%"></div>')
+					$('.header-inner').prepend('<div class="placeholder" style="height:'+primaryNavHeight+'px; position:relative; width:100%"></div>');
 				}
 				else
 				{
@@ -43,27 +44,26 @@ define(['jquery'], function ($) {
 				isFixed = false;
 			}
 
-			if(scrollPosition == 0)
+			if(scrollPosition === 0)
 			{
 				fixedHeader.resetPrimaryNavPosition();
 
 				if (actionsNav.hasClass('fixed'))
 				{
-					fixedHeader.resetActionNavPosition()
+					fixedHeader.resetActionNavPosition();
 				}
 			}
 
-			if(actionsNav.length)
+			if(actionsNav.length && $(window).width() > 767)
 			{
 				// position actions nav;
-				if(scrollPosition > (actionsNavPosition - primaryNav.outerHeight())){
-					actionsNav.css('top', primaryNavHeight + 1).addClass('fixed');
+				if(scrollPosition > (actionsNavPosition - primaryNav.outerHeight())) {
+					actionsNav.css('top', primaryNavHeight).addClass('fixed');
 				}
-				console.log(isFixed + scrollPosition);
+
 				if ( (scrollPosition <= (actionsNavPosition - primaryNav.outerHeight())) && isFixed)
 				{
-					console.log('reset');
-					fixedHeader.resetActionNavPosition()
+					fixedHeader.resetActionNavPosition();
 				}
 			}
 		},
@@ -77,13 +77,13 @@ define(['jquery'], function ($) {
 		},
 
 		resetActionNavPosition : function() {
-			actionsNav.removeClass('fixed').css('top', '')
+			actionsNav.removeClass('fixed').css('top', '');
 		},
 
 		allowFixedHeader : function () {
 			if ($(window).width() >= 768 )
 			{
-				return true
+				return true;
 			}
 			return false;
 		},
@@ -91,10 +91,10 @@ define(['jquery'], function ($) {
 		init: function () {
 			var _self = this;
 			this.updateHeaderPosition();
-			$(window).on('scroll', _self.updateHeaderPosition)
+			$(window).on('scroll', _self.updateHeaderPosition);
 		}
-	}
+	};
 
 	return fixedHeader;
 
-})
+});
