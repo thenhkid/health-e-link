@@ -10,6 +10,10 @@ $(document).ready(function() {
     if(selMethodId === "3") {
         $('#additionalFTPDiv').show();
     }
+    
+    if(selMethodId !== "2" && selMethodId !== "") {
+        $('.assocMessageTypes').show();
+    }
 });
 
 $(function() {
@@ -32,6 +36,13 @@ $(function() {
        if(methodId === "3") {
            $('#additionalFTPDiv').show();
        }
+       
+       if(methodId !== "2" && methodId !== "") {
+            $('.assocMessageTypes').show();
+        }
+        else {
+            $('.assocMessageTypes').hide();
+        }
         
     });
     

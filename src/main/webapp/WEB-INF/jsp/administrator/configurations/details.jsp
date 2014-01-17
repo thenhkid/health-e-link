@@ -74,10 +74,18 @@
                                 <span id="configMessageTypeMsg" class="control-label"></span>
                             </div>
                         </spring:bind>
+                        <spring:bind path="configName">
+                            <div id="configNameDiv" class="form-group ${status.error ? 'has-error' : '' } ${not empty existingName ? 'has-error' : ''}">
+                                <label class="control-label" for="configName">Unique Configuration Name *</label>
+                                <form:input path="configName" id="configName" class="form-control" type="text" maxLength="45" disabled="${configurationDetails.id == 0 ? 'false' : 'true' }" />
+                                <c:if test="${not empty existingName}"><span class="control-label">${existingName}</span></c:if>
+                                <c:if test="${configurationDetails.id > 0}"><form:hidden path="configName"/></c:if> 
+                                <span id="configNameMsg" class="control-label"></span>
+                            </div>
+                        </spring:bind>        
                     </div>
                 </div>
             </section>   
-        </form:form>
-                        
+        </form:form> 
     </div>
 </div>

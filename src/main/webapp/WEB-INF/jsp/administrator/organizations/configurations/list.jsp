@@ -24,6 +24,7 @@
                     <table class="table table-striped table-hover table-default">
                         <thead>
                             <tr>
+                                <th scope="col">Configuration Name</th>
                                 <th scope="col">Message Type</th>
                                 <th scope="col">Configuration Type</th>
                                 <th scope="col" class="center-text">Transport Method</th>
@@ -36,6 +37,11 @@
                                 <c:when test="${not empty configs}">
                                     <c:forEach var="config" items="${configs}">
                                         <tr style="cursor: pointer">
+                                            <td scope="row">
+                                                <a href="<c:url value='/administrator/configurations/details?i=${config.id}' />" title="Edit this configuration">${config.configName}</a>
+                                                <br />
+                                                (<c:choose><c:when test="${config.status == true}">active</c:when><c:otherwise>inactive</c:otherwise></c:choose>)
+                                            </td>
                                             <td>
                                                 ${config.messageTypeName}
                                             </td>

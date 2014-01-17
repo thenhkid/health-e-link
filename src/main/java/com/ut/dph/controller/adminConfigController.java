@@ -259,6 +259,28 @@ public class adminConfigController {
     @RequestMapping(value = "/create", method = RequestMethod.POST)
     public ModelAndView saveNewConfiguration(@ModelAttribute(value = "configurationDetails") configuration configurationDetails, BindingResult result, RedirectAttributes redirectAttr, @RequestParam String action) throws Exception {
 
+        /* Need to make sure the name isn't already taken for the org selected */
+        configuration existing = configurationmanager.getConfigurationByName(configurationDetails.getconfigName(), configurationDetails.getorgId());
+        
+        if (existing != null) {
+            ModelAndView mav = new ModelAndView();
+            mav.setViewName("/administrator/configurations/details");
+            
+            mav.addObject("configurationDetails", configurationDetails);
+            
+            //Need to get a list of active organizations.
+            List<Organization> organizations = organizationmanager.getAllActiveOrganizations();
+            mav.addObject("organizations", organizations);
+
+            //Need to get a list of active message types
+            List<messageType> messageTypes = messagetypemanager.getActiveMessageTypes();
+            mav.addObject("messageTypes", messageTypes);
+            
+            mav.addObject("existingName", "The configuration name " + configurationDetails.getconfigName().trim() + " already exists.");
+            return mav;
+        }
+        
+        
         Integer id = (Integer) configurationmanager.createConfiguration(configurationDetails);
 
         configId = id;
@@ -423,6 +445,20 @@ public class adminConfigController {
         configurationTransport transportDetails = configurationTransportManager.getTransportDetails(configId);
         if(transportDetails == null) {
             transportDetails = new configurationTransport();
+            
+            /* Get organization directory name */
+            Organization orgDetails = organizationmanager.getOrganizationById(configurationDetails.getorgId());
+            if(configurationDetails.getType() == 1) {
+                transportDetails.setfileLocation("/bowlink/"+orgDetails.getcleanURL()+"/input files/");
+            }
+            else {
+               transportDetails.setfileLocation("/bowlink/"+orgDetails.getcleanURL()+"/output files/"); 
+            }
+            
+            List<Integer> assocMessageTypes = new ArrayList<Integer>();
+            assocMessageTypes.add(configurationDetails.getId());
+            transportDetails.setmessageTypes(assocMessageTypes);
+            
         }
         else {
             //Need to set the associated message types

@@ -6,6 +6,7 @@
 
 package com.ut.dph.service;
 
+import com.ut.dph.model.batchUploadSummary;
 import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.fieldSelectOptions;
 import com.ut.dph.model.transactionAttachment;
@@ -27,6 +28,8 @@ public interface transactionInManager {
     
     Integer submitBatchUpload(batchUploads batchUpload);
     
+    void submitBatchUploadSummary(batchUploadSummary summary);
+    
     void submitBatchUploadChanges(batchUploads batchUpload);
     
     Integer submitTransactionIn(transactionIn transactionIn);
@@ -37,9 +40,11 @@ public interface transactionInManager {
     
     void submitTransactionInRecordsUpdates(transactionInRecords records);
     
-    void submitTransactionTranslatedInRecords(int transactionId, int transactionRecordId);
+    void submitTransactionTranslatedInRecords(int transactionId, int transactionRecordId, int configId);
     
-    List<transactionIn> getpendingTransactions(int orgId);
+    List<batchUploads> getpendingBatches(int userId, int orgId);
+    
+    List<transactionIn> getBatchTransactions(int batchId, int userId);
     
     List<transactionIn> getsentTransactions(int orgId);
     

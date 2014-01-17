@@ -23,6 +23,7 @@
                     <dt>
                         <dt>Configuration Summary:</dt>
                         <dd><strong>Organization:</strong> ${configurationDetails.orgName}</dd>
+                        <dd><strong>Configuration Name:</strong> ${configurationDetails.configName}</dd>
                         <dd><strong>Message Type:</strong> ${configurationDetails.messageTypeName}</dd>
                         <dd><strong>Transport Method:</strong> ${configurationDetails.transportMethod}</dd>
                     </dt>
@@ -83,7 +84,7 @@
                                                             <select name="fields[${field.index}].messageTypeFieldId" id="matchingField_${mappings.fieldNo}" class="formField">
                                                             <option value="0">-</option>
                                                             <c:forEach var="tField" items="${templateFields}">
-                                                                <option value="${tField.id}" <c:if test="${mappings.messageTypeFieldId == tField.id}">selected</c:if>>${tField.fieldNo}</option>
+                                                                <option value="${tField.id}" <c:if test="${mappings.messageTypeFieldId == tField.id}">selected</c:if>>${tField.fieldNo} - ${tField.fieldLabel}</option>
                                                             </c:forEach>
                                                         </select>
                                                     </td>

@@ -132,10 +132,10 @@ function populateConfigurations(orgId, selectBoxId) {
             
             for (var i = 0; i < len; i++) {
               if(data[i].id == currConfigId) {
-                 html += '<option value="' + data[i].id + '" selected>' + data[i].messageTypeName + '&nbsp;&#149;&nbsp;' + data[i].transportMethod + '</option>';
+                 html += '<option value="' + data[i].id + '" selected>' + data[i].configName + '&nbsp;&#149;&nbsp;' + data[i].messageTypeName + '&nbsp;&#149;&nbsp;' + data[i].transportMethod + '</option>';
               }
               else {
-                 html += '<option value="' + data[i].id + '">' + data[i].messageTypeName + '&nbsp;&#149;&nbsp;' + data[i].transportMethod + '</option>'; 
+                 html += '<option value="' + data[i].id + '">' + data[i].configName + '&nbsp;&#149;&nbsp;' + data[i].messageTypeName + '&nbsp;&#149;&nbsp;' + data[i].transportMethod + '</option>'; 
               }
             }
             $('#'+selectBoxId).html(html);
@@ -165,10 +165,20 @@ function populateUsers(orgId, selectBoxId) {
             
             for (var i = 0; i < len; i++) {
                 if(users != '' && users.indexOf(data[i][0]) != -1) {
-                    html += '<option value="' + data[i][0]+ '" selected>' + data[i][1] + ' ' + data[i][2] + '</option>';
+                    if(data[i][3] == 1) {
+                        html += '<option value="' + data[i][0]+ '" selected>' + data[i][1] + ' ' + data[i][2] +' (Manager) </option>';
+                    }
+                    else {
+                       html += '<option value="' + data[i][0]+ '" selected>' + data[i][1] + ' ' + data[i][2] +' (Staff Member) </option>'; 
+                    }
                 }
                 else {
-                    html += '<option value="' + data[i][0]+ '">' + data[i][1] + ' ' + data[i][2] + '</option>';
+                    if(data[i][3] == 1) {
+                        html += '<option value="' + data[i][0]+ '">' + data[i][1] + ' ' + data[i][2] +' (Manager) </option>';
+                    }
+                    else {
+                        html += '<option value="' + data[i][0]+ '">' + data[i][1] + ' ' + data[i][2] +' (Staff Member) </option>'; 
+                    }
                 }
             }
             $('#'+selectBoxId).html(html);

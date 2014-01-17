@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ut.dph.dao.configurationDAO;
 import com.ut.dph.model.Macros;
 import com.ut.dph.model.Organization;
-import com.ut.dph.model.User;
 import com.ut.dph.model.configuration;
 import com.ut.dph.model.configurationConnection;
 import com.ut.dph.model.configurationConnectionReceivers;
@@ -149,21 +148,23 @@ public class configurationDAOImpl implements configurationDAO {
     }
 
     /**
-     * The 'getOrganizationByName' function will return a single organization based on the name passed in.
+     * The 'getConfigurationByName' function will return a single configuration based on the name passed in.
      *
-     * @Table	organizations
+     * @Table	configurations
      *
-     * @param	cleanURL	Will hold the 'clean' organization name from the url
+     * @param	configName	Will hold the configuration name to search on
      *
-     * @return	This function will return a single organization object
+     * @return	This function will return a single configuration object
      */
     @Override
     @SuppressWarnings("unchecked")
-    public List<configuration> getConfigurationByName(String configName) {
+    public configuration getConfigurationByName(String configName, int orgId) {
         Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configuration.class);
         criteria.add(Restrictions.like("configName", configName));
-        return criteria.list();
-    }
+        criteria.add(Restrictions.eq("orgId", orgId));
+        
+        return (configuration) criteria.uniqueResult();
+    }    
 
     /**
      * The 'getConfigurations' function will return a list of the configurations in the system
@@ -693,6 +694,11 @@ public class configurationDAOImpl implements configurationDAO {
         //translations. This will allow the admin to change the configuration transport method after
         //one was previously selected. This will only be available while the configuration is not active.
         if (clearFields == 1) {
+            //Delete the existing data translactions
+            Query deleteTranslations = sessionFactory.getCurrentSession().createSQLQuery("DELETE from configurationDataTranslations where configId = :configId");
+            deleteTranslations.setParameter("configId", messageSpecs.getconfigId());
+            deleteTranslations.executeUpdate();
+            
             //Delete the existing form fields
             Query deleteFields = sessionFactory.getCurrentSession().createSQLQuery("DELETE from configurationFormFields where configId = :configId and transportDetailId = :transportDetailId");
             deleteFields.setParameter("configId", messageSpecs.getconfigId());

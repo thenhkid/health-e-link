@@ -80,8 +80,8 @@ public class configurationManagerImpl implements configurationManager {
     
     @Override
     @Transactional
-    public List<configuration> getConfigurationByName(String configName) {
-        return configurationDAO.getConfigurationByName(configName);
+    public configuration getConfigurationByName(String configName, int orgId) {
+        return configurationDAO.getConfigurationByName(configName,orgId);
     }
 
     @Override

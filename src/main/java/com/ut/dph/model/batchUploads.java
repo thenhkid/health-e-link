@@ -13,6 +13,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import org.springframework.format.annotation.DateTimeFormat;
 
 /**
@@ -22,6 +23,15 @@ import org.springframework.format.annotation.DateTimeFormat;
 @Entity
 @Table(name = "BATCHUPLOADS")
 public class batchUploads {
+    
+    @Transient
+    private Integer totalTransactions = 0;
+    
+    @Transient
+    private String statusValue;
+    
+    @Transient
+    private String usersName;
     
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -186,4 +196,29 @@ public class batchUploads {
     public Date getdateSubmitted() {
        return dateSubmitted;
     }
+    
+    public void settotalTransactions(int totalTransactions) {
+        this.totalTransactions = totalTransactions;
+    } 
+    
+    public int gettotalTransactions() {
+        return totalTransactions;
+    }
+    
+    public String getstatusValue() {
+       return statusValue;
+    }
+   
+    public void setstatusValue(String statusValue) {
+       this.statusValue = statusValue;
+    }
+    
+    public String getusersName() {
+       return usersName;
+    }
+   
+    public void setusersName(String usersName) {
+       this.usersName = usersName;
+    }
+    
 }

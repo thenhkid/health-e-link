@@ -12,7 +12,7 @@
             <ol class="breadcrumb">
                 <li><a href="<c:url value='/profile'/>">My Account</a></li>
                 <li><a href="#">eRG</a></li>
-                <li class="active">Pending Messages</li>
+                <li class="active">Pending Batches</li>
             </ol>
                 
             <c:if test="${not empty savedStatus}" >
@@ -32,49 +32,30 @@
                 <table class="table table-striped table-hover table-default">
                     <thead>
                         <tr>
-                            <th scope="col">Message Type</th>
-                            <th scope="col">Patient Info</th>
-                            <th scope="col">Target Organization</th>
-                            <th scope="col" class="center-text">Urgency</th>
+                            <th scope="col">Batch Name</th>
+                            <th scope="col" class="center-text">Total Transactions</th>
                             <th scope="col" class="center-text">Status</th>
+                            <th scope="col" class="center-text">Submitted By</th>
                             <th scope="col" class="center-text">Date Submitted</th>
                             <th scope="col"></th>
                         </tr>
                     </thead>
                     <tbody>
                         <c:choose>
-                            <c:when test="${not empty pendingTransactions}">
-                                <c:forEach var="transaction" items="${pendingTransactions}">
+                            <c:when test="${not empty pendingBatches}">
+                                <c:forEach var="batch" items="${pendingBatches}">
                                     <tr>
-                                        <td scope="row">${transaction.messageTypeName}</td>
-                                        <td>
-                                            ${transaction.patientFields[0].fieldValue}&nbsp;${transaction.patientFields[1].fieldValue}
-                                            <dd class="adr">
-                                                <span class="street-address">${transaction.patientFields[4].fieldValue}</span><br/>
-                                                <c:if test="${not empty transaction.patientFields[5].fieldValue}"><span class="street-address">${transaction.patientFields[5].fieldValue}</span><br/></c:if>
-                                                <span class="region">${transaction.patientFields[6].fieldValue}&nbsp;${transaction.patientFields[7].fieldValue}</span>, <span class="postal-code">${transaction.patientFields[8].fieldValue}</span>
-                                            </dd>
-                                        </td>
-                                        <td>
-                                            ${transaction.targetOrgFields[0].fieldValue}
-                                            <dd class="adr">
-                                                <span class="street-address">${transaction.targetOrgFields[1].fieldValue}</span><br/>
-                                                <c:if test="${not empty transaction.targetOrgFields[2].fieldValue}"><span class="street-address">${transaction.targetOrgFields[2].fieldValue}</span><br/></c:if>
-                                                <span class="region">${transaction.targetOrgFields[3].fieldValue}&nbsp;${transaction.targetOrgFields[4].fieldValue}</span>, <span class="postal-code">${transaction.targetOrgFields[5].fieldValue}</span>
-                                            </dd>
-                                            <c:if test="${not empty transaction.targetOrgFields[6].fieldValue}"><dd>phone: <span class="tel">${transaction.targetOrgFields[6].fieldValue}</span></dd></c:if>
-                                            <c:if test="${not empty transaction.targetOrgFields[7].fieldValue}"><dd>fax: <span class="tel">${transaction.targetOrgFields[7].fieldValue}</span></dd></c:if>
+                                        <td scope="row">${batch.utBatchName}</td>
+                                        <td class="center-text">
+                                            ${batch.totalTransactions}
                                         </td>
                                         <td class="center-text">
-                                            <c:forEach items="${transaction.detailFields}" var="detailInfo" varStatus="dfield"><c:if test="${detailInfo.fieldLabel == 'urgency'}"><c:set var="urgencyVal" value="${detailInfo.fieldValue}" /></c:if></c:forEach>
-                                            ${urgencyVal}
+                                            <a href="#statusModal" data-toggle="modal" class="btn btn-link viewStatus" rel="${batch.statusId}" title="View this Status">${batch.statusValue}&nbsp;<span class="badge badge-help" data-placement="top" title="" data-original-title="">?</span></a>
                                         </td>
-                                        <td class="center-text">
-                                            <a href="#statusModal" data-toggle="modal" class="btn btn-link viewStatus" rel="${transaction.statusId}" title="View this Status">${transaction.statusValue}&nbsp;<span class="badge badge-help" data-placement="top" title="" data-original-title="">?</span></a>
-                                        </td>
-                                        <td class="center-text"><fmt:formatDate value="${transaction.dateSubmitted}" type="date" pattern="M/dd/yyyy" /></td>
+                                        <td class="center-text">${batch.usersName}</td>
+                                        <td class="center-text"><fmt:formatDate value="${batch.dateSubmitted}" type="date" pattern="M/dd/yyyy" /></td>
                                         <td class="actions-col" style="width:50px;">
-                                            <a href="javascript:void(0);" rel2="${transaction.configId}" rel="${transaction.transactionRecordId}" class="btn btn-link viewLink">
+                                            <a href="javascript:void(0);" rel="${batch.id}" class="btn btn-link viewLink">
                                                 <span class="glyphicon glyphicon-edit"></span>
                                                 View
                                             </a>
@@ -83,7 +64,7 @@
                                 </c:forEach>
                            </c:when>
                            <c:otherwise>
-                                <tr><td colspan="7" class="center-text">You currently have no pending messages</td></tr>
+                                <tr><td colspan="7" class="center-text">You currently have no pending batches</td></tr>
                             </c:otherwise>
                       </c:choose>                  
                     </tbody>

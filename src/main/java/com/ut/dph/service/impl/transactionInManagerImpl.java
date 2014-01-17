@@ -7,6 +7,7 @@
 package com.ut.dph.service.impl;
 
 import com.ut.dph.dao.transactionInDAO;
+import com.ut.dph.model.batchUploadSummary;
 import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.fieldSelectOptions;
 import com.ut.dph.model.transactionAttachment;
@@ -56,6 +57,12 @@ public class transactionInManagerImpl implements transactionInManager {
     
     @Override
     @Transactional
+    public void submitBatchUploadSummary(batchUploadSummary summary) {
+        transactionInDAO.submitBatchUploadSummary(summary);
+    }
+    
+    @Override
+    @Transactional
     public void submitBatchUploadChanges(batchUploads batchUpload) {
         transactionInDAO.submitBatchUploadChanges(batchUpload);
     }
@@ -86,14 +93,20 @@ public class transactionInManagerImpl implements transactionInManager {
     
     @Override
     @Transactional
-    public void submitTransactionTranslatedInRecords(int transactionId, int transactionRecordId) {
-        transactionInDAO.submitTransactionTranslatedInRecords(transactionId, transactionRecordId);
+    public void submitTransactionTranslatedInRecords(int transactionId, int transactionRecordId, int configId) {
+        transactionInDAO.submitTransactionTranslatedInRecords(transactionId, transactionRecordId, configId);
     }
     
     @Override
     @Transactional
-    public List<transactionIn> getpendingTransactions(int orgId) {
-        return transactionInDAO.getpendingTransactions(orgId);
+    public List<batchUploads> getpendingBatches(int userId, int orgId) {
+        return transactionInDAO.getpendingBatches(userId, orgId);
+    }
+    
+    @Override
+    @Transactional
+    public List<transactionIn> getBatchTransactions(int batchId, int userId) {
+        return transactionInDAO.getBatchTransactions(batchId, userId);
     }
     
     @Override

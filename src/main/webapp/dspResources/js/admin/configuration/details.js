@@ -49,6 +49,14 @@ function checkform() {
         errorFound = 1;
     }
     
+    //Check to make sure a configuration name is entered
+    if($('#configName').val() === '') {
+        $('#configNameDiv').addClass("has-error");
+        $('#configNameMsg').addClass("has-error");
+        $('#configNameMsg').html('The configuration name is a required field.');
+        errorFound = 1;
+    }
+    
     
     return errorFound;
     

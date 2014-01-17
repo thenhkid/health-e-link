@@ -29,6 +29,7 @@
                     <dt>
                         <dt>Configuration Summary:</dt>
                         <dd><strong>Organization:</strong> ${configurationDetails.orgName}</dd>
+                        <dd><strong>Configuration Name:</strong> ${configurationDetails.configName}</dd>
                         <dd><strong>Message Type:</strong> ${configurationDetails.messageTypeName}</dd>
                         <dd><strong>Transport Method:</strong> ${configurationDetails.transportMethod}</dd>
                     </dt>

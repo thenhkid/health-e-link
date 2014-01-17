@@ -34,8 +34,6 @@ INSERT INTO `universaltranslator`.`lu_ProcessStatus` (`category`, `displayCode`,
 
 /** Grace 01.11.2014 **/
 
-drop table transactionErrors;
-
 CREATE TABLE `transactionInErrors` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `batchUploadId` int(11) NOT NULL,
@@ -175,4 +173,82 @@ ADD CONSTRAINT `configFFIdFK`
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
   
+/** grace 01.14.14**/
+drop table `universalTranslator`.`transactionErrors`;
+
+/* Chad 01.14.2014 @ 10:25 AM */
+ALTER TABLE `universalTranslator`.`configurations` 
+ADD COLUMN `configName` VARCHAR(45) NOT NULL AFTER `stepsCompleted`;
+
+/* Chad 01.15.2014 @ 11:43 AM */
+ALTER TABLE `universaltranslator`.`users` 
+ADD COLUMN `editAuthority` BIT(1) NOT NULL DEFAULT b'0' AFTER `deliverAuthority`;
+
+/* Chad 01.15.14 @ 3:05 PM */
+CREATE TABLE `universalTranslator`.`batchUploadSummary` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `batchId` INT NOT NULL,
+  `transactionInId` INT NOT NULL,
+  `sourceOrgId` INT NOT NULL,
+  `targetOrgId` INT NOT NULL,
+  `messageTypeId` INT NOT NULL,
+  `sourceConfigId` INT NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `sumBatchIdfk_idx` (`batchId` ASC),
+  INDEX `sumTransactionIdfk_idx` (`transactionInId` ASC),
+  INDEX `sumSourceOrgIdfk_idx` (`sourceOrgId` ASC),
+  INDEX `sumTargetOrgIdfk_idx` (`targetOrgId` ASC),
+  INDEX `sumMessageTypeIdfk_idx` (`messageTypeId` ASC),
+  INDEX `sumConfigIdfk_idx` (`sourceConfigId` ASC),
+  CONSTRAINT `sumBatchIdfk`
+    FOREIGN KEY (`batchId`)
+    REFERENCES `universalTranslator`.`batchUploads` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `sumTransactionIdfk`
+    FOREIGN KEY (`transactionInId`)
+    REFERENCES `universalTranslator`.`transactionIn` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `sumSourceOrgIdfk`
+    FOREIGN KEY (`sourceOrgId`)
+    REFERENCES `universalTranslator`.`organizations` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `sumTargetOrgIdfk`
+    FOREIGN KEY (`targetOrgId`)
+    REFERENCES `universalTranslator`.`organizations` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `sumMessageTypeIdfk`
+    FOREIGN KEY (`messageTypeId`)
+    REFERENCES `universalTranslator`.`messagetypes` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `sumConfigIdfk`
+    FOREIGN KEY (`sourceConfigId`)
+    REFERENCES `universalTranslator`.`configurations` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+/*Grace 01.16.14 */
+ ALTER TABLE `universalTranslator`.`transactionTranslatedOut` 
+ADD COLUMN `configId` INT NOT NULL AFTER `transactionTargetId`;
+
+ALTER TABLE `universalTranslator`.`transactionTranslatedOut` 
+ADD INDEX `ttoConfigFK_idx` (`configId` ASC);
+ALTER TABLE `universalTranslator`.`transactionTranslatedOut` 
+ADD CONSTRAINT `ttoConfigFK`
+  FOREIGN KEY (`configId`)
+  REFERENCES `universalTranslator`.`configurations` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+/* Chad 1.16.14 @ 11:09 AM */
+ALTER TABLE `universalTranslator`.`users` 
+ADD COLUMN `createAuthority` BIT(1) NOT NULL DEFAULT b'0' AFTER `editAuthority`,
+ADD COLUMN `cancelAuthority` BIT(1) NOT NULL DEFAULT b'0' AFTER `createAuthority`;
+
+
+
 
