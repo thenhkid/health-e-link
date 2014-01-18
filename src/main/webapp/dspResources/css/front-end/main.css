@@ -6353,6 +6353,8 @@ td.visible-print {
   margin-bottom: 0;
   border-radius: 0;
   padding: 15px 0;
+  -webkit-transition: background-color 0.5s;
+  transition: background-color 0.5s;
 }
 .primary-nav .container .navbar-header,
 .primary-nav .container .navbar-brand {
@@ -6360,8 +6362,8 @@ td.visible-print {
   margin-right: 0;
 }
 .primary-nav.fixed {
-  background-color: #fff;
   border-bottom: 1px solid #ccc;
+  background-color: rgba(255, 255, 255, 0.8);
   width: 100%;
   top: 0;
   left: 0;
@@ -6446,6 +6448,8 @@ td.visible-print {
   margin-bottom: 0;
 }
 .actions-nav {
+  -webkit-transition: background-color 0.5s;
+  transition: background-color 0.5s;
   margin-bottom: 0px;
 }
 .actions-nav .navbar-brand {
@@ -6453,7 +6457,7 @@ td.visible-print {
   padding-bottom: 22px;
 }
 .actions-nav.fixed {
-  background-color: #333;
+  background-color: rgba(0, 0, 0, 0.7);
   width: 100%;
   left: 0;
   position: fixed !important;
@@ -6601,7 +6605,7 @@ td.visible-print {
 }
 .secondary .affix {
   position: fixed;
-  top: 20px;
+  top: 90px;
   box-sizing: border-box;
 }
 .secondary .affix-bottom {
@@ -6678,6 +6682,11 @@ td.visible-print {
 }
 .cb {
   clear: both;
+}
+.basic-clearfix {
+  overflow: hidden;
+  height: 1%;
+  zoom: 1;
 }
 .center-text {
   text-align: center;
