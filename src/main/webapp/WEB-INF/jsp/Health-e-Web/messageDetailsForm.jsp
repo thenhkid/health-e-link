@@ -16,11 +16,40 @@
             <ol class="breadcrumb">
                 <li><a href="<c:url value='/profile'/>">My Account</a></li>
                 <li><a href="#">eRG</a></li>
-                <c:if test="${pageHeader == 'pending'}"><li><a href="<c:url value='/Health-e-Web/pending'/>">Pending Messages</a></li></c:if>
-                <li class="active"><c:choose><c:when test="${pageHeader == 'create'}">Create New Message</c:when><c:otherwise>Message Details</c:otherwise></c:choose></li>
+                <c:if test="${pageHeader == 'pending'}"><li><a href="<c:url value='/Health-e-Web/pending'/>">Pending Batches</a></li></c:if>
+                <li class="active"><c:choose><c:when test="${pageHeader == 'create'}">Create New Message</c:when><c:otherwise>Referral #${transaction.batchName}</c:otherwise></c:choose></li>
             </ol>
+            
+            <c:choose>
+                <c:when test="${transaction.transactionId > 0}">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h3>${transaction.messageTypeName} Transaction</h3>
+                            <dl>
+                                <dd><strong>Date Submitted:</strong> <fmt:formatDate value="${transaction.dateSubmitted}" type="both" dateStyle="long" timeStyle="long" /></dd>
+                                <dd><strong>System ID:</strong> ${transaction.batchName}</dd>
+                                <dd><strong>Status:</strong> <a href="#statusModal" data-toggle="modal" class="btn btn-link viewStatus" rel="${transaction.statusId}" title="View this Status">${transaction.statusValue}&nbsp;<span class="badge badge-help" data-placement="top" title="" data-original-title="">?</span></a></dd>
+                            </dl>
+                        </div>
+                        <div class="col-md-6"></div>
+                    </div>
+                    <div class="well">
+                        <div class="row form-inline">
+                            <div class="form-group col-sm-4">
+                                  
+                            </div>
+                            <div class="form-group col-sm-4 col-sm-offset-4">
+                                    <label class="sr-only">Select Action</label>
+                                    <select class="form-control"><option>Select Action</option></select>
+                            </div>
+                        </div>
+                    </div>
+                </c:when>
+                <c:otherwise>
+                    <h2 class="form-title">Create New Message</h2>
+                </c:otherwise>
+            </c:choose>
 
-            <h2 class="form-title"><c:choose><c:when test="${pageHeader == 'create'}">Create New Message</c:when><c:otherwise>Message Details</c:otherwise></c:choose></h2>
             <form:form id="messageForm" action="/Health-e-Web/submitMessage" modelAttribute="transaction" role="form" class="form" method="post">
                 <input type="hidden" id="action" name="action" value="save" />
                 <form:hidden path="orgId" />
@@ -38,10 +67,6 @@
                 <c:forEach items="${transaction.sourceOrgFields}" varStatus="i">
                     <form:hidden path="sourceOrgFields[${i.index}].fieldValue" />
                     <form:hidden path="sourceOrgFields[${i.index}].fieldNo" />
-                </c:forEach>
-                <c:forEach items="${transaction.sourceProviderFields}" varStatus="sp">
-                    <form:hidden path="sourceProviderFields[${sp.index}].fieldValue" />
-                    <form:hidden path="sourceProviderFields[${sp.index}].fieldNo" />
                 </c:forEach>
                 <c:forEach items="${transaction.targetOrgFields}" varStatus="t">
                     <form:hidden path="targetOrgFields[${t.index}].fieldValue" />
@@ -69,6 +94,25 @@
                                             <c:if test="${not empty transaction.sourceOrgFields[6].fieldValue}"><dd>phone: <span class="tel">${transaction.sourceOrgFields[6].fieldValue}</span></dd></c:if>
                                             <c:if test="${not empty transaction.sourceOrgFields[7].fieldValue}"><dd>fax: <span class="tel">${transaction.sourceOrgFields[7].fieldValue}</span></dd></c:if>
                                        </dl>
+                                        <c:choose>
+                                            <c:when test="${not empty providers}">
+                                                <dl>
+                                                    <dd>
+                                                        Choose Provider: 
+                                                        <select class="form-control" id="orgProvider">
+                                                            <option value="">-Choose-</option>
+                                                             <c:forEach items="${providers}" var="provider">
+                                                                     <option value="${provider.id}">${provider.firstName}&nbsp;${provider.lastName}</option>
+                                                             </c:forEach>
+                                                        </select>
+                                                    </dd>
+                                                </dl>
+                                            </c:when>
+                                        </c:choose>
+                                        <c:forEach items="${transaction.sourceProviderFields}" var="providerInfo" varStatus="sp">
+                                            <form:hidden id="provider_${providerInfo.fieldNo}" path="sourceProviderFields[${sp.index}].fieldValue" value="" />
+                                            <form:hidden path="sourceProviderFields[${sp.index}].fieldNo" />
+                                        </c:forEach>
                                     </div>
                                     <div class="col-md-6">
                                         <h4 class="form-section-heading">Recipient Organization:</h4>
@@ -179,3 +223,5 @@
         </div>
     </div>
 </div>
+<!-- Status Definition modal -->
+<div class="modal fade" id="statusModal" role="dialog" tabindex="-1" aria-labeledby="Status Details" aria-hidden="true" aria-describedby="Status Details"></div>

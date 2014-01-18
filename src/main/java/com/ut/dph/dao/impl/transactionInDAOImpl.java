@@ -485,14 +485,14 @@ public class transactionInDAOImpl implements transactionInDAO {
     }
     
     /**
-     * The 'getUploadBatch' function will return the batch details for the
+     * The 'getBatchDetails' function will return the batch details for the
      * passed in batch id.
      * 
      * @param batchId   The id of the batch to return.  
      */
     @Override
     @Transactional
-    public batchUploads getUploadBatch(int batchId) {
+    public batchUploads getBatchDetails(int batchId) {
          return (batchUploads) sessionFactory.getCurrentSession().get(batchUploads.class, batchId);
         
     }

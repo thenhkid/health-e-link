@@ -17,10 +17,25 @@ $(document).ready(function() {
 $(function() {
     
     $('.viewLink').click(function() {
-       var batchId = $(this).attr('rel');
+       var transactionId = $(this).attr('rel');
+       var configId = $(this).attr('rel2');
+       var editAuthority = $(this).attr('rel3');
        
-        $('#batchId').val(batchId);
-        $('#viewBatchTransactions').submit();
+        $('#transactionId').val(transactionId);
+        $('#configId').val(configId);
+        
+        //Need to set the action for the form
+        //If user has edit capability then 'pending/details'
+        //otherwise only view 'sent/messageDetails'
+        if(editAuthority === "true") {
+            $('#viewTransactionDetails').attr("action","/Health-e-Web/pending/details");
+        }
+        else {
+            $('#viewTransactionDetails').attr("action","/Health-e-Web/sent/messageDetails"); 
+        }
+        
+        
+        $('#viewTransactionDetails').submit();
        
     });
     
@@ -28,7 +43,7 @@ $(function() {
     //status
     $(document).on('click', '.viewStatus', function() {
         $.ajax({
-            url: 'viewStatus' + $(this).attr('rel'),
+            url: '../viewStatus' + $(this).attr('rel'),
             type: "GET",
             success: function(data) {
                 $("#statusModal").html(data);

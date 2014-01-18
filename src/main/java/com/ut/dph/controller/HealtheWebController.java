@@ -7,6 +7,7 @@
 package com.ut.dph.controller;
 
 import com.ut.dph.model.Organization;
+import com.ut.dph.model.Provider;
 import com.ut.dph.model.Transaction;
 import com.ut.dph.model.User;
 import com.ut.dph.model.batchUploadSummary;
@@ -27,6 +28,7 @@ import com.ut.dph.service.configurationManager;
 import com.ut.dph.service.configurationTransportManager;
 import com.ut.dph.service.messageTypeManager;
 import com.ut.dph.service.organizationManager;
+import com.ut.dph.service.providerManager;
 import com.ut.dph.service.sysAdminManager;
 import com.ut.dph.service.transactionInManager;
 import com.ut.dph.service.userManager;
@@ -85,6 +87,33 @@ public class HealtheWebController {
     @Autowired
     private userManager usermanager;
     
+    @Autowired
+    private providerManager providermanager;
+    
+    private int inboxTotal = 0;
+    private int pendingTotal = 0;
+    
+    /**
+     * The 'findTotals' function will set the total number of
+     * inbox messages and total number of pending messages 
+     */
+    public void setTotals(int inboxTotal, int totalPending, HttpSession session) {
+        
+        User userInfo = (User)session.getAttribute("userDetails");
+        
+        /* Need to get a list of all pending batches */
+        if(totalPending == 0) {
+            List<batchUploads> pendingBatches = transactionInManager.getpendingBatches(userInfo.getId(), userInfo.getOrgId());
+            pendingTotal = pendingBatches.size();
+        }
+        else {
+            pendingTotal = totalPending;
+        }
+        
+       
+        inboxTotal = 0;
+    }
+    
     
     /**
      * The '/inbox' request will serve up the Health-e-Web (ERG) inbox.
@@ -95,10 +124,16 @@ public class HealtheWebController {
      * @throws Exception
      */
     @RequestMapping(value = "/inbox", method = RequestMethod.GET)
-    public ModelAndView viewinbox(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public ModelAndView viewinbox(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
         
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/Health-e-Web/inbox");
+        
+        /* Set the header totals */
+        setTotals(0,0,session);
+        
+        mav.addObject("pendingTotal", pendingTotal);
+        mav.addObject("inboxTotal", inboxTotal);
         
         return mav;
     }
@@ -139,6 +174,12 @@ public class HealtheWebController {
         }
         
         mav.addObject("configurations", configurations);
+        
+        /* Set the header totals */
+        setTotals(0,0,session);
+        
+        mav.addObject("pendingTotal", pendingTotal);
+        mav.addObject("inboxTotal", inboxTotal);
         
         return mav;
     }
@@ -201,16 +242,16 @@ public class HealtheWebController {
         
         if(transactionId > 0) {
             transactionIn transactionInfo = transactionInManager.getTransactionDetails(transactionId);
-            batchUploads batchInfo = transactionInManager.getUploadBatch(transactionInfo.getbatchId());
+            batchUploads batchInfo = transactionInManager.getBatchDetails(transactionInfo.getbatchId());
             transactionTarget transactionTarget = transactionInManager.getTransactionTarget(transactionInfo.getbatchId(), transactionId);
             
             transaction.setorgId(batchInfo.getOrgId());
-            transaction.settransportMethodId(2);
+            transaction.settransportMethodId(transportDetails.gettransportMethodId());
             transaction.setmessageTypeId(configDetails.getMessageTypeId());
             transaction.setuserId(batchInfo.getuserId());
             transaction.setbatchName(batchInfo.getutBatchName());
             transaction.setoriginalFileName(batchInfo.getoriginalFileName());
-            transaction.setstatusId(batchInfo.getstatusId());
+            transaction.setstatusId(transactionInfo.getstatusId());
             transaction.settransactionStatusId(transactionInfo.getstatusId());
             transaction.settargetOrgId(targetOrg);
             transaction.setconfigId(transactionInfo.getconfigId());
@@ -218,6 +259,13 @@ public class HealtheWebController {
             transaction.setbatchId(batchInfo.getId());
             transaction.settransactionId(transactionId);
             transaction.settransactionTargetId(transactionTarget.getId());
+            transaction.setdateSubmitted(transactionInfo.getdateCreated());
+            
+            lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(transaction.getstatusId());
+            transaction.setstatusValue(processStatus.getDisplayCode());
+            
+            /* get the message type name */
+            transaction.setmessageTypeName(messagetypemanager.getMessageTypeById(configDetails.getMessageTypeId()).getName());
             
             records = transactionInManager.getTransactionRecords(transactionId);
             transaction.settransactionRecordId(records.getId());
@@ -480,6 +528,15 @@ public class HealtheWebController {
         
         mav.addObject(transaction);
         
+        /* Get a list of organization providers */
+        List<Provider> providers = organizationmanager.getOrganizationProviders(configDetails.getorgId(), 1, 0);
+        mav.addObject("providers", providers);
+        
+        /* Set the header totals */
+        setTotals(0,0,session);
+        
+        mav.addObject("pendingTotal", pendingTotal);
+        mav.addObject("inboxTotal", inboxTotal);
         
         return mav;
     }
@@ -544,7 +601,7 @@ public class HealtheWebController {
             batchId = currBatchId;
             
             /* Get the details of the batch */
-            batchUploads batchUpload = transactionInManager.getUploadBatch(batchId);
+            batchUploads batchUpload = transactionInManager.getBatchDetails(batchId);
             
             /* 
             If the "Save" button was pressed set the
@@ -785,9 +842,6 @@ public class HealtheWebController {
             transactionInManager.submitTransactionTargetChanges(transactiontarget);
         }
         
-        
-        
-        
         if (action.equals("send")) {
             
             /*
@@ -828,6 +882,7 @@ public class HealtheWebController {
     @RequestMapping(value = "/pending", method = RequestMethod.GET)
     public ModelAndView pendingBatches(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
         
+        
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/Health-e-Web/pending");
         
@@ -852,7 +907,12 @@ public class HealtheWebController {
         }
         
         mav.addObject("pendingBatches", pendingBatches);
+       
+        /* Set the header totals */
+        setTotals(0,pendingBatches.size(),session);
         
+        mav.addObject("pendingTotal", pendingTotal);
+        mav.addObject("inboxTotal", inboxTotal);
         
         return mav;
     }
@@ -887,7 +947,7 @@ public class HealtheWebController {
         if(sentTransactions != null) {
            
             for(transactionIn transactionRecord : sentTransactions) {
-                batchUploads batchInfo = transactionInManager.getUploadBatch(transactionRecord.getbatchId());
+                batchUploads batchInfo = transactionInManager.getBatchDetails(transactionRecord.getbatchId());
                 
                 Transaction transactionDetails = new Transaction();
                 transactionDetails.setbatchName(batchInfo.getutBatchName());
@@ -975,9 +1035,144 @@ public class HealtheWebController {
         
         mav.addObject("sentTransactions", transactionList);
         
+        /* Set the header totals */
+        setTotals(0,0,session);
+        
+        mav.addObject("pendingTotal", pendingTotal);
+        mav.addObject("inboxTotal", inboxTotal);
         
         return mav;
     }
+    
+    
+    /**
+     * The 'batch/transactions' request will display a page that will show all transactions
+     * associated with the clicked batch.
+     * 
+     * @param batchId   The id of the clicked batch
+     * @param fromPage  The page the user was on when viewing batches (Pending or Sent)
+     * @param session   The session scope variables
+     * 
+     * @return This method will return the page to display all transactions for the batch.
+     */
+    @RequestMapping(value = "batch/transactions", method = RequestMethod.POST)
+    public ModelAndView showBatchTransactions(@RequestParam Integer batchId, @RequestParam String fromPage, HttpSession session) throws Exception {
+        
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/Health-e-Web/batchTransactions");
+        
+        /* Need to get all the message types set up for the user */
+        User userInfo = (User)session.getAttribute("userDetails");
+        
+        /* Get the details of the batch */
+        batchUploads batchDetails = transactionInManager.getBatchDetails(batchId);
+        mav.addObject("batchDetails", batchDetails);
+        
+        /* Get all the transactions for the batch */
+        List<transactionIn> batchTransactions = transactionInManager.getBatchTransactions(batchId, userInfo.getId());
+        
+        List<Transaction> transactionList = new ArrayList<Transaction>();
+        
+        for(transactionIn transaction : batchTransactions) {
+                 
+            Transaction transactionDetails = new Transaction();
+            transactionDetails.settransactionRecordId(transaction.getId());
+            transactionDetails.setstatusId(transaction.getstatusId());
+            transactionDetails.setdateSubmitted(transaction.getdateCreated());
+            transactionDetails.setconfigId(transaction.getconfigId());
+
+            lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(transaction.getstatusId());
+            transactionDetails.setstatusValue(processStatus.getDisplayCode());
+
+            transactionInRecords records = transactionInManager.getTransactionRecords(transaction.getId());
+
+            /* Get a list of form fields */
+            configurationTransport transportDetails = configurationTransportManager.getTransportDetailsByTransportMethod(transaction.getconfigId(), 2);
+            List<configurationFormFields> targetInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transaction.getconfigId(),transportDetails.getId(),3);
+            List<configurationFormFields> patientInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transaction.getconfigId(),transportDetails.getId(),5);
+            List<configurationFormFields> detailFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transaction.getconfigId(),transportDetails.getId(),6);
+
+            /* Set all the transaction TARGET fields */
+            List<transactionRecords> toFields = new ArrayList<transactionRecords>();
+            for(configurationFormFields fields : targetInfoFormFields) {
+                transactionRecords field = new transactionRecords();
+
+                String colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
+                try {
+                    field.setfieldValue(BeanUtils.getProperty(records, colName));
+                } catch (IllegalAccessException ex) {
+                    Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (InvocationTargetException ex) {
+                    Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
+                /* Get the pre-populated values */
+                toFields.add(field);
+            }
+            transactionDetails.settargetOrgFields(toFields);
+
+            /* Set all the transaction PATIENT fields */
+            List<transactionRecords> patientFields = new ArrayList<transactionRecords>();
+            for(configurationFormFields fields : patientInfoFormFields) {
+                transactionRecords field = new transactionRecords();
+
+                String colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
+                try {
+                    field.setfieldValue(BeanUtils.getProperty(records, colName));
+                } catch (IllegalAccessException ex) {
+                    Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (InvocationTargetException ex) {
+                    Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
+                patientFields.add(field);
+            }
+            transactionDetails.setpatientFields(patientFields);
+
+            /* Set all the transaction DETAIL fields */
+            List<transactionRecords> detailFields = new ArrayList<transactionRecords>();
+            for(configurationFormFields fields : detailFormFields) {
+                transactionRecords field = new transactionRecords();
+                field.setfieldLabel(fields.getFieldDesc()); 
+
+                String colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
+                String fieldValue = BeanUtils.getProperty(records, colName);
+
+                if(fields.getFieldDesc().equals("urgency") && !fieldValue.equals("")) {
+                    int id = Integer.parseInt(fieldValue);
+                    TableData  tableData = sysAdminManager.getTableData(id, "lu_Urgency");
+                    fieldValue = tableData.getDisplayText();
+                }
+
+               field.setfieldValue(fieldValue);
+
+               detailFields.add(field);
+            }
+            transactionDetails.setdetailFields(detailFields);
+
+
+            /* get the message type name */
+            configuration configDetails = configurationManager.getConfigurationById(transaction.getconfigId());
+            transactionDetails.setmessageTypeName(messagetypemanager.getMessageTypeById(configDetails.getMessageTypeId()).getName());
+
+            transactionList.add(transactionDetails);
+        }
+        
+        
+        mav.addObject("transactions", transactionList);
+        mav.addObject("fromPage", fromPage);
+        
+        /* Set the header totals */
+        setTotals(0,0,session);
+        
+        mav.addObject("pendingTotal", pendingTotal);
+        mav.addObject("inboxTotal", inboxTotal);
+        
+        return mav;
+        
+    }
+    
+    
     
     /**
      * The '/sent/details' POST request will take the selected message type and target org and display
@@ -989,10 +1184,14 @@ public class HealtheWebController {
      * @return this request will return the messageDetailsForm
      */
     @RequestMapping(value="/sent/messageDetails", method = RequestMethod.POST)
-    public ModelAndView showMessageDetails(@RequestParam(value = "transactionId", required = true) Integer transactionId, HttpSession session) throws NoSuchMethodException {
+    public ModelAndView showMessageDetails(@RequestParam(value = "transactionId", required = true) Integer transactionId, @RequestParam(value = "fromPage", required = false) String fromPage, HttpSession session) throws NoSuchMethodException {
        
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/Health-e-Web/sentmessageDetails");
+        
+        if(fromPage != null) {
+            mav.addObject("fromPage", fromPage);
+        }
         
         transactionIn transactionInfo = transactionInManager.getTransactionDetails(transactionId);
           
@@ -1021,7 +1220,7 @@ public class HealtheWebController {
         Transaction transaction = new Transaction();
         transactionInRecords records = null;
             
-        batchUploads batchInfo = transactionInManager.getUploadBatch(transactionInfo.getbatchId());
+        batchUploads batchInfo = transactionInManager.getBatchDetails(transactionInfo.getbatchId());
         transactionTarget transactionTarget = transactionInManager.getTransactionTarget(transactionInfo.getbatchId(), transactionId);
 
         transaction.setorgId(batchInfo.getOrgId());
@@ -1038,6 +1237,10 @@ public class HealtheWebController {
         transaction.setbatchId(batchInfo.getId());
         transaction.settransactionId(transactionId);
         transaction.settransactionTargetId(transactionTarget.getId());
+        transaction.setdateSubmitted(transactionInfo.getdateCreated());
+            
+        /* get the message type name */
+        transaction.setmessageTypeName(messagetypemanager.getMessageTypeById(configDetails.getMessageTypeId()).getName());
 
         records = transactionInManager.getTransactionRecords(transactionId);
         transaction.settransactionRecordId(records.getId());
@@ -1045,16 +1248,13 @@ public class HealtheWebController {
         
         /* Set all the transaction SOURCE ORG fields */
         List<transactionRecords> fromFields = new ArrayList<transactionRecords>();
-        String tableName;
-        String tableCol;
-        String colName;
-       
+        
         for(configurationFormFields fields : senderInfoFormFields) {
             transactionRecords field = new transactionRecords();
             field.setfieldNo(fields.getFieldNo());
             field.setfieldLabel(fields.getFieldLabel());
             
-            colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
+            String colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
             try {
                 field.setfieldValue(BeanUtils.getProperty(records, colName));
             } catch (IllegalAccessException ex) {
@@ -1075,7 +1275,7 @@ public class HealtheWebController {
             field.setfieldNo(fields.getFieldNo());
             field.setfieldLabel(fields.getFieldLabel());
             
-            colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
+            String colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
             try {
                 field.setfieldValue(BeanUtils.getProperty(records, colName));
             } catch (IllegalAccessException ex) {
@@ -1096,7 +1296,7 @@ public class HealtheWebController {
             field.setfieldNo(fields.getFieldNo());
             field.setfieldLabel(fields.getFieldLabel());
             
-            colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
+            String colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
             try {
                 field.setfieldValue(BeanUtils.getProperty(records, colName));
             } catch (IllegalAccessException ex) {
@@ -1117,7 +1317,7 @@ public class HealtheWebController {
             field.setfieldNo(fields.getFieldNo());
             field.setfieldLabel(fields.getFieldLabel());
             
-            colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
+            String colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
             try {
                 field.setfieldValue(BeanUtils.getProperty(records, colName));
             } catch (IllegalAccessException ex) {
@@ -1137,7 +1337,7 @@ public class HealtheWebController {
             field.setfieldNo(fields.getFieldNo());
             field.setfieldLabel(fields.getFieldLabel());
             
-            colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
+            String colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
             try {
                 field.setfieldValue(BeanUtils.getProperty(records, colName));
             } catch (IllegalAccessException ex) {
@@ -1161,7 +1361,7 @@ public class HealtheWebController {
             field.setfieldNo(fields.getFieldNo());
             field.setfieldLabel(fields.getFieldLabel());
             
-            colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
+            String colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
             try {
                 field.setfieldValue(BeanUtils.getProperty(records, colName));
             } catch (IllegalAccessException ex) {
@@ -1179,6 +1379,12 @@ public class HealtheWebController {
         transaction.setdetailFields(detailFields);
         
         mav.addObject("transactionDetails", transaction);
+        
+        /* Set the header totals */
+        setTotals(0,0,session);
+        
+        mav.addObject("pendingTotal", pendingTotal);
+        mav.addObject("inboxTotal", inboxTotal);
         
         return mav;
     }
@@ -1285,6 +1491,18 @@ public class HealtheWebController {
         transactionInManager.removeAttachmentById(attachmentId);
        
         return 1;
+        
+    }
+    
+    /**
+     * 
+     */
+    @RequestMapping(value="/populateProvider.do", method = RequestMethod.GET)
+    public @ResponseBody Provider populateProvider(@RequestParam(value = "providerId", required = true) int providerId) {
+        
+        Provider providerDetails = providermanager.getProviderById(providerId);
+        
+        return providerDetails;
         
     }
     
