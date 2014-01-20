@@ -19,6 +19,8 @@ import com.ut.dph.model.configurationTransport;
 import com.ut.dph.model.custom.TableData;
 import com.ut.dph.model.fieldSelectOptions;
 import com.ut.dph.model.lutables.lu_ProcessStatus;
+import com.ut.dph.model.providerAddress;
+import com.ut.dph.model.providerIdNum;
 import com.ut.dph.model.transactionAttachment;
 import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionInRecords;
@@ -1495,15 +1497,27 @@ public class HealtheWebController {
     }
     
     /**
+     * The 'populateProvider.do' function will get the provider details for the provider id
+     * passed in.
      * 
+     * @param   providerId  The id of the provider to return details for.
+     * 
+     * @return This function will return the provider object.
      */
     @RequestMapping(value="/populateProvider.do", method = RequestMethod.GET)
     public @ResponseBody Provider populateProvider(@RequestParam(value = "providerId", required = true) int providerId) {
         
         Provider providerDetails = providermanager.getProviderById(providerId);
         
-        return providerDetails;
+        /* Get the list of addresses for the provider */
+        List<providerAddress> providerAddresses = providermanager.getProviderAddresses(providerId);
+        providerDetails.setProviderAddresses(providerAddresses);
         
+        /* Get the list of ids for the provider */
+        List<providerIdNum> providerIds = providermanager.getProviderIds(providerId);
+        providerDetails.setProviderIds(providerIds);
+        
+        return providerDetails;
     }
     
 }

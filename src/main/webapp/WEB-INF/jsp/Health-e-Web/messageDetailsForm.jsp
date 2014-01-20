@@ -95,8 +95,22 @@
                                             <c:if test="${not empty transaction.sourceOrgFields[7].fieldValue}"><dd>fax: <span class="tel">${transaction.sourceOrgFields[7].fieldValue}</span></dd></c:if>
                                        </dl>
                                         <c:choose>
+                                            <c:when test="${not empty transaction.sourceProviderFields[0].fieldValue}">
+                                                <h4 class="form-section-heading">Originating Organization Provider: </h4>
+                                                <dl class="vcard">
+                                                    <dd class="fn">${transaction.sourceProviderFields[0].fieldValue}&nbsp;${transaction.sourceProviderFields[1].fieldValue}</dd>
+                                                    <dd class="fn">Id: ${transaction.sourceProviderFields[2].fieldValue}</dd>
+                                                    <dd class="adr">
+                                                        <span class="street-address">${transaction.sourceProviderFields[3].fieldValue}</span><br/>
+                                                        <c:if test="${not empty transaction.sourceProviderFields[4].fieldValue}"><span class="street-address">${transaction.sourceProviderFields[4].fieldValue}</span><br/></c:if>
+                                                        <span class="region">${transaction.sourceProviderFields[5].fieldValue}&nbsp;${transaction.sourceProviderFields[6].fieldValue}</span>, <span class="postal-code">${transaction.sourceProviderFields[7].fieldValue}</span>
+                                                    </dd>
+                                                    <c:if test="${not empty transaction.sourceProviderFields[8].fieldValue}"><dd>phone: <span class="tel">${transaction.sourceProviderFields[8].fieldValue}</span></dd></c:if>
+                                                    <c:if test="${not empty transaction.sourceProviderFields[9].fieldValue}"><dd>fax: <span class="tel">${transaction.sourceProviderFields[9].fieldValue}</span></dd></c:if>
+                                               </dl>
+                                            </c:when>
                                             <c:when test="${not empty providers}">
-                                                <dl>
+                                                <dl id="fromOrgProviderChoose">
                                                     <dd>
                                                         Choose Provider: 
                                                         <select class="form-control" id="orgProvider">
@@ -113,6 +127,19 @@
                                             <form:hidden id="provider_${providerInfo.fieldNo}" path="sourceProviderFields[${sp.index}].fieldValue" value="" />
                                             <form:hidden path="sourceProviderFields[${sp.index}].fieldNo" />
                                         </c:forEach>
+                                       <div id="fromorgProvider" style="display:none">
+                                           <h4 class="form-section-heading">Originating Organization Provider:  - <a href="javascript:void(0)" title="Change selected provider." id="fromOrgProviderChange">Change</a></h4>
+                                           <dl class="vcard">
+                                               <dd class="fn" id="fromOrgProviderName"></dd>
+                                               <dd class="adr">
+                                                <span class="street-address" id="fromOrgProviderLine1"></span><br/>
+                                                <span class="street-address" id="fromOrgProviderLine2"></span><br/>
+                                                <span class="region" id="fromOrgProviderRegion"></span>, <span class="postal-code" id="fromOrgProviderZip"></span>
+                                               </dd>
+                                               <dd id="fromOrgProviderPhone"></dd>
+                                               <dd id="fromOrgProviderFax"></dd>
+                                           </dl>
+                                       </div>
                                     </div>
                                     <div class="col-md-6">
                                         <h4 class="form-section-heading">Recipient Organization:</h4>

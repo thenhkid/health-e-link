@@ -92,25 +92,77 @@ $(document).ready(function() {
     //Function to go get providers as the user types in letters
     $(document).on('change', '#orgProvider', function() {
         
-        $.ajax({
-            url: '../populateProvider.do',
-            type: 'GET',
-            data: {'providerId': $(this).val()},
-            success: function(data) {
-                //fields 9 - 18
-                $('#provider_9').val(data.firstName);
-                $('#provider_10').val(data.lastName);
-                $('#provider_11').val("");//Provider ID
-                $('#provider_12').val("");//Provider Address
-                $('#provider_13').val("");//Provider Address 2
-                $('#provider_14').val("");//Provider City
-                $('#provider_15').val("");//Provider State
-                $('#provider_16').val("");//Provider Zip
-                $('#provider_17').val("");//Provider Phone
-                $('#provider_18').val("");//Provider Fax
-            }
-        });
+        if($(this).val() > 0) {
+            $.ajax({
+                url: '../populateProvider.do',
+                type: 'GET',
+                data: {'providerId': $(this).val()},
+                success: function(data) {
+                    //fields 9 - 18
+                    $('#provider_9').val(data.firstName);
+                    $('#provider_10').val(data.lastName);
+
+                    if(data.providerAddresses.length > 0) {
+                        $('#provider_12').val(data.providerAddresses[0].line1);
+                        $('#provider_13').val(data.providerAddresses[0].line2);
+                        $('#provider_14').val(data.providerAddresses[0].city);
+                        $('#provider_15').val(data.providerAddresses[0].state);
+                        $('#provider_16').val(data.providerAddresses[0].postalCode);
+                        $('#provider_17').val(data.providerAddresses[0].phone1);
+                        $('#provider_18').val(data.providerAddresses[0].fax);
+                    }
+
+                    if(data.providerIds.length > 0) {
+                         $('#provider_11').val(data.providerIds[0].idNum);
+                    }
+                    $('#fromOrgProviderName').html(data.firstName+" "+data.lastName);
+                    $('#fromOrgProviderLine1').html(data.providerAddresses[0].line1);
+                    $('#fromOrgProviderLine2').html(data.providerAddresses[0].line2);
+                    $('#fromOrgProviderRegion').html(data.providerAddresses[0].city+" "+data.providerAddresses[0].state);
+                    $('#fromOrgProviderZip').html(data.providerAddresses[0].postalCode);
+                    if(data.providerAddresses[0].phone1 != "") {
+                        $('#fromOrgProviderPhone').html("phone: <span class='tel' >"+data.providerAddresses[0].phone1+"</span>");
+                    }
+                    if(data.providerAddresses[0].fax != "") {
+                        $('#fromOrgProviderFax').html("fax: <span class='tel'>"+data.providerAddresses[0].fax+"</span>");
+                    }
+                    $('#fromorgProvider').show();
+                    $('#fromOrgProviderChoose').hide();
+                }
+            });
+        }
+        else {
+            $('#provider_9').val("");
+            $('#provider_10').val("");
+            $('#provider_11').val("");
+            $('#provider_12').val("");
+            $('#provider_13').val("");
+            $('#provider_14').val("");
+            $('#provider_15').val("");
+            $('#provider_16').val("");
+            $('#provider_17').val("");
+            $('#provider_18').val("");
+            $('#fromorgProvider').hide();
+        }
         
+    });
+    
+    //Function hide the selected provider and show the provider
+    //drop down.
+    $(document).on('click', '#fromOrgProviderChange', function() {
+        $('#provider_9').val("");
+        $('#provider_10').val("");
+        $('#provider_11').val("");
+        $('#provider_12').val("");
+        $('#provider_13').val("");
+        $('#provider_14').val("");
+        $('#provider_15').val("");
+        $('#provider_16').val("");
+        $('#provider_17').val("");
+        $('#provider_18').val("");
+        $('#fromorgProvider').hide();
+        $('#orgProvider').val("");
+        $('#fromOrgProviderChoose').show();
     });
     
 
