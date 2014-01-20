@@ -13,6 +13,7 @@ import com.ut.dph.model.transactionAttachment;
 import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionInRecords;
 import com.ut.dph.model.transactionTarget;
+import com.ut.dph.model.custom.ConfigForInsert;
 import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -78,4 +79,10 @@ public interface transactionInManager {
     
     boolean processTransactions(int batchUploadId);
     
+    boolean insertToMessageTables(ConfigForInsert configForInsert);
+    
+    ConfigForInsert setConfigForInsert(ConfigForInsert configForInsert);
+    
+    List <Integer> getConfigIdsForBatch (int batchUploadId);
+       
 }

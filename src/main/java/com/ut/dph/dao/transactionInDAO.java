@@ -72,4 +72,6 @@ public interface transactionInDAO {
     List<transactionAttachment> getAttachmentsByTransactionId(int transactionInId);
     
     void removeAttachmentById(int attachmentId);
+    
+    List <Integer> getConfigIdsForBatch (int batchUploadId);
 }

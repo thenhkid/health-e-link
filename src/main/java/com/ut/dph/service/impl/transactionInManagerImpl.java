@@ -14,6 +14,7 @@ import com.ut.dph.model.transactionAttachment;
 import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionInRecords;
 import com.ut.dph.model.transactionTarget;
+import com.ut.dph.model.custom.ConfigForInsert;
 import com.ut.dph.reference.fileSystem;
 import org.springframework.stereotype.Service;
 import com.ut.dph.service.transactionInManager;
@@ -265,9 +266,61 @@ public class transactionInManagerImpl implements transactionInManager {
 
     
 
+    /**
+     * This method needs to take in a batchUploadId and process the batch all the way to 
+     * inserting into message tables
+     * If any steps fails, we revert and note the error
+     * 
+     * 
+     * Last Step - insert all transactions with RP (10) status and batch status of SRP (5)
+     * for a batch
+     **/
+    
 	@Override
 	public boolean processTransactions(int batchUploadId) {
+		
+		
+		/**from here we get insert statements ready and insert**/
+		List<Integer> configIds = getConfigIdsForBatch(batchUploadId);
+		/**loop each configId and prep sqls**/
+		for (int i=0;i<=configIds.size();i++) {
+			/** separate out the transactionIds for the one that need to loop**/
+			ConfigForInsert config = new ConfigForInsert();
+			config.setBatchUploadId(batchUploadId);
+			config.setConfigId(i);
+			/**call sp to grab config info**/
+		}
+		
+		
+		return false;
+	}
+
+	/** 
+	 *  These are ready records
+	 * 	We will insert by configId
+	 *  All the values for being inserted into the same field would have been appended to
+	 *  the first field Id 
+	 * **/
+	@Override
+	public boolean insertToMessageTables(ConfigForInsert configForInsert) {
 		// TODO Auto-generated method stub
 		return false;
 	}
+
+	@Override
+	public ConfigForInsert setConfigForInsert(ConfigForInsert configForInsert) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<Integer> getConfigIdsForBatch(int batchUploadId) {
+		transactionInDAO.getConfigIdsForBatch(batchUploadId);
+		return null;
+	}
+
+
+
+	
+	
 }

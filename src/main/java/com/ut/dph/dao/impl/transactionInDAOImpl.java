@@ -688,5 +688,30 @@ public class transactionInDAOImpl implements transactionInDAO {
         deletAttachment.executeUpdate();
         
     }
+
+    /**
+     * The 'getConfigIdsForBatch' function will return a list of configurations for a batch
+     * 
+     * @param batchUploadId  The id of the attachment to be removed
+     * 
+     * @table transactionTranslatedIn
+     * 
+     * @return This function will return a list of configIds (Integer)
+     */
+    
+    @Override
+	@Transactional
+	@SuppressWarnings("unchecked")
+	public List<Integer> getConfigIdsForBatch(int batchUploadId) {
+		
+    String sql = ("select distinct configId from transactionTranslatedIn where transactionInId in (select transactionInId from transactionIn where batchId = :id);");
+        
+	Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+              query.setParameter("id", batchUploadId);
+			
+	List <Integer> configIds =  query.list();
+
+        return configIds;
+	}
     
 }

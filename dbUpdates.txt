@@ -249,6 +249,12 @@ ALTER TABLE `universalTranslator`.`users`
 ADD COLUMN `createAuthority` BIT(1) NOT NULL DEFAULT b'0' AFTER `editAuthority`,
 ADD COLUMN `cancelAuthority` BIT(1) NOT NULL DEFAULT b'0' AFTER `createAuthority`;
 
+/** 1.19.2014 Grace **/
+
+CREATE FUNCTION strSplit(x varchar(255), delim varchar(12), pos int) returns varchar(255)
+return replace(substring(substring_index(x, delim, pos), 
+length(substring_index(x, delim, pos - 1)) + 1), delim, '');
+
 
 
 
