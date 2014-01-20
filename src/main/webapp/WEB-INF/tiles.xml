@@ -367,6 +367,7 @@
     <definition name="/Health-e-Web/sentmessageDetails" extends="base.definition.frontEnd">
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Health-e-Web&amp;page=sent" />
         <put-attribute name="body" value="/WEB-INF/jsp/Health-e-Web/sentmessageDetails.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/front-end/Health-e-Web/sentDetails.js" />
     </definition>
     
     
