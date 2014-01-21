@@ -41,13 +41,24 @@
                             <label for="type">Configuration Type * <span class="badge badge-help" data-placement="top" title="" data-original-title="Select &quot;For Source&quot; if this is for sending a message and &quot;For Target&quot; if this is for receiving a message">?</span></label>
                             <div>
                                 <label class="radio-inline">
-                                    <form:radiobutton id="type" path="type" value="1" disabled="${configurationDetails.id == 0 ? 'false' : 'true' }"/> For Source Organization 
+                                    <form:radiobutton id="type" path="type" value="1" class="type" disabled="${configurationDetails.id == 0 ? 'false' : 'true' }"/> For Source Organization 
                                 </label>
                                 <label class="radio-inline">
-                                    <form:radiobutton id="type" path="type" value="2" disabled="${configurationDetails.id == 0 ? 'false' : 'true' }"/> For Target Organization
+                                    <form:radiobutton id="type" path="type" value="2" class="type" disabled="${configurationDetails.id == 0 ? 'false' : 'true' }"/> For Target Organization
                                 </label>
                             </div>
                         </div>
+                        <div id="sourceTypeDiv" class="form-group" style="display:${configurationDetails.type == 1 ? 'block' : 'none'}">
+                            <label for="type">Source Type * </label>
+                            <div>
+                                <label class="radio-inline">
+                                    <form:radiobutton id="sourceType" path="sourceType" value="1" disabled="${configurationDetails.id == 0 ? 'false' : 'true' }"/> Originating Message 
+                                </label>
+                                <label class="radio-inline">
+                                    <form:radiobutton id="sourceType" path="sourceType"  value="2" disabled="${configurationDetails.id == 0 ? 'false' : 'true' }"/> Feedback Report
+                                </label>
+                            </div>
+                        </div>        
                         <spring:bind path="orgId">
                             <div id="orgDiv" class="form-group ${status.error ? 'has-error' : '' }">
                                 <label class="control-label" for="organization">Organization *</label>

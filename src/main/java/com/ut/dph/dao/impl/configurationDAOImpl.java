@@ -778,6 +778,7 @@ public class configurationDAOImpl implements configurationDAO {
         */
         Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configuration.class);
         criteria.add(Restrictions.eq("status", true));
+        criteria.add(Restrictions.eq("sourceType", 1));
         criteria.add(Restrictions.and(
                 Restrictions.in("id", ergConfigList)
         ));

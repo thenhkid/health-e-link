@@ -62,6 +62,9 @@ public class configuration {
     @Column(name = "CONFIGNAME", nullable = false)
     private String configName;
     
+    @Column(name = "SOURCETYPE", nullable = false)
+    private int sourceType = 1;
+    
     
     public int getId() {
         return id;
@@ -166,6 +169,14 @@ public class configuration {
     
     public String getconfigName() {
         return configName;
+    }
+    
+    public void setsourceType(int sourceType) {
+        this.sourceType = sourceType;
+    }
+    
+    public int getsourceType() {
+        return sourceType;
     }
     
 }

@@ -281,4 +281,10 @@ end proc_main$$
 call setSqlForConfig(15, 17);
 
 
+/* 1.21.2014 Chad @ 10:30 AM */
+ALTER TABLE `universalTranslator`.`configurations` 
+ADD COLUMN `sourceType` SMALLINT NOT NULL DEFAULT '1' COMMENT '1 = Originating Message\n2 = Feedback Report' AFTER `configName`;
+
+
+
 
