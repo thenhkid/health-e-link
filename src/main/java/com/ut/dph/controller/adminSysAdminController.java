@@ -72,9 +72,6 @@ public class adminSysAdminController {
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public ModelAndView dashboard(HttpServletRequest request, HttpServletResponse response) throws Exception {
     	
-    	transactionInManager.processTransactions(17);
-    	
-    	
     	ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/sysadmin/dashboard");
         /**set totals**/
