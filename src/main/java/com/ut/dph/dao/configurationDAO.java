@@ -40,6 +40,8 @@ public interface configurationDAO {
   @SuppressWarnings("rawtypes")
   List getFileTypes();
   
+  String getFileTypesById(int id);
+  
   List<configurationDataTranslations> getDataTranslations(int configId);
   
   String getFieldName(int fieldId);
@@ -70,7 +72,7 @@ public interface configurationDAO {
   
   void updateMessageSpecs(configurationMessageSpecs messageSpecs, int transportDetailId, int clearFields);
   
-  List<configuration> getActiveERGConfigurationsByUserId(int userId);
+  List<configuration> getActiveConfigurationsByUserId(int userId, int transportMethod);
   
   List<configurationConnectionSenders> getConnectionSenders(int connectionId);
   

@@ -126,6 +126,12 @@ public class configurationManagerImpl implements configurationManager {
     public List getFileTypes() {
         return configurationDAO.getFileTypes();
     }
+    
+    @Override
+    @Transactional
+    public String getFileTypesById(int id) {
+        return configurationDAO.getFileTypesById(id);
+    }
 
     @Override
     @Transactional
@@ -213,8 +219,8 @@ public class configurationManagerImpl implements configurationManager {
     
     @Override
     @Transactional
-    public List<configuration> getActiveERGConfigurationsByUserId(int userId) {
-        return configurationDAO.getActiveERGConfigurationsByUserId(userId);
+    public List<configuration> getActiveConfigurationsByUserId(int userId, int transportMethod) {
+        return configurationDAO.getActiveConfigurationsByUserId(userId,transportMethod);
     }
     
     @Override

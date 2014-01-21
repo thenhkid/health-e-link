@@ -156,7 +156,7 @@ public class HealtheWebController {
         
         /** Need to get all the message types set up for the user */
         User userInfo = (User)session.getAttribute("userDetails");
-        List<configuration> configurations = configurationManager.getActiveERGConfigurationsByUserId(userInfo.getId());
+        List<configuration> configurations = configurationManager.getActiveConfigurationsByUserId(userInfo.getId(), 2);
         
         
         for (configuration config : configurations) {

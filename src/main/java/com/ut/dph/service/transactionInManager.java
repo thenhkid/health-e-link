@@ -86,5 +86,7 @@ public interface transactionInManager {
     List <Integer> getConfigIdsForBatch (int batchUploadId);
     
     List <Integer> getTransWithSingleValues (String checkDelim, int batchUploadId, int configId);
+    
+    List <Integer> uploadBatchFile(int configId, MultipartFile fileUpload);
        
 }

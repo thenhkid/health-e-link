@@ -42,7 +42,7 @@
                                                 <li>
                                                     <c:choose>
                                                         <c:when test="${sections.featureId == 3}"><a href="<c:url value='/Health-e-Web/inbox'/>" title="Health-e-Web">Health-e-Web</a></c:when>
-                                                        <c:when test="${sections.featureId == 4}"><a href="<c:url value='/Health-e-Connect'/>" title="Health-e-Connect">Health-e-Connect</a></c:when>
+                                                        <c:when test="${sections.featureId == 4}"><a href="<c:url value='/Health-e-Connect/upload'/>" title="Health-e-Connect">Health-e-Connect</a></c:when>
                                                     </c:choose>
                                                 </li>
                                             </c:forEach> 
@@ -95,6 +95,7 @@
                 <div class="container">
                     <c:choose>
                         <c:when test="${param['page-section'] == 'Health-e-Web'}"><h1 class="page-title"><span class="page-title-icon pull-left"></span>Health-e-Web</h1></c:when>
+                        <c:when test="${param['page-section'] == 'Health-e-Connect'}"><h1 class="page-title"><span class="page-title-icon pull-left"></span>Health-e-Connect</h1></c:when>
                         <c:otherwise><h1 class="page-title">${pageTitle}</h1></c:otherwise>
                     </c:choose>
                 </div>   
@@ -120,6 +121,16 @@
                                 </li>
                             </ul>
                         </c:if>
+                    </div>
+                </nav>
+            </c:when>
+            <c:when test="${param['page-section'] == 'Health-e-Connect'}">
+                <nav class="navbar navbar-default actions-nav" role="navigation">
+                    <div class="container">
+                        <ul class="nav navbar-nav navbar-actions">
+                           <li ${param['page'] == 'upload' ? 'class="active"' : ''}><a href="<c:url value='/Health-e-Connect/upload'/>" title="Upload New File" class="btn btn-link"><span class="glyphicon glyphicon-upload"></span>&nbsp; Upload Files</a><span class="indicator-active arrow-up"></span></li>
+                           <li ${param['page'] == 'audit' ? 'class="active"' : ''}><a href="<c:url value='/Health-e-Connect/audit-reports'/>" title="View Audit Reports" class="btn btn-link"><span class="glyphicon glyphicon-calendar"></span>&nbsp; Audit Reports</a><span class="indicator-active arrow-up"></span></li>
+                        </ul>
                     </div>
                 </nav>
             </c:when>

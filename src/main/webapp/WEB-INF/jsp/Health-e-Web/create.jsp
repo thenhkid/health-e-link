@@ -10,6 +10,7 @@
         <div class="col-md-12 page-content">
             <ol class="breadcrumb">
                 <li><a href="<c:url value='/profile'/>">My Account</a></li>
+                <li><a href="#">eRG</a></li>
                 <li class="active">Available Message Types</li>
             </ol>
             <form action="create/details" id="createMessageForm" method="post">
