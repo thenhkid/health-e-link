@@ -255,7 +255,7 @@ CREATE FUNCTION strSplit(x varchar(255), delim varchar(12), pos int) returns var
 return replace(substring(substring_index(x, delim, pos), 
 length(substring_index(x, delim, pos - 1)) + 1), delim, '');
 
-/** 1.20.2014 **/
+/** 1.20.2014 grace **/
 drop procedure if exists setSqlForConfig;
 
 delimiter $$
@@ -267,7 +267,7 @@ as (select min(fieldNo) as fieldNo, saveToTableName, savetotablecol, configId, b
 from configurationFormFields where configId = inConfigId
 group by savetotablecol, saveToTableName);
 SELECT  batchuploadId, saveToTableName, 
-group_concat(distinct savetotablecol ORDER BY savetotablecol SEPARATOR ',') as saveToColName,
+group_concat(distinct savetotablecol ORDER BY savetotablecol SEPARATOR ',') as savetotablecol,
 group_concat( concat('F',fieldNo) ORDER BY fieldNo SEPARATOR ',') as singleValueFields, 
 group_concat( concat('strSplit(F',fieldNo, ', ''||^||'',@valPos)') ORDER BY fieldNo SEPARATOR ',') as splitFields, 
 group_concat( concat('F',fieldNo, ' like ''''%||^||%''''') ORDER BY fieldNo SEPARATOR ' or ') as checkForDelim,
@@ -278,6 +278,7 @@ GROUP BY saveToTableName
 ORDER BY saveToTableName;
 end proc_main$$
 
+call setSqlForConfig(15, 17);
 
 
 
