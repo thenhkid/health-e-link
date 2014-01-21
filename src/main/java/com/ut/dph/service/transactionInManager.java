@@ -84,5 +84,7 @@ public interface transactionInManager {
     List <ConfigForInsert> setConfigForInsert(int configId, int batchUploadId);
     
     List <Integer> getConfigIdsForBatch (int batchUploadId);
+    
+    List <Integer> getTransWithSingleValues (String checkDelim, int batchUploadId, int configId);
        
 }

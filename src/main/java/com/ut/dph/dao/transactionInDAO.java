@@ -78,4 +78,6 @@ public interface transactionInDAO {
     List <Integer> getConfigIdsForBatch (int batchUploadId);
     
     List <ConfigForInsert> setConfigForInsert(int configId, int batchUploadId);
+    
+    List<Integer> getTransWithSingleValues(String checkDelim, int batchUploadId, int configId);
 }

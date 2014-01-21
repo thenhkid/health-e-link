@@ -272,43 +272,25 @@ public class transactionInManagerImpl implements transactionInManager {
      */
     @Override
     public boolean processTransactions(int batchUploadId) {
-
+    	/**
+    	 * Check for R/O
+    	 * Apply CW/Macros
+    	 */
+    	
+    	
         /**
          * from here we get insert statements ready and insert*
          */
-        List<Integer> configIds = getConfigIdsForBatch(batchUploadId);
-        /**
-         * loop each configId and prep sqls*
-         */
-        
-        /* Grace: Here is a faster way to loop */
-        for(Integer configId : configIds) {
-             /**
-             * separate out the transactionIds for the one that need to loop*
-             */
-            ConfigForInsert config = new ConfigForInsert();
-            config.setBatchUploadId(batchUploadId);
-            config.setConfigId(configId);
-            /**
-             * call sp to grab config info*
-             */
-        }
-        
-        /** Old way **/
-        /*
-        for (int i = 0; i <= configIds.size(); i++) {
-            
-             * separate out the transactionIds for the one that need to loop*
-            
-            ConfigForInsert config = new ConfigForInsert();
-            config.setBatchUploadId(batchUploadId);
-            config.setConfigId(i);
-            
-             * call sp to grab config info*
+         List<Integer> configIds = getConfigIdsForBatch(batchUploadId);
+         for(Integer configId : configIds) {
+            /** this list have the insert /check statements for each message table **/
+        	 List <ConfigForInsert> configs = setConfigForInsert(configId, batchUploadId);
+             /** we grab the transactions that has multiple values, we set it to a list **/
+        	 
+        	 /** we straight insert the ones that are one **/
             
         }
-       */
-
+        
         return false;
     }
 
@@ -332,5 +314,14 @@ public class transactionInManagerImpl implements transactionInManager {
 	public List<Integer> getConfigIdsForBatch(int batchUploadId) {
 		return transactionInDAO.getConfigIdsForBatch(batchUploadId);
 	}
+
+	@Override
+	public List<Integer> getTransWithSingleValues(String checkDelim,
+			int batchUploadId, int configId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	
 
 }

@@ -17,7 +17,6 @@ import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionInRecords;
 import com.ut.dph.model.transactionTarget;
 import com.ut.dph.model.custom.ConfigForInsert;
-import com.ut.dph.model.custom.LookUpTable;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -688,14 +687,12 @@ public class transactionInDAOImpl implements transactionInDAO {
         return configIds;
 	}
     
-}
-	}
 
     @Override
 	@Transactional
 	@SuppressWarnings("unchecked")
 	public List <ConfigForInsert> setConfigForInsert(int configId, int batchUploadId) {
-		String sql = ("call setSqlForConfig(:id);");
+		String sql = ("call setSqlForConfig(:id, :batchUploadId);");
         Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
         		.addScalar("saveToTableName", StandardBasicTypes.STRING)
 				.addScalar("saveToTableCol", StandardBasicTypes.STRING)
@@ -703,13 +700,31 @@ public class transactionInDAOImpl implements transactionInDAO {
 				.addScalar("configId", StandardBasicTypes.INTEGER)
 				.addScalar("singleValueFields", StandardBasicTypes.STRING)
 				.addScalar("splitFields", StandardBasicTypes.STRING)
+				.addScalar("checkForDelim", StandardBasicTypes.STRING)
 				.setResultTransformer(
 				Transformers.aliasToBean(ConfigForInsert.class))
-				.setParameter("id", configId);
+				.setParameter("id", configId)
+				.setParameter("batchUploadId", batchUploadId);
         
         List <ConfigForInsert> configListForInsert = query.list();
 		
 		return configListForInsert;
+	}
+
+	@Override
+	public List<Integer> getTransWithSingleValues(String checkDelim,
+			int batchUploadId, int configId) {
+		
+			String sql = ("");
+
+	        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+	        query.setParameter("configId", configId);
+	        query.setParameter("batchUploadId", batchUploadId);
+
+	        List<Integer> transId = query.list();
+
+	        return transId;
+		
 	}
     
 }
