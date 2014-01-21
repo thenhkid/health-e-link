@@ -27,6 +27,21 @@ $(function() {
             $("#configuration").submit();
         }
     });
+    
+    //When teh Configuration type changes need to show the
+    //source type field only if the config type is a source
+    $('.type').change(function(event) {
+        
+        if($(this).val() == 2) {
+            $('#sourceTypeDiv').hide();
+            $('input:radio[id="sourceType"]').get(0).checked = true;
+        }
+        else {
+           $('#sourceTypeDiv').show();
+           $('input:radio[id="sourceType"]').get(0).checked = true;
+        }
+        
+    });
 
 });
 
