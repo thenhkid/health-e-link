@@ -13,6 +13,8 @@ import com.ut.dph.model.transactionAttachment;
 import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionInRecords;
 import com.ut.dph.model.transactionTarget;
+import com.ut.dph.model.custom.ConfigForInsert;
+
 import java.util.List;
 
 /**
@@ -74,4 +76,6 @@ public interface transactionInDAO {
     void removeAttachmentById(int attachmentId);
     
     List <Integer> getConfigIdsForBatch (int batchUploadId);
+    
+    List <ConfigForInsert> setConfigForInsert(int configId, int batchUploadId);
 }

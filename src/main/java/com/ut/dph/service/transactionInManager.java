@@ -81,7 +81,7 @@ public interface transactionInManager {
     
     boolean insertToMessageTables(ConfigForInsert configForInsert);
     
-    ConfigForInsert setConfigForInsert(ConfigForInsert configForInsert);
+    List <ConfigForInsert> setConfigForInsert(int configId, int batchUploadId);
     
     List <Integer> getConfigIdsForBatch (int batchUploadId);
        

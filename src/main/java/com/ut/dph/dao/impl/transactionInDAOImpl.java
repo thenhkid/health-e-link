@@ -17,14 +17,20 @@ import com.ut.dph.model.transactionAttachment;
 import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionInRecords;
 import com.ut.dph.model.transactionTarget;
+import com.ut.dph.model.custom.ConfigForInsert;
+import com.ut.dph.model.custom.LookUpTable;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.Transformers;
+import org.hibernate.type.StandardBasicTypes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -712,6 +718,27 @@ public class transactionInDAOImpl implements transactionInDAO {
 	List <Integer> configIds =  query.list();
 
         return configIds;
+	}
+
+    @Override
+	@Transactional
+	@SuppressWarnings("unchecked")
+	public List <ConfigForInsert> setConfigForInsert(int configId, int batchUploadId) {
+		String sql = ("call setSqlForConfig(:id);");
+        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
+        		.addScalar("saveToTableName", StandardBasicTypes.STRING)
+				.addScalar("saveToTableCol", StandardBasicTypes.STRING)
+				.addScalar("batchUploadId", StandardBasicTypes.INTEGER)
+				.addScalar("configId", StandardBasicTypes.INTEGER)
+				.addScalar("singleValueFields", StandardBasicTypes.STRING)
+				.addScalar("splitFields", StandardBasicTypes.STRING)
+				.setResultTransformer(
+				Transformers.aliasToBean(ConfigForInsert.class))
+				.setParameter("id", configId);
+        
+        List <ConfigForInsert> configListForInsert = query.list();
+		
+		return configListForInsert;
 	}
     
 }

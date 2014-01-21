@@ -16,14 +16,19 @@ import com.ut.dph.model.transactionInRecords;
 import com.ut.dph.model.transactionTarget;
 import com.ut.dph.model.custom.ConfigForInsert;
 import com.ut.dph.reference.fileSystem;
+
 import org.springframework.stereotype.Service;
+
 import com.ut.dph.service.transactionInManager;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.LinkedList;
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -279,16 +284,23 @@ public class transactionInManagerImpl implements transactionInManager {
 	@Override
 	public boolean processTransactions(int batchUploadId) {
 		
+		/**many methods here
+		 * 1. check r/o
+		 * 2. apply cw/macros**/
+		
 		
 		/**from here we get insert statements ready and insert**/
 		List<Integer> configIds = getConfigIdsForBatch(batchUploadId);
+		List <ConfigForInsert> configLists = new LinkedList();
 		/**loop each configId and prep sqls**/
 		for (int i=0;i<=configIds.size();i++) {
 			/** separate out the transactionIds for the one that need to loop**/
 			ConfigForInsert config = new ConfigForInsert();
-			config.setBatchUploadId(batchUploadId);
-			config.setConfigId(i);
 			/**call sp to grab config info**/
+			configLists = setConfigForInsert(configIds.get(i), batchUploadId);
+			
+			/**we take config and loop through tables and insert **/
+			
 		}
 		
 		
@@ -308,15 +320,14 @@ public class transactionInManagerImpl implements transactionInManager {
 	}
 
 	@Override
-	public ConfigForInsert setConfigForInsert(ConfigForInsert configForInsert) {
-		// TODO Auto-generated method stub
-		return null;
+	public List <ConfigForInsert> setConfigForInsert(int configId, int batchUploadId) {
+		// we call sp and set the parameters here
+		return transactionInDAO.setConfigForInsert(configId, batchUploadId);	
 	}
 
 	@Override
 	public List<Integer> getConfigIdsForBatch(int batchUploadId) {
-		transactionInDAO.getConfigIdsForBatch(batchUploadId);
-		return null;
+		return transactionInDAO.getConfigIdsForBatch(batchUploadId);
 	}
 
 

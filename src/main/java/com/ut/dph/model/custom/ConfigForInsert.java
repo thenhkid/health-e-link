@@ -23,9 +23,10 @@ public class ConfigForInsert {
 	String singleValueFields;
 	/** when we concatenated the string and have to loop through each transaction to insert**/
 	String splitFields;
+	String checkForDelim;
 	List <Integer> loopTransIds;
 	List <Integer> transactionInIds;
-	String checkForDelim;
+	
 	public int getBatchUploadId() {
 		return batchUploadId;
 	}

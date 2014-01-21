@@ -13,6 +13,7 @@ import com.ut.dph.reference.USStateList;
 import com.ut.dph.reference.ProcessCategoryList;
 import com.ut.dph.service.configurationManager;
 import com.ut.dph.service.sysAdminManager;
+import com.ut.dph.service.transactionInManager;
 import com.ut.dph.model.Macros;
 import com.ut.dph.model.custom.LogoInfo;
 import com.ut.dph.model.custom.LookUpTable;
@@ -52,6 +53,11 @@ public class adminSysAdminController {
 	private configurationManager configurationmanager;
 	
 	@Autowired private ServletContext servletContext;
+	
+	@Autowired
+	private transactionInManager transactionInManager;
+
+	
 	/**
 	 * The private maxResults variable will hold the number of results to show per
 	 * list page.
@@ -65,8 +71,11 @@ public class adminSysAdminController {
 	 * **/
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public ModelAndView dashboard(HttpServletRequest request, HttpServletResponse response) throws Exception {
-
-        ModelAndView mav = new ModelAndView();
+    	
+    	transactionInManager.processTransactions(17);
+    	
+    	
+    	ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/sysadmin/dashboard");
         /**set totals**/
         int totalLookUpTables = sysAdminManager.findTotalLookUpTable();
