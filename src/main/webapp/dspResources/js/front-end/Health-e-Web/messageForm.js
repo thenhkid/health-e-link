@@ -16,7 +16,7 @@ $(document).ready(function() {
        $('#action').val(clickedBtn);
        
        //Only check form fields if Sending or Releasing the message
-       if(clickedBtn != 'save') {
+       if(clickedBtn !== 'save') {
             errorsFound = checkFormFields();
             
             if(errorsFound == 0) {
@@ -165,7 +165,14 @@ $(document).ready(function() {
         $('#fromOrgProviderChoose').show();
     });
     
-
+    //Function to handle the form actions
+    $(document).on('change','#formAction',function() {
+        
+        if($(this).val() === 'print') {
+            window.print();
+        }
+        
+    })
 
 });
 
