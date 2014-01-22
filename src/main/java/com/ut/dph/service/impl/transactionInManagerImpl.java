@@ -32,8 +32,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.commons.io.FilenameUtils;
 
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -291,34 +291,38 @@ public class transactionInManagerImpl implements transactionInManager {
     	/**
     	 * Check for R/O
     	 * Apply CW/Macros
+    	 * Apply method to concat values for the same saveToTableCol using delimiter ||^||
     	 */
-    	
-    	
-        /**
+    	/**
          * from here we get insert statements ready and insert*
          */
          List<Integer> configIds = getConfigIdsForBatch(batchUploadId);
          for(Integer configId : configIds) {
             /** this list have the insert /check statements for each message table **/
-        	 List <ConfigForInsert> configs = setConfigForInsert(configId, batchUploadId);
-             /** we grab the transactions that has multiple values, we set it to a list **/
+        	 List <ConfigForInsert> configforConfigIds = setConfigForInsert(configId, batchUploadId);
+             /** we loop though each table and 
+              *  grab the transactions that has multiple values for that table, we set it to a list 
+              *  **/
+        	 for(ConfigForInsert config : configforConfigIds) {
+        		 /**we grab list of ids with multiple for this config
+        		  * we use the checkDelim string to check
+        		  *  **/
+        		 List<Integer> transIds = getTransWithMultiValues(config);
+        		 config.setLoopTransIds(transIds);
+        		
+        		 /** we insert single values **/
+        		 insertSingleToMessageTables(config);
+        		 
+        		 /** we loop through multi values and use SP to loop delimiter **/
+        		 
+        		 
+        	 }
         	 
-        	 /** we straight insert the ones that are one **/
             
         }
-        
         return false;
     }
 
-    /**
-     * These are ready records We will insert by configId All the values for being inserted into the same field would have been appended to the first field Id 
-	 * *
-     */
-    @Override
-    public boolean insertToMessageTables(ConfigForInsert configForInsert) {
-        // TODO Auto-generated method stub
-        return false;
-    }
 
 	@Override
 	public List <ConfigForInsert> setConfigForInsert(int configId, int batchUploadId) {
@@ -363,8 +367,9 @@ public class transactionInManagerImpl implements transactionInManager {
 			System.out.println("clearMessageTables " + e.getStackTrace());
 			
 		}
+	}
 		
-		/**
+	    /**
 	     * The 'uploadBatchFile' function will take in the file and orgName and upload the file to the appropriate file on the file system. 
 	     * The function will run the file through various validations. If a single validation fails the batch will be put in a error
 	     * validation status and the file will be removed from the system. The user will receive an  error message on the screen letting them 
@@ -386,10 +391,10 @@ public class transactionInManagerImpl implements transactionInManager {
 	        
 	        configuration configDetails = configurationManager.getConfigurationById(configId);
 	        configurationTransport transportDetails = configurationtransportmanager.getTransportDetails(configId);
-
+	 
 	        MultipartFile file = fileUpload;
 	        String fileName = file.getOriginalFilename();
-
+	 
 	        InputStream inputStream = null;
 	        OutputStream outputStream = null;
 	        
@@ -401,20 +406,20 @@ public class transactionInManagerImpl implements transactionInManager {
 	        */
 	        
 	        List <Integer> errorCodes = new ArrayList<Integer>();
-
+	 
 	        try {
 	            inputStream = file.getInputStream();
 	            File newFile = null;
-
+	 
 	            //Set the directory to save the brochures to
 	            fileSystem dir = new fileSystem();
 	            
 	            String filelocation = transportDetails.getfileLocation();
 	            filelocation = filelocation.replace("/bowlink/","");
 	            dir.setDirByName(filelocation);
-
+	 
 	            newFile = new File(dir.getDir() + fileName);
-
+	 
 	            if (newFile.exists()) {
 	                int i = 1;
 	                while (newFile.exists()) {
@@ -459,25 +464,23 @@ public class transactionInManagerImpl implements transactionInManager {
 	            if (delimCount < 10) {
 	                errorCodes.add(4);
 	            }
-
+	 
 	            outputStream = new FileOutputStream(newFile);
 	            int read = 0;
 	            byte[] bytes = new byte[1024];
-
+	 
 	            while ((read = inputStream.read(bytes)) != -1) {
 	                outputStream.write(bytes, 0, read);
 	            }
 	            outputStream.close();
-
+	 
 	            //Save the attachment
 	        } catch (IOException e) {
 	            e.printStackTrace();
 	        }
-
+	 
 	        return errorCodes;
 	        
-	    }		
-		
-	}
+	    }
 
 }
