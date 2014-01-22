@@ -31,7 +31,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.apache.commons.io.FilenameUtils;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -357,7 +359,7 @@ public class transactionInManagerImpl implements transactionInManager {
      * 
      */
     @Override
-    public List <Integer> uploadBatchFile(int configId, MultipartFile fileUpload) {
+    public Map<String,String> uploadBatchFile(int configId, MultipartFile fileUpload) {
         
         configuration configDetails = configurationManager.getConfigurationById(configId);
         configurationTransport transportDetails = configurationtransportmanager.getTransportDetails(configId);
@@ -375,7 +377,7 @@ public class transactionInManagerImpl implements transactionInManager {
             4 = Wrong delimiter
         */
         
-        List <Integer> errorCodes = new ArrayList<Integer>();
+        Map<String,String> batchFileResults = new HashMap<String,String>();
 
         try {
             inputStream = file.getInputStream();
@@ -389,30 +391,34 @@ public class transactionInManagerImpl implements transactionInManager {
             dir.setDirByName(filelocation);
 
             newFile = new File(dir.getDir() + fileName);
-
+            
             if (newFile.exists()) {
                 int i = 1;
                 while (newFile.exists()) {
                     int iDot = fileName.lastIndexOf(".");
                     newFile = new File(dir.getDir() + fileName.substring(0, iDot) + "_(" + ++i + ")" + fileName.substring(iDot));
+                    
                 }
                 fileName = newFile.getName();
+                newFile.createNewFile();
             } else {
                 newFile.createNewFile();
             }
+            
+            batchFileResults.put("fileName",fileName);
             
             /* Get the size of the file */
             double fileSizeMB = ((newFile.length() / 1024) / 1024);
             
              /* Make sure the file is not empty : ERROR CODE 1 */
             if(fileSizeMB == 0) {
-                errorCodes.add(1);
+                batchFileResults.put("emptyFile", "1");
             }
             
             /* Make sure file is the correct size : ERROR CODE 2 */
             double maxFileSize = (double) transportDetails.getmaxFileSize();
             if(fileSizeMB > maxFileSize) {
-                errorCodes.add(2);
+                batchFileResults.put("wrongSize", "2");
             }
             
             /* Make sure file is the correct file type : ERROR CODE 3 */
@@ -421,7 +427,7 @@ public class transactionInManagerImpl implements transactionInManager {
             String fileType = (String) configurationManager.getFileTypesById(transportDetails.getfileType());
             
             if(ext == null ? fileType != null : !ext.equals(fileType)) {
-                errorCodes.add(3);
+                batchFileResults.put("wrongFileType", "3");
             }
             
             /* Make sure the file has the correct delimiter : ERROR CODE 5 */
@@ -432,7 +438,7 @@ public class transactionInManagerImpl implements transactionInManager {
             int delimCount = (Integer) dir.checkFileDelimiter(dir, fileName, delimChar);
             
             if (delimCount < 10) {
-                errorCodes.add(4);
+               batchFileResults.put("wrongDelim", "4");
             }
 
             outputStream = new FileOutputStream(newFile);
@@ -449,7 +455,7 @@ public class transactionInManagerImpl implements transactionInManager {
             e.printStackTrace();
         }
 
-        return errorCodes;
+        return batchFileResults;
         
     }
 

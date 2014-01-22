@@ -16,6 +16,7 @@ import com.ut.dph.service.organizationManager;
 import com.ut.dph.service.transactionInManager;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -129,7 +130,7 @@ public class HealtheConnectController {
         configuration configDetails = configurationManager.getConfigurationById(configId);
         
         /* Upload the attachment */
-        List <Integer> errorCodes = transactionInManager.uploadBatchFile(configId, uploadedFile);
+        Map<String,String> batchResults = transactionInManager.uploadBatchFile(configId, uploadedFile);
         
         /* Need to add the file to the batchUploads table */
         /* Create the batch name (OrgId+MessageTypeId+Date/Time) */
@@ -144,14 +145,37 @@ public class HealtheConnectController {
         batchUpload.setutBatchName(batchName);
         batchUpload.settransportMethodId(1);
         batchUpload.setoriginalFileName(batchName);
+        batchUpload.setoriginalFileName(batchResults.get("fileName"));
         
         /* Set the status to the batch as SFV (Source Failed Validation) */
         batchUpload.setstatusId(1);
         
         Integer batchId = (Integer) transactionInManager.submitBatchUpload(batchUpload); 
         
+        List <Integer> errorCodes = new ArrayList<Integer>();
+        
+        Object emptyFileVal = batchResults.get("emptyFile");
+        if(emptyFileVal != null) {
+            errorCodes.add(1);
+        }
+        
+        Object wrongSizeVal = batchResults.get("wrongSize");
+        if(wrongSizeVal != null) {
+            errorCodes.add(2);
+        }
+        
+        Object wrongFileTypeVal = batchResults.get("wrongFileType");
+        if(wrongFileTypeVal != null) {
+            errorCodes.add(3);
+        }
+        
+        Object wrongDelimVal = batchResults.get("wrongDelim");
+        if(wrongDelimVal != null) {
+            errorCodes.add(4);
+        }
+        
         /* If Passed validation update the status to Source Submission Accepted */
-        if(errorCodes == null || 0 == errorCodes.size()) {
+        if(0 == errorCodes.size()) {
             /* Get the details of the batch */
             batchUploads batch = transactionInManager.getBatchDetails(batchId);
             batch.setstatusId(2);

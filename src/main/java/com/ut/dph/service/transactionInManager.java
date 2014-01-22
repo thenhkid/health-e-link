@@ -15,6 +15,7 @@ import com.ut.dph.model.transactionInRecords;
 import com.ut.dph.model.transactionTarget;
 import com.ut.dph.model.custom.ConfigForInsert;
 import java.util.List;
+import java.util.Map;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -87,6 +88,6 @@ public interface transactionInManager {
     
     List <Integer> getTransWithSingleValues (String checkDelim, int batchUploadId, int configId);
     
-    List <Integer> uploadBatchFile(int configId, MultipartFile fileUpload);
+    Map<String,String> uploadBatchFile(int configId, MultipartFile fileUpload);
        
 }
