@@ -324,7 +324,7 @@ public class messageTypeDAOImpl implements messageTypeDAO {
     @SuppressWarnings("rawtypes")
     @Transactional
     public List getInformationTables() {
-        Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT distinct table_name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'universalTranslator' and (TABLE_NAME LIKE 'info\\_%' or TABLE_NAME LIKE 'message\\_%')");
+        Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT distinct table_name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'universalTranslator' and TABLE_NAME LIKE 'message\\_%'");
 
         return query.list();
     }
