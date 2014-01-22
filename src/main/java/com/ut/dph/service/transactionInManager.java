@@ -94,5 +94,7 @@ public interface transactionInManager {
     void clearMessageTables(int batchId);
     
      Map<String,String> uploadBatchFile(int configId, MultipartFile fileUpload);
-       
+    
+    List <Integer> getBlankTransIds (ConfigForInsert config);
+   
 }

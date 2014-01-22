@@ -35,7 +35,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.io.FilenameUtils;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -378,7 +377,7 @@ public class transactionInManagerImpl implements transactionInManager {
 		}
 	}
 		
-	   /**
+	  /**
      * The 'uploadBatchFile' function will take in the file and orgName and upload the file to the appropriate file on the file system. 
      * The function will run the file through various validations. If a single validation fails the batch will be put in a error
      * validation status and the file will be removed from the system. The user will receive an  error message on the screen letting them 
