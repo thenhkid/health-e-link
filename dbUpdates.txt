@@ -302,7 +302,7 @@ as (select min(fieldNo) as fieldNo, saveToTableName, savetotablecol, configId, b
 from configurationFormFields where configId = inConfigId
 group by savetotablecol, saveToTableName);
 SELECT  batchUploadId, saveToTableName, 
-group_concat(distinct savetotablecol ORDER BY savetotablecol SEPARATOR ',') as savetotablecol,
+group_concat(distinct savetotablecol ORDER BY fieldNo SEPARATOR ',') as savetotablecol,
 group_concat( concat('F',fieldNo) ORDER BY fieldNo SEPARATOR ',') as singleValueFields, 
 group_concat( concat('strSplit(F',fieldNo, ', ''||^||'',@valPos)') ORDER BY fieldNo SEPARATOR ',') as splitFields, 
 group_concat( concat('F',fieldNo, ' like ''%||^||%''') ORDER BY fieldNo SEPARATOR ' or ') as checkForDelim,
@@ -314,6 +314,55 @@ ORDER BY saveToTableName;
 end proc_main$$
 
 delimiter ;
+
+
+/*1.22.2014 2:01 AM 
+Do we need configId in the tables below?
+*/
+ALTER TABLE `universalTranslator`.`message_FromOrg` 
+CHANGE COLUMN `configId` `configId` INT(11) NULL ;
+
+ALTER TABLE `universalTranslator`.`message_FromProvider` 
+CHANGE COLUMN `configId` `configId` INT(11) NULL ;
+
+ALTER TABLE `universalTranslator`.`message_ToOrg` 
+CHANGE COLUMN `configId` `configId` INT(11) NULL ;
+
+ALTER TABLE `universalTranslator`.`message_ToProvider` 
+CHANGE COLUMN `configId` `configId` INT(11) NULL ;
+
+ALTER TABLE `universalTranslator`.`message_ToProvider` 
+DROP FOREIGN KEY `FKMessToPProviderId`;
+ALTER TABLE `universalTranslator`.`message_ToProvider` 
+CHANGE COLUMN `providerId` `providerId` INT(11) NULL ;
+ALTER TABLE `universalTranslator`.`message_ToProvider` 
+ADD CONSTRAINT `FKMessToPProviderId`
+  FOREIGN KEY (`providerId`)
+  REFERENCES `universalTranslator`.`info_providers` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+ALTER TABLE `universalTranslator`.`message_FromOrg` 
+DROP FOREIGN KEY `FKMessFromOrgId`;
+ALTER TABLE `universalTranslator`.`message_FromOrg` 
+CHANGE COLUMN `orgId` `orgId` INT(11) NULL ;
+ALTER TABLE `universalTranslator`.`message_FromOrg` 
+ADD CONSTRAINT `FKMessFromOrgId`
+  FOREIGN KEY (`orgId`)
+  REFERENCES `universalTranslator`.`organizations` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+ALTER TABLE `universalTranslator`.`message_FromProvider` 
+DROP FOREIGN KEY `FKMessFromPProviderId`;
+ALTER TABLE `universalTranslator`.`message_FromProvider` 
+CHANGE COLUMN `providerId` `providerId` INT(11) NULL ;
+ALTER TABLE `universalTranslator`.`message_FromProvider` 
+ADD CONSTRAINT `FKMessFromPProviderId`
+  FOREIGN KEY (`providerId`)
+  REFERENCES `universalTranslator`.`info_providers` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
 
 
 
