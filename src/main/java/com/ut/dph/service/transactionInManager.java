@@ -14,6 +14,7 @@ import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionInRecords;
 import com.ut.dph.model.transactionTarget;
 import com.ut.dph.model.custom.ConfigForInsert;
+
 import java.util.List;
 import java.util.Map;
 import org.springframework.web.multipart.MultipartFile;
@@ -80,14 +81,18 @@ public interface transactionInManager {
     
     boolean processTransactions(int batchUploadId);
     
-    boolean insertToMessageTables(ConfigForInsert configForInsert);
+    boolean insertSingleToMessageTables(ConfigForInsert configForInsert);
+    
+    boolean insertMultiToMessageTables(ConfigForInsert configForInsert);
     
     List <ConfigForInsert> setConfigForInsert(int configId, int batchUploadId);
     
     List <Integer> getConfigIdsForBatch (int batchUploadId);
     
-    List <Integer> getTransWithSingleValues (String checkDelim, int batchUploadId, int configId);
+    List <Integer> getTransWithMultiValues (ConfigForInsert config);
+
+    void clearMessageTables(int batchId);
     
-    Map<String,String> uploadBatchFile(int configId, MultipartFile fileUpload);
+     Map<String,String> uploadBatchFile(int configId, MultipartFile fileUpload);
        
 }

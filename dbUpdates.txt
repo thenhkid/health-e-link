@@ -112,6 +112,10 @@ please update your configId or delete the rows first
  
 **/
 
+/**1.22.2014 Grace added this so added fk won't fail**/
+UPDATE `universalTranslator`.`transactionTranslatedIn` SET `configId`='15' WHERE `id`='12';
+
+
 ALTER TABLE `universalTranslator`.`transactionTranslatedIn` 
 ADD INDEX `ttiConfigId_idx` (`configId` ASC);
 ALTER TABLE `universalTranslator`.`transactionTranslatedIn` 
@@ -256,7 +260,6 @@ return replace(substring(substring_index(x, delim, pos),
 length(substring_index(x, delim, pos - 1)) + 1), delim, '');
 
 /** 1.20.2014 grace **/
-drop procedure if exists setSqlForConfig;
 
 delimiter $$
 create procedure setSqlForConfig(in inConfigId int, in batchUploadId int)
@@ -278,13 +281,100 @@ GROUP BY saveToTableName
 ORDER BY saveToTableName;
 end proc_main$$
 
-call setSqlForConfig(15, 17);
-
+delimiter ;
 
 /* 1.21.2014 Chad @ 10:30 AM */
 ALTER TABLE `universalTranslator`.`configurations` 
 ADD COLUMN `sourceType` SMALLINT NOT NULL DEFAULT '1' COMMENT '1 = Originating Message\n2 = Feedback Report' AFTER `configName`;
 
+
+/*1.22.2014 Grace*/
+
+drop procedure `universalTranslator`.`setSqlForConfig`;
+
+/**recreate **/
+delimiter $$
+create procedure `universalTranslator`.`setSqlForConfig`(in inConfigId int, in batchUploadId int)
+proc_main:begin
+drop TEMPORARY TABLE if exists temp1;
+CREATE TEMPORARY TABLE temp1
+as (select min(fieldNo) as fieldNo, saveToTableName, savetotablecol, configId, batchUploadId
+from configurationFormFields where configId = inConfigId
+group by savetotablecol, saveToTableName);
+SELECT  batchUploadId, saveToTableName, 
+group_concat(distinct savetotablecol ORDER BY fieldNo SEPARATOR ',') as savetotablecol,
+group_concat( concat('F',fieldNo) ORDER BY fieldNo SEPARATOR ',') as singleValueFields, 
+group_concat( concat('strSplit(F',fieldNo, ', ''||^||'',@valPos)') ORDER BY fieldNo SEPARATOR ',') as splitFields, 
+group_concat( concat('F',fieldNo, ' like ''%||^||%''') ORDER BY fieldNo SEPARATOR ' or ') as checkForDelim,
+configId
+FROM temp1 
+where configId = inConfigId
+GROUP BY saveToTableName
+ORDER BY saveToTableName;
+end proc_main$$
+
+delimiter ;
+
+
+/*1.22.2014 2:01 AM 
+Do we need configId in the tables below?
+*/
+ALTER TABLE `universalTranslator`.`message_FromOrg` 
+CHANGE COLUMN `configId` `configId` INT(11) NULL ;
+
+ALTER TABLE `universalTranslator`.`message_FromProvider` 
+CHANGE COLUMN `configId` `configId` INT(11) NULL ;
+
+ALTER TABLE `universalTranslator`.`message_ToOrg` 
+CHANGE COLUMN `configId` `configId` INT(11) NULL ;
+
+ALTER TABLE `universalTranslator`.`message_ToProvider` 
+CHANGE COLUMN `configId` `configId` INT(11) NULL ;
+
+ALTER TABLE `universalTranslator`.`message_ToProvider` 
+DROP FOREIGN KEY `FKMessToPProviderId`;
+ALTER TABLE `universalTranslator`.`message_ToProvider` 
+CHANGE COLUMN `providerId` `providerId` INT(11) NULL ;
+ALTER TABLE `universalTranslator`.`message_ToProvider` 
+ADD CONSTRAINT `FKMessToPProviderId`
+  FOREIGN KEY (`providerId`)
+  REFERENCES `universalTranslator`.`info_providers` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+ALTER TABLE `universalTranslator`.`message_FromOrg` 
+DROP FOREIGN KEY `FKMessFromOrgId`;
+ALTER TABLE `universalTranslator`.`message_FromOrg` 
+CHANGE COLUMN `orgId` `orgId` INT(11) NULL ;
+ALTER TABLE `universalTranslator`.`message_FromOrg` 
+ADD CONSTRAINT `FKMessFromOrgId`
+  FOREIGN KEY (`orgId`)
+  REFERENCES `universalTranslator`.`organizations` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+ALTER TABLE `universalTranslator`.`message_FromProvider` 
+DROP FOREIGN KEY `FKMessFromPProviderId`;
+ALTER TABLE `universalTranslator`.`message_FromProvider` 
+CHANGE COLUMN `providerId` `providerId` INT(11) NULL ;
+ALTER TABLE `universalTranslator`.`message_FromProvider` 
+ADD CONSTRAINT `FKMessFromPProviderId`
+  FOREIGN KEY (`providerId`)
+  REFERENCES `universalTranslator`.`info_providers` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+
+ALTER TABLE `universalTranslator`.`message_ToOrg` 
+DROP FOREIGN KEY `FKMessToOrgId`;
+ALTER TABLE `universalTranslator`.`message_ToOrg` 
+CHANGE COLUMN `orgId` `orgId` INT(11) NULL ;
+ALTER TABLE `universalTranslator`.`message_ToOrg` 
+ADD CONSTRAINT `FKMessToOrgId`
+  FOREIGN KEY (`orgId`)
+  REFERENCES `universalTranslator`.`organizations` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
 
 
 

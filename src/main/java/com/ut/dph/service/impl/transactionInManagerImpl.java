@@ -288,60 +288,97 @@ public class transactionInManagerImpl implements transactionInManager {
      *
      */
     @Override
+    //TODO implement true/false so we can break from method when error occurs
     public boolean processTransactions(int batchUploadId) {
-        /**
-         * Check for R/O Apply CW/Macros
+    	/**
+    	 * Check for R/O
+    	 * Apply CW/Macros
+    	 * Apply method to concatenate values for the same saveToTableCol using delimiter ||^||
+    	 */
+    	/**
+         * from here we prepare sql statement and insert
+         * we assume all transactions are validated and that multiple values /rows being inserted in the the same field are separated by
+         * delimiter ||^||
          */
-
-        /**
-         * from here we get insert statements ready and insert*
-         */
-        List<Integer> configIds = getConfigIdsForBatch(batchUploadId);
-        for (Integer configId : configIds) {
-            /**
-             * this list have the insert /check statements for each message table *
-             */
-            List<ConfigForInsert> configs = setConfigForInsert(configId, batchUploadId);
-            /**
-             * we grab the transactions that has multiple values, we set it to a list *
-             */
-
-            /**
-             * we straight insert the ones that are one *
-             */
+         List<Integer> configIds = getConfigIdsForBatch(batchUploadId);
+         for(Integer configId : configIds) {
+            /** this list have the insert /check statements for each message table **/
+        	 List <ConfigForInsert> configforConfigIds = setConfigForInsert(configId, batchUploadId);
+             /** we loop though each table and 
+              *  grab the transactions that has multiple values for that table, we set it to a list 
+              *  **/
+        	 for(ConfigForInsert config : configforConfigIds) {
+        		 /**we grab list of ids with multiple for this config
+        		  * we use the checkDelim string to look for those transactions
+        		  *  **/
+        		 List<Integer> transIds = getTransWithMultiValues(config);
+        		 config.setLoopTransIds(transIds);
+        		
+        		 /** we need to check if we need to insert in case the whole table 
+        		  * is mapped but doesn't contain values **/
+        		 List<Integer> skipTheseIds = getBlankTransIds(config);
+        		 config.setBlankValueTransId(skipTheseIds);
+        		 
+        		 /** we insert single values **/
+        		 insertSingleToMessageTables(config);
+        		 
+        		 /** we loop through transactions with multi values and use SP to loop values with delimiters **/
+        		 
+        		 
+        	 }
+        	 
+            
         }
-
         return false;
     }
 
-    /**
-     * These are ready records We will insert by configId All the values for being inserted into the same field would have been appended to the first field Id *
-     */
-    @Override
-    public boolean insertToMessageTables(ConfigForInsert configForInsert) {
-        // TODO Auto-generated method stub
-        return false;
-    }
 
-    @Override
-    public List<ConfigForInsert> setConfigForInsert(int configId, int batchUploadId) {
-        // we call sp and set the parameters here
-        return transactionInDAO.setConfigForInsert(configId, batchUploadId);
-    }
+	@Override
+	public List <ConfigForInsert> setConfigForInsert(int configId, int batchUploadId) {
+		// we call sp and set the parameters here
+		return transactionInDAO.setConfigForInsert(configId, batchUploadId);	
+	}
 
     @Override
     public List<Integer> getConfigIdsForBatch(int batchUploadId) {
         return transactionInDAO.getConfigIdsForBatch(batchUploadId);
     }
 
-    @Override
-    public List<Integer> getTransWithSingleValues(String checkDelim,
-            int batchUploadId, int configId) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-    
-    /**
+	@Override
+	public List<Integer> getTransWithMultiValues(ConfigForInsert config) {
+		return transactionInDAO.getTransWithMultiValues(config);
+	}
+
+	
+	 /**
+     * These are ready records We will insert by configId All the values for being inserted into the same field would have been appended to the first field Id 
+	 * *
+     */
+	@Override
+	public boolean insertSingleToMessageTables(ConfigForInsert configForInsert) {
+		return transactionInDAO.insertSingleToMessageTables(configForInsert);
+	}
+
+	@Override
+	public boolean insertMultiToMessageTables(ConfigForInsert configForInsert) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
+	@Override
+	public void clearMessageTables(int batchId) {
+		List <String> mts = transactionInDAO.getMessageTables();
+		try {
+			for (String mt:mts) {
+				transactionInDAO.clearMessageTableForBatch(batchId, mt);
+			}
+		} catch (Exception e) {
+			System.out.println("clearMessageTables " + e.getStackTrace());
+			
+		}
+	}
+		
+	   /**
      * The 'uploadBatchFile' function will take in the file and orgName and upload the file to the appropriate file on the file system. 
      * The function will run the file through various validations. If a single validation fails the batch will be put in a error
      * validation status and the file will be removed from the system. The user will receive an  error message on the screen letting them 
@@ -458,5 +495,10 @@ public class transactionInManagerImpl implements transactionInManager {
         return batchFileResults;
         
     }
+
+		@Override
+		public List<Integer> getBlankTransIds(ConfigForInsert config) {
+			return transactionInDAO.getBlankTransIds(config);
+		}
 
 }

@@ -25,7 +25,7 @@ public class ConfigForInsert {
 	String splitFields;
 	String checkForDelim;
 	List <Integer> loopTransIds;
-	List <Integer> transactionInIds;
+	List <Integer> blankValueTransId;
 	
 	public int getBatchUploadId() {
 		return batchUploadId;
@@ -63,25 +63,24 @@ public class ConfigForInsert {
 	public void setSplitFields(String splitFields) {
 		this.splitFields = splitFields;
 	}
-	public List<Integer> getLoopTransIds() {
-		return loopTransIds;
-	}
-	public void setLoopTransIds(List<Integer> loopTransIds) {
-		this.loopTransIds = loopTransIds;
-	}
-	public List<Integer> getTransactionInIds() {
-		return transactionInIds;
-	}
-	public void setTransactionInIds(List<Integer> transactionInIds) {
-		this.transactionInIds = transactionInIds;
-	}
 	public String getCheckForDelim() {
 		return checkForDelim;
 	}
 	public void setCheckForDelim(String checkForDelim) {
 		this.checkForDelim = checkForDelim;
 	}
-
+	public List<Integer> getLoopTransIds() {
+		return loopTransIds;
+	}
+	public void setLoopTransIds(List<Integer> loopTransIds) {
+		this.loopTransIds = loopTransIds;
+	}
+	public List<Integer> getBlankValueTransId() {
+		return blankValueTransId;
+	}
+	public void setBlankValueTransId(List<Integer> blankValueTransId) {
+		this.blankValueTransId = blankValueTransId;
+	}
 	
-		
+	
 }
