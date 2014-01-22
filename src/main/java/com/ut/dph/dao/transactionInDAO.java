@@ -88,4 +88,7 @@ public interface transactionInDAO {
     boolean clearMessageTableForBatch(int batchId, String tableName);
     
     public List <String> getMessageTables();
+    
+    List<Integer> getBlankTransIds(ConfigForInsert config);
+    
 }

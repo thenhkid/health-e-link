@@ -365,7 +365,16 @@ ADD CONSTRAINT `FKMessFromPProviderId`
   ON UPDATE NO ACTION;
 
 
-
+ALTER TABLE `universalTranslator`.`message_ToOrg` 
+DROP FOREIGN KEY `FKMessToOrgId`;
+ALTER TABLE `universalTranslator`.`message_ToOrg` 
+CHANGE COLUMN `orgId` `orgId` INT(11) NULL ;
+ALTER TABLE `universalTranslator`.`message_ToOrg` 
+ADD CONSTRAINT `FKMessToOrgId`
+  FOREIGN KEY (`orgId`)
+  REFERENCES `universalTranslator`.`organizations` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
 
 
 

@@ -739,7 +739,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 	@Transactional
 	public boolean insertSingleToMessageTables(ConfigForInsert config) {
 		
-			//TODO check not null fields
+			//TODO need to handle mappings but there are no values - etc best time to call / not require / we do not need to insert blank row
 		
 			String sql  = "insert into " + config.getSaveToTableName() 
 					+ " (transactionInId, " + config.getSaveToTableCol()
@@ -749,7 +749,10 @@ public class transactionInDAOImpl implements transactionInDAO {
 					+ " transactionInId in (select id from transactionIn where batchId = :batchId"
 					+ " and configId = :configId and statusId = 10 ";
 			if (config.getLoopTransIds().size() > 0) {
-				sql = sql + " and id not in (" + config.getLoopTransIds().toString().replace("[", "").replace("]", "") + ")";
+				sql = sql + " and id not in (" + config.getLoopTransIds().toString().substring(1, config.getLoopTransIds().toString().length()-1) + ")";
+			}
+			if (config.getBlankValueTransId().size() > 0) {
+				sql = sql + " and id not in (" + config.getBlankValueTransId().toString().substring(1, config.getBlankValueTransId().toString().length()-1) + ")";
 			}
 			
 			sql = sql + ");";
@@ -779,8 +782,6 @@ public class transactionInDAOImpl implements transactionInDAO {
 	public boolean clearMessageTableForBatch(int batchId, String mt) {
 		String sql  = "delete from " + mt + " where transactionInId in "
 				+ " (select id from transactionIn where batchId = :id)"
-				//TODO need to remove this
-				+ " and transactionInId >0"
 				+ ";";
 		Query deleteTable = sessionFactory.getCurrentSession().createSQLQuery(sql)
 				.addScalar("id",StandardBasicTypes.INTEGER ).setParameter("id", batchId);
@@ -808,6 +809,26 @@ public class transactionInDAOImpl implements transactionInDAO {
         query.setParameter("schemaName", schemaName);
         List<String> mt = query.list();
         return mt;
+	}
+
+	@Override
+	@Transactional
+	@SuppressWarnings("unchecked")
+	public List<Integer> getBlankTransIds(ConfigForInsert config) {
+		String sql = ("select transactionInId from "
+				+ " transactionTranslatedIn where (length(concat(" + config.getSingleValueFields()
+				+ ")) = 0 or length(concat(" + config.getSingleValueFields()
+				+ ")) is null) and transactionInId in (select id from transactionIn where statusId = 10 "
+				+ " and batchId = :batchUploadId"
+				+ " and configId = :configId); ");
+		
+        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+        query.setParameter("configId", config.getConfigId());
+        query.setParameter("batchUploadId", config.getBatchUploadId());
+
+        List<Integer> transId = query.list();
+
+        return transId;
 	}
     
 }

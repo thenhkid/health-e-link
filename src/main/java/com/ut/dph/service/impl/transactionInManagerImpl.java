@@ -291,10 +291,12 @@ public class transactionInManagerImpl implements transactionInManager {
     	/**
     	 * Check for R/O
     	 * Apply CW/Macros
-    	 * Apply method to concat values for the same saveToTableCol using delimiter ||^||
+    	 * Apply method to concatenate values for the same saveToTableCol using delimiter ||^||
     	 */
     	/**
-         * from here we get insert statements ready and insert*
+         * from here we prepare sql statement and insert
+         * we assume all transactions are validated and that multiple values /rows being inserted in the the same field are separated by
+         * delimiter ||^||
          */
          List<Integer> configIds = getConfigIdsForBatch(batchUploadId);
          for(Integer configId : configIds) {
@@ -305,15 +307,20 @@ public class transactionInManagerImpl implements transactionInManager {
               *  **/
         	 for(ConfigForInsert config : configforConfigIds) {
         		 /**we grab list of ids with multiple for this config
-        		  * we use the checkDelim string to check
+        		  * we use the checkDelim string to look for those transactions
         		  *  **/
         		 List<Integer> transIds = getTransWithMultiValues(config);
         		 config.setLoopTransIds(transIds);
         		
+        		 /** we need to check if we need to insert in case the whole table 
+        		  * is mapped but doesn't contain values **/
+        		 List<Integer> skipTheseIds = getBlankTransIds(config);
+        		 config.setBlankValueTransId(skipTheseIds);
+        		 
         		 /** we insert single values **/
         		 insertSingleToMessageTables(config);
         		 
-        		 /** we loop through multi values and use SP to loop delimiter **/
+        		 /** we loop through transactions with multi values and use SP to loop values with delimiters **/
         		 
         		 
         	 }
@@ -482,5 +489,10 @@ public class transactionInManagerImpl implements transactionInManager {
 	        return errorCodes;
 	        
 	    }
+
+		@Override
+		public List<Integer> getBlankTransIds(ConfigForInsert config) {
+			return transactionInDAO.getBlankTransIds(config);
+		}
 
 }
