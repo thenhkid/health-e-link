@@ -6,6 +6,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class fileSystem {
 
@@ -202,30 +204,31 @@ public class fileSystem {
 
         int delimCount = 0;
 
-        FileInputStream file = null;
+        FileInputStream fileInput = null;
         try {
-            file = new FileInputStream(new File(dir.getDir() + fileName));
+            File file = new File(dir.getDir() + fileName);
+            fileInput = new FileInputStream(file);
+            
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-
-        BufferedReader br = new BufferedReader(new InputStreamReader(file));
-
+        
+        
+        BufferedReader br = new BufferedReader(new InputStreamReader(fileInput));
+        
         try {
-            String line = null;
+            String line;
             try {
-                line = br.readLine();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            while (line != null) {
-                if (delim == "t") {
-                    delimCount = line.split("\t", -1).length - 1;
-                } else {
-                    delimCount = line.split("\\" + delim, -1).length - 1;
+                while ((line = br.readLine()) != null) {
+                    if (delim == "t") {
+                        delimCount = line.split("\t", -1).length - 1;
+                    } else {
+                        delimCount = line.split("\\" + delim, -1).length - 1;
+                    }
+                    break;
                 }
-                break;
+            } catch (IOException ex) {
+                Logger.getLogger(fileSystem.class.getName()).log(Level.SEVERE, null, ex);
             }
         } finally {
             try {
