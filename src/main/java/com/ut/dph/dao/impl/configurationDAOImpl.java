@@ -364,6 +364,27 @@ public class configurationDAOImpl implements configurationDAO {
 
         return query.list();
     }
+    
+    /**
+     * The 'getFileTypesById' function will return the fileType by the id passed in
+     * 
+     * @param id    The fileTypeId
+     * 
+     * @table ref_fileTypes
+     * 
+     * @return This function will return the file type
+     */
+    @SuppressWarnings("rawtypes")
+    @Override
+    @Transactional
+    public String getFileTypesById(int id) {
+        Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT fileType FROM ref_fileTypes where id = :id")
+              .setParameter("id", id);
+        
+        String fileType = (String) query.uniqueResult();
+
+        return fileType;
+    }
 
     /**
      * The 'getFieldName' function will return the name of a field based on the fieldId passed in. This is used for display purposes to show the actual field lable instead of a field name.
@@ -711,15 +732,18 @@ public class configurationDAOImpl implements configurationDAO {
     }
     
     /**
-     * The 'getActiveConfigurationByUserId' function will return a list of configurations
-     * set up for ERG and for the passed in userId
+     * The 'getActiveConfigurationsByUserId' function will return a list of configurations
+     * set up the passed in userId and passed in transport method
      * 
-     * @param   userId  
+     * @param   userId          The id of the logged in user
+     * @param   transportMethod The id of the transport method to find configurations
+     *                          1 = File Upload
+     *                          2 = ERG
      * 
      * @return This function will return a list of ERG configurations.
      */
     @Override
-    public List<configuration> getActiveERGConfigurationsByUserId(int userId) {
+    public List<configuration> getActiveConfigurationsByUserId(int userId, int transportMethod) {
         
         /* Find all SENDER connections for the passed in user */
         Criteria findAuthConnections = sessionFactory.getCurrentSession().createCriteria(configurationConnectionSenders.class);
@@ -757,7 +781,7 @@ public class configurationDAOImpl implements configurationDAO {
         List<Integer> ergConfigList = new ArrayList<Integer>();
         Criteria findERGConfigs = sessionFactory.getCurrentSession().createCriteria(configurationTransport.class);
         findERGConfigs.add(Restrictions.or(
-                Restrictions.eq("transportMethodId",2),
+                Restrictions.eq("transportMethodId",transportMethod),
                 Restrictions.eq("errorHandling",1)
         )).add(Restrictions.and(Restrictions.in("configId",senderConfigList))); 
        

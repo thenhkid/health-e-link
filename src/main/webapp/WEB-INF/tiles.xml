@@ -406,5 +406,11 @@
     </definition>
     
     <!-- Health-e-Connect (Exchange) Pages -->
+    <!-- Upload -->
+    <definition name="/Health-e-Connect/upload" extends="base.definition.frontEnd">
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Health-e-Connect&amp;page=upload" />
+        <put-attribute name="body" value="/WEB-INF/jsp/Health-e-Connect/upload.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/front-end/Health-e-Connect/upload.js" />
+    </definition>
 
 </tiles-definitions>

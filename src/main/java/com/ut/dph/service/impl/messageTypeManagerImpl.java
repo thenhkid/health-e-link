@@ -330,7 +330,7 @@ public class messageTypeManagerImpl implements messageTypeManager {
         //Need to get the actual delimiter character
         String delimChar = (String) messageTypeDAO.getDelimiterChar(crosswalkDetails.getFileDelimiter());
 
-		//Check to make sure the file contains the selected delimiter
+	//Check to make sure the file contains the selected delimiter
         //Set the directory that holds the crosswalk files
         int delimCount = (Integer) dir.checkFileDelimiter(dir, fileName, delimChar);
 

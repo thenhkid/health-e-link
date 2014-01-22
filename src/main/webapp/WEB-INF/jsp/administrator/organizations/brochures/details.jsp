@@ -8,8 +8,8 @@
         <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
             <h3 class="panel-title"><c:choose><c:when test="${btnValue == 'Update'}">Update</c:when><c:when test="${btnValue == 'Create'}">Add</c:when></c:choose> Brochure ${success}</h3>
-                </div>
-                <div class="modal-body">
+        </div>
+        <div class="modal-body">
             <form:form id="brochuredetailsform" commandName="brochuredetails" modelAttribute="brochuredetails" enctype="multipart/form-data" method="post" role="form">
                 <form:hidden path="id" id="id" />
                 <form:hidden path="orgId" id="orgId" />
