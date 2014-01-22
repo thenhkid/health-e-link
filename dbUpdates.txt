@@ -375,6 +375,37 @@ ADD CONSTRAINT `FKMessToOrgId`
   REFERENCES `universalTranslator`.`organizations` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
+  
+
+/** 01.22.2014 12:05 **/
+
+ALTER TABLE `universalTranslator`.`message_ToOrg` 
+DROP FOREIGN KEY `FKMessToOrgId`;
+ALTER TABLE `universalTranslator`.`message_ToOrg` 
+CHANGE COLUMN `orgId` `locationId` INT(11) NULL DEFAULT NULL ,
+DROP INDEX `FKMessToOrgId_idx` ;
+
+ALTER TABLE `universalTranslator`.`message_ToProvider` 
+DROP FOREIGN KEY `FKMessToPProviderId`;
+
+ALTER TABLE `universalTranslator`.`message_ToProvider` 
+DROP INDEX `FKMessToPProviderId_idx` ;
+
+ALTER TABLE `universalTranslator`.`message_FromOrg` 
+DROP FOREIGN KEY `FKMessFromOrgId`;
+ALTER TABLE `universalTranslator`.`message_FromOrg` 
+DROP INDEX `FKMessFromOrgId_idx` ;
+
+ALTER TABLE `universalTranslator`.`message_FromOrg` 
+CHANGE COLUMN `orgId` `locationId` INT(11) NULL DEFAULT NULL ;
+
+ALTER TABLE `universalTranslator`.`message_FromProvider` 
+DROP FOREIGN KEY `FKMessFromPProviderId`;
+ALTER TABLE `universalTranslator`.`message_FromProvider` 
+DROP INDEX `FKMessFromPProviderId_idx` ;
+
+
+
 
 
 
