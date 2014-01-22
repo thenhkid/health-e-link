@@ -405,6 +405,9 @@ ALTER TABLE `universalTranslator`.`message_FromProvider`
 DROP INDEX `FKMessFromPProviderId_idx` ;
 
 
+/** grace 1.22.2014 1:37PM */
+ALTER TABLE `universalTranslator`.`message_Patients` 
+CHANGE COLUMN `englishProficient` `englishProficient` VARCHAR(10) NULL DEFAULT NULL COMMENT 'can be Yes, No, Unknown...\nWe wi\nso changing it to varchar' ;
 
 
 
