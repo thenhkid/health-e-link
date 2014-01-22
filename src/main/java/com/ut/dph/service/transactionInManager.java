@@ -79,12 +79,16 @@ public interface transactionInManager {
     
     boolean processTransactions(int batchUploadId);
     
-    boolean insertToMessageTables(ConfigForInsert configForInsert);
+    boolean insertSingleToMessageTables(ConfigForInsert configForInsert);
+    
+    boolean insertMultiToMessageTables(ConfigForInsert configForInsert);
     
     List <ConfigForInsert> setConfigForInsert(int configId, int batchUploadId);
     
     List <Integer> getConfigIdsForBatch (int batchUploadId);
     
-    List <Integer> getTransWithSingleValues (String checkDelim, int batchUploadId, int configId);
-       
+    List <Integer> getTransWithMultiValues (ConfigForInsert config);
+
+    void clearMessageTables(int batchId);
+   
 }

@@ -271,39 +271,45 @@ public class transactionInManagerImpl implements transactionInManager {
      *
      */
     @Override
+    //TODO implement true/false so we can break from method when error occurs
     public boolean processTransactions(int batchUploadId) {
     	/**
     	 * Check for R/O
     	 * Apply CW/Macros
+    	 * Apply method to concat values for the same saveToTableCol using delimiter ||^||
     	 */
-    	
-    	
-        /**
+    	/**
          * from here we get insert statements ready and insert*
          */
          List<Integer> configIds = getConfigIdsForBatch(batchUploadId);
          for(Integer configId : configIds) {
             /** this list have the insert /check statements for each message table **/
-        	 List <ConfigForInsert> configs = setConfigForInsert(configId, batchUploadId);
-             /** we grab the transactions that has multiple values, we set it to a list **/
+        	 List <ConfigForInsert> configforConfigIds = setConfigForInsert(configId, batchUploadId);
+             /** we loop though each table and 
+              *  grab the transactions that has multiple values for that table, we set it to a list 
+              *  **/
+        	 for(ConfigForInsert config : configforConfigIds) {
+        		 /**we grab list of ids with multiple for this config
+        		  * we use the checkDelim string to check
+        		  *  **/
+        		 List<Integer> transIds = getTransWithMultiValues(config);
+        		 config.setLoopTransIds(transIds);
+        		
+        		 /** we insert single values **/
+        		 insertSingleToMessageTables(config);
+        		 
+        		 /** we loop through multi values and use SP to loop delimiter and insert **/
+        		 
+        		 
+        	 }
         	 
-        	 /** we straight insert the ones that are one **/
             
         }
         
         return false;
     }
 
-    /**
-     * These are ready records We will insert by configId All the values for being inserted into the same field would have been appended to the first field Id 
-	 * *
-     */
-    @Override
-    public boolean insertToMessageTables(ConfigForInsert configForInsert) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
+ 
 	@Override
 	public List <ConfigForInsert> setConfigForInsert(int configId, int batchUploadId) {
 		// we call sp and set the parameters here
@@ -316,12 +322,37 @@ public class transactionInManagerImpl implements transactionInManager {
 	}
 
 	@Override
-	public List<Integer> getTransWithSingleValues(String checkDelim,
-			int batchUploadId, int configId) {
+	public List<Integer> getTransWithMultiValues(ConfigForInsert config) {
+		return transactionInDAO.getTransWithMultiValues(config);
+	}
+
+	
+	 /**
+     * These are ready records We will insert by configId All the values for being inserted into the same field would have been appended to the first field Id 
+	 * *
+     */
+	@Override
+	public boolean insertSingleToMessageTables(ConfigForInsert configForInsert) {
+		return transactionInDAO.insertSingleToMessageTables(configForInsert);
+	}
+
+	@Override
+	public boolean insertMultiToMessageTables(ConfigForInsert configForInsert) {
 		// TODO Auto-generated method stub
-		return null;
+		return false;
 	}
 	
-	
+	@Override
+	public void clearMessageTables(int batchId) {
+		List <String> mts = transactionInDAO.getMessageTables();
+		try {
+			for (String mt:mts) {
+				transactionInDAO.clearMessageTableForBatch(batchId, mt);
+			}
+		} catch (Exception e) {
+			System.out.println("clearMessageTables " + e.getStackTrace());
+			
+		}
+	}
 
 }

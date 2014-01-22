@@ -79,5 +79,13 @@ public interface transactionInDAO {
     
     List <ConfigForInsert> setConfigForInsert(int configId, int batchUploadId);
     
-    List<Integer> getTransWithSingleValues(String checkDelim, int batchUploadId, int configId);
+    List<Integer> getTransWithMultiValues(ConfigForInsert config);
+    
+    boolean insertSingleToMessageTables(ConfigForInsert configForInsert);
+    
+    boolean insertMultiToMessageTables(ConfigForInsert configForInsert);
+    
+    boolean clearMessageTableForBatch(int batchId, String tableName);
+    
+    public List <String> getMessageTables();
 }

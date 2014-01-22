@@ -43,6 +43,8 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Autowired
     private SessionFactory sessionFactory;
 
+    private String schemaName = "universalTranslator";
+    
     /**
      * The 'getFieldValue' function will return the value saved for the passed in tableName, tableCol and idValue.
      *
@@ -711,20 +713,101 @@ public class transactionInDAOImpl implements transactionInDAO {
 		return configListForInsert;
 	}
 
-	@Override
-	public List<Integer> getTransWithSingleValues(String checkDelim,
-			int batchUploadId, int configId) {
+    @Override
+	@Transactional
+	@SuppressWarnings("unchecked")
+	public List<Integer> getTransWithMultiValues(ConfigForInsert config) {
 		
-			String sql = ("");
-
+			String sql = ("select transactionInId from "
+					+ " transactionTranslatedIn where (" + config.getCheckForDelim() 
+					+ ") and transactionInId in (select id from transactionIn where statusId = 10 "
+					+ " and batchId = :batchUploadId"
+					+ " and configId = :configId); ");
+			
 	        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
-	        query.setParameter("configId", configId);
-	        query.setParameter("batchUploadId", batchUploadId);
+	        query.setParameter("configId", config.getConfigId());
+	        query.setParameter("batchUploadId", config.getBatchUploadId());
 
 	        List<Integer> transId = query.list();
 
 	        return transId;
 		
+	}
+
+    
+	@Override
+	@Transactional
+	public boolean insertSingleToMessageTables(ConfigForInsert config) {
+		
+			//TODO check not null fields
+		
+			String sql  = "insert into " + config.getSaveToTableName() 
+					+ " (transactionInId, " + config.getSaveToTableCol()
+					+ ") select transactionInId, " 
+					+ config.getSingleValueFields() 
+					+ " from transactionTranslatedIn where "  
+					+ " transactionInId in (select id from transactionIn where batchId = :batchId"
+					+ " and configId = :configId and statusId = 10 ";
+			if (config.getLoopTransIds().size() > 0) {
+				sql = sql + " and id not in (" + config.getLoopTransIds().toString().replace("[", "").replace("]", "") + ")";
+			}
+			
+			sql = sql + ");";
+			
+			Query insertData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+					.setParameter("batchId", config.getBatchUploadId())
+					.setParameter("configId", config.getConfigId());
+			
+			try {
+				insertData.executeUpdate();
+				return true;
+			} catch (Throwable ex) {
+	            System.err.println("insertSingleToMessageTables." + ex);
+	            return false;
+			}
+	}
+
+	/** this call sp to loop through values and insert **/
+	@Override
+	public boolean insertMultiToMessageTables(ConfigForInsert configForInsert) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	@Transactional
+	public boolean clearMessageTableForBatch(int batchId, String mt) {
+		String sql  = "delete from " + mt + " where transactionInId in "
+				+ " (select id from transactionIn where batchId = :id)"
+				//TODO need to remove this
+				+ " and transactionInId >0"
+				+ ";";
+		Query deleteTable = sessionFactory.getCurrentSession().createSQLQuery(sql)
+				.addScalar("id",StandardBasicTypes.INTEGER ).setParameter("id", batchId);
+		try {
+			deleteTable.executeUpdate();
+			return true;
+		} catch (Throwable ex) {
+            System.err.println("clearMessageTableForBatch failed. " + ex);
+            return false;
+            	
+		}
+	}
+	
+
+
+	@Override
+	@Transactional
+	@SuppressWarnings("unchecked")
+	public List<String> getMessageTables() {
+		String sql = ("select table_name from information_schema.COLUMNS "
+				+ " where TABLE_SCHEMA = :schemaName "
+				+ " and table_name like concat('message_%')"
+				+ " and column_name like 'transactionInId';");
+        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+        query.setParameter("schemaName", schemaName);
+        List<String> mt = query.list();
+        return mt;
 	}
     
 }
