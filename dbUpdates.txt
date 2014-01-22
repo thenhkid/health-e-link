@@ -112,6 +112,10 @@ please update your configId or delete the rows first
  
 **/
 
+/**1.22.2014 Grace added this so added fk won't fail**/
+UPDATE `universalTranslator`.`transactionTranslatedIn` SET `configId`='15' WHERE `id`='12';
+
+
 ALTER TABLE `universalTranslator`.`transactionTranslatedIn` 
 ADD INDEX `ttiConfigId_idx` (`configId` ASC);
 ALTER TABLE `universalTranslator`.`transactionTranslatedIn` 
@@ -256,7 +260,6 @@ return replace(substring(substring_index(x, delim, pos),
 length(substring_index(x, delim, pos - 1)) + 1), delim, '');
 
 /** 1.20.2014 grace **/
-drop procedure if exists setSqlForConfig;
 
 delimiter $$
 create procedure setSqlForConfig(in inConfigId int, in batchUploadId int)
@@ -278,12 +281,41 @@ GROUP BY saveToTableName
 ORDER BY saveToTableName;
 end proc_main$$
 
-call setSqlForConfig(15, 17);
-
+delimiter ;
 
 /* 1.21.2014 Chad @ 10:30 AM */
 ALTER TABLE `universalTranslator`.`configurations` 
 ADD COLUMN `sourceType` SMALLINT NOT NULL DEFAULT '1' COMMENT '1 = Originating Message\n2 = Feedback Report' AFTER `configName`;
+
+
+/*1.22.2014 Grace*/
+
+drop procedure `universalTranslator`.`setSqlForConfig`;
+
+/**recreate **/
+delimiter $$
+create procedure `universalTranslator`.`setSqlForConfig`(in inConfigId int, in batchUploadId int)
+proc_main:begin
+drop TEMPORARY TABLE if exists temp1;
+CREATE TEMPORARY TABLE temp1
+as (select min(fieldNo) as fieldNo, saveToTableName, savetotablecol, configId, batchUploadId
+from configurationFormFields where configId = inConfigId
+group by savetotablecol, saveToTableName);
+SELECT  batchUploadId, saveToTableName, 
+group_concat(distinct savetotablecol ORDER BY savetotablecol SEPARATOR ',') as savetotablecol,
+group_concat( concat('F',fieldNo) ORDER BY fieldNo SEPARATOR ',') as singleValueFields, 
+group_concat( concat('strSplit(F',fieldNo, ', ''||^||'',@valPos)') ORDER BY fieldNo SEPARATOR ',') as splitFields, 
+group_concat( concat('F',fieldNo, ' like ''%||^||%''') ORDER BY fieldNo SEPARATOR ' or ') as checkForDelim,
+configId
+FROM temp1 
+where configId = inConfigId
+GROUP BY saveToTableName
+ORDER BY saveToTableName;
+end proc_main$$
+
+delimiter ;
+
+
 
 
 
