@@ -52,7 +52,6 @@
                         <div id="validationTypeDiv">
                             <label class="control-label" for="validationType">Validation Type</label>
                             <form:select path="validationType" id="validationType" class="form-control half">
-                                <option value="0" label=" - Select - " ></option>
                                 <c:forEach items="${validationTypes}"  var="fieldvalidationtypes" varStatus="vtype">
                                     <option value="${validationTypes[vtype.index][0]}">${validationTypes[vtype.index][1]}</option>
                                 </c:forEach>

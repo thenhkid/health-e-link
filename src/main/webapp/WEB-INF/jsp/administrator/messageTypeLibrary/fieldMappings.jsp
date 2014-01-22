@@ -6,6 +6,7 @@
 <c:set var="endDspPostLoop" value="1" />
 
 <!-- Need to calculate how many fields for current section -->
+<c:set var="maxFieldNo" value="0" />
 <c:set var="totalFieldsBucket1, totalFieldsBucket2, totalFieldsBucket3, totalFieldsBucket4, totalFieldsBucket5, totalFieldsBucket6" value="0" />
 <c:forEach items="${messageTypeDetails.fields}" var="mappings" varStatus="field">
     <c:if test="${mappings.bucketNo == 1}">
@@ -67,8 +68,9 @@
                                         <th scope="col" style="width:150px; min-width:150px;">Auto Populate Table Column Name</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody>  
                                     <c:forEach items="${messageTypeDetails.fields}" var="mappings" varStatus="field">
+                                        <c:if test="${mappings.fieldNo > maxFieldNo}"><c:set var="maxFieldNo" value="${mappings.fieldNo}" /></c:if>
                                         <c:if test="${mappings.bucketNo == i}">
                                             <tr>
                                                 <input type="hidden" name="fields[${field.index}].id" value="${mappings.id}" />
@@ -163,12 +165,14 @@
                                         </tr>
                                     </c:if>
                                 </c:forEach>
+                                
                                 </tbody>
                             </table>
                         </div>
                     </div>
                 </section>
             </c:forEach>
+            <input type="hidden" id="maxFieldNo" value="${maxFieldNo}" />
         </form:form>
     </div>
 </div>

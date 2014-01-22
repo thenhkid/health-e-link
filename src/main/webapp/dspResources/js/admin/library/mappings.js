@@ -12,8 +12,8 @@ $(function() {
     $(document).on('click', '#addNewField', function() {
         var bucketNo = $(this).attr('rel');
         var displayPos = $('.dspPos_' + bucketNo + ':last').val();
-        var fieldNo = $('.fieldNo:last').val();
-
+        var fieldNo = $('#maxFieldNo').val();
+        
         $.ajax({
             url: 'addNewField',
             type: "GET",
