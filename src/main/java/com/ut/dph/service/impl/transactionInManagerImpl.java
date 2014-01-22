@@ -5,9 +5,12 @@
  */
 package com.ut.dph.service.impl;
 
+import com.ut.dph.dao.messageTypeDAO;
 import com.ut.dph.dao.transactionInDAO;
 import com.ut.dph.model.batchUploadSummary;
 import com.ut.dph.model.batchUploads;
+import com.ut.dph.model.configuration;
+import com.ut.dph.model.configurationTransport;
 import com.ut.dph.model.fieldSelectOptions;
 import com.ut.dph.model.transactionAttachment;
 import com.ut.dph.model.transactionIn;
@@ -15,6 +18,8 @@ import com.ut.dph.model.transactionInRecords;
 import com.ut.dph.model.transactionTarget;
 import com.ut.dph.model.custom.ConfigForInsert;
 import com.ut.dph.reference.fileSystem;
+import com.ut.dph.service.configurationManager;
+import com.ut.dph.service.configurationTransportManager;
 
 import org.springframework.stereotype.Service;
 
@@ -25,8 +30,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.io.FilenameUtils;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -353,6 +359,121 @@ public class transactionInManagerImpl implements transactionInManager {
 			System.out.println("clearMessageTables " + e.getStackTrace());
 			
 		}
+		
+		/**
+	     * The 'uploadBatchFile' function will take in the file and orgName and upload the file to the appropriate file on the file system. 
+	     * The function will run the file through various validations. If a single validation fails the batch will be put in a error
+	     * validation status and the file will be removed from the system. The user will receive an  error message on the screen letting them 
+	     * know which validations have failed and be asked
+	     * to upload a new file.
+	     * 
+	     * The following validations will be taken place.
+	     *  - File is not empty
+	     *  - Proper file type (as determined in the configuration set up)
+	     *  - Proper delimiter (as determined in the configuration set up)
+	     *  - Does not exceed file size (as determined in the configuration set up)
+	     * 
+	     * @param configId   The configuration Id to get some validation parameters
+	     * @param fileUpload The file to be uploaded
+	     * 
+	     */
+	    @Override
+	    public List <Integer> uploadBatchFile(int configId, MultipartFile fileUpload) {
+	        
+	        configuration configDetails = configurationManager.getConfigurationById(configId);
+	        configurationTransport transportDetails = configurationtransportmanager.getTransportDetails(configId);
+
+	        MultipartFile file = fileUpload;
+	        String fileName = file.getOriginalFilename();
+
+	        InputStream inputStream = null;
+	        OutputStream outputStream = null;
+	        
+	        /* 
+	            1 = File is empty
+	            2 = Too large
+	            3 = Wrong file type
+	            4 = Wrong delimiter
+	        */
+	        
+	        List <Integer> errorCodes = new ArrayList<Integer>();
+
+	        try {
+	            inputStream = file.getInputStream();
+	            File newFile = null;
+
+	            //Set the directory to save the brochures to
+	            fileSystem dir = new fileSystem();
+	            
+	            String filelocation = transportDetails.getfileLocation();
+	            filelocation = filelocation.replace("/bowlink/","");
+	            dir.setDirByName(filelocation);
+
+	            newFile = new File(dir.getDir() + fileName);
+
+	            if (newFile.exists()) {
+	                int i = 1;
+	                while (newFile.exists()) {
+	                    int iDot = fileName.lastIndexOf(".");
+	                    newFile = new File(dir.getDir() + fileName.substring(0, iDot) + "_(" + ++i + ")" + fileName.substring(iDot));
+	                }
+	                fileName = newFile.getName();
+	            } else {
+	                newFile.createNewFile();
+	            }
+	            
+	            /* Get the size of the file */
+	            double fileSizeMB = ((newFile.length() / 1024) / 1024);
+	            
+	             /* Make sure the file is not empty : ERROR CODE 1 */
+	            if(fileSizeMB == 0) {
+	                errorCodes.add(1);
+	            }
+	            
+	            /* Make sure file is the correct size : ERROR CODE 2 */
+	            double maxFileSize = (double) transportDetails.getmaxFileSize();
+	            if(fileSizeMB > maxFileSize) {
+	                errorCodes.add(2);
+	            }
+	            
+	            /* Make sure file is the correct file type : ERROR CODE 3 */
+	            String ext = FilenameUtils.getExtension(dir.getDir() + fileName);
+	            
+	            String fileType = (String) configurationManager.getFileTypesById(transportDetails.getfileType());
+	            
+	            if(ext == null ? fileType != null : !ext.equals(fileType)) {
+	                errorCodes.add(3);
+	            }
+	            
+	            /* Make sure the file has the correct delimiter : ERROR CODE 5 */
+	            String delimChar = (String) messageTypeDAO.getDelimiterChar(transportDetails.getfileDelimiter());
+	            
+	            //Check to make sure the file contains the selected delimiter
+	            //Set the directory that holds the crosswalk files
+	            int delimCount = (Integer) dir.checkFileDelimiter(dir, fileName, delimChar);
+	            
+	            if (delimCount < 10) {
+	                errorCodes.add(4);
+	            }
+
+	            outputStream = new FileOutputStream(newFile);
+	            int read = 0;
+	            byte[] bytes = new byte[1024];
+
+	            while ((read = inputStream.read(bytes)) != -1) {
+	                outputStream.write(bytes, 0, read);
+	            }
+	            outputStream.close();
+
+	            //Save the attachment
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }
+
+	        return errorCodes;
+	        
+	    }		
+		
 	}
 
 }

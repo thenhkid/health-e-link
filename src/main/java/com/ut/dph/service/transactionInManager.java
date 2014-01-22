@@ -14,7 +14,9 @@ import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionInRecords;
 import com.ut.dph.model.transactionTarget;
 import com.ut.dph.model.custom.ConfigForInsert;
+
 import java.util.List;
+
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -90,5 +92,7 @@ public interface transactionInManager {
     List <Integer> getTransWithMultiValues (ConfigForInsert config);
 
     void clearMessageTables(int batchId);
+    
+    List <Integer> uploadBatchFile(int configId, MultipartFile fileUpload);
    
 }
