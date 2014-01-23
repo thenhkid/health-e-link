@@ -927,7 +927,7 @@ public class transactionInDAOImpl implements transactionInDAO {
         String sql = ("select transactionInId from "
                 + " transactionTranslatedIn where (length(concat(" + config.getSingleValueFields()
                 + ")) = 0 or length(concat(" + config.getSingleValueFields()
-                + ")) is null) and transactionInId in (select id from transactionIn where statusId = : relId "
+                + ")) is null) and transactionInId in (select id from transactionIn where statusId = :relId "
                 + " and batchId = :batchUploadId"
                 + " and configId = :configId); ");
 
