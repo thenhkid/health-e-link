@@ -302,13 +302,11 @@ public class transactionInManagerImpl implements transactionInManager {
              */
             List<ConfigForInsert> configforConfigIds = setConfigForInsert(configId, batchUploadId);
             /**
-             * we loop though each table and grab the transactions that has multiple values for that table, we set it to a list 
-              *  *
+             * we loop though each table and grab the transactions that has multiple values for that table, we set it to a list *
              */
             for (ConfigForInsert config : configforConfigIds) {
                 /**
-                 * we grab list of ids with multiple for this config we use the checkDelim string to look for those transactions
-        		  *  *
+                 * we grab list of ids with multiple for this config we use the checkDelim string to look for those transactions *
                  */
                 List<Integer> transIds = getTransWithMultiValues(config);
                 config.setLoopTransIds(transIds);
@@ -325,18 +323,19 @@ public class transactionInManagerImpl implements transactionInManager {
                 insertSingleToMessageTables(config);
 
                 /**
-                 * we loop through transactions with multiple values 
-                 * and use SP to loop values with delimiters
-                 * 
+                 * we loop through transactions with multiple values and use SP to loop values with delimiters
+                 *
                  */
                 for (Integer transId : transIds) {
-                	/**we check how long field is**/
-                	Integer subStringTotal =  countSubString(config, transId);
-                	//TODO look up loop counter - how to write counter in new syntax?
-                	for (int i=0;i<=subStringTotal;i++) {
-                		insertMultiValToMessageTables(config, i+1, transId);	
-                	}
-                	
+                    /**
+                     * we check how long field is*
+                     */
+                    Integer subStringTotal = countSubString(config, transId);
+                    //TODO look up loop counter - how to write counter in new syntax?
+                    for (int i = 0; i <= subStringTotal; i++) {
+                        insertMultiValToMessageTables(config, i + 1, transId);
+                    }
+
                 }
             }
         }
@@ -367,10 +366,12 @@ public class transactionInManagerImpl implements transactionInManager {
         return transactionInDAO.insertSingleToMessageTables(configForInsert);
     }
 
-    /** this method takes in the transId, the insert fields, the insert tables**/
+    /**
+     * this method takes in the transId, the insert fields, the insert tables*
+     */
     @Override
     public boolean insertMultiValToMessageTables(ConfigForInsert config, Integer subStringCounter, Integer transId) {
-    	return transactionInDAO.insertMultiValToMessageTables(config, subStringCounter, transId); 
+        return transactionInDAO.insertMultiValToMessageTables(config, subStringCounter, transId);
     }
 
     @Override
@@ -466,7 +467,6 @@ public class transactionInManagerImpl implements transactionInManager {
                 batchFileResults.put("wrongFileType", "3");
             }
 
-
             outputStream = new FileOutputStream(newFile);
             int read = 0;
             byte[] bytes = new byte[1024];
@@ -475,14 +475,14 @@ public class transactionInManagerImpl implements transactionInManager {
                 outputStream.write(bytes, 0, read);
             }
             outputStream.close();
-            
-             /* Make sure the file has the correct delimiter : ERROR CODE 5 */
+
+            /* Make sure the file has the correct delimiter : ERROR CODE 5 */
             String delimChar = (String) messageTypeDAO.getDelimiterChar(transportDetails.getfileDelimiter());
 
             //Check to make sure the file contains the selected delimiter
             //Set the directory that holds the crosswalk files
             int delimCount = (Integer) dir.checkFileDelimiter(dir, fileName, delimChar);
-            
+
             if (delimCount < 10) {
                 batchFileResults.put("wrongDelim", "4");
             }
@@ -501,9 +501,14 @@ public class transactionInManagerImpl implements transactionInManager {
         return transactionInDAO.getBlankTransIds(config);
     }
 
-	@Override
-	public Integer countSubString(ConfigForInsert config, Integer transId) {
-		 return transactionInDAO.countSubString(config, transId);
-	}
+    @Override
+    public Integer countSubString(ConfigForInsert config, Integer transId) {
+        return transactionInDAO.countSubString(config, transId);
+    }
+    
+    @Override
+    public List<batchUploads> getuploadedBatches(int userId, int orgId) {
+        return transactionInDAO.getuploadedBatches(userId, orgId);
+    }
 
 }

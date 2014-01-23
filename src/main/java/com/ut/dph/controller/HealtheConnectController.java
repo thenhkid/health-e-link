@@ -10,10 +10,14 @@ import com.ut.dph.model.Organization;
 import com.ut.dph.model.User;
 import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.configuration;
+import com.ut.dph.model.lutables.lu_ProcessStatus;
+import com.ut.dph.model.transactionIn;
 import com.ut.dph.service.configurationManager;
 import com.ut.dph.service.messageTypeManager;
 import com.ut.dph.service.organizationManager;
+import com.ut.dph.service.sysAdminManager;
 import com.ut.dph.service.transactionInManager;
+import com.ut.dph.service.userManager;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -55,6 +59,12 @@ public class HealtheConnectController {
     @Autowired
     private transactionInManager transactionInManager;
     
+    @Autowired
+    private sysAdminManager sysAdminManager;
+    
+    @Autowired
+    private userManager usermanager;
+    
     
     /**
      * The '/upload' request will serve up the Health-e-Connect upload page.
@@ -69,6 +79,29 @@ public class HealtheConnectController {
         
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/Health-e-Connect/upload");
+        
+        /* Need to get a list of uploaded files */
+        User userInfo = (User)session.getAttribute("userDetails");
+        
+        /* Need to get a list of all uploaded batches */
+        List<batchUploads> uploadedBatches = transactionInManager.getuploadedBatches(userInfo.getId(), userInfo.getOrgId());
+        
+        if(!uploadedBatches.isEmpty()) {
+            for(batchUploads batch : uploadedBatches) {
+                List<transactionIn> batchTransactions = transactionInManager.getBatchTransactions(batch.getId(), userInfo.getId());
+                batch.settotalTransactions(batchTransactions.size());
+                
+                lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
+                batch.setstatusValue(processStatus.getDisplayCode());
+                
+                User userDetails = usermanager.getUserById(batch.getuserId());
+                String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
+                batch.setusersName(usersName);
+                
+            }
+        }
+        
+        mav.addObject("uploadedBatches", uploadedBatches);
         
         return mav;
     }

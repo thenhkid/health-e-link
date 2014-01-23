@@ -91,7 +91,8 @@ public interface transactionInDAO {
     
     List<Integer> getBlankTransIds(ConfigForInsert config);
     
-    
     Integer countSubString(ConfigForInsert config, Integer transId);
+    
+    List<batchUploads> getuploadedBatches(int userId, int orgId);
     
 }
