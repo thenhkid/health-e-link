@@ -770,13 +770,6 @@ public class transactionInDAOImpl implements transactionInDAO {
 			}
 	}
 
-	/** this call sp to loop through values and insert **/
-	@Override
-	public boolean insertMultiToMessageTables(ConfigForInsert configForInsert) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
 	@Override
 	@Transactional
 	public boolean clearMessageTableForBatch(int batchId, String mt) {
@@ -833,17 +826,53 @@ public class transactionInDAOImpl implements transactionInDAO {
 	
 
 	/** 
-	 * This method will call the SP and pass in the transaction Id, field lists and table name
-	 * 
-	 * SP will select the values and split it so it will be inserted into
-	 * the appropriate message_table in rows / pairs
+	 * This method will pass in the subString position and
+	 * insert value
 	 * **/
 	@Override
 	@Transactional
-	@SuppressWarnings("unchecked")
-	public boolean insertMultiValToMessageTables(ConfigForInsert config) {
-	
-		return false;
+	public boolean insertMultiValToMessageTables(ConfigForInsert config, 
+			Integer subStringCounter, Integer transId) {
+		String replaceSplitField = config.getSplitFields().replaceAll("@valPos", subStringCounter.toString());
+		String sql  = "insert into " + config.getSaveToTableName() 
+				+ " (transactionInId, " + config.getSaveToTableCol()
+				+ ") select transactionInId, " 
+				+ replaceSplitField
+				+ " from transactionTranslatedIn where "  
+				+ " transactionInId in (select id from transactionIn where batchId = :batchId"
+				+ " and configId = :configId and statusId = 10 and id = :id";
+		
+		sql = sql + ");";
+		
+		Query insertData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+				.setParameter("batchId", config.getBatchUploadId())
+				.setParameter("configId", config.getConfigId())
+				.setParameter("id", transId);
+		
+		
+		try {
+			insertData.executeUpdate();
+			return true;
+		} catch (Throwable ex) {
+            System.err.println("insertMultiValToMessageTables." + ex);
+            return false;
+		}
+	}
+
+	@Override
+	@Transactional
+	public Integer countSubString(ConfigForInsert config, Integer transId) {
+		String col = config.getSingleValueFields().substring(0, config.getSingleValueFields().indexOf(","));
+		String sql =  
+				"(SELECT ROUND(((LENGTH(" +  col
+				+ ") - LENGTH(REPLACE(LCASE(" + col
+				+"), '||^||', '')))/LENGTH('||^||')),0) as stringCount from transactionTranslatedin "
+				+ " where transactionInId = :id);";
+			Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).addScalar("stringCount", StandardBasicTypes.INTEGER);
+				  query.setParameter("id", transId);
+		Integer stringCount = (Integer) query.list().get(0);
+
+		return stringCount;
 	}
     
 }

@@ -33,6 +33,7 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -326,9 +327,18 @@ public class transactionInManagerImpl implements transactionInManager {
                 /**
                  * we loop through transactions with multiple values 
                  * and use SP to loop values with delimiters
+                 * 
                  */
+                for (Integer transId : transIds) {
+                	/**we check how long field is**/
+                	Integer subStringTotal =  countSubString(config, transId);
+                	//TODO look up loop counter - how to write counter in new syntax?
+                	for (int i=0;i<=subStringTotal;i++) {
+                		insertMultiValToMessageTables(config, i+1, transId);	
+                	}
+                	
+                }
             }
-
         }
         return false;
     }
@@ -359,12 +369,8 @@ public class transactionInManagerImpl implements transactionInManager {
 
     /** this method takes in the transId, the insert fields, the insert tables**/
     @Override
-    public boolean insertMultiToMessageTables(ConfigForInsert configForInsert) {
-    	/** test if loop transactionid is faster here or in sql **/
-    	transactionInDAO.insertMultiValToMessageTables(configForInsert);
-    	
-    	
-    	return false;
+    public boolean insertMultiValToMessageTables(ConfigForInsert config, Integer subStringCounter, Integer transId) {
+    	return transactionInDAO.insertMultiValToMessageTables(config, subStringCounter, transId); 
     }
 
     @Override
@@ -494,5 +500,10 @@ public class transactionInManagerImpl implements transactionInManager {
     public List<Integer> getBlankTransIds(ConfigForInsert config) {
         return transactionInDAO.getBlankTransIds(config);
     }
+
+	@Override
+	public Integer countSubString(ConfigForInsert config, Integer transId) {
+		 return transactionInDAO.countSubString(config, transId);
+	}
 
 }

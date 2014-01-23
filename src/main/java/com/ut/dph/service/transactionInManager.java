@@ -17,6 +17,7 @@ import com.ut.dph.model.custom.ConfigForInsert;
 
 import java.util.List;
 import java.util.Map;
+
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -83,7 +84,7 @@ public interface transactionInManager {
     
     boolean insertSingleToMessageTables(ConfigForInsert configForInsert);
     
-    boolean insertMultiToMessageTables(ConfigForInsert configForInsert);
+    boolean insertMultiValToMessageTables(ConfigForInsert config, Integer subStringCounter, Integer transId);
     
     List <ConfigForInsert> setConfigForInsert(int configId, int batchUploadId);
     
@@ -96,5 +97,7 @@ public interface transactionInManager {
      Map<String,String> uploadBatchFile(int configId, MultipartFile fileUpload);
     
     List <Integer> getBlankTransIds (ConfigForInsert config);
+    
+    Integer countSubString(ConfigForInsert config, Integer transId);
    
 }

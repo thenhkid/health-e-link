@@ -83,7 +83,7 @@ public interface transactionInDAO {
     
     boolean insertSingleToMessageTables(ConfigForInsert configForInsert);
     
-    boolean insertMultiToMessageTables(ConfigForInsert configForInsert);
+    boolean insertMultiValToMessageTables(ConfigForInsert config, Integer subStringCounter, Integer transId);
     
     boolean clearMessageTableForBatch(int batchId, String tableName);
     
@@ -91,6 +91,7 @@ public interface transactionInDAO {
     
     List<Integer> getBlankTransIds(ConfigForInsert config);
     
-    boolean insertMultiValToMessageTables(ConfigForInsert config);
+    
+    Integer countSubString(ConfigForInsert config, Integer transId);
     
 }
