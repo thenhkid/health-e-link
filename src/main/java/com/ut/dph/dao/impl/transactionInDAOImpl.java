@@ -47,6 +47,8 @@ public class transactionInDAOImpl implements transactionInDAO {
     private SessionFactory sessionFactory;
 
     private String schemaName = "universalTranslator";
+    
+    private int transRELId = 12;
 
     /**
      * The 'getFieldValue' function will return the value saved for the passed in tableName, tableCol and idValue.
@@ -836,14 +838,15 @@ public class transactionInDAOImpl implements transactionInDAO {
 
         String sql = ("select transactionInId from "
                 + " transactionTranslatedIn where (" + config.getCheckForDelim()
-                + ") and transactionInId in (select id from transactionIn where statusId = 10 "
+                + ") and transactionInId in (select id from transactionIn where statusId = :relId "
                 + " and batchId = :batchUploadId"
                 + " and configId = :configId); ");
 
         Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
         query.setParameter("configId", config.getConfigId());
         query.setParameter("batchUploadId", config.getBatchUploadId());
-
+        query.setParameter("relId", transRELId);
+        
         List<Integer> transId = query.list();
 
         return transId;
@@ -861,7 +864,7 @@ public class transactionInDAOImpl implements transactionInDAO {
                 + config.getSingleValueFields()
                 + " from transactionTranslatedIn where "
                 + " transactionInId in (select id from transactionIn where batchId = :batchId"
-                + " and configId = :configId and statusId = 10 ";
+                + " and configId = :configId and statusId = :relId ";
         if (config.getLoopTransIds().size() > 0) {
             sql = sql + " and id not in (" + config.getLoopTransIds().toString().substring(1, config.getLoopTransIds().toString().length() - 1) + ")";
         }
@@ -873,7 +876,8 @@ public class transactionInDAOImpl implements transactionInDAO {
 
         Query insertData = sessionFactory.getCurrentSession().createSQLQuery(sql)
                 .setParameter("batchId", config.getBatchUploadId())
-                .setParameter("configId", config.getConfigId());
+                .setParameter("configId", config.getConfigId())
+        		.setParameter("relId", transRELId);
 
         try {
             insertData.executeUpdate();
@@ -923,13 +927,14 @@ public class transactionInDAOImpl implements transactionInDAO {
         String sql = ("select transactionInId from "
                 + " transactionTranslatedIn where (length(concat(" + config.getSingleValueFields()
                 + ")) = 0 or length(concat(" + config.getSingleValueFields()
-                + ")) is null) and transactionInId in (select id from transactionIn where statusId = 10 "
+                + ")) is null) and transactionInId in (select id from transactionIn where statusId = : relId "
                 + " and batchId = :batchUploadId"
                 + " and configId = :configId); ");
 
         Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
         query.setParameter("configId", config.getConfigId());
         query.setParameter("batchUploadId", config.getBatchUploadId());
+        query.setParameter("relId", transRELId);
 
         List<Integer> transId = query.list();
 
@@ -951,14 +956,15 @@ public class transactionInDAOImpl implements transactionInDAO {
                 + replaceSplitField
                 + " from transactionTranslatedIn where "
                 + " transactionInId in (select id from transactionIn where batchId = :batchId"
-                + " and configId = :configId and statusId = 10 and id = :id";
+                + " and configId = :configId and statusId = :relId and id = :id";
 
         sql = sql + ");";
 
         Query insertData = sessionFactory.getCurrentSession().createSQLQuery(sql)
                 .setParameter("batchId", config.getBatchUploadId())
                 .setParameter("configId", config.getConfigId())
-                .setParameter("id", transId);
+                .setParameter("id", transId)
+        		.setParameter("relId", transRELId);
 
         try {
             insertData.executeUpdate();
