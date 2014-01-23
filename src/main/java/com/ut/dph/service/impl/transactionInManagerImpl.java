@@ -295,7 +295,9 @@ public class transactionInManagerImpl implements transactionInManager {
     @Override
     //TODO implement true/false so we can break from method when error occurs
     public boolean processTransactions(int batchUploadId) {
-        /**
+        /** check batch status **/
+    	
+    	/**
          * Check for R/O Apply CW/Macros Apply method to concatenate values for the same saveToTableCol using delimiter ||^||
          */
         /**
@@ -345,6 +347,11 @@ public class transactionInManagerImpl implements transactionInManager {
                 }
             }
         }
+        /** now that we are done with inserting we check batch settings to see if we can release the batch 
+         * we have Auto Release
+         * **/
+        
+        
         return false;
     }
 
@@ -516,5 +523,19 @@ public class transactionInManagerImpl implements transactionInManager {
     public List<batchUploads> getuploadedBatches(int userId, int orgId) {
         return transactionInDAO.getuploadedBatches(userId, orgId);
     }
+
+    /** this will be the main process to call.  We will take a batch and 
+     * then from its status etc we will decide if we want to process transactions or not.
+     */
+	@Override
+	public boolean processBatch(int batchUploadId) {
+		/** this do a bunch of batch checks **/
+		
+		/** inserts targets, transactionIn etc **/
+		
+		/** run validation and inserts for batches that passes **/
+		processTransactions(batchUploadId);
+		return false;
+	}
 
 }

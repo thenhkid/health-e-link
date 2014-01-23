@@ -103,5 +103,7 @@ public interface transactionInManager {
     Integer countSubString(ConfigForInsert config, Integer transId);
     
     List<batchUploads> getuploadedBatches(int userId, int orgId);
+    
+    boolean processBatch(int batchUploadId);
    
 }
