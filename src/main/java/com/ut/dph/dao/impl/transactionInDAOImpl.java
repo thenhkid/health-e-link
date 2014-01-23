@@ -17,8 +17,11 @@ import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionInRecords;
 import com.ut.dph.model.transactionTarget;
 import com.ut.dph.model.custom.ConfigForInsert;
+import com.ut.dph.model.messageType;
+import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -288,7 +291,9 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Override
     @Transactional
     @SuppressWarnings("UnusedAssignment")
-    public List<batchUploads> getpendingBatches(int userId, int orgId) {
+    public List<batchUploads> getpendingBatches(int userId, int orgId, int page, int maxResults) {
+        
+        int firstResult = 0;
 
         /* Get a list of connections the user has access to */
         Criteria connections = sessionFactory.getCurrentSession().createCriteria(configurationConnectionSenders.class);
@@ -355,7 +360,119 @@ public class transactionInDAOImpl implements transactionInDAO {
         )
         );
         findBatches.addOrder(Order.desc("dateSubmitted"));
+        
+        if (page > 1) {
+            firstResult = (maxResults * (page - 1));
+        }
+        
+        findBatches.setFirstResult(firstResult);
+        
+        if(maxResults > 0) {
+            //Set the max results to display
+            findBatches.setMaxResults(maxResults);
+        }
 
+        return findBatches.list();
+    }
+    
+    /**
+     * The 'findBatches' function will take a list of batches and apply the searchTerm to 
+     * narrow down the results.
+     * 
+     * @param  batches The object containing the returned batches
+     * @param  searchTerm The term to search the batches on
+     * 
+     * @return This function will return a list of batches that match the search term.
+     */
+    @Override
+    @Transactional
+    public List<batchUploads> findBatches(List<batchUploads> batches, String searchTerm) {
+        
+        List<Integer> batchIdList = new ArrayList<Integer>();
+        
+        searchTerm = searchTerm.toLowerCase();
+        searchTerm = searchTerm.replace(".", "\\.");
+        
+        for(batchUploads batch : batches) {
+            
+            /* Search the submitted by */
+            if(batch.getusersName().toLowerCase().matches(".*"+searchTerm+".*")) {
+                if(!batchIdList.contains(batch.getId())) {
+                    batchIdList.add(batch.getId());
+                }
+            }
+            
+            /* Search the batch name */
+            if(batch.getutBatchName().toLowerCase().matches(".*"+searchTerm+".*")) {
+                if(!batchIdList.contains(batch.getId())) {
+                    batchIdList.add(batch.getId());
+                }
+            }
+            
+            /* Search the batch date */
+            String dateAsString = new SimpleDateFormat("MM/dd/yyyy").format(batch.getdateSubmitted());
+            
+            if(dateAsString.matches(".*"+searchTerm+".*")) {
+                if(!batchIdList.contains(batch.getId())) {
+                    batchIdList.add(batch.getId());
+                }
+            }
+            
+            /* Search the status */
+            if(batch.getstatusValue().toLowerCase().matches(".*"+searchTerm+".*")) {
+                if(!batchIdList.contains(batch.getId())) {
+                    batchIdList.add(batch.getId());
+                }
+            }
+            
+            /* Search message types included in the batch */
+            Criteria transactionQuery = sessionFactory.getCurrentSession().createCriteria(transactionIn.class);
+            transactionQuery.add(Restrictions.eq("batchId",batch.getId()));
+            List<transactionIn> transactions = transactionQuery.list();
+            
+            if(!transactions.isEmpty()) {
+                
+                /* Loop through the transactions to get the config details */
+                for(transactionIn transaction : transactions) {
+                    
+                    Criteria configQuery = sessionFactory.getCurrentSession().createCriteria(configuration.class);
+                    configQuery.add(Restrictions.eq("id", transaction.getconfigId()));
+                    List<configuration> configs = configQuery.list();
+                    
+                    if(!configs.isEmpty()) {
+                        
+                        /* Loop through the configurations to get the config details */
+                        for(configuration config : configs) {
+                            
+                            messageType messageTypeDetails = (messageType) sessionFactory.getCurrentSession().get(messageType.class, config.getMessageTypeId());
+                            
+                            /* Search the status */
+                            if(messageTypeDetails.getName().toLowerCase().matches(".*"+searchTerm+".*")) {
+                                if(!batchIdList.contains(batch.getId())) {
+                                    batchIdList.add(batch.getId());
+                                }
+                            }
+                        }
+                    }
+                    
+                }
+                
+            }
+           
+            /* Search target data */
+            
+            
+        }
+        
+        if(batchIdList.isEmpty()) {
+            batchIdList.add(0);
+        }
+        
+        
+        Criteria findBatches = sessionFactory.getCurrentSession().createCriteria(batchUploads.class);
+        findBatches.add(Restrictions.in("id", batchIdList));
+        findBatches.addOrder(Order.desc("dateSubmitted"));
+        
         return findBatches.list();
     }
 

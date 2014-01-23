@@ -43,7 +43,9 @@ public interface transactionInDAO {
     
     void submitTransactionTranslatedInRecords(int transactionId, int transactionRecordId, int configId);
     
-    List<batchUploads> getpendingBatches(int userId, int orgId);
+    List<batchUploads> getpendingBatches(int userId, int orgId, int page, int maxResults);
+    
+    List<batchUploads> findBatches(List<batchUploads> batches, String searchTerm);
     
     List<transactionIn> getBatchTransactions(int batchId, int userId);
     

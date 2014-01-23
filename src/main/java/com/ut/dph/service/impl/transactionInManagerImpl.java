@@ -120,8 +120,14 @@ public class transactionInManagerImpl implements transactionInManager {
 
     @Override
     @Transactional
-    public List<batchUploads> getpendingBatches(int userId, int orgId) {
-        return transactionInDAO.getpendingBatches(userId, orgId);
+    public List<batchUploads> getpendingBatches(int userId, int orgId, int page, int maxResults) {
+        return transactionInDAO.getpendingBatches(userId, orgId, page, maxResults);
+    }
+    
+    @Override
+    @Transactional
+    public List<batchUploads> findBatches(List<batchUploads> batches, String searchTerm) {
+        return transactionInDAO.findBatches(batches, searchTerm);
     }
 
     @Override

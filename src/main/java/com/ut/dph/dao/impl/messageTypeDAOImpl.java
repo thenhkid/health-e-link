@@ -119,7 +119,7 @@ public class messageTypeDAOImpl implements messageTypeDAO {
 
         int firstResult = 0;
 
-		//Set the parameters for paging
+	//Set the parameters for paging
         //Set the page to load
         if (page > 1) {
             firstResult = (maxResults * (page - 1));
