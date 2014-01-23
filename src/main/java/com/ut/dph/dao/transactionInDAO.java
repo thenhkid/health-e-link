@@ -91,4 +91,6 @@ public interface transactionInDAO {
     
     List<Integer> getBlankTransIds(ConfigForInsert config);
     
+    boolean insertMultiValToMessageTables(ConfigForInsert config);
+    
 }

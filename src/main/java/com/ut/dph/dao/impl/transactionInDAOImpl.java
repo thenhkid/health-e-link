@@ -830,5 +830,20 @@ public class transactionInDAOImpl implements transactionInDAO {
 
         return transId;
 	}
+	
+
+	/** 
+	 * This method will call the SP and pass in the transaction Id, field lists and table name
+	 * 
+	 * SP will select the values and split it so it will be inserted into
+	 * the appropriate message_table in rows / pairs
+	 * **/
+	@Override
+	@Transactional
+	@SuppressWarnings("unchecked")
+	public boolean insertMultiValToMessageTables(ConfigForInsert config) {
+	
+		return false;
+	}
     
 }

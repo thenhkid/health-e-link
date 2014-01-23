@@ -324,7 +324,8 @@ public class transactionInManagerImpl implements transactionInManager {
                 insertSingleToMessageTables(config);
 
                 /**
-                 * we loop through transactions with multi values and use SP to loop values with delimiters *
+                 * we loop through transactions with multiple values 
+                 * and use SP to loop values with delimiters
                  */
             }
 
@@ -356,10 +357,14 @@ public class transactionInManagerImpl implements transactionInManager {
         return transactionInDAO.insertSingleToMessageTables(configForInsert);
     }
 
+    /** this method takes in the transId, the insert fields, the insert tables**/
     @Override
     public boolean insertMultiToMessageTables(ConfigForInsert configForInsert) {
-        // TODO Auto-generated method stub
-        return false;
+    	/** test if loop transactionid is faster here or in sql **/
+    	transactionInDAO.insertMultiValToMessageTables(configForInsert);
+    	
+    	
+    	return false;
     }
 
     @Override

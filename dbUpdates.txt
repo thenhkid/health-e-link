@@ -409,6 +409,11 @@ DROP INDEX `FKMessFromPProviderId_idx` ;
 ALTER TABLE `universalTranslator`.`message_Patients` 
 CHANGE COLUMN `englishProficient` `englishProficient` VARCHAR(10) NULL DEFAULT NULL COMMENT 'can be Yes, No, Unknown...\nWe wi\nso changing it to varchar' ;
 
+/* 1.22.2014 5:04PM **/
+ALTER TABLE `universalTranslator`.`message_VisitInfo` 
+CHANGE COLUMN `incomeReported` `incomeReported` VARCHAR(10) NULL DEFAULT NULL COMMENT 'could be y, n, unknown, etc.' ,
+ADD COLUMN `weight` FLOAT NULL AFTER `comments`,
+ADD COLUMN `height` FLOAT NULL AFTER `weight`;
 
 
 
