@@ -592,11 +592,18 @@ public class HealtheWebController {
                 batchUpload.setstatusId(8);
             }
             /* 
-            If the "Send" or "Release" button was pressed 
+            If the "Release" button was pressed 
             set the status to "Submission Release Pending"
             */
-            else {
+            else if(action.equals("release")) {
                 batchUpload.setstatusId(5);
+            }
+            /* 
+            If the "Send" button was pressed 
+            set the status to "Submission Released"
+            */
+            else {
+                batchUpload.setstatusId(6);
             }
             batchUpload.settotalRecordCount(1);
 
@@ -618,11 +625,18 @@ public class HealtheWebController {
                 batchUpload.setstatusId(8);
             }
             /* 
-            If the "Send" or "Release" button was pressed 
+            If the "Release" button was pressed 
             set the status to "Submission Release Pending"
             */
-            else {
+            else if(action.equals("release")) {
                 batchUpload.setstatusId(5);
+            }
+            /* 
+            If the "Send" button was pressed 
+            set the status to "Submission Released"
+            */
+            else {
+                batchUpload.setstatusId(6);
             }
             
             transactionInManager.submitBatchUploadChanges(batchUpload);
@@ -644,11 +658,18 @@ public class HealtheWebController {
                 transactionIn.setstatusId(15);
             }
             /* 
-            If the "Send" or "Release" button was pressed 
+            If the "Release" button was pressed 
             set the status to "Release Pending"
             */
-            else {
+            else if(action.equals("release")) {
                 transactionIn.setstatusId(10);
+            }
+            /* 
+            If the "Send" button was pressed 
+            set the status to "Released"
+            */
+            else {
+                transactionIn.setstatusId(12);
             }
 
             transactionId = (Integer) transactionInManager.submitTransactionIn(transactionIn);
@@ -679,12 +700,19 @@ public class HealtheWebController {
             if(action.equals("save")) {
                 transactionIn.setstatusId(15);
             }
-            /* 
-            If the "Send" or "Release" button was pressed 
+            /*
+            If the "Release" button was pressed 
             set the status to "Release Pending"
             */
-            else {
+            else if(action.equals("release")) {
                 transactionIn.setstatusId(10);
+            }
+            /* 
+            If the "Send" button was pressed 
+            set the status to "Released"
+            */
+            else {
+                transactionIn.setstatusId(12);
             }
             
             transactionInManager.submitTransactionInChanges(transactionIn);
