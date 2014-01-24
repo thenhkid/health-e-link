@@ -1589,6 +1589,11 @@ public class HealtheWebController {
         */
         if(!batchIdList.isEmpty()) {
             for(Integer batchId : batchIdList) {
+                
+                /* Update the transactionIn status to 12 (REL) */
+                transactionInManager.updateTransactionStatus(batchId,0,12);
+                
+                /* Process the batch */
                 boolean transactionSentToProcess = transactionInManager.processBatch(batchId);
             }
         }

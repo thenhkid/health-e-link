@@ -47,7 +47,7 @@ public class transactionInDAOImpl implements transactionInDAO {
     private SessionFactory sessionFactory;
 
     private String schemaName = "universalTranslator";
-    
+
     private int transRELId = 12;
 
     /**
@@ -294,7 +294,7 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Transactional
     @SuppressWarnings("UnusedAssignment")
     public List<batchUploads> getpendingBatches(int userId, int orgId, int page, int maxResults) {
-        
+
         int firstResult = 0;
 
         /* Get a list of connections the user has access to */
@@ -364,135 +364,133 @@ public class transactionInDAOImpl implements transactionInDAO {
         )
         );
         findBatches.addOrder(Order.desc("dateSubmitted"));
-        
+
         if (page > 1) {
             firstResult = (maxResults * (page - 1));
         }
-        
+
         findBatches.setFirstResult(firstResult);
-        
-        if(maxResults > 0) {
+
+        if (maxResults > 0) {
             //Set the max results to display
             findBatches.setMaxResults(maxResults);
         }
 
         return findBatches.list();
     }
-    
+
     /**
-     * The 'findBatches' function will take a list of batches and apply the searchTerm to 
-     * narrow down the results.
-     * 
-     * @param  batches The object containing the returned batches
-     * @param  searchTerm The term to search the batches on
-     * 
+     * The 'findBatches' function will take a list of batches and apply the searchTerm to narrow down the results.
+     *
+     * @param batches The object containing the returned batches
+     * @param searchTerm The term to search the batches on
+     *
      * @return This function will return a list of batches that match the search term.
      */
     @Override
     @Transactional
     public List<batchUploads> findBatches(List<batchUploads> batches, String searchTerm) {
-        
+
         List<Integer> batchIdList = new ArrayList<Integer>();
-        
+
         searchTerm = searchTerm.toLowerCase();
         searchTerm = searchTerm.replace(".", "\\.");
-        
-        for(batchUploads batch : batches) {
-            
+
+        for (batchUploads batch : batches) {
+
             /* Search the submitted by */
-            if(batch.getusersName().toLowerCase().matches(".*"+searchTerm+".*")) {
-                if(!batchIdList.contains(batch.getId())) {
+            if (batch.getusersName().toLowerCase().matches(".*" + searchTerm + ".*")) {
+                if (!batchIdList.contains(batch.getId())) {
                     batchIdList.add(batch.getId());
                 }
             }
-            
+
             /* Search the batch name */
-            if(batch.getutBatchName().toLowerCase().matches(".*"+searchTerm+".*")) {
-                if(!batchIdList.contains(batch.getId())) {
+            if (batch.getutBatchName().toLowerCase().matches(".*" + searchTerm + ".*")) {
+                if (!batchIdList.contains(batch.getId())) {
                     batchIdList.add(batch.getId());
                 }
             }
-            
+
             /* Search the batch date */
             String dateAsString = new SimpleDateFormat("MM/dd/yyyy").format(batch.getdateSubmitted());
-            
-            if(dateAsString.matches(".*"+searchTerm+".*")) {
-                if(!batchIdList.contains(batch.getId())) {
+
+            if (dateAsString.matches(".*" + searchTerm + ".*")) {
+                if (!batchIdList.contains(batch.getId())) {
                     batchIdList.add(batch.getId());
                 }
             }
-            
+
             /* Search the status */
-            if(batch.getstatusValue().toLowerCase().matches(".*"+searchTerm+".*")) {
-                if(!batchIdList.contains(batch.getId())) {
+            if (batch.getstatusValue().toLowerCase().matches(".*" + searchTerm + ".*")) {
+                if (!batchIdList.contains(batch.getId())) {
                     batchIdList.add(batch.getId());
                 }
             }
-            
+
             /* Search message types included in the batch */
             Criteria transactionQuery = sessionFactory.getCurrentSession().createCriteria(transactionIn.class);
-            transactionQuery.add(Restrictions.eq("batchId",batch.getId()));
+            transactionQuery.add(Restrictions.eq("batchId", batch.getId()));
             List<transactionIn> transactions = transactionQuery.list();
-            
-            if(!transactions.isEmpty()) {
-                
+
+            if (!transactions.isEmpty()) {
+
                 /* Loop through the transactions to get the config details */
-                for(transactionIn transaction : transactions) {
-                    
+                for (transactionIn transaction : transactions) {
+
                     Criteria configQuery = sessionFactory.getCurrentSession().createCriteria(configuration.class);
                     configQuery.add(Restrictions.eq("id", transaction.getconfigId()));
                     List<configuration> configs = configQuery.list();
-                    
-                    if(!configs.isEmpty()) {
-                        
+
+                    if (!configs.isEmpty()) {
+
                         /* Loop through the configurations to get the config details */
-                        for(configuration config : configs) {
-                            
+                        for (configuration config : configs) {
+
                             messageType messageTypeDetails = (messageType) sessionFactory.getCurrentSession().get(messageType.class, config.getMessageTypeId());
-                            
+
                             /* Search the status */
-                            if(messageTypeDetails.getName().toLowerCase().matches(".*"+searchTerm+".*")) {
-                                if(!batchIdList.contains(batch.getId())) {
+                            if (messageTypeDetails.getName().toLowerCase().matches(".*" + searchTerm + ".*")) {
+                                if (!batchIdList.contains(batch.getId())) {
                                     batchIdList.add(batch.getId());
                                 }
                             }
                         }
                     }
-                    
+
                 }
-                
+
             }
-           
+
             /* Search target data */
             Criteria targetQuery = sessionFactory.getCurrentSession().createCriteria(batchUploadSummary.class);
             targetQuery.add(Restrictions.eq("batchId", batch.getId()));
             List<batchUploadSummary> targets = targetQuery.list();
-            
-            if(!targets.isEmpty()) {
-                
-                for(batchUploadSummary target : targets) {
+
+            if (!targets.isEmpty()) {
+
+                for (batchUploadSummary target : targets) {
                     Organization orgDetails = (Organization) sessionFactory.getCurrentSession().get(Organization.class, target.gettargetOrgId());
-                    
+
                     /* Search the organization name */
-                    if(orgDetails.getOrgName().toLowerCase().matches(".*"+searchTerm+".*")) {
-                        if(!batchIdList.contains(batch.getId())) {
+                    if (orgDetails.getOrgName().toLowerCase().matches(".*" + searchTerm + ".*")) {
+                        if (!batchIdList.contains(batch.getId())) {
                             batchIdList.add(batch.getId());
                         }
                     }
                 }
-                
+
             }
         }
-        
-        if(batchIdList.isEmpty()) {
+
+        if (batchIdList.isEmpty()) {
             batchIdList.add(0);
         }
-        
-        
+
         Criteria findBatches = sessionFactory.getCurrentSession().createCriteria(batchUploads.class);
         findBatches.add(Restrictions.in("id", batchIdList));
         findBatches.addOrder(Order.desc("dateSubmitted"));
-        
+
         return findBatches.list();
     }
 
@@ -580,7 +578,7 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Override
     @Transactional
     public List<batchUploads> getsentBatches(int userId, int orgId, int page, int maxResults) {
-        
+
         int firstResult = 0;
 
         /* Get a list of connections the user has access to */
@@ -650,14 +648,14 @@ public class transactionInDAOImpl implements transactionInDAO {
         )
         );
         findBatches.addOrder(Order.desc("dateSubmitted"));
-        
+
         if (page > 1) {
             firstResult = (maxResults * (page - 1));
         }
-        
+
         findBatches.setFirstResult(firstResult);
-        
-        if(maxResults > 0) {
+
+        if (maxResults > 0) {
             //Set the max results to display
             findBatches.setMaxResults(maxResults);
         }
@@ -923,7 +921,7 @@ public class transactionInDAOImpl implements transactionInDAO {
         query.setParameter("configId", config.getConfigId());
         query.setParameter("batchUploadId", config.getBatchUploadId());
         query.setParameter("relId", transRELId);
-        
+
         List<Integer> transId = query.list();
 
         return transId;
@@ -934,7 +932,7 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Transactional
     public boolean insertSingleToMessageTables(ConfigForInsert config) {
 
-			//TODO need to handle mappings but there are no values - etc best time to call / not require / we do not need to insert blank row
+        //TODO need to handle mappings but there are no values - etc best time to call / not require / we do not need to insert blank row
         String sql = "insert into " + config.getSaveToTableName()
                 + " (transactionInId, " + config.getSaveToTableCol()
                 + ") select transactionInId, "
@@ -954,7 +952,7 @@ public class transactionInDAOImpl implements transactionInDAO {
         Query insertData = sessionFactory.getCurrentSession().createSQLQuery(sql)
                 .setParameter("batchId", config.getBatchUploadId())
                 .setParameter("configId", config.getConfigId())
-        		.setParameter("relId", transRELId);
+                .setParameter("relId", transRELId);
 
         try {
             insertData.executeUpdate();
@@ -1019,8 +1017,7 @@ public class transactionInDAOImpl implements transactionInDAO {
     }
 
     /**
-     * This method will pass in the subString position and insert value
-	 * *
+     * This method will pass in the subString position and insert value *
      */
     @Override
     @Transactional
@@ -1041,7 +1038,7 @@ public class transactionInDAOImpl implements transactionInDAO {
                 .setParameter("batchId", config.getBatchUploadId())
                 .setParameter("configId", config.getConfigId())
                 .setParameter("id", transId)
-        		.setParameter("relId", transRELId);
+                .setParameter("relId", transRELId);
 
         try {
             insertData.executeUpdate();
@@ -1067,20 +1064,19 @@ public class transactionInDAOImpl implements transactionInDAO {
 
         return stringCount;
     }
-    
+
     /**
-     * The 'getuploadedBatches' function will return a list of batches that were
-     * uploaded by the logged in user.
-     * 
-     * @param userId    The id of the logged in user
-     * @param orgId     The id of the organization the logged in user belongs to
-     * 
+     * The 'getuploadedBatches' function will return a list of batches that were uploaded by the logged in user.
+     *
+     * @param userId The id of the logged in user
+     * @param orgId The id of the organization the logged in user belongs to
+     *
      * @return This function will return a list of batches.
      */
     @Override
     @Transactional
     public List<batchUploads> getuploadedBatches(int userId, int orgId) {
-        
+
         /* Get a list of uploaded batches for the organization */
         Criteria findBatches = sessionFactory.getCurrentSession().createCriteria(batchUploads.class);
         findBatches.add(Restrictions.eq("orgId", orgId));
@@ -1091,90 +1087,87 @@ public class transactionInDAOImpl implements transactionInDAO {
         return findBatches.list();
     }
 
-	@Override
-	@Transactional
-	public void updateBatchStatus(Integer batchUploadId, Integer statusId,
-			String timeField) {
-		
-		String sql  = "update batchUploads set statusId = :statusId ";
-		if (!timeField.equalsIgnoreCase("")) {
-				sql = sql + ", " + timeField + " = CURRENT_TIMESTAMP";
-		} else {
-			// we reset time
-			sql = sql + ", startDateTime = null, endDateTime = null";
-		}
-				sql = sql +  " where id = :id ";
-		Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
-				.setParameter("statusId", statusId)	
-				.setParameter("id", batchUploadId);
-		try {
-			updateData.executeUpdate();
-		} catch (Throwable ex) {
+    @Override
+    @Transactional
+    public void updateBatchStatus(Integer batchUploadId, Integer statusId,
+            String timeField) {
+
+        String sql = "update batchUploads set statusId = :statusId ";
+        if (!timeField.equalsIgnoreCase("")) {
+            sql = sql + ", " + timeField + " = CURRENT_TIMESTAMP";
+        } else {
+            // we reset time
+            sql = sql + ", startDateTime = null, endDateTime = null";
+        }
+        sql = sql + " where id = :id ";
+        Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                .setParameter("statusId", statusId)
+                .setParameter("id", batchUploadId);
+        try {
+            updateData.executeUpdate();
+        } catch (Throwable ex) {
             System.err.println("updateBatchStatus failed." + ex);
-		}
-		
-		
-	}
+        }
 
-	@Override
-	@Transactional
-	public void updateTransactionStatus(Integer batchUploadId,
-			Integer fromStatusId, Integer toStatusId) {
-		String sql  = "update transactionIn "
-				+ " set statusId = :toStatusId, "
-				+  "dateCreated = CURRENT_TIMESTAMP"
-				+ " where batchId = :batchUploadId ";
-		if (fromStatusId != 0) {
-			sql = sql + " and statusId = :fromStatusId";
-		}
-		Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
-				.setParameter("toStatusId", toStatusId)	
-				.setParameter("batchUploadId", batchUploadId);
-		
-		if (fromStatusId != 0) {
-			updateData.setParameter("fromStatusId", fromStatusId);
-		}
-		
-		try {
-			updateData.executeUpdate();
-		} catch (Throwable ex) {
+    }
+
+    @Override
+    @Transactional
+    public void updateTransactionStatus(Integer batchUploadId,
+            Integer fromStatusId, Integer toStatusId) {
+        String sql = "update transactionIn "
+                + " set statusId = :toStatusId, "
+                + "dateCreated = CURRENT_TIMESTAMP"
+                + " where batchId = :batchUploadId ";
+        if (fromStatusId != 0) {
+            sql = sql + " and statusId = :fromStatusId";
+        }
+        Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                .setParameter("toStatusId", toStatusId)
+                .setParameter("batchUploadId", batchUploadId);
+
+        if (fromStatusId != 0) {
+            updateData.setParameter("fromStatusId", fromStatusId);
+        }
+
+        try {
+            updateData.executeUpdate();
+        } catch (Throwable ex) {
             System.err.println("updateTransactionStatus failed." + ex);
-		}
-		
-	}
+        }
 
-	@Override
-	@Transactional
-	public boolean allowBatchClear(Integer batchUploadId) {
-		String sql
+    }
+
+    @Override
+    @Transactional
+    public boolean allowBatchClear(Integer batchUploadId) {
+        String sql
                 = "select count(*) as rowCount from batchUploads where id = :id and statusId in (22,23,1);";
         Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).addScalar("rowCount", StandardBasicTypes.INTEGER);
         query.setParameter("id", batchUploadId);
         Integer rowCount = (Integer) query.list().get(0);
         if (rowCount == 0) {
-        	return true;
-        } 
-		return false;
-	}
+            return true;
+        }
+        return false;
+    }
 
-	@Override
-	@Transactional
-	public boolean clearTransactionInRecords(Integer batchUploadId) {
-		String sql  = "delete from transactionInRecords where transactionInId in"
-				+ "(select id from transactionIn where batchId = :batchUploadId )";
-		
-		Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
-				.setParameter("batchUploadId", batchUploadId);
-		
-		try {
-			deleteData.executeUpdate();
-			return true;
-		} catch (Throwable ex) {
+    @Override
+    @Transactional
+    public boolean clearTransactionInRecords(Integer batchUploadId) {
+        String sql = "delete from transactionInRecords where transactionInId in"
+                + "(select id from transactionIn where batchId = :batchUploadId )";
+
+        Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                .setParameter("batchUploadId", batchUploadId);
+
+        try {
+            deleteData.executeUpdate();
+            return true;
+        } catch (Throwable ex) {
             System.err.println("clearTransactionInRecords failed." + ex);
             return false;
-		}
-	}
-	
-	
+        }
+    }
 
 }
