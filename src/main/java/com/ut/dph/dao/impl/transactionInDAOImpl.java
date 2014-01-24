@@ -1083,10 +1083,10 @@ public class transactionInDAOImpl implements transactionInDAO {
 	@Transactional
 	public boolean clearTransactionInRecords(Integer batchUploadId) {
 		String sql  = "delete from transactionInRecords where transactionInId in"
-				+ "(select id from transactionIn where batchId = :batchId )";
+				+ "(select id from transactionIn where batchId = :batchUploadId )";
 		
 		Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
-				.setParameter("id", batchUploadId);
+				.setParameter("batchUploadId", batchUploadId);
 		
 		try {
 			deleteData.executeUpdate();
