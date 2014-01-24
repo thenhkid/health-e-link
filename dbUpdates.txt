@@ -428,8 +428,17 @@ DROP COLUMN `configId`;
 ALTER TABLE `universalTranslator`.`message_FromProvider` 
 DROP COLUMN `configId`;
 
-/**1.24.2014 **/
+/**1.24.2014 Grace**/
 INSERT INTO `universalTranslator`.`lu_ProcessStatus` (`category`, `displayCode`, `displayText`) VALUES ('batch', 'TBP', 'Target Batch Creation in Process');
 INSERT INTO `universalTranslator`.`lu_ProcessStatus` (`category`, `displayCode`, `displayText`) VALUES ('batch', 'TBC', 'Target Batch Created');
 
+/*1.24.14 Grace PM */
+ALTER TABLE `universaltranslator`.`message_Visitinfo` 
+DROP FOREIGN KEY `mdTransFK`;
+ALTER TABLE `universaltranslator`.`message_VisitInfo` 
+ADD CONSTRAINT `mdTransFK`
+  FOREIGN KEY (`transactionInId`)
+  REFERENCES `universaltranslator`.`transactionin` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
 
