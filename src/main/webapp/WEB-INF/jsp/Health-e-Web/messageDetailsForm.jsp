@@ -42,7 +42,7 @@
                                 <label class="sr-only">Select Action</label>
                                 <select class="form-control" id="formAction">
                                     <option value="">Select Action</option>
-                                    <option value="print">Print</option>
+                                    <option value="print">Print / Save As</option>
                                 </select>
                             </div>
                         </div>

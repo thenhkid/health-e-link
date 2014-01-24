@@ -39,7 +39,8 @@
                         <label class="sr-only">Select Action</label>
                         <select class="form-control" id="formAction">
                             <option value="">Select Action</option>
-                            <option value="print">Print</option>
+                            <option value="print">Print / Save As</option>
+                            <option value="feedbackReports">View Feedback Reports</option>
                         </select>
                     </div>
                 </div>
@@ -62,6 +63,21 @@
                                             <c:if test="${not empty transactionDetails.sourceOrgFields[6].fieldValue}"><dd>phone: <span class="tel">${transactionDetails.sourceOrgFields[6].fieldValue}</span></dd></c:if>
                                             <c:if test="${not empty transactionDetails.sourceOrgFields[7].fieldValue}"><dd>fax: <span class="tel">${transactionDetails.sourceOrgFields[7].fieldValue}</span></dd></c:if>
                                        </dl>
+                                       
+                                        <c:if test="${not empty transactionDetails.sourceProviderFields[0].fieldValue}">
+                                            <h4 class="form-section-heading">Originating Organization Provider: </h4>
+                                            <dl class="vcard">
+                                                <dd class="fn">${transactionDetails.sourceProviderFields[0].fieldValue}&nbsp;${transactionDetails.sourceProviderFields[1].fieldValue}</dd>
+                                                <dd class="fn">Id: ${transactionDetails.sourceProviderFields[2].fieldValue}</dd>
+                                                <dd class="adr">
+                                                    <span class="street-address">${transactionDetails.sourceProviderFields[3].fieldValue}</span><br/>
+                                                    <c:if test="${not empty transactionDetails.sourceProviderFields[4].fieldValue}"><span class="street-address">${transactionDetails.sourceProviderFields[4].fieldValue}</span><br/></c:if>
+                                                    <span class="region">${transactionDetails.sourceProviderFields[5].fieldValue}&nbsp;${transactionDetails.sourceProviderFields[6].fieldValue}</span>, <span class="postal-code">${transactionDetails.sourceProviderFields[7].fieldValue}</span>
+                                                </dd>
+                                                <c:if test="${not empty transactionDetails.sourceProviderFields[8].fieldValue}"><dd>phone: <span class="tel">${transactionDetails.sourceProviderFields[8].fieldValue}</span></dd></c:if>
+                                                <c:if test="${not empty transactionDetails.sourceProviderFields[9].fieldValue}"><dd>fax: <span class="tel">${transactionDetails.sourceProviderFields[9].fieldValue}</span></dd></c:if>
+                                           </dl>
+                                        </c:if>
                                     </div>
                                     <div class="col-md-6">
                                         <h4 class="form-section-heading">Recipient Organization:</h4>
