@@ -97,4 +97,12 @@ public interface transactionInDAO {
     
     List<batchUploads> getuploadedBatches(int userId, int orgId);
     
+    void updateBatchStatus (Integer batchUploadId, Integer statusId, String timeField);
+    
+    void updateTransactionStatus (Integer batchUploadId, Integer fromStatusId, Integer toStatusId);
+    
+    boolean allowBatchClear (Integer batchUploadId);
+    
+    boolean clearTransactionInRecords(Integer batchId);
+    
 }

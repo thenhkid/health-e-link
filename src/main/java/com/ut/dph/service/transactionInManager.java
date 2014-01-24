@@ -94,7 +94,7 @@ public interface transactionInManager {
     
     List <Integer> getTransWithMultiValues (ConfigForInsert config);
 
-    void clearMessageTables(int batchId);
+    boolean clearMessageTables(int batchId);
     
      Map<String,String> uploadBatchFile(int configId, MultipartFile fileUpload);
     
@@ -105,5 +105,17 @@ public interface transactionInManager {
     List<batchUploads> getuploadedBatches(int userId, int orgId);
     
     boolean processBatch(int batchUploadId);
+    
+    boolean processBatches();
+    
+    void updateBatchStatus (Integer batchUploadId, Integer statusId, String timeField);
+    
+    void updateTransactionStatus (Integer batchUploadId, Integer fromStatusId, Integer toStatusId);
+    
+    boolean clearBatch(Integer batchUploadId);
+    
+    boolean setDoNotProcess(Integer batchUploadId);
+    
+    boolean clearTransactionInRecords(Integer batchUploadId);
    
 }

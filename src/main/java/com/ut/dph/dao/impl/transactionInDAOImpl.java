@@ -18,10 +18,9 @@ import com.ut.dph.model.transactionInRecords;
 import com.ut.dph.model.transactionTarget;
 import com.ut.dph.model.custom.ConfigForInsert;
 import com.ut.dph.model.messageType;
-import java.text.SimpleDateFormat;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -1013,5 +1012,91 @@ public class transactionInDAOImpl implements transactionInDAO {
 
         return findBatches.list();
     }
+
+	@Override
+	@Transactional
+	public void updateBatchStatus(Integer batchUploadId, Integer statusId,
+			String timeField) {
+		
+		String sql  = "update batchUploads set statusId = :statusId ";
+		if (!timeField.equalsIgnoreCase("")) {
+				sql = sql + ", " + timeField + " = CURRENT_TIMESTAMP";
+		} else {
+			// we reset time
+			sql = sql + ", startDateTime = null, endDateTime = null";
+		}
+				sql = sql +  " where id = :id ";
+		Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+				.setParameter("statusId", statusId)	
+				.setParameter("id", batchUploadId);
+		try {
+			updateData.executeUpdate();
+		} catch (Throwable ex) {
+            System.err.println("updateBatchStatus failed." + ex);
+		}
+		
+		
+	}
+
+	@Override
+	@Transactional
+	public void updateTransactionStatus(Integer batchUploadId,
+			Integer fromStatusId, Integer toStatusId) {
+		String sql  = "update transactionIn "
+				+ " set statusId = :toStatusId, "
+				+  "dateCreated = CURRENT_TIMESTAMP"
+				+ " where batchId = :batchUploadId ";
+		if (fromStatusId != 0) {
+			sql = sql + " and statusId = :fromStatusId";
+		}
+		Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+				.setParameter("toStatusId", toStatusId)	
+				.setParameter("batchUploadId", batchUploadId);
+		
+		if (fromStatusId != 0) {
+			updateData.setParameter("fromStatusId", fromStatusId);
+		}
+		
+		try {
+			updateData.executeUpdate();
+		} catch (Throwable ex) {
+            System.err.println("updateTransactionStatus failed." + ex);
+		}
+		
+	}
+
+	@Override
+	@Transactional
+	public boolean allowBatchClear(Integer batchUploadId) {
+		String sql
+                = "select count(*) as rowCount from batchUploads where id = :id and statusId in (22,23,1);";
+        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).addScalar("rowCount", StandardBasicTypes.INTEGER);
+        query.setParameter("id", batchUploadId);
+        Integer rowCount = (Integer) query.list().get(0);
+        if (rowCount == 0) {
+        	return true;
+        } 
+		return false;
+	}
+
+	@Override
+	@Transactional
+	public boolean clearTransactionInRecords(Integer batchUploadId) {
+		String sql  = "delete from transactionInRecords where transactionInId in"
+				+ "(select id from transactionIn where batchId = :batchId )";
+		
+		Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+				.setParameter("id", batchUploadId);
+		
+		try {
+			deleteData.executeUpdate();
+			return true;
+		} catch (Throwable ex) {
+            System.err.println("clearTransactionInRecords failed." + ex);
+            return false;
+		}
+	}
+	
+	
 
 }
