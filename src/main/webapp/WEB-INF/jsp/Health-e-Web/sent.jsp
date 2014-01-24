@@ -5,6 +5,7 @@
 --%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <c:set var="urgencyVal" value="Not Reported" />
 <div class="container main-container" role="main">
     <div class="row">
@@ -23,6 +24,18 @@
                     </c:choose>
                 </div>
             </c:if>  
+                
+           <div class="" style="overflow:hidden; margin-bottom:10px;">
+               <form:form class="form form-inline" id="searchForm" action="/Health-e-Web/sent" method="post">
+                    <div class="form-group">
+                        <label class="sr-only" for="searchTerm">Search</label>
+                        <input type="text" name="searchTerm" id="searchTerm" value="${searchTerm}" class="form-control" placeholder="Search"/>
+                    </div>
+                    <button id="searchBatchesBtn" class="btn btn-primary btn-sm" title="Search Sent Batches">
+                        <span class="glyphicon glyphicon-search"></span>
+                    </button>
+                </form:form>
+            </div>     
             
             <form action="batch/transactions" id="viewBatchTransactions" method="post">
                 <input type="hidden" id="batchId" name="batchId" value="" />
@@ -42,8 +55,8 @@
                     </thead>
                     <tbody>
                         <c:choose>
-                            <c:when test="${not empty sentTransactions}">
-                                <c:forEach var="batch" items="${sentTransactions}">
+                            <c:when test="${not empty sentBatches}">
+                                <c:forEach var="batch" items="${sentBatches}">
                                     <tr>
                                         <td scope="row">${batch.utBatchName}</td>
                                         <td class="center-text">
@@ -69,6 +82,15 @@
                         </c:choose>    
                     </tbody>
                 </table>
+                <c:if test="${totalPages > 0}">
+                <ul class="pagination pull-right" role="navigation" aria-labelledby="Paging">
+                    <c:if test="${currentPage > 1}"><li><a href="?page=${currentPage-1}">&laquo;</a></li></c:if>
+                    <c:forEach var="i" begin="1" end="${totalPages}">
+                    <li><a href="?page=${i}">${i}</a></li>
+                    </c:forEach>
+                    <c:if test="${currentPage < totalPages}"><li><a href="?page=${currentPage+1}">&raquo;</a></li></c:if>
+                </ul>
+                </c:if>
             </div>
         </div>
     </div>

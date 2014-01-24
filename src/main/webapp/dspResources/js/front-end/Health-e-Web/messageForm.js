@@ -342,8 +342,9 @@ function validateURL($URL) {
 }
 
 function validateDate($date) {
-    var DateReg = /\b\d{1,2}[\/-]\d{1,2}[\/-]\d{4}\b/;
-    if( !DateReg.test( $date ) ) {
+    var DateReg = /\b\d{1,2}[\/-]\d{1,2}[\/-]\d{4}\b/; // mm/dd/yyyy
+    var DateReg2 = /\b\d{4}[\-]\d{1,2}[\-]\d{1,2}\b/; // yyyy-mm-dd
+    if( !DateReg.test( $date ) && !DateReg2.test($date) ) {
       return false;
     } 
     else {

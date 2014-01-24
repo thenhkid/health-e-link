@@ -36,7 +36,7 @@
                         <label class="sr-only" for="searchTerm">Search</label>
                         <input type="text" name="searchTerm" id="searchTerm" value="${searchTerm}" class="form-control" placeholder="Search"/>
                     </div>
-                    <button id="searchBatchesBtn" class="btn btn-primary btn-sm" title="Search Message Types">
+                    <button id="searchBatchesBtn" class="btn btn-primary btn-sm" title="Search Pending Batches">
                         <span class="glyphicon glyphicon-search"></span>
                     </button>
                 </form:form>
@@ -100,13 +100,15 @@
                       </c:choose>                  
                     </tbody>
                 </table>
-                <ul class="pagination pull-right" role="navigation" aria-labelledby="Paging">
-                    <c:if test="${currentPage > 1}"><li><a href="?page=${currentPage-1}">&laquo;</a></li></c:if>
-                    <c:forEach var="i" begin="1" end="${totalPages}">
-                    <li><a href="?page=${i}">${i}</a></li>
-                    </c:forEach>
-                    <c:if test="${currentPage < totalPages}"><li><a href="?page=${currentPage+1}">&raquo;</a></li></c:if>
-                </ul>
+                <c:if test="${totalPages > 0}">            
+                    <ul class="pagination pull-right" role="navigation" aria-labelledby="Paging">
+                        <c:if test="${currentPage > 1}"><li><a href="?page=${currentPage-1}">&laquo;</a></li></c:if>
+                        <c:forEach var="i" begin="1" end="${totalPages}">
+                        <li><a href="?page=${i}">${i}</a></li>
+                        </c:forEach>
+                        <c:if test="${currentPage < totalPages}"><li><a href="?page=${currentPage+1}">&raquo;</a></li></c:if>
+                    </ul>
+                </c:if>
             </div>
         </div>
     </div>

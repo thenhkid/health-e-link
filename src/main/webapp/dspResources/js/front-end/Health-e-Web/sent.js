@@ -35,4 +35,8 @@ $(function() {
         });
     });
     
+    $('#searchBatchesBtn').click(function() { 
+        $('#searchForm').submit();
+    });
+    
 });
