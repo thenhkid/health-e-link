@@ -884,7 +884,7 @@ public class HealtheWebController {
             method to handle all the processing and saving to the final messages_ tables. This method
             will return true if successfully received and false otherwise.
             */
-            boolean transactionSentToProcess = transactionInManager.processTransactions(batchId);
+            boolean transactionSentToProcess = transactionInManager.processBatch(batchId);
             
             
             /*
@@ -1639,5 +1639,38 @@ public class HealtheWebController {
         
         return providerDetails;
     }
+    
+    
+    /**
+     * The 'batch/sendBatches' POST function will send the marked batches off to the processing
+     * method.
+     * 
+     * @param batchIdList The list of marked batch Ids
+     * 
+     * @return  This function will redirect the user to the sent items page
+     * 
+     */
+    @RequestMapping(value="/sendBatches", method = RequestMethod.POST)
+    public ModelAndView sendBatches(@RequestParam(value = "batchIdList", required = true) List<Integer> batchIdList, RedirectAttributes redirectAttr , HttpSession session) throws NoSuchMethodException {
+        
+        /* 
+        If the list of batch Ids is not empty loop through each marked batch
+        and send off to the processBatch method.
+        */
+        if(!batchIdList.isEmpty()) {
+            for(Integer batchId : batchIdList) {
+                boolean transactionSentToProcess = transactionInManager.processBatch(batchId);
+            }
+        }
+        
+            
+        /*
+            Send the user back to the pending items page
+        */
+        redirectAttr.addFlashAttribute("savedStatus", "sent");
+        ModelAndView mav = new ModelAndView(new RedirectView("sent"));
+        return mav;
+    }
+       
     
 }

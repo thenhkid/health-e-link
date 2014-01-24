@@ -123,7 +123,7 @@ public class transactionInManagerImpl implements transactionInManager {
     public List<batchUploads> getpendingBatches(int userId, int orgId, int page, int maxResults) {
         return transactionInDAO.getpendingBatches(userId, orgId, page, maxResults);
     }
-    
+
     @Override
     @Transactional
     public List<batchUploads> findBatches(List<batchUploads> batches, String searchTerm) {
@@ -286,17 +286,19 @@ public class transactionInManagerImpl implements transactionInManager {
     }
 
     /**
-     * This takes a batch of 
+     * This takes a batch of
      *
      * Last Step - insert all transactions with RP (10) status and batch status of SRP (5) for a batch
      *
      */
     @Override
-    
+
     public boolean processTransactions(int batchUploadId) {
-        /** check batch status **/
-    	
-    	/**
+        /**
+         * check batch status *
+         */
+
+        /**
          * Check for R/O Apply CW/Macros Apply method to concatenate values for the same saveToTableCol using delimiter ||^||
          */
         /**
@@ -346,11 +348,11 @@ public class transactionInManagerImpl implements transactionInManager {
                 }
             }
         }
-        /** now that we are done with inserting we check batch settings to see if we can release the batch 
-         * we have Auto Release
-         * **/
-        
-        
+        /**
+         * now that we are done with inserting we check batch settings to see if we can release the batch we have Auto Release
+         * *
+         */
+
         return false;
     }
 
@@ -519,138 +521,127 @@ public class transactionInManagerImpl implements transactionInManager {
     public Integer countSubString(ConfigForInsert config, Integer transId) {
         return transactionInDAO.countSubString(config, transId);
     }
-    
+
     @Override
     public List<batchUploads> getuploadedBatches(int userId, int orgId) {
         return transactionInDAO.getuploadedBatches(userId, orgId);
     }
 
-    /** We will take a batch and 
-     * then from its status etc we will decide if we want to process transactions or not.
-     * This allow the admin to run just one batch
-     * 
-     * This assumes batches SR - 6, Trans status REL
-     * We still run through entire proces but
-     * these records should pass... (check to make sure it aligns with file upload)
-     * just be applying Macros / CW and inserting into our message tables
+    /**
+     * We will take a batch and then from its status etc we will decide if we want to process transactions or not. This allow the admin to run just one batch
+     *
+     * This assumes batches SR - 6, Trans status REL We still run through entire process but these records should pass... (check to make sure it aligns with file upload) just be applying Macros / CW and inserting into our message tables
      */
     /**
-     * This assumes batch being passed in is SSA or SR
-     * 1. We set it to SBP, start date time
-     * 
-     * **/
-	@Override
-	public boolean processBatch(int batchUploadId) {
-		/** set batch to SBP - 4**/
-		updateBatchStatus (batchUploadId, 4, "startDateTime");
-		
-		/** for non erg, this do a bunch of batch checks **/
-		
-		/** inserts targets, transactionIn etc **/
-		
-		/** run validation**/
-		
-		/** run cw/macros **/
-		
-		/** inserts for batches that passes **/
-		processTransactions(batchUploadId);
-		
-		/** set batch to SPC 24**/
-		updateBatchStatus (batchUploadId, 24, "endDateTime");
-		/** set all REL - 10 records to 19 **/
-		updateTransactionStatus (batchUploadId, 12, 19);
-		
-		return false;
-	}
-	
+     * This assumes batch being passed in is SSA or SR 1. We set it to SBP, start date time
+     *
+     * *
+     */
+    @Override
+    public boolean processBatch(int batchUploadId) {
+        /**
+         * set batch to SBP - 4*
+         */
+        updateBatchStatus(batchUploadId, 4, "startDateTime");
 
-	/** 
-	 * 	this is called by the scheduler
-	 *  It selects all batch with a status of SSA 
-	 *  Loads them SSL - Trans - L
-	 *  Starts the Process - SBP - Parses 
-	 *  
-	 *  1. Validate R/O - ERG records will just pass
-     * 		we select batches that are 
-     * 2. Validate Fields - ERG records will just pass
-     * 3. Apply CW / Macros - ERG records should just pass as what is being inserted is our internal
-     * standard
-     * 4. We insert
-     * 
-     * In between don't forget to change status
-     * Might need wrapper to align upload file process
-	 */
-	@Override
-	public boolean processBatches() {
+        /**
+         * for non erg, this do a bunch of batch checks *
+         */
+        /**
+         * inserts targets, transactionIn etc *
+         */
+        /**
+         * run validation*
+         */
+        /**
+         * run cw/macros *
+         */
+        /**
+         * inserts for batches that passes *
+         */
+        processTransactions(batchUploadId);
+
+        /**
+         * set batch to SPC 24*
+         */
+        updateBatchStatus(batchUploadId, 24, "endDateTime");
+        /**
+         * set all REL - 10 records to 19 *
+         */
+        updateTransactionStatus(batchUploadId, 12, 19);
+
+        return false;
+    }
+
+    /**
+     * this is called by the scheduler It selects all batch with a status of SSA Loads them SSL - Trans - L Starts the Process - SBP - Parses
+     *
+     * 1. Validate R/O - ERG records will just pass we select batches that are 2. Validate Fields - ERG records will just pass 3. Apply CW / Macros - ERG records should just pass as what is being inserted is our internal standard 4. We insert
+     *
+     * In between don't forget to change status Might need wrapper to align upload file process
+     */
+    @Override
+    public boolean processBatches() {
 		//0. grab all batches with SSA - 2
-		
+
 		//1. validate r/o
-		
 		//2. validate type
-		
 		//3. apply cw / macros to check for valid data
-		
 		//4. check auto release / manual status 
-		
-		//5. assuming all is well, call processTransactions(batchUploadId);
-			/**status at this point **/
-		return false;
-	}
+        //5. assuming all is well, call processTransactions(batchUploadId);
+        /**
+         * status at this point *
+         */
+        return false;
+    }
 
-	@Override
-	public void updateBatchStatus(Integer batchUploadId, Integer statusId, String timeField) {
-		transactionInDAO.updateBatchStatus (batchUploadId, statusId, timeField);
-	}
+    @Override
+    public void updateBatchStatus(Integer batchUploadId, Integer statusId, String timeField) {
+        transactionInDAO.updateBatchStatus(batchUploadId, statusId, timeField);
+    }
 
-	@Override
-	public void updateTransactionStatus (Integer batchUploadId, Integer fromStatusId, Integer toStatusId)
-	{
-		transactionInDAO.updateTransactionStatus (batchUploadId, fromStatusId, toStatusId);
-	}
+    @Override
+    public void updateTransactionStatus(Integer batchUploadId, Integer fromStatusId, Integer toStatusId) {
+        transactionInDAO.updateTransactionStatus(batchUploadId, fromStatusId, toStatusId);
+    }
 
-	/**
-	 * provided the batch status is not one of the delivery status
-	 * (22 SDL, 23 SDC)
-	 * what would we like clear batch to do
-	 * 1. Change batch process to SBP to nothing can be touch 
-	 * 2. remove records from message tables
-	 * 3. figure out what status to set batch
-	 * **/
-	@Override
-	public boolean clearBatch(Integer batchUploadId) {
-		boolean canDelete = transactionInDAO.allowBatchClear(batchUploadId);
-		boolean cleared = false;
-		if (canDelete) {
-			/**we remove from message tables**/
-			cleared = clearMessageTables(batchUploadId);
-			if (cleared) {
-				int toBatchStatusId = 3; //SSA
-				if (getBatchDetails(batchUploadId).gettransportMethodId() == 2) {
-					toBatchStatusId = 5;
-					transactionInDAO.updateTransactionStatus (batchUploadId, 0, 15); 
-				} else  {
-					//we clear transactionInRecords here as for batch upload we start over
-					cleared = clearTransactionInRecords(batchUploadId);
-				}
-				transactionInDAO.updateBatchStatus(batchUploadId, toBatchStatusId, "");
-			}
-		}
-		return cleared;
-	}
+    /**
+     * provided the batch status is not one of the delivery status (22 SDL, 23 SDC) what would we like clear batch to do 1. Change batch process to SBP to nothing can be touch 2. remove records from message tables 3. figure out what status to set batch
+	 * *
+     */
+    @Override
+    public boolean clearBatch(Integer batchUploadId) {
+        boolean canDelete = transactionInDAO.allowBatchClear(batchUploadId);
+        boolean cleared = false;
+        if (canDelete) {
+            /**
+             * we remove from message tables*
+             */
+            cleared = clearMessageTables(batchUploadId);
+            if (cleared) {
+                int toBatchStatusId = 3; //SSA
+                if (getBatchDetails(batchUploadId).gettransportMethodId() == 2) {
+                    toBatchStatusId = 5;
+                    transactionInDAO.updateTransactionStatus(batchUploadId, 0, 15);
+                } else {
+                    //we clear transactionInRecords here as for batch upload we start over
+                    cleared = clearTransactionInRecords(batchUploadId);
+                }
+                transactionInDAO.updateBatchStatus(batchUploadId, toBatchStatusId, "");
+            }
+        }
+        return cleared;
+    }
 
-	@Override
-	public boolean setDoNotProcess(Integer batchId) {
-		// TODO Auto-generated method stub
-		return false;
-	}
+    @Override
+    public boolean setDoNotProcess(Integer batchId) {
+        // TODO Auto-generated method stub
+        return false;
+    }
 
-	@Override
-	public boolean clearTransactionInRecords(Integer batchUploadId) {
-		return transactionInDAO.clearTransactionInRecords(batchUploadId);
-	}
-	
-	
-	
-	
+    @Override
+    public boolean clearTransactionInRecords(Integer batchUploadId) {
+        return transactionInDAO.clearTransactionInRecords(batchUploadId);
+    }
 
 }

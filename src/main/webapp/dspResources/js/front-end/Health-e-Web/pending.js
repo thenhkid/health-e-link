@@ -40,4 +40,30 @@ $(function() {
         $('#searchForm').submit();
     });
     
+    //This function will handle sending batches
+    $(document).on('click','.sendBatches', function() {
+      
+       $('.alert-danger').hide();
+       
+       var batchIdList = "";
+       
+       //Loop through all batch ids
+       $('input[type=checkbox]').each(function() {
+           if(this.checked) {
+                batchIdList += (batchIdList ==="" ? this.value : "," + this.value);
+            }
+       });
+       
+       if(batchIdList === "") {
+           $('.alert-danger').html("At lease one batch must be marked to send!");
+           $('.alert-danger').show();
+       }
+       else {
+           $('#batchIdList').val(batchIdList);
+           $('#sendMarkedBatches').submit();
+       }
+       
+        
+    });
+    
 });

@@ -6,6 +6,7 @@
 package com.ut.dph.dao.impl;
 
 import com.ut.dph.dao.transactionInDAO;
+import com.ut.dph.model.Organization;
 import com.ut.dph.model.batchUploadSummary;
 import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.configuration;
@@ -461,6 +462,25 @@ public class transactionInDAOImpl implements transactionInDAO {
             }
            
             /* Search target data */
+            Criteria targetQuery = sessionFactory.getCurrentSession().createCriteria(batchUploadSummary.class);
+            targetQuery.add(Restrictions.eq("batchId", batch.getId()));
+            List<batchUploadSummary> targets = targetQuery.list();
+            
+            if(!targets.isEmpty()) {
+                
+                for(batchUploadSummary target : targets) {
+                    Organization orgDetails = (Organization) sessionFactory.getCurrentSession().get(Organization.class, target.gettargetOrgId());
+                    
+                    /* Search the organization name */
+                    if(orgDetails.getOrgName().toLowerCase().matches(".*"+searchTerm+".*")) {
+                        if(!batchIdList.contains(batch.getId())) {
+                            batchIdList.add(batch.getId());
+                        }
+                    }
+                }
+                
+            }
+            
             
             
         }

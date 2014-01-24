@@ -23,10 +23,15 @@
                         <c:when test="${savedStatus == 'saved'}">Your message has been successfully saved!</c:when>
                     </c:choose>
                 </div>
-            </c:if>   
+            </c:if>  
+                
+            <div style="display:none;" class="alert alert-danger" role="alert"></div>    
                 
            <div class="" style="overflow:hidden; margin-bottom:10px;">
-                <form:form class="form form-inline" id="searchForm" action="/Health-e-Web/pending" method="post">
+               <c:if test="${userDetails.deliverAuthority == true}">
+                <a href="javascript:void(0);" title="Send Batches" class="pull-right btn btn-primary sendBatches"><span class="glyphicon glyphicon-send"></span> Send Marked Batches</a> 
+               </c:if>
+               <form:form class="form form-inline" id="searchForm" action="/Health-e-Web/pending" method="post">
                     <div class="form-group">
                         <label class="sr-only" for="searchTerm">Search</label>
                         <input type="text" name="searchTerm" id="searchTerm" value="${searchTerm}" class="form-control" placeholder="Search"/>
@@ -36,7 +41,9 @@
                     </button>
                 </form:form>
             </div>     
-                
+            <form action="sendBatches" id="sendMarkedBatches" method="post">
+                <input type="hidden" id="batchIdList" name="batchIdList" value="" />
+            </form>       
             <form action="batch/transactions" id="viewBatchTransactions" method="post">
                 <input type="hidden" id="batchId" name="batchId" value="" />
                 <input type="hidden" name="fromPage" value="pending" />
@@ -45,6 +52,7 @@
                 <table class="table table-striped table-hover table-default">
                     <thead>
                         <tr>
+                            <c:if test="${userDetails.deliverAuthority == true}"><th scope="col" class="center-text">Mark?</th></c:if>
                             <th scope="col">Batch Name</th>
                             <th scope="col" class="center-text">Total Transactions</th>
                             <th scope="col" class="center-text">Status</th>
@@ -58,6 +66,16 @@
                             <c:when test="${not empty pendingBatches}">
                                 <c:forEach var="batch" items="${pendingBatches}">
                                     <tr>
+                                        <c:if test="${userDetails.deliverAuthority == true}">
+                                            <td class="actions-col center-text">
+                                                <c:choose>
+                                                    <c:when test="${batch.statusId == 5}">
+                                                        <input type="checkbox" id="batchId" name="batchId" class="batchIds" value="${batch.id}" />
+                                                    </c:when>
+                                                    <c:otherwise>&nbsp;</c:otherwise>
+                                                </c:choose>
+                                            </td>
+                                        </c:if>
                                         <td scope="row">${batch.utBatchName}</td>
                                         <td class="center-text">
                                             ${batch.totalTransactions}
