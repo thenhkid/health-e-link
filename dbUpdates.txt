@@ -428,5 +428,8 @@ DROP COLUMN `configId`;
 ALTER TABLE `universalTranslator`.`message_FromProvider` 
 DROP COLUMN `configId`;
 
+/**1.24.2014 **/
+INSERT INTO `universalTranslator`.`lu_ProcessStatus` (`category`, `displayCode`, `displayText`) VALUES ('batch', 'TBP', 'Target Batch Creation in Process');
+INSERT INTO `universalTranslator`.`lu_ProcessStatus` (`category`, `displayCode`, `displayText`) VALUES ('batch', 'TBC', 'Target Batch Created');
 
 
