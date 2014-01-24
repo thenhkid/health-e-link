@@ -27,7 +27,7 @@
                 
             <form action="" id="viewTransactionDetails" method="post">
                 <input type="hidden" id="transactionId" name="transactionId" value="" />
-                <input type="hidden" name="fromPage" value="pending" />
+                <input type="hidden" id="fromPage" name="fromPage" value="${fromPage}" />
                 <input type="hidden" id="configId" name="configId" value="" />
             </form>    
             <div class="form-container scrollable">

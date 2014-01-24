@@ -138,8 +138,8 @@ public class transactionInManagerImpl implements transactionInManager {
 
     @Override
     @Transactional
-    public List<transactionIn> getsentTransactions(int orgId) {
-        return transactionInDAO.getsentTransactions(orgId);
+    public List<batchUploads> getsentBatches(int userId, int orgId, int page, int maxResults) {
+        return transactionInDAO.getsentBatches(userId, orgId, page, maxResults);
     }
 
     @Override

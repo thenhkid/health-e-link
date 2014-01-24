@@ -49,7 +49,7 @@ public interface transactionInDAO {
     
     List<transactionIn> getBatchTransactions(int batchId, int userId);
     
-    List<transactionIn> getsentTransactions(int orgId);
+    List<batchUploads> getsentBatches(int userId, int orgId, int page, int maxResults);
     
     batchUploads getBatchDetails(int batchId);
     

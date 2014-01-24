@@ -27,11 +27,16 @@ $(function() {
         //Need to set the action for the form
         //If user has edit capability then 'pending/details'
         //otherwise only view 'sent/messageDetails'
-        if(editAuthority === "true") {
-            $('#viewTransactionDetails').attr("action","/Health-e-Web/pending/details");
+        if($('#fromPage').val() === "sent") {
+            $('#viewTransactionDetails').attr("action","/Health-e-Web/sent/messageDetails"); 
         }
         else {
-            $('#viewTransactionDetails').attr("action","/Health-e-Web/sent/messageDetails"); 
+            if(editAuthority === "true") {
+                $('#viewTransactionDetails').attr("action","/Health-e-Web/pending/details");
+            }
+            else {
+                $('#viewTransactionDetails').attr("action","/Health-e-Web/sent/messageDetails"); 
+            }
         }
         
         

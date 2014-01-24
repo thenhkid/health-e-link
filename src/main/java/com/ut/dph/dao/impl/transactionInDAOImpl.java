@@ -357,8 +357,10 @@ public class transactionInDAOImpl implements transactionInDAO {
         Criteria findBatches = sessionFactory.getCurrentSession().createCriteria(batchUploads.class);
         findBatches.add(Restrictions.in("id", batchIdList));
         findBatches.add(Restrictions.or(
-                Restrictions.eq("statusId", 8),
-                Restrictions.eq("statusId", 5)
+                Restrictions.eq("statusId", 5),
+                Restrictions.eq("statusId", 6),
+                Restrictions.eq("statusId", 7),
+                Restrictions.eq("statusId", 8)
         )
         );
         findBatches.addOrder(Order.desc("dateSubmitted"));
@@ -480,9 +482,6 @@ public class transactionInDAOImpl implements transactionInDAO {
                 }
                 
             }
-            
-            
-            
         }
         
         if(batchIdList.isEmpty()) {
@@ -572,7 +571,7 @@ public class transactionInDAOImpl implements transactionInDAO {
     }
 
     /**
-     * The 'getsentTransactions' function will return a list of sent transactions for the organization passed in.
+     * The 'getsentBatches' function will return a list of sent batches for the organization passed in.
      *
      * @param orgId The organization Id to find pending transactions for.
      *
@@ -580,31 +579,90 @@ public class transactionInDAOImpl implements transactionInDAO {
      */
     @Override
     @Transactional
-    public List<transactionIn> getsentTransactions(int orgId) {
+    public List<batchUploads> getsentBatches(int userId, int orgId, int page, int maxResults) {
+        
+        int firstResult = 0;
 
-        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(transactionIn.class);
-        criteria.add(Restrictions.eq("statusId", 17));
+        /* Get a list of connections the user has access to */
+        Criteria connections = sessionFactory.getCurrentSession().createCriteria(configurationConnectionSenders.class);
+        connections.add(Restrictions.eq("userId", userId));
+        List<configurationConnectionSenders> userConnections = connections.list();
 
-        List<Integer> batchList = new ArrayList<Integer>();
+        List<Integer> messageTypeList = new ArrayList<Integer>();
+        List<Integer> targetOrgList = new ArrayList<Integer>();
+
+        if (userConnections.isEmpty()) {
+            messageTypeList.add(0);
+            targetOrgList.add(0);
+        } else {
+
+            for (configurationConnectionSenders userConnection : userConnections) {
+                Criteria connection = sessionFactory.getCurrentSession().createCriteria(configurationConnection.class);
+                connection.add(Restrictions.eq("id", userConnection.getconnectionId()));
+
+                configurationConnection connectionInfo = (configurationConnection) connection.uniqueResult();
+
+                /* Get the message type for the configuration */
+                Criteria sourceconfigurationQuery = sessionFactory.getCurrentSession().createCriteria(configuration.class);
+                sourceconfigurationQuery.add(Restrictions.eq("id", connectionInfo.getsourceConfigId()));
+
+                configuration configDetails = (configuration) sourceconfigurationQuery.uniqueResult();
+
+                /* Add the message type to the message type list */
+                messageTypeList.add(configDetails.getMessageTypeId());
+
+                /* Get the list of target orgs */
+                Criteria targetconfigurationQuery = sessionFactory.getCurrentSession().createCriteria(configuration.class);
+                targetconfigurationQuery.add(Restrictions.eq("id", connectionInfo.gettargetConfigId()));
+                configuration targetconfigDetails = (configuration) targetconfigurationQuery.uniqueResult();
+
+                /* Add the target org to the target organization list */
+                targetOrgList.add(targetconfigDetails.getorgId());
+            }
+        }
+
+        /* Get a list of available batches */
+        Criteria batchSummaries = sessionFactory.getCurrentSession().createCriteria(batchUploadSummary.class);
+        batchSummaries.add(Restrictions.eq("sourceOrgId", orgId));
+        batchSummaries.add(Restrictions.in("messageTypeId", messageTypeList));
+        batchSummaries.add(Restrictions.in("targetOrgId", targetOrgList));
+        List<batchUploadSummary> batchUploadSummaryList = batchSummaries.list();
+
+        List<Integer> batchIdList = new ArrayList<Integer>();
+
+        if (batchUploadSummaryList.isEmpty()) {
+            batchIdList.add(0);
+        } else {
+
+            for (batchUploadSummary summary : batchUploadSummaryList) {
+                batchIdList.add(summary.getbatchId());
+            }
+
+        }
+
         Criteria findBatches = sessionFactory.getCurrentSession().createCriteria(batchUploads.class);
-        findBatches.add(Restrictions.eq("orgId", orgId));
-        findBatches.add(Restrictions.eq("statusId", 2));
-
-        List<batchUploads> batches = findBatches.list();
-
-        for (batchUploads batch : batches) {
-            batchList.add(batch.getId());
+        findBatches.add(Restrictions.in("id", batchIdList));
+        findBatches.add(Restrictions.or(
+                Restrictions.eq("statusId", 4),
+                Restrictions.eq("statusId", 22),
+                Restrictions.eq("statusId", 23),
+                Restrictions.eq("statusId", 24)
+        )
+        );
+        findBatches.addOrder(Order.desc("dateSubmitted"));
+        
+        if (page > 1) {
+            firstResult = (maxResults * (page - 1));
+        }
+        
+        findBatches.setFirstResult(firstResult);
+        
+        if(maxResults > 0) {
+            //Set the max results to display
+            findBatches.setMaxResults(maxResults);
         }
 
-        if (batchList.isEmpty()) {
-            batchList.add(0);
-        }
-
-        criteria.add(Restrictions.in("batchId", batchList));
-
-        criteria.addOrder(Order.desc("dateCreated"));
-
-        return criteria.list();
+        return findBatches.list();
     }
 
     /**

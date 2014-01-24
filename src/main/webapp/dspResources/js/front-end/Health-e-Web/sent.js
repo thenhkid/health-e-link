@@ -17,10 +17,9 @@ $(document).ready(function() {
 $(function() {
     
     $('.viewLink').click(function() {
-        var transactionId = $(this).attr('rel');
-       
-        $('#transactionId').val(transactionId);
-        $('#viewMessageDetails').submit();
+       var batchId = $(this).attr('rel');
+        $('#batchId').val(batchId);
+        $('#viewBatchTransactions').submit();
        
     });
     
