@@ -441,4 +441,53 @@ ADD CONSTRAINT `mdTransFK`
   REFERENCES `universaltranslator`.`transactionin` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
+  
+  
+  /*1.24.14 Grace 2:04 PM*/
+INSERT INTO `universalTranslator`.`lu_ProcessStatus` (`category`, `displayCode`, `displayText`) VALUES ('batch', 'SPE', 'Submission Process Errored');
+INSERT INTO `universalTranslator`.`lu_ProcessStatus` (`category`, `displayCode`, `displayText`) VALUES ('batch', 'TPE', 'Target Creation Errored');
+
+/*1.25.2014 */
+ALTER TABLE `universalTranslator`.`transactionInErrors` 
+ADD COLUMN `errorId` INT NULL AFTER `configurationFormFieldsId`;
+
+INSERT INTO `universalTranslator`.`lookUpTables` (`utTableName`, `displayText`) VALUES ('lu_ErrorCodes', 'Validation Error Codes');
+
+CREATE TABLE `universalTranslator`.`lu_ErrorCodes` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `displayText` VARCHAR(45) NOT NULL,
+  `description` VARCHAR(200) NULL,
+  `isCustom` BIT NOT NULL DEFAULT 0,
+  `status` BIT NOT NULL DEFAULT 1,
+  `dateCreated` DATETIME NOT NULL DEFAULT current_timestamp,
+  `dateModified` DATETIME NOT NULL DEFAULT current_timestamp,
+  PRIMARY KEY (`id`));
+
+INSERT INTO `universalTranslator`.`lu_ErrorCodes` (`displayText`, `description`) VALUES ('Required Field Check Failed', 'Value not provided for required field');
+INSERT INTO `universalTranslator`.`lu_ErrorCodes` (`displayText`, `description`) VALUES ('Failed Validation', 'Failed Validation');
+INSERT INTO `universalTranslator`.`lu_ErrorCodes` (`displayText`, `description`) VALUES ('Failed Crosswalks or Macros', 'Failed Crosswalks/ Macro');
+
+ALTER TABLE `universalTranslator`.`transactionInErrors` 
+ADD INDEX `errorIdFK_idx` (`errorId` ASC);
+ALTER TABLE `universalTranslator`.`transactionInErrors` 
+ADD CONSTRAINT `errorIdFK`
+  FOREIGN KEY (`errorId`)
+  REFERENCES `universalTranslator`.`lu_ErrorCodes` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+ALTER TABLE `universalTranslator`.`transactionOutErrors` 
+ADD COLUMN `errorId` INT NULL AFTER `configurationFormFieldsId`;
+
+ALTER TABLE `universalTranslator`.`transactionOutErrors` 
+ADD INDEX `FKErrorId_idx` (`errorId` ASC);
+ALTER TABLE `universalTranslator`.`transactionOutErrors` 
+ADD CONSTRAINT `FKErrorId`
+  FOREIGN KEY (`errorId`)
+  REFERENCES `universalTranslator`.`lu_ErrorCodes` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+  
+  
 
