@@ -117,5 +117,8 @@ public interface transactionInManager {
     boolean setDoNotProcess(Integer batchUploadId);
     
     boolean clearTransactionInRecords(Integer batchUploadId);
+    
+    boolean insertTransactions (Integer batchUploadId);
+
    
 }

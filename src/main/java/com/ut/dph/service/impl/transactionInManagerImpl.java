@@ -294,66 +294,50 @@ public class transactionInManagerImpl implements transactionInManager {
     @Override
 
     public boolean processTransactions(int batchUploadId) {
-        /**
-         * check batch status *
-         */
-
-        /**
-         * Check for R/O Apply CW/Macros Apply method to concatenate values for the same saveToTableCol using delimiter ||^||
-         */
-        /**
-         * from here we prepare sql statement and insert we assume all transactions are validated and that multiple values /rows being inserted in the the same field are separated by delimiter ||^||
-         */
-        List<Integer> configIds = getConfigIdsForBatch(batchUploadId);
-        for (Integer configId : configIds) {
-            /**
-             * this list have the insert /check statements for each message table *
-             */
-            List<ConfigForInsert> configforConfigIds = setConfigForInsert(configId, batchUploadId);
-            /**
-             * we loop though each table and grab the transactions that has multiple values for that table, we set it to a list *
-             */
-            for (ConfigForInsert config : configforConfigIds) {
-                /**
-                 * we grab list of ids with multiple for this config we use the checkDelim string to look for those transactions *
-                 */
-                List<Integer> transIds = getTransWithMultiValues(config);
-                config.setLoopTransIds(transIds);
-
-                /**
-                 * we need to check if we need to insert in case the whole table is mapped but doesn't contain values *
-                 */
-                List<Integer> skipTheseIds = getBlankTransIds(config);
-                config.setBlankValueTransId(skipTheseIds);
-
-                /**
-                 * we insert single values *
-                 */
-                insertSingleToMessageTables(config);
-
-                /**
-                 * we loop through transactions with multiple values and use SP to loop values with delimiters
-                 *
-                 */
-                for (Integer transId : transIds) {
-                    /**
-                     * we check how long field is*
-                     */
-                    Integer subStringTotal = countSubString(config, transId);
-                    //TODO look up loop counter - how to write counter in new syntax?
-                    for (int i = 0; i <= subStringTotal; i++) {
-                        insertMultiValToMessageTables(config, i + 1, transId);
-                    }
-
-                }
-            }
-        }
-        /**
-         * now that we are done with inserting we check batch settings to see if we can release the batch we have Auto Release
-         * *
-         */
-
-        return false;
+    	
+    	boolean batchProcessed = false;
+    	
+			/**Check for R/O **/
+    	
+	        /** Check Validation**/
+    	
+    		/**Apply CW/Macros **/
+    		
+    		/**Apply method to concatenate values for the same saveToTableCol using delimiter ||^||*/
+	        
+	    	
+	    	/** here we check config settings for the org to see if we can insert this batch into
+	    	 *  message tables **/
+			boolean insertTransactionsToMT = true; // set this to method
+			
+			if (insertTransactionsToMT) {
+				/**
+    	         * from here we prepare sql statement and insert we assume all transactions are validated and that multiple values /rows being inserted in 
+    	         * the the same field are separated by delimiter ||^||
+    	         */
+				if (!insertTransactions(batchUploadId)) {
+					batchProcessed = false;
+					/** something went wrong, we removed all inserted entries **/
+					clearMessageTables(batchUploadId);
+					/** we leave transaction status alone and flag batch as error during processing -SPE**/
+					updateBatchStatus(batchUploadId, 28, "endDateTime");
+				}
+			} else {
+				/** we assume batch is done and we report back **/
+				batchProcessed = true;
+			}
+					
+	    	
+	        /**
+	         * if there are any errors we email admin
+	         * **/
+	    	
+	    	//we set it to false here to get out of loop
+	    	 
+	    	 //batchProcessed = true;
+		
+	
+			return batchProcessed;
     }
 
     @Override
@@ -377,7 +361,7 @@ public class transactionInManagerImpl implements transactionInManager {
      */
     @Override
     public boolean insertSingleToMessageTables(ConfigForInsert configForInsert) {
-        return transactionInDAO.insertSingleToMessageTables(configForInsert);
+        return transactionInDAO.insertSingleToMessageTables(configForInsert); 
     }
 
     /**
@@ -539,38 +523,34 @@ public class transactionInManagerImpl implements transactionInManager {
      */
     @Override
     public boolean processBatch(int batchUploadId) {
-        /**
-         * set batch to SBP - 4*
-         */
+        
+    	boolean successfulBatch = false;
+    	/**Check to make sure the file is valid for processing,
+    	 * valid file is a batch with SSA or **/
+    	
+    	/**set batch to SBP - 4**/
         updateBatchStatus(batchUploadId, 4, "startDateTime");
 
-        /**
-         * for non erg, this do a bunch of batch checks *
-         */
+        /**for non erg, this do a bunch of batch checks **/
         /**
          * inserts targets, transactionIn etc *
          */
-        /**
-         * run validation*
-         */
-        /**
-         * run cw/macros *
-         */
-        /**
-         * inserts for batches that passes *
-         */
-        processTransactions(batchUploadId);
+        /**run validation**/
+        
+        /**run cw/macros **/
+       
+        /**inserts for batches that passes **/
+        
+        successfulBatch = processTransactions(batchUploadId);
 
-        /**
-         * set batch to SPC 24*
-         */
-        updateBatchStatus(batchUploadId, 24, "endDateTime");
-        /**
-         * set all REL - 10 records to 19 *
-         */
-        updateTransactionStatus(batchUploadId, 12, 19);
-
-        return false;
+        
+        /**set batch to SPC 24**/
+        if (successfulBatch) {
+	        updateBatchStatus(batchUploadId, 24, "endDateTime");
+	        /** set all REL - 10 records to 19 **/
+	        updateTransactionStatus(batchUploadId, 12, 19);
+        }
+        return successfulBatch;
     }
 
     /**
@@ -643,5 +623,54 @@ public class transactionInManagerImpl implements transactionInManager {
     public boolean clearTransactionInRecords(Integer batchUploadId) {
         return transactionInDAO.clearTransactionInRecords(batchUploadId);
     }
+
+    /**
+     * This method assumes that all records are validated and ready for insert 
+     * We loop through each configuration and insert
+     * Transaction status will remain unchanged.
+     * **/
+    
+	@Override
+	public boolean insertTransactions(Integer batchUploadId) {
+		List<Integer> configIds = getConfigIdsForBatch(batchUploadId);
+        boolean processTransactions = true;
+
+        for (Integer configId : configIds) {
+            
+			/** this list have the insert /check statements for each message table **/
+            List<ConfigForInsert> configforConfigIds = setConfigForInsert(configId, batchUploadId);
+            /** we loop though each table and grab the transactions that has multiple values for that table, we set it to a list **/
+            for (ConfigForInsert config : configforConfigIds) {
+                
+            	/** we grab list of ids with multiple for this config we use the checkDelim string to look for those transactions **/
+            	List<Integer> transIds = getTransWithMultiValues(config);
+            	config.setLoopTransIds(transIds);
+            	
+            	/** we need to check if we need to insert in case the whole table is mapped but doesn't contain values **/
+                List<Integer> skipTheseIds = getBlankTransIds(config);
+                config.setBlankValueTransId(skipTheseIds);
+
+                /**we insert single values **/
+                if (!insertSingleToMessageTables(config)) {
+                	return false;
+                }
+
+                /** we loop through transactions with multiple values and use SP to loop values with delimiters  **/
+                for (Integer transId : transIds) {
+                    /**we check how long field is**/
+                    Integer subStringTotal = countSubString(config, transId);
+                    for (int i = 0; i <= subStringTotal; i++) {
+                        if (!insertMultiValToMessageTables(config, i + 1, transId)) {
+                        	return false;	
+                        }
+                    }
+
+                }
+                
+            }
+        }
+		
+		return processTransactions;
+	}
 
 }

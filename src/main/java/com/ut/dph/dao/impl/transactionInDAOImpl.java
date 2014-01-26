@@ -931,19 +931,18 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Override
     @Transactional
     public boolean insertSingleToMessageTables(ConfigForInsert config) {
-
-        //TODO need to handle mappings but there are no values - etc best time to call / not require / we do not need to insert blank row
-        String sql = "insert into " + config.getSaveToTableName()
+    	boolean insertSuccess = false;
+    	String sql = "insert into " + config.getSaveToTableName()
                 + " (transactionInId, " + config.getSaveToTableCol()
                 + ") select transactionInId, "
                 + config.getSingleValueFields()
                 + " from transactionTranslatedIn where "
                 + " transactionInId in (select id from transactionIn where batchId = :batchId"
                 + " and configId = :configId and statusId = :relId ";
-        if (config.getLoopTransIds().size() > 0) {
+        if (config.getLoopTransIds() != null) {
             sql = sql + " and id not in (" + config.getLoopTransIds().toString().substring(1, config.getLoopTransIds().toString().length() - 1) + ")";
         }
-        if (config.getBlankValueTransId().size() > 0) {
+        if (config.getBlankValueTransId() != null) {
             sql = sql + " and id not in (" + config.getBlankValueTransId().toString().substring(1, config.getBlankValueTransId().toString().length() - 1) + ")";
         }
 
@@ -956,11 +955,12 @@ public class transactionInDAOImpl implements transactionInDAO {
 
         try {
             insertData.executeUpdate();
-            return true;
-        } catch (Throwable ex) {
+            insertSuccess = true;
+        } catch (Exception ex) {
             System.err.println("insertSingleToMessageTables." + ex);
-            return false;
+            
         }
+        return insertSuccess;
     }
 
     @Override
@@ -974,7 +974,7 @@ public class transactionInDAOImpl implements transactionInDAO {
         try {
             deleteTable.executeUpdate();
             return true;
-        } catch (Throwable ex) {
+        } catch (Exception ex) {
             System.err.println("clearMessageTableForBatch failed. " + ex);
             return false;
 
@@ -1022,8 +1022,9 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Override
     @Transactional
     public boolean insertMultiValToMessageTables(ConfigForInsert config,
-            Integer subStringCounter, Integer transId) {
-        String replaceSplitField = config.getSplitFields().replaceAll("@valPos", subStringCounter.toString());
+        Integer subStringCounter, Integer transId) {
+        
+    	String replaceSplitField = config.getSplitFields().replaceAll("@valPos", subStringCounter.toString());
         String sql = "insert into " + config.getSaveToTableName()
                 + " (transactionInId, " + config.getSaveToTableCol()
                 + ") select transactionInId, "
@@ -1039,11 +1040,10 @@ public class transactionInDAOImpl implements transactionInDAO {
                 .setParameter("configId", config.getConfigId())
                 .setParameter("id", transId)
                 .setParameter("relId", transRELId);
-
         try {
             insertData.executeUpdate();
             return true;
-        } catch (Throwable ex) {
+        } catch (Exception ex) {
             System.err.println("insertMultiValToMessageTables." + ex);
             return false;
         }
@@ -1105,7 +1105,7 @@ public class transactionInDAOImpl implements transactionInDAO {
                 .setParameter("id", batchUploadId);
         try {
             updateData.executeUpdate();
-        } catch (Throwable ex) {
+        } catch (Exception ex) {
             System.err.println("updateBatchStatus failed." + ex);
         }
 
@@ -1132,7 +1132,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 
         try {
             updateData.executeUpdate();
-        } catch (Throwable ex) {
+        } catch (Exception ex) {
             System.err.println("updateTransactionStatus failed." + ex);
         }
 
@@ -1164,7 +1164,7 @@ public class transactionInDAOImpl implements transactionInDAO {
         try {
             deleteData.executeUpdate();
             return true;
-        } catch (Throwable ex) {
+        } catch (Exception ex) {
             System.err.println("clearTransactionInRecords failed." + ex);
             return false;
         }
