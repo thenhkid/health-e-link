@@ -487,6 +487,11 @@ ADD CONSTRAINT `FKErrorId`
   REFERENCES `universalTranslator`.`lu_ErrorCodes` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
+  
+  /**1.26.14 Grace **/
+  UPDATE `universalTranslator`.`lookUpTables` SET `urlId`='8221Err4102des' WHERE `id`='33';
+  
+  
 
   
   
