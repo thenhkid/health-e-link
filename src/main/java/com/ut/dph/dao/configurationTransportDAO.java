@@ -40,4 +40,6 @@ public interface configurationTransportDAO {
     
     void copyExistingTransportMethod(int configTransportId, int configId);
 
+    List <configurationFormFields> getRequiredFieldsForConfig (Integer configId);
+    
 }

@@ -39,5 +39,6 @@ public interface configurationTransportManager {
     void saveTransportMessageTypes(configurationTransportMessageTypes messageType);
     
     void copyExistingTransportMethod(int configTransportId, int configId);
-
+   
+    List<configurationFormFields> getRequiredFieldsForConfig(Integer configId);
 }

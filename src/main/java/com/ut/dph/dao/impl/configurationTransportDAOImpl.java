@@ -331,4 +331,18 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
         
     }
 
+    /**this method will return a list of required form field for a configuration**/
+    
+	@SuppressWarnings("unchecked")
+	@Override
+	@Transactional
+	public List<configurationFormFields> getRequiredFieldsForConfig(Integer configId) {
+		 Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configurationFormFields.class)
+	                .add(Restrictions.eq("configId", configId))
+	                .add(Restrictions.eq("required", true))
+	                .addOrder(Order.asc("fieldNo"));
+	                
+	        return criteria.list();
+	}
+
 }

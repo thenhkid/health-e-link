@@ -113,4 +113,9 @@ public class configurationTransportManagerImpl implements configurationTransport
     public void copyExistingTransportMethod(int configTransportId, int configId) {
         configurationTransportDAO.copyExistingTransportMethod(configTransportId, configId);
     }
+
+	@Override
+	public List<configurationFormFields> getRequiredFieldsForConfig(Integer configId) {
+		 return configurationTransportDAO.getRequiredFieldsForConfig(configId);
+	}
 }
