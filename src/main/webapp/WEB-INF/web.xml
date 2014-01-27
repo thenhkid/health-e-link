@@ -13,14 +13,14 @@
     </context-param>
     
     <context-param>
-    	<param-name>defaultHtmlEscape</param-name>
-    	<param-value>true</param-value>
-	</context-param>
+        <param-name>defaultHtmlEscape</param-name>
+        <param-value>true</param-value>
+    </context-param>
 	
-	<!--  Set the default timeout setting for a logged in user/admin -->
-	<session-config>  
-  		<session-timeout>30</session-timeout>  
-	</session-config>  
+    <!--  Set the default timeout setting for a logged in user/admin -->
+    <session-config>  
+        <session-timeout>30</session-timeout>  
+    </session-config>  
 
     <servlet>
         <servlet-name>appServlet</servlet-name>
@@ -37,15 +37,15 @@
         <url-pattern>/</url-pattern>
     </servlet-mapping>
     
-   <error-page>
-		<error-code>404</error-code>
-		<location>/WEB-INF/jsp/404.jsp</location>
-   </error-page>
+    <error-page>
+        <error-code>404</error-code>
+        <location>/WEB-INF/jsp/404.jsp</location>
+    </error-page>
    
-   <error-page>
-		<error-code>403</error-code>
-		<location>/WEB-INF/jsp/403.jsp</location>
-   </error-page>
+    <error-page>
+        <error-code>403</error-code>
+        <location>/WEB-INF/jsp/403.jsp</location>
+    </error-page>
    
     
     <!-- Spring Security -->
@@ -63,28 +63,28 @@
     
     
     <!-- quartz 
-     <context-param>
-         <param-name>quartz:config-file</param-name>
-         <param-value>quartz.properties</param-value>
-     </context-param>
-     <context-param>
-         <param-name>quartz:shutdown-on-unload</param-name>
-         <param-value>true</param-value>
-     </context-param>
-     <context-param>
-         <param-name>quartz:wait-on-shutdown</param-name>
-         <param-value>false</param-value>
-     </context-param>
-     <context-param>
-         <param-name>quartz:start-scheduler-on-load</param-name>
-         <param-value>true</param-value>
-     </context-param>
-     <listener>
-         <listener-class>
-             org.quartz.ee.servlet.QuartzInitializerListener
-         </listener-class>
-     </listener>
-     -->
-<!--  end of quartz --> 
+    <context-param>
+        <param-name>quartz:config-file</param-name>
+        <param-value>quartz.properties</param-value>
+    </context-param>
+    <context-param>
+        <param-name>quartz:shutdown-on-unload</param-name>
+        <param-value>true</param-value>
+    </context-param>
+    <context-param>
+        <param-name>quartz:wait-on-shutdown</param-name>
+        <param-value>false</param-value>
+    </context-param>
+    <context-param>
+        <param-name>quartz:start-scheduler-on-load</param-name>
+        <param-value>true</param-value>
+    </context-param>
+    <listener>
+        <listener-class>
+            org.quartz.ee.servlet.QuartzInitializerListener
+        </listener-class>
+    </listener>
+    -->
+    <!--  end of quartz --> 
 
 </web-app>

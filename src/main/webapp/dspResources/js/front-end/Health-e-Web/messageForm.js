@@ -188,7 +188,7 @@ function populateExistingAttachments() {
     $.ajax({
         url: '../populateExistingAttachments.do',
         type: 'GET',
-        data: {'transactionId': transactionId, 'newattachmentIdList': currentIdList},
+        data: {'transactionId': transactionId, 'newattachmentIdList': currentIdList, 'pageFrom': 'pending'},
         success: function(data) {
             $("#existingAttachments").html(data);
         }

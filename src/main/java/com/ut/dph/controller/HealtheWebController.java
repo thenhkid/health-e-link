@@ -966,6 +966,7 @@ public class HealtheWebController {
      *
      * @param request
      * @param response
+     * * @param searchTerm The term to search pending messages
      * @return	the health-e-web pending message list view
      * @throws Exception
      */
@@ -1097,12 +1098,13 @@ public class HealtheWebController {
     
     
     /**
-     * The '/sent' POST request will serve up the Health-e-Web (ERG) page that will list all pending
+     * The '/sent' POST request will serve up the Health-e-Web (ERG) page that will list all sent
      * messages based on the term searched for.
      *
      * @param request
      * @param response
-     * @return	the health-e-web pending message list view
+     * @param searchTerm The term to search sent messages 
+     * @return	the health-e-web sent message list view
      * @throws Exception
      */
     @RequestMapping(value = "/sent", method = RequestMethod.POST)
@@ -1579,7 +1581,11 @@ public class HealtheWebController {
      * @return  This function will return the transaction attachment list page.
      */
     @RequestMapping(value= "/populateExistingAttachments.do", method = RequestMethod.GET)
-    public @ResponseBody ModelAndView getMessageAttachments(@RequestParam(value = "transactionId", required = false) Integer transactionId, @RequestParam(value = "newattachmentIdList", required = false) List<Integer> newattachmentIdList) {
+    public @ResponseBody ModelAndView getMessageAttachments(@RequestParam(value = "transactionId", required = false) Integer transactionId, @RequestParam(value = "newattachmentIdList", required = false) List<Integer> newattachmentIdList, @RequestParam(value= "pageFrom", required = false) String pageFrom) {
+        
+        if(pageFrom == null) {
+            pageFrom = "sent";
+        }
         
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/Health-e-Web/existingAttachments");
@@ -1592,7 +1598,6 @@ public class HealtheWebController {
             for(transactionAttachment attachment : existingAttachments) {
                 attachments.add(attachment);
             }
-            
         }
         
         if(newattachmentIdList != null && !newattachmentIdList.isEmpty()) {
@@ -1603,6 +1608,7 @@ public class HealtheWebController {
         }
         
         mav.addObject("attachments", attachments);
+        mav.addObject("pageFrom", pageFrom);
         
         return mav;
         

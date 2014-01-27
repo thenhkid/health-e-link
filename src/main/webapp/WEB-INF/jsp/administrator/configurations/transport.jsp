@@ -219,22 +219,24 @@
                             <div id="additionalFTPDiv" class="methodDiv" style="display:none">
                             
                             </div>
-                            <spring:bind path="autoRelease">
-                                <div class="form-group">
-                                    <label class="control-label" for="autoRelease">Release Records *</label>
-                                    <div>
-                                        <label class="radio-inline">
-                                          <form:radiobutton id="autoRelease" path="autoRelease" value="1" disabled="${transportDetails.copiedTransportId > 0 ? 'true' : 'false'}" /> Automatically 
-                                        </label>
-                                        <label class="radio-inline">
-                                            <form:radiobutton id="autoRelease" path="autoRelease" value="0" disabled="${transportDetails.copiedTransportId > 0 ? 'true' : 'false'}" /> Manually
-                                        </label>
+                            <c:if test="${configurationDetails.type == 1}">    
+                                <spring:bind path="autoRelease">
+                                    <div class="form-group">
+                                        <label class="control-label" for="autoRelease">Release Records *</label>
+                                        <div>
+                                            <label class="radio-inline">
+                                              <form:radiobutton id="autoRelease" path="autoRelease" value="1" disabled="${transportDetails.copiedTransportId > 0 ? 'true' : 'false'}" /> Automatically 
+                                            </label>
+                                            <label class="radio-inline">
+                                                <form:radiobutton id="autoRelease" path="autoRelease" value="0" disabled="${transportDetails.copiedTransportId > 0 ? 'true' : 'false'}" /> Manually
+                                            </label>
+                                        </div>
+                                        <c:if test="${transportDetails.copiedTransportId > 0}">
+                                            <form:hidden path="autoRelease" />
+                                        </c:if>    
                                     </div>
-                                    <c:if test="${transportDetails.copiedTransportId > 0}">
-                                        <form:hidden path="autoRelease" />
-                                    </c:if>    
-                                </div>
-                            </spring:bind>    
+                                </spring:bind>  
+                            </c:if>
                         </div>
                     </div>
                 </section>

@@ -22,10 +22,20 @@
                             ${attachment.fileLocation}
                         </td>
                         <td class="center-text">
-                            <a href="javascript:void(0);" class="btn btn-link removeAttachment" rel="${attachment.id}" title="Remove this attachment.">
-                                <span class="glyphicon glyphicon-edit"></span>
-                                Remove
-                            </a>
+                            <c:choose>
+                                <c:when test="${pageFrom == 'sent'}">
+                                    <a href="<c:url value="/fileDownloadController/downloadFile?filename=${attachment.fileName}&foldername=${attachment.fileLocation}"/>"  class="media-modal" title="Download this brochure">
+                                        <span class="glyphicon glyphicon-edit"></span>
+                                        View	
+                                    </a>
+                                </c:when>
+                                <c:otherwise>
+                                    <a href="javascript:void(0);" class="btn btn-link removeAttachment" rel="${attachment.id}" title="Remove this attachment.">
+                                        <span class="glyphicon glyphicon-edit"></span>
+                                        Remove
+                                    </a>
+                                </c:otherwise>
+                            </c:choose>
                         </td>
                     </tr>
                 </c:forEach>

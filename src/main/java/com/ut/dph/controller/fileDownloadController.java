@@ -18,46 +18,47 @@ import com.ut.dph.reference.fileSystem;
 @Controller
 @RequestMapping("/fileDownloadController")
 public class fileDownloadController {
-	
-	@Autowired 
-	private organizationManager organizationManager;
-	
-	@RequestMapping("/downloadFile")
-    public void downloadFile(@RequestParam String filename, @RequestParam String foldername, @RequestParam Integer orgId, HttpServletResponse response) {
+
+    @Autowired
+    private organizationManager organizationManager;
+
+    @RequestMapping("/downloadFile")
+    public void downloadFile(@RequestParam String filename, @RequestParam String foldername, @RequestParam(value= "orgId", required = false) Integer orgId, HttpServletResponse response) {
         OutputStream outputStream = null;
         InputStream in = null;
         try {
+            fileSystem dir = new fileSystem();
             
-        	Organization organization = organizationManager.getOrganizationById(orgId);
-        	String cleanURL = organization.getcleanURL();
-        	
-        	//Set the type of attachment
-   		 	fileSystem dir = new fileSystem();
-   		 	dir.setDir(cleanURL, foldername);
-        	
-        	in = new FileInputStream(dir.getDir() + filename); 
+            if(orgId != null) {
+
+                Organization organization = organizationManager.getOrganizationById(orgId);
+                String cleanURL = organization.getcleanURL();
+
+                dir.setDir(cleanURL, foldername);
+            }
+            else {
+                dir.setDirByName(foldername);
+            }
+
+            in = new FileInputStream(dir.getDir() + filename);
             byte[] buffer = new byte[1024];
             int bytesRead = 0;
-            response.setHeader("Content-Disposition","attachment;filename=\"" + filename + "\"");
+            response.setHeader("Content-Disposition", "attachment;filename=\"" + filename + "\"");
             outputStream = response.getOutputStream();
-            while( 0 < ( bytesRead = in.read( buffer ) ) )
-            {
-                outputStream.write( buffer, 0, bytesRead );
+            while (0 < (bytesRead = in.read(buffer))) {
+                outputStream.write(buffer, 0, bytesRead);
             }
         } catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-        finally
-        {
-            if ( null != in )
-            {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (null != in) {
                 try {
-					in.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+                    in.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
 

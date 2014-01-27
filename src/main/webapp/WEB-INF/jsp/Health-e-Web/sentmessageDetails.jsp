@@ -46,6 +46,8 @@
                 </div>
             </div>        
             <form:form id="messageForm" action="/Health-e-Web/submitMessage" modelAttribute="transactionDetails" role="form" class="form" method="post">
+                <form:hidden path="transactionId" id="transactionId" />
+                <input type="hidden" id="attachmentIds" name="attachmentIds" value="" />
                 <div class="panel-group form-accordion" id="accordion">
                     <div class="panel panel-default panel-form">
                         <div id="collapseThree" class="panel-collapse collapse in">
@@ -140,6 +142,12 @@
                                          </div>
                                     </c:forEach>
                                 </div>
+                                        
+                                <%-- Existing Message Attachments --%>
+                                <div class="form-section row">
+                                    <div class="col-md-12"><h4 class="form-section-heading">Existing Attachments:</h4></div>
+                                    <div class="col-md-12" id="existingAttachments"></div>
+                                </div>  
                             </div>
                         </div>
                     </div>
