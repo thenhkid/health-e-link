@@ -10,6 +10,7 @@ import com.ut.dph.dao.transactionInDAO;
 import com.ut.dph.model.batchUploadSummary;
 import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.configuration;
+import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.configurationTransport;
 import com.ut.dph.model.fieldSelectOptions;
 import com.ut.dph.model.transactionAttachment;
@@ -286,7 +287,7 @@ public class transactionInManagerImpl implements transactionInManager {
     }
 
     /**
-     * This takes a batch of
+     * 1.27.14 not in use
      *
      * Last Step - insert all transactions with RP (10) status and batch status of SRP (5) for a batch
      *
@@ -308,34 +309,34 @@ public class transactionInManagerImpl implements transactionInManager {
 	    	
 	    	/** here we check config settings for the org to see if we can insert this batch into
 	    	 *  message tables **/
-			boolean insertTransactionsToMT = true; // set this to method
+		/**	
+    	boolean insertTransactionsToMT = true; // set this to method
 			
 			if (insertTransactionsToMT) {
 				/**
     	         * from here we prepare sql statement and insert we assume all transactions are validated and that multiple values /rows being inserted in 
     	         * the the same field are separated by delimiter ||^||
     	         */
+    	/**
 				if (!insertTransactions(batchUploadId)) {
 					batchProcessed = false;
-					/** something went wrong, we removed all inserted entries **/
+					//something went wrong, we removed all inserted entries
 					clearMessageTables(batchUploadId);
-					/** we leave transaction status alone and flag batch as error during processing -SPE**/
+					//we leave transaction status alone and flag batch as error during processing -SPE
 					updateBatchStatus(batchUploadId, 28, "endDateTime");
 				}
 			} else {
-				/** we assume batch is done and we report back **/
+				//we assume batch is done and we report back
 				batchProcessed = true;
 			}
-					
+			**/		
 	    	
-	        /**
-	         * if there are any errors we email admin
-	         * **/
+	        /**if there are any errors we email admin**/
 	    	
 	    	//we set it to false here to get out of loop
 	    	 
 	    	 //batchProcessed = true;
-		
+			
 	
 			return batchProcessed;
     }
@@ -525,32 +526,95 @@ public class transactionInManagerImpl implements transactionInManager {
     public boolean processBatch(int batchUploadId) {
         
     	boolean successfulBatch = false;
-    	/**Check to make sure the file is valid for processing,
-    	 * valid file is a batch with SSA or **/
+    	/** get batch details **/
+    	batchUploads batch = getBatchDetails(batchUploadId);
     	
-    	/**set batch to SBP - 4**/
-        updateBatchStatus(batchUploadId, 4, "startDateTime");
+        /**ERG are loaded already, we load all other files
+         * maybe move loading?
+         ***/
+        if (batch.gettransportMethodId() != 2) { // 2 is ERG
 
-        /**for non erg, this do a bunch of batch checks **/
-        /**
-         * inserts targets, transactionIn etc *
-         */
-        /**run validation**/
-        
-        /**run cw/macros **/
-       
-        /**inserts for batches that passes **/
-        
-        successfulBatch = processTransactions(batchUploadId);
+        	/**set batch to SBP - 4**/
+            updateBatchStatus(batchUploadId, 4, "startDateTime");
 
-        
-        /**set batch to SPC 24**/
-        if (successfulBatch) {
-	        updateBatchStatus(batchUploadId, 24, "endDateTime");
-	        /** set all REL - 10 records to 19 **/
-	        updateTransactionStatus(batchUploadId, 12, 19);
+        	/**let's clear all tables first as we are starting over**/
+        	successfulBatch = clearTransactionTables(batchUploadId); 
+        	/**loading batch will take it all the way to loaded (9) status for transactions
+        	and SSL (3) for batch 
+        	**/
+        	successfulBatch = loadBatch(batchUploadId);
+        	/**after loading is successful we update to SSL **/
+        	/**Check to make sure the file is valid for processing,
+        	 * valid file is a batch with SSL or RP **/
+            batch = getBatchDetails(batchUploadId);
+        	
         }
-        return successfulBatch;
+       
+        /** this should be the same point of both ERG and Uploaded File **/
+        /**Check to make sure the file is valid for processing,
+    	 * valid file is a batch with SSL (3) or SR**/
+        successfulBatch = true;
+       
+    	if ((batch.getstatusId() == 3 || batch.getstatusId() == 6) && successfulBatch) {
+    		/**set batch to SBP - 4**/
+            updateBatchStatus(batchUploadId, 4, "startDateTime");
+
+    		/** we figure out if we pass a batch, reject the batch, etc here **/
+    		
+    		
+    		/** we get all the configurations **/
+    		List<Integer> configIds = getConfigIdsForBatch(batchUploadId);
+    		
+    		 for (Integer configId : configIds) {
+    		       
+    		/** we need to run all checks before insert regardless **/
+    		/** check R/O **/
+    		List <configurationFormFields> reqFields = getRequiredFieldsForConfig(configId);
+    		/** we loop each field and flag errors **/
+    		for (configurationFormFields cff : reqFields) {
+    			insertFailedRequiredFields(cff, batchUploadId);
+    		}
+    		//TODO Hold off on setting records to REJ here - finish coding and see because it might be a pass record....
+    		/** we have REJ - 13, Error - 14, Passed 16 for transactions
+    		
+    		/**run validation**/
+            
+            
+    		/**run cw/macros **/
+    		
+    		
+    		/** we check configuration details, 
+    		 *  remove rejected records from transactionTranslatedIn, pass records stays
+    		 * 
+    		 * **/
+           
+    		 }
+            
+    		}
+    	
+    		/** somewhere in here we need to make sure all configs are set to handle files
+    		 * the same way, if not, we will go with manual release **/
+    	boolean autoRelease = true;
+    	if (autoRelease) {
+    		/**inserts for batches that passes **/
+    		if (!insertTransactions(batchUploadId)) {
+    			successfulBatch = false;
+				/** something went wrong, we removed all inserted entries **/
+				clearMessageTables(batchUploadId);
+				/** we leave transaction status alone and flag batch as error during processing -SPE**/
+				updateBatchStatus(batchUploadId, 28, "endDateTime");
+			}
+            
+            /**set batch to SPC 24**/
+            if (successfulBatch) {
+    	        updateBatchStatus(batchUploadId, 24, "endDateTime");
+    	        /** set all REL - 10 records to 19 **/
+    	        updateTransactionStatus(batchUploadId, 12, 19);
+    	        /** we update total record counts for batch **/
+            }
+    	}
+        
+                return successfulBatch;
     }
 
     /**
@@ -605,7 +669,7 @@ public class transactionInManagerImpl implements transactionInManager {
                     transactionInDAO.updateTransactionStatus(batchUploadId, 0, 15);
                 } else {
                     //we clear transactionInRecords here as for batch upload we start over
-                    cleared = clearTransactionInRecords(batchUploadId);
+                    cleared = clearTransactionTables(batchUploadId);                
                 }
                 transactionInDAO.updateBatchStatus(batchUploadId, toBatchStatusId, "");
             }
@@ -671,6 +735,82 @@ public class transactionInManagerImpl implements transactionInManager {
         }
 		
 		return processTransactions;
+	}
+
+	/** this process will load an upload file with status of SSA and take it all
+	 * the way to SSL
+	 * 
+	 *  1. read file
+	 *  2. parse row by row and 
+	 *  a. figure out config
+	 *  b. insert into transactionIn
+	 *  c. insert into transacitonTarget
+	 *  d. flag transactions as Loaded or Invalid
+	 *   **/
+	@Override
+	public boolean loadBatch(Integer batchUploadId) {
+		/**we read uploaded file, line by line**/
+		/**we look for config id**/
+		/** if we find we insert into transactionIn, transactionInRecords, transactionTranslatedIn, transactionTarget **/
+		/** only transactions with valid configId will make it into transactionTranslatedIn
+		 * We will not find INVALID records in transactionTranslatedIn
+		 */
+		/** when we are done, the batch will be SSL and records will either be INVALID or Loaded **/
+		return true;
+	}
+
+	@Override
+	public boolean clearTransactionTranslatedIn(Integer batchUploadId) {
+		return transactionInDAO.clearTransactionTranslatedIn(batchUploadId);
+	}
+
+	@Override
+	public boolean clearTransactionTables(Integer batchUploadId) {
+		boolean cleared = false;
+		//we clear transactionTranslatedIn
+		cleared = clearTransactionTranslatedIn(batchUploadId);
+		//we clear transactionInRecords
+		if (cleared) {
+			cleared = clearTransactionInRecords(batchUploadId);
+		}
+		//we clear transactionTarget
+		if (cleared) {
+			cleared = clearTransactionTarget(batchUploadId);
+		}
+		//we clear transactionIn
+		if (cleared) {
+			cleared = clearTransactionTarget(batchUploadId);
+		}
+		if (!cleared) {
+			flagAndEmailAdmin(batchUploadId);
+		}
+		return cleared;
+	}
+
+	@Override
+	public boolean clearTransactionTarget(Integer batchUploadId) {
+		return transactionInDAO.clearTransactionTarget(batchUploadId);
+	}
+
+	@Override
+	public boolean clearTransactionIn(Integer batchUploadId) {
+		return transactionInDAO.clearTransactionIn(batchUploadId);
+	}
+
+	@Override
+	public void flagAndEmailAdmin(Integer batchUploadId) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public List<configurationFormFields> getRequiredFieldsForConfig(Integer configId) {
+		return configurationtransportmanager.getRequiredFieldsForConfig(configId);
+	}
+
+	@Override
+	public boolean insertFailedRequiredFields(configurationFormFields cff, int batchUploadId) {
+		return transactionInDAO.insertFailedRequiredFields(cff, batchUploadId);	
 	}
 
 }

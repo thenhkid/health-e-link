@@ -12,6 +12,7 @@ import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.configuration;
 import com.ut.dph.model.configurationConnection;
 import com.ut.dph.model.configurationConnectionSenders;
+import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.fieldSelectOptions;
 import com.ut.dph.model.transactionAttachment;
 import com.ut.dph.model.transactionIn;
@@ -873,7 +874,9 @@ public class transactionInDAOImpl implements transactionInDAO {
     @SuppressWarnings("unchecked")
     public List<Integer> getConfigIdsForBatch(int batchUploadId) {
 
-        String sql = ("select distinct configId from transactionTranslatedIn where transactionInId in (select transactionInId from transactionIn where batchId = :id);");
+        String sql = ("select distinct configId from transactionTranslatedIn "
+        		+ " where transactionInId in (select transactionInId from transactionIn "
+        		+ " where batchId = :id);");
 
         Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
         query.setParameter("id", batchUploadId);
@@ -939,10 +942,10 @@ public class transactionInDAOImpl implements transactionInDAO {
                 + " from transactionTranslatedIn where "
                 + " transactionInId in (select id from transactionIn where batchId = :batchId"
                 + " and configId = :configId and statusId = :relId ";
-        if (config.getLoopTransIds() != null) {
+        if (config.getLoopTransIds()!= null && config.getLoopTransIds().size() > 0) {
             sql = sql + " and id not in (" + config.getLoopTransIds().toString().substring(1, config.getLoopTransIds().toString().length() - 1) + ")";
         }
-        if (config.getBlankValueTransId() != null) {
+        if (config.getBlankValueTransId() != null && config.getBlankValueTransId().size() > 0) {
             sql = sql + " and id not in (" + config.getBlankValueTransId().toString().substring(1, config.getBlankValueTransId().toString().length() - 1) + ")";
         }
 
@@ -1169,5 +1172,87 @@ public class transactionInDAOImpl implements transactionInDAO {
             return false;
         }
     }
+
+	@Override
+	@Transactional
+	public boolean clearTransactionTranslatedIn(Integer batchUploadId) {
+		 String sql = "delete from transactionTranslatedIn where transactionInId in"
+	                + "(select id from transactionIn where batchId = :batchUploadId )";
+
+	        Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+	                .setParameter("batchUploadId", batchUploadId);
+
+	        try {
+	            deleteData.executeUpdate();
+	            return true;
+	        } catch (Exception ex) {
+	            System.err.println("clearTransactionTranslatedIn failed." + ex);
+	            return false;
+	        }
+	}
+
+	
+	@Override
+	@Transactional
+	public boolean clearTransactionTarget(Integer batchUploadId) {
+		 String sql = "delete from TransactionTarget where batchUploadId = :batchUploadId)";
+
+	        Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+	                .setParameter("batchUploadId", batchUploadId);
+
+	        try {
+	            deleteData.executeUpdate();
+	            return true;
+	        } catch (Exception ex) {
+	            System.err.println("clearTransactionTarget failed." + ex);
+	            return false;
+	        }
+	}
+	
+
+	@Override
+	@Transactional
+	public boolean clearTransactionIn(Integer batchUploadId) {
+		String sql = "delete from transactionIn batchId = :batchUploadId )";
+        Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                .setParameter("batchUploadId", batchUploadId);
+        try {
+            deleteData.executeUpdate();
+            return true;
+        } catch (Exception ex) {
+            System.err.println("clearTransactionIn failed." + ex);
+            return false;
+        }
+	}
+
+	/**errorId = 1 is required field missing**/
+	@Override
+	@Transactional
+	public boolean insertFailedRequiredFields(configurationFormFields cff, int batchUploadId) {		
+		System.out.println("checkiing field  F" + cff.getFieldNo());
+		String sql = "insert into transactionInerrors (batchUploadId, transactionInId, configurationFormFieldsId, errorid)"
+				+ "(select " + batchUploadId +", transactionInId, " + cff.getId() 
+				+ ", 1 from transactionTranslatedIn where configId = :configId "
+				+ " and (F" + cff.getFieldNo()
+				+ " is  null  or length(trim(F" + cff.getFieldNo() + ")) = 0)"
+				+ "and transactionInId in (select id from transactionIn where batchId = :batchUploadId"
+				+ " and configId = :configId));";
+        Query insertData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                .setParameter("batchUploadId", batchUploadId)
+                .setParameter("configId", cff.getconfigId());
+        
+        try {
+        	insertData.executeUpdate();
+            return true;
+        } catch (Exception ex) {
+            System.err.println("insertFailedRequiredFields failed." + ex);
+            return false;
+        }	
+		
+	}
+
+
+
+
 
 }

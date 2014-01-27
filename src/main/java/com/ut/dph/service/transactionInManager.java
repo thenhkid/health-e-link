@@ -8,6 +8,7 @@ package com.ut.dph.service;
 
 import com.ut.dph.model.batchUploadSummary;
 import com.ut.dph.model.batchUploads;
+import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.fieldSelectOptions;
 import com.ut.dph.model.transactionAttachment;
 import com.ut.dph.model.transactionIn;
@@ -119,6 +120,20 @@ public interface transactionInManager {
     boolean clearTransactionInRecords(Integer batchUploadId);
     
     boolean insertTransactions (Integer batchUploadId);
+    
+    boolean loadBatch (Integer batchUploadId);
+    
+    boolean clearTransactionIn(Integer batchUploadId);
+    
+    boolean clearTransactionTranslatedIn(Integer batchUploadId);
+    
+    boolean clearTransactionTables(Integer batchUploadId);
+    
+    boolean clearTransactionTarget(Integer batchUploadId);
 
-   
+    void flagAndEmailAdmin(Integer batchUploadId);
+    
+    List <configurationFormFields> getRequiredFieldsForConfig (Integer configId);
+    
+    boolean insertFailedRequiredFields(configurationFormFields cff, int batchUploadId);
 }

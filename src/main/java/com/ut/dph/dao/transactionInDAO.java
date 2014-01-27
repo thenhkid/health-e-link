@@ -8,6 +8,7 @@ package com.ut.dph.dao;
 
 import com.ut.dph.model.batchUploadSummary;
 import com.ut.dph.model.batchUploads;
+import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.fieldSelectOptions;
 import com.ut.dph.model.transactionAttachment;
 import com.ut.dph.model.transactionIn;
@@ -105,4 +106,11 @@ public interface transactionInDAO {
     
     boolean clearTransactionInRecords(Integer batchId);
     
+    boolean clearTransactionTranslatedIn(Integer batchUploadId);
+    
+    boolean clearTransactionTarget(Integer batchUploadId);
+
+    boolean clearTransactionIn(Integer batchUploadId);
+     
+    boolean insertFailedRequiredFields(configurationFormFields cff, int batchUploadId);
 }
