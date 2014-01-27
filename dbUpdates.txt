@@ -490,6 +490,54 @@ ADD CONSTRAINT `FKErrorId`
   
   /**1.26.14 Grace **/
   UPDATE `universalTranslator`.`lookUpTables` SET `urlId`='8221Err4102des' WHERE `id`='33';
+
+/** Chad 1.27.14 @ 12:36 PM **/
+CREATE TABLE `universalTranslator`.`batchDownloadSummary` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `batchId` INT NOT NULL,
+  `transactionTargetId` INT NOT NULL,
+  `sourceOrgId` INT NOT NULL,
+  `targetOrgId` INT NOT NULL,
+  `messageTypeId` INT NOT NULL,
+  `targetConfigId` INT NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `dwnSumBatchIdFk_idx` (`batchId` ASC),
+  INDEX `dwnSumConfigIdFk_idx` (`targetConfigId` ASC),
+  INDEX `dwnSumMessageTypeIdFk_idx` (`messageTypeId` ASC),
+  INDEX `dwnSumOrgIdFk_idx` (`sourceOrgId` ASC),
+  INDEX `dwnSumTargetOrgIdFk_idx` (`targetOrgId` ASC),
+  INDEX `dwnSumTransactionIdFk_idx` (`transactionTargetId` ASC),
+  CONSTRAINT `dwnSumBatchIdFk`
+    FOREIGN KEY (`batchId`)
+    REFERENCES `universalTranslator`.`BatchDownloads` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `dwnSumConfigIdFk`
+    FOREIGN KEY (`targetConfigId`)
+    REFERENCES `universalTranslator`.`configurations` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `dwnSumMessageTypeIdFk`
+    FOREIGN KEY (`messageTypeId`)
+    REFERENCES `universalTranslator`.`messagetypes` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `dwnSumSourceOrgIdFk`
+    FOREIGN KEY (`sourceOrgId`)
+    REFERENCES `universalTranslator`.`organizations` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `dwnSumTargetOrgIdFk`
+    FOREIGN KEY (`targetOrgId`)
+    REFERENCES `universalTranslator`.`organizations` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `dwnSumTransactionIdFk`
+    FOREIGN KEY (`transactionTargetId`)
+    REFERENCES `universalTranslator`.`transactionTarget` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
   
   
 
