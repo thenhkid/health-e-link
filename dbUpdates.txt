@@ -539,6 +539,9 @@ CREATE TABLE `universalTranslator`.`batchDownloadSummary` (
     ON UPDATE NO ACTION);
 
   
+/** Chad 1.27.14 @ 3:22 PM **/
+ALTER TABLE `universalTranslator`.`BatchDownloads` 
+ADD COLUMN `utBatchName` VARCHAR(255) NOT NULL AFTER `userId`;
   
 
   

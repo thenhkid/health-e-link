@@ -7,6 +7,7 @@ package com.ut.dph.service.impl;
 
 import com.ut.dph.dao.messageTypeDAO;
 import com.ut.dph.dao.transactionInDAO;
+import com.ut.dph.model.batchDownloads;
 import com.ut.dph.model.batchUploadSummary;
 import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.configuration;
@@ -117,11 +118,23 @@ public class transactionInManagerImpl implements transactionInManager {
     public void submitTransactionTranslatedInRecords(int transactionId, int transactionRecordId, int configId) {
         transactionInDAO.submitTransactionTranslatedInRecords(transactionId, transactionRecordId, configId);
     }
+    
+    @Override
+    @Transactional
+    public List<batchDownloads> getInboxBatches(int userId, int orgId, int page, int maxResults) {
+        return transactionInDAO.getInboxBatches(userId, orgId, page, maxResults);
+    }
 
     @Override
     @Transactional
     public List<batchUploads> getpendingBatches(int userId, int orgId, int page, int maxResults) {
         return transactionInDAO.getpendingBatches(userId, orgId, page, maxResults);
+    }
+    
+    @Override
+    @Transactional
+    public List<batchDownloads> findInboxBatches(List<batchDownloads> batches, String searchTerm) {
+        return transactionInDAO.findInboxBatches(batches, searchTerm);
     }
 
     @Override
@@ -134,6 +147,12 @@ public class transactionInManagerImpl implements transactionInManager {
     @Transactional
     public List<transactionIn> getBatchTransactions(int batchId, int userId) {
         return transactionInDAO.getBatchTransactions(batchId, userId);
+    }
+    
+    @Override
+    @Transactional
+    public List<transactionTarget> getInboxBatchTransactions(int batchId, int userId) {
+        return transactionInDAO.getInboxBatchTransactions(batchId, userId);
     }
 
     @Override

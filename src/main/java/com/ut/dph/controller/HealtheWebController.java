@@ -10,6 +10,7 @@ import com.ut.dph.model.Organization;
 import com.ut.dph.model.Provider;
 import com.ut.dph.model.Transaction;
 import com.ut.dph.model.User;
+import com.ut.dph.model.batchDownloads;
 import com.ut.dph.model.batchUploadSummary;
 import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.configuration;
@@ -117,8 +118,15 @@ public class HealtheWebController {
             pendingTotal = totalPending;
         }
         
-       
-        inboxTotal = 0;
+        /* Need to get a list of all inbox batches */
+        if(inboxTotal == 0) {
+            List<batchDownloads> inboxBatches = transactionInManager.getInboxBatches(userInfo.getId(), userInfo.getOrgId(), 1, 1000);
+            inboxTotal = inboxBatches.size();
+        }
+        else {
+            inboxTotal = inboxTotal;
+        }
+        
     }
     
     
@@ -131,16 +139,47 @@ public class HealtheWebController {
      * @throws Exception
      */
     @RequestMapping(value = "/inbox", method = RequestMethod.GET)
-    public ModelAndView viewinbox(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
+    public ModelAndView viewinbox(HttpServletRequest request, HttpServletResponse response, HttpSession session,@RequestParam(value = "page", required = false) Integer page) throws Exception {
+        
+        if (page == null) {
+            page = 1;
+        }
         
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/Health-e-Web/inbox");
         
+        /* Need to get all the message types set up for the user */
+        User userInfo = (User)session.getAttribute("userDetails");
+        
+        /* Need to get a list of all inbox batches */
+        Integer totalInboxBatches = transactionInManager.getInboxBatches(userInfo.getId(), userInfo.getOrgId(), page, 0).size();
+        List<batchDownloads> inboxBatches = transactionInManager.getInboxBatches(userInfo.getId(), userInfo.getOrgId(), page, maxResults);
+        
+        if(!inboxBatches.isEmpty()) {
+            for(batchDownloads batch : inboxBatches) {
+                List<transactionTarget> batchTransactions = transactionInManager.getInboxBatchTransactions(batch.getId(), userInfo.getId());
+                batch.settotalTransactions(batchTransactions.size());
+                
+                lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
+                batch.setstatusValue(processStatus.getDisplayCode());
+                
+                User userDetails = usermanager.getUserById(batch.getuserId());
+                String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
+                batch.setusersName(usersName);
+            }
+        }
+        
+        mav.addObject("inboxBatches", inboxBatches);
+       
         /* Set the header totals */
-        setTotals(0,0,session);
+        setTotals(totalInboxBatches,0,session);
         
         mav.addObject("pendingTotal", pendingTotal);
         mav.addObject("inboxTotal", inboxTotal);
+        
+        Integer totalPages = (int)Math.ceil((double)inboxTotal / maxResults);
+        mav.addObject("totalPages", totalPages);
+        mav.addObject("currentPage", page);
         
         return mav;
     }
