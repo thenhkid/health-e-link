@@ -38,9 +38,8 @@
                     </button>
                 </form:form>
             </div>     
-            <form action="batch/transactions" id="viewBatchTransactions" method="post">
+            <form action="inbox/batch/Transactions" id="viewBatchTransactions" method="post">
                 <input type="hidden" id="batchId" name="batchId" value="" />
-                <input type="hidden" name="fromPage" value="inbox" />
             </form>    
             <div class="form-container scrollable">
                 <table class="table table-striped table-hover table-default">
