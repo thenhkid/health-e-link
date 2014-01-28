@@ -124,12 +124,7 @@ public class HealtheWebController {
         
         /* Need to get a list of all inbox batches */
         if(totalInbox == 0) {
-<<<<<<< HEAD
             inboxTotal = transactionOutManager.getInboxBatches(userInfo.getId(), userInfo.getOrgId(), 1, 0).size();
-=======
-            List<batchDownloads> inboxBatches = transactionOutManager.getInboxBatches(userInfo.getId(), userInfo.getOrgId(), 1, 1000);
-            inboxTotal = inboxBatches.size();
->>>>>>> origin/master
         }
         else {
             inboxTotal = totalInbox;
