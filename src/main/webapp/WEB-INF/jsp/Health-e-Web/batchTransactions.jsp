@@ -16,14 +16,9 @@
                     <c:choose>
                         <c:when test="${fromPage == 'inbox'}"><a href="<c:url value='/Health-e-Web/inbox'/>">Inbox</a></c:when>
                         <c:when test="${fromPage == 'pending'}"><a href="<c:url value='/Health-e-Web/pending'/>">Pending Batches</a></c:when>
-<<<<<<< HEAD
 			<c:otherwise><a href="<c:url value='/Health-e-Web/sent'/>">Sent Batches</a></c:otherwise>
                     </c:choose>
                 </li>
-
-=======
-                        <c:otherwise><a href="<c:url value='/Health-e-Web/sent'/>">Sent Batches</a></c:otherwise></c:choose></li>
->>>>>>> origin/master
                 <li class="active">Referral #${batchDetails.utBatchName}</li>
             </ol>
 
