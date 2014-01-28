@@ -114,10 +114,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
         Criteria findBatches = sessionFactory.getCurrentSession().createCriteria(batchDownloads.class);
         findBatches.add(Restrictions.in("id", batchIdList));
         findBatches.addOrder(Order.desc("dateCreated"));
-<<<<<<< HEAD
-=======
 
->>>>>>> origin/master
         if (page > 1) {
             firstResult = (maxResults * (page - 1));
         }
@@ -225,21 +222,14 @@ public class transactionOutDAOImpl implements transactionOutDAO {
                 for (batchDownloadSummary source : sources) {
                     Organization orgDetails = (Organization) sessionFactory.getCurrentSession().get(Organization.class, source.getsourceOrgId());
 
-<<<<<<< HEAD
+
                     /* Search the source organization name */
-=======
-                    /* Search the organization name */
->>>>>>> origin/master
                     if (orgDetails.getOrgName().toLowerCase().matches(".*" + searchTerm + ".*")) {
                         if (!batchIdList.contains(batch.getId())) {
                             batchIdList.add(batch.getId());
                         }
                     }
                 }
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/master
             }
         }
 
@@ -383,7 +373,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
         return (transactionTarget) sessionFactory.getCurrentSession().get(transactionTarget.class, transactionId);
     }
     
-<<<<<<< HEAD
+
     /**
      * The 'changeDeliveryStatus' function will modify the status of the viewed transaction and its related inbound
      * transaction. The function will also review the current status of all the transactions within the download batch
@@ -465,6 +455,4 @@ public class transactionOutDAOImpl implements transactionOutDAO {
         batchUploadStatusUpdate.executeUpdate();
     }
 
-=======
->>>>>>> origin/master
 }

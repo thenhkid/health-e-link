@@ -67,7 +67,6 @@ public class transactionOutManagerImpl implements transactionOutManager {
     public transactionOutRecords getTransactionRecord(int recordId) {
         return transactionOutDAO.getTransactionRecord(recordId);
     }
-<<<<<<< HEAD
 
     @Override
     @Transactional
@@ -75,7 +74,4 @@ public class transactionOutManagerImpl implements transactionOutManager {
         transactionOutDAO.changeDeliveryStatus(batchDLId, batchUploadId, transactionTargetId, transactionInId);
     }
 
-=======
-    
->>>>>>> origin/master
 }
