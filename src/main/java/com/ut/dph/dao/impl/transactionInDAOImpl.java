@@ -1514,7 +1514,6 @@ public class transactionInDAOImpl implements transactionInDAO {
 	@Override
 	@Transactional
 	public boolean insertFailedRequiredFields(configurationFormFields cff, int batchUploadId) {		
-		System.out.println("checkiing field  F" + cff.getFieldNo());
 		String sql = "insert into transactionInerrors (batchUploadId, transactionInId, configurationFormFieldsId, errorid)"
 				+ "(select " + batchUploadId +", transactionInId, " + cff.getId() 
 				+ ", 1 from transactionTranslatedIn where configId = :configId "
@@ -1551,6 +1550,25 @@ public class transactionInDAOImpl implements transactionInDAO {
         } catch (Exception ex) {
             System.err.println("clearTransactionInRecords failed." + ex);
             return false;
+        }
+	}
+
+	@Override
+	@Transactional
+	public void updateStatusForErrorTrans(Integer batchUploadId, int statusId) {
+		String sql = "update transactionIn set statusId = :statusId where"
+				+ " id in (select distinct transactionInId"
+				+ " from transactionInErrors where batchUploadId = :batchUploadId); ";
+
+        Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                .setParameter("batchUploadId", batchUploadId)
+                .setParameter("statusId", statusId);
+
+        try {
+            updateData.executeUpdate();
+           
+        } catch (Exception ex) {
+            System.err.println("updateStatusForErrorTrans failed." + ex);
         }
 	}
 

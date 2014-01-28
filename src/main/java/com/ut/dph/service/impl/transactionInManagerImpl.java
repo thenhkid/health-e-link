@@ -545,47 +545,35 @@ public class transactionInManagerImpl implements transactionInManager {
          */
         if (batch.gettransportMethodId() != 2) { // 2 is ERG
 
-            /**
-             * set batch to SBP - 4*
-             */
+            //set batch to SBP - 4
             updateBatchStatus(batchUploadId, 4, "startDateTime");
-
-            /**
-             * let's clear all tables first as we are starting over*
-             */
+           
+            //let's clear all tables first as we are starting over
             successfulBatch = clearTransactionTables(batchUploadId);
-            /**
-             * loading batch will take it all the way to loaded (9) status for transactions and SSL (3) for batch 
-        	*
-             */
-            successfulBatch = loadBatch(batchUploadId);
-            /**
-             * after loading is successful we update to SSL *
-             */
-            /**
-             * Check to make sure the file is valid for processing, valid file is a batch with SSL or RP *
-             */
-            batch = getBatchDetails(batchUploadId);
+            
+            //loading batch will take it all the way to loaded (9) status for transactions and SSL (3) for batch 
+        	successfulBatch = loadBatch(batchUploadId);
+            
+        	//after loading is successful we update to SSL
+        	updateBatchStatus(batchUploadId, 3, "startDateTime");
+        	
+        	//get batch details again for next round
+        	batch = getBatchDetails(batchUploadId);
 
         }
 
         /**
          * this should be the same point of both ERG and Uploaded File *
          */
-        /**
-         * Check to make sure the file is valid for processing, valid file is a batch with SSL (3) or SR*
-         */
+        
+        //Check to make sure the file is valid for processing, valid file is a batch with SSL (3) or SR*
         successfulBatch = true;
 
         if ((batch.getstatusId() == 3 || batch.getstatusId() == 6) && successfulBatch) {
-            /**
-             * set batch to SBP - 4*
-             */
+            
+        	//set batch to SBP - 4*
             updateBatchStatus(batchUploadId, 4, "startDateTime");
 
-    		/** we figure out if we pass a batch, reject the batch, etc here **/
-    		
-    		
     		/** we get all the configurations **/
     		List<Integer> configIds = getConfigIdsForBatch(batchUploadId);
     		
@@ -598,8 +586,8 @@ public class transactionInManagerImpl implements transactionInManager {
     		for (configurationFormFields cff : reqFields) {
     			insertFailedRequiredFields(cff, batchUploadId);
     		}
-    		//TODO Hold off on setting records to REJ here - finish coding and see because it might be a pass record....
-    		/** we have REJ - 13, Error - 14, Passed 16 for transactions
+    		//update status of the failed records to ERR - 14
+    		updateStatusForErrorTrans(batchUploadId, 14);
     		
     		/**run validation**/
             
@@ -608,9 +596,11 @@ public class transactionInManagerImpl implements transactionInManager {
     		
     		
     		/** we check configuration details, 
-    		 *  remove rejected records from transactionTranslatedIn, pass records stays
-    		 * 
-    		 * **/
+    		 *  remove rejected records from transactionTranslatedIn, pass records stays * **/
+    		//TODO we figure out if we pass a batch, reject the batch, etc here
+    		//we have REJ - 13, Error - 14, Passed 16 for transactions
+    		
+    		
            
     		 }
             
@@ -863,6 +853,16 @@ public class transactionInManagerImpl implements transactionInManager {
 	@Override
 	public boolean clearTransactionInErrors(Integer batchUploadId) {
 		return transactionInDAO.clearTransactionInErrors(batchUploadId);
+	}
+	
+	/** This method finds all error transactionInId in TransactionInErrors and update
+	 * transactionIn with the appropriate error status
+	 * It can be passed, reject and error
+	 * 
+	 */
+	@Override
+	public void updateStatusForErrorTrans(Integer batchUploadId, int statusId) {
+		transactionInDAO.updateStatusForErrorTrans(batchUploadId, statusId);
 	}
 
 }
