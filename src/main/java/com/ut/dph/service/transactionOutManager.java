@@ -31,10 +31,7 @@ public interface transactionOutManager {
     transactionOutRecords getTransactionRecords(int transactionTargetId);
     
     transactionOutRecords getTransactionRecord(int recordId);
-    
-<<<<<<< HEAD
+
     void changeDeliveryStatus(int batchDLId, int batchUploadId, int transactionTargetId, int transactionInId);
-    
-=======
->>>>>>> ac9942cb8ae159da81ca57e434e458ae58833c37
+
 }
