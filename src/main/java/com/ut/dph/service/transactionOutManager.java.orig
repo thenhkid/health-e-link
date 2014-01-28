@@ -4,18 +4,19 @@
  * and open the template in the editor.
  */
 
-package com.ut.dph.dao;
+package com.ut.dph.service;
 
 import com.ut.dph.model.batchDownloads;
-import com.ut.dph.model.transactionOutRecords;
 import com.ut.dph.model.transactionTarget;
+import com.ut.dph.model.transactionOutRecords;
+
 import java.util.List;
 
 /**
  *
  * @author chadmccue
  */
-public interface transactionOutDAO {
+public interface transactionOutManager {
     
     List<batchDownloads> getInboxBatches(int userId, int orgId, int page, int maxResults);
     
@@ -31,9 +32,10 @@ public interface transactionOutDAO {
     
     transactionOutRecords getTransactionRecord(int recordId);
 <<<<<<< HEAD
+
     void changeDeliveryStatus(int batchDLId, int batchUploadId, int transactionTargetId, int transactionInId);
 
 =======
-   
->>>>>>> origin/master
+    
+>>>>>>> ac9942cb8ae159da81ca57e434e458ae58833c37
 }

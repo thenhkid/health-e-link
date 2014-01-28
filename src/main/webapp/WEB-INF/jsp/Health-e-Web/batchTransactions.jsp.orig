@@ -23,7 +23,7 @@
 
 =======
                         <c:otherwise><a href="<c:url value='/Health-e-Web/sent'/>">Sent Batches</a></c:otherwise></c:choose></li>
->>>>>>> origin/master
+>>>>>>> ac9942cb8ae159da81ca57e434e458ae58833c37
                 <li class="active">Referral #${batchDetails.utBatchName}</li>
             </ol>
 

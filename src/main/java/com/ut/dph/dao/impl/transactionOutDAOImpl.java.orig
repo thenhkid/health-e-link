@@ -117,7 +117,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
 <<<<<<< HEAD
 =======
 
->>>>>>> origin/master
+>>>>>>> ac9942cb8ae159da81ca57e434e458ae58833c37
         if (page > 1) {
             firstResult = (maxResults * (page - 1));
         }
@@ -229,7 +229,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
                     /* Search the source organization name */
 =======
                     /* Search the organization name */
->>>>>>> origin/master
+>>>>>>> ac9942cb8ae159da81ca57e434e458ae58833c37
                     if (orgDetails.getOrgName().toLowerCase().matches(".*" + searchTerm + ".*")) {
                         if (!batchIdList.contains(batch.getId())) {
                             batchIdList.add(batch.getId());
@@ -239,7 +239,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
 <<<<<<< HEAD
 =======
 
->>>>>>> origin/master
+>>>>>>> ac9942cb8ae159da81ca57e434e458ae58833c37
             }
         }
 
@@ -466,5 +466,5 @@ public class transactionOutDAOImpl implements transactionOutDAO {
     }
 
 =======
->>>>>>> origin/master
+>>>>>>> ac9942cb8ae159da81ca57e434e458ae58833c37
 }

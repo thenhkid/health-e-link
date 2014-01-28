@@ -129,7 +129,7 @@ public class HealtheWebController {
 =======
             List<batchDownloads> inboxBatches = transactionOutManager.getInboxBatches(userInfo.getId(), userInfo.getOrgId(), 1, 1000);
             inboxTotal = inboxBatches.size();
->>>>>>> origin/master
+>>>>>>> ac9942cb8ae159da81ca57e434e458ae58833c37
         }
         else {
             inboxTotal = totalInbox;
