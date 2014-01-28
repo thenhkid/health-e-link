@@ -18,7 +18,7 @@ function populateExistingAttachments() {
     var currentIdList = $('#attachmentIds').val();
     
     $.ajax({
-        url: '../populateExistingAttachments.do',
+        url: '/Health-e-Web/populateExistingAttachments.do',
         type: 'GET',
         data: {'transactionId': transactionId, 'newattachmentIdList': currentIdList, 'pageFrom': 'sent'},
         success: function(data) {

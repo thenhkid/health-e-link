@@ -2,7 +2,9 @@
     Document   : messageDetailsForm
     Created on : Dec 12, 2013, 2:47:34 PM
     Author     : chadmccue
+    Description: 
 --%>
+
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
@@ -16,7 +18,12 @@
             <ol class="breadcrumb">
                 <li><a href="<c:url value='/profile'/>">My Account</a></li>
                 <li><a href="#">eRG</a></li>
-                <li><c:choose><c:when test="${fromPage == 'pending'}"><a href="<c:url value='/Health-e-Web/pending'/>">Pending Batches</a></c:when><c:otherwise><a href="<c:url value='/Health-e-Web/sent'/>">Sent Messages</a></c:otherwise></c:choose></li>
+                <li>
+                    <c:choose>
+                        <c:when test="${fromPage == 'inbox'}"><a href="<c:url value='/Health-e-Web/inbox'/>">Inbox</a></c:when>
+                        <c:when test="${fromPage == 'pending'}"><a href="<c:url value='/Health-e-Web/pending'/>">Pending Batches</a></c:when>
+                        <c:otherwise><a href="<c:url value='/Health-e-Web/sent'/>">Sent Messages</a></c:otherwise></c:choose>
+                </li>
                 <li class="active">Batch #${transactionDetails.batchName}</li>
             </ol>
 
@@ -33,7 +40,14 @@
             <div class="well">
                 <div class="row form-inline">
                     <div class="form-group col-sm-4">
-                            
+                        <%-- If viewing an inbox message (not feedback report) need to give the ability
+                        to change the internal status of the message --%>
+                        <c:if test="${fromPage == 'inbox' && transactionDetails.sourceType == 1}">
+                            <label class="sr-only">Select Action</label>
+                            <select class="form-control" id="formAction">
+                                
+                            </select>
+                        </c:if>
                     </div>
                     <div class="form-group col-sm-4 col-sm-offset-4">
                         <label class="sr-only">Select Action</label>

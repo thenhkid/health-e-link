@@ -30,6 +30,9 @@ $(function() {
         if($('#fromPage').val() === "sent") {
             $('#viewTransactionDetails').attr("action","/Health-e-Web/sent/messageDetails"); 
         }
+        else if($('#fromPage').val() === "inbox") {
+            $('#viewTransactionDetails').attr("action","/Health-e-Web/inbox/messageDetails"); 
+        }
         else {
             if(editAuthority === "true") {
                 $('#viewTransactionDetails').attr("action","/Health-e-Web/pending/details");
@@ -39,7 +42,6 @@ $(function() {
             }
         }
         
-        
         $('#viewTransactionDetails').submit();
        
     });
@@ -48,7 +50,7 @@ $(function() {
     //status
     $(document).on('click', '.viewStatus', function() {
         $.ajax({
-            url: '../viewStatus' + $(this).attr('rel'),
+            url: '/Health-e-Web/viewStatus' + $(this).attr('rel'),
             type: "GET",
             success: function(data) {
                 $("#statusModal").html(data);

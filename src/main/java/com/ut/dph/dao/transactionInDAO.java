@@ -45,17 +45,11 @@ public interface transactionInDAO {
     
     void submitTransactionTranslatedInRecords(int transactionId, int transactionRecordId, int configId);
     
-    List<batchDownloads> getInboxBatches(int userId, int orgId, int page, int maxResults);
-    
     List<batchUploads> getpendingBatches(int userId, int orgId, int page, int maxResults);
-    
-    List<batchDownloads> findInboxBatches(List<batchDownloads> batches, String searchTerm);
     
     List<batchUploads> findBatches(List<batchUploads> batches, String searchTerm);
     
     List<transactionIn> getBatchTransactions(int batchId, int userId);
-    
-    List<transactionTarget> getInboxBatchTransactions(int batchId, int userId);
     
     List<batchUploads> getsentBatches(int userId, int orgId, int page, int maxResults);
     

@@ -28,7 +28,7 @@
             <div style="display:none;" class="alert alert-danger" role="alert"></div>    
                 
            <div class="" style="overflow:hidden; margin-bottom:10px;">
-               <c:if test="${userDetails.deliverAuthority == true}">
+               <c:if test="${userDetails.deliverAuthority == true && not empty pendingBatches}">
                 <a href="javascript:void(0);" title="Send Batches" class="pull-right btn btn-primary sendBatches"><span class="glyphicon glyphicon-send"></span> Send Marked Batches</a> 
                </c:if>
                <form:form class="form form-inline" id="searchForm" action="/Health-e-Web/pending" method="post">
