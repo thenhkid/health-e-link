@@ -1536,6 +1536,24 @@ public class transactionInDAOImpl implements transactionInDAO {
 		
 	}
 
+	@Override
+	@Transactional
+	public boolean clearTransactionInErrors(Integer batchUploadId) {
+		String sql = "delete from transactionInErrors where transactionInId in"
+                + "(select id from transactionIn where batchId = :batchUploadId )";
+
+        Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                .setParameter("batchUploadId", batchUploadId);
+
+        try {
+            deleteData.executeUpdate();
+            return true;
+        } catch (Exception ex) {
+            System.err.println("clearTransactionInRecords failed." + ex);
+            return false;
+        }
+	}
+
 
 
 

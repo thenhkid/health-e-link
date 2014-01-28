@@ -143,4 +143,7 @@ public interface transactionInManager {
     List <configurationFormFields> getRequiredFieldsForConfig (Integer configId);
     
     boolean insertFailedRequiredFields(configurationFormFields cff, int batchUploadId);
+    
+    boolean clearTransactionInErrors(Integer batchUploadId);
+
 }

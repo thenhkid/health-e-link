@@ -593,11 +593,10 @@ public class transactionInManagerImpl implements transactionInManager {
     		for (configurationFormFields cff : reqFields) {
     			insertFailedRequiredFields(cff, batchUploadId);
     		}
-    		//TODO Hold off on setting records to REJ here - finish coding and see because it might be a pass record....
+    		//TODO Flagging them all as error, at the end of processing, we will re-flag as REJ or Pass
     		/** we have REJ - 13, Error - 14, Passed 16 for transactions
     		
     		/**run validation**/
-            
             
     		/**run cw/macros **/
     		
@@ -678,8 +677,9 @@ public class transactionInManagerImpl implements transactionInManager {
         boolean cleared = false;
         if (canDelete) {
             /**
-             * we remove from message tables*
-             */
+             * we remove from message tables**/
+             //TODO how much should we clear? Is it different for ERG and Upload?
+            
             cleared = clearMessageTables(batchUploadId);
             if (cleared) {
                 int toBatchStatusId = 3; //SSA
@@ -796,6 +796,9 @@ public class transactionInManagerImpl implements transactionInManager {
 		if (cleared) {
 			cleared = clearTransactionTarget(batchUploadId);
 		}
+		if (cleared) {
+			cleared = clearTransactionInErrors(batchUploadId);
+		}
 		//we clear transactionIn
 		if (cleared) {
 			cleared = clearTransactionTarget(batchUploadId);
@@ -830,6 +833,11 @@ public class transactionInManagerImpl implements transactionInManager {
 	@Override
 	public boolean insertFailedRequiredFields(configurationFormFields cff, int batchUploadId) {
 		return transactionInDAO.insertFailedRequiredFields(cff, batchUploadId);	
+	}
+
+	@Override
+	public boolean clearTransactionInErrors(Integer batchUploadId) {
+		return transactionInDAO.clearTransactionInErrors(batchUploadId);
 	}
 
 }
