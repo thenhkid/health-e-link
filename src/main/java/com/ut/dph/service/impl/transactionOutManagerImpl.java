@@ -73,5 +73,11 @@ public class transactionOutManagerImpl implements transactionOutManager {
     public void changeDeliveryStatus(int batchDLId, int batchUploadId, int transactionTargetId, int transactionInId) {
         transactionOutDAO.changeDeliveryStatus(batchDLId, batchUploadId, transactionTargetId, transactionInId);
     }
+    
+    @Override
+    @Transactional
+    public List getInternalStatusCodes() {
+        return transactionOutDAO.getInternalStatusCodes();
+    }
 
 }

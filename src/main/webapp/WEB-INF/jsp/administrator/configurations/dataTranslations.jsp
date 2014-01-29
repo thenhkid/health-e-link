@@ -147,7 +147,7 @@
             </section>
         </div>
 
-        <!-- Existing Crosswalks -->
+        <%-- Existing Crosswalks --%>
         <div class="col-md-6">
             <section class="panel panel-default">
                 <div class="panel-heading">
@@ -167,7 +167,7 @@
 </div>
 
 <div class="main clearfix" role="main">	
-    <!-- Existing Translations -->
+    <%-- Existing Translations --%>
     <div class="col-md-12">
         <section class="panel panel-default">
             <div class="panel-heading">
@@ -185,6 +185,6 @@
 <input type="hidden" id="orgId" value="${orgId}" />
 <input type="hidden" id="macroLookUpList" value="${macroLookUpList}" />
 
-<!-- Provider Address modal -->
+<%-- Provider Address modal --%>
 <div class="modal fade" id="crosswalkModal" role="dialog" tabindex="-1" aria-labeledby="Message Crosswalks" aria-hidden="true" aria-describedby="Message Crosswalks"></div>
 <div class="modal fade" id="macroModal" role="dialog" tabindex="-1" aria-labeledby="Macro Details" aria-hidden="true" aria-describedby="Macro Details"></div>

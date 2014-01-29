@@ -47,6 +47,9 @@ public class transactionTarget {
     @Column(name = "DATECREATED", nullable = false)
     private Date dateCreated = new Date();
     
+    @Column(name = "INTERNALSTATUSID", nullable = true)
+    private int internalStatusId = 0;
+    
     public int getId() {
         return id;
     }
@@ -101,5 +104,13 @@ public class transactionTarget {
     
     public void setdateCreated(Date dateCreated) {
         this.dateCreated = dateCreated;
+    }
+    
+    public int getinternalStatusId() {
+        return internalStatusId;
+    }
+    
+    public void setinternalStatusId(int internalStatusId) {
+        this.internalStatusId = internalStatusId;
     }
 }

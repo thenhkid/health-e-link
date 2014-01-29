@@ -33,5 +33,7 @@ public interface transactionOutManager {
     transactionOutRecords getTransactionRecord(int recordId);
 
     void changeDeliveryStatus(int batchDLId, int batchUploadId, int transactionTargetId, int transactionInId);
+    
+    List getInternalStatusCodes();
 
 }

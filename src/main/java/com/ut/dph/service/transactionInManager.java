@@ -143,8 +143,6 @@ public interface transactionInManager {
     
     boolean runValidations(Integer batchUploadId, Integer configId);
     
-    void phoneValidation(configurationFormFields cff, Integer validationTypeId,Integer batchUploadId);
-    
     void genericValidation(configurationFormFields cff, Integer validationTypeId, Integer batchUploadId, String regEx);
     
     void urlValidation(configurationFormFields cff, Integer validationTypeId, Integer batchUploadId);

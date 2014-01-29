@@ -41,7 +41,7 @@
                             <div class="form-group col-sm-4 col-sm-offset-4">
                                 <label class="sr-only">Select Action</label>
                                 <select class="form-control" id="formAction">
-                                    <option value="">Select Action</option>
+                                    <option value="">-Select Action-</option>
                                     <option value="print">Print / Save As</option>
                                 </select>
                             </div>

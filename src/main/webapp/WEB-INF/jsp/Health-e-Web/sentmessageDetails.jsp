@@ -44,15 +44,18 @@
                         to change the internal status of the message --%>
                         <c:if test="${fromPage == 'inbox' && transactionDetails.sourceType == 1}">
                             <label class="sr-only">Select Action</label>
-                            <select class="form-control" id="formAction">
-                                
+                            <select class="form-control" id="internalStatus" rel="${transactionDetails.transactionId}">
+                                <option value="">-Select Status-</option>
+                                <c:forEach items="${internalStatusCodes}"  varStatus="sCode">
+                                    <option value="${internalStatusCodes[sCode.index][0]}" <c:if test="${transactionDetails.internalStatusId == internalStatusCodes[sCode.index][0]}">selected</c:if>>${internalStatusCodes[sCode.index][1]}</option>
+                                </c:forEach>
                             </select>
                         </c:if>
                     </div>
                     <div class="form-group col-sm-4 col-sm-offset-4">
                         <label class="sr-only">Select Action</label>
                         <select class="form-control" id="formAction">
-                            <option value="">Select Action</option>
+                            <option value="">-Select Action-</option>
                             <option value="print">Print / Save As</option>
                             <option value="feedbackReports">View Feedback Reports</option>
                         </select>
@@ -61,6 +64,7 @@
             </div>        
             <form:form id="messageForm" action="/Health-e-Web/submitMessage" modelAttribute="transactionDetails" role="form" class="form" method="post">
                 <form:hidden path="transactionId" id="transactionId" />
+                <form:hidden path="transactionInId" id="transactionInId" />
                 <input type="hidden" id="attachmentIds" name="attachmentIds" value="" />
                 <div class="panel-group form-accordion" id="accordion">
                     <div class="panel panel-default panel-form">
@@ -167,6 +171,36 @@
                     </div>
                 </div>
            </form:form>
+        </div>
+    </div>
+</div>
+<%-- Note diallog --%>
+<div class="modal fade" id="messageNoteModal" role="dialog" tabindex="-1" aria-labeledby="Message Notes" aria-hidden="true" aria-describedby="Message Notes">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h3 class="panel-title">Create a New Note</h3>
+            </div>
+            <div class="modal-body">
+                <form id="messageNoteForm" action="" method="post" role="form">
+                    <input type="hidden" name="messageTransactionId" id="messagetransactionId" />
+                    <input type="hidden" name="internalStatusId" id="internalStatusId" />
+                    <div class="form-container">
+                        <div id="selStatus" class="form-group" style="display:none;">
+                           <h4 class="form-section-heading">Selected Status: </h4>
+                           <span id="statusDisplayText" class="control-label"></span>
+                        </div>
+                        <div class="form-group">
+                             <h4 class="form-section-heading">Note: </h4>
+                             <textarea name="messageNotes" class="form-control" rows="5"></textarea>
+                        </div>   
+                        <div class="form-group">
+                            <input type="button" id="submitMessageNote" class="btn btn-primary" value="Save Note"/>
+                        </div>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>

@@ -35,6 +35,8 @@ public class Transaction {
    private int transactionRecordId = 0;
    private int transactionTargetId = 0;
    private int sourceType = 1;
+   private int internalStatusId = 0;
+   private int transactionInId = 0;
    
    private List<transactionRecords> sourceOrgFields = null;
    private List<transactionRecords> sourceProviderFields = null;
@@ -250,5 +252,21 @@ public class Transaction {
    
    public void setsourceType(int sourceType) {
        this.sourceType = sourceType;
+   }
+   
+   public int getinternalStatusId() {
+       return internalStatusId;
+   }
+   
+   public void setinternalStatusId(int internalStatusId) {
+       this.internalStatusId = internalStatusId;
+   }
+   
+   public int gettransactionInId() {
+       return transactionInId;
+   }
+   
+   public void settransactionInId(int transactionInId) {
+       this.transactionInId = transactionInId;
    }
 }

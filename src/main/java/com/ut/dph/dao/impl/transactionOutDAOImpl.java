@@ -454,5 +454,17 @@ public class transactionOutDAOImpl implements transactionOutDAO {
         
         batchUploadStatusUpdate.executeUpdate();
     }
+    
+    /**
+     * 
+     */
+    @Override
+    @Transactional
+    public List getInternalStatusCodes() {
+        Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT id, displaytext FROM lu_internalMessageStatus order by displayText asc");
+        return query.list();
+    }
+    
+    
 
 }

@@ -389,6 +389,8 @@ public class HealtheWebController {
         transaction.settransactionTargetId(transactionInfo.getId());
         transaction.setdateSubmitted(transactionInfo.getdateCreated());
         transaction.setsourceType(configDetails.getsourceType());
+        transaction.setinternalStatusId(transactionInfo.getinternalStatusId());
+        transaction.settransactionInId(transactionInfo.gettransactionInId());
             
         /* get the message type name */
         transaction.setmessageTypeName(messagetypemanager.getMessageTypeById(configDetails.getMessageTypeId()).getName());
@@ -530,6 +532,10 @@ public class HealtheWebController {
         transaction.setdetailFields(detailFields);
         
         mav.addObject("transactionDetails", transaction);
+        
+        /* Get the list of internal message status */
+        List internalStatusCodes = transactionOutManager.getInternalStatusCodes();
+        mav.addObject("internalStatusCodes",internalStatusCodes);
         
         /* Set the header totals */
         setTotals(0,0,session);

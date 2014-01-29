@@ -32,5 +32,7 @@ public interface transactionOutDAO {
     transactionOutRecords getTransactionRecord(int recordId);
 
     void changeDeliveryStatus(int batchDLId, int batchUploadId, int transactionTargetId, int transactionInId);
+    
+    List getInternalStatusCodes();
 
 }
