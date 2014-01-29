@@ -1005,8 +1005,8 @@ public class transactionInDAOImpl implements transactionInDAO {
     @SuppressWarnings("unchecked")
     public List<Integer> getBlankTransIds(ConfigForInsert config) {
         String sql = ("select transactionInId from "
-                + " transactionTranslatedIn where (length(concat(" + config.getSingleValueFields()
-                + ")) = 0 or length(concat(" + config.getSingleValueFields()
+                + " transactionTranslatedIn where (length(CONCAT_WS(" + config.getSingleValueFields()
+                + ")) = 0 or length(CONCAT_WS(" + config.getSingleValueFields()
                 + ")) is null) and transactionInId in (select id from transactionIn where statusId = :relId "
                 + " and batchId = :batchUploadId"
                 + " and configId = :configId); ");
@@ -1307,6 +1307,27 @@ public class transactionInDAOImpl implements transactionInDAO {
         } catch (Exception ex) {
             System.err.println("genericValidation failed." + ex);
         }
+	}
+
+	@Override
+	@Transactional
+	public void updateBlanksToNull(configurationFormFields cff,
+			Integer batchUploadId) {
+		String sql = "update transactiontranslatedIn set F" + cff.getFieldNo() + " = null where length(F"+
+			cff.getFieldNo() + ") = 0 "
+					+ "and transactionInId in (select id from transactionIn where batchId = :batchUploadId "
+					+ "and configId = :configId and statusId = :relId);";
+		
+		Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql);
+				updateData.setParameter("batchUploadId", batchUploadId);
+        updateData.setParameter("configId", cff.getconfigId());
+        updateData.setParameter("relId", transRELId);
+		try {
+			updateData.executeUpdate();   
+        } catch (Exception ex) {
+            System.err.println("updateBlanksToNull failed." + ex);
+        }
+		
 	}
 
 

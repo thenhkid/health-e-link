@@ -121,4 +121,6 @@ public interface transactionInDAO {
     boolean clearTransactionInErrors(Integer batchUploadId);
     
     void updateStatusForErrorTrans(Integer batchUploadId, Integer statusId);
+    
+    void updateBlanksToNull(configurationFormFields cff, Integer batchUploadId);
 }

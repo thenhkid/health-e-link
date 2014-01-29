@@ -524,7 +524,7 @@ public class transactionInManagerImpl implements transactionInManager {
         successfulBatch = true;
 
         if ((batch.getstatusId() == 3 || batch.getstatusId() == 6) && successfulBatch) {
-            
+        	        	
         	//set batch to SBP - 4*
             updateBatchStatus(batchUploadId, 4, "startDateTime");
 
@@ -570,9 +570,9 @@ public class transactionInManagerImpl implements transactionInManager {
     		if (!insertTransactions(batchUploadId)) {
     			successfulBatch = false;
 				/** something went wrong, we removed all inserted entries **/
-				//clearMessageTables(batchUploadId);
+				clearMessageTables(batchUploadId);
 				/** we leave transaction status alone and flag batch as error during processing -SPE**/
-				//updateBatchStatus(batchUploadId, 28, "endDateTime");
+				updateBatchStatus(batchUploadId, 28, "endDateTime");
 			}
             
             /**set batch to SPC 24**/
@@ -674,6 +674,13 @@ public class transactionInManagerImpl implements transactionInManager {
 
         for (Integer configId : configIds) {
 
+        	//blank values are seen as space and will cause errors when insert if field is not use
+        	List <configurationFormFields> configurationFormFields = 
+					configurationtransportmanager.getCffByValidationType(configId, 0);
+        	for (configurationFormFields cff : configurationFormFields)  {
+						updateBlanksToNull(cff, batchUploadId);
+			}
+        	
             /**
              * this list have the insert /check statements for each message table *
              */
@@ -694,21 +701,15 @@ public class transactionInManagerImpl implements transactionInManager {
                  */
                 List<Integer> skipTheseIds = getBlankTransIds(config);
                 config.setBlankValueTransId(skipTheseIds);
-
-                /**
-                 * we insert single values *
-                 */
+               
+                //we insert single values
                 if (!insertSingleToMessageTables(config)) {
                     return false;
                 }
 
-                /**
-                 * we loop through transactions with multiple values and use SP to loop values with delimiters  *
-                 */
+                //we loop through transactions with multiple values and use SP to loop values with delimiters
                 for (Integer transId : transIds) {
-                    /**
-                     * we check how long field is*
-                     */
+                    //we check how long field is
                     Integer subStringTotal = countSubString(config, transId);
                     for (int i = 0; i <= subStringTotal; i++) {
                         if (!insertMultiValToMessageTables(config, i + 1, transId)) {
@@ -906,6 +907,11 @@ public class transactionInManagerImpl implements transactionInManager {
 			Integer validationTypeId, Integer batchUploadId) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public void updateBlanksToNull(configurationFormFields cff, Integer batchUploadId) {
+		transactionInDAO.updateBlanksToNull(cff, batchUploadId);
 	}
 
 }

@@ -151,4 +151,6 @@ public interface transactionInManager {
     
     void dateValidation(configurationFormFields cff, Integer validationTypeId, Integer batchUploadId);
     
+    void updateBlanksToNull(configurationFormFields cff, Integer batchUploadId);
+    
 }
