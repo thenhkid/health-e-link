@@ -63,7 +63,7 @@ public class transactionInManagerImpl implements transactionInManager {
 
     @Autowired
     private messageTypeManager messagetypemanager;
-    
+
     @Override
     @Transactional
     public String getFieldValue(String tableName, String tableCol, int idValue) {
@@ -129,7 +129,6 @@ public class transactionInManagerImpl implements transactionInManager {
     public List<batchUploads> getpendingBatches(int userId, int orgId, int page, int maxResults) {
         return transactionInDAO.getpendingBatches(userId, orgId, page, maxResults);
     }
-
 
     @Override
     @Transactional
@@ -300,7 +299,7 @@ public class transactionInManagerImpl implements transactionInManager {
      */
     @Override
     public boolean processTransactions(int batchUploadId) {
-    	return true;
+        return true;
     }
 
     @Override
@@ -494,88 +493,103 @@ public class transactionInManagerImpl implements transactionInManager {
         batchUploads batch = getBatchDetails(batchUploadId);
 
         /**
-         * ERG are loaded already, we load all other files maybe move loading?
-         **
+         * ERG are loaded already, we load all other files maybe move loading? *
          */
         if (batch.gettransportMethodId() != 2) { // 2 is ERG
 
             //set batch to SBP - 4
             updateBatchStatus(batchUploadId, 4, "startDateTime");
-           
+
             //let's clear all tables first as we are starting over
             successfulBatch = clearTransactionTables(batchUploadId);
-            
+
             //loading batch will take it all the way to loaded (9) status for transactions and SSL (3) for batch 
-        	successfulBatch = loadBatch(batchUploadId);
-            
-        	//after loading is successful we update to SSL
-        	updateBatchStatus(batchUploadId, 3, "startDateTime");
-        	
-        	//get batch details again for next round
-        	batch = getBatchDetails(batchUploadId);
+            successfulBatch = loadBatch(batchUploadId);
+
+            //after loading is successful we update to SSL
+            updateBatchStatus(batchUploadId, 3, "startDateTime");
+
+            //get batch details again for next round
+            batch = getBatchDetails(batchUploadId);
 
         }
 
         /**
          * this should be the same point of both ERG and Uploaded File *
          */
-        
         //Check to make sure the file is valid for processing, valid file is a batch with SSL (3) or SR*
         successfulBatch = true;
 
         if ((batch.getstatusId() == 3 || batch.getstatusId() == 6) && successfulBatch) {
-        	        	
-        	//set batch to SBP - 4*
+
+            //set batch to SBP - 4*
             updateBatchStatus(batchUploadId, 4, "startDateTime");
 
-    		/** we get all the configurations **/
-    		List<Integer> configIds = getConfigIdsForBatch(batchUploadId);
-    		
-    		 for (Integer configId : configIds) {
-    		       
-    		/** we need to run all checks before insert regardless **/
-    		/** check R/O **/
-    		List <configurationFormFields> reqFields = getRequiredFieldsForConfig(configId);
-    		/** we loop each field and flag errors **/
-    		for (configurationFormFields cff : reqFields) {
-    			insertFailedRequiredFields(cff, batchUploadId);
-    		}
-    		//update status of the failed records to ERR - 14
-    		updateStatusForErrorTrans(batchUploadId, 14);
-    		
-    		/**run validation**/
-    		runValidations(batchUploadId, configId);
-    		//update status of the failed records to ERR - 14
-    		updateStatusForErrorTrans(batchUploadId, 14);
-    		
-    		/**run cw/macros **/
-    		
-    		
-    		/** we check configuration details, 
-    		 *  remove rejected records from transactionTranslatedIn, pass records stays * **/
+            /**
+             * we get all the configurations *
+             */
+            List<Integer> configIds = getConfigIdsForBatch(batchUploadId);
+
+            for (Integer configId : configIds) {
+
+                /**
+                 * we need to run all checks before insert regardless *
+                 */
+                /**
+                 * check R/O *
+                 */
+                List<configurationFormFields> reqFields = getRequiredFieldsForConfig(configId);
+                /**
+                 * we loop each field and flag errors *
+                 */
+                for (configurationFormFields cff : reqFields) {
+                    insertFailedRequiredFields(cff, batchUploadId);
+                }
+                //update status of the failed records to ERR - 14
+                updateStatusForErrorTrans(batchUploadId, 14);
+
+                /**
+                 * run validation*
+                 */
+                runValidations(batchUploadId, configId);
+                //update status of the failed records to ERR - 14
+                updateStatusForErrorTrans(batchUploadId, 14);
+
+                /**
+                 * run cw/macros *
+                 */
+                /**
+                 * we check configuration details, remove rejected records from transactionTranslatedIn, pass records stays * *
+                 */
     		//TODO we figure out if we pass a batch, reject the batch, etc here
-    		//we have REJ - 13, Error - 14, Passed 16 for transactions
-    		
-    		
-           
-    		 }
-            
-    		}
-    	
-    		/** somewhere in here we need to make sure all configs are set to handle files
-    		 * the same way, if not, we will go with manual release **/
-    	boolean autoRelease = true;
-    	if (autoRelease) {
-    		/**inserts for batches that passes **/
-    		if (!insertTransactions(batchUploadId)) {
-    			successfulBatch = false;
-				/** something went wrong, we removed all inserted entries **/
-				clearMessageTables(batchUploadId);
-				/** we leave transaction status alone and flag batch as error during processing -SPE**/
-				updateBatchStatus(batchUploadId, 28, "endDateTime");
-			}
-            
-            /**set batch to SPC 24**/
+                //we have REJ - 13, Error - 14, Passed 16 for transactions
+            }
+
+        }
+
+        /**
+         * somewhere in here we need to make sure all configs are set to handle files the same way, if not, we will go with manual release *
+         */
+        boolean autoRelease = true;
+        if (autoRelease) {
+            /**
+             * inserts for batches that passes *
+             */
+            if (!insertTransactions(batchUploadId)) {
+                successfulBatch = false;
+                /**
+                 * something went wrong, we removed all inserted entries *
+                 */
+                clearMessageTables(batchUploadId);
+                /**
+                 * we leave transaction status alone and flag batch as error during processing -SPE*
+                 */
+                updateBatchStatus(batchUploadId, 28, "endDateTime");
+            }
+
+            /**
+             * set batch to SPC 24*
+             */
             if (successfulBatch) {
                 updateBatchStatus(batchUploadId, 24, "endDateTime");
                 /**
@@ -602,7 +616,7 @@ public class transactionInManagerImpl implements transactionInManager {
     public boolean processBatches() {
 		//0. grab all batches with SSA - 2
 
-		//1. validate r/o
+              //1. validate r/o
         //2. validate type
         //3. apply cw / macros to check for valid data
         //4. check auto release / manual status 
@@ -632,14 +646,15 @@ public class transactionInManagerImpl implements transactionInManager {
         boolean cleared = false;
         if (canDelete) {
             /**
-             * we remove from message tables**/
+             * we remove from message tables*
+             */
              //TODO how much should we clear? Is it different for ERG and Upload?
-        	 
+
             cleared = clearMessageTables(batchUploadId);
             if (cleared) {
                 int toBatchStatusId = 3; //SSA
                 if (getBatchDetails(batchUploadId).gettransportMethodId() == 2) {
-                	cleared = clearTransactionInErrors(batchUploadId);
+                    cleared = clearTransactionInErrors(batchUploadId);
                     toBatchStatusId = 5;
                     transactionInDAO.updateTransactionStatus(batchUploadId, 0, 15);
                 } else {
@@ -664,8 +679,7 @@ public class transactionInManagerImpl implements transactionInManager {
     }
 
     /**
-     * This method assumes that all records are validated and ready for insert We loop through each configuration and insert Transaction status will remain unchanged.
-     * *
+     * This method assumes that all records are validated and ready for insert We loop through each configuration and insert Transaction status will remain unchanged. *
      */
     @Override
     public boolean insertTransactions(Integer batchUploadId) {
@@ -674,13 +688,13 @@ public class transactionInManagerImpl implements transactionInManager {
 
         for (Integer configId : configIds) {
 
-        	//blank values are seen as space and will cause errors when insert if field is not use
-        	List <configurationFormFields> configurationFormFields = 
-					configurationtransportmanager.getCffByValidationType(configId, 0);
-        	for (configurationFormFields cff : configurationFormFields)  {
-						updateBlanksToNull(cff, batchUploadId);
-			}
-        	
+            //blank values are seen as space and will cause errors when insert if field is not use
+            List<configurationFormFields> configurationFormFields
+                    = configurationtransportmanager.getCffByValidationType(configId, 0);
+            for (configurationFormFields cff : configurationFormFields) {
+                updateBlanksToNull(cff, batchUploadId);
+            }
+
             /**
              * this list have the insert /check statements for each message table *
              */
@@ -701,7 +715,7 @@ public class transactionInManagerImpl implements transactionInManager {
                  */
                 List<Integer> skipTheseIds = getBlankTransIds(config);
                 config.setBlankValueTransId(skipTheseIds);
-               
+
                 //we insert single values
                 if (!insertSingleToMessageTables(config)) {
                     return false;
@@ -728,8 +742,7 @@ public class transactionInManagerImpl implements transactionInManager {
     /**
      * this process will load an upload file with status of SSA and take it all the way to SSL
      *
-     * 1. read file 2. parse row by row and a. figure out config b. insert into transactionIn c. insert into transacitonTarget d. flag transactions as Loaded or Invalid
-	 *   *
+     * 1. read file 2. parse row by row and a. figure out config b. insert into transactionIn c. insert into transacitonTarget d. flag transactions as Loaded or Invalid *
      */
     @Override
     public boolean loadBatch(Integer batchUploadId) {
@@ -756,31 +769,31 @@ public class transactionInManagerImpl implements transactionInManager {
         return transactionInDAO.clearTransactionTranslatedIn(batchUploadId);
     }
 
-	@Override
-	public boolean clearTransactionTables(Integer batchUploadId) {
-		boolean cleared = false;
-		//we clear transactionTranslatedIn
-		cleared = clearTransactionTranslatedIn(batchUploadId);
-		//we clear transactionInRecords
-		if (cleared) {
-			cleared = clearTransactionInRecords(batchUploadId);
-		}
-		//we clear transactionTarget
-		if (cleared) {
-			cleared = clearTransactionTarget(batchUploadId);
-		}
-		if (cleared) {
-			cleared = clearTransactionInErrors(batchUploadId);
-		}
-		//we clear transactionIn
-		if (cleared) {
-			cleared = clearTransactionTarget(batchUploadId);
-		}
-		if (!cleared) {
-			flagAndEmailAdmin(batchUploadId);
-		}
-		return cleared;
-	}
+    @Override
+    public boolean clearTransactionTables(Integer batchUploadId) {
+        boolean cleared = false;
+        //we clear transactionTranslatedIn
+        cleared = clearTransactionTranslatedIn(batchUploadId);
+        //we clear transactionInRecords
+        if (cleared) {
+            cleared = clearTransactionInRecords(batchUploadId);
+        }
+        //we clear transactionTarget
+        if (cleared) {
+            cleared = clearTransactionTarget(batchUploadId);
+        }
+        if (cleared) {
+            cleared = clearTransactionInErrors(batchUploadId);
+        }
+        //we clear transactionIn
+        if (cleared) {
+            cleared = clearTransactionTarget(batchUploadId);
+        }
+        if (!cleared) {
+            flagAndEmailAdmin(batchUploadId);
+        }
+        return cleared;
+    }
 
     @Override
     public boolean clearTransactionTarget(Integer batchUploadId) {
@@ -794,7 +807,7 @@ public class transactionInManagerImpl implements transactionInManager {
 
     @Override
     public void flagAndEmailAdmin(Integer batchUploadId) {
-		// TODO Auto-generated method stub
+        // TODO Auto-generated method stub
 
     }
 
@@ -808,102 +821,99 @@ public class transactionInManagerImpl implements transactionInManager {
         return transactionInDAO.insertFailedRequiredFields(cff, batchUploadId);
     }
 
-	@Override
-	public boolean clearTransactionInErrors(Integer batchUploadId) {
-		return transactionInDAO.clearTransactionInErrors(batchUploadId);
-	}
-	
-	/** This method finds all error transactionInId in TransactionInErrors and update
-	 * transactionIn with the appropriate error status
-	 * It can be passed, reject and error
-	 * 
-	 */
-	@Override
-	public void updateStatusForErrorTrans(Integer batchUploadId, Integer statusId) {
-		transactionInDAO.updateStatusForErrorTrans(batchUploadId, statusId);
-	}
+    @Override
+    public boolean clearTransactionInErrors(Integer batchUploadId) {
+        return transactionInDAO.clearTransactionInErrors(batchUploadId);
+    }
 
-	@Override
-	public boolean runValidations(Integer batchUploadId, Integer configId) {
+    /**
+     * This method finds all error transactionInId in TransactionInErrors and update transactionIn with the appropriate error status It can be passed, reject and error
+     *
+     */
+    @Override
+    public void updateStatusForErrorTrans(Integer batchUploadId, Integer statusId) {
+        transactionInDAO.updateStatusForErrorTrans(batchUploadId, statusId);
+    }
+
+    @Override
+    public boolean runValidations(Integer batchUploadId, Integer configId) {
 		//1. we get validation types
-		//2. we skip 1 as that is not necessary
-		//3. we skip date (4) as there is no isDate function in MySQL
-		//4. we skip the ids that are not null as Mysql will bomb out checking character placement
-		//5. back to date, we grab transaction info and we loop (errId 7)
-		
-		/**
-		 * MySql RegEXP
-		 * validate numeric - ^-?[0-9]+[.]?[0-9]*$|^-?[.][0-9]+$
-		 * validate email - ^[a-z0-9\._%+!$&*=^|~#%\'`?{}/\-]+@[a-z0-9\.-]+\.[a-z]{2,6}$ or ^[A-Z0-9._%-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$
-		 * validate url - ^(https?://)?([\da-z.-]+).([a-z0-9])([0-9a-z]*)*[/]?$ - need to fix not correct - might have to run in java as mysql is not catching all.
-		 * validate phone - should be no longer than 11 digits ^[0-9]{7,11}$
-		 * validate date - doing this in java
-		**/
+        //2. we skip 1 as that is not necessary
+        //3. we skip date (4) as there is no isDate function in MySQL
+        //4. we skip the ids that are not null as Mysql will bomb out checking character placement
+        //5. back to date, we grab transaction info and we loop (errId 7)
+
+        /**
+         * MySql RegEXP validate numeric - ^-?[0-9]+[.]?[0-9]*$|^-?[.][0-9]+$ validate email - ^[a-z0-9\._%+!$&*=^|~#%\'`?{}/\-]+@[a-z0-9\.-]+\.[a-z]{2,6}$ or ^[A-Z0-9._%-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$ validate url - ^(https?://)?([\da-z.-]+).([a-z0-9])([0-9a-z]*)*[/]?$ - need to fix not correct - might have to run in java as mysql is not catching all. validate phone - should be no longer than 11 digits ^[0-9]{7,11}$ validate date - doing this in java
+		*
+         */
 //TODO was hoping to have one SP but concat in SP not setting and not catching errors correctly. Need to recheck
-		
-			List <configurationFormFields> configurationFormFields = 
-					configurationtransportmanager.getCffByValidationType(configId, 0);
+        List<configurationFormFields> configurationFormFields
+                = configurationtransportmanager.getCffByValidationType(configId, 0);
 
-			for (configurationFormFields cff : configurationFormFields)  {
-				String regEx = "";
-				Integer validationTypeId = cff.getValidationType();
-				switch (cff.getValidationType()) {
-					case 1: break; // no validation
-					//email calling SQL to validation and insert - one statement
-					case 2:  
-						genericValidation(cff, validationTypeId, batchUploadId, regEx);
-						break;
-					//phone  calling SP to validation and insert - one statement 
-					case 3:  
-						genericValidation(cff, validationTypeId, batchUploadId, regEx);
-					break;
-					// need to loop through each record / each field
-					case 4: 
-						dateValidation(cff, validationTypeId, batchUploadId);
-					break;
-					//numeric   calling SQL to validation and insert - one statement      
-					case 5: 
-						genericValidation(cff, validationTypeId, batchUploadId, regEx);
-					break;
-					//url - nned to rethink as regExp is not validating correctly
-					case 6:  urlValidation(cff, validationTypeId, batchUploadId);
-					break;
-					//anything new we hope to only have to modify sp
-					default: genericValidation(cff, validationTypeId, batchUploadId, regEx); 
-					break;
-				}
-				
-			}
-		return true;
-	}
+        for (configurationFormFields cff : configurationFormFields) {
+            String regEx = "";
+            Integer validationTypeId = cff.getValidationType();
+            switch (cff.getValidationType()) {
+                case 1:
+                    break; // no validation
+                //email calling SQL to validation and insert - one statement
+                case 2:
+                    genericValidation(cff, validationTypeId, batchUploadId, regEx);
+                    break;
+                //phone  calling SP to validation and insert - one statement 
+                case 3:
+                    genericValidation(cff, validationTypeId, batchUploadId, regEx);
+                    break;
+                // need to loop through each record / each field
+                case 4:
+                    dateValidation(cff, validationTypeId, batchUploadId);
+                    break;
+                //numeric   calling SQL to validation and insert - one statement      
+                case 5:
+                    genericValidation(cff, validationTypeId, batchUploadId, regEx);
+                    break;
+                //url - nned to rethink as regExp is not validating correctly
+                case 6:
+                    urlValidation(cff, validationTypeId, batchUploadId);
+                    break;
+                //anything new we hope to only have to modify sp
+                default:
+                    genericValidation(cff, validationTypeId, batchUploadId, regEx);
+                    break;
+            }
 
-	@Override
-	public void genericValidation(configurationFormFields cff,
-			Integer validationTypeId, Integer batchUploadId, String regEx) {
-		transactionInDAO.genericValidation(cff, validationTypeId, batchUploadId, regEx);
-	}
+        }
+        return true;
+    }
 
-	@Override
-	public void urlValidation(configurationFormFields cff,
-			Integer validationTypeId, Integer batchUploadId) {
+    @Override
+    public void genericValidation(configurationFormFields cff,
+            Integer validationTypeId, Integer batchUploadId, String regEx) {
+        transactionInDAO.genericValidation(cff, validationTypeId, batchUploadId, regEx);
+    }
+
+    @Override
+    public void urlValidation(configurationFormFields cff,
+            Integer validationTypeId, Integer batchUploadId) {
 		// TODO Auto-generated method stub
-		
-	}
 
-	@Override
-	public void dateValidation(configurationFormFields cff,
-			Integer validationTypeId, Integer batchUploadId) {
+    }
+
+    @Override
+    public void dateValidation(configurationFormFields cff,
+            Integer validationTypeId, Integer batchUploadId) {
 		// TODO Auto-generated method stub
-		
-	}
 
-	/**
-	 * This method updates all the length of 0 values for a particular column for a batch and configuration
-	 * to null.
-	 **/
-	@Override
-	public void updateBlanksToNull(configurationFormFields cff, Integer batchUploadId) {
-		transactionInDAO.updateBlanksToNull(cff, batchUploadId);
-	}
+    }
+
+    /**
+     * This method updates all the length of 0 values for a particular column for a batch and configuration to null.
+	 *
+     */
+    @Override
+    public void updateBlanksToNull(configurationFormFields cff, Integer batchUploadId) {
+        transactionInDAO.updateBlanksToNull(cff, batchUploadId);
+    }
 
 }
