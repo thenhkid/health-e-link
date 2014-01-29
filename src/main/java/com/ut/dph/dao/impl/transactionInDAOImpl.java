@@ -1230,7 +1230,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 	/**errorId = 1 is required field missing**/
 	@Override
 	@Transactional
-	public boolean insertFailedRequiredFields(configurationFormFields cff, int batchUploadId) {		
+	public boolean insertFailedRequiredFields(configurationFormFields cff, Integer batchUploadId) {		
 		String sql = "insert into transactionInerrors (batchUploadId, transactionInId, configurationFormFieldsId, errorid)"
 				+ "(select " + batchUploadId +", transactionInId, " + cff.getId() 
 				+ ", 1 from transactionTranslatedIn where configId = :configId "
@@ -1272,7 +1272,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 
 	@Override
 	@Transactional
-	public void updateStatusForErrorTrans(Integer batchUploadId, int statusId) {
+	public void updateStatusForErrorTrans(Integer batchUploadId, Integer statusId) {
 		String sql = "update transactionIn set statusId = :statusId where"
 				+ " id in (select distinct transactionInId"
 				+ " from transactionInErrors where batchUploadId = :batchUploadId); ";

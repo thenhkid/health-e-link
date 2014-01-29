@@ -135,12 +135,20 @@ public interface transactionInManager {
     
     List <configurationFormFields> getRequiredFieldsForConfig (Integer configId);
     
-    boolean insertFailedRequiredFields(configurationFormFields cff, int batchUploadId);
+    boolean insertFailedRequiredFields(configurationFormFields cff, Integer batchUploadId);
     
     boolean clearTransactionInErrors(Integer batchUploadId);
     
-    void updateStatusForErrorTrans(Integer batchUploadId, int statusId);
+    void updateStatusForErrorTrans(Integer batchUploadId, Integer statusId);
     
     boolean runValidations(Integer batchUploadId, Integer configId);
-
+    
+    void phoneValidation(configurationFormFields cff, Integer validationTypeId,Integer batchUploadId);
+    
+    void genericValidation(configurationFormFields cff, Integer validationTypeId, Integer batchUploadId, String regEx);
+    
+    void urlValidation(configurationFormFields cff, Integer validationTypeId, Integer batchUploadId);
+    
+    void dateValidation(configurationFormFields cff, Integer validationTypeId, Integer batchUploadId);
+    
 }

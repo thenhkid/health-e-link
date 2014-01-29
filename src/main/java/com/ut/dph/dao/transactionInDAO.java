@@ -113,9 +113,9 @@ public interface transactionInDAO {
 
     boolean clearTransactionIn(Integer batchUploadId);
      
-    boolean insertFailedRequiredFields(configurationFormFields cff, int batchUploadId);
+    boolean insertFailedRequiredFields(configurationFormFields cff, Integer batchUploadId);
     
     boolean clearTransactionInErrors(Integer batchUploadId);
     
-    void updateStatusForErrorTrans(Integer batchUploadId, int statusId);
+    void updateStatusForErrorTrans(Integer batchUploadId, Integer statusId);
 }

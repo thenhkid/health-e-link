@@ -800,7 +800,7 @@ public class transactionInManagerImpl implements transactionInManager {
     }
 
     @Override
-    public boolean insertFailedRequiredFields(configurationFormFields cff, int batchUploadId) {
+    public boolean insertFailedRequiredFields(configurationFormFields cff, Integer batchUploadId) {
         return transactionInDAO.insertFailedRequiredFields(cff, batchUploadId);
     }
 
@@ -815,7 +815,7 @@ public class transactionInManagerImpl implements transactionInManager {
 	 * 
 	 */
 	@Override
-	public void updateStatusForErrorTrans(Integer batchUploadId, int statusId) {
+	public void updateStatusForErrorTrans(Integer batchUploadId, Integer statusId) {
 		transactionInDAO.updateStatusForErrorTrans(batchUploadId, statusId);
 	}
 
@@ -831,26 +831,83 @@ public class transactionInManagerImpl implements transactionInManager {
 		 * MySql RegEXP
 		 * validate numeric - ^-?[0-9]+[.]?[0-9]*$|^-?[.][0-9]+$
 		 * validate email - ^[a-z0-9\._%+!$&*=^|~#%\'`?{}/\-]+@[a-z0-9\.-]+\.[a-z]{2,6}$ or ^[A-Z0-9._%-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$
-		 * validate url -^(https?://)?([\da-z.-]+).([a-z0-9])([0-9a-z]*)*[/]?$ - need to fix not correct - might have to run in java as mysql is not catching all.
+		 * validate url - ^(https?://)?([\da-z.-]+).([a-z0-9])([0-9a-z]*)*[/]?$ - need to fix not correct - might have to run in java as mysql is not catching all.
 		 * validate phone - should be no longer than 10 digits
 		 * validate date - doing this in java
 		**/
-		
+//TODO was hoping to have one SP but concat in SP not setting and not catching errors correctly. Need to recheck
 		List <validationType> validationTypes = messagetypemanager.getValidationTypes1();
+		
 		for (validationType vt : validationTypes)  {
+			Integer validationTypeId = vt.getId();
 			
-			List <configurationFormFields> cffForVT = 
+			List <configurationFormFields> configurationFormFields = 
 					configurationtransportmanager.getCffByValidationType(configId, vt.getId());
-			
-			//was hoping to loop by column and call sp, sp doesn't reject correctly... using java instead...
-			
+
+			for (configurationFormFields cff : configurationFormFields)  {
+				String regEx = "";
+				switch (validationTypeId) {
+					case 1: break; // no validation
+					//email calling SQL to validation and insert - one statement
+					case 2:  
+						regEx = "^[a-z0-9\\._%+!$&*=^|~#%\\'`?{}/\\-]+@[a-z0-9\\.-]+\\.[a-z]{2,6}$ or ^[A-Z0-9._%-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}$";
+						genericValidation(cff, validationTypeId, batchUploadId, regEx);
+						break;
+					//phone  calling SP to validation and insert - one statement 
+					case 3:  phoneValidation(cff, validationTypeId, batchUploadId);
+					break;
+					// need to loop through each record / each field
+					case 4:  dateValidation(cff, validationTypeId, batchUploadId);
+					break;
+					//income   calling SQL to validation and insert - one statement      
+					case 5: regEx = "^-?[0-9]+[.]?[0-9]*$|^-?[.][0-9]+$"; 
+					genericValidation(cff, validationTypeId, batchUploadId, regEx);
+					break;
+					//url - nned to rethink as regExp is not validating correctly
+					case 6:  urlValidation(cff, validationTypeId, batchUploadId);
+					break;
+					default: break;
+				}
+				
+			}
 		
 		}
 		
-		
-		
-		
 		return true;
+	}
+
+	/** 
+	 * 1. this calls the SP that strips all the
+	 * 2. it then checks to make sure phone is not longer than 11 digits as it might be entered as 1-234-567-7890
+	 * 3. it will then insert errors into transactionInErrors
+	 */
+
+	@Override
+	public void phoneValidation(configurationFormFields cff,
+			Integer validationTypeId, Integer batchUploadId) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void genericValidation(configurationFormFields cff,
+			Integer validationTypeId, Integer batchUploadId, String regEx) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void urlValidation(configurationFormFields cff,
+			Integer validationTypeId, Integer batchUploadId) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void dateValidation(configurationFormFields cff,
+			Integer validationTypeId, Integer batchUploadId) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
