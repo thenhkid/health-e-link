@@ -256,5 +256,5 @@
         </div>
     </div>
 </div>
-<!-- Status Definition modal -->
+<%-- Status Definition modal --%>
 <div class="modal fade" id="statusModal" role="dialog" tabindex="-1" aria-labeledby="Status Details" aria-hidden="true" aria-describedby="Status Details"></div>

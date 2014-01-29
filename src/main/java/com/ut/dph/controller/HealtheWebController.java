@@ -391,13 +391,15 @@ public class HealtheWebController {
         transaction.setsourceType(configDetails.getsourceType());
         transaction.setinternalStatusId(transactionInfo.getinternalStatusId());
         transaction.settransactionInId(transactionInfo.gettransactionInId());
+        
+        lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(transaction.getstatusId());
+        transaction.setstatusValue(processStatus.getDisplayCode());
             
         /* get the message type name */
         transaction.setmessageTypeName(messagetypemanager.getMessageTypeById(configDetails.getMessageTypeId()).getName());
 
         records = transactionOutManager.getTransactionRecords(transactionId);
         transaction.settransactionRecordId(records.getId());
-        
         
         /* Set all the transaction SOURCE ORG fields */
         List<transactionRecords> fromFields = new ArrayList<transactionRecords>();
@@ -1786,13 +1788,15 @@ public class HealtheWebController {
         transaction.settransactionId(transactionId);
         transaction.settransactionTargetId(transactionTarget.getId());
         transaction.setdateSubmitted(transactionInfo.getdateCreated());
+        
+        lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(transaction.getstatusId());
+        transaction.setstatusValue(processStatus.getDisplayCode());
             
         /* get the message type name */
         transaction.setmessageTypeName(messagetypemanager.getMessageTypeById(configDetails.getMessageTypeId()).getName());
 
         records = transactionInManager.getTransactionRecords(transactionId);
         transaction.settransactionRecordId(records.getId());
-        
         
         /* Set all the transaction SOURCE ORG fields */
         List<transactionRecords> fromFields = new ArrayList<transactionRecords>();

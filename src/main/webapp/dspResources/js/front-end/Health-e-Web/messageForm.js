@@ -35,7 +35,7 @@ $(document).ready(function() {
     
     //Function to upload an attachment to the message
     new AjaxUpload('attachmentFileUpload', {
-        action: '../uploadMessageAttachment',
+        action: '/Health-e-Web/uploadMessageAttachment',
         name: 'fileUpload',
         onSubmit: function(file, extension){
             this.setData({title: getTitle()});
@@ -68,7 +68,7 @@ $(document).ready(function() {
             var attachmentId = $(this).attr('rel');
             
             $.ajax({
-                url: '../removeAttachment.do',
+                url: '/Health-e-Web/removeAttachment.do',
                 type: 'POST',
                 data: {'attachmentId': attachmentId},
                 success: function(data) {
@@ -84,7 +84,7 @@ $(document).ready(function() {
     //status
     $(document).on('click', '.viewStatus', function() {
         $.ajax({
-            url: '../viewStatus' + $(this).attr('rel'),
+            url: '/Health-e-Web/viewStatus' + $(this).attr('rel'),
             type: "GET",
             success: function(data) {
                 $("#statusModal").html(data);
@@ -98,7 +98,7 @@ $(document).ready(function() {
         
         if($(this).val() > 0) {
             $.ajax({
-                url: '../populateProvider.do',
+                url: '/Health-e-Web/populateProvider.do',
                 type: 'GET',
                 data: {'providerId': $(this).val()},
                 success: function(data) {
@@ -192,7 +192,7 @@ function populateExistingAttachments() {
     var currentIdList = $('#attachmentIds').val();
     
     $.ajax({
-        url: '../populateExistingAttachments.do',
+        url: '/Health-e-Web/populateExistingAttachments.do',
         type: 'GET',
         data: {'transactionId': transactionId, 'newattachmentIdList': currentIdList, 'pageFrom': 'pending'},
         success: function(data) {
