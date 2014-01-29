@@ -95,6 +95,9 @@ public interface transactionInDAO {
     
     List<Integer> getBlankTransIds(ConfigForInsert config);
     
+    void genericValidation(configurationFormFields cff, Integer validationTypeId, Integer batchUploadId, String regEx);
+    
+    
     Integer countSubString(ConfigForInsert config, Integer transId);
     
     List<batchUploads> getuploadedBatches(int userId, int orgId);

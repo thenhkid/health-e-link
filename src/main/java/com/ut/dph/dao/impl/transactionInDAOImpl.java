@@ -1289,6 +1289,27 @@ public class transactionInDAOImpl implements transactionInDAO {
         }
 	}
 
+	@Override
+	@Transactional
+	public void genericValidation(configurationFormFields cff,
+			Integer validationTypeId, Integer batchUploadId, String regEx) {
+		
+		String sql = "call insertValidationErrors(:vtType, :fieldNo, :batchUploadId, :configId, :cffId)";
+		
+		Query insertError = sessionFactory.getCurrentSession().createSQLQuery(sql);
+				insertError.setParameter("vtType", cff.getValidationType());
+				insertError.setParameter("fieldNo", cff.getFieldNo());
+				insertError.setParameter("batchUploadId", batchUploadId);
+				insertError.setParameter("configId", cff.getconfigId());
+				insertError.setParameter("cffId", cff.getId());
+        try {
+        	insertError.executeUpdate();   
+        } catch (Exception ex) {
+            System.err.println("genericValidation failed." + ex);
+        }
+		
+	}
+
 
 
 

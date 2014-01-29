@@ -345,7 +345,8 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
 	        return criteria.list();
 	}
 
-	/** this method returns a list of cff by validation type **/
+	/** this method returns a list of cff by validation type
+	 * if 0 is passed in, we get them all **/
 	@SuppressWarnings("unchecked")
 	@Override
 	@Transactional

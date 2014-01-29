@@ -632,6 +632,7 @@ public class transactionInManagerImpl implements transactionInManager {
             /**
              * we remove from message tables**/
              //TODO how much should we clear? Is it different for ERG and Upload?
+        	cleared = clearTransactionInErrors(batchUploadId);
             
             cleared = clearMessageTables(batchUploadId);
             if (cleared) {
@@ -836,43 +837,39 @@ public class transactionInManagerImpl implements transactionInManager {
 		 * validate date - doing this in java
 		**/
 //TODO was hoping to have one SP but concat in SP not setting and not catching errors correctly. Need to recheck
-		List <validationType> validationTypes = messagetypemanager.getValidationTypes1();
 		
-		for (validationType vt : validationTypes)  {
-			Integer validationTypeId = vt.getId();
-			
 			List <configurationFormFields> configurationFormFields = 
-					configurationtransportmanager.getCffByValidationType(configId, vt.getId());
+					configurationtransportmanager.getCffByValidationType(configId, 0);
 
 			for (configurationFormFields cff : configurationFormFields)  {
 				String regEx = "";
-				switch (validationTypeId) {
+				Integer validationTypeId = cff.getValidationType();
+				switch (cff.getValidationType()) {
 					case 1: break; // no validation
 					//email calling SQL to validation and insert - one statement
 					case 2:  
-						regEx = "^[a-z0-9\\._%+!$&*=^|~#%\\'`?{}/\\-]+@[a-z0-9\\.-]+\\.[a-z]{2,6}$ or ^[A-Z0-9._%-]+@[A-Z0-9.-]+\\.[A-Z]{2,4}$";
 						genericValidation(cff, validationTypeId, batchUploadId, regEx);
 						break;
 					//phone  calling SP to validation and insert - one statement 
-					case 3:  phoneValidation(cff, validationTypeId, batchUploadId);
+					case 3:  
+						phoneValidation(cff, validationTypeId, batchUploadId);
 					break;
 					// need to loop through each record / each field
-					case 4:  dateValidation(cff, validationTypeId, batchUploadId);
+					case 4: 
+						dateValidation(cff, validationTypeId, batchUploadId);
 					break;
-					//income   calling SQL to validation and insert - one statement      
-					case 5: regEx = "^-?[0-9]+[.]?[0-9]*$|^-?[.][0-9]+$"; 
-					genericValidation(cff, validationTypeId, batchUploadId, regEx);
+					//numeric   calling SQL to validation and insert - one statement      
+					case 5: 
+						genericValidation(cff, validationTypeId, batchUploadId, regEx);
 					break;
 					//url - nned to rethink as regExp is not validating correctly
 					case 6:  urlValidation(cff, validationTypeId, batchUploadId);
 					break;
-					default: break;
+					default: genericValidation(cff, validationTypeId, batchUploadId, regEx); 
+					break;
 				}
 				
 			}
-		
-		}
-		
 		return true;
 	}
 
@@ -892,8 +889,7 @@ public class transactionInManagerImpl implements transactionInManager {
 	@Override
 	public void genericValidation(configurationFormFields cff,
 			Integer validationTypeId, Integer batchUploadId, String regEx) {
-		// TODO Auto-generated method stub
-		
+		transactionInDAO.genericValidation(cff, validationTypeId, batchUploadId, regEx);
 	}
 
 	@Override
