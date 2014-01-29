@@ -235,6 +235,9 @@
                                 </div>
 
                                 <div class="form-group">
+                                    <div id="translationMsgDiv"  class="alert alert-danger" style="display:none;">
+                                        <strong>An error has occurred in one of the above fields!</strong>
+                                    </div>
                                     <input type="button" id="save" class="btn btn-primary btn-action submitMessage" value="Save Referral"/>
                                     <c:choose>
                                         <c:when test="${transaction.autoRelease == true}">
