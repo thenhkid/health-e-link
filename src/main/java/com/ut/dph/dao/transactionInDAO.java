@@ -6,7 +6,6 @@
 
 package com.ut.dph.dao;
 
-import com.ut.dph.model.batchDownloads;
 import com.ut.dph.model.batchUploadSummary;
 import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.configurationFormFields;
