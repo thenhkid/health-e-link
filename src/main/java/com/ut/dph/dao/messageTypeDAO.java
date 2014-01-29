@@ -6,6 +6,7 @@ import com.ut.dph.model.Crosswalks;
 import com.ut.dph.model.messageType;
 import com.ut.dph.model.messageTypeDataTranslations;
 import com.ut.dph.model.messageTypeFormFields;
+import com.ut.dph.model.validationType;
 
 public interface messageTypeDAO {
 	
@@ -81,5 +82,7 @@ public interface messageTypeDAO {
 	String getDelimiterChar(int id);
 	
 	void deleteDataTranslations(int messageTypeId);
+	
+	List <validationType> getValidationTypes1();
 
 }

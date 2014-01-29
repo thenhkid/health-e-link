@@ -147,5 +147,7 @@ public interface transactionInManager {
     boolean clearTransactionInErrors(Integer batchUploadId);
     
     void updateStatusForErrorTrans(Integer batchUploadId, int statusId);
+    
+    boolean runValidations(Integer batchUploadId, int configId);
 
 }

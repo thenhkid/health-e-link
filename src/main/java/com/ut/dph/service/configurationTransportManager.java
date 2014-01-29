@@ -1,6 +1,7 @@
 package com.ut.dph.service;
 
 import com.ut.dph.model.configurationFTPFields;
+
 import java.util.List;
 
 import com.ut.dph.model.configurationFormFields;
@@ -41,4 +42,6 @@ public interface configurationTransportManager {
     void copyExistingTransportMethod(int configTransportId, int configId);
    
     List<configurationFormFields> getRequiredFieldsForConfig(Integer configId);
+    
+    List<configurationFormFields> getCffByValidationType(Integer configId, int validationTypeId);
 }

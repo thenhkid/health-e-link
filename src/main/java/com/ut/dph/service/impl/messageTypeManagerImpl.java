@@ -33,6 +33,7 @@ import com.ut.dph.model.Organization;
 import com.ut.dph.model.messageType;
 import com.ut.dph.model.messageTypeDataTranslations;
 import com.ut.dph.model.messageTypeFormFields;
+import com.ut.dph.model.validationType;
 import com.ut.dph.reference.fileSystem;
 
 @Service
@@ -556,5 +557,13 @@ public class messageTypeManagerImpl implements messageTypeManager {
         }
 
     }
+
+    
+    // this does the same thing as getValidationTypes except putting result in an object
+    //TODO need to combine and test and replace getValidationTypes
+    @Override
+	public List<validationType> getValidationTypes1() {
+		return messageTypeDAO.getValidationTypes1();
+	}
 
 }

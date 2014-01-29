@@ -118,4 +118,9 @@ public class configurationTransportManagerImpl implements configurationTransport
 	public List<configurationFormFields> getRequiredFieldsForConfig(Integer configId) {
 		 return configurationTransportDAO.getRequiredFieldsForConfig(configId);
 	}
+	
+	@Override
+	public List <configurationFormFields> getCffByValidationType(Integer configId, int validationTypeId) {
+		 return configurationTransportDAO.getCffByValidationType(configId, validationTypeId );
+	}
 }

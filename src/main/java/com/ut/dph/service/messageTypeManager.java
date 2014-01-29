@@ -6,6 +6,7 @@ import com.ut.dph.model.Crosswalks;
 import com.ut.dph.model.messageType;
 import com.ut.dph.model.messageTypeDataTranslations;
 import com.ut.dph.model.messageTypeFormFields;
+import com.ut.dph.model.validationType;
 
 public interface messageTypeManager {
 	
@@ -79,5 +80,9 @@ public interface messageTypeManager {
 	Long checkCrosswalkName(String name, int orgId);
 	
 	void deleteDataTranslations(int messageTypeId);
+	
+	List <validationType> getValidationTypes1 ();
+	
+
 
 }

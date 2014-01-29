@@ -542,6 +542,14 @@ CREATE TABLE `universalTranslator`.`batchDownloadSummary` (
 /** Chad 1.27.14 @ 3:22 PM **/
 ALTER TABLE `universalTranslator`.`BatchDownloads` 
 ADD COLUMN `utBatchName` VARCHAR(255) NOT NULL AFTER `userId`;
+
+/** Grace 1.28.14 */
+UPDATE `universalTranslator`.`lu_ErrorCodes` SET `displayText`='Failed Validation - Email' WHERE `id`='2';
+INSERT INTO `universalTranslator`.`lu_ErrorCodes` (`displayText`) VALUES ('Failed Validation - Phone');
+INSERT INTO `universalTranslator`.`lu_ErrorCodes` (`displayText`) VALUES ('Failed Validation - Numeric');
+INSERT INTO `universalTranslator`.`lu_ErrorCodes` (`displayText`) VALUES ('Failed Validation - URL');
+INSERT INTO `universalTranslator`.`lu_ErrorCodes` (`displayText`) VALUES ('Failed Validation - Date');
+
   
 
   

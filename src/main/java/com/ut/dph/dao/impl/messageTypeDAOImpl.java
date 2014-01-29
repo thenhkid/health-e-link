@@ -17,6 +17,7 @@ import com.ut.dph.model.configuration;
 import com.ut.dph.model.messageType;
 import com.ut.dph.model.messageTypeDataTranslations;
 import com.ut.dph.model.messageTypeFormFields;
+import com.ut.dph.model.validationType;
 
 /**
  * The brochureDAOImpl class will implement the DAO access layer to handle updates for organization brochures
@@ -625,5 +626,13 @@ public class messageTypeDAOImpl implements messageTypeDAO {
 
         return cwName;
     }
+
+	@SuppressWarnings("unchecked")
+	@Override
+	@Transactional
+	public List<validationType> getValidationTypes1() {
+		Query query = sessionFactory.getCurrentSession().createQuery("from validationType order by id asc");
+		return query.list();
+	}
 
 }

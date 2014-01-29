@@ -18,10 +18,12 @@ import com.ut.dph.model.transactionAttachment;
 import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionInRecords;
 import com.ut.dph.model.transactionTarget;
+import com.ut.dph.model.validationType;
 import com.ut.dph.model.custom.ConfigForInsert;
 import com.ut.dph.reference.fileSystem;
 import com.ut.dph.service.configurationManager;
 import com.ut.dph.service.configurationTransportManager;
+import com.ut.dph.service.messageTypeManager;
 
 import org.springframework.stereotype.Service;
 
@@ -60,6 +62,9 @@ public class transactionInManagerImpl implements transactionInManager {
     @Autowired
     private configurationTransportManager configurationtransportmanager;
 
+    @Autowired
+    private messageTypeManager messagetypemanager;
+    
     @Override
     @Transactional
     public String getFieldValue(String tableName, String tableCol, int idValue) {
@@ -312,41 +317,8 @@ public class transactionInManagerImpl implements transactionInManager {
      *
      */
     @Override
-
     public boolean processTransactions(int batchUploadId) {
-
-        boolean batchProcessed = false;
-
-        /**
-         * Check for R/O *
-         */
-        /**
-         * Check Validation*
-         */
-        /**
-         * Apply CW/Macros *
-         */
-        /**
-         * Apply method to concatenate values for the same saveToTableCol using delimiter ||^||
-         */
-        /**
-         * here we check config settings for the org to see if we can insert this batch into message tables *
-         */
-        /**
-         * boolean insertTransactionsToMT = true; // set this to method
-         *
-         * if (insertTransactionsToMT) { /** from here we prepare sql statement and insert we assume all transactions are validated and that multiple values /rows being inserted in the the same field are separated by delimiter ||^||
-         */
-        /**
-         * if (!insertTransactions(batchUploadId)) { batchProcessed = false; //something went wrong, we removed all inserted entries clearMessageTables(batchUploadId); //we leave transaction status alone and flag batch as error during processing -SPE updateBatchStatus(batchUploadId, 28, "endDateTime"); } } else { //we assume batch is done and we report back batchProcessed = true; }
-			*
-         */
-        /**
-         * if there are any errors we email admin*
-         */
-	    	//we set it to false here to get out of loop
-	    	 //batchProcessed = true;
-        return batchProcessed;
+    	return true;
     }
 
     @Override
@@ -590,7 +562,7 @@ public class transactionInManagerImpl implements transactionInManager {
     		updateStatusForErrorTrans(batchUploadId, 14);
     		
     		/**run validation**/
-            
+    		runValidations(batchUploadId, configId);
             
     		/**run cw/macros **/
     		
@@ -863,6 +835,29 @@ public class transactionInManagerImpl implements transactionInManager {
 	@Override
 	public void updateStatusForErrorTrans(Integer batchUploadId, int statusId) {
 		transactionInDAO.updateStatusForErrorTrans(batchUploadId, statusId);
+	}
+
+	@Override
+	public boolean runValidations(Integer batchUploadId, int configId) {
+		//1. we get validation types
+		//2. we skip 1 as that is not necessary
+		//3. we skip date (4) as there is no isDate function in MySQL
+		//4. we skip the ids that are not null as Mysql will bomb out checking character placement
+		//5. back to date, we grab transaction info and we loop (errId 7)
+		
+		/**
+		 * MySql RegEXP
+		 * validate numeric - ^-?[0-9]+[.]?[0-9]*$|^-?[.][0-9]+$
+		 * validate email - ^[a-z0-9\._%+!$&*=^|~#%\'`?{}/\-]+@[a-z0-9\.-]+\.[a-z]{2,6}$ or ^[A-Z0-9._%-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$
+		 * validate url -^(https?://)?([\da-z.-]+).([a-z0-9])([0-9a-z]*)*[/]?$ - need to fix not correct
+		 * validate phone - should be no longer than 10 digits
+		 * validate date - doing this in java
+		**/
+		List <validationType> validationTypes = messagetypemanager.getValidationTypes1();
+		for (validationType vt : validationTypes)  {
+			System.out.println(vt);
+		}
+		return true;
 	}
 
 }

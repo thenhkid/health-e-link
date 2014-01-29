@@ -331,7 +331,7 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
         
     }
 
-    /**this method will return a list of required form field for a configuration**/
+    /**this method will returns a list of required form field for a configuration**/
     
 	@SuppressWarnings("unchecked")
 	@Override
@@ -343,6 +343,20 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
 	                .addOrder(Order.asc("fieldNo"));
 	                
 	        return criteria.list();
+	}
+
+	/** this method returns a list of cff by validation type **/
+	@SuppressWarnings("unchecked")
+	@Override
+	@Transactional
+	public List<configurationFormFields> getCffByValidationType(
+			Integer configId, int validationTypeId) {
+		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configurationFormFields.class)
+                .add(Restrictions.eq("configId", configId))
+                .add(Restrictions.eq("validationTypeId", validationTypeId))
+                .addOrder(Order.asc("fieldNo"));
+                
+        return criteria.list();
 	}
 
 }
