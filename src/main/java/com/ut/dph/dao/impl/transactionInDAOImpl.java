@@ -1307,7 +1307,6 @@ public class transactionInDAOImpl implements transactionInDAO {
         } catch (Exception ex) {
             System.err.println("genericValidation failed." + ex);
         }
-		
 	}
 
 

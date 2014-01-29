@@ -545,7 +545,9 @@ public class transactionInManagerImpl implements transactionInManager {
     		
     		/**run validation**/
     		runValidations(batchUploadId, configId);
-            
+    		//update status of the failed records to ERR - 14
+    		updateStatusForErrorTrans(batchUploadId, 14);
+    		
     		/**run cw/macros **/
     		
     		
@@ -568,9 +570,9 @@ public class transactionInManagerImpl implements transactionInManager {
     		if (!insertTransactions(batchUploadId)) {
     			successfulBatch = false;
 				/** something went wrong, we removed all inserted entries **/
-				clearMessageTables(batchUploadId);
+				//clearMessageTables(batchUploadId);
 				/** we leave transaction status alone and flag batch as error during processing -SPE**/
-				updateBatchStatus(batchUploadId, 28, "endDateTime");
+				//updateBatchStatus(batchUploadId, 28, "endDateTime");
 			}
             
             /**set batch to SPC 24**/
