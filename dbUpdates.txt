@@ -612,6 +612,37 @@ EXECUTE stmt;
  END$$
 DELIMITER ;
 
+/**Grace 01.29.2014 **/
+drop PROCEDURE `universalTranslator`.`insertValidationErrors`;
+
+DELIMITER $$
+CREATE PROCEDURE `universalTranslator`.`insertValidationErrors`(in vtType int, in fieldNo int,
+in batchUploadId int, in configId int, in cffId int)
+BEGIN
+
+DECLARE regEx varchar(100) DEFAULT '';
+
+CASE vtType
+	WHEN 2 THEN set regEx = '^[a-z0-9\._%+!$&*=^|~#%\'`?{}/\-]+@[a-z0-9\.-]+\.[a-z]{2,6}$ or ^[A-Z0-9._%-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$';
+    WHEN 5 THEN set regEx = '^-?[0-9]+[.]?[0-9]*$|^-?[.][0-9]+$';
+    ELSE
+        BEGIN
+        END;
+	END 
+	CASE;
+ 
+set @stmt = concat(
+'insert into transactionInerrors (batchUploadId, transactionInId, configurationFormFieldsId, errorid, 
+validationTypeId) SELECT ', batchUploadId, ', transactionInId, ',cffId,',2, ', vtType,'  
+ FROM transactionTranslatedIn WHERE F' ,fieldNo, ' not REGEXP  "', regEx, '" and F',fieldNo, ' is not null and configId = ', configId, ' and transactionInId 
+in (select id from transactionIn where batchId = ', batchUploadId,' and configId = ', configId,');');
+
+PREPARE stmt from @stmt;
+EXECUTE stmt;
+
+ END$$
+DELIMITER ;
+
 
 
   
