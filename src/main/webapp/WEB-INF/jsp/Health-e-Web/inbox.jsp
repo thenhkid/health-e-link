@@ -28,19 +28,18 @@
             <div style="display:none;" class="alert alert-danger" role="alert"></div>    
                 
            <div class="" style="overflow:hidden; margin-bottom:10px;">
-               <form:form class="form form-inline" id="searchForm" action="/Health-e-Web/pending" method="post">
+               <form:form class="form form-inline" id="searchForm" action="/Health-e-Web/inbox" method="post">
                     <div class="form-group">
                         <label class="sr-only" for="searchTerm">Search</label>
                         <input type="text" name="searchTerm" id="searchTerm" value="${searchTerm}" class="form-control" placeholder="Search"/>
                     </div>
-                    <button id="searchBatchesBtn" class="btn btn-primary btn-sm" title="Search Pending Batches">
+                    <button id="searchBatchesBtn" class="btn btn-primary btn-sm" title="Search Inbox">
                         <span class="glyphicon glyphicon-search"></span>
                     </button>
                 </form:form>
             </div>     
-            <form action="batch/transactions" id="viewBatchTransactions" method="post">
+            <form action="inbox/batch/Transactions" id="viewBatchTransactions" method="post">
                 <input type="hidden" id="batchId" name="batchId" value="" />
-                <input type="hidden" name="fromPage" value="inbox" />
             </form>    
             <div class="form-container scrollable">
                 <table class="table table-striped table-hover table-default">

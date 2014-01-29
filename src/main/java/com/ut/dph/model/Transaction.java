@@ -34,6 +34,7 @@ public class Transaction {
    private int transactionId = 0;
    private int transactionRecordId = 0;
    private int transactionTargetId = 0;
+   private int sourceType = 1;
    
    private List<transactionRecords> sourceOrgFields = null;
    private List<transactionRecords> sourceProviderFields = null;
@@ -241,5 +242,13 @@ public class Transaction {
    
    public void settransactionTargetId(int transactionTargetId) {
        this.transactionTargetId = transactionTargetId;
+   }
+   
+   public int getsourceType() {
+       return sourceType;
+   }
+   
+   public void setsourceType(int sourceType) {
+       this.sourceType = sourceType;
    }
 }
