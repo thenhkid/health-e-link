@@ -352,9 +352,11 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
 	public List<configurationFormFields> getCffByValidationType(
 			Integer configId, Integer validationTypeId) {
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configurationFormFields.class)
-                .add(Restrictions.eq("configId", configId))
-                .add(Restrictions.eq("validationTypeId", validationTypeId))
-                .addOrder(Order.asc("fieldNo"));
+                .add(Restrictions.eq("configId", configId));
+		if (validationTypeId != 0){
+			criteria.add(Restrictions.eq("validationTypeId", validationTypeId));
+		}     
+                criteria.addOrder(Order.asc("fieldNo"));
                 
         return criteria.list();
 	}
