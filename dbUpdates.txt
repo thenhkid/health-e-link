@@ -644,6 +644,21 @@ EXECUTE stmt;
 DELIMITER ;
 
 
+/** Chad 1.29.2014 @ 2:41 PM **/
+CREATE TABLE `universalTranslator`.`lu_internalMessageStatus` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `displayText` VARCHAR(45) NOT NULL,
+  `status` BIT(1) NOT NULL DEFAULT b'1',
+  PRIMARY KEY (`id`));
+
+INSERT INTO `universalTranslator`.`lu_internalMessageStatus` (`displayText`, `status`) VALUES ('Appointment Scheduled', 1);
+INSERT INTO `universalTranslator`.`lu_internalMessageStatus` (`displayText`, `status`) VALUES ('Complete Program', 1);
+INSERT INTO `universalTranslator`.`lu_internalMessageStatus` (`displayText`, `status`) VALUES ('In Progress', 1);
+INSERT INTO `universalTranslator`.`lu_internalMessageStatus` (`displayText`, `status`) VALUES ('Patient Contacted', 1);
+INSERT INTO `universalTranslator`.`lu_internalMessageStatus` (`displayText`, `status`) VALUES ('Patient Enrolled', 1);
+INSERT INTO `universalTranslator`.`lu_internalMessageStatus` (`displayText`, `status`) VALUES ('Patient No Show', 1);
+INSERT INTO `universalTranslator`.`lu_internalMessageStatus` (`displayText`, `status`) VALUES ('Patient Refused Service', 1);
+INSERT INTO `universalTranslator`.`lu_internalMessageStatus` (`displayText`) VALUES ('Unable to Contact Patient');
 
   
   

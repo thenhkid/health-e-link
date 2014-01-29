@@ -230,9 +230,29 @@ public class HealtheWebController {
 
             /* Get a list of form fields */
             configurationTransport transportDetails = configurationTransportManager.getTransportDetailsByTransportMethod(transaction.getconfigId(), 2);
+            List<configurationFormFields> sourceInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transaction.getconfigId(),transportDetails.getId(),1);
             List<configurationFormFields> targetInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transaction.getconfigId(),transportDetails.getId(),3);
             List<configurationFormFields> patientInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transaction.getconfigId(),transportDetails.getId(),5);
             List<configurationFormFields> detailFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transaction.getconfigId(),transportDetails.getId(),6);
+            
+            /* Set all the transaction SOURCE fields */
+            List<transactionRecords> fromFields = new ArrayList<transactionRecords>();
+            for(configurationFormFields fields : sourceInfoFormFields) {
+                transactionRecords field = new transactionRecords();
+
+                String colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
+                try {
+                    field.setfieldValue(BeanUtils.getProperty(records, colName));
+                } catch (IllegalAccessException ex) {
+                    Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (InvocationTargetException ex) {
+                    Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
+                /* Get the pre-populated values */
+                fromFields.add(field);
+            }
+            transactionDetails.setsourceOrgFields(fromFields);
 
             /* Set all the transaction TARGET fields */
             List<transactionRecords> toFields = new ArrayList<transactionRecords>();
