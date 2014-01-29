@@ -350,7 +350,7 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
 	@Override
 	@Transactional
 	public List<configurationFormFields> getCffByValidationType(
-			Integer configId, int validationTypeId) {
+			Integer configId, Integer validationTypeId) {
 		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configurationFormFields.class)
                 .add(Restrictions.eq("configId", configId))
                 .add(Restrictions.eq("validationTypeId", validationTypeId))

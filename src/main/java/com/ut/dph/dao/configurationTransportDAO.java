@@ -42,6 +42,6 @@ public interface configurationTransportDAO {
 
     List <configurationFormFields> getRequiredFieldsForConfig (Integer configId);
     
-    List <configurationFormFields> getCffByValidationType(Integer configId, int validationTypeId);
+    List <configurationFormFields> getCffByValidationType(Integer configId, Integer validationTypeId);
     
 }

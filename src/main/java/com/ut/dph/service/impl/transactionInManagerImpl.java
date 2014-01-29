@@ -820,7 +820,7 @@ public class transactionInManagerImpl implements transactionInManager {
 	}
 
 	@Override
-	public boolean runValidations(Integer batchUploadId, int configId) {
+	public boolean runValidations(Integer batchUploadId, Integer configId) {
 		//1. we get validation types
 		//2. we skip 1 as that is not necessary
 		//3. we skip date (4) as there is no isDate function in MySQL
@@ -831,14 +831,25 @@ public class transactionInManagerImpl implements transactionInManager {
 		 * MySql RegEXP
 		 * validate numeric - ^-?[0-9]+[.]?[0-9]*$|^-?[.][0-9]+$
 		 * validate email - ^[a-z0-9\._%+!$&*=^|~#%\'`?{}/\-]+@[a-z0-9\.-]+\.[a-z]{2,6}$ or ^[A-Z0-9._%-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$
-		 * validate url -^(https?://)?([\da-z.-]+).([a-z0-9])([0-9a-z]*)*[/]?$ - need to fix not correct
+		 * validate url -^(https?://)?([\da-z.-]+).([a-z0-9])([0-9a-z]*)*[/]?$ - need to fix not correct - might have to run in java as mysql is not catching all.
 		 * validate phone - should be no longer than 10 digits
 		 * validate date - doing this in java
 		**/
+		
 		List <validationType> validationTypes = messagetypemanager.getValidationTypes1();
 		for (validationType vt : validationTypes)  {
-			System.out.println(vt);
+			
+			List <configurationFormFields> cffForVT = 
+					configurationtransportmanager.getCffByValidationType(configId, vt.getId());
+			
+			//was hoping to loop by column and call sp, sp doesn't reject correctly... using java instead...
+			
+		
 		}
+		
+		
+		
+		
 		return true;
 	}
 

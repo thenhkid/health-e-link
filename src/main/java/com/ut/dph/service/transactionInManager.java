@@ -141,6 +141,6 @@ public interface transactionInManager {
     
     void updateStatusForErrorTrans(Integer batchUploadId, int statusId);
     
-    boolean runValidations(Integer batchUploadId, int configId);
+    boolean runValidations(Integer batchUploadId, Integer configId);
 
 }

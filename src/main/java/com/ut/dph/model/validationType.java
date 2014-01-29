@@ -20,17 +20,17 @@ public class validationType {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID", nullable = false)
-    private int id;
+    private Integer id;
 
     @NotEmpty
     @Column(name = "validationType", nullable = false)
     private String validationType;
 
-	public int getId() {
+	public Integer getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(Integer id) {
 		this.id = id;
 	}
 
@@ -43,7 +43,6 @@ public class validationType {
 	}
 
 	
-
     
 
 }

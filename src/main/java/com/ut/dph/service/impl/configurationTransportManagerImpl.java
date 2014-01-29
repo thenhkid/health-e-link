@@ -120,7 +120,7 @@ public class configurationTransportManagerImpl implements configurationTransport
 	}
 	
 	@Override
-	public List <configurationFormFields> getCffByValidationType(Integer configId, int validationTypeId) {
+	public List <configurationFormFields> getCffByValidationType(Integer configId, Integer validationTypeId) {
 		 return configurationTransportDAO.getCffByValidationType(configId, validationTypeId );
 	}
 }
