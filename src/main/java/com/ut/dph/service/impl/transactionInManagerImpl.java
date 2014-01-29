@@ -634,12 +634,12 @@ public class transactionInManagerImpl implements transactionInManager {
             /**
              * we remove from message tables**/
              //TODO how much should we clear? Is it different for ERG and Upload?
-        	cleared = clearTransactionInErrors(batchUploadId);
-            
+        	 
             cleared = clearMessageTables(batchUploadId);
             if (cleared) {
                 int toBatchStatusId = 3; //SSA
                 if (getBatchDetails(batchUploadId).gettransportMethodId() == 2) {
+                	cleared = clearTransactionInErrors(batchUploadId);
                     toBatchStatusId = 5;
                     transactionInDAO.updateTransactionStatus(batchUploadId, 0, 15);
                 } else {
@@ -836,7 +836,7 @@ public class transactionInManagerImpl implements transactionInManager {
 		 * validate numeric - ^-?[0-9]+[.]?[0-9]*$|^-?[.][0-9]+$
 		 * validate email - ^[a-z0-9\._%+!$&*=^|~#%\'`?{}/\-]+@[a-z0-9\.-]+\.[a-z]{2,6}$ or ^[A-Z0-9._%-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$
 		 * validate url - ^(https?://)?([\da-z.-]+).([a-z0-9])([0-9a-z]*)*[/]?$ - need to fix not correct - might have to run in java as mysql is not catching all.
-		 * validate phone - should be no longer than 10 digits
+		 * validate phone - should be no longer than 11 digits ^[0-9]{7,11}$
 		 * validate date - doing this in java
 		**/
 //TODO was hoping to have one SP but concat in SP not setting and not catching errors correctly. Need to recheck
@@ -855,7 +855,7 @@ public class transactionInManagerImpl implements transactionInManager {
 						break;
 					//phone  calling SP to validation and insert - one statement 
 					case 3:  
-						phoneValidation(cff, validationTypeId, batchUploadId);
+						genericValidation(cff, validationTypeId, batchUploadId, regEx);
 					break;
 					// need to loop through each record / each field
 					case 4: 
@@ -868,25 +868,13 @@ public class transactionInManagerImpl implements transactionInManager {
 					//url - nned to rethink as regExp is not validating correctly
 					case 6:  urlValidation(cff, validationTypeId, batchUploadId);
 					break;
+					//anything new we hope to only have to modify sp
 					default: genericValidation(cff, validationTypeId, batchUploadId, regEx); 
 					break;
 				}
 				
 			}
 		return true;
-	}
-
-	/** 
-	 * 1. this calls the SP that strips all the
-	 * 2. it then checks to make sure phone is not longer than 11 digits as it might be entered as 1-234-567-7890
-	 * 3. it will then insert errors into transactionInErrors
-	 */
-
-	@Override
-	public void phoneValidation(configurationFormFields cff,
-			Integer validationTypeId, Integer batchUploadId) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
@@ -909,6 +897,10 @@ public class transactionInManagerImpl implements transactionInManager {
 		
 	}
 
+	/**
+	 * This method updates all the length of 0 values for a particular column for a batch and configuration
+	 * to null.
+	 **/
 	@Override
 	public void updateBlanksToNull(configurationFormFields cff, Integer batchUploadId) {
 		transactionInDAO.updateBlanksToNull(cff, batchUploadId);

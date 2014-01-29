@@ -660,6 +660,44 @@ INSERT INTO `universalTranslator`.`lu_internalMessageStatus` (`displayText`, `st
 INSERT INTO `universalTranslator`.`lu_internalMessageStatus` (`displayText`, `status`) VALUES ('Patient Refused Service', 1);
 INSERT INTO `universalTranslator`.`lu_internalMessageStatus` (`displayText`) VALUES ('Unable to Contact Patient');
 
-  
+/**
+Grace 01.29.2014 @2:53PM
+need to insert table name and urlId into the lookUpTable in order for it to display on sys admin.... 
+**/  
+
+INSERT INTO `universalTranslator`.`lookUpTables` (`utTableName`, `displayText`, `urlId`) VALUES ('lu_internalMessageStatus', 'Internal Message Status', '6201Int9691tus');
   
 
+DELIMITER $$
+CREATE PROCEDURE `universalTranslator`.`stripPhoneChars`(in vtType int, in fieldNo int,
+in batchUploadId int, in configId int, in cffId int)
+BEGIN
+	DECLARE varToReplace varchar(100) DEFAULT '.';
+	DECLARE part1 varchar(255) DEFAULT '.';
+	DECLARE part2 varchar(25) DEFAULT '.';
+
+	set part1 = concat("update transactiontranslatedIn JOIN (SELECT id from transactionIn WHERE configId = ",
+	  configId,"  and batchId = ", batchUploadId, ") as ti ON transactiontranslatedIn.transactionInId = ti.id SET transactiontranslatedIn.F"
+	  , fieldNo, " = replace(F", fieldNo, ", '");
+	set part2 = "', '');";
+	set @stmt = concat(part1, varToReplace, part2);
+  	PREPARE stmt from @stmt;
+	EXECUTE stmt;
+
+	set varToReplace = '-';
+	set @stmt = concat(part1, varToReplace, part2);
+	PREPARE stmt from @stmt;
+	EXECUTE stmt;
+
+	set varToReplace = ')';
+	set @stmt = concat(part1, varToReplace, part2);
+	PREPARE stmt from @stmt;
+	EXECUTE stmt;
+
+	set varToReplace = '(';
+	set @stmt = concat(part1, varToReplace, part2);
+	PREPARE stmt from @stmt;
+	EXECUTE stmt;
+
+ END$$
+DELIMITER ;
