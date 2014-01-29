@@ -551,6 +551,42 @@ INSERT INTO `universalTranslator`.`lu_ErrorCodes` (`displayText`) VALUES ('Faile
 INSERT INTO `universalTranslator`.`lu_ErrorCodes` (`displayText`) VALUES ('Failed Validation - Date');
 
   
+/** grace 1.29.2014 **/
+DELETE FROM `universalTranslator`.`lu_ErrorCodes` WHERE `id`='4';
+DELETE FROM `universalTranslator`.`lu_ErrorCodes` WHERE `id`='5';
+DELETE FROM `universalTranslator`.`lu_ErrorCodes` WHERE `id`='6';
+DELETE FROM `universalTranslator`.`lu_ErrorCodes` WHERE `id`='7';
+
+ALTER TABLE `universalTranslator`.`transactionInErrors` 
+ADD COLUMN `cwId` INT NULL AFTER `errorId`,
+ADD COLUMN `macroId` INT NULL AFTER `cwId`,
+ADD COLUMN `validationTypeId` INT NULL AFTER `macroId`;
+
+ALTER TABLE `universalTranslator`.`transactionInErrors` 
+CHANGE COLUMN `dateCreated` `dateCreated` DATETIME NULL DEFAULT CURRENT_TIMESTAMP ;
+
+ALTER TABLE `universalTranslator`.`transactionInErrors` 
+ADD INDEX `tieVTFK_idx` (`validationTypeId` ASC),
+ADD INDEX `tieCWFK_idx` (`cwId` ASC),
+ADD INDEX `tieMacroFK_idx` (`macroId` ASC);
+ALTER TABLE `universalTranslator`.`transactionInErrors` 
+ADD CONSTRAINT `tieVTFK`
+  FOREIGN KEY (`validationTypeId`)
+  REFERENCES `universalTranslator`.`ref_validationTypes` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION,
+ADD CONSTRAINT `tieCWFK`
+  FOREIGN KEY (`cwId`)
+  REFERENCES `universalTranslator`.`crosswalks` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION,
+ADD CONSTRAINT `tieMacroFK`
+  FOREIGN KEY (`macroId`)
+  REFERENCES `universalTranslator`.`Macro_Names` (`ID`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+
 
   
   
