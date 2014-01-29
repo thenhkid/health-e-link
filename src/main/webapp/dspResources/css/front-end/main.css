@@ -5989,6 +5989,16 @@ td.visible-print {
 .product-suite .icon-product {
   margin-right: 20px;
 }
+@media (max-width: 767px) {
+  .product-suite .product-demo {
+    padding-bottom: 20px;
+    display: none;
+    display: block;
+    color: #fff;
+    border-top: 1px solid #193c57;
+    padding-top: 20px;
+  }
+}
 .home .product-suite .icon-product {
   margin: auto;
 }
@@ -6027,9 +6037,6 @@ td.visible-print {
 .product-suite-header h2 {
   margin: 0;
   white-space: nowrap;
-}
-.product-suite-header .product-demo {
-  margin-top: 5px;
 }
 .modal-media.image-modal .modal-dialog {
   min-width: 0;
@@ -6169,10 +6176,26 @@ td.visible-print {
   margin-left: -15px;
 }
 @media (max-width: 767px) {
+  .central-graphic {
+    height: auto;
+  }
   .central-graphic .image-a,
   .central-graphic .image-b,
   .central-graphic .image-c {
     display: none;
+  }
+  .central-graphic h1 {
+    font-size: 32px;
+    line-height: 36px;
+    margin-top: 0;
+  }
+  .central-graphic h1 small {
+    font-size: 24px;
+  }
+  .central-graphic .central-graphic-content {
+    position: relative;
+    bottom: auto;
+    padding-bottom: 0;
   }
 }
 @media (min-width: 768px) and (max-width: 991px) {

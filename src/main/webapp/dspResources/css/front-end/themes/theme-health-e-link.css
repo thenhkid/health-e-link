@@ -395,6 +395,11 @@ h3 {
   height: 609px;
   background-image: url('../../../img/front-end/health-e-link/bg-header-home.jpg');
 }
+@media (max-width: 767px) {
+  .home .header {
+    height: auto;
+  }
+}
 .home .header-inner {
   height: 100%;
   background-image: url('../../../img/front-end/health-e-link/bg-home-central-graphic.png');
