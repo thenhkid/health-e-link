@@ -22,6 +22,10 @@ $(document).ready(function() {
             if(errorsFound == 0) {
                 $('#messageForm').submit(); 
             }
+            else {
+                $('.alert-danger').show();
+                $('.alert-danger').delay(2000).fadeOut(1000);
+            }
        }
        else {
             $('#messageForm').submit(); 
@@ -54,6 +58,7 @@ $(document).ready(function() {
         }
     });
     
+    //Function to remove the selected attachment
     $(document).on('click', '.removeAttachment', function() {
        
         var confirmed = confirm("Are you sure you want to remove this attachment?");
@@ -74,7 +79,6 @@ $(document).ready(function() {
         }
         
     });
-    
     
     //This function will launch the status detail overlay with the selected
     //status
@@ -101,7 +105,7 @@ $(document).ready(function() {
                     //fields 9 - 18
                     $('#provider_9').val(data.firstName);
                     $('#provider_10').val(data.lastName);
-
+                                
                     if(data.providerAddresses.length > 0) {
                         $('#provider_12').val(data.providerAddresses[0].line1);
                         $('#provider_13').val(data.providerAddresses[0].line2);
@@ -110,22 +114,24 @@ $(document).ready(function() {
                         $('#provider_16').val(data.providerAddresses[0].postalCode);
                         $('#provider_17').val(data.providerAddresses[0].phone1);
                         $('#provider_18').val(data.providerAddresses[0].fax);
+                        
+                        $('#fromOrgProviderLine1').html(data.providerAddresses[0].line1);
+                        $('#fromOrgProviderLine2').html(data.providerAddresses[0].line2);
+                        $('#fromOrgProviderRegion').html(data.providerAddresses[0].city+" "+data.providerAddresses[0].state);
+                        $('#fromOrgProviderZip').html(data.providerAddresses[0].postalCode);
+                        if(data.providerAddresses[0].phone1 != "") {
+                            $('#fromOrgProviderPhone').html("phone: <span class='tel' >"+data.providerAddresses[0].phone1+"</span>");
+                        }
+                        if(data.providerAddresses[0].fax != "") {
+                            $('#fromOrgProviderFax').html("fax: <span class='tel'>"+data.providerAddresses[0].fax+"</span>");
+                        }
                     }
 
                     if(data.providerIds.length > 0) {
                          $('#provider_11').val(data.providerIds[0].idNum);
                     }
                     $('#fromOrgProviderName').html(data.firstName+" "+data.lastName);
-                    $('#fromOrgProviderLine1').html(data.providerAddresses[0].line1);
-                    $('#fromOrgProviderLine2').html(data.providerAddresses[0].line2);
-                    $('#fromOrgProviderRegion').html(data.providerAddresses[0].city+" "+data.providerAddresses[0].state);
-                    $('#fromOrgProviderZip').html(data.providerAddresses[0].postalCode);
-                    if(data.providerAddresses[0].phone1 != "") {
-                        $('#fromOrgProviderPhone').html("phone: <span class='tel' >"+data.providerAddresses[0].phone1+"</span>");
-                    }
-                    if(data.providerAddresses[0].fax != "") {
-                        $('#fromOrgProviderFax').html("fax: <span class='tel'>"+data.providerAddresses[0].fax+"</span>");
-                    }
+                    
                     $('#fromorgProvider').show();
                     $('#fromOrgProviderChoose').hide();
                 }
