@@ -705,3 +705,47 @@ BEGIN
 
  END$$
 DELIMITER ;
+
+
+/** 01.30.2014 Grace **/
+drop procedure `universalTranslator`.`stripPhoneChars`;
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `stripPhoneChars`(in vtType int, in fieldNo int,
+in batchUploadId int, in configId int, in cffId int)
+BEGIN
+	DECLARE varToReplace varchar(100) DEFAULT '.';
+	DECLARE part1 varchar(255) DEFAULT '.';
+	DECLARE part2 varchar(25) DEFAULT '.';
+
+	set part1 = concat("update transactiontranslatedIn JOIN (SELECT id from transactionIn WHERE configId = ",
+	  configId,"  and batchId = ", batchUploadId, ") as ti ON transactiontranslatedIn.transactionInId = ti.id SET transactiontranslatedIn.F"
+	  , fieldNo, " = replace(F", fieldNo, ", '");
+	set part2 = "', '');";
+	set @stmt = concat(part1, varToReplace, part2);
+  	PREPARE stmt from @stmt;
+	EXECUTE stmt;
+
+	set varToReplace = '-';
+	set @stmt = concat(part1, varToReplace, part2);
+	PREPARE stmt from @stmt;
+	EXECUTE stmt;
+
+	set varToReplace = ')';
+	set @stmt = concat(part1, varToReplace, part2);
+	PREPARE stmt from @stmt;
+	EXECUTE stmt;
+
+	set varToReplace = '(';
+	set @stmt = concat(part1, varToReplace, part2);
+	PREPARE stmt from @stmt;
+	EXECUTE stmt;
+
+	set varToReplace = ' ';
+	set @stmt = concat(part1, varToReplace, part2);
+	PREPARE stmt from @stmt;
+	EXECUTE stmt;
+
+ END$$
+DELIMITER ;
+
