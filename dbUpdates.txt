@@ -762,3 +762,7 @@ CREATE TABLE `universalTranslator`.`transactionOutNotes` (
 ALTER TABLE `universalTranslator`.`message_VisitInfo` 
 ADD COLUMN `completedProgram` INT NULL DEFAULT NULL AFTER `dateCreated`,
 ADD COLUMN `totalTimesSeen` INT NULL DEFAULT NULL AFTER `completedProgram`;
+
+/ ** Chad 1.30.2014 @ 2:26 PM **/
+ALTER TABLE `universalTranslator`.`configurations` 
+ADD COLUMN `associatedMessageTypeId` INT NULL DEFAULT '0' AFTER `sourceType`;

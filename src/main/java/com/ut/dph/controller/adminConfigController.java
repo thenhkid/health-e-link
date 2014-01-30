@@ -1209,6 +1209,12 @@ public class adminConfigController {
                 srcconfigDetails.setOrgName(organizationmanager.getOrganizationById(srcconfigDetails.getorgId()).getOrgName());
                 srcconfigDetails.setMessageTypeName(messagetypemanager.getMessageTypeById(srcconfigDetails.getMessageTypeId()).getName());
                 srcconfigDetails.settransportMethod(configurationTransportManager.getTransportMethodById(srctransportDetails.gettransportMethodId()));
+                if(srctransportDetails.gettransportMethodId() == 1 && srcconfigDetails.getType() == 2) {
+                     srcconfigDetails.settransportMethod("File Download");
+                }
+                else {
+                    srcconfigDetails.settransportMethod(configurationTransportManager.getTransportMethodById(srctransportDetails.gettransportMethodId()));
+                }
                 
                 connection.setsrcConfigDetails(srcconfigDetails);
                 
@@ -1217,7 +1223,12 @@ public class adminConfigController {
                 
                 tgtconfigDetails.setOrgName(organizationmanager.getOrganizationById(tgtconfigDetails.getorgId()).getOrgName());
                 tgtconfigDetails.setMessageTypeName(messagetypemanager.getMessageTypeById(tgtconfigDetails.getMessageTypeId()).getName());
-                tgtconfigDetails.settransportMethod(configurationTransportManager.getTransportMethodById(tgttransportDetails.gettransportMethodId()));
+                if(tgttransportDetails.gettransportMethodId() == 1 && tgtconfigDetails.getType() == 2) {
+                     tgtconfigDetails.settransportMethod("File Download");
+                }
+                else {
+                    tgtconfigDetails.settransportMethod(configurationTransportManager.getTransportMethodById(tgttransportDetails.gettransportMethodId()));
+                }
                 
                 /* Get the list of connection senders */
                 List<configurationConnectionSenders> senders = configurationmanager.getConnectionSenders(connection.getId());
@@ -1284,7 +1295,7 @@ public class adminConfigController {
      * 
      * @param connectionId The id of the clicked configuration connection
      * 
-     * @return This function will disp;ay the edit connection overlay
+     * @return This function will display the edit connection overlay
      */
     @RequestMapping(value = "/editConnection", method = RequestMethod.GET)
     public @ResponseBody ModelAndView editConnectionForm(@RequestParam(value = "connectionId", required = true) int connectionId) throws Exception {

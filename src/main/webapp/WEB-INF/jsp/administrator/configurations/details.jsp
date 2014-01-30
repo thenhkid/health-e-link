@@ -46,17 +46,19 @@
                                 <label class="radio-inline">
                                     <form:radiobutton id="type" path="type" value="2" class="type" disabled="${configurationDetails.id == 0 ? 'false' : 'true' }"/> For Target Organization
                                 </label>
+                                <c:if test="${configurationDetails.id > 0}"><form:hidden id="typeVal" path="type"/></c:if>  
                             </div>
                         </div>
                         <div id="sourceTypeDiv" class="form-group" style="display:${configurationDetails.type == 1 ? 'block' : 'none'}">
                             <label for="type">Source Type * </label>
                             <div>
                                 <label class="radio-inline">
-                                    <form:radiobutton id="sourceType" path="sourceType" value="1" disabled="${configurationDetails.id == 0 ? 'false' : 'true' }"/> Originating Message 
+                                    <form:radiobutton id="sourceType" path="sourceType" class="sourceType" value="1" disabled="${configurationDetails.id == 0 ? 'false' : 'true' }"/> Originating Message 
                                 </label>
                                 <label class="radio-inline">
-                                    <form:radiobutton id="sourceType" path="sourceType"  value="2" disabled="${configurationDetails.id == 0 ? 'false' : 'true' }"/> Feedback Report
+                                    <form:radiobutton id="sourceType" path="sourceType" class="sourceType" value="2" disabled="${configurationDetails.id == 0 ? 'false' : 'true' }"/> Feedback Report
                                 </label>
+                                <c:if test="${configurationDetails.id > 0}"><form:hidden id="sourceTypeVal" path="sourceType"/></c:if>  
                             </div>
                         </div>        
                         <spring:bind path="orgId">
@@ -85,6 +87,21 @@
                                 <span id="configMessageTypeMsg" class="control-label"></span>
                             </div>
                         </spring:bind>
+                        <div id="associatedmessageTypeTopDiv" class="form-group" style="display:${configurationDetails.sourceType == 2 ? 'block' : 'none'}">        
+                            <spring:bind path="associatedmessageTypeId">
+                                <div id="associatedmessageTypeDiv" class="form-group ${status.error ? 'has-error' : '' }">
+                                    <label class="control-label" for="associatedmessageTypeId">Associated Message Type *</label>
+                                    <form:select path="associatedmessageTypeId" id="associatedmessageTypeId" class="form-control half" disabled="${configurationDetails.id == 0 ? 'false' : 'true' }">
+                                        <option value="">- Select -</option>
+                                        <c:forEach items="${messageTypes}" var="messageType" varStatus="mStatus">
+                                            <option value="${messageType.id}" <c:if test="${messageType.id == configurationDetails.associatedmessageTypeId}">selected</c:if>>${messageType.name}</option>
+                                        </c:forEach>
+                                    </form:select>
+                                    <c:if test="${configurationDetails.id > 0}"><form:hidden path="associatedmessageTypeId"/></c:if> 
+                                    <span id="associatedmessageTypeMsg" class="control-label"></span>
+                                </div>
+                            </spring:bind>
+                        </div>
                         <spring:bind path="configName">
                             <div id="configNameDiv" class="form-group ${status.error ? 'has-error' : '' } ${not empty existingName ? 'has-error' : ''}">
                                 <label class="control-label" for="configName">Unique Configuration Name *</label>

@@ -38,8 +38,8 @@
                             <tr>
                                 <th scope="col">Organization</th>
                                 <th scope="col">Configuration Name</th>
-                                <th scope="col">Message Type</th>
                                 <th scope="col">Configuration Type</th>
+                                <th scope="col">Message Type</th>
                                 <th scope="col" class="center-text">Transport Method</th>
                                 <th scope="col" class="center-text">Date Created</th>
                                 <th scope="col"></th>
@@ -59,10 +59,14 @@
                                                 ${config.configName}
                                             </td>
                                             <td>
-                                                ${config.messageTypeName}
+                                                <c:choose><c:when test="${config.type == 1}">Source Configuration</c:when><c:otherwise>Target Configuration</c:otherwise></c:choose>
+                                                <br />
+                                                (
+                                                <c:choose><c:when test="${config.sourceType == 1}">Originating Message</c:when><c:otherwise>Feedback Report</c:otherwise></c:choose>
+                                                )
                                             </td>
                                             <td>
-                                                <c:choose><c:when test="${config.type == 1}">Source Configuration</c:when><c:otherwise>Target Configuration</c:otherwise></c:choose>
+                                                ${config.messageTypeName}
                                             </td>
                                             <td class="center-text">
                                                 ${config.transportMethod}

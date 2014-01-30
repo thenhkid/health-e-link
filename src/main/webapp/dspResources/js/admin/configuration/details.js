@@ -28,7 +28,7 @@ $(function() {
         }
     });
     
-    //When teh Configuration type changes need to show the
+    //When the Configuration type changes need to show the
     //source type field only if the config type is a source
     $('.type').change(function(event) {
         
@@ -40,7 +40,19 @@ $(function() {
            $('#sourceTypeDiv').show();
            $('input:radio[id="sourceType"]').get(0).checked = true;
         }
+    });
+    
+    
+    //When the source type changes need to show the
+    //associated message type field only if the source type is feedback report
+    $('.sourceType').change(function(event) {
         
+        if($(this).val() == 1) {
+            $('#associatedmessageTypeTopDiv').hide();
+        }
+        else {
+           $('#associatedmessageTypeTopDiv').show();
+        }
     });
 
 });
@@ -60,7 +72,7 @@ function checkform() {
     if($('#messageTypeId').val() === '') {
         $('#messageTypeDiv').addClass("has-error");
         $('#configMessageTypeMsg').addClass("has-error");
-        $('#configMessageTypeMsg').html('The authorized user is a required field.');
+        $('#configMessageTypeMsg').html('The message type is a required field.');
         errorFound = 1;
     }
     
@@ -71,7 +83,13 @@ function checkform() {
         $('#configNameMsg').html('The configuration name is a required field.');
         errorFound = 1;
     }
-    
+    //Make sure an associated message type is selected if it is a Feedback report configuration
+    if($('#sourceTypeVal').val() == 2 && $('#associatedmessageTypeId').val() === '') {
+        $('#associatedmessageTypeDiv').addClass("has-error");
+        $('#associatedmessageTypeMsg').addClass("has-error");
+        $('#associatedmessageTypeMsg').html('The associated message type is a required field.');
+        errorFound = 1;
+    }
     
     return errorFound;
     
