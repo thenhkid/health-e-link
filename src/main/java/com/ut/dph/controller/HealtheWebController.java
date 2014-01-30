@@ -189,6 +189,91 @@ public class HealtheWebController {
     }
     
     
+   /**
+     * The '/inbox' POST request will serve up the Health-e-Web (ERG) page that will list all inbox
+     * messages based on the term searched for.
+     *
+     * @param request
+     * @param response
+     * * @param searchTerm The term to search pending messages
+     * @return	the health-e-web inbox message list view
+     * @throws Exception
+     */
+    @RequestMapping(value = "/inbox", method = RequestMethod.POST)
+    public ModelAndView findInboxBatches(@RequestParam String searchTerm, HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
+        
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/Health-e-Web/inbox");
+        
+        /* Need to get all the message types set up for the user */
+        User userInfo = (User)session.getAttribute("userDetails");
+        
+        List<batchDownloads> inboxBatches;
+        Integer totalInboxBatches = 0;
+        
+        /* Need to get a list of all pending batches */
+        if(searchTerm != null && !"".equals(searchTerm)) {
+            inboxBatches = transactionOutManager.getInboxBatches(userInfo.getId(), userInfo.getOrgId(), 1, 0);
+            totalInboxBatches = inboxBatches.size();
+        }
+        else {
+           inboxBatches = transactionOutManager.getInboxBatches(userInfo.getId(), userInfo.getOrgId(), 1, maxResults);
+           totalInboxBatches = transactionOutManager.getInboxBatches(userInfo.getId(), userInfo.getOrgId(), 1, 0).size();
+        }
+        
+        if(!inboxBatches.isEmpty()) {
+            for(batchDownloads batch : inboxBatches) {
+                List<transactionTarget> batchTransactions = transactionOutManager.getInboxBatchTransactions(batch.getId(), userInfo.getId());
+                batch.settotalTransactions(batchTransactions.size());
+                
+                lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
+                batch.setstatusValue(processStatus.getDisplayCode());
+                
+                User userDetails = usermanager.getUserById(batch.getuserId());
+                String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
+                batch.setusersName(usersName);
+            }
+        }
+        
+        if(searchTerm != null && !"".equals(searchTerm)) {
+            /* Pass the returned pending batches to the filter method */
+            List<batchDownloads> batchResults = transactionOutManager.findInboxBatches(inboxBatches, searchTerm);
+
+            if(!batchResults.isEmpty()) {
+                for(batchDownloads batch : inboxBatches) {
+                    List<transactionTarget> batchTransactions = transactionOutManager.getInboxBatchTransactions(batch.getId(), userInfo.getId());
+                    batch.settotalTransactions(batchTransactions.size());
+
+                    lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
+                    batch.setstatusValue(processStatus.getDisplayCode());
+
+                    User userDetails = usermanager.getUserById(batch.getuserId());
+                    String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
+                    batch.setusersName(usersName);
+                }
+            }
+
+            mav.addObject("inboxBatches", batchResults);
+            mav.addObject("totalPages", 0);
+        }
+        else {
+            mav.addObject("inboxBatches", inboxBatches);    
+            Integer totalPages = (int)Math.ceil((double)totalInboxBatches / maxResults);
+            mav.addObject("totalPages", totalPages);
+        }
+        
+        /* Set the header totals */
+        setTotals(totalInboxBatches,0,session);
+       
+        mav.addObject("searchTerm", searchTerm);
+        mav.addObject("pendingTotal", pendingTotal);
+        mav.addObject("inboxTotal", inboxTotal);
+        mav.addObject("currentPage", 1);
+        
+        return mav;
+    }
+    
+    
     /**
      * The 'batch/inboxTransactions' request will display a page that will show all transactions
      * associated with the clicked inbox batch.
@@ -1391,6 +1476,7 @@ public class HealtheWebController {
         /* Need to get a list of all pending batches */
         if(searchTerm != null && !"".equals(searchTerm)) {
             pendingBatches = transactionInManager.getpendingBatches(userInfo.getId(), userInfo.getOrgId(), 1, 0);
+            totalpendingBatches = pendingBatches.size();
         }
         else {
            pendingBatches = transactionInManager.getpendingBatches(userInfo.getId(), userInfo.getOrgId(), 1, maxResults);
@@ -1437,6 +1523,9 @@ public class HealtheWebController {
             Integer totalPages = (int)Math.ceil((double)totalpendingBatches / maxResults);
             mav.addObject("totalPages", totalPages);
         }
+        
+        /* Set the header totals */
+        setTotals(0,totalpendingBatches,session);
        
         mav.addObject("searchTerm", searchTerm);
         mav.addObject("pendingTotal", pendingTotal);
@@ -1574,6 +1663,9 @@ public class HealtheWebController {
             Integer totalPages = (int)Math.ceil((double)totalSentBatches / maxResults);
             mav.addObject("totalPages", totalPages);
         }
+        
+        /* Set the header totals */
+        setTotals(0,0,session);
        
         mav.addObject("searchTerm", searchTerm);
         mav.addObject("pendingTotal", pendingTotal);

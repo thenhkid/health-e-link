@@ -758,3 +758,7 @@ CREATE TABLE `universalTranslator`.`transactionOutNotes` (
   `dateSubmitted` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`));
 
+/ ** Chad 1.30.2014 @ 2:14 PM **/
+ALTER TABLE `universalTranslator`.`message_VisitInfo` 
+ADD COLUMN `completedProgram` INT NULL DEFAULT NULL AFTER `dateCreated`,
+ADD COLUMN `totalTimesSeen` INT NULL DEFAULT NULL AFTER `completedProgram`;
