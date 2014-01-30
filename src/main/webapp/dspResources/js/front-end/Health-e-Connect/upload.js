@@ -40,7 +40,7 @@ jQuery(document).ready(function($) {
         if ($('#configIds').val() == '' || $('#configIds').val() == null) {
             $('#configIdsDiv').addClass("has-error");
             $('#configIdsMsg').addClass("has-error");
-            $('#configIdsMsg').html('At least one message type must be selected.');
+            $('#configIdsMsg').html('A message type must be selected.');
             errorFound = 1;
         }
         
