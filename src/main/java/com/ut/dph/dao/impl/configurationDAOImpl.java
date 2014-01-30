@@ -780,10 +780,8 @@ public class configurationDAOImpl implements configurationDAO {
         */
         List<Integer> ergConfigList = new ArrayList<Integer>();
         Criteria findERGConfigs = sessionFactory.getCurrentSession().createCriteria(configurationTransport.class);
-        findERGConfigs.add(Restrictions.or(
-                Restrictions.eq("transportMethodId",transportMethod),
-                Restrictions.eq("errorHandling",1)
-        )).add(Restrictions.and(Restrictions.in("configId",senderConfigList))); 
+        findERGConfigs.add(Restrictions.eq("transportMethodId",transportMethod)
+        ).add(Restrictions.and(Restrictions.in("configId",senderConfigList))); 
        
         
         List<configurationTransport> ergConfigs = findERGConfigs.list();
