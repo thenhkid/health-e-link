@@ -625,6 +625,8 @@ public class HealtheWebController {
         List internalStatusCodes = transactionOutManager.getInternalStatusCodes();
         mav.addObject("internalStatusCodes",internalStatusCodes);
         
+        /* Get a list of associated feedback reports for this message */
+        
         /* Set the header totals */
         setTotals(0,0,session);
         
