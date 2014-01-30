@@ -13,6 +13,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import org.springframework.format.annotation.DateTimeFormat;
 
 /**
@@ -22,6 +23,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 @Entity
 @Table(name = "TRANSACTIONOUTNOTES")
 public class transactionOutNotes {
+    
+    @Transient
+    private String userName = null;
     
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -79,6 +83,14 @@ public class transactionOutNotes {
     
     public void setdateSubmitted(Date dateSubmitted) {
         this.dateSubmitted = dateSubmitted;
+    }
+    
+    public String getuserName() {
+        return userName;
+    }
+    
+    public void setuserName(String userName) {
+        this.userName = userName;
     }
     
 }

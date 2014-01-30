@@ -6664,9 +6664,15 @@ td.visible-print {
     width: 263px;
   }
 }
+
+.panel .panel-heading .btn-xsaction.btn-xs {
+  margin-top: -2px;
+}
+
 .btn-action {
   padding: 10px 30px;
 }
+
 .margin-small {
   margin: 5px;
 }

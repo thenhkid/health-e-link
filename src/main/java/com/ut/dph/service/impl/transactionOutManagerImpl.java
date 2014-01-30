@@ -92,5 +92,17 @@ public class transactionOutManagerImpl implements transactionOutManager {
     public void saveNote(transactionOutNotes note) {
         transactionOutDAO.saveNote(note);
     }
+    
+    @Override
+    @Transactional
+    public List<transactionOutNotes> getNotesByTransactionId(int transactionId) {
+        return transactionOutDAO.getNotesByTransactionId(transactionId);
+    }
+    
+    @Override
+    @Transactional
+    public void removeNoteById(int noteId) {
+        transactionOutDAO.removeNoteById(noteId);
+    }
 
 }

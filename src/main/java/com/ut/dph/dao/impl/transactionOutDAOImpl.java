@@ -492,5 +492,42 @@ public class transactionOutDAOImpl implements transactionOutDAO {
     public void saveNote(transactionOutNotes note) {
         sessionFactory.getCurrentSession().save(note);
     }
+    
+    /**
+     * The 'getNotesByTransactionId' function will return a list of notes for the passed in transaction.
+     *
+     * @param transactionInId The id of the transaction to search on
+     *
+     * @return This function will return a list of transactionOutNotes objects
+     */
+    @Override
+    @Transactional
+    public List<transactionOutNotes> getNotesByTransactionId(int transactionId) {
+       Criteria criteria = sessionFactory.getCurrentSession().createCriteria(transactionOutNotes.class);
+       criteria.add(Restrictions.eq("transactionTargetId", transactionId));
+       criteria.addOrder(Order.desc("dateSubmitted"));
+       
 
+       return criteria.list();
+        
+    }
+    
+    /**
+     * The 'removeNoteById' function will remove the note from the Database.
+     *
+     * @param noteId The id of the attachment to be removed
+     *
+     * @table transactionOutNotes
+     *
+     * @return This function will not return anything.
+     */
+    @Override
+    @Transactional
+    public void removeNoteById(int noteId) {
+
+        Query deletNote = sessionFactory.getCurrentSession().createQuery("delete from transactionOutNotes where id = :noteId");
+        deletNote.setParameter("noteId", noteId);
+        deletNote.executeUpdate();
+
+    }
 }

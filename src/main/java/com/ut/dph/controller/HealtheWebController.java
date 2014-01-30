@@ -2051,7 +2051,6 @@ public class HealtheWebController {
         transactionInManager.removeAttachmentById(attachmentId);
        
         return 1;
-        
     }
     
     /**
@@ -2149,7 +2148,56 @@ public class HealtheWebController {
         }
         
         return 1;
+    }
+    
+    
+    /**
+     * The 'populateExistingNotes.do' function will look to see if any notes exist
+     * for the transaction.
+     * 
+     * @param   transactionId   The id of the selected transaction (only passed when viewing an
+     *                          existing transaction)
+     * 
+     * 
+     * @return  This function will return the transaction note list page.
+     */
+    @RequestMapping(value= "/populateExistingNotes.do", method = RequestMethod.GET)
+    public @ResponseBody ModelAndView getMessageNotes(@RequestParam(value = "transactionId", required = true) Integer transactionId) {
        
+        
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/Health-e-Web/existingNotes");
+        
+        List<transactionOutNotes> existingNotes = transactionOutManager.getNotesByTransactionId(transactionId);
+        
+        /* Set the name of the user who created it */
+        for(transactionOutNotes note : existingNotes) {
+            User userDetails = usermanager.getUserById(note.getuserId());
+            String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
+            note.setuserName(usersName);
+        }
+         
+        mav.addObject("notes", existingNotes);
+        mav.addObject("pageFrom", "inbox");
+        
+        return mav;
+        
+    }
+    
+    /**
+     * The 'removeNote.do' function will remove the selected note.
+     * 
+     * @param noteId  The id of the note to remove
+     * 
+     * @return This function will simply return a 1.
+     */
+    @RequestMapping(value= "/removeNote.do", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody Integer removeMessageNote(@RequestParam(value = "noteId", required = false) Integer noteId) {
+        
+        transactionOutManager.removeNoteById(noteId);
+       
+        return 1;
+        
     }
     
 }

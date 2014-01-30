@@ -40,5 +40,9 @@ public interface transactionOutManager {
     void updateTransactionDetails(transactionTarget transactionDetails);
     
     void saveNote(transactionOutNotes note);
+    
+    List<transactionOutNotes> getNotesByTransactionId(int transactionId);
+    
+    void removeNoteById(int noteId);
 
 }

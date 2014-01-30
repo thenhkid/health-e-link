@@ -1,6 +1,7 @@
 $(document).ready(function() {
     
     populateExistingAttachments();
+    populateExistingNotes();
    
     //Function to handle the form actions
     $(document).on('change','#formAction',function() {
@@ -36,6 +37,17 @@ $(document).ready(function() {
         });
     });
     
+    //This function will handle opening up the note model window so the
+    //user can enter a new note.
+    $(document).on('click', '#createNewNote', function() {
+        //Open the note modal window
+       $('#messageNoteModal').modal('show');
+       $('#internalStatusId').val(0);
+       $('#messagetransactionId').val($('#transactionId').val());
+       $('#statusDisplayText').html("");
+       $('#selStatus').hide();
+    });
+    
     //This function will handle submitting the new note
     $(document).on('click', '#submitMessageNote', function(event) {
         var transactionId = $('#transactionId').val();
@@ -53,6 +65,26 @@ $(document).ready(function() {
         event.preventDefault();
         return false;
         
+    });
+    
+    //This function will handle removing an existing note
+    $(document).on('click', '.removeNote', function() {
+        var confirmed = confirm("Are you sure you want to remove this note?");
+        
+        if(confirmed) {
+            
+            var noteId = $(this).attr('rel');
+            
+            $.ajax({
+                url: '/Health-e-Web/removeNote.do',
+                type: 'POST',
+                data: {'noteId': noteId},
+                success: function(data) {
+                   $('#noteRow-'+noteId).remove();
+                }
+            });
+            
+        }
     });
     
 
@@ -79,6 +111,19 @@ function populateExistingAttachments() {
         data: {'transactionId': transactionId, 'newattachmentIdList': currentIdList, 'pageFrom': 'sent'},
         success: function(data) {
             $("#existingAttachments").html(data);
+        }
+    });
+}
+
+function populateExistingNotes() {
+    var transactionId = $('#transactionId').val();
+    
+    $.ajax({
+        url: '/Health-e-Web/populateExistingNotes.do',
+        type: 'GET',
+        data: {'transactionId': transactionId},
+        success: function(data) {
+            $("#existingNotes").html(data);
         }
     });
 }

@@ -164,19 +164,47 @@
                                          </div>
                                     </c:forEach>
                                 </div>
-                                        
-                                <%-- Existing Message Attachments --%>
-                                <div class="form-section row">
-                                    <div class="col-md-12"><h4 class="form-section-heading">Existing Attachments:</h4></div>
-                                    <div class="col-md-12" id="existingAttachments"></div>
-                                </div>  
+                               
                             </div>
                         </div>
                     </div>
                 </div>
+                                        
+                <div class="col-md-12 form-section">
+                    <section class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Existing Attachments:</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="form-container scrollable">
+                                <div id="existingAttachments"></div>
+                            </div>
+                        </div>
+                    </section>
+                </div>                     
+
+                <c:if test="${fromPage == 'inbox'}">                    
+                <div class="col-md-12 form-section">
+                    <section class="panel panel-default">
+                        <div class="panel-heading">
+                            <div class="pull-right">
+                                <a href="#messageNoteModal" data-toggle="modal" class="btn btn-primary btn-xs btn-xsaction" id="createNewNote" title="Create a new Note"  ><span class="glyphicon glyphicon-plus"></span></a>
+                            </div>
+                            <h3 class="panel-title">Notes:</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="form-container scrollable">
+                                <div id="existingNotes"></div>
+                            </div>
+                        </div>
+                    </section>
+                </div> 
+                </c:if> 
            </form:form>
         </div>
+                       
     </div>
+                       
 </div>
 <%-- Status Definition modal --%>
 <div class="modal fade" id="statusModal" role="dialog" tabindex="-1" aria-labeledby="Status Details" aria-hidden="true" aria-describedby="Status Details"></div>
