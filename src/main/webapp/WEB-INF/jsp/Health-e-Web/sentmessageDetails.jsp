@@ -63,6 +63,9 @@
                     </div>
                 </div>
             </div>        
+            <form:form action="/Health-e-Web/inbox/messageDetails" id="viewTransactionDetails" modelAttribute="transactionDetails" method="post">
+                <form:hidden path="transactionId" id="transactionId" />
+            </form:form>               
             <form:form id="messageForm" action="/Health-e-Web/submitMessage" modelAttribute="transactionDetails" role="form" class="form" method="post">
                 <form:hidden path="transactionId" id="transactionId" />
                 <form:hidden path="transactionInId" id="transactionInId" />
@@ -177,6 +180,7 @@
 </div>
 <%-- Status Definition modal --%>
 <div class="modal fade" id="statusModal" role="dialog" tabindex="-1" aria-labeledby="Status Details" aria-hidden="true" aria-describedby="Status Details"></div>
+
 <%-- Note diallog --%>
 <div class="modal fade" id="messageNoteModal" role="dialog" tabindex="-1" aria-labeledby="Message Notes" aria-hidden="true" aria-describedby="Message Notes">
     <div class="modal-dialog">
@@ -186,7 +190,7 @@
                 <h3 class="panel-title">Create a New Note</h3>
             </div>
             <div class="modal-body">
-                <form id="messageNoteForm" action="" method="post" role="form">
+                <form id="messageNoteForm" method="post" role="form">
                     <input type="hidden" name="messageTransactionId" id="messagetransactionId" />
                     <input type="hidden" name="internalStatusId" id="internalStatusId" />
                     <div class="form-container">

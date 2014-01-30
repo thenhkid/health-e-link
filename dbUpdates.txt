@@ -749,3 +749,12 @@ BEGIN
  END$$
 DELIMITER ;
 
+/ ** Chad 1.30.2014 @ 10:39 AM **/
+CREATE TABLE `universalTranslator`.`transactionOutNotes` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `transactionTargetId` INT NOT NULL,
+  `note` TEXT NULL DEFAULT NULL,
+  `userId` INT NOT NULL,
+  `dateSubmitted` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`));
+

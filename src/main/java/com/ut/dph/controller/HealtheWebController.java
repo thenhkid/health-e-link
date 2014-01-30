@@ -25,6 +25,7 @@ import com.ut.dph.model.providerIdNum;
 import com.ut.dph.model.transactionAttachment;
 import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionInRecords;
+import com.ut.dph.model.transactionOutNotes;
 import com.ut.dph.model.transactionOutRecords;
 import com.ut.dph.model.transactionRecords;
 import com.ut.dph.model.transactionTarget;
@@ -42,7 +43,9 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
@@ -2111,6 +2114,42 @@ public class HealtheWebController {
         ModelAndView mav = new ModelAndView(new RedirectView("sent"));
         return mav;
     }
+      
+    
+    /**
+     * The 'submitMessageNote.do' function will get the provider details for the provider id
+     * passed in.
+     * 
+     * @param   providerId  The id of the provider to return details for.
+     * 
+     * @return This function will return the provider object.
+     */
+    @RequestMapping(value="/submitMessageNote.do", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Integer submitMessageNote(HttpSession session, @RequestParam(value = "messageTransactionId", required = true) int messageTransactionId, @RequestParam(value = "internalStatusId", required = false) int internalStatusId, @RequestParam(value = "messageNotes", required = false) String messageNotes) {
+        
+        /* Update the internal status code if exists */
+        if(internalStatusId > 0) {
+            transactionTarget transactionDetails = transactionOutManager.getTransactionDetails(messageTransactionId);
+            transactionDetails.setinternalStatusId(internalStatusId);
+            
+            transactionOutManager.updateTransactionDetails(transactionDetails);
+        }
+        
+        /* If the note is not emtpy need to insert it */
+        if(!"".equals(messageNotes) && messageNotes != null) {
+            /* Need to get all the message types set up for the user */
+            User userInfo = (User)session.getAttribute("userDetails");
+            
+            transactionOutNotes newNote = new transactionOutNotes();
+            newNote.settransactionTargetId(messageTransactionId);
+            newNote.setuserId(userInfo.getId());
+            newNote.setnote(messageNotes);
+            
+            transactionOutManager.saveNote(newNote);
+        }
+        
+        return 1;
        
+    }
     
 }

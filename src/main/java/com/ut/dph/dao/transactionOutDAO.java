@@ -7,6 +7,7 @@
 package com.ut.dph.dao;
 
 import com.ut.dph.model.batchDownloads;
+import com.ut.dph.model.transactionOutNotes;
 import com.ut.dph.model.transactionOutRecords;
 import com.ut.dph.model.transactionTarget;
 import java.util.List;
@@ -34,5 +35,9 @@ public interface transactionOutDAO {
     void changeDeliveryStatus(int batchDLId, int batchUploadId, int transactionTargetId, int transactionInId);
     
     List getInternalStatusCodes();
+    
+    void updateTransactionDetails(transactionTarget transactionDetails);
+    
+    void saveNote(transactionOutNotes note);
 
 }

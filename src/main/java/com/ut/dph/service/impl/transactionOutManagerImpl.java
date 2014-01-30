@@ -8,6 +8,7 @@ package com.ut.dph.service.impl;
 
 import com.ut.dph.dao.transactionOutDAO;
 import com.ut.dph.model.batchDownloads;
+import com.ut.dph.model.transactionOutNotes;
 import com.ut.dph.model.transactionOutRecords;
 import com.ut.dph.model.transactionTarget;
 import com.ut.dph.service.transactionOutManager;
@@ -78,6 +79,18 @@ public class transactionOutManagerImpl implements transactionOutManager {
     @Transactional
     public List getInternalStatusCodes() {
         return transactionOutDAO.getInternalStatusCodes();
+    }
+    
+    @Override
+    @Transactional
+    public void updateTransactionDetails(transactionTarget transactionDetails) {
+        transactionOutDAO.updateTransactionDetails(transactionDetails);
+    }
+    
+    @Override
+    @Transactional
+    public void saveNote(transactionOutNotes note) {
+        transactionOutDAO.saveNote(note);
     }
 
 }

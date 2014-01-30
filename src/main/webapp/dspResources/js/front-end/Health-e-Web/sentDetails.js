@@ -36,8 +36,31 @@ $(document).ready(function() {
         });
     });
     
+    //This function will handle submitting the new note
+    $(document).on('click', '#submitMessageNote', function(event) {
+        var transactionId = $('#transactionId').val();
+        
+        var formData = $("#messageNoteForm").serialize();
+        
+        $.ajax({
+            url: '/Health-e-Web/submitMessageNote.do',
+            data: formData,
+            type: "POST",
+            async: false,
+            success: _RedirectToDetails()
+        });
+        
+        event.preventDefault();
+        return false;
+        
+    });
+    
 
 });
+
+function _RedirectToDetails() {
+    $('#viewTransactionDetails').submit();
+}
 
 function populateExistingAttachments() {
     var transactionId = $('#transactionId').val();

@@ -15,6 +15,7 @@ import com.ut.dph.model.configurationConnection;
 import com.ut.dph.model.configurationConnectionReceivers;
 import com.ut.dph.model.messageType;
 import com.ut.dph.model.transactionIn;
+import com.ut.dph.model.transactionOutNotes;
 import com.ut.dph.model.transactionOutRecords;
 import com.ut.dph.model.transactionTarget;
 import java.text.SimpleDateFormat;
@@ -456,7 +457,10 @@ public class transactionOutDAOImpl implements transactionOutDAO {
     }
     
     /**
+     * The 'getInternalStatusCodes' function will query and return the list of active internal status
+     * codes that can be set to a message.
      * 
+     * @return This function will return a list of internal status codes
      */
     @Override
     @Transactional
@@ -465,6 +469,28 @@ public class transactionOutDAOImpl implements transactionOutDAO {
         return query.list();
     }
     
+    /**
+     * The 'updateTransactionDetails' function will update the details of the transaction.
+     * 
+     * @param transactionDetails    The object containing the transaction to update
+     * 
+     * @return This function does not return anything
+     */
+    public void updateTransactionDetails(transactionTarget transactionDetails) {
+        sessionFactory.getCurrentSession().update(transactionDetails);
+    }
     
+    /**
+     * The 'saveNote' function will save the new transaction note.
+     * 
+     * @table transactionOutNotes
+     * 
+     * @param note  The transactionOutNote object that will hold the new note
+     * 
+     * @return This function will not return anything
+     */
+    public void saveNote(transactionOutNotes note) {
+        sessionFactory.getCurrentSession().save(note);
+    }
 
 }

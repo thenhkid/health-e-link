@@ -7,6 +7,7 @@
 package com.ut.dph.service;
 
 import com.ut.dph.model.batchDownloads;
+import com.ut.dph.model.transactionOutNotes;
 import com.ut.dph.model.transactionTarget;
 import com.ut.dph.model.transactionOutRecords;
 
@@ -35,5 +36,9 @@ public interface transactionOutManager {
     void changeDeliveryStatus(int batchDLId, int batchUploadId, int transactionTargetId, int transactionInId);
     
     List getInternalStatusCodes();
+    
+    void updateTransactionDetails(transactionTarget transactionDetails);
+    
+    void saveNote(transactionOutNotes note);
 
 }
