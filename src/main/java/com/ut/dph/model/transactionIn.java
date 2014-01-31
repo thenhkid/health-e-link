@@ -41,6 +41,9 @@ public class transactionIn {
     @Column(name = "DATECREATED", nullable = false)
     private Date dateCreated = new Date();
     
+    @Column(name = "ORIGTRANSACTIONINID", nullable = false)
+    private int origtransactionInId = 0;
+    
     public int getId() {
         return id;
     }
@@ -79,6 +82,14 @@ public class transactionIn {
     
     public void setdateCreated(Date dateCreated) {
         this.dateCreated = dateCreated;
+    }
+    
+    public int getorigtransactionInId() {
+        return origtransactionInId;
+    }
+    
+    public void setorigtransactionInId(int origtransactionInId) {
+        this.origtransactionInId = origtransactionInId;
     }
   
 }

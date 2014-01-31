@@ -1396,6 +1396,7 @@ public class HealtheWebController {
             transactionIn transactionIn = new transactionIn();
             transactionIn.setbatchId(batchId);
             transactionIn.setconfigId(transactionDetails.getconfigId());
+            transactionIn.setorigtransactionInId(transactionDetails.gettransactionInId());
 
             /* 
             If the "Save" button was pressed set the

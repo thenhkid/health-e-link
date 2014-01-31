@@ -77,6 +77,7 @@
                 <form:hidden path="targetConfigId" />
                 <form:hidden path="transactionTargetId" />
                 <form:hidden path="targetOrgId" />
+                <form:hidden path="transactionInId" />
                 <input type="hidden" id="attachmentIds" name="attachmentIds" value="" />
                 <c:forEach items="${transaction.sourceOrgFields}" varStatus="i">
                     <form:hidden path="sourceOrgFields[${i.index}].fieldValue" />
@@ -173,6 +174,9 @@
                                     <div class="col-md-12"><h4 class="form-section-heading">Patient Information:</h4></div>
                                     <c:forEach items="${transaction.patientFields}" var="patientInfo" varStatus="pfield">
                                         <input type="hidden" name="patientFields[${pfield.index}].fieldNo" value="${patientInfo.fieldNo}" />
+                                        <c:if test="${patientInfo.readOnly == true}">
+                                            <input type="hidden" name="patientFields[${pfield.index}].fieldValue" value="${patientInfo.fieldValue}" />
+                                        </c:if>
                                         <div class="col-md-6 ${(pfield.index mod 2) == 0 ? 'cb' : ''}">
                                             <div id="fieldDiv_${patientInfo.fieldNo}" class="form-group">
                                                 <label class="control-label" for="${patientInfo.fieldNo}">
