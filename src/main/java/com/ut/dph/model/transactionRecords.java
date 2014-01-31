@@ -22,6 +22,7 @@ public class transactionRecords {
     private String validation = null;
     private String fieldLabel = null;
     private int transactionId; 
+    private boolean readOnly = false;
    
     public int getTransactionId() {
 		return transactionId;
@@ -103,6 +104,14 @@ public class transactionRecords {
     
     public String getfieldLabel() {
         return fieldLabel;
+    }
+    
+    public void setreadOnly(boolean readOnly) {
+        this.readOnly = readOnly;
+    }
+    
+    public boolean getreadOnly() {
+        return readOnly;
     }
     
 }

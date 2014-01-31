@@ -9,6 +9,10 @@ $(document).ready(function() {
         if($(this).val() === 'print') {
             window.print();
         }
+        else if($.isNumeric($(this).val())) {
+            $('#feedbackConfigId').val($(this).val());
+            $('#newFeedbackForm').submit();
+        }
         
     });
     

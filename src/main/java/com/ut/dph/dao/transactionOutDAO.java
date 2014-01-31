@@ -7,6 +7,7 @@
 package com.ut.dph.dao;
 
 import com.ut.dph.model.batchDownloads;
+import com.ut.dph.model.configuration;
 import com.ut.dph.model.transactionOutNotes;
 import com.ut.dph.model.transactionOutRecords;
 import com.ut.dph.model.transactionTarget;
@@ -43,5 +44,7 @@ public interface transactionOutDAO {
     List<transactionOutNotes> getNotesByTransactionId(int transactionId);
     
     void removeNoteById(int noteId);
+    
+    Integer getActiveFeedbackReportsByMessageType(int messageTypeId, int orgId);
 
 }

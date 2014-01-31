@@ -108,14 +108,14 @@
                 <nav class="navbar navbar-default actions-nav" role="navigation">
                     <div class="container">
                         <ul class="nav navbar-nav navbar-actions">
-                            <li ${(param['page'] == 'inbox' || fromPage == 'inbox') ? 'class="active"' : ''}><a href="<c:url value='/Health-e-Web/inbox'/>" title="Inbox" class="btn btn-link"><span class="glyphicon glyphicon-inbox"></span>&nbsp; Inbox <c:if test="${inboxTotal > 0}"><span class="badge" style="background-color:transparent; border:1px solid #fff">${inboxTotal}</span></c:if></a><span class="indicator-active arrow-up"></span></li>
+                            <li ${(param['page'] == 'inbox' || fromPage == 'inbox' || pageHeader == 'feedback') ? 'class="active"' : ''}><a href="<c:url value='/Health-e-Web/inbox'/>" title="Inbox" class="btn btn-link"><span class="glyphicon glyphicon-inbox"></span>&nbsp; Inbox <c:if test="${inboxTotal > 0}"><span class="badge" style="background-color:transparent; border:1px solid #fff">${inboxTotal}</span></c:if></a><span class="indicator-active arrow-up"></span></li>
                             <li ${(param['page'] == 'sent' || fromPage == 'sent') && fromPage != 'pending' && fromPage != 'inbox' ? 'class="active"' : ''}><a href="<c:url value='/Health-e-Web/sent'/>" title="Sent Items" class="btn btn-link"><span class="glyphicon glyphicon-send"></span>&nbsp; Sent</a><span class="indicator-active arrow-up"></span></li>
                             <li ${param['page'] == 'pending' || fromPage == 'pending' ? 'class="active"' : ''}><a href="<c:url value='/Health-e-Web/pending'/>" title="Pending Items" class="btn btn-link"><span class="glyphicon glyphicon-time"></span>&nbsp; Pending <c:if test="${pendingTotal > 0}"><span class="badge" style="background-color:transparent; border:1px solid #fff">${pendingTotal}</span></c:if></a><span class="indicator-active arrow-up"></span></li>
                             <li ${param['page'] == 'history' ? 'class="active"' : ''}><a href="<c:url value='/Health-e-Web/history'/>" title="History" class="btn btn-link"><span class="glyphicon glyphicon-calendar"></span>&nbsp; History</a><span class="indicator-active arrow-up"></span></li>
                         </ul>
                         <c:if test="${userDetails.createAuthority == true}">
                             <ul class="nav navbar-nav navbar-right navbar-actions">
-                                <li ${param['page'] == 'create' ? 'class="active"' : ''}>
+                                <li ${param['page'] == 'create' && pageHeader != 'feedback' ? 'class="active"' : ''}>
                                     <a href="<c:url value='/Health-e-Web/create'/>" title="Create a new message" >Create New Message</a>
                                     <span class="indicator-active arrow-up"></span>
                                 </li>

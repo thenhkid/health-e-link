@@ -18,7 +18,6 @@ import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionInRecords;
 import com.ut.dph.model.transactionRecords;
 import com.ut.dph.model.transactionTarget;
-import com.ut.dph.model.validationType;
 import com.ut.dph.model.custom.ConfigForInsert;
 import com.ut.dph.reference.fileSystem;
 import com.ut.dph.service.configurationManager;
@@ -563,7 +562,7 @@ public class transactionInManagerImpl implements transactionInManager {
                 /**
                  * we check configuration details, remove rejected records from transactionTranslatedIn, pass records stays * *
                  */
-    		//TODO we figure out if we pass a batch, reject the batch, etc here
+                //TODO we figure out if we pass a batch, reject the batch, etc here
                 //we have REJ - 13, Error - 14, Passed 16 for transactions
             }
 
@@ -618,7 +617,6 @@ public class transactionInManagerImpl implements transactionInManager {
     public boolean processBatches() {
 		//0. grab all batches with SSA - 2
 
-              //1. validate r/o
         //2. validate type
         //3. apply cw / macros to check for valid data
         //4. check auto release / manual status 
@@ -650,7 +648,7 @@ public class transactionInManagerImpl implements transactionInManager {
             /**
              * we remove from message tables*
              */
-             //TODO how much should we clear? Is it different for ERG and Upload?
+            //TODO how much should we clear? Is it different for ERG and Upload?
 
             cleared = clearMessageTables(batchUploadId);
             if (cleared) {
@@ -839,7 +837,7 @@ public class transactionInManagerImpl implements transactionInManager {
 
     @Override
     public boolean runValidations(Integer batchUploadId, Integer configId) {
-		//1. we get validation types
+        //1. we get validation types
         //2. we skip 1 as that is not necessary
         //3. we skip date (4) as there is no isDate function in MySQL
         //4. we skip the ids that are not null as Mysql will bomb out checking character placement
@@ -847,9 +845,9 @@ public class transactionInManagerImpl implements transactionInManager {
 
         /**
          * MySql RegEXP validate numeric - ^-?[0-9]+[.]?[0-9]*$|^-?[.][0-9]+$ validate email - ^[a-z0-9\._%+!$&*=^|~#%\'`?{}/\-]+@[a-z0-9\.-]+\.[a-z]{2,6}$ or ^[A-Z0-9._%-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$ validate url - ^(https?://)?([\da-z.-]+).([a-z0-9])([0-9a-z]*)*[/]?$ - need to fix not correct - might have to run in java as mysql is not catching all. validate phone - should be no longer than 11 digits ^[0-9]{7,11}$ validate date - doing this in java
-		*
+         *
          */
-    	//TODO was hoping to have one SP but concat in SP not setting and not catching errors correctly. Need to recheck
+        //TODO was hoping to have one SP but concat in SP not setting and not catching errors correctly. Need to recheck
         List<configurationFormFields> configurationFormFields
                 = configurationtransportmanager.getCffByValidationType(configId, 0);
 
@@ -898,73 +896,76 @@ public class transactionInManagerImpl implements transactionInManager {
     @Override
     public void urlValidation(configurationFormFields cff,
             Integer validationTypeId, Integer batchUploadId) {
-		// TODO Auto-generated method stub
+        // TODO Auto-generated method stub
 
     }
 
     @Override
     public void dateValidation(configurationFormFields cff, Integer validationTypeId, Integer batchUploadId) {
-		//1. we grab all transactionInIds for messages that are not length of 0 and not null 
-    	List<transactionRecords>  trs = getFieldColAndValues (batchUploadId, cff);	
-    	//2. we look at each column and check each value by trying to convert it to a date
-    	for (transactionRecords tr : trs) {
-    			String formattedDate = transformDate(tr.getFieldValue());
-    			if (formattedDate != null) {
-    				//3. if it converts, we update the column value
-    				updateFieldValue(tr, formattedDate);
-    			} 
-    	}
-    	//4. we run date validation, chk column, and insert errors
-    	if (trs.size() > 0) {
-    		insertDateErrors(batchUploadId, cff);
-    	}
+        //1. we grab all transactionInIds for messages that are not length of 0 and not null 
+        List<transactionRecords> trs = getFieldColAndValues(batchUploadId, cff);
+        //2. we look at each column and check each value by trying to convert it to a date
+        for (transactionRecords tr : trs) {
+            String formattedDate = transformDate(tr.getFieldValue());
+            if (formattedDate != null) {
+                //3. if it converts, we update the column value
+                updateFieldValue(tr, formattedDate);
+            }
+        }
+        //4. we run date validation, chk column, and insert errors
+        if (trs.size() > 0) {
+            insertDateErrors(batchUploadId, cff);
+        }
     }
 
     /**
      * This method updates all the length of 0 values for a particular column for a batch and configuration to null.
-	 *
+     *
      */
     @Override
     public void updateBlanksToNull(configurationFormFields cff, Integer batchUploadId) {
         transactionInDAO.updateBlanksToNull(cff, batchUploadId);
     }
 
-	@Override
-	public List<transactionRecords> getFieldColAndValues(Integer batchUploadId, configurationFormFields cff) {
-		return transactionInDAO.getFieldColAndValues(batchUploadId, cff);
-	}
+    @Override
+    public List<transactionRecords> getFieldColAndValues(Integer batchUploadId, configurationFormFields cff) {
+        return transactionInDAO.getFieldColAndValues(batchUploadId, cff);
+    }
 
-	@Override
-	public String transformDate(String dateValue) {
-		java.util.Date  date = null;
-		try {
-			date = java.text.DateFormat.getDateInstance().parse(dateValue);
-		} 	catch (Exception e) {
-			return null;
-		}	
-		try {
-	    	SimpleDateFormat dateformat = new SimpleDateFormat("YYYY-MM-DD");
-	    	dateformat.format(date);
-	    	return dateformat.format(date);
-		} catch (Exception e) {
-			return null;
-		}
-		
-	}
+    @Override
+    public String transformDate(String dateValue) {
+        java.util.Date date = null;
+        try {
+            date = java.text.DateFormat.getDateInstance().parse(dateValue);
+        } catch (Exception e) {
+            return null;
+        }
+        try {
+            SimpleDateFormat dateformat = new SimpleDateFormat("YYYY-MM-DD");
+            dateformat.format(date);
+            return dateformat.format(date);
+        } catch (Exception e) {
+            return null;
+        }
 
-	@Override
-	public void updateFieldValue(transactionRecords tr, String newValue) {
-		transactionInDAO.updateFieldValue(tr, newValue);
-	}
+    }
 
-	@Override
-	public void insertDateErrors(Integer batchUploadId,
-			configurationFormFields cff) {
+    @Override
+    public void updateFieldValue(transactionRecords tr, String newValue) {
+        transactionInDAO.updateFieldValue(tr, newValue);
+    }
+
+    @Override
+    public void insertDateErrors(Integer batchUploadId,
+            configurationFormFields cff) {
 		// TODO Auto-generated method stub
-		
-	}
-	
-	
-	
+
+    }
+    
+    @Override
+    @Transactional
+    public Integer getFeedbackReportConnection(int configId, int targetorgId) {
+        return transactionInDAO.getFeedbackReportConnection(configId, targetorgId);
+    }
 
 }

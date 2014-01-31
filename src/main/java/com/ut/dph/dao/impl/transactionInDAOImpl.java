@@ -284,7 +284,6 @@ public class transactionInDAOImpl implements transactionInDAO {
         query.setParameter("configId", configId);
         query.executeUpdate();
     }
-    
 
     /**
      * The 'getpendingBatches' function will return a list of batches that have a status of "Error" or "Release Pending". The batches returned will only be the ones the current user has access to viewing.
@@ -382,7 +381,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 
         return findBatches.list();
     }
-    
+
     /**
      * The 'findBatches' function will take a list of batches and apply the searchTerm to narrow down the results.
      *
@@ -510,7 +509,7 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Transactional
     public List<transactionIn> getBatchTransactions(int batchId, int userId) {
         /* Get a list of connections the user has access to */
-        
+
         Criteria connections = sessionFactory.getCurrentSession().createCriteria(configurationConnectionSenders.class);
         connections.add(Restrictions.eq("userId", userId));
         List<configurationConnectionSenders> userConnections = connections.list();
@@ -879,8 +878,8 @@ public class transactionInDAOImpl implements transactionInDAO {
     public List<Integer> getConfigIdsForBatch(int batchUploadId) {
 
         String sql = ("select distinct configId from transactionTranslatedIn "
-        		+ " where transactionInId in (select transactionInId from transactionIn "
-        		+ " where batchId = :id);");
+                + " where transactionInId in (select transactionInId from transactionIn "
+                + " where batchId = :id);");
 
         Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
         query.setParameter("id", batchUploadId);
@@ -938,15 +937,15 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Override
     @Transactional
     public boolean insertSingleToMessageTables(ConfigForInsert config) {
-    	boolean insertSuccess = false;
-    	String sql = "insert into " + config.getSaveToTableName()
+        boolean insertSuccess = false;
+        String sql = "insert into " + config.getSaveToTableName()
                 + " (transactionInId, " + config.getSaveToTableCol()
                 + ") select transactionInId, "
                 + config.getSingleValueFields()
                 + " from transactionTranslatedIn where "
                 + " transactionInId in (select id from transactionIn where batchId = :batchId"
                 + " and configId = :configId and statusId = :relId ";
-        if (config.getLoopTransIds()!= null && config.getLoopTransIds().size() > 0) {
+        if (config.getLoopTransIds() != null && config.getLoopTransIds().size() > 0) {
             sql = sql + " and id not in (" + config.getLoopTransIds().toString().substring(1, config.getLoopTransIds().toString().length() - 1) + ")";
         }
         if (config.getBlankValueTransId() != null && config.getBlankValueTransId().size() > 0) {
@@ -965,7 +964,7 @@ public class transactionInDAOImpl implements transactionInDAO {
             insertSuccess = true;
         } catch (Exception ex) {
             System.err.println("insertSingleToMessageTables." + ex);
-            
+
         }
         return insertSuccess;
     }
@@ -1029,9 +1028,9 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Override
     @Transactional
     public boolean insertMultiValToMessageTables(ConfigForInsert config,
-        Integer subStringCounter, Integer transId) {
-        
-    	String replaceSplitField = config.getSplitFields().replaceAll("@valPos", subStringCounter.toString());
+            Integer subStringCounter, Integer transId) {
+
+        String replaceSplitField = config.getSplitFields().replaceAll("@valPos", subStringCounter.toString());
         String sql = "insert into " + config.getSaveToTableName()
                 + " (transactionInId, " + config.getSaveToTableCol()
                 + ") select transactionInId, "
@@ -1081,7 +1080,7 @@ public class transactionInDAOImpl implements transactionInDAO {
      * @return This function will return a list of batches.
      */
     @SuppressWarnings("unchecked")
-	@Override
+    @Override
     @Transactional
     public List<batchUploads> getuploadedBatches(int userId, int orgId) {
 
@@ -1178,47 +1177,45 @@ public class transactionInDAOImpl implements transactionInDAO {
         }
     }
 
-	@Override
-	@Transactional
-	public boolean clearTransactionTranslatedIn(Integer batchUploadId) {
-		 String sql = "delete from transactionTranslatedIn where transactionInId in"
-	                + "(select id from transactionIn where batchId = :batchUploadId )";
+    @Override
+    @Transactional
+    public boolean clearTransactionTranslatedIn(Integer batchUploadId) {
+        String sql = "delete from transactionTranslatedIn where transactionInId in"
+                + "(select id from transactionIn where batchId = :batchUploadId )";
 
-	        Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
-	                .setParameter("batchUploadId", batchUploadId);
+        Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                .setParameter("batchUploadId", batchUploadId);
 
-	        try {
-	            deleteData.executeUpdate();
-	            return true;
-	        } catch (Exception ex) {
-	            System.err.println("clearTransactionTranslatedIn failed." + ex);
-	            return false;
-	        }
-	}
+        try {
+            deleteData.executeUpdate();
+            return true;
+        } catch (Exception ex) {
+            System.err.println("clearTransactionTranslatedIn failed." + ex);
+            return false;
+        }
+    }
 
-	
-	@Override
-	@Transactional
-	public boolean clearTransactionTarget(Integer batchUploadId) {
-		 String sql = "delete from TransactionTarget where batchUploadId = :batchUploadId)";
+    @Override
+    @Transactional
+    public boolean clearTransactionTarget(Integer batchUploadId) {
+        String sql = "delete from TransactionTarget where batchUploadId = :batchUploadId)";
 
-	        Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
-	                .setParameter("batchUploadId", batchUploadId);
+        Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                .setParameter("batchUploadId", batchUploadId);
 
-	        try {
-	            deleteData.executeUpdate();
-	            return true;
-	        } catch (Exception ex) {
-	            System.err.println("clearTransactionTarget failed." + ex);
-	            return false;
-	        }
-	}
-	
+        try {
+            deleteData.executeUpdate();
+            return true;
+        } catch (Exception ex) {
+            System.err.println("clearTransactionTarget failed." + ex);
+            return false;
+        }
+    }
 
-	@Override
-	@Transactional
-	public boolean clearTransactionIn(Integer batchUploadId) {
-		String sql = "delete from transactionIn batchId = :batchUploadId )";
+    @Override
+    @Transactional
+    public boolean clearTransactionIn(Integer batchUploadId) {
+        String sql = "delete from transactionIn batchId = :batchUploadId )";
         Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
                 .setParameter("batchUploadId", batchUploadId);
         try {
@@ -1228,37 +1225,39 @@ public class transactionInDAOImpl implements transactionInDAO {
             System.err.println("clearTransactionIn failed." + ex);
             return false;
         }
-	}
+    }
 
-	/**errorId = 1 is required field missing**/
-	@Override
-	@Transactional
-	public boolean insertFailedRequiredFields(configurationFormFields cff, Integer batchUploadId) {		
-		String sql = "insert into transactionInerrors (batchUploadId, transactionInId, configurationFormFieldsId, errorid)"
-				+ "(select " + batchUploadId +", transactionInId, " + cff.getId() 
-				+ ", 1 from transactionTranslatedIn where configId = :configId "
-				+ " and (F" + cff.getFieldNo()
-				+ " is  null  or length(trim(F" + cff.getFieldNo() + ")) = 0)"
-				+ "and transactionInId in (select id from transactionIn where batchId = :batchUploadId"
-				+ " and configId = :configId));";
+    /**
+     * errorId = 1 is required field missing*
+     */
+    @Override
+    @Transactional
+    public boolean insertFailedRequiredFields(configurationFormFields cff, Integer batchUploadId) {
+        String sql = "insert into transactionInerrors (batchUploadId, transactionInId, configurationFormFieldsId, errorid)"
+                + "(select " + batchUploadId + ", transactionInId, " + cff.getId()
+                + ", 1 from transactionTranslatedIn where configId = :configId "
+                + " and (F" + cff.getFieldNo()
+                + " is  null  or length(trim(F" + cff.getFieldNo() + ")) = 0)"
+                + "and transactionInId in (select id from transactionIn where batchId = :batchUploadId"
+                + " and configId = :configId));";
         Query insertData = sessionFactory.getCurrentSession().createSQLQuery(sql)
                 .setParameter("batchUploadId", batchUploadId)
                 .setParameter("configId", cff.getconfigId());
-        
+
         try {
-        	insertData.executeUpdate();
+            insertData.executeUpdate();
             return true;
         } catch (Exception ex) {
             System.err.println("insertFailedRequiredFields failed." + ex);
             return false;
-        }	
-		
-	}
+        }
 
-	@Override
-	@Transactional
-	public boolean clearTransactionInErrors(Integer batchUploadId) {
-		String sql = "delete from transactionInErrors where transactionInId in"
+    }
+
+    @Override
+    @Transactional
+    public boolean clearTransactionInErrors(Integer batchUploadId) {
+        String sql = "delete from transactionInErrors where transactionInId in"
                 + "(select id from transactionIn where batchId = :batchUploadId )";
 
         Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
@@ -1271,14 +1270,14 @@ public class transactionInDAOImpl implements transactionInDAO {
             System.err.println("clearTransactionInRecords failed." + ex);
             return false;
         }
-	}
+    }
 
-	@Override
-	@Transactional
-	public void updateStatusForErrorTrans(Integer batchUploadId, Integer statusId) {
-		String sql = "update transactionIn set statusId = :statusId where"
-				+ " id in (select distinct transactionInId"
-				+ " from transactionInErrors where batchUploadId = :batchUploadId); ";
+    @Override
+    @Transactional
+    public void updateStatusForErrorTrans(Integer batchUploadId, Integer statusId) {
+        String sql = "update transactionIn set statusId = :statusId where"
+                + " id in (select distinct transactionInId"
+                + " from transactionInErrors where batchUploadId = :batchUploadId); ";
 
         Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
                 .setParameter("batchUploadId", batchUploadId)
@@ -1286,122 +1285,151 @@ public class transactionInDAOImpl implements transactionInDAO {
 
         try {
             updateData.executeUpdate();
-           
+
         } catch (Exception ex) {
             System.err.println("updateStatusForErrorTrans failed." + ex);
         }
-	}
+    }
 
-	@Override
-	@Transactional
-	public void genericValidation(configurationFormFields cff,
-			Integer validationTypeId, Integer batchUploadId, String regEx) {
-		
-		String sql = "call insertValidationErrors(:vtType, :fieldNo, :batchUploadId, :configId, :cffId)";
-		
-		Query insertError = sessionFactory.getCurrentSession().createSQLQuery(sql);
-				insertError.setParameter("vtType", cff.getValidationType());
-				insertError.setParameter("fieldNo", cff.getFieldNo());
-				insertError.setParameter("batchUploadId", batchUploadId);
-				insertError.setParameter("configId", cff.getconfigId());
-				insertError.setParameter("cffId", cff.getId());
+    @Override
+    @Transactional
+    public void genericValidation(configurationFormFields cff,
+            Integer validationTypeId, Integer batchUploadId, String regEx) {
+
+        String sql = "call insertValidationErrors(:vtType, :fieldNo, :batchUploadId, :configId, :cffId)";
+
+        Query insertError = sessionFactory.getCurrentSession().createSQLQuery(sql);
+        insertError.setParameter("vtType", cff.getValidationType());
+        insertError.setParameter("fieldNo", cff.getFieldNo());
+        insertError.setParameter("batchUploadId", batchUploadId);
+        insertError.setParameter("configId", cff.getconfigId());
+        insertError.setParameter("cffId", cff.getId());
         try {
-        	insertError.executeUpdate();   
+            insertError.executeUpdate();
         } catch (Exception ex) {
             System.err.println("genericValidation failed." + ex);
         }
-	}
+    }
 
-	@Override
-	@Transactional
-	public void updateBlanksToNull(configurationFormFields cff,
-			Integer batchUploadId) {
-		String sql = "update transactiontranslatedIn set F" + cff.getFieldNo() + " = null where length(F"+
-			cff.getFieldNo() + ") = 0 "
-					+ "and transactionInId in (select id from transactionIn where batchId = :batchUploadId "
-					+ "and configId = :configId and statusId = :relId);";
-		
-		Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql);
-				updateData.setParameter("batchUploadId", batchUploadId);
+    @Override
+    @Transactional
+    public void updateBlanksToNull(configurationFormFields cff,
+            Integer batchUploadId) {
+        String sql = "update transactiontranslatedIn set F" + cff.getFieldNo() + " = null where length(F"
+                + cff.getFieldNo() + ") = 0 "
+                + "and transactionInId in (select id from transactionIn where batchId = :batchUploadId "
+                + "and configId = :configId and statusId = :relId);";
+
+        Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql);
+        updateData.setParameter("batchUploadId", batchUploadId);
         updateData.setParameter("configId", cff.getconfigId());
         updateData.setParameter("relId", transRELId);
-		try {
-			updateData.executeUpdate();   
+        try {
+            updateData.executeUpdate();
         } catch (Exception ex) {
             System.err.println("updateBlanksToNull failed." + ex);
         }
-		
-	}
 
-	@Override
-	@Transactional
-	@SuppressWarnings("unchecked")
-	public List<transactionRecords> getFieldColAndValues(Integer batchUploadId,
-			configurationFormFields cff) {
-		String sql = ("select transactionInId as transactionId, F" + cff.getFieldNo() +"  as fieldValue, " + cff.getFieldNo() +" as fieldNo from transactiontranslatedIn "
-				+ " where configId = :configId "
-				+ " and F" +cff.getFieldNo()+ " is not null and date(F" + cff.getFieldNo() + ") is null"
-				+ " and transactionInId in (select id from transactionIn where"
+    }
+
+    @Override
+    @Transactional
+    @SuppressWarnings("unchecked")
+    public List<transactionRecords> getFieldColAndValues(Integer batchUploadId,
+            configurationFormFields cff) {
+        String sql = ("select transactionInId as transactionId, F" + cff.getFieldNo() + "  as fieldValue, " + cff.getFieldNo() + " as fieldNo from transactiontranslatedIn "
+                + " where configId = :configId "
+                + " and F" + cff.getFieldNo() + " is not null and date(F" + cff.getFieldNo() + ") is null"
+                + " and transactionInId in (select id from transactionIn where"
                 + " batchId = :batchUploadId"
                 + " and configId = :configId order by transactionInId); ");
 
         Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
-        .addScalar("transactionId", StandardBasicTypes.INTEGER)
-		.addScalar("fieldValue", StandardBasicTypes.STRING)
-		.addScalar("fieldNo", StandardBasicTypes.INTEGER)
-		.setResultTransformer(Transformers.aliasToBean(transactionRecords.class))
-        .setParameter("configId", cff.getconfigId())
-        .setParameter("batchUploadId", batchUploadId);
+                .addScalar("transactionId", StandardBasicTypes.INTEGER)
+                .addScalar("fieldValue", StandardBasicTypes.STRING)
+                .addScalar("fieldNo", StandardBasicTypes.INTEGER)
+                .setResultTransformer(Transformers.aliasToBean(transactionRecords.class))
+                .setParameter("configId", cff.getconfigId())
+                .setParameter("batchUploadId", batchUploadId);
 
-		List<transactionRecords> trs = query.list();
+        List<transactionRecords> trs = query.list();
 
         return trs;
-	}
+    }
 
-	@Override
-	@Transactional
-	public void updateFieldValue(transactionRecords tr, String newValue) {
-		String sql = "update transactiontranslatedIn set F" + tr.getfieldNo() + " = :newValue where"
-				+ " transactionInId = :ttiId";			
-			Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql);
-					updateData.setParameter("ttiId", tr.getTransactionId());
-	        updateData.setParameter("newValue", newValue);
-	        
-	        try {
-				updateData.executeUpdate();   
-	        } catch (Exception ex) {
-	            System.err.println("updateFieldValue failed." + ex);
-	        }
-		
-	}
+    @Override
+    @Transactional
+    public void updateFieldValue(transactionRecords tr, String newValue) {
+        String sql = "update transactiontranslatedIn set F" + tr.getfieldNo() + " = :newValue where"
+                + " transactionInId = :ttiId";
+        Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql);
+        updateData.setParameter("ttiId", tr.getTransactionId());
+        updateData.setParameter("newValue", newValue);
 
-	@Override
-	@Transactional
-	public void insertDateErrors(Integer batchUploadId, configurationFormFields cff) {
-		String sql = "insert into transactionInerrors "
-				+ "(batchUploadId, transactionInId, configurationFormFieldsId, errorid, validationTypeId)"
-				+ "(select " + batchUploadId +", transactionInId, " + cff.getId() 
-				+ ", 2, "+ cff.getValidationType() + " from transactionTranslatedIn "
-				+ " where configId = :configId "
-				+ " and (F" + cff.getFieldNo()
-				+ " is  null  or date(F" + cff.getFieldNo() + ") is null)"
-				+ "and transactionInId in (select id from transactionIn where batchId = :batchUploadId"
-				+ " and configId = :configId));";
+        try {
+            updateData.executeUpdate();
+        } catch (Exception ex) {
+            System.err.println("updateFieldValue failed." + ex);
+        }
+
+    }
+
+    @Override
+    @Transactional
+    public void insertDateErrors(Integer batchUploadId, configurationFormFields cff) {
+        String sql = "insert into transactionInerrors "
+                + "(batchUploadId, transactionInId, configurationFormFieldsId, errorid, validationTypeId)"
+                + "(select " + batchUploadId + ", transactionInId, " + cff.getId()
+                + ", 2, " + cff.getValidationType() + " from transactionTranslatedIn "
+                + " where configId = :configId "
+                + " and (F" + cff.getFieldNo()
+                + " is  null  or date(F" + cff.getFieldNo() + ") is null)"
+                + "and transactionInId in (select id from transactionIn where batchId = :batchUploadId"
+                + " and configId = :configId));";
         Query insertData = sessionFactory.getCurrentSession().createSQLQuery(sql)
                 .setParameter("batchUploadId", batchUploadId)
                 .setParameter("configId", cff.getconfigId());
-        
+
         try {
-        	insertData.executeUpdate();
-            
+            insertData.executeUpdate();
+
         } catch (Exception ex) {
             System.err.println("insertDateErrors failed." + ex);
+
+        }
+    }
+    
+    /**
+     * 
+     */
+    @Override
+    @Transactional
+    public Integer getFeedbackReportConnection(int configId, int targetorgId) {
+        
+        Criteria configurationConnections = sessionFactory.getCurrentSession().createCriteria(configurationConnection.class);
+        configurationConnections.add(Restrictions.eq("sourceConfigId", configId));
+        List<configurationConnection> connections = configurationConnections.list();
+        
+        Integer connectionId = 0;
+        
+        if(!connections.isEmpty()) {
+           
+            for(configurationConnection connection : connections) {
+                Criteria configurations = sessionFactory.getCurrentSession().createCriteria(configuration.class);
+                configurations.add(Restrictions.eq("id", connection.gettargetConfigId()));
+                
+                configuration configDetails = (configuration) configurations.uniqueResult();
+                
+                if(configDetails.getorgId() == targetorgId) {
+                    connectionId = connection.getId();
+                }
+                
+            }
             
         }
-	}
-
-
-
-
+        
+        return connectionId;
+        
+    }
 
 }

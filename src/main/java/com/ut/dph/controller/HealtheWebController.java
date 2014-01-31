@@ -625,7 +625,10 @@ public class HealtheWebController {
         List internalStatusCodes = transactionOutManager.getInternalStatusCodes();
         mav.addObject("internalStatusCodes",internalStatusCodes);
         
-        /* Get a list of associated feedback reports for this message */
+        /* Get id of the associated feedback report for this message */
+        Integer feedbackConfigId = transactionOutManager.getActiveFeedbackReportsByMessageType(configDetails.getMessageTypeId(),userInfo.getOrgId());
+        mav.addObject("feedbackConfigId", feedbackConfigId);
+        
         
         /* Set the header totals */
         setTotals(0,0,session);
@@ -683,6 +686,257 @@ public class HealtheWebController {
         
         return mav;
     }
+    
+    
+    /**
+     * The '/feedbackReport/details' POST request will display the feedback message form
+     * 
+     * @param configId      The selected feedback report configuration
+     * @param transactionId The id of the transaction the feedback report will be for
+     * 
+     * @return this request will return the messageDetailsForm
+     */
+    @RequestMapping(value="/feedbackReport/details", method = RequestMethod.POST)
+    public ModelAndView showfeedbackReportDetailsForm(@RequestParam(value = "configId", required = true) int configId, @RequestParam(value = "transactionId", required = true) int transactionId, HttpSession session) throws NoSuchMethodException {
+        
+        
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/Health-e-Web/messageDetailsForm");
+        mav.addObject("pageHeader", "feedback");
+        
+        /* Get the feedback report configuration details */
+        configuration configDetails = configurationManager.getConfigurationById(configId);
+        
+        User userInfo = (User)session.getAttribute("userDetails");
+        
+        /* Get the organization details for the source (Sender) organization from the original transaction */
+        transactionTarget transactionDetails = transactionOutManager.getTransactionDetails(transactionId);
+        transactionIn origTransactionDetails = transactionInManager.getTransactionDetails(transactionDetails.gettransactionInId());
+        configuration origConfigDetails = configurationManager.getConfigurationById(origTransactionDetails.getconfigId());
+        Organization sendingOrgDetails = organizationmanager.getOrganizationById(origConfigDetails.getorgId());
+        
+        /* Get the organization details for the target (Receiving) organization from the original transaction */
+        Organization receivingOrgDetails = organizationmanager.getOrganizationById(configDetails.getorgId());
+        
+        /* Find out the target configuration id */
+        Integer targetConnectionId = transactionInManager.getFeedbackReportConnection(configId, origConfigDetails.getorgId());
+        configurationConnection connectionDetails = configurationManager.getConnection(targetConnectionId);
+        
+        /* Get a list of form fields */
+        configurationTransport transportDetails = configurationTransportManager.getTransportDetailsByTransportMethod(configId, 2);
+        List<configurationFormFields> senderInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId,transportDetails.getId(),1);
+        List<configurationFormFields> senderProviderFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId,transportDetails.getId(),2);
+        List<configurationFormFields> targetInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId,transportDetails.getId(),3);
+        List<configurationFormFields> targetProviderFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId,transportDetails.getId(),4);
+        List<configurationFormFields> patientInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId,transportDetails.getId(),5);
+        List<configurationFormFields> detailFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId,transportDetails.getId(),6);
+        
+        Transaction transaction = new Transaction();
+        transactionOutRecords records = transactionOutManager.getTransactionRecords(transactionId);
+        
+        /* Create a new transaction */
+        transaction.setorgId(userInfo.getOrgId());
+        transaction.settransportMethodId(2);
+        transaction.setmessageTypeId(configDetails.getMessageTypeId());
+        transaction.setuserId(userInfo.getId());
+        transaction.setbatchName(null);
+        transaction.setoriginalFileName(null);
+        transaction.setstatusId(0);
+        transaction.settransactionStatusId(0);
+        transaction.settargetOrgId(origConfigDetails.getorgId());
+        transaction.setconfigId(configId);
+        transaction.setautoRelease(transportDetails.getautoRelease());
+        transaction.settargetConfigId(connectionDetails.gettargetConfigId());
+        transaction.settransactionInId(transactionDetails.gettransactionInId());
+    
+        /* Set all the transaction SOURCE ORG fields */
+        List<transactionRecords> fromFields = new ArrayList<transactionRecords>();
+        String colName;
+       
+       for(configurationFormFields fields : senderInfoFormFields) {
+            transactionRecords field = new transactionRecords();
+            field.setfieldNo(fields.getFieldNo());
+            field.setrequired(fields.getRequired());
+            field.setsaveToTable(fields.getsaveToTableName());
+            field.setsaveToTableCol(fields.getsaveToTableCol());
+            field.setfieldLabel(fields.getFieldLabel());
+            
+            /* Get the validation */
+            if(fields.getValidationType() > 1) {
+                field.setvalidation(messagetypemanager.getValidationById(fields.getValidationType()).toString());
+            }
+            
+            colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
+            try {
+                field.setfieldValue(BeanUtils.getProperty(records, colName));
+            } catch (IllegalAccessException ex) {
+                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InvocationTargetException ex) {
+                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+            
+            fromFields.add(field);
+        }
+        transaction.setsourceOrgFields(fromFields);
+        
+        /* Set all the transaction SOURCE PROVIDER fields */
+        List<transactionRecords> fromProviderFields = new ArrayList<transactionRecords>();
+        
+        for(configurationFormFields fields : senderProviderFormFields) {
+            transactionRecords field = new transactionRecords();
+            field.setfieldNo(fields.getFieldNo());
+            field.setrequired(fields.getRequired());
+            field.setsaveToTable(fields.getsaveToTableName());
+            field.setsaveToTableCol(fields.getsaveToTableCol());
+            field.setfieldLabel(fields.getFieldLabel());
+            
+            /* Get the validation */
+            if(fields.getValidationType() > 1) {
+                field.setvalidation(messagetypemanager.getValidationById(fields.getValidationType()).toString());
+            }
+            
+            colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
+            try {
+                field.setfieldValue(BeanUtils.getProperty(records, colName));
+            } catch (IllegalAccessException ex) {
+                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InvocationTargetException ex) {
+                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+            
+            fromProviderFields.add(field);
+        }
+       transaction.setsourceProviderFields(fromProviderFields);
+        
+        
+        /* Set all the transaction TARGET fields */
+        List<transactionRecords> toFields = new ArrayList<transactionRecords>();
+        for(configurationFormFields fields : targetInfoFormFields) {
+            transactionRecords field = new transactionRecords();
+            field.setfieldNo(fields.getFieldNo());
+            field.setrequired(fields.getRequired());
+            field.setsaveToTable(fields.getsaveToTableName());
+            field.setsaveToTableCol(fields.getsaveToTableCol());
+            field.setfieldLabel(fields.getFieldLabel());
+            
+            /* Get the validation */
+            if(fields.getValidationType() > 1) {
+                field.setvalidation(messagetypemanager.getValidationById(fields.getValidationType()).toString());
+            }
+            
+            colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
+            try {
+                field.setfieldValue(BeanUtils.getProperty(records, colName));
+            } catch (IllegalAccessException ex) {
+                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InvocationTargetException ex) {
+                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+            /* Get the pre-populated values */
+            toFields.add(field);
+        }
+        transaction.settargetOrgFields(toFields);
+        
+        /* Set all the transaction TARGET PROVIDER fields */
+        List<transactionRecords> toProviderFields = new ArrayList<transactionRecords>();
+        for(configurationFormFields fields : targetProviderFormFields) {
+            transactionRecords field = new transactionRecords();
+            field.setfieldNo(fields.getFieldNo());
+            field.setrequired(fields.getRequired());
+            field.setsaveToTable(fields.getsaveToTableName());
+            field.setsaveToTableCol(fields.getsaveToTableCol());
+            field.setfieldLabel(fields.getFieldLabel());
+            
+            /* Get the validation */
+            if(fields.getValidationType() > 1) {
+                field.setvalidation(messagetypemanager.getValidationById(fields.getValidationType()).toString());
+            }
+            
+            colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
+            try {
+                field.setfieldValue(BeanUtils.getProperty(records, colName));
+            } catch (IllegalAccessException ex) {
+                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InvocationTargetException ex) {
+                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+           
+            toProviderFields.add(field);
+        }
+        transaction.settargetProviderFields(toProviderFields);
+        
+        /* Set all the transaction PATIENT fields */
+        List<transactionRecords> patientFields = new ArrayList<transactionRecords>();
+        for(configurationFormFields fields : patientInfoFormFields) {
+            transactionRecords field = new transactionRecords();
+            field.setfieldNo(fields.getFieldNo());
+            field.setrequired(fields.getRequired());
+            field.setsaveToTable(fields.getsaveToTableName());
+            field.setsaveToTableCol(fields.getsaveToTableCol());
+            field.setfieldLabel(fields.getFieldLabel());
+            field.setreadOnly(true);
+            
+            /* Get the validation */
+            if(fields.getValidationType() > 1) {
+                field.setvalidation(messagetypemanager.getValidationById(fields.getValidationType()).toString());
+            }
+            
+            colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
+            try {
+                field.setfieldValue(BeanUtils.getProperty(records, colName));
+            } catch (IllegalAccessException ex) {
+                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InvocationTargetException ex) {
+                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+            /* See if any fields have crosswalks associated to it */
+            List<fieldSelectOptions> fieldSelectOptions = transactionInManager.getFieldSelectOptions(fields.getId(),configId);
+            field.setfieldSelectOptions(fieldSelectOptions);
+            
+            patientFields.add(field);
+        }
+        transaction.setpatientFields(patientFields);
+        
+        /* Set all the transaction DETAIL fields */
+        List<transactionRecords> detailFields = new ArrayList<transactionRecords>();
+        for(configurationFormFields fields : detailFormFields) {
+            transactionRecords field = new transactionRecords();
+            field.setfieldNo(fields.getFieldNo());
+            field.setrequired(fields.getRequired());
+            field.setsaveToTable(fields.getsaveToTableName());
+            field.setsaveToTableCol(fields.getsaveToTableCol());
+            field.setfieldLabel(fields.getFieldLabel());
+            field.setfieldValue(null);
+            
+            /* Get the validation */
+            if(fields.getValidationType() > 1) {
+                field.setvalidation(messagetypemanager.getValidationById(fields.getValidationType()).toString());
+            }
+            
+            /* See if any fields have crosswalks associated to it */
+            List<fieldSelectOptions> fieldSelectOptions = transactionInManager.getFieldSelectOptions(fields.getId(),configId);
+            field.setfieldSelectOptions(fieldSelectOptions);
+            
+            detailFields.add(field);
+        }
+        transaction.setdetailFields(detailFields);
+        
+        mav.addObject(transaction);
+        
+        
+        /* Set the header totals */
+        setTotals(0,0,session);
+        
+        mav.addObject("pendingTotal", pendingTotal);
+        mav.addObject("inboxTotal", inboxTotal);
+        
+        return mav;
+    }
+    
     
     /**
      * The '/create/details' POST request will take the selected message type and target org and display

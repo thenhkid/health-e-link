@@ -13,6 +13,7 @@ import com.ut.dph.model.batchDownloads;
 import com.ut.dph.model.configuration;
 import com.ut.dph.model.configurationConnection;
 import com.ut.dph.model.configurationConnectionReceivers;
+import com.ut.dph.model.configurationTransport;
 import com.ut.dph.model.messageType;
 import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionOutNotes;
@@ -529,5 +530,50 @@ public class transactionOutDAOImpl implements transactionOutDAO {
         deletNote.setParameter("noteId", noteId);
         deletNote.executeUpdate();
 
+    }
+    
+    /**
+     * The 'getActiveFeedbacReportsByMessageType' function will return an associated feedback report
+     * configuration for the organization passed in and for the message type of the viewed transaction.
+     * 
+     * @param messageTypeId     The messageType of the viewed transaction
+     * @param orgId             The organization id of the user viewing the transaction
+     * 
+     * @return This function will return a 0 if no feedback reports are found or the id of the feedback
+     *         report configuration found.
+     */
+    @Override
+    @Transactional
+    public Integer getActiveFeedbackReportsByMessageType(int messageTypeId, int orgId) {
+        
+        /* Get the feedback report configurations for the passed in or and message type */
+        Criteria feedbackReports = sessionFactory.getCurrentSession().createCriteria(configuration.class);
+        feedbackReports.add(Restrictions.eq("orgId", orgId));
+        feedbackReports.add(Restrictions.eq("associatedMessageTypeId", messageTypeId));
+        feedbackReports.add(Restrictions.eq("status", true));
+        feedbackReports.add(Restrictions.eq("sourceType", 2));
+        feedbackReports.add(Restrictions.eq("type", 1));
+        
+        List<configuration> feedbackReportConfigs = feedbackReports.list();
+        
+        Integer feedbackConfigId = 0;
+        
+        if(!feedbackReportConfigs.isEmpty()) {
+            /* Make sure the feedback report is of an ERG type */
+            for(configuration config : feedbackReportConfigs) {
+
+                Criteria configurationTransports = sessionFactory.getCurrentSession().createCriteria(configurationTransport.class);
+                configurationTransports.add(Restrictions.eq("configId", config.getId()));
+
+                configurationTransport transportDetails = (configurationTransport) configurationTransports.uniqueResult();
+
+                if(transportDetails.gettransportMethodId() == 2) {
+                    feedbackConfigId = config.getId();
+                }
+
+            }
+        }
+        
+        return feedbackConfigId;
     }
 }

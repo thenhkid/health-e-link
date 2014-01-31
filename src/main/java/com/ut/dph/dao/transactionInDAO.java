@@ -8,6 +8,7 @@ package com.ut.dph.dao;
 
 import com.ut.dph.model.batchUploadSummary;
 import com.ut.dph.model.batchUploads;
+import com.ut.dph.model.configurationConnection;
 import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.fieldSelectOptions;
 import com.ut.dph.model.transactionAttachment;
@@ -129,4 +130,6 @@ public interface transactionInDAO {
     void updateFieldValue (transactionRecords tr, String newValue);
     
     void insertDateErrors(Integer batchUploadId, configurationFormFields cff);
+    
+    Integer getFeedbackReportConnection(int configId, int targetorgId);
 }

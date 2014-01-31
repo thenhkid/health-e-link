@@ -16,8 +16,18 @@
             <ol class="breadcrumb">
                 <li><a href="<c:url value='/profile'/>">My Account</a></li>
                 <li><a href="#">eRG</a></li>
-                <c:if test="${pageHeader == 'pending'}"><li><a href="<c:url value='/Health-e-Web/pending'/>">Pending Batches</a></li></c:if>
-                <li class="active"><c:choose><c:when test="${pageHeader == 'create'}">Create New Message</c:when><c:otherwise>Referral #${transaction.batchName}</c:otherwise></c:choose></li>
+                <c:choose>
+                    <c:when test="${pageHeader == 'pending'}">
+                        <li><a href="<c:url value='/Health-e-Web/pending'/>">Pending Batches</a></li>
+                    </c:when>
+                </c:choose>
+                <li class="active">
+                    <c:choose>
+                        <c:when test="${pageHeader == 'create'}">Create New Message</c:when>
+                        <c:when test="${pageHeader == 'feedback'}">Create New Feedback Report</c:when>
+                        <c:otherwise>Referral #${transaction.batchName}</c:otherwise>
+                    </c:choose>
+                </li>
             </ol>
             
             <c:choose>
@@ -48,6 +58,7 @@
                         </div>
                     </div>
                 </c:when>
+                <c:when test="${pageHeader == 'feedback'}"><h2 class="form-title">Create New Feedback Report</h2></c:when>
                 <c:otherwise>
                     <h2 class="form-title">Create New Message</h2>
                 </c:otherwise>
@@ -168,7 +179,7 @@
                                                    ${patientInfo.fieldLabel}&nbsp;<c:if test="${patientInfo.required == true}">*&nbsp;</c:if></label>
                                                 <c:choose>
                                                     <c:when test="${patientInfo.fieldSelectOptions.size() > 0}">
-                                                        <select id="${patientInfo.fieldNo}" name="patientFields[${pfield.index}].fieldValue" class="form-control <c:if test="${patientInfo.required == true}"> required</c:if>">
+                                                        <select <c:if test="${patientInfo.readOnly == true}">disabled</c:if> id="${patientInfo.fieldNo}" name="patientFields[${pfield.index}].fieldValue" class="form-control <c:if test="${patientInfo.required == true}"> required</c:if>">
                                                             <option value="">-Choose-</option>
                                                             <c:forEach items="${patientInfo.fieldSelectOptions}" var="options">
                                                                 <option value="${options.optionValue}" <c:if test="${patientInfo.fieldValue == options.optionValue}">selected</c:if>>${options.optionDesc}</option>
@@ -176,7 +187,7 @@
                                                         </select>
                                                     </c:when>
                                                     <c:otherwise>
-                                                        <input id="${patientInfo.fieldNo}" name="patientFields[${pfield.index}].fieldValue" value="${patientInfo.fieldValue}" class="form-control ${patientInfo.validation.replace(' ','-')} <c:if test="${patientInfo.required == true}"> required</c:if>" type="text">
+                                                        <input <c:if test="${patientInfo.readOnly == true}">disabled</c:if> id="${patientInfo.fieldNo}" name="patientFields[${pfield.index}].fieldValue" value="${patientInfo.fieldValue}" class="form-control ${patientInfo.validation.replace(' ','-')} <c:if test="${patientInfo.required == true}"> required</c:if>" type="text">
                                                    </c:otherwise>
                                                 </c:choose>
                                                 <span id="errorMsg_${patientInfo.fieldNo}" class="control-label"></span>  
@@ -238,7 +249,7 @@
                                     <div id="translationMsgDiv"  class="alert alert-danger" style="display:none;">
                                         <strong>An error has occurred in one of the above fields!</strong>
                                     </div>
-                                    <input type="button" id="save" class="btn btn-primary btn-action submitMessage" value="Save Referral"/>
+                                    <input type="button" id="save" class="btn btn-primary btn-action submitMessage" value="Save ${pageHeader == 'feedback' ? 'Feedback Report' : 'Referral'}"/>
                                     <c:choose>
                                         <c:when test="${transaction.autoRelease == true}">
                                             <input type="button" id="send" class="btn btn-primary btn-action submitMessage" value="Send Referral"/>

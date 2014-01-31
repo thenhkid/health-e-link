@@ -66,7 +66,7 @@ public class configuration {
     private int sourceType = 1;
     
     @Column(name = "ASSOCIATEDMESSAGETYPEID", nullable = false)
-    private int associatedmessageTypeId = 0;
+    private int associatedMessageTypeId = 0;
     
     
     public int getId() {
@@ -182,12 +182,12 @@ public class configuration {
         return sourceType;
     }
     
-    public void setassociatedmessageTypeId(int associatedmessageTypeId) {
-        this.associatedmessageTypeId = associatedmessageTypeId;
+    public void setassociatedMessageTypeId(int associatedMessageTypeId) {
+        this.associatedMessageTypeId = associatedMessageTypeId;
     }
     
-    public int getassociatedmessageTypeId() {
-        return associatedmessageTypeId;
+    public int getassociatedMessageTypeId() {
+        return associatedMessageTypeId;
     }
     
 }
