@@ -38,6 +38,7 @@
                             <dl>
                                 <dd><strong>Date Submitted:</strong> <fmt:formatDate value="${transaction.dateSubmitted}" type="both" dateStyle="long" timeStyle="long" /></dd>
                                 <dd><strong>System ID:</strong> ${transaction.batchName}</dd>
+                                <dd><strong>Transaction Type:</strong> <c:choose><c:when test="${transaction.sourceType == 1}">Originating Message</c:when><c:otherwise>Feedback Report</c:otherwise></c:choose></dd>
                                 <dd><strong>Status:</strong> <a href="#statusModal" data-toggle="modal" class="btn btn-link viewStatus" rel="${transaction.statusId}" title="View this Status">${transaction.statusValue}&nbsp;<span class="badge badge-help" data-placement="top" title="" data-original-title="">?</span></a></dd>
                             </dl>
                         </div>
@@ -52,6 +53,7 @@
                                 <label class="sr-only">Select Action</label>
                                 <select class="form-control" id="formAction">
                                     <option value="">-Select Action-</option>
+                                    <c:if test="${transaction.sourceType == 2}"><option value="">View Original Referral</option></c:if>
                                     <option value="print">Print / Save As</option>
                                 </select>
                             </div>

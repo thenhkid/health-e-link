@@ -22,7 +22,8 @@
                     <c:choose>
                         <c:when test="${fromPage == 'inbox'}"><a href="<c:url value='/Health-e-Web/inbox'/>">Inbox</a></c:when>
                         <c:when test="${fromPage == 'pending'}"><a href="<c:url value='/Health-e-Web/pending'/>">Pending Batches</a></c:when>
-                        <c:otherwise><a href="<c:url value='/Health-e-Web/sent'/>">Sent Messages</a></c:otherwise></c:choose>
+                        <c:otherwise><a href="<c:url value='/Health-e-Web/sent'/>">Sent Messages</a></c:otherwise>
+                    </c:choose>
                 </li>
                 <li class="active">Batch #${transactionDetails.batchName}</li>
             </ol>
@@ -33,6 +34,7 @@
                     <dl>
                         <dd><strong>Date Submitted:</strong> <fmt:formatDate value="${transactionDetails.dateSubmitted}" type="both" dateStyle="long" timeStyle="long" /></dd>
                         <dd><strong>System ID:</strong> ${transactionDetails.batchName}</dd>
+                        <dd><strong>Transaction Type:</strong> <c:choose><c:when test="${transactionDetails.sourceType == 1}">Originating Message</c:when><c:otherwise>Feedback Report</c:otherwise></c:choose></dd>
                         <dd><strong>Status:</strong> <a href="#statusModal" data-toggle="modal" class="btn btn-link viewStatus" rel="${transactionDetails.statusId}" title="View this Status">${transactionDetails.statusValue}&nbsp;<span class="badge badge-help" data-placement="top" title="" data-original-title="">?</span></a></dd>
                     </dl>
                 </div>
@@ -60,10 +62,10 @@
                             <option value="print">Print / Save As</option>
                             <option value="feedbackReports">View Feedback Reports</option>
                             <c:if test="${feedbackConfigId > 0 and userDetails.createAuthority == true}"><option value="${feedbackConfigId}">Create Feedback Report</option></c:if>
-                        </select>
+                            </select>
+                        </div>
                     </div>
-                </div>
-            </div>    
+                </div>    
             <form:form action="/Health-e-Web/feedbackReport/details" id="newFeedbackForm" modelAttribute="transactionDetails" method="post">
                 <form:hidden path="transactionId" id="transactionId" />
                 <input type="hidden" id="feedbackConfigId" name="configId" value="" />
@@ -91,8 +93,8 @@
                                             </dd>
                                             <c:if test="${not empty transactionDetails.sourceOrgFields[6].fieldValue}"><dd>phone: <span class="tel">${transactionDetails.sourceOrgFields[6].fieldValue}</span></dd></c:if>
                                             <c:if test="${not empty transactionDetails.sourceOrgFields[7].fieldValue}"><dd>fax: <span class="tel">${transactionDetails.sourceOrgFields[7].fieldValue}</span></dd></c:if>
-                                       </dl>
-                                       
+                                            </dl>
+
                                         <c:if test="${not empty transactionDetails.sourceProviderFields[0].fieldValue}">
                                             <h4 class="form-section-heading">Originating Organization Provider: </h4>
                                             <dl class="vcard">
@@ -105,7 +107,7 @@
                                                 </dd>
                                                 <c:if test="${not empty transactionDetails.sourceProviderFields[8].fieldValue}"><dd>phone: <span class="tel">${transactionDetails.sourceProviderFields[8].fieldValue}</span></dd></c:if>
                                                 <c:if test="${not empty transactionDetails.sourceProviderFields[9].fieldValue}"><dd>fax: <span class="tel">${transactionDetails.sourceProviderFields[9].fieldValue}</span></dd></c:if>
-                                           </dl>
+                                                </dl>
                                         </c:if>
                                     </div>
                                     <div class="col-md-6">
@@ -119,19 +121,19 @@
                                             </dd>
                                             <c:if test="${not empty transactionDetails.targetOrgFields[6].fieldValue}"><dd>phone: <span class="tel">${transactionDetails.targetOrgFields[6].fieldValue}</span></dd></c:if>
                                             <c:if test="${not empty transactionDetails.targetOrgFields[7].fieldValue}"><dd>fax: <span class="tel">${transactionDetails.targetOrgFields[7].fieldValue}</span></dd></c:if>
-                                        </dl>
+                                            </dl>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="form-section row">
-                                    <div class="col-md-12"><h4 class="form-section-heading">Patient Information:</h4></div>
+                                    <div class="form-section row">
+                                        <div class="col-md-12"><h4 class="form-section-heading">Patient Information:</h4></div>
                                     <c:forEach items="${transactionDetails.patientFields}" var="patientInfo" varStatus="pfield">
-                                         <div class="col-md-6">
+                                        <div class="col-md-6">
                                             <div id="fieldDiv_${patientInfo.fieldNo}" class="form-group">
                                                 <label class="control-label" for="${patientInfo.fieldNo}">${patientInfo.fieldLabel}</label>
                                                 <c:choose>
                                                     <c:when test="${patientInfo.fieldSelectOptions.size() > 0}">
                                                         <select disabled id="${patientInfo.fieldNo}" name="patientFields[${pfield.index}].fieldValue" class="form-control <c:if test="${patientInfo.required == true}"> required</c:if>">
-                                                            <option value="">-Choose-</option>
+                                                                <option value="">-Choose-</option>
                                                             <c:forEach items="${patientInfo.fieldSelectOptions}" var="options">
                                                                 <option value="${options.optionValue}" <c:if test="${patientInfo.fieldValue == options.optionValue}">selected</c:if>>${options.optionDesc}</option>
                                                             </c:forEach>
@@ -139,23 +141,23 @@
                                                     </c:when>
                                                     <c:otherwise>
                                                         <input id="${patientInfo.fieldNo}" disabled name="patientFields[${pfield.index}].fieldValue" value="${patientInfo.fieldValue}" class="form-control ${patientInfo.validation.replace(' ','-')} <c:if test="${patientInfo.required == true}"> required</c:if>" type="text">
-                                                   </c:otherwise>
+                                                    </c:otherwise>
                                                 </c:choose>
                                             </div>
-                                         </div>
+                                        </div>
                                     </c:forEach>
                                 </div>
 
                                 <div class="form-section row">
                                     <div class="col-md-12"><h4 class="form-section-heading">Message Details: </h4></div>
                                     <c:forEach items="${transactionDetails.detailFields}" var="detailInfo" varStatus="dfield">
-                                         <div class="col-md-6">
+                                        <div class="col-md-6">
                                             <div id="fieldDiv_${detailInfo.fieldNo}" class="form-group">
                                                 <label class="control-label" for="fieldA">${detailInfo.fieldLabel}</label>
                                                 <c:choose>
                                                     <c:when test="${detailInfo.fieldSelectOptions.size() > 0}">
                                                         <select disabled id="${detailInfo.fieldNo}" name="detailFields[${dfield.index}].fieldValue" class="form-control <c:if test="${detailInfo.required == true}"> required</c:if>">
-                                                            <option value="">-Choose-</option>
+                                                                <option value="">-Choose-</option>
                                                             <c:forEach items="${detailInfo.fieldSelectOptions}" var="options">
                                                                 <option value="${options.optionValue}" <c:if test="${detailInfo.fieldValue == options.optionValue}">selected</c:if>>${options.optionDesc}</option>
                                                             </c:forEach>
@@ -166,15 +168,15 @@
                                                     </c:otherwise>
                                                 </c:choose>               
                                             </div>
-                                         </div>
+                                        </div>
                                     </c:forEach>
                                 </div>
-                               
+
                             </div>
                         </div>
                     </div>
                 </div>
-                                        
+
                 <div class="col-md-12 form-section">
                     <section class="panel panel-default">
                         <div class="panel-heading">
@@ -189,27 +191,27 @@
                 </div>                     
 
                 <c:if test="${fromPage == 'inbox'}">                    
-                <div class="col-md-12 form-section">
-                    <section class="panel panel-default">
-                        <div class="panel-heading">
-                            <div class="pull-right">
-                                <a href="#messageNoteModal" data-toggle="modal" class="btn btn-primary btn-xs btn-xsaction" id="createNewNote" title="Create a new Note"  ><span class="glyphicon glyphicon-plus"></span></a>
+                    <div class="col-md-12 form-section">
+                        <section class="panel panel-default">
+                            <div class="panel-heading">
+                                <div class="pull-right">
+                                    <a href="#messageNoteModal" data-toggle="modal" class="btn btn-primary btn-xs btn-xsaction" id="createNewNote" title="Create a new Note"  ><span class="glyphicon glyphicon-plus"></span></a>
+                                </div>
+                                <h3 class="panel-title">Notes:</h3>
                             </div>
-                            <h3 class="panel-title">Notes:</h3>
-                        </div>
-                        <div class="panel-body">
-                            <div class="form-container scrollable">
-                                <div id="existingNotes"></div>
+                            <div class="panel-body">
+                                <div class="form-container scrollable">
+                                    <div id="existingNotes"></div>
+                                </div>
                             </div>
-                        </div>
-                    </section>
-                </div> 
+                        </section>
+                    </div> 
                 </c:if> 
-           </form:form>
+            </form:form>
         </div>
-                       
+
     </div>
-                       
+
 </div>
 <%-- Status Definition modal --%>
 <div class="modal fade" id="statusModal" role="dialog" tabindex="-1" aria-labeledby="Status Details" aria-hidden="true" aria-describedby="Status Details"></div>
@@ -228,12 +230,12 @@
                     <input type="hidden" name="internalStatusId" id="internalStatusId" />
                     <div class="form-container">
                         <div id="selStatus" class="form-group" style="display:none;">
-                           <h4 class="form-section-heading">Selected Status: </h4>
-                           <span id="statusDisplayText" class="control-label"></span>
+                            <h4 class="form-section-heading">Selected Status: </h4>
+                            <span id="statusDisplayText" class="control-label"></span>
                         </div>
                         <div class="form-group">
-                             <h4 class="form-section-heading">Note: </h4>
-                             <textarea name="messageNotes" class="form-control" rows="5"></textarea>
+                            <h4 class="form-section-heading">Note: </h4>
+                            <textarea name="messageNotes" class="form-control" rows="5"></textarea>
                         </div>   
                         <div class="form-group">
                             <input type="button" id="submitMessageNote" class="btn btn-primary" value="Save Note"/>

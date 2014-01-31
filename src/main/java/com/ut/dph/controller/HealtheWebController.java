@@ -1014,6 +1014,7 @@ public class HealtheWebController {
             transaction.settransactionId(transactionId);
             transaction.settransactionTargetId(transactionTarget.getId());
             transaction.setdateSubmitted(transactionInfo.getdateCreated());
+            transaction.setsourceType(configDetails.getsourceType());
             
             lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(transaction.getstatusId());
             transaction.setstatusValue(processStatus.getDisplayCode());
@@ -1038,6 +1039,7 @@ public class HealtheWebController {
             transaction.setconfigId(configId);
             transaction.setautoRelease(transportDetails.getautoRelease());
             transaction.settargetConfigId(targetConfig);
+            transaction.setsourceType(configDetails.getsourceType());
         }
         
        /* Set all the transaction SOURCE ORG fields */
@@ -1234,6 +1236,11 @@ public class HealtheWebController {
                 } catch (InvocationTargetException ex) {
                     Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
                 }
+                
+                 /* If this is a feedback report the fields should be read only */
+                if(configDetails.getsourceType() == 2) {
+                    field.setreadOnly(true);
+                }
             }
             
             /* See if any fields have crosswalks associated to it */
@@ -1254,7 +1261,7 @@ public class HealtheWebController {
             field.setsaveToTableCol(fields.getsaveToTableCol());
             field.setfieldLabel(fields.getFieldLabel());
             field.setfieldValue(null);
-            
+           
             /* Get the validation */
             if(fields.getValidationType() > 1) {
                 field.setvalidation(messagetypemanager.getValidationById(fields.getValidationType()).toString());
@@ -2138,6 +2145,7 @@ public class HealtheWebController {
         transaction.settransactionId(transactionId);
         transaction.settransactionTargetId(transactionTarget.getId());
         transaction.setdateSubmitted(transactionInfo.getdateCreated());
+        transaction.setsourceType(configDetails.getsourceType());
         
         lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(transaction.getstatusId());
         transaction.setstatusValue(processStatus.getDisplayCode());
