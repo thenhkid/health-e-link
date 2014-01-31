@@ -17,8 +17,10 @@ import com.ut.dph.model.fieldSelectOptions;
 import com.ut.dph.model.transactionAttachment;
 import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionInRecords;
+import com.ut.dph.model.transactionRecords;
 import com.ut.dph.model.transactionTarget;
 import com.ut.dph.model.custom.ConfigForInsert;
+import com.ut.dph.model.custom.LookUpTable;
 import com.ut.dph.model.messageType;
 
 import java.text.SimpleDateFormat;
@@ -1078,7 +1080,8 @@ public class transactionInDAOImpl implements transactionInDAO {
      *
      * @return This function will return a list of batches.
      */
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     @Transactional
     public List<batchUploads> getuploadedBatches(int userId, int orgId) {
 
@@ -1328,6 +1331,73 @@ public class transactionInDAOImpl implements transactionInDAO {
             System.err.println("updateBlanksToNull failed." + ex);
         }
 		
+	}
+
+	@Override
+	@Transactional
+	@SuppressWarnings("unchecked")
+	public List<transactionRecords> getFieldColAndValues(Integer batchUploadId,
+			configurationFormFields cff) {
+		String sql = ("select transactionInId as transactionId, F" + cff.getFieldNo() +"  as fieldValue, " + cff.getFieldNo() +" as fieldNo from transactiontranslatedIn "
+				+ " where configId = :configId "
+				+ " and F" +cff.getFieldNo()+ " is not null and date(F" + cff.getFieldNo() + ") is null"
+				+ " and transactionInId in (select id from transactionIn where"
+                + " batchId = :batchUploadId"
+                + " and configId = :configId order by transactionInId); ");
+
+        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
+        .addScalar("transactionId", StandardBasicTypes.INTEGER)
+		.addScalar("fieldValue", StandardBasicTypes.STRING)
+		.addScalar("fieldNo", StandardBasicTypes.INTEGER)
+		.setResultTransformer(Transformers.aliasToBean(transactionRecords.class))
+        .setParameter("configId", cff.getconfigId())
+        .setParameter("batchUploadId", batchUploadId);
+
+		List<transactionRecords> trs = query.list();
+
+        return trs;
+	}
+
+	@Override
+	@Transactional
+	public void updateFieldValue(transactionRecords tr, String newValue) {
+		String sql = "update transactiontranslatedIn set F" + tr.getfieldNo() + " = :newValue where"
+				+ " transactionInId = :ttiId";			
+			Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql);
+					updateData.setParameter("ttiId", tr.getTransactionId());
+	        updateData.setParameter("newValue", newValue);
+	        
+	        try {
+				updateData.executeUpdate();   
+	        } catch (Exception ex) {
+	            System.err.println("updateFieldValue failed." + ex);
+	        }
+		
+	}
+
+	@Override
+	@Transactional
+	public void insertDateErrors(Integer batchUploadId, configurationFormFields cff) {
+		String sql = "insert into transactionInerrors "
+				+ "(batchUploadId, transactionInId, configurationFormFieldsId, errorid, validationTypeId)"
+				+ "(select " + batchUploadId +", transactionInId, " + cff.getId() 
+				+ ", 2, "+ cff.getValidationType() + " from transactionTranslatedIn "
+				+ " where configId = :configId "
+				+ " and (F" + cff.getFieldNo()
+				+ " is  null  or date(F" + cff.getFieldNo() + ") is null)"
+				+ "and transactionInId in (select id from transactionIn where batchId = :batchUploadId"
+				+ " and configId = :configId));";
+        Query insertData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                .setParameter("batchUploadId", batchUploadId)
+                .setParameter("configId", cff.getconfigId());
+        
+        try {
+        	insertData.executeUpdate();
+            
+        } catch (Exception ex) {
+            System.err.println("insertDateErrors failed." + ex);
+            
+        }
 	}
 
 

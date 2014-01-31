@@ -21,10 +21,27 @@ public class transactionRecords {
     private boolean required = true;
     private String validation = null;
     private String fieldLabel = null;
+    private int transactionId; 
+   
+    public int getTransactionId() {
+		return transactionId;
+	}
+
+	public void setTransactionId(int transactionId) {
+		this.transactionId = transactionId;
+	}
+
+	private List<fieldSelectOptions> fieldSelectOptions = null;
     
-    private List<fieldSelectOptions> fieldSelectOptions = null;
-    
-    public String getfieldValue() {
+    public String getFieldValue() {
+		return fieldValue;
+	}
+
+	public void setFieldValue(String fieldValue) {
+		this.fieldValue = fieldValue;
+	}
+
+	public String getfieldValue() {
         return fieldValue;
     }
     

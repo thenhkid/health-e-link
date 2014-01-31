@@ -13,6 +13,7 @@ import com.ut.dph.model.fieldSelectOptions;
 import com.ut.dph.model.transactionAttachment;
 import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionInRecords;
+import com.ut.dph.model.transactionRecords;
 import com.ut.dph.model.transactionTarget;
 import com.ut.dph.model.custom.ConfigForInsert;
 
@@ -151,4 +152,11 @@ public interface transactionInManager {
     
     void updateBlanksToNull(configurationFormFields cff, Integer batchUploadId);
     
+    List<transactionRecords> getFieldColAndValues (Integer batchUploadId, configurationFormFields cff);
+    
+    String transformDate (String dateValue);
+    
+    void updateFieldValue (transactionRecords tr, String newValue);
+    
+    void insertDateErrors(Integer batchUploadId, configurationFormFields cff);
 }

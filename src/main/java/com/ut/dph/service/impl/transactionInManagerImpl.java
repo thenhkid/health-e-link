@@ -16,6 +16,7 @@ import com.ut.dph.model.fieldSelectOptions;
 import com.ut.dph.model.transactionAttachment;
 import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionInRecords;
+import com.ut.dph.model.transactionRecords;
 import com.ut.dph.model.transactionTarget;
 import com.ut.dph.model.validationType;
 import com.ut.dph.model.custom.ConfigForInsert;
@@ -33,6 +34,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -847,7 +849,7 @@ public class transactionInManagerImpl implements transactionInManager {
          * MySql RegEXP validate numeric - ^-?[0-9]+[.]?[0-9]*$|^-?[.][0-9]+$ validate email - ^[a-z0-9\._%+!$&*=^|~#%\'`?{}/\-]+@[a-z0-9\.-]+\.[a-z]{2,6}$ or ^[A-Z0-9._%-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$ validate url - ^(https?://)?([\da-z.-]+).([a-z0-9])([0-9a-z]*)*[/]?$ - need to fix not correct - might have to run in java as mysql is not catching all. validate phone - should be no longer than 11 digits ^[0-9]{7,11}$ validate date - doing this in java
 		*
          */
-//TODO was hoping to have one SP but concat in SP not setting and not catching errors correctly. Need to recheck
+    	//TODO was hoping to have one SP but concat in SP not setting and not catching errors correctly. Need to recheck
         List<configurationFormFields> configurationFormFields
                 = configurationtransportmanager.getCffByValidationType(configId, 0);
 
@@ -873,7 +875,7 @@ public class transactionInManagerImpl implements transactionInManager {
                 case 5:
                     genericValidation(cff, validationTypeId, batchUploadId, regEx);
                     break;
-                //url - nned to rethink as regExp is not validating correctly
+                //url - need to rethink as regExp is not validating correctly
                 case 6:
                     urlValidation(cff, validationTypeId, batchUploadId);
                     break;
@@ -901,10 +903,21 @@ public class transactionInManagerImpl implements transactionInManager {
     }
 
     @Override
-    public void dateValidation(configurationFormFields cff,
-            Integer validationTypeId, Integer batchUploadId) {
-		// TODO Auto-generated method stub
-
+    public void dateValidation(configurationFormFields cff, Integer validationTypeId, Integer batchUploadId) {
+		//1. we grab all transactionInIds for messages that are not length of 0 and not null 
+    	List<transactionRecords>  trs = getFieldColAndValues (batchUploadId, cff);	
+    	//2. we look at each column and check each value by trying to convert it to a date
+    	for (transactionRecords tr : trs) {
+    			String formattedDate = transformDate(tr.getFieldValue());
+    			if (formattedDate != null) {
+    				//3. if it converts, we update the column value
+    				updateFieldValue(tr, formattedDate);
+    			} 
+    	}
+    	//4. we run date validation, chk column, and insert errors
+    	if (trs.size() > 0) {
+    		insertDateErrors(batchUploadId, cff);
+    	}
     }
 
     /**
@@ -915,5 +928,43 @@ public class transactionInManagerImpl implements transactionInManager {
     public void updateBlanksToNull(configurationFormFields cff, Integer batchUploadId) {
         transactionInDAO.updateBlanksToNull(cff, batchUploadId);
     }
+
+	@Override
+	public List<transactionRecords> getFieldColAndValues(Integer batchUploadId, configurationFormFields cff) {
+		return transactionInDAO.getFieldColAndValues(batchUploadId, cff);
+	}
+
+	@Override
+	public String transformDate(String dateValue) {
+		java.util.Date  date = null;
+		try {
+			date = java.text.DateFormat.getDateInstance().parse(dateValue);
+		} 	catch (Exception e) {
+			return null;
+		}	
+		try {
+	    	SimpleDateFormat dateformat = new SimpleDateFormat("YYYY-MM-DD");
+	    	dateformat.format(date);
+	    	return dateformat.format(date);
+		} catch (Exception e) {
+			return null;
+		}
+		
+	}
+
+	@Override
+	public void updateFieldValue(transactionRecords tr, String newValue) {
+		transactionInDAO.updateFieldValue(tr, newValue);
+	}
+
+	@Override
+	public void insertDateErrors(Integer batchUploadId,
+			configurationFormFields cff) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	
+	
 
 }
