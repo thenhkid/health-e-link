@@ -976,7 +976,6 @@ public class transactionInManagerImpl implements transactionInManager {
         // no check for leap years (Schaltjahr)
         // and 31.02.2006 will also be correct
         String day = "(([12]\\d)|(3[01])|(0?[1-9]))"; // 01 up to 31
-        //String month = "((1[012])|(0\\d))"; // 01 up to 12
         String month = "((1[012])|(0\\d))"; // 01 up to 12
         String year = "\\d{4}";
      
@@ -990,8 +989,8 @@ public class transactionInManagerImpl implements transactionInManager {
         // check dates
         
           if (pattern1.matcher(date).matches()) {
-        	  //we have d-m-y format, we transform and return date
         	  try {
+        		  //check to make sure we have two digits date and month
         		  SimpleDateFormat dateformat = new SimpleDateFormat("dd-MM-YYYY");
             	  dateformat.setLenient(false);
             	  Date dateValue = dateformat.parse(date);
