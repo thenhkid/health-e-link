@@ -576,4 +576,24 @@ public class transactionOutDAOImpl implements transactionOutDAO {
         
         return feedbackConfigId;
     }
+    
+    /**
+     * The 'getFeedbackReports' function will return a list of feedback reports for the passed in transaction.
+     * 
+     * @param transactionId The id of the selected transaction
+     * 
+     * @return This function will return a list of feedback reports
+     */
+    @Override
+    @Transactional
+    public List<transactionIn> getFeedbackReports(int transactionId) {
+        
+        Criteria feedbackReportQuery = sessionFactory.getCurrentSession().createCriteria(transactionIn.class);
+        feedbackReportQuery.add(Restrictions.eq("transactionTargetId", transactionId));
+        feedbackReportQuery.addOrder(Order.desc("dateCreated"));
+        
+        List<transactionIn> feedbackReports = feedbackReportQuery.list();
+        
+        return feedbackReports;
+    }
 }

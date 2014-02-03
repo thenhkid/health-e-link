@@ -62,10 +62,10 @@
                             <option value="print">Print / Save As</option>
                             <option value="feedbackReports">View Feedback Reports</option>
                             <c:if test="${feedbackConfigId > 0 and userDetails.createAuthority == true}"><option value="${feedbackConfigId}">Create Feedback Report</option></c:if>
-                            </select>
-                        </div>
-                    </div>
-                </div>    
+                        </select>
+                  </div>
+               </div>
+            </div>    
             <form:form action="/Health-e-Web/feedbackReport/details" id="newFeedbackForm" modelAttribute="transactionDetails" method="post">
                 <form:hidden path="transactionId" id="transactionId" />
                 <input type="hidden" id="feedbackConfigId" name="configId" value="" />

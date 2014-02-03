@@ -9,6 +9,10 @@ $(document).ready(function() {
         if($(this).val() === 'print') {
             window.print();
         }
+        if($(this).val() === 'feedbackReports') {
+           $('#viewTransactionDetails').attr("action","/Health-e-Web/feedbackReports");
+           $('#viewTransactionDetails').submit();
+        }
         else if($.isNumeric($(this).val())) {
             $('#feedbackConfigId').val($(this).val());
             $('#newFeedbackForm').submit();
