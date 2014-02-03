@@ -23,8 +23,6 @@ import com.ut.dph.reference.fileSystem;
 import com.ut.dph.service.configurationManager;
 import com.ut.dph.service.configurationTransportManager;
 import com.ut.dph.service.messageTypeManager;
-
-import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 import org.springframework.stereotype.Service;
@@ -1096,9 +1094,5 @@ public class transactionInManagerImpl implements transactionInManager {
           } else  {
         	  return false;
           }
-     
-     
       }
-	
-
 }
