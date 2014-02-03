@@ -476,7 +476,6 @@ public class HealtheWebController {
         transaction.setdateSubmitted(transactionInfo.getdateCreated());
         transaction.setsourceType(configDetails.getsourceType());
         transaction.setinternalStatusId(transactionInfo.getinternalStatusId());
-        transaction.settransactionInId(transactionInfo.gettransactionInId());
         
         lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(transaction.getstatusId());
         transaction.setstatusValue(processStatus.getDisplayCode());
@@ -638,7 +637,7 @@ public class HealtheWebController {
         transaction.setconfigId(configId);
         transaction.setautoRelease(transportDetails.getautoRelease());
         transaction.settargetConfigId(connectionDetails.gettargetConfigId());
-        transaction.settransactionInId(transactionDetails.gettransactionInId());
+        transaction.settransactionTargetId(transactionId);
     
         
         /* Set all the transaction SOURCE ORG fields */
@@ -751,7 +750,7 @@ public class HealtheWebController {
             transaction.setautoRelease(transportDetails.getautoRelease());
             transaction.setbatchId(batchInfo.getId());
             transaction.settransactionId(transactionId);
-            transaction.settransactionTargetId(transactionTarget.getId());
+            transaction.settransactionTargetId(transactionInfo.gettransactionTargetId());
             transaction.setdateSubmitted(transactionInfo.getdateCreated());
             transaction.setsourceType(configDetails.getsourceType());
             
@@ -931,7 +930,7 @@ public class HealtheWebController {
             transactionIn transactionIn = new transactionIn();
             transactionIn.setbatchId(batchId);
             transactionIn.setconfigId(transactionDetails.getconfigId());
-            transactionIn.setorigtransactionInId(transactionDetails.gettransactionInId());
+            transactionIn.settransactionTargetId(transactionDetails.gettransactionTargetId());
 
             /* 
             If the "Save" button was pressed set the
@@ -1617,7 +1616,7 @@ public class HealtheWebController {
     
     
     /**
-     * The '/sent/details' POST request will display the selected transaction details. This page is 
+     * The '/sent/messageDetails' POST request will display the selected transaction details. This page is 
      * served up from inbox or sent Items batch transaction list page. So the form will be readOnly.
      * 
      * @param transactionId  The id of the selected transaction

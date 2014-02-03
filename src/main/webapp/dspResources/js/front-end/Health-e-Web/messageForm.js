@@ -177,6 +177,10 @@ $(document).ready(function() {
         if($(this).val() === 'print') {
             window.print();
         }
+        else if($.isNumeric($(this).val())) {
+            $('#originalTransactionId').val($(this).val());
+            $('#viewOriginalTransaction').submit();
+        }
         
     })
 

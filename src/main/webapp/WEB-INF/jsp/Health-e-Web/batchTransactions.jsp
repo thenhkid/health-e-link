@@ -19,7 +19,7 @@
 			<c:otherwise><a href="<c:url value='/Health-e-Web/sent'/>">Sent Batches</a></c:otherwise>
                     </c:choose>
                 </li>
-                <li class="active">Referral #${batchDetails.utBatchName}</li>
+                <li class="active">Batch: #${batchDetails.utBatchName}</li>
             </ol>
 
             <c:if test="${not empty savedStatus}" >

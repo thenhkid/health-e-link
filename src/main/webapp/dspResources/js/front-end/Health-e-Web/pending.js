@@ -12,6 +12,19 @@ $(document).ready(function() {
     if ($('.alert').length > 0) {
         $('.alert').delay(2000).fadeOut(1000);
     }
+    
+    var totalCheckBoxes = 0;
+    //Count how many batches are ready to be sent
+    $('input[type=checkbox]').each(function() {
+        totalCheckBoxes+=1;
+    });
+    
+    //If there are zero batches ready to be sent hide the button
+    if(totalCheckBoxes == 0) {
+        $('.sendBatches').hide();
+    }
+    
+    
 });
 
 $(function() {

@@ -41,8 +41,8 @@ public class transactionIn {
     @Column(name = "DATECREATED", nullable = false)
     private Date dateCreated = new Date();
     
-    @Column(name = "ORIGTRANSACTIONINID", nullable = false)
-    private int origtransactionInId = 0;
+    @Column(name = "TRANSACTIONTARGETID", nullable = false)
+    private int transactionTargetId = 0;
     
     public int getId() {
         return id;
@@ -84,12 +84,12 @@ public class transactionIn {
         this.dateCreated = dateCreated;
     }
     
-    public int getorigtransactionInId() {
-        return origtransactionInId;
+    public int gettransactionTargetId() {
+        return transactionTargetId;
     }
     
-    public void setorigtransactionInId(int origtransactionInId) {
-        this.origtransactionInId = origtransactionInId;
+    public void settransactionTargetId(int transactionTargetId) {
+        this.transactionTargetId = transactionTargetId;
     }
   
 }

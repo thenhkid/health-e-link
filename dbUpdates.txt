@@ -770,3 +770,7 @@ ADD COLUMN `associatedMessageTypeId` INT NULL DEFAULT '0' AFTER `sourceType`;
 / ** Chad 1.31.2014 @ 1:40 PM **/
 ALTER TABLE `universalTranslator`.`transactionIn` 
 ADD COLUMN `origtransactionInId` INT NULL DEFAULT 0 AFTER `dateCreated`;
+
+/** Chad 2.3.2014 @ 11:58 AM ** /
+ALTER TABLE `universalTranslator`.`transactionIn` 
+CHANGE COLUMN `origtransactionInId` `transactionTargetId` INT(11) NULL DEFAULT '0' ;

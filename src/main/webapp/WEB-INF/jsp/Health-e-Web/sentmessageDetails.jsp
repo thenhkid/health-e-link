@@ -75,7 +75,7 @@
             </form:form>               
             <form:form id="messageForm" action="/Health-e-Web/submitMessage" modelAttribute="transactionDetails" role="form" class="form" method="post">
                 <form:hidden path="transactionId" id="transactionId" />
-                <form:hidden path="transactionInId" id="transactionInId" />
+                <form:hidden path="transactionTargetId" id="transactionTargetId" />
                 <input type="hidden" id="attachmentIds" name="attachmentIds" value="" />
                 <div class="panel-group form-accordion" id="accordion">
                     <div class="panel panel-default panel-form">

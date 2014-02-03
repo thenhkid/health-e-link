@@ -25,7 +25,7 @@
                     <c:choose>
                         <c:when test="${pageHeader == 'create'}">Create New Message</c:when>
                         <c:when test="${pageHeader == 'feedback'}">Create New Feedback Report</c:when>
-                        <c:otherwise>Referral #${transaction.batchName}</c:otherwise>
+                        <c:otherwise>Batch #${transaction.batchName}</c:otherwise>
                     </c:choose>
                 </li>
             </ol>
@@ -53,7 +53,7 @@
                                 <label class="sr-only">Select Action</label>
                                 <select class="form-control" id="formAction">
                                     <option value="">-Select Action-</option>
-                                    <c:if test="${transaction.sourceType == 2}"><option value="">View Original Referral</option></c:if>
+                                    <c:if test="${transaction.sourceType == 2}"><option value="${transaction.transactionTargetId}">View Original Referral</option></c:if>
                                     <option value="print">Print / Save As</option>
                                 </select>
                             </div>
@@ -65,7 +65,10 @@
                     <h2 class="form-title">Create New Message</h2>
                 </c:otherwise>
             </c:choose>
-
+                    
+            <form action="/Health-e-Web/inbox/messageDetails" id="viewOriginalTransaction" method="post">
+                <input type="hidden" id="originalTransactionId" name="transactionId" value="" />
+            </form> 
             <form:form id="messageForm" action="/Health-e-Web/submitMessage" modelAttribute="transaction" role="form" class="form" method="post">
                 <input type="hidden" id="action" name="action" value="save" />
                 <form:hidden path="orgId" />
@@ -79,7 +82,6 @@
                 <form:hidden path="targetConfigId" />
                 <form:hidden path="transactionTargetId" />
                 <form:hidden path="targetOrgId" />
-                <form:hidden path="transactionInId" />
                 <input type="hidden" id="attachmentIds" name="attachmentIds" value="" />
                 <c:forEach items="${transaction.sourceOrgFields}" varStatus="i">
                     <form:hidden path="sourceOrgFields[${i.index}].fieldValue" />
