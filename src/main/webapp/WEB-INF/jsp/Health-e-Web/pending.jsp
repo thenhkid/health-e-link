@@ -52,7 +52,7 @@
                 <table class="table table-striped table-hover table-default">
                     <thead>
                         <tr>
-                            <c:if test="${userDetails.deliverAuthority == true}"><th scope="col" class="center-text">Mark?</th></c:if>
+                            <c:if test="${userDetails.deliverAuthority == true}"><th scope="col" class="center-text">Send?</th></c:if>
                             <th scope="col">Batch Name</th>
                             <th scope="col" class="center-text">Total Transactions</th>
                             <th scope="col" class="center-text">Status</th>

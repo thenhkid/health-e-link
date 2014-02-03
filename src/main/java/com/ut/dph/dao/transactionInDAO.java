@@ -106,6 +106,8 @@ public interface transactionInDAO {
     
     void updateTransactionStatus (Integer batchUploadId, Integer fromStatusId, Integer toStatusId);
     
+    void updateTransactionTargetStatus (Integer batchUploadId, Integer fromStatusId, Integer toStatusId);
+    
     boolean allowBatchClear (Integer batchUploadId);
     
     boolean clearTransactionInRecords(Integer batchId);

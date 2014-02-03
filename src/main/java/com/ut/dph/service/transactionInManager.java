@@ -115,6 +115,8 @@ public interface transactionInManager {
     
     void updateTransactionStatus (Integer batchUploadId, Integer fromStatusId, Integer toStatusId);
     
+    void updateTransactionTargetStatus (Integer batchUploadId, Integer fromStatusId, Integer toStatusId);
+    
     boolean clearBatch(Integer batchUploadId);
     
     boolean setDoNotProcess(Integer batchUploadId);

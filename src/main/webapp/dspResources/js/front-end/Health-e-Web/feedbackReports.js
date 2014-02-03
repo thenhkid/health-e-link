@@ -21,6 +21,14 @@ $(document).ready(function() {
     
     //This function will load the original transaction details
     $(document).on('click','#viewOriginalTransaction', function() {
+       
+        if($('#fromPage').val() == 'sent') {
+            $('#viewOriginalTransactionDetails').attr('action','/Health-e-Web/sent/messageDetails');
+        }
+        else {
+           $('#viewOriginalTransactionDetails').attr('action','/Health-e-Web/inbox/messageDetails'); 
+        }
+        
         $('#originalTransactionId').val($(this).attr('rel'));
         $('#viewOriginalTransactionDetails').submit();
     });

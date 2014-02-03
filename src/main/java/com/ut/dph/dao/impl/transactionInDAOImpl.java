@@ -1146,6 +1146,41 @@ public class transactionInDAOImpl implements transactionInDAO {
         }
 
     }
+    
+    /**
+     * The 'updateTransactionTargetStatus' function will update the transactionTarget entries when the
+     * created batch has been sent.
+     * 
+     * @param batchUploadId The id of the created batch
+     * @param fromStatusId  
+     * @param toStatusId The status we want to change to
+     */
+    @Override
+    @Transactional
+    public void updateTransactionTargetStatus(Integer batchUploadId, Integer fromStatusId, Integer toStatusId) {
+        String sql = "update transactionTarget "
+                + " set statusId = :toStatusId, "
+                + "statusTime = CURRENT_TIMESTAMP"
+                + " where batchUploadId = :batchUploadId ";
+        if (fromStatusId != 0) {
+            sql = sql + " and statusId = :fromStatusId";
+        }
+        Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                .setParameter("toStatusId", toStatusId)
+                .setParameter("batchUploadId", batchUploadId);
+
+        if (fromStatusId != 0) {
+            updateData.setParameter("fromStatusId", fromStatusId);
+        }
+
+        try {
+            updateData.executeUpdate();
+        } catch (Exception ex) {
+            System.err.println("updateTransactionStatus failed." + ex);
+        }
+
+    }
+
 
     @Override
     @Transactional

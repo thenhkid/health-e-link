@@ -601,6 +601,7 @@ public class transactionInManagerImpl implements transactionInManager {
                  * set all REL - 10 records to 19 *
                  */
                 updateTransactionStatus(batchUploadId, 12, 19);
+                updateTransactionTargetStatus(batchUploadId, 12, 19);
                 /**
                  * we update total record counts for batch *
                  */
@@ -639,6 +640,12 @@ public class transactionInManagerImpl implements transactionInManager {
     @Override
     public void updateTransactionStatus(Integer batchUploadId, Integer fromStatusId, Integer toStatusId) {
         transactionInDAO.updateTransactionStatus(batchUploadId, fromStatusId, toStatusId);
+    }
+    
+    @Override
+    public
+    void updateTransactionTargetStatus (Integer batchUploadId, Integer fromStatusId, Integer toStatusId) {
+        transactionInDAO.updateTransactionTargetStatus(batchUploadId, fromStatusId, toStatusId);
     }
 
     /**

@@ -18,12 +18,12 @@
                 <li class="active">Feedback Reports</li>
             </ol>
 
-            <form action="/Health-e-Web/inbox/messageDetails" id="viewOriginalTransactionDetails" method="post">
+            <form action="" id="viewOriginalTransactionDetails" method="post">
                 <input type="hidden" id="originalTransactionId" name="transactionId" value="" />
             </form>    
             <form action="" id="viewTransactionDetails" method="post">
                 <input type="hidden" id="transactionId" name="transactionId" value="" />
-                <input type="hidden" id="fromPage" name="fromPage" value="inbox" />
+                <input type="hidden" id="fromPage" name="fromPage" value="${fromPage}" />
                 <input type="hidden" id="configId" name="configId" value="" />
             </form>
             <div class="form-container scrollable">

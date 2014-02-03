@@ -49,6 +49,6 @@ public interface transactionOutManager {
     
     Integer getActiveFeedbackReportsByMessageType(int messageTypeId, int orgId);
     
-    List<transactionIn> getFeedbackReports(int transactionId);
+    List<transactionIn> getFeedbackReports(int transactionId, String fromPage);
 
 }

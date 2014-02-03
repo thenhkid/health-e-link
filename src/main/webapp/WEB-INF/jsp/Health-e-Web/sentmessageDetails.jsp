@@ -34,7 +34,7 @@
                     <dl>
                         <dd><strong>Date Submitted:</strong> <fmt:formatDate value="${transactionDetails.dateSubmitted}" type="both" dateStyle="long" timeStyle="long" /></dd>
                         <dd><strong>System ID:</strong> ${transactionDetails.batchName}</dd>
-                        <dd><strong>Transaction Type:</strong> <c:choose><c:when test="${transactionDetails.sourceType == 1}">Originating Message</c:when><c:otherwise>Feedback Report</c:otherwise></c:choose></dd>
+                        <dd><strong>Transaction Type:</strong> <c:choose><c:when test="${transactionDetails.sourceType == 1}">Original Message</c:when><c:otherwise>Feedback Report</c:otherwise></c:choose></dd>
                         <dd><strong>Status:</strong> <a href="#statusModal" data-toggle="modal" class="btn btn-link viewStatus" rel="${transactionDetails.statusId}" title="View this Status">${transactionDetails.statusValue}&nbsp;<span class="badge badge-help" data-placement="top" title="" data-original-title="">?</span></a></dd>
                     </dl>
                 </div>
@@ -60,7 +60,7 @@
                         <select class="form-control" id="formAction">
                             <option value="">-Select Action-</option>
                             <option value="print">Print / Save As</option>
-                            <option value="feedbackReports">View Feedback Reports</option>
+                            <c:if test="${transactionDetails.sourceType == 1}"><option value="feedbackReports">View Feedback Reports</option></c:if>
                             <c:if test="${feedbackConfigId > 0 and userDetails.createAuthority == true}"><option value="${feedbackConfigId}">Create Feedback Report</option></c:if>
                         </select>
                   </div>
@@ -72,6 +72,7 @@
             </form:form>               
             <form:form action="/Health-e-Web/inbox/messageDetails" id="viewTransactionDetails" modelAttribute="transactionDetails" method="post">
                 <form:hidden path="transactionId" id="transactionId" />
+                <input type="hidden" name="fromPage" value="${fromPage}" />
             </form:form>               
             <form:form id="messageForm" action="/Health-e-Web/submitMessage" modelAttribute="transactionDetails" role="form" class="form" method="post">
                 <form:hidden path="transactionId" id="transactionId" />

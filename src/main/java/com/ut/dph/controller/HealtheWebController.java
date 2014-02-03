@@ -1122,14 +1122,21 @@ public class HealtheWebController {
             status to "Saved"
             */
             if(action.equals("save")) {
-                transactiontarget.setstatusId(8);
+                transactiontarget.setstatusId(15);
             }
-            /* 
-            If the "Send" or "Release" button was pressed 
+            /*
+            If the "Release" button was pressed 
             set the status to "Release Pending"
             */
+            else if(action.equals("release")) {
+                transactiontarget.setstatusId(10);
+            }
+            /* 
+            If the "Send" button was pressed 
+            set the status to "Released"
+            */
             else {
-                transactiontarget.setstatusId(6);
+                transactiontarget.setstatusId(12);
             }
 
             transactionInManager.submitTransactionTarget(transactiontarget);
@@ -1146,14 +1153,21 @@ public class HealtheWebController {
             status to "Saved"
             */
             if(action.equals("save")) {
-                transactiontarget.setstatusId(8);
+                transactiontarget.setstatusId(15);
             }
-            /* 
-            If the "Send" or "Release" button was pressed 
+            /*
+            If the "Release" button was pressed 
             set the status to "Release Pending"
             */
+            else if(action.equals("release")) {
+                transactiontarget.setstatusId(10);
+            }
+            /* 
+            If the "Send" button was pressed 
+            set the status to "Released"
+            */
             else {
-                transactiontarget.setstatusId(6);
+                transactiontarget.setstatusId(12);
             }
             
             transactionInManager.submitTransactionTargetChanges(transactiontarget);
@@ -1669,7 +1683,7 @@ public class HealtheWebController {
         transaction.setconfigId(transactionInfo.getconfigId());
         transaction.setautoRelease(transportDetails.getautoRelease());
         transaction.setbatchId(batchInfo.getId());
-        transaction.settransactionId(transactionId);
+        transaction.settransactionId(transactionTarget.getId());
         transaction.settransactionTargetId(transactionTarget.getId());
         transaction.setdateSubmitted(transactionInfo.getdateCreated());
         transaction.setsourceType(configDetails.getsourceType());
@@ -1874,6 +1888,9 @@ public class HealtheWebController {
                 
                 /* Update the transactionIn status to 12 (REL) */
                 transactionInManager.updateTransactionStatus(batchId,0,12);
+                
+                /* Update the transactionTarget status to 12 (REL) */
+                transactionInManager.updateTransactionTargetStatus(batchId,0,12);
                 
                 /* Process the batch */
                 boolean transactionSentToProcess = transactionInManager.processBatch(batchId);
@@ -2095,24 +2112,44 @@ public class HealtheWebController {
      * @throws Exception
      */
     @RequestMapping(value = "/feedbackReports", method = RequestMethod.POST)
-    public ModelAndView getFeedbackReports(@RequestParam(value = "transactionId", required = true) Integer transactionId, HttpSession session) throws Exception {
+    public ModelAndView getFeedbackReports(@RequestParam(value = "transactionId", required = true) Integer transactionId, @RequestParam(value = "fromPage", required = false) String fromPage, HttpSession session) throws Exception {
         
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/Health-e-Web/feedbackReports");
+        
+        if(fromPage == null) {
+            fromPage = "inbox";
+        }
         
         /* Need to get all the message types set up for the user */
         User userInfo = (User)session.getAttribute("userDetails");
         
         /* Get the transaction Details */
         transactionTarget transactionDetails = transactionOutManager.getTransactionDetails(transactionId);
-        mav.addObject("OriginaltransactionId", transactionId);
         
         /* Get the details of the batch */
-        batchDownloads batchDetails = transactionOutManager.getBatchDetails(transactionDetails.getbatchDLId());
-        mav.addObject("batchDetails", batchDetails);
+        int batchId = 0;
+        
+        
+        /* if coming from the sent page then we need to look for feedback reports from the 
+        originating message. Otherwise we need to look for feedback reports from the message in
+        the inbox.
+        */
+        if("sent".equals(fromPage)) {
+            batchId = transactionDetails.getbatchUploadId();
+            batchUploads batchDetails = transactionInManager.getBatchDetails(batchId);
+            mav.addObject("batchDetails", batchDetails);
+            mav.addObject("OriginaltransactionId", transactionDetails.gettransactionInId());
+        }
+        else {
+            batchId = transactionDetails.getbatchDLId();
+            batchDownloads batchDetails = transactionOutManager.getBatchDetails(batchId);
+            mav.addObject("batchDetails", batchDetails);
+            mav.addObject("OriginaltransactionId", transactionId);
+        }
         
         /* Get all the feedback reports for the batch */
-        List<transactionIn> feedbackReports = transactionOutManager.getFeedbackReports(transactionId);
+        List<transactionIn> feedbackReports = transactionOutManager.getFeedbackReports(transactionId, fromPage);
         
         List<Transaction> transactionList = new ArrayList<Transaction>();
         
@@ -2223,7 +2260,7 @@ public class HealtheWebController {
         
         
         mav.addObject("transactions", transactionList);
-        mav.addObject("fromPage", "inbox");
+        mav.addObject("fromPage", fromPage);
         
         /* Set the header totals */
         setTotals(0,0,session);

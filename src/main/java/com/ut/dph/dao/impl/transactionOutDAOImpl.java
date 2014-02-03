@@ -581,15 +581,29 @@ public class transactionOutDAOImpl implements transactionOutDAO {
      * The 'getFeedbackReports' function will return a list of feedback reports for the passed in transaction.
      * 
      * @param transactionId The id of the selected transaction
+     * @param fromPage  The page the user is coming from, if from sent items page then we only want to show
+     *                  feedback reports that are fully sent.
      * 
      * @return This function will return a list of feedback reports
      */
     @Override
     @Transactional
-    public List<transactionIn> getFeedbackReports(int transactionId) {
+    public List<transactionIn> getFeedbackReports(int transactionId, String fromPage) {
         
         Criteria feedbackReportQuery = sessionFactory.getCurrentSession().createCriteria(transactionIn.class);
         feedbackReportQuery.add(Restrictions.eq("transactionTargetId", transactionId));
+        
+        /* 
+        If looking for feedback reports from sent batches the 
+        feedback reports must be in a received state
+        */
+        if("sent".equals(fromPage)) {
+            feedbackReportQuery.add(Restrictions.or(
+                Restrictions.eq("statusId", 18),
+                Restrictions.eq("statusId", 20)
+            ));
+        }
+        
         feedbackReportQuery.addOrder(Order.desc("dateCreated"));
         
         List<transactionIn> feedbackReports = feedbackReportQuery.list();

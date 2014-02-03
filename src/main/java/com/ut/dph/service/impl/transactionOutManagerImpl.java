@@ -8,7 +8,6 @@ package com.ut.dph.service.impl;
 
 import com.ut.dph.dao.transactionOutDAO;
 import com.ut.dph.model.batchDownloads;
-import com.ut.dph.model.configuration;
 import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionOutNotes;
 import com.ut.dph.model.transactionOutRecords;
@@ -115,8 +114,8 @@ public class transactionOutManagerImpl implements transactionOutManager {
     
     @Override
     @Transactional
-    public List<transactionIn> getFeedbackReports(int transactionId) {
-        return transactionOutDAO.getFeedbackReports(transactionId);
+    public List<transactionIn> getFeedbackReports(int transactionId, String fromPage) {
+        return transactionOutDAO.getFeedbackReports(transactionId, fromPage);
     }
 
 }
