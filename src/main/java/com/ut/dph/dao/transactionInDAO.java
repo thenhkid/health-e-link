@@ -124,11 +124,11 @@ public interface transactionInDAO {
     
     void updateBlanksToNull(configurationFormFields cff, Integer batchUploadId);
     
-    List<transactionRecords> getDateColAndValues (Integer batchUploadId, configurationFormFields cff);
+    List<transactionRecords> getFieldColAndValues (Integer batchUploadId, configurationFormFields cff);
     
     void updateFieldValue (transactionRecords tr, String newValue);
     
-    void insertDateError(transactionRecords tr, configurationFormFields cff, Integer batchUploadId);
+    void insertValidationError(transactionRecords tr, configurationFormFields cff, Integer batchUploadId);
     
     Integer getFeedbackReportConnection(int configId, int targetorgId);
 }

@@ -1335,12 +1335,12 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Override
     @Transactional
     @SuppressWarnings("unchecked")
-    public List<transactionRecords> getDateColAndValues(Integer batchUploadId,
+    public List<transactionRecords> getFieldColAndValues(Integer batchUploadId,
             configurationFormFields cff) {
-        String sql = ("select transactionInId as transactionId, F" + cff.getFieldNo() + "  as fieldValue, " + cff.getFieldNo() + " as fieldNo from transactiontranslatedIn "
+        String sql = ("select transactionInId as transactionId, F" + cff.getFieldNo() 
+        		+ "  as fieldValue, " + cff.getFieldNo() + " as fieldNo from transactiontranslatedIn "
                 + " where configId = :configId "
                 + " and F" + cff.getFieldNo() + " is not null "
-                //+ " and date(F" + cff.getFieldNo() + ") is null"
                 + " and transactionInId in (select id from transactionIn where"
                 + " batchId = :batchUploadId"
                 + " and configId = :configId order by transactionInId); ");
@@ -1377,7 +1377,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 
     @Override
     @Transactional
-    public void insertDateError(transactionRecords tr, configurationFormFields cff, Integer batchUploadId) {
+    public void insertValidationError(transactionRecords tr, configurationFormFields cff, Integer batchUploadId) {
         String sql = "insert into transactionInerrors "
                 + "(batchUploadId, transactionInId, configurationFormFieldsId, errorid, validationTypeId)"
                 + " values (:batchUploadId, :ttiId, :cffId, 2, :validationId);";

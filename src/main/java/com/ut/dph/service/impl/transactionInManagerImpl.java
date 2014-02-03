@@ -23,6 +23,7 @@ import com.ut.dph.reference.fileSystem;
 import com.ut.dph.service.configurationManager;
 import com.ut.dph.service.configurationTransportManager;
 import com.ut.dph.service.messageTypeManager;
+
 import java.util.regex.Pattern;
 
 import org.springframework.stereotype.Service;
@@ -41,6 +42,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.validator.routines.UrlValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -898,7 +900,24 @@ public class transactionInManagerImpl implements transactionInManager {
     @Override
     public void urlValidation(configurationFormFields cff,
             Integer validationTypeId, Integer batchUploadId) {
-        // TODO Auto-generated method stub
+    	 //1. we grab all transactionInIds for messages that are not length of 0 and not null 
+        List<transactionRecords> trs = getFieldColAndValues(batchUploadId, cff);
+        //2. we look at each column and check each value to make sure it is a valid url
+        for (transactionRecords tr : trs) {
+        	System.out.println(tr.getfieldValue());
+        	if (tr.getfieldValue() != null) {
+        		//we append http:// if url doesn't start with it
+        		String urlToValidate = tr.getfieldValue();
+        		if (!urlToValidate.startsWith("http")){
+        			urlToValidate = "http://" + urlToValidate;
+        		}
+        		if (!isValidURL(urlToValidate)) {
+        			insertValidationError(tr, cff, batchUploadId);
+        		}
+	    		
+        	}
+        }
+        
 
     }
 
@@ -931,7 +950,7 @@ public class transactionInManagerImpl implements transactionInManager {
         		}
         		
         		if (formattedDate == null && !mySQLDate) {
-        			insertDateError(tr, cff, batchUploadId);
+        			insertValidationError(tr, cff, batchUploadId);
 	            }
 	    		
         	}
@@ -949,8 +968,8 @@ public class transactionInManagerImpl implements transactionInManager {
     }
 
     @Override
-    public List<transactionRecords> getFieldColAndValues(Integer batchUploadId, configurationFormFields cff) {
-        return transactionInDAO.getDateColAndValues(batchUploadId, cff);
+    public List<transactionRecords> getFieldColAndValues (Integer batchUploadId, configurationFormFields cff) {
+        return transactionInDAO.getFieldColAndValues(batchUploadId, cff);
     }
 
     /** this method checks the potential day formats that a user can send in.  
@@ -1037,9 +1056,9 @@ public class transactionInManagerImpl implements transactionInManager {
     }
 
     @Override
-    public void insertDateError(transactionRecords tr,
+    public void insertValidationError(transactionRecords tr,
             configurationFormFields cff, Integer batchUploadId) {
-    	transactionInDAO.insertDateError(tr, cff, batchUploadId);
+    	transactionInDAO.insertValidationError(tr, cff, batchUploadId);
     }
     
     @Override
@@ -1103,4 +1122,14 @@ public class transactionInManagerImpl implements transactionInManager {
         	  return false;
           }
       }
+
+	@Override
+	public boolean isValidURL(String url) {
+		UrlValidator urlValidator = new UrlValidator();
+	    if (urlValidator.isValid(url)) {
+	      return true;
+	    } else {
+	      return false;
+	    }
+	}
 }

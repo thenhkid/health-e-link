@@ -159,7 +159,7 @@ public interface transactionInManager {
     
     void updateFieldValue (transactionRecords tr, String newValue);
     
-    void insertDateError(transactionRecords tr, configurationFormFields cff, Integer batchUploadId);
+    void insertValidationError(transactionRecords tr, configurationFormFields cff, Integer batchUploadId);
     
     Integer getFeedbackReportConnection(int configId, int targetorgId);
        
@@ -169,4 +169,5 @@ public interface transactionInManager {
     
     boolean chkMySQLDate(String date);
 	
+    boolean isValidURL(String url);
 }

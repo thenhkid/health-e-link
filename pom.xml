@@ -233,6 +233,13 @@
       <artifactId>jboss-transaction-api_1.1_spec</artifactId>
       <version>1.0.0.Final</version>
     </dependency>
+ 
+<dependency>
+	<groupId>commons-validator</groupId>
+	<artifactId>commons-validator</artifactId>
+	<version>1.4.0</version>
+</dependency>    
+    
   </dependencies>
   <build>
     <finalName>universalTranslator</finalName>
