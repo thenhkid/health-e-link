@@ -911,7 +911,7 @@ public class transactionInManagerImpl implements transactionInManager {
         for (transactionRecords tr : trs) {
         	if (tr.getfieldValue() != null) {
         		//sql is picking up dates in mysql format and it is not massive inserting, running this check to avoid unnecessary sql call
-        		//System.out.println(tr.getFieldValue());
+        		System.out.println(tr.getFieldValue());
         		//we check long dates
         		Date dateValue = null;
         		boolean mySQLDate = chkMySQLDate(tr.getFieldValue());
@@ -977,7 +977,7 @@ public class transactionInManagerImpl implements transactionInManager {
         // and 31.02.2006 will also be correct
         String day = "(([12]\\d)|(3[01])|(0?[1-9]))"; // 01 up to 31
         //String month = "((1[012])|(0\\d))"; // 01 up to 12
-        String month = "((1[012])|(\\d))"; // 01 up to 12
+        String month = "((1[012])|(0\\d))"; // 01 up to 12
         String year = "\\d{4}";
      
         // define here all date format
