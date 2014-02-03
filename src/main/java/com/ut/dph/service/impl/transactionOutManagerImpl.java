@@ -9,6 +9,7 @@ package com.ut.dph.service.impl;
 import com.ut.dph.dao.transactionOutDAO;
 import com.ut.dph.model.batchDownloads;
 import com.ut.dph.model.configuration;
+import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionOutNotes;
 import com.ut.dph.model.transactionOutRecords;
 import com.ut.dph.model.transactionTarget;
@@ -110,6 +111,12 @@ public class transactionOutManagerImpl implements transactionOutManager {
     @Transactional
     public Integer getActiveFeedbackReportsByMessageType(int messageTypeId, int orgId) {
         return transactionOutDAO.getActiveFeedbackReportsByMessageType(messageTypeId, orgId);
+    }
+    
+    @Override
+    @Transactional
+    public List<transactionIn> getFeedbackReports(int transactionId) {
+        return transactionOutDAO.getFeedbackReports(transactionId);
     }
 
 }

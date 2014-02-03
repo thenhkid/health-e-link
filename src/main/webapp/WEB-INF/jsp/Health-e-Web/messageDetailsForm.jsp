@@ -82,6 +82,7 @@
                 <form:hidden path="targetConfigId" />
                 <form:hidden path="transactionTargetId" />
                 <form:hidden path="targetOrgId" />
+                <form:hidden path="orginialTransactionId" />
                 <input type="hidden" id="attachmentIds" name="attachmentIds" value="" />
                 <c:forEach items="${transaction.sourceOrgFields}" varStatus="i">
                     <form:hidden path="sourceOrgFields[${i.index}].fieldValue" />
@@ -229,47 +230,64 @@
                                          </div>
                                     </c:forEach>
                                 </div>
-                                        
-                                <%-- Existing Message Attachments --%>
-                                <div class="form-section row">
-                                    <div class="col-md-12"><h4 class="form-section-heading">Existing Attachments:</h4></div>
-                                    <div class="col-md-12" id="existingAttachments"></div>
-                                </div>     
-                                    
-                                <%-- New Message Attachment --%>
-                                <div class="form-section row">
-                                    <div class="col-md-12"><h4 class="form-section-heading">Upload New Attachment:</h4></div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label class="control-label" for="attachmentTitle">Attachment Title</label>
-                                            <input id="attachmentTitle" class="form-control" />
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label class="control-label" for="attachmentFile">Attachment File</label>
-                                            <input name="fileUpload" id="attachmentFileUpload" type="file" class="form-control" />
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="form-group">
-                                    <div id="translationMsgDiv"  class="alert alert-danger" style="display:none;">
-                                        <strong>An error has occurred in one of the above fields!</strong>
-                                    </div>
-                                    <input type="button" id="save" class="btn btn-primary btn-action submitMessage" value="Save ${pageHeader == 'feedback' ? 'Feedback Report' : 'Referral'}"/>
-                                    <c:choose>
-                                        <c:when test="${transaction.autoRelease == true}">
-                                            <input type="button" id="send" class="btn btn-primary btn-action submitMessage" value="Send Referral"/>
-                                        </c:when>
-                                        <c:otherwise>
-                                            <input type="button" id="release" class="btn btn-primary btn-action submitMessage" value="Release"/>
-                                        </c:otherwise>
-                                    </c:choose>
-                                </div>
                             </div>
                         </div>
                     </div>
+                </div>
+                                    
+                <%-- Existing Message Attachments --%>
+                <div class="col-md-12 form-section">
+                    <section class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Existing Attachments:</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="form-container scrollable">
+                                <div id="existingAttachments"></div>
+                            </div>
+                        </div>
+                    </section>
+                </div>  
+                    
+
+                <%-- New Message Attachment --%>
+                <div class="col-md-12 form-section">
+                    <section class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">Upload New Attachment</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div class="form-container scrollable">
+                               <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label" for="attachmentTitle">Attachment Title</label>
+                                        <input id="attachmentTitle" class="form-control" />
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label" for="attachmentFile">Attachment File</label>
+                                        <input name="fileUpload" id="attachmentFileUpload" type="file" class="form-control" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <div class="form-group">
+                    <div id="translationMsgDiv"  class="alert alert-danger" style="display:none;">
+                        <strong>An error has occurred in one of the above fields!</strong>
+                    </div>
+                    <input type="button" id="save" class="btn btn-primary btn-action submitMessage" value="Save ${pageHeader == 'feedback' ? 'Feedback Report' : 'Referral'}"/>
+                    <c:choose>
+                        <c:when test="${transaction.autoRelease == true}">
+                            <input type="button" id="send" class="btn btn-primary btn-action submitMessage" value="Send Referral"/>
+                        </c:when>
+                        <c:otherwise>
+                            <input type="button" id="release" class="btn btn-primary btn-action submitMessage" value="Release"/>
+                        </c:otherwise>
+                    </c:choose>
                 </div>
            </form:form>
         </div>

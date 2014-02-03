@@ -8,6 +8,7 @@ package com.ut.dph.service;
 
 import com.ut.dph.model.batchDownloads;
 import com.ut.dph.model.configuration;
+import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionOutNotes;
 import com.ut.dph.model.transactionTarget;
 import com.ut.dph.model.transactionOutRecords;
@@ -47,5 +48,7 @@ public interface transactionOutManager {
     void removeNoteById(int noteId);
     
     Integer getActiveFeedbackReportsByMessageType(int messageTypeId, int orgId);
+    
+    List<transactionIn> getFeedbackReports(int transactionId);
 
 }
