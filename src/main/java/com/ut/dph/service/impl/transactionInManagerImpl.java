@@ -922,6 +922,7 @@ public class transactionInManagerImpl implements transactionInManager {
         		if (dateValue == null && !mySQLDate) {
 	    			dateValue = convertDate(tr.getfieldValue());
 	    		}
+        		
         		String formattedDate = null;
         		if (dateValue != null && !mySQLDate) {
         			formattedDate = formatDateForDB(dateValue);
@@ -930,7 +931,7 @@ public class transactionInManagerImpl implements transactionInManager {
         		}
         		
         		if (formattedDate == null && !mySQLDate) {
-	            	insertDateError(tr, cff, batchUploadId);
+        			insertDateError(tr, cff, batchUploadId);
 	            }
 	    		
         	}
@@ -1090,7 +1091,15 @@ public class transactionInManagerImpl implements transactionInManager {
         // check dates
         
           if (pattern.matcher(date).matches()) {
-        	    return true;  
+        	  try {
+        		  SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd");
+            	  dateformat.setLenient(false);
+            	  dateformat.parse(date);
+            	  return true;
+        	  } catch (Exception e) {
+        		  e.printStackTrace();
+        		  return false;
+        	  }   
           } else  {
         	  return false;
           }
