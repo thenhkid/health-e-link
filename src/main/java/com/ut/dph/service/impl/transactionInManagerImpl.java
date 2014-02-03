@@ -24,6 +24,9 @@ import com.ut.dph.service.configurationManager;
 import com.ut.dph.service.configurationTransportManager;
 import com.ut.dph.service.messageTypeManager;
 
+import java.util.ArrayList;
+import java.util.regex.Pattern;
+
 import org.springframework.stereotype.Service;
 
 import com.ut.dph.service.transactionInManager;
@@ -34,6 +37,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -904,18 +908,36 @@ public class transactionInManagerImpl implements transactionInManager {
     public void dateValidation(configurationFormFields cff, Integer validationTypeId, Integer batchUploadId) {
         //1. we grab all transactionInIds for messages that are not length of 0 and not null 
         List<transactionRecords> trs = getFieldColAndValues(batchUploadId, cff);
+        
         //2. we look at each column and check each value by trying to convert it to a date
         for (transactionRecords tr : trs) {
-            String formattedDate = transformDate(tr.getFieldValue());
-            if (formattedDate != null) {
-                //3. if it converts, we update the column value
-                updateFieldValue(tr, formattedDate);
-            }
+        	if (tr.getfieldValue() != null) {
+        		//sql is picking up dates in mysql format and it is not massive inserting, running this check to avoid unnecessary sql call
+        		//System.out.println(tr.getFieldValue());
+        		//we check long dates
+        		Date dateValue = null;
+        		boolean mySQLDate = chkMySQLDate(tr.getFieldValue());
+        		
+        		if (dateValue == null && !mySQLDate) {
+        			dateValue = convertLongDate(tr.getFieldValue());
+        		}
+        		if (dateValue == null && !mySQLDate) {
+	    			dateValue = convertDate(tr.getfieldValue());
+	    		}
+        		String formattedDate = null;
+        		if (dateValue != null && !mySQLDate) {
+        			formattedDate = formatDateForDB(dateValue);
+        			//3. if it converts, we update the column value
+	                updateFieldValue(tr, formattedDate);
+        		}
+        		
+        		if (formattedDate == null && !mySQLDate) {
+	            	insertDateError(tr, cff, batchUploadId);
+	            }
+	    		
+        	}
         }
-        //4. we run date validation, chk column, and insert errors
-        if (trs.size() > 0) {
-            insertDateErrors(batchUploadId, cff);
-        }
+        
     }
 
     /**
@@ -929,37 +951,97 @@ public class transactionInManagerImpl implements transactionInManager {
 
     @Override
     public List<transactionRecords> getFieldColAndValues(Integer batchUploadId, configurationFormFields cff) {
-        return transactionInDAO.getFieldColAndValues(batchUploadId, cff);
+        return transactionInDAO.getDateColAndValues(batchUploadId, cff);
     }
 
-    @Override
-    public String transformDate(String dateValue) {
-        java.util.Date date = null;
-        try {
-            date = java.text.DateFormat.getDateInstance().parse(dateValue);
-        } catch (Exception e) {
-            return null;
-        }
-        try {
-            SimpleDateFormat dateformat = new SimpleDateFormat("YYYY-MM-DD");
-            dateformat.format(date);
-            return dateformat.format(date);
-        } catch (Exception e) {
-            return null;
-        }
-
-    }
-
+    /** this method checks the potential day formats that a user can send in.  
+     * We will check for long days such as February 2, 2014 Wednesday etc.
+     * Only accepting US format of month - day - year
+     * February 2, 2014 Sunday 2:00:02 PM
+     * February 2, 2014
+     * 02-02-2014
+     * 02/02/2014
+     * 02/02/14
+     * 02/2/14 12:02:00 PM
+     * etc.
+     */
+    /** this method returns the pattern date is in so we can convert it properly and 
+     * translate into mysql datetime insert format
+     */
+    public Date convertDate(String input) {
+    	 
+        // some regular expression
+        String time = "(\\s(([01]?\\d)|(2[0123]))[:](([012345]\\d)|(60))"
+            + "[:](([012345]\\d)|(60)))?"; // with a space before, zero or one time
+     
+        // no check for leap years (Schaltjahr)
+        // and 31.02.2006 will also be correct
+        String day = "(([12]\\d)|(3[01])|(0?[1-9]))"; // 01 up to 31
+        //String month = "((1[012])|(0\\d))"; // 01 up to 12
+        String month = "((1[012])|(\\d))"; // 01 up to 12
+        String year = "\\d{4}";
+     
+        // define here all date format
+        String date = input.replace("/", "-");
+        date = date.replace(".", "-");
+        //ArrayList<Pattern> patterns = new ArrayList<Pattern>();
+        Pattern pattern1 = Pattern.compile(day + "-" + month + "-" + year + time);
+        Pattern pattern2 = Pattern.compile(year + "-" + month + "-" + day + time);
+        Pattern pattern3 = Pattern.compile(month + "-" + day + "-" + year + time);
+        // check dates
+        
+          if (pattern1.matcher(date).matches()) {
+        	  //we have d-m-y format, we transform and return date
+        	  try {
+        		  SimpleDateFormat dateformat = new SimpleDateFormat("dd-MM-YYYY");
+            	  dateformat.setLenient(false);
+            	  Date dateValue = dateformat.parse(date);
+            	  return dateValue;
+        	  } catch (Exception e) {
+        		  e.printStackTrace();
+        		  return null;
+        	  } 
+          } else if (pattern2.matcher(date).matches()) {
+            	//we have d-m-y format, we transform and return date
+            	  try {
+            		  SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-mm-dd");
+                	  dateformat.setLenient(false);
+                	  Date dateValue = dateformat.parse(date);
+                	  return dateValue;
+            	  } catch (Exception e) {
+            		  e.printStackTrace();
+            		  return null;
+            	  }
+            	  	  
+          } else if (pattern3.matcher(date).matches()) {
+              	//we have d-m-y format, we transform and return date
+              	  try {
+              		  SimpleDateFormat dateformat = new SimpleDateFormat("MM-dd-yyyy");
+                  	  dateformat.setLenient(false);
+                  	  Date dateValue = dateformat.parse(date);
+                  	  return dateValue;
+              	  } catch (Exception e) {
+              		  e.printStackTrace();
+              		  return null;
+              	  }
+              	  	  
+          } else {
+        	  return null;
+          }
+            
+     
+     
+      }
+   
     @Override
     public void updateFieldValue(transactionRecords tr, String newValue) {
         transactionInDAO.updateFieldValue(tr, newValue);
     }
 
     @Override
-    public void insertDateErrors(Integer batchUploadId,
-            configurationFormFields cff) {
-		// TODO Auto-generated method stub
-
+    public void insertDateError(transactionRecords tr,
+            configurationFormFields cff, Integer batchUploadId) {
+    	transactionInDAO.insertDateError(tr, cff, batchUploadId);
     }
     
     @Override
@@ -967,5 +1049,56 @@ public class transactionInManagerImpl implements transactionInManager {
     public Integer getFeedbackReportConnection(int configId, int targetorgId) {
         return transactionInDAO.getFeedbackReportConnection(configId, targetorgId);
     }
+
+	@Override
+	public String formatDateForDB(Date date) {
+		try {
+			SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd");
+			return dateformat.format(date);
+		} catch (Exception e) {
+			return null;
+		}
+	}
+
+	@Override
+    public Date convertLongDate(String dateValue) {
+    	
+        Date date = null;
+        //this checks convert long date such February 2, 2014
+        try {
+            date = java.text.DateFormat.getDateInstance().parse(dateValue);
+        } catch (Exception e) {
+        }
+        return date;
+    }
+
+    public boolean chkMySQLDate(String date) {
+   	 
+        // some regular expression
+        String time = "(\\s(([01]?\\d)|(2[0123]))[:](([012345]\\d)|(60))"
+            + "[:](([012345]\\d)|(60)))?"; // with a space before, zero or one time
+     
+        // no check for leap years (Schaltjahr)
+        // and 31.02.2006 will also be correct
+        String day = "(([12]\\d)|(3[01])|(0?[1-9]))"; // 01 up to 31
+        String month = "((1[012])|(0\\d))"; // 01 up to 12
+        String year = "\\d{4}";
+     
+        // define here all date format
+        date.replace("/", "-");
+        date.replace(".", "-");
+        Pattern pattern = Pattern.compile(year + "-" + month + "-" + day + time);
+       
+        // check dates
+        
+          if (pattern.matcher(date).matches()) {
+        	    return true;  
+          } else  {
+        	  return false;
+          }
+     
+     
+      }
+	
 
 }

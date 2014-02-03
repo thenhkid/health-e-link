@@ -8,7 +8,6 @@ package com.ut.dph.service;
 
 import com.ut.dph.model.batchUploadSummary;
 import com.ut.dph.model.batchUploads;
-import com.ut.dph.model.configurationConnection;
 import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.fieldSelectOptions;
 import com.ut.dph.model.transactionAttachment;
@@ -18,6 +17,7 @@ import com.ut.dph.model.transactionRecords;
 import com.ut.dph.model.transactionTarget;
 import com.ut.dph.model.custom.ConfigForInsert;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -155,11 +155,18 @@ public interface transactionInManager {
     
     List<transactionRecords> getFieldColAndValues (Integer batchUploadId, configurationFormFields cff);
     
-    String transformDate (String dateValue);
+    Date convertLongDate (String dateValue);
     
     void updateFieldValue (transactionRecords tr, String newValue);
     
-    void insertDateErrors(Integer batchUploadId, configurationFormFields cff);
+    void insertDateError(transactionRecords tr, configurationFormFields cff, Integer batchUploadId);
     
     Integer getFeedbackReportConnection(int configId, int targetorgId);
+       
+    String formatDateForDB (Date date);
+    
+    Date convertDate(String date);
+    
+    boolean chkMySQLDate(String date);
+	
 }

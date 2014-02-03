@@ -1335,11 +1335,12 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Override
     @Transactional
     @SuppressWarnings("unchecked")
-    public List<transactionRecords> getFieldColAndValues(Integer batchUploadId,
+    public List<transactionRecords> getDateColAndValues(Integer batchUploadId,
             configurationFormFields cff) {
         String sql = ("select transactionInId as transactionId, F" + cff.getFieldNo() + "  as fieldValue, " + cff.getFieldNo() + " as fieldNo from transactiontranslatedIn "
                 + " where configId = :configId "
-                + " and F" + cff.getFieldNo() + " is not null and date(F" + cff.getFieldNo() + ") is null"
+                + " and F" + cff.getFieldNo() + " is not null "
+                //+ " and date(F" + cff.getFieldNo() + ") is null"
                 + " and transactionInId in (select id from transactionIn where"
                 + " batchId = :batchUploadId"
                 + " and configId = :configId order by transactionInId); ");
@@ -1376,25 +1377,21 @@ public class transactionInDAOImpl implements transactionInDAO {
 
     @Override
     @Transactional
-    public void insertDateErrors(Integer batchUploadId, configurationFormFields cff) {
+    public void insertDateError(transactionRecords tr, configurationFormFields cff, Integer batchUploadId) {
         String sql = "insert into transactionInerrors "
                 + "(batchUploadId, transactionInId, configurationFormFieldsId, errorid, validationTypeId)"
-                + "(select " + batchUploadId + ", transactionInId, " + cff.getId()
-                + ", 2, " + cff.getValidationType() + " from transactionTranslatedIn "
-                + " where configId = :configId "
-                + " and (F" + cff.getFieldNo()
-                + " is  null  or date(F" + cff.getFieldNo() + ") is null)"
-                + "and transactionInId in (select id from transactionIn where batchId = :batchUploadId"
-                + " and configId = :configId));";
+                + " values (:batchUploadId, :ttiId, :cffId, 2, :validationId);";
         Query insertData = sessionFactory.getCurrentSession().createSQLQuery(sql)
                 .setParameter("batchUploadId", batchUploadId)
-                .setParameter("configId", cff.getconfigId());
+                .setParameter("cffId", cff.getId())
+                .setParameter("ttiId", tr.getTransactionId())
+                .setParameter("validationId", cff.getValidationType());
 
         try {
             insertData.executeUpdate();
 
         } catch (Exception ex) {
-            System.err.println("insertDateErrors failed." + ex);
+            System.err.println("insertDateError failed." + ex);
 
         }
     }
