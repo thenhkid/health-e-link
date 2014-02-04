@@ -1005,10 +1005,10 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Transactional
     @SuppressWarnings("unchecked")
     public List<Integer> getBlankTransIds(ConfigForInsert config) {
-       
+    	
     	String sql = ("select transactionInId from "
-                + " transactionTranslatedIn where (length(CONCAT_WS(" + config.getSingleValueFields()
-                + ")) = 0 or length(CONCAT_WS(" + config.getSingleValueFields()
+                + " transactionTranslatedIn where (length(CONCAT_WS(''," + config.getSingleValueFields()
+                + ")) = 0 or length(CONCAT_WS(''," + config.getSingleValueFields()
                 + ")) is null) and transactionInId in (select id from transactionIn where statusId = :relId "
                 + " and batchId = :batchUploadId"
                 + " and configId = :configId); ");

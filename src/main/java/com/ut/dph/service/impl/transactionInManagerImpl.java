@@ -714,8 +714,7 @@ public class transactionInManagerImpl implements transactionInManager {
              * we loop though each table and grab the transactions that has multiple values for that table, we set it to a list *
              */
             for (ConfigForInsert config : configforConfigIds) {
-            	if (!config.getSaveToTableCol().equalsIgnoreCase("")) {
-	            	/**
+            	 	/**
 	                 * we grab list of ids with multiple for this config we use the checkDelim string to look for those transactions *
 	                 */
 	                List<Integer> transIds = getTransWithMultiValues(config);
@@ -741,7 +740,6 @@ public class transactionInManagerImpl implements transactionInManager {
 	                        }
 	                    }
 	                }
-            	}
             }
         }
 
