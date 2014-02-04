@@ -610,4 +610,25 @@ public class transactionOutDAOImpl implements transactionOutDAO {
         
         return feedbackReports;
     }
+    
+    
+    /**
+     * The 'getTransactionsByInId' will find inbox transactions based on an outbound transactionId.
+     * 
+     * @param transactionInId The id of the outbound transaction
+     * 
+     * @return This function will return a transactionTarget object
+     */
+    @Override
+    @Transactional
+    public transactionTarget getTransactionsByInId(int transactionInId) {
+        
+        Criteria transactionQuery = sessionFactory.getCurrentSession().createCriteria(transactionTarget.class);
+        transactionQuery.add(Restrictions.eq("transactionInId", transactionInId));
+        
+         transactionTarget transaction = (transactionTarget) transactionQuery.uniqueResult();
+
+        return transaction;
+        
+    }
 }

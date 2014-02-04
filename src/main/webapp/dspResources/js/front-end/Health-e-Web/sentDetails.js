@@ -13,6 +13,14 @@ $(document).ready(function() {
            $('#viewTransactionDetails').attr("action","/Health-e-Web/feedbackReports");
            $('#viewTransactionDetails').submit();
         }
+        else if($(this).val() === 'originalReferral') {
+           if($('#fromPage').val() == 'inbox') {
+              $('#viewTransactionDetails').attr("action","/Health-e-Web/sent/messageDetails"); 
+           }
+           
+           $('.transactionId').val($('#formAction').attr('rel'));
+           $('#viewTransactionDetails').submit();
+        }
         else if($.isNumeric($(this).val())) {
             $('#feedbackConfigId').val($(this).val());
             $('#newFeedbackForm').submit();

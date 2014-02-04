@@ -321,91 +321,28 @@ public class HealtheWebController {
             List<configurationFormFields> patientInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transaction.getconfigId(),transportDetails.getId(),5);
             List<configurationFormFields> detailFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transaction.getconfigId(),transportDetails.getId(),6);
             
-            /* Set all the transaction SOURCE fields */
-            List<transactionRecords> fromFields = new ArrayList<transactionRecords>();
-            for(configurationFormFields fields : sourceInfoFormFields) {
-                transactionRecords field = new transactionRecords();
-
-                String colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
-                try {
-                    field.setfieldValue(BeanUtils.getProperty(records, colName));
-                } catch (IllegalAccessException ex) {
-                    Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (InvocationTargetException ex) {
-                    Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
-                }
-
-                /* Get the pre-populated values */
-                fromFields.add(field);
-            }
+            /* Set all the transaction SOURCE ORG fields */
+            List<transactionRecords> fromFields = setInboxFormFields(sourceInfoFormFields, records, 0, true);
             transactionDetails.setsourceOrgFields(fromFields);
 
             /* Set all the transaction TARGET fields */
-            List<transactionRecords> toFields = new ArrayList<transactionRecords>();
-            for(configurationFormFields fields : targetInfoFormFields) {
-                transactionRecords field = new transactionRecords();
-
-                String colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
-                try {
-                    field.setfieldValue(BeanUtils.getProperty(records, colName));
-                } catch (IllegalAccessException ex) {
-                    Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (InvocationTargetException ex) {
-                    Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
-                }
-
-                /* Get the pre-populated values */
-                toFields.add(field);
-            }
+            List<transactionRecords> toFields = setInboxFormFields(targetInfoFormFields, records, 0, true);
             transactionDetails.settargetOrgFields(toFields);
 
             /* Set all the transaction PATIENT fields */
-            List<transactionRecords> patientFields = new ArrayList<transactionRecords>();
-            for(configurationFormFields fields : patientInfoFormFields) {
-                transactionRecords field = new transactionRecords();
-
-                String colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
-                try {
-                    field.setfieldValue(BeanUtils.getProperty(records, colName));
-                } catch (IllegalAccessException ex) {
-                    Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (InvocationTargetException ex) {
-                    Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
-                }
-
-                patientFields.add(field);
-            }
+            List<transactionRecords> patientFields = setInboxFormFields(patientInfoFormFields, records, 0, true);
             transactionDetails.setpatientFields(patientFields);
 
             /* Set all the transaction DETAIL fields */
-            List<transactionRecords> detailFields = new ArrayList<transactionRecords>();
-            for(configurationFormFields fields : detailFormFields) {
-                transactionRecords field = new transactionRecords();
-                field.setfieldLabel(fields.getFieldDesc()); 
-
-                String colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
-                String fieldValue = BeanUtils.getProperty(records, colName);
-
-                if(fields.getFieldDesc().equals("urgency") && !fieldValue.equals("")) {
-                    int id = Integer.parseInt(fieldValue);
-                    TableData  tableData = sysAdminManager.getTableData(id, "lu_Urgency");
-                    fieldValue = tableData.getDisplayText();
-                }
-
-               field.setfieldValue(fieldValue);
-
-               detailFields.add(field);
-            }
+            List<transactionRecords> detailFields = setInboxFormFields(detailFormFields, records, 0, true);
             transactionDetails.setdetailFields(detailFields);
-
-
+            
             /* get the message type name */
             configuration configDetails = configurationManager.getConfigurationById(transaction.getconfigId());
             transactionDetails.setmessageTypeName(messagetypemanager.getMessageTypeById(configDetails.getMessageTypeId()).getName());
 
             transactionList.add(transactionDetails);
         }
-        
         
         mav.addObject("transactions", transactionList);
         mav.addObject("fromPage", "inbox");
@@ -437,6 +374,9 @@ public class HealtheWebController {
         mav.setViewName("/Health-e-Web/sentmessageDetails");
         
         transactionTarget transactionInfo = transactionOutManager.getTransactionDetails(transactionId);
+        
+        /* Get the details of the sent transaction */
+        transactionIn originalTransactionInfo = transactionInManager.getTransactionDetails(transactionInfo.gettransactionInId());
         
         /* Need to update the status of the transaction to Recieved (id=20) */
         transactionOutManager.changeDeliveryStatus(transactionInfo.getbatchDLId(), transactionInfo.getbatchUploadId(), transactionId, transactionInfo.gettransactionInId());
@@ -474,7 +414,15 @@ public class HealtheWebController {
         transaction.settransactionId(transactionId);
         transaction.settransactionTargetId(transactionInfo.getId());
         transaction.setdateSubmitted(transactionInfo.getdateCreated());
-        transaction.setsourceType(configDetails.getsourceType());
+        
+        /* Check to see if the message is a feedback report */
+        if(originalTransactionInfo.gettransactionTargetId() > 0) {
+            transaction.setsourceType(2); /* Feedback report */
+            transaction.setorginialTransactionId(transactionOutManager.getTransactionDetails(originalTransactionInfo.gettransactionTargetId()).gettransactionInId());
+        }
+        else {
+            transaction.setsourceType(configDetails.getsourceType());
+        }
         transaction.setinternalStatusId(transactionInfo.getinternalStatusId());
         
         lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(transaction.getstatusId());
@@ -1029,7 +977,6 @@ public class HealtheWebController {
             records = transactionInManager.getTransactionRecord(currRecordId);
         }
         
-        
         String colName;
         for(transactionRecords field : sourceOrgFields) {
             colName = new StringBuilder().append("f").append(field.getfieldNo()).toString();
@@ -1528,91 +1475,29 @@ public class HealtheWebController {
             List<configurationFormFields> patientInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transaction.getconfigId(),transportDetails.getId(),5);
             List<configurationFormFields> detailFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transaction.getconfigId(),transportDetails.getId(),6);
             
-            /* Set all the transaction SOURCE fields */
-            List<transactionRecords> fromFields = new ArrayList<transactionRecords>();
-            for(configurationFormFields fields : sourceInfoFormFields) {
-                transactionRecords field = new transactionRecords();
-
-                String colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
-                try {
-                    field.setfieldValue(BeanUtils.getProperty(records, colName));
-                } catch (IllegalAccessException ex) {
-                    Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (InvocationTargetException ex) {
-                    Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
-                }
-
-                /* Get the pre-populated values */
-                fromFields.add(field);
-            }
+            /* Set all the transaction SOURCE ORG fields */
+            List<transactionRecords> fromFields = setOutboundFormFields(sourceInfoFormFields, records, 0, true, 0);
             transactionDetails.setsourceOrgFields(fromFields);
-
+            
             /* Set all the transaction TARGET fields */
-            List<transactionRecords> toFields = new ArrayList<transactionRecords>();
-            for(configurationFormFields fields : targetInfoFormFields) {
-                transactionRecords field = new transactionRecords();
-
-                String colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
-                try {
-                    field.setfieldValue(BeanUtils.getProperty(records, colName));
-                } catch (IllegalAccessException ex) {
-                    Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (InvocationTargetException ex) {
-                    Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
-                }
-
-                /* Get the pre-populated values */
-                toFields.add(field);
-            }
+            List<transactionRecords> toFields = setOutboundFormFields(targetInfoFormFields, records, 0, true, 0);
             transactionDetails.settargetOrgFields(toFields);
-
+            
             /* Set all the transaction PATIENT fields */
-            List<transactionRecords> patientFields = new ArrayList<transactionRecords>();
-            for(configurationFormFields fields : patientInfoFormFields) {
-                transactionRecords field = new transactionRecords();
-
-                String colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
-                try {
-                    field.setfieldValue(BeanUtils.getProperty(records, colName));
-                } catch (IllegalAccessException ex) {
-                    Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (InvocationTargetException ex) {
-                    Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
-                }
-
-                patientFields.add(field);
-            }
+            List<transactionRecords> patientFields = setOutboundFormFields(patientInfoFormFields, records, 0, true, 0);
             transactionDetails.setpatientFields(patientFields);
+            
 
             /* Set all the transaction DETAIL fields */
-            List<transactionRecords> detailFields = new ArrayList<transactionRecords>();
-            for(configurationFormFields fields : detailFormFields) {
-                transactionRecords field = new transactionRecords();
-                field.setfieldLabel(fields.getFieldDesc()); 
-
-                String colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
-                String fieldValue = BeanUtils.getProperty(records, colName);
-
-                if(fields.getFieldDesc().equals("urgency") && !fieldValue.equals("")) {
-                    int id = Integer.parseInt(fieldValue);
-                    TableData  tableData = sysAdminManager.getTableData(id, "lu_Urgency");
-                    fieldValue = tableData.getDisplayText();
-                }
-
-               field.setfieldValue(fieldValue);
-
-               detailFields.add(field);
-            }
+            List<transactionRecords> detailFields = setOutboundFormFields(detailFormFields, records, 0, true, 0);
             transactionDetails.setdetailFields(detailFields);
-
-
+            
             /* get the message type name */
             configuration configDetails = configurationManager.getConfigurationById(transaction.getconfigId());
             transactionDetails.setmessageTypeName(messagetypemanager.getMessageTypeById(configDetails.getMessageTypeId()).getName());
 
             transactionList.add(transactionDetails);
         }
-        
         
         mav.addObject("transactions", transactionList);
         mav.addObject("fromPage", fromPage);
@@ -1686,7 +1571,15 @@ public class HealtheWebController {
         transaction.settransactionId(transactionTarget.getId());
         transaction.settransactionTargetId(transactionTarget.getId());
         transaction.setdateSubmitted(transactionInfo.getdateCreated());
-        transaction.setsourceType(configDetails.getsourceType());
+        
+        /* Check to see if the message is a feedback report */
+        if(transactionInfo.gettransactionTargetId() > 0) {
+            transaction.setsourceType(2); /* Feedback report */
+            transaction.setorginialTransactionId(transactionInfo.gettransactionTargetId());
+        }
+        else {
+            transaction.setsourceType(configDetails.getsourceType());
+        }
         
         lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(transaction.getstatusId());
         transaction.setstatusValue(processStatus.getDisplayCode());
@@ -2032,9 +1925,11 @@ public class HealtheWebController {
                 }
             }
             
-            /* See if any fields have crosswalks associated to it */
-            List<fieldSelectOptions> fieldSelectOptions = transactionInManager.getFieldSelectOptions(formfield.getId(),configId);
-            field.setfieldSelectOptions(fieldSelectOptions);
+            if(configId > 0) {
+                /* See if any fields have crosswalks associated to it */
+                List<fieldSelectOptions> fieldSelectOptions = transactionInManager.getFieldSelectOptions(formfield.getId(),configId);
+                field.setfieldSelectOptions(fieldSelectOptions);
+            }
             
             fields.add(field);
         }
@@ -2092,9 +1987,11 @@ public class HealtheWebController {
                 }
             }
             
-            /* See if any fields have crosswalks associated to it */
-            List<fieldSelectOptions> fieldSelectOptions = transactionInManager.getFieldSelectOptions(formfield.getId(),configId);
-            field.setfieldSelectOptions(fieldSelectOptions);
+            if(configId > 0) {
+                /* See if any fields have crosswalks associated to it */
+                List<fieldSelectOptions> fieldSelectOptions = transactionInManager.getFieldSelectOptions(formfield.getId(),configId);
+                field.setfieldSelectOptions(fieldSelectOptions);
+            }
             
             fields.add(field);
         }
@@ -2130,6 +2027,10 @@ public class HealtheWebController {
         /* Get the details of the batch */
         int batchId = 0;
         
+        /* Get all the feedback reports for the original batch */
+        List<transactionIn> feedbackReports = transactionOutManager.getFeedbackReports(transactionId, fromPage);
+        
+        List<Transaction> transactionList = new ArrayList<Transaction>();
         
         /* if coming from the sent page then we need to look for feedback reports from the 
         originating message. Otherwise we need to look for feedback reports from the message in
@@ -2140,124 +2041,103 @@ public class HealtheWebController {
             batchUploads batchDetails = transactionInManager.getBatchDetails(batchId);
             mav.addObject("batchDetails", batchDetails);
             mav.addObject("OriginaltransactionId", transactionDetails.gettransactionInId());
+            
+            for(transactionIn feedbackReport : feedbackReports) {
+                
+                /* Need to get the feedback reports in the inbox */
+                transactionTarget inboxFeedbackReport = transactionOutManager.getTransactionsByInId(feedbackReport.getId());
+                
+                Transaction transaction = new Transaction();
+                transaction.settransactionRecordId(inboxFeedbackReport.getId());
+                transaction.setstatusId(inboxFeedbackReport.getstatusId());
+                transaction.setdateSubmitted(inboxFeedbackReport.getdateCreated());
+                transaction.setconfigId(inboxFeedbackReport.getconfigId());
+                
+                lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(inboxFeedbackReport.getstatusId());
+                transaction.setstatusValue(processStatus.getDisplayCode());
+
+                transactionOutRecords records = transactionOutManager.getTransactionRecords(inboxFeedbackReport.getId());
+                
+                /* Get a list of form fields */
+                configurationTransport transportDetails = configurationTransportManager.getTransportDetailsByTransportMethod(inboxFeedbackReport.getconfigId(), 2);
+                List<configurationFormFields> sourceInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(inboxFeedbackReport.getconfigId(),transportDetails.getId(),1);
+                List<configurationFormFields> targetInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(inboxFeedbackReport.getconfigId(),transportDetails.getId(),3);
+                List<configurationFormFields> patientInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(inboxFeedbackReport.getconfigId(),transportDetails.getId(),5);
+                List<configurationFormFields> detailFormFields = configurationTransportManager.getConfigurationFieldsByBucket(inboxFeedbackReport.getconfigId(),transportDetails.getId(),6);
+
+                /* Set all the transaction SOURCE ORG fields */
+                List<transactionRecords> fromFields = setInboxFormFields(sourceInfoFormFields, records, 0, true);
+                transaction.setsourceOrgFields(fromFields);
+               
+                /* Set all the transaction TARGET fields */
+                List<transactionRecords> toFields = setInboxFormFields(targetInfoFormFields, records, 0, true);
+                transaction.settargetOrgFields(toFields);
+                
+                /* Set all the transaction PATIENT fields */
+                List<transactionRecords> patientFields = setInboxFormFields(patientInfoFormFields, records, 0, true);
+                transaction.setpatientFields(patientFields);
+
+                /* Set all the transaction DETAIL fields */
+                List<transactionRecords> detailFields = setInboxFormFields(detailFormFields, records, 0, true);
+                transaction.setdetailFields(detailFields);
+                
+                /* get the message type name */
+                configuration configDetails = configurationManager.getConfigurationById(inboxFeedbackReport.getconfigId());
+                transaction.setmessageTypeName(messagetypemanager.getMessageTypeById(configDetails.getMessageTypeId()).getName());
+
+                transactionList.add(transaction);
+            }
         }
         else {
             batchId = transactionDetails.getbatchDLId();
             batchDownloads batchDetails = transactionOutManager.getBatchDetails(batchId);
             mav.addObject("batchDetails", batchDetails);
             mav.addObject("OriginaltransactionId", transactionId);
-        }
-        
-        /* Get all the feedback reports for the original batch */
-        List<transactionIn> feedbackReports = transactionOutManager.getFeedbackReports(transactionId, fromPage);
-        
-        List<Transaction> transactionList = new ArrayList<Transaction>();
-        
-        for(transactionIn feedbackReport : feedbackReports) {
+            
+            for(transactionIn feedbackReport : feedbackReports) {
                  
-            Transaction transaction = new Transaction();
-            transaction.settransactionRecordId(feedbackReport.getId());
-            transaction.setstatusId(feedbackReport.getstatusId());
-            transaction.setdateSubmitted(feedbackReport.getdateCreated());
-            transaction.setconfigId(feedbackReport.getconfigId());
-            
+                Transaction transaction = new Transaction();
+                transaction.settransactionRecordId(feedbackReport.getId());
+                transaction.setstatusId(feedbackReport.getstatusId());
+                transaction.setdateSubmitted(feedbackReport.getdateCreated());
+                transaction.setconfigId(feedbackReport.getconfigId());
 
-            lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(feedbackReport.getstatusId());
-            transaction.setstatusValue(processStatus.getDisplayCode());
 
-            transactionInRecords records = transactionInManager.getTransactionRecords(feedbackReport.getId());
+                lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(feedbackReport.getstatusId());
+                transaction.setstatusValue(processStatus.getDisplayCode());
 
-            /* Get a list of form fields */
-            configurationTransport transportDetails = configurationTransportManager.getTransportDetailsByTransportMethod(feedbackReport.getconfigId(), 2);
-            List<configurationFormFields> sourceInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(feedbackReport.getconfigId(),transportDetails.getId(),1);
-            List<configurationFormFields> targetInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(feedbackReport.getconfigId(),transportDetails.getId(),3);
-            List<configurationFormFields> patientInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(feedbackReport.getconfigId(),transportDetails.getId(),5);
-            List<configurationFormFields> detailFormFields = configurationTransportManager.getConfigurationFieldsByBucket(feedbackReport.getconfigId(),transportDetails.getId(),6);
-            
-            /* Set all the transaction SOURCE fields */
-            List<transactionRecords> fromFields = new ArrayList<transactionRecords>();
-            for(configurationFormFields fields : sourceInfoFormFields) {
-                transactionRecords field = new transactionRecords();
+                transactionInRecords records = transactionInManager.getTransactionRecords(feedbackReport.getId());
 
-                String colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
-                try {
-                    field.setfieldValue(BeanUtils.getProperty(records, colName));
-                } catch (IllegalAccessException ex) {
-                    Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (InvocationTargetException ex) {
-                    Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                /* Get a list of form fields */
+                configurationTransport transportDetails = configurationTransportManager.getTransportDetailsByTransportMethod(feedbackReport.getconfigId(), 2);
+                List<configurationFormFields> sourceInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(feedbackReport.getconfigId(),transportDetails.getId(),1);
+                List<configurationFormFields> targetInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(feedbackReport.getconfigId(),transportDetails.getId(),3);
+                List<configurationFormFields> patientInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(feedbackReport.getconfigId(),transportDetails.getId(),5);
+                List<configurationFormFields> detailFormFields = configurationTransportManager.getConfigurationFieldsByBucket(feedbackReport.getconfigId(),transportDetails.getId(),6);
 
-                /* Get the pre-populated values */
-                fromFields.add(field);
+                /* Set all the transaction SOURCE fields */
+                List<transactionRecords> fromFields = setOutboundFormFields(sourceInfoFormFields, records, 0, true, 0);
+                transaction.setsourceOrgFields(fromFields);
+
+                /* Set all the transaction TARGET fields */
+                List<transactionRecords> toFields = setOutboundFormFields(targetInfoFormFields, records, 0, true, 0);
+                transaction.settargetOrgFields(toFields);
+                
+                /* Set all the transaction PATIENT fields */
+                List<transactionRecords> patientFields = setOutboundFormFields(patientInfoFormFields, records, 0, true, 0);
+                transaction.setpatientFields(patientFields);
+                
+                /* Set all the transaction DETAIL fields */
+                List<transactionRecords> detailFields = setOutboundFormFields(detailFormFields, records, 0, true, 0);
+                transaction.setdetailFields(detailFields);
+                
+                /* get the message type name */
+                configuration configDetails = configurationManager.getConfigurationById(feedbackReport.getconfigId());
+                transaction.setmessageTypeName(messagetypemanager.getMessageTypeById(configDetails.getMessageTypeId()).getName());
+
+                transactionList.add(transaction);
             }
-            transaction.setsourceOrgFields(fromFields);
-
-            /* Set all the transaction TARGET fields */
-            List<transactionRecords> toFields = new ArrayList<transactionRecords>();
-            for(configurationFormFields fields : targetInfoFormFields) {
-                transactionRecords field = new transactionRecords();
-
-                String colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
-                try {
-                    field.setfieldValue(BeanUtils.getProperty(records, colName));
-                } catch (IllegalAccessException ex) {
-                    Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (InvocationTargetException ex) {
-                    Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
-                }
-
-                /* Get the pre-populated values */
-                toFields.add(field);
-            }
-            transaction.settargetOrgFields(toFields);
-
-            /* Set all the transaction PATIENT fields */
-            List<transactionRecords> patientFields = new ArrayList<transactionRecords>();
-            for(configurationFormFields fields : patientInfoFormFields) {
-                transactionRecords field = new transactionRecords();
-
-                String colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
-                try {
-                    field.setfieldValue(BeanUtils.getProperty(records, colName));
-                } catch (IllegalAccessException ex) {
-                    Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (InvocationTargetException ex) {
-                    Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
-                }
-
-                patientFields.add(field);
-            }
-            transaction.setpatientFields(patientFields);
-
-            /* Set all the transaction DETAIL fields */
-            List<transactionRecords> detailFields = new ArrayList<transactionRecords>();
-            for(configurationFormFields fields : detailFormFields) {
-                transactionRecords field = new transactionRecords();
-                field.setfieldLabel(fields.getFieldDesc()); 
-
-                String colName = new StringBuilder().append("f").append(fields.getFieldNo()).toString();
-                String fieldValue = BeanUtils.getProperty(records, colName);
-
-                if(fields.getFieldDesc().equals("urgency") && !fieldValue.equals("")) {
-                    int id = Integer.parseInt(fieldValue);
-                    TableData  tableData = sysAdminManager.getTableData(id, "lu_Urgency");
-                    fieldValue = tableData.getDisplayText();
-                }
-
-               field.setfieldValue(fieldValue);
-
-               detailFields.add(field);
-            }
-            transaction.setdetailFields(detailFields);
-
-            /* get the message type name */
-            configuration configDetails = configurationManager.getConfigurationById(feedbackReport.getconfigId());
-            transaction.setmessageTypeName(messagetypemanager.getMessageTypeById(configDetails.getMessageTypeId()).getName());
-
-            transactionList.add(transaction);
         }
-        
         
         mav.addObject("transactions", transactionList);
         mav.addObject("fromPage", fromPage);

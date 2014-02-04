@@ -57,11 +57,12 @@
                     </div>
                     <div class="form-group col-sm-4 col-sm-offset-4">
                         <label class="sr-only">Select Action</label>
-                        <select class="form-control" id="formAction">
+                        <select class="form-control" id="formAction" rel="${transactionDetails.orginialTransactionId}">
                             <option value="">-Select Action-</option>
                             <option value="print">Print / Save As</option>
                             <c:if test="${transactionDetails.sourceType == 1}"><option value="feedbackReports">View Feedback Reports</option></c:if>
                             <c:if test="${feedbackConfigId > 0 and userDetails.createAuthority == true}"><option value="${feedbackConfigId}">Create Feedback Report</option></c:if>
+                            <c:if test="${transactionDetails.sourceType == 2}"><option value="originalReferral">View Original Referral</option></c:if>
                         </select>
                   </div>
                </div>
@@ -71,8 +72,8 @@
                 <input type="hidden" id="feedbackConfigId" name="configId" value="" />
             </form:form>               
             <form:form action="/Health-e-Web/inbox/messageDetails" id="viewTransactionDetails" modelAttribute="transactionDetails" method="post">
-                <form:hidden path="transactionId" id="transactionId" />
-                <input type="hidden" name="fromPage" value="${fromPage}" />
+                <form:hidden path="transactionId" class="transactionId" id="transactionId" />
+                <input type="hidden" name="fromPage" id="fromPage" value="${fromPage}" />
             </form:form>               
             <form:form id="messageForm" action="/Health-e-Web/submitMessage" modelAttribute="transactionDetails" role="form" class="form" method="post">
                 <form:hidden path="transactionId" id="transactionId" />

@@ -117,5 +117,11 @@ public class transactionOutManagerImpl implements transactionOutManager {
     public List<transactionIn> getFeedbackReports(int transactionId, String fromPage) {
         return transactionOutDAO.getFeedbackReports(transactionId, fromPage);
     }
+    
+    @Override
+    @Transactional
+    public transactionTarget getTransactionsByInId(int transactionInId) {
+        return transactionOutDAO.getTransactionsByInId(transactionInId);
+    }
 
 }

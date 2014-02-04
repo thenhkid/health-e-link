@@ -42,20 +42,29 @@ $(document).ready(function() {
         $('#transactionId').val(transactionId);
         $('#configId').val(configId);
         
-        //Need to set the action for the form
-        //If user has edit capability then 'pending/details'
-        //otherwise only view 'sent/messageDetails'
-        if(editAuthority === "true") {
-            if(['17','18','19','20'].indexOf(statusId) >= 0) {
-                $('#viewTransactionDetails').attr("action","/Health-e-Web/sent/messageDetails"); 
-            }
-            else {
-                $('#viewTransactionDetails').attr("action","/Health-e-Web/pending/details");
-            }
-            
+        //If viewing a sent message need to look at the feedback report
+        //details from the inbox side.
+        
+        if($('#fromPage').val() == 'sent') {
+            $('#viewTransactionDetails').attr("action","/Health-e-Web/inbox/messageDetails"); 
         }
         else {
-            $('#viewTransactionDetails').attr("action","/Health-e-Web/sent/messageDetails"); 
+        
+            //Need to set the action for the form
+            //If user has edit capability then 'pending/details'
+            //otherwise only view 'sent/messageDetails'
+            if(editAuthority === "true") {
+                if(['17','18','19','20'].indexOf(statusId) >= 0) {
+                    $('#viewTransactionDetails').attr("action","/Health-e-Web/sent/messageDetails"); 
+                }
+                else {
+                    $('#viewTransactionDetails').attr("action","/Health-e-Web/pending/details");
+                }
+
+            }
+            else {
+                $('#viewTransactionDetails').attr("action","/Health-e-Web/sent/messageDetails"); 
+            }
         }
         
         $('#viewTransactionDetails').submit();
