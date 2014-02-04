@@ -88,16 +88,16 @@
                             </div>
                         </spring:bind>
                         <div id="associatedmessageTypeTopDiv" class="form-group" style="display:${configurationDetails.sourceType == 2 ? 'block' : 'none'}">        
-                            <spring:bind path="associatedmessageTypeId">
+                            <spring:bind path="associatedMessageTypeId">
                                 <div id="associatedmessageTypeDiv" class="form-group ${status.error ? 'has-error' : '' }">
-                                    <label class="control-label" for="associatedmessageTypeId">Associated Message Type *</label>
-                                    <form:select path="associatedmessageTypeId" id="associatedmessageTypeId" class="form-control half" disabled="${configurationDetails.id == 0 ? 'false' : 'true' }">
+                                    <label class="control-label" for="associatedMessageTypeId">Associated Message Type *</label>
+                                    <form:select path="associatedMessageTypeId" id="associatedMessageTypeId" class="form-control half" disabled="${configurationDetails.id == 0 ? 'false' : 'true' }">
                                         <option value="">- Select -</option>
                                         <c:forEach items="${messageTypes}" var="messageType" varStatus="mStatus">
-                                            <option value="${messageType.id}" <c:if test="${messageType.id == configurationDetails.associatedmessageTypeId}">selected</c:if>>${messageType.name}</option>
+                                            <option value="${messageType.id}" <c:if test="${messageType.id == configurationDetails.associatedMessageTypeId}">selected</c:if>>${messageType.name}</option>
                                         </c:forEach>
                                     </form:select>
-                                    <c:if test="${configurationDetails.id > 0}"><form:hidden path="associatedmessageTypeId"/></c:if> 
+                                    <c:if test="${configurationDetails.id > 0}"><form:hidden path="associatedMessageTypeId"/></c:if> 
                                     <span id="associatedmessageTypeMsg" class="control-label"></span>
                                 </div>
                             </spring:bind>
