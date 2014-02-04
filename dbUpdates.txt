@@ -1,0 +1,2 @@
+/** 2.4.14 Grace **/
+UPDATE `universaltranslator`.`lookuptables` SET `utTableName`='lu_ProcedureStatuses' WHERE `id`='22';
