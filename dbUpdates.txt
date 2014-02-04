@@ -749,7 +749,7 @@ BEGIN
  END$$
 DELIMITER ;
 
-/ ** Chad 1.30.2014 @ 10:39 AM **/
+/** Chad 1.30.2014 @ 10:39 AM **/
 CREATE TABLE `universalTranslator`.`transactionOutNotes` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `transactionTargetId` INT NOT NULL,
@@ -758,19 +758,57 @@ CREATE TABLE `universalTranslator`.`transactionOutNotes` (
   `dateSubmitted` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`));
 
-/ ** Chad 1.30.2014 @ 2:14 PM **/
+/** Chad 1.30.2014 @ 2:14 PM **/
 ALTER TABLE `universalTranslator`.`message_VisitInfo` 
 ADD COLUMN `completedProgram` INT NULL DEFAULT NULL AFTER `dateCreated`,
 ADD COLUMN `totalTimesSeen` INT NULL DEFAULT NULL AFTER `completedProgram`;
 
-/ ** Chad 1.30.2014 @ 2:26 PM **/
+/** Chad 1.30.2014 @ 2:26 PM **/
 ALTER TABLE `universalTranslator`.`configurations` 
 ADD COLUMN `associatedMessageTypeId` INT NULL DEFAULT '0' AFTER `sourceType`;
 
-/ ** Chad 1.31.2014 @ 1:40 PM **/
+/** Chad 1.31.2014 @ 1:40 PM **/
 ALTER TABLE `universalTranslator`.`transactionIn` 
 ADD COLUMN `origtransactionInId` INT NULL DEFAULT 0 AFTER `dateCreated`;
 
 /** Chad 2.3.2014 @ 11:58 AM ** /
 ALTER TABLE `universalTranslator`.`transactionIn` 
 CHANGE COLUMN `origtransactionInId` `transactionTargetId` INT(11) NULL DEFAULT '0' ;
+
+
+/** Grace 02.03.2014 **/
+drop procedure `universalTranslator`.`insertValidationErrors`;
+DELIMITER $$
+CREATE procedure `universalTranslator`.`insertValidationErrors`(in vtType int, in fieldNo int,
+in batchUploadId int, in configId int, in cffId int)
+BEGIN
+
+DECLARE regEx varchar(100) DEFAULT '';
+
+CASE vtType
+	WHEN 2 THEN set regEx = '^[a-z0-9\._%+!$&*=^|~#%\'`?{}/\-]+@[a-z0-9\.-]+\.[a-z]{2,6}$ or ^[A-Z0-9._%-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$';
+    WHEN 3 THEN 
+		BEGIN 
+			CALL `universalTranslator`.`stripPhoneChars`(vtType, fieldNo, batchUploadId, configId, cffId);
+			set regEx ='^[0-9]{7,11}$';
+		END;
+	WHEN 5 THEN set regEx = '^-?[0-9]+[.]?[0-9]*$|^-?[.][0-9]+$';
+    ELSE
+        BEGIN
+        END;
+	END 
+	CASE;
+ 
+set @stmt = concat(
+'insert into transactionInerrors (batchUploadId, transactionInId, configurationFormFieldsId, errorid, 
+validationTypeId) SELECT ', batchUploadId, ', transactionInId, ',cffId,',2, ', vtType,'  
+ FROM transactionTranslatedIn WHERE F' ,fieldNo, ' not REGEXP  "', regEx, '" and F',fieldNo, ' is not null 
+and length(F', fieldNO, ') != 0
+and configId = ', configId, ' and transactionInId 
+in (select id from transactionIn where batchId = ', batchUploadId,' and configId = ', configId,');');
+
+PREPARE stmt from @stmt;
+EXECUTE stmt;
+
+ END$$
+DELIMITER ;
