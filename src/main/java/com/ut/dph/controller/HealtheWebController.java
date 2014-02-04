@@ -436,10 +436,10 @@ public class HealtheWebController {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/Health-e-Web/sentmessageDetails");
         
-        /* Need to update the status of the transaction to Recieved (id=20) */
-        
-        
         transactionTarget transactionInfo = transactionOutManager.getTransactionDetails(transactionId);
+        
+        /* Need to update the status of the transaction to Recieved (id=20) */
+        transactionOutManager.changeDeliveryStatus(transactionInfo.getbatchDLId(), transactionInfo.getbatchUploadId(), transactionId, transactionInfo.gettransactionInId());
           
         /* Get the configuration details */
         configuration configDetails = configurationManager.getConfigurationById(transactionInfo.getconfigId());
@@ -2148,7 +2148,7 @@ public class HealtheWebController {
             mav.addObject("OriginaltransactionId", transactionId);
         }
         
-        /* Get all the feedback reports for the batch */
+        /* Get all the feedback reports for the original batch */
         List<transactionIn> feedbackReports = transactionOutManager.getFeedbackReports(transactionId, fromPage);
         
         List<Transaction> transactionList = new ArrayList<Transaction>();

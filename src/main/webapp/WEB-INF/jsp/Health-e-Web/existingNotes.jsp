@@ -38,7 +38,7 @@
                     </tr>
                 </c:forEach>
             </c:when>
-        <c:otherwise><tr><td scope="row" colspan="3" style="text-align:center">There have been no notes added.</td></c:otherwise>
+        <c:otherwise><tr><td scope="row" colspan="4" style="text-align:center">There have been no notes added.</td></c:otherwise>
         </c:choose>
     </tbody>
 </table>

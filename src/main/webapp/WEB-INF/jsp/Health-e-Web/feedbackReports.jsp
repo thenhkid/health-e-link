@@ -87,7 +87,7 @@
                             </c:forEach>
                         </c:when>
                         <c:otherwise>
-                            <tr><td colspan="7" class="center-text">There are currently no feedback reports for this batch.</td></tr>
+                            <tr><td colspan="7" class="center-text">There are currently no feedback reports for this transaction.</td></tr>
                         </c:otherwise>
                     </c:choose>                  
                     </tbody>
