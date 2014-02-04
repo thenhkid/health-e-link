@@ -1005,7 +1005,7 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Transactional
     @SuppressWarnings("unchecked")
     public List<Integer> getBlankTransIds(ConfigForInsert config) {
-        /**
+       
     	String sql = ("select transactionInId from "
                 + " transactionTranslatedIn where (length(CONCAT_WS(" + config.getSingleValueFields()
                 + ")) = 0 or length(CONCAT_WS(" + config.getSingleValueFields()
@@ -1019,8 +1019,7 @@ public class transactionInDAOImpl implements transactionInDAO {
         query.setParameter("relId", transRELId);
 
         List<Integer> transId = query.list();
-        **/
-		List<Integer> transId = null;
+       
         return transId;
     }
 
