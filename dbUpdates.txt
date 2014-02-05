@@ -1,2 +1,6 @@
 /** 2.4.14 Grace **/
 UPDATE `universaltranslator`.`lookuptables` SET `utTableName`='lu_ProcedureStatuses' WHERE `id`='22';
+
+/** Chad 2.5.14 @ 1:31 PM **/
+ALTER TABLE `universalTranslator`.`message_FromProvider` 
+CHANGE COLUMN `providerId` `providerId` VARCHAR(45) NULL DEFAULT NULL ;

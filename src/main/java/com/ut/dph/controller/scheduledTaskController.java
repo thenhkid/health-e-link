@@ -85,8 +85,10 @@ public class scheduledTaskController {
                 
                 /* If no schedule details is found or the setting is for 'automatically' then process now */
                 if(scheduleDetails == null || scheduleDetails.gettype() == 5) {
-                    System.out.println("configId: "+ transaction.getconfigId());
-                    System.out.println("transaction In Id: "+ transaction.gettransactionInId());
+                    
+                    /* Process the output (transactionTargetId, targetConfigId, transactionInId) */
+                    boolean processed = transactionOutManager.processOutPutTransactions(transaction.getId(), transaction.getconfigId(), transaction.gettransactionInId());
+                    
                 }
                 /* If the setting is for 'Daily' */
                 else if(scheduleDetails.gettype() == 2) {

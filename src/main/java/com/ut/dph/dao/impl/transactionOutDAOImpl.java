@@ -13,6 +13,7 @@ import com.ut.dph.model.batchDownloads;
 import com.ut.dph.model.configuration;
 import com.ut.dph.model.configurationConnection;
 import com.ut.dph.model.configurationConnectionReceivers;
+import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.configurationTransport;
 import com.ut.dph.model.messageType;
 import com.ut.dph.model.transactionIn;
@@ -656,6 +657,69 @@ public class transactionOutDAOImpl implements transactionOutDAO {
         List<transactionTarget> transactions = transactionQuery.list();
 
         return transactions;
+    }
+    
+    /**
+     * 
+     */
+    @Override
+    @Transactional
+    public boolean processOutPutTransactions(int transactionTargetId, int configId, int transactionInId) {
+        
+        /* Need to pull all the data out of the appropriate message_ tables for the transaction */
+        Criteria formFieldsQuery = sessionFactory.getCurrentSession().createCriteria(configurationFormFields.class);
+        formFieldsQuery.add(Restrictions.eq("configId", configId));
+        
+        List<configurationFormFields> formFields = formFieldsQuery.list();
+        
+        if(!formFields.isEmpty()) {
+            
+            String sql;
+            sql = "insert into transactionTranslatedOut (transactionTargetId, configId, ";
+            Integer counter = 1;
+            for(configurationFormFields formField : formFields) {
+                
+                sql += "f"+formField.getFieldNo();
+                
+                if(counter < formFields.size()) {
+                    sql += ", ";
+                    counter+=1;
+                }
+            }
+            
+            sql += ") ";
+            
+            sql += "VALUES( :transactionTargetId, :configId, ";
+            
+            String dataSQL;
+            counter = 1;
+            for(configurationFormFields formField : formFields) {
+                
+                dataSQL = "SELECT " + formField.getsaveToTableCol() + " from " + formField.getsaveToTableName()
+                        + " WHERE transactionInId = :transactionInId";
+                
+                Query getData = sessionFactory.getCurrentSession().createSQLQuery(dataSQL)
+                .setParameter("transactionInId", transactionInId);
+                
+                sql += "'"+getData.uniqueResult()+"'";
+                
+                if(counter < formFields.size()) {
+                    sql += ", ";
+                    counter+=1;
+                }
+            }
+            
+            sql += ") ";
+            
+            Query insertData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                .setParameter("transactionTargetId", transactionTargetId)
+                .setParameter("configId", configId);
+            
+            insertData.executeUpdate();
+            
+        }
+        
+        return true;
         
     }
 }

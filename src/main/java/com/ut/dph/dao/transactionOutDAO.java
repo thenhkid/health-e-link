@@ -52,5 +52,7 @@ public interface transactionOutDAO {
     transactionTarget getTransactionsByInId(int transactionInId);
     
     List<transactionTarget> getpendingOutPutTransactions(int transactionTargetId);
+    
+    boolean processOutPutTransactions(int transactionTargetId, int configId, int transactionInId);
 
 }
