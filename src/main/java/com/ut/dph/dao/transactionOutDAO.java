@@ -7,7 +7,6 @@
 package com.ut.dph.dao;
 
 import com.ut.dph.model.batchDownloads;
-import com.ut.dph.model.configuration;
 import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionOutNotes;
 import com.ut.dph.model.transactionOutRecords;
@@ -51,5 +50,7 @@ public interface transactionOutDAO {
     List<transactionIn> getFeedbackReports(int transactionId, String fromPage);
     
     transactionTarget getTransactionsByInId(int transactionInId);
+    
+    List<transactionTarget> getpendingOutPutTransactions(int transactionTargetId);
 
 }

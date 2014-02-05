@@ -123,5 +123,11 @@ public class transactionOutManagerImpl implements transactionOutManager {
     public transactionTarget getTransactionsByInId(int transactionInId) {
         return transactionOutDAO.getTransactionsByInId(transactionInId);
     }
+    
+    @Override
+    @Transactional
+    public List<transactionTarget> getpendingOutPutTransactions(int transactionTargetId) {
+        return transactionOutDAO.getpendingOutPutTransactions(transactionTargetId);
+    }
 
 }

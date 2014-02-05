@@ -52,5 +52,7 @@ public interface transactionOutManager {
     List<transactionIn> getFeedbackReports(int transactionId, String fromPage);
     
     transactionTarget getTransactionsByInId(int transactionInId);
+    
+    List<transactionTarget> getpendingOutPutTransactions(int transactionTargetId);
 
 }

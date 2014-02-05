@@ -631,4 +631,31 @@ public class transactionOutDAOImpl implements transactionOutDAO {
         return transaction;
         
     }
+    
+    /**
+     * The 'getpendingOutPutTransactions' function will return a list of transactions
+     * that are in the 'Pending Output' status (id = 19) that are ready to start the output
+     * process
+     * 
+     * @param   transactionTargetId This will hold a specific transaction Id to process will
+     *                              default to 0 which will find all transactions.
+     * 
+     * @table transactionTarget;
+     */
+    @Override
+    @Transactional
+    public List<transactionTarget> getpendingOutPutTransactions(int transactionTargetId) {
+        
+        Criteria transactionQuery = sessionFactory.getCurrentSession().createCriteria(transactionTarget.class);
+        transactionQuery.add(Restrictions.eq("statusId", 19));
+        
+        if(transactionTargetId > 0) {
+            transactionQuery.add(Restrictions.eq("id", transactionTargetId));
+        }
+        
+        List<transactionTarget> transactions = transactionQuery.list();
+
+        return transactions;
+        
+    }
 }
