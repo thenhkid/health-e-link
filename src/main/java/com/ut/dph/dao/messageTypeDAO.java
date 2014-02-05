@@ -64,7 +64,7 @@ public interface messageTypeDAO {
 	
 	Long checkCrosswalkName(String name, int orgId);
 	
-	Long findTotalCrosswalks();
+	double findTotalCrosswalks(int orgId);
 	
 	Crosswalks getCrosswalk(int cwId);
 	

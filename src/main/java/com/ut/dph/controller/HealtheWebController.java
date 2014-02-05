@@ -17,7 +17,6 @@ import com.ut.dph.model.configuration;
 import com.ut.dph.model.configurationConnection;
 import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.configurationTransport;
-import com.ut.dph.model.custom.TableData;
 import com.ut.dph.model.fieldSelectOptions;
 import com.ut.dph.model.lutables.lu_ProcessStatus;
 import com.ut.dph.model.providerAddress;
@@ -2150,6 +2149,5 @@ public class HealtheWebController {
         
         return mav;
     }
-    
     
 }

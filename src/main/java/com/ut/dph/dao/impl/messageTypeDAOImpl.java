@@ -234,17 +234,24 @@ public class messageTypeDAOImpl implements messageTypeDAO {
     /**
      * The 'findTotalCrosswalks' function will return the total number of generic crosswalks in the system
      *
+     * @param   orgId  Will pass the orgId this will help determine if I want all crosswalks or generic
+     *                 system only crosswalks
+     * 
      * @Table	crosswalks
      *
      *
      * @Return	This function will return the total number of generic crosswalks set up in the system
      */
     @Override
-    public Long findTotalCrosswalks() {
-
-        Query query = sessionFactory.getCurrentSession().createQuery("select count(*) as totalCrosswalks from Crosswalks where orgId = 0");
-
-        Long totalCrosswalks = (Long) query.uniqueResult();
+    public double findTotalCrosswalks(int orgId) {
+        
+        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Crosswalks.class);
+        
+        if(orgId == 0) {
+            criteria.add(Restrictions.eq("orgId", 0));
+        }
+        
+        double totalCrosswalks = (double)criteria.list().size();
 
         return totalCrosswalks;
     }

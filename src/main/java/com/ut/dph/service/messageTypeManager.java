@@ -62,7 +62,7 @@ public interface messageTypeManager {
 	
 	Integer createCrosswalk(Crosswalks crosswalkDetails);
 	
-	Long findTotalCrosswalks();
+	double findTotalCrosswalks(int orgId);
 	
 	Crosswalks getCrosswalk(int cwId);
 	

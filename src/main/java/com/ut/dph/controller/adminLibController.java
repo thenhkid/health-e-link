@@ -456,8 +456,8 @@ public class adminLibController {
         mav.addObject("availableCrosswalks", crosswalks);
 
         //Find out the total number of crosswalks
-        Long totalCrosswalks = messagetypemanager.findTotalCrosswalks();
-
+        double totalCrosswalks = messagetypemanager.findTotalCrosswalks(orgId);
+        
         Integer totalPages = (int) Math.ceil((double)totalCrosswalks / maxCrosswalkVal);
         mav.addObject("totalPages", totalPages);
         mav.addObject("currentPage", page);

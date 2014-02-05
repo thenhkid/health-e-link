@@ -312,7 +312,7 @@ function populateCrosswalks(page) {
     var orgId = $('#orgId').val();
 
     $.ajax({
-        url: '../library/getCrosswalks.do?',
+        url: '/administrator/library/getCrosswalks.do',
         type: "GET",
         data: {'page': page, 'orgId': orgId, 'maxCrosswalks': 8},
         success: function(data) {

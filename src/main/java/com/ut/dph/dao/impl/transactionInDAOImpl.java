@@ -20,7 +20,6 @@ import com.ut.dph.model.transactionInRecords;
 import com.ut.dph.model.transactionRecords;
 import com.ut.dph.model.transactionTarget;
 import com.ut.dph.model.custom.ConfigForInsert;
-import com.ut.dph.model.custom.LookUpTable;
 import com.ut.dph.model.messageType;
 
 import java.text.SimpleDateFormat;

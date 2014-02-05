@@ -168,8 +168,8 @@ public class messageTypeManagerImpl implements messageTypeManager {
 
     @Override
     @Transactional
-    public Long findTotalCrosswalks() {
-        return messageTypeDAO.findTotalCrosswalks();
+    public double findTotalCrosswalks(int orgId) {
+        return messageTypeDAO.findTotalCrosswalks(orgId);
     }
 
     @Override
