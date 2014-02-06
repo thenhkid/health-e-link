@@ -17,6 +17,9 @@ import com.ut.dph.model.transactionTarget;
 import com.ut.dph.service.configurationManager;
 import com.ut.dph.service.transactionInManager;
 import com.ut.dph.service.transactionOutManager;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -192,7 +195,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
     @Override
     @Transactional
     public void processOutputRecords(int transactionTargetId) {
-        
+       
         /* 
         Need to find all transactionTarget records that are ready to be processed
         statusId (19 - Pending Output)
@@ -204,7 +207,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
         schedule setting for the configuration.
         */
         if(!pendingTransactions.isEmpty()) {
-            
+           
             for(transactionTarget transaction : pendingTransactions) {
             
                 configurationSchedules scheduleDetails = configurationManager.getScheduleDetails(transaction.getconfigId());
@@ -220,6 +223,25 @@ public class transactionOutManagerImpl implements transactionOutManager {
                 }
                 /* If the setting is for 'Daily' */
                 else if(scheduleDetails.gettype() == 2) {
+                    
+                    /* if Daily check for scheduled or continuous */
+                    if(scheduleDetails.getprocessingType() == 1) {
+                        /* SCHEDULED */
+                        Date date = new Date();
+                        Calendar calendar = GregorianCalendar.getInstance();
+                        calendar.setTime(date);
+                        
+                        int hourOfDay = calendar.get(Calendar.HOUR_OF_DAY);
+                       
+                        if(hourOfDay >= scheduleDetails.getprocessingTime()) {
+                            System.out.println("RUN");
+                        }
+                    }
+                    else {
+                        /* CONTINUOUS */
+                        
+                    }
+                    
                     
                 }
                 /* If the setting is for 'Weekly' */

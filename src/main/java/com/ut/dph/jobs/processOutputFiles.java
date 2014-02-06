@@ -11,6 +11,7 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
 
 /**
@@ -25,6 +26,9 @@ public class processOutputFiles implements Job {
     @Override
     public void execute(JobExecutionContext context)  throws JobExecutionException {
         System.out.println("Job processOutputFiles is runing");
+        
+        SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
+        
         transactionOutManager.processOutputRecords(0);
         
     }
