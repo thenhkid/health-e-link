@@ -7,7 +7,6 @@
 package com.ut.dph.service;
 
 import com.ut.dph.model.batchDownloads;
-import com.ut.dph.model.configuration;
 import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionOutNotes;
 import com.ut.dph.model.transactionTarget;
@@ -62,5 +61,7 @@ public interface transactionOutManager {
     boolean translateTargetRecords(int transactionTargetId, int configId, int batchId);
     
     void moveTranslatedRecords(int transactionTargetId);
+    
+    void processOutputRecords(int transactionTargetId);
 
 }

@@ -9,6 +9,7 @@ package com.ut.dph.service.impl;
 import com.ut.dph.dao.transactionOutDAO;
 import com.ut.dph.model.batchDownloads;
 import com.ut.dph.model.configurationDataTranslations;
+import com.ut.dph.model.configurationSchedules;
 import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionOutNotes;
 import com.ut.dph.model.transactionOutRecords;
@@ -36,6 +37,9 @@ public class transactionOutManagerImpl implements transactionOutManager {
     
     @Autowired
     private transactionInManager transactionInManager;
+    
+    @Autowired
+    private transactionOutManager transactionOutManager;
     
     @Override
     @Transactional
@@ -186,6 +190,85 @@ public class transactionOutManagerImpl implements transactionOutManager {
     @Transactional
     public void moveTranslatedRecords(int transactionTargetId) {
         transactionOutDAO.moveTranslatedRecords(transactionTargetId);
+    }
+    
+    @Override
+    @Transactional
+    public void processOutputRecords(int transactionTargetId) {
+        
+        /* 
+        Need to find all transactionTarget records that are ready to be processed
+        statusId (19 - Pending Output)
+         */
+        List<transactionTarget> pendingTransactions = transactionOutManager.getpendingOutPutTransactions(transactionTargetId);
+        
+        /* 
+        If pending transactions are found need to loop through and check the 
+        schedule setting for the configuration.
+        */
+        if(!pendingTransactions.isEmpty()) {
+            
+            for(transactionTarget transaction : pendingTransactions) {
+            
+                configurationSchedules scheduleDetails = configurationManager.getScheduleDetails(transaction.getconfigId());
+                
+                boolean processed = false;
+                
+                /* If no schedule details is found or the setting is for 'automatically' then process now */
+                if(scheduleDetails == null || scheduleDetails.gettype() == 5) {
+                    
+                    /* Process the output (transactionTargetId, targetConfigId, transactionInId) */
+                    processed = transactionOutManager.processOutPutTransactions(transaction.getId(), transaction.getconfigId(), transaction.gettransactionInId());
+                    
+                }
+                /* If the setting is for 'Daily' */
+                else if(scheduleDetails.gettype() == 2) {
+                    
+                }
+                /* If the setting is for 'Weekly' */
+                else if(scheduleDetails.gettype() == 3) {
+                    
+                }
+                /* If the setting is for 'Monthly' */
+                else if(scheduleDetails.gettype() == 4) {
+                    
+                }
+                
+                /* If processed == true update the status of the batch and transaction */
+                if(processed == true) {
+                    /* Update the status of the uploaded batch to  TBP (Target Batch Creating in process) (ID = 25) */
+                    transactionInManager.updateBatchStatus(transaction.getbatchUploadId(),25,"");
+                    
+                    /* Update the status of the target batch to  TBP (Target Batch Creating in process) (ID = 25) */
+                    transactionOutManager.updateTargetBatchStatus(transaction.getbatchDLId(),25,"");
+                    
+                    /* Need to start the transaction translations */
+                    boolean recordsTranslated = transactionOutManager.translateTargetRecords(transaction.getId(), transaction.getconfigId(), transaction.getbatchDLId());
+                    
+                    /* Once all the processing has completed with no errors need to copy records to the transactionOutRecords to make availble to view */
+                    if(recordsTranslated == true) {
+                        transactionOutManager.moveTranslatedRecords(transaction.getId());
+                        
+                        /* Update the status of the transaction to PP (Pending Pickup) (ID = 18) */
+                        transactionInManager.updateTransactionStatus(transaction.getbatchUploadId(), transaction.gettransactionInId(), 0, 18);
+                        
+                        /* Update the status of the transaction target to PP (Pending Pickup) (ID = 18) */
+                        transactionInManager.updateTransactionTargetStatus(transaction.getbatchUploadId(), transaction.gettransactionInId(), 0, 18);
+                        
+                        /* Update the status of the uploaded batch to  TBP (Target Batch Created) (ID = 28) */
+                        transactionInManager.updateBatchStatus(transaction.getbatchUploadId(),28,"");
+
+                        /* Update the status of the target batch to  TBP (Target Batch Created) (ID = 28) */
+                        transactionOutManager.updateTargetBatchStatus(transaction.getbatchDLId(),28,"");
+                    }
+                    
+                    /* Check to see if an output file is to be generated */
+                    
+                }
+                
+            }
+            
+        }
     }
     
 }
