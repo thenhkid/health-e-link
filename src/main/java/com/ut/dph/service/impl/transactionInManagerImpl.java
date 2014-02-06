@@ -571,7 +571,7 @@ public class transactionInManagerImpl implements transactionInManager {
                     if (cdt.getCrosswalkId() != 0) {
                         successfulBatch = processCrosswalk(configId, batchUploadId, cdt, false);
                     } else if (cdt.getMacroId() != 0) {
-                        successfulBatch = processMacro(configId, batchUploadId, cdt);
+                        successfulBatch = processMacro(configId, batchUploadId, cdt, false);
                     }
                 }
 
@@ -1160,8 +1160,7 @@ public class transactionInManagerImpl implements transactionInManager {
     }
 
     @Override
-    public boolean processMacro(Integer configId,
-            Integer batchUploadId, configurationDataTranslations translation) {
+    public boolean processMacro(Integer configId, Integer batchId, configurationDataTranslations translation, boolean foroutboundProcessing) {
         // TODO Auto-generated method stub
         return false;
     }

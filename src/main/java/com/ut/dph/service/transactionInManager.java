@@ -177,7 +177,7 @@ public interface transactionInManager {
     
     boolean processCrosswalk (Integer configId, Integer batchId, configurationDataTranslations translation, boolean foroutboundProcessing);
     
-    boolean processMacro (Integer configId, Integer batchUploadId, configurationDataTranslations translation);
+    boolean processMacro (Integer configId, Integer batchId, configurationDataTranslations translation, boolean foroutboundProcessing);
     
     void nullForSWCol(Integer configId, Integer batchId, boolean foroutboundProcessing);
     

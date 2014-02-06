@@ -176,7 +176,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                    translated = transactionInManager.processCrosswalk (configId, batchId, cdt, true);
             } 
             else if (cdt.getMacroId()!= 0)  {
-                   translated = transactionInManager.processMacro (configId, batchId, cdt);
+                   translated = transactionInManager.processMacro (configId, batchId, cdt, true);
             }
         }
         
