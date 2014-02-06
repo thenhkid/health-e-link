@@ -2,6 +2,7 @@ package com.ut.dph.dao;
 
 import java.util.List;
 
+import com.ut.dph.model.CrosswalkData;
 import com.ut.dph.model.Macros;
 import com.ut.dph.model.configuration;
 import com.ut.dph.model.configurationConnection;
@@ -87,4 +88,7 @@ public interface configurationDAO {
   void removeConnectionSenders(int connectionId);
   
   void removeConnectionReceivers(int connectionId);
+  
+  List<CrosswalkData> getCrosswalkData(int cwId);
+  
 }

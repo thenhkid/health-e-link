@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ut.dph.dao.configurationDAO;
+import com.ut.dph.model.CrosswalkData;
 import com.ut.dph.model.Macros;
 import com.ut.dph.model.Organization;
 import com.ut.dph.model.configuration;
@@ -828,5 +829,15 @@ public class configurationDAOImpl implements configurationDAO {
 		List<configurationDataTranslations> cdtList = query.list();
 		
 		return cdtList;
+	}
+
+	@Override
+	@Transactional
+	@SuppressWarnings("unchecked")
+	public List<CrosswalkData> getCrosswalkData(int cwId) {
+		 Criteria criteria = sessionFactory.getCurrentSession().createCriteria(CrosswalkData.class);
+	        criteria.add(Restrictions.eq("cwId", cwId));
+	        
+	        return criteria.list();
 	}
 }

@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ut.dph.dao.configurationDAO;
 import com.ut.dph.dao.organizationDAO;
+import com.ut.dph.model.CrosswalkData;
 import com.ut.dph.model.Macros;
 import com.ut.dph.model.Organization;
 import com.ut.dph.model.configuration;
@@ -19,6 +20,7 @@ import com.ut.dph.model.configurationMessageSpecs;
 import com.ut.dph.model.configurationSchedules;
 import com.ut.dph.reference.fileSystem;
 import com.ut.dph.service.configurationManager;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -27,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Iterator;
+
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -439,6 +442,11 @@ public class configurationManagerImpl implements configurationManager {
 	public List<configurationDataTranslations> getDataTranslationsWithFieldNo(
 			int configId) {
 		return configurationDAO.getDataTranslationsWithFieldNo(configId);
+	}
+
+	@Override
+	public List<CrosswalkData> getCrosswalkData(int cwId) {
+		return configurationDAO.getCrosswalkData(cwId);
 	}
 
 }

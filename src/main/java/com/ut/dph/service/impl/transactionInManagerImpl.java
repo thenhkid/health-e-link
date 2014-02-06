@@ -7,6 +7,7 @@ package com.ut.dph.service.impl;
 
 import com.ut.dph.dao.messageTypeDAO;
 import com.ut.dph.dao.transactionInDAO;
+import com.ut.dph.model.CrosswalkData;
 import com.ut.dph.model.batchUploadSummary;
 import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.configuration;
@@ -1150,9 +1151,13 @@ public class transactionInManagerImpl implements transactionInManager {
 
 	@Override
 	public boolean processCrosswalk(Integer configId,
-			Integer batchUploadId, configurationDataTranslations translation) {
+			Integer batchUploadId, configurationDataTranslations cdt) {
 		// 1. we get the info for that cw (fieldNo, sourceVal, targetVal rel_crosswalkData)
-		
+		List <CrosswalkData> cdList = configurationManager.getCrosswalkData(cdt.getCrosswalkId());
+		for (CrosswalkData cwd : cdList) {
+			//we null column, we translate
+			
+		}
 		
 		//we update column values to null
 		
@@ -1169,4 +1174,5 @@ public class transactionInManagerImpl implements transactionInManager {
 		// TODO Auto-generated method stub
 		return false;
 	}
+
 }
