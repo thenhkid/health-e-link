@@ -57,4 +57,5 @@ public interface transactionOutDAO {
     
     void updateTargetBatchStatus(Integer batchDLId, Integer statusId, String timeField);
 
+    void moveTranslatedRecords(int transactionTargetId);
 }

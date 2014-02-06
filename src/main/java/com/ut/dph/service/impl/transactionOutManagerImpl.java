@@ -163,7 +163,6 @@ public class transactionOutManagerImpl implements transactionOutManager {
      *         OR FALSE (If translation failed for any reason)
      */
     @Override
-    @Transactional
     public boolean translateTargetRecords(int transactionTargetId, int configId, int batchId) {
         
         boolean translated = false;
@@ -181,6 +180,12 @@ public class transactionOutManagerImpl implements transactionOutManager {
         }
         
         return translated;
+    }
+    
+    @Override
+    @Transactional
+    public void moveTranslatedRecords(int transactionTargetId) {
+        transactionOutDAO.moveTranslatedRecords(transactionTargetId);
     }
     
 }

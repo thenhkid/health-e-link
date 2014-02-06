@@ -612,8 +612,8 @@ public class transactionInManagerImpl implements transactionInManager {
                 /**
                  * set all REL - 10 records to 19 *
                  */
-                updateTransactionStatus(batchUploadId, 12, 19);
-                updateTransactionTargetStatus(batchUploadId, 12, 19);
+                updateTransactionStatus(batchUploadId, 0, 12, 19);
+                updateTransactionTargetStatus(batchUploadId, 0, 12, 19);
                 /**
                  * we update total record counts for batch *
                  */
@@ -650,14 +650,13 @@ public class transactionInManagerImpl implements transactionInManager {
     }
 
     @Override
-    public void updateTransactionStatus(Integer batchUploadId, Integer fromStatusId, Integer toStatusId) {
-        transactionInDAO.updateTransactionStatus(batchUploadId, fromStatusId, toStatusId);
+    public void updateTransactionStatus(Integer batchUploadId, Integer transactionId, Integer fromStatusId, Integer toStatusId) {
+        transactionInDAO.updateTransactionStatus(batchUploadId, transactionId, fromStatusId, toStatusId);
     }
 
     @Override
-    public
-            void updateTransactionTargetStatus(Integer batchUploadId, Integer fromStatusId, Integer toStatusId) {
-        transactionInDAO.updateTransactionTargetStatus(batchUploadId, fromStatusId, toStatusId);
+    public void updateTransactionTargetStatus(Integer batchUploadId, Integer transactionId, Integer fromStatusId, Integer toStatusId) {
+        transactionInDAO.updateTransactionTargetStatus(batchUploadId, transactionId, fromStatusId, toStatusId);
     }
 
     /**
@@ -679,7 +678,7 @@ public class transactionInManagerImpl implements transactionInManager {
                 if (getBatchDetails(batchUploadId).gettransportMethodId() == 2) {
                     cleared = clearTransactionInErrors(batchUploadId);
                     toBatchStatusId = 5;
-                    transactionInDAO.updateTransactionStatus(batchUploadId, 0, 15);
+                    transactionInDAO.updateTransactionStatus(batchUploadId, 0, 0, 15);
                 } else {
                     //we clear transactionInRecords here as for batch upload we start over
                     cleared = clearTransactionTables(batchUploadId);

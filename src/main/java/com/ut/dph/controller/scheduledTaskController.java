@@ -119,9 +119,28 @@ public class scheduledTaskController {
                     
                     /* Need to start the transaction translations */
                     boolean recordsTranslated = transactionOutManager.translateTargetRecords(transaction.getId(), transaction.getconfigId(), transaction.getbatchDLId());
+                    
+                    /* Once all the processing has completed with no errors need to copy records to the transactionOutRecords to make availble to view */
+                    if(recordsTranslated == true) {
+                        transactionOutManager.moveTranslatedRecords(transaction.getId());
+                        
+                        /* Update the status of the transaction to PP (Pending Pickup) (ID = 18) */
+                        transactionInManager.updateTransactionStatus(transaction.getbatchUploadId(), transaction.gettransactionInId(), 0, 18);
+                        
+                        /* Update the status of the transaction target to PP (Pending Pickup) (ID = 18) */
+                        transactionInManager.updateTransactionTargetStatus(transaction.getbatchUploadId(), transaction.gettransactionInId(), 0, 18);
+                        
+                        /* Update the status of the uploaded batch to  TBP (Target Batch Created) (ID = 28) */
+                        transactionInManager.updateBatchStatus(transaction.getbatchUploadId(),28,"");
+
+                        /* Update the status of the target batch to  TBP (Target Batch Created) (ID = 28) */
+                        transactionOutManager.updateTargetBatchStatus(transaction.getbatchDLId(),28,"");
+                    }
+                    
+                    /* Check to see if an output file is to be generated */
+                    
                 }
                 
-            
             }
             
         }

@@ -115,9 +115,9 @@ public interface transactionInManager {
     
     void updateBatchStatus (Integer batchUploadId, Integer statusId, String timeField);
     
-    void updateTransactionStatus (Integer batchUploadId, Integer fromStatusId, Integer toStatusId);
+    void updateTransactionStatus (Integer batchUploadId, Integer transactionId, Integer fromStatusId, Integer toStatusId);
     
-    void updateTransactionTargetStatus (Integer batchUploadId, Integer fromStatusId, Integer toStatusId);
+    void updateTransactionTargetStatus (Integer batchUploadId, Integer transactionId, Integer fromStatusId, Integer toStatusId);
     
     boolean clearBatch(Integer batchUploadId);
     

@@ -60,5 +60,7 @@ public interface transactionOutManager {
     void updateTargetBatchStatus(Integer batchDLId, Integer statusId, String timeField);
     
     boolean translateTargetRecords(int transactionTargetId, int configId, int batchId);
+    
+    void moveTranslatedRecords(int transactionTargetId);
 
 }

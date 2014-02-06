@@ -1121,12 +1121,18 @@ public class transactionInDAOImpl implements transactionInDAO {
 
     @Override
     @Transactional
-    public void updateTransactionStatus(Integer batchUploadId,
-            Integer fromStatusId, Integer toStatusId) {
+    public void updateTransactionStatus(Integer batchUploadId, Integer transactionId, Integer fromStatusId, Integer toStatusId) {
         String sql = "update transactionIn "
                 + " set statusId = :toStatusId, "
-                + "dateCreated = CURRENT_TIMESTAMP"
-                + " where batchId = :batchUploadId ";
+                + "dateCreated = CURRENT_TIMESTAMP";
+        
+        if(transactionId > 0) {
+             sql+= " where id = :transactionId ";
+        }
+        else {
+             sql+= " where batchId = :batchUploadId ";
+        }     
+               
         if (fromStatusId != 0) {
             sql = sql + " and statusId = :fromStatusId";
         }
@@ -1150,16 +1156,25 @@ public class transactionInDAOImpl implements transactionInDAO {
      * The 'updateTransactionTargetStatus' function will update the transactionTarget entries when the created batch has been sent.
      *
      * @param batchUploadId The id of the created batch
+     * @param transactionId The id of the specific transaction to update (default to 0)
      * @param fromStatusId
      * @param toStatusId The status we want to change to
      */
     @Override
     @Transactional
-    public void updateTransactionTargetStatus(Integer batchUploadId, Integer fromStatusId, Integer toStatusId) {
+    public void updateTransactionTargetStatus(Integer batchUploadId, Integer transactionId, Integer fromStatusId, Integer toStatusId) {
         String sql = "update transactionTarget "
                 + " set statusId = :toStatusId, "
-                + "statusTime = CURRENT_TIMESTAMP"
-                + " where batchUploadId = :batchUploadId ";
+                + "statusTime = CURRENT_TIMESTAMP";
+        
+        if(transactionId > 0) {
+             sql+= " where id = :transactionId ";
+        }
+        else {
+             sql+= " where batchUploadId = :batchUploadId ";
+        }  
+        
+        
         if (fromStatusId != 0) {
             sql = sql + " and statusId = :fromStatusId";
         }

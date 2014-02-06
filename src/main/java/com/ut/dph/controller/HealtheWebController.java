@@ -1779,10 +1779,10 @@ public class HealtheWebController {
             for(Integer batchId : batchIdList) {
                 
                 /* Update the transactionIn status to 12 (REL) */
-                transactionInManager.updateTransactionStatus(batchId,0,12);
+                transactionInManager.updateTransactionStatus(batchId,0,0,12);
                 
                 /* Update the transactionTarget status to 12 (REL) */
-                transactionInManager.updateTransactionTargetStatus(batchId,0,12);
+                transactionInManager.updateTransactionTargetStatus(batchId,0,0,12);
                 
                 /* Process the batch */
                 boolean transactionSentToProcess = transactionInManager.processBatch(batchId);
