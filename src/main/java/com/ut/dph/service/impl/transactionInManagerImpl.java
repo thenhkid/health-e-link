@@ -568,14 +568,13 @@ public class transactionInManagerImpl implements transactionInManager {
                 //1. grab the configurationDataTranslations
                 List<configurationDataTranslations> dataTranslations = configurationManager.getDataTranslationsWithFieldNo(configId);
                 for (configurationDataTranslations cdt : dataTranslations) {
-                	if (cdt.getCrosswalkId() != 0) {
-                		successfulBatch = processCrosswalk (configId, batchUploadId, cdt);
-                	} else if (cdt.getMacroId()!= 0)  {
-                		successfulBatch = processMacro (configId, batchUploadId, cdt);
-                	}
+                    if (cdt.getCrosswalkId() != 0) {
+                        successfulBatch = processCrosswalk(configId, batchUploadId, cdt);
+                    } else if (cdt.getMacroId() != 0) {
+                        successfulBatch = processMacro(configId, batchUploadId, cdt);
+                    }
                 }
-                
-                
+
                 /**
                  * we check configuration details, remove rejected records from transactionTranslatedIn, pass records stays * *
                  */
@@ -654,10 +653,10 @@ public class transactionInManagerImpl implements transactionInManager {
     public void updateTransactionStatus(Integer batchUploadId, Integer fromStatusId, Integer toStatusId) {
         transactionInDAO.updateTransactionStatus(batchUploadId, fromStatusId, toStatusId);
     }
-    
+
     @Override
     public
-    void updateTransactionTargetStatus (Integer batchUploadId, Integer fromStatusId, Integer toStatusId) {
+            void updateTransactionTargetStatus(Integer batchUploadId, Integer fromStatusId, Integer toStatusId) {
         transactionInDAO.updateTransactionTargetStatus(batchUploadId, fromStatusId, toStatusId);
     }
 
@@ -727,32 +726,32 @@ public class transactionInManagerImpl implements transactionInManager {
              * we loop though each table and grab the transactions that has multiple values for that table, we set it to a list *
              */
             for (ConfigForInsert config : configforConfigIds) {
-            	 	/**
-	                 * we grab list of ids with multiple for this config we use the checkDelim string to look for those transactions *
-	                 */
-	                List<Integer> transIds = getTransWithMultiValues(config);
-	                config.setLoopTransIds(transIds);
-	                /**
-	                 * we need to check if we need to insert in case the whole table is mapped but doesn't contain values *
-	                 */
-	                List<Integer> skipTheseIds = getBlankTransIds(config);
-	                config.setBlankValueTransId(skipTheseIds);
-	
-	                //we insert single values
-	                if (!insertSingleToMessageTables(config)) {
-	                    return false;
-	                }
+                /**
+                 * we grab list of ids with multiple for this config we use the checkDelim string to look for those transactions *
+                 */
+                List<Integer> transIds = getTransWithMultiValues(config);
+                config.setLoopTransIds(transIds);
+                /**
+                 * we need to check if we need to insert in case the whole table is mapped but doesn't contain values *
+                 */
+                List<Integer> skipTheseIds = getBlankTransIds(config);
+                config.setBlankValueTransId(skipTheseIds);
 
-	                //we loop through transactions with multiple values and use SP to loop values with delimiters
-	                for (Integer transId : transIds) {
-	                    //we check how long field is
-	                    Integer subStringTotal = countSubString(config, transId);
-	                    for (int i = 0; i <= subStringTotal; i++) {
-	                        if (!insertMultiValToMessageTables(config, i + 1, transId)) {
-	                            return false;
-	                        }
-	                    }
-	                }
+                //we insert single values
+                if (!insertSingleToMessageTables(config)) {
+                    return false;
+                }
+
+                //we loop through transactions with multiple values and use SP to loop values with delimiters
+                for (Integer transId : transIds) {
+                    //we check how long field is
+                    Integer subStringTotal = countSubString(config, transId);
+                    for (int i = 0; i <= subStringTotal; i++) {
+                        if (!insertMultiValToMessageTables(config, i + 1, transId)) {
+                            return false;
+                        }
+                    }
+                }
             }
         }
 
@@ -916,24 +915,23 @@ public class transactionInManagerImpl implements transactionInManager {
     @Override
     public void urlValidation(configurationFormFields cff,
             Integer validationTypeId, Integer batchUploadId) {
-    	 //1. we grab all transactionInIds for messages that are not length of 0 and not null 
+        //1. we grab all transactionInIds for messages that are not length of 0 and not null 
         List<transactionRecords> trs = getFieldColAndValues(batchUploadId, cff);
         //2. we look at each column and check each value to make sure it is a valid url
         for (transactionRecords tr : trs) {
-        	//System.out.println(tr.getfieldValue());
-        	if (tr.getfieldValue() != null) {
-        		//we append http:// if url doesn't start with it
-        		String urlToValidate = tr.getfieldValue();
-        		if (!urlToValidate.startsWith("http")){
-        			urlToValidate = "http://" + urlToValidate;
-        		}
-        		if (!isValidURL(urlToValidate)) {
-        			insertValidationError(tr, cff, batchUploadId);
-        		}
-	    		
-        	}
+            //System.out.println(tr.getfieldValue());
+            if (tr.getfieldValue() != null) {
+                //we append http:// if url doesn't start with it
+                String urlToValidate = tr.getfieldValue();
+                if (!urlToValidate.startsWith("http")) {
+                    urlToValidate = "http://" + urlToValidate;
+                }
+                if (!isValidURL(urlToValidate)) {
+                    insertValidationError(tr, cff, batchUploadId);
+                }
+
+            }
         }
-        
 
     }
 
@@ -941,37 +939,37 @@ public class transactionInManagerImpl implements transactionInManager {
     public void dateValidation(configurationFormFields cff, Integer validationTypeId, Integer batchUploadId) {
         //1. we grab all transactionInIds for messages that are not length of 0 and not null 
         List<transactionRecords> trs = getFieldColAndValues(batchUploadId, cff);
-        
+
         //2. we look at each column and check each value by trying to convert it to a date
         for (transactionRecords tr : trs) {
-        	if (tr.getfieldValue() != null) {
+            if (tr.getfieldValue() != null) {
         		//sql is picking up dates in mysql format and it is not massive inserting, running this check to avoid unnecessary sql call
-        		//System.out.println(tr.getFieldValue());
-        		//we check long dates
-        		Date dateValue = null;
-        		boolean mySQLDate = chkMySQLDate(tr.getFieldValue());
-        		
-        		if (dateValue == null && !mySQLDate) {
-        			dateValue = convertLongDate(tr.getFieldValue());
-        		}
-        		if (dateValue == null && !mySQLDate) {
-	    			dateValue = convertDate(tr.getfieldValue());
-	    		}
-        		
-        		String formattedDate = null;
-        		if (dateValue != null && !mySQLDate) {
-        			formattedDate = formatDateForDB(dateValue);
-        			//3. if it converts, we update the column value
-	                updateFieldValue(tr, formattedDate);
-        		}
-        		
-        		if (formattedDate == null && !mySQLDate) {
-        			insertValidationError(tr, cff, batchUploadId);
-	            }
-	    		
-        	}
+                //System.out.println(tr.getFieldValue());
+                //we check long dates
+                Date dateValue = null;
+                boolean mySQLDate = chkMySQLDate(tr.getFieldValue());
+
+                if (dateValue == null && !mySQLDate) {
+                    dateValue = convertLongDate(tr.getFieldValue());
+                }
+                if (dateValue == null && !mySQLDate) {
+                    dateValue = convertDate(tr.getfieldValue());
+                }
+
+                String formattedDate = null;
+                if (dateValue != null && !mySQLDate) {
+                    formattedDate = formatDateForDB(dateValue);
+                    //3. if it converts, we update the column value
+                    updateFieldValue(tr, formattedDate);
+                }
+
+                if (formattedDate == null && !mySQLDate) {
+                    insertValidationError(tr, cff, batchUploadId);
+                }
+
+            }
         }
-        
+
     }
 
     /**
@@ -984,36 +982,28 @@ public class transactionInManagerImpl implements transactionInManager {
     }
 
     @Override
-    public List<transactionRecords> getFieldColAndValues (Integer batchUploadId, configurationFormFields cff) {
+    public List<transactionRecords> getFieldColAndValues(Integer batchUploadId, configurationFormFields cff) {
         return transactionInDAO.getFieldColAndValues(batchUploadId, cff);
     }
 
-    /** this method checks the potential day formats that a user can send in.  
-     * We will check for long days such as February 2, 2014 Wednesday etc.
-     * Only accepting US format of month - day - year
-     * February 2, 2014 Sunday 2:00:02 PM
-     * February 2, 2014
-     * 02-02-2014
-     * 02/02/2014
-     * 02/02/14
-     * 02/2/14 12:02:00 PM
-     * etc.
+    /**
+     * this method checks the potential day formats that a user can send in. We will check for long days such as February 2, 2014 Wednesday etc. Only accepting US format of month - day - year February 2, 2014 Sunday 2:00:02 PM February 2, 2014 02-02-2014 02/02/2014 02/02/14 02/2/14 12:02:00 PM etc.
      */
-    /** this method returns the pattern date is in so we can convert it properly and 
-     * translate into mysql datetime insert format
+    /**
+     * this method returns the pattern date is in so we can convert it properly and translate into mysql datetime insert format
      */
     public Date convertDate(String input) {
-    	 
+
         // some regular expression
         String time = "(\\s(([01]?\\d)|(2[0123]))[:](([012345]\\d)|(60))"
-            + "[:](([012345]\\d)|(60)))?"; // with a space before, zero or one time
-     
+                + "[:](([012345]\\d)|(60)))?"; // with a space before, zero or one time
+
         // no check for leap years (Schaltjahr)
         // and 31.02.2006 will also be correct
         String day = "(([12]\\d)|(3[01])|(0?[1-9]))"; // 01 up to 31
         String month = "((1[012])|(0\\d))"; // 01 up to 12
         String year = "\\d{4}";
-     
+
         // define here all date format
         String date = input.replace("/", "-");
         date = date.replace(".", "-");
@@ -1022,50 +1012,48 @@ public class transactionInManagerImpl implements transactionInManager {
         Pattern pattern2 = Pattern.compile(year + "-" + month + "-" + day + time);
         Pattern pattern3 = Pattern.compile(month + "-" + day + "-" + year + time);
         // check dates
-        
-          if (pattern1.matcher(date).matches()) {
-        	  try {
-        		  //check to make sure we have two digits date and month
-        		  SimpleDateFormat dateformat = new SimpleDateFormat("dd-MM-YYYY");
-            	  dateformat.setLenient(false);
-            	  Date dateValue = dateformat.parse(date);
-            	  return dateValue;
-        	  } catch (Exception e) {
-        		  e.printStackTrace();
-        		  return null;
-        	  } 
-          } else if (pattern2.matcher(date).matches()) {
-            	//we have d-m-y format, we transform and return date
-            	  try {
-            		  SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-mm-dd");
-                	  dateformat.setLenient(false);
-                	  Date dateValue = dateformat.parse(date);
-                	  return dateValue;
-            	  } catch (Exception e) {
-            		  e.printStackTrace();
-            		  return null;
-            	  }
-            	  	  
-          } else if (pattern3.matcher(date).matches()) {
-              	//we have d-m-y format, we transform and return date
-              	  try {
-              		  SimpleDateFormat dateformat = new SimpleDateFormat("MM-dd-yyyy");
-                  	  dateformat.setLenient(false);
-                  	  Date dateValue = dateformat.parse(date);
-                  	  return dateValue;
-              	  } catch (Exception e) {
-              		  e.printStackTrace();
-              		  return null;
-              	  }
-              	  	  
-          } else {
-        	  return null;
-          }
-            
-     
-     
-      }
-   
+
+        if (pattern1.matcher(date).matches()) {
+            try {
+                //check to make sure we have two digits date and month
+                SimpleDateFormat dateformat = new SimpleDateFormat("dd-MM-YYYY");
+                dateformat.setLenient(false);
+                Date dateValue = dateformat.parse(date);
+                return dateValue;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+        } else if (pattern2.matcher(date).matches()) {
+            //we have d-m-y format, we transform and return date
+            try {
+                SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-mm-dd");
+                dateformat.setLenient(false);
+                Date dateValue = dateformat.parse(date);
+                return dateValue;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+
+        } else if (pattern3.matcher(date).matches()) {
+            //we have d-m-y format, we transform and return date
+            try {
+                SimpleDateFormat dateformat = new SimpleDateFormat("MM-dd-yyyy");
+                dateformat.setLenient(false);
+                Date dateValue = dateformat.parse(date);
+                return dateValue;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
+
+        } else {
+            return null;
+        }
+
+    }
+
     @Override
     public void updateFieldValue(transactionRecords tr, String newValue) {
         transactionInDAO.updateFieldValue(tr, newValue);
@@ -1074,28 +1062,28 @@ public class transactionInManagerImpl implements transactionInManager {
     @Override
     public void insertValidationError(transactionRecords tr,
             configurationFormFields cff, Integer batchUploadId) {
-    	transactionInDAO.insertValidationError(tr, cff, batchUploadId);
+        transactionInDAO.insertValidationError(tr, cff, batchUploadId);
     }
-    
+
     @Override
     @Transactional
     public Integer getFeedbackReportConnection(int configId, int targetorgId) {
         return transactionInDAO.getFeedbackReportConnection(configId, targetorgId);
     }
 
-	@Override
-	public String formatDateForDB(Date date) {
-		try {
-			SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd");
-			return dateformat.format(date);
-		} catch (Exception e) {
-			return null;
-		}
-	}
+    @Override
+    public String formatDateForDB(Date date) {
+        try {
+            SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd");
+            return dateformat.format(date);
+        } catch (Exception e) {
+            return null;
+        }
+    }
 
-	@Override
+    @Override
     public Date convertLongDate(String dateValue) {
-    	
+
         Date date = null;
         //this checks convert long date such February 2, 2014
         try {
@@ -1106,60 +1094,58 @@ public class transactionInManagerImpl implements transactionInManager {
     }
 
     public boolean chkMySQLDate(String date) {
-   	 
+
         // some regular expression
         String time = "(\\s(([01]?\\d)|(2[0123]))[:](([012345]\\d)|(60))"
-            + "[:](([012345]\\d)|(60)))?"; // with a space before, zero or one time
-     
+                + "[:](([012345]\\d)|(60)))?"; // with a space before, zero or one time
+
         // no check for leap years (Schaltjahr)
         // and 31.02.2006 will also be correct
         String day = "(([12]\\d)|(3[01])|(0?[1-9]))"; // 01 up to 31
         String month = "((1[012])|(0\\d))"; // 01 up to 12
         String year = "\\d{4}";
-     
+
         // define here all date format
         date.replace("/", "-");
         date.replace(".", "-");
         Pattern pattern = Pattern.compile(year + "-" + month + "-" + day + time);
-       
+
         // check dates
-        
-          if (pattern.matcher(date).matches()) {
-        	  try {
-        		  SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd");
-            	  dateformat.setLenient(false);
-            	  dateformat.parse(date);
-            	  return true;
-        	  } catch (Exception e) {
-        		  e.printStackTrace();
-        		  return false;
-        	  }   
-          } else  {
-        	  return false;
-          }
-      }
+        if (pattern.matcher(date).matches()) {
+            try {
+                SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd");
+                dateformat.setLenient(false);
+                dateformat.parse(date);
+                return true;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
 
-	@Override
-	public boolean isValidURL(String url) {
-		UrlValidator urlValidator = new UrlValidator();
-	    if (urlValidator.isValid(url)) {
-	      return true;
-	    } else {
-	      return false;
-	    }
-	}
+    @Override
+    public boolean isValidURL(String url) {
+        UrlValidator urlValidator = new UrlValidator();
+        if (urlValidator.isValid(url)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
-	@Override
-	public boolean processCrosswalk(Integer configId,
-			Integer batchUploadId, configurationDataTranslations cdt) {
-		try {
-		// 1. we get the info for that cw (fieldNo, sourceVal, targetVal rel_crosswalkData)
-		List <CrosswalkData> cdList = configurationManager.getCrosswalkData(cdt.getCrosswalkId());
-		//we null forcw column, we translate and insert there, we then replace
-		nullForSWCol(configId, batchUploadId);
-		for (CrosswalkData cwd : cdList) {
-			executeCWData(configId,  batchUploadId, cdt.getFieldNo(), cwd);
-		}
+    @Override
+    public boolean processCrosswalk(Integer configId, Integer batchUploadId, configurationDataTranslations cdt) {
+        try {
+            // 1. we get the info for that cw (fieldNo, sourceVal, targetVal rel_crosswalkData)
+            List<CrosswalkData> cdList = configurationManager.getCrosswalkData(cdt.getCrosswalkId());
+            //we null forcw column, we translate and insert there, we then replace
+            nullForSWCol(configId, batchUploadId);
+            for (CrosswalkData cwd : cdList) {
+                executeCWData(configId, batchUploadId, cdt.getFieldNo(), cwd);
+            }
 		//we figure out pass/clear option
 		
 		//we replace original F[FieldNo] column with data in forcw
@@ -1174,22 +1160,22 @@ public class transactionInManagerImpl implements transactionInManager {
 		
 	}
 
-	@Override
-	public boolean processMacro (Integer configId,
-			Integer batchUploadId, configurationDataTranslations translation) {
-		// TODO Auto-generated method stub
-		return false;
-	}
+    @Override
+    public boolean processMacro(Integer configId,
+            Integer batchUploadId, configurationDataTranslations translation) {
+        // TODO Auto-generated method stub
+        return false;
+    }
 
-	@Override
-	public void nullForSWCol(Integer configId, Integer batchUploadId) {
-		transactionInDAO.nullForSWCol(configId, batchUploadId);
-	}
+    @Override
+    public void nullForSWCol(Integer configId, Integer batchUploadId) {
+        transactionInDAO.nullForSWCol(configId, batchUploadId);
+    }
 
-	@Override
-	public void executeCWData(Integer configId, Integer batchUploadId, Integer fieldNo, CrosswalkData cwd) {
-		transactionInDAO.executeCWData(configId, batchUploadId, fieldNo, cwd);
-	}
+    @Override
+    public void executeCWData(Integer configId, Integer batchUploadId, Integer fieldNo, CrosswalkData cwd) {
+        transactionInDAO.executeCWData(configId, batchUploadId, fieldNo, cwd);
+    }
 
 	@Override
 	public void updateFieldNoWithCWData(Integer configId,

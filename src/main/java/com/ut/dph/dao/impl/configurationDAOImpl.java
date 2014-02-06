@@ -33,7 +33,6 @@ public class configurationDAOImpl implements configurationDAO {
 
     @Autowired
     private SessionFactory sessionFactory;
-   
 
     /**
      * The 'createConfiguration' function will create a new configuration
@@ -94,9 +93,9 @@ public class configurationDAOImpl implements configurationDAO {
     @Override
     @SuppressWarnings("unchecked")
     public List<configuration> getConfigurationsByOrgId(int orgId, String searchTerm) {
-        
+
         if (!"".equals(searchTerm)) {
-           
+
             //get a list of message type id's that match the term passed in
             List<Integer> msgTypeIdList = new ArrayList<Integer>();
             Criteria findMsgTypes = sessionFactory.getCurrentSession().createCriteria(messageType.class);
@@ -109,27 +108,26 @@ public class configurationDAOImpl implements configurationDAO {
 
             Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configuration.class);
 
-             if (msgTypeIdList.isEmpty()) {
+            if (msgTypeIdList.isEmpty()) {
                 msgTypeIdList.add(0);
             }
 
             criteria.add(Restrictions.eq("orgId", orgId));
             criteria.add(Restrictions.or(
                     Restrictions.in("messageTypeId", msgTypeIdList)
-                )
             )
-            .addOrder(Order.desc("dateCreated"));
+            )
+                    .addOrder(Order.desc("dateCreated"));
 
             return criteria.list();
-        } 
-        else {
+        } else {
             Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configuration.class);
             criteria.add(Restrictions.eq("orgId", orgId));
             criteria.addOrder(Order.desc("dateCreated"));
             return criteria.list();
         }
     }
-    
+
     /**
      * The 'getActiveConfigurationsByOrgId' function will return a list of active configurations for the organization id passed in
      *
@@ -145,7 +143,7 @@ public class configurationDAOImpl implements configurationDAO {
         Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configuration.class);
         criteria.add(Restrictions.eq("orgId", orgId));
         criteria.add(Restrictions.eq("status", true));
-        
+
         return criteria.list();
     }
 
@@ -164,17 +162,17 @@ public class configurationDAOImpl implements configurationDAO {
         Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configuration.class);
         criteria.add(Restrictions.like("configName", configName));
         criteria.add(Restrictions.eq("orgId", orgId));
-        
+
         return (configuration) criteria.uniqueResult();
-    }    
+    }
 
     /**
      * The 'getConfigurations' function will return a list of the configurations in the system
      *
      * @Table	configurations
      *
-     * @param	page	This will hold the value of page being viewed (used for pagination) 
-     * @param    maxResults	This will hold the value of the maximum number of results we want to send back to the list page
+     * @param	page	This will hold the value of page being viewed (used for pagination)
+     * @param maxResults	This will hold the value of the maximum number of results we want to send back to the list page
      *
      * @Return	This function will return a list of configuration objects
      */
@@ -241,7 +239,6 @@ public class configurationDAOImpl implements configurationDAO {
             for (Organization org : orgs) {
                 orgIdList.add(org.getId());
             }
-            
 
             //get a list of message type id's that match the term passed in
             List<Integer> msgTypeIdList = new ArrayList<Integer>();
@@ -366,14 +363,14 @@ public class configurationDAOImpl implements configurationDAO {
 
         return query.list();
     }
-    
+
     /**
      * The 'getFileTypesById' function will return the fileType by the id passed in
-     * 
-     * @param id    The fileTypeId
-     * 
+     *
+     * @param id The fileTypeId
+     *
      * @table ref_fileTypes
-     * 
+     *
      * @return This function will return the file type
      */
     @SuppressWarnings("rawtypes")
@@ -381,8 +378,8 @@ public class configurationDAOImpl implements configurationDAO {
     @Transactional
     public String getFileTypesById(int id) {
         Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT fileType FROM ref_fileTypes where id = :id")
-              .setParameter("id", id);
-        
+                .setParameter("id", id);
+
         String fileType = (String) query.uniqueResult();
 
         return fileType;
@@ -445,7 +442,7 @@ public class configurationDAOImpl implements configurationDAO {
         Query query = sessionFactory.getCurrentSession().createQuery("from Macros order by macro_short_name asc");
         return query.list();
     }
-    
+
     /**
      * The 'getMacroById' function will return the macro details for the passed in macro id.
      *
@@ -456,15 +453,14 @@ public class configurationDAOImpl implements configurationDAO {
     public Macros getMacroById(int macroId) {
         return (Macros) sessionFactory.getCurrentSession().get(Macros.class, macroId);
     }
-    
+
     /**
-     * The 'getAllConnections' function will return the list of configuration connections
-     * in the system.
+     * The 'getAllConnections' function will return the list of configuration connections in the system.
      *
      * @Table	configurationConnections
      *
-     * @param	page        This will hold the value of page being viewed (used for pagination) 
-     * @param   maxResults  This will hold the value of the maximum number of results we want to send back to the list page
+     * @param	page This will hold the value of page being viewed (used for pagination)
+     * @param maxResults This will hold the value of the maximum number of results we want to send back to the list page
      *
      * @Return	This function will return a list of configurationConnection objects
      */
@@ -490,13 +486,12 @@ public class configurationDAOImpl implements configurationDAO {
         List<configurationConnection> connections = query.list();
         return connections;
     }
-    
+
     /**
-     * The 'getConnectionsByConfiguration' will return a list of target connections
-     * for a passed in configuration;
-     * 
-     * @param configId  The id of the configuration to search connections for.
-     * 
+     * The 'getConnectionsByConfiguration' will return a list of target connections for a passed in configuration;
+     *
+     * @param configId The id of the configuration to search connections for.
+     *
      * @return This function will return a list of configurationConnection objects
      */
     @Override
@@ -504,16 +499,16 @@ public class configurationDAOImpl implements configurationDAO {
     public List<configurationConnection> getConnectionsByConfiguration(int configId) {
         Query query = sessionFactory.getCurrentSession().createQuery("from configurationConnection where sourceConfigId = :configId");
         query.setParameter("configId", configId);
-        
+
         List<configurationConnection> connections = query.list();
         return connections;
     }
-    
+
     /**
      * The 'saveConnection' function will save the new connection
-     * 
-     * @param connection    The object holding the new connection
-     * 
+     *
+     * @param connection The object holding the new connection
+     *
      * @return This function does not return anything.
      */
     @Override
@@ -524,17 +519,16 @@ public class configurationDAOImpl implements configurationDAO {
         connectionId = (Integer) sessionFactory.getCurrentSession().save(connection);
 
         return connectionId;
-        
+
     }
-    
+
     /**
-     * The 'saveConnectionSenders' function will save the list of users selected
-     * to be authorized to send transactions for a configuration connection.
-     * 
+     * The 'saveConnectionSenders' function will save the list of users selected to be authorized to send transactions for a configuration connection.
+     *
      * @table configurationConnectionSenders
-     * 
+     *
      * @param senders The configurationConnectionSenders object
-     * 
+     *
      * @return This function does not return anything
      */
     @Override
@@ -542,15 +536,14 @@ public class configurationDAOImpl implements configurationDAO {
     public void saveConnectionSenders(configurationConnectionSenders senders) {
         sessionFactory.getCurrentSession().save(senders);
     }
-  
+
     /**
-     * The 'saveConnectionReceivers' function will save the list of users selected
-     * to be authorized to receive transactions for a configuration connection.
-     * 
+     * The 'saveConnectionReceivers' function will save the list of users selected to be authorized to receive transactions for a configuration connection.
+     *
      * @table configurationConnectionReceivers
-     * 
+     *
      * @param receivers The configurationConnectionSenders object
-     * 
+     *
      * @return This function does not return anything
      */
     @Override
@@ -558,7 +551,7 @@ public class configurationDAOImpl implements configurationDAO {
     public void saveConnectionReceivers(configurationConnectionReceivers receivers) {
         sessionFactory.getCurrentSession().save(receivers);
     }
-    
+
     /**
      * The 'getConnection' function will return a connection based on the id passed in.
      *
@@ -572,13 +565,12 @@ public class configurationDAOImpl implements configurationDAO {
     public configurationConnection getConnection(int connectionId) {
         return (configurationConnection) sessionFactory.getCurrentSession().get(configurationConnection.class, connectionId);
     }
-    
+
     /**
-     * The 'getConnectionSenders' function will return a list of authorized users who are set up
-     * to create new messages for the passed in connectionId
-     * 
+     * The 'getConnectionSenders' function will return a list of authorized users who are set up to create new messages for the passed in connectionId
+     *
      * @param connectionId The id of the configuration connection to get a list of users
-     * 
+     *
      * @return This function will return a list of configurationConnectionSenders objects
      */
     @Override
@@ -586,16 +578,15 @@ public class configurationDAOImpl implements configurationDAO {
     public List<configurationConnectionSenders> getConnectionSenders(int connectionId) {
         Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configurationConnectionSenders.class);
         criteria.add(Restrictions.eq("connectionId", connectionId));
-        
+
         return criteria.list();
     }
-  
+
     /**
-     * The 'getConnectionReceivers' function will return a list of authorized users who are set up
-     * to receive messages for the passed in connectionId
-     * 
+     * The 'getConnectionReceivers' function will return a list of authorized users who are set up to receive messages for the passed in connectionId
+     *
      * @param connectionId The id of the configuration connection to get a list of users
-     * 
+     *
      * @return This function will return a list of configurationConnectionSenders objects
      */
     @Override
@@ -603,15 +594,15 @@ public class configurationDAOImpl implements configurationDAO {
     public List<configurationConnectionReceivers> getConnectionReceivers(int connectionId) {
         Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configurationConnectionReceivers.class);
         criteria.add(Restrictions.eq("connectionId", connectionId));
-        
+
         return criteria.list();
     }
-    
+
     /**
      * The 'removeConnectionSenders' function will remove the authorized senders for the passed in connectionId.
-     * 
+     *
      * @param connectionId The connection Id to remove senders for
-     * 
+     *
      * @return THis function does not return anything
      */
     @Override
@@ -622,12 +613,12 @@ public class configurationDAOImpl implements configurationDAO {
 
         query.executeUpdate();
     }
-  
+
     /**
      * The 'removeConnectionReceivers' function will remove the authorized receivers for the passed in connectionId.
-     * 
+     *
      * @param connectionId The connection Id to remove receivers for
-     * 
+     *
      * @return THis function does not return anything
      */
     @Override
@@ -638,13 +629,12 @@ public class configurationDAOImpl implements configurationDAO {
 
         query.executeUpdate();
     }
-    
+
     /**
-     * The 'updateConnection' function will update the status of the
-     * passed in connection
-     * 
-     * @param connection    The object holding the connection
-     * 
+     * The 'updateConnection' function will update the status of the passed in connection
+     *
+     * @param connection The object holding the connection
+     *
      * @return This function does not return anything.
      */
     @Override
@@ -652,8 +642,6 @@ public class configurationDAOImpl implements configurationDAO {
     public void updateConnection(configurationConnection connection) {
         sessionFactory.getCurrentSession().update(connection);
     }
-
-
 
     /**
      * The 'getScheduleDetails' function will return the details of the schedule for the passed in configuration id and transport method.
@@ -682,37 +670,33 @@ public class configurationDAOImpl implements configurationDAO {
     public void saveSchedule(configurationSchedules scheduleDetails) {
         sessionFactory.getCurrentSession().saveOrUpdate(scheduleDetails);
     }
-    
-    
+
     /**
-     * The 'getMessageSpecs' function will return the message specs for the passing configuration
-     * ID.
-     * 
-     * @param configId  The configuration Id to find message specs for
-     * 
-     * @return  This function will return the configuartionMessageSpec object.
+     * The 'getMessageSpecs' function will return the message specs for the passing configuration ID.
+     *
+     * @param configId The configuration Id to find message specs for
+     *
+     * @return This function will return the configuartionMessageSpec object.
      */
     @Override
     public configurationMessageSpecs getMessageSpecs(int configId) {
         Query query = sessionFactory.getCurrentSession().createQuery("from configurationMessageSpecs where configId = :configId");
         query.setParameter("configId", configId);
-        
-         return (configurationMessageSpecs) query.uniqueResult();
+
+        return (configurationMessageSpecs) query.uniqueResult();
     }
-    
+
     /**
-     * The 'updateMessageSpecs' function will save/update the configuration message
-     * specs.
-     * 
-     * @param   messageSpecs The object that will hold the values from the message spec form
-     * @param   clearField   The value that will determine to clear out existing form fields
-     *                       if a new file is uploaded.
-     * 
+     * The 'updateMessageSpecs' function will save/update the configuration message specs.
+     *
+     * @param messageSpecs The object that will hold the values from the message spec form
+     * @param clearField The value that will determine to clear out existing form fields if a new file is uploaded.
+     *
      * @return This function does not return anything.
      */
     @Override
     public void updateMessageSpecs(configurationMessageSpecs messageSpecs, int transportDetailId, int clearFields) {
-        
+
         //if clearFields == 1 then we need to clear out the configuration form fields, mappings and data
         //translations. This will allow the admin to change the configuration transport method after
         //one was previously selected. This will only be available while the configuration is not active.
@@ -721,128 +705,123 @@ public class configurationDAOImpl implements configurationDAO {
             Query deleteTranslations = sessionFactory.getCurrentSession().createSQLQuery("DELETE from configurationDataTranslations where configId = :configId");
             deleteTranslations.setParameter("configId", messageSpecs.getconfigId());
             deleteTranslations.executeUpdate();
-            
+
             //Delete the existing form fields
             Query deleteFields = sessionFactory.getCurrentSession().createSQLQuery("DELETE from configurationFormFields where configId = :configId and transportDetailId = :transportDetailId");
             deleteFields.setParameter("configId", messageSpecs.getconfigId());
             deleteFields.setParameter("transportDetailId", transportDetailId);
             deleteFields.executeUpdate();
         }
-        
+
         sessionFactory.getCurrentSession().saveOrUpdate(messageSpecs);
-        
+
     }
-    
+
     /**
-     * The 'getActiveConfigurationsByUserId' function will return a list of configurations
-     * set up the passed in userId and passed in transport method
-     * 
-     * @param   userId          The id of the logged in user
-     * @param   transportMethod The id of the transport method to find configurations
-     *                          1 = File Upload
-     *                          2 = ERG
-     * 
+     * The 'getActiveConfigurationsByUserId' function will return a list of configurations set up the passed in userId and passed in transport method
+     *
+     * @param userId The id of the logged in user
+     * @param transportMethod The id of the transport method to find configurations 1 = File Upload 2 = ERG
+     *
      * @return This function will return a list of ERG configurations.
      */
     @Override
     public List<configuration> getActiveConfigurationsByUserId(int userId, int transportMethod) {
-        
+
         /* Find all SENDER connections for the passed in user */
         Criteria findAuthConnections = sessionFactory.getCurrentSession().createCriteria(configurationConnectionSenders.class);
         findAuthConnections.add(Restrictions.eq("userId", userId));
-        
+
         /* This variables (senderConnections) will hold the list of authorized connections */
         List<configurationConnectionSenders> senderConnections = findAuthConnections.list();
-        
+
         /* 
-        Create an emtpy array that will hold the list of configurations associated to the
-        found connections.
-        */
+         Create an emtpy array that will hold the list of configurations associated to the
+         found connections.
+         */
         List<Integer> senderConfigList = new ArrayList<Integer>();
-        
+
         if (senderConnections.isEmpty()) {
             senderConfigList.add(0);
-        }
-        else {
+        } else {
             /* Search the connections by connectionId to pull the sourceConfigId */
-            for(configurationConnectionSenders connection : senderConnections) {
-               Criteria findConnectionDetails = sessionFactory.getCurrentSession().createCriteria(configurationConnection.class);
-               findConnectionDetails.add(Restrictions.eq("id", connection.getconnectionId()));
-               configurationConnection connectionDetails = (configurationConnection) findConnectionDetails.uniqueResult();
-               
-               /* Add the sourceConfigId to the array */
-               senderConfigList.add(connectionDetails.getsourceConfigId());
-               findConnectionDetails = null;
+            for (configurationConnectionSenders connection : senderConnections) {
+                Criteria findConnectionDetails = sessionFactory.getCurrentSession().createCriteria(configurationConnection.class);
+                findConnectionDetails.add(Restrictions.eq("id", connection.getconnectionId()));
+                configurationConnection connectionDetails = (configurationConnection) findConnectionDetails.uniqueResult();
+
+                /* Add the sourceConfigId to the array */
+                senderConfigList.add(connectionDetails.getsourceConfigId());
+                findConnectionDetails = null;
             }
         }
-        
+
         /* 
-        Query to get a list of all ERG configurations that the logged in
-        user is authorized to create
-        */
+         Query to get a list of all ERG configurations that the logged in
+         user is authorized to create
+         */
         List<Integer> ergConfigList = new ArrayList<Integer>();
         Criteria findERGConfigs = sessionFactory.getCurrentSession().createCriteria(configurationTransport.class);
-        findERGConfigs.add(Restrictions.eq("transportMethodId",transportMethod)
-        ).add(Restrictions.and(Restrictions.in("configId",senderConfigList))); 
-       
-        
+        findERGConfigs.add(Restrictions.eq("transportMethodId", transportMethod)
+        ).add(Restrictions.and(Restrictions.in("configId", senderConfigList)));
+
         List<configurationTransport> ergConfigs = findERGConfigs.list();
 
         for (configurationTransport config : ergConfigs) {
             ergConfigList.add(config.getconfigId());
         }
-        
+
         if (ergConfigList.isEmpty()) {
             ergConfigList.add(0);
         }
-        
+
         /*
-        Finally query the configuration table to get all configurations in the authorized list
-        of configuration Ids.
-        */
+         Finally query the configuration table to get all configurations in the authorized list
+         of configuration Ids.
+         */
         Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configuration.class);
         criteria.add(Restrictions.eq("status", true));
         criteria.add(Restrictions.eq("sourceType", 1));
         criteria.add(Restrictions.and(
                 Restrictions.in("id", ergConfigList)
         ));
-        
+
         return criteria.list();
-        
+
     }
 
-	@Override
-	@Transactional
-	@SuppressWarnings("unchecked")
-	public List<configurationDataTranslations> getDataTranslationsWithFieldNo(
-			int configId) {
-		Query query = sessionFactory
-				.getCurrentSession()
-				.createSQLQuery(
-						"select configurationDataTranslations.*, fieldNo from configurationDataTranslations, configurationFormFields"
-						+ " where configurationDataTranslations.fieldId = configurationFormFields.id "
-						+ " and configurationDataTranslations.configId = :configId order by processorder asc;")
-						.setResultTransformer(
-						Transformers.aliasToBean(configurationDataTranslations.class))
-				.setParameter("configId", configId);
-		
-		List<configurationDataTranslations> cdtList = query.list();
-		
-		return cdtList;
-	}
+    @Override
+    @Transactional
+    @SuppressWarnings("unchecked")
+    public List<configurationDataTranslations> getDataTranslationsWithFieldNo(
+            int configId) {
+        Query query = sessionFactory
+                .getCurrentSession()
+                .createSQLQuery(
+                        "select configurationDataTranslations.*, fieldNo from configurationDataTranslations, configurationFormFields"
+                        + " where configurationDataTranslations.fieldId = configurationFormFields.id "
+                        + " and configurationDataTranslations.configId = :configId order by processorder asc;")
+                .setResultTransformer(
+                        Transformers.aliasToBean(configurationDataTranslations.class))
+                .setParameter("configId", configId);
 
-	@Override
-	@Transactional
-	@SuppressWarnings("unchecked")
-	public List<CrosswalkData> getCrosswalkData(int cwId) {
-		try { 
-		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(CrosswalkData.class);
-	        criteria.add(Restrictions.eq("crosswalkId", cwId));
-	        
-	        return criteria.list();
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
+        List<configurationDataTranslations> cdtList = query.list();
+
+        return cdtList;
+    }
+
+    @Override
+    @Transactional
+    @SuppressWarnings("unchecked")
+    public List<CrosswalkData> getCrosswalkData(int cwId) {
+        try {
+            Criteria criteria = sessionFactory.getCurrentSession().createCriteria(CrosswalkData.class);
+            criteria.add(Restrictions.eq("crosswalkId", cwId));
+
+            return criteria.list();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }
