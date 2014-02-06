@@ -6,7 +6,10 @@
 
 package com.ut.dph.jobs;
 
+import java.util.Date;
+
 import com.ut.dph.service.transactionOutManager;
+
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -25,8 +28,8 @@ public class processOutputFiles implements Job {
     @Override
     public void execute(JobExecutionContext context)  throws JobExecutionException {
         System.out.println("Job processOutputFiles is runing");
-        transactionOutManager.processOutputRecords(0);
-        
+        System.out.println(new Date());
+        transactionOutManager.processOutputRecords(0);   
     }
 
 }
