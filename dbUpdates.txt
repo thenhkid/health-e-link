@@ -14,3 +14,6 @@ ADD COLUMN `forCW` TEXT NULL AFTER `dateCreated`;
 DELETE FROM `universalTranslator`.`lu_ProcessStatus` WHERE `id`='26';
 DELETE FROM `universalTranslator`.`lu_ProcessStatus` WHERE `id`='27';
 
+/** grace 2.6.14 **/
+ALTER TABLE `universalTranslator`.`transactionTranslatedOut` 
+ADD COLUMN `forCW` TEXT NULL AFTER `dateCreated`;

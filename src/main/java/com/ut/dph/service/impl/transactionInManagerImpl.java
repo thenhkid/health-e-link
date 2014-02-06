@@ -1181,7 +1181,6 @@ public class transactionInManagerImpl implements transactionInManager {
 	public void updateFieldNoWithCWData(Integer configId,
 			Integer batchUploadId, Integer fieldNo, Integer passClear) {
 			transactionInDAO.updateFieldNoWithCWData(configId, batchUploadId, fieldNo, passClear);
-		
 	}
 
 }
