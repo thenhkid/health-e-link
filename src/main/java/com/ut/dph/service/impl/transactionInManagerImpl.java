@@ -1159,15 +1159,15 @@ public class transactionInManagerImpl implements transactionInManager {
 		nullForSWCol(configId, batchUploadId);
 		for (CrosswalkData cwd : cdList) {
 			executeCWData(configId,  batchUploadId, cdt.getFieldNo(), cwd);
-			
 		}
-		
 		//we figure out pass/clear option
 		
 		//we replace original F[FieldNo] column with data in forcw
+		updateFieldNoWithCWData(configId,  batchUploadId, cdt.getFieldNo());
 		
 		return true;
 		} catch (Exception e) {
+			e.printStackTrace();
 			return false;
 		}
 		
@@ -1189,6 +1189,13 @@ public class transactionInManagerImpl implements transactionInManager {
 	@Override
 	public void executeCWData(Integer configId, Integer batchUploadId, Integer fieldNo, CrosswalkData cwd) {
 		transactionInDAO.executeCWData(configId, batchUploadId, fieldNo, cwd);
+	}
+
+	@Override
+	public void updateFieldNoWithCWData(Integer configId,
+			Integer batchUploadId, Integer fieldNo) {
+			transactionInDAO.updateFieldNoWithCWData(configId, batchUploadId, fieldNo);
+		
 	}
 
 }

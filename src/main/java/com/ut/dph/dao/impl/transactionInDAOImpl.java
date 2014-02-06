@@ -1483,6 +1483,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 	}
 
 	@Override
+	@Transactional
 	public void executeCWData(Integer configId, Integer batchUploadId, Integer fieldNo,
 			CrosswalkData cwd) {
 		 String sql = "update transactiontranslatedin set forcw = :targetValue where "
@@ -1498,9 +1499,29 @@ public class transactionInDAOImpl implements transactionInDAO {
 		        try {
 		            updateData.executeUpdate();
 		        } catch (Exception ex) {
-		            System.err.println("nullForSWCol failed." + ex);
+		            System.err.println("executeCWData failed." + ex);
 		        }
 		
 	}
+
+	@Override
+	@Transactional
+	public void updateFieldNoWithCWData(Integer configId,
+			Integer batchUploadId, Integer fieldNo) {
+
+		String sql = "update transactiontranslatedIn "
+				+ " JOIN (SELECT id from transactionIn WHERE configId = :configId"
+				+ " and batchId = :batchUploadId) as ti ON transactiontranslatedIn.transactionInId = ti.id "
+				+ " SET transactiontranslatedIn.F"+ fieldNo + " = forcw where forcw is not null;";
+	        
+	        Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+	                .setParameter("batchUploadId", batchUploadId)
+	                .setParameter("configId", configId);
+	        try {
+	            updateData.executeUpdate();
+	        } catch (Exception ex) {
+	            System.err.println("updateFieldNoWithCWData failed." + ex);
+	        }
+		}
 
 }

@@ -138,4 +138,6 @@ public interface transactionInDAO {
     void nullForSWCol(Integer configId, Integer batchUploadId);
     
     void executeCWData(Integer configId, Integer batchUploadId, Integer fieldNo, CrosswalkData cwd);
+    
+    void updateFieldNoWithCWData (Integer configId, Integer batchUploadId, Integer fieldNo);
 }

@@ -183,4 +183,5 @@ public interface transactionInManager {
     
     void executeCWData(Integer configId, Integer batchUploadId, Integer fieldNo, CrosswalkData cwd);
 
+    void updateFieldNoWithCWData (Integer configId, Integer batchUploadId, Integer fieldNo);
 }
