@@ -139,5 +139,5 @@ public interface transactionInDAO {
     
     void executeCWData(Integer configId, Integer batchUploadId, Integer fieldNo, CrosswalkData cwd);
     
-    void updateFieldNoWithCWData (Integer configId, Integer batchUploadId, Integer fieldNo);
+    void updateFieldNoWithCWData (Integer configId, Integer batchUploadId, Integer fieldNo, Integer passClear);
 }

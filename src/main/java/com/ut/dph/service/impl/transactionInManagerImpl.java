@@ -1163,7 +1163,7 @@ public class transactionInManagerImpl implements transactionInManager {
 		//we figure out pass/clear option
 		
 		//we replace original F[FieldNo] column with data in forcw
-		updateFieldNoWithCWData(configId,  batchUploadId, cdt.getFieldNo());
+		updateFieldNoWithCWData(configId,  batchUploadId, cdt.getFieldNo(), cdt.getPassClear());
 		
 		return true;
 		} catch (Exception e) {
@@ -1193,8 +1193,8 @@ public class transactionInManagerImpl implements transactionInManager {
 
 	@Override
 	public void updateFieldNoWithCWData(Integer configId,
-			Integer batchUploadId, Integer fieldNo) {
-			transactionInDAO.updateFieldNoWithCWData(configId, batchUploadId, fieldNo);
+			Integer batchUploadId, Integer fieldNo, Integer passClear) {
+			transactionInDAO.updateFieldNoWithCWData(configId, batchUploadId, fieldNo, passClear);
 		
 	}
 

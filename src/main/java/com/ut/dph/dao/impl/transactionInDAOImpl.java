@@ -1507,13 +1507,16 @@ public class transactionInDAOImpl implements transactionInDAO {
 	@Override
 	@Transactional
 	public void updateFieldNoWithCWData(Integer configId,
-			Integer batchUploadId, Integer fieldNo) {
+			Integer batchUploadId, Integer fieldNo, Integer passClear) {
 
 		String sql = "update transactiontranslatedIn "
 				+ " JOIN (SELECT id from transactionIn WHERE configId = :configId"
 				+ " and batchId = :batchUploadId) as ti ON transactiontranslatedIn.transactionInId = ti.id "
-				+ " SET transactiontranslatedIn.F"+ fieldNo + " = forcw where forcw is not null;";
-	        
+				+ " SET transactiontranslatedIn.F"+ fieldNo + " = forcw ";
+				if (passClear == 1) {
+					// 1 is pass, we leave original values in fieldNo alone
+					sql = sql + "where forcw is not null;";
+				}
 	        Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
 	                .setParameter("batchUploadId", batchUploadId)
 	                .setParameter("configId", configId);
