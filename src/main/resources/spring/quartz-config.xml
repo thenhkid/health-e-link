@@ -20,7 +20,7 @@
                 <job-name>ProcessOutputFiles</job-name>
                 <job-group>processGroup</job-group>
                 <!-- It will run every 60 seconds -->
-                <cron-expression>0/60 * * * * ?</cron-expression>
+                <cron-expression>0/59 * * * * ?</cron-expression>
             </cron>
         </trigger>
     </schedule>
