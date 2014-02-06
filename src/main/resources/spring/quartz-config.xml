@@ -19,7 +19,7 @@
                 <name>60SecTrigger</name>
                 <job-name>ProcessOutputFiles</job-name>
                 <job-group>processGroup</job-group>
-                <!-- It will run every 60 seconds -->
+                <!-- It will run every minute seconds -->
                 <cron-expression>0 0/1 * * * ?</cron-expression>
             </cron>
         </trigger>
