@@ -8,10 +8,12 @@ package com.ut.dph.service.impl;
 
 import com.ut.dph.dao.transactionOutDAO;
 import com.ut.dph.model.batchDownloads;
+import com.ut.dph.model.configurationDataTranslations;
 import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionOutNotes;
 import com.ut.dph.model.transactionOutRecords;
 import com.ut.dph.model.transactionTarget;
+import com.ut.dph.service.configurationManager;
 import com.ut.dph.service.transactionOutManager;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,10 @@ public class transactionOutManagerImpl implements transactionOutManager {
     
     @Autowired
     private transactionOutDAO transactionOutDAO;
+    
+    @Autowired
+    private configurationManager configurationManager;
+
     
     @Override
     @Transactional
@@ -142,4 +148,37 @@ public class transactionOutManagerImpl implements transactionOutManager {
         transactionOutDAO.updateTargetBatchStatus(batchDLId, statusId, timeField);
     }
 
+    /**
+     * The 'translateTargetRecords' function will attempt to translate the target records based on the
+     * translation details set up in the target configuration.
+     * 
+     * @param transactionTargetId   The id of the target transaction to be translated
+     * @param configId              The id of the target configuration.
+     * 
+     * @return This function will return either TRUE (If translation completed with no errors)
+     *         OR FALSE (If translation failed for any reason)
+     */
+    @Override
+    @Transactional
+    public boolean translateTargetRecords(int transactionTargetId, int configId) {
+        
+        boolean translated = false;
+        
+        /* Need to get the configured data translations */
+        List<configurationDataTranslations> dataTranslations = configurationManager.getDataTranslationsWithFieldNo(configId);
+        
+        for (configurationDataTranslations cdt : dataTranslations) {
+            if (cdt.getCrosswalkId() != 0) {
+                   translated = processCrosswalk (configId, batchUploadId, cdt);
+            } 
+            else if (cdt.getMacroId()!= 0)  {
+                   translated = processMacro (configId, batchUploadId, cdt);
+            }
+        }
+        
+        
+        
+        return true;
+    }
+    
 }

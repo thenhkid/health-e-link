@@ -116,6 +116,9 @@ public class scheduledTaskController {
                     
                     /* Update the status of the target batch to  TBP (Target Batch Creating in process) (ID = 25) */
                     transactionOutManager.updateTargetBatchStatus(transaction.getbatchDLId(),25,"");
+                    
+                    /* Need to start the transaction translations */
+                    boolean recordsTranslated = transactionOutManager.translateTargetRecords(transaction.getId(), transaction.getconfigId());
                 }
                 
             
