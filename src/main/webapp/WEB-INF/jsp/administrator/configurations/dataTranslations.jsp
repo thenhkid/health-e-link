@@ -112,10 +112,10 @@
                             <label class="control-label" for="passclear">Pass/Clear Error</label>
                             <div>
                                 <label class="radio-inline">
-                                    <input type="radio" id="passclear" value="1" checked />Pass Error 
+                                    <input type="radio" name="passClear" class="passclear" value="1" checked />Pass Error 
                                 </label>
                                 <label class="radio-inline">
-                                    <input type="radio" id="passclear" value="2" />Clear Error
+                                    <input type="radio" name="passClear" class="passclear" value="2" />Clear Error
                                 </label>
                             </div>
                         </div>
