@@ -715,11 +715,47 @@ public class transactionOutDAOImpl implements transactionOutDAO {
                 .setParameter("transactionTargetId", transactionTargetId)
                 .setParameter("configId", configId);
             
-            insertData.executeUpdate();
+            try {
+                insertData.executeUpdate();
+                return true;
+            } 
+            catch (Exception ex) {
+                return false;
+            }
             
         }
-        
-        return true;
-        
+        else {
+            return false;
+        }
+    }
+    
+    /**
+     * The 'updateTargetBatchStatus' function will update the status of the passed in batch downloadId
+     * 
+     * @param batchDLId The id of the batch download
+     * @param statusId  The id of the new status
+     * @param timeField 
+     */
+    @Override
+    @Transactional
+    public void updateTargetBatchStatus(Integer batchDLId, Integer statusId, String timeField) {
+
+        String sql = "update batchDownloads set statusId = :statusId ";
+        if (!timeField.equalsIgnoreCase("")) {
+            sql = sql + ", " + timeField + " = CURRENT_TIMESTAMP";
+        } else {
+            // we reset time
+            sql = sql + ", startDateTime = null, endDateTime = null";
+        }
+        sql = sql + " where id = :id ";
+        Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                .setParameter("statusId", statusId)
+                .setParameter("id", batchDLId);
+        try {
+            updateData.executeUpdate();
+        } catch (Exception ex) {
+            System.err.println("updateTargetBatchStatus failed." + ex);
+        }
+
     }
 }

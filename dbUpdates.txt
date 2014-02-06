@@ -8,3 +8,9 @@ CHANGE COLUMN `providerId` `providerId` VARCHAR(45) NULL DEFAULT NULL ;
 /** grace 02.06.2014 **/
 ALTER TABLE `universalTranslator`.`transactionTranslatedIn` 
 ADD COLUMN `forCW` TEXT NULL AFTER `dateCreated`;
+
+/** Chad 2.6.2014 @ 10:40 AM **/
+/** Remove duplicates **/
+DELETE FROM `universalTranslator`.`lu_ProcessStatus` WHERE `id`='26';
+DELETE FROM `universalTranslator`.`lu_ProcessStatus` WHERE `id`='27';
+

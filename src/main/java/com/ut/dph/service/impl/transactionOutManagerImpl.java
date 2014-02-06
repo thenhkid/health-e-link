@@ -135,5 +135,11 @@ public class transactionOutManagerImpl implements transactionOutManager {
     public boolean processOutPutTransactions(int transactionTargetId, int configId, int transactionInId) {
         return transactionOutDAO.processOutPutTransactions(transactionTargetId, configId, transactionInId);
     }
+    
+    @Override
+    @Transactional
+    public void updateTargetBatchStatus(Integer batchDLId, Integer statusId, String timeField) {
+        transactionOutDAO.updateTargetBatchStatus(batchDLId, statusId, timeField);
+    }
 
 }
