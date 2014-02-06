@@ -1465,13 +1465,26 @@ public class transactionInDAOImpl implements transactionInDAO {
 
     @Override
     @Transactional
-    public void nullForSWCol(Integer configId, Integer batchUploadId) {
-        String sql = "update transactiontranslatedin set forcw = null where "
-                + "transactionInId in (select id from transactionIn where configId = :configId "
-                + " and batchId = :batchUploadId);";
-
+    public void nullForSWCol(Integer configId, Integer batchId, boolean foroutboundProcessing) {
+        
+        String sql;
+        
+        if(foroutboundProcessing == false) {
+        
+            sql = "update transactionTranslatedIn set forcw = null where "
+                  + "transactionInId in (select id from transactionIn where configId = :configId "
+                  + " and batchId = :batchId);";
+        
+        }
+        else {
+             sql = "update transactionTranslatedOut set forcw = null where "
+                   + "transactionTargetId in (select id from transactionTarget where configId = :configId "
+                   + " and batchDLId = :batchId);";
+        }
+        
+       
         Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
-                .setParameter("batchUploadId", batchUploadId)
+                .setParameter("batchId", batchId)
                 .setParameter("configId", configId);
         try {
             updateData.executeUpdate();
@@ -1482,17 +1495,28 @@ public class transactionInDAOImpl implements transactionInDAO {
 
     @Override
     @Transactional
-    public void executeCWData(Integer configId, Integer batchUploadId, Integer fieldNo,
-            CrosswalkData cwd) {
-        String sql = "update transactiontranslatedin set forcw = :targetValue where "
+    public void executeCWData(Integer configId, Integer batchId, Integer fieldNo, CrosswalkData cwd, boolean foroutboundProcessing) {
+        
+        String sql;
+        
+        if(foroutboundProcessing == false) {
+            sql = "update transactionTranslatedIn set forcw = :targetValue where "
                 + "F" + fieldNo + " = :sourceValue and transactionInId in "
                 + "(select id from transactionIn where configId = :configId "
-                + " and batchId = :batchUploadId);";
+                + " and batchId = :batchId);";
+        }
+        else {
+            sql = "update transactionTranslatedOut set forcw = :targetValue where "
+                + "F" + fieldNo + " = :sourceValue and transactionTargetId in "
+                + "(select id from transactionTarget where configId = :configId "
+                + " and batchDLId = :batchId);";
+        }
+        
 
         Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
                 .setParameter("targetValue", cwd.getTargetValue())
                 .setParameter("sourceValue", cwd.getSourceValue())
-                .setParameter("batchUploadId", batchUploadId)
+                .setParameter("batchId", batchId)
                 .setParameter("configId", configId);
         try {
             updateData.executeUpdate();
@@ -1504,19 +1528,29 @@ public class transactionInDAOImpl implements transactionInDAO {
 
     @Override
     @Transactional
-    public void updateFieldNoWithCWData(Integer configId,
-            Integer batchUploadId, Integer fieldNo, Integer passClear) {
-
-        String sql = "update transactiontranslatedIn "
+    public void updateFieldNoWithCWData(Integer configId, Integer batchId, Integer fieldNo, Integer passClear, boolean foroutboundProcessing) {
+        
+        String sql;
+        
+        if(foroutboundProcessing == false) {
+            sql = "update transactionTranslatedIn "
                 + " JOIN (SELECT id from transactionIn WHERE configId = :configId"
-                + " and batchId = :batchUploadId) as ti ON transactiontranslatedIn.transactionInId = ti.id "
-                + " SET transactiontranslatedIn.F" + fieldNo + " = forcw ";
+                + " and batchId = :batchId) as ti ON transactionTranslatedIn.transactionInId = ti.id "
+                + " SET transactionTranslatedIn.F" + fieldNo + " = forcw ";
+        }
+        else {
+            sql = "update transactionTranslatedOut "
+                + " JOIN (SELECT id from transactionTarget WHERE configId = :configId"
+                + " and batchDLId = :batchId) as ti ON transactionTranslatedOut.transactionTargetId = ti.id "
+                + " SET transactionTranslatedOut.F" + fieldNo + " = forcw ";
+        }
+
         if (passClear == 1) {
             // 1 is pass, we leave original values in fieldNo alone
             sql = sql + "where forcw is not null;";
         }
         Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
-                .setParameter("batchUploadId", batchUploadId)
+                .setParameter("batchId", batchId)
                 .setParameter("configId", configId);
         try {
             updateData.executeUpdate();

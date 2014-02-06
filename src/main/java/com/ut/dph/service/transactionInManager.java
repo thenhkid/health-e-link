@@ -175,13 +175,13 @@ public interface transactionInManager {
 	
     boolean isValidURL(String url);
     
-    boolean processCrosswalk (Integer configId, Integer batchUploadId, configurationDataTranslations translation);
+    boolean processCrosswalk (Integer configId, Integer batchId, configurationDataTranslations translation, boolean foroutboundProcessing);
     
     boolean processMacro (Integer configId, Integer batchUploadId, configurationDataTranslations translation);
     
-    void nullForSWCol(Integer configId, Integer batchUploadId);
+    void nullForSWCol(Integer configId, Integer batchId, boolean foroutboundProcessing);
     
-    void executeCWData(Integer configId, Integer batchUploadId, Integer fieldNo, CrosswalkData cwd);
+    void executeCWData(Integer configId, Integer batchId, Integer fieldNo, CrosswalkData cwd, boolean foroutboundProcessing);
 
-    void updateFieldNoWithCWData (Integer configId, Integer batchUploadId, Integer fieldNo, Integer passClear);
+    void updateFieldNoWithCWData (Integer configId, Integer batchId, Integer fieldNo, Integer passClear, boolean foroutboundProcessing);
 }

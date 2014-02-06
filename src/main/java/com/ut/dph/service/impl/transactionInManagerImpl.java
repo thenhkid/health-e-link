@@ -569,7 +569,7 @@ public class transactionInManagerImpl implements transactionInManager {
                 List<configurationDataTranslations> dataTranslations = configurationManager.getDataTranslationsWithFieldNo(configId);
                 for (configurationDataTranslations cdt : dataTranslations) {
                     if (cdt.getCrosswalkId() != 0) {
-                        successfulBatch = processCrosswalk(configId, batchUploadId, cdt);
+                        successfulBatch = processCrosswalk(configId, batchUploadId, cdt, false);
                     } else if (cdt.getMacroId() != 0) {
                         successfulBatch = processMacro(configId, batchUploadId, cdt);
                     }
@@ -1137,19 +1137,19 @@ public class transactionInManagerImpl implements transactionInManager {
     }
 
     @Override
-    public boolean processCrosswalk(Integer configId, Integer batchUploadId, configurationDataTranslations cdt) {
+    public boolean processCrosswalk(Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing) {
         try {
             // 1. we get the info for that cw (fieldNo, sourceVal, targetVal rel_crosswalkData)
             List<CrosswalkData> cdList = configurationManager.getCrosswalkData(cdt.getCrosswalkId());
             //we null forcw column, we translate and insert there, we then replace
-            nullForSWCol(configId, batchUploadId);
+            nullForSWCol(configId, batchId, foroutboundProcessing);
             for (CrosswalkData cwd : cdList) {
-                executeCWData(configId, batchUploadId, cdt.getFieldNo(), cwd);
+                executeCWData(configId, batchId, cdt.getFieldNo(), cwd, foroutboundProcessing);
             }
 		//we figure out pass/clear option
 
             //we replace original F[FieldNo] column with data in forcw
-            updateFieldNoWithCWData(configId, batchUploadId, cdt.getFieldNo(), cdt.getPassClear());
+            updateFieldNoWithCWData(configId, batchId, cdt.getFieldNo(), cdt.getPassClear(), foroutboundProcessing);
 
             return true;
         } catch (Exception e) {
@@ -1167,20 +1167,19 @@ public class transactionInManagerImpl implements transactionInManager {
     }
 
     @Override
-    public void nullForSWCol(Integer configId, Integer batchUploadId) {
-        transactionInDAO.nullForSWCol(configId, batchUploadId);
+    public void nullForSWCol(Integer configId, Integer batchId, boolean foroutboundProcessing) {
+        transactionInDAO.nullForSWCol(configId, batchId, foroutboundProcessing);
     }
 
     @Override
-    public void executeCWData(Integer configId, Integer batchUploadId, Integer fieldNo, CrosswalkData cwd) {
-        transactionInDAO.executeCWData(configId, batchUploadId, fieldNo, cwd);
+    public void executeCWData(Integer configId, Integer batchId, Integer fieldNo, CrosswalkData cwd, boolean foroutboundProcessing) {
+        transactionInDAO.executeCWData(configId, batchId, fieldNo, cwd, foroutboundProcessing);
     }
 
-	@Override
-	public void updateFieldNoWithCWData(Integer configId,
-			Integer batchUploadId, Integer fieldNo, Integer passClear) {
-			transactionInDAO.updateFieldNoWithCWData(configId, batchUploadId, fieldNo, passClear);
-		
-	}
+    @Override
+    public void updateFieldNoWithCWData(Integer configId, Integer batchId, Integer fieldNo, Integer passClear, boolean foroutboundProcessing) {
+        transactionInDAO.updateFieldNoWithCWData(configId, batchId, fieldNo, passClear, foroutboundProcessing);
+
+    }
 
 }
