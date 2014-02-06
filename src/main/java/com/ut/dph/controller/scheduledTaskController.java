@@ -6,12 +6,9 @@
 
 package com.ut.dph.controller;
 
-import com.ut.dph.model.configurationSchedules;
-import com.ut.dph.model.transactionTarget;
 import com.ut.dph.service.configurationManager;
 import com.ut.dph.service.transactionInManager;
 import com.ut.dph.service.transactionOutManager;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;

@@ -38,9 +38,6 @@ public class transactionOutManagerImpl implements transactionOutManager {
     @Autowired
     private transactionInManager transactionInManager;
     
-    @Autowired
-    private transactionOutManager transactionOutManager;
-    
     @Override
     @Transactional
     public List<batchDownloads> getInboxBatches(int userId, int orgId, int page, int maxResults) {
@@ -200,7 +197,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
         Need to find all transactionTarget records that are ready to be processed
         statusId (19 - Pending Output)
          */
-        List<transactionTarget> pendingTransactions = transactionOutManager.getpendingOutPutTransactions(transactionTargetId);
+        List<transactionTarget> pendingTransactions = transactionOutDAO.getpendingOutPutTransactions(transactionTargetId);
         
         /* 
         If pending transactions are found need to loop through and check the 
@@ -218,7 +215,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                 if(scheduleDetails == null || scheduleDetails.gettype() == 5) {
                     
                     /* Process the output (transactionTargetId, targetConfigId, transactionInId) */
-                    processed = transactionOutManager.processOutPutTransactions(transaction.getId(), transaction.getconfigId(), transaction.gettransactionInId());
+                    processed = transactionOutDAO.processOutPutTransactions(transaction.getId(), transaction.getconfigId(), transaction.gettransactionInId());
                     
                 }
                 /* If the setting is for 'Daily' */
@@ -240,14 +237,14 @@ public class transactionOutManagerImpl implements transactionOutManager {
                     transactionInManager.updateBatchStatus(transaction.getbatchUploadId(),25,"");
                     
                     /* Update the status of the target batch to  TBP (Target Batch Creating in process) (ID = 25) */
-                    transactionOutManager.updateTargetBatchStatus(transaction.getbatchDLId(),25,"");
+                    transactionOutDAO.updateTargetBatchStatus(transaction.getbatchDLId(),25,"");
                     
                     /* Need to start the transaction translations */
-                    boolean recordsTranslated = transactionOutManager.translateTargetRecords(transaction.getId(), transaction.getconfigId(), transaction.getbatchDLId());
+                    boolean recordsTranslated = translateTargetRecords(transaction.getId(), transaction.getconfigId(), transaction.getbatchDLId());
                     
                     /* Once all the processing has completed with no errors need to copy records to the transactionOutRecords to make availble to view */
                     if(recordsTranslated == true) {
-                        transactionOutManager.moveTranslatedRecords(transaction.getId());
+                        transactionOutDAO.moveTranslatedRecords(transaction.getId());
                         
                         /* Update the status of the transaction to PP (Pending Pickup) (ID = 18) */
                         transactionInManager.updateTransactionStatus(transaction.getbatchUploadId(), transaction.gettransactionInId(), 0, 18);
@@ -259,7 +256,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                         transactionInManager.updateBatchStatus(transaction.getbatchUploadId(),28,"");
 
                         /* Update the status of the target batch to  TBP (Target Batch Created) (ID = 28) */
-                        transactionOutManager.updateTargetBatchStatus(transaction.getbatchDLId(),28,"");
+                        transactionOutDAO.updateTargetBatchStatus(transaction.getbatchDLId(),28,"");
                     }
                     
                     /* Check to see if an output file is to be generated */

@@ -24,7 +24,7 @@
             </cron>
         </trigger>
     </schedule>
-    <!--<schedule>
+    <schedule>
         <job>
             <name>JobB</name>
             <group>GroupDummy</group>
@@ -40,5 +40,5 @@
                 <cron-expression>0/10 * * * * ?</cron-expression>
             </cron>
         </trigger>
-    </schedule>-->
+    </schedule>
 </job-scheduling-data>
