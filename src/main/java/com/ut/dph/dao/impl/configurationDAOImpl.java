@@ -9,6 +9,7 @@ import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.Transformers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -808,4 +809,24 @@ public class configurationDAOImpl implements configurationDAO {
         return criteria.list();
         
     }
+
+	@Override
+	@Transactional
+	@SuppressWarnings("unchecked")
+	public List<configurationDataTranslations> getDataTranslationsWithFieldNo(
+			int configId) {
+		Query query = sessionFactory
+				.getCurrentSession()
+				.createSQLQuery(
+						"select configurationDataTranslations.*, fieldNo from configurationDataTranslations, configurationFormFields"
+						+ " where configurationDataTranslations.fieldId = configurationFormFields.id "
+						+ " and configurationDataTranslations.configId = :configId order by processorder asc;")
+						.setResultTransformer(
+						Transformers.aliasToBean(configurationDataTranslations.class))
+				.setParameter("configId", configId);
+		
+		List<configurationDataTranslations> cdtList = query.list();
+		
+		return cdtList;
+	}
 }

@@ -10,6 +10,7 @@ import com.ut.dph.dao.transactionInDAO;
 import com.ut.dph.model.batchUploadSummary;
 import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.configuration;
+import com.ut.dph.model.configurationDataTranslations;
 import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.configurationTransport;
 import com.ut.dph.model.fieldSelectOptions;
@@ -498,7 +499,7 @@ public class transactionInManagerImpl implements transactionInManager {
         batchUploads batch = getBatchDetails(batchUploadId);
 
         /**
-         * ERG are loaded already, we load all other files maybe move loading? *
+         * ERG are loaded already, we load all other files - maybe move loading? *
          */
         if (batch.gettransportMethodId() != 2) { // 2 is ERG
 
@@ -514,7 +515,7 @@ public class transactionInManagerImpl implements transactionInManager {
             //after loading is successful we update to SSL
             updateBatchStatus(batchUploadId, 3, "startDateTime");
 
-            //get batch details again for next round
+            //get batch details again for next set of processing
             batch = getBatchDetails(batchUploadId);
 
         }
@@ -563,6 +564,17 @@ public class transactionInManagerImpl implements transactionInManager {
                 /**
                  * run cw/macros *
                  */
+                //1. grab the configurationDataTranslations
+                List<configurationDataTranslations> dataTranslations = configurationManager.getDataTranslationsWithFieldNo(configId);
+                for (configurationDataTranslations cdt : dataTranslations) {
+                	if (cdt.getCrosswalkId() != 0) {
+                		successfulBatch = processCrosswalk (configId, batchUploadId, cdt);
+                	} else if (cdt.getMacroId()!= 0)  {
+                		successfulBatch = processMacro (configId, batchUploadId, cdt);
+                	}
+                }
+                
+                
                 /**
                  * we check configuration details, remove rejected records from transactionTranslatedIn, pass records stays * *
                  */
@@ -1134,5 +1146,27 @@ public class transactionInManagerImpl implements transactionInManager {
 	    } else {
 	      return false;
 	    }
+	}
+
+	@Override
+	public boolean processCrosswalk(Integer configId,
+			Integer batchUploadId, configurationDataTranslations translation) {
+		// 1. we get the info for that cw (fieldNo, sourceVal, targetVal rel_crosswalkData)
+		
+		
+		//we update column values to null
+		
+		//we take values from transactionInRecords, translate and insert
+		
+		//depending on pass/clear option, we fill in the null values for that column
+		
+		return false;
+	}
+
+	@Override
+	public boolean processMacro (Integer configId,
+			Integer batchUploadId, configurationDataTranslations translation) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }

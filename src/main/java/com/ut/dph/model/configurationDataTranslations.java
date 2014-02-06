@@ -21,7 +21,10 @@ public class configurationDataTranslations {
     @Transient
     String macroName = null;
 
-    @Id
+    @Transient
+    int fieldNo;
+
+	@Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID", nullable = false)
     private int id;
@@ -167,5 +170,14 @@ public class configurationDataTranslations {
     public String getMacroName() {
         return macroName;
     }
+    
+    public int getFieldNo() {
+		return fieldNo;
+	}
+
+	public void setFieldNo(int fieldNo) {
+		this.fieldNo = fieldNo;
+	}
+
 
 }

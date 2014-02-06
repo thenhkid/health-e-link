@@ -435,6 +435,12 @@ public class configurationManagerImpl implements configurationManager {
         }
     }
 
+	@Override
+	public List<configurationDataTranslations> getDataTranslationsWithFieldNo(
+			int configId) {
+		return configurationDAO.getDataTranslationsWithFieldNo(configId);
+	}
+
 }
 
 

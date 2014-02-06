@@ -44,6 +44,8 @@ public interface configurationManager {
   
   List<configurationDataTranslations> getDataTranslations(int configId);
   
+  List<configurationDataTranslations> getDataTranslationsWithFieldNo(int configId);
+    
   String getFieldName(int fieldId);
   
   void deleteDataTranslations(int configId);

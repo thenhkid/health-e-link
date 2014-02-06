@@ -8,6 +8,7 @@ package com.ut.dph.service;
 
 import com.ut.dph.model.batchUploadSummary;
 import com.ut.dph.model.batchUploads;
+import com.ut.dph.model.configurationDataTranslations;
 import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.fieldSelectOptions;
 import com.ut.dph.model.transactionAttachment;
@@ -172,4 +173,9 @@ public interface transactionInManager {
     boolean chkMySQLDate(String date);
 	
     boolean isValidURL(String url);
+    
+    boolean processCrosswalk (Integer configId, Integer batchUploadId, configurationDataTranslations translation);
+    
+    boolean processMacro (Integer configId, Integer batchUploadId, configurationDataTranslations translation);
+
 }

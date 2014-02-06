@@ -877,7 +877,7 @@ public class transactionInDAOImpl implements transactionInDAO {
     public List<Integer> getConfigIdsForBatch(int batchUploadId) {
 
         String sql = ("select distinct configId from transactionTranslatedIn "
-                + " where transactionInId in (select transactionInId from transactionIn "
+                + " where transactionInId in (select id from transactionIn "
                 + " where batchId = :id);");
 
         Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
@@ -1233,7 +1233,7 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Override
     @Transactional
     public boolean clearTransactionTarget(Integer batchUploadId) {
-        String sql = "delete from TransactionTarget where batchUploadId = :batchUploadId)";
+        String sql = "delete from TransactionTarget where batchUploadId = :batchUploadId";
 
         Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
                 .setParameter("batchUploadId", batchUploadId);
