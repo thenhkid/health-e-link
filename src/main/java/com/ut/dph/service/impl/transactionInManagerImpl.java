@@ -920,7 +920,7 @@ public class transactionInManagerImpl implements transactionInManager {
         List<transactionRecords> trs = getFieldColAndValues(batchUploadId, cff);
         //2. we look at each column and check each value to make sure it is a valid url
         for (transactionRecords tr : trs) {
-        	System.out.println(tr.getfieldValue());
+        	//System.out.println(tr.getfieldValue());
         	if (tr.getfieldValue() != null) {
         		//we append http:// if url doesn't start with it
         		String urlToValidate = tr.getfieldValue();
@@ -946,7 +946,7 @@ public class transactionInManagerImpl implements transactionInManager {
         for (transactionRecords tr : trs) {
         	if (tr.getfieldValue() != null) {
         		//sql is picking up dates in mysql format and it is not massive inserting, running this check to avoid unnecessary sql call
-        		System.out.println(tr.getFieldValue());
+        		//System.out.println(tr.getFieldValue());
         		//we check long dates
         		Date dateValue = null;
         		boolean mySQLDate = chkMySQLDate(tr.getFieldValue());
@@ -1152,20 +1152,26 @@ public class transactionInManagerImpl implements transactionInManager {
 	@Override
 	public boolean processCrosswalk(Integer configId,
 			Integer batchUploadId, configurationDataTranslations cdt) {
+		try {
 		// 1. we get the info for that cw (fieldNo, sourceVal, targetVal rel_crosswalkData)
 		List <CrosswalkData> cdList = configurationManager.getCrosswalkData(cdt.getCrosswalkId());
+		//we null forcw column, we translate and insert there, we then replace
+		nullForSWCol(configId, batchUploadId);
 		for (CrosswalkData cwd : cdList) {
-			//we null column, we translate
+			executeCWData(configId,  batchUploadId, cdt.getFieldNo(), cwd);
 			
 		}
 		
-		//we update column values to null
+		//we figure out pass/clear option
 		
-		//we take values from transactionInRecords, translate and insert
+		//we replace original F[FieldNo] column with data in forcw
 		
-		//depending on pass/clear option, we fill in the null values for that column
+		return true;
+		} catch (Exception e) {
+			return false;
+		}
 		
-		return false;
+		
 	}
 
 	@Override
@@ -1173,6 +1179,16 @@ public class transactionInManagerImpl implements transactionInManager {
 			Integer batchUploadId, configurationDataTranslations translation) {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	@Override
+	public void nullForSWCol(Integer configId, Integer batchUploadId) {
+		transactionInDAO.nullForSWCol(configId, batchUploadId);
+	}
+
+	@Override
+	public void executeCWData(Integer configId, Integer batchUploadId, Integer fieldNo, CrosswalkData cwd) {
+		transactionInDAO.executeCWData(configId, batchUploadId, fieldNo, cwd);
 	}
 
 }

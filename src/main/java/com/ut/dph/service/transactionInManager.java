@@ -6,6 +6,7 @@
 
 package com.ut.dph.service;
 
+import com.ut.dph.model.CrosswalkData;
 import com.ut.dph.model.batchUploadSummary;
 import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.configurationDataTranslations;
@@ -177,5 +178,9 @@ public interface transactionInManager {
     boolean processCrosswalk (Integer configId, Integer batchUploadId, configurationDataTranslations translation);
     
     boolean processMacro (Integer configId, Integer batchUploadId, configurationDataTranslations translation);
+    
+    void nullForSWCol(Integer configId, Integer batchUploadId);
+    
+    void executeCWData(Integer configId, Integer batchUploadId, Integer fieldNo, CrosswalkData cwd);
 
 }

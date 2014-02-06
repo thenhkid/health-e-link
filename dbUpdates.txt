@@ -4,3 +4,7 @@ UPDATE `universaltranslator`.`lookuptables` SET `utTableName`='lu_ProcedureStatu
 /** Chad 2.5.14 @ 1:31 PM **/
 ALTER TABLE `universalTranslator`.`message_FromProvider` 
 CHANGE COLUMN `providerId` `providerId` VARCHAR(45) NULL DEFAULT NULL ;
+
+/** grace 02.06.2014 **/
+ALTER TABLE `universalTranslator`.`transactionTranslatedIn` 
+ADD COLUMN `forCW` TEXT NULL AFTER `dateCreated`;

@@ -835,9 +835,14 @@ public class configurationDAOImpl implements configurationDAO {
 	@Transactional
 	@SuppressWarnings("unchecked")
 	public List<CrosswalkData> getCrosswalkData(int cwId) {
-		 Criteria criteria = sessionFactory.getCurrentSession().createCriteria(CrosswalkData.class);
-	        criteria.add(Restrictions.eq("cwId", cwId));
+		try { 
+		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(CrosswalkData.class);
+	        criteria.add(Restrictions.eq("crosswalkId", cwId));
 	        
 	        return criteria.list();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 }

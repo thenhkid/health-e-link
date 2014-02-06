@@ -6,6 +6,7 @@
 package com.ut.dph.dao.impl;
 
 import com.ut.dph.dao.transactionInDAO;
+import com.ut.dph.model.CrosswalkData;
 import com.ut.dph.model.Organization;
 import com.ut.dph.model.batchUploadSummary;
 import com.ut.dph.model.batchUploads;
@@ -1463,5 +1464,43 @@ public class transactionInDAOImpl implements transactionInDAO {
         return connectionId;
         
     }
+
+	@Override
+	@Transactional
+	public void nullForSWCol(Integer configId, Integer batchUploadId) {
+		 String sql = "update transactiontranslatedin set forcw = null where "
+		 		+ "transactionInId in (select id from transactionIn where configId = :configId "
+				+ " and batchId = :batchUploadId);";
+	        
+	        Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+	                .setParameter("batchUploadId", batchUploadId)
+	                .setParameter("configId", configId);
+	        try {
+	            updateData.executeUpdate();
+	        } catch (Exception ex) {
+	            System.err.println("nullForSWCol failed." + ex);
+	        }
+	}
+
+	@Override
+	public void executeCWData(Integer configId, Integer batchUploadId, Integer fieldNo,
+			CrosswalkData cwd) {
+		 String sql = "update transactiontranslatedin set forcw = :targetValue where "
+			 		+ "F" + fieldNo + " = :sourceValue and transactionInId in "
+			 		+ "(select id from transactionIn where configId = :configId "
+					+ " and batchId = :batchUploadId);";
+		        
+		        Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+		        		.setParameter("targetValue", cwd.getTargetValue())
+		        		.setParameter("sourceValue", cwd.getSourceValue())
+		                .setParameter("batchUploadId", batchUploadId)
+		                .setParameter("configId", configId);
+		        try {
+		            updateData.executeUpdate();
+		        } catch (Exception ex) {
+		            System.err.println("nullForSWCol failed." + ex);
+		        }
+		
+	}
 
 }

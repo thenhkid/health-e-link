@@ -6,6 +6,7 @@
 
 package com.ut.dph.dao;
 
+import com.ut.dph.model.CrosswalkData;
 import com.ut.dph.model.batchUploadSummary;
 import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.configurationFormFields;
@@ -133,4 +134,8 @@ public interface transactionInDAO {
     void insertValidationError(transactionRecords tr, configurationFormFields cff, Integer batchUploadId);
     
     Integer getFeedbackReportConnection(int configId, int targetorgId);
+    
+    void nullForSWCol(Integer configId, Integer batchUploadId);
+    
+    void executeCWData(Integer configId, Integer batchUploadId, Integer fieldNo, CrosswalkData cwd);
 }
