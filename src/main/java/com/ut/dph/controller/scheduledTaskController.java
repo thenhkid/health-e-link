@@ -118,7 +118,7 @@ public class scheduledTaskController {
                     transactionOutManager.updateTargetBatchStatus(transaction.getbatchDLId(),25,"");
                     
                     /* Need to start the transaction translations */
-                    boolean recordsTranslated = transactionOutManager.translateTargetRecords(transaction.getId(), transaction.getconfigId());
+                    boolean recordsTranslated = transactionOutManager.translateTargetRecords(transaction.getId(), transaction.getconfigId(), transaction.getbatchDLId());
                 }
                 
             

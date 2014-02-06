@@ -943,7 +943,7 @@ public class transactionInManagerImpl implements transactionInManager {
         //2. we look at each column and check each value by trying to convert it to a date
         for (transactionRecords tr : trs) {
             if (tr.getfieldValue() != null) {
-        		//sql is picking up dates in mysql format and it is not massive inserting, running this check to avoid unnecessary sql call
+                //sql is picking up dates in mysql format and it is not massive inserting, running this check to avoid unnecessary sql call
                 //System.out.println(tr.getFieldValue());
                 //we check long dates
                 Date dateValue = null;
@@ -1147,18 +1147,17 @@ public class transactionInManagerImpl implements transactionInManager {
                 executeCWData(configId, batchUploadId, cdt.getFieldNo(), cwd);
             }
 		//we figure out pass/clear option
-		
-		//we replace original F[FieldNo] column with data in forcw
-		updateFieldNoWithCWData(configId,  batchUploadId, cdt.getFieldNo(), cdt.getPassClear());
-		
-		return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-		
-		
-	}
+
+            //we replace original F[FieldNo] column with data in forcw
+            updateFieldNoWithCWData(configId, batchUploadId, cdt.getFieldNo(), cdt.getPassClear());
+
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+
+    }
 
     @Override
     public boolean processMacro(Integer configId,
@@ -1177,11 +1176,11 @@ public class transactionInManagerImpl implements transactionInManager {
         transactionInDAO.executeCWData(configId, batchUploadId, fieldNo, cwd);
     }
 
-	@Override
-	public void updateFieldNoWithCWData(Integer configId,
-			Integer batchUploadId, Integer fieldNo, Integer passClear) {
-			transactionInDAO.updateFieldNoWithCWData(configId, batchUploadId, fieldNo, passClear);
-		
-	}
+    @Override
+    public void updateFieldNoWithCWData(Integer configId,
+            Integer batchUploadId, Integer fieldNo, Integer passClear) {
+        transactionInDAO.updateFieldNoWithCWData(configId, batchUploadId, fieldNo, passClear);
+
+    }
 
 }

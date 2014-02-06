@@ -1005,8 +1005,8 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Transactional
     @SuppressWarnings("unchecked")
     public List<Integer> getBlankTransIds(ConfigForInsert config) {
-    	
-    	String sql = ("select transactionInId from "
+
+        String sql = ("select transactionInId from "
                 + " transactionTranslatedIn where (length(CONCAT_WS(''," + config.getSingleValueFields()
                 + ")) = 0 or length(CONCAT_WS(''," + config.getSingleValueFields()
                 + ")) is null) and transactionInId in (select id from transactionIn where statusId = :relId "
@@ -1019,7 +1019,7 @@ public class transactionInDAOImpl implements transactionInDAO {
         query.setParameter("relId", transRELId);
 
         List<Integer> transId = query.list();
-       
+
         return transId;
     }
 
@@ -1145,13 +1145,12 @@ public class transactionInDAOImpl implements transactionInDAO {
         }
 
     }
-    
+
     /**
-     * The 'updateTransactionTargetStatus' function will update the transactionTarget entries when the
-     * created batch has been sent.
-     * 
+     * The 'updateTransactionTargetStatus' function will update the transactionTarget entries when the created batch has been sent.
+     *
      * @param batchUploadId The id of the created batch
-     * @param fromStatusId  
+     * @param fromStatusId
      * @param toStatusId The status we want to change to
      */
     @Override
@@ -1179,7 +1178,6 @@ public class transactionInDAOImpl implements transactionInDAO {
         }
 
     }
-
 
     @Override
     @Transactional
@@ -1373,8 +1371,8 @@ public class transactionInDAOImpl implements transactionInDAO {
     @SuppressWarnings("unchecked")
     public List<transactionRecords> getFieldColAndValues(Integer batchUploadId,
             configurationFormFields cff) {
-        String sql = ("select transactionInId as transactionId, F" + cff.getFieldNo() 
-        		+ "  as fieldValue, " + cff.getFieldNo() + " as fieldNo from transactiontranslatedIn "
+        String sql = ("select transactionInId as transactionId, F" + cff.getFieldNo()
+                + "  as fieldValue, " + cff.getFieldNo() + " as fieldNo from transactiontranslatedIn "
                 + " where configId = :configId "
                 + " and F" + cff.getFieldNo() + " is not null "
                 + " and transactionInId in (select id from transactionIn where"
@@ -1431,100 +1429,100 @@ public class transactionInDAOImpl implements transactionInDAO {
 
         }
     }
-    
+
     /**
-     * 
+     *
      */
     @Override
     @Transactional
     public Integer getFeedbackReportConnection(int configId, int targetorgId) {
-        
+
         Criteria configurationConnections = sessionFactory.getCurrentSession().createCriteria(configurationConnection.class);
         configurationConnections.add(Restrictions.eq("sourceConfigId", configId));
         List<configurationConnection> connections = configurationConnections.list();
-        
+
         Integer connectionId = 0;
-        
-        if(!connections.isEmpty()) {
-           
-            for(configurationConnection connection : connections) {
+
+        if (!connections.isEmpty()) {
+
+            for (configurationConnection connection : connections) {
                 Criteria configurations = sessionFactory.getCurrentSession().createCriteria(configuration.class);
                 configurations.add(Restrictions.eq("id", connection.gettargetConfigId()));
-                
+
                 configuration configDetails = (configuration) configurations.uniqueResult();
-                
-                if(configDetails.getorgId() == targetorgId) {
+
+                if (configDetails.getorgId() == targetorgId) {
                     connectionId = connection.getId();
                 }
-                
+
             }
-            
+
         }
-        
+
         return connectionId;
-        
+
     }
 
-	@Override
-	@Transactional
-	public void nullForSWCol(Integer configId, Integer batchUploadId) {
-		 String sql = "update transactiontranslatedin set forcw = null where "
-		 		+ "transactionInId in (select id from transactionIn where configId = :configId "
-				+ " and batchId = :batchUploadId);";
-	        
-	        Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
-	                .setParameter("batchUploadId", batchUploadId)
-	                .setParameter("configId", configId);
-	        try {
-	            updateData.executeUpdate();
-	        } catch (Exception ex) {
-	            System.err.println("nullForSWCol failed." + ex);
-	        }
-	}
+    @Override
+    @Transactional
+    public void nullForSWCol(Integer configId, Integer batchUploadId) {
+        String sql = "update transactiontranslatedin set forcw = null where "
+                + "transactionInId in (select id from transactionIn where configId = :configId "
+                + " and batchId = :batchUploadId);";
 
-	@Override
-	@Transactional
-	public void executeCWData(Integer configId, Integer batchUploadId, Integer fieldNo,
-			CrosswalkData cwd) {
-		 String sql = "update transactiontranslatedin set forcw = :targetValue where "
-			 		+ "F" + fieldNo + " = :sourceValue and transactionInId in "
-			 		+ "(select id from transactionIn where configId = :configId "
-					+ " and batchId = :batchUploadId);";
-		        
-		        Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
-		        		.setParameter("targetValue", cwd.getTargetValue())
-		        		.setParameter("sourceValue", cwd.getSourceValue())
-		                .setParameter("batchUploadId", batchUploadId)
-		                .setParameter("configId", configId);
-		        try {
-		            updateData.executeUpdate();
-		        } catch (Exception ex) {
-		            System.err.println("executeCWData failed." + ex);
-		        }
-		
-	}
+        Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                .setParameter("batchUploadId", batchUploadId)
+                .setParameter("configId", configId);
+        try {
+            updateData.executeUpdate();
+        } catch (Exception ex) {
+            System.err.println("nullForSWCol failed." + ex);
+        }
+    }
 
-	@Override
-	@Transactional
-	public void updateFieldNoWithCWData(Integer configId,
-			Integer batchUploadId, Integer fieldNo, Integer passClear) {
+    @Override
+    @Transactional
+    public void executeCWData(Integer configId, Integer batchUploadId, Integer fieldNo,
+            CrosswalkData cwd) {
+        String sql = "update transactiontranslatedin set forcw = :targetValue where "
+                + "F" + fieldNo + " = :sourceValue and transactionInId in "
+                + "(select id from transactionIn where configId = :configId "
+                + " and batchId = :batchUploadId);";
 
-		String sql = "update transactiontranslatedIn "
-				+ " JOIN (SELECT id from transactionIn WHERE configId = :configId"
-				+ " and batchId = :batchUploadId) as ti ON transactiontranslatedIn.transactionInId = ti.id "
-				+ " SET transactiontranslatedIn.F"+ fieldNo + " = forcw ";
-				if (passClear == 1) {
-					// 1 is pass, we leave original values in fieldNo alone
-					sql = sql + "where forcw is not null;";
-				}
-	        Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
-	                .setParameter("batchUploadId", batchUploadId)
-	                .setParameter("configId", configId);
-	        try {
-	            updateData.executeUpdate();
-	        } catch (Exception ex) {
-	            System.err.println("updateFieldNoWithCWData failed." + ex);
-	        }
-		}
+        Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                .setParameter("targetValue", cwd.getTargetValue())
+                .setParameter("sourceValue", cwd.getSourceValue())
+                .setParameter("batchUploadId", batchUploadId)
+                .setParameter("configId", configId);
+        try {
+            updateData.executeUpdate();
+        } catch (Exception ex) {
+            System.err.println("executeCWData failed." + ex);
+        }
+
+    }
+
+    @Override
+    @Transactional
+    public void updateFieldNoWithCWData(Integer configId,
+            Integer batchUploadId, Integer fieldNo, Integer passClear) {
+
+        String sql = "update transactiontranslatedIn "
+                + " JOIN (SELECT id from transactionIn WHERE configId = :configId"
+                + " and batchId = :batchUploadId) as ti ON transactiontranslatedIn.transactionInId = ti.id "
+                + " SET transactiontranslatedIn.F" + fieldNo + " = forcw ";
+        if (passClear == 1) {
+            // 1 is pass, we leave original values in fieldNo alone
+            sql = sql + "where forcw is not null;";
+        }
+        Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                .setParameter("batchUploadId", batchUploadId)
+                .setParameter("configId", configId);
+        try {
+            updateData.executeUpdate();
+        } catch (Exception ex) {
+            System.err.println("updateFieldNoWithCWData failed." + ex);
+        }
+    }
 
 }

@@ -14,6 +14,7 @@ import com.ut.dph.model.transactionOutNotes;
 import com.ut.dph.model.transactionOutRecords;
 import com.ut.dph.model.transactionTarget;
 import com.ut.dph.service.configurationManager;
+import com.ut.dph.service.transactionInManager;
 import com.ut.dph.service.transactionOutManager;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,9 @@ public class transactionOutManagerImpl implements transactionOutManager {
     
     @Autowired
     private configurationManager configurationManager;
-
+    
+    @Autowired
+    private transactionInManager transactionInManager;
     
     @Override
     @Transactional
@@ -153,6 +156,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
      * translation details set up in the target configuration.
      * 
      * @param transactionTargetId   The id of the target transaction to be translated
+     * @param batchId               The id of the batch the target transaction belongs to
      * @param configId              The id of the target configuration.
      * 
      * @return This function will return either TRUE (If translation completed with no errors)
@@ -160,7 +164,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
      */
     @Override
     @Transactional
-    public boolean translateTargetRecords(int transactionTargetId, int configId) {
+    public boolean translateTargetRecords(int transactionTargetId, int configId, int batchId) {
         
         boolean translated = false;
         
@@ -169,16 +173,14 @@ public class transactionOutManagerImpl implements transactionOutManager {
         
         for (configurationDataTranslations cdt : dataTranslations) {
             if (cdt.getCrosswalkId() != 0) {
-                   translated = processCrosswalk (configId, batchUploadId, cdt);
+                   translated = transactionInManager.processCrosswalk (configId, batchId, cdt);
             } 
             else if (cdt.getMacroId()!= 0)  {
-                   translated = processMacro (configId, batchUploadId, cdt);
+                   translated = transactionInManager.processMacro (configId, batchId, cdt);
             }
         }
         
-        
-        
-        return true;
+        return translated;
     }
     
 }
