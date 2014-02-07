@@ -70,4 +70,6 @@ public interface transactionOutDAO {
     
     void updateTransactionTargetBatchDLId(Integer batchId, Integer transactionTargetId);
     
+    void updateBatchOutputFileName(int batchId, String fileName);
+    
 }

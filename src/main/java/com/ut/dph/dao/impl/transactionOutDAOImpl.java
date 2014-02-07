@@ -931,4 +931,29 @@ public class transactionOutDAOImpl implements transactionOutDAO {
         }
 
     }
+    
+    /**
+     * The 'updateBatchOutputFileName' function will update the outputFileName with the finalized
+     * generated file name. This will contain the appropriate extension.
+     * 
+     * @param batchId   The id of the batch to update
+     * @param fileName  The new file name to update.
+     */
+    @Override
+    @Transactional
+    public void updateBatchOutputFileName(int batchId, String fileName) {
+         String sql = "update BatchDownloads "
+                + " set outputFileName = :fileName "
+                + " where id = :batchId";
+
+        Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                .setParameter("batchId", batchId)
+                .setParameter("fileName", fileName);
+          
+        try {
+            updateData.executeUpdate();
+        } catch (Exception ex) {
+            System.err.println("update Batch outputfile name failed." + ex);
+        }
+    }
 }

@@ -20,10 +20,17 @@ import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionOutNotes;
 import com.ut.dph.model.transactionOutRecords;
 import com.ut.dph.model.transactionTarget;
+import com.ut.dph.reference.fileSystem;
 import com.ut.dph.service.configurationManager;
 import com.ut.dph.service.configurationTransportManager;
 import com.ut.dph.service.transactionInManager;
 import com.ut.dph.service.transactionOutManager;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -362,6 +369,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
         else if(transportDetails.gettransportMethodId() == 1) {
 
             int batchId = 0;
+            boolean createNewFile = true;
 
             /* 
                 If the merge batches option is not checked create the batch right away
@@ -404,15 +412,15 @@ public class transactionOutManagerImpl implements transactionOutManager {
                    summary.setsourceOrgId(uploadedBatchDetails.getOrgId());
 
                    transactionOutDAO.submitSummaryEntry(summary);
+                   
+                   createNewFile = false;
 
                 }
 
             }
             
-            batchDownloads batchDetails = transactionOutDAO.getBatchDetails(batchId);
-
             /* Generate the file */
-            System.out.println("GENERATE FILE");
+            generateTargetFile(createNewFile, transaction.getId(), batchId, transportDetails);
             
         }
         
@@ -516,6 +524,81 @@ public class transactionOutManagerImpl implements transactionOutManager {
         transactionOutDAO.submitSummaryEntry(summary);
         
         return batchId;
+        
+    }
+    
+    /**
+     * 
+     */
+    public void generateTargetFile(boolean createNewFile, int transactionTargetId, int batchId, configurationTransport transportDetails) {
+        
+         String fileName = null; 
+         
+         batchDownloads batchDetails = transactionOutDAO.getBatchDetails(batchId);
+         
+         InputStream inputStream = null;
+         OutputStream outputStream = null;
+         
+         fileSystem dir = new fileSystem();
+         
+         String filelocation = transportDetails.getfileLocation();
+         filelocation = filelocation.replace("/bowlink/", "");
+         
+         dir.setDirByName(filelocation);
+         
+         String fileType = (String) configurationManager.getFileTypesById(transportDetails.getfileType());
+         
+         
+         /* Create the empty file in the correct location */
+         if(createNewFile == true) {
+            try {
+               
+               fileName = new StringBuilder().append(batchDetails.getoutputFIleName()).append(".").append(fileType).toString();
+               
+               File newFile = new File(dir.getDir() + fileName);
+
+               if (newFile.exists()) {
+                  int i = 1;
+                  while (newFile.exists()) {
+                      int iDot = fileName.lastIndexOf(".");
+                      newFile = new File(dir.getDir() + fileName.substring(0, iDot) + "_(" + ++i + ")" + fileName.substring(iDot));
+                  }
+                  fileName = newFile.getName();
+                  newFile.createNewFile();
+              } else {
+                  newFile.createNewFile();
+              }
+           } catch (IOException e) {
+               e.printStackTrace();
+           }
+            
+           /* Need to update the batch with the updated file name */
+           transactionOutDAO.updateBatchOutputFileName(batchDetails.getId(),fileName);
+            
+            
+         }
+         else {
+             fileName = batchDetails.getoutputFIleName();
+         }
+         
+         /* Read in the file */
+         try {
+            FileInputStream fileInput = null; 
+            File file = new File(dir.getDir() + fileName);
+            fileInput = new FileInputStream(file);
+            
+            
+            /* Need to get the records for the transaction */
+            
+            
+            
+            
+            
+         } catch (FileNotFoundException e) {
+            e.printStackTrace();
+         }
+         
+         
         
     }
 }
