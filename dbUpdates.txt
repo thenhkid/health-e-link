@@ -52,3 +52,8 @@ ADD COLUMN `mergeable` BIT(1) NULL DEFAULT b'0' AFTER `deleted`;
 
 
   
+
+  /** grace 020713 **/
+ALTER TABLE `universalTranslator`.`transactionOutErrors` 
+DROP FOREIGN KEY `batchDLFK`;
+  
