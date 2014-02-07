@@ -144,4 +144,5 @@ public interface transactionInDAO {
 
     void flagCWErrors (Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing);
 
+    void resetTransactionTranslatedIn (Integer batchId);
 }

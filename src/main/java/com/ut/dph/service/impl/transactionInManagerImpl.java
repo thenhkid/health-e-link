@@ -678,10 +678,11 @@ public class transactionInManagerImpl implements transactionInManager {
                 if (getBatchDetails(batchUploadId).gettransportMethodId() == 2) {
                     cleared = clearTransactionInErrors(batchUploadId);
                     toBatchStatusId = 5;
-                    transactionInDAO.updateTransactionStatus(batchUploadId, 0, 0, 15);
+                    resetTransactionTranslatedIn(batchUploadId);
+                    transactionInDAO.updateTransactionStatus(batchUploadId, 0, 0, 15);    
                 } else {
                     //we clear transactionInRecords here as for batch upload we start over
-                    cleared = clearTransactionTables(batchUploadId);
+                    cleared = clearTransactionTables(batchUploadId); 
                 }
                 transactionInDAO.updateBatchStatus(batchUploadId, toBatchStatusId, "");
             }
@@ -1194,6 +1195,11 @@ public class transactionInManagerImpl implements transactionInManager {
 	public void flagCWErrors(Integer configId, Integer batchId,
 			configurationDataTranslations cdt, boolean foroutboundProcessing) {
 		 transactionInDAO.flagCWErrors(configId, batchId, cdt, foroutboundProcessing);
+	}
+
+	@Override
+	public void resetTransactionTranslatedIn(Integer batchId) {
+		 transactionInDAO.resetTransactionTranslatedIn(batchId);
 	}
 
 }
