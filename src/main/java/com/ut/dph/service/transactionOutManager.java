@@ -65,5 +65,5 @@ public interface transactionOutManager {
     void processOutputRecords(int transactionTargetId);
     
     void generateOutputFiles();
-
+    
 }

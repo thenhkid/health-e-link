@@ -43,6 +43,91 @@ public class transactionOutDAOImpl implements transactionOutDAO {
     private SessionFactory sessionFactory;
     
     /**
+     * The 'submitBatchDownload' function will submit the new batch.
+     *
+     * @param batchDownload The object that will hold the new batch info
+     *
+     * @table batchDownloadd
+     *
+     * @return This function returns the batchId for the newly inserted batch
+     */
+    @Override
+    @Transactional
+    public Integer submitBatchDownload(batchDownloads batchDownload) {
+
+        Integer batchId = null;
+
+        batchId = (Integer) sessionFactory.getCurrentSession().save(batchDownload);
+
+        return batchId;
+
+    }
+    
+    /**
+     * The 'submitSummaryEntry' function will submit an entry that will contain specific information for transactions within the submitted batch. 
+     * This will be used when trying to find out which batches a user has access to when logged into the ERG.
+     *
+     * @param summary The object that will hold the batch summary information
+     *
+     * @table batchDownloadSummary
+     *
+     * @return This function does not return anything.
+     */
+    @Override
+    @Transactional
+    public void submitSummaryEntry(batchDownloadSummary summary) {
+            
+        /* Need to make sure no duplicates */
+        Query query = sessionFactory.getCurrentSession().createQuery(""
+                + "select id from batchDownloadSummary where batchId = :batchId "
+                + "and transactionTargetId = :transactionTargetId "
+                + "and sourceOrgId = :sourceOrgId "
+                + "and targetOrgId = :targetOrgId "
+                + "and messageTypeId = :messageTypeId "
+                + "and targetConfigId = :targetConfigId"
+                + "");
+        
+        query.setParameter("batchId", summary.getbatchId());
+        query.setParameter("transactionTargetId", summary.gettransactionTargetId());
+        query.setParameter("sourceOrgId", summary.getsourceOrgId());
+        query.setParameter("targetOrgId", summary.gettargetOrgId());
+        query.setParameter("messageTypeId", summary.getmessageTypeId());
+        query.setParameter("targetConfigId", summary.gettargetConfigId());
+        
+        Integer summaryId = (Integer) query.uniqueResult();
+        
+        if(summaryId == null) {
+             sessionFactory.getCurrentSession().save(summary);
+        } 
+    }
+    
+    /**
+     * The 'findMergeableBatch' function will check for any batches created for the target org that are mergable and have not 
+     * yet been picked up or viewed.
+     * 
+     * @param orgId The id of the organization to look for.
+     * 
+     * @return  This function will return the id of a mergeable batch or 0 if no batches are found.
+     */
+    @Override
+    @Transactional
+    public int findMergeableBatch(int orgId) {
+        
+         Query query = sessionFactory.getCurrentSession().createQuery("select id FROM batchDownloads where orgId = :orgId and mergeable = 1 and statusId = 28");
+         query.setParameter("orgId", orgId);
+        
+         Integer batchId = (Integer) query.uniqueResult();
+         
+         if(batchId == null) {
+             batchId = 0;
+         }
+         
+         return batchId;
+        
+    }
+    
+    
+    /**
      * The 'getInboxBatches' will return a list of received batches for the logged
      * in user.
      *
@@ -798,5 +883,22 @@ public class transactionOutDAOImpl implements transactionOutDAO {
                 + "FROM transactionTranslatedOut where transactionTargetId = :transactionTargetId");
         query.setParameter("transactionTargetId", transactionTargetId);
         query.executeUpdate();
+    }
+    
+    
+    /**
+     * The 'getLoadedOutBoundTransactions' function will look to see what translated transactions are loaded
+     * and ready to be pulled out into a download batch
+     */
+    @Override
+    @Transactional
+    public List<transactionTarget> getLoadedOutBoundTransactions() {
+        
+        Criteria transactionQuery = sessionFactory.getCurrentSession().createCriteria(transactionTarget.class);
+        transactionQuery.add(Restrictions.eq("statusId", 9));
+        
+        List<transactionTarget> transactions = transactionQuery.list();
+
+        return transactions;
     }
 }

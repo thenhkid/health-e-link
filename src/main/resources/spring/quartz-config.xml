@@ -6,7 +6,7 @@
         http://www.quartz-scheduler.org/xml/job_scheduling_data_1_8.xsd"
     version="1.8">
  
-    <schedule>
+    <!--<schedule>
         <job>
             <name>ProcessOutputFiles</name>
             <group>processGroup</group>
@@ -19,11 +19,11 @@
                 <name>60SecTrigger</name>
                 <job-name>ProcessOutputFiles</job-name>
                 <job-group>processGroup</job-group>
-                <!-- It will run every minute seconds -->
+                // It will run every minute seconds//
                 <cron-expression>0 0/1 * * * ?</cron-expression>
             </cron>
         </trigger>
-    </schedule>
+    </schedule>-->
     <schedule>
         <job>
             <name>GenerateOutputFiles</name>
@@ -37,7 +37,7 @@
                 <name>10MinTrigger</name>
                 <job-name>GenerateOutputFiles</job-name>
                 <job-group>processGroup</job-group>
-                <cron-expression>0 0/10 * * * ?</cron-expression>
+                <cron-expression>0 0/1 * * * ?</cron-expression>
             </cron>
         </trigger>
     </schedule>

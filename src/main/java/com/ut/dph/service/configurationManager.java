@@ -61,6 +61,8 @@ public interface configurationManager {
   
   List<configurationConnection> getConnectionsByConfiguration(int configId);
   
+  List<configurationConnection> getConnectionsByTargetConfiguration(int configId);
+  
   Integer saveConnection(configurationConnection connection);
   
   configurationConnection getConnection(int connectionId);

@@ -1590,7 +1590,6 @@ public class transactionInDAOImpl implements transactionInDAO {
     }
 
     @Override
-    @Transactional
     public void flagCWErrors(Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing) {
 
         String sql;

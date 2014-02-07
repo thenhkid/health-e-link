@@ -6,6 +6,7 @@
 
 package com.ut.dph.dao;
 
+import com.ut.dph.model.batchDownloadSummary;
 import com.ut.dph.model.batchDownloads;
 import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionOutNotes;
@@ -58,4 +59,13 @@ public interface transactionOutDAO {
     void updateTargetBatchStatus(Integer batchDLId, Integer statusId, String timeField);
 
     void moveTranslatedRecords(int transactionTargetId);
+    
+    List<transactionTarget> getLoadedOutBoundTransactions();
+    
+    Integer submitBatchDownload(batchDownloads batchDownload);
+    
+    int findMergeableBatch(int orgId);
+    
+    void submitSummaryEntry(batchDownloadSummary summary);
+    
 }

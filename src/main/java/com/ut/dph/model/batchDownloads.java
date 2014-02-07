@@ -78,6 +78,8 @@ public class batchDownloads {
     @Column(name = "DELETED", nullable = false)
     private boolean deleted = false;
     
+    @Column(name = "MERGEABLE", nullable = false)
+    private boolean mergeable = false;
     
     public int getId() {
         return id;
@@ -211,4 +213,11 @@ public class batchDownloads {
        this.usersName = usersName;
     }
     
+    public boolean getmergeable() {
+        return mergeable;
+    }
+    
+    public void setmergeable(boolean mergeable) {
+        this.mergeable = mergeable;
+    }
 }

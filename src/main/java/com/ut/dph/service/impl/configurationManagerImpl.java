@@ -186,6 +186,12 @@ public class configurationManagerImpl implements configurationManager {
     
     @Override
     @Transactional
+    public List<configurationConnection> getConnectionsByTargetConfiguration(int configId) {
+        return configurationDAO.getConnectionsByTargetConfiguration(configId);
+    }
+    
+    @Override
+    @Transactional
     public Integer saveConnection(configurationConnection connection) {
         return configurationDAO.saveConnection(connection);
     }

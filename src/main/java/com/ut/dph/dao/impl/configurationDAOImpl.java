@@ -503,6 +503,23 @@ public class configurationDAOImpl implements configurationDAO {
         List<configurationConnection> connections = query.list();
         return connections;
     }
+    
+    /**
+     * The 'getConnectionsByTargetConfiguration' will return a list of target connections for a passed in configuration;
+     *
+     * @param configId The id of the configuration to search connections for.
+     *
+     * @return This function will return a list of configurationConnection objects
+     */
+    @Override
+    @Transactional
+    public List<configurationConnection> getConnectionsByTargetConfiguration(int configId) {
+        Query query = sessionFactory.getCurrentSession().createQuery("from configurationConnection where targetConfigId = :configId");
+        query.setParameter("configId", configId);
+
+        List<configurationConnection> connections = query.list();
+        return connections;
+    }
 
     /**
      * The 'saveConnection' function will save the new connection
