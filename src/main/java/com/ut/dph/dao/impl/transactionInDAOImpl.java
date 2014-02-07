@@ -1126,20 +1126,25 @@ public class transactionInDAOImpl implements transactionInDAO {
         String sql = "update transactionIn "
                 + " set statusId = :toStatusId, "
                 + "dateCreated = CURRENT_TIMESTAMP";
-        
-        if(transactionId > 0) {
-             sql+= " where id = :transactionId ";
+
+        if (transactionId > 0) {
+            sql += " where id = :transactionId ";
+        } else {
+            sql += " where batchId = :batchUploadId ";
         }
-        else {
-             sql+= " where batchId = :batchUploadId ";
-        }     
-               
+
         if (fromStatusId != 0) {
             sql = sql + " and statusId = :fromStatusId";
         }
         Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
-                .setParameter("toStatusId", toStatusId)
-                .setParameter("batchUploadId", batchUploadId);
+                .setParameter("toStatusId", toStatusId);
+                if (transactionId > 0) {
+                     updateData.setParameter("transactionId", transactionId);
+                }
+                else {
+                     updateData.setParameter("batchUploadId", batchUploadId);
+                }
+               
 
         if (fromStatusId != 0) {
             updateData.setParameter("fromStatusId", fromStatusId);
@@ -1164,24 +1169,28 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Override
     @Transactional
     public void updateTransactionTargetStatus(Integer batchUploadId, Integer transactionId, Integer fromStatusId, Integer toStatusId) {
+        
         String sql = "update transactionTarget "
                 + " set statusId = :toStatusId, "
                 + "statusTime = CURRENT_TIMESTAMP";
-        
-        if(transactionId > 0) {
-             sql+= " where id = :transactionId ";
+
+        if (transactionId > 0) {
+            sql += " where id = :transactionId ";
+        } else {
+            sql += " where batchUploadId = :batchUploadId ";
         }
-        else {
-             sql+= " where batchUploadId = :batchUploadId ";
-        }  
-        
-        
+
         if (fromStatusId != 0) {
             sql = sql + " and statusId = :fromStatusId";
         }
         Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
-                .setParameter("toStatusId", toStatusId)
-                .setParameter("batchUploadId", batchUploadId);
+                .setParameter("toStatusId", toStatusId);
+                if (transactionId > 0) {
+                    updateData.setParameter("transactionId", transactionId);
+                }
+                else {
+                    updateData.setParameter("batchUploadId", batchUploadId);
+                }
 
         if (fromStatusId != 0) {
             updateData.setParameter("fromStatusId", fromStatusId);
@@ -1325,20 +1334,20 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Override
     @Transactional
     public void updateStatusForErrorTrans(Integer batchId, Integer statusId, boolean foroutboundProcessing) {
-        
-    	String sql;
-        
+
+        String sql;
+
         if (foroutboundProcessing == false) {
-        sql= "update transactionIn set statusId = :statusId where"
-                + " id in (select distinct transactionInId"
-                + " from transactionInErrors where batchUploadId = :batchId); ";
+            sql = "update transactionIn set statusId = :statusId where"
+                    + " id in (select distinct transactionInId"
+                    + " from transactionInErrors where batchUploadId = :batchId); ";
         } else {
-        	sql= "update transactionTarget set statusId = :statusId where"
+            sql = "update transactionTarget set statusId = :statusId where"
                     + " id in (select distinct transactionTargetId"
                     + " from transactionOutErrors where batchDownLoadId = :batchId); ";
-            
+
         }
-       
+
         Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
                 .setParameter("batchId", batchId)
                 .setParameter("statusId", statusId);
@@ -1492,23 +1501,21 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Override
     @Transactional
     public void nullForSWCol(Integer configId, Integer batchId, boolean foroutboundProcessing) {
-        
+
         String sql;
-        
-        if(foroutboundProcessing == false) {
-        
+
+        if (foroutboundProcessing == false) {
+
             sql = "update transactionTranslatedIn set forcw = null where "
-                  + "transactionInId in (select id from transactionIn where configId = :configId "
-                  + " and batchId = :batchId);";
-        
+                    + "transactionInId in (select id from transactionIn where configId = :configId "
+                    + " and batchId = :batchId);";
+
+        } else {
+            sql = "update transactionTranslatedOut set forcw = null where "
+                    + "transactionTargetId in (select id from transactionTarget where configId = :configId "
+                    + " and batchDLId = :batchId);";
         }
-        else {
-             sql = "update transactionTranslatedOut set forcw = null where "
-                   + "transactionTargetId in (select id from transactionTarget where configId = :configId "
-                   + " and batchDLId = :batchId);";
-        }
-        
-       
+
         Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
                 .setParameter("batchId", batchId)
                 .setParameter("configId", configId);
@@ -1522,22 +1529,20 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Override
     @Transactional
     public void executeCWData(Integer configId, Integer batchId, Integer fieldNo, CrosswalkData cwd, boolean foroutboundProcessing) {
-        
+
         String sql;
-        
-        if(foroutboundProcessing == false) {
+
+        if (foroutboundProcessing == false) {
             sql = "update transactionTranslatedIn set forcw = :targetValue where "
-                + "F" + fieldNo + " = :sourceValue and transactionInId in "
-                + "(select id from transactionIn where configId = :configId "
-                + " and batchId = :batchId);";
-        }
-        else {
+                    + "F" + fieldNo + " = :sourceValue and transactionInId in "
+                    + "(select id from transactionIn where configId = :configId "
+                    + " and batchId = :batchId);";
+        } else {
             sql = "update transactionTranslatedOut set forcw = :targetValue where "
-                + "F" + fieldNo + " = :sourceValue and transactionTargetId in "
-                + "(select id from transactionTarget where configId = :configId "
-                + " and batchDLId = :batchId);";
+                    + "F" + fieldNo + " = :sourceValue and transactionTargetId in "
+                    + "(select id from transactionTarget where configId = :configId "
+                    + " and batchDLId = :batchId);";
         }
-        
 
         Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
                 .setParameter("targetValue", cwd.getTargetValue())
@@ -1555,20 +1560,19 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Override
     @Transactional
     public void updateFieldNoWithCWData(Integer configId, Integer batchId, Integer fieldNo, Integer passClear, boolean foroutboundProcessing) {
-        
+
         String sql;
-        
-        if(foroutboundProcessing == false) {
+
+        if (foroutboundProcessing == false) {
             sql = "update transactionTranslatedIn "
-                + " JOIN (SELECT id from transactionIn WHERE configId = :configId"
-                + " and batchId = :batchId) as ti ON transactionTranslatedIn.transactionInId = ti.id "
-                + " SET transactionTranslatedIn.F" + fieldNo + " = forcw ";
-        }
-        else {
+                    + " JOIN (SELECT id from transactionIn WHERE configId = :configId"
+                    + " and batchId = :batchId) as ti ON transactionTranslatedIn.transactionInId = ti.id "
+                    + " SET transactionTranslatedIn.F" + fieldNo + " = forcw ";
+        } else {
             sql = "update transactionTranslatedOut "
-                + " JOIN (SELECT id from transactionTarget WHERE configId = :configId"
-                + " and batchDLId = :batchId) as ti ON transactionTranslatedOut.transactionTargetId = ti.id "
-                + " SET transactionTranslatedOut.F" + fieldNo + " = forcw ";
+                    + " JOIN (SELECT id from transactionTarget WHERE configId = :configId"
+                    + " and batchDLId = :batchId) as ti ON transactionTranslatedOut.transactionTargetId = ti.id "
+                    + " SET transactionTranslatedOut.F" + fieldNo + " = forcw ";
         }
 
         if (passClear == 1) {
@@ -1584,35 +1588,34 @@ public class transactionInDAOImpl implements transactionInDAO {
             System.err.println("updateFieldNoWithCWData failed." + ex);
         }
     }
-    
+
     @Override
     @Transactional
-    public void flagCWErrors(Integer configId, Integer batchId, 
-    		configurationDataTranslations cdt, boolean foroutboundProcessing) {
-        
-    	String sql;
-        
-    	if(foroutboundProcessing == false) {
-    		sql = "insert into transactionInerrors (batchUploadId, "
-    				+ "transactionInId, configurationFormFieldsId, errorid, cwId)"
+    public void flagCWErrors(Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing) {
+
+        String sql;
+
+        if (foroutboundProcessing == false) {
+            sql = "insert into transactionInerrors (batchUploadId, "
+                    + "transactionInId, configurationFormFieldsId, errorid, cwId)"
                     + " select " + batchId + ", transactionInId, " + cdt.getFieldId()
                     + ", 3,  " + cdt.getCrosswalkId() + " from transactionTranslatedIn where "
                     + "configId = :configId "
-                    + " and (F" + cdt.getFieldNo() 
+                    + " and (F" + cdt.getFieldNo()
                     + " is not null and forcw is null)"
                     + "and transactionInId in (select id from transactionIn "
                     + "where batchId = :batchId"
                     + " and configId = :configId);";
 
         } else {
-        	sql = "insert into transactionOutErrors (batchDownloadId, "
-    				+ "transactionTargetId, configurationFormFieldsId, errorid, cwId)"
+            sql = "insert into transactionOutErrors (batchDownloadId, "
+                    + "transactionTargetId, configurationFormFieldsId, errorid, cwId)"
                     + " select " + batchId + ", transactionTargetId, " + cdt.getFieldId()
                     + ", 3,  " + cdt.getCrosswalkId() + " from transactionTranslatedOut where "
                     + "configId = :configId "
-                    + " and (F" + cdt.getFieldNo() 
+                    + " and (F" + cdt.getFieldNo()
                     + " is not null and forcw is null)"
-                    + "and transactionTargetId in (select id from transactionTarget "
+                    + " and transactionTargetId in (select id from transactionTarget "
                     + "where batchDLId = :batchId"
                     + " and configId = :configId);";
         }
@@ -1627,268 +1630,268 @@ public class transactionInDAOImpl implements transactionInDAO {
         }
     }
 
-	@Override
-	@Transactional
-	public void resetTransactionTranslatedIn(Integer batchId) {
-		String  sql = "UPDATE transactionTranslatedIn INNER JOIN transactionInRecords ON "
-				+ " (transactionTranslatedIn.transactionInId = transactionInRecords.transactionInId) and transactionTranslatedIn.transactionInId "
-				+ " in (select id from transactionIn where batchId = :batchId) SET transactionTranslatedIn.F1 = transactionInRecords.F1,"
-				+ " transactionTranslatedIn.F2 = transactionInRecords.F2, transactionTranslatedIn.F3 = transactionInRecords.F3,"
-				+ " transactionTranslatedIn.F4 = transactionInRecords.F4, transactionTranslatedIn.F5 = transactionInRecords.F5,"
-				+ "transactionTranslatedIn.F6 = transactionInRecords.F6,transactionTranslatedIn.F7 = transactionInRecords.F7,"
-				+ "transactionTranslatedIn.F8 = transactionInRecords.F8,transactionTranslatedIn.F9 = transactionInRecords.F9,"
-				+ "transactionTranslatedIn.F10 = transactionInRecords.F10,transactionTranslatedIn.F11 = transactionInRecords.F11,"
-				+ "transactionTranslatedIn.F12 = transactionInRecords.F12,transactionTranslatedIn.F13 = transactionInRecords.F13,"
-				+ "transactionTranslatedIn.F14 = transactionInRecords.F14,transactionTranslatedIn.F15 = transactionInRecords.F15,"
-				+ "transactionTranslatedIn.F16 = transactionInRecords.F16,transactionTranslatedIn.F17 = transactionInRecords.F17,"
-				+ "transactiontranslatedIn.F18 = transactionInRecords.F18,"  
-				+ "transactiontranslatedIn.F19 = transactionInRecords.F19,"  
-				+ "transactiontranslatedIn.F20 = transactionInRecords.F20,"  
-				+ "transactiontranslatedIn.F21 = transactionInRecords.F21,"  
-				+ "transactiontranslatedIn.F22 = transactionInRecords.F22,"  
-				+ "transactiontranslatedIn.F23 = transactionInRecords.F23,"  
-				+ "transactiontranslatedIn.F24 = transactionInRecords.F24,"  
-				+ "transactiontranslatedIn.F25 = transactionInRecords.F25,"  
-				+ "transactiontranslatedIn.F26 = transactionInRecords.F26,"  
-				+ "transactiontranslatedIn.F27 = transactionInRecords.F27,"  
-				+ "transactiontranslatedIn.F28 = transactionInRecords.F28,"  
-				+ "transactiontranslatedIn.F29 = transactionInRecords.F29,"  
-				+ "transactiontranslatedIn.F30 = transactionInRecords.F30,"  
-				+ "transactiontranslatedIn.F31 = transactionInRecords.F31,"  
-				+ "transactiontranslatedIn.F32 = transactionInRecords.F32,"  
-				+ "transactiontranslatedIn.F33 = transactionInRecords.F33,"  
-				+ "transactiontranslatedIn.F34 = transactionInRecords.F34,"  
-				+ "transactiontranslatedIn.F35 = transactionInRecords.F35,"  
-				+ "transactiontranslatedIn.F36 = transactionInRecords.F36,"  
-				+ "transactiontranslatedIn.F37 = transactionInRecords.F37,"  
-				+ "transactiontranslatedIn.F38 = transactionInRecords.F38,"  
-				+ "transactiontranslatedIn.F39 = transactionInRecords.F39,"  
-				+ "transactiontranslatedIn.F40 = transactionInRecords.F40,"  
-				+ "transactiontranslatedIn.F41 = transactionInRecords.F41,"  
-				+ "transactiontranslatedIn.F42 = transactionInRecords.F42,"  
-				+ "transactiontranslatedIn.F43 = transactionInRecords.F43,"  
-				+ "transactiontranslatedIn.F44 = transactionInRecords.F44,"  
-				+ "transactiontranslatedIn.F45 = transactionInRecords.F45,"  
-				+ "transactiontranslatedIn.F46 = transactionInRecords.F46,"  
-				+ "transactiontranslatedIn.F47 = transactionInRecords.F47,"  
-				+ "transactiontranslatedIn.F48 = transactionInRecords.F48,"  
-				+ "transactiontranslatedIn.F49 = transactionInRecords.F49,"  
-				+ "transactiontranslatedIn.F50 = transactionInRecords.F50,"  
-				+ "transactiontranslatedIn.F51 = transactionInRecords.F51,"  
-				+ "transactiontranslatedIn.F52 = transactionInRecords.F52,"  
-				+ "transactiontranslatedIn.F53 = transactionInRecords.F53,"  
-				+ "transactiontranslatedIn.F54 = transactionInRecords.F54,"  
-				+ "transactiontranslatedIn.F55 = transactionInRecords.F55,"  
-				+ "transactiontranslatedIn.F56 = transactionInRecords.F56,"  
-				+ "transactiontranslatedIn.F57 = transactionInRecords.F57,"  
-				+ "transactiontranslatedIn.F58 = transactionInRecords.F58,"  
-				+ "transactiontranslatedIn.F59 = transactionInRecords.F59,"  
-				+ "transactiontranslatedIn.F60 = transactionInRecords.F60,"  
-				+ "transactiontranslatedIn.F61 = transactionInRecords.F61,"  
-				+ "transactiontranslatedIn.F62 = transactionInRecords.F62,"  
-				+ "transactiontranslatedIn.F63 = transactionInRecords.F63,"  
-				+ "transactiontranslatedIn.F64 = transactionInRecords.F64,"  
-				+ "transactiontranslatedIn.F65 = transactionInRecords.F65,"  
-				+ "transactiontranslatedIn.F66 = transactionInRecords.F66,"  
-				+ "transactiontranslatedIn.F67 = transactionInRecords.F67,"  
-				+ "transactiontranslatedIn.F68 = transactionInRecords.F68,"  
-				+ "transactiontranslatedIn.F69 = transactionInRecords.F69,"  
-				+ "transactiontranslatedIn.F70 = transactionInRecords.F70,"  
-				+ "transactiontranslatedIn.F71 = transactionInRecords.F71,"  
-				+ "transactiontranslatedIn.F72 = transactionInRecords.F72,"  
-				+ "transactiontranslatedIn.F73 = transactionInRecords.F73,"  
-				+ "transactiontranslatedIn.F74 = transactionInRecords.F74,"  
-				+ "transactiontranslatedIn.F75 = transactionInRecords.F75,"  
-				+ "transactiontranslatedIn.F76 = transactionInRecords.F76,"  
-				+ "transactiontranslatedIn.F77 = transactionInRecords.F77,"  
-				+ "transactiontranslatedIn.F78 = transactionInRecords.F78,"  
-				+ "transactiontranslatedIn.F79 = transactionInRecords.F79,"  
-				+ "transactiontranslatedIn.F80 = transactionInRecords.F80,"  
-				+ "transactiontranslatedIn.F81 = transactionInRecords.F81,"  
-				+ "transactiontranslatedIn.F82 = transactionInRecords.F82,"  
-				+ "transactiontranslatedIn.F83 = transactionInRecords.F83,"  
-				+ "transactiontranslatedIn.F84 = transactionInRecords.F84,"  
-				+ "transactiontranslatedIn.F85 = transactionInRecords.F85,"  
-				+ "transactiontranslatedIn.F86 = transactionInRecords.F86,"  
-				+ "transactiontranslatedIn.F87 = transactionInRecords.F87,"  
-				+ "transactiontranslatedIn.F88 = transactionInRecords.F88,"  
-				+ "transactiontranslatedIn.F89 = transactionInRecords.F89,"  
-				+ "transactiontranslatedIn.F90 = transactionInRecords.F90,"  
-				+ "transactiontranslatedIn.F91 = transactionInRecords.F91,"  
-				+ "transactiontranslatedIn.F92 = transactionInRecords.F92,"  
-				+ "transactiontranslatedIn.F93 = transactionInRecords.F93,"  
-				+ "transactiontranslatedIn.F94 = transactionInRecords.F94,"  
-				+ "transactiontranslatedIn.F95 = transactionInRecords.F95,"  
-				+ "transactiontranslatedIn.F96 = transactionInRecords.F96,"  
-				+ "transactiontranslatedIn.F97 = transactionInRecords.F97,"  
-				+ "transactiontranslatedIn.F98 = transactionInRecords.F98,"  
-				+ "transactiontranslatedIn.F99 = transactionInRecords.F99,"  
-				+ "transactiontranslatedIn.F100 = transactionInRecords.F100,"  
-				+ "transactiontranslatedIn.F101 = transactionInRecords.F101,"  
-				+ "transactiontranslatedIn.F102 = transactionInRecords.F102,"  
-				+ "transactiontranslatedIn.F103 = transactionInRecords.F103,"  
-				+ "transactiontranslatedIn.F104 = transactionInRecords.F104,"  
-				+ "transactiontranslatedIn.F105 = transactionInRecords.F105,"  
-				+ "transactiontranslatedIn.F106 = transactionInRecords.F106,"  
-				+ "transactiontranslatedIn.F107 = transactionInRecords.F107,"  
-				+ "transactiontranslatedIn.F108 = transactionInRecords.F108,"  
-				+ "transactiontranslatedIn.F109 = transactionInRecords.F109,"  
-				+ "transactiontranslatedIn.F110 = transactionInRecords.F110,"  
-				+ "transactiontranslatedIn.F111 = transactionInRecords.F111,"  
-				+ "transactiontranslatedIn.F112 = transactionInRecords.F112,"  
-				+ "transactiontranslatedIn.F113 = transactionInRecords.F113,"  
-				+ "transactiontranslatedIn.F114 = transactionInRecords.F114,"  
-				+ "transactiontranslatedIn.F115 = transactionInRecords.F115,"  
-				+ "transactiontranslatedIn.F116 = transactionInRecords.F116,"  
-				+ "transactiontranslatedIn.F117 = transactionInRecords.F117,"  
-				+ "transactiontranslatedIn.F118 = transactionInRecords.F118,"  
-				+ "transactiontranslatedIn.F119 = transactionInRecords.F119,"  
-				+ "transactiontranslatedIn.F120 = transactionInRecords.F120,"  
-				+ "transactiontranslatedIn.F121 = transactionInRecords.F121,"  
-				+ "transactiontranslatedIn.F122 = transactionInRecords.F122,"  
-				+ "transactiontranslatedIn.F123 = transactionInRecords.F123,"  
-				+ "transactiontranslatedIn.F124 = transactionInRecords.F124,"  
-				+ "transactiontranslatedIn.F125 = transactionInRecords.F125,"  
-				+ "transactiontranslatedIn.F126 = transactionInRecords.F126,"  
-				+ "transactiontranslatedIn.F127 = transactionInRecords.F127,"  
-				+ "transactiontranslatedIn.F128 = transactionInRecords.F128,"  
-				+ "transactiontranslatedIn.F129 = transactionInRecords.F129,"  
-				+ "transactiontranslatedIn.F130 = transactionInRecords.F130,"  
-				+ "transactiontranslatedIn.F131 = transactionInRecords.F131,"  
-				+ "transactiontranslatedIn.F132 = transactionInRecords.F132,"  
-				+ "transactiontranslatedIn.F133 = transactionInRecords.F133,"  
-				+ "transactiontranslatedIn.F134 = transactionInRecords.F134,"  
-				+ "transactiontranslatedIn.F135 = transactionInRecords.F135,"  
-				+ "transactiontranslatedIn.F136 = transactionInRecords.F136,"  
-				+ "transactiontranslatedIn.F137 = transactionInRecords.F137,"  
-				+ "transactiontranslatedIn.F138 = transactionInRecords.F138,"  
-				+ "transactiontranslatedIn.F139 = transactionInRecords.F139,"  
-				+ "transactiontranslatedIn.F140 = transactionInRecords.F140,"  
-				+ "transactiontranslatedIn.F141 = transactionInRecords.F141,"  
-				+ "transactiontranslatedIn.F142 = transactionInRecords.F142,"  
-				+ "transactiontranslatedIn.F143 = transactionInRecords.F143,"  
-				+ "transactiontranslatedIn.F144 = transactionInRecords.F144,"  
-				+ "transactiontranslatedIn.F145 = transactionInRecords.F145,"  
-				+ "transactiontranslatedIn.F146 = transactionInRecords.F146,"  
-				+ "transactiontranslatedIn.F147 = transactionInRecords.F147,"  
-				+ "transactiontranslatedIn.F148 = transactionInRecords.F148,"  
-				+ "transactiontranslatedIn.F149 = transactionInRecords.F149,"  
-				+ "transactiontranslatedIn.F150 = transactionInRecords.F150,"  
-				+ "transactiontranslatedIn.F151 = transactionInRecords.F151,"  
-				+ "transactiontranslatedIn.F152 = transactionInRecords.F152,"  
-				+ "transactiontranslatedIn.F153 = transactionInRecords.F153,"  
-				+ "transactiontranslatedIn.F154 = transactionInRecords.F154,"  
-				+ "transactiontranslatedIn.F155 = transactionInRecords.F155,"  
-				+ "transactiontranslatedIn.F156 = transactionInRecords.F156,"  
-				+ "transactiontranslatedIn.F157 = transactionInRecords.F157,"  
-				+ "transactiontranslatedIn.F158 = transactionInRecords.F158,"  
-				+ "transactiontranslatedIn.F159 = transactionInRecords.F159,"  
-				+ "transactiontranslatedIn.F160 = transactionInRecords.F160,"  
-				+ "transactiontranslatedIn.F161 = transactionInRecords.F161,"  
-				+ "transactiontranslatedIn.F162 = transactionInRecords.F162,"  
-				+ "transactiontranslatedIn.F163 = transactionInRecords.F163,"  
-				+ "transactiontranslatedIn.F164 = transactionInRecords.F164,"  
-				+ "transactiontranslatedIn.F165 = transactionInRecords.F165,"  
-				+ "transactiontranslatedIn.F166 = transactionInRecords.F166,"  
-				+ "transactiontranslatedIn.F167 = transactionInRecords.F167,"  
-				+ "transactiontranslatedIn.F168 = transactionInRecords.F168,"  
-				+ "transactiontranslatedIn.F169 = transactionInRecords.F169,"  
-				+ "transactiontranslatedIn.F170 = transactionInRecords.F170,"  
-				+ "transactiontranslatedIn.F171 = transactionInRecords.F171,"  
-				+ "transactiontranslatedIn.F172 = transactionInRecords.F172,"  
-				+ "transactiontranslatedIn.F173 = transactionInRecords.F173,"  
-				+ "transactiontranslatedIn.F174 = transactionInRecords.F174,"  
-				+ "transactiontranslatedIn.F175 = transactionInRecords.F175,"  
-				+ "transactiontranslatedIn.F176 = transactionInRecords.F176,"  
-				+ "transactiontranslatedIn.F177 = transactionInRecords.F177,"  
-				+ "transactiontranslatedIn.F178 = transactionInRecords.F178,"  
-				+ "transactiontranslatedIn.F179 = transactionInRecords.F179,"  
-				+ "transactiontranslatedIn.F180 = transactionInRecords.F180,"  
-				+ "transactiontranslatedIn.F181 = transactionInRecords.F181,"  
-				+ "transactiontranslatedIn.F182 = transactionInRecords.F182,"  
-				+ "transactiontranslatedIn.F183 = transactionInRecords.F183,"  
-				+ "transactiontranslatedIn.F184 = transactionInRecords.F184,"  
-				+ "transactiontranslatedIn.F185 = transactionInRecords.F185,"  
-				+ "transactiontranslatedIn.F186 = transactionInRecords.F186,"  
-				+ "transactiontranslatedIn.F187 = transactionInRecords.F187,"  
-				+ "transactiontranslatedIn.F188 = transactionInRecords.F188,"  
-				+ "transactiontranslatedIn.F189 = transactionInRecords.F189,"  
-				+ "transactiontranslatedIn.F190 = transactionInRecords.F190,"  
-				+ "transactiontranslatedIn.F191 = transactionInRecords.F191,"  
-				+ "transactiontranslatedIn.F192 = transactionInRecords.F192,"  
-				+ "transactiontranslatedIn.F193 = transactionInRecords.F193,"  
-				+ "transactiontranslatedIn.F194 = transactionInRecords.F194,"  
-				+ "transactiontranslatedIn.F195 = transactionInRecords.F195,"  
-				+ "transactiontranslatedIn.F196 = transactionInRecords.F196,"  
-				+ "transactiontranslatedIn.F197 = transactionInRecords.F197,"  
-				+ "transactiontranslatedIn.F198 = transactionInRecords.F198,"  
-				+ "transactiontranslatedIn.F199 = transactionInRecords.F199,"  
-				+ "transactiontranslatedIn.F200 = transactionInRecords.F200,"  
-				+ "transactiontranslatedIn.F201 = transactionInRecords.F201,"  
-				+ "transactiontranslatedIn.F202 = transactionInRecords.F202,"  
-				+ "transactiontranslatedIn.F203 = transactionInRecords.F203,"  
-				+ "transactiontranslatedIn.F204 = transactionInRecords.F204,"  
-				+ "transactiontranslatedIn.F205 = transactionInRecords.F205,"  
-				+ "transactiontranslatedIn.F206 = transactionInRecords.F206,"  
-				+ "transactiontranslatedIn.F207 = transactionInRecords.F207,"  
-				+ "transactiontranslatedIn.F208 = transactionInRecords.F208,"  
-				+ "transactiontranslatedIn.F209 = transactionInRecords.F209,"  
-				+ "transactiontranslatedIn.F210 = transactionInRecords.F210,"  
-				+ "transactiontranslatedIn.F211 = transactionInRecords.F211,"  
-				+ "transactiontranslatedIn.F212 = transactionInRecords.F212,"  
-				+ "transactiontranslatedIn.F213 = transactionInRecords.F213,"  
-				+ "transactiontranslatedIn.F214 = transactionInRecords.F214,"  
-				+ "transactiontranslatedIn.F215 = transactionInRecords.F215,"  
-				+ "transactiontranslatedIn.F216 = transactionInRecords.F216,"  
-				+ "transactiontranslatedIn.F217 = transactionInRecords.F217,"  
-				+ "transactiontranslatedIn.F218 = transactionInRecords.F218,"  
-				+ "transactiontranslatedIn.F219 = transactionInRecords.F219,"  
-				+ "transactiontranslatedIn.F220 = transactionInRecords.F220,"  
-				+ "transactiontranslatedIn.F221 = transactionInRecords.F221,"  
-				+ "transactiontranslatedIn.F222 = transactionInRecords.F222,"  
-				+ "transactiontranslatedIn.F223 = transactionInRecords.F223,"  
-				+ "transactiontranslatedIn.F224 = transactionInRecords.F224,"  
-				+ "transactiontranslatedIn.F225 = transactionInRecords.F225,"  
-				+ "transactiontranslatedIn.F226 = transactionInRecords.F226,"  
-				+ "transactiontranslatedIn.F227 = transactionInRecords.F227,"  
-				+ "transactiontranslatedIn.F228 = transactionInRecords.F228,"  
-				+ "transactiontranslatedIn.F229 = transactionInRecords.F229,"  
-				+ "transactiontranslatedIn.F230 = transactionInRecords.F230,"  
-				+ "transactiontranslatedIn.F231 = transactionInRecords.F231,"  
-				+ "transactiontranslatedIn.F232 = transactionInRecords.F232,"  
-				+ "transactiontranslatedIn.F233 = transactionInRecords.F233,"  
-				+ "transactiontranslatedIn.F234 = transactionInRecords.F234,"  
-				+ "transactiontranslatedIn.F235 = transactionInRecords.F235,"  
-				+ "transactiontranslatedIn.F236 = transactionInRecords.F236,"  
-				+ "transactiontranslatedIn.F237 = transactionInRecords.F237,"  
-				+ "transactiontranslatedIn.F238 = transactionInRecords.F238,"  
-				+ "transactiontranslatedIn.F239 = transactionInRecords.F239,"  
-				+ "transactiontranslatedIn.F240 = transactionInRecords.F240,"  
-				+ "transactiontranslatedIn.F241 = transactionInRecords.F241,"  
-				+ "transactiontranslatedIn.F242 = transactionInRecords.F242,"  
-				+ "transactiontranslatedIn.F243 = transactionInRecords.F243,"  
-				+ "transactiontranslatedIn.F244 = transactionInRecords.F244,"  
-				+ "transactiontranslatedIn.F245 = transactionInRecords.F245,"  
-				+ "transactiontranslatedIn.F246 = transactionInRecords.F246,"  
-				+ "transactiontranslatedIn.F247 = transactionInRecords.F247,"  
-				+ "transactiontranslatedIn.F248 = transactionInRecords.F248,"  
-				+ "transactiontranslatedIn.F249 = transactionInRecords.F249,"  
-				+ "transactiontranslatedIn.F250 = transactionInRecords.F250,"  
-				+ "transactiontranslatedIn.F251 = transactionInRecords.F251,"  
-				+ "transactiontranslatedIn.F252 = transactionInRecords.F252,"  
-				+ "transactiontranslatedIn.F253 = transactionInRecords.F253,"  
-				+ "transactiontranslatedIn.F254 = transactionInRecords.F254,"  
-				+ "transactiontranslatedIn.F255 = transactionInRecords.F255";
+    @Override
+    @Transactional
+    public void resetTransactionTranslatedIn(Integer batchId) {
+        String sql = "UPDATE transactionTranslatedIn INNER JOIN transactionInRecords ON "
+                + " (transactionTranslatedIn.transactionInId = transactionInRecords.transactionInId) and transactionTranslatedIn.transactionInId "
+                + " in (select id from transactionIn where batchId = :batchId) SET transactionTranslatedIn.F1 = transactionInRecords.F1,"
+                + " transactionTranslatedIn.F2 = transactionInRecords.F2, transactionTranslatedIn.F3 = transactionInRecords.F3,"
+                + " transactionTranslatedIn.F4 = transactionInRecords.F4, transactionTranslatedIn.F5 = transactionInRecords.F5,"
+                + "transactionTranslatedIn.F6 = transactionInRecords.F6,transactionTranslatedIn.F7 = transactionInRecords.F7,"
+                + "transactionTranslatedIn.F8 = transactionInRecords.F8,transactionTranslatedIn.F9 = transactionInRecords.F9,"
+                + "transactionTranslatedIn.F10 = transactionInRecords.F10,transactionTranslatedIn.F11 = transactionInRecords.F11,"
+                + "transactionTranslatedIn.F12 = transactionInRecords.F12,transactionTranslatedIn.F13 = transactionInRecords.F13,"
+                + "transactionTranslatedIn.F14 = transactionInRecords.F14,transactionTranslatedIn.F15 = transactionInRecords.F15,"
+                + "transactionTranslatedIn.F16 = transactionInRecords.F16,transactionTranslatedIn.F17 = transactionInRecords.F17,"
+                + "transactiontranslatedIn.F18 = transactionInRecords.F18,"
+                + "transactiontranslatedIn.F19 = transactionInRecords.F19,"
+                + "transactiontranslatedIn.F20 = transactionInRecords.F20,"
+                + "transactiontranslatedIn.F21 = transactionInRecords.F21,"
+                + "transactiontranslatedIn.F22 = transactionInRecords.F22,"
+                + "transactiontranslatedIn.F23 = transactionInRecords.F23,"
+                + "transactiontranslatedIn.F24 = transactionInRecords.F24,"
+                + "transactiontranslatedIn.F25 = transactionInRecords.F25,"
+                + "transactiontranslatedIn.F26 = transactionInRecords.F26,"
+                + "transactiontranslatedIn.F27 = transactionInRecords.F27,"
+                + "transactiontranslatedIn.F28 = transactionInRecords.F28,"
+                + "transactiontranslatedIn.F29 = transactionInRecords.F29,"
+                + "transactiontranslatedIn.F30 = transactionInRecords.F30,"
+                + "transactiontranslatedIn.F31 = transactionInRecords.F31,"
+                + "transactiontranslatedIn.F32 = transactionInRecords.F32,"
+                + "transactiontranslatedIn.F33 = transactionInRecords.F33,"
+                + "transactiontranslatedIn.F34 = transactionInRecords.F34,"
+                + "transactiontranslatedIn.F35 = transactionInRecords.F35,"
+                + "transactiontranslatedIn.F36 = transactionInRecords.F36,"
+                + "transactiontranslatedIn.F37 = transactionInRecords.F37,"
+                + "transactiontranslatedIn.F38 = transactionInRecords.F38,"
+                + "transactiontranslatedIn.F39 = transactionInRecords.F39,"
+                + "transactiontranslatedIn.F40 = transactionInRecords.F40,"
+                + "transactiontranslatedIn.F41 = transactionInRecords.F41,"
+                + "transactiontranslatedIn.F42 = transactionInRecords.F42,"
+                + "transactiontranslatedIn.F43 = transactionInRecords.F43,"
+                + "transactiontranslatedIn.F44 = transactionInRecords.F44,"
+                + "transactiontranslatedIn.F45 = transactionInRecords.F45,"
+                + "transactiontranslatedIn.F46 = transactionInRecords.F46,"
+                + "transactiontranslatedIn.F47 = transactionInRecords.F47,"
+                + "transactiontranslatedIn.F48 = transactionInRecords.F48,"
+                + "transactiontranslatedIn.F49 = transactionInRecords.F49,"
+                + "transactiontranslatedIn.F50 = transactionInRecords.F50,"
+                + "transactiontranslatedIn.F51 = transactionInRecords.F51,"
+                + "transactiontranslatedIn.F52 = transactionInRecords.F52,"
+                + "transactiontranslatedIn.F53 = transactionInRecords.F53,"
+                + "transactiontranslatedIn.F54 = transactionInRecords.F54,"
+                + "transactiontranslatedIn.F55 = transactionInRecords.F55,"
+                + "transactiontranslatedIn.F56 = transactionInRecords.F56,"
+                + "transactiontranslatedIn.F57 = transactionInRecords.F57,"
+                + "transactiontranslatedIn.F58 = transactionInRecords.F58,"
+                + "transactiontranslatedIn.F59 = transactionInRecords.F59,"
+                + "transactiontranslatedIn.F60 = transactionInRecords.F60,"
+                + "transactiontranslatedIn.F61 = transactionInRecords.F61,"
+                + "transactiontranslatedIn.F62 = transactionInRecords.F62,"
+                + "transactiontranslatedIn.F63 = transactionInRecords.F63,"
+                + "transactiontranslatedIn.F64 = transactionInRecords.F64,"
+                + "transactiontranslatedIn.F65 = transactionInRecords.F65,"
+                + "transactiontranslatedIn.F66 = transactionInRecords.F66,"
+                + "transactiontranslatedIn.F67 = transactionInRecords.F67,"
+                + "transactiontranslatedIn.F68 = transactionInRecords.F68,"
+                + "transactiontranslatedIn.F69 = transactionInRecords.F69,"
+                + "transactiontranslatedIn.F70 = transactionInRecords.F70,"
+                + "transactiontranslatedIn.F71 = transactionInRecords.F71,"
+                + "transactiontranslatedIn.F72 = transactionInRecords.F72,"
+                + "transactiontranslatedIn.F73 = transactionInRecords.F73,"
+                + "transactiontranslatedIn.F74 = transactionInRecords.F74,"
+                + "transactiontranslatedIn.F75 = transactionInRecords.F75,"
+                + "transactiontranslatedIn.F76 = transactionInRecords.F76,"
+                + "transactiontranslatedIn.F77 = transactionInRecords.F77,"
+                + "transactiontranslatedIn.F78 = transactionInRecords.F78,"
+                + "transactiontranslatedIn.F79 = transactionInRecords.F79,"
+                + "transactiontranslatedIn.F80 = transactionInRecords.F80,"
+                + "transactiontranslatedIn.F81 = transactionInRecords.F81,"
+                + "transactiontranslatedIn.F82 = transactionInRecords.F82,"
+                + "transactiontranslatedIn.F83 = transactionInRecords.F83,"
+                + "transactiontranslatedIn.F84 = transactionInRecords.F84,"
+                + "transactiontranslatedIn.F85 = transactionInRecords.F85,"
+                + "transactiontranslatedIn.F86 = transactionInRecords.F86,"
+                + "transactiontranslatedIn.F87 = transactionInRecords.F87,"
+                + "transactiontranslatedIn.F88 = transactionInRecords.F88,"
+                + "transactiontranslatedIn.F89 = transactionInRecords.F89,"
+                + "transactiontranslatedIn.F90 = transactionInRecords.F90,"
+                + "transactiontranslatedIn.F91 = transactionInRecords.F91,"
+                + "transactiontranslatedIn.F92 = transactionInRecords.F92,"
+                + "transactiontranslatedIn.F93 = transactionInRecords.F93,"
+                + "transactiontranslatedIn.F94 = transactionInRecords.F94,"
+                + "transactiontranslatedIn.F95 = transactionInRecords.F95,"
+                + "transactiontranslatedIn.F96 = transactionInRecords.F96,"
+                + "transactiontranslatedIn.F97 = transactionInRecords.F97,"
+                + "transactiontranslatedIn.F98 = transactionInRecords.F98,"
+                + "transactiontranslatedIn.F99 = transactionInRecords.F99,"
+                + "transactiontranslatedIn.F100 = transactionInRecords.F100,"
+                + "transactiontranslatedIn.F101 = transactionInRecords.F101,"
+                + "transactiontranslatedIn.F102 = transactionInRecords.F102,"
+                + "transactiontranslatedIn.F103 = transactionInRecords.F103,"
+                + "transactiontranslatedIn.F104 = transactionInRecords.F104,"
+                + "transactiontranslatedIn.F105 = transactionInRecords.F105,"
+                + "transactiontranslatedIn.F106 = transactionInRecords.F106,"
+                + "transactiontranslatedIn.F107 = transactionInRecords.F107,"
+                + "transactiontranslatedIn.F108 = transactionInRecords.F108,"
+                + "transactiontranslatedIn.F109 = transactionInRecords.F109,"
+                + "transactiontranslatedIn.F110 = transactionInRecords.F110,"
+                + "transactiontranslatedIn.F111 = transactionInRecords.F111,"
+                + "transactiontranslatedIn.F112 = transactionInRecords.F112,"
+                + "transactiontranslatedIn.F113 = transactionInRecords.F113,"
+                + "transactiontranslatedIn.F114 = transactionInRecords.F114,"
+                + "transactiontranslatedIn.F115 = transactionInRecords.F115,"
+                + "transactiontranslatedIn.F116 = transactionInRecords.F116,"
+                + "transactiontranslatedIn.F117 = transactionInRecords.F117,"
+                + "transactiontranslatedIn.F118 = transactionInRecords.F118,"
+                + "transactiontranslatedIn.F119 = transactionInRecords.F119,"
+                + "transactiontranslatedIn.F120 = transactionInRecords.F120,"
+                + "transactiontranslatedIn.F121 = transactionInRecords.F121,"
+                + "transactiontranslatedIn.F122 = transactionInRecords.F122,"
+                + "transactiontranslatedIn.F123 = transactionInRecords.F123,"
+                + "transactiontranslatedIn.F124 = transactionInRecords.F124,"
+                + "transactiontranslatedIn.F125 = transactionInRecords.F125,"
+                + "transactiontranslatedIn.F126 = transactionInRecords.F126,"
+                + "transactiontranslatedIn.F127 = transactionInRecords.F127,"
+                + "transactiontranslatedIn.F128 = transactionInRecords.F128,"
+                + "transactiontranslatedIn.F129 = transactionInRecords.F129,"
+                + "transactiontranslatedIn.F130 = transactionInRecords.F130,"
+                + "transactiontranslatedIn.F131 = transactionInRecords.F131,"
+                + "transactiontranslatedIn.F132 = transactionInRecords.F132,"
+                + "transactiontranslatedIn.F133 = transactionInRecords.F133,"
+                + "transactiontranslatedIn.F134 = transactionInRecords.F134,"
+                + "transactiontranslatedIn.F135 = transactionInRecords.F135,"
+                + "transactiontranslatedIn.F136 = transactionInRecords.F136,"
+                + "transactiontranslatedIn.F137 = transactionInRecords.F137,"
+                + "transactiontranslatedIn.F138 = transactionInRecords.F138,"
+                + "transactiontranslatedIn.F139 = transactionInRecords.F139,"
+                + "transactiontranslatedIn.F140 = transactionInRecords.F140,"
+                + "transactiontranslatedIn.F141 = transactionInRecords.F141,"
+                + "transactiontranslatedIn.F142 = transactionInRecords.F142,"
+                + "transactiontranslatedIn.F143 = transactionInRecords.F143,"
+                + "transactiontranslatedIn.F144 = transactionInRecords.F144,"
+                + "transactiontranslatedIn.F145 = transactionInRecords.F145,"
+                + "transactiontranslatedIn.F146 = transactionInRecords.F146,"
+                + "transactiontranslatedIn.F147 = transactionInRecords.F147,"
+                + "transactiontranslatedIn.F148 = transactionInRecords.F148,"
+                + "transactiontranslatedIn.F149 = transactionInRecords.F149,"
+                + "transactiontranslatedIn.F150 = transactionInRecords.F150,"
+                + "transactiontranslatedIn.F151 = transactionInRecords.F151,"
+                + "transactiontranslatedIn.F152 = transactionInRecords.F152,"
+                + "transactiontranslatedIn.F153 = transactionInRecords.F153,"
+                + "transactiontranslatedIn.F154 = transactionInRecords.F154,"
+                + "transactiontranslatedIn.F155 = transactionInRecords.F155,"
+                + "transactiontranslatedIn.F156 = transactionInRecords.F156,"
+                + "transactiontranslatedIn.F157 = transactionInRecords.F157,"
+                + "transactiontranslatedIn.F158 = transactionInRecords.F158,"
+                + "transactiontranslatedIn.F159 = transactionInRecords.F159,"
+                + "transactiontranslatedIn.F160 = transactionInRecords.F160,"
+                + "transactiontranslatedIn.F161 = transactionInRecords.F161,"
+                + "transactiontranslatedIn.F162 = transactionInRecords.F162,"
+                + "transactiontranslatedIn.F163 = transactionInRecords.F163,"
+                + "transactiontranslatedIn.F164 = transactionInRecords.F164,"
+                + "transactiontranslatedIn.F165 = transactionInRecords.F165,"
+                + "transactiontranslatedIn.F166 = transactionInRecords.F166,"
+                + "transactiontranslatedIn.F167 = transactionInRecords.F167,"
+                + "transactiontranslatedIn.F168 = transactionInRecords.F168,"
+                + "transactiontranslatedIn.F169 = transactionInRecords.F169,"
+                + "transactiontranslatedIn.F170 = transactionInRecords.F170,"
+                + "transactiontranslatedIn.F171 = transactionInRecords.F171,"
+                + "transactiontranslatedIn.F172 = transactionInRecords.F172,"
+                + "transactiontranslatedIn.F173 = transactionInRecords.F173,"
+                + "transactiontranslatedIn.F174 = transactionInRecords.F174,"
+                + "transactiontranslatedIn.F175 = transactionInRecords.F175,"
+                + "transactiontranslatedIn.F176 = transactionInRecords.F176,"
+                + "transactiontranslatedIn.F177 = transactionInRecords.F177,"
+                + "transactiontranslatedIn.F178 = transactionInRecords.F178,"
+                + "transactiontranslatedIn.F179 = transactionInRecords.F179,"
+                + "transactiontranslatedIn.F180 = transactionInRecords.F180,"
+                + "transactiontranslatedIn.F181 = transactionInRecords.F181,"
+                + "transactiontranslatedIn.F182 = transactionInRecords.F182,"
+                + "transactiontranslatedIn.F183 = transactionInRecords.F183,"
+                + "transactiontranslatedIn.F184 = transactionInRecords.F184,"
+                + "transactiontranslatedIn.F185 = transactionInRecords.F185,"
+                + "transactiontranslatedIn.F186 = transactionInRecords.F186,"
+                + "transactiontranslatedIn.F187 = transactionInRecords.F187,"
+                + "transactiontranslatedIn.F188 = transactionInRecords.F188,"
+                + "transactiontranslatedIn.F189 = transactionInRecords.F189,"
+                + "transactiontranslatedIn.F190 = transactionInRecords.F190,"
+                + "transactiontranslatedIn.F191 = transactionInRecords.F191,"
+                + "transactiontranslatedIn.F192 = transactionInRecords.F192,"
+                + "transactiontranslatedIn.F193 = transactionInRecords.F193,"
+                + "transactiontranslatedIn.F194 = transactionInRecords.F194,"
+                + "transactiontranslatedIn.F195 = transactionInRecords.F195,"
+                + "transactiontranslatedIn.F196 = transactionInRecords.F196,"
+                + "transactiontranslatedIn.F197 = transactionInRecords.F197,"
+                + "transactiontranslatedIn.F198 = transactionInRecords.F198,"
+                + "transactiontranslatedIn.F199 = transactionInRecords.F199,"
+                + "transactiontranslatedIn.F200 = transactionInRecords.F200,"
+                + "transactiontranslatedIn.F201 = transactionInRecords.F201,"
+                + "transactiontranslatedIn.F202 = transactionInRecords.F202,"
+                + "transactiontranslatedIn.F203 = transactionInRecords.F203,"
+                + "transactiontranslatedIn.F204 = transactionInRecords.F204,"
+                + "transactiontranslatedIn.F205 = transactionInRecords.F205,"
+                + "transactiontranslatedIn.F206 = transactionInRecords.F206,"
+                + "transactiontranslatedIn.F207 = transactionInRecords.F207,"
+                + "transactiontranslatedIn.F208 = transactionInRecords.F208,"
+                + "transactiontranslatedIn.F209 = transactionInRecords.F209,"
+                + "transactiontranslatedIn.F210 = transactionInRecords.F210,"
+                + "transactiontranslatedIn.F211 = transactionInRecords.F211,"
+                + "transactiontranslatedIn.F212 = transactionInRecords.F212,"
+                + "transactiontranslatedIn.F213 = transactionInRecords.F213,"
+                + "transactiontranslatedIn.F214 = transactionInRecords.F214,"
+                + "transactiontranslatedIn.F215 = transactionInRecords.F215,"
+                + "transactiontranslatedIn.F216 = transactionInRecords.F216,"
+                + "transactiontranslatedIn.F217 = transactionInRecords.F217,"
+                + "transactiontranslatedIn.F218 = transactionInRecords.F218,"
+                + "transactiontranslatedIn.F219 = transactionInRecords.F219,"
+                + "transactiontranslatedIn.F220 = transactionInRecords.F220,"
+                + "transactiontranslatedIn.F221 = transactionInRecords.F221,"
+                + "transactiontranslatedIn.F222 = transactionInRecords.F222,"
+                + "transactiontranslatedIn.F223 = transactionInRecords.F223,"
+                + "transactiontranslatedIn.F224 = transactionInRecords.F224,"
+                + "transactiontranslatedIn.F225 = transactionInRecords.F225,"
+                + "transactiontranslatedIn.F226 = transactionInRecords.F226,"
+                + "transactiontranslatedIn.F227 = transactionInRecords.F227,"
+                + "transactiontranslatedIn.F228 = transactionInRecords.F228,"
+                + "transactiontranslatedIn.F229 = transactionInRecords.F229,"
+                + "transactiontranslatedIn.F230 = transactionInRecords.F230,"
+                + "transactiontranslatedIn.F231 = transactionInRecords.F231,"
+                + "transactiontranslatedIn.F232 = transactionInRecords.F232,"
+                + "transactiontranslatedIn.F233 = transactionInRecords.F233,"
+                + "transactiontranslatedIn.F234 = transactionInRecords.F234,"
+                + "transactiontranslatedIn.F235 = transactionInRecords.F235,"
+                + "transactiontranslatedIn.F236 = transactionInRecords.F236,"
+                + "transactiontranslatedIn.F237 = transactionInRecords.F237,"
+                + "transactiontranslatedIn.F238 = transactionInRecords.F238,"
+                + "transactiontranslatedIn.F239 = transactionInRecords.F239,"
+                + "transactiontranslatedIn.F240 = transactionInRecords.F240,"
+                + "transactiontranslatedIn.F241 = transactionInRecords.F241,"
+                + "transactiontranslatedIn.F242 = transactionInRecords.F242,"
+                + "transactiontranslatedIn.F243 = transactionInRecords.F243,"
+                + "transactiontranslatedIn.F244 = transactionInRecords.F244,"
+                + "transactiontranslatedIn.F245 = transactionInRecords.F245,"
+                + "transactiontranslatedIn.F246 = transactionInRecords.F246,"
+                + "transactiontranslatedIn.F247 = transactionInRecords.F247,"
+                + "transactiontranslatedIn.F248 = transactionInRecords.F248,"
+                + "transactiontranslatedIn.F249 = transactionInRecords.F249,"
+                + "transactiontranslatedIn.F250 = transactionInRecords.F250,"
+                + "transactiontranslatedIn.F251 = transactionInRecords.F251,"
+                + "transactiontranslatedIn.F252 = transactionInRecords.F252,"
+                + "transactiontranslatedIn.F253 = transactionInRecords.F253,"
+                + "transactiontranslatedIn.F254 = transactionInRecords.F254,"
+                + "transactiontranslatedIn.F255 = transactionInRecords.F255";
 
         Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
                 .setParameter("batchId", batchId);
-               
+
         try {
             updateData.executeUpdate();
         } catch (Exception ex) {
             System.err.println("resetTransactionTranslatedIn failed." + ex);
         }
-		
-	}
+
+    }
 
 }

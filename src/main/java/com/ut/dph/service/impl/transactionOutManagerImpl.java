@@ -221,14 +221,10 @@ public class transactionOutManagerImpl implements transactionOutManager {
                 /* Process the output (transactionTargetId, targetConfigId, transactionInId) */
                 processed = transactionOutDAO.processOutPutTransactions(transaction.getId(), transaction.getconfigId(), transaction.gettransactionInId());
                     
-                
                 /* If processed == true update the status of the batch and transaction */
                 if(processed == true) {
                     /* Update the status of the uploaded batch to  TBP (Target Batch Creating in process) (ID = 25) */
                     transactionInManager.updateBatchStatus(transaction.getbatchUploadId(),25,"");
-                    
-                    /* Update the status of the target batch to  TBP (Target Batch Creating in process) (ID = 25) */
-                    transactionOutDAO.updateTargetBatchStatus(transaction.getbatchDLId(),25,"");
                     
                     /* Need to start the transaction translations */
                     boolean recordsTranslated = translateTargetRecords(transaction.getId(), transaction.getconfigId(), transaction.getbatchDLId());
@@ -241,13 +237,11 @@ public class transactionOutManagerImpl implements transactionOutManager {
                         transactionInManager.updateTransactionStatus(transaction.getbatchUploadId(), transaction.gettransactionInId(), 0, 18);
                         
                         /* Update the status of the transaction target to PP (Pending Pickup) (ID = 18) */
-                        transactionInManager.updateTransactionTargetStatus(transaction.getbatchUploadId(), transaction.gettransactionInId(), 0, 18);
+                        transactionInManager.updateTransactionTargetStatus(0, transaction.getId(), 0, 18);
                         
                         /* Update the status of the uploaded batch to  TBP (Target Batch Created) (ID = 28) */
                         transactionInManager.updateBatchStatus(transaction.getbatchUploadId(),28,"");
 
-                        /* Update the status of the target batch to  TBP (Target Batch Created) (ID = 28) */
-                        transactionOutDAO.updateTargetBatchStatus(transaction.getbatchDLId(),28,"");
                     }
                     
                 }
@@ -269,6 +263,17 @@ public class transactionOutManagerImpl implements transactionOutManager {
         statusId (19 - Pending Output)
          */
         List<transactionTarget> pendingTransactions = transactionOutDAO.getpendingOutPutTransactions(10);
+        
+       
+                    /* Update the status of the target batch to  TBP (Target Batch Creating in process) (ID = 25) */
+                    /* transactionOutDAO.updateTargetBatchStatus(transaction.getbatchDLId(),25,"");*/
+        
+        
+        
+                        /* Update the status of the target batch to  TBP (Target Batch Created) (ID = 28) */
+                        /*transactionOutDAO.updateTargetBatchStatus(transaction.getbatchDLId(),28,"");*/
+        
+        
         
         /* 
         If pending transactions are found need to loop through and check the 

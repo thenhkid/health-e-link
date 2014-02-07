@@ -796,7 +796,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
                 + "f220, f221, f222, f223, f224, f225, f226, f227, f228, f229, f230, f231, f232, f233, f234, f235, f236, f237, f238, f239, f240, f241, f242, f243, f244, f245, f246, f247, f248, f249,"
                 + "f250, f251, f252, f253, f254, f255 "
                 + "FROM transactionTranslatedOut where transactionTargetId = :transactionTargetId");
-        query.setParameter("id", transactionTargetId);
+        query.setParameter("transactionTargetId", transactionTargetId);
         query.executeUpdate();
     }
 }

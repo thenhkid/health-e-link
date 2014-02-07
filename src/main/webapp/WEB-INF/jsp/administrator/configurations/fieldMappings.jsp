@@ -74,6 +74,10 @@
                                                         <input type="hidden" name="fields[${field.index}].required" value="${mappings.required}" />
                                                         <input type="hidden" name="fields[${field.index}].bucketDspPos" value="${mappings.bucketDspPos}" />
                                                         <input type="hidden" name="fields[${field.index}].validationType" value="${mappings.validationType}" />
+                                                        <input type="hidden" name="fields[${field.index}].saveToTableName" value="${mappings.saveToTableName}" />
+                                                        <input type="hidden" name="fields[${field.index}].saveToTableCol" value="${mappings.saveToTableCol}" />
+                                                        <input type="hidden" name="fields[${field.index}].autoPopulateTableName" value="${mappings.autoPopulateTableName}" />
+                                                        <input type="hidden" name="fields[${field.index}].autoPopulateTableCol" value="${mappings.autoPopulateTableCol}" />
                                                         ${mappings.fieldNo}
                                                     </td>
                                                     <td>${mappings.fieldDesc}</td>
