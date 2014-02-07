@@ -192,6 +192,12 @@ public class transactionOutManagerImpl implements transactionOutManager {
         transactionOutDAO.moveTranslatedRecords(transactionTargetId);
     }
     
+    /**
+     * The 'processOutputRecords' function will look for pending output records and
+     * start the translation process on the records to generate for the target.
+     * 
+     * @param transactionTargetId  The id of a specific transaction to process (defaults to 0)
+     */
     @Override
     @Transactional
     public void processOutputRecords(int transactionTargetId) {
@@ -210,48 +216,11 @@ public class transactionOutManagerImpl implements transactionOutManager {
            
             for(transactionTarget transaction : pendingTransactions) {
             
-                configurationSchedules scheduleDetails = configurationManager.getScheduleDetails(transaction.getconfigId());
-                
                 boolean processed = false;
                 
-                /* If no schedule details is found or the setting is for 'automatically' then process now */
-                if(scheduleDetails == null || scheduleDetails.gettype() == 5) {
+                /* Process the output (transactionTargetId, targetConfigId, transactionInId) */
+                processed = transactionOutDAO.processOutPutTransactions(transaction.getId(), transaction.getconfigId(), transaction.gettransactionInId());
                     
-                    /* Process the output (transactionTargetId, targetConfigId, transactionInId) */
-                    processed = transactionOutDAO.processOutPutTransactions(transaction.getId(), transaction.getconfigId(), transaction.gettransactionInId());
-                    
-                }
-                /* If the setting is for 'Daily' */
-                else if(scheduleDetails.gettype() == 2) {
-                    
-                    /* if Daily check for scheduled or continuous */
-                    if(scheduleDetails.getprocessingType() == 1) {
-                        /* SCHEDULED */
-                        Date date = new Date();
-                        Calendar calendar = GregorianCalendar.getInstance();
-                        calendar.setTime(date);
-                        
-                        int hourOfDay = calendar.get(Calendar.HOUR_OF_DAY);
-                       
-                        if(hourOfDay >= scheduleDetails.getprocessingTime()) {
-                            System.out.println("RUN");
-                        }
-                    }
-                    else {
-                        /* CONTINUOUS */
-                        
-                    }
-                    
-                    
-                }
-                /* If the setting is for 'Weekly' */
-                else if(scheduleDetails.gettype() == 3) {
-                    
-                }
-                /* If the setting is for 'Monthly' */
-                else if(scheduleDetails.gettype() == 4) {
-                    
-                }
                 
                 /* If processed == true update the status of the batch and transaction */
                 if(processed == true) {
@@ -281,13 +250,73 @@ public class transactionOutManagerImpl implements transactionOutManager {
                         transactionOutDAO.updateTargetBatchStatus(transaction.getbatchDLId(),28,"");
                     }
                     
-                    /* Check to see if an output file is to be generated */
-                    
                 }
-                
             }
-            
         }
     }
     
+    /**
+     * The 'generateOutputFiles' function will look to see if any output files need to 
+     * be generated.
+     * 
+     */
+    @Override
+    @Transactional
+    public void generateOutputFiles() {
+       
+        /* 
+        Need to find all transactionTarget records that are ready to be processed
+        statusId (19 - Pending Output)
+         */
+        List<transactionTarget> pendingTransactions = transactionOutDAO.getpendingOutPutTransactions(10);
+        
+        /* 
+        If pending transactions are found need to loop through and check the 
+        schedule setting for the configuration.
+        */
+        if(!pendingTransactions.isEmpty()) {
+           
+            for(transactionTarget transaction : pendingTransactions) {
+            
+                configurationSchedules scheduleDetails = configurationManager.getScheduleDetails(transaction.getconfigId());
+                
+                boolean processed = false;
+                
+                /* If the setting is for 'Daily' */
+                if(scheduleDetails.gettype() == 2) {
+                    
+                    /* if Daily check for scheduled or continuous */
+                    if(scheduleDetails.getprocessingType() == 1) {
+                        /* SCHEDULED */
+                        Date date = new Date();
+                        Calendar calendar = GregorianCalendar.getInstance();
+                        calendar.setTime(date);
+                        
+                        int hourOfDay = calendar.get(Calendar.HOUR_OF_DAY);
+                       
+                        if(hourOfDay >= scheduleDetails.getprocessingTime()) {
+                            /* Process the output (transactionTargetId, targetConfigId, transactionInId) */
+                            /*processed = transactionOutDAO.processOutPutTransactions(transaction.getId(), transaction.getconfigId(), transaction.gettransactionInId());*/
+                        }
+                    }
+                    else {
+                        /* CONTINUOUS */
+                        
+                    }
+                    
+                    
+                }
+                /* If the setting is for 'Weekly' */
+                else if(scheduleDetails.gettype() == 3) {
+                    
+                }
+                /* If the setting is for 'Monthly' */
+                else if(scheduleDetails.gettype() == 4) {
+                    
+                }
+                    
+            }
+                
+       }
+    }
 }

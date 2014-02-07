@@ -5,7 +5,6 @@
  */
 
 package com.ut.dph.jobs;
-
 import com.ut.dph.service.transactionOutManager;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
@@ -13,24 +12,21 @@ import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
-
 /**
  *
  * @author chadmccue
  */
-public class processOutputFiles implements Job {
+public class generateOutputFiles implements Job {
     
     @Autowired
     private transactionOutManager transactionOutManager;
     
     @Override
     public void execute(JobExecutionContext context)  throws JobExecutionException {
-        System.out.println("Job processOutputFiles is runing");
-        
         SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
         
-        transactionOutManager.processOutputRecords(0);
+        transactionOutManager.generateOutputFiles();
         
     }
-
+    
 }

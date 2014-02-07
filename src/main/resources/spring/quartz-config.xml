@@ -11,7 +11,7 @@
             <name>ProcessOutputFiles</name>
             <group>processGroup</group>
             <description>This process will run every minute to check if any outbound files must be processed</description>
-            <job-class>com.ut.dph.jobs.processOutputFiles</job-class>
+            <job-class>com.ut.dph.jobs.processOutputRecords</job-class>
         </job>
  
         <trigger>

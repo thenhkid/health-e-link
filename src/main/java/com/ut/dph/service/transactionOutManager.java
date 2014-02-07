@@ -63,5 +63,7 @@ public interface transactionOutManager {
     void moveTranslatedRecords(int transactionTargetId);
     
     void processOutputRecords(int transactionTargetId);
+    
+    void generateOutputFiles();
 
 }
