@@ -46,3 +46,8 @@ ADD CONSTRAINT `macroFKOut`
 UPDATE `universalTranslator`.`lu_ErrorCodes` SET `displayText`='Failed Crosswalk', `description`='Failed Crosswalk' WHERE `id`='3';
 INSERT INTO `universalTranslator`.`lu_ErrorCodes` (`displayText`, `description`) VALUES ('Failed Macro', 'Failed Macro');
   
+
+  /** grace 020713 **/
+ALTER TABLE `universalTranslator`.`transactionOutErrors` 
+DROP FOREIGN KEY `batchDLFK`;
+  
