@@ -283,18 +283,12 @@ public class transactionOutManagerImpl implements transactionOutManager {
            
             for(transactionTarget transaction : loadedTransactions) {
                 
-                batchUploads uploadedBatchDetails = transactionInManager.getBatchDetails(transaction.getbatchUploadId());
-            
                 configurationSchedules scheduleDetails = configurationManager.getScheduleDetails(transaction.getconfigId());
-                
-                configuration configDetails = configurationManager.getConfigurationById(transaction.getconfigId());
-                    
-                configurationTransport transportDetails = configurationTransportManager.getTransportDetails(transaction.getconfigId());
                 
                 /* If no schedule is found or automatic */
                 if(scheduleDetails == null || scheduleDetails.gettype() == 5) {
                     
-                    beginOutputProcess(configDetails, transaction, transportDetails, uploadedBatchDetails);
+                    beginOutputProcess(transaction);
                             
                 }
                 /* If the setting is for 'Daily' */
@@ -310,7 +304,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                         int hourOfDay = calendar.get(Calendar.HOUR_OF_DAY);
                         
                         if(hourOfDay >= scheduleDetails.getprocessingTime()) {
-                            beginOutputProcess(configDetails, transaction, transportDetails, uploadedBatchDetails);
+                            beginOutputProcess(transaction);
                         }
                     }
                     else {
@@ -331,9 +325,6 @@ public class transactionOutManagerImpl implements transactionOutManager {
                     
             }
             
-            /* Generate the file */
-            System.out.println("DONE 2");
-                
        }
     }
     
@@ -346,10 +337,16 @@ public class transactionOutManagerImpl implements transactionOutManager {
      * @param transportDetails
      * @param uploadedBatchDetails 
      */
-    public void beginOutputProcess(configuration configDetails, transactionTarget transaction, configurationTransport transportDetails, batchUploads uploadedBatchDetails) {
+    public void beginOutputProcess(transactionTarget transaction) {
          
         /* Update the status of the uploaded batch to  TBP (Target Batch Creating in process) (ID = 25) */
         transactionInManager.updateBatchStatus(transaction.getbatchUploadId(),25,"");
+        
+        batchUploads uploadedBatchDetails = transactionInManager.getBatchDetails(transaction.getbatchUploadId());
+        
+        configuration configDetails = configurationManager.getConfigurationById(transaction.getconfigId());
+                    
+        configurationTransport transportDetails = configurationTransportManager.getTransportDetails(transaction.getconfigId());
        
         /* Check to see what outut transport method was set up */
         
@@ -395,9 +392,8 @@ public class transactionOutManagerImpl implements transactionOutManager {
                    batchId = mergeablebatchId;
                    
                    /* Need to upldate the transaction batchDLId to the new found batch Id */
-                   transaction.setbatchDLId(batchId);
-                   transactionOutDAO.updateTransactionDetails(transaction);
-
+                   transactionOutDAO.updateTransactionTargetBatchDLId(batchId, transaction.getId());
+                   
                    /* Need to add a new entry in the summary table (need to make sure we don't enter duplicates) */
                    batchDownloadSummary summary = new batchDownloadSummary();
                    summary.setbatchId(batchId);
@@ -418,19 +414,16 @@ public class transactionOutManagerImpl implements transactionOutManager {
             /* Generate the file */
             System.out.println("GENERATE FILE");
             
-            /* Update the status of the transaction to PP (Pending Pickup) (ID = 18) */
-            transactionInManager.updateTransactionStatus(transaction.getbatchUploadId(), transaction.gettransactionInId(), 0, 18);
-
-            /* Update the status of the transaction target to PP (Pending Pickup) (ID = 18) */
-            transactionInManager.updateTransactionTargetStatus(0, transaction.getId(), 0, 18);
-            
-            /* Update the status of the uploaded batch to  TBP (Target Batch Created) (ID = 28) */
-            transactionInManager.updateBatchStatus(transaction.getbatchUploadId(),28,"");
-            
-            /* Generate the file */
-            System.out.println("DONE 1");
-
         }
+        
+        /* Update the status of the transaction to PP (Pending Pickup) (ID = 18) */
+        transactionInManager.updateTransactionStatus(transaction.getbatchUploadId(), transaction.gettransactionInId(), 0, 18);
+
+        /* Update the status of the transaction target to PP (Pending Pickup) (ID = 18) */
+        transactionInManager.updateTransactionTargetStatus(0, transaction.getId(), 0, 18);
+
+        /* Update the status of the uploaded batch to  TBP (Target Batch Created) (ID = 28) */
+        transactionInManager.updateBatchStatus(transaction.getbatchUploadId(),28,"");
     }
     
     
@@ -509,8 +502,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
         int batchId = (int) transactionOutDAO.submitBatchDownload(batchDownload);
 
         /* Need to upldate the transaction batchDLId to the new created batch Id */
-        transaction.setbatchDLId(batchId);
-        transactionOutDAO.updateTransactionDetails(transaction);
+        transactionOutDAO.updateTransactionTargetBatchDLId(batchId, transaction.getId());
         
         /* Need to submit the batch summary */
         batchDownloadSummary summary = new batchDownloadSummary();

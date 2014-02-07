@@ -68,4 +68,6 @@ public interface transactionOutDAO {
     
     void submitSummaryEntry(batchDownloadSummary summary);
     
+    void updateTransactionTargetBatchDLId(Integer batchId, Integer transactionTargetId);
+    
 }

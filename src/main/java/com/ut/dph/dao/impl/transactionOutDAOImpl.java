@@ -901,4 +901,34 @@ public class transactionOutDAOImpl implements transactionOutDAO {
 
         return transactions;
     }
+    
+    
+    /**
+     * The 'updateTransactionTargetBatchDLId' function will update the transactionTarget with the generated
+     * batch downloadId.
+     *
+     * @param batchId The id of the created batch
+     * @param transactionId The id of the specific transaction to update (default to 0)
+     * 
+     */
+    @Override
+    @Transactional
+    public void updateTransactionTargetBatchDLId(Integer batchId, Integer transactionTargetId) {
+        
+        String sql = "update transactionTarget "
+                + " set batchDLId = :batchId, "
+                + "statusTime = CURRENT_TIMESTAMP"
+                + " where id = :transactionTargetId";
+
+        Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                .setParameter("batchId", batchId)
+                .setParameter("transactionTargetId", transactionTargetId);
+          
+        try {
+            updateData.executeUpdate();
+        } catch (Exception ex) {
+            System.err.println("updateTransactionStatus failed." + ex);
+        }
+
+    }
 }
