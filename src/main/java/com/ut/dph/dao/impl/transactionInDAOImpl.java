@@ -13,6 +13,7 @@ import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.configuration;
 import com.ut.dph.model.configurationConnection;
 import com.ut.dph.model.configurationConnectionSenders;
+import com.ut.dph.model.configurationDataTranslations;
 import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.fieldSelectOptions;
 import com.ut.dph.model.transactionAttachment;
@@ -1323,13 +1324,23 @@ public class transactionInDAOImpl implements transactionInDAO {
 
     @Override
     @Transactional
-    public void updateStatusForErrorTrans(Integer batchUploadId, Integer statusId) {
-        String sql = "update transactionIn set statusId = :statusId where"
+    public void updateStatusForErrorTrans(Integer batchId, Integer statusId, boolean foroutboundProcessing) {
+        
+    	String sql;
+        
+        if (foroutboundProcessing == false) {
+        sql= "update transactionIn set statusId = :statusId where"
                 + " id in (select distinct transactionInId"
-                + " from transactionInErrors where batchUploadId = :batchUploadId); ";
-
+                + " from transactionInErrors where batchUploadId = :batchId); ";
+        } else {
+        	sql= "update transactionOut set statusId = :statusId where"
+                    + " id in (select distinct transactionTargetId"
+                    + " from transactionOutErrors where batchDownLoadId = :batchId); ";
+            
+        }
+       
         Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
-                .setParameter("batchUploadId", batchUploadId)
+                .setParameter("batchId", batchId)
                 .setParameter("statusId", statusId);
 
         try {
@@ -1571,6 +1582,48 @@ public class transactionInDAOImpl implements transactionInDAO {
             updateData.executeUpdate();
         } catch (Exception ex) {
             System.err.println("updateFieldNoWithCWData failed." + ex);
+        }
+    }
+    
+    @Override
+    @Transactional
+    public void flagCWErrors(Integer configId, Integer batchId, 
+    		configurationDataTranslations cdt, boolean foroutboundProcessing) {
+        
+    	String sql;
+        
+    	if(foroutboundProcessing == false) {
+    		sql = "insert into transactionInerrors (batchUploadId, "
+    				+ "transactionInId, configurationFormFieldsId, errorid, cwId)"
+                    + " select " + batchId + ", transactionInId, " + cdt.getFieldId()
+                    + ", 3,  " + cdt.getCrosswalkId() + " from transactionTranslatedIn where "
+                    + "configId = :configId "
+                    + " and (F" + cdt.getFieldNo() 
+                    + " is not null and forcw is null)"
+                    + "and transactionInId in (select id from transactionIn "
+                    + "where batchId = :batchId"
+                    + " and configId = :configId);";
+
+        } else {
+        	sql = "insert into transactionOutErrors (batchDownloadId, "
+    				+ "transactionTargetId, configurationFormFieldsId, errorid, cwId)"
+                    + " select " + batchId + ", transactionTargetId, " + cdt.getFieldId()
+                    + ", 3,  " + cdt.getCrosswalkId() + " from transactionTranslatedOut where "
+                    + "configId = :configId "
+                    + " and (F" + cdt.getFieldNo() 
+                    + " is not null and forcw is null)"
+                    + "and transactionTargetId in (select id from transactionTarget "
+                    + "where batchDLId = :batchId"
+                    + " and configId = :configId);";
+        }
+
+        Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                .setParameter("batchId", batchId)
+                .setParameter("configId", configId);
+        try {
+            updateData.executeUpdate();
+        } catch (Exception ex) {
+            System.err.println("flagCWErrors failed." + ex);
         }
     }
 

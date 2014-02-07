@@ -145,7 +145,7 @@ public interface transactionInManager {
     
     boolean clearTransactionInErrors(Integer batchUploadId);
     
-    void updateStatusForErrorTrans(Integer batchUploadId, Integer statusId);
+    void updateStatusForErrorTrans(Integer batchId, Integer statusId, boolean foroutboundProcessing);
     
     boolean runValidations(Integer batchUploadId, Integer configId);
     
@@ -184,4 +184,6 @@ public interface transactionInManager {
     void executeCWData(Integer configId, Integer batchId, Integer fieldNo, CrosswalkData cwd, boolean foroutboundProcessing);
 
     void updateFieldNoWithCWData (Integer configId, Integer batchId, Integer fieldNo, Integer passClear, boolean foroutboundProcessing);
+    
+    void flagCWErrors (Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing);
 }

@@ -553,14 +553,14 @@ public class transactionInManagerImpl implements transactionInManager {
                     insertFailedRequiredFields(cff, batchUploadId);
                 }
                 //update status of the failed records to ERR - 14
-                updateStatusForErrorTrans(batchUploadId, 14);
+                updateStatusForErrorTrans(batchUploadId, 14, false);
 
                 /**
                  * run validation*
                  */
                 runValidations(batchUploadId, configId);
                 //update status of the failed records to ERR - 14
-                updateStatusForErrorTrans(batchUploadId, 14);
+                updateStatusForErrorTrans(batchUploadId, 14, false);
 
                 /**
                  * run cw/macros *
@@ -845,13 +845,15 @@ public class transactionInManagerImpl implements transactionInManager {
     }
 
     /**
-     * This method finds all error transactionInId in TransactionInErrors and update transactionIn with the appropriate error status It can be passed, reject and error
+     * This method finds all error transactionInId in TransactionInErrors / TransactionOutErrors
+     *  and update transactionIn with the appropriate error status It can be passed, reject and error
      *
      */
     @Override
-    public void updateStatusForErrorTrans(Integer batchUploadId, Integer statusId) {
-        transactionInDAO.updateStatusForErrorTrans(batchUploadId, statusId);
-    }
+	public void updateStatusForErrorTrans(Integer batchId,
+			Integer statusId, boolean foroutboundProcessing) {
+    	transactionInDAO.updateStatusForErrorTrans(batchId, statusId, foroutboundProcessing);
+	}
 
     @Override
     public boolean runValidations(Integer batchUploadId, Integer configId) {
@@ -1136,7 +1138,8 @@ public class transactionInManagerImpl implements transactionInManager {
     }
 
     @Override
-    public boolean processCrosswalk(Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing) {
+    public boolean processCrosswalk(Integer configId, Integer batchId, 
+    		configurationDataTranslations cdt, boolean foroutboundProcessing) {
         try {
             // 1. we get the info for that cw (fieldNo, sourceVal, targetVal rel_crosswalkData)
             List<CrosswalkData> cdList = configurationManager.getCrosswalkData(cdt.getCrosswalkId());
@@ -1145,8 +1148,16 @@ public class transactionInManagerImpl implements transactionInManager {
             for (CrosswalkData cwd : cdList) {
                 executeCWData(configId, batchId, cdt.getFieldNo(), cwd, foroutboundProcessing);
             }
-		//we figure out pass/clear option
+			
+            //we replace original F[FieldNo] column with data in forcw
+            updateFieldNoWithCWData(configId, batchId, cdt.getFieldNo(), cdt.getPassClear(), foroutboundProcessing);
 
+            //flag errors, anything row that is not null in F[FieldNo] but null in forCW
+            flagCWErrors(configId, batchId, cdt, foroutboundProcessing);
+            
+            //flag as error in transactionIn or transactionOut table
+            updateStatusForErrorTrans(batchId, 14, foroutboundProcessing);
+            
             //we replace original F[FieldNo] column with data in forcw
             updateFieldNoWithCWData(configId, batchId, cdt.getFieldNo(), cdt.getPassClear(), foroutboundProcessing);
 
@@ -1177,7 +1188,12 @@ public class transactionInManagerImpl implements transactionInManager {
     @Override
     public void updateFieldNoWithCWData(Integer configId, Integer batchId, Integer fieldNo, Integer passClear, boolean foroutboundProcessing) {
         transactionInDAO.updateFieldNoWithCWData(configId, batchId, fieldNo, passClear, foroutboundProcessing);
-
     }
+
+	@Override
+	public void flagCWErrors(Integer configId, Integer batchId,
+			configurationDataTranslations cdt, boolean foroutboundProcessing) {
+		 transactionInDAO.flagCWErrors(configId, batchId, cdt, foroutboundProcessing);
+	}
 
 }

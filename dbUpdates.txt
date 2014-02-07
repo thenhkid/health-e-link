@@ -17,3 +17,32 @@ DELETE FROM `universalTranslator`.`lu_ProcessStatus` WHERE `id`='27';
 /** grace 2.6.14 **/
 ALTER TABLE `universalTranslator`.`transactionTranslatedOut` 
 ADD COLUMN `forCW` TEXT NULL AFTER `dateCreated`;
+
+/** Grace 02.06.2014 PM **/
+ALTER TABLE `universalTranslator`.`transactionOutErrors` 
+ADD COLUMN `cwId` INT NULL AFTER `errorId`,
+ADD COLUMN `macroId` INT NULL AFTER `cwId`,
+ADD COLUMN `validationTypeId` INT NULL AFTER `macroId`,
+ADD INDEX `validationTypeFKOut_idx` (`validationTypeId` ASC),
+ADD INDEX `cwFKOut_idx` (`cwId` ASC),
+ADD INDEX `macroFKOut_idx` (`macroId` ASC);
+ALTER TABLE `universalTranslator`.`transactionOutErrors` 
+ADD CONSTRAINT `validationTypeFKOut`
+  FOREIGN KEY (`validationTypeId`)
+  REFERENCES `universalTranslator`.`ref_validationTypes` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION,
+ADD CONSTRAINT `cwFKOut`
+  FOREIGN KEY (`cwId`)
+  REFERENCES `universalTranslator`.`crosswalks` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION,
+ADD CONSTRAINT `macroFKOut`
+  FOREIGN KEY (`macroId`)
+  REFERENCES `universalTranslator`.`Macro_Names` (`ID`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+  
+UPDATE `universalTranslator`.`lu_ErrorCodes` SET `displayText`='Failed Crosswalk', `description`='Failed Crosswalk' WHERE `id`='3';
+INSERT INTO `universalTranslator`.`lu_ErrorCodes` (`displayText`, `description`) VALUES ('Failed Macro', 'Failed Macro');
+  

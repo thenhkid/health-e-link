@@ -9,6 +9,7 @@ package com.ut.dph.dao;
 import com.ut.dph.model.CrosswalkData;
 import com.ut.dph.model.batchUploadSummary;
 import com.ut.dph.model.batchUploads;
+import com.ut.dph.model.configurationDataTranslations;
 import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.fieldSelectOptions;
 import com.ut.dph.model.transactionAttachment;
@@ -123,7 +124,7 @@ public interface transactionInDAO {
     
     boolean clearTransactionInErrors(Integer batchUploadId);
     
-    void updateStatusForErrorTrans(Integer batchUploadId, Integer statusId);
+    void updateStatusForErrorTrans(Integer batchId, Integer statusId, boolean foroutboundProcessing);
     
     void updateBlanksToNull(configurationFormFields cff, Integer batchUploadId);
     
@@ -140,4 +141,7 @@ public interface transactionInDAO {
     void executeCWData(Integer configId, Integer batchId, Integer fieldNo, CrosswalkData cwd, boolean foroutboundProcessing);
     
     void updateFieldNoWithCWData (Integer configId, Integer batchId, Integer fieldNo, Integer passClear, boolean foroutboundProcessing);
+
+    void flagCWErrors (Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing);
+
 }
