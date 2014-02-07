@@ -45,4 +45,10 @@ ADD CONSTRAINT `macroFKOut`
   
 UPDATE `universalTranslator`.`lu_ErrorCodes` SET `displayText`='Failed Crosswalk', `description`='Failed Crosswalk' WHERE `id`='3';
 INSERT INTO `universalTranslator`.`lu_ErrorCodes` (`displayText`, `description`) VALUES ('Failed Macro', 'Failed Macro');
+
+/** Chad 2.7.2014 @ 12:59 PM **/
+ALTER TABLE `universalTranslator`.`BatchDownloads` 
+ADD COLUMN `mergeable` BIT(1) NULL DEFAULT b'0' AFTER `deleted`;
+
+
   
