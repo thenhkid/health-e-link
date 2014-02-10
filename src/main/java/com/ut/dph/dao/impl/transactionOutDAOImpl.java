@@ -848,6 +848,25 @@ public class transactionOutDAOImpl implements transactionOutDAO {
     }
     
     /**
+     * 
+     */
+    @Override
+    @Transactional
+    public void updateTargetTransasctionStatus(int batchDLId, int statusId) {
+        String sql = "update transactionTarget set statusId = :statusId where batchDLId = :batchDLId";
+        
+        Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                .setParameter("statusId", statusId)
+                .setParameter("batchDLId", batchDLId);
+        
+        try {
+            updateData.executeUpdate();
+        } catch (Exception ex) {
+            System.err.println("updateTargetTransactionStatus failed." + ex);
+        }
+    }
+    
+    /**
      * The 'moveTranslatedRecords' function will copy the translated records found in
      * transactionTranslatedOut table to the transactionOutRecords table for the passed
      * in transactionId.
@@ -982,5 +1001,113 @@ public class transactionOutDAOImpl implements transactionOutDAO {
         
         return maxFieldNo;
         
+    }
+    
+    /**
+     * The 'getdownloadableBatches' will return a list of received batches for the logged
+     * in user that are ready to be downloaded
+     *
+     * @param userId The id of the logged in user trying to view downloadable batches
+     * @param orgId The id of the organization the user belongs to
+     *
+     * @return The function will return a list of downloadable batches
+     */
+    @Override
+    @Transactional
+    @SuppressWarnings("UnusedAssignment")
+    public List<batchDownloads> getdownloadableBatches(int userId, int orgId, int page, int maxResults) {
+        int firstResult = 0;
+
+        /* Get a list of connections the user has access to */
+        Criteria connections = sessionFactory.getCurrentSession().createCriteria(configurationConnectionReceivers.class);
+        connections.add(Restrictions.eq("userId", userId));
+        List<configurationConnectionReceivers> userConnections = connections.list();
+
+        List<Integer> messageTypeList = new ArrayList<Integer>();
+        List<Integer> sourceOrgList = new ArrayList<Integer>();
+
+        if (userConnections.isEmpty()) {
+            messageTypeList.add(0);
+            sourceOrgList.add(0);
+        } else {
+
+            for (configurationConnectionReceivers userConnection : userConnections) {
+                Criteria connection = sessionFactory.getCurrentSession().createCriteria(configurationConnection.class);
+                connection.add(Restrictions.eq("id", userConnection.getconnectionId()));
+
+                configurationConnection connectionInfo = (configurationConnection) connection.uniqueResult();
+
+                /* Get the message type for the configuration */
+                Criteria targetconfigurationQuery = sessionFactory.getCurrentSession().createCriteria(configuration.class);
+                targetconfigurationQuery.add(Restrictions.eq("id", connectionInfo.gettargetConfigId()));
+
+                configuration configDetails = (configuration) targetconfigurationQuery.uniqueResult();
+                
+                /* Need to make sure only file download configurations are displayed */
+                Criteria transportDetailsQuery = sessionFactory.getCurrentSession().createCriteria(configurationTransport.class);
+                transportDetailsQuery.add(Restrictions.eq("configId", configDetails.getId()));
+                
+                configurationTransport transportDetails = (configurationTransport) transportDetailsQuery.uniqueResult();
+                
+                if(transportDetails.gettransportMethodId() == 1) {
+                    /* Add the message type to the message type list */
+                    messageTypeList.add(configDetails.getMessageTypeId()); 
+                }
+
+                /* Get the list of source orgs */
+                Criteria sourceconfigurationQuery = sessionFactory.getCurrentSession().createCriteria(configuration.class);
+                sourceconfigurationQuery.add(Restrictions.eq("id", connectionInfo.getsourceConfigId()));
+                configuration sourceconfigDetails = (configuration) sourceconfigurationQuery.uniqueResult();
+
+                /* Add the target org to the target organization list */
+                sourceOrgList.add(sourceconfigDetails.getorgId());
+            }
+        }
+        
+        if(messageTypeList.isEmpty()) {
+            messageTypeList.add(0);
+        }
+
+        /* Get a list of available batches */
+        Criteria batchSummaries = sessionFactory.getCurrentSession().createCriteria(batchDownloadSummary.class);
+        batchSummaries.add(Restrictions.eq("targetOrgId", orgId));
+        batchSummaries.add(Restrictions.in("messageTypeId", messageTypeList));
+        batchSummaries.add(Restrictions.in("sourceOrgId", sourceOrgList));
+        List<batchDownloadSummary> batchDownloadSummaryList = batchSummaries.list();
+
+        List<Integer> batchIdList = new ArrayList<Integer>();
+
+        if (batchDownloadSummaryList.isEmpty()) {
+            batchIdList.add(0);
+        } else {
+
+            for (batchDownloadSummary summary : batchDownloadSummaryList) {
+                batchIdList.add(summary.getbatchId());
+            }
+
+        }
+
+        Criteria findBatches = sessionFactory.getCurrentSession().createCriteria(batchDownloads.class);
+        findBatches.add(Restrictions.in("id", batchIdList));
+        findBatches.add(Restrictions.or(
+                Restrictions.eq("statusId", 22),
+                Restrictions.eq("statusId", 23),
+                Restrictions.eq("statusId", 28)
+        )
+        );
+        findBatches.addOrder(Order.desc("dateCreated"));
+
+        if (page > 1) {
+            firstResult = (maxResults * (page - 1));
+        }
+
+        findBatches.setFirstResult(firstResult);
+
+        if (maxResults > 0) {
+            //Set the max results to display
+            findBatches.setMaxResults(maxResults);
+        }
+
+        return findBatches.list();
     }
 }

@@ -58,6 +58,8 @@ public interface transactionOutManager {
     
     void updateTargetBatchStatus(Integer batchDLId, Integer statusId, String timeField);
     
+    void updateTargetTransasctionStatus(int batchDLId, int statusId);
+    
     boolean translateTargetRecords(int transactionTargetId, int configId, int batchId);
     
     void moveTranslatedRecords(int transactionTargetId);
@@ -65,5 +67,7 @@ public interface transactionOutManager {
     void processOutputRecords(int transactionTargetId);
     
     void generateOutputFiles();
+    
+    List<batchDownloads> getdownloadableBatches(int userId, int orgId, int page, int maxResults);
     
 }

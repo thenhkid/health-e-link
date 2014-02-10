@@ -57,6 +57,8 @@ public interface transactionOutDAO {
     boolean processOutPutTransactions(int transactionTargetId, int configId, int transactionInId);
     
     void updateTargetBatchStatus(Integer batchDLId, Integer statusId, String timeField);
+    
+    void updateTargetTransasctionStatus(int batchDLId, int statusId);
 
     void moveTranslatedRecords(int transactionTargetId);
     
@@ -73,5 +75,7 @@ public interface transactionOutDAO {
     void updateBatchOutputFileName(int batchId, String fileName);
     
     int getMaxFieldNo(int configId);
+    
+    List<batchDownloads> getdownloadableBatches(int userId, int orgId, int page, int maxResults);
     
 }

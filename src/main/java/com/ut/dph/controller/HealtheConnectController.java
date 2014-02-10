@@ -8,6 +8,7 @@ package com.ut.dph.controller;
 
 import com.ut.dph.model.Organization;
 import com.ut.dph.model.User;
+import com.ut.dph.model.batchDownloads;
 import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.configuration;
 import com.ut.dph.model.lutables.lu_ProcessStatus;
@@ -17,6 +18,7 @@ import com.ut.dph.service.messageTypeManager;
 import com.ut.dph.service.organizationManager;
 import com.ut.dph.service.sysAdminManager;
 import com.ut.dph.service.transactionInManager;
+import com.ut.dph.service.transactionOutManager;
 import com.ut.dph.service.userManager;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -29,6 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -64,6 +67,14 @@ public class HealtheConnectController {
     
     @Autowired
     private userManager usermanager;
+    
+    @Autowired
+    private transactionOutManager transactionOutManager;
+    
+    /**
+     * The private maxResults variable will hold the number of results to show per list page.
+     */
+    private static int maxResults = 20;
     
     
     /**
@@ -231,4 +242,64 @@ public class HealtheConnectController {
         
     }
     
+    
+    /**
+     * The '/download' request will serve up the Health-e-Connect download batch page.
+     *
+     * @param request
+     * @param response
+     * @return	the health-e-Connect download view
+     * @throws Exception
+     */
+    @RequestMapping(value = "/download", method = RequestMethod.GET)
+    public ModelAndView viewDownloads(HttpServletRequest request, HttpServletResponse response, HttpSession session, @RequestParam(value = "page", required = false) Integer page) throws Exception {
+        
+        if (page == null) {
+            page = 1;
+        }
+        
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/Health-e-Connect/download");
+        
+        /* Need to get a list of uploaded files */
+        User userInfo = (User)session.getAttribute("userDetails");
+        
+        /* Need to get a list of all uploaded batches */
+        List<batchDownloads> downloadableBatches = transactionOutManager.getdownloadableBatches(userInfo.getId(), userInfo.getOrgId(),page,maxResults);
+        
+        if(!downloadableBatches.isEmpty()) {
+            for(batchDownloads batch : downloadableBatches) {
+                
+                lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
+                batch.setstatusValue(processStatus.getDisplayCode());
+                
+                User userDetails = usermanager.getUserById(batch.getuserId());
+                String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
+                batch.setusersName(usersName);
+                
+            }
+        }
+        
+        mav.addObject("downloadableBatches", downloadableBatches);
+        
+        return mav;
+    }
+    
+    /**
+     * The 'downloadBatch.do' function will update the status of the batch and all the transactions
+     * associated to the batch when the download link is clicked.
+     * 
+     * @param batchId  The id of the clicked batch to download
+     * 
+     * @return This function will simply return a 1.
+     */
+    @RequestMapping(value= "/downloadBatch.do", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody Integer downloadBatch(@RequestParam(value = "batchId", required = false) Integer batchId) {
+        
+        transactionOutManager.updateTargetBatchStatus(batchId, 22 , "");
+        
+        transactionOutManager.updateTargetTransasctionStatus(batchId, 20);
+       
+        return 1;
+    }
 }

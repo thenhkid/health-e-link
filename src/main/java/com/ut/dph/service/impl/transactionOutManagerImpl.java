@@ -183,6 +183,12 @@ public class transactionOutManagerImpl implements transactionOutManager {
     public void updateTargetBatchStatus(Integer batchDLId, Integer statusId, String timeField) {
         transactionOutDAO.updateTargetBatchStatus(batchDLId, statusId, timeField);
     }
+    
+    @Override
+    @Transactional
+    public void updateTargetTransasctionStatus(int batchDLId, int statusId) {
+        transactionOutDAO.updateTargetTransasctionStatus(batchDLId, statusId);
+    }
 
     /**
      * The 'translateTargetRecords' function will attempt to translate the target records based on the
@@ -669,7 +675,11 @@ public class transactionOutManagerImpl implements transactionOutManager {
             e.printStackTrace();
          }
          
-         
-        
+    }
+    
+    @Override
+    @Transactional
+    public List<batchDownloads> getdownloadableBatches(int userId, int orgId, int page, int maxResults) {
+        return transactionOutDAO.getdownloadableBatches(userId, orgId, page, maxResults);
     }
 }
