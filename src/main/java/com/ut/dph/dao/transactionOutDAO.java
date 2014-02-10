@@ -72,4 +72,6 @@ public interface transactionOutDAO {
     
     void updateBatchOutputFileName(int batchId, String fileName);
     
+    int getMaxFieldNo(int configId);
+    
 }

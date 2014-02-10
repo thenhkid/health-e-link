@@ -956,4 +956,27 @@ public class transactionOutDAOImpl implements transactionOutDAO {
             System.err.println("update Batch outputfile name failed." + ex);
         }
     }
+    
+    
+    /**
+     * The 'getMaxFieldNo' function will return the max field number for the passed in configuration.
+     * 
+     * @param configId  The id of the configuration to find out how many fields it has
+     * 
+     * @return This function will return the max field number.
+     */
+    public int getMaxFieldNo(int configId) {
+        
+        
+         /* Need to make sure no duplicates */
+        Query query = sessionFactory.getCurrentSession().createQuery(""
+                + "select max(fieldNo) as maxFieldNo from configurationFormFields where configId = :configId ");
+      
+        query.setParameter("configId", configId);
+        
+        int maxFieldNo = (Integer) query.uniqueResult();
+        
+        return maxFieldNo;
+        
+    }
 }

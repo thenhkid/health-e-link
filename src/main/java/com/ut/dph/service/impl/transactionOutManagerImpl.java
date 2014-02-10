@@ -6,6 +6,8 @@
 
 package com.ut.dph.service.impl;
 
+import com.ut.dph.controller.HealtheWebController;
+import com.ut.dph.dao.messageTypeDAO;
 import com.ut.dph.dao.transactionOutDAO;
 import com.ut.dph.model.batchDownloadSummary;
 import com.ut.dph.model.batchDownloads;
@@ -28,15 +30,20 @@ import com.ut.dph.service.transactionOutManager;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,6 +66,9 @@ public class transactionOutManagerImpl implements transactionOutManager {
     
     @Autowired
     private transactionInManager transactionInManager;
+    
+    @Autowired
+    private messageTypeDAO messageTypeDAO;
     
     @Override
     @Transactional
@@ -420,7 +430,12 @@ public class transactionOutManagerImpl implements transactionOutManager {
             }
             
             /* Generate the file */
-            generateTargetFile(createNewFile, transaction.getId(), batchId, transportDetails);
+            try {
+                
+                generateTargetFile(createNewFile, transaction.getId(), batchId, transportDetails);
+            } catch (IllegalAccessException ex) {
+                Logger.getLogger(transactionOutManagerImpl.class.getName()).log(Level.SEVERE, null, ex);
+            }
             
         }
         
@@ -432,6 +447,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
 
         /* Update the status of the uploaded batch to  TBP (Target Batch Created) (ID = 28) */
         transactionInManager.updateBatchStatus(transaction.getbatchUploadId(),28,"");
+        
     }
     
     
@@ -530,7 +546,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
     /**
      * 
      */
-    public void generateTargetFile(boolean createNewFile, int transactionTargetId, int batchId, configurationTransport transportDetails) {
+    public void generateTargetFile(boolean createNewFile, int transactionTargetId, int batchId, configurationTransport transportDetails) throws IllegalAccessException, IllegalAccessException {
         
          String fileName = null; 
          
@@ -548,15 +564,22 @@ public class transactionOutManagerImpl implements transactionOutManager {
          
          String fileType = (String) configurationManager.getFileTypesById(transportDetails.getfileType());
          
+         int findExt = batchDetails.getoutputFIleName().lastIndexOf(".");
+         
+         if(findExt >= 0) {
+             fileName = batchDetails.getoutputFIleName();
+         }
+         else {
+            fileName = new StringBuilder().append(batchDetails.getoutputFIleName()).append(".").append(fileType).toString(); 
+         }
+           
+         File newFile = new File(dir.getDir() + fileName);
+         
          
          /* Create the empty file in the correct location */
-         if(createNewFile == true) {
+         if(createNewFile == true || !newFile.exists()) {
             try {
                
-               fileName = new StringBuilder().append(batchDetails.getoutputFIleName()).append(".").append(fileType).toString();
-               
-               File newFile = new File(dir.getDir() + fileName);
-
                if (newFile.exists()) {
                   int i = 1;
                   while (newFile.exists()) {
@@ -574,12 +597,9 @@ public class transactionOutManagerImpl implements transactionOutManager {
             
            /* Need to update the batch with the updated file name */
            transactionOutDAO.updateBatchOutputFileName(batchDetails.getId(),fileName);
-            
-            
+           
          }
-         else {
-             fileName = batchDetails.getoutputFIleName();
-         }
+         
          
          /* Read in the file */
          try {
@@ -587,12 +607,63 @@ public class transactionOutManagerImpl implements transactionOutManager {
             File file = new File(dir.getDir() + fileName);
             fileInput = new FileInputStream(file);
             
-            
             /* Need to get the records for the transaction */
+            String recordRow = "";
             
+            transactionOutRecords records = transactionOutDAO.getTransactionRecords(transactionTargetId);
             
+            /* Need to get the max field number */
+            int maxFieldNo = transactionOutDAO.getMaxFieldNo(transportDetails.getconfigId());
             
+            /* Need to get the correct delimiter for the output file */
+            String delimChar = (String) messageTypeDAO.getDelimiterChar(transportDetails.getfileDelimiter());
             
+            if(records != null) {
+                FileWriter fw = null;
+                
+                try {
+                    fw = new FileWriter(file, true);
+                } catch (IOException ex) {
+                    Logger.getLogger(transactionOutManagerImpl.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
+                for(int i = 1; i <= maxFieldNo; i++) {
+                    
+                    String colName = new StringBuilder().append("f").append(i).toString();
+                
+                    try {
+                        String fieldValue = BeanUtils.getProperty(records, colName);
+                        
+                        if("null".equals(fieldValue)) {
+                            fieldValue = "";
+                        }
+                        
+                        if(i == maxFieldNo) {
+                            recordRow = new StringBuilder().append(recordRow).append(fieldValue).append("\n").toString();
+                        }
+                        else {
+                            recordRow = new StringBuilder().append(recordRow).append(fieldValue).append(delimChar).toString();
+                        }
+                        
+                    } catch (IllegalAccessException ex) {
+                        Logger.getLogger(transactionOutManagerImpl.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (InvocationTargetException ex) {
+                        Logger.getLogger(transactionOutManagerImpl.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (NoSuchMethodException ex) {
+                        Logger.getLogger(transactionOutManagerImpl.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                
+                if(recordRow != null) {
+                    try {
+                        fw.write(recordRow);
+                        fw.close();
+                    } catch (IOException ex) {
+                        Logger.getLogger(transactionOutManagerImpl.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                
+            }
             
          } catch (FileNotFoundException e) {
             e.printStackTrace();
