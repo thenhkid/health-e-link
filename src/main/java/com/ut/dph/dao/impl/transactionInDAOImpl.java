@@ -642,14 +642,19 @@ public class transactionInDAOImpl implements transactionInDAO {
             }
 
         }
-
+        
         Criteria findBatches = sessionFactory.getCurrentSession().createCriteria(batchUploads.class);
         findBatches.add(Restrictions.in("id", batchIdList));
         findBatches.add(Restrictions.or(
-                Restrictions.eq("statusId", 4),
-                Restrictions.eq("statusId", 22),
-                Restrictions.eq("statusId", 23),
-                Restrictions.eq("statusId", 24)
+                Restrictions.eq("statusId", 4), /* Submission Being Processed */
+                Restrictions.eq("statusId", 22), /* Submission Delivery Locked */
+                Restrictions.eq("statusId", 23), /* Submission Delivery Completed */
+                Restrictions.eq("statusId", 24), /* Submission Processing Completed */
+                Restrictions.eq("statusId", 25), /* Target Batch Creation in process */
+                Restrictions.eq("statusId", 28), /* Target Batch Creation in process */
+                Restrictions.eq("statusId", 29), /* Submission Processed Errored */
+                Restrictions.eq("statusId", 30) /* Target Creation Errored */
+                
         )
         );
         findBatches.addOrder(Order.desc("dateSubmitted"));

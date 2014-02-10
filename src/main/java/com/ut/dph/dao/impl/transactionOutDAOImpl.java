@@ -166,9 +166,9 @@ public class transactionOutDAOImpl implements transactionOutDAO {
                 targetconfigurationQuery.add(Restrictions.eq("id", connectionInfo.gettargetConfigId()));
 
                 configuration configDetails = (configuration) targetconfigurationQuery.uniqueResult();
-
+                
                 /* Add the message type to the message type list */
-                messageTypeList.add(configDetails.getMessageTypeId());
+               messageTypeList.add(configDetails.getMessageTypeId());  
 
                 /* Get the list of source orgs */
                 Criteria sourceconfigurationQuery = sessionFactory.getCurrentSession().createCriteria(configuration.class);
@@ -178,6 +178,10 @@ public class transactionOutDAOImpl implements transactionOutDAO {
                 /* Add the target org to the target organization list */
                 sourceOrgList.add(sourceconfigDetails.getorgId());
             }
+        }
+        
+        if(messageTypeList.isEmpty()) {
+            messageTypeList.add(0);
         }
 
         /* Get a list of available batches */
