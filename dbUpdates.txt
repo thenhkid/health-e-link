@@ -155,4 +155,62 @@ DELETE FROM `universalTranslator`.`lu_ErrorCodes` WHERE `id`='4';
 UPDATE `universalTranslator`.`lu_ErrorCodes` SET `displayText`='Failed Data Translation', `description`='Failed Data Translation' WHERE `id`='3';
 
 
+/** 02112014 Grace PM **/
+
+DROP TABLE IF EXISTS `transactionOutErrors`;
+DROP TABLE IF EXISTS `transactionInErrors`;
+
+CREATE TABLE `transactionInErrors` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `batchUploadId` int(11) NOT NULL,
+  `transactionInId` int(11) NOT NULL,
+  `configurationFormFieldsId` int(11) NOT NULL,
+  `errorId` int(11) DEFAULT NULL,
+  `cwId` int(11) DEFAULT NULL,
+  `macroId` int(11) DEFAULT NULL,
+  `validationTypeId` int(11) DEFAULT NULL,
+  `dateCreated` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `batchUploadIdFK_idx` (`batchUploadId`),
+  KEY `configFFFKId_idx` (`configurationFormFieldsId`),
+  KEY `errorIdFK_idx` (`errorId`),
+  KEY `tieVTFK_idx` (`validationTypeId`),
+  KEY `tieMacroFK_idx` (`macroId`),
+  KEY `tieCWIDFK_idx` (`cwId`),
+  CONSTRAINT `tieCWIDFK` FOREIGN KEY (`cwId`) REFERENCES `crosswalks` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `tieMacroFK` FOREIGN KEY (`macroId`) REFERENCES `Macro_Names` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `batchUploadIdFK` FOREIGN KEY (`batchUploadId`) REFERENCES `batchUploads` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `configFFFKId` FOREIGN KEY (`configurationFormFieldsId`) REFERENCES `configurationFormFields` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `errorIdFK` FOREIGN KEY (`errorId`) REFERENCES `lu_ErrorCodes` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `tieVTFK` FOREIGN KEY (`validationTypeId`) REFERENCES `ref_validationTypes` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=241 DEFAULT CHARSET=latin1;
+
+
+CREATE TABLE `transactionOutErrors` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `BatchDownloadId` int(11) NOT NULL,
+  `transactionTargetId` int(11) NOT NULL,
+  `configurationFormFieldsId` int(11) DEFAULT NULL,
+  `errorId` int(11) DEFAULT NULL,
+  `cwId` int(11) DEFAULT NULL,
+  `macroId` int(11) DEFAULT NULL,
+  `validationTypeId` int(11) DEFAULT NULL,
+  `dateCreated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `configFFIdFK_idx` (`configurationFormFieldsId`),
+  KEY `FKErrorId_idx` (`errorId`),
+  KEY `validationTypeFKOut_idx` (`validationTypeId`),
+  KEY `cwId_idx` (`cwId`),
+  KEY `macroId_idx` (`macroId`),
+  CONSTRAINT `cwIdFK` FOREIGN KEY (`cwId`) REFERENCES `crosswalks` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `macroIdFK` FOREIGN KEY (`macroId`) REFERENCES `Macro_Names` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `configFFIdFK` FOREIGN KEY (`configurationFormFieldsId`) REFERENCES `configurationFormFields` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `FKErrorId` FOREIGN KEY (`errorId`) REFERENCES `lu_ErrorCodes` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `validationTypeFKOut` FOREIGN KEY (`validationTypeId`) REFERENCES `ref_validationTypes` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+INSERT INTO `universalTranslator`.`lu_ErrorCodes` (`displayText`, `description`) VALUES ('Failed Macros', 'Failed Macros');
+UPDATE `universalTranslator`.`lu_ErrorCodes` SET `displayText`='Failed Crosswalk', `description`='Failed Crosswalk' WHERE `id`='3';
+
+
   
