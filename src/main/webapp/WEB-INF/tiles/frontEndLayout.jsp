@@ -56,6 +56,7 @@
 </c:if>
 <tiles:importAttribute name="otherscript" toName="otherscript" ignore="true" />
 <c:if test="${not empty otherscript}">
-<script src="<%=request.getContextPath()%><tiles:getAsString name='otherscript' ignore='true' />" language="javascript"></script>
+<script src="<%=request.getContextPath()%><tiles:getAsString name='otherscript' ignore='true' />" type="text/javascript"></script>
 </c:if>
 </html>
+

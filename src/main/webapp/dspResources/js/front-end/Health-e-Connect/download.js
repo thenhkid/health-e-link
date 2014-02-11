@@ -43,8 +43,8 @@ jQuery(document).ready(function($) {
                 
             }
         });
-        
     });
+    
 });
 
 
