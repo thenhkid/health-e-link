@@ -234,6 +234,10 @@ public class transactionOutDAOImpl implements transactionOutDAO {
             
             List<Integer> batchFoundIdList = findInboxBatches(batches, searchTerm);
             
+            if (batchFoundIdList.isEmpty()) {
+                batchFoundIdList.add(0);
+            }
+            
             Criteria foundBatches = sessionFactory.getCurrentSession().createCriteria(batchDownloads.class);
             foundBatches.add(Restrictions.in("id", batchFoundIdList));
             foundBatches.addOrder(Order.desc("dateCreated"));
@@ -1163,6 +1167,10 @@ public class transactionOutDAOImpl implements transactionOutDAO {
             
             List<Integer> batchFoundIdList = finddownloadableBatches(batches, searchTerm);
             
+            if (batchFoundIdList.isEmpty()) {
+                batchFoundIdList.add(0);
+            }
+            
             Criteria foundBatches = sessionFactory.getCurrentSession().createCriteria(batchDownloads.class);
             foundBatches.add(Restrictions.in("id", batchFoundIdList));
             foundBatches.addOrder(Order.desc("dateCreated"));
@@ -1217,7 +1225,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
         searchTerm = searchTerm.replace(".", "\\.");
 
         for (batchDownloads batch : batches) {
-
+           
             /* Search the submitted by */
             if (batch.getoutputFIleName().toLowerCase().matches(".*" + searchTerm + ".*")) {
                 if (!batchIdList.contains(batch.getId())) {
@@ -1236,13 +1244,6 @@ public class transactionOutDAOImpl implements transactionOutDAO {
             String dateAsString = new SimpleDateFormat("MM/dd/yyyy").format(batch.getdateCreated());
 
             if (dateAsString.matches(".*" + searchTerm + ".*")) {
-                if (!batchIdList.contains(batch.getId())) {
-                    batchIdList.add(batch.getId());
-                }
-            }
-
-            /* Search the status */
-            if (batch.getstatusValue().toLowerCase().matches(".*" + searchTerm + ".*")) {
                 if (!batchIdList.contains(batch.getId())) {
                     batchIdList.add(batch.getId());
                 }
