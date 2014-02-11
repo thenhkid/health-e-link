@@ -22,6 +22,7 @@ import com.ut.dph.model.transactionOutRecords;
 import com.ut.dph.model.transactionTarget;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
@@ -1015,7 +1016,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
     @Override
     @Transactional
     @SuppressWarnings("UnusedAssignment")
-    public List<batchDownloads> getdownloadableBatches(int userId, int orgId, int page, int maxResults) {
+    public List<batchDownloads> getdownloadableBatches(int userId, int orgId, Date fromDate, Date toDate, int page, int maxResults) {
         int firstResult = 0;
 
         /* Get a list of connections the user has access to */
@@ -1093,8 +1094,16 @@ public class transactionOutDAOImpl implements transactionOutDAO {
                 Restrictions.eq("statusId", 22),
                 Restrictions.eq("statusId", 23),
                 Restrictions.eq("statusId", 28)
-        )
-        );
+        ));
+                
+        if(!"".equals(fromDate)) {
+            findBatches.add(Restrictions.ge("dateCreated", fromDate));
+        }  
+        
+        if(!"".equals(toDate)) {
+            findBatches.add(Restrictions.lt("dateCreated", toDate));
+        } 
+         
         findBatches.addOrder(Order.desc("dateCreated"));
 
         if (page > 1) {

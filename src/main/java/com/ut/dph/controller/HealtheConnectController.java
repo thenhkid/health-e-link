@@ -23,10 +23,13 @@ import com.ut.dph.service.userManager;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -244,7 +247,7 @@ public class HealtheConnectController {
     
     
     /**
-     * The '/download' request will serve up the Health-e-Connect download batch page.
+     * The '/download' GET request will serve up the Health-e-Connect download batch page.
      *
      * @param request
      * @param response
@@ -261,11 +264,61 @@ public class HealtheConnectController {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/Health-e-Connect/download");
         
+        Date fromDate = getMonthDate("START");
+        Date toDate = getMonthDate("END");
+        
+        mav.addObject("fromDate", fromDate);
+        mav.addObject("toDate", toDate);
+        
         /* Need to get a list of uploaded files */
         User userInfo = (User)session.getAttribute("userDetails");
         
         /* Need to get a list of all uploaded batches */
-        List<batchDownloads> downloadableBatches = transactionOutManager.getdownloadableBatches(userInfo.getId(), userInfo.getOrgId(),page,maxResults);
+        List<batchDownloads> downloadableBatches = transactionOutManager.getdownloadableBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, page, 0);
+        
+        if(!downloadableBatches.isEmpty()) {
+            for(batchDownloads batch : downloadableBatches) {
+                
+                lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
+                batch.setstatusValue(processStatus.getDisplayCode());
+                
+                User userDetails = usermanager.getUserById(batch.getuserId());
+                String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
+                batch.setusersName(usersName);
+                
+            }
+        }
+        
+        mav.addObject("downloadableBatches", downloadableBatches);
+        
+        return mav;
+    }
+    
+    /**
+     * The '/download' POST request will serve up the Health-e-Connect download batch page.
+     *
+     * @param request
+     * @param response
+     * @return	the health-e-Connect download view
+     * @throws Exception
+     */
+    @RequestMapping(value = "/download", method = RequestMethod.POST)
+    public ModelAndView findDownloads(@RequestParam String searchTerm, @RequestParam Date fromDate, @RequestParam Date toDate,HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
+       
+        
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/Health-e-Connect/download");
+        
+        System.out.println(fromDate);
+        
+        mav.addObject("fromDate", fromDate);
+        mav.addObject("toDate", toDate);
+        
+        /* Need to get a list of uploaded files */
+        User userInfo = (User)session.getAttribute("userDetails");
+        
+        /* Need to get a list of all uploaded batches */
+        List<batchDownloads> downloadableBatches = transactionOutManager.getdownloadableBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, 1, 0);
         
         if(!downloadableBatches.isEmpty()) {
             for(batchDownloads batch : downloadableBatches) {
@@ -302,4 +355,31 @@ public class HealtheConnectController {
        
         return 1;
     }
+    
+    /**
+    * @param filter 
+    * START for start date of month e.g.  Nov 01, 2013
+    * END for end date of month e.g.  Nov 30, 2013
+    * @return
+    */
+   public Date getMonthDate(String filter){
+       
+       String MM_DD_YYYY = "yyyy-mm-dd";
+       SimpleDateFormat sdf = new SimpleDateFormat(MM_DD_YYYY);
+       sdf.setTimeZone(TimeZone.getTimeZone("EST"));
+       sdf.format(GregorianCalendar.getInstance().getTime());
+
+       Calendar cal =  GregorianCalendar.getInstance();
+       int date = cal.getActualMinimum(Calendar.DATE);
+       if("END".equalsIgnoreCase(filter)){
+           date = cal.getActualMaximum(Calendar.DATE);
+       }
+       cal.set(Calendar.DATE, date);
+       cal.set(Calendar.HOUR_OF_DAY, 0);
+       cal.set(Calendar.MINUTE, 0);
+       cal.set(Calendar.SECOND, 0);
+       cal.set(Calendar.MILLISECOND, 0);
+       
+       return cal.getTime();
+   }
 }

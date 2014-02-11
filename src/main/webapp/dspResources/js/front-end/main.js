@@ -7,21 +7,27 @@ require.config({
 		'mediaModal' : '../mediaModal',
 		'overlay' : '../overlay',
 		'sprintf' : '../vendor/sprintf',
-		'fixed-header' : '../fixed-header'
+		'fixed-header' : '../fixed-header',
+		'moment' : '../vendor/moment',
+		'daterangepicker' : '../vendor/daterangepicker'
 	},
 	shim: {
 		'bootstrap': ['jquery'],
-		'responsive-tables': ['jquery']
+		'responsive-tables': ['jquery'],
+		'daterangepicker': ['jquery', 'bootstrap']
 	}
 });
 
-require(['jquery', 'fixed-header','bootstrap', 'responsive-tables', 'mediaModal', 'overlay'], function ($, fixedHeader) {
+require(['jquery', 'fixed-header', 'moment', 'bootstrap', 'responsive-tables', 'mediaModal', 'overlay', 'daterangepicker'], function ($, fixedHeader, moment) {
 
-	// left nav fixed nav bar
+	var primaryNav = $('.primary-nav');
+	var primaryNavHeight = primaryNav.outerHeight();
+    
+        // left nav fixed nav bar
 	$('.fixed-region').affix({
 		offset: {
 			top: function () {
-				return $('.main-container').position().top;
+				return $('.main-container').position().top + primaryNavHeight;
 			},
 			bottom: function () {
 				// calculate how far down the content section goes down the page
@@ -29,6 +35,18 @@ require(['jquery', 'fixed-header','bootstrap', 'responsive-tables', 'mediaModal'
 				return bottomNum;
 			}
 		}
+	});
+        
+        // tooltip demo
+	$(document).tooltip({
+		selector: "[data-toggle=tooltip]",
+		container: "body"
+	});
+
+	// popover demo
+	$(document).popover	({
+		selector: "[data-toggle=popover]",
+		container: "body"
 	});
 
 	// overwrite scrollspy to get rid of activating parent list items
@@ -53,6 +71,27 @@ require(['jquery', 'fixed-header','bootstrap', 'responsive-tables', 'mediaModal'
 
 		active.trigger('activate');
 	};
+        
+        $('.date-range-picker-trigger').daterangepicker(
+	{
+            ranges: {
+                    'Today': [moment(), moment()],
+                    'Yesterday': [moment().subtract('days', 1), moment().subtract('days', 1)],
+                    'Last 7 Days': [moment().subtract('days', 6), moment()],
+                    'Last 30 Days': [moment().subtract('days', 29), moment()],
+                    'This Month': [moment().startOf('month'), moment().endOf('month')],
+                    'Last Month': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')]
+            },
+            startDate: moment().startOf('month'),
+            endDate: moment().endOf('month')
+            },
+            function(start, end) {
+                $('.daterange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+                $('.daterange span').attr('rel',start.format('MMM DD 00:00:00 YYYY'));
+                $('.daterange span').attr('rel2',end.format('MMM DD 00:00:00 YYYY'));
+                searchByDateRange();
+            }
+	);
 
 	// left nav scrollspy
 	$('body').scrollspy({ target: '#active-page-nav' });

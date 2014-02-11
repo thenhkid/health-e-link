@@ -11,6 +11,7 @@ import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionOutNotes;
 import com.ut.dph.model.transactionTarget;
 import com.ut.dph.model.transactionOutRecords;
+import java.util.Date;
 
 import java.util.List;
 
@@ -68,6 +69,6 @@ public interface transactionOutManager {
     
     void generateOutputFiles();
     
-    List<batchDownloads> getdownloadableBatches(int userId, int orgId, int page, int maxResults);
+    List<batchDownloads> getdownloadableBatches(int userId, int orgId, Date fromDate, Date toDate, int page, int maxResults);
     
 }

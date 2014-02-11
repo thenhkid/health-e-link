@@ -45,6 +45,23 @@ jQuery(document).ready(function($) {
         });
     });
     
+     $('#searchBatchesBtn').click(function() { 
+        $('#searchForm').submit();
+    });
+    
 });
+
+
+function searchByDateRange() {
+   var fromDate = $('.daterange span').attr('rel');
+   var toDate = $('.daterange span').attr('rel2');
+    
+   $('#fromDate').val(fromDate);
+   $('#toDate').val(toDate);
+   
+   $('#searchForm').submit();
+
+}
+
 
 

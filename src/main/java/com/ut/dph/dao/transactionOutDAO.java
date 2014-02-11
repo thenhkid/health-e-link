@@ -12,6 +12,7 @@ import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionOutNotes;
 import com.ut.dph.model.transactionOutRecords;
 import com.ut.dph.model.transactionTarget;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -76,6 +77,6 @@ public interface transactionOutDAO {
     
     int getMaxFieldNo(int configId);
     
-    List<batchDownloads> getdownloadableBatches(int userId, int orgId, int page, int maxResults);
+    List<batchDownloads> getdownloadableBatches(int userId, int orgId, Date fromDate, Date toDate, int page, int maxResults);
     
 }
