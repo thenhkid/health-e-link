@@ -22,6 +22,9 @@ public class User {
 
     @Transient
     private List<Integer> sectionList;
+    
+    @Transient
+    private Date dateOrgWasCreated = null;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -225,5 +228,13 @@ public class User {
     
     public void setcancelAuthority(boolean cancelAuthority) {
         this.cancelAuthority = cancelAuthority;
+    }
+    
+    public Date getdateOrgWasCreated() {
+        return dateOrgWasCreated;
+    }
+    
+    public void setdateOrgWasCreated(Date dateOrgWasCreated) {
+        this.dateOrgWasCreated = dateOrgWasCreated;
     }
 }

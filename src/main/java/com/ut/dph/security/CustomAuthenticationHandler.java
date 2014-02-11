@@ -1,7 +1,9 @@
 package com.ut.dph.security;
 
+import com.ut.dph.model.Organization;
 import com.ut.dph.model.User;
 import com.ut.dph.model.userAccess;
+import com.ut.dph.service.organizationManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.security.core.Authentication;
@@ -22,6 +24,9 @@ public class CustomAuthenticationHandler extends SimpleUrlAuthenticationSuccessH
 
     @Autowired
     private userManager usermanager;
+    
+    @Autowired
+    private organizationManager organizationManager;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws ServletException, IOException {
@@ -36,6 +41,10 @@ public class CustomAuthenticationHandler extends SimpleUrlAuthenticationSuccessH
         } else if (roles.contains("ROLE_USER")) {
             /* Need to get the userId */
             User userDetails = usermanager.getUserByUserName(authentication.getName());
+            
+            Organization orgDetails = organizationManager.getOrganizationById(userDetails.getOrgId());
+            
+            userDetails.setdateOrgWasCreated(orgDetails.getDateCreated());
             
             /* Need to set some session variables to hold information about the user */
             List<userAccess> userAccess = usermanager.getuserSections(userDetails.getId());

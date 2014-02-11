@@ -52,7 +52,6 @@ function searchByDateRange() {
     
    $('#fromDate').val(fromDate);
    $('#toDate').val(toDate);
-   
    $('#searchForm').submit();
 
 }

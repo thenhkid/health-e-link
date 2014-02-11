@@ -20,8 +20,8 @@
                             <div class="form-group">
                                 <label class="sr-only" for="searchTerm">Search</label>
                                 <input type="text" name="searchTerm" id="searchTerm" value="${searchTerm}" class="form-control" placeholder="Search"/>
-                                <input type="hidden" name="fromDate" id="fromDate" value="${fromDate}" />
-                                <input type="hidden" name="toDate" id="toDate" value="${toDate}" />
+                                <input type="hidden" name="fromDate" id="fromDate" rel="<fmt:formatDate value="${fromDate}" type="date" pattern="MM/dd/yyyy" />" rel2="<fmt:formatDate value="${userDetails.dateOrgWasCreated}" type="date" pattern="MM/dd/yyyy" />" value="${fromDate}" />
+                                <input type="hidden" name="toDate" id="toDate" rel="<fmt:formatDate value="${toDate}" type="date" pattern="MM/dd/yyyy" />" value="${toDate}" />
                             </div>
                             <button id="searchBatchesBtn" class="btn btn-primary btn-sm" title="Search Inbox">
                                 <span class="glyphicon glyphicon-search"></span>

@@ -75,6 +75,7 @@ require(['jquery', 'fixed-header', 'moment', 'bootstrap', 'responsive-tables', '
         $('.date-range-picker-trigger').daterangepicker(
 	{
             ranges: {
+                    'See All': [$('#fromDate').attr('rel2'), moment()],
                     'Today': [moment(), moment()],
                     'Yesterday': [moment().subtract('days', 1), moment().subtract('days', 1)],
                     'Last 7 Days': [moment().subtract('days', 6), moment()],
@@ -82,16 +83,17 @@ require(['jquery', 'fixed-header', 'moment', 'bootstrap', 'responsive-tables', '
                     'This Month': [moment().startOf('month'), moment().endOf('month')],
                     'Last Month': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')]
             },
-            startDate: moment().startOf('month'),
-            endDate: moment().endOf('month')
+            startDate: $('#fromDate').attr('rel'),
+            endDate: $('#toDate').attr('rel')
             },
-            function(start, end) {
+            function(start, end) { 
                 $('.daterange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
                 $('.daterange span').attr('rel',start.format('MMM DD 00:00:00 YYYY'));
                 $('.daterange span').attr('rel2',end.format('MMM DD 00:00:00 YYYY'));
                 searchByDateRange();
             }
 	);
+
 
 	// left nav scrollspy
 	$('body').scrollspy({ target: '#active-page-nav' });
