@@ -127,7 +127,7 @@ public class HealtheWebController {
         
         /* Need to get a list of all inbox batches */
         if(totalInbox == 0) {
-            inboxTotal = transactionOutManager.getInboxBatches(userInfo.getId(), userInfo.getOrgId(), 1, 0).size();
+            inboxTotal = transactionOutManager.getInboxBatches(userInfo.getId(), userInfo.getOrgId(), "", null, null, 1, 0).size();
         }
         else {
             inboxTotal = totalInbox;
@@ -145,21 +145,24 @@ public class HealtheWebController {
      * @throws Exception
      */
     @RequestMapping(value = "/inbox", method = RequestMethod.GET)
-    public ModelAndView viewinbox(HttpServletRequest request, HttpServletResponse response, HttpSession session,@RequestParam(value = "page", required = false) Integer page) throws Exception {
-        
-        if (page == null) {
-            page = 1;
-        }
+    public ModelAndView viewinbox(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
         
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/Health-e-Web/inbox");
+        
+        Date fromDate = getMonthDate("START");
+        Date toDate = getMonthDate("END");
+        
+        mav.addObject("fromDate", fromDate);
+        mav.addObject("toDate", toDate);
+        mav.addObject("page", 1);
         
         /* Need to get all the message types set up for the user */
         User userInfo = (User)session.getAttribute("userDetails");
         
         /* Need to get a list of all inbox batches */
-        Integer totalInboxBatches = transactionOutManager.getInboxBatches(userInfo.getId(), userInfo.getOrgId(), page, 0).size();
-        List<batchDownloads> inboxBatches = transactionOutManager.getInboxBatches(userInfo.getId(), userInfo.getOrgId(), page, maxResults);
+        Integer totalInboxBatches = transactionOutManager.getInboxBatches(userInfo.getId(), userInfo.getOrgId(), "", null, null, 1, 0).size();
+        List<batchDownloads> inboxBatches = transactionOutManager.getInboxBatches(userInfo.getId(), userInfo.getOrgId(), "", fromDate, toDate, 1, maxResults);
         
         if(!inboxBatches.isEmpty()) {
             for(batchDownloads batch : inboxBatches) {
@@ -183,9 +186,9 @@ public class HealtheWebController {
         mav.addObject("pendingTotal", pendingTotal);
         mav.addObject("inboxTotal", inboxTotal);
         
-        Integer totalPages = (int)Math.ceil((double)inboxTotal / maxResults);
+        Integer totalPages = (int)Math.ceil((double)inboxBatches.size() / maxResults);
         mav.addObject("totalPages", totalPages);
-        mav.addObject("currentPage", page);
+        mav.addObject("currentPage", 1);
         
         return mav;
     }
@@ -202,10 +205,18 @@ public class HealtheWebController {
      * @throws Exception
      */
     @RequestMapping(value = "/inbox", method = RequestMethod.POST)
-    public ModelAndView findInboxBatches(@RequestParam String searchTerm, HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
+    public ModelAndView findInboxBatches(@RequestParam(value = "page", required = false) Integer page, @RequestParam String searchTerm, @RequestParam Date fromDate, @RequestParam Date toDate, HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
+        
+        if (page == null) {
+            page = 1;
+        }
         
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/Health-e-Web/inbox");
+        
+        mav.addObject("fromDate", fromDate);
+        mav.addObject("toDate", toDate);
+        mav.addObject("page", page);
         
         /* Need to get all the message types set up for the user */
         User userInfo = (User)session.getAttribute("userDetails");
@@ -214,14 +225,8 @@ public class HealtheWebController {
         Integer totalInboxBatches = 0;
         
         /* Need to get a list of all pending batches */
-        if(searchTerm != null && !"".equals(searchTerm)) {
-            inboxBatches = transactionOutManager.getInboxBatches(userInfo.getId(), userInfo.getOrgId(), 1, 0);
-            totalInboxBatches = inboxBatches.size();
-        }
-        else {
-           inboxBatches = transactionOutManager.getInboxBatches(userInfo.getId(), userInfo.getOrgId(), 1, maxResults);
-           totalInboxBatches = transactionOutManager.getInboxBatches(userInfo.getId(), userInfo.getOrgId(), 1, 0).size();
-        }
+        totalInboxBatches = transactionOutManager.getInboxBatches(userInfo.getId(), userInfo.getOrgId(), searchTerm, fromDate, toDate, 1, 0).size();
+        inboxBatches = transactionOutManager.getInboxBatches(userInfo.getId(), userInfo.getOrgId(), searchTerm, fromDate, toDate, page, maxResults);
         
         if(!inboxBatches.isEmpty()) {
             for(batchDownloads batch : inboxBatches) {
@@ -237,40 +242,17 @@ public class HealtheWebController {
             }
         }
         
-        if(searchTerm != null && !"".equals(searchTerm)) {
-            /* Pass the returned pending batches to the filter method */
-            List<batchDownloads> batchResults = transactionOutManager.findInboxBatches(inboxBatches, searchTerm);
-
-            if(!batchResults.isEmpty()) {
-                for(batchDownloads batch : batchResults) {
-                    List<transactionTarget> batchTransactions = transactionOutManager.getInboxBatchTransactions(batch.getId(), userInfo.getId());
-                    batch.settotalTransactions(batchTransactions.size());
-
-                    lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
-                    batch.setstatusValue(processStatus.getDisplayCode());
-
-                    User userDetails = usermanager.getUserById(batch.getuserId());
-                    String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
-                    batch.setusersName(usersName);
-                }
-            }
-
-            mav.addObject("inboxBatches", batchResults);
-            mav.addObject("totalPages", 0);
-        }
-        else {
-            mav.addObject("inboxBatches", inboxBatches);    
-            Integer totalPages = (int)Math.ceil((double)totalInboxBatches / maxResults);
-            mav.addObject("totalPages", totalPages);
-        }
+        mav.addObject("inboxBatches", inboxBatches);    
+        Integer totalPages = (int)Math.ceil((double)totalInboxBatches / maxResults);
+        mav.addObject("totalPages", totalPages);
         
         /* Set the header totals */
-        setTotals(totalInboxBatches,0,session);
+        setTotals(0,0,session);
        
         mav.addObject("searchTerm", searchTerm);
         mav.addObject("pendingTotal", pendingTotal);
         mav.addObject("inboxTotal", inboxTotal);
-        mav.addObject("currentPage", 1);
+        mav.addObject("currentPage", page);
         
         return mav;
     }

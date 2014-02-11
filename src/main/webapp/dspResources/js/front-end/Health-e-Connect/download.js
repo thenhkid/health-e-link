@@ -45,7 +45,7 @@ jQuery(document).ready(function($) {
         });
     });
     
-     $('#searchBatchesBtn').click(function() { 
+    $('#searchBatchesBtn').click(function() { 
         $('#searchForm').submit();
     });
     

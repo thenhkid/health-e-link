@@ -21,9 +21,7 @@ import java.util.List;
  */
 public interface transactionOutDAO {
     
-    List<batchDownloads> getInboxBatches(int userId, int orgId, int page, int maxResults);
-    
-    List<batchDownloads> findInboxBatches(List<batchDownloads> batches, String searchTerm);
+    List<batchDownloads> getInboxBatches(int userId, int orgId, String searchTerm, Date fromDate, Date toDate, int page, int maxResults);
     
     batchDownloads getBatchDetails(int batchId);
     

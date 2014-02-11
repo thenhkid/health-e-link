@@ -8,6 +8,7 @@ package com.ut.dph.dao.impl;
 
 import com.ut.dph.dao.transactionOutDAO;
 import com.ut.dph.model.Organization;
+import com.ut.dph.model.User;
 import com.ut.dph.model.batchDownloadSummary;
 import com.ut.dph.model.batchDownloads;
 import com.ut.dph.model.configuration;
@@ -15,11 +16,14 @@ import com.ut.dph.model.configurationConnection;
 import com.ut.dph.model.configurationConnectionReceivers;
 import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.configurationTransport;
+import com.ut.dph.model.lutables.lu_ProcessStatus;
 import com.ut.dph.model.messageType;
 import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionOutNotes;
 import com.ut.dph.model.transactionOutRecords;
 import com.ut.dph.model.transactionTarget;
+import com.ut.dph.service.sysAdminManager;
+import com.ut.dph.service.userManager;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -42,6 +46,12 @@ public class transactionOutDAOImpl implements transactionOutDAO {
     
     @Autowired
     private SessionFactory sessionFactory;
+    
+    @Autowired
+    private sysAdminManager sysAdminManager;
+    
+    @Autowired
+    private userManager usermanager;
     
     /**
      * The 'submitBatchDownload' function will submit the new batch.
@@ -140,7 +150,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
     @Override
     @Transactional
     @SuppressWarnings("UnusedAssignment")
-    public List<batchDownloads> getInboxBatches(int userId, int orgId, int page, int maxResults) {
+    public List<batchDownloads> getInboxBatches(int userId, int orgId, String searchTerm, Date fromDate, Date toDate, int page, int maxResults) {
         int firstResult = 0;
 
         /* Get a list of connections the user has access to */
@@ -206,20 +216,59 @@ public class transactionOutDAOImpl implements transactionOutDAO {
 
         Criteria findBatches = sessionFactory.getCurrentSession().createCriteria(batchDownloads.class);
         findBatches.add(Restrictions.in("id", batchIdList));
+        
+        if(!"".equals(fromDate) && fromDate != null) {
+            findBatches.add(Restrictions.ge("dateCreated", fromDate));
+        }  
+        
+        if(!"".equals(toDate)&& toDate != null) {
+            findBatches.add(Restrictions.lt("dateCreated", toDate));
+        } 
+        
         findBatches.addOrder(Order.desc("dateCreated"));
+        
+        /* If a search term is entered conduct a search */
+        if(!"".equals(searchTerm)) {
+            
+            List<batchDownloads> batches = findBatches.list();
+            
+            List<Integer> batchFoundIdList = findInboxBatches(batches, searchTerm);
+            
+            Criteria foundBatches = sessionFactory.getCurrentSession().createCriteria(batchDownloads.class);
+            foundBatches.add(Restrictions.in("id", batchFoundIdList));
+            foundBatches.addOrder(Order.desc("dateCreated"));
+            
+            if (page > 1) {
+                firstResult = (maxResults * (page - 1));
+            }
 
-        if (page > 1) {
-            firstResult = (maxResults * (page - 1));
+            foundBatches.setFirstResult(firstResult);
+
+            if (maxResults > 0) {
+                //Set the max results to display
+                foundBatches.setMaxResults(maxResults);
+            }
+            
+            return foundBatches.list();
+            
         }
+        
+        else {
+            
+            if (page > 1) {
+                firstResult = (maxResults * (page - 1));
+            }
 
-        findBatches.setFirstResult(firstResult);
+            findBatches.setFirstResult(firstResult);
 
-        if (maxResults > 0) {
-            //Set the max results to display
-            findBatches.setMaxResults(maxResults);
+            if (maxResults > 0) {
+                //Set the max results to display
+                findBatches.setMaxResults(maxResults);
+            }
+
+            return findBatches.list();
         }
-
-        return findBatches.list();
+        
     }
     
     /**
@@ -230,9 +279,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
      *
      * @return This function will return a list of batches that match the search term.
      */
-    @Override
-    @Transactional
-    public List<batchDownloads> findInboxBatches(List<batchDownloads> batches, String searchTerm) {
+    public List<Integer> findInboxBatches(List<batchDownloads> batches, String searchTerm) {
 
         List<Integer> batchIdList = new ArrayList<Integer>();
 
@@ -240,6 +287,13 @@ public class transactionOutDAOImpl implements transactionOutDAO {
         searchTerm = searchTerm.replace(".", "\\.");
 
         for (batchDownloads batch : batches) {
+            
+            lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
+            batch.setstatusValue(processStatus.getDisplayCode());
+
+            User userDetails = usermanager.getUserById(batch.getuserId());
+            String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
+            batch.setusersName(usersName);
 
             /* Search the submitted by */
             if (batch.getusersName().toLowerCase().matches(".*" + searchTerm + ".*")) {
@@ -330,11 +384,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
             batchIdList.add(0);
         }
 
-        Criteria findBatches = sessionFactory.getCurrentSession().createCriteria(batchDownloads.class);
-        findBatches.add(Restrictions.in("id", batchIdList));
-        findBatches.addOrder(Order.desc("dateCreated"));
-
-        return findBatches.list();
+        return batchIdList;
     }
     
     /**

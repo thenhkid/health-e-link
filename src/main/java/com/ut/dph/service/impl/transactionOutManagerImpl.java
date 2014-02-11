@@ -6,7 +6,6 @@
 
 package com.ut.dph.service.impl;
 
-import com.ut.dph.controller.HealtheWebController;
 import com.ut.dph.dao.messageTypeDAO;
 import com.ut.dph.dao.transactionOutDAO;
 import com.ut.dph.model.batchDownloadSummary;
@@ -72,14 +71,8 @@ public class transactionOutManagerImpl implements transactionOutManager {
     
     @Override
     @Transactional
-    public List<batchDownloads> getInboxBatches(int userId, int orgId, int page, int maxResults) {
-        return transactionOutDAO.getInboxBatches(userId, orgId, page, maxResults);
-    }
-    
-    @Override
-    @Transactional
-    public List<batchDownloads> findInboxBatches(List<batchDownloads> batches, String searchTerm) {
-        return transactionOutDAO.findInboxBatches(batches, searchTerm);
+    public List<batchDownloads> getInboxBatches(int userId, int orgId, String searchTerm, Date fromDate, Date toDate, int page, int maxResults) {
+        return transactionOutDAO.getInboxBatches(userId, orgId, searchTerm, fromDate, toDate, page, maxResults);
     }
     
     @Override

@@ -27,16 +27,31 @@
                 
             <div style="display:none;" class="alert alert-danger" role="alert"></div>    
                 
-           <div class="" style="overflow:hidden; margin-bottom:10px;">
-               <form:form class="form form-inline" id="searchForm" action="/Health-e-Web/inbox" method="post">
-                    <div class="form-group">
-                        <label class="sr-only" for="searchTerm">Search</label>
-                        <input type="text" name="searchTerm" id="searchTerm" value="${searchTerm}" class="form-control" placeholder="Search"/>
+           <div class="row" style="overflow:hidden; margin-bottom:10px;">
+              
+               <div class="col-md-3">
+                    <form:form class="form form-inline" id="searchForm" action="/Health-e-Web/inbox" method="post">
+                        <div class="form-group">
+                            <label class="sr-only" for="searchTerm">Search</label>
+                            <input type="text" name="searchTerm" id="searchTerm" value="${searchTerm}" class="form-control" placeholder="Search"/>
+                            <input type="hidden" name="fromDate" id="fromDate" value="${fromDate}" />
+                            <input type="hidden" name="toDate" id="toDate" value="${toDate}" />
+                            <input type="hidden" name="page" id="page" value="${page}" />
+                        </div>
+                        <button id="searchBatchesBtn" class="btn btn-primary btn-sm" title="Search Inbox">
+                            <span class="glyphicon glyphicon-search"></span>
+                        </button>
+                    </form:form>
+                </div>
+
+                <div class="col-md-2 col-md-offset-3"></div>
+
+                <div class="col-md-4">
+                    <div class="date-range-picker-trigger form-control pull-right daterange">
+                        <i class="glyphicon glyphicon-calendar"></i>
+                        <span class="date-label" rel="" rel2=""><fmt:formatDate value="${fromDate}" type="date" pattern="MMMM dd, yyyy" /> - <fmt:formatDate value="${toDate}" type="date" pattern="MMMM dd, yyyy" /></span> <b class="caret"></b>
                     </div>
-                    <button id="searchBatchesBtn" class="btn btn-primary btn-sm" title="Search Inbox">
-                        <span class="glyphicon glyphicon-search"></span>
-                    </button>
-                </form:form>
+                </div>
             </div>     
             <form action="inbox/batch/Transactions" id="viewBatchTransactions" method="post">
                 <input type="hidden" id="batchId" name="batchId" value="" />
@@ -84,11 +99,11 @@
                 </table>
                 <c:if test="${totalPages > 0}">            
                     <ul class="pagination pull-right" role="navigation" aria-labelledby="Paging">
-                        <c:if test="${currentPage > 1}"><li><a href="?page=${currentPage-1}">&laquo;</a></li></c:if>
+                        <c:if test="${currentPage > 1}"><li><a href="javascript:void(0);" rel="${currentPage-1}" class="changePage">&laquo;</a></li></c:if>
                         <c:forEach var="i" begin="1" end="${totalPages}">
-                        <li><a href="?page=${i}">${i}</a></li>
+                        <li><a href="javascript:void(0);" rel="${i}" class="changePage">${i}</a></li>
                         </c:forEach>
-                        <c:if test="${currentPage < totalPages}"><li><a href="?page=${currentPage+1}">&raquo;</a></li></c:if>
+                        <c:if test="${currentPage < totalPages}"><li><a href="javascript:void(0);" rel="${currentPage+1}" class="changePage">&raquo;</a></li></c:if>
                     </ul>
                 </c:if>
             </div>
