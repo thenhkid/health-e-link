@@ -49,7 +49,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 
     @Autowired
     private SessionFactory sessionFactory;
-
+   	
     private String schemaName = "universalTranslator";
 
     private int transRELId = 12;
@@ -1595,6 +1595,7 @@ public class transactionInDAOImpl implements transactionInDAO {
     }
 
     @Override
+    @Transactional
     public void flagCWErrors(Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing) {
 
         String sql;
@@ -1897,5 +1898,34 @@ public class transactionInDAOImpl implements transactionInDAO {
         }
 
     }
+
+	@Override
+	@Transactional
+	public Integer executeMacro(Integer configId, Integer batchId,
+			Integer cdtId, Integer fieldNo, boolean foroutboundProcessing) {
+	   
+		try {
+		String sql = ("CALL runMacro(:configId, :batchId, :cdtId, :fieldNo, "
+				+ ":foroutboundProcessing, @fieldNoOut);");
+	    		
+        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                .setParameter("configId", configId)
+                .setParameter("batchId", batchId)
+                .setParameter("cdtId", cdtId)
+                .setParameter("fieldNo", fieldNo)
+                .setParameter("foroutboundProcessing", foroutboundProcessing);
+
+        return (Integer)query.list().get(0);
+        
+	   } catch (Exception e) {
+		   e.printStackTrace();
+		   return 0;
+	   }
+       
+	}
+	
+	
+	
+	
 
 }

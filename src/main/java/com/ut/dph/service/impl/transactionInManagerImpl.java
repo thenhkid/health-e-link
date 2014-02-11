@@ -1171,9 +1171,30 @@ public class transactionInManagerImpl implements transactionInManager {
     }
 
     @Override
-    public boolean processMacro(Integer configId, Integer batchId, configurationDataTranslations translation, boolean foroutboundProcessing) {
-        // TODO Auto-generated method stub
-        return false;
+    public boolean processMacro(Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing) {
+        try {
+        	
+    	// 1. we call SP to run the macro formulas
+        	Integer fieldNoOut = transactionInDAO.executeMacro(configId, batchId, cdt.getId(), cdt.getFieldNo(), foroutboundProcessing);
+    	// 2. we will get back a field no where we should set the values in forCW to targetField, if sp all logic should be handled in sp and we will just return a 0
+    	if (fieldNoOut != 0) {
+    		//we replace original F[FieldNo] column with data in forcw
+            updateFieldNoWithCWData(configId, batchId, fieldNoOut, cdt.getPassClear(), foroutboundProcessing);
+            //we reset fieldNo here
+            cdt.setFieldNo(fieldNoOut);
+            //flag errors, anything row that is not null in F[FieldNo] but null in forCW
+            flagCWErrors(configId, batchId, cdt, foroutboundProcessing);
+            
+            //flag as error in transactionIn or transactionOut table
+            updateStatusForErrorTrans(batchId, 14, foroutboundProcessing);
+            
+            //we replace original F[FieldNo] column with data in forcw
+            updateFieldNoWithCWData(configId, batchId, fieldNoOut, cdt.getPassClear(), foroutboundProcessing);
+    	} 
+    		return true;
+        } catch (Exception e) {
+        	return false;
+        }
     }
 
     @Override

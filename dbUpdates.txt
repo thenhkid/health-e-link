@@ -53,7 +53,52 @@ ADD COLUMN `mergeable` BIT(1) NULL DEFAULT b'0' AFTER `deleted`;
 
   
 
-  /** grace 020713 **/
+  /** grace 020714 **/
 ALTER TABLE `universalTranslator`.`transactionOutErrors` 
 DROP FOREIGN KEY `batchDLFK`;
+
+/** grace 02.10.2014 **/
+
+DELIMITER $$
+CREATE Procedure `universaltranslator`.`runMacro`(in inConfigId int, in batchId int, 
+in cdtId int, in fieldNo int, in foroutboundProcessing boolean, out fieldNoOut int) 
+proc_main:begin
+set fieldNoOut = 0; -- dummy for now
+select fieldNoOut;
+
+end proc_main$$
+DELIMITER ;
+
+
+drop procedure `universaltranslator`.`runMacro`;
+
+DELIMITER $$
+CREATE Procedure `universaltranslator`.`runMacro`(in inConfigId int, in batchId int, 
+in cdtId int, in fieldNo int, in foroutboundProcessing boolean, out fieldNoOut int) 
+proc_main:begin
+ -- 1 - we look up macro info
+
+declare localFormulaName varchar(255) default "";
+
+select formula into localFormulaName from Macro_Names mc, configurationDataTranslations cdt where cdt.macroId = mc.id and cdt.id = cdtId;
+
+-- we can have different types, there is always a formula
+
+-- DO NO PASS
+
+-- SP
+
+-- Mapspec Links
+
+-- HL7 Message
+
+
+-- we will return the fieldNo for the target column so forCW values can be updated, return 0 for SP
+set fieldNoOut = 0; -- dummy for now
+select fieldNoOut;
+
+end proc_main$$
+DELIMITER ;
+
+
   
