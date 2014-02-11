@@ -35,7 +35,7 @@
                                         </td>
                                         <td class="center-text"><fmt:formatDate value="${batch.dateCreated}" type="date" pattern="M/dd/yyyy" /></td>
                                         <td class="actions-col" style="width:100px;">
-                                             <a href="/downloadFile.do?filename=${batch.outputFIleName}&foldername=output files&orgId=${batch.orgId}" rel="${batch.id}"  class="downloadFile" title="Download">
+                                             <a href="javascript:void(0);" rel="${batch.id}" rel1="${batch.outputFIleName}" rel2="${batch.orgId}" class="downloadFile" title="Download">
                                                 <span class="glyphicon glyphicon-edit"></span>
                                                 Download	
                                             </a>

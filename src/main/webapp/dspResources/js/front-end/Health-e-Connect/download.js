@@ -26,6 +26,8 @@ jQuery(document).ready(function($) {
     //This function will update the status of the batch when the download link is clicked.
     $(document).on('click', '.downloadFile', function() {
         var batchId = $(this).attr('rel');
+        var fileName = $(this).attr('rel1');
+        var orgId = $(this).attr('rel2');
         
          $.ajax({
             url: '/Health-e-Connect/downloadBatch.do',
@@ -34,11 +36,10 @@ jQuery(document).ready(function($) {
             success: function(data) {
                 
                //Need to rewrite the status of the clicked batch
-               //var statusHTML = '<a href="#statusModal" data-toggle="modal" class="btn btn-link viewStatus" rel="22" title="View this Status">SDL&nbsp;<span class="badge badge-help" data-placement="top" title="" data-original-title="">?</span></a>';
-               //alert(statusHTML);
-               // $('#statusDiv'+data).html(statusHTML);
+               var statusHTML = '<a href="#statusModal" data-toggle="modal" class="btn btn-link viewStatus" rel="22" title="View this Status">SDL&nbsp;<span class="badge badge-help" data-placement="top" title="" data-original-title="">?</span></a>';
+               $('#statusDiv'+batchId).html(statusHTML);
                
-               alert(data);
+               window.location.href = "/downloadFile.do?filename="+fileName+"&foldername=output files&orgId="+orgId;
                 
             }
         });
