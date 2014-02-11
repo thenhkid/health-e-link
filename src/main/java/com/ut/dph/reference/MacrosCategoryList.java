@@ -11,7 +11,7 @@ public class MacrosCategoryList {
 		
 		LinkedHashMap<String,String> categories = new LinkedHashMap<String,String>();
 		
-		categories.put("Compare Values", "Compare Values");
+		categories.put("Do Not Pass", "Do Not Pass");
 		categories.put("HL7 MESSAGE", "HL7 MESSAGE");
 		categories.put("Maplink Specs", "Maplink Specs");
 		categories.put("Stored Procedures", "Stored Procedures");
