@@ -9,6 +9,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.ut.dph.reference.MacrosCategoryList;
 import com.ut.dph.reference.USStateList;
 import com.ut.dph.reference.ProcessCategoryList;
 import com.ut.dph.service.configurationManager;
@@ -154,6 +155,8 @@ public class adminSysAdminController {
 		//create a macro
 		Macros macro = new Macros();
 		macro.setId(0);
+		MacrosCategoryList categoryList = new MacrosCategoryList();
+	    mav.addObject("categoryList", categoryList.getCategories());
 		mav.addObject("macroDetails",macro);
 		mav.addObject("btnValue", "Create");
 		return mav;
@@ -166,7 +169,9 @@ public class adminSysAdminController {
 			BindingResult result) throws Exception {
 		
 		ModelAndView mav = new ModelAndView();
-		mav.setViewName("/administrator/sysadmin/macro/details");	
+		mav.setViewName("/administrator/sysadmin/macro/details");
+		MacrosCategoryList categoryList = new MacrosCategoryList();
+	    mav.addObject("categoryList", categoryList.getCategories());		
 		/** check for error **/
 		if(result.hasErrors()) {
 			mav.addObject("macroDetails",macroDetails);
@@ -191,6 +196,8 @@ public class adminSysAdminController {
 		mav.setViewName("/administrator/sysadmin/macro/details");	
 		//get macro info here
 		Macros macroDetails = configurationmanager.getMacroById(i);
+		MacrosCategoryList categoryList = new MacrosCategoryList();
+	    mav.addObject("categoryList", categoryList.getCategories());		
 		mav.addObject("macroDetails",macroDetails);
 		mav.addObject("btnValue", "Update");
 		return mav;		
