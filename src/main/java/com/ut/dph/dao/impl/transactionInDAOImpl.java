@@ -1596,15 +1596,15 @@ public class transactionInDAOImpl implements transactionInDAO {
 
     @Override
     @Transactional
-    public void flagCWErrors(Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing) {
+    public void flagCWMacroErrors(Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing) {
 
         String sql;
 
         if (foroutboundProcessing == false) {
             sql = "insert into transactionInerrors (batchUploadId, "
-                    + "transactionInId, configurationFormFieldsId, errorid, cwId)"
+                    + "transactionInId, configurationFormFieldsId, errorid, cdtId)"
                     + " select " + batchId + ", transactionInId, " + cdt.getFieldId()
-                    + ", 3,  " + cdt.getCrosswalkId() + " from transactionTranslatedIn where "
+                    + ", 3,  " + cdt.getId() + " from transactionTranslatedIn where "
                     + "configId = :configId "
                     + " and (F" + cdt.getFieldNo()
                     + " is not null and forcw is null)"
@@ -1614,9 +1614,9 @@ public class transactionInDAOImpl implements transactionInDAO {
 
         } else {
             sql = "insert into transactionOutErrors (batchDownloadId, "
-                    + "transactionTargetId, configurationFormFieldsId, errorid, cwId)"
+                    + "transactionTargetId, configurationFormFieldsId, errorid, cdtId)"
                     + " select " + batchId + ", transactionTargetId, " + cdt.getFieldId()
-                    + ", 3,  " + cdt.getCrosswalkId() + " from transactionTranslatedOut where "
+                    + ", 3,  " + cdt.getId() + " from transactionTranslatedOut where "
                     + "configId = :configId "
                     + " and (F" + cdt.getFieldNo()
                     + " is not null and forcw is null)"

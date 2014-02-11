@@ -101,4 +101,58 @@ end proc_main$$
 DELIMITER ;
 
 
+/** 02.11.2014 Grace **/
+
+DROP TABLE IF EXISTS `transactionOutErrors`;
+
+CREATE TABLE `transactionOutErrors` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `BatchDownloadId` int(11) NOT NULL,
+  `transactionTargetId` int(11) NOT NULL,
+  `configurationFormFieldsId` int(11) DEFAULT NULL,
+  `errorId` int(11) DEFAULT NULL,
+  `cdtId` int(11) DEFAULT NULL,
+  `validationTypeId` int(11) DEFAULT NULL,
+  `dateCreated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `batchDLFK_idx` (`BatchDownloadId`),
+  KEY `configFFIdFK_idx` (`configurationFormFieldsId`),
+  KEY `FKErrorId_idx` (`errorId`),
+  KEY `validationTypeFKOut_idx` (`validationTypeId`),
+  KEY `cwFKOut_idx` (`cdtId`),
+  CONSTRAINT `cdtIdFK` FOREIGN KEY (`cdtId`) REFERENCES `configurationDataTranslations` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `configFFIdFK` FOREIGN KEY (`configurationFormFieldsId`) REFERENCES `configurationFormFields` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `FKErrorId` FOREIGN KEY (`errorId`) REFERENCES `lu_ErrorCodes` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `validationTypeFKOut` FOREIGN KEY (`validationTypeId`) REFERENCES `ref_validationTypes` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+
+DROP TABLE IF EXISTS `transactionInErrors`;
+
+CREATE TABLE `transactionInErrors` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `batchUploadId` int(11) NOT NULL,
+  `transactionInId` int(11) NOT NULL,
+  `configurationFormFieldsId` int(11) NOT NULL,
+  `errorId` int(11) DEFAULT NULL,
+  `cdtId` int(11) DEFAULT NULL,
+  `validationTypeId` int(11) DEFAULT NULL,
+  `dateCreated` datetime DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `batchUploadIdFK_idx` (`batchUploadId`),
+  KEY `configFFFKId_idx` (`configurationFormFieldsId`),
+  KEY `errorIdFK_idx` (`errorId`),
+  KEY `tieVTFK_idx` (`validationTypeId`),
+  KEY `tieCWFK_idx` (`cdtId`),
+  CONSTRAINT `cdtIdInFK` FOREIGN KEY (`cdtId`) REFERENCES `configurationDataTranslations` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `batchUploadIdFK` FOREIGN KEY (`batchUploadId`) REFERENCES `batchUploads` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `configFFFKId` FOREIGN KEY (`configurationFormFieldsId`) REFERENCES `configurationFormFields` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `errorIdFK` FOREIGN KEY (`errorId`) REFERENCES `lu_ErrorCodes` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `tieVTFK` FOREIGN KEY (`validationTypeId`) REFERENCES `ref_validationTypes` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=233 DEFAULT CHARSET=latin1;
+
+
+DELETE FROM `universalTranslator`.`lu_ErrorCodes` WHERE `id`='4';
+UPDATE `universalTranslator`.`lu_ErrorCodes` SET `displayText`='Failed Data Translation', `description`='Failed Data Translation' WHERE `id`='3';
+
+
   

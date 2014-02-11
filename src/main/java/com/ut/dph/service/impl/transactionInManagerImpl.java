@@ -1154,7 +1154,7 @@ public class transactionInManagerImpl implements transactionInManager {
             updateFieldNoWithCWData(configId, batchId, cdt.getFieldNo(), cdt.getPassClear(), foroutboundProcessing);
 
             //flag errors, anything row that is not null in F[FieldNo] but null in forCW
-            flagCWErrors(configId, batchId, cdt, foroutboundProcessing);
+            flagCWMacroErrors(configId, batchId, cdt, foroutboundProcessing);
             
             //flag as error in transactionIn or transactionOut table
             updateStatusForErrorTrans(batchId, 14, foroutboundProcessing);
@@ -1180,10 +1180,10 @@ public class transactionInManagerImpl implements transactionInManager {
     	if (fieldNoOut != 0) {
     		//we replace original F[FieldNo] column with data in forcw
             updateFieldNoWithCWData(configId, batchId, fieldNoOut, cdt.getPassClear(), foroutboundProcessing);
-            //we reset fieldNo here
+            //we reset fieldNo here as for macro it doesn't have to be sourceFieldNo
             cdt.setFieldNo(fieldNoOut);
             //flag errors, anything row that is not null in F[FieldNo] but null in forCW
-            flagCWErrors(configId, batchId, cdt, foroutboundProcessing);
+            flagCWMacroErrors(configId, batchId, cdt, foroutboundProcessing);
             
             //flag as error in transactionIn or transactionOut table
             updateStatusForErrorTrans(batchId, 14, foroutboundProcessing);
@@ -1213,9 +1213,9 @@ public class transactionInManagerImpl implements transactionInManager {
     }
 
 	@Override
-	public void flagCWErrors(Integer configId, Integer batchId,
+	public void flagCWMacroErrors(Integer configId, Integer batchId,
 			configurationDataTranslations cdt, boolean foroutboundProcessing) {
-		 transactionInDAO.flagCWErrors(configId, batchId, cdt, foroutboundProcessing);
+		 transactionInDAO.flagCWMacroErrors(configId, batchId, cdt, foroutboundProcessing);
 	}
 
 	@Override
