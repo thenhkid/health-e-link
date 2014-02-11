@@ -18,6 +18,7 @@ public class Macros {
     @Column(name = "ID", nullable = false)
     private int id;
 
+    @NotEmpty
     @Column(name = "CATEGORY", nullable = false)
     private String category;
 

@@ -16,8 +16,10 @@
                         <spring:bind path="category">
                             <div class="form-group ${status.error ? 'has-error' : '' }">
                                 <label class="control-label" for="category">Category</label>
-                                <form:input path="category" id="category" class="form-control" type="text" maxLength="45" />
-                                <form:errors path="category" cssClass="control-label" element="label" />
+                                 <form:select id="state" path="category" cssClass="form-control half">
+                                    <option value="" label=" - Select - " ></option>
+                                    <form:options items="${categoryList}"/>
+                                </form:select><form:errors path="category" cssClass="control-label" element="label" />
                             </div>
                         </spring:bind>
                          <spring:bind path="macroShortName">
