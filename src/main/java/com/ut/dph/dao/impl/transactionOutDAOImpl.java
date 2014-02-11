@@ -1018,7 +1018,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
     @SuppressWarnings("UnusedAssignment")
     public List<batchDownloads> getdownloadableBatches(int userId, int orgId, Date fromDate, Date toDate, int page, int maxResults) {
         int firstResult = 0;
-
+        
         /* Get a list of connections the user has access to */
         Criteria connections = sessionFactory.getCurrentSession().createCriteria(configurationConnectionReceivers.class);
         connections.add(Restrictions.eq("userId", userId));
@@ -1116,6 +1116,122 @@ public class transactionOutDAOImpl implements transactionOutDAO {
             //Set the max results to display
             findBatches.setMaxResults(maxResults);
         }
+        
+        return findBatches.list(); 
+        
+    }
+    
+    /**
+     * The 'finddownloadableBatches' function will take a list of downloadable batches and apply the searchTerm to narrow down the results.
+     *
+     * @param batches The object containing the returned batches
+     * @param searchTerm The term to search the batches on
+     *
+     * @return This function will return a list of batches that match the search term.
+     */
+    @Override
+    @Transactional
+    public List<batchDownloads> finddownloadableBatches(List<batchDownloads> batches, String searchTerm) {
+
+        List<Integer> batchIdList = new ArrayList<Integer>();
+
+        searchTerm = searchTerm.toLowerCase();
+        searchTerm = searchTerm.replace(".", "\\.");
+
+        for (batchDownloads batch : batches) {
+
+            /* Search the submitted by */
+            if (batch.getoutputFIleName().toLowerCase().matches(".*" + searchTerm + ".*")) {
+                if (!batchIdList.contains(batch.getId())) {
+                    batchIdList.add(batch.getId());
+                }
+            }
+
+            /* Search the batch name */
+            if (batch.getutBatchName().toLowerCase().matches(".*" + searchTerm + ".*")) {
+                if (!batchIdList.contains(batch.getId())) {
+                    batchIdList.add(batch.getId());
+                }
+            }
+
+            /* Search the batch date */
+            String dateAsString = new SimpleDateFormat("MM/dd/yyyy").format(batch.getdateCreated());
+
+            if (dateAsString.matches(".*" + searchTerm + ".*")) {
+                if (!batchIdList.contains(batch.getId())) {
+                    batchIdList.add(batch.getId());
+                }
+            }
+
+            /* Search the status */
+            if (batch.getstatusValue().toLowerCase().matches(".*" + searchTerm + ".*")) {
+                if (!batchIdList.contains(batch.getId())) {
+                    batchIdList.add(batch.getId());
+                }
+            }
+
+            /* Search message types included in the batch */
+            Criteria transactionQuery = sessionFactory.getCurrentSession().createCriteria(transactionTarget.class);
+            transactionQuery.add(Restrictions.eq("batchDLId", batch.getId()));
+            List<transactionTarget> transactions = transactionQuery.list();
+
+            if (!transactions.isEmpty()) {
+
+                /* Loop through the transactions to get the config details */
+                for (transactionTarget transaction : transactions) {
+
+                    Criteria configQuery = sessionFactory.getCurrentSession().createCriteria(configuration.class);
+                    configQuery.add(Restrictions.eq("id", transaction.getconfigId()));
+                    List<configuration> configs = configQuery.list();
+
+                    if (!configs.isEmpty()) {
+
+                        /* Loop through the configurations to get the config details */
+                        for (configuration config : configs) {
+
+                            messageType messageTypeDetails = (messageType) sessionFactory.getCurrentSession().get(messageType.class, config.getMessageTypeId());
+
+                            /* Search the status */
+                            if (messageTypeDetails.getName().toLowerCase().matches(".*" + searchTerm + ".*")) {
+                                if (!batchIdList.contains(batch.getId())) {
+                                    batchIdList.add(batch.getId());
+                                }
+                            }
+                        }
+                    }
+
+                }
+
+            }
+
+            /* Search target data */
+            Criteria targetQuery = sessionFactory.getCurrentSession().createCriteria(batchDownloadSummary.class);
+            targetQuery.add(Restrictions.eq("batchId", batch.getId()));
+            List<batchDownloadSummary> targets = targetQuery.list();
+
+            if (!targets.isEmpty()) {
+
+                for (batchDownloadSummary target : targets) {
+                    Organization orgDetails = (Organization) sessionFactory.getCurrentSession().get(Organization.class, target.gettargetOrgId());
+
+                    /* Search the organization name */
+                    if (orgDetails.getOrgName().toLowerCase().matches(".*" + searchTerm + ".*")) {
+                        if (!batchIdList.contains(batch.getId())) {
+                            batchIdList.add(batch.getId());
+                        }
+                    }
+                }
+
+            }
+        }
+
+        if (batchIdList.isEmpty()) {
+            batchIdList.add(0);
+        }
+
+        Criteria findBatches = sessionFactory.getCurrentSession().createCriteria(batchDownloads.class);
+        findBatches.add(Restrictions.in("id", batchIdList));
+        findBatches.addOrder(Order.desc("dateCreated"));
 
         return findBatches.list();
     }

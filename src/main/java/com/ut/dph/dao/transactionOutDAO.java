@@ -79,4 +79,6 @@ public interface transactionOutDAO {
     
     List<batchDownloads> getdownloadableBatches(int userId, int orgId, Date fromDate, Date toDate, int page, int maxResults);
     
+    List<batchDownloads> finddownloadableBatches(List<batchDownloads> batches, String searchTerm);
+    
 }

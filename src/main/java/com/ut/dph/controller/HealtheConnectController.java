@@ -333,7 +333,27 @@ public class HealtheConnectController {
             }
         }
         
-        mav.addObject("downloadableBatches", downloadableBatches);
+        if(searchTerm != null && !"".equals(searchTerm)) {
+            /* Pass the returned pending batches to the filter method */
+            List<batchDownloads> batchResults = transactionOutManager.finddownloadableBatches(downloadableBatches, searchTerm);
+
+            if(!batchResults.isEmpty()) {
+                for(batchDownloads batch : batchResults) {
+                    
+                    lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
+                    batch.setstatusValue(processStatus.getDisplayCode());
+
+                    User userDetails = usermanager.getUserById(batch.getuserId());
+                    String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
+                    batch.setusersName(usersName);
+                }
+            }
+
+            mav.addObject("downloadableBatches", batchResults);
+        }
+        else {
+            mav.addObject("downloadableBatches", downloadableBatches);  
+        }
         
         return mav;
     }

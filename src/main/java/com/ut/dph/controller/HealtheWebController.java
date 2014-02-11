@@ -41,8 +41,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
@@ -239,7 +242,7 @@ public class HealtheWebController {
             List<batchDownloads> batchResults = transactionOutManager.findInboxBatches(inboxBatches, searchTerm);
 
             if(!batchResults.isEmpty()) {
-                for(batchDownloads batch : inboxBatches) {
+                for(batchDownloads batch : batchResults) {
                     List<transactionTarget> batchTransactions = transactionOutManager.getInboxBatchTransactions(batch.getId(), userInfo.getId());
                     batch.settotalTransactions(batchTransactions.size());
 
@@ -2149,5 +2152,32 @@ public class HealtheWebController {
         
         return mav;
     }
+    
+    /**
+    * @param filter 
+    * START for start date of month e.g.  Nov 01, 2013
+    * END for end date of month e.g.  Nov 30, 2013
+    * @return
+    */
+   public Date getMonthDate(String filter){
+       
+       String MM_DD_YYYY = "yyyy-mm-dd";
+       SimpleDateFormat sdf = new SimpleDateFormat(MM_DD_YYYY);
+       sdf.setTimeZone(TimeZone.getTimeZone("EST"));
+       sdf.format(GregorianCalendar.getInstance().getTime());
+
+       Calendar cal =  GregorianCalendar.getInstance();
+       int date = cal.getActualMinimum(Calendar.DATE);
+       if("END".equalsIgnoreCase(filter)){
+           date = cal.getActualMaximum(Calendar.DATE);
+       }
+       cal.set(Calendar.DATE, date);
+       cal.set(Calendar.HOUR_OF_DAY, 0);
+       cal.set(Calendar.MINUTE, 0);
+       cal.set(Calendar.SECOND, 0);
+       cal.set(Calendar.MILLISECOND, 0);
+       
+       return cal.getTime();
+   }
     
 }
