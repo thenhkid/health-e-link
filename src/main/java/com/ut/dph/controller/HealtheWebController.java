@@ -155,13 +155,12 @@ public class HealtheWebController {
         
         mav.addObject("fromDate", fromDate);
         mav.addObject("toDate", toDate);
-        mav.addObject("page", 1);
         
         /* Need to get all the message types set up for the user */
         User userInfo = (User)session.getAttribute("userDetails");
         
         /* Need to get a list of all inbox batches */
-        Integer totalInboxBatches = transactionOutManager.getInboxBatches(userInfo.getId(), userInfo.getOrgId(), "", null, null, 1, 0).size();
+        Integer totalInboxBatches = transactionOutManager.getInboxBatches(userInfo.getId(), userInfo.getOrgId(), "", fromDate, toDate, 1, 0).size();
         List<batchDownloads> inboxBatches = transactionOutManager.getInboxBatches(userInfo.getId(), userInfo.getOrgId(), "", fromDate, toDate, 1, maxResults);
         
         if(!inboxBatches.isEmpty()) {
@@ -181,12 +180,12 @@ public class HealtheWebController {
         mav.addObject("inboxBatches", inboxBatches);
        
         /* Set the header totals */
-        setTotals(totalInboxBatches,0,session);
+        setTotals(0,0,session);
         
         mav.addObject("pendingTotal", pendingTotal);
         mav.addObject("inboxTotal", inboxTotal);
         
-        Integer totalPages = (int)Math.ceil((double)inboxBatches.size() / maxResults);
+        Integer totalPages = (int)Math.ceil((double)totalInboxBatches / maxResults);
         mav.addObject("totalPages", totalPages);
         mav.addObject("currentPage", 1);
         
@@ -216,7 +215,6 @@ public class HealtheWebController {
         
         mav.addObject("fromDate", fromDate);
         mav.addObject("toDate", toDate);
-        mav.addObject("page", page);
         
         /* Need to get all the message types set up for the user */
         User userInfo = (User)session.getAttribute("userDetails");

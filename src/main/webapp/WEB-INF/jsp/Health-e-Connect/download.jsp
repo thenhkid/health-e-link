@@ -22,6 +22,7 @@
                                 <input type="text" name="searchTerm" id="searchTerm" value="${searchTerm}" class="form-control" placeholder="Search"/>
                                 <input type="hidden" name="fromDate" id="fromDate" rel="<fmt:formatDate value="${fromDate}" type="date" pattern="MM/dd/yyyy" />" rel2="<fmt:formatDate value="${userDetails.dateOrgWasCreated}" type="date" pattern="MM/dd/yyyy" />" value="${fromDate}" />
                                 <input type="hidden" name="toDate" id="toDate" rel="<fmt:formatDate value="${toDate}" type="date" pattern="MM/dd/yyyy" />" value="${toDate}" />
+                                <input type="hidden" name="page" id="page" value="${currentPage}" />
                             </div>
                             <button id="searchBatchesBtn" class="btn btn-primary btn-sm" title="Search Inbox">
                                 <span class="glyphicon glyphicon-search"></span>
@@ -78,6 +79,15 @@
                         </c:choose>    
                     </tbody>
                 </table>
+                <c:if test="${totalPages > 0}">            
+                    <ul class="pagination pull-right" role="navigation" aria-labelledby="Paging">
+                        <c:if test="${currentPage > 1}"><li><a href="javascript:void(0);" rel="${currentPage-1}" class="changePage">&laquo;</a></li></c:if>
+                        <c:forEach var="i" begin="1" end="${totalPages}">
+                        <li><a href="javascript:void(0);" rel="${i}" class="changePage">${i}</a></li>
+                        </c:forEach>
+                        <c:if test="${currentPage < totalPages}"><li><a href="javascript:void(0);" rel="${currentPage+1}" class="changePage">&raquo;</a></li></c:if>
+                    </ul>
+                </c:if>
             </div>
         </div>
     </div>

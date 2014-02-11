@@ -94,6 +94,7 @@ public class HealtheConnectController {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/Health-e-Connect/upload");
         
+        
         /* Need to get a list of uploaded files */
         User userInfo = (User)session.getAttribute("userDetails");
         
@@ -255,11 +256,7 @@ public class HealtheConnectController {
      * @throws Exception
      */
     @RequestMapping(value = "/download", method = RequestMethod.GET)
-    public ModelAndView viewDownloads(HttpServletRequest request, HttpServletResponse response, HttpSession session, @RequestParam(value = "page", required = false) Integer page) throws Exception {
-        
-        if (page == null) {
-            page = 1;
-        }
+    public ModelAndView viewDownloads(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
         
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/Health-e-Connect/download");
@@ -269,12 +266,14 @@ public class HealtheConnectController {
         
         mav.addObject("fromDate", fromDate);
         mav.addObject("toDate", toDate);
+        mav.addObject("currentPage", 1);
         
         /* Need to get a list of uploaded files */
         User userInfo = (User)session.getAttribute("userDetails");
         
         /* Need to get a list of all uploaded batches */
-        List<batchDownloads> downloadableBatches = transactionOutManager.getdownloadableBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, page, 0);
+        Integer totaldownloadableBatches = transactionOutManager.getdownloadableBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, "", 1, 0).size();
+        List<batchDownloads> downloadableBatches = transactionOutManager.getdownloadableBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, "", 1, maxResults);
         
         if(!downloadableBatches.isEmpty()) {
             for(batchDownloads batch : downloadableBatches) {
@@ -291,6 +290,9 @@ public class HealtheConnectController {
         
         mav.addObject("downloadableBatches", downloadableBatches);
         
+        Integer totalPages = (int)Math.ceil((double)totaldownloadableBatches / maxResults);
+        mav.addObject("totalPages", totalPages);
+        
         return mav;
     }
     
@@ -303,7 +305,7 @@ public class HealtheConnectController {
      * @throws Exception
      */
     @RequestMapping(value = "/download", method = RequestMethod.POST)
-    public ModelAndView findDownloads(@RequestParam String searchTerm, @RequestParam Date fromDate, @RequestParam Date toDate,HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
+    public ModelAndView findDownloads(@RequestParam(value = "page", required = false) Integer page, @RequestParam String searchTerm, @RequestParam Date fromDate, @RequestParam Date toDate,HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
        
         
         ModelAndView mav = new ModelAndView();
@@ -318,7 +320,8 @@ public class HealtheConnectController {
         User userInfo = (User)session.getAttribute("userDetails");
         
         /* Need to get a list of all uploaded batches */
-        List<batchDownloads> downloadableBatches = transactionOutManager.getdownloadableBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, 1, 0);
+        Integer totaldownloadableBatches = transactionOutManager.getdownloadableBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, searchTerm, 1, 0).size();
+        List<batchDownloads> downloadableBatches = transactionOutManager.getdownloadableBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, searchTerm, page, maxResults);
         
         if(!downloadableBatches.isEmpty()) {
             for(batchDownloads batch : downloadableBatches) {
@@ -332,28 +335,13 @@ public class HealtheConnectController {
                 
             }
         }
+        mav.addObject("downloadableBatches", downloadableBatches); 
         
-        if(searchTerm != null && !"".equals(searchTerm)) {
-            /* Pass the returned pending batches to the filter method */
-            List<batchDownloads> batchResults = transactionOutManager.finddownloadableBatches(downloadableBatches, searchTerm);
-
-            if(!batchResults.isEmpty()) {
-                for(batchDownloads batch : batchResults) {
-                    
-                    lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
-                    batch.setstatusValue(processStatus.getDisplayCode());
-
-                    User userDetails = usermanager.getUserById(batch.getuserId());
-                    String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
-                    batch.setusersName(usersName);
-                }
-            }
-
-            mav.addObject("downloadableBatches", batchResults);
-        }
-        else {
-            mav.addObject("downloadableBatches", downloadableBatches);  
-        }
+        Integer totalPages = (int)Math.ceil((double)totaldownloadableBatches / maxResults);
+        mav.addObject("totalPages", totalPages);
+        mav.addObject("searchTerm", searchTerm);
+        mav.addObject("currentPage", page);
+        
         
         return mav;
     }

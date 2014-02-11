@@ -75,8 +75,6 @@ public interface transactionOutDAO {
     
     int getMaxFieldNo(int configId);
     
-    List<batchDownloads> getdownloadableBatches(int userId, int orgId, Date fromDate, Date toDate, int page, int maxResults);
-    
-    List<batchDownloads> finddownloadableBatches(List<batchDownloads> batches, String searchTerm);
+    List<batchDownloads> getdownloadableBatches(int userId, int orgId, Date fromDate, Date toDate, String searchTerm, int page, int maxResults);
     
 }

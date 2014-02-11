@@ -672,13 +672,8 @@ public class transactionOutManagerImpl implements transactionOutManager {
     
     @Override
     @Transactional
-    public List<batchDownloads> getdownloadableBatches(int userId, int orgId, Date fromDate, Date toDate, int page, int maxResults) {
-        return transactionOutDAO.getdownloadableBatches(userId, orgId, fromDate, toDate, page, maxResults);
+    public List<batchDownloads> getdownloadableBatches(int userId, int orgId, Date fromDate, Date toDate, String searchTerm, int page, int maxResults) {
+        return transactionOutDAO.getdownloadableBatches(userId, orgId, fromDate, toDate, searchTerm, page, maxResults);
     }
-    
-    @Override
-    @Transactional
-    public List<batchDownloads> finddownloadableBatches(List<batchDownloads> batches, String searchTerm) {
-        return transactionOutDAO.finddownloadableBatches(batches, searchTerm);
-    }
+   
 }

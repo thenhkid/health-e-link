@@ -1066,7 +1066,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
     @Override
     @Transactional
     @SuppressWarnings("UnusedAssignment")
-    public List<batchDownloads> getdownloadableBatches(int userId, int orgId, Date fromDate, Date toDate, int page, int maxResults) {
+    public List<batchDownloads> getdownloadableBatches(int userId, int orgId, Date fromDate, Date toDate, String searchTerm, int page, int maxResults) {
         int firstResult = 0;
         
         /* Get a list of connections the user has access to */
@@ -1155,19 +1155,49 @@ public class transactionOutDAOImpl implements transactionOutDAO {
         } 
          
         findBatches.addOrder(Order.desc("dateCreated"));
+        
+        /* If a search term is entered conduct a search */
+        if(!"".equals(searchTerm)) {
+            
+            List<batchDownloads> batches = findBatches.list();
+            
+            List<Integer> batchFoundIdList = finddownloadableBatches(batches, searchTerm);
+            
+            Criteria foundBatches = sessionFactory.getCurrentSession().createCriteria(batchDownloads.class);
+            foundBatches.add(Restrictions.in("id", batchFoundIdList));
+            foundBatches.addOrder(Order.desc("dateCreated"));
+            
+            if (page > 1) {
+                firstResult = (maxResults * (page - 1));
+            }
 
-        if (page > 1) {
-            firstResult = (maxResults * (page - 1));
-        }
+            foundBatches.setFirstResult(firstResult);
 
-        findBatches.setFirstResult(firstResult);
-
-        if (maxResults > 0) {
-            //Set the max results to display
-            findBatches.setMaxResults(maxResults);
+            if (maxResults > 0) {
+                //Set the max results to display
+                foundBatches.setMaxResults(maxResults);
+            }
+            
+            return foundBatches.list();
+            
         }
         
-        return findBatches.list(); 
+        else {
+            
+            if (page > 1) {
+                firstResult = (maxResults * (page - 1));
+            }
+
+            findBatches.setFirstResult(firstResult);
+
+            if (maxResults > 0) {
+                //Set the max results to display
+                findBatches.setMaxResults(maxResults);
+            }
+
+            return findBatches.list();
+        }
+
         
     }
     
@@ -1179,9 +1209,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
      *
      * @return This function will return a list of batches that match the search term.
      */
-    @Override
-    @Transactional
-    public List<batchDownloads> finddownloadableBatches(List<batchDownloads> batches, String searchTerm) {
+    public List<Integer> finddownloadableBatches(List<batchDownloads> batches, String searchTerm) {
 
         List<Integer> batchIdList = new ArrayList<Integer>();
 
@@ -1279,10 +1307,6 @@ public class transactionOutDAOImpl implements transactionOutDAO {
             batchIdList.add(0);
         }
 
-        Criteria findBatches = sessionFactory.getCurrentSession().createCriteria(batchDownloads.class);
-        findBatches.add(Restrictions.in("id", batchIdList));
-        findBatches.addOrder(Order.desc("dateCreated"));
-
-        return findBatches.list();
+        return batchIdList;
     }
 }

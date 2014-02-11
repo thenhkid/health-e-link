@@ -49,6 +49,11 @@ jQuery(document).ready(function($) {
         $('#searchForm').submit();
     });
     
+    $(document).on('click','.changePage', function() {
+       $('#page').val($(this).attr('rel'));
+       $('#searchForm').submit();
+    });
+    
 });
 
 
