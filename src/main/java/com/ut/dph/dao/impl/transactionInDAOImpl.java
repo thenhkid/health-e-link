@@ -7,6 +7,7 @@ package com.ut.dph.dao.impl;
 
 import com.ut.dph.dao.transactionInDAO;
 import com.ut.dph.model.CrosswalkData;
+import com.ut.dph.model.Macros;
 import com.ut.dph.model.Organization;
 import com.ut.dph.model.User;
 import com.ut.dph.model.batchUploadSummary;
@@ -1602,7 +1603,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 
     @Override
     @Transactional
-    public void nullForSWCol(Integer configId, Integer batchId, boolean foroutboundProcessing) {
+    public void nullForCWCol(Integer configId, Integer batchId, boolean foroutboundProcessing) {
 
         String sql;
 
@@ -2039,29 +2040,25 @@ public class transactionInDAOImpl implements transactionInDAO {
     }
 
 	@Override
-	@Transactional
-	public Integer executeMacro(Integer configId, Integer batchId,
-			Integer cdtId, Integer fieldNo, boolean foroutboundProcessing) {
-	   
+	public boolean executeMacro(Integer configId, Integer batchId,
+			configurationDataTranslations cdt, boolean foroutboundProcessing,
+			Macros macro) {
 		try {
-		String sql = ("CALL runMacro(:configId, :batchId, :cdtId, :fieldNo, "
-				+ ":foroutboundProcessing, @fieldNoOut);");
-	    		
-        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
-                .setParameter("configId", configId)
-                .setParameter("batchId", batchId)
-                .setParameter("cdtId", cdtId)
-                .setParameter("fieldNo", fieldNo)
-                .setParameter("foroutboundProcessing", foroutboundProcessing);
+			/**
+			String sql = ("CALL " + macro.getFormula() + "(:configId, :batchId, "
+					+ ":fieldA, :fieldB, :con1, :con2, :macroId);");	
+	        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+	        query.list();
+	        **/
+	        	return true; 
+		   } catch (Exception e) {
+			   e.printStackTrace();
+			   return false;
+		   }
 
-        return (Integer)query.list().get(0);
-        
-	   } catch (Exception e) {
-		   e.printStackTrace();
-		   return 0;
-	   }
-       
 	}
+
+
 	
 	
 	

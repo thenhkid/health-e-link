@@ -8,6 +8,7 @@ package com.ut.dph.service.impl;
 import com.ut.dph.dao.messageTypeDAO;
 import com.ut.dph.dao.transactionInDAO;
 import com.ut.dph.model.CrosswalkData;
+import com.ut.dph.model.Macros;
 import com.ut.dph.model.batchUploadSummary;
 import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.configuration;
@@ -562,7 +563,7 @@ public class transactionInManagerImpl implements transactionInManager {
                 //1. grab the configurationDataTranslations
                 List<configurationDataTranslations> dataTranslations = configurationManager.getDataTranslationsWithFieldNo(configId);
                 for (configurationDataTranslations cdt : dataTranslations) {
-                    if (cdt.getCrosswalkId() != 0) {
+                	if (cdt.getCrosswalkId() != 0) {
                         successfulBatch = processCrosswalk(configId, batchUploadId, cdt, false);
                     } else if (cdt.getMacroId() != 0) {
                         successfulBatch = processMacro(configId, batchUploadId, cdt, false);
@@ -1139,7 +1140,7 @@ public class transactionInManagerImpl implements transactionInManager {
             // 1. we get the info for that cw (fieldNo, sourceVal, targetVal rel_crosswalkData)
             List<CrosswalkData> cdList = configurationManager.getCrosswalkData(cdt.getCrosswalkId());
             //we null forcw column, we translate and insert there, we then replace
-            nullForSWCol(configId, batchId, foroutboundProcessing);
+            nullForCWCol(configId, batchId, foroutboundProcessing);
             for (CrosswalkData cwd : cdList) {
                 executeCWData(configId, batchId, cdt.getFieldNo(), cwd, foroutboundProcessing);
             }
@@ -1165,35 +1166,28 @@ public class transactionInManagerImpl implements transactionInManager {
     }
 
     @Override
-    public boolean processMacro(Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing) {
+    public boolean processMacro(Integer configId, Integer batchId, configurationDataTranslations cdt, 
+    		boolean foroutboundProcessing) {
+    	// we clear forCW column for before we begin any translation
+        nullForCWCol(configId, batchId, foroutboundProcessing);
+        
         try {
-        	
-    	// 1. we call SP to run the macro formulas
-        	Integer fieldNoOut = transactionInDAO.executeMacro(configId, batchId, cdt.getId(), cdt.getFieldNo(), foroutboundProcessing);
-    	// 2. we will get back a field no where we should set the values in forCW to targetField, if sp all logic should be handled in sp and we will just return a 0
-    	if (fieldNoOut != 0) {
-    		//we replace original F[FieldNo] column with data in forcw
-            updateFieldNoWithCWData(configId, batchId, fieldNoOut, cdt.getPassClear(), foroutboundProcessing);
-            //we reset fieldNo here as for macro it doesn't have to be sourceFieldNo
-            cdt.setFieldNo(fieldNoOut);
-            //flag errors, anything row that is not null in F[FieldNo] but null in forCW
-            flagMacroErrors(configId, batchId, cdt, foroutboundProcessing);
-            
-            //flag as error in transactionIn or transactionOut table
-            updateStatusForErrorTrans(batchId, 14, foroutboundProcessing);
-            
-            //we replace original F[FieldNo] column with data in forcw
-            updateFieldNoWithCWData(configId, batchId, fieldNoOut, cdt.getPassClear(), foroutboundProcessing);
-    	} 
-    		return true;
-        } catch (Exception e) {
+    		Macros macro = configurationManager.getMacroById(cdt.getMacroId());
+    		try {
+        		return executeMacro(configId, batchId, cdt, foroutboundProcessing, macro);
+            } catch (Exception e) {
+            	e.printStackTrace();
+            	return false;
+            }
+    	} catch (Exception e) {
+    		e.printStackTrace();
         	return false;
-        }
+    	}
     }
 
     @Override
-    public void nullForSWCol(Integer configId, Integer batchId, boolean foroutboundProcessing) {
-        transactionInDAO.nullForSWCol(configId, batchId, foroutboundProcessing);
+    public void nullForCWCol(Integer configId, Integer batchId, boolean foroutboundProcessing) {
+        transactionInDAO.nullForCWCol(configId, batchId, foroutboundProcessing);
     }
 
     @Override
@@ -1221,6 +1215,13 @@ public class transactionInManagerImpl implements transactionInManager {
 	@Override
 	public void resetTransactionTranslatedIn(Integer batchId) {
 		 transactionInDAO.resetTransactionTranslatedIn(batchId);
+	}
+
+	@Override
+	public boolean executeMacro(Integer configId, Integer batchId,
+			configurationDataTranslations cdt, boolean foroutboundProcessing, Macros macro) {
+		 return transactionInDAO.executeMacro(configId, batchId, cdt, foroutboundProcessing, macro);
+		
 	}
 
 }

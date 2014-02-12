@@ -7,6 +7,7 @@
 package com.ut.dph.service;
 
 import com.ut.dph.model.CrosswalkData;
+import com.ut.dph.model.Macros;
 import com.ut.dph.model.batchUploadSummary;
 import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.configurationDataTranslations;
@@ -177,11 +178,13 @@ public interface transactionInManager {
     
     boolean processMacro (Integer configId, Integer batchId, configurationDataTranslations translation, boolean foroutboundProcessing);
     
-    void nullForSWCol(Integer configId, Integer batchId, boolean foroutboundProcessing);
+    void nullForCWCol(Integer configId, Integer batchId, boolean foroutboundProcessing);
     
     void executeCWData(Integer configId, Integer batchId, Integer fieldNo, CrosswalkData cwd, boolean foroutboundProcessing);
 
     void updateFieldNoWithCWData (Integer configId, Integer batchId, Integer fieldNo, Integer passClear, boolean foroutboundProcessing);
+    
+    boolean executeMacro (Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing, Macros macro);
     
     void flagCWErrors (Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing);
     

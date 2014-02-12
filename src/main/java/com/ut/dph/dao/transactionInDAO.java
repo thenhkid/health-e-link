@@ -7,6 +7,7 @@
 package com.ut.dph.dao;
 
 import com.ut.dph.model.CrosswalkData;
+import com.ut.dph.model.Macros;
 import com.ut.dph.model.batchUploadSummary;
 import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.configurationDataTranslations;
@@ -18,8 +19,8 @@ import com.ut.dph.model.transactionInRecords;
 import com.ut.dph.model.transactionRecords;
 import com.ut.dph.model.transactionTarget;
 import com.ut.dph.model.custom.ConfigForInsert;
-import java.util.Date;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -135,7 +136,7 @@ public interface transactionInDAO {
     
     Integer getFeedbackReportConnection(int configId, int targetorgId);
     
-    void nullForSWCol(Integer configId, Integer batchId, boolean foroutboundProcessing);
+    void nullForCWCol(Integer configId, Integer batchId, boolean foroutboundProcessing);
     
     void executeCWData(Integer configId, Integer batchId, Integer fieldNo, CrosswalkData cwd, boolean foroutboundProcessing);
     
@@ -147,6 +148,6 @@ public interface transactionInDAO {
 
     void resetTransactionTranslatedIn (Integer batchId);
     
-    Integer executeMacro (Integer configId, Integer batchId, Integer cdtId, Integer fieldNo, boolean foroutboundProcessing);
+    boolean executeMacro (Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing, Macros macro);
     
 }
