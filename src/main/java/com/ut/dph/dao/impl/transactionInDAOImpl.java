@@ -8,6 +8,7 @@ package com.ut.dph.dao.impl;
 import com.ut.dph.dao.transactionInDAO;
 import com.ut.dph.model.CrosswalkData;
 import com.ut.dph.model.Organization;
+import com.ut.dph.model.User;
 import com.ut.dph.model.batchUploadSummary;
 import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.configuration;
@@ -22,10 +23,14 @@ import com.ut.dph.model.transactionInRecords;
 import com.ut.dph.model.transactionRecords;
 import com.ut.dph.model.transactionTarget;
 import com.ut.dph.model.custom.ConfigForInsert;
+import com.ut.dph.model.lutables.lu_ProcessStatus;
 import com.ut.dph.model.messageType;
+import com.ut.dph.service.sysAdminManager;
+import com.ut.dph.service.userManager;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -49,6 +54,12 @@ public class transactionInDAOImpl implements transactionInDAO {
 
     @Autowired
     private SessionFactory sessionFactory;
+    
+    @Autowired
+    private sysAdminManager sysAdminManager;
+    
+    @Autowired
+    private userManager usermanager;
    	
     private String schemaName = "universalTranslator";
 
@@ -297,7 +308,7 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Override
     @Transactional
     @SuppressWarnings("UnusedAssignment")
-    public List<batchUploads> getpendingBatches(int userId, int orgId, int page, int maxResults) {
+    public List<batchUploads> getpendingBatches(int userId, int orgId, String searchTerm, Date fromDate, Date toDate, int page, int maxResults) {
 
         int firstResult = 0;
 
@@ -367,20 +378,62 @@ public class transactionInDAOImpl implements transactionInDAO {
                 Restrictions.eq("statusId", 8)
         )
         );
+        
+         if(!"".equals(fromDate)) {
+            findBatches.add(Restrictions.ge("dateSubmitted", fromDate));
+        }  
+        
+        if(!"".equals(toDate)) {
+            findBatches.add(Restrictions.lt("dateSubmitted", toDate));
+        } 
+        
         findBatches.addOrder(Order.desc("dateSubmitted"));
+        
+         /* If a search term is entered conduct a search */
+        if(!"".equals(searchTerm)) {
+            
+            List<batchUploads> batches = findBatches.list();
+            
+            List<Integer> batchFoundIdList = findBatches(batches, searchTerm);
+            
+            if (batchFoundIdList.isEmpty()) {
+                batchFoundIdList.add(0);
+            }
+            
+            Criteria foundBatches = sessionFactory.getCurrentSession().createCriteria(batchUploads.class);
+            foundBatches.add(Restrictions.in("id", batchFoundIdList));
+            foundBatches.addOrder(Order.desc("dateSubmitted"));
+            
+            if (page > 1) {
+                firstResult = (maxResults * (page - 1));
+            }
 
-        if (page > 1) {
-            firstResult = (maxResults * (page - 1));
+            foundBatches.setFirstResult(firstResult);
+
+            if (maxResults > 0) {
+                //Set the max results to display
+                foundBatches.setMaxResults(maxResults);
+            }
+            
+            return foundBatches.list();
+            
         }
+        
+        else {
 
-        findBatches.setFirstResult(firstResult);
+            if (page > 1) {
+                firstResult = (maxResults * (page - 1));
+            }
 
-        if (maxResults > 0) {
-            //Set the max results to display
-            findBatches.setMaxResults(maxResults);
+            findBatches.setFirstResult(firstResult);
+
+            if (maxResults > 0) {
+                //Set the max results to display
+                findBatches.setMaxResults(maxResults);
+            }
+
+            return findBatches.list();
         }
-
-        return findBatches.list();
     }
 
     /**
@@ -391,9 +444,7 @@ public class transactionInDAOImpl implements transactionInDAO {
      *
      * @return This function will return a list of batches that match the search term.
      */
-    @Override
-    @Transactional
-    public List<batchUploads> findBatches(List<batchUploads> batches, String searchTerm) {
+    public List<Integer> findBatches(List<batchUploads> batches, String searchTerm) {
 
         List<Integer> batchIdList = new ArrayList<Integer>();
 
@@ -401,6 +452,13 @@ public class transactionInDAOImpl implements transactionInDAO {
         searchTerm = searchTerm.replace(".", "\\.");
 
         for (batchUploads batch : batches) {
+            
+            lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
+            batch.setstatusValue(processStatus.getDisplayCode());
+
+            User userDetails = usermanager.getUserById(batch.getuserId());
+            String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
+            batch.setusersName(usersName);
 
             /* Search the submitted by */
             if (batch.getusersName().toLowerCase().matches(".*" + searchTerm + ".*")) {
@@ -491,11 +549,7 @@ public class transactionInDAOImpl implements transactionInDAO {
             batchIdList.add(0);
         }
 
-        Criteria findBatches = sessionFactory.getCurrentSession().createCriteria(batchUploads.class);
-        findBatches.add(Restrictions.in("id", batchIdList));
-        findBatches.addOrder(Order.desc("dateSubmitted"));
-
-        return findBatches.list();
+        return batchIdList;
     }
 
     /**
@@ -582,7 +636,7 @@ public class transactionInDAOImpl implements transactionInDAO {
      */
     @Override
     @Transactional
-    public List<batchUploads> getsentBatches(int userId, int orgId, int page, int maxResults) {
+    public List<batchUploads> getsentBatches(int userId, int orgId, String searchTerm, Date fromDate, Date toDate, int page, int maxResults) {
 
         int firstResult = 0;
 
@@ -657,20 +711,63 @@ public class transactionInDAOImpl implements transactionInDAO {
                 
         )
         );
+        
+        if(!"".equals(fromDate)) {
+            findBatches.add(Restrictions.ge("dateSubmitted", fromDate));
+        }  
+        
+        if(!"".equals(toDate)) {
+            findBatches.add(Restrictions.lt("dateSubmitted", toDate));
+        } 
+        
+        
         findBatches.addOrder(Order.desc("dateSubmitted"));
+        
+        /* If a search term is entered conduct a search */
+        if(!"".equals(searchTerm)) {
+            
+            List<batchUploads> batches = findBatches.list();
+            
+            List<Integer> batchFoundIdList = findBatches(batches, searchTerm);
+            
+            if (batchFoundIdList.isEmpty()) {
+                batchFoundIdList.add(0);
+            }
+            
+            Criteria foundBatches = sessionFactory.getCurrentSession().createCriteria(batchUploads.class);
+            foundBatches.add(Restrictions.in("id", batchFoundIdList));
+            foundBatches.addOrder(Order.desc("dateSubmitted"));
+            
+            if (page > 1) {
+                firstResult = (maxResults * (page - 1));
+            }
 
-        if (page > 1) {
-            firstResult = (maxResults * (page - 1));
+            foundBatches.setFirstResult(firstResult);
+
+            if (maxResults > 0) {
+                //Set the max results to display
+                foundBatches.setMaxResults(maxResults);
+            }
+            
+            return foundBatches.list();
+            
         }
+        
+        else {
 
-        findBatches.setFirstResult(firstResult);
+            if (page > 1) {
+                firstResult = (maxResults * (page - 1));
+            }
 
-        if (maxResults > 0) {
-            //Set the max results to display
-            findBatches.setMaxResults(maxResults);
+            findBatches.setFirstResult(firstResult);
+
+            if (maxResults > 0) {
+                //Set the max results to display
+                findBatches.setMaxResults(maxResults);
+            }
+
+            return findBatches.list();
         }
-
-        return findBatches.list();
     }
 
     /**

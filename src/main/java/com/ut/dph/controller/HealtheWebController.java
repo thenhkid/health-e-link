@@ -119,7 +119,7 @@ public class HealtheWebController {
         
         /* Need to get a list of all pending batches */
         if(totalPending == 0) {
-            pendingTotal = transactionInManager.getpendingBatches(userInfo.getId(), userInfo.getOrgId(), 1, 0).size();
+            pendingTotal = transactionInManager.getpendingBatches(userInfo.getId(), userInfo.getOrgId(), "", null, null, 1, 0).size();
          }
         else {
             pendingTotal = totalPending;
@@ -219,12 +219,9 @@ public class HealtheWebController {
         /* Need to get all the message types set up for the user */
         User userInfo = (User)session.getAttribute("userDetails");
         
-        List<batchDownloads> inboxBatches;
-        Integer totalInboxBatches = 0;
-        
         /* Need to get a list of all pending batches */
-        totalInboxBatches = transactionOutManager.getInboxBatches(userInfo.getId(), userInfo.getOrgId(), searchTerm, fromDate, toDate, 1, 0).size();
-        inboxBatches = transactionOutManager.getInboxBatches(userInfo.getId(), userInfo.getOrgId(), searchTerm, fromDate, toDate, page, maxResults);
+        Integer totalInboxBatches = transactionOutManager.getInboxBatches(userInfo.getId(), userInfo.getOrgId(), searchTerm, fromDate, toDate, 1, 0).size();
+        List<batchDownloads> inboxBatches = transactionOutManager.getInboxBatches(userInfo.getId(), userInfo.getOrgId(), searchTerm, fromDate, toDate, page, maxResults);
         
         if(!inboxBatches.isEmpty()) {
             for(batchDownloads batch : inboxBatches) {
@@ -1140,21 +1137,24 @@ public class HealtheWebController {
      * @throws Exception
      */
     @RequestMapping(value = "/pending", method = RequestMethod.GET)
-    public ModelAndView pendingBatches(HttpServletRequest request, HttpServletResponse response, HttpSession session,@RequestParam(value = "page", required = false) Integer page) throws Exception {
-        
-        if (page == null) {
-            page = 1;
-        }
+    public ModelAndView pendingBatches(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
         
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/Health-e-Web/pending");
+        
+        Date fromDate = getMonthDate("START");
+        Date toDate = getMonthDate("END");
+        
+        mav.addObject("fromDate", fromDate);
+        mav.addObject("toDate", toDate);
         
         /* Need to get all the message types set up for the user */
         User userInfo = (User)session.getAttribute("userDetails");
         
         /* Need to get a list of all pending batches */
-        Integer totalpendingBatches = transactionInManager.getpendingBatches(userInfo.getId(), userInfo.getOrgId(), page, 0).size();
-        List<batchUploads> pendingBatches = transactionInManager.getpendingBatches(userInfo.getId(), userInfo.getOrgId(), page, maxResults);
+        /* Need to get a list of all pending transactions */
+        Integer totalpendingBatches = transactionInManager.getpendingBatches(userInfo.getId(), userInfo.getOrgId(), "", fromDate, toDate, 1, 0).size();
+        List<batchUploads> pendingBatches = transactionInManager.getpendingBatches(userInfo.getId(), userInfo.getOrgId(), "", fromDate, toDate, 1, maxResults);
         
         if(!pendingBatches.isEmpty()) {
             for(batchUploads batch : pendingBatches) {
@@ -1173,14 +1173,14 @@ public class HealtheWebController {
         mav.addObject("pendingBatches", pendingBatches);
        
         /* Set the header totals */
-        setTotals(0,totalpendingBatches,session);
+        setTotals(0,0,session);
         
         mav.addObject("pendingTotal", pendingTotal);
         mav.addObject("inboxTotal", inboxTotal);
         
-        Integer totalPages = (int)Math.ceil((double)pendingTotal / maxResults);
+        Integer totalPages = (int)Math.ceil((double)totalpendingBatches / maxResults);
         mav.addObject("totalPages", totalPages);
-        mav.addObject("currentPage", page);
+        mav.addObject("currentPage", 1);
         
         return mav;
     }
@@ -1196,26 +1196,25 @@ public class HealtheWebController {
      * @throws Exception
      */
     @RequestMapping(value = "/pending", method = RequestMethod.POST)
-    public ModelAndView findpendingBatches(@RequestParam String searchTerm, HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
+    public ModelAndView findpendingBatches(@RequestParam(value = "page", required = false) Integer page, @RequestParam String searchTerm, @RequestParam Date fromDate, @RequestParam Date toDate, HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
+        
+        if (page == null) {
+            page = 1;
+        }
         
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/Health-e-Web/pending");
         
+        mav.addObject("fromDate", fromDate);
+        mav.addObject("toDate", toDate);
+        
         /* Need to get all the message types set up for the user */
         User userInfo = (User)session.getAttribute("userDetails");
         
-        List<batchUploads> pendingBatches;
-        Integer totalpendingBatches = 0;
+        /* Need to get a list of all pending transactions */
+        Integer totalpendingBatches = transactionInManager.getpendingBatches(userInfo.getId(), userInfo.getOrgId(), searchTerm, fromDate, toDate, 1, 0).size();
+        List<batchUploads> pendingBatches = transactionInManager.getpendingBatches(userInfo.getId(), userInfo.getOrgId(), searchTerm, fromDate, toDate, page, maxResults);
         
-        /* Need to get a list of all pending batches */
-        if(searchTerm != null && !"".equals(searchTerm)) {
-            pendingBatches = transactionInManager.getpendingBatches(userInfo.getId(), userInfo.getOrgId(), 1, 0);
-            totalpendingBatches = pendingBatches.size();
-        }
-        else {
-           pendingBatches = transactionInManager.getpendingBatches(userInfo.getId(), userInfo.getOrgId(), 1, maxResults);
-           totalpendingBatches = transactionInManager.getpendingBatches(userInfo.getId(), userInfo.getOrgId(), 1, 0).size();
-        }
         
         if(!pendingBatches.isEmpty()) {
             for(batchUploads batch : pendingBatches) {
@@ -1230,41 +1229,18 @@ public class HealtheWebController {
                 batch.setusersName(usersName);
             }
         }
-        
-        if(searchTerm != null && !"".equals(searchTerm)) {
-            /* Pass the returned pending batches to the filter method */
-            List<batchUploads> batchResults = transactionInManager.findBatches(pendingBatches, searchTerm);
-
-            if(!batchResults.isEmpty()) {
-                for(batchUploads batch : batchResults) {
-                    List<transactionIn> batchTransactions = transactionInManager.getBatchTransactions(batch.getId(), userInfo.getId());
-                    batch.settotalTransactions(batchTransactions.size());
-
-                    lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
-                    batch.setstatusValue(processStatus.getDisplayCode());
-
-                    User userDetails = usermanager.getUserById(batch.getuserId());
-                    String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
-                    batch.setusersName(usersName);
-                }
-            }
-
-            mav.addObject("pendingBatches", batchResults);
-            mav.addObject("totalPages", 0);
-        }
-        else {
-            mav.addObject("pendingBatches", pendingBatches);    
-            Integer totalPages = (int)Math.ceil((double)totalpendingBatches / maxResults);
-            mav.addObject("totalPages", totalPages);
-        }
+       
+        mav.addObject("pendingBatches", pendingBatches);    
+        Integer totalPages = (int)Math.ceil((double)totalpendingBatches / maxResults);
+        mav.addObject("totalPages", totalPages);
         
         /* Set the header totals */
-        setTotals(0,totalpendingBatches,session);
+        setTotals(0,0,session);
        
         mav.addObject("searchTerm", searchTerm);
         mav.addObject("pendingTotal", pendingTotal);
         mav.addObject("inboxTotal", inboxTotal);
-        mav.addObject("currentPage", 1);
+        mav.addObject("currentPage", page);
         
         return mav;
     }
@@ -1279,23 +1255,24 @@ public class HealtheWebController {
      * @throws Exception
      */
     @RequestMapping(value = "/sent", method = RequestMethod.GET)
-    public ModelAndView sentMessages(HttpServletRequest request, HttpServletResponse response, HttpSession session,@RequestParam(value = "page", required = false) Integer page) throws Exception {
-        
-        if (page == null) {
-            page = 1;
-        }
+    public ModelAndView sentMessages(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
         
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/Health-e-Web/sent");
+        
+        Date fromDate = getMonthDate("START");
+        Date toDate = getMonthDate("END");
+        
+        mav.addObject("fromDate", fromDate);
+        mav.addObject("toDate", toDate);
         
         /* Need to get all the message types set up for the user */
         User userInfo = (User)session.getAttribute("userDetails");
         
         /* Need to get a list of all pending transactions */
-        Integer totalSentBatches = transactionInManager.getsentBatches(userInfo.getId(), userInfo.getOrgId(), page, 0).size();
+        Integer totalSentBatches = transactionInManager.getsentBatches(userInfo.getId(), userInfo.getOrgId(), "", fromDate, toDate, 1, 0).size();
+        List<batchUploads> sentBatches = transactionInManager.getsentBatches(userInfo.getId(), userInfo.getOrgId(), "", fromDate, toDate, 1, maxResults);
         
-        List<batchUploads> sentBatches = transactionInManager.getsentBatches(userInfo.getId(), userInfo.getOrgId(), page, maxResults);
-       
         if(!sentBatches.isEmpty()) {
             for(batchUploads batch : sentBatches) {
                 List<transactionIn> batchTransactions = transactionInManager.getBatchTransactions(batch.getId(), userInfo.getId());
@@ -1320,7 +1297,7 @@ public class HealtheWebController {
         
         Integer totalPages = (int)Math.ceil((double)totalSentBatches / maxResults);
         mav.addObject("totalPages", totalPages);
-        mav.addObject("currentPage", page);
+        mav.addObject("currentPage", 1);
         
         return mav;
     }
@@ -1337,26 +1314,25 @@ public class HealtheWebController {
      * @throws Exception
      */
     @RequestMapping(value = "/sent", method = RequestMethod.POST)
-    public ModelAndView findsentBatches(@RequestParam String searchTerm, HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
+    public ModelAndView findsentBatches(@RequestParam(value = "page", required = false) Integer page, @RequestParam String searchTerm, @RequestParam Date fromDate, @RequestParam Date toDate, HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
+        
+        if (page == null) {
+            page = 1;
+        }
         
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/Health-e-Web/sent");
         
+        mav.addObject("fromDate", fromDate);
+        mav.addObject("toDate", toDate);
+        
         /* Need to get all the message types set up for the user */
         User userInfo = (User)session.getAttribute("userDetails");
         
-        List<batchUploads> sentBatches;
-        Integer totalSentBatches = 0;
-        
-        /* Need to get a list of all pending batches */
-        if(searchTerm != null && !"".equals(searchTerm)) {
-            sentBatches = transactionInManager.getsentBatches(userInfo.getId(), userInfo.getOrgId(), 1, 0);
-        }
-        else {
-            sentBatches = transactionInManager.getsentBatches(userInfo.getId(), userInfo.getOrgId(), 1, maxResults);
-            totalSentBatches = transactionInManager.getsentBatches(userInfo.getId(), userInfo.getOrgId(), 1, 0).size();
-        }
-        
+        /* Need to get a list of all pending transactions */
+        Integer totalSentBatches = transactionInManager.getsentBatches(userInfo.getId(), userInfo.getOrgId(), searchTerm, fromDate, toDate, 1, 0).size();
+        List<batchUploads> sentBatches = transactionInManager.getsentBatches(userInfo.getId(), userInfo.getOrgId(), searchTerm, fromDate, toDate, page, maxResults);
+       
         if(!sentBatches.isEmpty()) {
             for(batchUploads batch : sentBatches) {
                 List<transactionIn> batchTransactions = transactionInManager.getBatchTransactions(batch.getId(), userInfo.getId());
@@ -1371,32 +1347,9 @@ public class HealtheWebController {
             }
         }
         
-        if(searchTerm != null && !"".equals(searchTerm)) {
-            /* Pass the returned pending batches to the filter method */
-            List<batchUploads> batchResults = transactionInManager.findBatches(sentBatches, searchTerm);
-               
-            if(!batchResults.isEmpty()) {
-                for(batchUploads batch : batchResults) {
-                    List<transactionIn> batchTransactions = transactionInManager.getBatchTransactions(batch.getId(), userInfo.getId());
-                    batch.settotalTransactions(batchTransactions.size());
-
-                    lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
-                    batch.setstatusValue(processStatus.getDisplayCode());
-
-                    User userDetails = usermanager.getUserById(batch.getuserId());
-                    String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
-                    batch.setusersName(usersName);
-                }
-            }
-
-            mav.addObject("sentBatches", batchResults);
-            mav.addObject("totalPages", 0);
-        }
-        else {
-            mav.addObject("sentBatches", sentBatches); 
-            Integer totalPages = (int)Math.ceil((double)totalSentBatches / maxResults);
-            mav.addObject("totalPages", totalPages);
-        }
+        mav.addObject("sentBatches", sentBatches); 
+        Integer totalPages = (int)Math.ceil((double)totalSentBatches / maxResults);
+        mav.addObject("totalPages", totalPages);
         
         /* Set the header totals */
         setTotals(0,0,session);
@@ -1404,7 +1357,7 @@ public class HealtheWebController {
         mav.addObject("searchTerm", searchTerm);
         mav.addObject("pendingTotal", pendingTotal);
         mav.addObject("inboxTotal", inboxTotal);
-        mav.addObject("currentPage", 1);
+        mav.addObject("currentPage", page);
         
         return mav;
     }

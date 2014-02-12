@@ -133,14 +133,8 @@ public class transactionInManagerImpl implements transactionInManager {
 
     @Override
     @Transactional
-    public List<batchUploads> getpendingBatches(int userId, int orgId, int page, int maxResults) {
-        return transactionInDAO.getpendingBatches(userId, orgId, page, maxResults);
-    }
-
-    @Override
-    @Transactional
-    public List<batchUploads> findBatches(List<batchUploads> batches, String searchTerm) {
-        return transactionInDAO.findBatches(batches, searchTerm);
+    public List<batchUploads> getpendingBatches(int userId, int orgId, String searchTerm, Date fromDate, Date toDate, int page, int maxResults) {
+        return transactionInDAO.getpendingBatches(userId, orgId, searchTerm, fromDate, toDate, page, maxResults);
     }
 
     @Override
@@ -151,8 +145,8 @@ public class transactionInManagerImpl implements transactionInManager {
 
     @Override
     @Transactional
-    public List<batchUploads> getsentBatches(int userId, int orgId, int page, int maxResults) {
-        return transactionInDAO.getsentBatches(userId, orgId, page, maxResults);
+    public List<batchUploads> getsentBatches(int userId, int orgId, String searchTerm, Date fromDate, Date toDate, int page, int maxResults) {
+        return transactionInDAO.getsentBatches(userId, orgId, searchTerm, fromDate, toDate, page, maxResults);
     }
 
     @Override

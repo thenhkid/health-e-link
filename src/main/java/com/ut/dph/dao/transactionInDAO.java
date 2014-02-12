@@ -18,6 +18,7 @@ import com.ut.dph.model.transactionInRecords;
 import com.ut.dph.model.transactionRecords;
 import com.ut.dph.model.transactionTarget;
 import com.ut.dph.model.custom.ConfigForInsert;
+import java.util.Date;
 
 import java.util.List;
 
@@ -47,13 +48,11 @@ public interface transactionInDAO {
     
     void submitTransactionTranslatedInRecords(int transactionId, int transactionRecordId, int configId);
     
-    List<batchUploads> getpendingBatches(int userId, int orgId, int page, int maxResults);
-    
-    List<batchUploads> findBatches(List<batchUploads> batches, String searchTerm);
+    List<batchUploads> getpendingBatches(int userId, int orgId, String searchTerm, Date fromDate, Date toDate, int page, int maxResults);
     
     List<transactionIn> getBatchTransactions(int batchId, int userId);
     
-    List<batchUploads> getsentBatches(int userId, int orgId, int page, int maxResults);
+    List<batchUploads> getsentBatches(int userId, int orgId, String searchTerm, Date fromDate, Date toDate, int page, int maxResults);
     
     batchUploads getBatchDetails(int batchId);
     
