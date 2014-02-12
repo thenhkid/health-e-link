@@ -2,6 +2,7 @@ package com.ut.dph.security;
 
 import com.ut.dph.model.Organization;
 import com.ut.dph.model.User;
+import com.ut.dph.model.custom.searchParameters;
 import com.ut.dph.model.userAccess;
 import com.ut.dph.service.organizationManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +45,8 @@ public class CustomAuthenticationHandler extends SimpleUrlAuthenticationSuccessH
             
             Organization orgDetails = organizationManager.getOrganizationById(userDetails.getOrgId());
             
+            searchParameters searchParameters = new searchParameters();
+            
             userDetails.setdateOrgWasCreated(orgDetails.getDateCreated());
             
             /* Need to set some session variables to hold information about the user */
@@ -55,6 +58,8 @@ public class CustomAuthenticationHandler extends SimpleUrlAuthenticationSuccessH
             /* Need to store the user object in session */
             session.setAttribute("userDetails", userDetails);
             
+            /* Need to store the search session object */
+            session.setAttribute("searchParameters", searchParameters);
             
             getRedirectStrategy().sendRedirect(request, response, userTargetUrl);
         } else {
