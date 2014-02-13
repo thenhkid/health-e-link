@@ -1,92 +1,33 @@
 /** 02.11.2014 **/
 
-
 drop procedure `universaltranslator`.`runMacro`;
 
+
+/** 02122014 Grace **/
+
+INSERT INTO `universalTranslator`.`lu_ErrorCodes` (`displayText`, `description`, `status`) 
+VALUES ('System Error', 'System Error, could be from crosswalks or macros', 1);
+
 DELIMITER $$
-CREATE Procedure `universaltranslator`.`runMacro`(in configId int, in batchId int, 
-in cdtId int, in fieldNo int, in foroutboundProcessing boolean, out fieldNoOut int) 
+CREATE Procedure `universaltranslator`.`setInboundOutBoundTables`(in foroutboundProcessing boolean) 
 proc_main:begin
 
-set @category = "";
-set @formula = "";
-set @invalidWhen = "";
-set @srcField = concat ('F', fieldNo);
-set @fieldA = "";
-set @fieldB = "";
-set @c1 = "";
-set @c2 = "";
-set @passClear = "";
+-- this SP sets the inbound / outbound tables
 set @translatedTable = "transactionTranslatedIn";
 set @transactionTable = "transactionIn";
 set @batchTable = "batchUploads";
 set @batchIdType = "batchId";
+set @errorTable = "transactionInErrors";
 
 if (foroutboundProcessing) THEN
-BEGIN-- true
+BEGIN -- true
 		set @translatedTable = "transactionTranslatedOut";
 		set @transactionTable = "transactionTarget";
 		set @batchTable = "batchDowloads";
 		set @batchIdType = "batchDLId";
+		set @errorTable = "transactionOutErrors";
 END; 
 END IF;
 
--- grab all the info we need
-select formula, invalid_when, lcase(category), concat('F',fieldA), concat('F',fieldB), constant1, constant2, passClear
-into @formula, @invalidWhen, @category, @fieldA, @fieldB, @c1, @c2, @passClear
-from Macro_Names mc, configurationDataTranslations cdt 
-where cdt.macroId = mc.id and cdt.id = cdtId;
-
-set @runFormula = replace(@formula, "@srcField", @srcField);
-set @runFormula = replace(@runFormula, "@fieldA", @fieldA);
-set @runFormula = replace(@runFormula, "@fieldB", @fieldB);
-set @runFormula = replace(@runFormula, "@c1", concat("'", @c1, "'"));
-set @runFormula = replace(@runFormula, "@c2", concat("'", @c2, "'"));
-
--- do the same with invalid formulas
-set @invalidFormula = replace(@invalidWhen, "@srcField", @srcField);
-set @invalidFormula1 = replace(@invalidFormula, "@fieldA", @fieldA);
-set @invalidFormula2 = replace(@invalidFormula1, "@fieldB", @fieldB);
-set @invalidFormula3 = replace(@invalidFormula2, "@c1", concat("'", @c1, "'"));
-set @invalidFormula4 = replace(@invalidFormula3, "@c2", concat("'", @c2, "'"));
-
--- run switch statements
-
-CASE @category
-	WHEN "do not pass" THEN  -- we reject records with these values
-		BEGIN
-		-- set forcw = null
-		set @stmt = concat("update ", @translatedTable," set forCW = 'error' where ", @runFormula, 
-		" and transactionInId in (SELECT id from ",@transactionTable," WHERE configId = ", configId, " and ", @batchIdType," = ",batchId,");");
-		PREPARE stmt from @stmt;
-		EXECUTE stmt;
-		
-		END;
-	WHEN "hl7 message" THEN 
-		BEGIN 
-			-- do this
-		END;
-	WHEN "maplink specs" THEN
-		BEGIN
-	-- do this
-		END;
-	WHEN "stored procedures" THEN
-		BEGIN
-	-- do this
-		END;
-    ELSE
-        BEGIN
-        END;
-	
-END 
-CASE;
-
-
-
--- we will return the fieldNo for the target column so forCW values can be updated, return 0 for SP
-set fieldNoOut = 0; -- dummy for now
-select fieldNoOut;
-
 end proc_main$$
 DELIMITER ;
-

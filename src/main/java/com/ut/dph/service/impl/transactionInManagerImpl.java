@@ -1174,7 +1174,14 @@ public class transactionInManagerImpl implements transactionInManager {
         try {
     		Macros macro = configurationManager.getMacroById(cdt.getMacroId());
     		try {
-        		return executeMacro(configId, batchId, cdt, foroutboundProcessing, macro);
+        		// we expect the target field back so we can figure out clear pass option
+    			String targetField = executeMacro(configId, batchId, cdt, foroutboundProcessing, macro);
+    			if (targetField.equalsIgnoreCase("ERROR")) {
+    				return false;
+    			} else {
+    				return true;
+    			}
+    			
             } catch (Exception e) {
             	e.printStackTrace();
             	return false;
@@ -1218,7 +1225,7 @@ public class transactionInManagerImpl implements transactionInManager {
 	}
 
 	@Override
-	public boolean executeMacro(Integer configId, Integer batchId,
+	public String executeMacro(Integer configId, Integer batchId,
 			configurationDataTranslations cdt, boolean foroutboundProcessing, Macros macro) {
 		 return transactionInDAO.executeMacro(configId, batchId, cdt, foroutboundProcessing, macro);
 		

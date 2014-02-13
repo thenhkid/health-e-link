@@ -148,6 +148,7 @@ public interface transactionInDAO {
 
     void resetTransactionTranslatedIn (Integer batchId);
     
-    boolean executeMacro (Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing, Macros macro);
+    String executeMacro (Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing, Macros macro);
     
+    void insertProcessingErrorForCDT(Integer errorId, Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing);
 }

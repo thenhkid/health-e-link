@@ -2038,28 +2038,84 @@ public class transactionInDAOImpl implements transactionInDAO {
         }
 
     }
-
+    
+    /**
+     * This method looks for fieldA, fieldB, con1 and con2, fieldNo in the configurationDataTranslations
+     * and passes it to the formula (SP) stored in Macros
+     * 
+     * All macros will take the following parameter -
+     * configId, batchId, srcField, fieldA, fieldB, con1, con2, macroId, foroutboundProcessing,
+     * errorId
+     * 
+     * **/
 	@Override
-	public boolean executeMacro(Integer configId, Integer batchId,
+	@Transactional
+	public String executeMacro(Integer configId, Integer batchId,
 			configurationDataTranslations cdt, boolean foroutboundProcessing,
 			Macros macro) {
 		try {
-			/**
-			String sql = ("CALL " + macro.getFormula() + "(:configId, :batchId, "
-					+ ":fieldA, :fieldB, :con1, :con2, :macroId);");	
-	        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
-	        query.list();
-	        **/
-	        	return true; 
+				String sql = ("CALL " + macro.getFormula() + " (:configId, :batchId, :srcField "
+						+ ":fieldA, :fieldB, :con1, :con2, :macroId, :foroutboundProcessing, :passClear);");	
+		        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+		        query.setParameter("configId", configId);
+		        query.setParameter("batchId", batchId);
+		        query.setParameter("srcField", ("F" + cdt.getFieldNo()));
+		        query.setParameter("fieldA", ("F" + cdt.getFieldA()));
+		        query.setParameter("fieldB", ("F" + cdt.getFieldB()));
+		        query.setParameter("con1", ("F" + cdt.getFieldNo()));
+		        query.setParameter("con2", cdt.getConstant2());
+		        query.setParameter("macroId", cdt.getMacroId());
+		        query.setParameter("foroutboundProcessing", foroutboundProcessing);
+		        query.setParameter("passClear", cdt.getPassClear());
+		       //we return target column
+		        return (String) query.list().get(0); 
 		   } catch (Exception e) {
+			   //insert system error
+			   insertProcessingErrorForCDT(5, configId, batchId, cdt, foroutboundProcessing);
 			   e.printStackTrace();
-			   return false;
+			   return "ERROR";
 		   }
 
 	}
 
 
-	
+	 @Override
+	    @Transactional
+	    public void insertProcessingErrorForCDT(Integer errorId, Integer configId, 
+	    		Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing) {
+
+	        String sql;
+	        
+	        if (foroutboundProcessing == false) {
+	            sql = "insert into transactionInerrors (batchUploadId, "
+	                    + "transactionInId, configurationFormFieldsId, errorid, cwId, macroId)"
+	                    + " select " + batchId + ", transactionInId, " + cdt.getFieldId()
+	                    + ", "+ errorId +",  " + cdt.getCrosswalkId() + ", "+ cdt.getMacroId() +" from transactionTranslatedIn where "
+	                    + " configId = :configId "
+	                    + " and transactionInId in (select id from transactionIn "
+	                    + " where batchId = :batchId"
+	                    + " and configId = :configId);";
+
+	        } else {
+	            sql = "insert into transactionOutErrors (batchDownloadId, "
+	                    + "transactionTargetId, configurationFormFieldsId, errorid, cwId, marcoId)"
+	                    + " select " + batchId + ", transactionTargetId, " + cdt.getFieldId()
+	                    + ", "+ errorId +",  " + cdt.getCrosswalkId() + ", "+ cdt.getMacroId() +" from transactionTranslatedOut where "
+	                    + " configId = :configId "
+	                    + " and transactionTargetId in (select id from transactionTarget "
+	                    + " where batchDLId = :batchId"
+	                    + " and configId = :configId);";
+	        }
+
+	        Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+	                .setParameter("batchId", batchId)
+	                .setParameter("configId", configId);
+	        try {
+	            updateData.executeUpdate();
+	        } catch (Exception ex) {
+	            System.err.println("insertProcessingErrorForCDT failed." + ex);
+	        }
+	    }
 	
 	
 	
