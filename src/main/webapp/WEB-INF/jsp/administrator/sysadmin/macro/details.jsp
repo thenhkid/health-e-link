@@ -13,15 +13,6 @@
                 <form:hidden path="id" id="id" />
                 
                 <div class="form-container">
-                        <spring:bind path="category">
-                            <div class="form-group ${status.error ? 'has-error' : '' }">
-                                <label class="control-label" for="category">Category</label>
-                                 <form:select id="state" path="category" cssClass="form-control half">
-                                    <option value="" label=" - Select - " ></option>
-                                    <form:options items="${categoryList}"/>
-                                </form:select><form:errors path="category" cssClass="control-label" element="label" />
-                            </div>
-                        </spring:bind>
                          <spring:bind path="macroShortName">
                             <div class="form-group ${status.error ? 'has-error' : '' }">
                                 <label class="control-label" for="macroShortName">Macro Short Name*</label>
@@ -36,34 +27,13 @@
                                 <form:errors path="macroName" cssClass="control-label" element="label" />
                             </div>
                         </spring:bind>
-                        <spring:bind path="refNumber">
-                            <div class="form-group ${status.error ? 'has-error' : '' }">
-                                <label class="control-label" for="refNumber">Reference Number</label>
-                                <form:input path="refNumber" id="refNumber" class="form-control" type="text" maxLength="9" />
-                                <form:errors path="refNumber" cssClass="control-label" element="label" />
-                            </div>
-                        </spring:bind>
-                        <spring:bind path="dateDisplay">
-                            <div class="form-group ${status.error ? 'has-error' : '' }">
-                                <label class="control-label" for="dateDisplay">Date Display</label>
-                                <form:input path="dateDisplay" id="dateDisplay" class="form-control" type="text" maxLength="10" />
-                                <form:errors path="dateDisplay" cssClass="control-label" element="label" />
-                            </div>
-                        </spring:bind>
                         <spring:bind path="formula">
                             <div class="form-group ${status.error ? 'has-error' : '' }">
-                                <label class="control-label" for="formula">Formula</label>
+                                <label class="control-label" for="formula">Stored Procedure Name</label>
                                 <form:input path="formula" id="formula" class="form-control" type="text" maxLength="255" />
                                 <form:errors path="formula" cssClass="control-label" element="label" />
                             </div>
                         </spring:bind>                       
-                        <spring:bind path="invalidWhen">
-                            <div class="form-group ${status.error ? 'has-error' : '' }">
-                                <label class="control-label" for="invalidWhen">Invalid When</label>
-                                <form:input path="invalidWhen" id="invalidWhen" class="form-control" type="text" maxLength="255" />
-                                <form:errors path="invalidWhen" cssClass="control-label" element="label" />
-                            </div>
-                        </spring:bind>
                         <spring:bind path="fieldAQuestion">
                             <div class="form-group ${status.error ? 'has-error' : '' }">
                                 <label class="control-label" for="fieldAQuestion">Field A Question</label>

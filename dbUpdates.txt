@@ -31,3 +31,11 @@ END IF;
 
 end proc_main$$
 DELIMITER ;
+
+/** 02132014 Grace **/
+ALTER TABLE `universalTranslator`.`Macro_Names` 
+CHANGE COLUMN `Category` `Category` VARCHAR(50) CHARACTER SET 'utf8' NULL DEFAULT 'Stored Procedure' ;
+
+delete from `Macro_Names`;
+INSERT INTO `Macro_Names` VALUES (1,'Stored Procedure','MatchFieldAUpdateFieldB','IF SFA = CON1, TFB = CON2',1,NULL,'MatchFieldAUpdateFieldB','','Please enter field number for matching','Please enter field number to update','Please enter the constant to match','Please enter the constant for update');
+

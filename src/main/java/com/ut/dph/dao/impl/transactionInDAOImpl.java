@@ -2054,7 +2054,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 			configurationDataTranslations cdt, boolean foroutboundProcessing,
 			Macros macro) {
 		try {
-				String sql = ("CALL " + macro.getFormula() + " (:configId, :batchId, :srcField "
+				String sql = ("CALL " + macro.getFormula() + " (:configId, :batchId, :srcField, "
 						+ ":fieldA, :fieldB, :con1, :con2, :macroId, :foroutboundProcessing, :passClear);");	
 		        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
 		        query.setParameter("configId", configId);
