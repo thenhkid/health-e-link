@@ -76,3 +76,6 @@ select '';
 end proc_main$$
 DELIMITER ;
 
+/** grace 021314 **/
+INSERT INTO `universalTranslator`.`macro_names` (`Macro_Name`, `Macro_Short_Name`, `Formula`, `FieldA_Question`, `Con1_Question`, `Con2_Question`) VALUES ('MatchFAUpdateSF', 'IF SFA = CON1, SF = CON2', 'MatchFAUpdateSF', 'Please enter field number to match', 'Please enter constant to match', 'Please enter constanct to update to');
+
