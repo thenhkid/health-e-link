@@ -39,3 +39,40 @@ CHANGE COLUMN `Category` `Category` VARCHAR(50) CHARACTER SET 'utf8' NULL DEFAUL
 delete from `Macro_Names`;
 INSERT INTO `Macro_Names` VALUES (1,'Stored Procedure','MatchFieldAUpdateFieldB','IF SFA = CON1, TFB = CON2',1,NULL,'MatchFieldAUpdateFieldB','','Please enter field number for matching','Please enter field number to update','Please enter the constant to match','Please enter the constant for update');
 
+DELIMITER $$
+CREATE Procedure `universaltranslator`.`MatchFieldAUpdateFieldB`(in configId int, 
+in batchId int, in srcField varchar(10),
+in fieldA varchar(10), in fieldB varchar(10), in con1 varchar(10), 
+in con2 varchar(10), in macroId int, in foroutboundProcessing boolean, in passClear int) 
+proc_main:begin
+
+-- this SP matches FieldA with Con1 and then updates fieldB with Con2
+-- this sets out table
+call setInboundOutBoundTables (foroutboundProcessing);
+select @translatedTable, @transactionTable, @batchTable, @batchIdType , @errorTable
+into @translatedTable, @transactionTable, @batchTable, @batchIdType , @errorTable;
+
+-- build our sql
+set @stmt = concat("update ",@translatedTable, " set ",fieldB," = '",con2,"' where ",fieldA," = '",con1,"'
+and ",@transactionTable,"Id in (select id from ",@transactionTable,
+" where configId = ",configId," and ", @batchIdType," = ",batchId,");");
+
+PREPARE stmt from @stmt;
+EXECUTE stmt;-- execute
+
+-- we check pass /clear
+if (passClear = 2) THEN
+BEGIN
+set @stmt = concat("update ",@translatedTable, " set ",fieldB," = null where ",fieldB," != '",con2,"'
+and ",@transactionTable,"Id in (select id from ",@transactionTable,
+" where configId = ",configId," and ", @batchIdType," = ",batchId,");");
+PREPARE stmt from @stmt;
+EXECUTE stmt;-- execute
+END;
+END IF;
+
+-- the only error for this is if SP bombs, no need to write in insert error logs
+select '';
+end proc_main$$
+DELIMITER ;
+
