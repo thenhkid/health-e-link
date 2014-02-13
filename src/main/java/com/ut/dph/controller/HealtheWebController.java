@@ -17,6 +17,7 @@ import com.ut.dph.model.configuration;
 import com.ut.dph.model.configurationConnection;
 import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.configurationTransport;
+import com.ut.dph.model.custom.searchParameters;
 import com.ut.dph.model.fieldSelectOptions;
 import com.ut.dph.model.lutables.lu_ProcessStatus;
 import com.ut.dph.model.providerAddress;
@@ -113,26 +114,16 @@ public class HealtheWebController {
      * The 'findTotals' function will set the total number of
      * inbox messages and total number of pending messages 
      */
-    public void setTotals(int totalInbox, int totalPending, HttpSession session) {
+    public void setTotals(HttpSession session) {
         
         User userInfo = (User)session.getAttribute("userDetails");
         
         /* Need to get a list of all pending batches */
-        if(totalPending == 0) {
-            pendingTotal = transactionInManager.getpendingBatches(userInfo.getId(), userInfo.getOrgId(), "", null, null, 1, 0).size();
-         }
-        else {
-            pendingTotal = totalPending;
-        }
+        pendingTotal = transactionInManager.getpendingBatches(userInfo.getId(), userInfo.getOrgId(), "", null, null, 1, 0).size();
         
         /* Need to get a list of all inbox batches */
-        if(totalInbox == 0) {
-            inboxTotal = transactionOutManager.getInboxBatches(userInfo.getId(), userInfo.getOrgId(), "", null, null, 1, 0).size();
-        }
-        else {
-            inboxTotal = totalInbox;
-        }
-        
+        inboxTotal = transactionOutManager.getInboxBatches(userInfo.getId(), userInfo.getOrgId(), "", null, null, 1, 0).size();
+       
     }
     
     
@@ -152,16 +143,35 @@ public class HealtheWebController {
         
         Date fromDate = getMonthDate("START");
         Date toDate = getMonthDate("END");
-        
-        mav.addObject("fromDate", fromDate);
-        mav.addObject("toDate", toDate);
+        int page = 1;
+        String searchTerm = "";
         
         /* Need to get all the message types set up for the user */
         User userInfo = (User)session.getAttribute("userDetails");
         
+        /* Retrieve search parameters from session */
+        searchParameters searchParameters = (searchParameters)session.getAttribute("searchParameters");
+        
+        if("".equals(searchParameters.getsection()) || !"inbox".equals(searchParameters.getsection())) {
+           searchParameters.setfromDate(fromDate);
+            searchParameters.settoDate(toDate);
+            searchParameters.setpage(1);
+            searchParameters.setsection("inbox");
+            searchParameters.setsearchTerm("");
+        }
+        else {
+            fromDate = searchParameters.getfromDate();
+            toDate = searchParameters.gettoDate();
+            page = searchParameters.getpage();
+            searchTerm = searchParameters.getsearchTerm();
+        }
+            
+        mav.addObject("fromDate", fromDate);
+        mav.addObject("toDate", toDate);
+        
         /* Need to get a list of all inbox batches */
-        Integer totalInboxBatches = transactionOutManager.getInboxBatches(userInfo.getId(), userInfo.getOrgId(), "", fromDate, toDate, 1, 0).size();
-        List<batchDownloads> inboxBatches = transactionOutManager.getInboxBatches(userInfo.getId(), userInfo.getOrgId(), "", fromDate, toDate, 1, maxResults);
+        Integer totalInboxBatches = transactionOutManager.getInboxBatches(userInfo.getId(), userInfo.getOrgId(), searchTerm, fromDate, toDate, 1, 0).size();
+        List<batchDownloads> inboxBatches = transactionOutManager.getInboxBatches(userInfo.getId(), userInfo.getOrgId(), searchTerm, fromDate, toDate, page, maxResults);
         
         if(!inboxBatches.isEmpty()) {
             for(batchDownloads batch : inboxBatches) {
@@ -180,14 +190,15 @@ public class HealtheWebController {
         mav.addObject("inboxBatches", inboxBatches);
        
         /* Set the header totals */
-        setTotals(0,0,session);
+        setTotals(session);
         
         mav.addObject("pendingTotal", pendingTotal);
         mav.addObject("inboxTotal", inboxTotal);
         
+        mav.addObject("searchTerm", searchTerm);
         Integer totalPages = (int)Math.ceil((double)totalInboxBatches / maxResults);
         mav.addObject("totalPages", totalPages);
-        mav.addObject("currentPage", 1);
+        mav.addObject("currentPage", page);
         
         return mav;
     }
@@ -212,6 +223,14 @@ public class HealtheWebController {
         
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/Health-e-Web/inbox");
+        
+        /* Retrieve search parameters from session */
+        searchParameters searchParameters = (searchParameters)session.getAttribute("searchParameters");
+        searchParameters.setfromDate(fromDate);
+        searchParameters.settoDate(toDate);
+        searchParameters.setpage(page);
+        searchParameters.setsection("inbox");
+        searchParameters.setsearchTerm(searchTerm);
         
         mav.addObject("fromDate", fromDate);
         mav.addObject("toDate", toDate);
@@ -242,7 +261,7 @@ public class HealtheWebController {
         mav.addObject("totalPages", totalPages);
         
         /* Set the header totals */
-        setTotals(0,0,session);
+        setTotals(session);
        
         mav.addObject("searchTerm", searchTerm);
         mav.addObject("pendingTotal", pendingTotal);
@@ -327,7 +346,7 @@ public class HealtheWebController {
         mav.addObject("fromPage", "inbox");
         
         /* Set the header totals */
-        setTotals(0,0,session);
+        setTotals(session);
         
         mav.addObject("pendingTotal", pendingTotal);
         mav.addObject("inboxTotal", inboxTotal);
@@ -448,7 +467,7 @@ public class HealtheWebController {
         mav.addObject("feedbackConfigId", feedbackConfigId);
         
         /* Set the header totals */
-        setTotals(0,0,session);
+        setTotals(session);
         
         mav.addObject("pendingTotal", pendingTotal);
         mav.addObject("inboxTotal", inboxTotal);
@@ -496,7 +515,7 @@ public class HealtheWebController {
         mav.addObject("configurations", configurations);
         
         /* Set the header totals */
-        setTotals(0,0,session);
+        setTotals(session);
         
         mav.addObject("pendingTotal", pendingTotal);
         mav.addObject("inboxTotal", inboxTotal);
@@ -594,7 +613,7 @@ public class HealtheWebController {
         mav.addObject(transaction);
         
         /* Set the header totals */
-        setTotals(0,0,session);
+        setTotals(session);
         
         mav.addObject("pendingTotal", pendingTotal);
         mav.addObject("inboxTotal", inboxTotal);
@@ -748,7 +767,7 @@ public class HealtheWebController {
         mav.addObject("providers", providers);
         
         /* Set the header totals */
-        setTotals(0,0,session);
+        setTotals(session);
         
         mav.addObject("pendingTotal", pendingTotal);
         mav.addObject("inboxTotal", inboxTotal);
@@ -1144,6 +1163,25 @@ public class HealtheWebController {
         
         Date fromDate = getMonthDate("START");
         Date toDate = getMonthDate("END");
+        int page = 1;
+        String searchTerm = "";
+        
+        /* Retrieve search parameters from session */
+        searchParameters searchParameters = (searchParameters)session.getAttribute("searchParameters");
+        
+        if("".equals(searchParameters.getsection()) || !"pending".equals(searchParameters.getsection())) {
+           searchParameters.setfromDate(fromDate);
+            searchParameters.settoDate(toDate);
+            searchParameters.setpage(1);
+            searchParameters.setsection("pending");
+            searchParameters.setsearchTerm("");
+        }
+        else {
+            fromDate = searchParameters.getfromDate();
+            toDate = searchParameters.gettoDate();
+            page = searchParameters.getpage();
+            searchTerm = searchParameters.getsearchTerm();
+        }
         
         mav.addObject("fromDate", fromDate);
         mav.addObject("toDate", toDate);
@@ -1153,8 +1191,8 @@ public class HealtheWebController {
         
         /* Need to get a list of all pending batches */
         /* Need to get a list of all pending transactions */
-        Integer totalpendingBatches = transactionInManager.getpendingBatches(userInfo.getId(), userInfo.getOrgId(), "", fromDate, toDate, 1, 0).size();
-        List<batchUploads> pendingBatches = transactionInManager.getpendingBatches(userInfo.getId(), userInfo.getOrgId(), "", fromDate, toDate, 1, maxResults);
+        Integer totalpendingBatches = transactionInManager.getpendingBatches(userInfo.getId(), userInfo.getOrgId(), searchTerm, fromDate, toDate, 1, 0).size();
+        List<batchUploads> pendingBatches = transactionInManager.getpendingBatches(userInfo.getId(), userInfo.getOrgId(), searchTerm, fromDate, toDate, page, maxResults);
         
         if(!pendingBatches.isEmpty()) {
             for(batchUploads batch : pendingBatches) {
@@ -1173,14 +1211,15 @@ public class HealtheWebController {
         mav.addObject("pendingBatches", pendingBatches);
        
         /* Set the header totals */
-        setTotals(0,0,session);
+        setTotals(session);
         
+        mav.addObject("searchTerm", searchTerm);
         mav.addObject("pendingTotal", pendingTotal);
         mav.addObject("inboxTotal", inboxTotal);
         
         Integer totalPages = (int)Math.ceil((double)totalpendingBatches / maxResults);
         mav.addObject("totalPages", totalPages);
-        mav.addObject("currentPage", 1);
+        mav.addObject("currentPage", page);
         
         return mav;
     }
@@ -1204,6 +1243,14 @@ public class HealtheWebController {
         
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/Health-e-Web/pending");
+        
+        /* Retrieve search parameters from session */
+        searchParameters searchParameters = (searchParameters)session.getAttribute("searchParameters");
+        searchParameters.setfromDate(fromDate);
+        searchParameters.settoDate(toDate);
+        searchParameters.setpage(page);
+        searchParameters.setsection("pending");
+        searchParameters.setsearchTerm(searchTerm);
         
         mav.addObject("fromDate", fromDate);
         mav.addObject("toDate", toDate);
@@ -1235,7 +1282,7 @@ public class HealtheWebController {
         mav.addObject("totalPages", totalPages);
         
         /* Set the header totals */
-        setTotals(0,0,session);
+        setTotals(session);
        
         mav.addObject("searchTerm", searchTerm);
         mav.addObject("pendingTotal", pendingTotal);
@@ -1262,16 +1309,35 @@ public class HealtheWebController {
         
         Date fromDate = getMonthDate("START");
         Date toDate = getMonthDate("END");
-        
-        mav.addObject("fromDate", fromDate);
-        mav.addObject("toDate", toDate);
+        int page = 1;
+        String searchTerm = "";
         
         /* Need to get all the message types set up for the user */
         User userInfo = (User)session.getAttribute("userDetails");
         
+        /* Retrieve search parameters from session */
+        searchParameters searchParameters = (searchParameters)session.getAttribute("searchParameters");
+        
+        if("".equals(searchParameters.getsection()) || !"sent".equals(searchParameters.getsection())) {
+            searchParameters.setfromDate(fromDate);
+            searchParameters.settoDate(toDate);
+            searchParameters.setpage(1);
+            searchParameters.setsection("sent");
+            searchParameters.setsearchTerm("");
+        }
+        else {
+            fromDate = searchParameters.getfromDate();
+            toDate = searchParameters.gettoDate();
+            page = searchParameters.getpage();
+            searchTerm = searchParameters.getsearchTerm();
+        }
+        
+        mav.addObject("fromDate", fromDate);
+        mav.addObject("toDate", toDate);
+        
         /* Need to get a list of all pending transactions */
-        Integer totalSentBatches = transactionInManager.getsentBatches(userInfo.getId(), userInfo.getOrgId(), "", fromDate, toDate, 1, 0).size();
-        List<batchUploads> sentBatches = transactionInManager.getsentBatches(userInfo.getId(), userInfo.getOrgId(), "", fromDate, toDate, 1, maxResults);
+        Integer totalSentBatches = transactionInManager.getsentBatches(userInfo.getId(), userInfo.getOrgId(), searchTerm, fromDate, toDate, 1, 0).size();
+        List<batchUploads> sentBatches = transactionInManager.getsentBatches(userInfo.getId(), userInfo.getOrgId(), searchTerm, fromDate, toDate, page, maxResults);
         
         if(!sentBatches.isEmpty()) {
             for(batchUploads batch : sentBatches) {
@@ -1290,14 +1356,15 @@ public class HealtheWebController {
         mav.addObject("sentBatches", sentBatches);
         
         /* Set the header totals */
-        setTotals(0,0,session);
+        setTotals(session);
         
+        mav.addObject("searchTerm", searchTerm);
         mav.addObject("pendingTotal", pendingTotal);
         mav.addObject("inboxTotal", inboxTotal);
         
         Integer totalPages = (int)Math.ceil((double)totalSentBatches / maxResults);
         mav.addObject("totalPages", totalPages);
-        mav.addObject("currentPage", 1);
+        mav.addObject("currentPage", page);
         
         return mav;
     }
@@ -1322,6 +1389,14 @@ public class HealtheWebController {
         
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/Health-e-Web/sent");
+        
+        /* Retrieve search parameters from session */
+        searchParameters searchParameters = (searchParameters)session.getAttribute("searchParameters");
+        searchParameters.setfromDate(fromDate);
+        searchParameters.settoDate(toDate);
+        searchParameters.setpage(page);
+        searchParameters.setsection("sent");
+        searchParameters.setsearchTerm(searchTerm);
         
         mav.addObject("fromDate", fromDate);
         mav.addObject("toDate", toDate);
@@ -1352,7 +1427,7 @@ public class HealtheWebController {
         mav.addObject("totalPages", totalPages);
         
         /* Set the header totals */
-        setTotals(0,0,session);
+        setTotals(session);
        
         mav.addObject("searchTerm", searchTerm);
         mav.addObject("pendingTotal", pendingTotal);
@@ -1438,7 +1513,7 @@ public class HealtheWebController {
         mav.addObject("fromPage", fromPage);
         
         /* Set the header totals */
-        setTotals(0,0,session);
+        setTotals(session);
         
         mav.addObject("pendingTotal", pendingTotal);
         mav.addObject("inboxTotal", inboxTotal);
@@ -1553,7 +1628,7 @@ public class HealtheWebController {
         mav.addObject("transactionDetails", transaction);
         
         /* Set the header totals */
-        setTotals(0,0,session);
+        setTotals(session);
         
         mav.addObject("pendingTotal", pendingTotal);
         mav.addObject("inboxTotal", inboxTotal);
@@ -2078,7 +2153,7 @@ public class HealtheWebController {
         mav.addObject("fromPage", fromPage);
         
         /* Set the header totals */
-        setTotals(0,0,session);
+        setTotals(session);
         
         mav.addObject("pendingTotal", pendingTotal);
         mav.addObject("inboxTotal", inboxTotal);
