@@ -729,7 +729,6 @@ public class transactionOutManagerImpl implements transactionOutManager {
            
          }
          
-         
          /* Read in the file */
          try {
             FileInputStream fileInput = null; 
@@ -768,7 +767,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                         }
                         
                         if(i == maxFieldNo) {
-                            recordRow = new StringBuilder().append(recordRow).append(fieldValue).append("\n").toString();
+                            recordRow = new StringBuilder().append(recordRow).append(fieldValue).append(System.getProperty( "line.separator" )).toString();
                         }
                         else {
                             recordRow = new StringBuilder().append(recordRow).append(fieldValue).append(delimChar).toString();
