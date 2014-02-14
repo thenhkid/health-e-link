@@ -384,12 +384,20 @@ public class HealtheConnectController {
        int date = cal.getActualMinimum(Calendar.DATE);
        if("END".equalsIgnoreCase(filter)){
            date = cal.getActualMaximum(Calendar.DATE);
+           cal.set(Calendar.DATE, date);
+           cal.set(Calendar.HOUR_OF_DAY, 23);
+           cal.set(Calendar.MINUTE, 59);
+           cal.set(Calendar.SECOND, 59);
+           cal.set(Calendar.MILLISECOND, 0);
        }
-       cal.set(Calendar.DATE, date);
-       cal.set(Calendar.HOUR_OF_DAY, 0);
-       cal.set(Calendar.MINUTE, 0);
-       cal.set(Calendar.SECOND, 0);
-       cal.set(Calendar.MILLISECOND, 0);
+       else {
+           cal.set(Calendar.DATE, date);
+           cal.set(Calendar.HOUR_OF_DAY, 0);
+           cal.set(Calendar.MINUTE, 0);
+           cal.set(Calendar.SECOND, 0);
+           cal.set(Calendar.MILLISECOND, 0);
+       }
+       
        
        return cal.getTime();
    }

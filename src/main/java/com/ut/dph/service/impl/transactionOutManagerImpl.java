@@ -355,9 +355,6 @@ public class transactionOutManagerImpl implements transactionOutManager {
      */
     public void beginOutputProcess(transactionTarget transaction) {
          
-        /* Update the status of the uploaded batch to  TBP (Target Batch Creating in process) (ID = 25) */
-        transactionInManager.updateBatchStatus(transaction.getbatchUploadId(),25,"");
-        
         batchUploads uploadedBatchDetails = transactionInManager.getBatchDetails(transaction.getbatchUploadId());
         
         configuration configDetails = configurationManager.getConfigurationById(transaction.getconfigId());
@@ -372,6 +369,9 @@ public class transactionOutManagerImpl implements transactionOutManager {
             /* Generate the batch */
             /* (target configuration Details, transaction details, transport Details for target config, Source OrgId, Source Original Filename, mergeable) */
             int batchId = generateBatch(configDetails, transaction, transportDetails, uploadedBatchDetails.getOrgId(), uploadedBatchDetails.getoriginalFileName(), false);
+            
+            /* Update the status of the uploaded batch to  TBP (Target Batch Creating in process) (ID = 25) */
+            transactionInManager.updateBatchStatus(batchId,25,"");
 
         }
         /* File Download */
@@ -389,6 +389,9 @@ public class transactionOutManagerImpl implements transactionOutManager {
                 /* Generate the batch */
                 /* (target configuration Details, transaction details, transport Details for target config, Source OrgId, Source Original Filename, mergeable) */
                 batchId = generateBatch(configDetails, transaction, transportDetails, uploadedBatchDetails.getOrgId(), uploadedBatchDetails.getoriginalFileName(), false);
+                
+                /* Update the status of the uploaded batch to  TBP (Target Batch Creating in process) (ID = 25) */
+                transactionInManager.updateBatchStatus(batchId,25,"");
 
             }
             else {
@@ -399,9 +402,13 @@ public class transactionOutManagerImpl implements transactionOutManager {
                 
                 /* If no mergable batch is found create a new batch */
                 if(mergeablebatchId == 0) {
+                    
                     /* Generate the batch */
                     /* (target configuration Details, transaction details, transport Details for target config, Source OrgId, Source Original Filename, mergeable) */
                     batchId = generateBatch(configDetails, transaction, transportDetails, uploadedBatchDetails.getOrgId(), uploadedBatchDetails.getoriginalFileName(), true);
+                    
+                    /* Update the status of the uploaded batch to  TBP (Target Batch Creating in process) (ID = 25) */
+                    transactionInManager.updateBatchStatus(batchId,25,"");
 
                 }
                 else {

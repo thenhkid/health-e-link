@@ -65,7 +65,7 @@
                                             <a href="#statusModal" data-toggle="modal" class="btn btn-link viewStatus" rel="${batch.statusId}" title="View this Status">${batch.statusValue}&nbsp;<span class="badge badge-help" data-placement="top" title="" data-original-title="">?</span></a>
                                         </td>
                                         <td class="center-text"><fmt:formatDate value="${batch.dateCreated}" type="date" pattern="M/dd/yyyy" /><br /><fmt:formatDate value="${batch.dateCreated}" type="time" pattern="h:mm:ss a" /></td>
-                                        <td class="center-text"><fmt:formatDate value="${batch.lastDownloaded}" type="date" pattern="M/dd/yyyy" /><br /><fmt:formatDate value="${batch.lastDownloaded}" type="time" pattern="h:mm:ss a" /></td>
+                                        <td class="center-text"  id="lastDownloadDiv${batch.id}"><fmt:formatDate value="${batch.lastDownloaded}" type="date" pattern="M/dd/yyyy" /><br /><fmt:formatDate value="${batch.lastDownloaded}" type="time" pattern="h:mm:ss a" /></td>
                                         <td class="actions-col" style="width:100px;">
                                              <a href="javascript:void(0);" rel="${batch.id}" rel1="${batch.outputFIleName}" rel2="${batch.orgId}" class="downloadFile" title="Download">
                                                 <span class="glyphicon glyphicon-edit"></span>

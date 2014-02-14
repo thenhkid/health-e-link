@@ -39,6 +39,37 @@ jQuery(document).ready(function($) {
                var statusHTML = '<a href="#statusModal" data-toggle="modal" class="btn btn-link viewStatus" rel="22" title="View this Status">SDL&nbsp;<span class="badge badge-help" data-placement="top" title="" data-original-title="">?</span></a>';
                $('#statusDiv'+batchId).html(statusHTML);
                
+               var d = new Date();
+               var month = d.getMonth()+1;
+               var day = d.getDate();
+               
+               var hourString;
+               var minString;
+               var amPm = "AM";
+               if ( d.getHours() > 11 ) {
+                    amPm = "PM"
+                    if(d.getHours() == 12) {
+                        hourString = (d.getHours() - 0);
+                    }
+                    else {
+                        hourString = (d.getHours() - 12);
+                    }
+                    
+                } else {
+                    amPm = "AM"
+                    hourString = d.getHours();
+                }
+                
+                
+                if(d.getMinutes() < 10) {
+                    minString = "0"+d.getMinutes();
+                }
+                else {
+                    minString = d.getMinutes();
+                }
+                
+               $('#lastDownloadDiv'+batchId).html(month + '/' + (day<10 ? '0' : '') + day + '/' + d.getFullYear() + '<br/>' + hourString + ':' + minString + ':' + d.getSeconds() + ' ' + amPm);
+               
                window.location.href = "/downloadFile.do?filename="+fileName+"&foldername=output files&orgId="+orgId;
                 
             }

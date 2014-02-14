@@ -89,7 +89,7 @@ require(['jquery', 'fixed-header', 'moment', 'bootstrap', 'responsive-tables', '
             function(start, end) { 
                 $('.daterange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
                 $('.daterange span').attr('rel',start.format('MMM DD 00:00:00 YYYY'));
-                $('.daterange span').attr('rel2',end.format('MMM DD 00:00:00 YYYY'));
+                $('.daterange span').attr('rel2',end.format('MMM DD 23:59:59 YYYY'));
                 searchByDateRange();
             }
 	);

@@ -33,7 +33,7 @@
  
         <trigger>
             <cron>
-                <name>10MinTrigger</name>
+                <name>5MinTrigger</name>
                 <job-name>GenerateOutputFiles</job-name>
                 <job-group>processGroup</job-group>
                 <cron-expression>0 0/5 * * * ?</cron-expression>
