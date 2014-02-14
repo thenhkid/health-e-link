@@ -76,3 +76,7 @@ select '';
 end proc_main$$
 DELIMITER ;
 
+
+/** Chad 2.13.14 @ 11:11 AM ** /
+ALTER TABLE `universalTranslator`.`BatchDownloads` 
+ADD COLUMN `lastDownloaded` DATETIME NULL AFTER `mergeable`;

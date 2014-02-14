@@ -360,6 +360,9 @@ public class HealtheConnectController {
         transactionOutManager.updateTargetBatchStatus(batchId, 22 , "");
         
         transactionOutManager.updateTargetTransasctionStatus(batchId, 20);
+        
+        /* Update the last Downloaded field */
+        transactionOutManager.updateLastDownloaded(batchId);
        
         return 1;
     }

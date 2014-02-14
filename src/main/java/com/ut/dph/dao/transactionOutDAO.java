@@ -77,4 +77,6 @@ public interface transactionOutDAO {
     
     List<batchDownloads> getdownloadableBatches(int userId, int orgId, Date fromDate, Date toDate, String searchTerm, int page, int maxResults);
     
+    void updateLastDownloaded(int batchId);
+    
 }

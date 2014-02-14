@@ -1310,4 +1310,33 @@ public class transactionOutDAOImpl implements transactionOutDAO {
 
         return batchIdList;
     }
+    
+    
+    /**
+     * The 'updateLastDownloaded' function will update the last downloaded
+     * field for the passed in batch
+     * 
+     * @param batchId   The id of the batch to update.
+     * 
+     * @return this function will not return anything.
+     */
+    @Override
+    @Transactional
+    public void updateLastDownloaded(int batchId) {
+        
+        String sql = "update BatchDownloads "
+                + " set lastDownloaded = CURRENT_TIMESTAMP "
+                + " where id = :batchId";
+
+        Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                .setParameter("batchId", batchId);
+          
+        try {
+            updateData.executeUpdate();
+        } catch (Exception ex) {
+            System.err.println("update Batch last downloaded date failed." + ex);
+        }
+        
+    }
+   
 }

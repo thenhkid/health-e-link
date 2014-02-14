@@ -81,6 +81,9 @@ public class batchDownloads {
     @Column(name = "MERGEABLE", nullable = false)
     private boolean mergeable = false;
     
+    @Column(name = "LASTDOWNLOADED", nullable = true)
+    private Date lastDownloaded = null;
+    
     public int getId() {
         return id;
     }
@@ -219,5 +222,13 @@ public class batchDownloads {
     
     public void setmergeable(boolean mergeable) {
         this.mergeable = mergeable;
+    }
+    
+    public Date getlastDownloaded() {
+        return lastDownloaded;
+    }
+    
+    public void setlastDownloaded(Date lastDownloaded) {
+        this.lastDownloaded = lastDownloaded;
     }
 }
