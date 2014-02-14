@@ -33,6 +33,9 @@ public class configurationFTPFields {
 
     @Column(name = "METHOD", nullable = false)
     private int method = 1;
+    
+    @Column(name = "PORT", nullable = true)
+    private String port = null;
 
     public int getId() {
         return id;
@@ -88,6 +91,14 @@ public class configurationFTPFields {
 
     public void setmethod(int method) {
         this.method = method;
+    }
+    
+    public String getport() {
+        return port;
+    }
+    
+    public void setport(String port) {
+        this.port = port;
     }
 
 }

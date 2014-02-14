@@ -82,3 +82,7 @@ INSERT INTO `universalTranslator`.`macro_names` (`Macro_Name`, `Macro_Short_Name
 /** Chad 2.13.14 @ 11:11 AM ** /
 ALTER TABLE `universalTranslator`.`BatchDownloads` 
 ADD COLUMN `lastDownloaded` DATETIME NULL AFTER `mergeable`;
+
+/** Chad 2.13.14 @ 11:09 PM **/
+ALTER TABLE `universalTranslator`.`rel_TransportFTPDetails` 
+ADD COLUMN `port` VARCHAR(45) NULL AFTER `method`;

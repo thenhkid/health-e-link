@@ -229,24 +229,29 @@
                                             <input name="FTPFields[${field.index}].id" class="form-control" type="hidden" value="${ftpDetails.id}"  />
                                         </div>
                                         <div id="ip${ftpDetails.method}Div" class="form-group">
-                                            <label class="control-label" for="IPAddress">IP Address *</label>
+                                            <label class="control-label" for="ip${ftpDetails.method}">IP Address *</label>
                                             <input name="FTPFields[${field.index}].ip" id="ip${ftpDetails.method}" class="form-control" type="text" maxLength="45" value="${ftpDetails.ip}"  />
                                             <span id="ip${ftpDetails.method}Msg" class="control-label"></span>
                                         </div>
                                         <div id="username${ftpDetails.method}Div" class="form-group">
-                                            <label class="control-label" for="IPAddress">Username *</label>
+                                            <label class="control-label" for="username${ftpDetails.method}">Username *</label>
                                             <input name="FTPFields[${field.index}].username" id="username${ftpDetails.method}" class="form-control" type="text" maxLength="45" value="${ftpDetails.username}"  />
                                              <span id="username${ftpDetails.method}Msg" class="control-label"></span>
                                         </div>
                                         <div id="password${ftpDetails.method}Div" class="form-group">
-                                            <label class="control-label" for="IPAddress">Password *</label>
+                                            <label class="control-label" for="password${ftpDetails.method}">Password *</label>
                                             <input name="FTPFields[${field.index}].password" id="password${ftpDetails.method}" class="form-control" type="text" maxLength="45" value="${ftpDetails.password}"  />
                                             <span id="password${ftpDetails.method}Msg" class="control-label"></span>
                                         </div>
                                         <div id="directory${ftpDetails.method}Div" class="form-group">
-                                            <label class="control-label" for="IPAddress">Directory *</label>
+                                            <label class="control-label" for="directory${ftpDetails.method}">Directory *</label>
                                             <input name="FTPFields[${field.index}].directory" id="directory${ftpDetails.method}" class="form-control" type="text" maxLength="255" value="${ftpDetails.directory}"  />
                                              <span id="directory${ftpDetails.method}Msg" class="control-label"></span>
+                                        </div>
+                                        <div id="port${ftpDetails.method}Div" class="form-group">
+                                            <label class="control-label" for="port${ftpDetails.method}">Port *</label>
+                                            <input name="FTPFields[${field.index}].port" id="port${ftpDetails.method}" class="form-control" type="text" maxLength="45" value="${ftpDetails.port}"  />
+                                             <span id="port${ftpDetails.method}Msg" class="control-label"></span>
                                         </div>
                                     </div>
                                     </c:forEach>
