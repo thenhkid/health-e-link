@@ -86,3 +86,14 @@ ADD COLUMN `lastDownloaded` DATETIME NULL AFTER `mergeable`;
 /** Chad 2.13.14 @ 11:09 PM **/
 ALTER TABLE `universalTranslator`.`rel_TransportFTPDetails` 
 ADD COLUMN `port` VARCHAR(45) NULL AFTER `method`;
+
+
+/** Chad 2.14.14 @ 11:41 AM **/
+CREATE TABLE `universaltranslator`.`targetoutputrunlogs` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `configId` INT NOT NULL,
+  `lastRunTime` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`));
+
+ALTER TABLE `universaltranslator`.`batchdownloads` 
+ADD COLUMN `lastDownloaded` DATETIME NULL DEFAULT CURRENT_TIMESTAMP AFTER `mergeable`;

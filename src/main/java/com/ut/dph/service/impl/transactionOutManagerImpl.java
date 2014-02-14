@@ -17,6 +17,7 @@ import com.ut.dph.model.configurationConnectionReceivers;
 import com.ut.dph.model.configurationDataTranslations;
 import com.ut.dph.model.configurationSchedules;
 import com.ut.dph.model.configurationTransport;
+import com.ut.dph.model.targetOutputRunLogs;
 import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionOutNotes;
 import com.ut.dph.model.transactionOutRecords;
@@ -267,7 +268,30 @@ public class transactionOutManagerImpl implements transactionOutManager {
                         
                         /* Update the status of the transaction target to L (Loaded) (ID = 9) */
                         transactionInManager.updateTransactionTargetStatus(0, transaction.getId(), 0, 9);
+                        
+                        /* If configuration is set to auto process the process right away */
+                        configurationSchedules scheduleDetails = configurationManager.getScheduleDetails(transaction.getconfigId());
+                        
+                        /* If no schedule is found or automatic */
+                        if(scheduleDetails == null || scheduleDetails.gettype() == 5) {
+                            int batchId =  beginOutputProcess(transaction);
+                           
+                            /* 
+                            Need to check the transport method for the configuration, if set to file download
+                            or set to FTP.
+                            */
+                            configurationTransport transportDetails = configurationTransportManager.getTransportDetails(transaction.getconfigId());
 
+                            /* if File Download update the status to Submission Delivery Completed ID = 23 status. This will only
+                            apply to scheduled and not continous settings. */
+                            if(transportDetails.gettransportMethodId() == 1) {
+                                transactionOutDAO.updateBatchStatus(batchId, 23);
+                            }
+                            /* If FTP Call the FTP Method */
+                            else if(transportDetails.gettransportMethodId() == 3) {
+                                FTPTargetFile(batchId);
+                            }
+                        }
                     }
                     
                 }
@@ -284,17 +308,10 @@ public class transactionOutManagerImpl implements transactionOutManager {
     @Override
     @Transactional
     public void generateOutputFiles() {
-        
-        
+         
         /*
-        Possible new way of processing output files. This will require every config to be in the schedule table with
-        at the very lease automatic.
-        1. Look at the configurationSchedule table first
-        2. Based on the results see if it qualifies by type (Auto, Daily, etc)
-        3. If the config qualifies look to get all loaded outbound transactions
-           for that config.
-        4. If transactions are found pass all transactions to the beginOutputProcess function
-        5. When the beginOutput Process function returns (RETURN BATCH ID???) check to see if the target transport method 
+        
+       . When the beginOutput Process function returns (RETURN BATCH ID???) check to see if the target transport method 
            for the config is set to FTP, if so then call the FTP method to send off the file. Batch would then get a 
            Submission Delivery Locked ID = 22 status.
         6. For file download transport methods, after the beginOutput Process function returns with the batch Id, the batch
@@ -303,67 +320,149 @@ public class transactionOutManagerImpl implements transactionOutManager {
            the file is downloaded.
         */
         
-        
-        
-        
-       
-        /* 
-        Need to find all transactionTarget records that are loaded ready to moved to a downloadable
-        batch
-         */
-        List<transactionTarget> loadedTransactions = transactionOutDAO.getLoadedOutBoundTransactions();
-        
-        /* 
-        If pending pick up transactions are found need to loop through and check the 
-        schedule setting for the configuration.
-        */
-        if(!loadedTransactions.isEmpty()) {
-           
-            for(transactionTarget transaction : loadedTransactions) {
-                
-                configurationSchedules scheduleDetails = configurationManager.getScheduleDetails(transaction.getconfigId());
-                
-                /* If no schedule is found or automatic */
-                if(scheduleDetails == null || scheduleDetails.gettype() == 5) {
+        /* Get a list of scheduled configurations (Daily, Weekly or Monthly) */
+        List<configurationSchedules> scheduledConfigs = transactionOutDAO.getScheduledConfigurations();
+      
+        if(!scheduledConfigs.isEmpty()) {
+            
+            int batchId = 0;
+            
+            for(configurationSchedules schedule : scheduledConfigs) {
+                 
+                /* DAILY SCHEDULE */
+                if(schedule.gettype() == 2) {
                     
-                    beginOutputProcess(transaction);
-                            
-                }
-                /* If the setting is for 'Daily' */
-                else if(scheduleDetails.gettype() == 2) {
+                    Date currDate = new Date();
+                    Calendar calendar = GregorianCalendar.getInstance();
+                    calendar.setTime(currDate);
+                    
+                    /* Need to get the latest log to make sure we don't run it again in the same day */
+                    List<targetOutputRunLogs> logs = transactionOutDAO.getLatestRunLog(schedule.getconfigId());
                     
                     /* if Daily check for scheduled or continuous */
-                    if(scheduleDetails.getprocessingType() == 1) {
-                        /* SCHEDULED */
-                        Date date = new Date();
-                        Calendar calendar = GregorianCalendar.getInstance();
-                        calendar.setTime(date);
+                    if(schedule.getprocessingType() == 1) {
                         
+                        /* SCHEDULED */
                         int hourOfDay = calendar.get(Calendar.HOUR_OF_DAY);
                         
-                        if(hourOfDay >= scheduleDetails.getprocessingTime()) {
-                            beginOutputProcess(transaction);
+                        double diffInHours;
+                        if(logs.size() > 0) {
+                            targetOutputRunLogs log = logs.get(0);
+                            long diff = currDate.getTime() - log.getlastRunTime().getTime();
+                            diffInHours = diff / ((double) 1000 * 60 * 60);
+                        }
+                        else {
+                            diffInHours = 0;
+                        }
+                        
+                        if(hourOfDay >= schedule.getprocessingTime() && (diffInHours == 0 || diffInHours >= 24)) {
+                            
+                             /* 
+                            Need to find all transactionTarget records that are loaded ready to moved to a downloadable
+                            batch
+                             */
+                            List<transactionTarget> loadedTransactions = transactionOutDAO.getLoadedOutBoundTransactions(schedule.getconfigId());
+                            
+                            if(!loadedTransactions.isEmpty()) {
+                                
+                                for(transactionTarget transaction : loadedTransactions) {
+                                    batchId = beginOutputProcess(transaction);
+                                }
+                                
+                                /* 
+                                Need to check the transport method for the configuration, if set to file download
+                                or set to FTP.
+                                */
+                                configurationTransport transportDetails = configurationTransportManager.getTransportDetails(schedule.getconfigId());
+                                
+                                /* if File Download update the status to Submission Delivery Completed ID = 23 status. This will only
+                                apply to scheduled and not continous settings. */
+                                if(transportDetails.gettransportMethodId() == 1) {
+                                    transactionOutDAO.updateBatchStatus(batchId, 23);
+                                }
+                                /* If FTP Call the FTP Method */
+                                else if(transportDetails.gettransportMethodId() == 3) {
+                                    FTPTargetFile(batchId);
+                                }
+                            }
+                            
+                            /* Log the last run time */
+                            targetOutputRunLogs log = new targetOutputRunLogs();
+                            log.setconfigId(schedule.getconfigId());
+
+                            transactionOutDAO.saveOutputRunLog(log);
                         }
                     }
                     else {
                         /* CONTINUOUS */
+                       
+                        double diffInHours;
+                        double diffInMinutes;
+                        if(logs.size() > 0) {
+                            targetOutputRunLogs log = logs.get(0);
+                            long diff = currDate.getTime() - log.getlastRunTime().getTime();
+                            diffInHours = diff / ((double) 1000 * 60 * 60);
+                            diffInMinutes = (diffInHours - (int)diffInHours)*60;
+                        }
+                        else {
+                            diffInMinutes = 0;
+                        }
+                        
+                        if(diffInMinutes == 0 || diffInMinutes >= schedule.getnewfileCheck()) {
+                            
+                             /* 
+                            Need to find all transactionTarget records that are loaded ready to moved to a downloadable
+                            batch
+                             */
+                            List<transactionTarget> loadedTransactions = transactionOutDAO.getLoadedOutBoundTransactions(schedule.getconfigId());
+                            
+                            if(!loadedTransactions.isEmpty()) {
+                                
+                                for(transactionTarget transaction : loadedTransactions) {
+                                    batchId = beginOutputProcess(transaction);
+                                }
+                                
+                                /* 
+                                Need to check the transport method for the configuration, if set to file download
+                                or set to FTP.
+                                */
+                                configurationTransport transportDetails = configurationTransportManager.getTransportDetails(schedule.getconfigId());
+                                
+                                /* if File Download update the status to Submission Delivery Completed ID = 23 status. This will only
+                                apply to scheduled and not continous settings. */
+                                if(transportDetails.gettransportMethodId() == 1) {
+                                    transactionOutDAO.updateBatchStatus(batchId, 23);
+                                }
+                                /* If FTP Call the FTP Method */
+                                else if(transportDetails.gettransportMethodId() == 3) {
+                                    FTPTargetFile(batchId);
+                                }
+                            }
+                            
+                            /* Log the last run time */
+                            targetOutputRunLogs log = new targetOutputRunLogs();
+                            log.setconfigId(schedule.getconfigId());
+
+                            transactionOutDAO.saveOutputRunLog(log);
+                        }
                         
                     }
-                    
+                }
+                /* WEEKLY SCHEDULE */
+                else if(schedule.gettype() == 3) {
                     
                 }
-                /* If the setting is for 'Weekly' */
-                else if(scheduleDetails.gettype() == 3) {
+                
+                /* MONTHLY SCHEDULE */
+                else if(schedule.gettype() == 4) {
                     
                 }
-                /* If the setting is for 'Monthly' */
-                else if(scheduleDetails.gettype() == 4) {
-                    
-                }
-                    
+                
+                
             }
             
-       }
+        }
+        
     }
     
     
@@ -375,7 +474,9 @@ public class transactionOutManagerImpl implements transactionOutManager {
      * @param transportDetails
      * @param uploadedBatchDetails 
      */
-    public void beginOutputProcess(transactionTarget transaction) {
+    public int beginOutputProcess(transactionTarget transaction) {
+        
+        int batchId = 0;
          
         batchUploads uploadedBatchDetails = transactionInManager.getBatchDetails(transaction.getbatchUploadId());
         
@@ -390,7 +491,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
 
             /* Generate the batch */
             /* (target configuration Details, transaction details, transport Details for target config, Source OrgId, Source Original Filename, mergeable) */
-            int batchId = generateBatch(configDetails, transaction, transportDetails, uploadedBatchDetails.getOrgId(), uploadedBatchDetails.getoriginalFileName(), false);
+            batchId = generateBatch(configDetails, transaction, transportDetails, uploadedBatchDetails.getOrgId(), uploadedBatchDetails.getoriginalFileName(), false);
             
             /* Update the status of the uploaded batch to  TBP (Target Batch Creating in process) (ID = 25) */
             transactionInManager.updateBatchStatus(batchId,25,"");
@@ -399,7 +500,6 @@ public class transactionOutManagerImpl implements transactionOutManager {
         /* File Download */
         else if(transportDetails.gettransportMethodId() == 1) {
 
-            int batchId = 0;
             boolean createNewFile = true;
 
             /* 
@@ -459,7 +559,6 @@ public class transactionOutManagerImpl implements transactionOutManager {
             
             /* Generate the file */
             try {
-                
                 generateTargetFile(createNewFile, transaction.getId(), batchId, transportDetails);
             } catch (IllegalAccessException ex) {
                 Logger.getLogger(transactionOutManagerImpl.class.getName()).log(Level.SEVERE, null, ex);
@@ -475,6 +574,8 @@ public class transactionOutManagerImpl implements transactionOutManager {
 
         /* Update the status of the uploaded batch to  TBP (Target Batch Created) (ID = 28) */
         transactionInManager.updateBatchStatus(transaction.getbatchUploadId(),28,"");
+        
+        return batchId;
         
     }
     
@@ -709,6 +810,17 @@ public class transactionOutManagerImpl implements transactionOutManager {
     @Transactional
     public void updateLastDownloaded(int batchId) {
         transactionOutDAO.updateLastDownloaded(batchId);
+    }
+    
+    /**
+     * The 'FTPTargetFile' function will get the FTP details and send off the generated file
+     * 
+     * @param batchId   The id of the batch to FTP the file for
+     */
+    private void FTPTargetFile(int batchId) {
+        
+        /* Update the status of the batch to locked */
+        transactionOutDAO.updateBatchStatus(batchId, 22);
     }
    
 }

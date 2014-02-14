@@ -8,6 +8,8 @@ package com.ut.dph.dao;
 
 import com.ut.dph.model.batchDownloadSummary;
 import com.ut.dph.model.batchDownloads;
+import com.ut.dph.model.configurationSchedules;
+import com.ut.dph.model.targetOutputRunLogs;
 import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionOutNotes;
 import com.ut.dph.model.transactionOutRecords;
@@ -61,7 +63,7 @@ public interface transactionOutDAO {
 
     void moveTranslatedRecords(int transactionTargetId);
     
-    List<transactionTarget> getLoadedOutBoundTransactions();
+    List<transactionTarget> getLoadedOutBoundTransactions(int configId);
     
     Integer submitBatchDownload(batchDownloads batchDownload);
     
@@ -78,5 +80,13 @@ public interface transactionOutDAO {
     List<batchDownloads> getdownloadableBatches(int userId, int orgId, Date fromDate, Date toDate, String searchTerm, int page, int maxResults);
     
     void updateLastDownloaded(int batchId);
+    
+    List<configurationSchedules> getScheduledConfigurations();
+    
+    void updateBatchStatus (Integer batchId, Integer statusId);
+    
+    void saveOutputRunLog(targetOutputRunLogs log);
+    
+    List<targetOutputRunLogs> getLatestRunLog(int configId);
     
 }

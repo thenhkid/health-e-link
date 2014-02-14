@@ -15,9 +15,11 @@ import com.ut.dph.model.configuration;
 import com.ut.dph.model.configurationConnection;
 import com.ut.dph.model.configurationConnectionReceivers;
 import com.ut.dph.model.configurationFormFields;
+import com.ut.dph.model.configurationSchedules;
 import com.ut.dph.model.configurationTransport;
 import com.ut.dph.model.lutables.lu_ProcessStatus;
 import com.ut.dph.model.messageType;
+import com.ut.dph.model.targetOutputRunLogs;
 import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionOutNotes;
 import com.ut.dph.model.transactionOutRecords;
@@ -971,13 +973,16 @@ public class transactionOutDAOImpl implements transactionOutDAO {
     /**
      * The 'getLoadedOutBoundTransactions' function will look to see what translated transactions are loaded
      * and ready to be pulled out into a download batch
+     * 
+     * @param configId  The id of the configuration to check for loaded transactions for
      */
     @Override
     @Transactional
-    public List<transactionTarget> getLoadedOutBoundTransactions() {
+    public List<transactionTarget> getLoadedOutBoundTransactions(int configId) {
         
         Criteria transactionQuery = sessionFactory.getCurrentSession().createCriteria(transactionTarget.class);
         transactionQuery.add(Restrictions.eq("statusId", 9));
+        transactionQuery.add(Restrictions.eq("configId", configId));
         
         List<transactionTarget> transactions = transactionQuery.list();
 
@@ -1342,5 +1347,73 @@ public class transactionOutDAOImpl implements transactionOutDAO {
         }
         
     }
-   
+    
+    /**
+     * The 'getScheduledConfigurations' function will return a list of configurations
+     * that have a Daily, Weekly or Monthly schedule setting
+     */
+    @Override
+    public List<configurationSchedules> getScheduledConfigurations() {
+        
+        Query query = sessionFactory.getCurrentSession().createQuery("from configurationSchedules where type = 2 or type = 3 or type = 4");
+
+        List<configurationSchedules> scheduledConfigList = query.list();
+        return scheduledConfigList;
+        
+    }
+    
+    /**
+     * The 'updateBatchStatus' function will update the status of the passed in batch
+     * 
+     * @param batchId   The id of the batch to update
+     * @param statusId  The status to update the batch to
+     * @param timeField 
+     */
+    @Override
+    @Transactional
+    public void updateBatchStatus(Integer batchId, Integer statusId) {
+
+        String sql = "update batchDownloads set statusId = :statusId ";
+        sql = sql + " where id = :batchId ";
+        Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                .setParameter("statusId", statusId)
+                .setParameter("batchId", batchId);
+        try {
+            updateData.executeUpdate();
+        } catch (Exception ex) {
+            System.err.println("updateBatch download Status failed." + ex);
+        }
+
+    }
+    
+    /**
+     * The 'saveOutputRunLog' function will insert the latest run log
+     * for the batch.
+     * 
+     * @param log The output run log to save.
+     */
+    public void saveOutputRunLog(targetOutputRunLogs log) {
+        sessionFactory.getCurrentSession().save(log);
+    }
+    
+    /**
+     * The 'targetOutputRunLogs' function will return the latest output run log for the
+     * passed in configuration Id
+     * 
+     * @param configId = The configuration to find the latest log.
+     * 
+     * @return This function will return the latest log
+     */
+    public List<targetOutputRunLogs> getLatestRunLog(int configId) {
+        
+        Criteria latestLogQuery = sessionFactory.getCurrentSession().createCriteria(targetOutputRunLogs.class);
+        latestLogQuery.add(Restrictions.eq("configId", configId));
+        latestLogQuery.addOrder(Order.desc("lastRunTime"));
+        
+        List<targetOutputRunLogs> latestRunLogs = latestLogQuery.list();
+
+        return latestRunLogs;
+        
+    }
+    
 }
