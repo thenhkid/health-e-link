@@ -580,7 +580,6 @@ public class transactionOutManagerImpl implements transactionOutManager {
     }
     
     
-    
     /**
      * The 'generateBatch' function will create the new download batch for the target
      */
@@ -673,7 +672,8 @@ public class transactionOutManagerImpl implements transactionOutManager {
     }
     
     /**
-     * 
+     * The 'generateTargetFile' function will generate the actual file in the correct organizations
+     * outpufiles folder.
      */
     public void generateTargetFile(boolean createNewFile, int transactionTargetId, int batchId, configurationTransport transportDetails) throws IllegalAccessException, IllegalAccessException {
         
@@ -691,7 +691,13 @@ public class transactionOutManagerImpl implements transactionOutManager {
          
          dir.setDirByName(filelocation);
          
+         boolean hl7 = false;
          String fileType = (String) configurationManager.getFileTypesById(transportDetails.getfileType());
+         
+         if(fileType == "hl7") {
+             fileType = "hr";
+             hl7 = true;
+         }
          
          int findExt = batchDetails.getoutputFIleName().lastIndexOf(".");
          
@@ -703,7 +709,6 @@ public class transactionOutManagerImpl implements transactionOutManager {
          }
            
          File newFile = new File(dir.getDir() + fileName);
-         
          
          /* Create the empty file in the correct location */
          if(createNewFile == true || !newFile.exists()) {

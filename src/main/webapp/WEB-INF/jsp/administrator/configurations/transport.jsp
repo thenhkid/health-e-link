@@ -178,7 +178,7 @@
                                     </spring:bind>
                                     <spring:bind path="mergeBatches">
                                         <div class="form-group">
-                                            <label class="control-label" for="mergeBatches">Merge Batches? <span class="badge badge-help" data-placement="top" title="" data-original-title="If multiple senders provide batches, do the batches need to be delivered as they were sent?">?</span> *</label>
+                                            <label class="control-label" for="mergeBatches">Merge Batches? <span class="badge badge-help" data-placement="top" title="" data-original-title="If multiple batches found should they be created all in one file?">?</span> *</label>
                                             <div>
                                                 <label class="radio-inline">
                                                   <form:radiobutton id="mergeBatches" path="mergeBatches" value="1" disabled="${transportDetails.copiedTransportId > 0 ? 'true' : 'false'}" /> Yes 
