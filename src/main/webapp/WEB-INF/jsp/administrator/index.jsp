@@ -84,6 +84,7 @@
                                                 <a href="administrator/configurations/details?i=${config.id}" title="Edit this Configuration"><strong>${config.orgName}</strong></a>
                                                 <br/> <strong>Configuration Type:</strong> <c:choose><c:when test="${config.type == 1}">Source Configuration</c:when><c:otherwise>Target Configuration</c:otherwise></c:choose>
                                                 <br/> <strong>Message Type:</strong>  ${config.messageTypeName}
+                                                <br/> <strong>Transport Method:</strong> ${config.transportMethod}
                                                 <br/> <strong>Status:</strong>  <c:choose><c:when test="${config.status == true}">active</c:when><c:otherwise>inactive</c:otherwise></c:choose>
                                             </td>
                                             <td>

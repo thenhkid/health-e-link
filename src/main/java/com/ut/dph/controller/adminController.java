@@ -14,9 +14,11 @@ import org.springframework.web.servlet.ModelAndView;
 import com.ut.dph.model.Organization;
 import com.ut.dph.model.messageType;
 import com.ut.dph.model.configuration;
+import com.ut.dph.model.configurationTransport;
 import com.ut.dph.service.messageTypeManager;
 import com.ut.dph.service.organizationManager;
 import com.ut.dph.service.configurationManager;
+import com.ut.dph.service.configurationTransportManager;
 
 /**
  * The adminController class will handle administrator page requests that fall outside specific sections.
@@ -36,6 +38,9 @@ public class adminController {
 
     @Autowired
     private configurationManager configurationmanager;
+    
+    @Autowired
+    private configurationTransportManager configurationTransportManager;
 
     private int maxResults = 3;
 
@@ -80,6 +85,7 @@ public class adminController {
         
         Organization org;
         messageType messagetype;
+        configurationTransport transportDetails;
         
         for (configuration config : configurations) {
             org = organizationManager.getOrganizationById(config.getorgId());
@@ -87,6 +93,11 @@ public class adminController {
 
             messagetype = messagetypemanager.getMessageTypeById(config.getMessageTypeId());
             config.setMessageTypeName(messagetype.getName());
+            
+            transportDetails = configurationTransportManager.getTransportDetails(config.getId());
+            if(transportDetails != null) {
+             config.settransportMethod(configurationTransportManager.getTransportMethodById(transportDetails.gettransportMethodId()));
+            }
         }
 
         return mav;

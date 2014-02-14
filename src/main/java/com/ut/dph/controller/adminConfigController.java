@@ -33,6 +33,7 @@ import com.ut.dph.model.User;
 import com.ut.dph.model.configurationConnection;
 import com.ut.dph.model.configurationConnectionReceivers;
 import com.ut.dph.model.configurationConnectionSenders;
+import com.ut.dph.model.configurationFTPFields;
 import com.ut.dph.model.configurationMessageSpecs;
 import com.ut.dph.model.configurationSchedules;
 import com.ut.dph.service.organizationManager;
@@ -461,7 +462,7 @@ public class adminConfigController {
             
         }
         else {
-            //Need to set the associated message types
+            /* Need to set the associated message types */
             List<configurationTransportMessageTypes> messageTypes = configurationTransportManager.getTransportMessageTypes(transportDetails.getId());
             List<Integer> assocMessageTypes = new ArrayList<Integer>();
             if(messageTypes != null) {
@@ -470,7 +471,30 @@ public class adminConfigController {
                 }
                 transportDetails.setmessageTypes(assocMessageTypes);
             }
+            
         }
+        
+        /* Need to get any FTP fields */
+        List<configurationFTPFields> ftpFields = configurationTransportManager.getTransportFTPDetails(transportDetails.getId());
+        
+        if(ftpFields.isEmpty()) {
+            List<configurationFTPFields> emptyFTPFields = new ArrayList<configurationFTPFields>();
+            configurationFTPFields pushFTPFields = new configurationFTPFields();
+            pushFTPFields.setmethod(1);
+            
+            emptyFTPFields.add(pushFTPFields);
+            
+            configurationFTPFields getFTPFields = new configurationFTPFields();
+            getFTPFields.setmethod(2);
+            
+            emptyFTPFields.add(getFTPFields);
+            
+            transportDetails.setFTPFields(emptyFTPFields);
+        }
+        else {
+            transportDetails.setFTPFields(ftpFields);
+        }
+        
         
         //Need to get a list of all configurations for the current organization
         List<configuration> configurations = configurationmanager.getConfigurationsByOrgId(configurationDetails.getorgId(),"");
@@ -572,6 +596,18 @@ public class adminConfigController {
             }
         }
         
+        /** 
+         * Need to set up the FTP information if
+         * any has been entered
+         */
+        if(!transportDetails.getFTPFields().isEmpty()) {
+            for(configurationFTPFields ftpFields : transportDetails.getFTPFields()) {
+                ftpFields.settransportId(currTransportId);
+                configurationTransportManager.saveTransportFTP(ftpFields);
+            }
+        }
+        
+        
         /**
          * Need to set the associated messages types
          * 
@@ -592,6 +628,8 @@ public class adminConfigController {
                 configurationTransportManager.saveTransportMessageTypes(messageType);
             }
         }
+        
+        
         
         redirectAttr.addFlashAttribute("savedStatus", "updated");
 

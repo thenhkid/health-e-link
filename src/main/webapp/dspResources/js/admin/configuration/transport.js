@@ -145,13 +145,104 @@ function checkFormFields() {
            hasErrors = 1;
        }
        
+       if(selMethodId === "3") {
+        var IPReg = /^(\d\d?)|(1\d\d)|(0\d\d)|(2[0-4]\d)|(2[0-5])\.(\d\d?)|(1\d\d)|(0\d\d)|(2[0-4]\d)|(2[0-5])\.(\d\d?)|(1\d\d)|(0\d\d)|(2[0-4]\d)|(2[0-5])$/;
+        
+            //Check FTP Get Fields
+        var getFieldsEntered = 0;
+
+        if($('#ip1').val() !== "" || $('#username1').val() !== "" || $('#password1').val() !== "" || $('#directory1').val() !== "") {
+             getFieldsEntered = 1;
+        }
+
+        if(getFieldsEntered == 1) {
+            if($('#ip1').val() === "") {
+                $('#ip1Div').addClass("has-error");
+                $('#ip1Msg').addClass("has-error");
+                $('#ip1Msg').html('The IP address is a required field.');
+                hasErrors = 1;
+            }
+            else if(!IPReg.test( $('#ip1').val() )) {
+               $('#ip1Div').addClass("has-error");
+                $('#ip1Msg').addClass("has-error");
+                $('#ip1Msg').html('The IP address entered is invalid.');
+                hasErrors = 1; 
+            }
+            if($('#username1').val() === "") {
+                $('#username1Div').addClass("has-error");
+                $('#username1Msg').addClass("has-error");
+                $('#username1Msg').html('The username is a required field.');
+                hasErrors = 1;
+            }
+            if($('#password1').val() === "") {
+                $('#password1Div').addClass("has-error");
+                $('#password1Msg').addClass("has-error");
+                $('#password1Msg').html('The password is a required field.');
+                hasErrors = 1;
+            }
+            if($('#directory1').val() === "") {
+                $('#directory1Div').addClass("has-error");
+                $('#directory1Msg').addClass("has-error");
+                $('#directory1Msg').html('The directory is a required field.');
+                hasErrors = 1;
+            }
+        }
+
+        //Check FTP push Fields
+        var pushFieldsEntered = 0;
+
+        if($('#ip2').val() !== "" || $('#username2').val() !== "" || $('#password2').val() !== "" || $('#directory2').val() !== "") {
+             pushFieldsEntered = 1;
+        }
+
+        if(pushFieldsEntered == 1) {
+            if($('#ip2').val() === "") { 
+                $('#ip2Div').addClass("has-error");
+                $('#ip2Msg').addClass("has-error");
+                $('#ip2Msg').html('The IP address is a required field.');
+                hasErrors = 1;
+            }
+            else if(!IPReg.test( $('#ip2').val() )) {
+                $('#ip2Div').addClass("has-error");
+                $('#ip2Msg').addClass("has-error");
+                $('#ip2Msg').html('The IP address entered is invalid.');
+                hasErrors = 1; 
+            }
+            if($('#username2').val() === "") {
+                $('#username2Div').addClass("has-error");
+                $('#username2Msg').addClass("has-error");
+                $('#username2Msg').html('The username is a required field.');
+                hasErrors = 1;
+            }
+            if($('#password2').val() === "") {
+                $('#password2Div').addClass("has-error");
+                $('#password2Msg').addClass("has-error");
+                $('#password2Msg').html('The password is a required field.');
+                hasErrors = 1;
+            }
+            if($('#directory2').val() === "") {
+                $('#directory2Div').addClass("has-error");
+                $('#directory2Msg').addClass("has-error");
+                $('#directory2Msg').html('The directory is a required field.');
+                hasErrors = 1;
+            }
+        }
+
+        if(getFieldsEntered == 0 && pushFieldsEntered == 0) {
+            $('#FTPDanger').show();
+            hasErrors = 1;
+        }
+     
+       }
+       
+       
     }
     
     //Make sure at least one message type is selected
     var $messageTypes = $('#transportDetails').find('input[class="availMessageTypes"]:checked');
     
     if(!$messageTypes.length) {
-        $('.alert-danger').show();
+        $('#messageTypeDanger').show();
         hasErrors = 1;
     }
  

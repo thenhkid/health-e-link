@@ -217,7 +217,40 @@
                                 </spring:bind>
                             </div>
                             <div id="additionalFTPDiv" class="methodDiv" style="display:none">
-                            
+                                <div id="FTPDanger" class="alert alert-danger" style="display:none;">
+                                   At least one FTP section must be filled out!
+                                </div> 
+                                <div class="row">
+                                    <c:forEach items="${transportDetails.FTPFields}" var="ftpDetails" varStatus="field">
+                                    <div class="form-group col-md-6">
+                                        <div class="form-group">
+                                            <label for="status">FTP <c:choose><c:when test="${ftpDetails.method == 1}">Get</c:when><c:otherwise>Push</c:otherwise></c:choose> Details</label>
+                                            <input name="FTPFields[${field.index}].method" class="form-control" type="hidden" value="${ftpDetails.method}"  />
+                                            <input name="FTPFields[${field.index}].id" class="form-control" type="hidden" value="${ftpDetails.id}"  />
+                                        </div>
+                                        <div id="ip${ftpDetails.method}Div" class="form-group">
+                                            <label class="control-label" for="IPAddress">IP Address *</label>
+                                            <input name="FTPFields[${field.index}].ip" id="ip${ftpDetails.method}" class="form-control" type="text" maxLength="45" value="${ftpDetails.ip}"  />
+                                            <span id="ip${ftpDetails.method}Msg" class="control-label"></span>
+                                        </div>
+                                        <div id="username${ftpDetails.method}Div" class="form-group">
+                                            <label class="control-label" for="IPAddress">Username *</label>
+                                            <input name="FTPFields[${field.index}].username" id="username${ftpDetails.method}" class="form-control" type="text" maxLength="45" value="${ftpDetails.username}"  />
+                                             <span id="username${ftpDetails.method}Msg" class="control-label"></span>
+                                        </div>
+                                        <div id="password${ftpDetails.method}Div" class="form-group">
+                                            <label class="control-label" for="IPAddress">Password *</label>
+                                            <input name="FTPFields[${field.index}].password" id="password${ftpDetails.method}" class="form-control" type="text" maxLength="45" value="${ftpDetails.password}"  />
+                                            <span id="password${ftpDetails.method}Msg" class="control-label"></span>
+                                        </div>
+                                        <div id="directory${ftpDetails.method}Div" class="form-group">
+                                            <label class="control-label" for="IPAddress">Directory *</label>
+                                            <input name="FTPFields[${field.index}].directory" id="directory${ftpDetails.method}" class="form-control" type="text" maxLength="255" value="${ftpDetails.directory}"  />
+                                             <span id="directory${ftpDetails.method}Msg" class="control-label"></span>
+                                        </div>
+                                    </div>
+                                    </c:forEach>
+                                </div>
                             </div>
                             <c:if test="${configurationDetails.type == 1}">    
                                 <spring:bind path="autoRelease">
@@ -241,7 +274,7 @@
                     </div>
                 </section>
                                 
-               <div class="alert alert-danger" style="display:none;">
+               <div id="messageTypeDanger" class="alert alert-danger" style="display:none;">
                     At least one message type must be selected!
                </div>                 
                <section class="panel panel-default assocMessageTypes" style="display:none;">
