@@ -845,6 +845,10 @@ public class transactionOutDAOImpl implements transactionOutDAO {
                 Query getData = sessionFactory.getCurrentSession().createSQLQuery(dataSQL)
                 .setParameter("transactionInId", transactionInId);
                 
+                /* if no result is found then we need to look at the main transactionTranslatedIn table 
+                for the value only if pass through errors is set
+                */
+                
                 sql += "'"+getData.uniqueResult()+"'";
                 
                 if(counter < formFields.size()) {

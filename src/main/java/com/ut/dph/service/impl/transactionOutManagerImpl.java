@@ -284,6 +284,28 @@ public class transactionOutManagerImpl implements transactionOutManager {
     @Override
     @Transactional
     public void generateOutputFiles() {
+        
+        
+        /*
+        Possible new way of processing output files. This will require every config to be in the schedule table with
+        at the very lease automatic.
+        1. Look at the configurationSchedule table first
+        2. Based on the results see if it qualifies by type (Auto, Daily, etc)
+        3. If the config qualifies look to get all loaded outbound transactions
+           for that config.
+        4. If transactions are found pass all transactions to the beginOutputProcess function
+        5. When the beginOutput Process function returns (RETURN BATCH ID???) check to see if the target transport method 
+           for the config is set to FTP, if so then call the FTP method to send off the file. Batch would then get a 
+           Submission Delivery Locked ID = 22 status.
+        6. For file download transport methods, after the beginOutput Process function returns with the batch Id, the batch
+           would then get a Submission Delivery Completed ID = 23 status so we don't keep adding new transactions to already
+           created batch files. FOR SCHEDULED PROCESSING ONLY, CONTINUOUS processing will keep adding to the same file until
+           the file is downloaded.
+        */
+        
+        
+        
+        
        
         /* 
         Need to find all transactionTarget records that are loaded ready to moved to a downloadable
@@ -396,7 +418,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
             }
             else {
 
-                /* We want to merge this transaction with the existing created batch if not yet opened */
+                /* We want to merge this transaction with the existing created batch if not yet opened (ID = 28) */
                 /* 1. Need to see if a mergable batch exists for the org that hasn't been picked up yet */
                 int mergeablebatchId = transactionOutDAO.findMergeableBatch(configDetails.getorgId());
                 
