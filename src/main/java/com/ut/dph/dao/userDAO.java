@@ -28,6 +28,6 @@ public interface userDAO {
 
     List<userAccess> getuserSections(int userId);
     
-    User getOrganizationContact(int orgId, int mainContact);
+    List<User> getOrganizationContact(int orgId, int mainContact);
 
 }

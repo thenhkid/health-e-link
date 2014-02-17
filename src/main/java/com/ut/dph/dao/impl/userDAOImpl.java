@@ -232,18 +232,13 @@ public class userDAOImpl implements userDAO {
      */
     @Override
     @SuppressWarnings("unchecked")
-    public User getOrganizationContact(int orgId, int mainContact) {
+    public List<User> getOrganizationContact(int orgId, int mainContact) {
         Query query = sessionFactory.getCurrentSession().createQuery("from User where orgId = :orgId and mainContact = :mainContact and sendEmailAlert = 1");
         query.setParameter("orgId", orgId);
         query.setParameter("mainContact", mainContact);
         
-        if(query.uniqueResult() == null) {
-            return null;
-        }
-        else {
-            User user = (User) query.uniqueResult();
-            return user;
-        }
+        return query.list();
+       
     }
 
 }

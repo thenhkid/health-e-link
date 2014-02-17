@@ -81,7 +81,7 @@ public class userManagerImpl implements userManager {
     }
     
     @Override
-    public User getOrganizationContact(int orgId, int mainContact){
+    public List<User> getOrganizationContact(int orgId, int mainContact){
         return userDAO.getOrganizationContact(orgId, mainContact);
     }
 

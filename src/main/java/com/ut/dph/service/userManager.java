@@ -28,7 +28,7 @@ public interface userManager {
   
   List<userAccess> getuserSections(int userId);
   
-  User getOrganizationContact(int orgId, int mainContact);
+  List<User> getOrganizationContact(int orgId, int mainContact);
   
 
 }

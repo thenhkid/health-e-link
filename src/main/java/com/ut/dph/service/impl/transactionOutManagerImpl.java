@@ -289,6 +289,12 @@ public class transactionOutManagerImpl implements transactionOutManager {
                         /* If no schedule is found or automatic */
                         if(scheduleDetails == null || scheduleDetails.gettype() == 5) {
                             int batchId =  beginOutputProcess(transaction);
+                            
+                            /* Log the last run time */
+                            targetOutputRunLogs log = new targetOutputRunLogs();
+                            log.setconfigId(transaction.getconfigId());
+
+                            transactionOutDAO.saveOutputRunLog(log);
                            
                             /* 
                             Need to check the transport method for the configuration, if set to file download
@@ -309,28 +315,59 @@ public class transactionOutManagerImpl implements transactionOutManager {
                             /* Send the email to primary contact */
                             /* Get the from user */
                             Organization fromOrg = organizationManager.getOrganizationById(configurationManager.getConfigurationById(transactionInManager.getTransactionDetails(transaction.gettransactionInId()).getconfigId()).getorgId());
-                            User fromPrimaryContact = userManager.getOrganizationContact(fromOrg.getId(),1);
+                            List<User> fromPrimaryContact = userManager.getOrganizationContact(fromOrg.getId(),1);
                             
                             /* get the to user details */
-                            User toPrimaryContact = userManager.getOrganizationContact(configurationManager.getConfigurationById(transaction.getconfigId()).getorgId(),1);
-                            User toSecondaryContact = userManager.getOrganizationContact(configurationManager.getConfigurationById(transaction.getconfigId()).getorgId(),2);
+                            List<User> toPrimaryContact = userManager.getOrganizationContact(configurationManager.getConfigurationById(transaction.getconfigId()).getorgId(),1);
+                            List<User> toSecondaryContact = userManager.getOrganizationContact(configurationManager.getConfigurationById(transaction.getconfigId()).getorgId(),2);
                             
-                            if(fromPrimaryContact != null && (toPrimaryContact != null || toSecondaryContact != null)) {
+                            if(fromPrimaryContact.size() > 0 && (toPrimaryContact.size() > 0 || toSecondaryContact.size() > 0)) {
                                 String toName = null;
                                 mailMessage msg = new mailMessage();
-                                msg.setfromEmailAddress(fromPrimaryContact.getEmail());
-                                
-                                if(toPrimaryContact != null) {
-                                    toName = toPrimaryContact.getFirstName() + " " + toPrimaryContact.getLastName();
-                                    msg.settoEmailAddress(toPrimaryContact.getEmail());
-                                    
-                                    if(toSecondaryContact != null) {
-                                        msg.setccEmailAddress(toSecondaryContact.getEmail());
+                                StringBuilder ccAddress = new StringBuilder();
+                                msg.setfromEmailAddress(fromPrimaryContact.get(0).getEmail());
+
+                                if(toPrimaryContact.size() > 0) {
+                                    toName = toPrimaryContact.get(0).getFirstName() + " " + toPrimaryContact.get(0).getLastName();
+                                    msg.settoEmailAddress(toPrimaryContact.get(0).getEmail());
+
+                                    if(toPrimaryContact.size() > 1) {
+                                        for(int i = 1; i <= toPrimaryContact.size(); i++) {
+                                            ccAddress.append(toPrimaryContact.get(i).getEmail());
+                                            if(i<toPrimaryContact.size()) {
+                                                ccAddress.append(",");
+                                            }
+                                        }
+                                    }
+
+                                    if(toSecondaryContact.size() > 0) {
+                                        if(ccAddress.length() > 0) {
+                                            ccAddress.append(",");
+                                        }
+                                        for(int i = 0; i <= toSecondaryContact.size(); i++) {
+                                            ccAddress.append(toSecondaryContact.get(i).getEmail());
+                                            if(i < toSecondaryContact.size()) {
+                                                ccAddress.append(",");
+                                            }
+                                        }
                                     }
                                 }
-                                else if(toSecondaryContact != null) {
-                                    toName = toSecondaryContact.getFirstName() + " " + toSecondaryContact.getLastName();
-                                    msg.settoEmailAddress(toSecondaryContact.getEmail());
+                                else {
+                                    toName = toSecondaryContact.get(0).getFirstName() + " " + toSecondaryContact.get(0).getLastName();
+                                    msg.settoEmailAddress(toSecondaryContact.get(0).getEmail());
+
+                                    if(toSecondaryContact.size() > 1) {
+                                        for(int i = 1; i <= toSecondaryContact.size(); i++) {
+                                            ccAddress.append(toSecondaryContact.get(i).getEmail());
+                                            if(i<toSecondaryContact.size()) {
+                                                ccAddress.append(",");
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if(ccAddress.length() > 0) {
+                                    msg.setccEmailAddress(ccAddress.toString());
                                 }
                                 
                                 msg.setmessageSubject("You have received a new message from the Universal Translator");
@@ -371,10 +408,10 @@ public class transactionOutManagerImpl implements transactionOutManager {
          
         /*
         
-       . When the beginOutput Process function returns (RETURN BATCH ID???) check to see if the target transport method 
+        1. When the beginOutput Process function returns (RETURN BATCH ID???) check to see if the target transport method 
            for the config is set to FTP, if so then call the FTP method to send off the file. Batch would then get a 
            Submission Delivery Locked ID = 22 status.
-        6. For file download transport methods, after the beginOutput Process function returns with the batch Id, the batch
+        2. For file download transport methods, after the beginOutput Process function returns with the batch Id, the batch
            would then get a Submission Delivery Completed ID = 23 status so we don't keep adding new transactions to already
            created batch files. FOR SCHEDULED PROCESSING ONLY, CONTINUOUS processing will keep adding to the same file until
            the file is downloaded.
@@ -388,6 +425,8 @@ public class transactionOutManagerImpl implements transactionOutManager {
             int batchId = 0;
             
             for(configurationSchedules schedule : scheduledConfigs) {
+                
+                batchId = 0;
                  
                 /* DAILY SCHEDULE */
                 if(schedule.gettype() == 2) {
@@ -444,13 +483,14 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                 else if(transportDetails.gettransportMethodId() == 3) {
                                     FTPTargetFile(batchId);
                                 }
+                                
+                                /* Log the last run time */
+                                targetOutputRunLogs log = new targetOutputRunLogs();
+                                log.setconfigId(schedule.getconfigId());
+
+                                transactionOutDAO.saveOutputRunLog(log);
                             }
                             
-                            /* Log the last run time */
-                            targetOutputRunLogs log = new targetOutputRunLogs();
-                            log.setconfigId(schedule.getconfigId());
-
-                            transactionOutDAO.saveOutputRunLog(log);
                         }
                     }
                     else {
@@ -497,13 +537,13 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                 else if(transportDetails.gettransportMethodId() == 3) {
                                     FTPTargetFile(batchId);
                                 }
-                            }
-                            
-                            /* Log the last run time */
-                            targetOutputRunLogs log = new targetOutputRunLogs();
-                            log.setconfigId(schedule.getconfigId());
+                                
+                                /* Log the last run time */
+                                targetOutputRunLogs log = new targetOutputRunLogs();
+                                log.setconfigId(schedule.getconfigId());
 
-                            transactionOutDAO.saveOutputRunLog(log);
+                                transactionOutDAO.saveOutputRunLog(log);
+                            }
                         }
                         
                     }
@@ -518,6 +558,83 @@ public class transactionOutManagerImpl implements transactionOutManager {
                     
                 }
                 
+                /* If batchId > 0 then send the email out */
+                if(batchId > 0) {
+                    
+                    /* Get the batch Details */
+                    batchDownloads batchDLInfo = transactionOutDAO.getBatchDetails(batchId);
+                    
+                    /* get the to user details */
+                    List<User> toPrimaryContact = userManager.getOrganizationContact(batchDLInfo.getOrgId(),1);
+                    List<User> toSecondaryContact = userManager.getOrganizationContact(batchDLInfo.getOrgId(),2);
+                    
+                    if(toPrimaryContact.size() > 0 || toSecondaryContact.size() > 0) {
+                        String toName = null;
+                        mailMessage msg = new mailMessage();
+                        StringBuilder ccAddress = new StringBuilder();
+                        msg.setfromEmailAddress("dphuniversaltranslator@gmail.com");
+                        
+                        if(toPrimaryContact.size() > 0) {
+                            toName = toPrimaryContact.get(0).getFirstName() + " " + toPrimaryContact.get(0).getLastName();
+                            msg.settoEmailAddress(toPrimaryContact.get(0).getEmail());
+                            
+                            if(toPrimaryContact.size() > 1) {
+                                for(int i = 1; i <= toPrimaryContact.size(); i++) {
+                                    ccAddress.append(toPrimaryContact.get(i).getEmail());
+                                    if(i<toPrimaryContact.size()) {
+                                        ccAddress.append(",");
+                                    }
+                                }
+                            }
+                            
+                            if(toSecondaryContact.size() > 0) {
+                                if(ccAddress.length() > 0) {
+                                    ccAddress.append(",");
+                                }
+                                for(int i = 0; i <= toSecondaryContact.size(); i++) {
+                                    ccAddress.append(toSecondaryContact.get(i).getEmail());
+                                    if(i < toSecondaryContact.size()) {
+                                        ccAddress.append(",");
+                                    }
+                                }
+                            }
+                        }
+                        else {
+                            toName = toSecondaryContact.get(0).getFirstName() + " " + toSecondaryContact.get(0).getLastName();
+                            msg.settoEmailAddress(toSecondaryContact.get(0).getEmail());
+                            
+                            if(toSecondaryContact.size() > 1) {
+                                for(int i = 1; i <= toSecondaryContact.size(); i++) {
+                                    ccAddress.append(toSecondaryContact.get(i).getEmail());
+                                    if(i<toSecondaryContact.size()) {
+                                        ccAddress.append(",");
+                                    }
+                                }
+                            }
+                        }
+                        
+                        if(ccAddress.length() > 0) {
+                            msg.setccEmailAddress(ccAddress.toString());
+                        }
+                        
+                        msg.setmessageSubject("You have received a new message from the Universal Translator");
+
+                        /* Build the body of the email */
+                        StringBuilder sb = new StringBuilder();
+                        sb.append("Dear " + toName + ", You have recieved a new message from the Universal Translator. ");
+                        sb.append(System.getProperty("line.separator"));
+                        sb.append(System.getProperty("line.separator"));
+                        sb.append("BatchId: "+batchId);
+                        sb.append(System.getProperty("line.separator"));
+
+                        msg.setmessageBody(sb.toString());
+
+                        /* Send the email */
+                        emailMessageManager.sendEmail(msg);
+                        
+                    }
+
+                }
                 
             }
             
@@ -886,5 +1003,6 @@ public class transactionOutManagerImpl implements transactionOutManager {
         /* Update the status of the batch to locked */
         transactionOutDAO.updateBatchStatus(batchId, 22);
     }
-   
+    
+    
 }
