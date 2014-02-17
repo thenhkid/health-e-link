@@ -79,5 +79,10 @@ public class userManagerImpl implements userManager {
     public List<userAccess> getuserSections(int userId) {
         return userDAO.getuserSections(userId);
     }
+    
+    @Override
+    public User getOrganizationContact(int orgId, int mainContact){
+        return userDAO.getOrganizationContact(orgId, mainContact);
+    }
 
 }

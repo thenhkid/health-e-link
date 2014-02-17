@@ -670,10 +670,15 @@ public class configurationDAOImpl implements configurationDAO {
     public configurationSchedules getScheduleDetails(int configId) {
         Query query = sessionFactory.getCurrentSession().createQuery("from configurationSchedules where configId = :configId");
         query.setParameter("configId", configId);
+        
+        if(query.uniqueResult() == null) {
+            return null;
+        }
+        else {
+            configurationSchedules scheduleDetails = (configurationSchedules) query.uniqueResult();
 
-        configurationSchedules scheduleDetails = (configurationSchedules) query.uniqueResult();
-
-        return scheduleDetails;
+            return scheduleDetails; 
+        }
 
     }
 

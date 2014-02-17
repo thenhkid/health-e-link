@@ -8,6 +8,8 @@ package com.ut.dph.service.impl;
 
 import com.ut.dph.dao.messageTypeDAO;
 import com.ut.dph.dao.transactionOutDAO;
+import com.ut.dph.model.Organization;
+import com.ut.dph.model.User;
 import com.ut.dph.model.batchDownloadSummary;
 import com.ut.dph.model.batchDownloads;
 import com.ut.dph.model.batchUploads;
@@ -17,6 +19,8 @@ import com.ut.dph.model.configurationConnectionReceivers;
 import com.ut.dph.model.configurationDataTranslations;
 import com.ut.dph.model.configurationSchedules;
 import com.ut.dph.model.configurationTransport;
+import com.ut.dph.service.emailMessageManager;
+import com.ut.dph.model.mailMessage;
 import com.ut.dph.model.targetOutputRunLogs;
 import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionOutNotes;
@@ -25,8 +29,10 @@ import com.ut.dph.model.transactionTarget;
 import com.ut.dph.reference.fileSystem;
 import com.ut.dph.service.configurationManager;
 import com.ut.dph.service.configurationTransportManager;
+import com.ut.dph.service.organizationManager;
 import com.ut.dph.service.transactionInManager;
 import com.ut.dph.service.transactionOutManager;
+import com.ut.dph.service.userManager;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -69,6 +75,15 @@ public class transactionOutManagerImpl implements transactionOutManager {
     
     @Autowired
     private messageTypeDAO messageTypeDAO;
+    
+    @Autowired
+    private userManager userManager;
+    
+    @Autowired
+    private organizationManager organizationManager;
+    
+    @Autowired
+    private emailMessageManager emailMessageManager;
     
     @Override
     @Transactional
@@ -211,7 +226,6 @@ public class transactionOutManagerImpl implements transactionOutManager {
                    translated = transactionInManager.processMacro (configId, batchId, cdt, true);
             }
         }
-        
         return translated;
     }
     
@@ -265,7 +279,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                         
                         /* Update the status of the transaction to L (Loaded) (ID = 9) */
                         transactionInManager.updateTransactionStatus(transaction.getbatchUploadId(), transaction.gettransactionInId(), 0, 9);
-                        
+                       
                         /* Update the status of the transaction target to L (Loaded) (ID = 9) */
                         transactionInManager.updateTransactionTargetStatus(0, transaction.getId(), 0, 9);
                         
@@ -291,6 +305,52 @@ public class transactionOutManagerImpl implements transactionOutManager {
                             else if(transportDetails.gettransportMethodId() == 3) {
                                 FTPTargetFile(batchId);
                             }
+                            
+                            /* Send the email to primary contact */
+                            /* Get the from user */
+                            Organization fromOrg = organizationManager.getOrganizationById(configurationManager.getConfigurationById(transactionInManager.getTransactionDetails(transaction.gettransactionInId()).getconfigId()).getorgId());
+                            User fromPrimaryContact = userManager.getOrganizationContact(fromOrg.getId(),1);
+                            
+                            /* get the to user details */
+                            User toPrimaryContact = userManager.getOrganizationContact(configurationManager.getConfigurationById(transaction.getconfigId()).getorgId(),1);
+                            User toSecondaryContact = userManager.getOrganizationContact(configurationManager.getConfigurationById(transaction.getconfigId()).getorgId(),2);
+                            
+                            if(fromPrimaryContact != null && (toPrimaryContact != null || toSecondaryContact != null)) {
+                                String toName = null;
+                                mailMessage msg = new mailMessage();
+                                msg.setfromEmailAddress(fromPrimaryContact.getEmail());
+                                
+                                if(toPrimaryContact != null) {
+                                    toName = toPrimaryContact.getFirstName() + " " + toPrimaryContact.getLastName();
+                                    msg.settoEmailAddress(toPrimaryContact.getEmail());
+                                    
+                                    if(toSecondaryContact != null) {
+                                        msg.setccEmailAddress(toSecondaryContact.getEmail());
+                                    }
+                                }
+                                else if(toSecondaryContact != null) {
+                                    toName = toSecondaryContact.getFirstName() + " " + toSecondaryContact.getLastName();
+                                    msg.settoEmailAddress(toSecondaryContact.getEmail());
+                                }
+                                
+                                msg.setmessageSubject("You have received a new message from the Universal Translator");
+                                
+                                /* Build the body of the email */
+                                StringBuilder sb = new StringBuilder();
+                                sb.append("Dear " + toName + ", You have recieved a new message from the Universal Translator. ");
+                                sb.append(System.getProperty("line.separator"));
+                                sb.append(System.getProperty("line.separator"));
+                                sb.append("BatchId: "+batchId);
+                                sb.append(System.getProperty("line.separator"));
+                                sb.append("From Organization: "+fromOrg.getOrgName());
+                                
+                                msg.setmessageBody(sb.toString());
+                                
+                                /* Send the email */
+                                emailMessageManager.sendEmail(msg);
+                                
+                            }
+                            
                         }
                     }
                     

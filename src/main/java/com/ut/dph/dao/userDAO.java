@@ -27,5 +27,7 @@ public interface userDAO {
     List<siteSections> getSections();
 
     List<userAccess> getuserSections(int userId);
+    
+    User getOrganizationContact(int orgId, int mainContact);
 
 }

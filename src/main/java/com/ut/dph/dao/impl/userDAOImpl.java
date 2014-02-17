@@ -220,5 +220,30 @@ public class userDAOImpl implements userDAO {
         List<userAccess> userSectionList = query.list();
         return userSectionList;
     }
+    
+    /**
+     * The 'getOrganizationContact' function will return a user based on the organization id passed in
+     * and the mainContact parameter;
+     * 
+     * @orgId         The id of the organization to search a user on
+     * @mainContact   The value of the contact type to return (1 = Primary, 2 = Secondary)
+     * 
+     * @return The function will return a user object
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public User getOrganizationContact(int orgId, int mainContact) {
+        Query query = sessionFactory.getCurrentSession().createQuery("from User where orgId = :orgId and mainContact = :mainContact and sendEmailAlert = 1");
+        query.setParameter("orgId", orgId);
+        query.setParameter("mainContact", mainContact);
+        
+        if(query.uniqueResult() == null) {
+            return null;
+        }
+        else {
+            User user = (User) query.uniqueResult();
+            return user;
+        }
+    }
 
 }
