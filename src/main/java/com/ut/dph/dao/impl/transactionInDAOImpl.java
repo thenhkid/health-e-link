@@ -380,11 +380,11 @@ public class transactionInDAOImpl implements transactionInDAO {
         )
         );
         
-         if(!"".equals(fromDate)) {
+         if(!"".equals(fromDate) && fromDate != null) {
             findBatches.add(Restrictions.ge("dateSubmitted", fromDate));
         }  
         
-        if(!"".equals(toDate)) {
+        if(!"".equals(toDate) && toDate != null) {
             findBatches.add(Restrictions.lt("dateSubmitted", toDate));
         } 
         

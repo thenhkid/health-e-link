@@ -312,80 +312,86 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                 FTPTargetFile(batchId);
                             }
                             
-                            /* Send the email to primary contact */
-                            /* Get the from user */
-                            Organization fromOrg = organizationManager.getOrganizationById(configurationManager.getConfigurationById(transactionInManager.getTransactionDetails(transaction.gettransactionInId()).getconfigId()).getorgId());
-                            List<User> fromPrimaryContact = userManager.getOrganizationContact(fromOrg.getId(),1);
+                            if(batchId > 0) {
+                                /* Send the email to primary contact */
                             
-                            /* get the to user details */
-                            List<User> toPrimaryContact = userManager.getOrganizationContact(configurationManager.getConfigurationById(transaction.getconfigId()).getorgId(),1);
-                            List<User> toSecondaryContact = userManager.getOrganizationContact(configurationManager.getConfigurationById(transaction.getconfigId()).getorgId(),2);
-                            
-                            if(fromPrimaryContact.size() > 0 && (toPrimaryContact.size() > 0 || toSecondaryContact.size() > 0)) {
-                                String toName = null;
-                                mailMessage msg = new mailMessage();
-                                StringBuilder ccAddress = new StringBuilder();
-                                msg.setfromEmailAddress(fromPrimaryContact.get(0).getEmail());
+                                /* Get the batch Details */
+                               batchDownloads batchDLInfo = transactionOutDAO.getBatchDetails(batchId);
 
-                                if(toPrimaryContact.size() > 0) {
-                                    toName = toPrimaryContact.get(0).getFirstName() + " " + toPrimaryContact.get(0).getLastName();
-                                    msg.settoEmailAddress(toPrimaryContact.get(0).getEmail());
+                               /* Get the from user */
+                               Organization fromOrg = organizationManager.getOrganizationById(configurationManager.getConfigurationById(transactionInManager.getTransactionDetails(transaction.gettransactionInId()).getconfigId()).getorgId());
+                               List<User> fromPrimaryContact = userManager.getOrganizationContact(fromOrg.getId(),1);
 
-                                    if(toPrimaryContact.size() > 1) {
-                                        for(int i = 1; i <= toPrimaryContact.size(); i++) {
-                                            ccAddress.append(toPrimaryContact.get(i).getEmail());
-                                            if(i<toPrimaryContact.size()) {
-                                                ccAddress.append(",");
-                                            }
-                                        }
-                                    }
+                               /* get the to user details */
+                               List<User> toPrimaryContact = userManager.getOrganizationContact(configurationManager.getConfigurationById(transaction.getconfigId()).getorgId(),1);
+                               List<User> toSecondaryContact = userManager.getOrganizationContact(configurationManager.getConfigurationById(transaction.getconfigId()).getorgId(),2);
 
-                                    if(toSecondaryContact.size() > 0) {
-                                        if(ccAddress.length() > 0) {
-                                            ccAddress.append(",");
-                                        }
-                                        for(int i = 0; i <= toSecondaryContact.size(); i++) {
-                                            ccAddress.append(toSecondaryContact.get(i).getEmail());
-                                            if(i < toSecondaryContact.size()) {
-                                                ccAddress.append(",");
-                                            }
-                                        }
-                                    }
-                                }
-                                else {
-                                    toName = toSecondaryContact.get(0).getFirstName() + " " + toSecondaryContact.get(0).getLastName();
-                                    msg.settoEmailAddress(toSecondaryContact.get(0).getEmail());
+                               if(fromPrimaryContact.size() > 0 && (toPrimaryContact.size() > 0 || toSecondaryContact.size() > 0)) {
+                                   String toName = null;
+                                   mailMessage msg = new mailMessage();
+                                   StringBuilder ccAddress = new StringBuilder();
+                                   msg.setfromEmailAddress(fromPrimaryContact.get(0).getEmail());
 
-                                    if(toSecondaryContact.size() > 1) {
-                                        for(int i = 1; i <= toSecondaryContact.size(); i++) {
-                                            ccAddress.append(toSecondaryContact.get(i).getEmail());
-                                            if(i<toSecondaryContact.size()) {
-                                                ccAddress.append(",");
-                                            }
-                                        }
-                                    }
-                                }
+                                   if(toPrimaryContact.size() > 0) {
+                                       toName = toPrimaryContact.get(0).getFirstName() + " " + toPrimaryContact.get(0).getLastName();
+                                       msg.settoEmailAddress(toPrimaryContact.get(0).getEmail());
 
-                                if(ccAddress.length() > 0) {
-                                    msg.setccEmailAddress(ccAddress.toString());
-                                }
-                                
-                                msg.setmessageSubject("You have received a new message from the Universal Translator");
-                                
-                                /* Build the body of the email */
-                                StringBuilder sb = new StringBuilder();
-                                sb.append("Dear " + toName + ", You have recieved a new message from the Universal Translator. ");
-                                sb.append(System.getProperty("line.separator"));
-                                sb.append(System.getProperty("line.separator"));
-                                sb.append("BatchId: "+batchId);
-                                sb.append(System.getProperty("line.separator"));
-                                sb.append("From Organization: "+fromOrg.getOrgName());
-                                
-                                msg.setmessageBody(sb.toString());
-                                
-                                /* Send the email */
-                                emailMessageManager.sendEmail(msg);
-                                
+                                       if(toPrimaryContact.size() > 1) {
+                                           for(int i = 1; i <= toPrimaryContact.size(); i++) {
+                                               ccAddress.append(toPrimaryContact.get(i).getEmail());
+                                               if(i<toPrimaryContact.size()) {
+                                                   ccAddress.append(",");
+                                               }
+                                           }
+                                       }
+
+                                       if(toSecondaryContact.size() > 0) {
+                                           if(ccAddress.length() > 0) {
+                                               ccAddress.append(",");
+                                           }
+                                           for(int i = 0; i <= toSecondaryContact.size(); i++) {
+                                               ccAddress.append(toSecondaryContact.get(i).getEmail());
+                                               if(i < toSecondaryContact.size()) {
+                                                   ccAddress.append(",");
+                                               }
+                                           }
+                                       }
+                                   }
+                                   else {
+                                       toName = toSecondaryContact.get(0).getFirstName() + " " + toSecondaryContact.get(0).getLastName();
+                                       msg.settoEmailAddress(toSecondaryContact.get(0).getEmail());
+
+                                       if(toSecondaryContact.size() > 1) {
+                                           for(int i = 1; i <= toSecondaryContact.size(); i++) {
+                                               ccAddress.append(toSecondaryContact.get(i).getEmail());
+                                               if(i<toSecondaryContact.size()) {
+                                                   ccAddress.append(",");
+                                               }
+                                           }
+                                       }
+                                   }
+
+                                   if(ccAddress.length() > 0) {
+                                       msg.setccEmailAddress(ccAddress.toString());
+                                   }
+
+                                   msg.setmessageSubject("You have received a new message from the Universal Translator");
+
+                                   /* Build the body of the email */
+                                   StringBuilder sb = new StringBuilder();
+                                   sb.append("Dear " + toName + ", You have recieved a new message from the Universal Translator. ");
+                                   sb.append(System.getProperty("line.separator"));
+                                   sb.append(System.getProperty("line.separator"));
+                                   sb.append("BatchId: "+batchDLInfo.getutBatchName());
+                                   sb.append(System.getProperty("line.separator"));
+                                   sb.append("From Organization: "+fromOrg.getOrgName());
+
+                                   msg.setmessageBody(sb.toString());
+
+                                   /* Send the email */
+                                   emailMessageManager.sendEmail(msg);
+
+                               }
                             }
                             
                         }
@@ -624,7 +630,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                         sb.append("Dear " + toName + ", You have recieved a new message from the Universal Translator. ");
                         sb.append(System.getProperty("line.separator"));
                         sb.append(System.getProperty("line.separator"));
-                        sb.append("BatchId: "+batchId);
+                        sb.append("BatchId: "+batchDLInfo.getutBatchName());
                         sb.append(System.getProperty("line.separator"));
 
                         msg.setmessageBody(sb.toString());

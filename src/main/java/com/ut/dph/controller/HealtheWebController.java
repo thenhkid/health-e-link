@@ -699,6 +699,7 @@ public class HealtheWebController {
             transaction.settransactionTargetId(transactionInfo.gettransactionTargetId());
             transaction.setdateSubmitted(transactionInfo.getdateCreated());
             transaction.setsourceType(configDetails.getsourceType());
+            transaction.settargetConfigId(transactionTarget.getconfigId());
             
             lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(transaction.getstatusId());
             transaction.setstatusValue(processStatus.getDisplayCode());
