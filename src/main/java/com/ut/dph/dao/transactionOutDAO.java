@@ -23,15 +23,15 @@ import java.util.List;
  */
 public interface transactionOutDAO {
     
-    List<batchDownloads> getInboxBatches(int userId, int orgId, String searchTerm, Date fromDate, Date toDate, int page, int maxResults);
+    List<batchDownloads> getInboxBatches(int userId, int orgId, String searchTerm, Date fromDate, Date toDate, int page, int maxResults) throws Exception;
     
-    batchDownloads getBatchDetails(int batchId);
+    batchDownloads getBatchDetails(int batchId) throws Exception;
     
-    List<transactionTarget> getInboxBatchTransactions(int batchId, int userId);
+    List<transactionTarget> getInboxBatchTransactions(int batchId, int userId) throws Exception;
     
     transactionTarget getTransactionDetails(int transactionId);
     
-    transactionOutRecords getTransactionRecords(int transactionTargetId);
+    transactionOutRecords getTransactionRecords(int transactionTargetId) throws Exception;
     
     transactionOutRecords getTransactionRecord(int recordId);
 

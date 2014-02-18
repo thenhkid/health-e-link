@@ -41,7 +41,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
-import java.sql.Array;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -89,19 +88,19 @@ public class transactionOutManagerImpl implements transactionOutManager {
     
     @Override
     @Transactional
-    public List<batchDownloads> getInboxBatches(int userId, int orgId, String searchTerm, Date fromDate, Date toDate, int page, int maxResults) {
+    public List<batchDownloads> getInboxBatches(int userId, int orgId, String searchTerm, Date fromDate, Date toDate, int page, int maxResults) throws Exception {
         return transactionOutDAO.getInboxBatches(userId, orgId, searchTerm, fromDate, toDate, page, maxResults);
     }
     
     @Override
     @Transactional
-    public batchDownloads getBatchDetails(int batchId) {
+    public batchDownloads getBatchDetails(int batchId) throws Exception {
         return transactionOutDAO.getBatchDetails(batchId);
     }
     
     @Override
     @Transactional
-    public List<transactionTarget> getInboxBatchTransactions(int batchId, int userId) {
+    public List<transactionTarget> getInboxBatchTransactions(int batchId, int userId) throws Exception {
         return transactionOutDAO.getInboxBatchTransactions(batchId, userId);
     }
     
@@ -113,7 +112,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
     
     @Override
     @Transactional
-    public transactionOutRecords getTransactionRecords(int transactionTargetId) {
+    public transactionOutRecords getTransactionRecords(int transactionTargetId) throws Exception {
         return transactionOutDAO.getTransactionRecords(transactionTargetId);
     }
 
@@ -895,7 +894,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
      * The 'generateTargetFile' function will generate the actual file in the correct organizations
      * outpufiles folder.
      */
-    public void generateTargetFile(boolean createNewFile, int transactionTargetId, int batchId, configurationTransport transportDetails) throws IllegalAccessException {
+    public void generateTargetFile(boolean createNewFile, int transactionTargetId, int batchId, configurationTransport transportDetails) throws Exception {
         
          try {
             String fileName = null; 

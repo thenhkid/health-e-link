@@ -105,7 +105,7 @@ public interface sysAdminDAO {
 	
 	void createProcessStatus(lu_ProcessStatus lu);
 	
-	lu_ProcessStatus getProcessStatusById (int id);
+	lu_ProcessStatus getProcessStatusById (int id) throws Exception;
 	
 	void updateProcessStatus(lu_ProcessStatus lu);
 	

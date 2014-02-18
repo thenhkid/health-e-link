@@ -115,7 +115,7 @@ public class HealtheWebController {
      * The 'findTotals' function will set the total number of
      * inbox messages and total number of pending messages 
      */
-    public void setTotals(HttpSession session) {
+    public void setTotals(HttpSession session) throws Exception {
         
         User userInfo = (User)session.getAttribute("userDetails");
         
@@ -123,8 +123,13 @@ public class HealtheWebController {
         pendingTotal = transactionInManager.getpendingBatches(userInfo.getId(), userInfo.getOrgId(), "", null, null, 1, 0).size();
         
         /* Need to get a list of all inbox batches */
-        inboxTotal = transactionOutManager.getInboxBatches(userInfo.getId(), userInfo.getOrgId(), "", null, null, 1, 0).size();
-       
+        try {
+            inboxTotal = transactionOutManager.getInboxBatches(userInfo.getId(), userInfo.getOrgId(), "", null, null, 1, 0).size();
+        }
+        catch (Exception e) {
+            throw new Exception("Error obtaining the inbox total badge number", e);
+        }
+        
     }
     
     
@@ -172,34 +177,40 @@ public class HealtheWebController {
         
         /* Need to get a list of all inbox batches */
         Integer totalInboxBatches = transactionOutManager.getInboxBatches(userInfo.getId(), userInfo.getOrgId(), searchTerm, fromDate, toDate, 1, 0).size();
-        List<batchDownloads> inboxBatches = transactionOutManager.getInboxBatches(userInfo.getId(), userInfo.getOrgId(), searchTerm, fromDate, toDate, page, maxResults);
         
-        if(!inboxBatches.isEmpty()) {
-            for(batchDownloads batch : inboxBatches) {
-                List<transactionTarget> batchTransactions = transactionOutManager.getInboxBatchTransactions(batch.getId(), userInfo.getId());
-                batch.settotalTransactions(batchTransactions.size());
-                
-                lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
-                batch.setstatusValue(processStatus.getDisplayCode());
-                
-                User userDetails = usermanager.getUserById(batch.getuserId());
-                String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
-                batch.setusersName(usersName);
+        try {
+            List<batchDownloads> inboxBatches = transactionOutManager.getInboxBatches(userInfo.getId(), userInfo.getOrgId(), searchTerm, fromDate, toDate, page, maxResults);
+            
+            if(!inboxBatches.isEmpty()) {
+                for(batchDownloads batch : inboxBatches) {
+                    List<transactionTarget> batchTransactions = transactionOutManager.getInboxBatchTransactions(batch.getId(), userInfo.getId());
+                    batch.settotalTransactions(batchTransactions.size());
+
+                    lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
+                    batch.setstatusValue(processStatus.getDisplayCode());
+
+                    User userDetails = usermanager.getUserById(batch.getuserId());
+                    String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
+                    batch.setusersName(usersName);
+                }
             }
+
+            mav.addObject("inboxBatches", inboxBatches);
+
+            /* Set the header totals */
+            setTotals(session);
+
+            mav.addObject("pendingTotal", pendingTotal);
+            mav.addObject("inboxTotal", inboxTotal);
+
+            mav.addObject("searchTerm", searchTerm);
+            Integer totalPages = (int)Math.ceil((double)totalInboxBatches / maxResults);
+            mav.addObject("totalPages", totalPages);
+            mav.addObject("currentPage", page);
         }
-        
-        mav.addObject("inboxBatches", inboxBatches);
-       
-        /* Set the header totals */
-        setTotals(session);
-        
-        mav.addObject("pendingTotal", pendingTotal);
-        mav.addObject("inboxTotal", inboxTotal);
-        
-        mav.addObject("searchTerm", searchTerm);
-        Integer totalPages = (int)Math.ceil((double)totalInboxBatches / maxResults);
-        mav.addObject("totalPages", totalPages);
-        mav.addObject("currentPage", page);
+        catch (Exception e) {
+            throw new Exception("Error returning batches for the inbox", e);
+        }
         
         return mav;
     }
@@ -239,35 +250,40 @@ public class HealtheWebController {
         /* Need to get all the message types set up for the user */
         User userInfo = (User)session.getAttribute("userDetails");
         
-        /* Need to get a list of all pending batches */
-        Integer totalInboxBatches = transactionOutManager.getInboxBatches(userInfo.getId(), userInfo.getOrgId(), searchTerm, fromDate, toDate, 1, 0).size();
-        List<batchDownloads> inboxBatches = transactionOutManager.getInboxBatches(userInfo.getId(), userInfo.getOrgId(), searchTerm, fromDate, toDate, page, maxResults);
-        
-        if(!inboxBatches.isEmpty()) {
-            for(batchDownloads batch : inboxBatches) {
-                List<transactionTarget> batchTransactions = transactionOutManager.getInboxBatchTransactions(batch.getId(), userInfo.getId());
-                batch.settotalTransactions(batchTransactions.size());
-                
-                lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
-                batch.setstatusValue(processStatus.getDisplayCode());
-                
-                User userDetails = usermanager.getUserById(batch.getuserId());
-                String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
-                batch.setusersName(usersName);
+        try {
+            /* Need to get a list of all pending batches */
+            Integer totalInboxBatches = transactionOutManager.getInboxBatches(userInfo.getId(), userInfo.getOrgId(), searchTerm, fromDate, toDate, 1, 0).size();
+            List<batchDownloads> inboxBatches = transactionOutManager.getInboxBatches(userInfo.getId(), userInfo.getOrgId(), searchTerm, fromDate, toDate, page, maxResults);
+
+            if(!inboxBatches.isEmpty()) {
+                for(batchDownloads batch : inboxBatches) {
+                    List<transactionTarget> batchTransactions = transactionOutManager.getInboxBatchTransactions(batch.getId(), userInfo.getId());
+                    batch.settotalTransactions(batchTransactions.size());
+
+                    lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
+                    batch.setstatusValue(processStatus.getDisplayCode());
+
+                    User userDetails = usermanager.getUserById(batch.getuserId());
+                    String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
+                    batch.setusersName(usersName);
+                }
             }
+
+            mav.addObject("inboxBatches", inboxBatches);    
+            Integer totalPages = (int)Math.ceil((double)totalInboxBatches / maxResults);
+            mav.addObject("totalPages", totalPages);
+
+            /* Set the header totals */
+            setTotals(session);
+
+            mav.addObject("searchTerm", searchTerm);
+            mav.addObject("pendingTotal", pendingTotal);
+            mav.addObject("inboxTotal", inboxTotal);
+            mav.addObject("currentPage", page);
         }
-        
-        mav.addObject("inboxBatches", inboxBatches);    
-        Integer totalPages = (int)Math.ceil((double)totalInboxBatches / maxResults);
-        mav.addObject("totalPages", totalPages);
-        
-        /* Set the header totals */
-        setTotals(session);
-       
-        mav.addObject("searchTerm", searchTerm);
-        mav.addObject("pendingTotal", pendingTotal);
-        mav.addObject("inboxTotal", inboxTotal);
-        mav.addObject("currentPage", page);
+        catch (Exception e) {
+            throw new Exception ("Error in the inbox search", e);
+        }
         
         return mav;
     }
@@ -291,66 +307,71 @@ public class HealtheWebController {
         /* Need to get all the message types set up for the user */
         User userInfo = (User)session.getAttribute("userDetails");
         
-        /* Get the details of the batch */
-        batchDownloads batchDetails = transactionOutManager.getBatchDetails(batchId);
-        mav.addObject("batchDetails", batchDetails);
-        
-        /* Get all the transactions for the batch */
-        List<transactionTarget> batchTransactions = transactionOutManager.getInboxBatchTransactions(batchId, userInfo.getId());
-        
-        List<Transaction> transactionList = new ArrayList<Transaction>();
-        
-        for(transactionTarget transaction : batchTransactions) {
-                 
-            Transaction transactionDetails = new Transaction();
-            transactionDetails.settransactionRecordId(transaction.getId());
-            transactionDetails.setstatusId(transaction.getstatusId());
-            transactionDetails.setdateSubmitted(transaction.getdateCreated());
-            transactionDetails.setconfigId(transaction.getconfigId());
+        try {
+            /* Get the details of the batch */
+            batchDownloads batchDetails = transactionOutManager.getBatchDetails(batchId);
+            mav.addObject("batchDetails", batchDetails);
 
-            lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(transaction.getstatusId());
-            transactionDetails.setstatusValue(processStatus.getDisplayCode());
+            /* Get all the transactions for the batch */
+            List<transactionTarget> batchTransactions = transactionOutManager.getInboxBatchTransactions(batchId, userInfo.getId());
 
-            transactionOutRecords records = transactionOutManager.getTransactionRecords(transaction.getId());
+            List<Transaction> transactionList = new ArrayList<Transaction>();
 
-            /* Get a list of form fields */
-            configurationTransport transportDetails = configurationTransportManager.getTransportDetails(transaction.getconfigId());
-            List<configurationFormFields> sourceInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transaction.getconfigId(),transportDetails.getId(),1);
-            List<configurationFormFields> targetInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transaction.getconfigId(),transportDetails.getId(),3);
-            List<configurationFormFields> patientInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transaction.getconfigId(),transportDetails.getId(),5);
-            List<configurationFormFields> detailFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transaction.getconfigId(),transportDetails.getId(),6);
-            
-            /* Set all the transaction SOURCE ORG fields */
-            List<transactionRecords> fromFields = setInboxFormFields(sourceInfoFormFields, records, 0, true);
-            transactionDetails.setsourceOrgFields(fromFields);
+            for(transactionTarget transaction : batchTransactions) {
 
-            /* Set all the transaction TARGET fields */
-            List<transactionRecords> toFields = setInboxFormFields(targetInfoFormFields, records, 0, true);
-            transactionDetails.settargetOrgFields(toFields);
+                Transaction transactionDetails = new Transaction();
+                transactionDetails.settransactionRecordId(transaction.getId());
+                transactionDetails.setstatusId(transaction.getstatusId());
+                transactionDetails.setdateSubmitted(transaction.getdateCreated());
+                transactionDetails.setconfigId(transaction.getconfigId());
 
-            /* Set all the transaction PATIENT fields */
-            List<transactionRecords> patientFields = setInboxFormFields(patientInfoFormFields, records, 0, true);
-            transactionDetails.setpatientFields(patientFields);
+                lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(transaction.getstatusId());
+                transactionDetails.setstatusValue(processStatus.getDisplayCode());
 
-            /* Set all the transaction DETAIL fields */
-            List<transactionRecords> detailFields = setInboxFormFields(detailFormFields, records, 0, true);
-            transactionDetails.setdetailFields(detailFields);
-            
-            /* get the message type name */
-            configuration configDetails = configurationManager.getConfigurationById(transaction.getconfigId());
-            transactionDetails.setmessageTypeName(messagetypemanager.getMessageTypeById(configDetails.getMessageTypeId()).getName());
+                transactionOutRecords records = transactionOutManager.getTransactionRecords(transaction.getId());
 
-            transactionList.add(transactionDetails);
+                /* Get a list of form fields */
+                configurationTransport transportDetails = configurationTransportManager.getTransportDetails(transaction.getconfigId());
+                List<configurationFormFields> sourceInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transaction.getconfigId(),transportDetails.getId(),1);
+                List<configurationFormFields> targetInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transaction.getconfigId(),transportDetails.getId(),3);
+                List<configurationFormFields> patientInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transaction.getconfigId(),transportDetails.getId(),5);
+                List<configurationFormFields> detailFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transaction.getconfigId(),transportDetails.getId(),6);
+
+                /* Set all the transaction SOURCE ORG fields */
+                List<transactionRecords> fromFields = setInboxFormFields(sourceInfoFormFields, records, 0, true);
+                transactionDetails.setsourceOrgFields(fromFields);
+
+                /* Set all the transaction TARGET fields */
+                List<transactionRecords> toFields = setInboxFormFields(targetInfoFormFields, records, 0, true);
+                transactionDetails.settargetOrgFields(toFields);
+
+                /* Set all the transaction PATIENT fields */
+                List<transactionRecords> patientFields = setInboxFormFields(patientInfoFormFields, records, 0, true);
+                transactionDetails.setpatientFields(patientFields);
+
+                /* Set all the transaction DETAIL fields */
+                List<transactionRecords> detailFields = setInboxFormFields(detailFormFields, records, 0, true);
+                transactionDetails.setdetailFields(detailFields);
+
+                /* get the message type name */
+                configuration configDetails = configurationManager.getConfigurationById(transaction.getconfigId());
+                transactionDetails.setmessageTypeName(messagetypemanager.getMessageTypeById(configDetails.getMessageTypeId()).getName());
+
+                transactionList.add(transactionDetails);
+            }
+
+            mav.addObject("transactions", transactionList);
+            mav.addObject("fromPage", "inbox");
+
+            /* Set the header totals */
+            setTotals(session);
+
+            mav.addObject("pendingTotal", pendingTotal);
+            mav.addObject("inboxTotal", inboxTotal); 
         }
-        
-        mav.addObject("transactions", transactionList);
-        mav.addObject("fromPage", "inbox");
-        
-        /* Set the header totals */
-        setTotals(session);
-        
-        mav.addObject("pendingTotal", pendingTotal);
-        mav.addObject("inboxTotal", inboxTotal);
+        catch (Exception e) {
+            throw new Exception("Error in the returning transactions for the batch: "+ batchId, e);
+        }
         
         return mav;
         
@@ -367,7 +388,7 @@ public class HealtheWebController {
      * @return this request will return the messageDetailsForm
      */
     @RequestMapping(value="/inbox/messageDetails", method = RequestMethod.POST)
-    public ModelAndView showInboxMessageDetails(@RequestParam(value = "transactionId", required = true) Integer transactionId, HttpSession session) throws NoSuchMethodException {
+    public ModelAndView showInboxMessageDetails(@RequestParam(value = "transactionId", required = true) Integer transactionId, HttpSession session) throws Exception {
        
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/Health-e-Web/sentmessageDetails");
@@ -534,7 +555,7 @@ public class HealtheWebController {
      * @return this request will return the messageDetailsForm
      */
     @RequestMapping(value="/feedbackReport/details", method = RequestMethod.POST)
-    public ModelAndView showfeedbackReportDetailsForm(@RequestParam(value = "configId", required = true) int configId, @RequestParam(value = "transactionId", required = true) int transactionId, HttpSession session) throws NoSuchMethodException {
+    public ModelAndView showfeedbackReportDetailsForm(@RequestParam(value = "configId", required = true) int configId, @RequestParam(value = "transactionId", required = true) int transactionId, HttpSession session) throws Exception {
         
         
         ModelAndView mav = new ModelAndView();
@@ -633,7 +654,7 @@ public class HealtheWebController {
      * @return this request will return the messageDetailsForm
      */
     @RequestMapping(value="/{pathVariable}/details", method = RequestMethod.POST)
-    public ModelAndView showMessageDetailsForm(@PathVariable String pathVariable, @RequestParam(value = "configId", required = true) int configId, @RequestParam(value = "targetOrg", required = false) Integer targetOrg, @RequestParam(value = "targetConfig", required = false) Integer targetConfig, @RequestParam(value = "transactionId", required = false) Integer transactionId, HttpSession session) throws NoSuchMethodException {
+    public ModelAndView showMessageDetailsForm(@PathVariable String pathVariable, @RequestParam(value = "configId", required = true) int configId, @RequestParam(value = "targetOrg", required = false) Integer targetOrg, @RequestParam(value = "targetConfig", required = false) Integer targetConfig, @RequestParam(value = "transactionId", required = false) Integer transactionId, HttpSession session) throws Exception {
         
         if(transactionId == null) {
             transactionId = 0;
@@ -785,7 +806,7 @@ public class HealtheWebController {
      * @return this request will return the messageDetailsForm
      */
     @RequestMapping(value= "/submitMessage", method = RequestMethod.POST)
-    public ModelAndView submitMessage(@ModelAttribute(value = "transactionDetails") Transaction transactionDetails, HttpSession session, @RequestParam String action, RedirectAttributes redirectAttr, @RequestParam List<Integer> attachmentIds) {
+    public ModelAndView submitMessage(@ModelAttribute(value = "transactionDetails") Transaction transactionDetails, HttpSession session, @RequestParam String action, RedirectAttributes redirectAttr, @RequestParam List<Integer> attachmentIds) throws Exception {
         
         User userInfo = (User)session.getAttribute("userDetails");
         Integer currBatchId = transactionDetails.getbatchId();
@@ -1536,7 +1557,7 @@ public class HealtheWebController {
      * @return this request will return the messageDetailsForm
      */
     @RequestMapping(value="/sent/messageDetails", method = RequestMethod.POST)
-    public ModelAndView showMessageDetails(@RequestParam(value = "transactionId", required = true) Integer transactionId, @RequestParam(value = "fromPage", required = false) String fromPage, HttpSession session) throws NoSuchMethodException {
+    public ModelAndView showMessageDetails(@RequestParam(value = "transactionId", required = true) Integer transactionId, @RequestParam(value = "fromPage", required = false) String fromPage, HttpSession session) throws Exception {
        
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/Health-e-Web/sentmessageDetails");

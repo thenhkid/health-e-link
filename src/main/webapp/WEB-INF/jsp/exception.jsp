@@ -1,57 +1,46 @@
-<!DOCTYPE html>
-<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
-<head>
-<meta charset="utf-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-<title></title>
-<meta name="description" content="">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
-<!-- main css compiled from main.less -->
-<link rel="stylesheet" href="<%=request.getContextPath()%>/dspResources/css/admin/main.css?v=2">
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
-<!-- default theme
-<link rel="stylesheet" href="css/themes/theme-default.css">
--->
+<div class="container main-container" role="main">
+    <div class="row">
+        <aside class="col-md-3 col-sm-3 secondary hidden-xs">
+            <div class="fixed-region">
+                <div class="module sidebar-module">
+                    <dl class="vcard info-list">
+                        <dt>Contact Us By Phone</dt>
+                        <dd class="tel">(508) 721-1977</dd>
 
-<!-- Health-e-link theme -->
-<link rel="stylesheet" href="<%=request.getContextPath()%>/dspResources/css/admin/themes/theme-health-e-link.css">
+                        <dt>Contact Us By Fax</dt>
+                        <dd class="tel">(508) 721-1978</dd>
 
+                        <dt>Contact Us By Email</dt>
+                        <dd class="email"><a href="" title="">info@health-e-link.net</a></dd>
 
-<!--[if lt IE 9]>
-	<link rel="stylesheet" href="css/ie.css">
-<![endif]-->
-
-<script type="text/javascript" src="js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
-<script data-main="js/front-end/main" src="js/vendor/require.js"></script>
-</head>
-<body class="theme-default" id="notFound" >
-	<!--[if lt IE 7]>
-	    <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
-	<![endif]-->
-
-	<div class="wrap">
-		<div class="login-container notFound">
-			<div class="login">
-			<header class="login-header">
-				<div class="login-header-content"><span class="logo ir" alt="{Company Name Logo}">Comany Name</span></div>
-			</header>
-					<h1>Sorry, an error has occurred</h1>
-				<p class="login-note"><a href="" id="back-btn" title="" class="btn btn-primary">Go Back</a></p>
-			</div>
-		</div>
-	</div>
-
-	<script>
-		var backBtn = document.getElementById('back-btn');
-		backBtn.addEventListener('click', function () {
-			window.history.back();
-		}, true)
-	</script>
-
-<script data-main="js/main" src="js/vendor/require.js"></script>
-</body>
-</html>
+                        <dt>Connect</dt>
+                        <dd class="margin-small top">
+                            <a href="" title="" class="icon-social icon-facebook ir-inline">Facebook</a>
+                            <a href="" title="" class="icon-social icon-linked-in ir-inline">Linked In</a>
+                            <a href="" title="" class="icon-social icon-twitter ir-inline">Twitter</a>
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </aside>
+        <div class="col-md-9 col-md-offset-0 col-sm-8 col-sm-offset-1 page-content">
+            <h2>Ops, An error has occurred.</h2>
+            <p>
+                Lorem ipsum <em>emphasised text</em> dolor sit amet, <strong>strong text</strong> 
+                consectetur adipisicing elit, <abbr title="">abbreviated text</abbr> sed do eiusmod tempor 
+                incididunt ut labore et dolore magna aliqua. Ut 
+                <q>quoted text</q> enim ad minim veniam, quis nostrud exercitation <a href="/">link text</a> 
+                ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute 
+                <ins>inserted text</ins> irure dolor in reprehenderit in voluptate velit esse cillum 
+                dolore eu fugiat nulla pariatur. Excepteur sint occaecat <code>code text</code> cupidatat 
+                non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+            </p>
+            <p>
+                ${messageBody}
+            </p>
+        </div>
+    </div>
+</div>
