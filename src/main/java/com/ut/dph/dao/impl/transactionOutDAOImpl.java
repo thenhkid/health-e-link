@@ -806,7 +806,14 @@ public class transactionOutDAOImpl implements transactionOutDAO {
     }
     
     /**
+     * The 'processOutPutTransactions' method will find all the configuration form fields set up for
+     * the target configuration and retrieve the data from the mapped tables and columns.
      * 
+     * @transactionTargetId The id of the target transactions
+     * 
+     * @configId    The id of the target configuration to retrieve the form fields.
+     * 
+     * @transactionInId The id of the inbound transaction to get the actual data.
      */
     @Override
     @Transactional

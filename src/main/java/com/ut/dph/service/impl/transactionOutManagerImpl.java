@@ -266,6 +266,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                 
                 /* Process the output (transactionTargetId, targetConfigId, transactionInId) */
                 processed = transactionOutDAO.processOutPutTransactions(transaction.getId(), transaction.getconfigId(), transaction.gettransactionInId());
+                
                     
                 /* If processed == true update the status of the batch and transaction */
                 if(processed == true) {
