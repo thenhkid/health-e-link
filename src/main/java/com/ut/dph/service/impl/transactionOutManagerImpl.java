@@ -106,7 +106,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
     
     @Override
     @Transactional
-    public transactionTarget getTransactionDetails(int transactionId) {
+    public transactionTarget getTransactionDetails(int transactionId) throws Exception {
         return transactionOutDAO.getTransactionDetails(transactionId);
     }
     

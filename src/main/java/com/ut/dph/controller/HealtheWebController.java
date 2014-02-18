@@ -332,27 +332,47 @@ public class HealtheWebController {
 
                 /* Get a list of form fields */
                 configurationTransport transportDetails = configurationTransportManager.getTransportDetails(transaction.getconfigId());
-                List<configurationFormFields> sourceInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transaction.getconfigId(),transportDetails.getId(),1);
-                List<configurationFormFields> targetInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transaction.getconfigId(),transportDetails.getId(),3);
-                List<configurationFormFields> patientInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transaction.getconfigId(),transportDetails.getId(),5);
-                List<configurationFormFields> detailFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transaction.getconfigId(),transportDetails.getId(),6);
-
-                /* Set all the transaction SOURCE ORG fields */
-                List<transactionRecords> fromFields = setInboxFormFields(sourceInfoFormFields, records, 0, true);
-                transactionDetails.setsourceOrgFields(fromFields);
-
-                /* Set all the transaction TARGET fields */
-                List<transactionRecords> toFields = setInboxFormFields(targetInfoFormFields, records, 0, true);
-                transactionDetails.settargetOrgFields(toFields);
-
-                /* Set all the transaction PATIENT fields */
-                List<transactionRecords> patientFields = setInboxFormFields(patientInfoFormFields, records, 0, true);
-                transactionDetails.setpatientFields(patientFields);
-
-                /* Set all the transaction DETAIL fields */
-                List<transactionRecords> detailFields = setInboxFormFields(detailFormFields, records, 0, true);
-                transactionDetails.setdetailFields(detailFields);
-
+                
+                try {
+                    List<configurationFormFields> sourceInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transaction.getconfigId(),transportDetails.getId(),1);
+                    /* Set all the transaction SOURCE ORG fields */
+                    List<transactionRecords> fromFields = setInboxFormFields(sourceInfoFormFields, records, 0, true);
+                    transactionDetails.setsourceOrgFields(fromFields);
+                }
+                catch (Exception e) {
+                    throw new Exception ("Error retrieving source fields for configuration id: "+ transaction.getconfigId(), e);
+                }
+                
+                try {
+                   List<configurationFormFields> targetInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transaction.getconfigId(),transportDetails.getId(),3);
+                    /* Set all the transaction TARGET fields */
+                    List<transactionRecords> toFields = setInboxFormFields(targetInfoFormFields, records, 0, true);
+                    transactionDetails.settargetOrgFields(toFields);
+                }
+                catch (Exception e) {
+                    throw new Exception ("Error retrieving target fields for configuration id: "+ transaction.getconfigId(), e);
+                }
+                
+                try {
+                    List<configurationFormFields> patientInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transaction.getconfigId(),transportDetails.getId(),5);
+                    /* Set all the transaction PATIENT fields */
+                    List<transactionRecords> patientFields = setInboxFormFields(patientInfoFormFields, records, 0, true);
+                    transactionDetails.setpatientFields(patientFields);
+                }
+                catch (Exception e) {
+                    throw new Exception ("Error retrieving patient fields for configuration id: "+ transaction.getconfigId(), e);
+                }
+                
+                try {
+                  List<configurationFormFields> detailFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transaction.getconfigId(),transportDetails.getId(),6);
+                  /* Set all the transaction DETAIL fields */
+                  List<transactionRecords> detailFields = setInboxFormFields(detailFormFields, records, 0, true);
+                  transactionDetails.setdetailFields(detailFields);
+                }
+                catch (Exception e) {
+                    throw new Exception ("Error retrieving detail fields for configuration id: "+ transaction.getconfigId(), e);
+                }
+                
                 /* get the message type name */
                 configuration configDetails = configurationManager.getConfigurationById(transaction.getconfigId());
                 transactionDetails.setmessageTypeName(messagetypemanager.getMessageTypeById(configDetails.getMessageTypeId()).getName());
@@ -393,107 +413,151 @@ public class HealtheWebController {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/Health-e-Web/sentmessageDetails");
         
-        transactionTarget transactionInfo = transactionOutManager.getTransactionDetails(transactionId);
+        try {
+            transactionTarget transactionInfo = transactionOutManager.getTransactionDetails(transactionId);
         
-        /* Get the details of the sent transaction */
-        transactionIn originalTransactionInfo = transactionInManager.getTransactionDetails(transactionInfo.gettransactionInId());
-        
-        /* Need to update the status of the transaction to Recieved (id=20) */
-        transactionOutManager.changeDeliveryStatus(transactionInfo.getbatchDLId(), transactionInfo.getbatchUploadId(), transactionId, transactionInfo.gettransactionInId());
-          
-        /* Get the configuration details */
-        configuration configDetails = configurationManager.getConfigurationById(transactionInfo.getconfigId());
-        
-        /* Get the organization details for the source (Sender) organization */
-        User userInfo = (User)session.getAttribute("userDetails");
-        
-        /* Get a list of form fields */
-        configurationTransport transportDetails = configurationTransportManager.getTransportDetails(transactionInfo.getconfigId());
-        List<configurationFormFields> senderInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),1);
-        List<configurationFormFields> senderProviderFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),2);
-        List<configurationFormFields> targetInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),3);
-        List<configurationFormFields> targetProviderFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),4);
-        List<configurationFormFields> patientInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),5);
-        List<configurationFormFields> detailFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),6);
-        
-        Transaction transaction = new Transaction();
-        transactionOutRecords records = null;
-            
-        batchDownloads batchInfo = transactionOutManager.getBatchDetails(transactionInfo.getbatchDLId());
-        
-        transaction.setorgId(batchInfo.getOrgId());
-        transaction.settransportMethodId(2);
-        transaction.setmessageTypeId(configDetails.getMessageTypeId());
-        transaction.setuserId(batchInfo.getuserId());
-        transaction.setbatchName(batchInfo.getutBatchName());
-        transaction.setstatusId(batchInfo.getstatusId());
-        transaction.settransactionStatusId(transactionInfo.getstatusId());
-        transaction.setconfigId(transactionInfo.getconfigId());
-        transaction.setautoRelease(transportDetails.getautoRelease());
-        transaction.setbatchId(batchInfo.getId());
-        transaction.settransactionId(transactionId);
-        transaction.settransactionTargetId(transactionInfo.getId());
-        transaction.setdateSubmitted(transactionInfo.getdateCreated());
-        
-        /* Check to see if the message is a feedback report */
-        if(originalTransactionInfo.gettransactionTargetId() > 0) {
-            transaction.setsourceType(2); /* Feedback report */
-            transaction.setorginialTransactionId(transactionOutManager.getTransactionDetails(originalTransactionInfo.gettransactionTargetId()).gettransactionInId());
-        }
-        else {
-            transaction.setsourceType(configDetails.getsourceType());
-        }
-        transaction.setinternalStatusId(transactionInfo.getinternalStatusId());
-        
-        lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(transaction.getstatusId());
-        transaction.setstatusValue(processStatus.getDisplayCode());
-            
-        /* get the message type name */
-        transaction.setmessageTypeName(messagetypemanager.getMessageTypeById(configDetails.getMessageTypeId()).getName());
+            /* Get the details of the sent transaction */
+            transactionIn originalTransactionInfo = transactionInManager.getTransactionDetails(transactionInfo.gettransactionInId());
 
-        records = transactionOutManager.getTransactionRecords(transactionId);
-        transaction.settransactionRecordId(records.getId());
+            /* Need to update the status of the transaction to Recieved (id=20) */
+            transactionOutManager.changeDeliveryStatus(transactionInfo.getbatchDLId(), transactionInfo.getbatchUploadId(), transactionId, transactionInfo.gettransactionInId());
+
+            /* Get the configuration details */
+            configuration configDetails = configurationManager.getConfigurationById(transactionInfo.getconfigId());
+
+            /* Get the organization details for the source (Sender) organization */
+            User userInfo = (User)session.getAttribute("userDetails");
+
+            /* Get a list of form fields */
+            configurationTransport transportDetails = configurationTransportManager.getTransportDetails(transactionInfo.getconfigId());
+            
+            Transaction transaction = new Transaction();
+            transactionOutRecords records = null;
+
+            batchDownloads batchInfo = transactionOutManager.getBatchDetails(transactionInfo.getbatchDLId());
+
+            transaction.setorgId(batchInfo.getOrgId());
+            transaction.settransportMethodId(2);
+            transaction.setmessageTypeId(configDetails.getMessageTypeId());
+            transaction.setuserId(batchInfo.getuserId());
+            transaction.setbatchName(batchInfo.getutBatchName());
+            transaction.setstatusId(batchInfo.getstatusId());
+            transaction.settransactionStatusId(transactionInfo.getstatusId());
+            transaction.setconfigId(transactionInfo.getconfigId());
+            transaction.setautoRelease(transportDetails.getautoRelease());
+            transaction.setbatchId(batchInfo.getId());
+            transaction.settransactionId(transactionId);
+            transaction.settransactionTargetId(transactionInfo.getId());
+            transaction.setdateSubmitted(transactionInfo.getdateCreated());
+
+            /* Check to see if the message is a feedback report */
+            if(originalTransactionInfo.gettransactionTargetId() > 0) {
+                transaction.setsourceType(2); /* Feedback report */
+                transaction.setorginialTransactionId(transactionOutManager.getTransactionDetails(originalTransactionInfo.gettransactionTargetId()).gettransactionInId());
+            }
+            else {
+                transaction.setsourceType(configDetails.getsourceType());
+            }
+            transaction.setinternalStatusId(transactionInfo.getinternalStatusId());
+
+            lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(transaction.getstatusId());
+            transaction.setstatusValue(processStatus.getDisplayCode());
+
+            /* get the message type name */
+            transaction.setmessageTypeName(messagetypemanager.getMessageTypeById(configDetails.getMessageTypeId()).getName());
+
+            records = transactionOutManager.getTransactionRecords(transactionId);
+            transaction.settransactionRecordId(records.getId());
+            
+            try {
+                List<configurationFormFields> senderInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),1);
+                /* Set all the transaction SOURCE ORG fields */
+                List<transactionRecords> fromFields = setInboxFormFields(senderInfoFormFields, records, transactionInfo.getconfigId(), true);
+                transaction.setsourceOrgFields(fromFields);
+            
+            }
+            catch (Exception e) {
+                throw new Exception ("Error retrieving sender fields for configuration id: "+ transactionInfo.getconfigId(), e);
+            }
+            
+            try {
+              List<configurationFormFields> senderProviderFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),2);
+              /* Set all the transaction SOURCE PROVIDER fields */
+              List<transactionRecords> fromProviderFields = setInboxFormFields(senderProviderFormFields, records, transactionInfo.getconfigId(), true);
+              transaction.setsourceProviderFields(fromProviderFields);
+              
+            }
+            catch (Exception e) {
+                throw new Exception ("Error retrieving sender provider fields for configuration id: "+ transactionInfo.getconfigId(), e);
+            }
+            
+            try {
+                List<configurationFormFields> targetInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),3);
+                /* Set all the transaction TARGET fields */
+                List<transactionRecords> toFields = setInboxFormFields(targetInfoFormFields, records, transactionInfo.getconfigId(), true);
+                transaction.settargetOrgFields(toFields);
+            
+            }
+            catch (Exception e) {
+                throw new Exception ("Error retrieving target fields for configuration id: "+ transactionInfo.getconfigId(), e);
+            }
+            
+            try {
+                List<configurationFormFields> targetProviderFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),4);
+                /* Set all the transaction TARGET PROVIDER fields */
+                List<transactionRecords> toProviderFields = setInboxFormFields(targetProviderFormFields, records, transactionInfo.getconfigId(), true);
+                transaction.settargetProviderFields(toProviderFields);
+            
+            }
+            catch (Exception e) {
+                throw new Exception ("Error retrieving target provider fields for configuration id: "+ transactionInfo.getconfigId(), e);
+            }
+            
+            try {
+               List<configurationFormFields> patientInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),5);
+               
+               /* Set all the transaction PATIENT fields */
+               List<transactionRecords> patientFields = setInboxFormFields(patientInfoFormFields, records, transactionInfo.getconfigId(), true);
+               transaction.setpatientFields(patientFields);
+             
+            }
+            catch (Exception e) {
+                throw new Exception ("Error retrieving patient fields for configuration id: "+ transactionInfo.getconfigId(), e);
+            }
+            
+            try {
+                List<configurationFormFields> detailFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),6);
+                /* Set all the transaction DETAIL fields */
+                List<transactionRecords> detailFields = setInboxFormFields(detailFormFields, records, transactionInfo.getconfigId(), true);
+                transaction.setdetailFields(detailFields);
+
+            }
+            catch (Exception e) {
+                throw new Exception ("Error retrieving the detail fields for configuration id: "+ transactionInfo.getconfigId(), e);
+            }
+            
+            mav.addObject("transactionDetails", transaction);
+
+            /* Get the list of internal message status */
+            List internalStatusCodes = transactionOutManager.getInternalStatusCodes();
+            mav.addObject("internalStatusCodes",internalStatusCodes);
+
+            /* Get id of the associated feedback report for this message */
+            Integer feedbackConfigId = transactionOutManager.getActiveFeedbackReportsByMessageType(configDetails.getMessageTypeId(),userInfo.getOrgId());
+            mav.addObject("feedbackConfigId", feedbackConfigId);
+
+            /* Set the header totals */
+            setTotals(session);
+
+            mav.addObject("pendingTotal", pendingTotal);
+            mav.addObject("inboxTotal", inboxTotal);
+            mav.addObject("fromPage", "inbox");
+        }
+        catch (Exception e) {
+            throw new Exception("An error occurred in returning the details of the message, id: "+ transactionId, e);
+        }
         
-        /* Set all the transaction SOURCE ORG fields */
-        List<transactionRecords> fromFields = setInboxFormFields(senderInfoFormFields, records, transactionInfo.getconfigId(), true);
-        transaction.setsourceOrgFields(fromFields);
         
-        /* Set all the transaction SOURCE PROVIDER fields */
-        List<transactionRecords> fromProviderFields = setInboxFormFields(senderProviderFormFields, records, transactionInfo.getconfigId(), true);
-        transaction.setsourceProviderFields(fromProviderFields);
-        
-        /* Set all the transaction TARGET fields */
-        List<transactionRecords> toFields = setInboxFormFields(targetInfoFormFields, records, transactionInfo.getconfigId(), true);
-        transaction.settargetOrgFields(toFields);
-        
-        /* Set all the transaction TARGET PROVIDER fields */
-        List<transactionRecords> toProviderFields = setInboxFormFields(targetProviderFormFields, records, transactionInfo.getconfigId(), true);
-        transaction.settargetProviderFields(toProviderFields);
-        
-        /* Set all the transaction PATIENT fields */
-        List<transactionRecords> patientFields = setInboxFormFields(patientInfoFormFields, records, transactionInfo.getconfigId(), true);
-        transaction.setpatientFields(patientFields);
-        
-        /* Set all the transaction DETAIL fields */
-        List<transactionRecords> detailFields = setInboxFormFields(detailFormFields, records, transactionInfo.getconfigId(), true);
-        transaction.setdetailFields(detailFields);
-        
-        mav.addObject("transactionDetails", transaction);
-        
-        /* Get the list of internal message status */
-        List internalStatusCodes = transactionOutManager.getInternalStatusCodes();
-        mav.addObject("internalStatusCodes",internalStatusCodes);
-        
-        /* Get id of the associated feedback report for this message */
-        Integer feedbackConfigId = transactionOutManager.getActiveFeedbackReportsByMessageType(configDetails.getMessageTypeId(),userInfo.getOrgId());
-        mav.addObject("feedbackConfigId", feedbackConfigId);
-        
-        /* Set the header totals */
-        setTotals(session);
-        
-        mav.addObject("pendingTotal", pendingTotal);
-        mav.addObject("inboxTotal", inboxTotal);
-        mav.addObject("fromPage", "inbox");
         
         return mav;
     }
@@ -1848,7 +1912,7 @@ public class HealtheWebController {
      * @return This function will return the provider object.
      */
     @RequestMapping(value="/submitMessageNote.do", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Integer submitMessageNote(HttpSession session, @RequestParam(value = "messageTransactionId", required = true) int messageTransactionId, @RequestParam(value = "internalStatusId", required = false) int internalStatusId, @RequestParam(value = "messageNotes", required = false) String messageNotes) {
+    public Integer submitMessageNote(HttpSession session, @RequestParam(value = "messageTransactionId", required = true) int messageTransactionId, @RequestParam(value = "internalStatusId", required = false) int internalStatusId, @RequestParam(value = "messageNotes", required = false) String messageNotes) throws Exception {
         
         /* Update the internal status code if exists */
         if(internalStatusId > 0) {

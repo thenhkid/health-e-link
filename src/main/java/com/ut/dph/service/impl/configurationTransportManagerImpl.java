@@ -22,7 +22,7 @@ public class configurationTransportManagerImpl implements configurationTransport
 
     @Override
     @Transactional
-    public configurationTransport getTransportDetails(int configId) {
+    public configurationTransport getTransportDetails(int configId) throws Exception {
         return configurationTransportDAO.getTransportDetails(configId);
     }
 
@@ -62,7 +62,7 @@ public class configurationTransportManagerImpl implements configurationTransport
     
     @Override
     @Transactional
-    public List<configurationFormFields> getConfigurationFieldsByBucket(int configId, int transportDetailId, int bucket) {
+    public List<configurationFormFields> getConfigurationFieldsByBucket(int configId, int transportDetailId, int bucket) throws Exception {
         return configurationTransportDAO.getConfigurationFieldsByBucket(configId, transportDetailId, bucket);
     }
 

@@ -29,7 +29,7 @@ public interface transactionOutDAO {
     
     List<transactionTarget> getInboxBatchTransactions(int batchId, int userId) throws Exception;
     
-    transactionTarget getTransactionDetails(int transactionId);
+    transactionTarget getTransactionDetails(int transactionId) throws Exception;
     
     transactionOutRecords getTransactionRecords(int transactionTargetId) throws Exception;
     
