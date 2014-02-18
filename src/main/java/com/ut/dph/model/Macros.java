@@ -30,7 +30,7 @@ public class Macros {
     private String macroShortName;
 
     @Column(name = "REF_NUMBER", nullable = false)
-    private int refNumber;
+    private Integer refNumber;
 
     @Column(name = "DATE_DISPLAY", nullable = true)
     private String dateDisplay;
@@ -169,7 +169,7 @@ public class Macros {
 		return refNumber;
 	}
 
-	public void setRefNumber(int refNumber) {
+	public void setRefNumber(Integer refNumber) {
 		this.refNumber = refNumber;
 	}
 
