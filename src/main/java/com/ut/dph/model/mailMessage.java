@@ -6,6 +6,8 @@
 
 package com.ut.dph.model;
 
+import java.util.List;
+
 /**
  *
  * @author chad
@@ -14,7 +16,7 @@ public class mailMessage {
     
     String messageSubject = null;
     String toEmailAddress = null;
-    String ccEmailAddress = null;
+    String[] ccEmailAddress = null;
     String fromEmailAddress = null;
     String messageBody = null;
     
@@ -50,11 +52,11 @@ public class mailMessage {
         return messageBody;
     }
     
-    public void setccEmailAddress(String ccEmailAddress) {
+    public void setccEmailAddress(String[] ccEmailAddress) {
         this.ccEmailAddress = ccEmailAddress;
     }
     
-    public String getccEmailAddress() {
+    public String[] getccEmailAddress() {
         return ccEmailAddress;
     }
     

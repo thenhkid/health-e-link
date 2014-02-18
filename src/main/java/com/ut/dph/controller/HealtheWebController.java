@@ -38,6 +38,7 @@ import com.ut.dph.service.sysAdminManager;
 import com.ut.dph.service.transactionInManager;
 import com.ut.dph.service.transactionOutManager;
 import com.ut.dph.service.userManager;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -1781,7 +1782,7 @@ public class HealtheWebController {
      * 
      */
     @RequestMapping(value="/sendBatches", method = RequestMethod.POST)
-    public ModelAndView sendBatches(@RequestParam(value = "batchIdList", required = true) List<Integer> batchIdList, RedirectAttributes redirectAttr , HttpSession session) throws NoSuchMethodException {
+    public ModelAndView sendBatches(@RequestParam(value = "batchIdList", required = true) List<Integer> batchIdList, RedirectAttributes redirectAttr , HttpSession session) throws NoSuchMethodException, IOException {
         
         /* 
         If the list of batch Ids is not empty loop through each marked batch
@@ -1797,7 +1798,13 @@ public class HealtheWebController {
                 transactionInManager.updateTransactionTargetStatus(batchId,0,0,12);
                 
                 /* Process the batch */
-                boolean transactionSentToProcess = transactionInManager.processBatch(batchId);
+                try {
+                    boolean transactionSentToProcess = transactionInManager.processBatch(batchId);
+                }
+                catch(Exception ex) {
+                    throw new IOException(ex);
+                }
+                
             }
         }
         

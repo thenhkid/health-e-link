@@ -41,8 +41,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.sql.Array;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -248,159 +250,164 @@ public class transactionOutManagerImpl implements transactionOutManager {
     @Transactional
     public void processOutputRecords(int transactionTargetId) {
        
-        /* 
-        Need to find all transactionTarget records that are ready to be processed
-        statusId (19 - Pending Output)
-         */
-        List<transactionTarget> pendingTransactions = transactionOutDAO.getpendingOutPutTransactions(transactionTargetId);
-        
-        /* 
-        If pending transactions are found need to loop through and start the processing
-        of the outbound records.
-        */
-        if(!pendingTransactions.isEmpty()) {
-           
-            for(transactionTarget transaction : pendingTransactions) {
-            
-                boolean processed = false;
-                
-                /* Process the output (transactionTargetId, targetConfigId, transactionInId) */
-                processed = transactionOutDAO.processOutPutTransactions(transaction.getId(), transaction.getconfigId(), transaction.gettransactionInId());
-                
-                    
-                /* If processed == true update the status of the batch and transaction */
-                if(processed == true) {
-                    
-                    /* Need to start the transaction translations */
-                    boolean recordsTranslated = translateTargetRecords(transaction.getId(), transaction.getconfigId(), transaction.getbatchDLId());
-                    
-                    /* Once all the processing has completed with no errors need to copy records to the transactionOutRecords to make availble to view */
-                    if(recordsTranslated == true) {
-                        transactionOutDAO.moveTranslatedRecords(transaction.getId());
-                        
-                        /* Update the status of the transaction to L (Loaded) (ID = 9) */
-                        transactionInManager.updateTransactionStatus(transaction.getbatchUploadId(), transaction.gettransactionInId(), 0, 9);
-                       
-                        /* Update the status of the transaction target to L (Loaded) (ID = 9) */
-                        transactionInManager.updateTransactionTargetStatus(0, transaction.getId(), 0, 9);
-                        
-                        /* If configuration is set to auto process the process right away */
-                        configurationSchedules scheduleDetails = configurationManager.getScheduleDetails(transaction.getconfigId());
-                        
-                        /* If no schedule is found or automatic */
-                        if(scheduleDetails == null || scheduleDetails.gettype() == 5) {
-                            int batchId =  beginOutputProcess(transaction);
-                            
-                            /* Log the last run time */
-                            targetOutputRunLogs log = new targetOutputRunLogs();
-                            log.setconfigId(transaction.getconfigId());
+        try {
+            /* 
+            Need to find all transactionTarget records that are ready to be processed
+            statusId (19 - Pending Output)
+             */
+            List<transactionTarget> pendingTransactions = transactionOutDAO.getpendingOutPutTransactions(transactionTargetId);
 
-                            transactionOutDAO.saveOutputRunLog(log);
-                           
-                            /* 
-                            Need to check the transport method for the configuration, if set to file download
-                            or set to FTP.
-                            */
-                            configurationTransport transportDetails = configurationTransportManager.getTransportDetails(transaction.getconfigId());
+            /* 
+            If pending transactions are found need to loop through and start the processing
+            of the outbound records.
+            */
+            if(!pendingTransactions.isEmpty()) {
 
-                            /* if File Download update the status to Submission Delivery Completed ID = 23 status. This will only
-                            apply to scheduled and not continous settings. */
-                            if(transportDetails.gettransportMethodId() == 1) {
-                                transactionOutDAO.updateBatchStatus(batchId, 23);
-                            }
-                            /* If FTP Call the FTP Method */
-                            else if(transportDetails.gettransportMethodId() == 3) {
-                                FTPTargetFile(batchId);
-                            }
-                            
-                            if(batchId > 0) {
-                                /* Send the email to primary contact */
-                            
-                                /* Get the batch Details */
-                               batchDownloads batchDLInfo = transactionOutDAO.getBatchDetails(batchId);
+                for(transactionTarget transaction : pendingTransactions) {
 
-                               /* Get the from user */
-                               Organization fromOrg = organizationManager.getOrganizationById(configurationManager.getConfigurationById(transactionInManager.getTransactionDetails(transaction.gettransactionInId()).getconfigId()).getorgId());
-                               List<User> fromPrimaryContact = userManager.getOrganizationContact(fromOrg.getId(),1);
+                    boolean processed = false;
 
-                               /* get the to user details */
-                               List<User> toPrimaryContact = userManager.getOrganizationContact(configurationManager.getConfigurationById(transaction.getconfigId()).getorgId(),1);
-                               List<User> toSecondaryContact = userManager.getOrganizationContact(configurationManager.getConfigurationById(transaction.getconfigId()).getorgId(),2);
+                    /* Process the output (transactionTargetId, targetConfigId, transactionInId) */
+                    processed = transactionOutDAO.processOutPutTransactions(transaction.getId(), transaction.getconfigId(), transaction.gettransactionInId());
 
-                               if(fromPrimaryContact.size() > 0 && (toPrimaryContact.size() > 0 || toSecondaryContact.size() > 0)) {
-                                   String toName = null;
-                                   mailMessage msg = new mailMessage();
-                                   StringBuilder ccAddress = new StringBuilder();
-                                   msg.setfromEmailAddress(fromPrimaryContact.get(0).getEmail());
 
-                                   if(toPrimaryContact.size() > 0) {
-                                       toName = toPrimaryContact.get(0).getFirstName() + " " + toPrimaryContact.get(0).getLastName();
-                                       msg.settoEmailAddress(toPrimaryContact.get(0).getEmail());
+                    /* If processed == true update the status of the batch and transaction */
+                    if(processed == true) {
 
-                                       if(toPrimaryContact.size() > 1) {
-                                           for(int i = 1; i <= toPrimaryContact.size(); i++) {
-                                               ccAddress.append(toPrimaryContact.get(i).getEmail());
-                                               if(i<toPrimaryContact.size()) {
-                                                   ccAddress.append(",");
+                        /* Need to start the transaction translations */
+                        boolean recordsTranslated = translateTargetRecords(transaction.getId(), transaction.getconfigId(), transaction.getbatchDLId());
+
+                        /* Once all the processing has completed with no errors need to copy records to the transactionOutRecords to make availble to view */
+                        if(recordsTranslated == true) {
+                            transactionOutDAO.moveTranslatedRecords(transaction.getId());
+
+                            /* Update the status of the transaction to L (Loaded) (ID = 9) */
+                            transactionInManager.updateTransactionStatus(transaction.getbatchUploadId(), transaction.gettransactionInId(), 0, 9);
+
+                            /* Update the status of the transaction target to L (Loaded) (ID = 9) */
+                            transactionInManager.updateTransactionTargetStatus(0, transaction.getId(), 0, 9);
+
+                            /* If configuration is set to auto process the process right away */
+                            configurationSchedules scheduleDetails = configurationManager.getScheduleDetails(transaction.getconfigId());
+
+                            /* If no schedule is found or automatic */
+                            if(scheduleDetails == null || scheduleDetails.gettype() == 5) {
+                                int batchId =  beginOutputProcess(transaction);
+
+                                /* Log the last run time */
+                                targetOutputRunLogs log = new targetOutputRunLogs();
+                                log.setconfigId(transaction.getconfigId());
+
+                                transactionOutDAO.saveOutputRunLog(log);
+
+                                /* 
+                                Need to check the transport method for the configuration, if set to file download
+                                or set to FTP.
+                                */
+                                configurationTransport transportDetails = configurationTransportManager.getTransportDetails(transaction.getconfigId());
+
+                                /* if File Download update the status to Submission Delivery Completed ID = 23 status. This will only
+                                apply to scheduled and not continous settings. */
+                                if(transportDetails.gettransportMethodId() == 1) {
+                                    transactionOutDAO.updateBatchStatus(batchId, 23);
+                                }
+                                /* If FTP Call the FTP Method */
+                                else if(transportDetails.gettransportMethodId() == 3) {
+                                    FTPTargetFile(batchId);
+                                }
+
+                                if(batchId > 0) {
+                                    /* Send the email to primary contact */
+
+                                    /* Get the batch Details */
+                                   batchDownloads batchDLInfo = transactionOutDAO.getBatchDetails(batchId);
+
+                                   /* Get the from user */
+                                   Organization fromOrg = organizationManager.getOrganizationById(configurationManager.getConfigurationById(transactionInManager.getTransactionDetails(transaction.gettransactionInId()).getconfigId()).getorgId());
+                                   List<User> fromPrimaryContact = userManager.getOrganizationContact(fromOrg.getId(),1);
+
+                                   /* get the to user details */
+                                   List<User> toPrimaryContact = userManager.getOrganizationContact(configurationManager.getConfigurationById(transaction.getconfigId()).getorgId(),1);
+                                   List<User> toSecondaryContact = userManager.getOrganizationContact(configurationManager.getConfigurationById(transaction.getconfigId()).getorgId(),2);
+
+                                   if(fromPrimaryContact.size() > 0 && (toPrimaryContact.size() > 0 || toSecondaryContact.size() > 0)) {
+                                       String toName = null;
+                                       mailMessage msg = new mailMessage();
+                                       ArrayList<String> ccAddressArray = new ArrayList<String>();
+                                       msg.setfromEmailAddress(fromPrimaryContact.get(0).getEmail());
+                                       
+
+                                       if(toPrimaryContact.size() > 0) {
+                                           toName = toPrimaryContact.get(0).getFirstName() + " " + toPrimaryContact.get(0).getLastName();
+                                           msg.settoEmailAddress(toPrimaryContact.get(0).getEmail());
+
+                                           if(toPrimaryContact.size() > 1) {
+                                               for(int i = 1; i < toPrimaryContact.size(); i++) {
+                                                   ccAddressArray.add(toPrimaryContact.get(i).getEmail());
+                                               }
+                                           }
+
+                                           if(toSecondaryContact.size() > 0) {
+                                              for(int i = 0; i <= toSecondaryContact.size(); i++) {
+                                                   ccAddressArray.add(toSecondaryContact.get(i).getEmail());
+                                               }
+                                           }
+                                       }
+                                       else {
+                                           toName = toSecondaryContact.get(0).getFirstName() + " " + toSecondaryContact.get(0).getLastName();
+                                           msg.settoEmailAddress(toSecondaryContact.get(0).getEmail());
+
+                                           if(toSecondaryContact.size() > 1) {
+                                               for(int i = 1; i < toSecondaryContact.size(); i++) {
+                                                   ccAddressArray.add(toSecondaryContact.get(i).getEmail());
                                                }
                                            }
                                        }
 
-                                       if(toSecondaryContact.size() > 0) {
-                                           if(ccAddress.length() > 0) {
-                                               ccAddress.append(",");
-                                           }
-                                           for(int i = 0; i <= toSecondaryContact.size(); i++) {
-                                               ccAddress.append(toSecondaryContact.get(i).getEmail());
-                                               if(i < toSecondaryContact.size()) {
-                                                   ccAddress.append(",");
-                                               }
-                                           }
+                                       if(ccAddressArray.size() > 0) {
+                                           String[] ccAddressList = new String[ccAddressArray.size()];
+                                           ccAddressList = ccAddressArray.toArray(ccAddressList);
+                                           msg.setccEmailAddress(ccAddressList);
                                        }
+
+                                       msg.setmessageSubject("You have received a new message from the Universal Translator");
+
+                                       /* Build the body of the email */
+                                       StringBuilder sb = new StringBuilder();
+                                       sb.append("Dear " + toName + ", You have recieved a new message from the Universal Translator. ");
+                                       sb.append(System.getProperty("line.separator"));
+                                       sb.append(System.getProperty("line.separator"));
+                                       sb.append("BatchId: "+batchDLInfo.getutBatchName());
+                                       if(batchDLInfo.getoutputFIleName() != null && !"".equals(batchDLInfo.getoutputFIleName())) {
+                                            sb.append(System.getProperty("line.separator"));
+                                            sb.append("File Name: "+batchDLInfo.getoutputFIleName());
+                                        }
+                                       sb.append(System.getProperty("line.separator"));
+                                       sb.append("From Organization: "+fromOrg.getOrgName());
+
+                                       msg.setmessageBody(sb.toString());
+
+                                       /* Send the email */
+                                       emailMessageManager.sendEmail(msg);
+
                                    }
-                                   else {
-                                       toName = toSecondaryContact.get(0).getFirstName() + " " + toSecondaryContact.get(0).getLastName();
-                                       msg.settoEmailAddress(toSecondaryContact.get(0).getEmail());
+                                }
 
-                                       if(toSecondaryContact.size() > 1) {
-                                           for(int i = 1; i <= toSecondaryContact.size(); i++) {
-                                               ccAddress.append(toSecondaryContact.get(i).getEmail());
-                                               if(i<toSecondaryContact.size()) {
-                                                   ccAddress.append(",");
-                                               }
-                                           }
-                                       }
-                                   }
-
-                                   if(ccAddress.length() > 0) {
-                                       msg.setccEmailAddress(ccAddress.toString());
-                                   }
-
-                                   msg.setmessageSubject("You have received a new message from the Universal Translator");
-
-                                   /* Build the body of the email */
-                                   StringBuilder sb = new StringBuilder();
-                                   sb.append("Dear " + toName + ", You have recieved a new message from the Universal Translator. ");
-                                   sb.append(System.getProperty("line.separator"));
-                                   sb.append(System.getProperty("line.separator"));
-                                   sb.append("BatchId: "+batchDLInfo.getutBatchName());
-                                   sb.append(System.getProperty("line.separator"));
-                                   sb.append("From Organization: "+fromOrg.getOrgName());
-
-                                   msg.setmessageBody(sb.toString());
-
-                                   /* Send the email */
-                                   emailMessageManager.sendEmail(msg);
-
-                               }
                             }
-                            
                         }
+
                     }
-                    
                 }
             }
         }
+        catch(Exception ex) {
+            try {
+                throw new IOException(ex);
+            } catch (IOException ex1) {
+                Logger.getLogger(transactionOutManagerImpl.class.getName()).log(Level.SEVERE, null, ex1);
+            }
+        }
+        
     }
     
     /**
@@ -424,228 +431,235 @@ public class transactionOutManagerImpl implements transactionOutManager {
            the file is downloaded.
         */
         
-        /* Get a list of scheduled configurations (Daily, Weekly or Monthly) */
-        List<configurationSchedules> scheduledConfigs = transactionOutDAO.getScheduledConfigurations();
-      
-        if(!scheduledConfigs.isEmpty()) {
-            
-            int batchId = 0;
-            
-            for(configurationSchedules schedule : scheduledConfigs) {
-                
-                batchId = 0;
-                 
-                /* DAILY SCHEDULE */
-                if(schedule.gettype() == 2) {
-                    
-                    Date currDate = new Date();
-                    Calendar calendar = GregorianCalendar.getInstance();
-                    calendar.setTime(currDate);
-                    
-                    /* Need to get the latest log to make sure we don't run it again in the same day */
-                    List<targetOutputRunLogs> logs = transactionOutDAO.getLatestRunLog(schedule.getconfigId());
-                    
-                    /* if Daily check for scheduled or continuous */
-                    if(schedule.getprocessingType() == 1) {
-                        
-                        /* SCHEDULED */
-                        int hourOfDay = calendar.get(Calendar.HOUR_OF_DAY);
-                        
-                        double diffInHours;
-                        if(logs.size() > 0) {
-                            targetOutputRunLogs log = logs.get(0);
-                            long diff = currDate.getTime() - log.getlastRunTime().getTime();
-                            diffInHours = diff / ((double) 1000 * 60 * 60);
-                        }
-                        else {
-                            diffInHours = 0;
-                        }
-                        
-                        if(hourOfDay >= schedule.getprocessingTime() && (diffInHours == 0 || diffInHours >= 24)) {
-                            
-                             /* 
-                            Need to find all transactionTarget records that are loaded ready to moved to a downloadable
-                            batch
-                             */
-                            List<transactionTarget> loadedTransactions = transactionOutDAO.getLoadedOutBoundTransactions(schedule.getconfigId());
-                            
-                            if(!loadedTransactions.isEmpty()) {
-                                
-                                for(transactionTarget transaction : loadedTransactions) {
-                                    batchId = beginOutputProcess(transaction);
-                                }
-                                
-                                /* 
-                                Need to check the transport method for the configuration, if set to file download
-                                or set to FTP.
-                                */
-                                configurationTransport transportDetails = configurationTransportManager.getTransportDetails(schedule.getconfigId());
-                                
-                                /* if File Download update the status to Submission Delivery Completed ID = 23 status. This will only
-                                apply to scheduled and not continous settings. */
-                                if(transportDetails.gettransportMethodId() == 1) {
-                                    transactionOutDAO.updateBatchStatus(batchId, 23);
-                                }
-                                /* If FTP Call the FTP Method */
-                                else if(transportDetails.gettransportMethodId() == 3) {
-                                    FTPTargetFile(batchId);
-                                }
-                                
-                                /* Log the last run time */
-                                targetOutputRunLogs log = new targetOutputRunLogs();
-                                log.setconfigId(schedule.getconfigId());
+        try{
+            /* Get a list of scheduled configurations (Daily, Weekly or Monthly) */
+            List<configurationSchedules> scheduledConfigs = transactionOutDAO.getScheduledConfigurations();
 
-                                transactionOutDAO.saveOutputRunLog(log);
-                            }
-                            
-                        }
-                    }
-                    else {
-                        /* CONTINUOUS */
-                       
-                        double diffInHours;
-                        double diffInMinutes;
-                        if(logs.size() > 0) {
-                            targetOutputRunLogs log = logs.get(0);
-                            long diff = currDate.getTime() - log.getlastRunTime().getTime();
-                            diffInHours = diff / ((double) 1000 * 60 * 60);
-                            diffInMinutes = (diffInHours - (int)diffInHours)*60;
-                        }
-                        else {
-                            diffInMinutes = 0;
-                        }
-                        
-                        if(diffInMinutes == 0 || diffInMinutes >= schedule.getnewfileCheck()) {
-                            
-                             /* 
-                            Need to find all transactionTarget records that are loaded ready to moved to a downloadable
-                            batch
-                             */
-                            List<transactionTarget> loadedTransactions = transactionOutDAO.getLoadedOutBoundTransactions(schedule.getconfigId());
-                            
-                            if(!loadedTransactions.isEmpty()) {
-                                
-                                for(transactionTarget transaction : loadedTransactions) {
-                                    batchId = beginOutputProcess(transaction);
-                                }
-                                
-                                /* 
-                                Need to check the transport method for the configuration, if set to file download
-                                or set to FTP.
-                                */
-                                configurationTransport transportDetails = configurationTransportManager.getTransportDetails(schedule.getconfigId());
-                                
-                                /* if File Download update the status to Submission Delivery Completed ID = 23 status. This will only
-                                apply to scheduled and not continous settings. */
-                                if(transportDetails.gettransportMethodId() == 1) {
-                                    transactionOutDAO.updateBatchStatus(batchId, 23);
-                                }
-                                /* If FTP Call the FTP Method */
-                                else if(transportDetails.gettransportMethodId() == 3) {
-                                    FTPTargetFile(batchId);
-                                }
-                                
-                                /* Log the last run time */
-                                targetOutputRunLogs log = new targetOutputRunLogs();
-                                log.setconfigId(schedule.getconfigId());
+            if(!scheduledConfigs.isEmpty()) {
 
-                                transactionOutDAO.saveOutputRunLog(log);
+                int batchId = 0;
+
+                for(configurationSchedules schedule : scheduledConfigs) {
+
+                    batchId = 0;
+
+                    /* DAILY SCHEDULE */
+                    if(schedule.gettype() == 2) {
+
+                        Date currDate = new Date();
+                        Calendar calendar = GregorianCalendar.getInstance();
+                        calendar.setTime(currDate);
+
+                        /* Need to get the latest log to make sure we don't run it again in the same day */
+                        List<targetOutputRunLogs> logs = transactionOutDAO.getLatestRunLog(schedule.getconfigId());
+
+                        /* if Daily check for scheduled or continuous */
+                        if(schedule.getprocessingType() == 1) {
+
+                            /* SCHEDULED */
+                            int hourOfDay = calendar.get(Calendar.HOUR_OF_DAY);
+
+                            double diffInHours;
+                            if(logs.size() > 0) {
+                                targetOutputRunLogs log = logs.get(0);
+                                long diff = currDate.getTime() - log.getlastRunTime().getTime();
+                                diffInHours = diff / ((double) 1000 * 60 * 60);
                             }
-                        }
-                        
-                    }
-                }
-                /* WEEKLY SCHEDULE */
-                else if(schedule.gettype() == 3) {
-                    
-                }
-                
-                /* MONTHLY SCHEDULE */
-                else if(schedule.gettype() == 4) {
-                    
-                }
-                
-                /* If batchId > 0 then send the email out */
-                if(batchId > 0) {
-                    
-                    /* Get the batch Details */
-                    batchDownloads batchDLInfo = transactionOutDAO.getBatchDetails(batchId);
-                    
-                    /* get the to user details */
-                    List<User> toPrimaryContact = userManager.getOrganizationContact(batchDLInfo.getOrgId(),1);
-                    List<User> toSecondaryContact = userManager.getOrganizationContact(batchDLInfo.getOrgId(),2);
-                    
-                    if(toPrimaryContact.size() > 0 || toSecondaryContact.size() > 0) {
-                        String toName = null;
-                        mailMessage msg = new mailMessage();
-                        StringBuilder ccAddress = new StringBuilder();
-                        msg.setfromEmailAddress("dphuniversaltranslator@gmail.com");
-                        
-                        if(toPrimaryContact.size() > 0) {
-                            toName = toPrimaryContact.get(0).getFirstName() + " " + toPrimaryContact.get(0).getLastName();
-                            msg.settoEmailAddress(toPrimaryContact.get(0).getEmail());
-                            
-                            if(toPrimaryContact.size() > 1) {
-                                for(int i = 1; i <= toPrimaryContact.size(); i++) {
-                                    ccAddress.append(toPrimaryContact.get(i).getEmail());
-                                    if(i<toPrimaryContact.size()) {
-                                        ccAddress.append(",");
-                                    }
-                                }
+                            else {
+                                diffInHours = 0;
                             }
-                            
-                            if(toSecondaryContact.size() > 0) {
-                                if(ccAddress.length() > 0) {
-                                    ccAddress.append(",");
-                                }
-                                for(int i = 0; i <= toSecondaryContact.size(); i++) {
-                                    ccAddress.append(toSecondaryContact.get(i).getEmail());
-                                    if(i < toSecondaryContact.size()) {
-                                        ccAddress.append(",");
+
+                            if(hourOfDay >= schedule.getprocessingTime() && (diffInHours == 0 || diffInHours >= 24)) {
+
+                                 /* 
+                                Need to find all transactionTarget records that are loaded ready to moved to a downloadable
+                                batch (Transaction Status Id = 9)
+                                 */
+                                List<transactionTarget> loadedTransactions = transactionOutDAO.getLoadedOutBoundTransactions(schedule.getconfigId());
+
+                                if(!loadedTransactions.isEmpty()) {
+
+                                    for(transactionTarget transaction : loadedTransactions) {
+                                        batchId = beginOutputProcess(transaction);
                                     }
+
+                                    /* 
+                                    Need to check the transport method for the configuration, if set to file download
+                                    or set to FTP.
+                                    */
+                                    configurationTransport transportDetails = configurationTransportManager.getTransportDetails(schedule.getconfigId());
+
+                                    /* if File Download update the status to Submission Delivery Completed ID = 23 status. This will only
+                                    apply to scheduled and not continous settings. */
+                                    if(transportDetails.gettransportMethodId() == 1) {
+                                        transactionOutDAO.updateBatchStatus(batchId, 23);
+                                    }
+                                    /* If FTP Call the FTP Method */
+                                    else if(transportDetails.gettransportMethodId() == 3) {
+                                        FTPTargetFile(batchId);
+                                    }
+
+                                    /* Log the last run time */
+                                    targetOutputRunLogs log = new targetOutputRunLogs();
+                                    log.setconfigId(schedule.getconfigId());
+
+                                    transactionOutDAO.saveOutputRunLog(log);
                                 }
+
                             }
                         }
                         else {
-                            toName = toSecondaryContact.get(0).getFirstName() + " " + toSecondaryContact.get(0).getLastName();
-                            msg.settoEmailAddress(toSecondaryContact.get(0).getEmail());
+                            /* CONTINUOUS */
+
+                            double diffInHours;
+                            double diffInMinutes;
+                            if(logs.size() > 0) {
+                                targetOutputRunLogs log = logs.get(0);
+                                long diff = currDate.getTime() - log.getlastRunTime().getTime();
+                                diffInHours = diff / ((double) 1000 * 60 * 60);
+                                diffInMinutes = (diffInHours - (int)diffInHours)*60;
+                            }
+                            else {
+                                diffInMinutes = 0;
+                            }
+
+                            if(diffInMinutes == 0 || diffInMinutes >= schedule.getnewfileCheck()) {
+
+                                 /* 
+                                Need to find all transactionTarget records that are loaded ready to moved to a downloadable
+                                batch
+                                 */
+                                List<transactionTarget> loadedTransactions = transactionOutDAO.getLoadedOutBoundTransactions(schedule.getconfigId());
+
+                                if(!loadedTransactions.isEmpty()) {
+
+                                    for(transactionTarget transaction : loadedTransactions) {
+                                        batchId = beginOutputProcess(transaction);
+                                    }
+
+                                    /* 
+                                    Need to check the transport method for the configuration, if set to file download
+                                    or set to FTP.
+                                    */
+                                    configurationTransport transportDetails = configurationTransportManager.getTransportDetails(schedule.getconfigId());
+
+                                    /* if File Download update the status to Submission Delivery Completed ID = 23 status. This will only
+                                    apply to scheduled and not continous settings. */
+                                    if(transportDetails.gettransportMethodId() == 1) {
+                                        transactionOutDAO.updateBatchStatus(batchId, 23);
+                                    }
+                                    /* If FTP Call the FTP Method */
+                                    else if(transportDetails.gettransportMethodId() == 3) {
+                                        FTPTargetFile(batchId);
+                                    }
+
+                                    /* Log the last run time */
+                                    targetOutputRunLogs log = new targetOutputRunLogs();
+                                    log.setconfigId(schedule.getconfigId());
+
+                                    transactionOutDAO.saveOutputRunLog(log);
+                                }
+                            }
+
+                        }
+                    }
+                    /* WEEKLY SCHEDULE */
+                    else if(schedule.gettype() == 3) {
+
+                    }
+
+                    /* MONTHLY SCHEDULE */
+                    else if(schedule.gettype() == 4) {
+
+                    }
+
+                    /* If batchId > 0 then send the email out */
+                    if(batchId > 0) {
+
+                        /* Get the batch Details */
+                        batchDownloads batchDLInfo = transactionOutDAO.getBatchDetails(batchId);
+
+                        /* Get the list of primary and secondary contacts */
+                        List<User> toPrimaryContact = userManager.getOrganizationContact(batchDLInfo.getOrgId(),1);
+                        List<User> toSecondaryContact = userManager.getOrganizationContact(batchDLInfo.getOrgId(),2);
+                        
+                        if(toPrimaryContact.size() > 0 || toSecondaryContact.size() > 0) {
+                            String toName = null;
+                            mailMessage msg = new mailMessage();
+                            ArrayList<String> ccAddressArray = new ArrayList<String>();
                             
-                            if(toSecondaryContact.size() > 1) {
-                                for(int i = 1; i <= toSecondaryContact.size(); i++) {
-                                    ccAddress.append(toSecondaryContact.get(i).getEmail());
-                                    if(i<toSecondaryContact.size()) {
-                                        ccAddress.append(",");
+                            msg.setfromEmailAddress("dphuniversaltranslator@gmail.com");
+                            
+                            if(toPrimaryContact.size() > 0) {
+                                toName = toPrimaryContact.get(0).getFirstName() + " " + toPrimaryContact.get(0).getLastName();
+                                msg.settoEmailAddress(toPrimaryContact.get(0).getEmail());
+                                
+                                if(toPrimaryContact.size() > 1) {
+                                    for(int i = 1; i < toPrimaryContact.size(); i++) {
+                                        ccAddressArray.add(toPrimaryContact.get(i).getEmail());
+                                    }
+                                    
+                                }
+
+                                if(toSecondaryContact.size() > 0) {
+                                    for(int i = 0; i < toSecondaryContact.size(); i++) {
+                                        ccAddressArray.add(toSecondaryContact.get(i).getEmail());
                                     }
                                 }
                             }
+                            else {
+                                toName = toSecondaryContact.get(0).getFirstName() + " " + toSecondaryContact.get(0).getLastName();
+                                msg.settoEmailAddress(toSecondaryContact.get(0).getEmail());
+
+                                if(toSecondaryContact.size() > 1) {
+                                    for(int i = 1; i < toSecondaryContact.size(); i++) {
+                                        ccAddressArray.add(toSecondaryContact.get(i).getEmail());
+                                    }
+                                }
+                            }
+
+                            if(ccAddressArray.size() > 0) {
+                                String[] ccAddressList = new String[ccAddressArray.size()];
+                                ccAddressList = ccAddressArray.toArray(ccAddressList);
+                                msg.setccEmailAddress(ccAddressList);
+                            }
+
+                            msg.setmessageSubject("You have received a new message from the Universal Translator");
+
+                            /* Build the body of the email */
+                            StringBuilder sb = new StringBuilder();
+                            sb.append("Dear " + toName + ", You have recieved a new message from the Universal Translator. ");
+                            sb.append(System.getProperty("line.separator"));
+                            sb.append(System.getProperty("line.separator"));
+                            sb.append("BatchId: "+batchDLInfo.getutBatchName());
+                            if(batchDLInfo.getoutputFIleName() != null && !"".equals(batchDLInfo.getoutputFIleName())) {
+                                sb.append(System.getProperty("line.separator"));
+                                sb.append("File Name: "+batchDLInfo.getoutputFIleName());
+                            }
+                            sb.append(System.getProperty("line.separator"));
+
+                            msg.setmessageBody(sb.toString());
+
+                            /* Send the email */
+                            emailMessageManager.sendEmail(msg);
+
                         }
-                        
-                        if(ccAddress.length() > 0) {
-                            msg.setccEmailAddress(ccAddress.toString());
-                        }
-                        
-                        msg.setmessageSubject("You have received a new message from the Universal Translator");
 
-                        /* Build the body of the email */
-                        StringBuilder sb = new StringBuilder();
-                        sb.append("Dear " + toName + ", You have recieved a new message from the Universal Translator. ");
-                        sb.append(System.getProperty("line.separator"));
-                        sb.append(System.getProperty("line.separator"));
-                        sb.append("BatchId: "+batchDLInfo.getutBatchName());
-                        sb.append(System.getProperty("line.separator"));
-
-                        msg.setmessageBody(sb.toString());
-
-                        /* Send the email */
-                        emailMessageManager.sendEmail(msg);
-                        
                     }
 
                 }
-                
+
             }
-            
         }
+        catch(Exception ex) {
+            try {
+                throw new IOException(ex);
+            } catch (IOException ex1) {
+                Logger.getLogger(transactionOutManagerImpl.class.getName()).log(Level.SEVERE, null, ex1);
+            }
+        }
+        
+        
         
     }
     
@@ -660,106 +674,117 @@ public class transactionOutManagerImpl implements transactionOutManager {
      */
     public int beginOutputProcess(transactionTarget transaction) {
         
-        int batchId = 0;
+        try {
+            int batchId = 0;
          
-        batchUploads uploadedBatchDetails = transactionInManager.getBatchDetails(transaction.getbatchUploadId());
-        
-        configuration configDetails = configurationManager.getConfigurationById(transaction.getconfigId());
-                    
-        configurationTransport transportDetails = configurationTransportManager.getTransportDetails(transaction.getconfigId());
-       
-        /* Check to see what outut transport method was set up */
-        
-        /* ERG */
-        if(transportDetails.gettransportMethodId() == 2) {
+            batchUploads uploadedBatchDetails = transactionInManager.getBatchDetails(transaction.getbatchUploadId());
 
-            /* Generate the batch */
-            /* (target configuration Details, transaction details, transport Details for target config, Source OrgId, Source Original Filename, mergeable) */
-            batchId = generateBatch(configDetails, transaction, transportDetails, uploadedBatchDetails.getOrgId(), uploadedBatchDetails.getoriginalFileName(), false);
-            
-            /* Update the status of the uploaded batch to  TBP (Target Batch Creating in process) (ID = 25) */
-            transactionInManager.updateBatchStatus(batchId,25,"");
+            configuration configDetails = configurationManager.getConfigurationById(transaction.getconfigId());
 
-        }
-        /* File Download */
-        else if(transportDetails.gettransportMethodId() == 1) {
+            configurationTransport transportDetails = configurationTransportManager.getTransportDetails(transaction.getconfigId());
 
-            boolean createNewFile = true;
+            /* Check to see what outut transport method was set up */
 
-            /* 
-                If the merge batches option is not checked create the batch right away
-            */
-           
-            if(transportDetails.getmergeBatches() == false) {
+            /* ERG */
+            if(transportDetails.gettransportMethodId() == 2) {
 
                 /* Generate the batch */
                 /* (target configuration Details, transaction details, transport Details for target config, Source OrgId, Source Original Filename, mergeable) */
                 batchId = generateBatch(configDetails, transaction, transportDetails, uploadedBatchDetails.getOrgId(), uploadedBatchDetails.getoriginalFileName(), false);
-                
+
                 /* Update the status of the uploaded batch to  TBP (Target Batch Creating in process) (ID = 25) */
                 transactionInManager.updateBatchStatus(batchId,25,"");
 
             }
-            else {
+            /* File Download */
+            else if(transportDetails.gettransportMethodId() == 1) {
 
-                /* We want to merge this transaction with the existing created batch if not yet opened (ID = 28) */
-                /* 1. Need to see if a mergable batch exists for the org that hasn't been picked up yet */
-                int mergeablebatchId = transactionOutDAO.findMergeableBatch(configDetails.getorgId());
-                
-                /* If no mergable batch is found create a new batch */
-                if(mergeablebatchId == 0) {
-                    
+                boolean createNewFile = true;
+
+                /* 
+                    If the merge batches option is not checked create the batch right away
+                */
+
+                if(transportDetails.getmergeBatches() == false) {
+
                     /* Generate the batch */
                     /* (target configuration Details, transaction details, transport Details for target config, Source OrgId, Source Original Filename, mergeable) */
-                    batchId = generateBatch(configDetails, transaction, transportDetails, uploadedBatchDetails.getOrgId(), uploadedBatchDetails.getoriginalFileName(), true);
-                    
+                    batchId = generateBatch(configDetails, transaction, transportDetails, uploadedBatchDetails.getOrgId(), uploadedBatchDetails.getoriginalFileName(), false);
+
                     /* Update the status of the uploaded batch to  TBP (Target Batch Creating in process) (ID = 25) */
                     transactionInManager.updateBatchStatus(batchId,25,"");
 
                 }
                 else {
 
-                   batchId = mergeablebatchId;
-                   
-                   /* Need to upldate the transaction batchDLId to the new found batch Id */
-                   transactionOutDAO.updateTransactionTargetBatchDLId(batchId, transaction.getId());
-                   
-                   /* Need to add a new entry in the summary table (need to make sure we don't enter duplicates) */
-                   batchDownloadSummary summary = new batchDownloadSummary();
-                   summary.setbatchId(batchId);
-                   summary.settargetConfigId(configDetails.getId());
-                   summary.setmessageTypeId(configDetails.getMessageTypeId());
-                   summary.settargetOrgId(configDetails.getorgId());
-                   summary.settransactionTargetId(transaction.getId());
-                   summary.setsourceOrgId(uploadedBatchDetails.getOrgId());
+                    /* We want to merge this transaction with the existing created batch if not yet opened (ID = 28) */
+                    /* 1. Need to see if a mergable batch exists for the org that hasn't been picked up yet */
+                    int mergeablebatchId = transactionOutDAO.findMergeableBatch(configDetails.getorgId());
 
-                   transactionOutDAO.submitSummaryEntry(summary);
-                   
-                   createNewFile = false;
+                    /* If no mergable batch is found create a new batch */
+                    if(mergeablebatchId == 0) {
+
+                        /* Generate the batch */
+                        /* (target configuration Details, transaction details, transport Details for target config, Source OrgId, Source Original Filename, mergeable) */
+                        batchId = generateBatch(configDetails, transaction, transportDetails, uploadedBatchDetails.getOrgId(), uploadedBatchDetails.getoriginalFileName(), true);
+
+                        /* Update the status of the uploaded batch to  TBP (Target Batch Creating in process) (ID = 25) */
+                        transactionInManager.updateBatchStatus(batchId,25,"");
+
+                    }
+                    else {
+
+                       batchId = mergeablebatchId;
+
+                       /* Need to upldate the transaction batchDLId to the new found batch Id */
+                       transactionOutDAO.updateTransactionTargetBatchDLId(batchId, transaction.getId());
+
+                       /* Need to add a new entry in the summary table (need to make sure we don't enter duplicates) */
+                       batchDownloadSummary summary = new batchDownloadSummary();
+                       summary.setbatchId(batchId);
+                       summary.settargetConfigId(configDetails.getId());
+                       summary.setmessageTypeId(configDetails.getMessageTypeId());
+                       summary.settargetOrgId(configDetails.getorgId());
+                       summary.settransactionTargetId(transaction.getId());
+                       summary.setsourceOrgId(uploadedBatchDetails.getOrgId());
+
+                       transactionOutDAO.submitSummaryEntry(summary);
+
+                       createNewFile = false;
+
+                    }
 
                 }
 
+                /* Generate the file */
+                try {
+                    generateTargetFile(createNewFile, transaction.getId(), batchId, transportDetails);
+                } catch (IllegalAccessException ex) {
+                    Logger.getLogger(transactionOutManagerImpl.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
             }
-            
-            /* Generate the file */
-            try {
-                generateTargetFile(createNewFile, transaction.getId(), batchId, transportDetails);
-            } catch (IllegalAccessException ex) {
-                Logger.getLogger(transactionOutManagerImpl.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            
+
+            /* Update the status of the transaction to PP (Pending Pickup) (ID = 18) */
+            transactionInManager.updateTransactionStatus(transaction.getbatchUploadId(), transaction.gettransactionInId(), 0, 18);
+
+            /* Update the status of the transaction target to PP (Pending Pickup) (ID = 18) */
+            transactionInManager.updateTransactionTargetStatus(0, transaction.getId(), 0, 18);
+
+            /* Update the status of the uploaded batch to  TBP (Target Batch Created) (ID = 28) */
+            transactionInManager.updateBatchStatus(transaction.getbatchUploadId(),28,"");
+
+            return batchId; 
         }
-        
-        /* Update the status of the transaction to PP (Pending Pickup) (ID = 18) */
-        transactionInManager.updateTransactionStatus(transaction.getbatchUploadId(), transaction.gettransactionInId(), 0, 18);
-
-        /* Update the status of the transaction target to PP (Pending Pickup) (ID = 18) */
-        transactionInManager.updateTransactionTargetStatus(0, transaction.getId(), 0, 18);
-
-        /* Update the status of the uploaded batch to  TBP (Target Batch Created) (ID = 28) */
-        transactionInManager.updateBatchStatus(transaction.getbatchUploadId(),28,"");
-        
-        return batchId;
+        catch(Exception ex) {
+            try {
+                throw new IOException(ex);
+            } catch (IOException ex1) {
+                Logger.getLogger(transactionOutManagerImpl.class.getName()).log(Level.SEVERE, null, ex1);
+            }
+            
+            return 0;
+        }
         
     }
     
@@ -769,89 +794,100 @@ public class transactionOutManagerImpl implements transactionOutManager {
      */
     public int generateBatch(configuration configDetails, transactionTarget transaction, configurationTransport transportDetails, int sourceOrgId, String sourceFileName, boolean mergeable) {
         
-        /* Create the batch name (OrgId+MessageTypeId+Date/Time) */
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-        Date date = new Date();
-        String utbatchName = new StringBuilder().append(configDetails.getorgId()).append(configDetails.getMessageTypeId()).append(dateFormat.format(date)).toString();
-        
-        
-        /* Need to create a new batch */
-        String batchName = null;
-        
-        if(transportDetails.gettargetFileName() == null) {
-            /* Create the batch name (OrgId+MessageTypeId) */
-            batchName = new StringBuilder().append(configDetails.getorgId()).append(configDetails.getMessageTypeId()).toString();
-        }
-        else if ("USE SOURCE FILE".equals(transportDetails.gettargetFileName())) {
-            int lastPeriodPos = sourceFileName.lastIndexOf(".");
-            
-            if(lastPeriodPos <= 0) {
-                batchName = sourceFileName;
+        try {
+            /* Create the batch name (OrgId+MessageTypeId+Date/Time) */
+            DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+            Date date = new Date();
+            String utbatchName = new StringBuilder().append(configDetails.getorgId()).append(configDetails.getMessageTypeId()).append(dateFormat.format(date)).toString();
+
+
+            /* Need to create a new batch */
+            String batchName = null;
+
+            if(transportDetails.gettargetFileName() == null) {
+                /* Create the batch name (OrgId+MessageTypeId) */
+                batchName = new StringBuilder().append(configDetails.getorgId()).append(configDetails.getMessageTypeId()).toString();
             }
-            else {
-                batchName = sourceFileName.substring(0,lastPeriodPos);
-            }
-            
-        }
-        else {
-            batchName = transportDetails.gettargetFileName();
-            
-        }
-        
-        /* Append the date time */
-        if(transportDetails.getappendDateTime() == true) {
-            batchName = new StringBuilder().append(batchName).append(dateFormat.format(date)).toString();
-        }
+            else if ("USE SOURCE FILE".equals(transportDetails.gettargetFileName())) {
+                int lastPeriodPos = sourceFileName.lastIndexOf(".");
 
-        /* Get the connection id for the configuration */
-        List<configurationConnection> connections = configurationManager.getConnectionsByTargetConfiguration(transaction.getconfigId());
-
-        int userId = 0;
-        if(!connections.isEmpty()) {
-            for(configurationConnection connection : connections) {
-                List<configurationConnectionReceivers> receivers = configurationManager.getConnectionReceivers(connection.getId());
-
-                if(!receivers.isEmpty()) {
-                    for(configurationConnectionReceivers receiver : receivers) {
-                        userId = receiver.getuserId();
-                    }
+                if(lastPeriodPos <= 0) {
+                    batchName = sourceFileName;
+                }
+                else {
+                    batchName = sourceFileName.substring(0,lastPeriodPos);
                 }
 
             }
+            else {
+                batchName = transportDetails.gettargetFileName();
+
+            }
+
+            /* Append the date time */
+            if(transportDetails.getappendDateTime() == true) {
+                batchName = new StringBuilder().append(batchName).append(dateFormat.format(date)).toString();
+            }
+
+            /* Get the connection id for the configuration */
+            List<configurationConnection> connections = configurationManager.getConnectionsByTargetConfiguration(transaction.getconfigId());
+
+            int userId = 0;
+            if(!connections.isEmpty()) {
+                for(configurationConnection connection : connections) {
+                    List<configurationConnectionReceivers> receivers = configurationManager.getConnectionReceivers(connection.getId());
+
+                    if(!receivers.isEmpty()) {
+                        for(configurationConnectionReceivers receiver : receivers) {
+                            userId = receiver.getuserId();
+                        }
+                    }
+
+                }
+            }
+
+            /* Submit a new batch */
+            batchDownloads batchDownload = new batchDownloads();
+            batchDownload.setOrgId(configDetails.getorgId());
+            batchDownload.setuserId(userId);
+            batchDownload.setutBatchName(utbatchName);
+            batchDownload.settotalErrorCount(0);
+            batchDownload.settotalRecordCount(1);
+            batchDownload.setdeleted(false);
+            batchDownload.settransportMethodId(transportDetails.gettransportMethodId());
+            batchDownload.setoutputFIleName(batchName);
+            batchDownload.setmergeable(mergeable);
+
+            /* Update the status of the target batch to TBP (Target Batch Created) (ID = 28) */
+            batchDownload.setstatusId(28);
+
+            int batchId = (int) transactionOutDAO.submitBatchDownload(batchDownload);
+
+            /* Need to upldate the transaction batchDLId to the new created batch Id */
+            transactionOutDAO.updateTransactionTargetBatchDLId(batchId, transaction.getId());
+
+            /* Need to submit the batch summary */
+            batchDownloadSummary summary = new batchDownloadSummary();
+            summary.setbatchId(batchId);
+            summary.settargetConfigId(configDetails.getId());
+            summary.setmessageTypeId(configDetails.getMessageTypeId());
+            summary.settargetOrgId(configDetails.getorgId());
+            summary.settransactionTargetId(transaction.getId());
+            summary.setsourceOrgId(sourceOrgId);
+
+            transactionOutDAO.submitSummaryEntry(summary);
+
+            return batchId;
         }
-        
-        /* Submit a new batch */
-        batchDownloads batchDownload = new batchDownloads();
-        batchDownload.setOrgId(configDetails.getorgId());
-        batchDownload.setuserId(userId);
-        batchDownload.setutBatchName(utbatchName);
-        batchDownload.settotalErrorCount(0);
-        batchDownload.settotalRecordCount(1);
-        batchDownload.setdeleted(false);
-        batchDownload.settransportMethodId(transportDetails.gettransportMethodId());
-        batchDownload.setoutputFIleName(batchName);
-        batchDownload.setmergeable(mergeable);
-
-        /* Update the status of the target batch to TBP (Target Batch Created) (ID = 28) */
-        batchDownload.setstatusId(28);
-
-        int batchId = (int) transactionOutDAO.submitBatchDownload(batchDownload);
-
-        /* Need to upldate the transaction batchDLId to the new created batch Id */
-        transactionOutDAO.updateTransactionTargetBatchDLId(batchId, transaction.getId());
-        
-        /* Need to submit the batch summary */
-        batchDownloadSummary summary = new batchDownloadSummary();
-        summary.setbatchId(batchId);
-        summary.settargetConfigId(configDetails.getId());
-        summary.setmessageTypeId(configDetails.getMessageTypeId());
-        summary.settargetOrgId(configDetails.getorgId());
-        summary.settransactionTargetId(transaction.getId());
-        summary.setsourceOrgId(sourceOrgId);
-        
-        transactionOutDAO.submitSummaryEntry(summary);
-        
-        return batchId;
+        catch(Exception ex) {
+            try {
+                throw new IOException(ex);
+            } catch (IOException ex1) {
+                Logger.getLogger(transactionOutManagerImpl.class.getName()).log(Level.SEVERE, null, ex1);
+            }
+            
+            return 0;
+        }
         
     }
     
@@ -859,132 +895,142 @@ public class transactionOutManagerImpl implements transactionOutManager {
      * The 'generateTargetFile' function will generate the actual file in the correct organizations
      * outpufiles folder.
      */
-    public void generateTargetFile(boolean createNewFile, int transactionTargetId, int batchId, configurationTransport transportDetails) throws IllegalAccessException, IllegalAccessException {
+    public void generateTargetFile(boolean createNewFile, int transactionTargetId, int batchId, configurationTransport transportDetails) throws IllegalAccessException {
         
-         String fileName = null; 
-         
-         batchDownloads batchDetails = transactionOutDAO.getBatchDetails(batchId);
-         
-         InputStream inputStream = null;
-         OutputStream outputStream = null;
-         
-         fileSystem dir = new fileSystem();
-         
-         String filelocation = transportDetails.getfileLocation();
-         filelocation = filelocation.replace("/bowlink/", "");
-         
-         dir.setDirByName(filelocation);
-         
-         boolean hl7 = false;
-         String fileType = (String) configurationManager.getFileTypesById(transportDetails.getfileType());
-         
-         if(fileType == "hl7") {
-             fileType = "hr";
-             hl7 = true;
-         }
-         
-         int findExt = batchDetails.getoutputFIleName().lastIndexOf(".");
-         
-         if(findExt >= 0) {
-             fileName = batchDetails.getoutputFIleName();
-         }
-         else {
-            fileName = new StringBuilder().append(batchDetails.getoutputFIleName()).append(".").append(fileType).toString(); 
-         }
-           
-         File newFile = new File(dir.getDir() + fileName);
-         
-         /* Create the empty file in the correct location */
-         if(createNewFile == true || !newFile.exists()) {
-            try {
-               
-               if (newFile.exists()) {
-                  int i = 1;
-                  while (newFile.exists()) {
-                      int iDot = fileName.lastIndexOf(".");
-                      newFile = new File(dir.getDir() + fileName.substring(0, iDot) + "_(" + ++i + ")" + fileName.substring(iDot));
-                  }
-                  fileName = newFile.getName();
-                  newFile.createNewFile();
-              } else {
-                  newFile.createNewFile();
-              }
-           } catch (IOException e) {
-               e.printStackTrace();
-           }
-            
-           /* Need to update the batch with the updated file name */
-           transactionOutDAO.updateBatchOutputFileName(batchDetails.getId(),fileName);
-           
-         }
-         
-         /* Read in the file */
          try {
-            FileInputStream fileInput = null; 
-            File file = new File(dir.getDir() + fileName);
-            fileInput = new FileInputStream(file);
-            
-            /* Need to get the records for the transaction */
-            String recordRow = "";
-            
-            transactionOutRecords records = transactionOutDAO.getTransactionRecords(transactionTargetId);
-            
-            /* Need to get the max field number */
-            int maxFieldNo = transactionOutDAO.getMaxFieldNo(transportDetails.getconfigId());
-            
-            /* Need to get the correct delimiter for the output file */
-            String delimChar = (String) messageTypeDAO.getDelimiterChar(transportDetails.getfileDelimiter());
-            
-            if(records != null) {
-                FileWriter fw = null;
-                
-                try {
-                    fw = new FileWriter(file, true);
-                } catch (IOException ex) {
-                    Logger.getLogger(transactionOutManagerImpl.class.getName()).log(Level.SEVERE, null, ex);
-                }
+            String fileName = null; 
+         
+            batchDownloads batchDetails = transactionOutDAO.getBatchDetails(batchId);
 
-                for(int i = 1; i <= maxFieldNo; i++) {
-                    
-                    String colName = new StringBuilder().append("f").append(i).toString();
-                
-                    try {
-                        String fieldValue = BeanUtils.getProperty(records, colName);
-                        
-                        if("null".equals(fieldValue)) {
-                            fieldValue = "";
-                        }
-                        
-                        if(i == maxFieldNo) {
-                            recordRow = new StringBuilder().append(recordRow).append(fieldValue).append(System.getProperty( "line.separator" )).toString();
-                        }
-                        else {
-                            recordRow = new StringBuilder().append(recordRow).append(fieldValue).append(delimChar).toString();
-                        }
-                        
-                    } catch (IllegalAccessException ex) {
-                        Logger.getLogger(transactionOutManagerImpl.class.getName()).log(Level.SEVERE, null, ex);
-                    } catch (InvocationTargetException ex) {
-                        Logger.getLogger(transactionOutManagerImpl.class.getName()).log(Level.SEVERE, null, ex);
-                    } catch (NoSuchMethodException ex) {
-                        Logger.getLogger(transactionOutManagerImpl.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-                
-                if(recordRow != null) {
-                    try {
-                        fw.write(recordRow);
-                        fw.close();
-                    } catch (IOException ex) {
-                        Logger.getLogger(transactionOutManagerImpl.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-                
+            InputStream inputStream = null;
+            OutputStream outputStream = null;
+
+            fileSystem dir = new fileSystem();
+
+            String filelocation = transportDetails.getfileLocation();
+            filelocation = filelocation.replace("/bowlink/", "");
+
+            dir.setDirByName(filelocation);
+
+            boolean hl7 = false;
+            String fileType = (String) configurationManager.getFileTypesById(transportDetails.getfileType());
+
+            if(fileType == "hl7") {
+                fileType = "hr";
+                hl7 = true;
+            }
+
+            int findExt = batchDetails.getoutputFIleName().lastIndexOf(".");
+
+            if(findExt >= 0) {
+                fileName = batchDetails.getoutputFIleName();
+            }
+            else {
+               fileName = new StringBuilder().append(batchDetails.getoutputFIleName()).append(".").append(fileType).toString(); 
+            }
+
+            File newFile = new File(dir.getDir() + fileName);
+
+            /* Create the empty file in the correct location */
+            if(createNewFile == true || !newFile.exists()) {
+               try {
+
+                  if (newFile.exists()) {
+                     int i = 1;
+                     while (newFile.exists()) {
+                         int iDot = fileName.lastIndexOf(".");
+                         newFile = new File(dir.getDir() + fileName.substring(0, iDot) + "_(" + ++i + ")" + fileName.substring(iDot));
+                     }
+                     fileName = newFile.getName();
+                     newFile.createNewFile();
+                 } else {
+                     newFile.createNewFile();
+                 }
+              } catch (IOException e) {
+                  e.printStackTrace();
+              }
+
+              /* Need to update the batch with the updated file name */
+              transactionOutDAO.updateBatchOutputFileName(batchDetails.getId(),fileName);
+
+            }
+
+            /* Read in the file */
+            try {
+               FileInputStream fileInput = null; 
+               File file = new File(dir.getDir() + fileName);
+               fileInput = new FileInputStream(file);
+
+               /* Need to get the records for the transaction */
+               String recordRow = "";
+
+               transactionOutRecords records = transactionOutDAO.getTransactionRecords(transactionTargetId);
+
+               /* Need to get the max field number */
+               int maxFieldNo = transactionOutDAO.getMaxFieldNo(transportDetails.getconfigId());
+
+               /* Need to get the correct delimiter for the output file */
+               String delimChar = (String) messageTypeDAO.getDelimiterChar(transportDetails.getfileDelimiter());
+
+               if(records != null) {
+                   FileWriter fw = null;
+
+                   try {
+                       fw = new FileWriter(file, true);
+                   } catch (IOException ex) {
+                       Logger.getLogger(transactionOutManagerImpl.class.getName()).log(Level.SEVERE, null, ex);
+                   }
+
+                   for(int i = 1; i <= maxFieldNo; i++) {
+
+                       String colName = new StringBuilder().append("f").append(i).toString();
+
+                       try {
+                           String fieldValue = BeanUtils.getProperty(records, colName);
+
+                           if("null".equals(fieldValue)) {
+                               fieldValue = "";
+                           }
+
+                           if(i == maxFieldNo) {
+                               recordRow = new StringBuilder().append(recordRow).append(fieldValue).append(System.getProperty( "line.separator" )).toString();
+                           }
+                           else {
+                               recordRow = new StringBuilder().append(recordRow).append(fieldValue).append(delimChar).toString();
+                           }
+
+                       } catch (IllegalAccessException ex) {
+                           Logger.getLogger(transactionOutManagerImpl.class.getName()).log(Level.SEVERE, null, ex);
+                       } catch (InvocationTargetException ex) {
+                           Logger.getLogger(transactionOutManagerImpl.class.getName()).log(Level.SEVERE, null, ex);
+                       } catch (NoSuchMethodException ex) {
+                           Logger.getLogger(transactionOutManagerImpl.class.getName()).log(Level.SEVERE, null, ex);
+                       }
+                   }
+
+                   if(recordRow != null) {
+                       try {
+                           fw.write(recordRow);
+                           fw.close();
+                       } catch (IOException ex) {
+                           throw new IOException(ex);
+                       }
+                   }
+
+               }
+
+            } catch (FileNotFoundException e) {
+               e.printStackTrace();
+            } 
+         }
+         catch(IOException ex) {
+            try {
+                throw new IOException(ex);
+            } catch (IOException ex1) {
+                Logger.getLogger(transactionOutManagerImpl.class.getName()).log(Level.SEVERE, null, ex1);
             }
             
-         } catch (FileNotFoundException e) {
-            e.printStackTrace();
-         }
+        }
          
     }
     

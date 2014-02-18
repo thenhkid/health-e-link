@@ -95,3 +95,19 @@ CREATE TABLE `universaltranslator`.`targetoutputrunlogs` (
   `lastRunTime` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`));
 
+/** Chad 2.18.14 @ 11:51 AM **/
+ALTER TABLE `universalTranslator`.`message_ToProvider` 
+CHANGE COLUMN `state` `state` VARCHAR(45) NULL DEFAULT NULL ;
+
+ALTER TABLE `universalTranslator`.`message_ToOrg` 
+CHANGE COLUMN `state` `state` VARCHAR(45) NULL DEFAULT NULL ;
+
+ALTER TABLE `universalTranslator`.`message_PatientAddresses` 
+CHANGE COLUMN `state` `state` VARCHAR(45) NULL DEFAULT NULL COMMENT 'State - e.g. MA' ;
+
+ALTER TABLE `universalTranslator`.`message_FromProvider` 
+CHANGE COLUMN `state` `state` VARCHAR(45) NULL DEFAULT NULL ;
+
+ALTER TABLE `universalTranslator`.`message_FromOrg` 
+CHANGE COLUMN `state` `state` VARCHAR(45) NULL DEFAULT NULL ;
+
