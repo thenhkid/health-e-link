@@ -194,5 +194,8 @@ public interface transactionInManager {
     void resetTransactionTranslatedIn (Integer batchId);
     
     List<configurationTransport> getHandlingDetailsByBatch(int batchId);
+    
+    void insertProcessingError(Integer errorId, Integer configId, Integer batchId, Integer fieldId, Integer macroId, Integer cwId, Integer validationTypeId, boolean required, boolean foroutboundProcessing, String errorCause);
+    
 
 }

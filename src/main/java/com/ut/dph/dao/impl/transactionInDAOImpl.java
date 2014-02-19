@@ -2131,18 +2131,24 @@ public class transactionInDAOImpl implements transactionInDAO {
 
 		@Override
 		@Transactional
-		 @SuppressWarnings("unchecked")
+		@SuppressWarnings("unchecked")
 		public List<configurationTransport> getHandlingDetailsByBatch(
 				int batchId) throws Exception {
-			String sql = ("select distinct clearRecords, autoRelease, errorHandling "
-					+ " from configurationtransportdetails where configId in "
-					+ "(select distinct configId from transactionIn where batchId = :batchId);");
-	        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
-	                .setResultTransformer(
-	                        Transformers.aliasToBean(configurationTransport.class))
-	                .setParameter("batchUploadId", batchId);
-	        List<configurationTransport> ct = query.list();
-
-	        return ct;
+			try {
+				String sql = ("select distinct clearRecords, autoRelease, errorHandling "
+						+ " from configurationtransportdetails where configId in "
+						+ "(select distinct configId from transactionIn where batchId = :batchId);");
+		        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
+		                .setResultTransformer(
+		                        Transformers.aliasToBean(configurationTransport.class))
+		                .setParameter("batchId", batchId);
+		       
+		        	List<configurationTransport> ct = query.list();
+		        	return ct;
+	        } catch (Exception ex) {
+	        	ex.printStackTrace();
+	        	return null;
+	        }
+	       
 	    }
 }

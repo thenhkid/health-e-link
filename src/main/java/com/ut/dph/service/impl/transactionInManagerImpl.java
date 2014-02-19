@@ -488,16 +488,17 @@ public class transactionInManagerImpl implements transactionInManager {
     @Override
     public boolean processBatch(int batchUploadId) throws Exception {
 
-        boolean successfulBatch = false;
-        /**
-         * get batch details *
-         */
-        batchUploads batch = getBatchDetails(batchUploadId);
+		boolean successfulBatch = false;
+		/**
+		 * get batch details *
+		 */
+		batchUploads batch = getBatchDetails(batchUploadId);
 
-        /**
-         * ERG are loaded already, we load all other files - maybe move loading? *
-         */
-        if (batch.gettransportMethodId() != 2) { // 2 is ERG
+		/**
+		 * ERG are loaded already, we load all other files - maybe move loading?
+		 * *
+		 */
+		if (batch.gettransportMethodId() != 2) { // 2 is ERG
 
             // set batch to SBP - 4
             updateBatchStatus(batchUploadId, 4, "startDateTime");
@@ -506,132 +507,147 @@ public class transactionInManagerImpl implements transactionInManager {
             successfulBatch = clearTransactionTables(batchUploadId);
 
 			// loading batch will take it all the way to loaded (9) status for
-            // transactions and SSL (3) for batch
-            successfulBatch = loadBatch(batchUploadId);
+			// transactions and SSL (3) for batch
+			successfulBatch = loadBatch(batchUploadId);
 
             // after loading is successful we update to SSL
             updateBatchStatus(batchUploadId, 3, "startDateTime");
 
-            // get batch details again for next set of processing
-            batch = getBatchDetails(batchUploadId);
+			// get batch details again for next set of processing
+			batch = getBatchDetails(batchUploadId);
 
-        }
+		}
 
-        /**
-         * this should be the same point of both ERG and Uploaded File *
-         */
-        successfulBatch = true; // successfulBatch will be false if there are
-        // unplanned errors, we will halt process and
-        // notify admin
-        Integer systemErrorCount = 0;
-		// Check to make sure the file is valid for processing, valid file is a
-        // batch with SSL (3) or SR*
-        if ((batch.getstatusId() == 3 || batch.getstatusId() == 6)
-                && successfulBatch) {
-            // set batch to SBP - 4*
-            updateBatchStatus(batchUploadId, 4, "startDateTime");
+		//this should be the same point of both ERG and Uploaded File *
+		successfulBatch = true; 
+		Integer systemErrorCount = 0;
+		// Check to make sure the file is valid for processing, valid file is a batch with SSL (3) or SR (6)*
+		if ((batch.getstatusId() == 3 || batch.getstatusId() == 6) && successfulBatch) {
+			// set batch to SBP - 4*
+			updateBatchStatus(batchUploadId, 4, "startDateTime");
+			
+			//we get all the configurations *
+			List<Integer> configIds = getConfigIdsForBatch(batchUploadId);
+			for (Integer configId : configIds) {
+				//we need to run all checks before insert regardless *
+				
+				//check R/O
+				List<configurationFormFields> reqFields = getRequiredFieldsForConfig(configId);
+				
+				for (configurationFormFields cff : reqFields) {
+					systemErrorCount = systemErrorCount + insertFailedRequiredFields(cff, batchUploadId);
+				}
+				// update status of the failed records to ERR - 14
+				updateStatusForErrorTrans(batchUploadId, 14, false);
 
-            /**
-             * we get all the configurations *
-             */
-            List<Integer> configIds = getConfigIdsForBatch(batchUploadId);
+				/**
+				 * run validation*
+				 */
+				systemErrorCount = systemErrorCount + runValidations(batchUploadId, configId);
+				// update status of the failed records to ERR - 14
+				updateStatusForErrorTrans(batchUploadId, 14, false);
 
-            for (Integer configId : configIds) {
+				// 1. grab the configurationDataTranslations and run cw/macros
+				List<configurationDataTranslations> dataTranslations = configurationManager
+						.getDataTranslationsWithFieldNo(configId);
+				for (configurationDataTranslations cdt : dataTranslations) {
+					if (cdt.getCrosswalkId() != 0) {
+						systemErrorCount = systemErrorCount + processCrosswalk(configId, batchUploadId, cdt, false);
+					} else if (cdt.getMacroId() != 0) {
+						systemErrorCount = systemErrorCount + processMacro(configId, batchUploadId, cdt, false);
+					}
+				}
 
-                /**
-                 * we need to run all checks before insert regardless *
-                 */
-                /**
-                 * check R/O *
-                 */
-                List<configurationFormFields> reqFields = getRequiredFieldsForConfig(configId);
-                /**
-                 * we loop each field and flag errors *
-                 */
-                for (configurationFormFields cff : reqFields) {
-                    systemErrorCount = systemErrorCount
-                            + insertFailedRequiredFields(cff, batchUploadId);
-                }
-                // update status of the failed records to ERR - 14
-                updateStatusForErrorTrans(batchUploadId, 14, false);
-
-                /**
-                 * run validation*
-                 */
-                systemErrorCount = systemErrorCount + runValidations(batchUploadId, configId);
-                // update status of the failed records to ERR - 14
-                updateStatusForErrorTrans(batchUploadId, 14, false);
-
-                // 1. grab the configurationDataTranslations and run cw/macros
-                List<configurationDataTranslations> dataTranslations = configurationManager
-                        .getDataTranslationsWithFieldNo(configId);
-                for (configurationDataTranslations cdt : dataTranslations) {
-                    if (cdt.getCrosswalkId() != 0) {
-                        systemErrorCount = systemErrorCount + processCrosswalk(configId, batchUploadId, cdt, false);
-                    } else if (cdt.getMacroId() != 0) {
-                        systemErrorCount = systemErrorCount + processMacro(configId, batchUploadId, cdt, false);
-                    }
-                }
-
-                /**
-                 * if there are errors, those are system errors, they will be logged we get errorId 5 and email to admin, update batch to 29
-				 **
-                 */
-                if (systemErrorCount > 0) {
-                    //error batch
-                    updateBatchStatus(batchUploadId, 29, "endDateTime");
+				/**
+				 * if there are errors, those are system errors, they will be
+				 * logged we get errorId 5 and email to admin, update batch to
+				 * 29
+				 ***/
+				if (systemErrorCount > 0) {
+					//error batch
+					updateBatchStatus (batchUploadId, 29, "endDateTime");
 					// email admin
 
-                    // break out of loop as errorCount is system error
-                    return false;
-                }
-            } //end of configs
-
-            //we finish all configs and need to check how to proceed with this file.
-            List<configurationTransport> handlingDetails = getHandlingDetailsByBatch(batchUploadId);
-
-            if (handlingDetails.size() > 1) {
-                // we manual release since set up is not correct
-            } else if (handlingDetails.size() == 1) {
+					// break out of loop as errorCount is system error
+					return false;
+				}
+			} //end of configs
+			
+			
+			List <configurationTransport> handlingDetails = getHandlingDetailsByBatch(batchUploadId);
+			// multiple config should be set to handle the batch the same way - we email admin if we don't have one way of handling a batch
+			if (handlingDetails.size() != 1) {
+				//TODO email admin to fix problem
+				clearMessageTables(batchUploadId);
+				insertProcessingError(5, null, batchUploadId, null, null, null, null, false, false, "Multiple or no file handling found, please check auto-release and error handling configurations");
+				updateBatchStatus(batchUploadId, 29, "endDateTime");
+				return false;
+			}
+			
+			
+			if (handlingDetails.size() == 1) {
+				
+				//TODO - what is status of loaded at this point
+				//if batch status is 6, batch has been released
+				
 				// we check to see what autoRelease is and set batch and transaction status accordingly.
-
-            }
-            boolean autoRelease = true;
-            if (autoRelease) {
-                /**
-                 * inserts for batches that passes *
-                 */
-                if (!insertTransactions(batchUploadId)) {
-                    successfulBatch = false;
-                    /**
-                     * something went wrong, we removed all inserted entries *
-                     */
-                    clearMessageTables(batchUploadId);
-                    /**
-                     * we leave transaction status alone and flag batch as error during processing -SPE*
-                     */
-                    updateBatchStatus(batchUploadId, 28, "endDateTime");
-                }
-
-                /**
-                 * set batch to SPC 24*
-                 */
-                if (successfulBatch) {
-                    updateBatchStatus(batchUploadId, 24, "endDateTime");
-                    /**
-                     * set all REL - 10 records to 19 *
-                     */
-                    updateTransactionStatus(batchUploadId, 0, 12, 19);
-                    updateTransactionTargetStatus(batchUploadId, 0, 12, 19);
-                    /**
-                     * we update total record counts for batch *
-                     */
-                }
-            }
-
-        }
-        return successfulBatch;
-    }
+				/**
+				 	1 = Post errors to ERG
+					2 = Reject record on error
+					3 = Reject submission on error
+					4 = Pass through errors
+				 */
+				// TODO make sure error count is still 0 for batch.getstatusId() != 6 incase configs are changed.  We will check errorHandling setting is 6 and errors.
+				if ((handlingDetails.get(0).getautoRelease() && handlingDetails.get(0).geterrorHandling() == 1) && (batch.getstatusId() != 6)) {
+					//TODO send email here
+					clearMessageTables(batchUploadId);
+					insertProcessingError(5,  null, null, batchUploadId, null, null, null,
+							false, false, "A batch cannot be set to auto-release and post errors to ERG.  Please modify configuration settings.");
+					updateBatchStatus(batchUploadId, 29, "endDateTime");
+					return false;
+				} else if (batch.getstatusId() == 6 || (handlingDetails.get(0).getautoRelease() &&
+						(handlingDetails.get(0).geterrorHandling() == 2 || handlingDetails.get(0).geterrorHandling() == 4))) {
+					
+					//we update all saved records to release
+					updateTransactionStatus(batchUploadId, 0, 15, 12);
+					
+					//we insert here
+					if (!insertTransactions(batchUploadId)) {
+						//something went wrong, we removed all inserted entries *
+						clearMessageTables(batchUploadId);
+						//we leave transaction status alone and flag batch as error during processing -SPE*
+						updateBatchStatus(batchUploadId, 29, "endDateTime");
+						return false;
+					}
+					if (handlingDetails.get(0).geterrorHandling() == 2) {
+							//update to reject - 13
+							updateTransactionStatus(batchUploadId, 0, 14, 13);
+							updateTransactionTargetStatus(batchUploadId, 0, 12, 13);
+					} else if  (handlingDetails.get(0).geterrorHandling() == 4) {
+							//update to pass - 16
+							updateTransactionStatus(batchUploadId, 0, 14, 16);
+							updateTransactionTargetStatus(batchUploadId, 0, 12, 16);
+					}
+						updateTransactionStatus(batchUploadId, 0, 12, 19);
+						updateTransactionTargetStatus(batchUploadId, 0, 12, 19);
+						updateBatchStatus(batchUploadId, 24, "endDateTime");
+				}  else if (handlingDetails.get(0).getautoRelease() && handlingDetails.get(0).geterrorHandling() == 3) {
+					//auto-release, 3 = Reject submission on error 
+					updateBatchStatus(batchUploadId, 7, "endDateTime");
+					//TODO do we update transaction status?
+					
+				}  else if (!handlingDetails.get(0).getautoRelease()) { //manual release
+					//TODO do something
+				} //end of checking auto/error handling
+				
+			} //end of making sure there is one handling details for batch
+			
+		} // end of single batch insert 
+		
+			
+		
+		return successfulBatch;
+	}
 
     /**
      * this is called by the scheduler It selects all batch with a status of SSA Loads them SSL - Trans - L Starts the Process - SBP - Parses
@@ -1195,10 +1211,10 @@ public class transactionInManagerImpl implements transactionInManager {
         // we clear forCW column for before we begin any translation
         nullForCWCol(configId, batchId, foroutboundProcessing);
         try {
-            Macros macro = configurationManager.getMacroById(cdt.getMacroId());
-            try {
-                // we expect the target field back so we can figure out clear pass option
-                return executeMacro(configId, batchId, cdt, foroutboundProcessing, macro);
+    		Macros macro = configurationManager.getMacroById(cdt.getMacroId());
+    		try {
+        		// we expect the target field back so we can figure out clear pass option
+    			return executeMacro(configId, batchId, cdt, foroutboundProcessing, macro);
             } catch (Exception e) {
                 e.printStackTrace();
                 return 1;
@@ -1256,5 +1272,14 @@ public class transactionInManagerImpl implements transactionInManager {
             return null;
         }
     }
+
+	@Override
+	public void insertProcessingError(Integer errorId, Integer configId,
+			Integer batchId, Integer fieldId, Integer macroId, Integer cwId,
+			Integer validationTypeId, boolean required,
+			boolean foroutboundProcessing, String errorCause) {
+		transactionInDAO.insertProcessingError(errorId, configId, batchId, fieldId, macroId, cwId, validationTypeId, required, foroutboundProcessing, errorCause);
+		
+	}
 
 }

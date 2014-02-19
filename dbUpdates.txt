@@ -140,5 +140,19 @@ CHANGE COLUMN `transactionInId` `transactionTargetId` INT(11) NULL DEFAULT NULL 
 ALTER TABLE `universalTranslator`.`transactionOutErrors` 
 ADD COLUMN `configId` INT NULL AFTER `transactionTargetId`;
 
+/** 02.19.14 Grace **/
+ALTER TABLE `universalTranslator`.`transactionInErrors` 
+DROP FOREIGN KEY `configFFFKId`;
+ALTER TABLE `universalTranslator`.`transactionInErrors` 
+CHANGE COLUMN `configurationFormFieldsId` `configurationFormFieldsId` INT(11) NULL ;
+ALTER TABLE `universalTranslator`.`transactionInErrors` 
+ADD CONSTRAINT `configFFFKId`
+  FOREIGN KEY (`configurationFormFieldsId`)
+  REFERENCES `universalTranslator`.`configurationFormFields` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+ALTER TABLE `universalTranslator`.`transactionInErrors` 
+CHANGE COLUMN `dateCreated` `dateCreated` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ;
 
 
