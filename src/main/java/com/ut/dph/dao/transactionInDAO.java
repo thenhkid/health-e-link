@@ -105,7 +105,7 @@ public interface transactionInDAO {
     
     List<batchUploads> getuploadedBatches(int userId, int orgId);
     
-    void updateBatchStatus (Integer batchUploadId, Integer statusId, String timeField);
+    void updateBatchStatus (Integer batchUploadId, Integer statusId, String timeField) throws Exception;
     
     void updateTransactionStatus (Integer batchUploadId, Integer transactionId, Integer fromStatusId, Integer toStatusId) throws Exception;
     

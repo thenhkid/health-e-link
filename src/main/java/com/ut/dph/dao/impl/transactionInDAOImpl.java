@@ -1202,8 +1202,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 
     @Override
     @Transactional
-    public void updateBatchStatus(Integer batchUploadId, Integer statusId,
-            String timeField) {
+    public void updateBatchStatus(Integer batchUploadId, Integer statusId, String timeField) throws Exception {
 
         String sql = "update batchUploads set statusId = :statusId ";
         if (!timeField.equalsIgnoreCase("")) {

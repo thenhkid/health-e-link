@@ -38,7 +38,6 @@ import com.ut.dph.service.sysAdminManager;
 import com.ut.dph.service.transactionInManager;
 import com.ut.dph.service.transactionOutManager;
 import com.ut.dph.service.userManager;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -2094,6 +2093,9 @@ public class HealtheWebController {
 
                     /* Update the transactionTarget status to 12 (REL) */
                     transactionInManager.updateTransactionTargetStatus(batchId,0,0,12);
+                    
+                    /* Update batch to released */
+                    transactionInManager.updateBatchStatus(batchId, 6, "");
 
                     /* Process the batch */
                     boolean transactionSentToProcess = transactionInManager.processBatch(batchId);
