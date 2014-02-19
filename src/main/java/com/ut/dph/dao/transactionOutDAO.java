@@ -55,13 +55,13 @@ public interface transactionOutDAO {
     
     List<transactionTarget> getpendingOutPutTransactions(int transactionTargetId) throws Exception;
     
-    boolean processOutPutTransactions(int transactionTargetId, int configId, int transactionInId);
+    boolean processOutPutTransactions(int transactionTargetId, int configId, int transactionInId) throws Exception;
     
     void updateTargetBatchStatus(Integer batchDLId, Integer statusId, String timeField) throws Exception;
     
     void updateTargetTransasctionStatus(int batchDLId, int statusId);
 
-    void moveTranslatedRecords(int transactionTargetId);
+    void moveTranslatedRecords(int transactionTargetId) throws Exception;
     
     List<transactionTarget> getLoadedOutBoundTransactions(int configId);
     
@@ -85,8 +85,8 @@ public interface transactionOutDAO {
     
     void updateBatchStatus (Integer batchId, Integer statusId);
     
-    void saveOutputRunLog(targetOutputRunLogs log);
+    void saveOutputRunLog(targetOutputRunLogs log) throws Exception;
     
-    List<targetOutputRunLogs> getLatestRunLog(int configId);
+    List<targetOutputRunLogs> getLatestRunLog(int configId) throws Exception;
     
 }

@@ -14,6 +14,6 @@ import com.ut.dph.model.mailMessage;
  */
 public interface emailMessageManager {
     
-    void sendEmail(mailMessage messageDetails);
+    void sendEmail(mailMessage messageDetails) throws Exception;
     
 }

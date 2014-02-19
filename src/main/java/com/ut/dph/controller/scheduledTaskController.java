@@ -50,7 +50,14 @@ public class scheduledTaskController {
         }
         
         if("!sysadmin!".equals(password)) {
-            processOutputRecords(transactionTargetId);
+            
+            try {
+                processOutputRecords(transactionTargetId);
+            }
+            catch (Exception e) {
+                throw new Exception("Error occurred trying to process output records. transactionTargetId: " + transactionTargetId,e);
+            }
+            
         }
     }
     
@@ -62,13 +69,19 @@ public class scheduledTaskController {
      * @param   transactionTargetId This will hold the id of a specific transaction to
      *                              process (Not required)
      */
-    private void processOutputRecords(Integer transactionTargetId) {
+    private void processOutputRecords(Integer transactionTargetId) throws Exception {
         
         if(transactionTargetId == null) {
             transactionTargetId = 0;
         }
-       
-        transactionOutManager.processOutputRecords(transactionTargetId);
+        
+        try {
+            transactionOutManager.processOutputRecords(transactionTargetId);
+        }
+        catch (Exception e) {
+            throw new Exception("Error occurred trying to process output records. transactionTargetId: " + transactionTargetId,e);
+        }
+        
         
     }
     

@@ -25,7 +25,7 @@ public class emailMessageManagerImpl implements emailMessageManager {
             this.mailSender = mailSender;
     }
     
-    public void sendEmail(mailMessage messageDetails) {
+    public void sendEmail(mailMessage messageDetails) throws Exception {
         
         SimpleMailMessage msg = new SimpleMailMessage();
        

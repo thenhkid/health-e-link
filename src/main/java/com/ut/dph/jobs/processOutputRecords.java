@@ -8,6 +8,8 @@ package com.ut.dph.jobs;
 
 
 import com.ut.dph.service.transactionOutManager;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -26,9 +28,18 @@ public class processOutputRecords implements Job {
     
     @Override
     public void execute(JobExecutionContext context)  throws JobExecutionException {
-        SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
         
-        transactionOutManager.processOutputRecords(0);
+        try {
+            SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
+            
+            transactionOutManager.processOutputRecords(0);
+        } catch (Exception ex) {
+            try {
+                throw new Exception("Error occurred trying to process output records from schedule task",ex);
+            } catch (Exception ex1) {
+                Logger.getLogger(processOutputRecords.class.getName()).log(Level.SEVERE, null, ex1);
+            }
+        }
         
     }
     

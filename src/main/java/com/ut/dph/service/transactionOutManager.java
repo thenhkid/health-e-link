@@ -53,17 +53,17 @@ public interface transactionOutManager {
     
     List<transactionTarget> getpendingOutPutTransactions(int transactionTargetId) throws Exception;
     
-    boolean processOutPutTransactions(int transactionTargetId, int configId, int transactionInId);
+    boolean processOutPutTransactions(int transactionTargetId, int configId, int transactionInId) throws Exception;
     
     void updateTargetBatchStatus(Integer batchDLId, Integer statusId, String timeField) throws Exception;
     
     void updateTargetTransasctionStatus(int batchDLId, int statusId);
     
-    Integer translateTargetRecords(int transactionTargetId, int configId, int batchId);
+    Integer translateTargetRecords(int transactionTargetId, int configId, int batchId) throws Exception;
     
-    void moveTranslatedRecords(int transactionTargetId);
+    void moveTranslatedRecords(int transactionTargetId) throws Exception;
     
-    void processOutputRecords(int transactionTargetId);
+    void processOutputRecords(int transactionTargetId) throws Exception;
     
     void generateOutputFiles();
     

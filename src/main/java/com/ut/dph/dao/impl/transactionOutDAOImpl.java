@@ -817,7 +817,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
      */
     @Override
     @Transactional
-    public boolean processOutPutTransactions(int transactionTargetId, int configId, int transactionInId) {
+    public boolean processOutPutTransactions(int transactionTargetId, int configId, int transactionInId) throws Exception {
         
         /* Need to pull all the data out of the appropriate message_ tables for the transaction */
         Criteria formFieldsQuery = sessionFactory.getCurrentSession().createCriteria(configurationFormFields.class);
@@ -872,13 +872,9 @@ public class transactionOutDAOImpl implements transactionOutDAO {
                 .setParameter("transactionTargetId", transactionTargetId)
                 .setParameter("configId", configId);
             
-            try {
-                insertData.executeUpdate();
-                return true;
-            } 
-            catch (Exception ex) {
-                return false;
-            }
+            insertData.executeUpdate();
+            
+            return true;
             
         }
         else {
@@ -945,7 +941,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
      */
     @Override
     @Transactional
-    public void moveTranslatedRecords(int transactionTargetId) {
+    public void moveTranslatedRecords(int transactionTargetId) throws Exception {
         
         /* Always clear this table out for the passed in transactionTargetId */
         Query clearRecords = sessionFactory.getCurrentSession().createSQLQuery("DELETE from transactionOutRecords where transactionTargetId = :transactionTargetId");
@@ -1399,7 +1395,8 @@ public class transactionOutDAOImpl implements transactionOutDAO {
      * 
      * @param log The output run log to save.
      */
-    public void saveOutputRunLog(targetOutputRunLogs log) {
+    @Override
+    public void saveOutputRunLog(targetOutputRunLogs log) throws Exception {
         sessionFactory.getCurrentSession().save(log);
     }
     
@@ -1411,7 +1408,8 @@ public class transactionOutDAOImpl implements transactionOutDAO {
      * 
      * @return This function will return the latest log
      */
-    public List<targetOutputRunLogs> getLatestRunLog(int configId) {
+    @Override
+    public List<targetOutputRunLogs> getLatestRunLog(int configId) throws Exception {
         
         Criteria latestLogQuery = sessionFactory.getCurrentSession().createCriteria(targetOutputRunLogs.class);
         latestLogQuery.add(Restrictions.eq("configId", configId));
