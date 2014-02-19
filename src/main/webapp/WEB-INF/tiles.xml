@@ -3,7 +3,7 @@
        "-//Apache Software Foundation//DTD Tiles Configuration 2.0//EN"
        "http://tiles.apache.org/dtds/tiles-config_2_0.dtd">
 <tiles-definitions>
-
+    
     <!-- Admin Definitions -->
     <definition name="base.definition.admin" template="/WEB-INF/tiles/layout.jsp">
         <put-attribute name="title" value="" />
@@ -425,6 +425,13 @@
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Health-e-Connect&amp;page=download" />
         <put-attribute name="body" value="/WEB-INF/jsp/Health-e-Connect/download.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/front-end/Health-e-Connect/download.js" />
+    </definition>
+    
+    
+    <!-- Exception handling -->
+    <definition name="/exception" extends="base.definition.frontEnd">
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp" />
+        <put-attribute name="body" value="/WEB-INF/jsp/exception.jsp" />
     </definition>
 
 </tiles-definitions>

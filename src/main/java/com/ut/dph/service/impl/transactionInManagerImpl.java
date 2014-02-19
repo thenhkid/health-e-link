@@ -134,7 +134,7 @@ public class transactionInManagerImpl implements transactionInManager {
 
     @Override
     @Transactional
-    public List<batchUploads> getpendingBatches(int userId, int orgId, String searchTerm, Date fromDate, Date toDate, int page, int maxResults) {
+    public List<batchUploads> getpendingBatches(int userId, int orgId, String searchTerm, Date fromDate, Date toDate, int page, int maxResults) throws Exception {
         return transactionInDAO.getpendingBatches(userId, orgId, searchTerm, fromDate, toDate, page, maxResults);
     }
 
@@ -146,7 +146,7 @@ public class transactionInManagerImpl implements transactionInManager {
 
     @Override
     @Transactional
-    public List<batchUploads> getsentBatches(int userId, int orgId, String searchTerm, Date fromDate, Date toDate, int page, int maxResults) {
+    public List<batchUploads> getsentBatches(int userId, int orgId, String searchTerm, Date fromDate, Date toDate, int page, int maxResults) throws Exception {
         return transactionInDAO.getsentBatches(userId, orgId, searchTerm, fromDate, toDate, page, maxResults);
     }
 
@@ -361,7 +361,7 @@ public class transactionInManagerImpl implements transactionInManager {
      *
      */
     @Override
-    public Map<String, String> uploadBatchFile(int configId, MultipartFile fileUpload) {
+    public Map<String, String> uploadBatchFile(int configId, MultipartFile fileUpload) throws Exception {
 
         configuration configDetails = configurationManager.getConfigurationById(configId);
         configurationTransport transportDetails = configurationtransportmanager.getTransportDetails(configId);

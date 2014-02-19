@@ -32,7 +32,7 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
      * @Return	This function will return a list of configurationTransport objects
      */
     @SuppressWarnings("unchecked")
-    public configurationTransport getTransportDetails(int configId) {
+    public configurationTransport getTransportDetails(int configId) throws Exception {
         Query query = sessionFactory.getCurrentSession().createQuery("from configurationTransport where configId = :configId");
         query.setParameter("configId", configId);
         
@@ -194,7 +194,7 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
     @SuppressWarnings("unchecked")
     @Override
     @Transactional
-    public List<configurationFormFields> getConfigurationFieldsByBucket(int configId, int transportDetailId, int bucket) {
+    public List<configurationFormFields> getConfigurationFieldsByBucket(int configId, int transportDetailId, int bucket) throws Exception {
         Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configurationFormFields.class)
                 .add(Restrictions.eq("configId", configId))
                 .add(Restrictions.eq("transportDetailId", transportDetailId))

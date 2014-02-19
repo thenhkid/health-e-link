@@ -309,7 +309,7 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Override
     @Transactional
     @SuppressWarnings("UnusedAssignment")
-    public List<batchUploads> getpendingBatches(int userId, int orgId, String searchTerm, Date fromDate, Date toDate, int page, int maxResults) {
+    public List<batchUploads> getpendingBatches(int userId, int orgId, String searchTerm, Date fromDate, Date toDate, int page, int maxResults) throws Exception {
 
         int firstResult = 0;
 
@@ -445,7 +445,7 @@ public class transactionInDAOImpl implements transactionInDAO {
      *
      * @return This function will return a list of batches that match the search term.
      */
-    public List<Integer> findBatches(List<batchUploads> batches, String searchTerm) {
+    public List<Integer> findBatches(List<batchUploads> batches, String searchTerm) throws Exception {
 
         List<Integer> batchIdList = new ArrayList<Integer>();
 
@@ -637,7 +637,7 @@ public class transactionInDAOImpl implements transactionInDAO {
      */
     @Override
     @Transactional
-    public List<batchUploads> getsentBatches(int userId, int orgId, String searchTerm, Date fromDate, Date toDate, int page, int maxResults) {
+    public List<batchUploads> getsentBatches(int userId, int orgId, String searchTerm, Date fromDate, Date toDate, int page, int maxResults) throws Exception {
 
         int firstResult = 0;
 

@@ -304,7 +304,7 @@ public class sysAdminManagerImpl implements sysAdminManager {
 	}
 
 	@Override
-	public lu_ProcessStatus getProcessStatusById(int id) {
+	public lu_ProcessStatus getProcessStatusById(int id) throws Exception {
 		return sysAdminDAO.getProcessStatusById(id);
 	}
 

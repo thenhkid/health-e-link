@@ -71,5 +71,5 @@
     <bean id="emailMessageManagerImpl" class="com.ut.dph.service.impl.emailMessageManagerImpl">
 	<property name="mailSender" ref="mailSender" />
     </bean>
-	
+    
 </beans>

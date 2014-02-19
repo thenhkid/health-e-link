@@ -52,11 +52,11 @@ public interface transactionInManager {
     
     void submitTransactionTranslatedInRecords(int transactionId, int transactionRecordId, int configId);
     
-    List<batchUploads> getpendingBatches(int userId, int orgId, String searchTerm, Date fromDate, Date toDate, int page, int maxResults);
+    List<batchUploads> getpendingBatches(int userId, int orgId, String searchTerm, Date fromDate, Date toDate, int page, int maxResults) throws Exception;
     
     List<transactionIn> getBatchTransactions(int batchId, int userId);
     
-    List<batchUploads> getsentBatches(int userId, int orgId, String searchTerm, Date fromDate, Date toDate, int page, int maxResults);
+    List<batchUploads> getsentBatches(int userId, int orgId, String searchTerm, Date fromDate, Date toDate, int page, int maxResults) throws Exception;
     
     batchUploads getBatchDetails(int batchId);
     
@@ -100,7 +100,7 @@ public interface transactionInManager {
 
     boolean clearMessageTables(int batchId);
     
-     Map<String,String> uploadBatchFile(int configId, MultipartFile fileUpload);
+     Map<String,String> uploadBatchFile(int configId, MultipartFile fileUpload) throws Exception;
     
     List <Integer> getBlankTransIds (ConfigForInsert config);
     

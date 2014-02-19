@@ -152,7 +152,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
     @Override
     @Transactional
     @SuppressWarnings("UnusedAssignment")
-    public List<batchDownloads> getInboxBatches(int userId, int orgId, String searchTerm, Date fromDate, Date toDate, int page, int maxResults) {
+    public List<batchDownloads> getInboxBatches(int userId, int orgId, String searchTerm, Date fromDate, Date toDate, int page, int maxResults) throws Exception {
         int firstResult = 0;
 
         /* Get a list of connections the user has access to */
@@ -285,7 +285,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
      *
      * @return This function will return a list of batches that match the search term.
      */
-    public List<Integer> findInboxBatches(List<batchDownloads> batches, String searchTerm) {
+    public List<Integer> findInboxBatches(List<batchDownloads> batches, String searchTerm) throws Exception {
 
         List<Integer> batchIdList = new ArrayList<Integer>();
 
@@ -400,7 +400,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
      */
     @Override
     @Transactional
-    public batchDownloads getBatchDetails(int batchId) {
+    public batchDownloads getBatchDetails(int batchId) throws Exception {
         return (batchDownloads) sessionFactory.getCurrentSession().get(batchDownloads.class, batchId);
 
     }
@@ -416,7 +416,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
      */
     @Override
     @Transactional
-    public List<transactionTarget> getInboxBatchTransactions(int batchId, int userId) {
+    public List<transactionTarget> getInboxBatchTransactions(int batchId, int userId) throws Exception {
         /* Get a list of connections the user has access to */
         
         Criteria connections = sessionFactory.getCurrentSession().createCriteria(configurationConnectionReceivers.class);
@@ -489,7 +489,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
      */
     @Override
     @Transactional
-    public transactionOutRecords getTransactionRecords(int transactionTargetId) {
+    public transactionOutRecords getTransactionRecords(int transactionTargetId) throws Exception {
         Query query = sessionFactory.getCurrentSession().createQuery("from transactionOutRecords where transactionTargetId = :transactionTargetId");
         query.setParameter("transactionTargetId", transactionTargetId);
 
@@ -518,7 +518,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
      */
     @Override
     @Transactional
-    public transactionTarget getTransactionDetails(int transactionId) {
+    public transactionTarget getTransactionDetails(int transactionId) throws Exception {
         return (transactionTarget) sessionFactory.getCurrentSession().get(transactionTarget.class, transactionId);
     }
     

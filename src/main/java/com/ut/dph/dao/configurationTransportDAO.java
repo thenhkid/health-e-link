@@ -9,7 +9,7 @@ import com.ut.dph.model.configurationTransportMessageTypes;
 
 public interface configurationTransportDAO {
 
-    configurationTransport getTransportDetails(int configId);
+    configurationTransport getTransportDetails(int configId) throws Exception;
 
     Integer updateTransportDetails(configurationTransport transportDetails);
 
@@ -17,7 +17,7 @@ public interface configurationTransportDAO {
 
     List<configurationFormFields> getConfigurationFields(int configId, int transportDetailId);
     
-    List<configurationFormFields> getConfigurationFieldsByBucket(int configId, int transportDetailId, int bucket);
+    List<configurationFormFields> getConfigurationFieldsByBucket(int configId, int transportDetailId, int bucket) throws Exception;
 
     void updateConfigurationFormFields(configurationFormFields formField);
 

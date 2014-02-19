@@ -6,9 +6,12 @@
 
 package com.ut.dph.errorHandling;
 
-import java.io.IOException;
-import org.springframework.mail.MailSender;
-import org.springframework.mail.SimpleMailMessage;
+import com.ut.dph.model.User;
+import com.ut.dph.model.mailMessage;
+import com.ut.dph.service.emailMessageManager;
+import java.util.Arrays;
+import javax.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.ModelAndView;
@@ -19,34 +22,47 @@ import org.springframework.web.servlet.ModelAndView;
  */
 @ControllerAdvice
 public class ExceptionControllerAdvice {
-    
-    private MailSender mailSender;
+   
+    @Autowired
+    private emailMessageManager emailMessageManager;
  
-    @ExceptionHandler(IOException.class)
-    public ModelAndView exception(IOException e) {
-         
+    @ExceptionHandler(Exception.class)
+    public ModelAndView exception(HttpSession session, Exception e) {
+        
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/exception");
         
-        SimpleMailMessage msg = new SimpleMailMessage();
-       
-        msg.setTo("dphuniversaltranslator@gmail.com");
+        mailMessage messageDetails = new mailMessage();
         
-        msg.setFrom("dphuniversaltranslator@gmail.com");
-        msg.setSubject("Exception Error");
+        messageDetails.settoEmailAddress("dphuniversaltranslator@gmail.com");
+        messageDetails.setmessageSubject("Exception Error");
         
         StringBuilder sb = new StringBuilder();
-        sb.append("Name: "+e.getClass().getSimpleName());
+        
+        /* If a user is logged in then send along the user details */
+        if(session.getAttribute("userDetails") != null) {
+            User userInfo = (User)session.getAttribute("userDetails");
+            if(userInfo != null) {
+                sb.append("Logged in User: " + userInfo.getFirstName() + " " + userInfo.getLastName() + " (ID: "+ userInfo.getId() + ")");
+                sb.append(System.getProperty("line.separator"));
+                sb.append("User OrgId: " + userInfo.getOrgId());
+                sb.append(System.getProperty("line.separator"));
+            }
+        }
+       
+        sb.append("Error: "+ e);
+        sb.append(System.getProperty("line.separator"));
         sb.append(System.getProperty("line.separator"));
         sb.append("Message: " + e.getMessage());
         sb.append(System.getProperty("line.separator"));
-        sb.append("Stack Trace: " + e.getStackTrace());
+        sb.append(System.getProperty("line.separator"));
+        sb.append("Stack Trace: " + Arrays.toString(e.getStackTrace()));
         
-        msg.setText(sb.toString());
+        messageDetails.setmessageBody(sb.toString());
         
-
-        mailSender.send(msg);
- 
+        /* emailMessageManager.sendEmail(messageDetails); */
+        mav.addObject("messageBody",sb.toString());
+        
         return mav;
     }
 }

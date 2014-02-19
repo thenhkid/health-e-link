@@ -1,5 +1,6 @@
 package com.ut.dph.controller;
 
+import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -78,6 +79,7 @@ public class mainController {
      */
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public ModelAndView welcome(HttpServletRequest request,  HttpServletResponse response) throws Exception {
+      
         return new ModelAndView("/home");
     }
     

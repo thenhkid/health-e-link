@@ -1391,7 +1391,7 @@ public class adminConfigController {
      */
     @SuppressWarnings("rawtypes")
     @RequestMapping(value= "/getAvailableConfigurations.do", method = RequestMethod.GET)
-    public @ResponseBody List<configuration> getAvailableConfigurations(@RequestParam(value = "orgId", required = true) int orgId) {
+    public @ResponseBody List<configuration> getAvailableConfigurations(@RequestParam(value = "orgId", required = true) int orgId) throws Exception {
         
         List<configuration> configurations = configurationmanager.getActiveConfigurationsByOrgId(orgId);
         
