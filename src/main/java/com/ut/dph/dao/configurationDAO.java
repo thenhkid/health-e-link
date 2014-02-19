@@ -77,7 +77,7 @@ public interface configurationDAO {
   
   void updateMessageSpecs(configurationMessageSpecs messageSpecs, int transportDetailId, int clearFields);
   
-  List<configuration> getActiveConfigurationsByUserId(int userId, int transportMethod);
+  List<configuration> getActiveConfigurationsByUserId(int userId, int transportMethod)  throws Exception;
   
   List<configurationConnectionSenders> getConnectionSenders(int connectionId);
   

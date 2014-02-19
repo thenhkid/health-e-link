@@ -748,7 +748,7 @@ public class configurationDAOImpl implements configurationDAO {
      * @return This function will return a list of ERG configurations.
      */
     @Override
-    public List<configuration> getActiveConfigurationsByUserId(int userId, int transportMethod) {
+    public List<configuration> getActiveConfigurationsByUserId(int userId, int transportMethod) throws Exception {
 
         /* Find all SENDER connections for the passed in user */
         Criteria findAuthConnections = sessionFactory.getCurrentSession().createCriteria(configurationConnectionSenders.class);

@@ -86,49 +86,49 @@ public class transactionInManagerImpl implements transactionInManager {
 
     @Override
     @Transactional
-    public Integer submitBatchUpload(batchUploads batchUpload) {
+    public Integer submitBatchUpload(batchUploads batchUpload)  throws Exception {
         return transactionInDAO.submitBatchUpload(batchUpload);
     }
 
     @Override
     @Transactional
-    public void submitBatchUploadSummary(batchUploadSummary summary) {
+    public void submitBatchUploadSummary(batchUploadSummary summary) throws Exception {
         transactionInDAO.submitBatchUploadSummary(summary);
     }
 
     @Override
     @Transactional
-    public void submitBatchUploadChanges(batchUploads batchUpload) {
+    public void submitBatchUploadChanges(batchUploads batchUpload) throws Exception {
         transactionInDAO.submitBatchUploadChanges(batchUpload);
     }
 
     @Override
     @Transactional
-    public Integer submitTransactionIn(transactionIn transactionIn) {
+    public Integer submitTransactionIn(transactionIn transactionIn) throws Exception {
         return transactionInDAO.submitTransactionIn(transactionIn);
     }
 
     @Override
     @Transactional
-    public void submitTransactionInChanges(transactionIn transactionIn) {
+    public void submitTransactionInChanges(transactionIn transactionIn) throws Exception {
         transactionInDAO.submitTransactionInChanges(transactionIn);
     }
 
     @Override
     @Transactional
-    public Integer submitTransactionInRecords(transactionInRecords records) {
+    public Integer submitTransactionInRecords(transactionInRecords records) throws Exception {
         return transactionInDAO.submitTransactionInRecords(records);
     }
 
     @Override
     @Transactional
-    public void submitTransactionInRecordsUpdates(transactionInRecords records) {
+    public void submitTransactionInRecordsUpdates(transactionInRecords records) throws Exception {
         transactionInDAO.submitTransactionInRecordsUpdates(records);
     }
 
     @Override
     @Transactional
-    public void submitTransactionTranslatedInRecords(int transactionId, int transactionRecordId, int configId) {
+    public void submitTransactionTranslatedInRecords(int transactionId, int transactionRecordId, int configId) throws Exception {
         transactionInDAO.submitTransactionTranslatedInRecords(transactionId, transactionRecordId, configId);
     }
 
@@ -140,7 +140,7 @@ public class transactionInManagerImpl implements transactionInManager {
 
     @Override
     @Transactional
-    public List<transactionIn> getBatchTransactions(int batchId, int userId) {
+    public List<transactionIn> getBatchTransactions(int batchId, int userId) throws Exception {
         return transactionInDAO.getBatchTransactions(batchId, userId);
     }
 
@@ -152,13 +152,13 @@ public class transactionInManagerImpl implements transactionInManager {
 
     @Override
     @Transactional
-    public batchUploads getBatchDetails(int batchId) {
+    public batchUploads getBatchDetails(int batchId) throws Exception {
         return transactionInDAO.getBatchDetails(batchId);
     }
 
     @Override
     @Transactional
-    public transactionIn getTransactionDetails(int transactionId) {
+    public transactionIn getTransactionDetails(int transactionId) throws Exception {
         return transactionInDAO.getTransactionDetails(transactionId);
     }
 
@@ -188,7 +188,7 @@ public class transactionInManagerImpl implements transactionInManager {
 
     @Override
     @Transactional
-    public void submitTransactionTargetChanges(transactionTarget transactionTarget) {
+    public void submitTransactionTargetChanges(transactionTarget transactionTarget) throws Exception {
         transactionInDAO.submitTransactionTargetChanges(transactionTarget);
     }
 
@@ -205,7 +205,7 @@ public class transactionInManagerImpl implements transactionInManager {
      * @param orgName The organization name that is uploading the file. This will be the folder where to save the file to.
      */
     @Override
-    public String uploadAttachment(MultipartFile fileUpload, String orgName) {
+    public String uploadAttachment(MultipartFile fileUpload, String orgName)  throws Exception {
 
         MultipartFile file = fileUpload;
         String fileName = file.getOriginalFilename();
@@ -253,31 +253,31 @@ public class transactionInManagerImpl implements transactionInManager {
 
     @Override
     @Transactional
-    public Integer submitAttachment(transactionAttachment attachment) {
+    public Integer submitAttachment(transactionAttachment attachment) throws Exception {
         return transactionInDAO.submitAttachment(attachment);
     }
 
     @Override
     @Transactional
-    public transactionAttachment getAttachmentById(int attachmentId) {
+    public transactionAttachment getAttachmentById(int attachmentId) throws Exception {
         return transactionInDAO.getAttachmentById(attachmentId);
     }
 
     @Override
     @Transactional
-    public void submitAttachmentChanges(transactionAttachment attachment) {
+    public void submitAttachmentChanges(transactionAttachment attachment) throws Exception {
         transactionInDAO.submitAttachmentChanges(attachment);
     }
 
     @Override
     @Transactional
-    public List<transactionAttachment> getAttachmentsByTransactionId(int transactionInId) {
+    public List<transactionAttachment> getAttachmentsByTransactionId(int transactionInId) throws Exception {
         return transactionInDAO.getAttachmentsByTransactionId(transactionInId);
     }
 
     @Override
     @Transactional
-    public void removeAttachmentById(int attachmentId) {
+    public void removeAttachmentById(int attachmentId) throws Exception {
 
         /* Need to get the file name of the attachment */
         transactionAttachment attachment = getAttachmentById(attachmentId);
@@ -486,7 +486,7 @@ public class transactionInManagerImpl implements transactionInManager {
      * *
      */
 	@Override
-	public boolean processBatch(int batchUploadId) {
+	public boolean processBatch(int batchUploadId) throws Exception {
 
 		boolean successfulBatch = false;
 		/**
@@ -664,12 +664,12 @@ public class transactionInManagerImpl implements transactionInManager {
     }
 
     @Override
-    public void updateTransactionStatus(Integer batchUploadId, Integer transactionId, Integer fromStatusId, Integer toStatusId) {
+    public void updateTransactionStatus(Integer batchUploadId, Integer transactionId, Integer fromStatusId, Integer toStatusId) throws Exception {
         transactionInDAO.updateTransactionStatus(batchUploadId, transactionId, fromStatusId, toStatusId);
     }
 
     @Override
-    public void updateTransactionTargetStatus(Integer batchUploadId, Integer transactionId, Integer fromStatusId, Integer toStatusId) {
+    public void updateTransactionTargetStatus(Integer batchUploadId, Integer transactionId, Integer fromStatusId, Integer toStatusId) throws Exception {
         transactionInDAO.updateTransactionTargetStatus(batchUploadId, transactionId, fromStatusId, toStatusId);
     }
 
@@ -677,7 +677,7 @@ public class transactionInManagerImpl implements transactionInManager {
      * provided the batch status is not one of the delivery status (22 SDL, 23 SDC) what would we like clear batch to do 1. Change batch process to SBP to nothing can be touch 2. remove records from message tables 3. figure out what status to set batch *
      */
     @Override
-    public boolean clearBatch(Integer batchUploadId) {
+    public boolean clearBatch(Integer batchUploadId) throws Exception {
         boolean canDelete = transactionInDAO.allowBatchClear(batchUploadId);
         boolean cleared = false;
         if (canDelete) {

@@ -228,7 +228,7 @@ public class configurationManagerImpl implements configurationManager {
     
     @Override
     @Transactional
-    public List<configuration> getActiveConfigurationsByUserId(int userId, int transportMethod) {
+    public List<configuration> getActiveConfigurationsByUserId(int userId, int transportMethod) throws Exception {
         return configurationDAO.getActiveConfigurationsByUserId(userId,transportMethod);
     }
     

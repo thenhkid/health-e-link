@@ -136,49 +136,49 @@ public class transactionOutManagerImpl implements transactionOutManager {
     
     @Override
     @Transactional
-    public void updateTransactionDetails(transactionTarget transactionDetails) {
+    public void updateTransactionDetails(transactionTarget transactionDetails) throws Exception {
         transactionOutDAO.updateTransactionDetails(transactionDetails);
     }
     
     @Override
     @Transactional
-    public void saveNote(transactionOutNotes note) {
+    public void saveNote(transactionOutNotes note) throws Exception {
         transactionOutDAO.saveNote(note);
     }
     
     @Override
     @Transactional
-    public List<transactionOutNotes> getNotesByTransactionId(int transactionId) {
+    public List<transactionOutNotes> getNotesByTransactionId(int transactionId) throws Exception {
         return transactionOutDAO.getNotesByTransactionId(transactionId);
     }
     
     @Override
     @Transactional
-    public void removeNoteById(int noteId) {
+    public void removeNoteById(int noteId) throws Exception {
         transactionOutDAO.removeNoteById(noteId);
     }
     
     @Override
     @Transactional
-    public Integer getActiveFeedbackReportsByMessageType(int messageTypeId, int orgId) {
+    public Integer getActiveFeedbackReportsByMessageType(int messageTypeId, int orgId) throws Exception {
         return transactionOutDAO.getActiveFeedbackReportsByMessageType(messageTypeId, orgId);
     }
     
     @Override
     @Transactional
-    public List<transactionIn> getFeedbackReports(int transactionId, String fromPage) {
+    public List<transactionIn> getFeedbackReports(int transactionId, String fromPage) throws Exception {
         return transactionOutDAO.getFeedbackReports(transactionId, fromPage);
     }
     
     @Override
     @Transactional
-    public transactionTarget getTransactionsByInId(int transactionInId) {
+    public transactionTarget getTransactionsByInId(int transactionInId) throws Exception {
         return transactionOutDAO.getTransactionsByInId(transactionInId);
     }
     
     @Override
     @Transactional
-    public List<transactionTarget> getpendingOutPutTransactions(int transactionTargetId) {
+    public List<transactionTarget> getpendingOutPutTransactions(int transactionTargetId) throws Exception {
         return transactionOutDAO.getpendingOutPutTransactions(transactionTargetId);
     }
     

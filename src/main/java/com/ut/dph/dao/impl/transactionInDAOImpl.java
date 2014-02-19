@@ -150,7 +150,7 @@ public class transactionInDAOImpl implements transactionInDAO {
      */
     @Override
     @Transactional
-    public Integer submitBatchUpload(batchUploads batchUpload) {
+    public Integer submitBatchUpload(batchUploads batchUpload) throws Exception {
 
         Integer batchId = null;
 
@@ -171,7 +171,7 @@ public class transactionInDAOImpl implements transactionInDAO {
      */
     @Override
     @Transactional
-    public void submitBatchUploadSummary(batchUploadSummary summary) {
+    public void submitBatchUploadSummary(batchUploadSummary summary) throws Exception {
         sessionFactory.getCurrentSession().save(summary);
     }
 
@@ -186,7 +186,7 @@ public class transactionInDAOImpl implements transactionInDAO {
      */
     @Override
     @Transactional
-    public void submitBatchUploadChanges(batchUploads batchUpload) {
+    public void submitBatchUploadChanges(batchUploads batchUpload) throws Exception {
         sessionFactory.getCurrentSession().update(batchUpload);
     }
 
@@ -201,7 +201,7 @@ public class transactionInDAOImpl implements transactionInDAO {
      */
     @Override
     @Transactional
-    public Integer submitTransactionIn(transactionIn transactionIn) {
+    public Integer submitTransactionIn(transactionIn transactionIn) throws Exception {
         Integer transactioInId = null;
 
         transactioInId = (Integer) sessionFactory.getCurrentSession().save(transactionIn);
@@ -220,7 +220,7 @@ public class transactionInDAOImpl implements transactionInDAO {
      */
     @Override
     @Transactional
-    public void submitTransactionInChanges(transactionIn transactionIn) {
+    public void submitTransactionInChanges(transactionIn transactionIn) throws Exception {
         sessionFactory.getCurrentSession().update(transactionIn);
     }
 
@@ -235,7 +235,7 @@ public class transactionInDAOImpl implements transactionInDAO {
      */
     @Override
     @Transactional
-    public Integer submitTransactionInRecords(transactionInRecords records) {
+    public Integer submitTransactionInRecords(transactionInRecords records) throws Exception {
         Integer transactioInRecordId = null;
 
         transactioInRecordId = (Integer) sessionFactory.getCurrentSession().save(records);
@@ -254,7 +254,7 @@ public class transactionInDAOImpl implements transactionInDAO {
      */
     @Override
     @Transactional
-    public void submitTransactionInRecordsUpdates(transactionInRecords records) {
+    public void submitTransactionInRecordsUpdates(transactionInRecords records) throws Exception {
         sessionFactory.getCurrentSession().update(records);
     }
 
@@ -267,7 +267,7 @@ public class transactionInDAOImpl implements transactionInDAO {
      */
     @Override
     @Transactional
-    public void submitTransactionTranslatedInRecords(int transactionInId, int transactionRecordId, int configId) {
+    public void submitTransactionTranslatedInRecords(int transactionInId, int transactionRecordId, int configId) throws Exception {
 
         /* Always clear this table out for the passed in transactionId */
         Query clearRecords = sessionFactory.getCurrentSession().createSQLQuery("DELETE from transactionTranslatedIn where transactionInId = :transactionInId");
@@ -564,7 +564,7 @@ public class transactionInDAOImpl implements transactionInDAO {
      */
     @Override
     @Transactional
-    public List<transactionIn> getBatchTransactions(int batchId, int userId) {
+    public List<transactionIn> getBatchTransactions(int batchId, int userId) throws Exception {
         /* Get a list of connections the user has access to */
 
         Criteria connections = sessionFactory.getCurrentSession().createCriteria(configurationConnectionSenders.class);
@@ -779,7 +779,7 @@ public class transactionInDAOImpl implements transactionInDAO {
      */
     @Override
     @Transactional
-    public batchUploads getBatchDetails(int batchId) {
+    public batchUploads getBatchDetails(int batchId) throws Exception {
         return (batchUploads) sessionFactory.getCurrentSession().get(batchUploads.class, batchId);
 
     }
@@ -792,7 +792,7 @@ public class transactionInDAOImpl implements transactionInDAO {
      */
     @Override
     @Transactional
-    public transactionIn getTransactionDetails(int transactionId) {
+    public transactionIn getTransactionDetails(int transactionId) throws Exception {
         return (transactionIn) sessionFactory.getCurrentSession().get(transactionIn.class, transactionId);
     }
 
@@ -865,7 +865,7 @@ public class transactionInDAOImpl implements transactionInDAO {
      */
     @Override
     @Transactional
-    public void submitTransactionTargetChanges(transactionTarget transactionTarget) {
+    public void submitTransactionTargetChanges(transactionTarget transactionTarget) throws Exception {
         sessionFactory.getCurrentSession().update(transactionTarget);
     }
 
@@ -899,7 +899,7 @@ public class transactionInDAOImpl implements transactionInDAO {
      */
     @Override
     @Transactional
-    public Integer submitAttachment(transactionAttachment attachment) {
+    public Integer submitAttachment(transactionAttachment attachment) throws Exception {
         Integer attachmentId = null;
 
         attachmentId = (Integer) sessionFactory.getCurrentSession().save(attachment);
@@ -916,7 +916,7 @@ public class transactionInDAOImpl implements transactionInDAO {
      */
     @Override
     @Transactional
-    public transactionAttachment getAttachmentById(int attachmentId) {
+    public transactionAttachment getAttachmentById(int attachmentId) throws Exception {
         return (transactionAttachment) sessionFactory.getCurrentSession().get(transactionAttachment.class, attachmentId);
     }
 
@@ -929,7 +929,7 @@ public class transactionInDAOImpl implements transactionInDAO {
      */
     @Override
     @Transactional
-    public void submitAttachmentChanges(transactionAttachment attachment) {
+    public void submitAttachmentChanges(transactionAttachment attachment) throws Exception {
         sessionFactory.getCurrentSession().update(attachment);
     }
 
@@ -942,7 +942,7 @@ public class transactionInDAOImpl implements transactionInDAO {
      */
     @Override
     @Transactional
-    public List<transactionAttachment> getAttachmentsByTransactionId(int transactionInId) {
+    public List<transactionAttachment> getAttachmentsByTransactionId(int transactionInId) throws Exception {
         Criteria criteria = sessionFactory.getCurrentSession().createCriteria(transactionAttachment.class);
         criteria.add(Restrictions.eq("transactionInId", transactionInId));
 
@@ -960,7 +960,7 @@ public class transactionInDAOImpl implements transactionInDAO {
      */
     @Override
     @Transactional
-    public void removeAttachmentById(int attachmentId) {
+    public void removeAttachmentById(int attachmentId) throws Exception {
 
         Query deletAttachment = sessionFactory.getCurrentSession().createQuery("delete from transactionAttachment where id = :attachmentId");
         deletAttachment.setParameter("attachmentId", attachmentId);
@@ -1226,7 +1226,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 
     @Override
     @Transactional
-    public void updateTransactionStatus(Integer batchUploadId, Integer transactionId, Integer fromStatusId, Integer toStatusId) {
+    public void updateTransactionStatus(Integer batchUploadId, Integer transactionId, Integer fromStatusId, Integer toStatusId) throws Exception {
         String sql = "update transactionIn "
                 + " set statusId = :toStatusId, "
                 + "dateCreated = CURRENT_TIMESTAMP";
@@ -1272,7 +1272,7 @@ public class transactionInDAOImpl implements transactionInDAO {
      */
     @Override
     @Transactional
-    public void updateTransactionTargetStatus(Integer batchUploadId, Integer transactionId, Integer fromStatusId, Integer toStatusId) {
+    public void updateTransactionTargetStatus(Integer batchUploadId, Integer transactionId, Integer fromStatusId, Integer toStatusId) throws Exception {
         
         String sql = "update transactionTarget "
                 + " set statusId = :toStatusId, "
