@@ -34,31 +34,31 @@ public interface transactionInDAO {
     
     List<fieldSelectOptions> getFieldSelectOptions(int fieldId, int configId);
     
-    Integer submitBatchUpload(batchUploads batchUpload);
+    Integer submitBatchUpload(batchUploads batchUpload) throws Exception;
     
-    void submitBatchUploadSummary(batchUploadSummary summary);
+    void submitBatchUploadSummary(batchUploadSummary summary) throws Exception;
     
-    void submitBatchUploadChanges(batchUploads batchUpload);
+    void submitBatchUploadChanges(batchUploads batchUpload) throws Exception;
     
-    Integer submitTransactionIn(transactionIn transactionIn);
+    Integer submitTransactionIn(transactionIn transactionIn) throws Exception;
     
-    void submitTransactionInChanges(transactionIn transactionIn);
+    void submitTransactionInChanges(transactionIn transactionIn) throws Exception;
     
-    Integer submitTransactionInRecords(transactionInRecords records);
+    Integer submitTransactionInRecords(transactionInRecords records) throws Exception;
     
-    void submitTransactionInRecordsUpdates(transactionInRecords records);
+    void submitTransactionInRecordsUpdates(transactionInRecords records) throws Exception;
     
-    void submitTransactionTranslatedInRecords(int transactionId, int transactionRecordId, int configId);
+    void submitTransactionTranslatedInRecords(int transactionId, int transactionRecordId, int configId) throws Exception;
     
     List<batchUploads> getpendingBatches(int userId, int orgId, String searchTerm, Date fromDate, Date toDate, int page, int maxResults) throws Exception;
     
-    List<transactionIn> getBatchTransactions(int batchId, int userId);
+    List<transactionIn> getBatchTransactions(int batchId, int userId) throws Exception;
     
     List<batchUploads> getsentBatches(int userId, int orgId, String searchTerm, Date fromDate, Date toDate, int page, int maxResults) throws Exception;
     
-    batchUploads getBatchDetails(int batchId);
+    batchUploads getBatchDetails(int batchId) throws Exception;
     
-    transactionIn getTransactionDetails(int transactionId);
+    transactionIn getTransactionDetails(int transactionId) throws Exception;
     
     transactionInRecords getTransactionRecords(int transactionId);
     
@@ -68,19 +68,19 @@ public interface transactionInDAO {
     
     transactionTarget getTransactionTargetDetails(int transactionTargetId);
     
-    void submitTransactionTargetChanges(transactionTarget transactionTarget);
+    void submitTransactionTargetChanges(transactionTarget transactionTarget) throws Exception;
     
     transactionTarget getTransactionTarget(int batchUploadId, int transactionInId);
     
-    Integer submitAttachment(transactionAttachment attachment);
+    Integer submitAttachment(transactionAttachment attachment) throws Exception;
     
-    transactionAttachment getAttachmentById(int attachmentId);
+    transactionAttachment getAttachmentById(int attachmentId) throws Exception;
     
-    void submitAttachmentChanges(transactionAttachment attachment);
+    void submitAttachmentChanges(transactionAttachment attachment) throws Exception;
     
-    List<transactionAttachment> getAttachmentsByTransactionId(int transactionInId);
+    List<transactionAttachment> getAttachmentsByTransactionId(int transactionInId) throws Exception;
     
-    void removeAttachmentById(int attachmentId);
+    void removeAttachmentById(int attachmentId) throws Exception;
     
     List <Integer> getConfigIdsForBatch (int batchUploadId);
     
@@ -105,11 +105,11 @@ public interface transactionInDAO {
     
     List<batchUploads> getuploadedBatches(int userId, int orgId);
     
-    void updateBatchStatus (Integer batchUploadId, Integer statusId, String timeField);
+    void updateBatchStatus (Integer batchUploadId, Integer statusId, String timeField) throws Exception;
     
-    void updateTransactionStatus (Integer batchUploadId, Integer transactionId, Integer fromStatusId, Integer toStatusId);
+    void updateTransactionStatus (Integer batchUploadId, Integer transactionId, Integer fromStatusId, Integer toStatusId) throws Exception;
     
-    void updateTransactionTargetStatus (Integer batchUploadId, Integer transactionId, Integer fromStatusId, Integer toStatusId);
+    void updateTransactionTargetStatus (Integer batchUploadId, Integer transactionId, Integer fromStatusId, Integer toStatusId) throws Exception;
     
     boolean allowBatchClear (Integer batchUploadId);
     

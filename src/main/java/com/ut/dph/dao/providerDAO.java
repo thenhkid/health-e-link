@@ -14,11 +14,11 @@ public interface providerDAO {
   
   void deleteProvider(int providerId);
 	  
-  Provider getProviderById(int providerId);
+  Provider getProviderById(int providerId) throws Exception;
   
   List<Provider> findProviders(int orgId, String searchTerm);
   
-  List<providerAddress> getProviderAddresses(int providerId);
+  List<providerAddress> getProviderAddresses(int providerId) throws Exception;
   
   providerAddress getAddressDetails(int addressId);
   

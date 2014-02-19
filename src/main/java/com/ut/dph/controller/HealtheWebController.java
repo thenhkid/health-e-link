@@ -38,7 +38,6 @@ import com.ut.dph.service.sysAdminManager;
 import com.ut.dph.service.transactionInManager;
 import com.ut.dph.service.transactionOutManager;
 import com.ut.dph.service.userManager;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -579,32 +578,39 @@ public class HealtheWebController {
         
         /** Need to get all the message types set up for the user */
         User userInfo = (User)session.getAttribute("userDetails");
-        List<configuration> configurations = configurationManager.getActiveConfigurationsByUserId(userInfo.getId(), 2);
+        
+        try {
+            List<configuration> configurations = configurationManager.getActiveConfigurationsByUserId(userInfo.getId(), 2);
         
         
-        for (configuration config : configurations) {
-            config.setMessageTypeName(messagetypemanager.getMessageTypeById(config.getMessageTypeId()).getName());
-            
-            /** Get a list of connections */
-            List<configurationConnection> connections = configurationManager.getConnectionsByConfiguration(config.getId());
-            
-            for(configurationConnection connection : connections) {
-                configuration configDetails = configurationManager.getConfigurationById(connection.gettargetConfigId());
-                connection.settargetOrgName(organizationmanager.getOrganizationById(configDetails.getorgId()).getOrgName());
-                connection.settargetOrgId(configDetails.getorgId());
+            for (configuration config : configurations) {
+                config.setMessageTypeName(messagetypemanager.getMessageTypeById(config.getMessageTypeId()).getName());
+
+                /** Get a list of connections */
+                List<configurationConnection> connections = configurationManager.getConnectionsByConfiguration(config.getId());
+
+                for(configurationConnection connection : connections) {
+                    configuration configDetails = configurationManager.getConfigurationById(connection.gettargetConfigId());
+                    connection.settargetOrgName(organizationmanager.getOrganizationById(configDetails.getorgId()).getOrgName());
+                    connection.settargetOrgId(configDetails.getorgId());
+                }
+
+                config.setconnections(connections);
+
             }
-            
-            config.setconnections(connections);
-            
+
+            mav.addObject("configurations", configurations);
+        
+            /* Set the header totals */
+            setTotals(session);
+
+            mav.addObject("pendingTotal", pendingTotal);
+            mav.addObject("inboxTotal", inboxTotal);
         }
-        
-        mav.addObject("configurations", configurations);
-        
-        /* Set the header totals */
-        setTotals(session);
-        
-        mav.addObject("pendingTotal", pendingTotal);
-        mav.addObject("inboxTotal", inboxTotal);
+        catch (Exception e) {
+            throw new Exception("An error occurred in returning a list of message types for user " + userInfo.getId(), e);
+        }
+       
         
         return mav;
     }
@@ -631,78 +637,132 @@ public class HealtheWebController {
         
         User userInfo = (User)session.getAttribute("userDetails");
         
-        /* Get the organization details for the source (Sender) organization from the original transaction */
-        transactionTarget transactionDetails = transactionOutManager.getTransactionDetails(transactionId);
-        transactionIn origTransactionDetails = transactionInManager.getTransactionDetails(transactionDetails.gettransactionInId());
-        configuration origConfigDetails = configurationManager.getConfigurationById(origTransactionDetails.getconfigId());
-        Organization sendingOrgDetails = organizationmanager.getOrganizationById(origConfigDetails.getorgId());
+        try {
+            /* Get the organization details for the source (Sender) organization from the original transaction */
+            transactionTarget transactionDetails = transactionOutManager.getTransactionDetails(transactionId);
+            transactionIn origTransactionDetails = transactionInManager.getTransactionDetails(transactionDetails.gettransactionInId());
+            configuration origConfigDetails = configurationManager.getConfigurationById(origTransactionDetails.getconfigId());
+            Organization sendingOrgDetails = organizationmanager.getOrganizationById(origConfigDetails.getorgId());
+            
+            /* Get the organization details for the target (Receiving) organization from the original transaction */
+            Organization receivingOrgDetails = organizationmanager.getOrganizationById(configDetails.getorgId());
+
+            /* Find out the target configuration id */
+            Integer targetConnectionId = transactionInManager.getFeedbackReportConnection(configId, origConfigDetails.getorgId());
+            configurationConnection connectionDetails = configurationManager.getConnection(targetConnectionId);
+
+            /* Get a list of form fields */
+            configurationTransport transportDetails = configurationTransportManager.getTransportDetailsByTransportMethod(configId, 2);
+            
+            Transaction transaction = new Transaction();
+            transactionOutRecords records = transactionOutManager.getTransactionRecords(transactionId);
+
+            /* Create a new transaction */
+            transaction.setorgId(userInfo.getOrgId());
+            transaction.settransportMethodId(2);
+            transaction.setmessageTypeId(configDetails.getMessageTypeId());
+            transaction.setuserId(userInfo.getId());
+            transaction.setbatchName(null);
+            transaction.setoriginalFileName(null);
+            transaction.setstatusId(0);
+            transaction.settransactionStatusId(0);
+            transaction.settargetOrgId(origConfigDetails.getorgId());
+            transaction.setconfigId(configId);
+            transaction.setautoRelease(transportDetails.getautoRelease());
+            transaction.settargetConfigId(connectionDetails.gettargetConfigId());
+            transaction.setorginialTransactionId(transactionId);
+            
+            
+            try {
+                List<configurationFormFields> senderInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId,transportDetails.getId(),1);
+           
+                /* Set all the transaction SOURCE ORG fields */
+                List<transactionRecords> fromFields = setInboxFormFields(senderInfoFormFields, records, configId, false);
+                transaction.setsourceOrgFields(fromFields);
+            
+            }
+            catch (Exception e) {
+                throw new Exception ("Error retrieving feedback sender fields for configuration id: "+ configId, e);
+            }
+            
+            try {
+                List<configurationFormFields> senderProviderFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId,transportDetails.getId(),2);
+            
+                /* Set all the transaction SOURCE PROVIDER fields */
+                List<transactionRecords> fromProviderFields = setInboxFormFields(senderProviderFormFields, records, configId, false);
+                transaction.setsourceProviderFields(fromProviderFields);
+            
+            }
+            catch (Exception e) {
+                throw new Exception ("Error retrieving feedback sender provider fields for configuration id: "+ configId, e);
+            }
+
+
+            try {
+                List<configurationFormFields> targetInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId,transportDetails.getId(),3);
+            
+                /* Set all the transaction TARGET fields */
+                List<transactionRecords> toFields = setInboxFormFields(targetInfoFormFields, records, configId, false);
+                transaction.settargetOrgFields(toFields);
+            
+            }
+            catch (Exception e) {
+                throw new Exception ("Error retrieving feedback target fields for configuration id: "+ configId, e);
+            }
+
+            try {
+                List<configurationFormFields> targetProviderFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId,transportDetails.getId(),4);
+            
+                /* Set all the transaction TARGET PROVIDER fields */
+                List<transactionRecords> toProviderFields = setInboxFormFields(targetProviderFormFields, records, configId, false);
+                transaction.settargetProviderFields(toProviderFields);
+            
+            }
+            catch (Exception e) {
+                throw new Exception ("Error retrieving feedback target provider fields for configuration id: "+ configId, e);
+            }
+
+            
+            try {
+                List<configurationFormFields> patientInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId,transportDetails.getId(),5);
+            
+                /* Set all the transaction PATIENT fields */
+                List<transactionRecords> patientFields = setInboxFormFields(patientInfoFormFields, records, configId, true);
+                transaction.setpatientFields(patientFields);
+            
+            }
+            catch (Exception e) {
+                throw new Exception ("Error retrieving feedback patient fields for configuration id: "+ configId, e);
+            }
+            
+            try {
+                List<configurationFormFields> detailFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId,transportDetails.getId(),6);
+
+                /* Set all the transaction DETAIL fields */
+                List<transactionRecords> detailFields = setInboxFormFields(detailFormFields, null, configId, false);
+                transaction.setdetailFields(detailFields);
+
+            
+            }
+            catch (Exception e) {
+                throw new Exception ("Error retrieving feedback detail fields for configuration id: "+ configId, e);
+            }
+            
+            
+            mav.addObject(transaction);
+
+            /* Set the header totals */
+            setTotals(session);
+
+            mav.addObject("pendingTotal", pendingTotal);
+            mav.addObject("inboxTotal", inboxTotal);
+            
+            
+        }
+        catch (Exception e) {
+            throw new Exception("An error occurred in returning the feedback report form for config " + configId, e);
+        }
         
-        /* Get the organization details for the target (Receiving) organization from the original transaction */
-        Organization receivingOrgDetails = organizationmanager.getOrganizationById(configDetails.getorgId());
-        
-        /* Find out the target configuration id */
-        Integer targetConnectionId = transactionInManager.getFeedbackReportConnection(configId, origConfigDetails.getorgId());
-        configurationConnection connectionDetails = configurationManager.getConnection(targetConnectionId);
-        
-        /* Get a list of form fields */
-        configurationTransport transportDetails = configurationTransportManager.getTransportDetailsByTransportMethod(configId, 2);
-        List<configurationFormFields> senderInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId,transportDetails.getId(),1);
-        List<configurationFormFields> senderProviderFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId,transportDetails.getId(),2);
-        List<configurationFormFields> targetInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId,transportDetails.getId(),3);
-        List<configurationFormFields> targetProviderFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId,transportDetails.getId(),4);
-        List<configurationFormFields> patientInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId,transportDetails.getId(),5);
-        List<configurationFormFields> detailFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId,transportDetails.getId(),6);
-        
-        Transaction transaction = new Transaction();
-        transactionOutRecords records = transactionOutManager.getTransactionRecords(transactionId);
-        
-        /* Create a new transaction */
-        transaction.setorgId(userInfo.getOrgId());
-        transaction.settransportMethodId(2);
-        transaction.setmessageTypeId(configDetails.getMessageTypeId());
-        transaction.setuserId(userInfo.getId());
-        transaction.setbatchName(null);
-        transaction.setoriginalFileName(null);
-        transaction.setstatusId(0);
-        transaction.settransactionStatusId(0);
-        transaction.settargetOrgId(origConfigDetails.getorgId());
-        transaction.setconfigId(configId);
-        transaction.setautoRelease(transportDetails.getautoRelease());
-        transaction.settargetConfigId(connectionDetails.gettargetConfigId());
-        transaction.setorginialTransactionId(transactionId);
-    
-        
-        /* Set all the transaction SOURCE ORG fields */
-        List<transactionRecords> fromFields = setInboxFormFields(senderInfoFormFields, records, configId, false);
-        transaction.setsourceOrgFields(fromFields);
-        
-        /* Set all the transaction SOURCE PROVIDER fields */
-        List<transactionRecords> fromProviderFields = setInboxFormFields(senderProviderFormFields, records, configId, false);
-        transaction.setsourceProviderFields(fromProviderFields);
-        
-        /* Set all the transaction TARGET fields */
-        List<transactionRecords> toFields = setInboxFormFields(targetInfoFormFields, records, configId, false);
-        transaction.settargetOrgFields(toFields);
-        
-        /* Set all the transaction TARGET PROVIDER fields */
-        List<transactionRecords> toProviderFields = setInboxFormFields(targetProviderFormFields, records, configId, false);
-        transaction.settargetProviderFields(toProviderFields);
-        
-        /* Set all the transaction PATIENT fields */
-        List<transactionRecords> patientFields = setInboxFormFields(patientInfoFormFields, records, configId, true);
-        transaction.setpatientFields(patientFields);
-        
-        /* Set all the transaction DETAIL fields */
-        List<transactionRecords> detailFields = setInboxFormFields(detailFormFields, null, configId, false);
-        transaction.setdetailFields(detailFields);
-       
-        mav.addObject(transaction);
-        
-        /* Set the header totals */
-        setTotals(session);
-        
-        mav.addObject("pendingTotal", pendingTotal);
-        mav.addObject("inboxTotal", inboxTotal);
         
         return mav;
     }
@@ -742,122 +802,170 @@ public class HealtheWebController {
             mav.addObject("pageHeader", "pending");
         }
         
-        /* Get the configuration details */
-        configuration configDetails = configurationManager.getConfigurationById(configId);
-        
-        /* Get the organization details for the source (Sender) organization */
-        User userInfo = (User)session.getAttribute("userDetails");
-        Organization sendingOrgDetails = organizationmanager.getOrganizationById(userInfo.getOrgId());
-        
-        /* Get a list of form fields */
-        configurationTransport transportDetails = configurationTransportManager.getTransportDetailsByTransportMethod(configId, 2);
-        List<configurationFormFields> senderInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId,transportDetails.getId(),1);
-        List<configurationFormFields> senderProviderFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId,transportDetails.getId(),2);
-        List<configurationFormFields> targetInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId,transportDetails.getId(),3);
-        List<configurationFormFields> targetProviderFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId,transportDetails.getId(),4);
-        List<configurationFormFields> patientInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId,transportDetails.getId(),5);
-        List<configurationFormFields> detailFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId,transportDetails.getId(),6);
-        
-        Transaction transaction = new Transaction();
-        transactionInRecords records = null;
-        
-        if(transactionId > 0) {
-            transactionIn transactionInfo = transactionInManager.getTransactionDetails(transactionId);
-            batchUploads batchInfo = transactionInManager.getBatchDetails(transactionInfo.getbatchId());
-            transactionTarget transactionTarget = transactionInManager.getTransactionTarget(transactionInfo.getbatchId(), transactionId);
+        try {
             
-            configuration targetConfigDetails = configurationManager.getConfigurationById(transactionTarget.getconfigId());
-            targetOrg = targetConfigDetails.getorgId();
-            
-            transaction.setorgId(batchInfo.getOrgId());
-            transaction.settransportMethodId(transportDetails.gettransportMethodId());
-            transaction.setmessageTypeId(configDetails.getMessageTypeId());
-            transaction.setuserId(batchInfo.getuserId());
-            transaction.setbatchName(batchInfo.getutBatchName());
-            transaction.setoriginalFileName(batchInfo.getoriginalFileName());
-            transaction.setstatusId(transactionInfo.getstatusId());
-            transaction.settransactionStatusId(transactionInfo.getstatusId());
-            transaction.settargetOrgId(targetOrg);
-            transaction.setconfigId(transactionInfo.getconfigId());
-            transaction.setautoRelease(transportDetails.getautoRelease());
-            transaction.setbatchId(batchInfo.getId());
-            transaction.settransactionId(transactionId);
-            transaction.settransactionTargetId(transactionInfo.gettransactionTargetId());
-            transaction.setdateSubmitted(transactionInfo.getdateCreated());
-            transaction.setsourceType(configDetails.getsourceType());
-            transaction.settargetConfigId(transactionTarget.getconfigId());
-            
-            lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(transaction.getstatusId());
-            transaction.setstatusValue(processStatus.getDisplayCode());
-            
-            /* get the message type name */
-            transaction.setmessageTypeName(messagetypemanager.getMessageTypeById(configDetails.getMessageTypeId()).getName());
-            
-            records = transactionInManager.getTransactionRecords(transactionId);
-            transaction.settransactionRecordId(records.getId());
+            /* Get the configuration details */
+            configuration configDetails = configurationManager.getConfigurationById(configId);
+
+            /* Get the organization details for the source (Sender) organization */
+            User userInfo = (User)session.getAttribute("userDetails");
+            Organization sendingOrgDetails = organizationmanager.getOrganizationById(userInfo.getOrgId());
+
+            /* Get a list of form fields */
+            configurationTransport transportDetails = configurationTransportManager.getTransportDetailsByTransportMethod(configId, 2);
+
+            Transaction transaction = new Transaction();
+            transactionInRecords records = null;
+
+            if(transactionId > 0) {
+                transactionIn transactionInfo = transactionInManager.getTransactionDetails(transactionId);
+                batchUploads batchInfo = transactionInManager.getBatchDetails(transactionInfo.getbatchId());
+                transactionTarget transactionTarget = transactionInManager.getTransactionTarget(transactionInfo.getbatchId(), transactionId);
+
+                configuration targetConfigDetails = configurationManager.getConfigurationById(transactionTarget.getconfigId());
+                targetOrg = targetConfigDetails.getorgId();
+
+                transaction.setorgId(batchInfo.getOrgId());
+                transaction.settransportMethodId(transportDetails.gettransportMethodId());
+                transaction.setmessageTypeId(configDetails.getMessageTypeId());
+                transaction.setuserId(batchInfo.getuserId());
+                transaction.setbatchName(batchInfo.getutBatchName());
+                transaction.setoriginalFileName(batchInfo.getoriginalFileName());
+                transaction.setstatusId(transactionInfo.getstatusId());
+                transaction.settransactionStatusId(transactionInfo.getstatusId());
+                transaction.settargetOrgId(targetOrg);
+                transaction.setconfigId(transactionInfo.getconfigId());
+                transaction.setautoRelease(transportDetails.getautoRelease());
+                transaction.setbatchId(batchInfo.getId());
+                transaction.settransactionId(transactionId);
+                transaction.settransactionTargetId(transactionInfo.gettransactionTargetId());
+                transaction.setdateSubmitted(transactionInfo.getdateCreated());
+                transaction.setsourceType(configDetails.getsourceType());
+                transaction.settargetConfigId(transactionTarget.getconfigId());
+
+                lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(transaction.getstatusId());
+                transaction.setstatusValue(processStatus.getDisplayCode());
+
+                /* get the message type name */
+                transaction.setmessageTypeName(messagetypemanager.getMessageTypeById(configDetails.getMessageTypeId()).getName());
+
+                records = transactionInManager.getTransactionRecords(transactionId);
+                transaction.settransactionRecordId(records.getId());
+            }
+            else {
+                /* Create a new transaction */
+                transaction.setorgId(userInfo.getOrgId());
+                transaction.settransportMethodId(2);
+                transaction.setmessageTypeId(configDetails.getMessageTypeId());
+                transaction.setuserId(userInfo.getId());
+                transaction.setbatchName(null);
+                transaction.setoriginalFileName(null);
+                transaction.setstatusId(0);
+                transaction.settransactionStatusId(0);
+                transaction.settargetOrgId(targetOrg);
+                transaction.setconfigId(configId);
+                transaction.setautoRelease(transportDetails.getautoRelease());
+                transaction.settargetConfigId(targetConfig);
+                transaction.setsourceType(configDetails.getsourceType());
+            }
+
+            /* Get the organization details for the target (Receiving) organization */
+            Organization receivingOrgDetails = organizationmanager.getOrganizationById(targetOrg);
+
+            boolean readOnly = false;
+
+            try {
+                List<configurationFormFields> senderInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId,transportDetails.getId(),1);
+
+                /* Set all the transaction SOURCE ORG fields */
+                List<transactionRecords> fromFields = setOutboundFormFields(senderInfoFormFields, records, configId, readOnly, sendingOrgDetails.getId());
+                transaction.setsourceOrgFields(fromFields);
+
+            }
+            catch (Exception e) {
+                throw new Exception ("Error retrieving sender fields for configuration id: "+ configId, e);
+            }
+
+            try {
+                List<configurationFormFields> senderProviderFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId,transportDetails.getId(),2);
+
+                /* Set all the transaction SOURCE PROVIDER fields */
+                List<transactionRecords> fromProviderFields = setOutboundFormFields(senderProviderFormFields, records, configId, readOnly, sendingOrgDetails.getId());
+                transaction.setsourceProviderFields(fromProviderFields);
+
+            }
+            catch (Exception e) {
+                throw new Exception ("Error retrieving sender provider fields for configuration id: "+ configId, e);
+            }
+
+            try {
+                List<configurationFormFields> targetInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId,transportDetails.getId(),3);
+
+                /* Set all the transaction TARGET fields */
+                List<transactionRecords> toFields = setOutboundFormFields(targetInfoFormFields, records, configId, readOnly, receivingOrgDetails.getId());
+                transaction.settargetOrgFields(toFields);
+
+            }
+            catch (Exception e) {
+                throw new Exception ("Error retrieving target fields for configuration id: "+ configId, e);
+            }
+
+            try {
+                List<configurationFormFields> targetProviderFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId,transportDetails.getId(),4);
+
+                /* Set all the transaction TARGET PROVIDER fields */
+                List<transactionRecords> toProviderFields = setOutboundFormFields(targetProviderFormFields, records, configId, readOnly, receivingOrgDetails.getId());
+                transaction.settargetProviderFields(toProviderFields);
+
+            }
+            catch (Exception e) {
+                throw new Exception ("Error retrieving target provider fields for configuration id: "+ configId, e);
+            }
+
+            try {
+                List<configurationFormFields> patientInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId,transportDetails.getId(),5);
+
+                /* Set all the transaction PATIENT fields */
+                if(configDetails.getsourceType() == 2) {
+                    readOnly = true;
+                }
+                List<transactionRecords> patientFields = setOutboundFormFields(patientInfoFormFields, records, configId, readOnly, 0);
+                transaction.setpatientFields(patientFields);
+
+
+            }
+            catch (Exception e) {
+                throw new Exception ("Error retrieving patient fields for configuration id: "+ configId, e);
+            }
+
+            try {
+                List<configurationFormFields> detailFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId,transportDetails.getId(),6);
+
+                /* Set all the transaction DETAIL fields */
+                readOnly = false;
+                List<transactionRecords> detailFields = setOutboundFormFields(detailFormFields, records, configId, readOnly, 0);
+                transaction.setdetailFields(detailFields);
+            }
+            catch (Exception e) {
+                throw new Exception ("Error retrieving patient fields for configuration id: "+ configId, e);
+            }
+
+            mav.addObject(transaction);
+
+            /* Get a list of organization providers */
+            List<Provider> providers = organizationmanager.getOrganizationProviders(configDetails.getorgId(), 1, 0);
+            mav.addObject("providers", providers);
+
+            /* Set the header totals */
+            setTotals(session);
+
+            mav.addObject("pendingTotal", pendingTotal);
+            mav.addObject("inboxTotal", inboxTotal);
         }
-        else {
-            /* Create a new transaction */
-            transaction.setorgId(userInfo.getOrgId());
-            transaction.settransportMethodId(2);
-            transaction.setmessageTypeId(configDetails.getMessageTypeId());
-            transaction.setuserId(userInfo.getId());
-            transaction.setbatchName(null);
-            transaction.setoriginalFileName(null);
-            transaction.setstatusId(0);
-            transaction.settransactionStatusId(0);
-            transaction.settargetOrgId(targetOrg);
-            transaction.setconfigId(configId);
-            transaction.setautoRelease(transportDetails.getautoRelease());
-            transaction.settargetConfigId(targetConfig);
-            transaction.setsourceType(configDetails.getsourceType());
+        catch (Exception e) {
+            throw new Exception("Error occurred in getting the details for the new message form for config "+configId, e);
         }
         
-        /* Get the organization details for the target (Receiving) organization */
-        Organization receivingOrgDetails = organizationmanager.getOrganizationById(targetOrg);
-        
-        boolean readOnly = false;
-        
-        /* Set all the transaction SOURCE ORG fields */
-        List<transactionRecords> fromFields = setOutboundFormFields(senderInfoFormFields, records, configId, readOnly, sendingOrgDetails.getId());
-        transaction.setsourceOrgFields(fromFields);
-        
-        /* Set all the transaction SOURCE PROVIDER fields */
-        List<transactionRecords> fromProviderFields = setOutboundFormFields(senderProviderFormFields, records, configId, readOnly, sendingOrgDetails.getId());
-        transaction.setsourceProviderFields(fromProviderFields);
-        
-        /* Set all the transaction TARGET fields */
-        List<transactionRecords> toFields = setOutboundFormFields(targetInfoFormFields, records, configId, readOnly, receivingOrgDetails.getId());
-        transaction.settargetOrgFields(toFields);
-        
-        /* Set all the transaction TARGET PROVIDER fields */
-        List<transactionRecords> toProviderFields = setOutboundFormFields(targetProviderFormFields, records, configId, readOnly, receivingOrgDetails.getId());
-        transaction.settargetProviderFields(toProviderFields);
-       
-        /* Set all the transaction PATIENT fields */
-        if(configDetails.getsourceType() == 2) {
-            readOnly = true;
-        }
-        List<transactionRecords> patientFields = setOutboundFormFields(patientInfoFormFields, records, configId, readOnly, 0);
-        transaction.setpatientFields(patientFields);
-        
-        
-        /* Set all the transaction DETAIL fields */
-        readOnly = false;
-        List<transactionRecords> detailFields = setOutboundFormFields(detailFormFields, records, configId, readOnly, 0);
-        transaction.setdetailFields(detailFields);
-        
-        mav.addObject(transaction);
-        
-        /* Get a list of organization providers */
-        List<Provider> providers = organizationmanager.getOrganizationProviders(configDetails.getorgId(), 1, 0);
-        mav.addObject("providers", providers);
-        
-        /* Set the header totals */
-        setTotals(session);
-        
-        mav.addObject("pendingTotal", pendingTotal);
-        mav.addObject("inboxTotal", inboxTotal);
         
         return mav;
     }
@@ -884,326 +992,368 @@ public class HealtheWebController {
         
         /* If currBatchId == 0 then create a new batch */
         if(currBatchId == 0) {
-        
-            /* Create the batch name (OrgId+MessageTypeId+Date/Time) */
-            DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-            Date date = new Date();
-            String batchName = new StringBuilder().append(transactionDetails.getorgId()).append(transactionDetails.getmessageTypeId()).append(dateFormat.format(date)).toString();
-
-            /* Submit a new batch */
-            batchUploads batchUpload = new batchUploads();
-            batchUpload.setOrgId(transactionDetails.getorgId());
-            batchUpload.setuserId(userInfo.getId());
-            batchUpload.setutBatchName(batchName);
-            batchUpload.settransportMethodId(2);
-            batchUpload.setoriginalFileName(batchName);
             
-            /* 
-            If the "Save" button was pressed set the
-            status to "Submission Saved"
-            */
-            if(action.equals("save")) {
-                batchUpload.setstatusId(8);
-            }
-            /* 
-            If the "Release" button was pressed 
-            set the status to "Submission Release Pending"
-            */
-            else if(action.equals("release")) {
-                batchUpload.setstatusId(5);
-            }
-            /* 
-            If the "Send" button was pressed 
-            set the status to "Submission Released"
-            */
-            else {
-                batchUpload.setstatusId(6);
-            }
-            batchUpload.settotalRecordCount(1);
+            try {
+                /* Create the batch name (OrgId+MessageTypeId+Date/Time) */
+                DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+                Date date = new Date();
+                String batchName = new StringBuilder().append(transactionDetails.getorgId()).append(transactionDetails.getmessageTypeId()).append(dateFormat.format(date)).toString();
 
-            batchId = (Integer) transactionInManager.submitBatchUpload(batchUpload); 
+                /* Submit a new batch */
+                batchUploads batchUpload = new batchUploads();
+                batchUpload.setOrgId(transactionDetails.getorgId());
+                batchUpload.setuserId(userInfo.getId());
+                batchUpload.setutBatchName(batchName);
+                batchUpload.settransportMethodId(2);
+                batchUpload.setoriginalFileName(batchName);
+
+                /* 
+                If the "Save" button was pressed set the
+                status to "Submission Saved"
+                */
+                if(action.equals("save")) {
+                    batchUpload.setstatusId(8);
+                }
+                /* 
+                If the "Release" button was pressed 
+                set the status to "Submission Release Pending"
+                */
+                else if(action.equals("release")) {
+                    batchUpload.setstatusId(5);
+                }
+                /* 
+                If the "Send" button was pressed 
+                set the status to "Submission Released"
+                */
+                else {
+                    batchUpload.setstatusId(6);
+                }
+                batchUpload.settotalRecordCount(1);
+
+                batchId = (Integer) transactionInManager.submitBatchUpload(batchUpload); 
+            }
+            catch (Exception e) {
+                throw new Exception ("Error occurred in creating new batch", e);
+            }
+        
+            
         }
         
         /* Otherwise update existing batch */
         else {
             batchId = currBatchId;
             
-            /* Get the details of the batch */
-            batchUploads batchUpload = transactionInManager.getBatchDetails(batchId);
+            try {
+                /* Get the details of the batch */
+                batchUploads batchUpload = transactionInManager.getBatchDetails(batchId);
+
+                /* 
+                If the "Save" button was pressed set the
+                status to "Submission Saved"
+                */
+                if(action.equals("save")) {
+                    batchUpload.setstatusId(8);
+                }
+                /* 
+                If the "Release" button was pressed 
+                set the status to "Submission Release Pending"
+                */
+                else if(action.equals("release")) {
+                    batchUpload.setstatusId(5);
+                }
+                /* 
+                If the "Send" button was pressed 
+                set the status to "Submission Released"
+                */
+                else {
+                    batchUpload.setstatusId(6);
+                }
+
+                transactionInManager.submitBatchUploadChanges(batchUpload);
+            }
+            catch (Exception e) {
+                throw new Exception("Error occurred in updating a batch id: "+batchId, e);
+            }
             
-            /* 
-            If the "Save" button was pressed set the
-            status to "Submission Saved"
-            */
-            if(action.equals("save")) {
-                batchUpload.setstatusId(8);
-            }
-            /* 
-            If the "Release" button was pressed 
-            set the status to "Submission Release Pending"
-            */
-            else if(action.equals("release")) {
-                batchUpload.setstatusId(5);
-            }
-            /* 
-            If the "Send" button was pressed 
-            set the status to "Submission Released"
-            */
-            else {
-                batchUpload.setstatusId(6);
-            }
-            
-            transactionInManager.submitBatchUploadChanges(batchUpload);
         }
         
         /* If currTransactionId == 0 then create a new transaction */
         if(currTransactionId == 0) {
+            
+            try {
+                /* Submit a new Transaction In record */
+                transactionIn transactionIn = new transactionIn();
+                transactionIn.setbatchId(batchId);
+                transactionIn.setconfigId(transactionDetails.getconfigId());
+                transactionIn.settransactionTargetId(transactionDetails.getorginialTransactionId());
+
+                /* 
+                If the "Save" button was pressed set the
+                status to "Saved"
+                */
+                if(action.equals("save")) {
+                    transactionIn.setstatusId(15);
+                }
+                /* 
+                If the "Release" button was pressed 
+                set the status to "Release Pending"
+                */
+                else if(action.equals("release")) {
+                    transactionIn.setstatusId(10);
+                }
+                /* 
+                If the "Send" button was pressed 
+                set the status to "Released"
+                */
+                else {
+                    transactionIn.setstatusId(12);
+                }
+
+                transactionId = (Integer) transactionInManager.submitTransactionIn(transactionIn);
+
+                /* Need to populate the batchUploadSummary table */
+                batchUploadSummary summary = new batchUploadSummary();
+                summary.setbatchId(batchId);
+                summary.settransactionInId(transactionId);
+                summary.setsourceOrgId(transactionDetails.getorgId());
+                summary.settargetOrgId(transactionDetails.gettargetOrgId());
+                summary.setmessageTypeId(transactionDetails.getmessageTypeId());
+                summary.setsourceConfigId(transactionDetails.getconfigId());
+
+                transactionInManager.submitBatchUploadSummary(summary);  
+            }
+            catch (Exception e) {
+                throw new Exception("Error occurred in creating the new transaction for batch "+batchId,e);
+            }
         
-            /* Submit a new Transaction In record */
-            transactionIn transactionIn = new transactionIn();
-            transactionIn.setbatchId(batchId);
-            transactionIn.setconfigId(transactionDetails.getconfigId());
-            transactionIn.settransactionTargetId(transactionDetails.getorginialTransactionId());
-
-            /* 
-            If the "Save" button was pressed set the
-            status to "Saved"
-            */
-            if(action.equals("save")) {
-                transactionIn.setstatusId(15);
-            }
-            /* 
-            If the "Release" button was pressed 
-            set the status to "Release Pending"
-            */
-            else if(action.equals("release")) {
-                transactionIn.setstatusId(10);
-            }
-            /* 
-            If the "Send" button was pressed 
-            set the status to "Released"
-            */
-            else {
-                transactionIn.setstatusId(12);
-            }
-
-            transactionId = (Integer) transactionInManager.submitTransactionIn(transactionIn);
-            
-            /* Need to populate the batchUploadSummary table */
-            batchUploadSummary summary = new batchUploadSummary();
-            summary.setbatchId(batchId);
-            summary.settransactionInId(transactionId);
-            summary.setsourceOrgId(transactionDetails.getorgId());
-            summary.settargetOrgId(transactionDetails.gettargetOrgId());
-            summary.setmessageTypeId(transactionDetails.getmessageTypeId());
-            summary.setsourceConfigId(transactionDetails.getconfigId());
-            
-            transactionInManager.submitBatchUploadSummary(summary);
-            
         }
         
         /* Otherwise update existing batch */
         else {
             transactionId =  currTransactionId;  
             
-            transactionIn transactionIn = transactionInManager.getTransactionDetails(transactionId);
+            try {
+                transactionIn transactionIn = transactionInManager.getTransactionDetails(transactionId);
             
-            /* 
-            If the "Save" button was pressed set the
-            status to "Saved"
-            */
-            if(action.equals("save")) {
-                transactionIn.setstatusId(15);
+                /* 
+                If the "Save" button was pressed set the
+                status to "Saved"
+                */
+                if(action.equals("save")) {
+                    transactionIn.setstatusId(15);
+                }
+                /*
+                If the "Release" button was pressed 
+                set the status to "Release Pending"
+                */
+                else if(action.equals("release")) {
+                    transactionIn.setstatusId(10);
+                }
+                /* 
+                If the "Send" button was pressed 
+                set the status to "Released"
+                */
+                else {
+                    transactionIn.setstatusId(12);
+                }
+
+                transactionInManager.submitTransactionInChanges(transactionIn);
+                
             }
-            /*
-            If the "Release" button was pressed 
-            set the status to "Release Pending"
-            */
-            else if(action.equals("release")) {
-                transactionIn.setstatusId(10);
-            }
-            /* 
-            If the "Send" button was pressed 
-            set the status to "Released"
-            */
-            else {
-                transactionIn.setstatusId(12);
+            catch (Exception e) {
+                throw new Exception("Error occurred in updating an existing transaction id:"+transactionId,e);
             }
             
-            transactionInManager.submitTransactionInChanges(transactionIn);
         }
         
         /* See if any attachments were uploaded */
         if(!attachmentIds.isEmpty()) {
             
             for(Integer attachmentId: attachmentIds) {
-                transactionAttachment attachment = transactionInManager.getAttachmentById(attachmentId);
-                attachment.setTransactionInId(transactionId);
-                
-                transactionInManager.submitAttachmentChanges(attachment);
+                try {
+                   transactionAttachment attachment = transactionInManager.getAttachmentById(attachmentId);
+                    attachment.setTransactionInId(transactionId);
+
+                    transactionInManager.submitAttachmentChanges(attachment); 
+                }
+                catch (Exception e) {
+                    throw new Exception("Error occurred in adding an attachment id:"+attachmentId,e);
+                }
             }
             
         }
         
-        /* Get the 6 Bucket (Source Org, Source Provider, Target Org, Target Provider, Patient, Details) fields */
-        List<transactionRecords> sourceOrgFields = transactionDetails.getsourceOrgFields();
-        List<transactionRecords> sourceProviderFields = transactionDetails.getsourceProviderFields();
-        List<transactionRecords> targetOrgFields = transactionDetails.gettargetOrgFields();
-        List<transactionRecords> targetProviderFields = transactionDetails.gettargetProviderFields();
-        List<transactionRecords> patientFields = transactionDetails.getpatientFields();
-        List<transactionRecords> detailFields = transactionDetails.getdetailFields();
-        
-        transactionInRecords records;
-        if(currRecordId == 0) {
-            records = new transactionInRecords();
-            records.setTransactionInId(transactionId);
-        }
-        else {
-            records = transactionInManager.getTransactionRecord(currRecordId);
-        }
-        
-        String colName;
-        for(transactionRecords field : sourceOrgFields) {
-            colName = new StringBuilder().append("f").append(field.getfieldNo()).toString();
-            try {
-                BeanUtils.setProperty(records, colName, field.getfieldValue());
-            } catch (IllegalAccessException ex) {
-                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (InvocationTargetException ex) {
-                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+        try {
+            /* Get the 6 Bucket (Source Org, Source Provider, Target Org, Target Provider, Patient, Details) fields */
+            List<transactionRecords> sourceOrgFields = transactionDetails.getsourceOrgFields();
+            List<transactionRecords> sourceProviderFields = transactionDetails.getsourceProviderFields();
+            List<transactionRecords> targetOrgFields = transactionDetails.gettargetOrgFields();
+            List<transactionRecords> targetProviderFields = transactionDetails.gettargetProviderFields();
+            List<transactionRecords> patientFields = transactionDetails.getpatientFields();
+            List<transactionRecords> detailFields = transactionDetails.getdetailFields();
+
+            transactionInRecords records;
+            if(currRecordId == 0) {
+                records = new transactionInRecords();
+                records.setTransactionInId(transactionId);
             }
-        }
-        
-        for(transactionRecords field : sourceProviderFields) {
-            colName = new StringBuilder().append("f").append(field.getfieldNo()).toString();
-            try {
-                BeanUtils.setProperty(records, colName, field.getfieldValue());
-            } catch (IllegalAccessException ex) {
-                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (InvocationTargetException ex) {
-                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-        
-        for(transactionRecords field : targetOrgFields) {
-            colName = new StringBuilder().append("f").append(field.getfieldNo()).toString();
-            try {
-                BeanUtils.setProperty(records, colName, field.getfieldValue());
-            } catch (IllegalAccessException ex) {
-                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (InvocationTargetException ex) {
-                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-        
-        for(transactionRecords field : targetProviderFields) {
-            colName = new StringBuilder().append("f").append(field.getfieldNo()).toString();
-            try {
-                BeanUtils.setProperty(records, colName, field.getfieldValue());
-            } catch (IllegalAccessException ex) {
-                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (InvocationTargetException ex) {
-                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-        
-        for(transactionRecords field : patientFields) {
-            colName = new StringBuilder().append("f").append(field.getfieldNo()).toString();
-            try {
-                BeanUtils.setProperty(records, colName, field.getfieldValue());
-            } catch (IllegalAccessException ex) {
-                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (InvocationTargetException ex) {
-                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-        
-        for(transactionRecords field : detailFields) {
-            colName = new StringBuilder().append("f").append(field.getfieldNo()).toString();
-            try {
-                BeanUtils.setProperty(records, colName, field.getfieldValue());
-            } catch (IllegalAccessException ex) {
-                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (InvocationTargetException ex) {
-                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-        
-        if(currRecordId == 0) {
-            transactionRecordId = (Integer) transactionInManager.submitTransactionInRecords(records);
-        }
-        else {
-            transactionRecordId = currRecordId;
-            records.setId(transactionRecordId);
-            transactionInManager.submitTransactionInRecordsUpdates(records);
-        }
-        
-        transactionInManager.submitTransactionTranslatedInRecords(transactionId, transactionRecordId, transactionDetails.getconfigId());
-        
-        /* Need to populate the transaction Target */
-        if(currTransactionTargetId == 0) {
-        
-            /* Submit a new Transaction Target record */
-            transactionTarget transactiontarget = new transactionTarget();
-            transactiontarget.setbatchUploadId(batchId);
-            transactiontarget.settransactionInId(transactionId);
-            transactiontarget.setconfigId(transactionDetails.gettargetConfigId());
-            
-            /* 
-            If the "Save" button was pressed set the
-            status to "Saved"
-            */
-            if(action.equals("save")) {
-                transactiontarget.setstatusId(15);
-            }
-            /*
-            If the "Release" button was pressed 
-            set the status to "Release Pending"
-            */
-            else if(action.equals("release")) {
-                transactiontarget.setstatusId(10);
-            }
-            /* 
-            If the "Send" button was pressed 
-            set the status to "Released"
-            */
             else {
-                transactiontarget.setstatusId(12);
+                records = transactionInManager.getTransactionRecord(currRecordId);
             }
 
-            transactionInManager.submitTransactionTarget(transactiontarget);
+            String colName;
+            for(transactionRecords field : sourceOrgFields) {
+                colName = new StringBuilder().append("f").append(field.getfieldNo()).toString();
+                try {
+                    BeanUtils.setProperty(records, colName, field.getfieldValue());
+                } catch (IllegalAccessException ex) {
+                    Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (InvocationTargetException ex) {
+                    Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+
+            for(transactionRecords field : sourceProviderFields) {
+                colName = new StringBuilder().append("f").append(field.getfieldNo()).toString();
+                try {
+                    BeanUtils.setProperty(records, colName, field.getfieldValue());
+                } catch (IllegalAccessException ex) {
+                    Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (InvocationTargetException ex) {
+                    Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+
+            for(transactionRecords field : targetOrgFields) {
+                colName = new StringBuilder().append("f").append(field.getfieldNo()).toString();
+                try {
+                    BeanUtils.setProperty(records, colName, field.getfieldValue());
+                } catch (IllegalAccessException ex) {
+                    Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (InvocationTargetException ex) {
+                    Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+
+            for(transactionRecords field : targetProviderFields) {
+                colName = new StringBuilder().append("f").append(field.getfieldNo()).toString();
+                try {
+                    BeanUtils.setProperty(records, colName, field.getfieldValue());
+                } catch (IllegalAccessException ex) {
+                    Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (InvocationTargetException ex) {
+                    Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+
+            for(transactionRecords field : patientFields) {
+                colName = new StringBuilder().append("f").append(field.getfieldNo()).toString();
+                try {
+                    BeanUtils.setProperty(records, colName, field.getfieldValue());
+                } catch (IllegalAccessException ex) {
+                    Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (InvocationTargetException ex) {
+                    Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+
+            for(transactionRecords field : detailFields) {
+                colName = new StringBuilder().append("f").append(field.getfieldNo()).toString();
+                try {
+                    BeanUtils.setProperty(records, colName, field.getfieldValue());
+                } catch (IllegalAccessException ex) {
+                    Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (InvocationTargetException ex) {
+                    Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            
+            if(currRecordId == 0) {
+                transactionRecordId = (Integer) transactionInManager.submitTransactionInRecords(records);
+            }
+            else {
+                transactionRecordId = currRecordId;
+                records.setId(transactionRecordId);
+                transactionInManager.submitTransactionInRecordsUpdates(records);
+            }
+            
+        }
+        catch (Exception e) {
+            throw new Exception("Error occurred in saving transaction field values", e);
         }
         
-        /* Otherwise update existing batch */
-        else {
-            transactionTargetId =  currTransactionTargetId;  
-            
-            transactionTarget transactiontarget = transactionInManager.getTransactionTargetDetails(transactionTargetId);
-            
-            /* 
-            If the "Save" button was pressed set the
-            status to "Saved"
-            */
-            if(action.equals("save")) {
-                transactiontarget.setstatusId(15);
+        try {
+            transactionInManager.submitTransactionTranslatedInRecords(transactionId, transactionRecordId, transactionDetails.getconfigId());
+        
+            /* Need to populate the transaction Target */
+            if(currTransactionTargetId == 0) {
+
+                /* Submit a new Transaction Target record */
+                transactionTarget transactiontarget = new transactionTarget();
+                transactiontarget.setbatchUploadId(batchId);
+                transactiontarget.settransactionInId(transactionId);
+                transactiontarget.setconfigId(transactionDetails.gettargetConfigId());
+
+                /* 
+                If the "Save" button was pressed set the
+                status to "Saved"
+                */
+                if(action.equals("save")) {
+                    transactiontarget.setstatusId(15);
+                }
+                /*
+                If the "Release" button was pressed 
+                set the status to "Release Pending"
+                */
+                else if(action.equals("release")) {
+                    transactiontarget.setstatusId(10);
+                }
+                /* 
+                If the "Send" button was pressed 
+                set the status to "Released"
+                */
+                else {
+                    transactiontarget.setstatusId(12);
+                }
+
+                transactionInManager.submitTransactionTarget(transactiontarget);
             }
-            /*
-            If the "Release" button was pressed 
-            set the status to "Release Pending"
-            */
-            else if(action.equals("release")) {
-                transactiontarget.setstatusId(10);
-            }
-            /* 
-            If the "Send" button was pressed 
-            set the status to "Released"
-            */
+
+            /* Otherwise update existing batch */
             else {
-                transactiontarget.setstatusId(12);
+                transactionTargetId =  currTransactionTargetId;  
+
+                transactionTarget transactiontarget = transactionInManager.getTransactionTargetDetails(transactionTargetId);
+
+                /* 
+                If the "Save" button was pressed set the
+                status to "Saved"
+                */
+                if(action.equals("save")) {
+                    transactiontarget.setstatusId(15);
+                }
+                /*
+                If the "Release" button was pressed 
+                set the status to "Release Pending"
+                */
+                else if(action.equals("release")) {
+                    transactiontarget.setstatusId(10);
+                }
+                /* 
+                If the "Send" button was pressed 
+                set the status to "Released"
+                */
+                else {
+                    transactiontarget.setstatusId(12);
+                }
+
+                transactionInManager.submitTransactionTargetChanges(transactiontarget);
             }
-            
-            transactionInManager.submitTransactionTargetChanges(transactiontarget);
         }
+        catch (Exception e) {
+            throw new Exception("Error occurred in submitting the translated records id:"+transactionId,e);
+        }
+        
         
         if (action.equals("send")) {
             
@@ -1276,37 +1426,43 @@ public class HealtheWebController {
         /* Need to get all the message types set up for the user */
         User userInfo = (User)session.getAttribute("userDetails");
         
-        /* Need to get a list of all pending batches */
-        /* Need to get a list of all pending transactions */
-        Integer totalpendingBatches = transactionInManager.getpendingBatches(userInfo.getId(), userInfo.getOrgId(), searchTerm, fromDate, toDate, 1, 0).size();
-        List<batchUploads> pendingBatches = transactionInManager.getpendingBatches(userInfo.getId(), userInfo.getOrgId(), searchTerm, fromDate, toDate, page, maxResults);
-        
-        if(!pendingBatches.isEmpty()) {
-            for(batchUploads batch : pendingBatches) {
-                List<transactionIn> batchTransactions = transactionInManager.getBatchTransactions(batch.getId(), userInfo.getId());
-                batch.settotalTransactions(batchTransactions.size());
-                
-                lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
-                batch.setstatusValue(processStatus.getDisplayCode());
-                
-                User userDetails = usermanager.getUserById(batch.getuserId());
-                String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
-                batch.setusersName(usersName);
+        try {
+            /* Need to get a list of all pending batches */
+            /* Need to get a list of all pending transactions */
+            Integer totalpendingBatches = transactionInManager.getpendingBatches(userInfo.getId(), userInfo.getOrgId(), searchTerm, fromDate, toDate, 1, 0).size();
+            List<batchUploads> pendingBatches = transactionInManager.getpendingBatches(userInfo.getId(), userInfo.getOrgId(), searchTerm, fromDate, toDate, page, maxResults);
+
+            if(!pendingBatches.isEmpty()) {
+                for(batchUploads batch : pendingBatches) {
+                    List<transactionIn> batchTransactions = transactionInManager.getBatchTransactions(batch.getId(), userInfo.getId());
+                    batch.settotalTransactions(batchTransactions.size());
+
+                    lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
+                    batch.setstatusValue(processStatus.getDisplayCode());
+
+                    User userDetails = usermanager.getUserById(batch.getuserId());
+                    String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
+                    batch.setusersName(usersName);
+                }
             }
+
+            mav.addObject("pendingBatches", pendingBatches);
+
+            /* Set the header totals */
+            setTotals(session);
+
+            mav.addObject("searchTerm", searchTerm);
+            mav.addObject("pendingTotal", pendingTotal);
+            mav.addObject("inboxTotal", inboxTotal);
+
+            Integer totalPages = (int)Math.ceil((double)totalpendingBatches / maxResults);
+            mav.addObject("totalPages", totalPages);
+            mav.addObject("currentPage", page);
+        }
+        catch (Exception e) {
+            throw new Exception("Error occurred trying to get pending items userId: "+userInfo.getId(),e);
         }
         
-        mav.addObject("pendingBatches", pendingBatches);
-       
-        /* Set the header totals */
-        setTotals(session);
-        
-        mav.addObject("searchTerm", searchTerm);
-        mav.addObject("pendingTotal", pendingTotal);
-        mav.addObject("inboxTotal", inboxTotal);
-        
-        Integer totalPages = (int)Math.ceil((double)totalpendingBatches / maxResults);
-        mav.addObject("totalPages", totalPages);
-        mav.addObject("currentPage", page);
         
         return mav;
     }
@@ -1345,36 +1501,42 @@ public class HealtheWebController {
         /* Need to get all the message types set up for the user */
         User userInfo = (User)session.getAttribute("userDetails");
         
-        /* Need to get a list of all pending transactions */
-        Integer totalpendingBatches = transactionInManager.getpendingBatches(userInfo.getId(), userInfo.getOrgId(), searchTerm, fromDate, toDate, 1, 0).size();
-        List<batchUploads> pendingBatches = transactionInManager.getpendingBatches(userInfo.getId(), userInfo.getOrgId(), searchTerm, fromDate, toDate, page, maxResults);
-        
-        
-        if(!pendingBatches.isEmpty()) {
-            for(batchUploads batch : pendingBatches) {
-                List<transactionIn> batchTransactions = transactionInManager.getBatchTransactions(batch.getId(), userInfo.getId());
-                batch.settotalTransactions(batchTransactions.size());
-                
-                lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
-                batch.setstatusValue(processStatus.getDisplayCode());
-                
-                User userDetails = usermanager.getUserById(batch.getuserId());
-                String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
-                batch.setusersName(usersName);
+        try {
+            /* Need to get a list of all pending transactions */
+            Integer totalpendingBatches = transactionInManager.getpendingBatches(userInfo.getId(), userInfo.getOrgId(), searchTerm, fromDate, toDate, 1, 0).size();
+            List<batchUploads> pendingBatches = transactionInManager.getpendingBatches(userInfo.getId(), userInfo.getOrgId(), searchTerm, fromDate, toDate, page, maxResults);
+
+
+            if(!pendingBatches.isEmpty()) {
+                for(batchUploads batch : pendingBatches) {
+                    List<transactionIn> batchTransactions = transactionInManager.getBatchTransactions(batch.getId(), userInfo.getId());
+                    batch.settotalTransactions(batchTransactions.size());
+
+                    lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
+                    batch.setstatusValue(processStatus.getDisplayCode());
+
+                    User userDetails = usermanager.getUserById(batch.getuserId());
+                    String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
+                    batch.setusersName(usersName);
+                }
             }
+
+            mav.addObject("pendingBatches", pendingBatches);    
+            Integer totalPages = (int)Math.ceil((double)totalpendingBatches / maxResults);
+            mav.addObject("totalPages", totalPages);
+
+            /* Set the header totals */
+            setTotals(session);
+
+            mav.addObject("searchTerm", searchTerm);
+            mav.addObject("pendingTotal", pendingTotal);
+            mav.addObject("inboxTotal", inboxTotal);
+            mav.addObject("currentPage", page);
+            
         }
-       
-        mav.addObject("pendingBatches", pendingBatches);    
-        Integer totalPages = (int)Math.ceil((double)totalpendingBatches / maxResults);
-        mav.addObject("totalPages", totalPages);
-        
-        /* Set the header totals */
-        setTotals(session);
-       
-        mav.addObject("searchTerm", searchTerm);
-        mav.addObject("pendingTotal", pendingTotal);
-        mav.addObject("inboxTotal", inboxTotal);
-        mav.addObject("currentPage", page);
+        catch (Exception e) {
+            throw new Exception("Error occurred in searching pending items.",e);
+        }
         
         return mav;
     }
@@ -1422,36 +1584,42 @@ public class HealtheWebController {
         mav.addObject("fromDate", fromDate);
         mav.addObject("toDate", toDate);
         
-        /* Need to get a list of all pending transactions */
-        Integer totalSentBatches = transactionInManager.getsentBatches(userInfo.getId(), userInfo.getOrgId(), searchTerm, fromDate, toDate, 1, 0).size();
-        List<batchUploads> sentBatches = transactionInManager.getsentBatches(userInfo.getId(), userInfo.getOrgId(), searchTerm, fromDate, toDate, page, maxResults);
-        
-        if(!sentBatches.isEmpty()) {
-            for(batchUploads batch : sentBatches) {
-                List<transactionIn> batchTransactions = transactionInManager.getBatchTransactions(batch.getId(), userInfo.getId());
-                batch.settotalTransactions(batchTransactions.size());
-                
-                lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
-                batch.setstatusValue(processStatus.getDisplayCode());
-                
-                User userDetails = usermanager.getUserById(batch.getuserId());
-                String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
-                batch.setusersName(usersName);
+        try {
+            /* Need to get a list of all pending transactions */
+            Integer totalSentBatches = transactionInManager.getsentBatches(userInfo.getId(), userInfo.getOrgId(), searchTerm, fromDate, toDate, 1, 0).size();
+            List<batchUploads> sentBatches = transactionInManager.getsentBatches(userInfo.getId(), userInfo.getOrgId(), searchTerm, fromDate, toDate, page, maxResults);
+
+            if(!sentBatches.isEmpty()) {
+                for(batchUploads batch : sentBatches) {
+                    List<transactionIn> batchTransactions = transactionInManager.getBatchTransactions(batch.getId(), userInfo.getId());
+                    batch.settotalTransactions(batchTransactions.size());
+
+                    lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
+                    batch.setstatusValue(processStatus.getDisplayCode());
+
+                    User userDetails = usermanager.getUserById(batch.getuserId());
+                    String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
+                    batch.setusersName(usersName);
+                }
             }
+
+            mav.addObject("sentBatches", sentBatches);
+
+            /* Set the header totals */
+            setTotals(session);
+
+            mav.addObject("searchTerm", searchTerm);
+            mav.addObject("pendingTotal", pendingTotal);
+            mav.addObject("inboxTotal", inboxTotal);
+
+            Integer totalPages = (int)Math.ceil((double)totalSentBatches / maxResults);
+            mav.addObject("totalPages", totalPages);
+            mav.addObject("currentPage", page);
+        }
+        catch (Exception e) {
+            throw new Exception("Error occurred in viewing the sent items screen. UserId: " + userInfo.getId(),e);
         }
         
-        mav.addObject("sentBatches", sentBatches);
-        
-        /* Set the header totals */
-        setTotals(session);
-        
-        mav.addObject("searchTerm", searchTerm);
-        mav.addObject("pendingTotal", pendingTotal);
-        mav.addObject("inboxTotal", inboxTotal);
-        
-        Integer totalPages = (int)Math.ceil((double)totalSentBatches / maxResults);
-        mav.addObject("totalPages", totalPages);
-        mav.addObject("currentPage", page);
         
         return mav;
     }
@@ -1491,35 +1659,41 @@ public class HealtheWebController {
         /* Need to get all the message types set up for the user */
         User userInfo = (User)session.getAttribute("userDetails");
         
-        /* Need to get a list of all pending transactions */
-        Integer totalSentBatches = transactionInManager.getsentBatches(userInfo.getId(), userInfo.getOrgId(), searchTerm, fromDate, toDate, 1, 0).size();
-        List<batchUploads> sentBatches = transactionInManager.getsentBatches(userInfo.getId(), userInfo.getOrgId(), searchTerm, fromDate, toDate, page, maxResults);
-       
-        if(!sentBatches.isEmpty()) {
-            for(batchUploads batch : sentBatches) {
-                List<transactionIn> batchTransactions = transactionInManager.getBatchTransactions(batch.getId(), userInfo.getId());
-                batch.settotalTransactions(batchTransactions.size());
-                
-                lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
-                batch.setstatusValue(processStatus.getDisplayCode());
-                
-                User userDetails = usermanager.getUserById(batch.getuserId());
-                String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
-                batch.setusersName(usersName);
+        try {
+            /* Need to get a list of all pending transactions */
+            Integer totalSentBatches = transactionInManager.getsentBatches(userInfo.getId(), userInfo.getOrgId(), searchTerm, fromDate, toDate, 1, 0).size();
+            List<batchUploads> sentBatches = transactionInManager.getsentBatches(userInfo.getId(), userInfo.getOrgId(), searchTerm, fromDate, toDate, page, maxResults);
+
+            if(!sentBatches.isEmpty()) {
+                for(batchUploads batch : sentBatches) {
+                    List<transactionIn> batchTransactions = transactionInManager.getBatchTransactions(batch.getId(), userInfo.getId());
+                    batch.settotalTransactions(batchTransactions.size());
+
+                    lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
+                    batch.setstatusValue(processStatus.getDisplayCode());
+
+                    User userDetails = usermanager.getUserById(batch.getuserId());
+                    String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
+                    batch.setusersName(usersName);
+                }
             }
+
+            mav.addObject("sentBatches", sentBatches); 
+            Integer totalPages = (int)Math.ceil((double)totalSentBatches / maxResults);
+            mav.addObject("totalPages", totalPages);
+
+            /* Set the header totals */
+            setTotals(session);
+
+            mav.addObject("searchTerm", searchTerm);
+            mav.addObject("pendingTotal", pendingTotal);
+            mav.addObject("inboxTotal", inboxTotal);
+            mav.addObject("currentPage", page);
+            
         }
-        
-        mav.addObject("sentBatches", sentBatches); 
-        Integer totalPages = (int)Math.ceil((double)totalSentBatches / maxResults);
-        mav.addObject("totalPages", totalPages);
-        
-        /* Set the header totals */
-        setTotals(session);
-       
-        mav.addObject("searchTerm", searchTerm);
-        mav.addObject("pendingTotal", pendingTotal);
-        mav.addObject("inboxTotal", inboxTotal);
-        mav.addObject("currentPage", page);
+        catch (Exception e) {
+            throw new Exception("Error occurred in searching sent items. UserId: "+ userInfo.getId(),e);
+        }
         
         return mav;
     }
@@ -1547,63 +1721,68 @@ public class HealtheWebController {
         batchUploads batchDetails = transactionInManager.getBatchDetails(batchId);
         mav.addObject("batchDetails", batchDetails);
         
-        /* Get all the transactions for the batch */
-        List<transactionIn> batchTransactions = transactionInManager.getBatchTransactions(batchId, userInfo.getId());
-        
-        List<Transaction> transactionList = new ArrayList<Transaction>();
-        
-        for(transactionIn transaction : batchTransactions) {
-                 
-            Transaction transactionDetails = new Transaction();
-            transactionDetails.settransactionRecordId(transaction.getId());
-            transactionDetails.setstatusId(transaction.getstatusId());
-            transactionDetails.setdateSubmitted(transaction.getdateCreated());
-            transactionDetails.setconfigId(transaction.getconfigId());
+        try {
+            /* Get all the transactions for the batch */
+            List<transactionIn> batchTransactions = transactionInManager.getBatchTransactions(batchId, userInfo.getId());
 
-            lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(transaction.getstatusId());
-            transactionDetails.setstatusValue(processStatus.getDisplayCode());
+            List<Transaction> transactionList = new ArrayList<Transaction>();
 
-            transactionInRecords records = transactionInManager.getTransactionRecords(transaction.getId());
+            for(transactionIn transaction : batchTransactions) {
 
-            /* Get a list of form fields */
-            configurationTransport transportDetails = configurationTransportManager.getTransportDetailsByTransportMethod(transaction.getconfigId(), 2);
-            List<configurationFormFields> sourceInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transaction.getconfigId(),transportDetails.getId(),1);
-            List<configurationFormFields> targetInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transaction.getconfigId(),transportDetails.getId(),3);
-            List<configurationFormFields> patientInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transaction.getconfigId(),transportDetails.getId(),5);
-            List<configurationFormFields> detailFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transaction.getconfigId(),transportDetails.getId(),6);
-            
-            /* Set all the transaction SOURCE ORG fields */
-            List<transactionRecords> fromFields = setOutboundFormFields(sourceInfoFormFields, records, 0, true, 0);
-            transactionDetails.setsourceOrgFields(fromFields);
-            
-            /* Set all the transaction TARGET fields */
-            List<transactionRecords> toFields = setOutboundFormFields(targetInfoFormFields, records, 0, true, 0);
-            transactionDetails.settargetOrgFields(toFields);
-            
-            /* Set all the transaction PATIENT fields */
-            List<transactionRecords> patientFields = setOutboundFormFields(patientInfoFormFields, records, 0, true, 0);
-            transactionDetails.setpatientFields(patientFields);
-            
+                Transaction transactionDetails = new Transaction();
+                transactionDetails.settransactionRecordId(transaction.getId());
+                transactionDetails.setstatusId(transaction.getstatusId());
+                transactionDetails.setdateSubmitted(transaction.getdateCreated());
+                transactionDetails.setconfigId(transaction.getconfigId());
 
-            /* Set all the transaction DETAIL fields */
-            List<transactionRecords> detailFields = setOutboundFormFields(detailFormFields, records, 0, true, 0);
-            transactionDetails.setdetailFields(detailFields);
-            
-            /* get the message type name */
-            configuration configDetails = configurationManager.getConfigurationById(transaction.getconfigId());
-            transactionDetails.setmessageTypeName(messagetypemanager.getMessageTypeById(configDetails.getMessageTypeId()).getName());
+                lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(transaction.getstatusId());
+                transactionDetails.setstatusValue(processStatus.getDisplayCode());
 
-            transactionList.add(transactionDetails);
+                transactionInRecords records = transactionInManager.getTransactionRecords(transaction.getId());
+
+                /* Get a list of form fields */
+                configurationTransport transportDetails = configurationTransportManager.getTransportDetailsByTransportMethod(transaction.getconfigId(), 2);
+                List<configurationFormFields> sourceInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transaction.getconfigId(),transportDetails.getId(),1);
+                List<configurationFormFields> targetInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transaction.getconfigId(),transportDetails.getId(),3);
+                List<configurationFormFields> patientInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transaction.getconfigId(),transportDetails.getId(),5);
+                List<configurationFormFields> detailFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transaction.getconfigId(),transportDetails.getId(),6);
+
+                /* Set all the transaction SOURCE ORG fields */
+                List<transactionRecords> fromFields = setOutboundFormFields(sourceInfoFormFields, records, 0, true, 0);
+                transactionDetails.setsourceOrgFields(fromFields);
+
+                /* Set all the transaction TARGET fields */
+                List<transactionRecords> toFields = setOutboundFormFields(targetInfoFormFields, records, 0, true, 0);
+                transactionDetails.settargetOrgFields(toFields);
+
+                /* Set all the transaction PATIENT fields */
+                List<transactionRecords> patientFields = setOutboundFormFields(patientInfoFormFields, records, 0, true, 0);
+                transactionDetails.setpatientFields(patientFields);
+
+
+                /* Set all the transaction DETAIL fields */
+                List<transactionRecords> detailFields = setOutboundFormFields(detailFormFields, records, 0, true, 0);
+                transactionDetails.setdetailFields(detailFields);
+
+                /* get the message type name */
+                configuration configDetails = configurationManager.getConfigurationById(transaction.getconfigId());
+                transactionDetails.setmessageTypeName(messagetypemanager.getMessageTypeById(configDetails.getMessageTypeId()).getName());
+
+                transactionList.add(transactionDetails);
+            }
+
+            mav.addObject("transactions", transactionList);
+            mav.addObject("fromPage", fromPage);
+
+            /* Set the header totals */
+            setTotals(session);
+
+            mav.addObject("pendingTotal", pendingTotal);
+            mav.addObject("inboxTotal", inboxTotal);
         }
-        
-        mav.addObject("transactions", transactionList);
-        mav.addObject("fromPage", fromPage);
-        
-        /* Set the header totals */
-        setTotals(session);
-        
-        mav.addObject("pendingTotal", pendingTotal);
-        mav.addObject("inboxTotal", inboxTotal);
+        catch (Exception e) {
+            throw new Exception("Error occurred in getting transactions for a sent batch. batchId: "+ batchId,e);
+        }
         
         return mav;
         
@@ -1630,96 +1809,102 @@ public class HealtheWebController {
             mav.addObject("fromPage", fromPage);
         }
         
-        transactionIn transactionInfo = transactionInManager.getTransactionDetails(transactionId);
+        try {
+            transactionIn transactionInfo = transactionInManager.getTransactionDetails(transactionId);
           
-        /* Get the configuration details */
-        configuration configDetails = configurationManager.getConfigurationById(transactionInfo.getconfigId());
-        
-        /* Get the organization details for the source (Sender) organization */
-        User userInfo = (User)session.getAttribute("userDetails");
-        
-        /* Get a list of form fields */
-        configurationTransport transportDetails = configurationTransportManager.getTransportDetailsByTransportMethod(transactionInfo.getconfigId(), 2);
-        List<configurationFormFields> senderInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),1);
-        List<configurationFormFields> senderProviderFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),2);
-        List<configurationFormFields> targetInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),3);
-        List<configurationFormFields> targetProviderFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),4);
-        List<configurationFormFields> patientInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),5);
-        List<configurationFormFields> detailFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),6);
-        
-        Transaction transaction = new Transaction();
-        transactionInRecords records = null;
-            
-        batchUploads batchInfo = transactionInManager.getBatchDetails(transactionInfo.getbatchId());
-        transactionTarget transactionTarget = transactionInManager.getTransactionTarget(transactionInfo.getbatchId(), transactionId);
+            /* Get the configuration details */
+            configuration configDetails = configurationManager.getConfigurationById(transactionInfo.getconfigId());
 
-        transaction.setorgId(batchInfo.getOrgId());
-        transaction.settransportMethodId(2);
-        transaction.setmessageTypeId(configDetails.getMessageTypeId());
-        transaction.setuserId(batchInfo.getuserId());
-        transaction.setbatchName(batchInfo.getutBatchName());
-        transaction.setoriginalFileName(batchInfo.getoriginalFileName());
-        transaction.setstatusId(batchInfo.getstatusId());
-        transaction.settransactionStatusId(transactionInfo.getstatusId());
-        transaction.settargetOrgId(0);
-        transaction.setconfigId(transactionInfo.getconfigId());
-        transaction.setautoRelease(transportDetails.getautoRelease());
-        transaction.setbatchId(batchInfo.getId());
-        transaction.settransactionId(transactionTarget.getId());
-        transaction.settransactionTargetId(transactionTarget.getId());
-        transaction.setdateSubmitted(transactionInfo.getdateCreated());
-        
-        /* Check to see if the message is a feedback report */
-        if(transactionInfo.gettransactionTargetId() > 0) {
-            transaction.setsourceType(2); /* Feedback report */
-            transaction.setorginialTransactionId(transactionInfo.gettransactionTargetId());
-        }
-        else {
-            transaction.setsourceType(configDetails.getsourceType());
-        }
-        
-        lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(transaction.getstatusId());
-        transaction.setstatusValue(processStatus.getDisplayCode());
-            
-        /* get the message type name */
-        transaction.setmessageTypeName(messagetypemanager.getMessageTypeById(configDetails.getMessageTypeId()).getName());
+            /* Get the organization details for the source (Sender) organization */
+            User userInfo = (User)session.getAttribute("userDetails");
 
-        records = transactionInManager.getTransactionRecords(transactionId);
-        transaction.settransactionRecordId(records.getId());
-        
-        
-        /* Set all the transaction SOURCE ORG fields */
-        List<transactionRecords> fromFields = setOutboundFormFields(senderInfoFormFields, records, transactionInfo.getconfigId(), true, 0);
-        transaction.setsourceOrgFields(fromFields);
-        
-        /* Set all the transaction SOURCE PROVIDER fields */
-        List<transactionRecords> fromProviderFields = setOutboundFormFields(senderProviderFormFields, records, transactionInfo.getconfigId(), true, 0);
-        transaction.setsourceProviderFields(fromProviderFields);
-        
-        /* Set all the transaction TARGET fields */
-        List<transactionRecords> toFields = setOutboundFormFields(targetInfoFormFields, records, transactionInfo.getconfigId(), true, 0);
-        transaction.settargetOrgFields(toFields);
-        
-        /* Set all the transaction TARGET PROVIDER fields */
-        List<transactionRecords> toProviderFields = setOutboundFormFields(targetProviderFormFields, records, transactionInfo.getconfigId(), true, 0);
-        transaction.settargetProviderFields(toProviderFields);
-        
-        /* Set all the transaction PATIENT fields */
-        List<transactionRecords> patientFields = setOutboundFormFields(patientInfoFormFields, records, transactionInfo.getconfigId(), true, 0);
-        transaction.setpatientFields(patientFields);
-       
-        /* Set all the transaction DETAIL fields */
-        List<transactionRecords> detailFields = setOutboundFormFields(detailFormFields, records, transactionInfo.getconfigId(), true, 0);
-        transaction.setdetailFields(detailFields);
-        
-        mav.addObject("transactionDetails", transaction);
-        
-        /* Set the header totals */
-        setTotals(session);
-        
-        mav.addObject("pendingTotal", pendingTotal);
-        mav.addObject("inboxTotal", inboxTotal);
-        mav.addObject("fromPage","sent");
+            /* Get a list of form fields */
+            configurationTransport transportDetails = configurationTransportManager.getTransportDetailsByTransportMethod(transactionInfo.getconfigId(), 2);
+            List<configurationFormFields> senderInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),1);
+            List<configurationFormFields> senderProviderFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),2);
+            List<configurationFormFields> targetInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),3);
+            List<configurationFormFields> targetProviderFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),4);
+            List<configurationFormFields> patientInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),5);
+            List<configurationFormFields> detailFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),6);
+
+            Transaction transaction = new Transaction();
+            transactionInRecords records = null;
+
+            batchUploads batchInfo = transactionInManager.getBatchDetails(transactionInfo.getbatchId());
+            transactionTarget transactionTarget = transactionInManager.getTransactionTarget(transactionInfo.getbatchId(), transactionId);
+
+            transaction.setorgId(batchInfo.getOrgId());
+            transaction.settransportMethodId(2);
+            transaction.setmessageTypeId(configDetails.getMessageTypeId());
+            transaction.setuserId(batchInfo.getuserId());
+            transaction.setbatchName(batchInfo.getutBatchName());
+            transaction.setoriginalFileName(batchInfo.getoriginalFileName());
+            transaction.setstatusId(batchInfo.getstatusId());
+            transaction.settransactionStatusId(transactionInfo.getstatusId());
+            transaction.settargetOrgId(0);
+            transaction.setconfigId(transactionInfo.getconfigId());
+            transaction.setautoRelease(transportDetails.getautoRelease());
+            transaction.setbatchId(batchInfo.getId());
+            transaction.settransactionId(transactionTarget.getId());
+            transaction.settransactionTargetId(transactionTarget.getId());
+            transaction.setdateSubmitted(transactionInfo.getdateCreated());
+
+            /* Check to see if the message is a feedback report */
+            if(transactionInfo.gettransactionTargetId() > 0) {
+                transaction.setsourceType(2); /* Feedback report */
+                transaction.setorginialTransactionId(transactionInfo.gettransactionTargetId());
+            }
+            else {
+                transaction.setsourceType(configDetails.getsourceType());
+            }
+
+            lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(transaction.getstatusId());
+            transaction.setstatusValue(processStatus.getDisplayCode());
+
+            /* get the message type name */
+            transaction.setmessageTypeName(messagetypemanager.getMessageTypeById(configDetails.getMessageTypeId()).getName());
+
+            records = transactionInManager.getTransactionRecords(transactionId);
+            transaction.settransactionRecordId(records.getId());
+
+
+            /* Set all the transaction SOURCE ORG fields */
+            List<transactionRecords> fromFields = setOutboundFormFields(senderInfoFormFields, records, transactionInfo.getconfigId(), true, 0);
+            transaction.setsourceOrgFields(fromFields);
+
+            /* Set all the transaction SOURCE PROVIDER fields */
+            List<transactionRecords> fromProviderFields = setOutboundFormFields(senderProviderFormFields, records, transactionInfo.getconfigId(), true, 0);
+            transaction.setsourceProviderFields(fromProviderFields);
+
+            /* Set all the transaction TARGET fields */
+            List<transactionRecords> toFields = setOutboundFormFields(targetInfoFormFields, records, transactionInfo.getconfigId(), true, 0);
+            transaction.settargetOrgFields(toFields);
+
+            /* Set all the transaction TARGET PROVIDER fields */
+            List<transactionRecords> toProviderFields = setOutboundFormFields(targetProviderFormFields, records, transactionInfo.getconfigId(), true, 0);
+            transaction.settargetProviderFields(toProviderFields);
+
+            /* Set all the transaction PATIENT fields */
+            List<transactionRecords> patientFields = setOutboundFormFields(patientInfoFormFields, records, transactionInfo.getconfigId(), true, 0);
+            transaction.setpatientFields(patientFields);
+
+            /* Set all the transaction DETAIL fields */
+            List<transactionRecords> detailFields = setOutboundFormFields(detailFormFields, records, transactionInfo.getconfigId(), true, 0);
+            transaction.setdetailFields(detailFields);
+
+            mav.addObject("transactionDetails", transaction);
+
+            /* Set the header totals */
+            setTotals(session);
+
+            mav.addObject("pendingTotal", pendingTotal);
+            mav.addObject("inboxTotal", inboxTotal);
+            mav.addObject("fromPage","sent");
+
+        }
+        catch (Exception e) {
+            throw new Exception("Error occurred in viewing the sent batch details. transactionId: "+transactionId,e);
+        }
         
         return mav;
     }
@@ -1752,21 +1937,29 @@ public class HealtheWebController {
     @RequestMapping(value = "/uploadMessageAttachment", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody Integer uploadMessageAttachment(@RequestParam(value = "fileUpload", required = true) MultipartFile fileUpload, @RequestParam(value = "title", required = false) String title, HttpSession session) throws Exception {
         
+        Integer attachmentId = 0;
+        
         /* Get the organization details for the source (Sender) organization */
         User userInfo = (User)session.getAttribute("userDetails");
         Organization sendingOrgDetails = organizationmanager.getOrganizationById(userInfo.getOrgId());
         
-        /* Upload the attachment */
-        String fileName = transactionInManager.uploadAttachment(fileUpload, sendingOrgDetails.getcleanURL());
-        
-        /* Create a new attachment */
-        transactionAttachment attachment = new transactionAttachment();
-        attachment.setTransactionInId(0);
-        attachment.setfileLocation("/"+sendingOrgDetails.getcleanURL()+"/attachments/");
-        attachment.setfileName(fileName);
-        attachment.settitle(title);
-        
-        Integer attachmentId = transactionInManager.submitAttachment(attachment);
+        try {
+            /* Upload the attachment */
+            String fileName = transactionInManager.uploadAttachment(fileUpload, sendingOrgDetails.getcleanURL());
+
+            /* Create a new attachment */
+            transactionAttachment attachment = new transactionAttachment();
+            attachment.setTransactionInId(0);
+            attachment.setfileLocation("/"+sendingOrgDetails.getcleanURL()+"/attachments/");
+            attachment.setfileName(fileName);
+            attachment.settitle(title);
+
+            attachmentId = transactionInManager.submitAttachment(attachment);
+
+        }
+        catch (Exception e) {
+            throw new Exception("Error occurred when uploading a message attachment.",e);
+        }
         
         return attachmentId;
     }
@@ -1784,7 +1977,7 @@ public class HealtheWebController {
      * @return  This function will return the transaction attachment list page.
      */
     @RequestMapping(value= "/populateExistingAttachments.do", method = RequestMethod.GET)
-    public @ResponseBody ModelAndView getMessageAttachments(@RequestParam(value = "transactionId", required = false) Integer transactionId, @RequestParam(value = "newattachmentIdList", required = false) List<Integer> newattachmentIdList, @RequestParam(value= "pageFrom", required = false) String pageFrom) {
+    public @ResponseBody ModelAndView getMessageAttachments(@RequestParam(value = "transactionId", required = false) Integer transactionId, @RequestParam(value = "newattachmentIdList", required = false) List<Integer> newattachmentIdList, @RequestParam(value= "pageFrom", required = false) String pageFrom) throws Exception {
         
         if(pageFrom == null) {
             pageFrom = "sent";
@@ -1793,25 +1986,32 @@ public class HealtheWebController {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/Health-e-Web/existingAttachments");
         
-        List<transactionAttachment> attachments = new ArrayList<transactionAttachment>();
+        try {
+            List<transactionAttachment> attachments = new ArrayList<transactionAttachment>();
         
-        if(transactionId > 0) {
-            List<transactionAttachment> existingAttachments = transactionInManager.getAttachmentsByTransactionId(transactionId);
+            if(transactionId > 0) {
+                List<transactionAttachment> existingAttachments = transactionInManager.getAttachmentsByTransactionId(transactionId);
+
+                for(transactionAttachment attachment : existingAttachments) {
+                    attachments.add(attachment);
+                }
+            }
+
+            if(newattachmentIdList != null && !newattachmentIdList.isEmpty()) {
+                for(Integer attachmentId : newattachmentIdList) {
+                    transactionAttachment attachment = transactionInManager.getAttachmentById(attachmentId);
+                    attachments.add(attachment);
+                }
+            }
+
+            mav.addObject("attachments", attachments);
+            mav.addObject("pageFrom", pageFrom);
             
-            for(transactionAttachment attachment : existingAttachments) {
-                attachments.add(attachment);
-            }
+        }
+        catch (Exception e) {
+            throw new Exception("Error occurred trying to get attachments. transactionid: "+ transactionId,e);
         }
         
-        if(newattachmentIdList != null && !newattachmentIdList.isEmpty()) {
-            for(Integer attachmentId : newattachmentIdList) {
-                transactionAttachment attachment = transactionInManager.getAttachmentById(attachmentId);
-                attachments.add(attachment);
-            }
-        }
-        
-        mav.addObject("attachments", attachments);
-        mav.addObject("pageFrom", pageFrom);
         
         return mav;
         
@@ -1825,10 +2025,15 @@ public class HealtheWebController {
      * @return This function will simply return a 1.
      */
     @RequestMapping(value= "/removeAttachment.do", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody Integer removeMessageAttachment(@RequestParam(value = "attachmentId", required = false) Integer attachmentId) {
+    public @ResponseBody Integer removeMessageAttachment(@RequestParam(value = "attachmentId", required = false) Integer attachmentId) throws Exception {
         
-        transactionInManager.removeAttachmentById(attachmentId);
-       
+        try {
+            transactionInManager.removeAttachmentById(attachmentId);
+        }
+        catch (Exception e) {
+            throw new Exception("Error occurred trying to delete an attachment. attachmentId: "+attachmentId,e);
+        }
+        
         return 1;
     }
     
@@ -1841,19 +2046,25 @@ public class HealtheWebController {
      * @return This function will return the provider object.
      */
     @RequestMapping(value="/populateProvider.do", method = RequestMethod.GET)
-    public @ResponseBody Provider populateProvider(@RequestParam(value = "providerId", required = true) int providerId) {
+    public @ResponseBody Provider populateProvider(@RequestParam(value = "providerId", required = true) int providerId) throws Exception {
         
-        Provider providerDetails = providermanager.getProviderById(providerId);
+        try {
+            Provider providerDetails = providermanager.getProviderById(providerId);
         
-        /* Get the list of addresses for the provider */
-        List<providerAddress> providerAddresses = providermanager.getProviderAddresses(providerId);
-        providerDetails.setProviderAddresses(providerAddresses);
+            /* Get the list of addresses for the provider */
+            List<providerAddress> providerAddresses = providermanager.getProviderAddresses(providerId);
+            providerDetails.setProviderAddresses(providerAddresses);
+
+            /* Get the list of ids for the provider */
+            List<providerIdNum> providerIds = providermanager.getProviderIds(providerId);
+            providerDetails.setProviderIds(providerIds);
+
+            return providerDetails;
+        }
+        catch (Exception e) {
+            throw new Exception("",e);
+        }
         
-        /* Get the list of ids for the provider */
-        List<providerIdNum> providerIds = providermanager.getProviderIds(providerId);
-        providerDetails.setProviderIds(providerIds);
-        
-        return providerDetails;
     }
     
     
@@ -1867,39 +2078,43 @@ public class HealtheWebController {
      * 
      */
     @RequestMapping(value="/sendBatches", method = RequestMethod.POST)
-    public ModelAndView sendBatches(@RequestParam(value = "batchIdList", required = true) List<Integer> batchIdList, RedirectAttributes redirectAttr , HttpSession session) throws NoSuchMethodException, IOException {
+    public ModelAndView sendBatches(@RequestParam(value = "batchIdList", required = true) List<Integer> batchIdList, RedirectAttributes redirectAttr , HttpSession session) throws Exception {
         
-        /* 
-        If the list of batch Ids is not empty loop through each marked batch
-        and send off to the processBatch method.
-        */
-        if(!batchIdList.isEmpty()) {
-            for(Integer batchId : batchIdList) {
-                
-                /* Update the transactionIn status to 12 (REL) */
-                transactionInManager.updateTransactionStatus(batchId,0,0,12);
-                
-                /* Update the transactionTarget status to 12 (REL) */
-                transactionInManager.updateTransactionTargetStatus(batchId,0,0,12);
-                
-                /* Process the batch */
-                try {
+        try {
+            /* 
+            If the list of batch Ids is not empty loop through each marked batch
+            and send off to the processBatch method.
+            */
+            if(!batchIdList.isEmpty()) {
+                for(Integer batchId : batchIdList) {
+
+                    /* Update the transactionIn status to 12 (REL) */
+                    transactionInManager.updateTransactionStatus(batchId,0,0,12);
+
+                    /* Update the transactionTarget status to 12 (REL) */
+                    transactionInManager.updateTransactionTargetStatus(batchId,0,0,12);
+                    
+                    /* Update batch to released */
+                    transactionInManager.updateBatchStatus(batchId, 6, "");
+
+                    /* Process the batch */
                     boolean transactionSentToProcess = transactionInManager.processBatch(batchId);
+
                 }
-                catch(Exception ex) {
-                    throw new IOException(ex);
-                }
-                
             }
+
+
+            /*
+                Send the user back to the pending items page
+            */
+            redirectAttr.addFlashAttribute("savedStatus", "sent");
+            ModelAndView mav = new ModelAndView(new RedirectView("sent"));
+            return mav;
+        }
+        catch (Exception e) {
+            throw new Exception("Error occurred trying to send batches. batchIdList: "+batchIdList,e);
         }
         
-            
-        /*
-            Send the user back to the pending items page
-        */
-        redirectAttr.addFlashAttribute("savedStatus", "sent");
-        ModelAndView mav = new ModelAndView(new RedirectView("sent"));
-        return mav;
     }
       
     
@@ -1914,28 +2129,34 @@ public class HealtheWebController {
     @RequestMapping(value="/submitMessageNote.do", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public Integer submitMessageNote(HttpSession session, @RequestParam(value = "messageTransactionId", required = true) int messageTransactionId, @RequestParam(value = "internalStatusId", required = false) int internalStatusId, @RequestParam(value = "messageNotes", required = false) String messageNotes) throws Exception {
         
-        /* Update the internal status code if exists */
-        if(internalStatusId > 0) {
-            transactionTarget transactionDetails = transactionOutManager.getTransactionDetails(messageTransactionId);
-            transactionDetails.setinternalStatusId(internalStatusId);
-            
-            transactionOutManager.updateTransactionDetails(transactionDetails);
+        try {
+            /* Update the internal status code if exists */
+            if(internalStatusId > 0) {
+                transactionTarget transactionDetails = transactionOutManager.getTransactionDetails(messageTransactionId);
+                transactionDetails.setinternalStatusId(internalStatusId);
+
+                transactionOutManager.updateTransactionDetails(transactionDetails);
+            }
+
+            /* If the note is not emtpy need to insert it */
+            if(!"".equals(messageNotes) && messageNotes != null) {
+                /* Need to get all the message types set up for the user */
+                User userInfo = (User)session.getAttribute("userDetails");
+
+                transactionOutNotes newNote = new transactionOutNotes();
+                newNote.settransactionTargetId(messageTransactionId);
+                newNote.setuserId(userInfo.getId());
+                newNote.setnote(messageNotes);
+
+                transactionOutManager.saveNote(newNote);
+            }
+
+            return 1;
+        }
+        catch (Exception e) {
+            throw new Exception("Error occcurred in creating a message note. transactionId: "+ messageTransactionId,e);
         }
         
-        /* If the note is not emtpy need to insert it */
-        if(!"".equals(messageNotes) && messageNotes != null) {
-            /* Need to get all the message types set up for the user */
-            User userInfo = (User)session.getAttribute("userDetails");
-            
-            transactionOutNotes newNote = new transactionOutNotes();
-            newNote.settransactionTargetId(messageTransactionId);
-            newNote.setuserId(userInfo.getId());
-            newNote.setnote(messageNotes);
-            
-            transactionOutManager.saveNote(newNote);
-        }
-        
-        return 1;
     }
     
     
@@ -1950,25 +2171,31 @@ public class HealtheWebController {
      * @return  This function will return the transaction note list page.
      */
     @RequestMapping(value= "/populateExistingNotes.do", method = RequestMethod.GET)
-    public @ResponseBody ModelAndView getMessageNotes(@RequestParam(value = "transactionId", required = true) Integer transactionId) {
+    public @ResponseBody ModelAndView getMessageNotes(@RequestParam(value = "transactionId", required = true) Integer transactionId) throws Exception {
        
-        
-        ModelAndView mav = new ModelAndView();
-        mav.setViewName("/Health-e-Web/existingNotes");
-        
-        List<transactionOutNotes> existingNotes = transactionOutManager.getNotesByTransactionId(transactionId);
-        
-        /* Set the name of the user who created it */
-        for(transactionOutNotes note : existingNotes) {
-            User userDetails = usermanager.getUserById(note.getuserId());
-            String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
-            note.setuserName(usersName);
+        try {
+             ModelAndView mav = new ModelAndView();
+            mav.setViewName("/Health-e-Web/existingNotes");
+            
+            List<transactionOutNotes> existingNotes = transactionOutManager.getNotesByTransactionId(transactionId);
+
+            /* Set the name of the user who created it */
+            for(transactionOutNotes note : existingNotes) {
+                User userDetails = usermanager.getUserById(note.getuserId());
+                String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
+                note.setuserName(usersName);
+            }
+
+            mav.addObject("notes", existingNotes);
+            mav.addObject("pageFrom", "inbox");
+
+            return mav;
         }
-         
-        mav.addObject("notes", existingNotes);
-        mav.addObject("pageFrom", "inbox");
+        catch (Exception e) {
+            throw new Exception("Error occurred trying to get message notes. transactionId: "+transactionId,e);
+        }
         
-        return mav;
+       
         
     }
     
@@ -1980,11 +2207,15 @@ public class HealtheWebController {
      * @return This function will simply return a 1.
      */
     @RequestMapping(value= "/removeNote.do", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody Integer removeMessageNote(@RequestParam(value = "noteId", required = false) Integer noteId) {
+    public @ResponseBody Integer removeMessageNote(@RequestParam(value = "noteId", required = false) Integer noteId) throws Exception {
         
-        transactionOutManager.removeNoteById(noteId);
-       
-        return 1;
+        try {
+            transactionOutManager.removeNoteById(noteId);
+            return 1;
+        }
+        catch (Exception e) {
+            throw new Exception("Error occurred trying to remove a message note. noteId: "+noteId,e);
+        }
         
     }
     
@@ -2124,132 +2355,138 @@ public class HealtheWebController {
         /* Need to get all the message types set up for the user */
         User userInfo = (User)session.getAttribute("userDetails");
         
-        /* Get the transaction Details */
-        transactionTarget transactionDetails = transactionOutManager.getTransactionDetails(transactionId);
-        
-        /* Get the details of the batch */
-        int batchId = 0;
-        
-        /* Get all the feedback reports for the original batch */
-        List<transactionIn> feedbackReports = transactionOutManager.getFeedbackReports(transactionId, fromPage);
-        
-        List<Transaction> transactionList = new ArrayList<Transaction>();
-        
-        /* if coming from the sent page then we need to look for feedback reports from the 
-        originating message. Otherwise we need to look for feedback reports from the message in
-        the inbox.
-        */
-        if("sent".equals(fromPage)) {
-            batchId = transactionDetails.getbatchUploadId();
-            batchUploads batchDetails = transactionInManager.getBatchDetails(batchId);
-            mav.addObject("batchDetails", batchDetails);
-            mav.addObject("OriginaltransactionId", transactionDetails.gettransactionInId());
-            
-            for(transactionIn feedbackReport : feedbackReports) {
-                
-                /* Need to get the feedback reports in the inbox */
-                transactionTarget inboxFeedbackReport = transactionOutManager.getTransactionsByInId(feedbackReport.getId());
-                
-                Transaction transaction = new Transaction();
-                transaction.settransactionRecordId(inboxFeedbackReport.getId());
-                transaction.setstatusId(inboxFeedbackReport.getstatusId());
-                transaction.setdateSubmitted(inboxFeedbackReport.getdateCreated());
-                transaction.setconfigId(inboxFeedbackReport.getconfigId());
-                
-                lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(inboxFeedbackReport.getstatusId());
-                transaction.setstatusValue(processStatus.getDisplayCode());
+        try {
+            /* Get the transaction Details */
+            transactionTarget transactionDetails = transactionOutManager.getTransactionDetails(transactionId);
 
-                transactionOutRecords records = transactionOutManager.getTransactionRecords(inboxFeedbackReport.getId());
-                
-                /* Get a list of form fields */
-                configurationTransport transportDetails = configurationTransportManager.getTransportDetails(inboxFeedbackReport.getconfigId());
-                List<configurationFormFields> sourceInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(inboxFeedbackReport.getconfigId(),transportDetails.getId(),1);
-                List<configurationFormFields> targetInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(inboxFeedbackReport.getconfigId(),transportDetails.getId(),3);
-                List<configurationFormFields> patientInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(inboxFeedbackReport.getconfigId(),transportDetails.getId(),5);
-                List<configurationFormFields> detailFormFields = configurationTransportManager.getConfigurationFieldsByBucket(inboxFeedbackReport.getconfigId(),transportDetails.getId(),6);
+            /* Get the details of the batch */
+            int batchId = 0;
 
-                /* Set all the transaction SOURCE ORG fields */
-                List<transactionRecords> fromFields = setInboxFormFields(sourceInfoFormFields, records, 0, true);
-                transaction.setsourceOrgFields(fromFields);
-               
-                /* Set all the transaction TARGET fields */
-                List<transactionRecords> toFields = setInboxFormFields(targetInfoFormFields, records, 0, true);
-                transaction.settargetOrgFields(toFields);
-                
-                /* Set all the transaction PATIENT fields */
-                List<transactionRecords> patientFields = setInboxFormFields(patientInfoFormFields, records, 0, true);
-                transaction.setpatientFields(patientFields);
+            /* Get all the feedback reports for the original batch */
+            List<transactionIn> feedbackReports = transactionOutManager.getFeedbackReports(transactionId, fromPage);
 
-                /* Set all the transaction DETAIL fields */
-                List<transactionRecords> detailFields = setInboxFormFields(detailFormFields, records, 0, true);
-                transaction.setdetailFields(detailFields);
-                
-                /* get the message type name */
-                configuration configDetails = configurationManager.getConfigurationById(inboxFeedbackReport.getconfigId());
-                transaction.setmessageTypeName(messagetypemanager.getMessageTypeById(configDetails.getMessageTypeId()).getName());
+            List<Transaction> transactionList = new ArrayList<Transaction>();
 
-                transactionList.add(transaction);
+            /* if coming from the sent page then we need to look for feedback reports from the 
+            originating message. Otherwise we need to look for feedback reports from the message in
+            the inbox.
+            */
+            if("sent".equals(fromPage)) {
+                batchId = transactionDetails.getbatchUploadId();
+                batchUploads batchDetails = transactionInManager.getBatchDetails(batchId);
+                mav.addObject("batchDetails", batchDetails);
+                mav.addObject("OriginaltransactionId", transactionDetails.gettransactionInId());
+
+                for(transactionIn feedbackReport : feedbackReports) {
+
+                    /* Need to get the feedback reports in the inbox */
+                    transactionTarget inboxFeedbackReport = transactionOutManager.getTransactionsByInId(feedbackReport.getId());
+
+                    Transaction transaction = new Transaction();
+                    transaction.settransactionRecordId(inboxFeedbackReport.getId());
+                    transaction.setstatusId(inboxFeedbackReport.getstatusId());
+                    transaction.setdateSubmitted(inboxFeedbackReport.getdateCreated());
+                    transaction.setconfigId(inboxFeedbackReport.getconfigId());
+
+                    lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(inboxFeedbackReport.getstatusId());
+                    transaction.setstatusValue(processStatus.getDisplayCode());
+
+                    transactionOutRecords records = transactionOutManager.getTransactionRecords(inboxFeedbackReport.getId());
+
+                    /* Get a list of form fields */
+                    configurationTransport transportDetails = configurationTransportManager.getTransportDetails(inboxFeedbackReport.getconfigId());
+                    List<configurationFormFields> sourceInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(inboxFeedbackReport.getconfigId(),transportDetails.getId(),1);
+                    List<configurationFormFields> targetInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(inboxFeedbackReport.getconfigId(),transportDetails.getId(),3);
+                    List<configurationFormFields> patientInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(inboxFeedbackReport.getconfigId(),transportDetails.getId(),5);
+                    List<configurationFormFields> detailFormFields = configurationTransportManager.getConfigurationFieldsByBucket(inboxFeedbackReport.getconfigId(),transportDetails.getId(),6);
+
+                    /* Set all the transaction SOURCE ORG fields */
+                    List<transactionRecords> fromFields = setInboxFormFields(sourceInfoFormFields, records, 0, true);
+                    transaction.setsourceOrgFields(fromFields);
+
+                    /* Set all the transaction TARGET fields */
+                    List<transactionRecords> toFields = setInboxFormFields(targetInfoFormFields, records, 0, true);
+                    transaction.settargetOrgFields(toFields);
+
+                    /* Set all the transaction PATIENT fields */
+                    List<transactionRecords> patientFields = setInboxFormFields(patientInfoFormFields, records, 0, true);
+                    transaction.setpatientFields(patientFields);
+
+                    /* Set all the transaction DETAIL fields */
+                    List<transactionRecords> detailFields = setInboxFormFields(detailFormFields, records, 0, true);
+                    transaction.setdetailFields(detailFields);
+
+                    /* get the message type name */
+                    configuration configDetails = configurationManager.getConfigurationById(inboxFeedbackReport.getconfigId());
+                    transaction.setmessageTypeName(messagetypemanager.getMessageTypeById(configDetails.getMessageTypeId()).getName());
+
+                    transactionList.add(transaction);
+                }
             }
-        }
-        else {
-            batchId = transactionDetails.getbatchDLId();
-            batchDownloads batchDetails = transactionOutManager.getBatchDetails(batchId);
-            mav.addObject("batchDetails", batchDetails);
-            mav.addObject("OriginaltransactionId", transactionId);
-            
-            for(transactionIn feedbackReport : feedbackReports) {
-                 
-                Transaction transaction = new Transaction();
-                transaction.settransactionRecordId(feedbackReport.getId());
-                transaction.setstatusId(feedbackReport.getstatusId());
-                transaction.setdateSubmitted(feedbackReport.getdateCreated());
-                transaction.setconfigId(feedbackReport.getconfigId());
+            else {
+                batchId = transactionDetails.getbatchDLId();
+                batchDownloads batchDetails = transactionOutManager.getBatchDetails(batchId);
+                mav.addObject("batchDetails", batchDetails);
+                mav.addObject("OriginaltransactionId", transactionId);
+
+                for(transactionIn feedbackReport : feedbackReports) {
+
+                    Transaction transaction = new Transaction();
+                    transaction.settransactionRecordId(feedbackReport.getId());
+                    transaction.setstatusId(feedbackReport.getstatusId());
+                    transaction.setdateSubmitted(feedbackReport.getdateCreated());
+                    transaction.setconfigId(feedbackReport.getconfigId());
 
 
-                lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(feedbackReport.getstatusId());
-                transaction.setstatusValue(processStatus.getDisplayCode());
+                    lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(feedbackReport.getstatusId());
+                    transaction.setstatusValue(processStatus.getDisplayCode());
 
-                transactionInRecords records = transactionInManager.getTransactionRecords(feedbackReport.getId());
+                    transactionInRecords records = transactionInManager.getTransactionRecords(feedbackReport.getId());
 
-                /* Get a list of form fields */
-                configurationTransport transportDetails = configurationTransportManager.getTransportDetailsByTransportMethod(feedbackReport.getconfigId(), 2);
-                List<configurationFormFields> sourceInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(feedbackReport.getconfigId(),transportDetails.getId(),1);
-                List<configurationFormFields> targetInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(feedbackReport.getconfigId(),transportDetails.getId(),3);
-                List<configurationFormFields> patientInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(feedbackReport.getconfigId(),transportDetails.getId(),5);
-                List<configurationFormFields> detailFormFields = configurationTransportManager.getConfigurationFieldsByBucket(feedbackReport.getconfigId(),transportDetails.getId(),6);
+                    /* Get a list of form fields */
+                    configurationTransport transportDetails = configurationTransportManager.getTransportDetailsByTransportMethod(feedbackReport.getconfigId(), 2);
+                    List<configurationFormFields> sourceInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(feedbackReport.getconfigId(),transportDetails.getId(),1);
+                    List<configurationFormFields> targetInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(feedbackReport.getconfigId(),transportDetails.getId(),3);
+                    List<configurationFormFields> patientInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(feedbackReport.getconfigId(),transportDetails.getId(),5);
+                    List<configurationFormFields> detailFormFields = configurationTransportManager.getConfigurationFieldsByBucket(feedbackReport.getconfigId(),transportDetails.getId(),6);
 
-                /* Set all the transaction SOURCE fields */
-                List<transactionRecords> fromFields = setOutboundFormFields(sourceInfoFormFields, records, 0, true, 0);
-                transaction.setsourceOrgFields(fromFields);
+                    /* Set all the transaction SOURCE fields */
+                    List<transactionRecords> fromFields = setOutboundFormFields(sourceInfoFormFields, records, 0, true, 0);
+                    transaction.setsourceOrgFields(fromFields);
 
-                /* Set all the transaction TARGET fields */
-                List<transactionRecords> toFields = setOutboundFormFields(targetInfoFormFields, records, 0, true, 0);
-                transaction.settargetOrgFields(toFields);
-                
-                /* Set all the transaction PATIENT fields */
-                List<transactionRecords> patientFields = setOutboundFormFields(patientInfoFormFields, records, 0, true, 0);
-                transaction.setpatientFields(patientFields);
-                
-                /* Set all the transaction DETAIL fields */
-                List<transactionRecords> detailFields = setOutboundFormFields(detailFormFields, records, 0, true, 0);
-                transaction.setdetailFields(detailFields);
-                
-                /* get the message type name */
-                configuration configDetails = configurationManager.getConfigurationById(feedbackReport.getconfigId());
-                transaction.setmessageTypeName(messagetypemanager.getMessageTypeById(configDetails.getMessageTypeId()).getName());
+                    /* Set all the transaction TARGET fields */
+                    List<transactionRecords> toFields = setOutboundFormFields(targetInfoFormFields, records, 0, true, 0);
+                    transaction.settargetOrgFields(toFields);
 
-                transactionList.add(transaction);
+                    /* Set all the transaction PATIENT fields */
+                    List<transactionRecords> patientFields = setOutboundFormFields(patientInfoFormFields, records, 0, true, 0);
+                    transaction.setpatientFields(patientFields);
+
+                    /* Set all the transaction DETAIL fields */
+                    List<transactionRecords> detailFields = setOutboundFormFields(detailFormFields, records, 0, true, 0);
+                    transaction.setdetailFields(detailFields);
+
+                    /* get the message type name */
+                    configuration configDetails = configurationManager.getConfigurationById(feedbackReport.getconfigId());
+                    transaction.setmessageTypeName(messagetypemanager.getMessageTypeById(configDetails.getMessageTypeId()).getName());
+
+                    transactionList.add(transaction);
+                }
             }
+
+            mav.addObject("transactions", transactionList);
+            mav.addObject("fromPage", fromPage);
+
+            /* Set the header totals */
+            setTotals(session);
+
+            mav.addObject("pendingTotal", pendingTotal);
+            mav.addObject("inboxTotal", inboxTotal);
+        }
+        catch (Exception e) {
+            throw new Exception("Error occurred in finding associted feedback report messages. transactionId: "+transactionId,e);
         }
         
-        mav.addObject("transactions", transactionList);
-        mav.addObject("fromPage", fromPage);
-        
-        /* Set the header totals */
-        setTotals(session);
-        
-        mav.addObject("pendingTotal", pendingTotal);
-        mav.addObject("inboxTotal", inboxTotal);
         
         return mav;
     }

@@ -67,7 +67,7 @@ public class providerDAOImpl implements providerDAO {
      * @return	The function will return a provider object
      */
     @Override
-    public Provider getProviderById(int providerId) {
+    public Provider getProviderById(int providerId) throws Exception {
         return (Provider) sessionFactory.getCurrentSession().get(Provider.class, providerId);
     }
 
@@ -129,7 +129,7 @@ public class providerDAOImpl implements providerDAO {
      */
     @Override
     @SuppressWarnings("unchecked")
-    public List<providerAddress> getProviderAddresses(int providerId) {
+    public List<providerAddress> getProviderAddresses(int providerId) throws Exception {
         //Order by city
         Criteria criteria = sessionFactory.getCurrentSession().createCriteria(providerAddress.class)
                 .add(Restrictions.eq("providerId", providerId))

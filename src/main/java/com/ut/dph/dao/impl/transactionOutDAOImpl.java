@@ -624,7 +624,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
      * 
      * @return This function does not return anything
      */
-    public void updateTransactionDetails(transactionTarget transactionDetails) {
+    public void updateTransactionDetails(transactionTarget transactionDetails) throws Exception {
         sessionFactory.getCurrentSession().update(transactionDetails);
     }
     
@@ -637,7 +637,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
      * 
      * @return This function will not return anything
      */
-    public void saveNote(transactionOutNotes note) {
+    public void saveNote(transactionOutNotes note) throws Exception {
         sessionFactory.getCurrentSession().save(note);
     }
     
@@ -650,7 +650,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
      */
     @Override
     @Transactional
-    public List<transactionOutNotes> getNotesByTransactionId(int transactionId) {
+    public List<transactionOutNotes> getNotesByTransactionId(int transactionId) throws Exception {
        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(transactionOutNotes.class);
        criteria.add(Restrictions.eq("transactionTargetId", transactionId));
        criteria.addOrder(Order.desc("dateSubmitted"));
@@ -671,7 +671,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
      */
     @Override
     @Transactional
-    public void removeNoteById(int noteId) {
+    public void removeNoteById(int noteId) throws Exception {
 
         Query deletNote = sessionFactory.getCurrentSession().createQuery("delete from transactionOutNotes where id = :noteId");
         deletNote.setParameter("noteId", noteId);
@@ -691,7 +691,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
      */
     @Override
     @Transactional
-    public Integer getActiveFeedbackReportsByMessageType(int messageTypeId, int orgId) {
+    public Integer getActiveFeedbackReportsByMessageType(int messageTypeId, int orgId) throws Exception {
         
         /* Get the feedback report configurations for the passed in or and message type */
         Criteria feedbackReports = sessionFactory.getCurrentSession().createCriteria(configuration.class);
@@ -735,7 +735,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
      */
     @Override
     @Transactional
-    public List<transactionIn> getFeedbackReports(int transactionId, String fromPage) {
+    public List<transactionIn> getFeedbackReports(int transactionId, String fromPage) throws Exception {
         
         Criteria feedbackReportQuery = sessionFactory.getCurrentSession().createCriteria(transactionIn.class);
         feedbackReportQuery.add(Restrictions.eq("transactionTargetId", transactionId));
@@ -768,7 +768,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
      */
     @Override
     @Transactional
-    public transactionTarget getTransactionsByInId(int transactionInId) {
+    public transactionTarget getTransactionsByInId(int transactionInId) throws Exception {
         
         Criteria transactionQuery = sessionFactory.getCurrentSession().createCriteria(transactionTarget.class);
         transactionQuery.add(Restrictions.eq("transactionInId", transactionInId));
@@ -791,7 +791,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
      */
     @Override
     @Transactional
-    public List<transactionTarget> getpendingOutPutTransactions(int transactionTargetId) {
+    public List<transactionTarget> getpendingOutPutTransactions(int transactionTargetId) throws Exception {
         
         Criteria transactionQuery = sessionFactory.getCurrentSession().createCriteria(transactionTarget.class);
         transactionQuery.add(Restrictions.eq("statusId", 19));

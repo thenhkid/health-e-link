@@ -37,21 +37,21 @@ public interface transactionOutManager {
     
     List getInternalStatusCodes();
     
-    void updateTransactionDetails(transactionTarget transactionDetails);
+    void updateTransactionDetails(transactionTarget transactionDetails) throws Exception;
     
-    void saveNote(transactionOutNotes note);
+    void saveNote(transactionOutNotes note) throws Exception;
     
-    List<transactionOutNotes> getNotesByTransactionId(int transactionId);
+    List<transactionOutNotes> getNotesByTransactionId(int transactionId) throws Exception;
     
-    void removeNoteById(int noteId);
+    void removeNoteById(int noteId) throws Exception;
     
-    Integer getActiveFeedbackReportsByMessageType(int messageTypeId, int orgId);
+    Integer getActiveFeedbackReportsByMessageType(int messageTypeId, int orgId) throws Exception;
     
-    List<transactionIn> getFeedbackReports(int transactionId, String fromPage);
+    List<transactionIn> getFeedbackReports(int transactionId, String fromPage) throws Exception;
     
-    transactionTarget getTransactionsByInId(int transactionInId);
+    transactionTarget getTransactionsByInId(int transactionInId) throws Exception;
     
-    List<transactionTarget> getpendingOutPutTransactions(int transactionTargetId);
+    List<transactionTarget> getpendingOutPutTransactions(int transactionTargetId) throws Exception;
     
     boolean processOutPutTransactions(int transactionTargetId, int configId, int transactionInId);
     

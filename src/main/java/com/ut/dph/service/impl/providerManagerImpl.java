@@ -40,7 +40,7 @@ public class providerManagerImpl implements providerManager {
 
     @Override
     @Transactional
-    public Provider getProviderById(int providerId) {
+    public Provider getProviderById(int providerId) throws Exception {
         return providerDAO.getProviderById(providerId);
     }
 
@@ -52,7 +52,7 @@ public class providerManagerImpl implements providerManager {
 
     @Override
     @Transactional
-    public List<providerAddress> getProviderAddresses(int providerId) {
+    public List<providerAddress> getProviderAddresses(int providerId) throws Exception {
         return providerDAO.getProviderAddresses(providerId);
     }
 

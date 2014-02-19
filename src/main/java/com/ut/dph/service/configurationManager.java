@@ -77,7 +77,7 @@ public interface configurationManager {
   
   void updateMessageSpecs(configurationMessageSpecs messageSpecs, int transportDetailId);
   
-  List<configuration> getActiveConfigurationsByUserId(int userId, int transportMethod);
+  List<configuration> getActiveConfigurationsByUserId(int userId, int transportMethod)  throws Exception;
   
   List<configurationConnectionSenders> getConnectionSenders(int connectionId);
   
