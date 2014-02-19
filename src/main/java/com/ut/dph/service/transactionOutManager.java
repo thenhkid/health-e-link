@@ -59,7 +59,7 @@ public interface transactionOutManager {
     
     void updateTargetTransasctionStatus(int batchDLId, int statusId);
     
-    boolean translateTargetRecords(int transactionTargetId, int configId, int batchId);
+    Integer translateTargetRecords(int transactionTargetId, int configId, int batchId);
     
     void moveTranslatedRecords(int transactionTargetId);
     

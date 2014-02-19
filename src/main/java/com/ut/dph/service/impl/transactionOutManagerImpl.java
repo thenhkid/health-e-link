@@ -41,7 +41,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
-import java.sql.Array;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -213,22 +212,22 @@ public class transactionOutManagerImpl implements transactionOutManager {
      *         OR FALSE (If translation failed for any reason)
      */
     @Override
-    public boolean translateTargetRecords(int transactionTargetId, int configId, int batchId) {
+    public Integer translateTargetRecords(int transactionTargetId, int configId, int batchId) {
         
-        boolean translated = false;
+        Integer errorCount = 0;
         
         /* Need to get the configured data translations */
         List<configurationDataTranslations> dataTranslations = configurationManager.getDataTranslationsWithFieldNo(configId);
         
         for (configurationDataTranslations cdt : dataTranslations) {
             if (cdt.getCrosswalkId() != 0) {
-                   translated = transactionInManager.processCrosswalk (configId, batchId, cdt, true);
+            	errorCount = errorCount + transactionInManager.processCrosswalk (configId, batchId, cdt, true);
             } 
             else if (cdt.getMacroId()!= 0)  {
-                   translated = transactionInManager.processMacro (configId, batchId, cdt, true);
+            	errorCount = errorCount + transactionInManager.processMacro (configId, batchId, cdt, true);
             }
         }
-        return translated;
+        return errorCount;
     }
     
     @Override
@@ -275,10 +274,10 @@ public class transactionOutManagerImpl implements transactionOutManager {
                     if(processed == true) {
 
                         /* Need to start the transaction translations */
-                        boolean recordsTranslated = translateTargetRecords(transaction.getId(), transaction.getconfigId(), transaction.getbatchDLId());
+                        Integer recordsTranslated = translateTargetRecords(transaction.getId(), transaction.getconfigId(), transaction.getbatchDLId());
 
-                        /* Once all the processing has completed with no errors need to copy records to the transactionOutRecords to make availble to view */
-                        if(recordsTranslated == true) {
+                        /* Once all the processing has completed with no errors need to copy records to the transactionOutRecords to make available to view */
+                        if(recordsTranslated == 0) { // no errors
                             transactionOutDAO.moveTranslatedRecords(transaction.getId());
 
                             /* Update the status of the transaction to L (Loaded) (ID = 9) */

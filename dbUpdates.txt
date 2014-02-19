@@ -111,3 +111,34 @@ CHANGE COLUMN `state` `state` VARCHAR(45) NULL DEFAULT NULL ;
 ALTER TABLE `universalTranslator`.`message_FromOrg` 
 CHANGE COLUMN `state` `state` VARCHAR(45) NULL DEFAULT NULL ;
 
+
+/** 02.18.2014 **/
+ALTER TABLE `universalTranslator`.`transactionInErrors` 
+ADD COLUMN `required` BIT NULL AFTER `configurationFormFieldsId`;
+
+ALTER TABLE `universalTranslator`.`transactionOutErrors` 
+ADD COLUMN `required` BIT NULL AFTER `configurationFormFieldsId`;
+
+ALTER TABLE `universalTranslator`.`transactionInErrors` 
+ADD COLUMN `stackTrace` TEXT NULL AFTER `validationTypeId`;
+
+ALTER TABLE `universalTranslator`.`transactionOutErrors` 
+ADD COLUMN `stackTrace` TEXT NULL AFTER `validationTypeId`;
+
+ALTER TABLE `universalTranslator`.`transactionInErrors` 
+CHANGE COLUMN `transactionInId` `transactionInId` INT(11) NULL ;
+
+ALTER TABLE `universalTranslator`.`transactionOutErrors` 
+CHANGE COLUMN `transactionTargetId` `transactionInId` INT(11) NULL ;
+
+ALTER TABLE `universalTranslator`.`transactionInErrors` 
+ADD COLUMN `configId` INT NULL AFTER `batchUploadId`;
+
+ALTER TABLE `universalTranslator`.`transactionOutErrors` 
+CHANGE COLUMN `transactionInId` `transactionTargetId` INT(11) NULL DEFAULT NULL ;
+
+ALTER TABLE `universalTranslator`.`transactionOutErrors` 
+ADD COLUMN `configId` INT NULL AFTER `transactionTargetId`;
+
+
+

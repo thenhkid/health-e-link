@@ -97,7 +97,7 @@ public interface transactionInDAO {
     
     List<Integer> getBlankTransIds(ConfigForInsert config);
     
-    void genericValidation(configurationFormFields cff, Integer validationTypeId, Integer batchUploadId, String regEx);
+    Integer genericValidation(configurationFormFields cff, Integer validationTypeId, Integer batchUploadId, String regEx);
     
     
     Integer countSubString(ConfigForInsert config, Integer transId);
@@ -120,7 +120,7 @@ public interface transactionInDAO {
 
     boolean clearTransactionIn(Integer batchUploadId);
      
-    boolean insertFailedRequiredFields(configurationFormFields cff, Integer batchUploadId);
+    Integer insertFailedRequiredFields(configurationFormFields cff, Integer batchUploadId);
     
     boolean clearTransactionInErrors(Integer batchUploadId);
     
@@ -138,7 +138,7 @@ public interface transactionInDAO {
     
     void nullForCWCol(Integer configId, Integer batchId, boolean foroutboundProcessing);
     
-    void executeCWData(Integer configId, Integer batchId, Integer fieldNo, CrosswalkData cwd, boolean foroutboundProcessing);
+    void executeCWData(Integer configId, Integer batchId, Integer fieldNo, CrosswalkData cwd, boolean foroutboundProcessing, Integer fieldId);
     
     void updateFieldNoWithCWData (Integer configId, Integer batchId, Integer fieldNo, Integer passClear, boolean foroutboundProcessing);
 
@@ -148,7 +148,8 @@ public interface transactionInDAO {
 
     void resetTransactionTranslatedIn (Integer batchId);
     
-    String executeMacro (Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing, Macros macro);
+    Integer executeMacro (Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing, Macros macro);
     
-    void insertProcessingErrorForCDT(Integer errorId, Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing);
+    void insertProcessingError(Integer errorId, Integer configId, Integer batchId, Integer fieldId, Integer macroId, Integer cwId, Integer validationTypeId, boolean required, boolean foroutboundProcessing, String stackTrace);
+    
 }

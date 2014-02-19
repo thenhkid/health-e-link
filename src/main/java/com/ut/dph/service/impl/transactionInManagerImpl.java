@@ -485,138 +485,151 @@ public class transactionInManagerImpl implements transactionInManager {
      *
      * *
      */
-    @Override
-    public boolean processBatch(int batchUploadId) {
+	@Override
+	public boolean processBatch(int batchUploadId) {
 
-        boolean successfulBatch = false;
-        /**
-         * get batch details *
-         */
-        batchUploads batch = getBatchDetails(batchUploadId);
+		boolean successfulBatch = false;
+		/**
+		 * get batch details *
+		 */
+		batchUploads batch = getBatchDetails(batchUploadId);
 
-        /**
-         * ERG are loaded already, we load all other files - maybe move loading? *
-         */
-        if (batch.gettransportMethodId() != 2) { // 2 is ERG
+		/**
+		 * ERG are loaded already, we load all other files - maybe move loading?
+		 * *
+		 */
+		if (batch.gettransportMethodId() != 2) { // 2 is ERG
 
-            //set batch to SBP - 4
-            updateBatchStatus(batchUploadId, 4, "startDateTime");
+			// set batch to SBP - 4
+			updateBatchStatus(batchUploadId, 4, "startDateTime");
 
-            //let's clear all tables first as we are starting over
-            successfulBatch = clearTransactionTables(batchUploadId);
+			// let's clear all tables first as we are starting over
+			successfulBatch = clearTransactionTables(batchUploadId);
 
-            //loading batch will take it all the way to loaded (9) status for transactions and SSL (3) for batch 
-            successfulBatch = loadBatch(batchUploadId);
+			// loading batch will take it all the way to loaded (9) status for
+			// transactions and SSL (3) for batch
+			successfulBatch = loadBatch(batchUploadId);
 
-            //after loading is successful we update to SSL
-            updateBatchStatus(batchUploadId, 3, "startDateTime");
+			// after loading is successful we update to SSL
+			updateBatchStatus(batchUploadId, 3, "startDateTime");
 
-            //get batch details again for next set of processing
-            batch = getBatchDetails(batchUploadId);
+			// get batch details again for next set of processing
+			batch = getBatchDetails(batchUploadId);
 
-        }
+		}
 
-        /**
-         * this should be the same point of both ERG and Uploaded File *
-         */
-        //Check to make sure the file is valid for processing, valid file is a batch with SSL (3) or SR*
-        successfulBatch = true;
+		/**
+		 * this should be the same point of both ERG and Uploaded File *
+		 */
 
-        if ((batch.getstatusId() == 3 || batch.getstatusId() == 6) && successfulBatch) {
+		successfulBatch = true; // successfulBatch will be false if there are
+								// unplanned errors, we will halt process and
+								// notify admin
+		Integer systemErrorCount = 0;
+		// Check to make sure the file is valid for processing, valid file is a
+		// batch with SSL (3) or SR*
+		if ((batch.getstatusId() == 3 || batch.getstatusId() == 6)
+				&& successfulBatch) {
+			// set batch to SBP - 4*
+			updateBatchStatus(batchUploadId, 4, "startDateTime");
 
-            //set batch to SBP - 4*
-            updateBatchStatus(batchUploadId, 4, "startDateTime");
+			/**
+			 * we get all the configurations *
+			 */
+			List<Integer> configIds = getConfigIdsForBatch(batchUploadId);
 
-            /**
-             * we get all the configurations *
-             */
-            List<Integer> configIds = getConfigIdsForBatch(batchUploadId);
+			for (Integer configId : configIds) {
 
-            for (Integer configId : configIds) {
+				/**
+				 * we need to run all checks before insert regardless *
+				 */
+				/**
+				 * check R/O *
+				 */
+				List<configurationFormFields> reqFields = getRequiredFieldsForConfig(configId);
+				/**
+				 * we loop each field and flag errors *
+				 */
+				for (configurationFormFields cff : reqFields) {
+					systemErrorCount = systemErrorCount
+							+ insertFailedRequiredFields(cff, batchUploadId);
+				}
+				// update status of the failed records to ERR - 14
+				updateStatusForErrorTrans(batchUploadId, 14, false);
 
-                /**
-                 * we need to run all checks before insert regardless *
-                 */
-                /**
-                 * check R/O *
-                 */
-                List<configurationFormFields> reqFields = getRequiredFieldsForConfig(configId);
-                /**
-                 * we loop each field and flag errors *
-                 */
-                for (configurationFormFields cff : reqFields) {
-                    insertFailedRequiredFields(cff, batchUploadId);
-                }
-                //update status of the failed records to ERR - 14
-                updateStatusForErrorTrans(batchUploadId, 14, false);
+				/**
+				 * run validation*
+				 */
+				systemErrorCount = systemErrorCount + runValidations(batchUploadId, configId);
+				// update status of the failed records to ERR - 14
+				updateStatusForErrorTrans(batchUploadId, 14, false);
 
-                /**
-                 * run validation*
-                 */
-                runValidations(batchUploadId, configId);
-                //update status of the failed records to ERR - 14
-                updateStatusForErrorTrans(batchUploadId, 14, false);
+				// 1. grab the configurationDataTranslations and run cw/macros
+				List<configurationDataTranslations> dataTranslations = configurationManager
+						.getDataTranslationsWithFieldNo(configId);
+				for (configurationDataTranslations cdt : dataTranslations) {
+					if (cdt.getCrosswalkId() != 0) {
+						systemErrorCount = systemErrorCount + processCrosswalk(configId, batchUploadId, cdt, false);
+					} else if (cdt.getMacroId() != 0) {
+						systemErrorCount = systemErrorCount + processMacro(configId, batchUploadId, cdt, false);
+					}
+				}
 
-                /**
-                 * run cw/macros *
-                 */
-                //1. grab the configurationDataTranslations
-                List<configurationDataTranslations> dataTranslations = configurationManager.getDataTranslationsWithFieldNo(configId);
-                for (configurationDataTranslations cdt : dataTranslations) {
-                	if (cdt.getCrosswalkId() != 0) {
-                        successfulBatch = processCrosswalk(configId, batchUploadId, cdt, false);
-                    } else if (cdt.getMacroId() != 0) {
-                        successfulBatch = processMacro(configId, batchUploadId, cdt, false);
-                    }
-                }
+				/**
+				 * if there are errors, those are system errors, they will be
+				 * logged we get errorId 5 and email to admin, update batch to
+				 * 29
+				 ***/
+				if (systemErrorCount > 0) {
+					//error batch
+					updateBatchStatus (batchUploadId, 29, "endDateTime");
+					// email admin
 
-                /**
-                 * we check configuration details, remove rejected records from transactionTranslatedIn, pass records stays * *
-                 */
-                //TODO we figure out if we pass a batch, reject the batch, etc here
-                //we have REJ - 13, Error - 14, Passed 16 for transactions
-            }
+					// break out of loop as errorCount is system error
+					return false;
+				}
 
-        }
+			} //end of configs
 
-        /**
-         * somewhere in here we need to make sure all configs are set to handle files the same way, if not, we will go with manual release *
-         */
-        boolean autoRelease = true;
-        if (autoRelease) {
-            /**
-             * inserts for batches that passes *
-             */
-            if (!insertTransactions(batchUploadId)) {
-                successfulBatch = false;
-                /**
-                 * something went wrong, we removed all inserted entries *
-                 */
-                clearMessageTables(batchUploadId);
-                /**
-                 * we leave transaction status alone and flag batch as error during processing -SPE*
-                 */
-                updateBatchStatus(batchUploadId, 28, "endDateTime");
-            }
+			//we finish all configs and need to check how to proceed with this file.
+			//configurationtransportdetails
+			boolean autoRelease = true;
+			if (autoRelease) {
+				/**
+				 * inserts for batches that passes *
+				 */
+				if (!insertTransactions(batchUploadId)) {
+					successfulBatch = false;
+					/**
+					 * something went wrong, we removed all inserted entries *
+					 */
+					clearMessageTables(batchUploadId);
+					/**
+					 * we leave transaction status alone and flag batch as error
+					 * during processing -SPE*
+					 */
+					updateBatchStatus(batchUploadId, 28, "endDateTime");
+				}
 
-            /**
-             * set batch to SPC 24*
-             */
-            if (successfulBatch) {
-                updateBatchStatus(batchUploadId, 24, "endDateTime");
-                /**
-                 * set all REL - 10 records to 19 *
-                 */
-                updateTransactionStatus(batchUploadId, 0, 12, 19);
-                updateTransactionTargetStatus(batchUploadId, 0, 12, 19);
-                /**
-                 * we update total record counts for batch *
-                 */
-            }
-        }
+				/**
+				 * set batch to SPC 24*
+				 */
+				if (successfulBatch) {
+					updateBatchStatus(batchUploadId, 24, "endDateTime");
+					/**
+					 * set all REL - 10 records to 19 *
+					 */
+					updateTransactionStatus(batchUploadId, 0, 12, 19);
+					updateTransactionTargetStatus(batchUploadId, 0, 12, 19);
+					/**
+					 * we update total record counts for batch *
+					 */
+				}
+			}
 
-        return successfulBatch;
-    }
+		}
+		return successfulBatch;
+	}
 
     /**
      * this is called by the scheduler It selects all batch with a status of SSA Loads them SSL - Trans - L Starts the Process - SBP - Parses
@@ -831,7 +844,7 @@ public class transactionInManagerImpl implements transactionInManager {
     }
 
     @Override
-    public boolean insertFailedRequiredFields(configurationFormFields cff, Integer batchUploadId) {
+    public Integer insertFailedRequiredFields(configurationFormFields cff, Integer batchUploadId) {
         return transactionInDAO.insertFailedRequiredFields(cff, batchUploadId);
     }
 
@@ -852,8 +865,9 @@ public class transactionInManagerImpl implements transactionInManager {
 	}
 
     @Override
-    public boolean runValidations(Integer batchUploadId, Integer configId) {
-        //1. we get validation types
+    public Integer runValidations(Integer batchUploadId, Integer configId) {
+        Integer errorCount = 0;
+    	//1. we get validation types
         //2. we skip 1 as that is not necessary
         //3. we skip date (4) as there is no isDate function in MySQL
         //4. we skip the ids that are not null as Mysql will bomb out checking character placement
@@ -875,44 +889,45 @@ public class transactionInManagerImpl implements transactionInManager {
                     break; // no validation
                 //email calling SQL to validation and insert - one statement
                 case 2:
-                    genericValidation(cff, validationTypeId, batchUploadId, regEx);
+                	errorCount = errorCount+ genericValidation(cff, validationTypeId, batchUploadId, regEx);
                     break;
                 //phone  calling SP to validation and insert - one statement 
                 case 3:
-                    genericValidation(cff, validationTypeId, batchUploadId, regEx);
+                	errorCount = errorCount + genericValidation(cff, validationTypeId, batchUploadId, regEx);
                     break;
                 // need to loop through each record / each field
                 case 4:
-                    dateValidation(cff, validationTypeId, batchUploadId);
+                	errorCount = errorCount + dateValidation(cff, validationTypeId, batchUploadId);
                     break;
                 //numeric   calling SQL to validation and insert - one statement      
                 case 5:
-                    genericValidation(cff, validationTypeId, batchUploadId, regEx);
+                	errorCount = errorCount+ genericValidation(cff, validationTypeId, batchUploadId, regEx);
                     break;
                 //url - need to rethink as regExp is not validating correctly
                 case 6:
-                    urlValidation(cff, validationTypeId, batchUploadId);
+                	errorCount = errorCount+ urlValidation(cff, validationTypeId, batchUploadId);
                     break;
                 //anything new we hope to only have to modify sp
                 default:
-                    genericValidation(cff, validationTypeId, batchUploadId, regEx);
+                	errorCount = errorCount+ genericValidation(cff, validationTypeId, batchUploadId, regEx);
                     break;
             }
 
         }
-        return true;
+        return errorCount;
     }
 
     @Override
-    public void genericValidation(configurationFormFields cff,
+    public Integer genericValidation(configurationFormFields cff,
             Integer validationTypeId, Integer batchUploadId, String regEx) {
-        transactionInDAO.genericValidation(cff, validationTypeId, batchUploadId, regEx);
+        return transactionInDAO.genericValidation(cff, validationTypeId, batchUploadId, regEx);
     }
 
     @Override
-    public void urlValidation(configurationFormFields cff,
+    public Integer urlValidation(configurationFormFields cff,
             Integer validationTypeId, Integer batchUploadId) {
-        //1. we grab all transactionInIds for messages that are not length of 0 and not null 
+        try {
+    	//1. we grab all transactionInIds for messages that are not length of 0 and not null 
         List<transactionRecords> trs = getFieldColAndValues(batchUploadId, cff);
         //2. we look at each column and check each value to make sure it is a valid url
         for (transactionRecords tr : trs) {
@@ -929,12 +944,20 @@ public class transactionInManagerImpl implements transactionInManager {
 
             }
         }
+        	return 0;
+        } catch (Exception ex) {
+        	ex.printStackTrace();
+        	transactionInDAO.insertProcessingError(5, cff.getconfigId(), batchUploadId, cff.getId(), null, null, validationTypeId, false, false, (ex.getClass() + " " + ex.getCause()));
+        	return 1;
+        }
 
     }
 
     @Override
-    public void dateValidation(configurationFormFields cff, Integer validationTypeId, Integer batchUploadId) {
-        //1. we grab all transactionInIds for messages that are not length of 0 and not null 
+    public Integer dateValidation(configurationFormFields cff, 
+    		Integer validationTypeId, Integer batchUploadId) {
+        try {
+    	//1. we grab all transactionInIds for messages that are not length of 0 and not null 
         List<transactionRecords> trs = getFieldColAndValues(batchUploadId, cff);
 
         //2. we look at each column and check each value by trying to convert it to a date
@@ -965,6 +988,12 @@ public class transactionInManagerImpl implements transactionInManager {
                 }
 
             }
+        }
+        	return 0;
+        } catch (Exception ex) {
+        	ex.printStackTrace();
+        	transactionInDAO.insertProcessingError(5, cff.getconfigId(), batchUploadId, cff.getId(), null, null, validationTypeId, false, false, (ex.getClass() + " " + ex.getCause()));
+        	return 1;
         }
 
     }
@@ -1005,24 +1034,18 @@ public class transactionInManagerImpl implements transactionInManager {
         String date = input.replace("/", "-");
         date = date.replace(".", "-");
         //ArrayList<Pattern> patterns = new ArrayList<Pattern>();
-        Pattern pattern1 = Pattern.compile(day + "-" + month + "-" + year + time);
+        //Pattern pattern1 = Pattern.compile(day + "-" + month + "-" + year + time); //not matching, doesn't work for 01-02-2014 is it jan or feb, will only accept us dates
         Pattern pattern2 = Pattern.compile(year + "-" + month + "-" + day + time);
         Pattern pattern3 = Pattern.compile(month + "-" + day + "-" + year + time);
         // check dates
-
-        if (pattern1.matcher(date).matches()) {
-            try {
-                //check to make sure we have two digits date and month
-                SimpleDateFormat dateformat = new SimpleDateFormat("dd-MM-YYYY");
-                dateformat.setLenient(false);
-                Date dateValue = dateformat.parse(date);
-                return dateValue;
-            } catch (Exception e) {
-                e.printStackTrace();
-                return null;
-            }
-        } else if (pattern2.matcher(date).matches()) {
-            //we have d-m-y format, we transform and return date
+        //month needs to have leading 0
+        System.out.print(date.indexOf("-"));
+        if (date.indexOf("-") == 1) {
+        	date = "0" + date;
+        }
+        
+        if (pattern2.matcher(date).matches()) {
+            //we have y-m-d format, we transform and return date
             try {
                 SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-mm-dd");
                 dateformat.setLenient(false);
@@ -1034,8 +1057,8 @@ public class transactionInManagerImpl implements transactionInManager {
             }
 
         } else if (pattern3.matcher(date).matches()) {
-            //we have d-m-y format, we transform and return date
-            try {
+            //we have m-d-y format, we transform and return date
+        	try {
                 SimpleDateFormat dateformat = new SimpleDateFormat("MM-dd-yyyy");
                 dateformat.setLenient(false);
                 Date dateValue = dateformat.parse(date);
@@ -1134,7 +1157,7 @@ public class transactionInManagerImpl implements transactionInManager {
     }
 
     @Override
-    public boolean processCrosswalk(Integer configId, Integer batchId, 
+    public Integer processCrosswalk(Integer configId, Integer batchId, 
     		configurationDataTranslations cdt, boolean foroutboundProcessing) {
         try {
             // 1. we get the info for that cw (fieldNo, sourceVal, targetVal rel_crosswalkData)
@@ -1142,7 +1165,7 @@ public class transactionInManagerImpl implements transactionInManager {
             //we null forcw column, we translate and insert there, we then replace
             nullForCWCol(configId, batchId, foroutboundProcessing);
             for (CrosswalkData cwd : cdList) {
-                executeCWData(configId, batchId, cdt.getFieldNo(), cwd, foroutboundProcessing);
+                executeCWData(configId, batchId, cdt.getFieldNo(), cwd, foroutboundProcessing, cdt.getFieldId());
             }
 			
             //we replace original F[FieldNo] column with data in forcw
@@ -1157,38 +1180,31 @@ public class transactionInManagerImpl implements transactionInManager {
             //we replace original F[FieldNo] column with data in forcw
             updateFieldNoWithCWData(configId, batchId, cdt.getFieldNo(), cdt.getPassClear(), foroutboundProcessing);
 
-            return true;
+            return 0;
         } catch (Exception e) {
             e.printStackTrace();
-            return false;
+            return 1;
         }
 
     }
 
     @Override
-    public boolean processMacro(Integer configId, Integer batchId, configurationDataTranslations cdt, 
+    public Integer processMacro(Integer configId, Integer batchId, configurationDataTranslations cdt, 
     		boolean foroutboundProcessing) {
     	// we clear forCW column for before we begin any translation
         nullForCWCol(configId, batchId, foroutboundProcessing);
-        
         try {
     		Macros macro = configurationManager.getMacroById(cdt.getMacroId());
     		try {
         		// we expect the target field back so we can figure out clear pass option
-    			String targetField = executeMacro(configId, batchId, cdt, foroutboundProcessing, macro);
-    			if (targetField.equalsIgnoreCase("ERROR")) {
-    				return false;
-    			} else {
-    				return true;
-    			}
-    			
+    			return executeMacro(configId, batchId, cdt, foroutboundProcessing, macro);
             } catch (Exception e) {
             	e.printStackTrace();
-            	return false;
+            	return 1;
             }
     	} catch (Exception e) {
     		e.printStackTrace();
-        	return false;
+        	return 1;
     	}
     }
 
@@ -1198,8 +1214,8 @@ public class transactionInManagerImpl implements transactionInManager {
     }
 
     @Override
-    public void executeCWData(Integer configId, Integer batchId, Integer fieldNo, CrosswalkData cwd, boolean foroutboundProcessing) {
-        transactionInDAO.executeCWData(configId, batchId, fieldNo, cwd, foroutboundProcessing);
+    public void executeCWData(Integer configId, Integer batchId, Integer fieldNo, CrosswalkData cwd, boolean foroutboundProcessing, Integer fieldId) {
+        transactionInDAO.executeCWData(configId, batchId, fieldNo, cwd, foroutboundProcessing, fieldId);
     }
 
     @Override
@@ -1225,7 +1241,7 @@ public class transactionInManagerImpl implements transactionInManager {
 	}
 
 	@Override
-	public String executeMacro(Integer configId, Integer batchId,
+	public Integer executeMacro(Integer configId, Integer batchId,
 			configurationDataTranslations cdt, boolean foroutboundProcessing, Macros macro) {
 		 return transactionInDAO.executeMacro(configId, batchId, cdt, foroutboundProcessing, macro);
 		

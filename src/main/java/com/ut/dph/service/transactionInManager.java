@@ -140,19 +140,19 @@ public interface transactionInManager {
     
     List <configurationFormFields> getRequiredFieldsForConfig (Integer configId);
     
-    boolean insertFailedRequiredFields(configurationFormFields cff, Integer batchUploadId);
+    Integer insertFailedRequiredFields(configurationFormFields cff, Integer batchUploadId);
     
     boolean clearTransactionInErrors(Integer batchUploadId);
     
     void updateStatusForErrorTrans(Integer batchId, Integer statusId, boolean foroutboundProcessing);
     
-    boolean runValidations(Integer batchUploadId, Integer configId);
+    Integer runValidations(Integer batchUploadId, Integer configId);
     
-    void genericValidation(configurationFormFields cff, Integer validationTypeId, Integer batchUploadId, String regEx);
+    Integer genericValidation(configurationFormFields cff, Integer validationTypeId, Integer batchUploadId, String regEx);
     
-    void urlValidation(configurationFormFields cff, Integer validationTypeId, Integer batchUploadId);
+    Integer urlValidation(configurationFormFields cff, Integer validationTypeId, Integer batchUploadId);
     
-    void dateValidation(configurationFormFields cff, Integer validationTypeId, Integer batchUploadId);
+    Integer dateValidation(configurationFormFields cff, Integer validationTypeId, Integer batchUploadId);
     
     void updateBlanksToNull(configurationFormFields cff, Integer batchUploadId);
     
@@ -174,17 +174,17 @@ public interface transactionInManager {
 	
     boolean isValidURL(String url);
     
-    boolean processCrosswalk (Integer configId, Integer batchId, configurationDataTranslations translation, boolean foroutboundProcessing);
+    Integer processCrosswalk (Integer configId, Integer batchId, configurationDataTranslations translation, boolean foroutboundProcessing);
     
-    boolean processMacro (Integer configId, Integer batchId, configurationDataTranslations translation, boolean foroutboundProcessing);
+    Integer processMacro (Integer configId, Integer batchId, configurationDataTranslations translation, boolean foroutboundProcessing);
     
     void nullForCWCol(Integer configId, Integer batchId, boolean foroutboundProcessing);
     
-    void executeCWData(Integer configId, Integer batchId, Integer fieldNo, CrosswalkData cwd, boolean foroutboundProcessing);
+    void executeCWData(Integer configId, Integer batchId, Integer fieldNo, CrosswalkData cwd, boolean foroutboundProcessing, Integer fieldId);
 
     void updateFieldNoWithCWData (Integer configId, Integer batchId, Integer fieldNo, Integer passClear, boolean foroutboundProcessing);
     
-    String executeMacro (Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing, Macros macro);
+    Integer executeMacro (Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing, Macros macro);
     
     void flagCWErrors (Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing);
     
