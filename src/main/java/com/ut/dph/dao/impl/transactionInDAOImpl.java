@@ -1188,7 +1188,7 @@ public class transactionInDAOImpl implements transactionInDAO {
     @SuppressWarnings("unchecked")
     @Override
     @Transactional
-    public List<batchUploads> getuploadedBatches(int userId, int orgId) {
+    public List<batchUploads> getuploadedBatches(int userId, int orgId) throws Exception {
 
         /* Get a list of uploaded batches for the organization */
         Criteria findBatches = sessionFactory.getCurrentSession().createCriteria(batchUploads.class);

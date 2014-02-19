@@ -471,7 +471,7 @@ public class transactionInManagerImpl implements transactionInManager {
     }
 
     @Override
-    public List<batchUploads> getuploadedBatches(int userId, int orgId) {
+    public List<batchUploads> getuploadedBatches(int userId, int orgId) throws Exception {
         return transactionInDAO.getuploadedBatches(userId, orgId);
     }
 

@@ -190,7 +190,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
     
     @Override
     @Transactional
-    public void updateTargetBatchStatus(Integer batchDLId, Integer statusId, String timeField) {
+    public void updateTargetBatchStatus(Integer batchDLId, Integer statusId, String timeField) throws Exception {
         transactionOutDAO.updateTargetBatchStatus(batchDLId, statusId, timeField);
     }
     
@@ -1035,13 +1035,13 @@ public class transactionOutManagerImpl implements transactionOutManager {
     
     @Override
     @Transactional
-    public List<batchDownloads> getdownloadableBatches(int userId, int orgId, Date fromDate, Date toDate, String searchTerm, int page, int maxResults) {
+    public List<batchDownloads> getdownloadableBatches(int userId, int orgId, Date fromDate, Date toDate, String searchTerm, int page, int maxResults) throws Exception {
         return transactionOutDAO.getdownloadableBatches(userId, orgId, fromDate, toDate, searchTerm, page, maxResults);
     }
     
     @Override
     @Transactional
-    public void updateLastDownloaded(int batchId) {
+    public void updateLastDownloaded(int batchId) throws Exception {
         transactionOutDAO.updateLastDownloaded(batchId);
     }
     

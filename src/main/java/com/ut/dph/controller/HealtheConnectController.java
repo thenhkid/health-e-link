@@ -98,25 +98,30 @@ public class HealtheConnectController {
         /* Need to get a list of uploaded files */
         User userInfo = (User)session.getAttribute("userDetails");
         
-        /* Need to get a list of all uploaded batches */
-        List<batchUploads> uploadedBatches = transactionInManager.getuploadedBatches(userInfo.getId(), userInfo.getOrgId());
-        
-        if(!uploadedBatches.isEmpty()) {
-            for(batchUploads batch : uploadedBatches) {
-                List<transactionIn> batchTransactions = transactionInManager.getBatchTransactions(batch.getId(), userInfo.getId());
-                batch.settotalTransactions(batchTransactions.size());
-                
-                lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
-                batch.setstatusValue(processStatus.getDisplayCode());
-                
-                User userDetails = usermanager.getUserById(batch.getuserId());
-                String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
-                batch.setusersName(usersName);
-                
+        try {
+            /* Need to get a list of all uploaded batches */
+            List<batchUploads> uploadedBatches = transactionInManager.getuploadedBatches(userInfo.getId(), userInfo.getOrgId());
+
+            if(!uploadedBatches.isEmpty()) {
+                for(batchUploads batch : uploadedBatches) {
+                    List<transactionIn> batchTransactions = transactionInManager.getBatchTransactions(batch.getId(), userInfo.getId());
+                    batch.settotalTransactions(batchTransactions.size());
+
+                    lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
+                    batch.setstatusValue(processStatus.getDisplayCode());
+
+                    User userDetails = usermanager.getUserById(batch.getuserId());
+                    String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
+                    batch.setusersName(usersName);
+
+                }
             }
+
+            mav.addObject("uploadedBatches", uploadedBatches);
         }
-        
-        mav.addObject("uploadedBatches", uploadedBatches);
+        catch (Exception e) {
+            throw new Exception("Error occurred viewing the uploaded batches. userId: "+ userInfo.getId(),e);
+        }
         
         return mav;
     }
@@ -177,72 +182,78 @@ public class HealtheConnectController {
         /* Need to get the message type for the first config */
         configuration configDetails = configurationManager.getConfigurationById(configId);
         
-        /* Upload the attachment */
-        Map<String,String> batchResults = transactionInManager.uploadBatchFile(configId, uploadedFile);
-        
-        /* Need to add the file to the batchUploads table */
-        /* Create the batch name (OrgId+MessageTypeId+Date/Time) */
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-        Date date = new Date();
-        String batchName = new StringBuilder().append(userInfo.getOrgId()).append(configDetails.getMessageTypeId()).append(dateFormat.format(date)).toString();
-        
-        /* Submit a new batch */
-        batchUploads batchUpload = new batchUploads();
-        batchUpload.setOrgId(userInfo.getOrgId());
-        batchUpload.setuserId(userInfo.getId());
-        batchUpload.setutBatchName(batchName);
-        batchUpload.settransportMethodId(1);
-        batchUpload.setoriginalFileName(batchName);
-        batchUpload.setoriginalFileName(batchResults.get("fileName"));
-        
-        /* Set the status to the batch as SFV (Source Failed Validation) */
-        batchUpload.setstatusId(1);
-        
-        Integer batchId = (Integer) transactionInManager.submitBatchUpload(batchUpload); 
-        
-        List <Integer> errorCodes = new ArrayList<Integer>();
-        
-        Object emptyFileVal = batchResults.get("emptyFile");
-        if(emptyFileVal != null) {
-            errorCodes.add(1);
+        try {
+            /* Upload the file */
+            Map<String,String> batchResults = transactionInManager.uploadBatchFile(configId, uploadedFile);
+
+            /* Need to add the file to the batchUploads table */
+            /* Create the batch name (OrgId+MessageTypeId+Date/Time) */
+            DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+            Date date = new Date();
+            String batchName = new StringBuilder().append(userInfo.getOrgId()).append(configDetails.getMessageTypeId()).append(dateFormat.format(date)).toString();
+
+            /* Submit a new batch */
+            batchUploads batchUpload = new batchUploads();
+            batchUpload.setOrgId(userInfo.getOrgId());
+            batchUpload.setuserId(userInfo.getId());
+            batchUpload.setutBatchName(batchName);
+            batchUpload.settransportMethodId(1);
+            batchUpload.setoriginalFileName(batchName);
+            batchUpload.setoriginalFileName(batchResults.get("fileName"));
+
+            /* Set the status to the batch as SFV (Source Failed Validation) */
+            batchUpload.setstatusId(1);
+
+            Integer batchId = (Integer) transactionInManager.submitBatchUpload(batchUpload); 
+
+            List <Integer> errorCodes = new ArrayList<Integer>();
+
+            Object emptyFileVal = batchResults.get("emptyFile");
+            if(emptyFileVal != null) {
+                errorCodes.add(1);
+            }
+
+            Object wrongSizeVal = batchResults.get("wrongSize");
+            if(wrongSizeVal != null) {
+                errorCodes.add(2);
+            }
+
+            Object wrongFileTypeVal = batchResults.get("wrongFileType");
+            if(wrongFileTypeVal != null) {
+                errorCodes.add(3);
+            }
+
+            Object wrongDelimVal = batchResults.get("wrongDelim");
+            if(wrongDelimVal != null) {
+                errorCodes.add(4);
+            }
+
+            /* If Passed validation update the status to Source Submission Accepted */
+            if(0 == errorCodes.size()) {
+                /* Get the details of the batch */
+                batchUploads batch = transactionInManager.getBatchDetails(batchId);
+                batch.setstatusId(2);
+
+                transactionInManager.submitBatchUploadChanges(batch);
+
+                /* Redirect to the list of uploaded batches */
+                redirectAttr.addFlashAttribute("savedStatus", "uploaded");
+
+            }
+
+            else {
+                redirectAttr.addFlashAttribute("savedStatus", "error");
+                redirectAttr.addFlashAttribute("errorCodes", errorCodes);
+            }
+
+
+            ModelAndView mav = new ModelAndView(new RedirectView("upload"));
+            return mav;
+
         }
-        
-        Object wrongSizeVal = batchResults.get("wrongSize");
-        if(wrongSizeVal != null) {
-            errorCodes.add(2);
+        catch (Exception e) {
+            throw new Exception("Error occurred uploading a new file. configId: "+ configId,e);
         }
-        
-        Object wrongFileTypeVal = batchResults.get("wrongFileType");
-        if(wrongFileTypeVal != null) {
-            errorCodes.add(3);
-        }
-        
-        Object wrongDelimVal = batchResults.get("wrongDelim");
-        if(wrongDelimVal != null) {
-            errorCodes.add(4);
-        }
-        
-        /* If Passed validation update the status to Source Submission Accepted */
-        if(0 == errorCodes.size()) {
-            /* Get the details of the batch */
-            batchUploads batch = transactionInManager.getBatchDetails(batchId);
-            batch.setstatusId(2);
-            
-            transactionInManager.submitBatchUploadChanges(batch);
-            
-            /* Redirect to the list of uploaded batches */
-            redirectAttr.addFlashAttribute("savedStatus", "uploaded");
-            
-        }
-        
-        else {
-            redirectAttr.addFlashAttribute("savedStatus", "error");
-            redirectAttr.addFlashAttribute("errorCodes", errorCodes);
-        }
-        
-        
-        ModelAndView mav = new ModelAndView(new RedirectView("upload"));
-        return mav;
         
     }
     
@@ -271,29 +282,35 @@ public class HealtheConnectController {
         /* Need to get a list of uploaded files */
         User userInfo = (User)session.getAttribute("userDetails");
         
-        /* Need to get a list of all uploaded batches */
-        Integer totaldownloadableBatches = transactionOutManager.getdownloadableBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, "", 1, 0).size();
-        List<batchDownloads> downloadableBatches = transactionOutManager.getdownloadableBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, "", 1, maxResults);
-        
-        if(!downloadableBatches.isEmpty()) {
-            for(batchDownloads batch : downloadableBatches) {
-                
-                lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
-                batch.setstatusValue(processStatus.getDisplayCode());
-                
-                User userDetails = usermanager.getUserById(batch.getuserId());
-                String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
-                batch.setusersName(usersName);
-                
+        try {
+            /* Need to get a list of all uploaded batches */
+            Integer totaldownloadableBatches = transactionOutManager.getdownloadableBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, "", 1, 0).size();
+            List<batchDownloads> downloadableBatches = transactionOutManager.getdownloadableBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, "", 1, maxResults);
+
+            if(!downloadableBatches.isEmpty()) {
+                for(batchDownloads batch : downloadableBatches) {
+
+                    lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
+                    batch.setstatusValue(processStatus.getDisplayCode());
+
+                    User userDetails = usermanager.getUserById(batch.getuserId());
+                    String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
+                    batch.setusersName(usersName);
+
+                }
             }
+
+            mav.addObject("downloadableBatches", downloadableBatches);
+
+            Integer totalPages = (int)Math.ceil((double)totaldownloadableBatches / maxResults);
+            mav.addObject("totalPages", totalPages);
+
+            return mav;
+        }
+        catch (Exception e) {
+            throw new Exception("Error occurred trying to view the download screen. userId: "+ userInfo.getId(),e);
         }
         
-        mav.addObject("downloadableBatches", downloadableBatches);
-        
-        Integer totalPages = (int)Math.ceil((double)totaldownloadableBatches / maxResults);
-        mav.addObject("totalPages", totalPages);
-        
-        return mav;
     }
     
     /**
@@ -319,31 +336,37 @@ public class HealtheConnectController {
         /* Need to get a list of uploaded files */
         User userInfo = (User)session.getAttribute("userDetails");
         
-        /* Need to get a list of all uploaded batches */
-        Integer totaldownloadableBatches = transactionOutManager.getdownloadableBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, searchTerm, 1, 0).size();
-        List<batchDownloads> downloadableBatches = transactionOutManager.getdownloadableBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, searchTerm, page, maxResults);
-        
-        if(!downloadableBatches.isEmpty()) {
-            for(batchDownloads batch : downloadableBatches) {
-                
-                lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
-                batch.setstatusValue(processStatus.getDisplayCode());
-                
-                User userDetails = usermanager.getUserById(batch.getuserId());
-                String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
-                batch.setusersName(usersName);
-                
+        try {
+            /* Need to get a list of all uploaded batches */
+            Integer totaldownloadableBatches = transactionOutManager.getdownloadableBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, searchTerm, 1, 0).size();
+            List<batchDownloads> downloadableBatches = transactionOutManager.getdownloadableBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, searchTerm, page, maxResults);
+
+            if(!downloadableBatches.isEmpty()) {
+                for(batchDownloads batch : downloadableBatches) {
+
+                    lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
+                    batch.setstatusValue(processStatus.getDisplayCode());
+
+                    User userDetails = usermanager.getUserById(batch.getuserId());
+                    String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
+                    batch.setusersName(usersName);
+
+                }
             }
+            mav.addObject("downloadableBatches", downloadableBatches); 
+
+            Integer totalPages = (int)Math.ceil((double)totaldownloadableBatches / maxResults);
+            mav.addObject("totalPages", totalPages);
+            mav.addObject("searchTerm", searchTerm);
+            mav.addObject("currentPage", page);
+
+
+            return mav;
         }
-        mav.addObject("downloadableBatches", downloadableBatches); 
+        catch (Exception e) {
+            throw new Exception("Error occurred searching downloadable batches.",e);
+        }
         
-        Integer totalPages = (int)Math.ceil((double)totaldownloadableBatches / maxResults);
-        mav.addObject("totalPages", totalPages);
-        mav.addObject("searchTerm", searchTerm);
-        mav.addObject("currentPage", page);
-        
-        
-        return mav;
     }
     
     /**
@@ -355,16 +378,22 @@ public class HealtheConnectController {
      * @return This function will simply return a 1.
      */
     @RequestMapping(value= "/downloadBatch.do", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody Integer downloadBatch(@RequestParam(value = "batchId", required = false) Integer batchId) {
+    public @ResponseBody Integer downloadBatch(@RequestParam(value = "batchId", required = false) Integer batchId) throws Exception {
         
-        transactionOutManager.updateTargetBatchStatus(batchId, 22 , "");
+        try {
+            transactionOutManager.updateTargetBatchStatus(batchId, 22 , "");
         
-        transactionOutManager.updateTargetTransasctionStatus(batchId, 20);
+            transactionOutManager.updateTargetTransasctionStatus(batchId, 20);
+
+            /* Update the last Downloaded field */
+            transactionOutManager.updateLastDownloaded(batchId);
+
+            return 1;
+        }
+        catch (Exception e) {
+            throw new Exception("Error occurred downloading the file. batchId: "+batchId,e);
+        }
         
-        /* Update the last Downloaded field */
-        transactionOutManager.updateLastDownloaded(batchId);
-       
-        return 1;
     }
     
     /**

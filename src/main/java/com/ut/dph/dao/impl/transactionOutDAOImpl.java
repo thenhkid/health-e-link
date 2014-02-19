@@ -895,7 +895,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
      */
     @Override
     @Transactional
-    public void updateTargetBatchStatus(Integer batchDLId, Integer statusId, String timeField) {
+    public void updateTargetBatchStatus(Integer batchDLId, Integer statusId, String timeField) throws Exception {
 
         String sql = "update batchDownloads set statusId = :statusId ";
         if (!timeField.equalsIgnoreCase("")) {
@@ -1086,7 +1086,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
     @Override
     @Transactional
     @SuppressWarnings("UnusedAssignment")
-    public List<batchDownloads> getdownloadableBatches(int userId, int orgId, Date fromDate, Date toDate, String searchTerm, int page, int maxResults) {
+    public List<batchDownloads> getdownloadableBatches(int userId, int orgId, Date fromDate, Date toDate, String searchTerm, int page, int maxResults) throws Exception {
         int firstResult = 0;
         
         /* Get a list of connections the user has access to */
@@ -1338,7 +1338,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
      */
     @Override
     @Transactional
-    public void updateLastDownloaded(int batchId) {
+    public void updateLastDownloaded(int batchId) throws Exception {
         
         String sql = "update BatchDownloads "
                 + " set lastDownloaded = CURRENT_TIMESTAMP "

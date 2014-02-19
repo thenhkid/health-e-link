@@ -55,7 +55,7 @@ public interface transactionOutManager {
     
     boolean processOutPutTransactions(int transactionTargetId, int configId, int transactionInId);
     
-    void updateTargetBatchStatus(Integer batchDLId, Integer statusId, String timeField);
+    void updateTargetBatchStatus(Integer batchDLId, Integer statusId, String timeField) throws Exception;
     
     void updateTargetTransasctionStatus(int batchDLId, int statusId);
     
@@ -67,8 +67,8 @@ public interface transactionOutManager {
     
     void generateOutputFiles();
     
-    List<batchDownloads> getdownloadableBatches(int userId, int orgId, Date fromDate, Date toDate, String searchTerm, int page, int maxResults);
+    List<batchDownloads> getdownloadableBatches(int userId, int orgId, Date fromDate, Date toDate, String searchTerm, int page, int maxResults) throws Exception;
     
-    void updateLastDownloaded(int batchId);
+    void updateLastDownloaded(int batchId) throws Exception;
     
 }
