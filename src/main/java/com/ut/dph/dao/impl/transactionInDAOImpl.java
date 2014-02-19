@@ -1716,7 +1716,7 @@ public class transactionInDAOImpl implements transactionInDAO {
                     + ", 3,  " + cdt.getCrosswalkId() + " from transactionTranslatedIn where "
                     + "configId = :configId "
                     + " and (F" + cdt.getFieldNo()
-                    + " is not null and forcw is null)"
+                    + " is not null and length(F"+cdt.getFieldNo()+") != 0  and forcw is null)"
                     + "and transactionInId in (select id from transactionIn "
                     + "where batchId = :batchId"
                     + " and configId = :configId);";
@@ -1726,11 +1726,11 @@ public class transactionInDAOImpl implements transactionInDAO {
                     + "transactionTargetId, configurationFormFieldsId, errorid, cwId)"
                     + " select " + batchId + ", "+ configId+",  transactionTargetId, " + cdt.getFieldId()
                     + ", 3,  " + cdt.getCrosswalkId() + " from transactionTranslatedOut where "
-                    + "configId = :configId "
+                    + " configId = :configId "
                     + " and (F" + cdt.getFieldNo()
-                    + " is not null and forcw is null)"
+                    + " is not null and length(F"+cdt.getFieldNo()+") != 0 and forcw is null)"
                     + " and transactionTargetId in (select id from transactionTarget "
-                    + "where batchDLId = :batchId"
+                    + " where batchDLId = :batchId"
                     + " and configId = :configId);";
         }
 
