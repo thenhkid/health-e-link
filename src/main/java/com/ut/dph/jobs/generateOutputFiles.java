@@ -6,6 +6,8 @@
 
 package com.ut.dph.jobs;
 import com.ut.dph.service.transactionOutManager;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -23,9 +25,19 @@ public class generateOutputFiles implements Job {
     
     @Override
     public void execute(JobExecutionContext context)  throws JobExecutionException {
-        SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
         
-        transactionOutManager.generateOutputFiles();
+        try {
+            SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
+        
+            transactionOutManager.generateOutputFiles();
+        } catch (Exception ex) {
+            try {
+                throw new Exception("Error occurred trying to generate output files from schedule task",ex);
+            } catch (Exception ex1) {
+                Logger.getLogger(processOutputRecords.class.getName()).log(Level.SEVERE, null, ex1);
+            }
+        }
+        
         
     }
     

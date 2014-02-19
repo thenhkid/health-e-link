@@ -69,7 +69,7 @@ public interface transactionOutDAO {
     
     int findMergeableBatch(int orgId);
     
-    void submitSummaryEntry(batchDownloadSummary summary);
+    void submitSummaryEntry(batchDownloadSummary summary) throws Exception;
     
     void updateTransactionTargetBatchDLId(Integer batchId, Integer transactionTargetId);
     

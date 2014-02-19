@@ -65,7 +65,7 @@ public interface transactionOutManager {
     
     void processOutputRecords(int transactionTargetId) throws Exception;
     
-    void generateOutputFiles();
+    void generateOutputFiles() throws Exception;
     
     List<batchDownloads> getdownloadableBatches(int userId, int orgId, Date fromDate, Date toDate, String searchTerm, int page, int maxResults) throws Exception;
     

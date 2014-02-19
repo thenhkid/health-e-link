@@ -88,7 +88,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
      */
     @Override
     @Transactional
-    public void submitSummaryEntry(batchDownloadSummary summary) {
+    public void submitSummaryEntry(batchDownloadSummary summary) throws Exception {
             
         /* Need to make sure no duplicates */
         Query query = sessionFactory.getCurrentSession().createQuery(""
