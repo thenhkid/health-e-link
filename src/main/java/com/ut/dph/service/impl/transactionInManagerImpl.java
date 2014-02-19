@@ -588,11 +588,17 @@ public class transactionInManagerImpl implements transactionInManager {
 					// break out of loop as errorCount is system error
 					return false;
 				}
-
 			} //end of configs
 
 			//we finish all configs and need to check how to proceed with this file.
-			//configurationtransportdetails
+			List <configurationTransport> handlingDetails = getHandlingDetailsByBatch(batchUploadId);
+			
+			if (handlingDetails.size() > 1) {
+				// we manual release since set up is not correct
+			} else if (handlingDetails.size() == 1) {
+				// we check to see what autoRelease is and set batch and transaction status accordingly.
+				
+			}
 			boolean autoRelease = true;
 			if (autoRelease) {
 				/**
@@ -1245,6 +1251,15 @@ public class transactionInManagerImpl implements transactionInManager {
 			configurationDataTranslations cdt, boolean foroutboundProcessing, Macros macro) {
 		 return transactionInDAO.executeMacro(configId, batchId, cdt, foroutboundProcessing, macro);
 		
+	}
+
+	@Override
+	public List<configurationTransport> getHandlingDetailsByBatch(int batchId) {
+		try { 
+			return transactionInDAO.getHandlingDetailsByBatch(batchId);
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 }

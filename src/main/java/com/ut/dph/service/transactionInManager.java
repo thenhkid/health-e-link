@@ -12,6 +12,7 @@ import com.ut.dph.model.batchUploadSummary;
 import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.configurationDataTranslations;
 import com.ut.dph.model.configurationFormFields;
+import com.ut.dph.model.configurationTransport;
 import com.ut.dph.model.fieldSelectOptions;
 import com.ut.dph.model.transactionAttachment;
 import com.ut.dph.model.transactionIn;
@@ -191,4 +192,7 @@ public interface transactionInManager {
     void flagMacroErrors (Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing);
     
     void resetTransactionTranslatedIn (Integer batchId);
+    
+    List<configurationTransport> getHandlingDetailsByBatch(int batchId);
+
 }

@@ -17,6 +17,7 @@ import com.ut.dph.model.configurationConnection;
 import com.ut.dph.model.configurationConnectionSenders;
 import com.ut.dph.model.configurationDataTranslations;
 import com.ut.dph.model.configurationFormFields;
+import com.ut.dph.model.configurationTransport;
 import com.ut.dph.model.fieldSelectOptions;
 import com.ut.dph.model.transactionAttachment;
 import com.ut.dph.model.transactionIn;
@@ -2127,5 +2128,22 @@ public class transactionInDAOImpl implements transactionInDAO {
 	        } catch (Exception ex) {
 	            System.err.println("insertProcessingError failed." + ex);
 	        }
+	    }
+
+		@Override
+		@Transactional
+		 @SuppressWarnings("unchecked")
+		public List<configurationTransport> getHandlingDetailsByBatch(
+				int batchId) throws Exception {
+			String sql = ("select distinct clearRecords, autoRelease, errorHandling "
+					+ " from configurationtransportdetails where configId in "
+					+ "(select distinct configId from transactionIn where batchId = :batchId);");
+	        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
+	                .setResultTransformer(
+	                        Transformers.aliasToBean(configurationTransport.class))
+	                .setParameter("batchUploadId", batchId);
+	        List<configurationTransport> ct = query.list();
+
+	        return ct;
 	    }
 }
