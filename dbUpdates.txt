@@ -156,3 +156,7 @@ ALTER TABLE `universalTranslator`.`transactionInErrors`
 CHANGE COLUMN `dateCreated` `dateCreated` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ;
 
 
+/** Grace 02.19.14 **/
+ALTER TABLE `universalTranslator`.`rel_crosswalkData` 
+CHANGE COLUMN `targetValue` `targetValue` VARCHAR(45) NOT NULL ;
+
