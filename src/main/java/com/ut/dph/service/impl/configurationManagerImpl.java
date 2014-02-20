@@ -180,6 +180,12 @@ public class configurationManagerImpl implements configurationManager {
     
     @Override
     @Transactional
+    public List<configurationConnection> findConnections(String searchTerm) {
+        return configurationDAO.findConnections(searchTerm);
+    }
+    
+    @Override
+    @Transactional
     public List<configurationConnection> getConnectionsByConfiguration(int configId) {
         return configurationDAO.getConnectionsByConfiguration(configId);
     }

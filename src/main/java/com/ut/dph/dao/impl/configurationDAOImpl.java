@@ -489,6 +489,79 @@ public class configurationDAOImpl implements configurationDAO {
         List<configurationConnection> connections = query.list();
         return connections;
     }
+    
+    /**
+     * The 'findConnections' function will return the list of configuration connections based on the search
+     * term entered.
+     * 
+     * @param searchTerm  The term to search connections on
+     *
+     * @Table	configurationConnections
+     *
+     * @Return	This function will return a list of configurationConnection objects
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    @Transactional
+    public List<configurationConnection> findConnections(String searchTerm) {
+        
+        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configurationConnection.class);
+
+        if (!"".equals(searchTerm)) {
+            //get a list of organization id's that match the term passed in
+            List<Integer> orgIdList = new ArrayList<Integer>();
+            Criteria findOrgs = sessionFactory.getCurrentSession().createCriteria(Organization.class);
+            findOrgs.add(Restrictions.like("orgName", "%" + searchTerm + "%"));
+            List<Organization> orgs = findOrgs.list();
+
+            for (Organization org : orgs) {
+                orgIdList.add(org.getId());
+            }
+
+            //get a list of message type id's that match the term passed in
+            List<Integer> msgTypeIdList = new ArrayList<Integer>();
+            Criteria findMsgTypes = sessionFactory.getCurrentSession().createCriteria(messageType.class);
+            findMsgTypes.add(Restrictions.like("name", "%" + searchTerm + "%"));
+            List<messageType> msgTypes = findMsgTypes.list();
+
+            for (messageType msgType : msgTypes) {
+                msgTypeIdList.add(msgType.getId());
+            }
+
+            if (orgIdList.isEmpty()) {
+                orgIdList.add(0);
+            }
+            if (msgTypeIdList.isEmpty()) {
+                msgTypeIdList.add(0);
+            }
+            
+            List<Integer> configIdList = new ArrayList<Integer>();
+            Criteria configCriteria = sessionFactory.getCurrentSession().createCriteria(configuration.class);
+            configCriteria.add(Restrictions.or(
+                    Restrictions.in("orgId", orgIdList),
+                    Restrictions.in("messageTypeId", msgTypeIdList),
+                    Restrictions.like("configName", "%" + searchTerm + "%")
+            ));
+            
+            List<configuration> configurations = configCriteria.list();
+
+            for (configuration config : configurations) {
+                configIdList.add(config.getId());
+            }
+            
+            if (configIdList.isEmpty()) {
+                configIdList.add(0);
+            }
+            
+            criteria.add(Restrictions.or(
+                    Restrictions.in("sourceConfigId", configIdList),
+                    Restrictions.in("targetConfigId", configIdList)
+            ));
+        }
+        
+        criteria.addOrder(Order.desc("dateCreated"));
+        return criteria.list();
+    }
 
     /**
      * The 'getConnectionsByConfiguration' will return a list of target connections for a passed in configuration;

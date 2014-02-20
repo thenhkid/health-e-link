@@ -59,6 +59,8 @@ public interface configurationManager {
   
   List<configurationConnection> getAllConnections(int page, int maxResults);
   
+  List<configurationConnection> findConnections(String searchTerm);
+  
   List<configurationConnection> getConnectionsByConfiguration(int configId);
   
   List<configurationConnection> getConnectionsByTargetConfiguration(int configId);
