@@ -160,3 +160,60 @@ CHANGE COLUMN `dateCreated` `dateCreated` DATETIME NOT NULL DEFAULT CURRENT_TIME
 ALTER TABLE `universalTranslator`.`rel_crosswalkData` 
 CHANGE COLUMN `targetValue` `targetValue` VARCHAR(45) NOT NULL ;
 
+
+/** Chad 2.20.14 @ 11:26 AM **/
+CREATE TABLE `universalTranslator`.`configurationHL7Details` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `configId` INT NOT NULL,
+  `fieldSeparator` VARCHAR(1) NOT NULL DEFAULT '|',
+  `componentSeparator` VARCHAR(1) NOT NULL DEFAULT '^',
+  `EscapeChar` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `hl7ConfigIdfk_idx` (`configId` ASC),
+  CONSTRAINT `hl7ConfigIdfk`
+    FOREIGN KEY (`configId`)
+    REFERENCES `universalTranslator`.`configurations` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+CREATE TABLE `universalTranslator`.`configurationHL7Segments` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `hl7Id` INT NOT NULL,
+  `segmentName` VARCHAR(3) NOT NULL,
+  `displayPos` INT NOT NULL DEFAULT 1,
+  PRIMARY KEY (`id`));
+
+ALTER TABLE `universalTranslator`.`configurationHL7Segments` 
+ADD INDEX `segHL7Idfk_idx` (`hl7Id` ASC);
+ALTER TABLE `universalTranslator`.`configurationHL7Segments` 
+ADD CONSTRAINT `segHL7Idfk`
+  FOREIGN KEY (`hl7Id`)
+  REFERENCES `universalTranslator`.`configurationHL7Details` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+CREATE TABLE `universalTranslator`.`configurationHL7Elements` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `hl7Id` INT NOT NULL,
+  `segmentId` INT NOT NULL,
+  `elementName` VARCHAR(255) NOT NULL,
+  `defaultValue` VARCHAR(45) NULL DEFAULT 'null',
+  `fieldDescriptor` VARCHAR(255) NULL,
+  `fieldValue` VARCHAR(4) NULL DEFAULT 'null',
+  `displayPos` INT NOT NULL DEFAULT 1,
+  PRIMARY KEY (`id`));
+
+ALTER TABLE `universalTranslator`.`configurationHL7Elements` 
+ADD INDEX `elemHLyIdfk_idx` (`hl7Id` ASC),
+ADD INDEX `elemSegIdfk_idx` (`segmentId` ASC);
+ALTER TABLE `universalTranslator`.`configurationHL7Elements` 
+ADD CONSTRAINT `elemHLyIdfk`
+  FOREIGN KEY (`hl7Id`)
+  REFERENCES `universalTranslator`.`configurationHL7Details` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION,
+ADD CONSTRAINT `elemSegIdfk`
+  FOREIGN KEY (`segmentId`)
+  REFERENCES `universalTranslator`.`configurationHL7Segments` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
