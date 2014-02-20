@@ -39,6 +39,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -584,39 +586,35 @@ public class transactionInManagerImpl implements transactionInManager {
 				return false;
 			}
 			
-			
+			Integer batchStausId = 29;
 			if (handlingDetails.size() == 1) {
-				
-				//TODO - what is status of loaded at this point
-				//if batch status is 6, batch has been released
-				
-				// we check to see what autoRelease is and set batch and transaction status accordingly.
 				/**
 				 	1 = Post errors to ERG
 					2 = Reject record on error
 					3 = Reject submission on error
 					4 = Pass through errors
-				 */
+				 **/
 				// TODO make sure error count is still 0 for batch.getstatusId() != 6 incase configs are changed.  We will check errorHandling setting is 6 and errors.
-				if ((handlingDetails.get(0).getautoRelease() && handlingDetails.get(0).geterrorHandling() == 1) && (batch.getstatusId() != 6)) {
+				if ((handlingDetails.get(0).getautoRelease() && handlingDetails.get(0).geterrorHandling() == 1) 
+						&& (batch.getstatusId() != 6)) {
 					//TODO send email here
 					clearMessageTables(batchUploadId);
 					insertProcessingError(5,  null, null, batchUploadId, null, null, null,
 							false, false, "A batch cannot be set to auto-release and post errors to ERG.  Please modify configuration settings.");
-					updateBatchStatus(batchUploadId, 29, "endDateTime");
+					updateBatchStatus(batchUploadId, batchStausId, "endDateTime");
 					return false;
 				} else if (batch.getstatusId() == 6 || (handlingDetails.get(0).getautoRelease() &&
 						(handlingDetails.get(0).geterrorHandling() == 2 || handlingDetails.get(0).geterrorHandling() == 4))) {
-					
-					//we update all saved records to release
+					//we update all saved to release
 					updateTransactionStatus(batchUploadId, 0, 15, 12);
 					
 					//we insert here
 					if (!insertTransactions(batchUploadId)) {
 						//something went wrong, we removed all inserted entries *
 						clearMessageTables(batchUploadId);
-						//we leave transaction status alone and flag batch as error during processing -SPE*
-						updateBatchStatus(batchUploadId, 29, "endDateTime");
+						insertProcessingError(5,  null, null, batchUploadId, null, null, null,
+								false, false, "An error occurred while inserting into message tables.");
+						updateBatchStatus(batchUploadId, batchStausId, "endDateTime");
 						return false;
 					}
 					if (handlingDetails.get(0).geterrorHandling() == 2) {
@@ -630,17 +628,27 @@ public class transactionInManagerImpl implements transactionInManager {
 					}
 						updateTransactionStatus(batchUploadId, 0, 12, 19);
 						updateTransactionTargetStatus(batchUploadId, 0, 12, 19);
-						updateBatchStatus(batchUploadId, 24, "endDateTime");
+						batchStausId = 24;
+						
 				}  else if (handlingDetails.get(0).getautoRelease() && handlingDetails.get(0).geterrorHandling() == 3) {
 					//auto-release, 3 = Reject submission on error 
-					updateBatchStatus(batchUploadId, 7, "endDateTime");
+					batchStausId = 7;
 					//TODO do we update transaction status?
 					
 				}  else if (!handlingDetails.get(0).getautoRelease()) { //manual release
-					//TODO do something
+					//TODO do something about the batches that are manual release
 				} //end of checking auto/error handling
 				
+				List<Integer> statusIds = new ArrayList <Integer> ();
+				updateRecordCounts (batchUploadId, statusIds, false, "totalRecordCount");
+				// do we count pass records as errors?
+				statusIds = Arrays.asList(11,13,14);
+				updateRecordCounts (batchUploadId, statusIds, false, "errorRecordCount");
+				updateBatchStatus(batchUploadId, batchStausId, "endDateTime");
+				 
 			} //end of making sure there is one handling details for batch
+			
+			
 			
 		} // end of single batch insert 
 		
@@ -1280,6 +1288,12 @@ public class transactionInManagerImpl implements transactionInManager {
 			boolean foroutboundProcessing, String errorCause) {
 		transactionInDAO.insertProcessingError(errorId, configId, batchId, fieldId, macroId, cwId, validationTypeId, required, foroutboundProcessing, errorCause);
 		
+	}
+
+	@Override
+	public void updateRecordCounts(Integer batchId, List<Integer> statusIds,
+			boolean foroutboundProcessing, String colNameToUpdate) {
+		transactionInDAO.updateRecordCounts(batchId, statusIds,foroutboundProcessing, colNameToUpdate);
 	}
 
 }

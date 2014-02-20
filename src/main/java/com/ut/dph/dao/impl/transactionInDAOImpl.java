@@ -2151,4 +2151,35 @@ public class transactionInDAOImpl implements transactionInDAO {
 	        }
 	       
 	    }
+
+		@Override
+		@Transactional
+		public void updateRecordCounts (Integer batchId, List <Integer> statusIds, boolean foroutboundProcessing, String colNameToUpdate) {
+			String sql = "";
+	        if (!foroutboundProcessing) {
+	        	sql = " update batchUploads set "+ colNameToUpdate  +" = "
+	        			+ "(select count(*) as total from transactionIn where batchId = :batchId ";
+	        } else {
+	        	sql = "update batchUploads set "+colNameToUpdate+" = (select count(*) as total "
+	        			+ " from transactionTarget where"
+						+ " batchDLId = :batchId ";
+	        }
+	        if (statusIds.size() > 0) {
+	        	sql = sql +  "and statusId in (:statusIds)";
+	        }
+	        sql = sql + ") where id = :batchId";
+	        
+	        try {
+	        	Query query = sessionFactory
+	                .getCurrentSession()
+	                .createSQLQuery(sql)
+	                .setParameter("batchId", batchId);
+	        	if (statusIds.size() > 0) {
+	                query.setParameterList("statusIds", statusIds);
+	        	}
+	        	query.executeUpdate();
+	        } catch (Exception e) {
+	        	System.out.println(e.getClass() + " " + e.getCause());
+	        }
+		}
 }
