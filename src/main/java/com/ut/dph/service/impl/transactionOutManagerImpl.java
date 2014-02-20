@@ -574,13 +574,26 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                 runProcess = true;
                             }
                             
-                            
                         }
 
                     }
 
                     /* MONTHLY SCHEDULE */
                     else if(schedule.gettype() == 4) {
+                        
+                        long diffInDays = 0;
+                        
+                        if(logs.size() > 0) {
+                            targetOutputRunLogs log = logs.get(0);
+                            long diff = currDate.getTime() - log.getlastRunTime().getTime();
+                            
+                            diffInDays = diff / ((long) 365.24 * 24 * 60 * 60 * 1000 / 12);
+                            
+                            if(diffInDays == 0 || diffInDays >= 30) {
+                                runProcess = true;
+                            }
+                            
+                        }
 
                     }
                     
