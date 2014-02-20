@@ -471,6 +471,10 @@ public class adminConfigController {
                 }
                 transportDetails.setmessageTypes(assocMessageTypes);
             }
+            else {
+                assocMessageTypes.add(configurationDetails.getId());
+                transportDetails.setmessageTypes(assocMessageTypes);
+            }
             
         }
         
@@ -600,9 +604,9 @@ public class adminConfigController {
          * Need to set up the FTP information if
          * any has been entered
          */
-        if(!transportDetails.getFTPFields().isEmpty()) {
+        if(transportDetails.gettransportMethodId() == 3 && !transportDetails.getFTPFields().isEmpty()) {
             for(configurationFTPFields ftpFields : transportDetails.getFTPFields()) {
-                ftpFields.settransportId(currTransportId);
+                ftpFields.settransportId(transportId);
                 configurationTransportManager.saveTransportFTP(ftpFields);
             }
         }
@@ -617,6 +621,7 @@ public class adminConfigController {
         
         /** Step 1: */ 
         configurationTransportManager.deleteTransportMessageTypes(transportId);
+        
         
         /** Step 2: */
         if(transportDetails.getmessageTypes() != null) {
