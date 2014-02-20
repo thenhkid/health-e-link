@@ -578,7 +578,11 @@ public class transactionInManagerImpl implements transactionInManager {
 				}
 			} //end of configs
 			
-			
+			// TODO should move this method to processHandling so codes are not so cumbersome
+			/**
+			 * batches gets process again when user hits release button, maybe have separate method call
+			 * for those that are just going from pending release to release, have to think about scenario when upload file is huge
+			 * **/
 			List <configurationTransport> handlingDetails = getHandlingDetailsByBatch(batchUploadId);
 			// multiple config should be set to handle the batch the same way - we email admin if we don't have one way of handling a batch
 			if (handlingDetails.size() != 1) {
@@ -639,10 +643,32 @@ public class transactionInManagerImpl implements transactionInManager {
 				}  else if (handlingDetails.get(0).getautoRelease() && handlingDetails.get(0).geterrorHandling() == 3) {
 					//auto-release, 3 = Reject submission on error 
 					batchStausId = 7;
-					//TODO do we update transaction status? Do we leave error as error and flag the rest rejected?
+					//updating entire batch to reject since error transactionIds are in error tables
+					updateTransactionTargetStatus(batchUploadId, 0, 0, 13);
+					updateTransactionStatus(batchUploadId, 0, 0, 13);
 					
-				}  else if (!handlingDetails.get(0).getautoRelease()) { //manual release
-					//TODO do something about the batches that are manual release
+				}  else if (!handlingDetails.get(0).getautoRelease() && handlingDetails.get(0).geterrorHandling() == 1) { //manual release
+					//transaction will be set to saved, batch will be set to RP
+					batchStausId = 5;
+					//TODO what should target status be?
+					updateTransactionStatus(batchUploadId, 0, 9, 10);
+				} else if (!handlingDetails.get(0).getautoRelease() && handlingDetails.get(0).geterrorHandling() == 2) {
+					//reject records
+					batchStausId = 5;
+					//loaded to PR, erg should be at saved already
+					updateTransactionStatus(batchUploadId, 0, 9, 10);
+					//error to reject
+					updateTransactionStatus(batchUploadId, 0, 14, 13);
+				} else if (!handlingDetails.get(0).getautoRelease() && handlingDetails.get(0).geterrorHandling() == 3) {
+					batchStausId = 7;
+					//everything gets rejected
+					updateTransactionStatus(batchUploadId, 0, 0, 13);
+				} else if (!handlingDetails.get(0).getautoRelease() && handlingDetails.get(0).geterrorHandling() == 4) {
+						batchStausId = 5;
+						// pass
+						updateTransactionStatus(batchUploadId, 0, 14, 16);
+						//pending release
+						updateTransactionStatus(batchUploadId, 0, 9, 10);
 				} //end of checking auto/error handling
 				
 				updateRecordCounts (batchUploadId, new ArrayList <Integer> (), false, "totalRecordCount");
