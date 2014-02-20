@@ -156,5 +156,7 @@ public interface transactionInDAO {
     List<configurationTransport> getHandlingDetailsByBatch(int batchId) throws Exception; 
     
     void updateRecordCounts (Integer batchId, List <Integer> statusIds, boolean foroutboundProcessing, String colNameToUpdate);
+    
+    Integer getRecordCounts (Integer batchId, List <Integer> statusIds, boolean foroutboundProcessing);
 
 }

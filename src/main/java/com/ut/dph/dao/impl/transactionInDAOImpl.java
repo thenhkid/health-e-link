@@ -2182,4 +2182,38 @@ public class transactionInDAOImpl implements transactionInDAO {
 	        	System.out.println(e.getClass() + " " + e.getCause());
 	        }
 		}
+
+		@Override
+		@Transactional
+		public Integer getRecordCounts(Integer batchId, List<Integer> statusIds, boolean foroutboundProcessing) {
+			String tableName = "transactionIn";
+			String batchType = "batchId";
+	        if (foroutboundProcessing) {
+	        	tableName = "transactionTarget";
+	        	batchType = "batchDLId";
+	        }
+	        	String sql = "select count(*) as total from " + tableName+ " where " + batchType +" = :batchId ";
+	        if (statusIds.size() > 0) {
+	        	sql = sql +  " and statusId in (:statusIds)";
+	        }
+	        
+	        
+	        
+	        try {
+	        	Query query = sessionFactory
+	                .getCurrentSession()
+	                .createSQLQuery(sql).addScalar("total", StandardBasicTypes.INTEGER);
+	            
+	        	query.setParameter("batchId", batchId);
+	        	
+	            if (statusIds.size() > 0) {
+	                query.setParameterList("statusIds", statusIds);
+	        	}
+	        	
+	        	return (Integer) query.list().get(0);
+	        } catch (Exception e) {
+	        	System.out.println(e.getClass() + " " + e.getCause());
+	        	return null;
+	        }
+		}
 }

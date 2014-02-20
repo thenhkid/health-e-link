@@ -491,6 +491,8 @@ public class transactionInManagerImpl implements transactionInManager {
     public boolean processBatch(int batchUploadId) throws Exception {
 
 		boolean successfulBatch = false;
+		Integer batchStausId = 29;
+		List <Integer> errorStatusIds = Arrays.asList(11,13,14);
 		/**
 		 * get batch details *
 		 */
@@ -560,6 +562,7 @@ public class transactionInManagerImpl implements transactionInManager {
 					}
 				}
 
+				
 				/**
 				 * if there are errors, those are system errors, they will be
 				 * logged we get errorId 5 and email to admin, update batch to
@@ -567,7 +570,7 @@ public class transactionInManagerImpl implements transactionInManager {
 				 ***/
 				if (systemErrorCount > 0) {
 					//error batch
-					updateBatchStatus (batchUploadId, 29, "endDateTime");
+					updateBatchStatus (batchUploadId, batchStausId, "endDateTime");
 					// email admin
 
 					// break out of loop as errorCount is system error
@@ -582,11 +585,10 @@ public class transactionInManagerImpl implements transactionInManager {
 				//TODO email admin to fix problem
 				clearMessageTables(batchUploadId);
 				insertProcessingError(5, null, batchUploadId, null, null, null, null, false, false, "Multiple or no file handling found, please check auto-release and error handling configurations");
-				updateBatchStatus(batchUploadId, 29, "endDateTime");
+				updateBatchStatus(batchUploadId, batchStausId, "endDateTime");
 				return false;
 			}
 			
-			Integer batchStausId = 29;
 			if (handlingDetails.size() == 1) {
 				/**
 				 	1 = Post errors to ERG
@@ -594,7 +596,11 @@ public class transactionInManagerImpl implements transactionInManager {
 					3 = Reject submission on error
 					4 = Pass through errors
 				 **/
-				// TODO make sure error count is still 0 for batch.getstatusId() != 6 incase configs are changed.  We will check errorHandling setting is 6 and errors.
+				if (getRecordCounts (batchUploadId, Arrays.asList(14), false) > 0 && batch.getstatusId() == 6) {
+					// config changed as record no longer passes as expected, set batch back to PR and go through auto/error handling
+					batch.setstatusId(5);
+					batchStausId = 5;
+				}
 				if ((handlingDetails.get(0).getautoRelease() && handlingDetails.get(0).geterrorHandling() == 1) 
 						&& (batch.getstatusId() != 6)) {
 					//TODO send email here
@@ -633,17 +639,15 @@ public class transactionInManagerImpl implements transactionInManager {
 				}  else if (handlingDetails.get(0).getautoRelease() && handlingDetails.get(0).geterrorHandling() == 3) {
 					//auto-release, 3 = Reject submission on error 
 					batchStausId = 7;
-					//TODO do we update transaction status?
+					//TODO do we update transaction status? Do we leave error as error and flag the rest rejected?
 					
 				}  else if (!handlingDetails.get(0).getautoRelease()) { //manual release
 					//TODO do something about the batches that are manual release
 				} //end of checking auto/error handling
 				
-				List<Integer> statusIds = new ArrayList <Integer> ();
-				updateRecordCounts (batchUploadId, statusIds, false, "totalRecordCount");
+				updateRecordCounts (batchUploadId, new ArrayList <Integer> (), false, "totalRecordCount");
 				// do we count pass records as errors?
-				statusIds = Arrays.asList(11,13,14);
-				updateRecordCounts (batchUploadId, statusIds, false, "errorRecordCount");
+				updateRecordCounts (batchUploadId, errorStatusIds, false, "errorRecordCount");
 				updateBatchStatus(batchUploadId, batchStausId, "endDateTime");
 				 
 			} //end of making sure there is one handling details for batch
@@ -1294,6 +1298,11 @@ public class transactionInManagerImpl implements transactionInManager {
 	public void updateRecordCounts(Integer batchId, List<Integer> statusIds,
 			boolean foroutboundProcessing, String colNameToUpdate) {
 		transactionInDAO.updateRecordCounts(batchId, statusIds,foroutboundProcessing, colNameToUpdate);
+	}
+	
+	@Override
+	public Integer getRecordCounts (Integer batchId, List <Integer> statusIds, boolean foroutboundProcessing) {
+		return transactionInDAO.getRecordCounts(batchId, statusIds,foroutboundProcessing);
 	}
 
 }
