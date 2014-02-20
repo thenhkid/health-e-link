@@ -24,7 +24,7 @@ public interface configurationDAO {
   
   List<configuration> getActiveConfigurationsByOrgId(int orgId);
   
-  List<configuration> findConfigurations(String searchTerm);
+  List<configuration> findConfigurations(String searchTerm, int configType);
   
   configuration getConfigurationByName(String configName, int orgId);
   

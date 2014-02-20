@@ -227,7 +227,9 @@ public class configurationDAOImpl implements configurationDAO {
      */
     @Override
     @SuppressWarnings("unchecked")
-    public List<configuration> findConfigurations(String searchTerm) {
+    public List<configuration> findConfigurations(String searchTerm, int configType) {
+        
+        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configuration.class);
 
         if (!"".equals(searchTerm)) {
             //get a list of organization id's that match the term passed in
@@ -250,8 +252,6 @@ public class configurationDAOImpl implements configurationDAO {
                 msgTypeIdList.add(msgType.getId());
             }
 
-            Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configuration.class);
-
             if (orgIdList.isEmpty()) {
                 orgIdList.add(0);
             }
@@ -261,17 +261,20 @@ public class configurationDAOImpl implements configurationDAO {
 
             criteria.add(Restrictions.or(
                     Restrictions.in("orgId", orgIdList),
-                    Restrictions.in("messageTypeId", msgTypeIdList)
+                    Restrictions.in("messageTypeId", msgTypeIdList),
+                    Restrictions.like("configName", "%" + searchTerm + "%")
             )
-            )
-                    .addOrder(Order.desc("dateCreated"));
-
-            return criteria.list();
-        } else {
-            Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configuration.class);
-            criteria.addOrder(Order.desc("dateCreated"));
-            return criteria.list();
+            );
+        } 
+        
+        if(configType > 0) {
+            
+            criteria.add(Restrictions.eq("type", configType));
+            
         }
+        
+        criteria.addOrder(Order.desc("dateCreated"));
+        return criteria.list();
 
     }
 

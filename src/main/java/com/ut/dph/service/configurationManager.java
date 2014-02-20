@@ -26,7 +26,7 @@ public interface configurationManager {
   
   configuration getConfigurationByName(String configName, int orgId);
   
-  List<configuration> findConfigurations(String searchTerm);
+  List<configuration> findConfigurations(String searchTerm, int configType);
   
   List<configuration> getConfigurations(int page, int maxResults);
   

@@ -95,8 +95,8 @@ public class configurationManagerImpl implements configurationManager {
 
     @Override
     @Transactional
-    public List<configuration> findConfigurations(String searchTerm) {
-        return configurationDAO.findConfigurations(searchTerm);
+    public List<configuration> findConfigurations(String searchTerm, int configType) {
+        return configurationDAO.findConfigurations(searchTerm, configType);
     }
 
     @Override

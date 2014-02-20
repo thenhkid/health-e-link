@@ -25,6 +25,30 @@
                                 <label class="sr-only" for="searchTerm">Search</label>
                                 <input type="text" name="searchTerm" id="searchTerm" value="${searchTerm}" class="form-control" id="search-configurations" placeholder="Search"/>
                             </div>
+                            
+                            <!--<div class="form-group">
+                                <label>
+                                    <input type="radio" />
+                                    Target
+                                </label>
+                            </div>
+
+                           <div class="form-group">
+                                <label>
+                                    <input type="radio" />
+                                    Source
+                                </label>
+                            </div>-->
+
+                            <div class="form-group">
+                                <label class="sr-only">Source</label>
+                                <select name="configType" class="form-control">
+                                    <option value="0">- Configuration Type -</option>
+                                    <option value="1" <c:if test="${searchConfigType == 1}">selected</c:if>>Source Configurations</option>
+                                    <option value="2" <c:if test="${searchConfigType == 2}">selected</c:if>>Target Configurations</option>
+                                </select>
+                            </div>
+
                             <button id="searchConfigBtn" class="btn btn-primary btn-sm" title="Search Configurations">
                                 <span class="glyphicon glyphicon-search"></span>
                             </button>

@@ -155,13 +155,14 @@ public class adminConfigController {
      * @throws Exception
      */
     @RequestMapping(value = "/list", method = RequestMethod.POST)
-    public ModelAndView findConfigurations(@RequestParam String searchTerm) throws Exception {
+    public ModelAndView findConfigurations(@RequestParam String searchTerm, @RequestParam int configType) throws Exception {
 
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/configurations/list");
 
-        List<configuration> configurations = configurationmanager.findConfigurations(searchTerm);
+        List<configuration> configurations = configurationmanager.findConfigurations(searchTerm, configType);
         mav.addObject("searchTerm", searchTerm);
+        mav.addObject("searchConfigType", configType);
         mav.addObject("configurationList", configurations);
 
         Organization org;
