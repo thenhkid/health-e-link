@@ -575,6 +575,8 @@ public class transactionInManagerImpl implements transactionInManager {
 
 					// break out of loop as errorCount is system error
 					return false;
+				} else  {
+					updateTransactionStatus(batchUploadId, 0, 10, 12);		
 				}
 			} //end of configs
 			
