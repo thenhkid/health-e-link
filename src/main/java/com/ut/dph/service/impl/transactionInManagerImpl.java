@@ -313,8 +313,8 @@ public class transactionInManagerImpl implements transactionInManager {
     }
 
     @Override
-    public List<Integer> getConfigIdsForBatch(int batchUploadId) {
-        return transactionInDAO.getConfigIdsForBatch(batchUploadId);
+    public List<Integer> getConfigIdsForBatch(int batchUploadId, boolean getAll) {
+        return transactionInDAO.getConfigIdsForBatch(batchUploadId, getAll);
     }
 
     @Override
@@ -530,8 +530,11 @@ public class transactionInManagerImpl implements transactionInManager {
 			// set batch to SBP - 4*
 			updateBatchStatus(batchUploadId, 4, "startDateTime");
 			
-			//we get all the configurations *
-			List<Integer> configIds = getConfigIdsForBatch(batchUploadId);
+			/** we should only process the ones that are not REL status, 
+			 * to be safe, we copy over data from transactionInRecords**/
+			resetTransactionTranslatedIn(batchUploadId, false);
+			
+			List<Integer> configIds = getConfigIdsForBatch(batchUploadId, false);
 			for (Integer configId : configIds) {
 				//we need to run all checks before insert regardless *
 				
@@ -576,7 +579,8 @@ public class transactionInManagerImpl implements transactionInManager {
 					// break out of loop as errorCount is system error
 					return false;
 				} else  {
-					updateTransactionStatus(batchUploadId, 0, 10, 12);		
+					updateTransactionStatus(batchUploadId, 0, 10, 12);	
+					updateTransactionTargetStatus(batchUploadId, 0, 10, 12);
 				}
 			} //end of configs
 			
@@ -617,8 +621,6 @@ public class transactionInManagerImpl implements transactionInManager {
 					return false;
 				} else if (batch.getstatusId() == 6 || (handlingDetails.get(0).getautoRelease() &&
 						(handlingDetails.get(0).geterrorHandling() == 2 || handlingDetails.get(0).geterrorHandling() == 4))) {
-					//we update all saved to release
-					updateTransactionStatus(batchUploadId, 0, 15, 12);
 					
 					//we insert here
 					if (!insertTransactions(batchUploadId)) {
@@ -744,7 +746,7 @@ public class transactionInManagerImpl implements transactionInManager {
                 if (getBatchDetails(batchUploadId).gettransportMethodId() == 2) {
                     cleared = clearTransactionInErrors(batchUploadId);
                     toBatchStatusId = 5;
-                    resetTransactionTranslatedIn(batchUploadId);
+                    resetTransactionTranslatedIn(batchUploadId, true);
                     transactionInDAO.updateTransactionStatus(batchUploadId, 0, 0, 15);
                 } else {
                     //we clear transactionInRecords here as for batch upload we start over
@@ -772,7 +774,7 @@ public class transactionInManagerImpl implements transactionInManager {
      */
     @Override
     public boolean insertTransactions(Integer batchUploadId) {
-        List<Integer> configIds = getConfigIdsForBatch(batchUploadId);
+        List<Integer> configIds = getConfigIdsForBatch(batchUploadId, true);
         boolean processTransactions = true;
 
         for (Integer configId : configIds) {
@@ -1292,10 +1294,6 @@ public class transactionInManagerImpl implements transactionInManager {
         transactionInDAO.flagMacroErrors(configId, batchId, cdt, foroutboundProcessing);
     }
 
-    @Override
-    public void resetTransactionTranslatedIn(Integer batchId) {
-        transactionInDAO.resetTransactionTranslatedIn(batchId);
-    }
 
     @Override
     public Integer executeMacro(Integer configId, Integer batchId,
@@ -1331,6 +1329,11 @@ public class transactionInManagerImpl implements transactionInManager {
 	@Override
 	public Integer getRecordCounts (Integer batchId, List <Integer> statusIds, boolean foroutboundProcessing) {
 		return transactionInDAO.getRecordCounts(batchId, statusIds,foroutboundProcessing);
+	}
+
+	@Override
+	public void resetTransactionTranslatedIn(Integer batchId, boolean resetAll) {
+		transactionInDAO.resetTransactionTranslatedIn(batchId, resetAll);	
 	}
 
 }

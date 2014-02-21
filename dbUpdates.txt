@@ -247,3 +247,119 @@ DROP COLUMN `defaultValue`;
 
 ALTER TABLE `universalTranslator`.`configurationHL7Elements` 
 ADD COLUMN `defaultValue` VARCHAR(45) NULL AFTER `displayPos`;
+
+  
+  /** grace 022114 **/
+  drop procedure insertValidationErrors;
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `insertValidationErrors`(in vtType int, in fieldNo int,
+in batchUploadId int, in configId int, in cffId int)
+BEGIN
+
+DECLARE regEx varchar(100) DEFAULT '';
+
+CASE vtType
+	WHEN 2 THEN set regEx = '^[a-z0-9\._%+!$&*=^|~#%\'`?{}/\-]+@[a-z0-9\.-]+\.[a-z]{2,6}$ or ^[A-Z0-9._%-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$';
+    WHEN 3 THEN 
+		BEGIN 
+			CALL `universalTranslator`.`stripPhoneChars`(vtType, fieldNo, batchUploadId, configId, cffId);
+			set regEx ='^[0-9]{7,11}$';
+		END;
+	WHEN 5 THEN set regEx = '^-?[0-9]+[.]?[0-9]*$|^-?[.][0-9]+$';
+    ELSE
+        BEGIN
+        END;
+	END 
+	CASE;
+ 
+set @stmt = concat(
+'insert into transactionInerrors (batchUploadId, transactionInId, configurationFormFieldsId, errorid, 
+validationTypeId) SELECT ', batchUploadId, ', transactionInId, ',cffId,',2, ', vtType,'  
+ FROM transactionTranslatedIn WHERE F' ,fieldNo, ' not REGEXP  "', regEx, '" and F',fieldNo, ' is not null 
+and length(F', fieldNO, ') != 0
+and configId = ', configId, ' and transactionInId 
+in (select id from transactionIn where batchId = ', batchUploadId,' and configId = ', configId,' and statusId != 12);');
+
+PREPARE stmt from @stmt;
+EXECUTE stmt;
+
+ END$$
+DELIMITER ;
+
+
+drop procedure MatchFieldAUpdateFieldB;
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `MatchFieldAUpdateFieldB`(in configId int, 
+in batchId int, in srcField varchar(10),
+in fieldA varchar(10), in fieldB varchar(10), in con1 varchar(10), 
+in con2 varchar(10), in macroId int, in foroutboundProcessing boolean, in passClear int)
+proc_main:begin
+
+-- this SP matches FieldA with Con1 and then updates fieldB with Con2
+-- this sets out table
+call setInboundOutBoundTables (foroutboundProcessing);
+select @translatedTable, @transactionTable, @batchTable, @batchIdType , @errorTable
+into @translatedTable, @transactionTable, @batchTable, @batchIdType , @errorTable;
+
+-- build our sql
+set @stmt = concat("update ",@translatedTable, " set ",fieldB," = '",con2,"' where ",fieldA," = '",con1,"'
+and ",@transactionTable,"Id in (select id from ",@transactionTable,
+" where configId = ",configId," and ", @batchIdType," = ",batchId," and statusId != 12);");
+
+PREPARE stmt from @stmt;
+EXECUTE stmt;-- execute
+
+-- we check pass /clear
+if (passClear = 2) THEN
+BEGIN
+set @stmt = concat("update ",@translatedTable, " set ",fieldB," = null where ",fieldB," != '",con2,"'
+and ",@transactionTable,"Id in (select id from ",@transactionTable,
+" where configId = ",configId," and ", @batchIdType," = ",batchId," and statusId != 12);");
+PREPARE stmt from @stmt;
+EXECUTE stmt;-- execute
+END;
+END IF;
+
+-- the only error for this is if SP bombs, no need to write in insert error logs
+select '';
+end proc_main$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `MatchFAUpdateSF`(in configId int, 
+in batchId int, in srcField varchar(10),
+in fieldA varchar(10), in fieldB varchar(10), in con1 varchar(10), 
+in con2 varchar(10), in macroId int, in foroutboundProcessing boolean, in passClear int)
+proc_main:begin
+
+-- this SP matches FieldA with Con1 and then updates fieldB with Con2
+-- this sets out table
+call setInboundOutBoundTables (foroutboundProcessing);
+select @translatedTable, @transactionTable, @batchTable, @batchIdType , @errorTable
+into @translatedTable, @transactionTable, @batchTable, @batchIdType , @errorTable;
+
+-- build our sql
+set @stmt = concat("update ",@translatedTable, " set ",srcField," = '",con2,"' where ",fieldA," = '",con1,"'
+and ",@transactionTable,"Id in (select id from ",@transactionTable,
+" where configId = ",configId," and ", @batchIdType," = ",batchId," and statusId != 12);");
+
+PREPARE stmt from @stmt;
+EXECUTE stmt;-- execute
+
+-- we check pass /clear
+if (passClear = 2) THEN
+BEGIN
+set @stmt = concat("update ",@translatedTable, " set ",srcField," = null where ",fieldB," != '",con2,"'
+and ",@transactionTable,"Id in (select id from ",@transactionTable,
+" where configId = ",configId," and ", @batchIdType," = ",batchId," and statusId != 12);");
+PREPARE stmt from @stmt;
+EXECUTE stmt;-- execute
+END;
+END IF;
+
+-- the only error for this is if SP bombs, no need to write in insert error logs
+select '';
+end proc_main$$
+DELIMITER ;

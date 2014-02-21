@@ -95,7 +95,7 @@ public interface transactionInManager {
     
     List <ConfigForInsert> setConfigForInsert(int configId, int batchUploadId);
     
-    List <Integer> getConfigIdsForBatch (int batchUploadId);
+    List <Integer> getConfigIdsForBatch (int batchUploadId, boolean getAll);
     
     List <Integer> getTransWithMultiValues (ConfigForInsert config);
 
@@ -191,8 +191,6 @@ public interface transactionInManager {
     
     void flagMacroErrors (Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing);
     
-    void resetTransactionTranslatedIn (Integer batchId);
-    
     List<configurationTransport> getHandlingDetailsByBatch(int batchId);
     
     void insertProcessingError(Integer errorId, Integer configId, Integer batchId, Integer fieldId, Integer macroId, Integer cwId, Integer validationTypeId, boolean required, boolean foroutboundProcessing, String errorCause);
@@ -200,5 +198,6 @@ public interface transactionInManager {
     void updateRecordCounts (Integer batchId, List <Integer> statusIds, boolean foroutboundProcessing, String colNameToUpdate);
     
     Integer getRecordCounts (Integer batchId, List <Integer> statusIds, boolean foroutboundProcessing);
-
+    
+    void resetTransactionTranslatedIn(Integer batchId, boolean resetAll);
 }

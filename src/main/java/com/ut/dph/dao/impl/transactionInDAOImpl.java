@@ -980,15 +980,21 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Override
     @Transactional
     @SuppressWarnings("unchecked")
-    public List<Integer> getConfigIdsForBatch(int batchUploadId) {
+    public List<Integer> getConfigIdsForBatch(int batchUploadId, boolean getAll) {
 
-        String sql = ("select distinct configId from transactionTranslatedIn "
-                + " where transactionInId in (select id from transactionIn "
-                + " where batchId = :id);");
+        String sql = "select distinct configId from transactionTranslatedIn "
+                + " where transactionInId in (select id from transactionIn where batchId = :id ";
+                
+                if (!getAll) {
+                	sql = sql + " and statusId != :transRELId";
+                }
+                sql = sql + ");";
 
         Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
         query.setParameter("id", batchUploadId);
-
+        if (!getAll) {
+        	query.setParameter("transRELId", transRELId);
+        }
         List<Integer> configIds = query.list();
 
         return configIds;
@@ -1391,6 +1397,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 
     /**
      * errorId = 1 is required field missing*
+     * we do not re-check REL records
      */
     @Override
     @Transactional
@@ -1401,10 +1408,11 @@ public class transactionInDAOImpl implements transactionInDAO {
                 + " and (F" + cff.getFieldNo()
                 + " is  null  or length(trim(F" + cff.getFieldNo() + ")) = 0)"
                 + "and transactionInId in (select id from transactionIn where batchId = :batchUploadId"
-                + " and configId = :configId));";
+                + " and configId = :configId and statusId != :transRELId));";
         Query insertData = sessionFactory.getCurrentSession().createSQLQuery(sql)
                 .setParameter("batchUploadId", batchUploadId)
-                .setParameter("configId", cff.getconfigId());
+                .setParameter("configId", cff.getconfigId())
+                .setParameter("transRELId", transRELId);
 
         try {
             insertData.executeUpdate();
@@ -1521,7 +1529,7 @@ public class transactionInDAOImpl implements transactionInDAO {
                 + " and F" + cff.getFieldNo() + " is not null "
                 + " and transactionInId in (select id from transactionIn where"
                 + " batchId = :batchUploadId"
-                + " and configId = :configId order by transactionInId); ");
+                + " and configId = :configId and statusId != :transRELId order by transactionInId); ");
 
         Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
                 .addScalar("transactionId", StandardBasicTypes.INTEGER)
@@ -1529,7 +1537,8 @@ public class transactionInDAOImpl implements transactionInDAO {
                 .addScalar("fieldNo", StandardBasicTypes.INTEGER)
                 .setResultTransformer(Transformers.aliasToBean(transactionRecords.class))
                 .setParameter("configId", cff.getconfigId())
-                .setParameter("batchUploadId", batchUploadId);
+                .setParameter("batchUploadId", batchUploadId)
+                .setParameter("transRELId", transRELId);
 
         List<transactionRecords> trs = query.list();
 
@@ -1647,19 +1656,20 @@ public class transactionInDAOImpl implements transactionInDAO {
             sql = "update transactionTranslatedIn set forcw = :targetValue where "
                     + "F" + fieldNo + " = :sourceValue and transactionInId in "
                     + "(select id from transactionIn where configId = :configId "
-                    + " and batchId = :batchId);";
+                    + " and batchId = :batchId and statusId != :transRELId);";
         } else {
             sql = "update transactionTranslatedOut set forcw = :targetValue where "
                     + "F" + fieldNo + " = :sourceValue and transactionTargetId in "
                     + "(select id from transactionTarget where configId = :configId "
-                    + " and batchDLId = :batchId);";
+                    + " and batchDLId = :batchId and statusId != :transRELId);";
         }
 
         Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
                 .setParameter("targetValue", cwd.getTargetValue())
                 .setParameter("sourceValue", cwd.getSourceValue())
                 .setParameter("batchId", batchId)
-                .setParameter("configId", configId);
+                .setParameter("configId", configId)
+                 .setParameter("transRELId", transRELId);
         try {
             updateData.executeUpdate();
         } catch (Exception ex) {
@@ -1786,12 +1796,23 @@ public class transactionInDAOImpl implements transactionInDAO {
         }
     }
 
+    /** this method will repalce transactionTranslatedIn data with
+     * 	data from transactionInRecords
+     * 
+     *  @param batchId - the batch to reset
+     *  @param resetAll - if true, we reset all records.  If false, we skip the REL records
+     *  
+     */
     @Override
     @Transactional
-    public void resetTransactionTranslatedIn(Integer batchId) {
+    public void resetTransactionTranslatedIn(Integer batchId, boolean resetAll) {
         String sql = "UPDATE transactionTranslatedIn INNER JOIN transactionInRecords ON "
                 + " (transactionTranslatedIn.transactionInId = transactionInRecords.transactionInId) and transactionTranslatedIn.transactionInId "
-                + " in (select id from transactionIn where batchId = :batchId) SET transactionTranslatedIn.F1 = transactionInRecords.F1,"
+                + " in (select id from transactionIn where batchId = :batchId ";
+                if (!resetAll) {
+                	sql = sql + " and statusId != :transRELId";
+                }
+                sql = sql + ") SET transactionTranslatedIn.F1 = transactionInRecords.F1,"
                 + " transactionTranslatedIn.F2 = transactionInRecords.F2, transactionTranslatedIn.F3 = transactionInRecords.F3,"
                 + " transactionTranslatedIn.F4 = transactionInRecords.F4, transactionTranslatedIn.F5 = transactionInRecords.F5,"
                 + "transactionTranslatedIn.F6 = transactionInRecords.F6,transactionTranslatedIn.F7 = transactionInRecords.F7,"
@@ -2041,6 +2062,9 @@ public class transactionInDAOImpl implements transactionInDAO {
 
         Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
                 .setParameter("batchId", batchId);
+        if (!resetAll) {
+        	updateData.setParameter("transRELId",transRELId);
+        }
 
         try {
             updateData.executeUpdate();
@@ -2216,5 +2240,4 @@ public class transactionInDAOImpl implements transactionInDAO {
 	        	return null;
 	        }
 		}
-
 }
