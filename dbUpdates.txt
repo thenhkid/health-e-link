@@ -217,3 +217,33 @@ ADD CONSTRAINT `elemSegIdfk`
   REFERENCES `universalTranslator`.`configurationHL7Segments` (`id`)
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
+
+
+/** Chad 2.21.14 @ 3:13 PM **/
+ALTER TABLE `universalTranslator`.`configurationHL7Elements` 
+DROP COLUMN `fieldValue`,
+DROP COLUMN `fieldDescriptor`,
+DROP COLUMN `defaultValue`;
+
+CREATE TABLE `universalTranslator`.`configurationHL7ElementValues` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `elementId` INT NOT NULL,
+  `defaultValue` VARCHAR(45) NULL DEFAULT NULL,
+  `fieldDescriptor` VARCHAR(255) NULL DEFAULT NULL,
+  `fieldValue` VARCHAR(4) NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `elemValIdfk_idx` (`elementId` ASC),
+  CONSTRAINT `elemValIdfk`
+    FOREIGN KEY (`elementId`)
+    REFERENCES `universalTranslator`.`configurationHL7Elements` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+ALTER TABLE `universalTranslator`.`configurationHL7ElementValues` 
+ADD COLUMN `displayPos` INT NULL DEFAULT 1 AFTER `fieldValue`;
+
+ALTER TABLE `universalTranslator`.`configurationHL7ElementValues` 
+DROP COLUMN `defaultValue`;
+
+ALTER TABLE `universalTranslator`.`configurationHL7Elements` 
+ADD COLUMN `defaultValue` VARCHAR(45) NULL AFTER `displayPos`;
