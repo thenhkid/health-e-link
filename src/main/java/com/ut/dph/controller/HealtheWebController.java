@@ -1106,7 +1106,7 @@ public class HealtheWebController {
                 set the status to "Released"
                 */
                 else {
-                    transactionIn.setstatusId(12);
+                    transactionIn.setstatusId(10);
                 }
 
                 transactionId = (Integer) transactionInManager.submitTransactionIn(transactionIn);
@@ -1154,7 +1154,7 @@ public class HealtheWebController {
                 set the status to "Released"
                 */
                 else {
-                    transactionIn.setstatusId(12);
+                    transactionIn.setstatusId(10);
                 }
 
                 transactionInManager.submitTransactionInChanges(transactionIn);
@@ -2087,12 +2087,6 @@ public class HealtheWebController {
             */
             if(!batchIdList.isEmpty()) {
                 for(Integer batchId : batchIdList) {
-
-                    /* Update the transactionIn status to 12 (REL) */
-                    transactionInManager.updateTransactionStatus(batchId,0,0,12);
-
-                    /* Update the transactionTarget status to 12 (REL) */
-                    transactionInManager.updateTransactionTargetStatus(batchId,0,0,12);
                     
                     /* Update batch to released */
                     transactionInManager.updateBatchStatus(batchId, 6, "");
