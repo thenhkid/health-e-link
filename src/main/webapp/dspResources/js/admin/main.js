@@ -15,7 +15,9 @@ require.config({
 	}
 });
 
-require(['jquery',  'bootstrap', 'responsive-tables', 'mediaModal', 'overlay'], function ($) {
+
+
+define(['jquery',  'bootstrap', 'responsive-tables', 'mediaModal', 'overlay'], function ($) {
 
 	// tooltip demo
 	$(document).tooltip({

@@ -4,47 +4,54 @@
  * and open the template in the editor.
  */
 
-$.ajaxSetup({
-    cache: false
-});
+require(['./main'], function ()
+{
+    require(['jquery'], function($) {
 
-//var searchTimeout;
+        $.ajaxSetup({
+            cache: false
+        });
 
-jQuery(document).ready(function($) {
+        //var searchTimeout;
 
-    //Fade out the updated/created message after being displayed.
-    if ($('.alert').length > 0) {
-        $('.alert').delay(2000).fadeOut(1000);
-    }
+        //Fade out the updated/created message after being displayed.
+        if ($('.alert').length > 0) {
+            $('.alert').delay(2000).fadeOut(1000);
+        }
 
-    $("input:text,form").attr("autocomplete", "off");
+        $("input:text,form").attr("autocomplete", "off");
 
-    $(document).on('click', '#orgRow', function() {
-        window.location.href = $(this).attr('rel') + '/';
-    });
+        $(document).on('click', '#orgRow', function() {
+            window.location.href = $(this).attr('rel') + '/';
+        });
 
-    $('#searchOrgBtn').click(function() {
+        $('#searchOrgBtn').click(function() {
+            $('#searchForm').submit();
+        });
+
+
+        /*$("#searchTerm").keyup(function(event) {
+         var term = $(this).val();
+         
+         if(term.length >= 3 || term.length == 0) {
+         if(searchTimeout) {clearTimeout(searchTimeout);}
+         searchTimeout = setInterval("orglookup()",500);
+         }
+         });*/
+
+
+        /*function orglookup() {
+        if(searchTimeout) {clearTimeout(searchTimeout);}
+
+        var term = $('#searchTerm').val().toLowerCase();
+
+        if(term.length >= 3 || term.length == 0) {
         $('#searchForm').submit();
+        }
+        }*/
     });
+})
 
-    /*$("#searchTerm").keyup(function(event) {
-     var term = $(this).val();
-     
-     if(term.length >= 3 || term.length == 0) {
-     if(searchTimeout) {clearTimeout(searchTimeout);}
-     searchTimeout = setInterval("orglookup()",500);
-     }
-     });*/
 
-});
 
-/*function orglookup() {
- if(searchTimeout) {clearTimeout(searchTimeout);}
- 
- var term = $('#searchTerm').val().toLowerCase();
- 
- if(term.length >= 3 || term.length == 0) {
- $('#searchForm').submit();
- }
- }*/
 
