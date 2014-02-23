@@ -36,7 +36,7 @@
             <section class="panel panel-default">
                 <div class="panel-heading">
                     <div class="pull-right">
-                        <a class="btn btn-primary btn-xs  btn-action" id="meetsStandard" data-toggle="tooltip" title="This describes what  does"><span class="glyphicon glyphicon-ok"></span> Meets Standard</a>
+                        <a class="btn btn-primary btn-xs  btn-action" id="meetsStandard" data-toggle="tooltip" data-original-title="Click here to match to the starndard fields.">Meets Standard</a>
                     </div>
                     <h3 class="panel-title">Uploaded File Fields</h3>
                 </div>

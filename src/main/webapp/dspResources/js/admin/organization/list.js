@@ -4,8 +4,7 @@
  * and open the template in the editor.
  */
 
-require(['./main'], function ()
-{
+require(['./main'], function () {
     require(['jquery'], function($) {
 
         $.ajaxSetup({
@@ -32,7 +31,7 @@ require(['./main'], function ()
 
         /*$("#searchTerm").keyup(function(event) {
          var term = $(this).val();
-         
+
          if(term.length >= 3 || term.length == 0) {
          if(searchTimeout) {clearTimeout(searchTimeout);}
          searchTimeout = setInterval("orglookup()",500);

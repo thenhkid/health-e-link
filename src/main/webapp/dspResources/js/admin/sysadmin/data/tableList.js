@@ -1,22 +1,25 @@
-$.ajaxSetup({
-    cache: false
-});
 
-//var searchTimeout;
+require(['./main'], function () {
+    require(['jquery'], function($) {
+        
+        $.ajaxSetup({
+            cache: false
+        });
+        
+        //Fade out the updated/created message after being displayed.
+        if ($('.alert').length > 0) {
+            $('.alert').delay(2000).fadeOut(1000);
+        }
 
-jQuery(document).ready(function($) {
+        $("input:text,form").attr("autocomplete", "off");
 
-    //Fade out the updated/created message after being displayed.
-    if ($('.alert').length > 0) {
-        $('.alert').delay(2000).fadeOut(1000);
-    }
-
-    $("input:text,form").attr("autocomplete", "off");
-
-    $('#searchOrgBtn').click(function() {
-        $('#searchForm').submit();
+        $('#searchOrgBtn').click(function() {
+            $('#searchForm').submit();
+        });
+        
     });
-
 });
+
+
 
 

@@ -1,94 +1,98 @@
-$(document).ready(function() {
-    $("input:text,form").attr("autocomplete", "off");
-});
 
-$(function() {
-    //Fade out the updated/created message after being displayed.
-    if ($('.alert').length > 0) {
-        $('.alert').delay(2000).fadeOut(1000);
-    }
 
-    //If any field changes need to show the message in red that nothign
-    //will be saved unless teh "Saved" button is pressed
-    $(document).on('change', '.formField', function() {
-        $('#saveMsgDiv').show();
-    });
-
-    //function that will get the field mappings for the selected transport method
-    $('.changeTransportMethod').click(function() {
-        var selTransportMethod = $('#transportMethod').val();
-
-        if (selTransportMethod == "") {
-            $('#transportMethodDiv').addClass("has-error");
+require(['./main'], function () {
+    require(['jquery'], function($) {
+        $("input:text,form").attr("autocomplete", "off");
+        
+        //Fade out the updated/created message after being displayed.
+        if ($('.alert-success').length > 0) {
+            $('.alert-success').delay(2000).fadeOut(1000);
         }
-        else {
-            window.location.href = 'mappings?i=' + selTransportMethod;
-        }
-    });
+
+        //If any field changes need to show the message in red that nothign
+        //will be saved unless teh "Saved" button is pressed
+        $(document).on('change', '.formField', function() {
+            $('#saveMsgDiv').show();
+        });
+
+        //function that will get the field mappings for the selected transport method
+        $('.changeTransportMethod').click(function() {
+            var selTransportMethod = $('#transportMethod').val();
+
+            if (selTransportMethod == "") {
+                $('#transportMethodDiv').addClass("has-error");
+            }
+            else {
+                window.location.href = 'mappings?i=' + selTransportMethod;
+            }
+        });
 
 
-    //This function will save the messgae type field mappings
-    $('#saveDetails').click(function(event) {
-        $('#action').val('save');
+        //This function will save the messgae type field mappings
+        $('#saveDetails').click(function(event) {
+            $('#action').val('save');
 
-        //Need to make sure all required fields are marked if empty.
-        var hasErrors = 0;
+            //Need to make sure all required fields are marked if empty.
+            var hasErrors = 0;
 
-        if (hasErrors == 0) {
-            $('#formFields').attr('action', 'saveFields');
-            $('#formFields').submit();
-        }
-    });
+            if (hasErrors == 0) {
+                $('#formFields').attr('action', 'saveFields');
+                $('#formFields').submit();
+            }
+        });
 
-    $('#next').click(function(event) {
-        $('#action').val('next');
+        $('#next').click(function(event) {
+            $('#action').val('next');
 
-        var hasErrors = 0;
+            var hasErrors = 0;
 
-        if (hasErrors == 0) {
-            $('#formFields').attr('action', 'saveFields');
-            $('#formFields').submit();
-        }
-    });
+            if (hasErrors == 0) {
+                $('#formFields').attr('action', 'saveFields');
+                $('#formFields').submit();
+            }
+        });
 
 
-    //Clicking the "Meets Standard" button will preselect the matching
-    //field select box to the appropiate template field
-    $(document).on('click', '#meetsStandard', function() {
-        var fieldNo = null;
-        $('#saveMsgDiv').show();
+        //Clicking the "Meets Standard" button will preselect the matching
+        //field select box to the appropiate template field
+        $(document).on('click', '#meetsStandard', function() {
+            var fieldNo = null;
+            var optionText = null;
+            $('#saveMsgDiv').show();
 
-        $('.uFieldRow').each(function() {
-            fieldNo = $(this).attr('rel');
-            $('#matchingField_' + fieldNo + ' > option').each(function() {
-                if ($(this).text() == fieldNo) {
-                    $('#matchingField_' + fieldNo).val($(this).val());
-                }
+            $('.uFieldRow').each(function() {
+                fieldNo = $(this).attr('rel');
+                $('#matchingField_' + fieldNo + ' > option').each(function() {
+                    if ($(this).text().indexOf(fieldNo+" - ") != -1) {
+                        $('#matchingField_' + fieldNo).val($(this).val());
+                        return false;
+                    }
+                });
             });
+            //<span class='glyphicon glyphicon-ok'></span> 
+            $(this).html("Clear Matching Fields");
+            $(this).attr("data-original-title","Click here to clear the matching fields.");
+            $(this).attr('id', 'clearFields');
         });
 
-        $(this).children("span").addClass("glyphicon-ok");
+        //Clicking the "Clear Fields" button will unselect the matching
+        //field select box.
+        $(document).on('click', '#clearFields', function() {
+            $('#saveMsgDiv').show();
 
-        $(this).val("Clear Fields");
-        $(this).attr('id', 'clearFields');
-    });
+            $('.uFieldRow').each(function() {
+                fieldNo = $(this).attr('rel');
+                $('#matchingField_' + fieldNo).val("0");
+            });
 
-    //Clicking the "Clear Fields" button will unselect the matching
-    //field select box.
-    $(document).on('click', '#clearFields', function() {
-        $('#saveMsgDiv').show();
-
-        $('.uFieldRow').each(function() {
-            fieldNo = $(this).attr('rel');
-            $('#matchingField_' + fieldNo).val("0");
+            $(this).html("Meets Standard");
+            $(this).attr('id', 'meetsStandard');
+            $(this).attr("data-original-title","Click here to match to the starndard fields.");
         });
-
-        $(this).children("span").removeClass("glyphicon-ok");
-
-        $(this).val("Meets Standard");
-        $(this).attr('id', 'meetsStandard');
+        
+        
     });
-
 });
+
 
 

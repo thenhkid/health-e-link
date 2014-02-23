@@ -1,19 +1,22 @@
-$.ajaxSetup({
-    cache: false
-});
 
-jQuery(document).ready(function($) {
 
-    //Fade out the updated/created message after being displayed.
-    if ($('.alert').length > 0) {
-        $('.alert').delay(2000).fadeOut(1000);
-    }
+require(['./main'], function () {
+    require(['jquery'], function($) {
+        
+        $.ajaxSetup({
+            cache: false
+        });
+        
+        //Fade out the updated/created message after being displayed.
+        if ($('.alert').length > 0) {
+            $('.alert').delay(2000).fadeOut(1000);
+        }
 
-    $("input:text,form").attr("autocomplete", "off");
+        $("input:text,form").attr("autocomplete", "off");
 
-    $('#searchConfigBtn').click(function() {
-        $('#searchForm').submit();
+        $('#searchConfigBtn').click(function() {
+            $('#searchForm').submit();
+        });
+        
     });
 });
-
-

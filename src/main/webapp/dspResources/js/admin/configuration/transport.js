@@ -1,104 +1,108 @@
-$(document).ready(function() {
-    $("input:text,form").attr("autocomplete", "off");
-    
-    var selMethodId = $('#transportMethod').val() 
-    //Show file/download/FTP fields
-    if(selMethodId === "1" || selMethodId === "3") {
-        $('#upload-downloadDiv').show();
-    }
 
-    if(selMethodId === "3") {
-        $('#additionalFTPDiv').show();
-    }
-    
-    if(selMethodId !== "2" && selMethodId !== "") {
-        $('.assocMessageTypes').show();
-    }
-});
 
-$(function() {
-    //Fade out the updated/created message after being displayed.
-    if ($('.alert').length > 0) {
-        $('.alert').delay(2000).fadeOut(1000);
-    }
+require(['./main'], function () {
+    require(['jquery'], function($) {
+        
+        $("input:text,form").attr("autocomplete", "off");
     
-    $('#transportMethod').change(function() {
-       var methodId = $(this).val();
-       
-       //hide all section divs
-       $('.methodDiv').hide();
-      
-       //Show file/download/FTP fields
-       if(methodId === "1" || methodId === "3") {
-           $('#upload-downloadDiv').show();
-       }
-       
-       if(methodId === "3") {
-           $('#additionalFTPDiv').show();
-       }
-       
-       if(methodId !== "2" && methodId !== "") {
+        var selMethodId = $('#transportMethod').val() 
+        //Show file/download/FTP fields
+        if(selMethodId === "1" || selMethodId === "3") {
+            $('#upload-downloadDiv').show();
+        }
+
+        if(selMethodId === "3") {
+            $('#additionalFTPDiv').show();
+        }
+
+        if(selMethodId !== "2" && selMethodId !== "") {
             $('.assocMessageTypes').show();
         }
-        else {
-            $('.assocMessageTypes').hide();
+        
+        //Fade out the updated/created message after being displayed.
+        if ($('.alert').length > 0) {
+            $('.alert').delay(2000).fadeOut(1000);
         }
+
+        $('#transportMethod').change(function() {
+           var methodId = $(this).val();
+
+           //hide all section divs
+           $('.methodDiv').hide();
+
+           //Show file/download/FTP fields
+           if(methodId === "1" || methodId === "3") {
+               $('#upload-downloadDiv').show();
+           }
+
+           if(methodId === "3") {
+               $('#additionalFTPDiv').show();
+           }
+
+           if(methodId !== "2" && methodId !== "") {
+                $('.assocMessageTypes').show();
+            }
+            else {
+                $('.assocMessageTypes').hide();
+            }
+
+        });
+
+        $('#useSource').click(function() {
+            if($('#useSource').is(":checked")) {
+                $('#targetFileName').val("USE SOURCE FILE");
+            }
+            else {
+                $('#targetFileName').val("");
+            }
+        });
+
+
+
+        //This function will save the messgae type field mappings
+        $('#saveDetails').click(function() {
+            $('#action').val('save');
+
+            //Need to make sure all required fields are marked if empty.
+            var hasErrors = 0;
+            hasErrors = checkFormFields();
+
+            if (hasErrors == 0) { 
+                $('#transportDetails').submit();
+            }
+        });
+
+        $('#next').click(function(event) {
+            $('#action').val('next');
+
+            var hasErrors = 0;
+            hasErrors = checkFormFields();
+
+            if (hasErrors == 0) {
+                $('#transportDetails').submit();
+            }
+        });
+
+        $('#existingtransportMethod').change(function() {
+           var detailId = $(this).val();
+           var configId = $('#configId').val();
+
+           if(detailId > 0) {
+                $.ajax({
+                    url: 'copyExistingTransportMethod.do',
+                    type: "POST",
+                    data: {'detailId': detailId, 'configId': configId},
+                    success: function(data) {
+                         window.location.href = "transport";
+                    }
+                });
+            }
+
+        });
         
     });
-    
-    $('#useSource').click(function() {
-        if($('#useSource').is(":checked")) {
-            $('#targetFileName').val("USE SOURCE FILE");
-        }
-        else {
-            $('#targetFileName').val("");
-        }
-    });
-
-    
-
-    //This function will save the messgae type field mappings
-    $('#saveDetails').click(function() {
-        $('#action').val('save');
-        
-        //Need to make sure all required fields are marked if empty.
-        var hasErrors = 0;
-        hasErrors = checkFormFields();
-
-        if (hasErrors == 0) { 
-            $('#transportDetails').submit();
-        }
-    });
-
-    $('#next').click(function(event) {
-        $('#action').val('next');
-
-        var hasErrors = 0;
-        hasErrors = checkFormFields();
-
-        if (hasErrors == 0) {
-            $('#transportDetails').submit();
-        }
-    });
-    
-    $('#existingtransportMethod').change(function() {
-       var detailId = $(this).val();
-       var configId = $('#configId').val();
-       
-       if(detailId > 0) {
-            $.ajax({
-                url: 'copyExistingTransportMethod.do',
-                type: "POST",
-                data: {'detailId': detailId, 'configId': configId},
-                success: function(data) {
-                     window.location.href = "transport";
-                }
-            });
-        }
-        
-    });
-
 });
+
 
 function checkFormFields() {
     var hasErrors = 0;

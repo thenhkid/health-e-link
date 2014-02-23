@@ -1,118 +1,122 @@
 
-$(function() {
-    
-    
-    //Fade out the updated/created message after being displayed.
-    if ($('.alert').length > 0) {
-        $('.alert').delay(2000).fadeOut(1000);
-    }
-    
-    //Update the status of the connection
-    $('.changeStatus').click(function() {
-        var connectionId = $(this).attr('rel'); 
-        var newStatusVal = $(this).attr('rel2');
 
-        $.ajax({
-            url: 'changeConnectionStatus.do',
-            type: "POST",
-            data: {'statusVal': newStatusVal, 'connectionId': connectionId},
-            success: function(data) {
-                if (data === 1) {
-                    window.location.href='connections?msg=updated'
+require(['./main'], function () {
+    require(['jquery'], function($) {
+        
+        //Fade out the updated/created message after being displayed.
+        if ($('.alert').length > 0) {
+            $('.alert').delay(2000).fadeOut(1000);
+        }
+
+        //Update the status of the connection
+        $('.changeStatus').click(function() {
+            var connectionId = $(this).attr('rel'); 
+            var newStatusVal = $(this).attr('rel2');
+
+            $.ajax({
+                url: 'changeConnectionStatus.do',
+                type: "POST",
+                data: {'statusVal': newStatusVal, 'connectionId': connectionId},
+                success: function(data) {
+                    if (data === 1) {
+                        window.location.href='connections?msg=updated'
+                    }
                 }
-            }
+            });
         });
-    });
-    
-    //This function will launch the new configuration connection overlay with a blank screen
-    $(document).on('click', '#createNewConnection', function() {
-        $.ajax({
-            url: 'createConnection',
-            type: "GET",
-            success: function(data) {
-                $("#connectionsModal").html(data);
-            }
-        });
-    });
-    
-    //This function will launch the edit connection overlay
-    $(document).on('click', '.connectionEdit', function() {
-        var connectionId = $(this).attr('rel');
-        $.ajax({
-            url: 'editConnection',
-            type: "GET",
-            data: {'connectionId':connectionId},
-            success: function(data) {
-                $("#connectionsModal").html(data);
-            }
-        });
-    });
-    
-    //Go get the existing message types for the selected organization'
-    $(document).on('change', '.selsrcOrganization', function() {
-        var selOrg = $(this).val();
-        
-        if (selOrg === '') {
-            $('#srcorgDiv').addClass("has-error");
-        }
-        else {
-            populateConfigurations(selOrg, 'srcConfig');
-            populateUsers(selOrg, 'srcUsers');
-        }
-    });
-    
-    
-    //Go get the existing message types for the selected organization
-    $(document).on('change', '.seltgtOrganization', function() {
-        var selOrg = $(this).val();
 
-        if (selOrg === '') {
-            $('#tgtorgDiv').addClass("has-error");
-        }
-        else {
-            populateConfigurations(selOrg, 'tgtConfig');
-            populateUsers(selOrg, 'tgtUsers');
-        }
-    });
+        //This function will launch the new configuration connection overlay with a blank screen
+        $(document).on('click', '#createNewConnection', function() {
+            $.ajax({
+                url: 'createConnection',
+                type: "GET",
+                success: function(data) {
+                    $("#connectionsModal").html(data);
+                }
+            });
+        });
 
-    
-    //This function will save the messgae type field mappings
-    $(document).on('click', '#submitButton', function() {
-        var hasErrors = 0;
-        var srcConfig = $('#srcConfig').val();
-        var tgtConfig = $('#tgtConfig').val();
-        var srcUsers = $('#srcUsers').val();
-        var tgtUsers = $('#tgtUsers').val();
+        //This function will launch the edit connection overlay
+        $(document).on('click', '.connectionEdit', function() {
+            var connectionId = $(this).attr('rel');
+            $.ajax({
+                url: 'editConnection',
+                type: "GET",
+                data: {'connectionId':connectionId},
+                success: function(data) {
+                    $("#connectionsModal").html(data);
+                }
+            });
+        });
+
+        //Go get the existing message types for the selected organization'
+        $(document).on('change', '.selsrcOrganization', function() {
+            var selOrg = $(this).val();
+
+            if (selOrg === '') {
+                $('#srcorgDiv').addClass("has-error");
+            }
+            else {
+                populateConfigurations(selOrg, 'srcConfig');
+                populateUsers(selOrg, 'srcUsers');
+            }
+        });
+
+
+        //Go get the existing message types for the selected organization
+        $(document).on('change', '.seltgtOrganization', function() {
+            var selOrg = $(this).val();
+
+            if (selOrg === '') {
+                $('#tgtorgDiv').addClass("has-error");
+            }
+            else {
+                populateConfigurations(selOrg, 'tgtConfig');
+                populateUsers(selOrg, 'tgtUsers');
+            }
+        });
+
+
+        //This function will save the messgae type field mappings
+        $(document).on('click', '#submitButton', function() {
+            var hasErrors = 0;
+            var srcConfig = $('#srcConfig').val();
+            var tgtConfig = $('#tgtConfig').val();
+            var srcUsers = $('#srcUsers').val();
+            var tgtUsers = $('#tgtUsers').val();
+
+            $('div.form-group').removeClass("has-error");
+            $('span.control-label').removeClass("has-error");
+            $('span.control-label').html("");
+            $('.alert-danger').hide();
+
+            if (srcConfig === '') {
+                $('#srcConfigDiv').addClass("has-error");
+                hasErrors = 1;
+            }
+
+            if (tgtConfig === '') {
+                $('#tgtConfigDiv').addClass("has-error");
+                hasErrors = 1;
+            }
+
+            if (srcUsers === '' || srcUsers == null) {
+                $('#srcUsersDiv').addClass("has-error");
+                hasErrors = 1;
+            }
+
+            if (tgtUsers === '' || tgtUsers == null) {
+                $('#tgtUsersDiv').addClass("has-error");
+                hasErrors = 1;
+            }
+
+            if(hasErrors == 0) {
+
+                $('#connectionForm').submit();
+            }
+
+        });
         
-        $('div.form-group').removeClass("has-error");
-        $('span.control-label').removeClass("has-error");
-        $('span.control-label').html("");
-        $('.alert-danger').hide();
-        
-        if (srcConfig === '') {
-            $('#srcConfigDiv').addClass("has-error");
-            hasErrors = 1;
-        }
-        
-        if (tgtConfig === '') {
-            $('#tgtConfigDiv').addClass("has-error");
-            hasErrors = 1;
-        }
-       
-        if (srcUsers === '' || srcUsers == null) {
-            $('#srcUsersDiv').addClass("has-error");
-            hasErrors = 1;
-        }
-        
-        if (tgtUsers === '' || tgtUsers == null) {
-            $('#tgtUsersDiv').addClass("has-error");
-            hasErrors = 1;
-        }
-        
-        if(hasErrors == 0) {
-            
-            $('#connectionForm').submit();
-        }
         
     });
 });
@@ -120,7 +124,7 @@ $(function() {
 function populateConfigurations(orgId, selectBoxId) {
     
     var currConfigId = $('#'+selectBoxId).attr('rel');
-   
+
     $.ajax({
         url: 'getAvailableConfigurations.do',
         type: "GET",
@@ -129,7 +133,7 @@ function populateConfigurations(orgId, selectBoxId) {
             //get value of preselected col
             var html = '<option value="">- Select - </option>';
             var len = data.length;
-            
+
             for (var i = 0; i < len; i++) {
               if(data[i].id == currConfigId) {
                  html += '<option value="' + data[i].id + '" selected>' + data[i].configName + '&nbsp;&#149;&nbsp;' + data[i].messageTypeName + '&nbsp;&#149;&nbsp;' + data[i].transportMethod + '</option>';
@@ -144,9 +148,9 @@ function populateConfigurations(orgId, selectBoxId) {
 }
 
 function populateUsers(orgId, selectBoxId) {
-    
+
     var users = $('#'+selectBoxId).attr('rel');
-    
+
     $.ajax({
         url: 'getAvailableUsers.do',
         type: "GET",
@@ -155,14 +159,14 @@ function populateUsers(orgId, selectBoxId) {
             //get value of preselected col
             var html = '<option value="">- Select - </option>';
             var len = data.length;
-            
+
             if(len > 1) {
                 $('#'+selectBoxId+'Found').html("(" + len + " users found)");
             }
             else {
                 $('#'+selectBoxId+'Found').html("(" + len + " user found)"); 
             }
-            
+
             for (var i = 0; i < len; i++) {
                 if(users != '' && users.indexOf(data[i][0]) != -1) {
                     if(data[i][3] == 1) {
@@ -185,3 +189,7 @@ function populateUsers(orgId, selectBoxId) {
         }
     });
 }
+
+
+
+
