@@ -9,6 +9,10 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ut.dph.dao.configurationDAO;
 import com.ut.dph.dao.organizationDAO;
 import com.ut.dph.model.CrosswalkData;
+import com.ut.dph.model.HL7Details;
+import com.ut.dph.model.HL7ElementComponents;
+import com.ut.dph.model.HL7Elements;
+import com.ut.dph.model.HL7Segments;
 import com.ut.dph.model.Macros;
 import com.ut.dph.model.Organization;
 import com.ut.dph.model.configuration;
@@ -40,13 +44,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class configurationManagerImpl implements configurationManager {
-    
+
     @Autowired
     private SessionFactory sessionFactory;
 
     @Autowired
     private configurationDAO configurationDAO;
-    
+
     @Autowired
     private organizationDAO organizationDAO;
 
@@ -74,17 +78,17 @@ public class configurationManagerImpl implements configurationManager {
     public List<configuration> getConfigurationsByOrgId(int configId, String searchTerm) {
         return configurationDAO.getConfigurationsByOrgId(configId, searchTerm);
     }
-    
+
     @Override
     @Transactional
     public List<configuration> getActiveConfigurationsByOrgId(int configId) {
         return configurationDAO.getActiveConfigurationsByOrgId(configId);
     }
-    
+
     @Override
     @Transactional
     public configuration getConfigurationByName(String configName, int orgId) {
-        return configurationDAO.getConfigurationByName(configName,orgId);
+        return configurationDAO.getConfigurationByName(configName, orgId);
     }
 
     @Override
@@ -129,7 +133,7 @@ public class configurationManagerImpl implements configurationManager {
     public List getFileTypes() {
         return configurationDAO.getFileTypes();
     }
-    
+
     @Override
     @Transactional
     public String getFileTypesById(int id) {
@@ -165,49 +169,49 @@ public class configurationManagerImpl implements configurationManager {
     public List<Macros> getMacros() {
         return configurationDAO.getMacros();
     }
-    
+
     @Override
     @Transactional
     public Macros getMacroById(int macroId) {
         return configurationDAO.getMacroById(macroId);
     }
-    
+
     @Override
     @Transactional
     public List<configurationConnection> getAllConnections(int page, int maxResults) {
         return configurationDAO.getAllConnections(page, maxResults);
     }
-    
+
     @Override
     @Transactional
     public List<configurationConnection> findConnections(String searchTerm) {
         return configurationDAO.findConnections(searchTerm);
     }
-    
+
     @Override
     @Transactional
     public List<configurationConnection> getConnectionsByConfiguration(int configId) {
         return configurationDAO.getConnectionsByConfiguration(configId);
     }
-    
+
     @Override
     @Transactional
     public List<configurationConnection> getConnectionsByTargetConfiguration(int configId) {
         return configurationDAO.getConnectionsByTargetConfiguration(configId);
     }
-    
+
     @Override
     @Transactional
     public Integer saveConnection(configurationConnection connection) {
         return configurationDAO.saveConnection(connection);
     }
-    
+
     @Override
     @Transactional
     public configurationConnection getConnection(int connectionId) {
         return configurationDAO.getConnection(connectionId);
     }
-    
+
     @Override
     @Transactional
     public void updateConnection(configurationConnection connection) {
@@ -219,70 +223,70 @@ public class configurationManagerImpl implements configurationManager {
     public configurationSchedules getScheduleDetails(int configId) {
         return configurationDAO.getScheduleDetails(configId);
     }
-    
+
     @Override
     @Transactional
     public void saveSchedule(configurationSchedules scheduleDetails) {
         configurationDAO.saveSchedule(scheduleDetails);
     }
-   
+
     @Override
     @Transactional
     public configurationMessageSpecs getMessageSpecs(int configId) {
         return configurationDAO.getMessageSpecs(configId);
     }
-    
+
     @Override
     @Transactional
     public List<configuration> getActiveConfigurationsByUserId(int userId, int transportMethod) throws Exception {
-        return configurationDAO.getActiveConfigurationsByUserId(userId,transportMethod);
+        return configurationDAO.getActiveConfigurationsByUserId(userId, transportMethod);
     }
-    
+
     @Override
     @Transactional
     public List<configurationConnectionSenders> getConnectionSenders(int connectionId) {
         return configurationDAO.getConnectionSenders(connectionId);
     }
-  
+
     @Override
     @Transactional
     public List<configurationConnectionReceivers> getConnectionReceivers(int connectionId) {
         return configurationDAO.getConnectionReceivers(connectionId);
     }
-    
+
     @Override
     @Transactional
     public void saveConnectionSenders(configurationConnectionSenders senders) {
         configurationDAO.saveConnectionSenders(senders);
     }
-  
+
     @Override
     @Transactional
     public void saveConnectionReceivers(configurationConnectionReceivers receivers) {
         configurationDAO.saveConnectionReceivers(receivers);
     }
-    
+
     @Override
     @Transactional
     public void removeConnectionSenders(int connectionId) {
         configurationDAO.removeConnectionSenders(connectionId);
     }
-  
+
     @Override
     @Transactional
     public void removeConnectionReceivers(int connectionId) {
         configurationDAO.removeConnectionReceivers(connectionId);
     }
-    
+
     @Override
     @Transactional
     public void updateMessageSpecs(configurationMessageSpecs messageSpecs, int transportDetailId) {
-        
+
         boolean processFile = false;
         String fileName = null;
         String cleanURL = null;
         int clearFields = 0;
-       
+
         MultipartFile file = messageSpecs.getFile();
         //If a file is uploaded
         if (file != null && !file.isEmpty()) {
@@ -335,15 +339,15 @@ public class configurationManagerImpl implements configurationManager {
                 e.printStackTrace();
             }
         }
-        
+
         configurationDAO.updateMessageSpecs(messageSpecs, transportDetailId, clearFields);
-      
+
         if (processFile == true) {
             loadExcelContents(messageSpecs.getconfigId(), transportDetailId, fileName, cleanURL);
         }
-        
+
     }
-    
+
     /**
      * The 'loadExcelContents' will take the contents of the uploaded excel template file and populate the corresponding configuration form fields table. This function will split up the contents into the appropriate buckets. Buckets (1 - 4) will be separated by spacer rows with in the excel file.
      *
@@ -450,17 +454,51 @@ public class configurationManagerImpl implements configurationManager {
         }
     }
 
-	@Override
-	public List<configurationDataTranslations> getDataTranslationsWithFieldNo(
-			int configId) {
-		return configurationDAO.getDataTranslationsWithFieldNo(configId);
-	}
+    @Override
+    public List<configurationDataTranslations> getDataTranslationsWithFieldNo(
+            int configId) {
+        return configurationDAO.getDataTranslationsWithFieldNo(configId);
+    }
 
-	@Override
-	public List<CrosswalkData> getCrosswalkData(int cwId) {
-		return configurationDAO.getCrosswalkData(cwId);
-	}
+    @Override
+    public List<CrosswalkData> getCrosswalkData(int cwId) {
+        return configurationDAO.getCrosswalkData(cwId);
+    }
+    
+    
+    @Override
+    public HL7Details getHL7Details(int configId) {
+        return configurationDAO.getHL7Details(configId);
+    }
+    
+    @Override
+    public List<HL7Segments> getHL7Segments(int hl7Id) {
+        return configurationDAO.getHL7Segments(hl7Id);
+    }
+    
+    @Override
+    @Transactional
+    public List<HL7Elements> getHL7Elements(int hl7Id, int segmentId) {
+        return configurationDAO.getHL7Elements(hl7Id, segmentId);
+    }
+    
+    @Override
+    public List<HL7ElementComponents> getHL7ElementComponents(int elementId) {
+        return configurationDAO.getHL7ElementComponents(elementId);
+    }
 
+    @Override
+    public void updateHL7Segments(HL7Segments segment) {
+        configurationDAO.updateHL7Segments(segment);
+    }
+    
+    @Override
+    public void updateHL7Elements(HL7Elements element) {
+        configurationDAO.updateHL7Elements(element);
+    }
+    
+    @Override
+    public void updateHL7ElementComponent(HL7ElementComponents component) {
+        configurationDAO.updateHL7ElementComponent(component);
+    }
 }
-
-

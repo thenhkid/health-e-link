@@ -3,6 +3,10 @@ package com.ut.dph.dao;
 import java.util.List;
 
 import com.ut.dph.model.CrosswalkData;
+import com.ut.dph.model.HL7Details;
+import com.ut.dph.model.HL7ElementComponents;
+import com.ut.dph.model.HL7Elements;
+import com.ut.dph.model.HL7Segments;
 import com.ut.dph.model.Macros;
 import com.ut.dph.model.configuration;
 import com.ut.dph.model.configurationConnection;
@@ -94,5 +98,19 @@ public interface configurationDAO {
   void removeConnectionReceivers(int connectionId);
   
   List<CrosswalkData> getCrosswalkData(int cwId);
+  
+  HL7Details getHL7Details(int configId);
+  
+  List<HL7Segments> getHL7Segments(int hl7Id);
+  
+  List<HL7Elements> getHL7Elements(int hl7Id, int segmentId);
+  
+  List<HL7ElementComponents> getHL7ElementComponents(int elementId);
+  
+  void updateHL7Segments(HL7Segments segment);
+  
+  void updateHL7Elements(HL7Elements element);
+  
+  void updateHL7ElementComponent(HL7ElementComponents component);
   
 }

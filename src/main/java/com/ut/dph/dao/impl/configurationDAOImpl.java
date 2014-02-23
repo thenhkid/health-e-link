@@ -16,6 +16,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ut.dph.dao.configurationDAO;
 import com.ut.dph.model.CrosswalkData;
+import com.ut.dph.model.HL7Details;
+import com.ut.dph.model.HL7ElementComponents;
+import com.ut.dph.model.HL7Elements;
+import com.ut.dph.model.HL7Segments;
 import com.ut.dph.model.Macros;
 import com.ut.dph.model.Organization;
 import com.ut.dph.model.configuration;
@@ -922,4 +926,115 @@ public class configurationDAOImpl implements configurationDAO {
             return null;
         }
     }
+    
+    /**
+     * The 'getHL7Details' function will the HL7 details for the passed in configuration.
+     *
+     * @Table configurationHL7Details
+     *
+     * @param	configId    This will hold the configuration id to find
+     *
+     * @return	This function will return a HL7Details object
+     */
+    @Override
+    @Transactional
+    @SuppressWarnings("unchecked")
+    public HL7Details getHL7Details(int configId) {
+        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(HL7Details.class);
+        criteria.add(Restrictions.eq("configId", configId));
+        
+        if(criteria.uniqueResult() == null) {
+            return null;
+        }
+        else {
+            return (HL7Details) criteria.uniqueResult();
+        }
+
+    }
+    
+    /**
+     * The 'getHL7Segments' function will return the list of segments for a specific HL7 Message.
+     * 
+     * @Table configurationHL7Segments
+     * 
+     * @return This function will return a list of HL7Segment objects
+     */
+    @Override
+    @Transactional
+    public List<HL7Segments> getHL7Segments(int hl7Id) {
+        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(HL7Segments.class);
+        criteria.add(Restrictions.eq("hl7Id", hl7Id));
+        
+        return criteria.list();
+    }
+    
+    /**
+     * The 'getHL7Elements' function will return the list of elements for a specific HL7 Message segment.
+     * 
+     * @Table configurationHL7Elements
+     * 
+     * @return This function will return a list of HL7Elements objects
+     */
+    @Override
+    @Transactional
+    public List<HL7Elements> getHL7Elements(int hl7Id, int segmentId) {
+        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(HL7Elements.class);
+        criteria.add(Restrictions.eq("hl7Id", hl7Id));
+        criteria.add(Restrictions.eq("segmentId", segmentId));
+        
+        return criteria.list();
+    }
+    
+    /**
+     * The 'getHL7ElementComponents' function will return any components associated to the passed in 
+     * element id
+     * 
+     * @param elementId
+     * 
+     * @return This function will return a list of element component objects
+     */
+    @Override
+    @Transactional
+    public List<HL7ElementComponents> getHL7ElementComponents(int elementId) {
+        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(HL7ElementComponents.class);
+        criteria.add(Restrictions.eq("elementId", elementId));
+        
+        return criteria.list();
+    }
+    
+    
+    /**
+     * The 'updateHL7Segments' function will update the segment passed to the function.
+     * 
+     * @param segment The segment object to update
+     */
+    @Override
+    @Transactional
+    public void updateHL7Segments(HL7Segments segment) {
+        sessionFactory.getCurrentSession().update(segment);
+    }
+    
+    /**
+     * The 'updateHL7Elements' function will update the segment element
+     * passed to the function.
+     * 
+     * @param element  The segment element object to update.
+     */
+    @Override
+    @Transactional
+    public void updateHL7Elements(HL7Elements element) {
+         sessionFactory.getCurrentSession().update(element);
+    }
+    
+    /**
+     * The '' function will update the segment element components
+     * 
+     * @param component The element component object to update.
+     */
+    @Override
+    @Transactional
+    public void updateHL7ElementComponent(HL7ElementComponents component) {
+        sessionFactory.getCurrentSession().update(component);
+    }
+    
 }

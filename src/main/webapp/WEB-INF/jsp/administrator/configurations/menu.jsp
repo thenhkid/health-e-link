@@ -9,6 +9,9 @@
             <li role="menuitem" ${param['page'] == 'ERGCustomize' ? 'class="active"' : ''} ${id > 0 and stepsCompleted >= 3 and (mappings == 2 or mappings == 3) ? '' : 'class="disabled"'}><a href="${param['page'] != 'ERGCustomize' and id > 0 and stepsCompleted >= 3 and (mappings == 2 or mappings == 3) ? 'ERGCustomize' : 'javascript:void(0);'}" title="ERG Customization">ERG Customization</a></li>
             <li role="menuitem" ${param['page'] == 'translations' ? 'class="active"' : ''} ${id > 0 and stepsCompleted >= 4 ? '' : 'class="disabled"'}><a href="${param['page'] != 'translations' and id > 0 and stepsCompleted >= 4 ? 'translations' : 'javascript:void(0);'}" title="Data Translations">Data Translations</a></li>
             <li role="menuitem" ${param['page'] == 'schedule' ? 'class="active"' : ''} ${id > 0 and stepsCompleted >= 5 and (mappings == 1 or mappings == 3) ? '' : 'class="disabled"'}><a href="${param['page'] != 'schedule' and id > 0 and stepsCompleted >= 5 and (mappings == 1 or mappings == 3) ? 'scheduling' : 'javascript:void(0);'}" title="Scheduling">Scheduling</a></li>
+            <c:if test="${HL7 == true}">
+                <li role="menuitem" ${param['page'] == 'HL7' ? 'class="active"' : ''} ${id > 0 and stepsCompleted >= 5 ? '' : 'class="disabled"'}><a href="${param['page'] != 'HL7' and id > 0 and stepsCompleted >= 5 ? 'HL7' : 'javascript:void(0);'}" title="HL7 Customization">HL7 Customization</a></li>
+            </c:if>
         </ul>
     </nav>
 </aside>

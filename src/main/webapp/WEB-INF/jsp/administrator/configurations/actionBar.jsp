@@ -32,6 +32,9 @@
                     </c:when>  
                     <c:when test="${param['page'] == 'connections'}">
                         <a href="javascript:void(0);" title="Configuration Connection List" class="unstyled-link">Configuration Connections</a>
+                    </c:when> 
+                    <c:when test="${param['page'] == 'HL7'}">
+                        <a href="javascript:void(0);" title="HL7 Customization" class="unstyled-link">Configuration - HL7 Customization</a>
                     </c:when>   
                 </c:choose>
             </h1>
@@ -46,7 +49,7 @@
                 </c:when>  
                 <c:otherwise>
                     <li><a href="javascript:void(0);" id="saveDetails" title="Save this Configuration initial setup" role="button"><span class="glyphicon glyphicon-ok icon-stacked"></span> Save </a></li>
-                    <c:if test="${param['page'] != 'schedule'}"><li><a href="javascript:void(0);" id="next" title="Save and Proceed to the Next Step"><span class="glyphicon glyphicon-forward icon-stacked" role="button"></span>Next Step</a></li></c:if>
+                    <c:if test="${param['page'] != 'schedule' && param['page'] != 'HL7'}"><li><a href="javascript:void(0);" id="next" title="Save and Proceed to the Next Step"><span class="glyphicon glyphicon-forward icon-stacked" role="button"></span>Next Step</a></li></c:if>
                     <%--<c:if test="${not empty id}"><li><a href="#confirmationOrgDelete" data-toggle="modal" rel="${id}" title="Delete this Configuration"><span class="glyphicon glyphicon-remove icon-stacked"></span>Delete</a></li></c:if>--%>
                     <li><a href="<c:url value='/administrator/configurations/list' />" title="Cancel" role="button"><span class="glyphicon icon-stacked custom-icon icon-cancel"></span>Cancel</a></li>
                </c:otherwise>

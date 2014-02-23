@@ -22,6 +22,10 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.ut.dph.model.Crosswalks;
+import com.ut.dph.model.HL7Details;
+import com.ut.dph.model.HL7ElementComponents;
+import com.ut.dph.model.HL7Elements;
+import com.ut.dph.model.HL7Segments;
 import com.ut.dph.model.Macros;
 import com.ut.dph.model.configuration;
 import com.ut.dph.model.configurationDataTranslations;
@@ -84,6 +88,12 @@ public class adminConfigController {
      * 3 = Both Mappings link and ERG Customization link are active
      */
     private static int mappings = 0;
+    
+    /**
+     * The private HL7 variable will determine if the transport method is file download
+     * of an HL7 message. This will display the HL7 Customization link in the left menu.
+     */
+    private static boolean HL7 = false;
     
     /** 
      * The stepsCompleted variable will hold the number of steps the configuration has gone 
@@ -359,9 +369,14 @@ public class adminConfigController {
                     mappings = 1;
                 }
             }
+            
+            if(transportDetails.getfileType() == 4) {
+                HL7 = true;
+            }
         }
         
         mav.addObject("mappings", mappings);
+        mav.addObject("HL7", HL7);
 
         return mav;
 
@@ -523,6 +538,7 @@ public class adminConfigController {
         //Set the variable id to hold the current configuration id
         mav.addObject("id", configId);
         mav.addObject("mappings", mappings);
+        mav.addObject("HL7", HL7);
 
         configurationDetails.setOrgName(organizationmanager.getOrganizationById(configurationDetails.getorgId()).getOrgName());
         configurationDetails.setMessageTypeName(messagetypemanager.getMessageTypeById(configurationDetails.getMessageTypeId()).getName());
@@ -599,6 +615,13 @@ public class adminConfigController {
             else {
                 mappings = 1;
             }
+        }
+        
+        if(transportDetails.getfileType() == 4) {
+            HL7 = true;
+        }
+        else {
+            HL7 = false;
         }
         
         /** 
@@ -729,6 +752,7 @@ public class adminConfigController {
         //Set the variable id to hold the current configuration id
         mav.addObject("id", configId);
         mav.addObject("mappings", mappings);
+        mav.addObject("HL7", HL7);
 
         //Get the configuration details for the selected config
         configuration configurationDetails = configurationmanager.getConfigurationById(configId);
@@ -814,6 +838,7 @@ public class adminConfigController {
         mav.setViewName("/administrator/configurations/ERGCustomize");
         mav.addObject("id", configId);
         mav.addObject("mappings", mappings);
+        mav.addObject("HL7", HL7);
         
         //Get the configuration details for the selected config
         configuration configurationDetails = configurationmanager.getConfigurationById(configId);
@@ -858,6 +883,7 @@ public class adminConfigController {
         mav.setViewName("/administrator/configurations/mappings");
         mav.addObject("id", configId);
         mav.addObject("mappings", mappings);
+        mav.addObject("HL7", HL7);
 
         //Get the completed steps for the selected configuration;
         configuration configurationDetails = configurationmanager.getConfigurationById(configId);
@@ -959,6 +985,7 @@ public class adminConfigController {
         mav.setViewName("/administrator/configurations/translations");
         mav.addObject("id", configId);
         mav.addObject("mappings", mappings);
+        mav.addObject("HL7", HL7);
         
         //Get the completed steps for the selected configuration;
         configuration configurationDetails = configurationmanager.getConfigurationById(configId);
@@ -1234,6 +1261,7 @@ public class adminConfigController {
         mav.setViewName("/administrator/configurations/connections");
         mav.addObject("id", configId);
         mav.addObject("mappings", mappings);
+        mav.addObject("HL7", HL7);
         
         /* get a list of all connections in the sysetm */
         List<configurationConnection> connections = configurationmanager.getAllConnections(page, maxResults);
@@ -1327,6 +1355,7 @@ public class adminConfigController {
         mav.addObject("id", configId);
         mav.addObject("mappings", mappings);
         mav.addObject("searchTerm", searchTerm);
+        mav.addObject("HL7", HL7);
         
         /* get a list of all connections in the sysetm */
         List<configurationConnection> connections = configurationmanager.findConnections(searchTerm);
@@ -1586,6 +1615,7 @@ public class adminConfigController {
         mav.setViewName("/administrator/configurations/schedule");
         mav.addObject("id", configId);
         mav.addObject("mappings", mappings);
+        mav.addObject("HL7", HL7);
         
         //Get the completed steps for the selected configuration;
         configuration configurationDetails = configurationmanager.getConfigurationById(configId);
@@ -1673,4 +1703,129 @@ public class adminConfigController {
        return mav;
     
     }
+    
+    /**
+     * The '/HL7' GET request will display the HL7 customization form.
+     */
+    @RequestMapping(value = "/HL7", method = RequestMethod.GET)
+    public ModelAndView getHL7Form() throws Exception {
+
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/configurations/HL7");
+        mav.addObject("id", configId);
+        mav.addObject("mappings", mappings);
+        mav.addObject("HL7", HL7);
+        
+        //Get the completed steps for the selected configuration;
+        configuration configurationDetails = configurationmanager.getConfigurationById(configId);
+        
+        //Get the transport details by configid and selected transport method
+        configurationTransport transportDetails = configurationTransportManager.getTransportDetails(configId);
+        
+        configurationDetails.setOrgName(organizationmanager.getOrganizationById(configurationDetails.getorgId()).getOrgName());
+        configurationDetails.setMessageTypeName(messagetypemanager.getMessageTypeById(configurationDetails.getMessageTypeId()).getName());
+        configurationDetails.settransportMethod(configurationTransportManager.getTransportMethodById(transportDetails.gettransportMethodId()));
+        
+        //pass the configuration detail object back to the page.
+        mav.addObject("configurationDetails", configurationDetails);
+        
+        //Set the variable to hold the number of completed steps for this configuration;
+        mav.addObject("stepsCompleted", stepsCompleted);
+        
+        HL7Details hl7Details = configurationmanager.getHL7Details(configId);
+        int HL7Id = 0;
+        
+        /* If null then create an empty HL7 Detail object */
+        if(hl7Details == null) {
+            HL7Details hl7DetailsEmpty = new HL7Details();
+            hl7DetailsEmpty.setconfigId(configId);
+            mav.addObject("HL7Details", hl7DetailsEmpty);
+        }
+        else {
+            HL7Id = hl7Details.getId();
+            
+            /* Get a list of HL7 Segments */
+            List<HL7Segments> HL7Segments = configurationmanager.getHL7Segments(HL7Id);
+
+            /* Get a list of HL7Elements */
+            if(!HL7Segments.isEmpty()) {
+                for(HL7Segments segment : HL7Segments) {
+
+                    List<HL7Elements> HL7Elments = configurationmanager.getHL7Elements(HL7Id, segment.getId());
+
+                    if(!HL7Elments.isEmpty()) {
+                        
+                        for(HL7Elements element : HL7Elments) {
+                            List<HL7ElementComponents> components = configurationmanager.getHL7ElementComponents(element.getId());
+                            element.setelementComponents(components);
+                        }
+                        
+                        segment.setHL7Elements(HL7Elments);
+                    }
+
+                }
+            }
+            hl7Details.setHL7Segments(HL7Segments);
+            
+            mav.addObject("HL7Details", hl7Details);
+            
+        }
+        
+        //Get the transport fields
+        List<configurationFormFields> fields = configurationTransportManager.getConfigurationFields(configId, transportDetails.getId());
+        transportDetails.setFields(fields);
+
+        mav.addObject("fields", fields);
+        
+        return mav;
+    }
+    
+    
+    /**
+     * The '/HL7' POST request save all the hl7 custom settings
+     */
+    @RequestMapping(value = "/HL7", method = RequestMethod.POST)
+    public ModelAndView saveHL7Customization(@ModelAttribute(value = "HL7Details") HL7Details HL7Details, RedirectAttributes redirectAttr) throws Exception {
+        
+        List<HL7Segments> segments = HL7Details.getHL7Segments();
+        
+        if (null != segments && segments.size() > 0) {
+            
+            for (HL7Segments segment : segments) {
+                
+                //Update each segment
+                configurationmanager.updateHL7Segments(segment);
+                
+                /* Get the list of segment elements */
+                List<HL7Elements> elements = segment.getHL7Elements();
+                
+                if (null != elements && elements.size() > 0) {
+                    
+                     for (HL7Elements element : elements) {
+                         configurationmanager.updateHL7Elements(element);
+                         
+                         
+                         /* Get the list of segment element components */
+                        List<HL7ElementComponents> components = element.getelementComponents();
+                        
+                        if (null != components && components.size() > 0) {
+                            for (HL7ElementComponents component : components) {
+                                configurationmanager.updateHL7ElementComponent(component);
+                            }
+                        }
+                         
+                     }
+                    
+                }
+                
+            }
+        }
+        
+        redirectAttr.addFlashAttribute("savedStatus", "updated");
+        ModelAndView mav = new ModelAndView(new RedirectView("HL7"));
+        return mav;
+        
+        
+    }
+    
 }
