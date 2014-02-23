@@ -18,6 +18,10 @@ require(['./main'], function () {
             hasErrors = checkFormFields();
 
             if (hasErrors == 0) { 
+                $('body').overlay({
+                    glyphicon : 'floppy-disk',
+                    message : 'Saving...'
+                });
                 $('#messageSpecs').submit();
             }
         });
@@ -29,6 +33,10 @@ require(['./main'], function () {
             hasErrors = checkFormFields();
 
             if (hasErrors == 0) {
+                $('body').overlay({
+                    glyphicon : 'floppy-disk',
+                    message : 'Saving...'
+                });
                 $('#messageSpecs').submit();
             }
         });

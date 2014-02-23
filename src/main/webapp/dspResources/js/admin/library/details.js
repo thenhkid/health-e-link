@@ -14,6 +14,10 @@ require(['./main'], function () {
             var hasErrors = 0;
             hasErrors = checkFileUploaded();
             if (hasErrors == 0) {
+                $('body').overlay({
+                    glyphicon : 'floppy-disk',
+                    message : 'Saving...'
+                });
                 $("#messageType").submit();
             }
 
@@ -24,6 +28,10 @@ require(['./main'], function () {
             var hasErrors = 0;
             hasErrors = checkFileUploaded();
             if (hasErrors == 0) {
+                $('body').overlay({
+                    glyphicon : 'floppy-disk',
+                    message : 'Saving...'
+                });
                 $("#messageType").submit();
             }
         });
