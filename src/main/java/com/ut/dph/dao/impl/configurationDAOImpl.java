@@ -1027,7 +1027,7 @@ public class configurationDAOImpl implements configurationDAO {
     }
     
     /**
-     * The '' function will update the segment element components
+     * The 'updateHL7ElementComponent' function will update the segment element components
      * 
      * @param component The element component object to update.
      */
@@ -1035,6 +1035,39 @@ public class configurationDAOImpl implements configurationDAO {
     @Transactional
     public void updateHL7ElementComponent(HL7ElementComponents component) {
         sessionFactory.getCurrentSession().update(component);
+    }
+    
+    /**
+     * The 'saveHL7Segment' function will save the new HL7 Segment
+     * 
+     * @param newSegment The object holding the new HL7 Object
+     */
+    @Override
+    @Transactional
+    public void saveHL7Segment(HL7Segments newSegment) {
+        sessionFactory.getCurrentSession().save(newSegment);
+    }
+    
+    /**
+     * The 'saveHL7Element' function will save the new HL7 Segment Element
+     * 
+     * @param newElement The object holding the new HL7 Element Object
+     */
+    @Override
+    @Transactional
+    public void saveHL7Element(HL7Elements newElement) {
+        sessionFactory.getCurrentSession().save(newElement);
+    }
+    
+    /**
+     * The 'saveHL7Component' function will save the new HL7 Element Component
+     * 
+     * @param newcomponent The object holding the new HL7 Element Component Object
+     */
+    @Override
+    @Transactional
+    public void saveHL7Component(HL7ElementComponents newcomponent) {
+        sessionFactory.getCurrentSession().save(newcomponent);
     }
     
 }

@@ -112,5 +112,11 @@ public interface configurationManager {
   void updateHL7Elements(HL7Elements element);
   
   void updateHL7ElementComponent(HL7ElementComponents component);
+  
+  void saveHL7Segment(HL7Segments newSegment);
+  
+  void saveHL7Element(HL7Elements newElement);
+  
+  void saveHL7Component(HL7ElementComponents newcomponent);
  
 }

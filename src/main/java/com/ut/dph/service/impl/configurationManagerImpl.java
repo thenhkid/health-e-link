@@ -501,4 +501,19 @@ public class configurationManagerImpl implements configurationManager {
     public void updateHL7ElementComponent(HL7ElementComponents component) {
         configurationDAO.updateHL7ElementComponent(component);
     }
+    
+    @Override
+    public void saveHL7Segment(HL7Segments newSegment) {
+        configurationDAO.saveHL7Segment(newSegment);
+    }
+    
+    @Override
+    public void saveHL7Element(HL7Elements newElement) {
+        configurationDAO.saveHL7Element(newElement);
+    }
+    
+    @Override
+    public void saveHL7Component(HL7ElementComponents newcomponent) {
+        configurationDAO.saveHL7Component(newcomponent);
+    }
 }

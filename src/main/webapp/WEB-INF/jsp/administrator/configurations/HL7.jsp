@@ -12,8 +12,20 @@
 
     <div class="col-md-12">
         
+        <c:if test="${not empty savedStatus}" >
+            <div class="alert alert-success" role="alert">
+                <strong>Success!</strong> 
+                <c:choose>
+                    <c:when test="${savedStatus == 'savedSegment'}">The new segment has been successfully saved!</c:when>
+                    <c:when test="${savedStatus == 'savedElement'}">The new element has been successfully saved!</c:when>
+                    <c:when test="${savedStatus == 'savedComponent'}">The new component has been successfully saved!</c:when>
+                    <c:otherwise>The HL7 Details have been saved</c:otherwise>
+                </c:choose>
+            </div>
+        </c:if>
+        
         <form:form id="HL7Details" modelAttribute="HL7Details" method="post" role="form">
-            <form:hidden path="id" />
+            <form:hidden id="hl7Id" path="id" />
             <form:hidden path="configId" /> 
             <section class="panel panel-default">
                 <div class="panel-heading">
@@ -56,11 +68,11 @@
             <c:forEach items="${HL7Details.HL7Segments}" var="segments" varStatus="segment">
                 <input type="hidden" name="HL7Segments[${segment.index}].id" value="${segments.id}" />
                 <input type="hidden" name="HL7Segments[${segment.index}].hl7Id" value="${segments.hl7Id}" />
-                <input type="hidden" name="HL7Segments[${segment.index}].displayPos" value="${segments.displayPos}" />
+                <input type="hidden" class="segmentPos" name="HL7Segments[${segment.index}].displayPos" value="${segments.displayPos}" />
                 <section class="panel panel-default">
                     <div class="panel-heading">
                         <div class="pull-right">
-                            <a href="#newSegmentElement" data-toggle="modal" class="btn btn-primary btn-xs btn-action" id="addNewSegment" title="Add new segment">Add New Element</a>
+                            <a href="#newSegmentElement" data-toggle="modal" rel="${segments.hl7Id}" rel2="${segments.id}" class="btn btn-primary btn-xs btn-action addNewElement" title="Add new Element">Add New Element</a>
                         </div>
                         <h3 class="panel-title"><strong>Segment ${segments.displayPos} (${segments.segmentName})</strong></h3>
                      </div>
@@ -77,11 +89,11 @@
                             <input type="hidden" name="HL7Segments[${segment.index}].HL7Elements[${element.index}].id" value="${elements.id}" />
                             <input type="hidden" name="HL7Segments[${segment.index}].HL7Elements[${element.index}].hl7Id" value="${elements.hl7Id}" />
                             <input type="hidden" name="HL7Segments[${segment.index}].HL7Elements[${element.index}].segmentId" value="${elements.segmentId}" />
-                            <input type="hidden" name="HL7Segments[${segment.index}].HL7Elements[${element.index}].displayPos" value="${elements.displayPos}" />
+                            <input type="hidden" class="displayPos_${elements.segmentId}" name="HL7Segments[${segment.index}].HL7Elements[${element.index}].displayPos" value="${elements.displayPos}" />
                              <section class="panel panel-default">
                                  <div class="panel-heading" style="background-color: lightgoldenrodyellow">
                                     <div class="pull-right">
-                                       <a href="#newSegmentElement" data-toggle="modal" class="btn btn-primary btn-xs btn-action" id="addNewSegment" title="Add new segment">Add New Component</a>
+                                       <a href="#newSegmentElement" data-toggle="modal" rel="${elements.id}" class="btn btn-primary btn-xs btn-action addNewComponent" title="Add new Component">Add New Component</a>
                                    </div>
                                     <h3 class="panel-title"><strong>Element ${elements.displayPos}</strong></h3>
                                  </div>
@@ -107,7 +119,7 @@
                                         <c:forEach items="${elements.elementComponents}" var="elementComponents" varStatus="component">
                                             <input type="hidden" name="HL7Segments[${segment.index}].HL7Elements[${element.index}].elementComponents[${component.index}].id" value="${elementComponents.id}" />
                                             <input type="hidden" name="HL7Segments[${segment.index}].HL7Elements[${element.index}].elementComponents[${component.index}].elementId" value="${elementComponents.elementId}" />
-                                            <input type="hidden" name="HL7Segments[${segment.index}].HL7Elements[${element.index}].elementComponents[${component.index}].displayPos" value="${elementComponents.displayPos}" />
+                                            <input type="hidden" class="displayPos_${elementComponents.elementId}" name="HL7Segments[${segment.index}].HL7Elements[${element.index}].elementComponents[${component.index}].displayPos" value="${elementComponents.displayPos}" />
                                             <div class="form-container scrollable">
                                                 <div class="row">
                                                     <div class="form-group col-md-6">
@@ -164,3 +176,8 @@
         
     </div>
 </div>
+<!-- New Segment Modal -->
+<div class="modal fade" id="newSegmentModal" role="dialog" tabindex="-1" aria-labeledby="Add HL7 Segment" aria-hidden="true" aria-describedby="Add HL7 Segment"></div>
+
+<!-- New Element Modal -->
+<div class="modal fade" id="newSegmentElement" role="dialog" tabindex="-1" aria-labeledby="Add HL7 Segment Element" aria-hidden="true" aria-describedby="Add HL7 Segment Element"></div>

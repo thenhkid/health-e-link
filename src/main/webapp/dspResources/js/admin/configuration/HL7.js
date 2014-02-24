@@ -20,6 +20,156 @@ require(['./main'], function () {
 
         });
         
+        $('#addNewSegment').click(function(event) {
+           var hl7Id = $('#hl7Id').val();
+           var lastSegPos = $('.segmentPos:last').val();
+           var nextPos = 1;
+           
+           if(lastSegPos > 0) {
+               nextPos = eval(eval(lastSegPos*1)+1);
+           }
+           
+           $.ajax({
+                url: 'newHL7Segment',
+                type: "GET",
+                data: {'hl7Id': hl7Id, 'nextPos': nextPos},
+                success: function(data) {
+                    $("#newSegmentModal").html(data);
+                }
+            });
+           
+        }); 
+        
+        //Function to submit the new HL7 Segment
+        $(document).on('click', '#submitSegmentButton', function(event) {
+            var errorFound = 0;
+
+            //Remove any error message classes
+            $('#segmentNameDiv').removeClass("has-error");
+            $('#segmentNameMsg').removeClass("has-error");
+            $('#segmentNameMsg').html('');
+
+            //Make sure a name is added
+            if ($('#newsegmentName').val() == '') {
+                $('#segmentNameDiv').addClass("has-error");
+                $('#segmentNameMsg').addClass("has-error");
+                $('#segmentNameMsg').html('The segment name is a required field.');
+                errorFound = 1;
+            }
+            
+            
+            if (errorFound == 1) {
+                event.preventDefault();
+                return false;
+            }
+
+            $('#hl7SegmentForm').attr('action','saveHL7Segment');
+            $('#hl7SegmentForm').submit();
+
+        });
+        
+        //Function to show the new segment element modal
+        $('.addNewElement').click(function() {
+            var hl7Id = $(this).attr("rel");
+            var segmentId = $(this).attr("rel2");
+            
+            var lastDspPos = $('.displayPos_'+segmentId+':last').val();
+            var nextPos = 1;
+
+            if(lastDspPos > 0) {
+                nextPos = eval(eval(lastDspPos*1)+1);
+            }
+            
+            $.ajax({
+                url: 'newHL7Element',
+                type: "GET",
+                data: {'hl7Id': hl7Id, 'segmentId': segmentId, 'nextPos': nextPos},
+                success: function(data) {
+                    $("#newSegmentElement").html(data);
+                }
+            });
+            
+        });
+        
+        //Function to submit the new HL7 Segment Element
+        $(document).on('click', '#submitElementButton', function(event) {
+            var errorFound = 0;
+
+            //Remove any error message classes
+            $('#elementNameDiv').removeClass("has-error");
+            $('#elementNameMsg').removeClass("has-error");
+            $('#elementNameMsg').html('');
+
+            //Make sure a name is added
+            if ($('#newelementName').val() == '') {
+                $('#elementNameDiv').addClass("has-error");
+                $('#elementNameMsg').addClass("has-error");
+                $('#elementNameMsg').html('The element name is a required field.');
+                errorFound = 1;
+            }
+            
+            
+            if (errorFound == 1) {
+                event.preventDefault();
+                return false;
+            }
+
+            $('#hl7ElementForm').attr('action','saveHL7Element');
+            $('#hl7ElementForm').submit();
+
+        });
+        
+        
+        //Function to show the new element component modal
+        $('.addNewComponent').click(function() {
+            var elementId = $(this).attr("rel");
+            
+            var lastDspPos = $('.displayPos_'+elementId+':last').val();
+            var nextPos = 1;
+
+            if(lastDspPos > 0) {
+                nextPos = eval(eval(lastDspPos*1)+1);
+            }
+            
+            $.ajax({
+                url: 'newHL7Component',
+                type: "GET",
+                data: {'elementId': elementId, 'nextPos': nextPos},
+                success: function(data) {
+                    $("#newSegmentElement").html(data);
+                }
+            });
+            
+        });
+        
+        //Function to submit the new HL7 Element Component
+        $(document).on('click', '#submitComponentButton', function(event) {
+            var errorFound = 0;
+
+            //Remove any error message classes
+            $('#fieldValueDiv').removeClass("has-error");
+            $('#fieldValueMsg').removeClass("has-error");
+            $('#fieldValueMsg').html('');
+
+            //Make sure a name is added
+            if ($('#newFieldValue').val() == '') {
+                $('#fieldValueDiv').addClass("has-error");
+                $('#fieldValueMsg').addClass("has-error");
+                $('#fieldValueMsg').html('The field value is a required field.');
+                errorFound = 1;
+            }
+            
+            
+            if (errorFound == 1) {
+                event.preventDefault();
+                return false;
+            }
+
+            $('#hl7ComponentForm').attr('action','saveHL7Component');
+            $('#hl7ComponentForm').submit();
+
+        });
+        
     });
     
 });

@@ -113,4 +113,10 @@ public interface configurationDAO {
   
   void updateHL7ElementComponent(HL7ElementComponents component);
   
+  void saveHL7Segment(HL7Segments newSegment);
+  
+  void saveHL7Element(HL7Elements newElement);
+  
+  void saveHL7Component(HL7ElementComponents newcomponent);
+  
 }

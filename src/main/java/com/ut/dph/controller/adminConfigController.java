@@ -1828,4 +1828,149 @@ public class adminConfigController {
         
     }
     
+    /**
+     * The '/newHL7Segment' GET request will be used to display the blank new HL7 Segment screen (In a modal)
+     *
+     *
+     * @return	The HL7 Segment blank form page
+     *
+     * @Objects	An object that will hold all the form fields of a new HL7 Segment 
+     *
+     */
+    @RequestMapping(value = "/newHL7Segment", method = RequestMethod.GET)
+    public @ResponseBody ModelAndView newHL7Segment(@RequestParam(value = "hl7Id", required = true) int hl7Id, @RequestParam(value = "nextPos", required = true) int nextPos) throws Exception {
+
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/configurations/HL7Segment");
+        
+        HL7Segments segmentDetails = new HL7Segments();
+        segmentDetails.sethl7Id(hl7Id);
+        segmentDetails.setdisplayPos(nextPos);
+        
+        mav.addObject("HL7SegmentDetails", segmentDetails);
+
+        return mav;
+    }
+    
+    /**
+     * The '/saveHL7Segment' POST request will handle submitting the new HL7 Segment
+     *
+     * @param HL7SegmentDetails	The object containing the HL7 Segment form fields
+     * @param result	The validation result
+     * @param redirectAttr	The variable that will hold values that can be read after the redirect
+     *
+     * @return	Will return the HL7 Customization page on "Save"
+     *
+     * @throws Exception
+     */
+    @RequestMapping(value = "/saveHL7Segment", method = RequestMethod.POST)
+    public ModelAndView saveHL7Segment(@ModelAttribute(value = "HL7SegmentDetails") HL7Segments HL7SegmentDetails, RedirectAttributes redirectAttr) throws Exception {
+
+        configurationmanager.saveHL7Segment(HL7SegmentDetails);
+
+        redirectAttr.addFlashAttribute("savedStatus", "savedSegment");
+        ModelAndView mav = new ModelAndView(new RedirectView("HL7"));
+        return mav;
+    }
+    
+    /**
+     * The '/newHL7Element' GET request will be used to display the blank new HL7 Segment Element screen (In a modal)
+     *
+     *
+     * @return	The HL7 Segment Element blank form page
+     *
+     * @Objects	An object that will hold all the form fields of a new HL7 Segment Element 
+     *
+     */
+    @RequestMapping(value = "/newHL7Element", method = RequestMethod.GET)
+    public @ResponseBody ModelAndView newHL7Element(@RequestParam(value = "hl7Id", required = true) int hl7Id, @RequestParam(value = "segmentId", required = true) int segmentId, @RequestParam(value = "nextPos", required = true) int nextPos) throws Exception {
+
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/configurations/HL7Element");
+        
+        HL7Elements elementDetails = new HL7Elements();
+        elementDetails.sethl7Id(hl7Id);
+        elementDetails.setsegmentId(segmentId);
+        elementDetails.setdisplayPos(nextPos);
+        
+        mav.addObject("HL7ElementDetails", elementDetails);
+
+        return mav;
+    }
+    
+    /**
+     * The '/saveHL7Element' POST request will handle submitting the new HL7 Segment Element
+     *
+     * @param HL7ElementDetails	The object containing the HL7 Segment Element form fields
+     * @param result	The validation result
+     * @param redirectAttr	The variable that will hold values that can be read after the redirect
+     *
+     * @return	Will return the HL7 Customization page on "Save"
+     *
+     * @throws Exception
+     */
+    @RequestMapping(value = "/saveHL7Element", method = RequestMethod.POST)
+    public ModelAndView saveHL7Element(@ModelAttribute(value = "HL7ElementDetails") HL7Elements HL7ElementDetails, RedirectAttributes redirectAttr) throws Exception {
+
+        configurationmanager.saveHL7Element(HL7ElementDetails);
+
+        redirectAttr.addFlashAttribute("savedStatus", "savedElement");
+        ModelAndView mav = new ModelAndView(new RedirectView("HL7"));
+        return mav;
+    }
+    
+    /**
+     * The '/newHL7Component' GET request will be used to display the blank new HL7 Element Component screen (In a modal)
+     *
+     *
+     * @return	The HL7 Element Component blank form page
+     *
+     * @Objects	An object that will hold all the form fields of a new HL7 Element Component 
+     *
+     */
+    @RequestMapping(value = "/newHL7Component", method = RequestMethod.GET)
+    public @ResponseBody ModelAndView newHL7Component(@RequestParam(value = "elementId", required = true) int elementId, @RequestParam(value = "nextPos", required = true) int nextPos) throws Exception {
+
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/configurations/HL7Component");
+        
+        HL7ElementComponents componentDetails = new HL7ElementComponents();
+        componentDetails.setelementId(elementId);
+        componentDetails.setdisplayPos(nextPos);
+        
+        mav.addObject("HL7ComponentDetails", componentDetails);
+        
+        //Get the transport fields
+        //Get the transport details by configid and selected transport method
+        configurationTransport transportDetails = configurationTransportManager.getTransportDetails(configId);
+        List<configurationFormFields> fields = configurationTransportManager.getConfigurationFields(configId, transportDetails.getId());
+        transportDetails.setFields(fields);
+
+        mav.addObject("fields", fields);
+
+        return mav;
+    }
+    
+    /**
+     * The '/saveHL7Component' POST request will handle submitting the new HL7 Segment Element
+     *
+     * @param HL7ComponentDetails  The object containing the HL7 Element Component form fields
+     * @param result	The validation result
+     * @param redirectAttr	The variable that will hold values that can be read after the redirect
+     *
+     * @return	Will return the HL7 Customization page on "Save"
+     *
+     * @throws Exception
+     */
+    @RequestMapping(value = "/saveHL7Component", method = RequestMethod.POST)
+    public ModelAndView saveHL7Component(@ModelAttribute(value = "HL7ComponentDetails") HL7ElementComponents HL7ComponentDetails, RedirectAttributes redirectAttr) throws Exception {
+
+        configurationmanager.saveHL7Component(HL7ComponentDetails);
+
+        redirectAttr.addFlashAttribute("savedStatus", "savedComponent");
+        ModelAndView mav = new ModelAndView(new RedirectView("HL7"));
+        return mav;
+    }
+    
+    
 }

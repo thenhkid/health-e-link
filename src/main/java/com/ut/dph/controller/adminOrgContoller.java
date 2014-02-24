@@ -1173,8 +1173,10 @@ public class adminOrgContoller {
 
     /**
      * *********************************************************
-     * ORGANIZATION BROCHURE FUNCTIONS *********************************************************
+     * ORGANIZATION BROCHURE FUNCTIONS 
+     * *********************************************************
      */
+    
     /**
      * The '/{cleanURL/brochures' GET request will display the list of brochures for the selected organization.
      *
