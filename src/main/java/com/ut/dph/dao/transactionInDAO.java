@@ -92,7 +92,7 @@ public interface transactionInDAO {
     
     boolean insertMultiValToMessageTables(ConfigForInsert config, Integer subStringCounter, Integer transId);
     
-    boolean clearMessageTableForBatch(int batchId, String tableName);
+    Integer clearMessageTableForBatch(int batchId, String tableName);
     
     public List <String> getMessageTables();
     
@@ -113,17 +113,17 @@ public interface transactionInDAO {
     
     boolean allowBatchClear (Integer batchUploadId);
     
-    boolean clearTransactionInRecords(Integer batchId);
+    Integer clearTransactionInRecords(Integer batchId);
     
-    boolean clearTransactionTranslatedIn(Integer batchUploadId);
+    Integer clearTransactionTranslatedIn(Integer batchUploadId);
     
-    boolean clearTransactionTarget(Integer batchUploadId);
+    Integer clearTransactionTarget(Integer batchUploadId);
 
-    boolean clearTransactionIn(Integer batchUploadId);
+    Integer clearTransactionIn(Integer batchUploadId);
      
     Integer insertFailedRequiredFields(configurationFormFields cff, Integer batchUploadId);
     
-    boolean clearTransactionInErrors(Integer batchUploadId);
+    Integer clearTransactionInErrors(Integer batchUploadId);
     
     void updateStatusForErrorTrans(Integer batchId, Integer statusId, boolean foroutboundProcessing);
     
@@ -158,5 +158,6 @@ public interface transactionInDAO {
     void updateRecordCounts (Integer batchId, List <Integer> statusIds, boolean foroutboundProcessing, String colNameToUpdate);
     
     Integer getRecordCounts (Integer batchId, List <Integer> statusIds, boolean foroutboundProcessing);
-
+    
+    Integer copyTransactionInStatusToTarget(Integer batchId);
 }

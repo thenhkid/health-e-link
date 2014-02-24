@@ -1082,7 +1082,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 
     @Override
     @Transactional
-    public boolean clearMessageTableForBatch(int batchId, String mt) {
+    public Integer clearMessageTableForBatch(int batchId, String mt) {
         String sql = "delete from " + mt + " where transactionInId in "
                 + " (select id from transactionIn where batchId = :id)"
                 + ";";
@@ -1090,10 +1090,10 @@ public class transactionInDAOImpl implements transactionInDAO {
                 .addScalar("id", StandardBasicTypes.INTEGER).setParameter("id", batchId);
         try {
             deleteTable.executeUpdate();
-            return true;
+            return 0;
         } catch (Exception ex) {
             System.err.println("clearMessageTableForBatch failed. " + ex);
-            return false;
+            return 1;
 
         }
     }
@@ -1329,7 +1329,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 
     @Override
     @Transactional
-    public boolean clearTransactionInRecords(Integer batchUploadId) {
+    public Integer clearTransactionInRecords(Integer batchUploadId) {
         String sql = "delete from transactionInRecords where transactionInId in"
                 + "(select id from transactionIn where batchId = :batchUploadId )";
 
@@ -1338,16 +1338,16 @@ public class transactionInDAOImpl implements transactionInDAO {
 
         try {
             deleteData.executeUpdate();
-            return true;
+            return 0;
         } catch (Exception ex) {
             System.err.println("clearTransactionInRecords failed." + ex);
-            return false;
+            return 1;
         }
     }
 
     @Override
     @Transactional
-    public boolean clearTransactionTranslatedIn(Integer batchUploadId) {
+    public Integer clearTransactionTranslatedIn(Integer batchUploadId) {
         String sql = "delete from transactionTranslatedIn where transactionInId in"
                 + "(select id from transactionIn where batchId = :batchUploadId )";
 
@@ -1356,16 +1356,16 @@ public class transactionInDAOImpl implements transactionInDAO {
 
         try {
             deleteData.executeUpdate();
-            return true;
+            return 0;
         } catch (Exception ex) {
             System.err.println("clearTransactionTranslatedIn failed." + ex);
-            return false;
+            return 1;
         }
     }
 
     @Override
     @Transactional
-    public boolean clearTransactionTarget(Integer batchUploadId) {
+    public Integer clearTransactionTarget(Integer batchUploadId) {
         String sql = "delete from TransactionTarget where batchUploadId = :batchUploadId";
 
         Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
@@ -1373,25 +1373,25 @@ public class transactionInDAOImpl implements transactionInDAO {
 
         try {
             deleteData.executeUpdate();
-            return true;
+            return 0;
         } catch (Exception ex) {
             System.err.println("clearTransactionTarget failed." + ex);
-            return false;
+            return 1;
         }
     }
 
     @Override
     @Transactional
-    public boolean clearTransactionIn(Integer batchUploadId) {
+    public Integer clearTransactionIn(Integer batchUploadId) {
         String sql = "delete from transactionIn batchId = :batchUploadId )";
         Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
                 .setParameter("batchUploadId", batchUploadId);
         try {
             deleteData.executeUpdate();
-            return true;
+            return 0;
         } catch (Exception ex) {
             System.err.println("clearTransactionIn failed." + ex);
-            return false;
+            return 1;
         }
     }
 
@@ -1428,7 +1428,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 
     @Override
     @Transactional
-    public boolean clearTransactionInErrors(Integer batchUploadId) {
+    public Integer clearTransactionInErrors(Integer batchUploadId) {
         String sql = "delete from transactionInErrors where batchUploadId = :batchUploadId";
 
         Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
@@ -1436,10 +1436,10 @@ public class transactionInDAOImpl implements transactionInDAO {
 
         try {
             deleteData.executeUpdate();
-            return true;
+            return 0;
         } catch (Exception ex) {
             System.err.println("clearTransactionInRecords failed." + ex);
-            return false;
+            return 1;
         }
     }
 
@@ -1490,9 +1490,8 @@ public class transactionInDAOImpl implements transactionInDAO {
             return 0;
         } catch (Exception ex) {
             System.err.println("genericValidation failed." + ex);
-            insertProcessingError(5, cff.getconfigId(), cff.getId(),
-		    		batchUploadId, null, null, validationTypeId,
-		    		false, false, (ex.getClass() + "-" + ex.getCause().toString()));
+            insertProcessingError(5, cff.getconfigId(), batchUploadId, cff.getId(),
+		    		null, null, validationTypeId, false, false, (ex.getClass() + "-" + ex.getCause().toString()));
             return 1; //we return error count of 1 when error
         }
     }
@@ -1674,8 +1673,8 @@ public class transactionInDAOImpl implements transactionInDAO {
             updateData.executeUpdate();
         } catch (Exception ex) {
             System.err.println("executeCWData failed." + ex);
-            insertProcessingError(5, configId, fieldId,
-		    		batchId, null, cwd.getCrosswalkId(), null,
+            insertProcessingError(5, configId, batchId, fieldId,
+		    		null, cwd.getCrosswalkId(), null,
 		    		false, foroutboundProcessing, (ex.getClass() + " " + ex.getCause().toString()));
         }
 
@@ -2107,8 +2106,8 @@ public class transactionInDAOImpl implements transactionInDAO {
 		        return 0; 
 		   } catch (Exception e) {
 			   //insert system error
-			   insertProcessingError(5, configId, cdt.getFieldId(),
-			    		batchId, cdt.getMacroId(), null, null,
+			   insertProcessingError(5, configId, batchId, cdt.getFieldId(),
+			    		cdt.getMacroId(), null, null,
 			    		false, foroutboundProcessing, (e.getClass() + " " + e.getCause().toString()));
 			   
 			   return 1;
@@ -2119,8 +2118,8 @@ public class transactionInDAOImpl implements transactionInDAO {
 
 		@Override
 	    @Transactional
-	    public void insertProcessingError(Integer errorId, Integer configId, Integer fieldId,
-	    		Integer batchId, Integer macroId, Integer cwId, Integer validationTypeId,
+	    public void insertProcessingError(Integer errorId, Integer configId, Integer batchId,
+	    		Integer fieldId,Integer macroId, Integer cwId, Integer validationTypeId,
 	    		boolean required, boolean foroutboundProcessing, String stackTrace) {
 
 	        String tableName = "transactionInErrors";
@@ -2239,5 +2238,21 @@ public class transactionInDAOImpl implements transactionInDAO {
 	        	System.out.println(e.getClass() + " " + e.getCause());
 	        	return null;
 	        }
+		}
+
+		@Override
+		@Transactional
+		public Integer copyTransactionInStatusToTarget(Integer batchId) {
+			try {
+				String sql = ("UPDATE transactionTarget INNER JOIN transactionIn  ON  transactionIn.id = transactionTarget.transactionInId "
+						+ " and transactionTarget.batchUploadId = :batchId set transactionTarget.statusId = transactionIn.statusId;");
+		        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
+		                .setParameter("batchId", batchId);
+		        query.executeUpdate();
+				return 0;
+			} catch (Exception ex) {
+				System.out.println(ex.getClass() + " " + ex.getCause());
+				return 1;
+			}
 		}
 }

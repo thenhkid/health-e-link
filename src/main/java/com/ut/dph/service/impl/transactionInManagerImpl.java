@@ -339,16 +339,17 @@ public class transactionInManagerImpl implements transactionInManager {
     }
 
     @Override
-    public boolean clearMessageTables(int batchId) {
+    public Integer clearMessageTables(int batchId) {
         List<String> mts = transactionInDAO.getMessageTables();
+        Integer sysErrorCount = 0;
         try {
             for (String mt : mts) {
-                transactionInDAO.clearMessageTableForBatch(batchId, mt);
+            	sysErrorCount = sysErrorCount + transactionInDAO.clearMessageTableForBatch(batchId, mt);
             }
-            return true;
+            return sysErrorCount;
         } catch (Exception e) {
             System.out.println("clearMessageTables " + e.getStackTrace());
-            return false;
+            return 1;
 
         }
     }
@@ -490,7 +491,6 @@ public class transactionInManagerImpl implements transactionInManager {
     @Override
     public boolean processBatch(int batchUploadId) throws Exception {
 
-		boolean successfulBatch = false;
 		Integer batchStausId = 29;
 		List <Integer> errorStatusIds = Arrays.asList(11,13,14);
 		/**
@@ -508,25 +508,61 @@ public class transactionInManagerImpl implements transactionInManager {
             updateBatchStatus(batchUploadId, 4, "startDateTime");
 
             // let's clear all tables first as we are starting over
-            successfulBatch = clearTransactionTables(batchUploadId);
+            
+             Integer sysErrors = clearTransactionTables(batchUploadId);
 
 			// loading batch will take it all the way to loaded (9) status for
 			// transactions and SSL (3) for batch
-			successfulBatch = loadBatch(batchUploadId);
+             sysErrors = sysErrors + loadBatch(batchUploadId);
 
+             if (sysErrors > 0) {
+            	insertProcessingError(5, null, batchUploadId, null, null, null, null, false, false, "Load errors, please contact admin");
+ 				updateBatchStatus(batchUploadId, batchStausId, "endDateTime");
+ 				return false;
+             }
+           
+			//we check handling here for rejecting entire batch
+            List <configurationTransport> batchHandling = getHandlingDetailsByBatch(batchUploadId);
+            if (batchHandling.size() != 1) {
+				//TODO email admin to fix problem
+				insertProcessingError(5, null, batchUploadId, null, null, null, null, false, false, "Multiple or no file handling found, please check auto-release and error handling configurations");
+				updateRecordCounts (batchUploadId, new ArrayList <Integer> (), false, "totalRecordCount");
+				// do we count pass records as errors?
+				updateRecordCounts (batchUploadId, errorStatusIds, false, "errorRecordCount");
+				updateBatchStatus(batchUploadId, batchStausId, "endDateTime");
+				return false;
+			}
+            if (batchHandling.size() == 1) {
+            	//reject submission on error
+            	if (batchHandling.get(0).geterrorHandling() == 3) {
+            		// at this point we will only have invalid records
+            		if (getRecordCounts (batchUploadId, errorStatusIds, false) > 0) {
+            			updateBatchStatus(batchUploadId, 7, "endDateTime");
+            			//update loaded to rejected
+            			updateTransactionStatus(batchUploadId, 0, 9 , 13);
+            			return false;
+            		}
+            	}
+            }
+			
+           //at the end of loaded, we update to PR
+			updateTransactionStatus(batchUploadId, 0, 9 , 10);	
+			updateTransactionTargetStatus(batchUploadId, 0, 9, 10);
+			 
             // after loading is successful we update to SSL
             updateBatchStatus(batchUploadId, 3, "startDateTime");
-
+           
 			// get batch details again for next set of processing
 			batch = getBatchDetails(batchUploadId);
-
+						
 		}
+		
+		
 
 		//this should be the same point of both ERG and Uploaded File *
-		successfulBatch = true; 
 		Integer systemErrorCount = 0;
 		// Check to make sure the file is valid for processing, valid file is a batch with SSL (3) or SR (6)*
-		if ((batch.getstatusId() == 3 || batch.getstatusId() == 6) && successfulBatch) {
+		if ((batch.getstatusId() == 3 || batch.getstatusId() == 6)) {
 			// set batch to SBP - 4*
 			updateBatchStatus(batchUploadId, 4, "startDateTime");
 			
@@ -574,16 +610,15 @@ public class transactionInManagerImpl implements transactionInManager {
 				if (systemErrorCount > 0) {
 					//error batch
 					updateBatchStatus (batchUploadId, batchStausId, "endDateTime");
-					// email admin
-
+					//TODO email admin
 					// break out of loop as errorCount is system error
 					return false;
-				} else  {
-					updateTransactionStatus(batchUploadId, 0, 10, 12);	
-					updateTransactionTargetStatus(batchUploadId, 0, 10, 12);
-				}
+				} 	
 			} //end of configs
 			
+			updateTransactionStatus(batchUploadId, 0, 10, 12);
+			//transactionIn and transactionTarget status should be the same 
+			copyTransactionInStatusToTarget(batchUploadId);
 			// TODO should move this method to processHandling so codes are not so cumbersome
 			/**
 			 * batches gets process again when user hits release button, maybe have separate method call
@@ -593,8 +628,10 @@ public class transactionInManagerImpl implements transactionInManager {
 			// multiple config should be set to handle the batch the same way - we email admin if we don't have one way of handling a batch
 			if (handlingDetails.size() != 1) {
 				//TODO email admin to fix problem
-				clearMessageTables(batchUploadId);
 				insertProcessingError(5, null, batchUploadId, null, null, null, null, false, false, "Multiple or no file handling found, please check auto-release and error handling configurations");
+				updateRecordCounts (batchUploadId, new ArrayList <Integer> (), false, "totalRecordCount");
+				// do we count pass records as errors?
+				updateRecordCounts (batchUploadId, errorStatusIds, false, "errorRecordCount");
 				updateBatchStatus(batchUploadId, batchStausId, "endDateTime");
 				return false;
 			}
@@ -607,39 +644,46 @@ public class transactionInManagerImpl implements transactionInManager {
 					4 = Pass through errors
 				 **/
 				if (getRecordCounts (batchUploadId, Arrays.asList(14), false) > 0 && batch.getstatusId() == 6) {
-					// config changed as record no longer passes as expected, set batch back to PR and go through auto/error handling
+					//batches with error should not be released, can only be Rejected/Invalid, set batch back to PR and go through auto/error handling
 					batch.setstatusId(5);
 					batchStausId = 5;
 				}
 				if ((handlingDetails.get(0).getautoRelease() && handlingDetails.get(0).geterrorHandling() == 1) 
 						&& (batch.getstatusId() != 6)) {
 					//TODO send email here
-					clearMessageTables(batchUploadId);
-					insertProcessingError(5,  null, null, batchUploadId, null, null, null,
+					insertProcessingError(5,  null, batchUploadId, null, null, null, null,
 							false, false, "A batch cannot be set to auto-release and post errors to ERG.  Please modify configuration settings.");
+					updateRecordCounts (batchUploadId, new ArrayList <Integer> (), false, "totalRecordCount");
+					// do we count pass records as errors?
+					updateRecordCounts (batchUploadId, errorStatusIds, false, "errorRecordCount");
 					updateBatchStatus(batchUploadId, batchStausId, "endDateTime");
 					return false;
 				} else if (batch.getstatusId() == 6 || (handlingDetails.get(0).getautoRelease() &&
 						(handlingDetails.get(0).geterrorHandling() == 2 || handlingDetails.get(0).geterrorHandling() == 4))) {
 					
-					//we insert here
-					if (!insertTransactions(batchUploadId)) {
-						//something went wrong, we removed all inserted entries *
-						clearMessageTables(batchUploadId);
-						insertProcessingError(5,  null, null, batchUploadId, null, null, null,
-								false, false, "An error occurred while inserting into message tables.");
-						updateBatchStatus(batchUploadId, batchStausId, "endDateTime");
-						return false;
-					}
 					if (handlingDetails.get(0).geterrorHandling() == 2) {
-							//update to reject - 13
+							//reject errors
 							updateTransactionStatus(batchUploadId, 0, 14, 13);
-							updateTransactionTargetStatus(batchUploadId, 0, 12, 13);
+							copyTransactionInStatusToTarget(batchUploadId);	
 					} else if  (handlingDetails.get(0).geterrorHandling() == 4) {
 							//update to pass - 16
 							updateTransactionStatus(batchUploadId, 0, 14, 16);
-							updateTransactionTargetStatus(batchUploadId, 0, 12, 16);
+							//target should still be pending output
+							updateTransactionTargetStatus(batchUploadId, 0, 14, 19);
 					}
+					//we insert here
+					if (!insertTransactions(batchUploadId)) {
+						//something went wrong, we removed all inserted entries
+						clearMessageTables(batchUploadId);
+						insertProcessingError(5,  null,  batchUploadId,null, null, null, null,
+								false, false, "An error occurred while inserting into message tables.");
+						updateRecordCounts (batchUploadId, new ArrayList <Integer> (), false, "totalRecordCount");
+						// do we count pass records as errors?
+						updateRecordCounts (batchUploadId, errorStatusIds, false, "errorRecordCount");
+						updateBatchStatus(batchUploadId, batchStausId, "endDateTime");
+						return false;
+					}
+						// all went well
 						updateTransactionStatus(batchUploadId, 0, 12, 19);
 						updateTransactionTargetStatus(batchUploadId, 0, 12, 19);
 						batchStausId = 24;
@@ -648,31 +692,27 @@ public class transactionInManagerImpl implements transactionInManager {
 					//auto-release, 3 = Reject submission on error 
 					batchStausId = 7;
 					//updating entire batch to reject since error transactionIds are in error tables
-					updateTransactionTargetStatus(batchUploadId, 0, 0, 13);
-					updateTransactionStatus(batchUploadId, 0, 0, 13);
+					updateTransactionTargetStatus(batchUploadId, 0, 14, 13);
+					updateTransactionStatus(batchUploadId, 0, 14, 13);
 					
 				}  else if (!handlingDetails.get(0).getautoRelease() && handlingDetails.get(0).geterrorHandling() == 1) { //manual release
 					//transaction will be set to saved, batch will be set to RP
 					batchStausId = 5;
-					//TODO what should target status be?
-					updateTransactionStatus(batchUploadId, 0, 9, 10);
+					//we leave status alone as we already set them
 				} else if (!handlingDetails.get(0).getautoRelease() && handlingDetails.get(0).geterrorHandling() == 2) {
 					//reject records
 					batchStausId = 5;
-					//loaded to PR, erg should be at saved already
-					updateTransactionStatus(batchUploadId, 0, 9, 10);
-					//error to reject
 					updateTransactionStatus(batchUploadId, 0, 14, 13);
+					updateTransactionTargetStatus(batchUploadId, 0, 14, 13);	
 				} else if (!handlingDetails.get(0).getautoRelease() && handlingDetails.get(0).geterrorHandling() == 3) {
 					batchStausId = 7;
-					//everything gets rejected
-					updateTransactionStatus(batchUploadId, 0, 0, 13);
+					updateTransactionStatus(batchUploadId, 0, 14, 13);
+					updateTransactionTargetStatus(batchUploadId, 0, 14, 13);
 				} else if (!handlingDetails.get(0).getautoRelease() && handlingDetails.get(0).geterrorHandling() == 4) {
 						batchStausId = 5;
 						// pass
 						updateTransactionStatus(batchUploadId, 0, 14, 16);
-						//pending release
-						updateTransactionStatus(batchUploadId, 0, 9, 10);
+						updateTransactionTargetStatus(batchUploadId, 0, 14, 19);
 				} //end of checking auto/error handling
 				
 				updateRecordCounts (batchUploadId, new ArrayList <Integer> (), false, "totalRecordCount");
@@ -681,14 +721,10 @@ public class transactionInManagerImpl implements transactionInManager {
 				updateBatchStatus(batchUploadId, batchStausId, "endDateTime");
 				 
 			} //end of making sure there is one handling details for batch
-			
-			
-			
+		
 		} // end of single batch insert 
 		
-			
-		
-		return successfulBatch;
+		return true;
 	}
 
     /**
@@ -733,29 +769,30 @@ public class transactionInManagerImpl implements transactionInManager {
     @Override
     public boolean clearBatch(Integer batchUploadId) throws Exception {
         boolean canDelete = transactionInDAO.allowBatchClear(batchUploadId);
-        boolean cleared = false;
+        Integer sysError = 0;
         if (canDelete) {
-            /**
-             * we remove from message tables*
-             */
             //TODO how much should we clear? Is it different for ERG and Upload?
 
-            cleared = clearMessageTables(batchUploadId);
-            if (cleared) {
+            sysError = clearMessageTables(batchUploadId);
+            if (sysError == 0) {
                 int toBatchStatusId = 3; //SSA
                 if (getBatchDetails(batchUploadId).gettransportMethodId() == 2) {
-                    cleared = clearTransactionInErrors(batchUploadId);
+                	sysError = clearTransactionInErrors(batchUploadId);
                     toBatchStatusId = 5;
                     resetTransactionTranslatedIn(batchUploadId, true);
                     transactionInDAO.updateTransactionStatus(batchUploadId, 0, 0, 15);
                 } else {
                     //we clear transactionInRecords here as for batch upload we start over
-                    cleared = clearTransactionTables(batchUploadId);
+                	sysError = clearTransactionTables(batchUploadId);
                 }
                 transactionInDAO.updateBatchStatus(batchUploadId, toBatchStatusId, "");
             }
         }
-        return cleared;
+        if (sysError == 0) {
+        	return true;
+        } else {
+        	return false;
+        }
     }
 
     @Override
@@ -765,7 +802,7 @@ public class transactionInManagerImpl implements transactionInManager {
     }
 
     @Override
-    public boolean clearTransactionInRecords(Integer batchUploadId) {
+    public Integer clearTransactionInRecords(Integer batchUploadId) {
         return transactionInDAO.clearTransactionInRecords(batchUploadId);
     }
 
@@ -832,7 +869,7 @@ public class transactionInManagerImpl implements transactionInManager {
      * 1. read file 2. parse row by row and a. figure out config b. insert into transactionIn c. insert into transacitonTarget d. flag transactions as Loaded or Invalid *
      */
     @Override
-    public boolean loadBatch(Integer batchUploadId) {
+    public Integer loadBatch(Integer batchUploadId) {
         /**
          * we read uploaded file, line by line*
          */
@@ -848,47 +885,46 @@ public class transactionInManagerImpl implements transactionInManager {
         /**
          * when we are done, the batch will be SSL and records will either be INVALID or Loaded *
          */
-        return true;
+    	try {
+    		return 0;
+    	} catch (Exception ex) {
+    		System.out.println(ex.getClass() + " " + ex.getCause());
+    		return 1;
+    	}
+        
     }
 
     @Override
-    public boolean clearTransactionTranslatedIn(Integer batchUploadId) {
+    public Integer clearTransactionTranslatedIn(Integer batchUploadId) {
         return transactionInDAO.clearTransactionTranslatedIn(batchUploadId);
     }
 
     @Override
-    public boolean clearTransactionTables(Integer batchUploadId) {
-        boolean cleared = false;
+    public Integer clearTransactionTables(Integer batchUploadId) {
         //we clear transactionTranslatedIn
-        cleared = clearTransactionTranslatedIn(batchUploadId);
+        Integer cleared = clearTransactionTranslatedIn(batchUploadId);
         //we clear transactionInRecords
-        if (cleared) {
-            cleared = clearTransactionInRecords(batchUploadId);
-        }
+        cleared = cleared + clearTransactionInRecords(batchUploadId);
         //we clear transactionTarget
-        if (cleared) {
-            cleared = clearTransactionTarget(batchUploadId);
-        }
-        if (cleared) {
-            cleared = clearTransactionInErrors(batchUploadId);
-        }
+        cleared = cleared + clearTransactionTarget(batchUploadId);
+        cleared = cleared + clearTransactionInErrors(batchUploadId);
+       
         //we clear transactionIn
-        if (cleared) {
-            cleared = clearTransactionTarget(batchUploadId);
-        }
-        if (!cleared) {
+        cleared = cleared + clearTransactionTarget(batchUploadId);
+       
+        if (cleared > 0) {
             flagAndEmailAdmin(batchUploadId);
         }
         return cleared;
     }
 
     @Override
-    public boolean clearTransactionTarget(Integer batchUploadId) {
+    public Integer clearTransactionTarget(Integer batchUploadId) {
         return transactionInDAO.clearTransactionTarget(batchUploadId);
     }
 
     @Override
-    public boolean clearTransactionIn(Integer batchUploadId) {
+    public Integer clearTransactionIn(Integer batchUploadId) {
         return transactionInDAO.clearTransactionIn(batchUploadId);
     }
 
@@ -909,7 +945,7 @@ public class transactionInManagerImpl implements transactionInManager {
     }
 
     @Override
-    public boolean clearTransactionInErrors(Integer batchUploadId) {
+    public Integer clearTransactionInErrors(Integer batchUploadId) {
         return transactionInDAO.clearTransactionInErrors(batchUploadId);
     }
 
@@ -1312,9 +1348,8 @@ public class transactionInManagerImpl implements transactionInManager {
     }
 
 	@Override
-	public void insertProcessingError(Integer errorId, Integer configId,
-			Integer batchId, Integer fieldId, Integer macroId, Integer cwId,
-			Integer validationTypeId, boolean required,
+	public void insertProcessingError(Integer errorId, Integer configId, Integer batchId, Integer fieldId, 
+			Integer macroId, Integer cwId, Integer validationTypeId, boolean required,
 			boolean foroutboundProcessing, String errorCause) {
 		transactionInDAO.insertProcessingError(errorId, configId, batchId, fieldId, macroId, cwId, validationTypeId, required, foroutboundProcessing, errorCause);
 		
@@ -1334,6 +1369,11 @@ public class transactionInManagerImpl implements transactionInManager {
 	@Override
 	public void resetTransactionTranslatedIn(Integer batchId, boolean resetAll) {
 		transactionInDAO.resetTransactionTranslatedIn(batchId, resetAll);	
+	}
+
+	@Override
+	public Integer copyTransactionInStatusToTarget(Integer batchId) {
+		return transactionInDAO.copyTransactionInStatusToTarget(batchId);
 	}
 
 }

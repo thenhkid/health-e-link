@@ -99,7 +99,7 @@ public interface transactionInManager {
     
     List <Integer> getTransWithMultiValues (ConfigForInsert config);
 
-    boolean clearMessageTables(int batchId);
+    Integer clearMessageTables(int batchId);
     
      Map<String,String> uploadBatchFile(int configId, MultipartFile fileUpload) throws Exception;
     
@@ -123,19 +123,19 @@ public interface transactionInManager {
     
     boolean setDoNotProcess(Integer batchUploadId);
     
-    boolean clearTransactionInRecords(Integer batchUploadId);
+    Integer clearTransactionInRecords(Integer batchUploadId);
     
     boolean insertTransactions (Integer batchUploadId);
     
-    boolean loadBatch (Integer batchUploadId);
+    Integer loadBatch (Integer batchUploadId);
     
-    boolean clearTransactionIn(Integer batchUploadId);
+    Integer clearTransactionIn(Integer batchUploadId);
     
-    boolean clearTransactionTranslatedIn(Integer batchUploadId);
+    Integer clearTransactionTranslatedIn(Integer batchUploadId);
     
-    boolean clearTransactionTables(Integer batchUploadId);
+    Integer clearTransactionTables(Integer batchUploadId);
     
-    boolean clearTransactionTarget(Integer batchUploadId);
+    Integer clearTransactionTarget(Integer batchUploadId);
 
     void flagAndEmailAdmin(Integer batchUploadId);
     
@@ -143,7 +143,7 @@ public interface transactionInManager {
     
     Integer insertFailedRequiredFields(configurationFormFields cff, Integer batchUploadId);
     
-    boolean clearTransactionInErrors(Integer batchUploadId);
+    Integer clearTransactionInErrors(Integer batchUploadId);
     
     void updateStatusForErrorTrans(Integer batchId, Integer statusId, boolean foroutboundProcessing);
     
@@ -200,4 +200,7 @@ public interface transactionInManager {
     Integer getRecordCounts (Integer batchId, List <Integer> statusIds, boolean foroutboundProcessing);
     
     void resetTransactionTranslatedIn(Integer batchId, boolean resetAll);
+    
+    Integer copyTransactionInStatusToTarget(Integer batchId);
+    
 }
