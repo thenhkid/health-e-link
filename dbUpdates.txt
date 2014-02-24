@@ -363,3 +363,41 @@ END IF;
 select '';
 end proc_main$$
 DELIMITER ;
+
+/** grace 02242014 **/
+drop procedure insertValidationErrors;
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `insertValidationErrors`(in vtType int, in fieldNo int,
+in batchUploadId int, in configId int, in cffId int)
+BEGIN
+
+DECLARE regEx varchar(100) DEFAULT '';
+
+CASE vtType
+	WHEN 2 THEN set regEx = '^[A-Z0-9._%-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$';
+    WHEN 3 THEN 
+		BEGIN 
+			CALL `universalTranslator`.`stripPhoneChars`(vtType, fieldNo, batchUploadId, configId, cffId);
+			set regEx ='^[0-9]{7,11}$';
+		END;
+	WHEN 5 THEN set regEx = '^-?[0-9]+[.]?[0-9]*$|^-?[.][0-9]+$';
+    ELSE
+        BEGIN
+        END;
+	END 
+	CASE;
+ 
+set @stmt = concat(
+'insert into transactionInerrors (batchUploadId, transactionInId, configurationFormFieldsId, errorid, 
+validationTypeId) SELECT ', batchUploadId, ', transactionInId, ',cffId,',2, ', vtType,'  
+ FROM transactionTranslatedIn WHERE F' ,fieldNo, ' not REGEXP  "', regEx, '" and F',fieldNo, ' is not null 
+and length(F', fieldNO, ') != 0
+and configId = ', configId, ' and transactionInId 
+in (select id from transactionIn where batchId = ', batchUploadId,' and configId = ', configId,' and statusId != 12);');
+
+PREPARE stmt from @stmt;
+EXECUTE stmt;
+
+ END$$
+DELIMITER ;
+
