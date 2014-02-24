@@ -964,6 +964,7 @@ public class configurationDAOImpl implements configurationDAO {
     public List<HL7Segments> getHL7Segments(int hl7Id) {
         Criteria criteria = sessionFactory.getCurrentSession().createCriteria(HL7Segments.class);
         criteria.add(Restrictions.eq("hl7Id", hl7Id));
+        criteria.addOrder(Order.asc("displayPos"));
         
         return criteria.list();
     }
@@ -981,6 +982,7 @@ public class configurationDAOImpl implements configurationDAO {
         Criteria criteria = sessionFactory.getCurrentSession().createCriteria(HL7Elements.class);
         criteria.add(Restrictions.eq("hl7Id", hl7Id));
         criteria.add(Restrictions.eq("segmentId", segmentId));
+        criteria.addOrder(Order.asc("displayPos"));
         
         return criteria.list();
     }
@@ -998,6 +1000,7 @@ public class configurationDAOImpl implements configurationDAO {
     public List<HL7ElementComponents> getHL7ElementComponents(int elementId) {
         Criteria criteria = sessionFactory.getCurrentSession().createCriteria(HL7ElementComponents.class);
         criteria.add(Restrictions.eq("elementId", elementId));
+        criteria.addOrder(Order.asc("displayPos"));
         
         return criteria.list();
     }

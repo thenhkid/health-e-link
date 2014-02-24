@@ -8,6 +8,10 @@ package com.ut.dph.service.impl;
 
 import com.ut.dph.dao.messageTypeDAO;
 import com.ut.dph.dao.transactionOutDAO;
+import com.ut.dph.model.HL7Details;
+import com.ut.dph.model.HL7ElementComponents;
+import com.ut.dph.model.HL7Elements;
+import com.ut.dph.model.HL7Segments;
 import com.ut.dph.model.Organization;
 import com.ut.dph.model.User;
 import com.ut.dph.model.batchDownloadSummary;
@@ -1050,40 +1054,134 @@ public class transactionOutManagerImpl implements transactionOutManager {
             } catch (IOException ex) {
                 Logger.getLogger(transactionOutManagerImpl.class.getName()).log(Level.SEVERE, null, ex);
             }
-
-            for(int i = 1; i <= maxFieldNo; i++) {
-
-                String colName = new StringBuilder().append("f").append(i).toString();
-
-                try {
-                    String fieldValue = BeanUtils.getProperty(records, colName);
-
-                    if("null".equals(fieldValue)) {
-                        fieldValue = "";
+            
+            /* If an hl7 file is to be generated */
+            if(hl7 == true) {
+                
+                /* Get the hl7 details */
+                HL7Details hl7Details = configurationManager.getHL7Details(transportDetails.getconfigId());
+                
+                
+                if(hl7Details != null) {
+                    
+                    /* Get the hl7 Segments */
+                    List<HL7Segments> hl7Segments = configurationManager.getHL7Segments(hl7Details.getId());
+                    
+                    if(!hl7Segments.isEmpty()) {
+                        StringBuilder hl7recordRow = new StringBuilder();
+                        
+                        for(HL7Segments segment : hl7Segments) {
+                            
+                            hl7recordRow.append(segment.getsegmentName()).append(hl7Details.getfieldSeparator());
+                            
+                            /* Get the segment elements */
+                            List<HL7Elements> hl7Elements = configurationManager.getHL7Elements(hl7Details.getId(), segment.getId());
+                            
+                            if(!hl7Elements.isEmpty()) {
+                                int elementCounter = 1;
+                                for(HL7Elements element : hl7Elements) {
+                                    
+                                    if(!"".equals(element.getdefaultValue())) {
+                                        hl7recordRow.append(element.getdefaultValue());
+                                    }
+                                    else {
+                                        
+                                        /* Get the element components */
+                                        List<HL7ElementComponents> hl7Components = configurationManager.getHL7ElementComponents(element.getId());
+                                        
+                                        if(!hl7Components.isEmpty()) {
+                                            int counter = 1;
+                                            for(HL7ElementComponents component : hl7Components) {
+                                                
+                                                String colName = new StringBuilder().append("f").append(component.getfieldValue()).toString();
+                                                
+                                                String fieldValue = BeanUtils.getProperty(records, colName);
+                                                
+                                                if(!"".equals(component.getfieldDescriptor()) && component.getfieldDescriptor() != null) {
+                                                    hl7recordRow.append(component.getfieldDescriptor()).append(fieldValue);  
+                                                }
+                                                else {
+                                                   hl7recordRow.append(fieldValue);  
+                                                }
+                                               
+                                                if(counter < hl7Components.size()) {
+                                                    hl7recordRow.append(hl7Details.getcomponentSeparator());
+                                                    counter+=1;
+                                                }
+                                                
+                                            }
+                                             hl7recordRow.append(hl7Details.getfieldSeparator());
+                                            
+                                        }
+                                        else {
+                                            hl7recordRow.append("");
+                                        }
+                                        
+                                    }
+                                    
+                                    if(elementCounter <= hl7Elements.size()) {
+                                        hl7recordRow.append(hl7Details.getfieldSeparator());
+                                        elementCounter+=1;
+                                    }
+                                    
+                                }
+                            }
+                           
+                            hl7recordRow.append(System.getProperty( "line.separator" )).append(System.getProperty( "line.separator" ));;
+                            
+                            if(!"".equals(hl7recordRow.toString())) {
+                                try {
+                                    fw.write(hl7recordRow.toString());
+                                } catch (IOException ex) {
+                                    throw new IOException(ex);
+                                }
+                            }
+                            
+                        }
+                        
+                        fw.close();
+                        
                     }
-
-                    if(i == maxFieldNo) {
-                        recordRow = new StringBuilder().append(recordRow).append(fieldValue).append(System.getProperty( "line.separator" )).toString();
-                    }
-                    else {
-                        recordRow = new StringBuilder().append(recordRow).append(fieldValue).append(delimChar).toString();
-                    }
-
-                } catch (IllegalAccessException ex) {
-                    Logger.getLogger(transactionOutManagerImpl.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (InvocationTargetException ex) {
-                    Logger.getLogger(transactionOutManagerImpl.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (NoSuchMethodException ex) {
-                    Logger.getLogger(transactionOutManagerImpl.class.getName()).log(Level.SEVERE, null, ex);
+                    
                 }
+                
             }
+            else {
 
-            if(recordRow != null) {
-                try {
-                    fw.write(recordRow);
-                    fw.close();
-                } catch (IOException ex) {
-                    throw new IOException(ex);
+                for(int i = 1; i <= maxFieldNo; i++) {
+
+                    String colName = new StringBuilder().append("f").append(i).toString();
+
+                    try {
+                        String fieldValue = BeanUtils.getProperty(records, colName);
+
+                        if("null".equals(fieldValue)) {
+                            fieldValue = "";
+                        }
+
+                        if(i == maxFieldNo) {
+                            recordRow = new StringBuilder().append(recordRow).append(fieldValue).append(System.getProperty( "line.separator" )).toString();
+                        }
+                        else {
+                            recordRow = new StringBuilder().append(recordRow).append(fieldValue).append(delimChar).toString();
+                        }
+
+                    } catch (IllegalAccessException ex) {
+                        Logger.getLogger(transactionOutManagerImpl.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (InvocationTargetException ex) {
+                        Logger.getLogger(transactionOutManagerImpl.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (NoSuchMethodException ex) {
+                        Logger.getLogger(transactionOutManagerImpl.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+
+                if(recordRow != null) {
+                    try {
+                        fw.write(recordRow);
+                        fw.close();
+                    } catch (IOException ex) {
+                        throw new IOException(ex);
+                    }
                 }
             }
 
