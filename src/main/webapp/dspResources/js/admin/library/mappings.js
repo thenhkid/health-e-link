@@ -130,6 +130,10 @@ require(['./main'], function () {
             });
 
             if (errorsFound == 0) {
+                $('body').overlay({
+                    glyphicon : 'floppy-disk',
+                    message : 'Saving...'
+                });
                 $("#fieldMappings").submit();
             }
             else {
