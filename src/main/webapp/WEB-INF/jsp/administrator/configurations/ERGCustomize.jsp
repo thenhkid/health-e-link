@@ -31,16 +31,10 @@
 <div class="main clearfix" role="main">
     <div class="row-fluid">
         <div class="col-md-12">
-            <c:choose>
-                <c:when test="${not empty savedStatus}" >
-                    <div class="alert alert-success">
-                        <strong>Success!</strong> 
-                        <c:choose>
-                            <c:when test="${savedStatus == 'updated'}">The ERG Customization have been successfully updated!</c:when>
-                        </c:choose>
-                    </div>
-                </c:when>
-            </c:choose>
+            <div class="alert alert-success fieldsUpdated" style="display:none;">
+                <strong>Success!</strong> 
+                The ERG Customization have been successfully updated!
+            </div>
             <div id="saveMsgDiv" class="alert alert-danger" style="display:none;">
                 <strong>You must click SAVE above to submit the ERG changes!</strong>
             </div>

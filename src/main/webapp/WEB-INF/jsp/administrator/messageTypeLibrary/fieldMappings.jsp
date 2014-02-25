@@ -36,9 +36,13 @@
         <c:if test="${not empty savedStatus}" >
             <div class="alert alert-success">
                 <strong>Success!</strong> 
-                <c:choose><c:when test="${savedStatus == 'updated'}">The field mappings have been successfully updated!</c:when><c:when test="${savedStatus == 'created'}">The message type has been successfully created!</c:when><c:when test="${savedStatus == 'fieldcreated'}">The new form field has been successfully created!</c:when></c:choose>
-                    </div>
+                <c:choose><c:when test="${savedStatus == 'created'}">The message type has been successfully created!</c:when><c:when test="${savedStatus == 'fieldcreated'}">The new form field has been successfully created!</c:when></c:choose>
+            </div>
         </c:if>
+        <div class="alert alert-success mappingsUpdated" style="display:none;">
+            <strong>Success!</strong> 
+            The field mappings have been successfully updated!
+        </div>
         <div id="mappingErrorMsgDiv" class="alert alert-danger" style="display:none;">
             <strong>There is an error with your Field Mappings, scroll to find the highlighted field!</strong>
         </div>

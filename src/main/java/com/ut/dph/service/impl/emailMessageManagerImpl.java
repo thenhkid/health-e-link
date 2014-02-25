@@ -10,6 +10,7 @@ import com.ut.dph.model.mailMessage;
 import com.ut.dph.service.emailMessageManager;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 /**
@@ -25,6 +26,7 @@ public class emailMessageManagerImpl implements emailMessageManager {
             this.mailSender = mailSender;
     }
     
+    @Async
     public void sendEmail(mailMessage messageDetails) throws Exception {
         
         SimpleMailMessage msg = new SimpleMailMessage();

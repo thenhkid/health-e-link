@@ -923,8 +923,8 @@ public class adminConfigController {
      *
      * @return	This method will either redirect back to the Choose Fields page or redirect to the next step data translations page.
      */
-    @RequestMapping(value = "/saveFields", method = RequestMethod.POST)
-    public ModelAndView saveFormFields(@Valid @ModelAttribute(value = "transportDetails") configurationTransport transportDetails, RedirectAttributes redirectAttr, @RequestParam String action, @RequestParam int transportMethod) throws Exception {
+    @RequestMapping(value = "/saveFields", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody Integer saveFormFields(@Valid @ModelAttribute(value = "transportDetails") configurationTransport transportDetails, RedirectAttributes redirectAttr, @RequestParam String action, @RequestParam int transportMethod) throws Exception {
 
         /**
          * Need to update the configuration completed step
@@ -951,22 +951,18 @@ public class adminConfigController {
             }
         }
 
-        redirectAttr.addFlashAttribute("savedStatus", "updated");
-
         //If the "Save" button was pressed 
         if (action.equals("save")) {
-            if(transportMethod == 2) {
-                ModelAndView mav = new ModelAndView(new RedirectView("ERGCustomize"));
-                return mav;
-            }
-            else {
-                ModelAndView mav = new ModelAndView(new RedirectView("mappings"));
-                return mav;
-            }
+            return 1;
             
         } else {
-            ModelAndView mav = new ModelAndView(new RedirectView("translations"));
-            return mav;
+            if(transportMethod == 2) {
+                return 1;
+            }
+            else {
+                return 2;
+            }
+            
         }
 
     }

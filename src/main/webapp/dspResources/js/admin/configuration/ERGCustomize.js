@@ -62,8 +62,22 @@ require(['./main'], function () {
             hasErrors = checkFormFields();
 
             if (hasErrors == 0) {
-                $('#formFields').attr('action', 'saveFields');
-                $('#formFields').submit();
+               
+                var formData = $("#formFields").serialize();
+                
+                $.ajax({
+                    url: 'saveFields',
+                    data: formData,
+                    type: "POST",
+                    async: false,
+                    success: function(data) {
+                        $('.fieldsUpdated').show();
+                        $('.alert').delay(2000).fadeOut(1000);
+                    }
+                });
+                event.preventDefault();
+                return false;
+                
             }
         });
 
@@ -74,8 +88,20 @@ require(['./main'], function () {
             hasErrors = checkFormFields();
 
             if (hasErrors == 0) {
-                $('#formFields').attr('action', 'saveFields');
-                $('#formFields').submit();
+                 
+                var formData = $("#formFields").serialize();
+                
+                $.ajax({
+                    url: 'saveFields',
+                    data: formData,
+                    type: "POST",
+                    async: false,
+                    success: function(data) {
+                       window.location.href='translations';
+                    }
+                });
+                event.preventDefault();
+                return false;
             }
         });
         

@@ -34,21 +34,54 @@ require(['./main'], function () {
 
             //Need to make sure all required fields are marked if empty.
             var hasErrors = 0;
+            $('.alert-danger').hide();
 
             if (hasErrors == 0) {
-                $('#formFields').attr('action', 'saveFields');
-                $('#formFields').submit();
+                
+                var formData = $("#formFields").serialize();
+                
+                $.ajax({
+                    url: 'saveFields',
+                    data: formData,
+                    type: "POST",
+                    async: false,
+                    success: function(data) {
+                        $('.fieldsUpdated').show();
+                        $('.alert').delay(2000).fadeOut(1000);
+                    }
+                });
+                event.preventDefault();
+                return false;
+                
             }
         });
 
         $('#next').click(function(event) {
             $('#action').val('next');
+            $('.alert-danger').hide();
 
             var hasErrors = 0;
 
             if (hasErrors == 0) {
-                $('#formFields').attr('action', 'saveFields');
-                $('#formFields').submit();
+                var formData = $("#formFields").serialize();
+                
+                $.ajax({
+                    url: 'saveFields',
+                    data: formData,
+                    type: "POST",
+                    async: false,
+                    success: function(data) {
+                       if(data == 1) {
+                           window.location.href='translations';
+                       }
+                       else {
+                           window.location.href='ERGCustomize';
+                       }
+                       
+                    }
+                });
+                event.preventDefault();
+                return false;
             }
         });
 

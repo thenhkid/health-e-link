@@ -7,6 +7,7 @@
 package com.ut.dph.service;
 
 import com.ut.dph.model.mailMessage;
+import org.springframework.scheduling.annotation.Async;
 
 /**
  *
@@ -14,6 +15,7 @@ import com.ut.dph.model.mailMessage;
  */
 public interface emailMessageManager {
     
+    @Async
     void sendEmail(mailMessage messageDetails) throws Exception;
     
 }

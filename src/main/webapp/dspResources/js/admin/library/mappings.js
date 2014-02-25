@@ -128,19 +128,40 @@ require(['./main'], function () {
                     errorsFound = 1;
                 }
             });
+            
 
             if (errorsFound == 0) {
-                $('body').overlay({
+                
+               /* $('body').overlay({
                     glyphicon : 'floppy-disk',
                     message : 'Saving...'
+                });*/
+                
+                var formData = $("#fieldMappings").serialize();
+                
+                $.ajax({
+                    url: 'mappings',
+                    data: formData,
+                    type: "POST",
+                    async: false,
+                    success: function(data) {
+                        if(data == 1) {
+                            $('.mappingsUpdated').show();
+                            $('.alert').delay(2000).fadeOut(1000);
+                        }
+                    }
                 });
-                $("#fieldMappings").submit();
+                event.preventDefault();
+                return false;
+                
+                //$("#fieldMappings").submit();
             }
             else {
                 $('#mappingErrorMsgDiv').show();
             }
 
         });
+       
         
     });
 });

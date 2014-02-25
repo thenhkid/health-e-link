@@ -275,8 +275,8 @@ public class adminLibController {
      * @Return	This function will redirect the user back to the mappings display page. A redirect is being used so we can show the fields in the appropriate display order.
      *
      */
-    @RequestMapping(value = "/mappings", method = RequestMethod.POST)
-    public ModelAndView submitFieldMappings(@ModelAttribute(value = "messageTypeDetails") messageType messageTypeDetails, RedirectAttributes redirectAttr) throws Exception {
+    @RequestMapping(value = "/mappings", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody Integer submitFieldMappings(@ModelAttribute(value = "messageTypeDetails") messageType messageTypeDetails, RedirectAttributes redirectAttr) throws Exception {
         List<messageTypeFormFields> fieldList = messageTypeDetails.getFields();
 
         if (null != fieldList && fieldList.size() > 0) {
@@ -288,9 +288,7 @@ public class adminLibController {
             }
         }
 
-        redirectAttr.addFlashAttribute("savedStatus", "updated");
-        ModelAndView mav = new ModelAndView(new RedirectView("mappings"));
-        return mav;
+        return 1;
 
     }
     
