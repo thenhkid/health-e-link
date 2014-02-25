@@ -403,8 +403,8 @@ DELIMITER ;
 
 /** 02242014 Grace **/
 ALTER TABLE `universalTranslator`.`transactionIn` 
-ADD COLUMN `loadTableId` VARCHAR(15) NULL AFTER `transactionTargetId`;
+ADD COLUMN `loadTableId` VARCHAR(45) NULL AFTER `transactionTargetId`;
 
 ALTER TABLE `universalTranslator`.`transactionInRecords` 
-ADD COLUMN `loadTableId` VARCHAR(15) NULL AFTER `dateCreated`;
+ADD COLUMN `loadTableId` VARCHAR(45) NULL AFTER `dateCreated`;
 
