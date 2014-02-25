@@ -401,3 +401,10 @@ EXECUTE stmt;
  END$$
 DELIMITER ;
 
+/** 02242014 Grace **/
+ALTER TABLE `universalTranslator`.`transactionIn` 
+ADD COLUMN `loadTableId` VARCHAR(15) NULL AFTER `transactionTargetId`;
+
+ALTER TABLE `universalTranslator`.`transactionInRecords` 
+ADD COLUMN `loadTableId` VARCHAR(15) NULL AFTER `dateCreated`;
+

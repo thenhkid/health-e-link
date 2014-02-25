@@ -160,4 +160,12 @@ public interface transactionInDAO {
     Integer getRecordCounts (Integer batchId, List <Integer> statusIds, boolean foroutboundProcessing);
     
     Integer copyTransactionInStatusToTarget(Integer batchId);
+    
+    Integer insertLoadData (Integer batchId, String delimiter, String fileWithPath);
+    
+    Integer createLoadTable (String tableName);
+    
+    Integer dropLoadTable (String tableName);
+   
+    Integer updateLoadTableId(String tableName);
 }

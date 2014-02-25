@@ -127,7 +127,7 @@ public interface transactionInManager {
     
     boolean insertTransactions (Integer batchUploadId);
     
-    Integer loadBatch (Integer batchUploadId);
+    Integer loadTextBatch (batchUploads batchUpload);
     
     Integer clearTransactionIn(Integer batchUploadId);
     
@@ -202,5 +202,13 @@ public interface transactionInManager {
     void resetTransactionTranslatedIn(Integer batchId, boolean resetAll);
     
     Integer copyTransactionInStatusToTarget(Integer batchId);
+    
+    Integer insertLoadData(Integer batchId, String delmiter, String fileWithPath);
+   
+    Integer createLoadTable (String tableName);
+    
+    Integer dropLoadTable (String tableName);
+    
+    Integer updateLoadTableId(String tableName);
     
 }

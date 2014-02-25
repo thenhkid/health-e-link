@@ -9,6 +9,7 @@ import com.ut.dph.dao.messageTypeDAO;
 import com.ut.dph.dao.transactionInDAO;
 import com.ut.dph.model.CrosswalkData;
 import com.ut.dph.model.Macros;
+import com.ut.dph.model.Organization;
 import com.ut.dph.model.batchUploadSummary;
 import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.configuration;
@@ -26,6 +27,7 @@ import com.ut.dph.reference.fileSystem;
 import com.ut.dph.service.configurationManager;
 import com.ut.dph.service.configurationTransportManager;
 import com.ut.dph.service.messageTypeManager;
+import com.ut.dph.service.organizationManager;
 
 import java.util.regex.Pattern;
 
@@ -73,6 +75,9 @@ public class transactionInManagerImpl implements transactionInManager {
 
     @Autowired
     private messageTypeManager messagetypemanager;
+
+    @Autowired
+    private organizationManager organizationmanager;
 
     @Override
     @Transactional
@@ -513,8 +518,16 @@ public class transactionInManagerImpl implements transactionInManager {
 
 			// loading batch will take it all the way to loaded (9) status for
 			// transactions and SSL (3) for batch
-             sysErrors = sysErrors + loadBatch(batchUploadId);
-
+             sysErrors = sysErrors + loadTextBatch(batch);
+             
+             //we parse and update configIds
+             
+             //we insert targets
+             
+             //we update transactionTranslatedIn
+             
+             //we update statusId to loaded
+             
              if (sysErrors > 0) {
             	insertProcessingError(5, null, batchUploadId, null, null, null, null, false, false, "Load errors, please contact admin");
  				updateBatchStatus(batchUploadId, batchStausId, "endDateTime");
@@ -869,23 +882,38 @@ public class transactionInManagerImpl implements transactionInManager {
      * 1. read file 2. parse row by row and a. figure out config b. insert into transactionIn c. insert into transacitonTarget d. flag transactions as Loaded or Invalid *
      */
     @Override
-    public Integer loadBatch(Integer batchUploadId) {
-        /**
-         * we read uploaded file, line by line*
-         */
-        /**
-         * we look for config id*
-         */
-        /**
-         * if we find we insert into transactionIn, transactionInRecords, transactionTranslatedIn, transactionTarget *
-         */
-        /**
-         * only transactions with valid configId will make it into transactionTranslatedIn We will not find INVALID records in transactionTranslatedIn
-         */
-        /**
-         * when we are done, the batch will be SSL and records will either be INVALID or Loaded *
-         */
+    public Integer loadTextBatch(batchUploads batchUpload) {
     	try {
+	    	/**
+	         * SP can't call load Files with prepared statement, we have to load file to real table with dynamic statement created in java
+	         * 1. we create batchLoadTable
+	         **/
+	    	String loadTableName = "loadTable_" + batchUpload.getId(); 
+	    	Integer sysError =  dropLoadTable(loadTableName);
+	    	sysError  = sysError  + createLoadTable(loadTableName);
+	    	
+	    	//get delimiter, get fileWithPath
+	    	/* Get organization directory name */
+	    	//configurationTransport transportDetails = configurationtransportmanager.getTransportDetails(configId);
+
+	    	fileSystem dir = new fileSystem();
+            Organization orgDetails = organizationmanager.getOrganizationById(batchUpload.getOrgId());
+            String fileWithPath = dir.getDir() + "/bowlink/"+orgDetails.getcleanURL()+"/input files/" + batchUpload.getoriginalFileName();
+	    	System.out.println(fileWithPath);
+	    	
+            //2. we load data with my sql
+	    	//sysError  = sysError  + insertLoadData (batchUpload.getId(), delimiter, fileWithPath);
+	    	sysError  = sysError  + updateLoadTableId(loadTableName);
+	        /** 
+	         * 3. we update batchId, loadRecordId
+	         * 4. we insert into transactionIn - status of invalid (11), batchId, loadRecordId
+	         * 4. we insert into transactionInRecords - we select transactionIn batchId, transactionInId
+	         * 5. we match loadRecordId and update transactionInRecords's F1-F255 data
+	         * 6. we delete table
+	         **/
+        
+        	//need delimiter, need file path, need file name, need batchId
+        	
     		return 0;
     	} catch (Exception ex) {
     		System.out.println(ex.getClass() + " " + ex.getCause());
@@ -1374,6 +1402,27 @@ public class transactionInManagerImpl implements transactionInManager {
 	@Override
 	public Integer copyTransactionInStatusToTarget(Integer batchId) {
 		return transactionInDAO.copyTransactionInStatusToTarget(batchId);
+	}
+
+	@Override
+	public Integer insertLoadData(Integer batchId, String delimiter, String fileWithPath) {
+		return transactionInDAO.insertLoadData(batchId, delimiter, fileWithPath);
+	}
+	
+	
+	@Override
+	public Integer createLoadTable(String tableName) {
+		return transactionInDAO.createLoadTable(tableName);
+	}
+
+	@Override
+	public Integer dropLoadTable(String tableName) {
+		return transactionInDAO.dropLoadTable(tableName);
+	}
+	
+	@Override
+	public Integer updateLoadTableId(String tableName) {
+		return transactionInDAO.updateLoadTableId(tableName);
 	}
 
 }
