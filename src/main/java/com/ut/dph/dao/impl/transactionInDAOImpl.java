@@ -2322,7 +2322,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 		public List <configurationTransport> getConfigurationTransportForBatch(Integer batchId) {
 			try {
 				
-				String sql = ("select delimChar, errorHandling, autoRelase, fileLocation, fileType, transportMethodId"
+				String sql = ("select delimChar, errorHandling, autoRelease, fileLocation, fileType, transportMethodId"
 						+ " from configurationTransportDetails, ref_delimiters "
 						+ "	where ref_delimiters.id = configurationTransportDetails.fileDelimiter "
 						+ " and configId in ( select configId from batchUploadConfirgurations where batchId = :batchId) ;");
