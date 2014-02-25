@@ -513,23 +513,21 @@ public class transactionInManagerImpl implements transactionInManager {
             updateBatchStatus(batchUploadId, 4, "startDateTime");
 
             // let's clear all tables first as we are starting over
-            
              Integer sysErrors = clearTransactionTables(batchUploadId);
-
+             String errorMessage = "Load errors, please contact admin to review logs";
 			// loading batch will take it all the way to loaded (9) status for
-			// transactions and SSL (3) for batch
-             sysErrors = sysErrors + loadTextBatch(batch);
-             
-             //we parse and update configIds
-             
-             //we insert targets
-             
-             //we update transactionTranslatedIn
-             
-             //we update statusId to loaded
-             
+			
+           //get delimiter, get fileWithPath etc
+ 	    	configurationTransport configurationTransport =  getConfigurationTransportForBatch(batchUploadId);
+ 	    	if (configurationTransport == null) {
+ 	    		sysErrors++;
+ 	    		errorMessage = "Multiple delimiter or file location for file is found.  Please contact admin to review configurations.";
+	    	} else if (configurationTransport.getfileType() == 2) {
+ 	    		sysErrors = sysErrors + loadTextBatch(batch, configurationTransport);
+ 	    	}
+            
              if (sysErrors > 0) {
-            	insertProcessingError(5, null, batchUploadId, null, null, null, null, false, false, "Load errors, please contact admin");
+            	insertProcessingError(5, null, batchUploadId, null, null, null, null, false, false, errorMessage);
  				updateBatchStatus(batchUploadId, batchStausId, "endDateTime");
  				return false;
              }
@@ -882,7 +880,7 @@ public class transactionInManagerImpl implements transactionInManager {
      * 1. read file 2. parse row by row and a. figure out config b. insert into transactionIn c. insert into transacitonTarget d. flag transactions as Loaded or Invalid *
      */
     @Override
-    public Integer loadTextBatch(batchUploads batchUpload) {
+    public Integer loadTextBatch(batchUploads batchUpload, configurationTransport configurationTransport) {
     	try {
     		/**
 	         * SP can't call load Files with prepared statement, we have to load file to real table with dynamic statement created in java
@@ -893,11 +891,7 @@ public class transactionInManagerImpl implements transactionInManager {
 	    	Integer sysError =  dropLoadTable(loadTableName);
 	    	sysError  = sysError  + createLoadTable(loadTableName);
 	    	
-	    	//get delimiter, get fileWithPath etc
-	    	configurationTransport configurationTransport =  getConfigurationTransportForBatch(batchUpload.getId());
-	    	if (configurationTransport == null) {
-	    		return 1;
-	    	} else {
+	    	
 	    		fileSystem dir = new fileSystem();
 	            String fileWithPath = dir.getDir() +configurationTransport.getfileLocation() + batchUpload.getoriginalFileName();
 		    	System.out.println(fileWithPath);
@@ -920,13 +914,28 @@ public class transactionInManagerImpl implements transactionInManager {
 		    	//7. we delete loadTable
 		    	sysError  = sysError  + dropLoadTable(loadTableName);
 	        	
-		    	//8. we get config count for batch from batchConfigurations  Map<configId,configCount>
-		    	 Map<Integer,Integer> configCount = getConfigsForBatch(batchUpload.getId());
+		    	//8. we see how many configs user selected from batchConfigurations
+		    	 List <Integer> configCount = getConfigsForUploadBatch(batchUpload.getId());
 		    	
+		    	 // if we only have one, we update the entire table 
+		    	 if (configCount.size() == 1) {
+		    		 // we update entire transactionIN with configId
+		    		 sysError  = sysError  +  updateConfigIdForBatch(batchUpload.getId(), configCount.get(0));
+		    	 } else if (configCount.size() == 0) {
+		    		 sysError++;
+		    	 } else {
+		    		// we parse each record
+		    	 }
+		    	 //we populate transactionTranslatedIn
+		    	 sysError  = sysError  +  loadTransactionTranslatedIn (batchUpload.getId());
 		    	 
+		    	 //update data in transactionTranslatedIn
+		    	 resetTransactionTranslatedIn(batchUpload.getId(), true);
 		    	
-		    }
-    		return 0;
+		    	 //records are loaded at this point
+		    	 updateTransactionStatus(batchUpload.getId(), 0, 11 , 9);
+		    	 
+	    	return sysError;
     	} catch (Exception ex) {
     		System.out.println(ex.getClass() + " " + ex.getCause());
     		return 1;
@@ -1464,8 +1473,18 @@ public class transactionInManagerImpl implements transactionInManager {
 	}
 	
 	@Override
-	public Map<Integer,Integer> getConfigsForBatch(Integer batchId) {
-		return transactionInDAO.getConfigsForBatch(batchId);
+	public List <Integer> getConfigsForUploadBatch(Integer batchId) {
+		return transactionInDAO.getConfigsForUploadBatch(batchId);
+	}
+	
+	@Override
+	public Integer updateConfigIdForBatch(Integer batchId, Integer configId) {
+		return transactionInDAO.updateConfigIdForBatch(batchId, configId);
+	} 
+	
+	@Override
+	public Integer loadTransactionTranslatedIn(Integer batchId) {
+		return transactionInDAO.loadTransactionTranslatedIn(batchId);
 	}
 	
 }

@@ -2643,22 +2643,54 @@ public class transactionInDAOImpl implements transactionInDAO {
 
 		@Override
 		@Transactional
-		public Map<Integer,Integer> getConfigsForBatch(Integer batchId){
+		@SuppressWarnings("unchecked")
+		public List <Integer> getConfigsForUploadBatch(Integer batchId){
 			try {
 				
-				String sql = ("select count(configId) configIdCount, configId "
-						+ " from batchUploadConfirgurations where batchId = :batchId group by configId order by configId");
-		        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
-		        .addScalar("configIdCount", StandardBasicTypes.INTEGER).setParameter("configIdCount", batchId);
+				String sql = ("select distinct configId "
+						+ " from batchUploadConfirgurations where batchId = :batchId"
+						+ " order by configId;");
+		        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setParameter("batchId", batchId);
 		        
-		        //List <Integer,Integer> configCount = query.list();
-				return null;
-		       
+		        List <Integer> configIds = query.list();
+		        return configIds;
 		        
 			} catch (Exception ex) {
 				System.out.println(ex.getClass() + " " + ex.getCause());
 				return null;
 			}
+		}
+
+		@Override
+		@Transactional
+		public Integer updateConfigIdForBatch(Integer batchId, Integer configId) {
+			try {
+				
+				String sql = ("update transactionIn set configId = :configId where batchId = :batchId");
+		        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
+		        		.setParameter("batchId", batchId).setParameter("configId", configId);
+		        query.executeUpdate();
+		        return 0;
+		        
+			} catch (Exception ex) {
+				System.out.println(ex.getClass() + " " + ex.getCause());
+				return 1;
+			}
+		}
+		
+		@Override
+		@Transactional
+		public Integer loadTransactionTranslatedIn(Integer batchId) {
+				try {
+					String sql = ("insert into transactionTranslatedIn (configId, transactionInId) select configId, id from transactionIn where batchId = :batchId and configId is not null;");
+			        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql); 
+			        query.setParameter("batchId", batchId);
+			        query.executeUpdate();
+					return 0;
+				} catch (Exception ex) {
+					System.out.println(ex.getClass() + " " + ex.getCause());
+					return 1;
+				}
 		}
 		
 		

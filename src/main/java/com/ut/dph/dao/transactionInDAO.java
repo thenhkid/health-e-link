@@ -178,5 +178,9 @@ public interface transactionInDAO {
     
     Integer loadTransactionInRecordsData (String loadTableName);
     
-    Map<Integer,Integer> getConfigsForBatch(Integer batchId);
+    List <Integer> getConfigsForUploadBatch(Integer batchId);
+    
+    Integer updateConfigIdForBatch(Integer batchId, Integer configId);
+    
+    Integer loadTransactionTranslatedIn (Integer batchId);
 }

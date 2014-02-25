@@ -127,7 +127,7 @@ public interface transactionInManager {
     
     boolean insertTransactions (Integer batchUploadId);
     
-    Integer loadTextBatch (batchUploads batchUpload);
+    Integer loadTextBatch (batchUploads batchUpload, configurationTransport configurationTransport);
     
     Integer clearTransactionIn(Integer batchUploadId);
     
@@ -219,6 +219,10 @@ public interface transactionInManager {
     
     Integer loadTransactionInRecordsData (String loadTableName);
     
-    Map<Integer,Integer> getConfigsForBatch(Integer batchId);
+    List <Integer> getConfigsForUploadBatch(Integer batchId);
+    
+    Integer updateConfigIdForBatch(Integer batchId, Integer configId);
+    
+    Integer loadTransactionTranslatedIn (Integer batchId);
     
 }
