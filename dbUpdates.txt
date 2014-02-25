@@ -408,3 +408,11 @@ ADD COLUMN `loadTableId` VARCHAR(45) NULL AFTER `transactionTargetId`;
 ALTER TABLE `universalTranslator`.`transactionInRecords` 
 ADD COLUMN `loadTableId` VARCHAR(45) NULL AFTER `dateCreated`;
 
+/** 02252014 Grace **/
+CREATE TABLE `universalTranslator`.`batchUploadConfirgurations` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `batchId` INT NOT NULL,
+  `configId` INT NULL,
+  `dateCreated` DATETIME NOT NULL DEFAULT current_timestamp,
+  PRIMARY KEY (`id`));
+
