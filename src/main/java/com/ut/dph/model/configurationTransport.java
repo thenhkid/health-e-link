@@ -21,6 +21,9 @@ public class configurationTransport {
     private List<configurationFTPFields> FTPfields = null;
     
     @Transient
+    private String delimChar = null;
+
+	@Transient
     private List<Integer> messageTypes = null;
 
     @Id
@@ -213,5 +216,12 @@ public class configurationTransport {
     public void setcopiedTransportId(int copiedTransportId) {
         this.copiedTransportId = copiedTransportId;
     }
+   
+    public String getDelimChar() {
+		return delimChar;
+	}
 
+	public void setDelimChar(String delimChar) {
+		this.delimChar = delimChar;
+	}
 }
