@@ -884,36 +884,48 @@ public class transactionInManagerImpl implements transactionInManager {
     @Override
     public Integer loadTextBatch(batchUploads batchUpload) {
     	try {
-	    	/**
+    		/**
 	         * SP can't call load Files with prepared statement, we have to load file to real table with dynamic statement created in java
 	         * 1. we create batchLoadTable
 	         **/
-	    	String loadTableName = "loadTable_" + batchUpload.getId(); 
+	    	String loadTableName = "uploadTable_" + batchUpload.getId(); 
+	    	//make sure old table is dropped if exists
 	    	Integer sysError =  dropLoadTable(loadTableName);
 	    	sysError  = sysError  + createLoadTable(loadTableName);
 	    	
-	    	//get delimiter, get fileWithPath
-	    	/* Get organization directory name */
-	    	//configurationTransport transportDetails = configurationtransportmanager.getTransportDetails(configId);
-
-	    	fileSystem dir = new fileSystem();
-            Organization orgDetails = organizationmanager.getOrganizationById(batchUpload.getOrgId());
-            String fileWithPath = dir.getDir() + "/bowlink/"+orgDetails.getcleanURL()+"/input files/" + batchUpload.getoriginalFileName();
-	    	System.out.println(fileWithPath);
-	    	
-            //2. we load data with my sql
-	    	//sysError  = sysError  + insertLoadData (batchUpload.getId(), delimiter, fileWithPath);
-	    	sysError  = sysError  + updateLoadTableId(loadTableName);
-	        /** 
-	         * 3. we update batchId, loadRecordId
-	         * 4. we insert into transactionIn - status of invalid (11), batchId, loadRecordId
-	         * 4. we insert into transactionInRecords - we select transactionIn batchId, transactionInId
-	         * 5. we match loadRecordId and update transactionInRecords's F1-F255 data
-	         * 6. we delete table
-	         **/
-        
-        	//need delimiter, need file path, need file name, need batchId
-        	
+	    	//get delimiter, get fileWithPath etc
+	    	configurationTransport configurationTransport =  getConfigurationTransportForBatch(batchUpload.getId());
+	    	if (configurationTransport == null) {
+	    		return 1;
+	    	} else {
+	    		fileSystem dir = new fileSystem();
+	            String fileWithPath = dir.getDir() +configurationTransport.getfileLocation() + batchUpload.getoriginalFileName();
+		    	System.out.println(fileWithPath);
+		    	
+	            //2. we load data with my sql
+		    	sysError  = sysError  + insertLoadData (batchUpload.getId(),configurationTransport.getDelimChar() , fileWithPath, loadTableName);
+		    	
+		    	//3. we update batchId, loadRecordId
+		    	sysError  = sysError  + updateLoadTable(loadTableName, batchUpload.getId());
+		        
+		    	// 4. we insert into transactionIn - status of invalid (11), batchId, loadRecordId
+		    	sysError  = sysError  + loadTransactionIn(loadTableName, batchUpload.getId());
+		        
+		    	//5. we insert into transactionInRecords - we select transactionIn batchId, transactionInId
+		    	sysError  = sysError  + loadTransactionInRecords(batchUpload.getId());
+		    	
+		    	//6. we match loadRecordId and update transactionInRecords's F1-F255 data
+		    	sysError  = sysError  + loadTransactionInRecordsData(loadTableName);
+		    	
+		    	//7. we delete loadTable
+		    	sysError  = sysError  + dropLoadTable(loadTableName);
+	        	
+		    	//8. we get config count for batch from batchConfigurations  Map<configId,configCount>
+		    	 Map<Integer,Integer> configCount = getConfigsForBatch(batchUpload.getId());
+		    	
+		    	 
+		    	
+		    }
     		return 0;
     	} catch (Exception ex) {
     		System.out.println(ex.getClass() + " " + ex.getCause());
@@ -1405,24 +1417,55 @@ public class transactionInManagerImpl implements transactionInManager {
 	}
 
 	@Override
-	public Integer insertLoadData(Integer batchId, String delimiter, String fileWithPath) {
-		return transactionInDAO.insertLoadData(batchId, delimiter, fileWithPath);
+	public Integer insertLoadData(Integer batchId, String delimChar, String fileWithPath, String loadTableName) {
+		return transactionInDAO.insertLoadData(batchId, delimChar, fileWithPath, loadTableName);
 	}
 	
 	
 	@Override
-	public Integer createLoadTable(String tableName) {
-		return transactionInDAO.createLoadTable(tableName);
+	public Integer createLoadTable(String loadTableName) {
+		return transactionInDAO.createLoadTable(loadTableName);
 	}
 
 	@Override
-	public Integer dropLoadTable(String tableName) {
-		return transactionInDAO.dropLoadTable(tableName);
+	public Integer dropLoadTable(String loadTableName) {
+		return transactionInDAO.dropLoadTable(loadTableName);
 	}
 	
 	@Override
-	public Integer updateLoadTableId(String tableName) {
-		return transactionInDAO.updateLoadTableId(tableName);
+	public Integer updateLoadTable(String loadTableName, Integer batchId) {
+		return transactionInDAO.updateLoadTable(loadTableName, batchId);
 	}
 
+	@Override
+	public configurationTransport getConfigurationTransportForBatch(Integer batchId) {
+		//we expect one
+		List <configurationTransport> configurationTransports = transactionInDAO.getConfigurationTransportForBatch(batchId);
+		if (configurationTransports.size() == 1) {
+			return configurationTransports.get(0);
+		} else {
+			return null;
+		}
+	}
+
+	@Override
+	public Integer loadTransactionIn(String loadTableName, Integer batchId) {
+		return transactionInDAO.loadTransactionIn(loadTableName, batchId);
+	}
+	
+	@Override
+	public Integer loadTransactionInRecords(Integer batchId) {
+		return transactionInDAO.loadTransactionInRecords(batchId);
+	}
+	
+	@Override
+	public Integer loadTransactionInRecordsData(String loadTableName) {
+		return transactionInDAO.loadTransactionInRecordsData(loadTableName);
+	}
+	
+	@Override
+	public Map<Integer,Integer> getConfigsForBatch(Integer batchId) {
+		return transactionInDAO.getConfigsForBatch(batchId);
+	}
+	
 }

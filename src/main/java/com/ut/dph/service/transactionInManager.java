@@ -203,12 +203,22 @@ public interface transactionInManager {
     
     Integer copyTransactionInStatusToTarget(Integer batchId);
     
-    Integer insertLoadData(Integer batchId, String delmiter, String fileWithPath);
+    Integer insertLoadData(Integer batchId, String delimChar, String fileWithPath, String loadTableName);
    
-    Integer createLoadTable (String tableName);
+    Integer createLoadTable (String loadTableName);
     
-    Integer dropLoadTable (String tableName);
+    Integer dropLoadTable (String loadTableName);
     
-    Integer updateLoadTableId(String tableName);
+    Integer updateLoadTable(String loadTableName, Integer batchId);
+    
+    configurationTransport getConfigurationTransportForBatch (Integer batchId);
+    
+    Integer loadTransactionIn(String loadTableName, Integer batchId);
+    
+    Integer loadTransactionInRecords(Integer batchId);
+    
+    Integer loadTransactionInRecordsData (String loadTableName);
+    
+    Map<Integer,Integer> getConfigsForBatch(Integer batchId);
     
 }

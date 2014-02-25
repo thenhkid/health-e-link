@@ -23,6 +23,7 @@ import com.ut.dph.model.custom.ConfigForInsert;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -161,11 +162,21 @@ public interface transactionInDAO {
     
     Integer copyTransactionInStatusToTarget(Integer batchId);
     
-    Integer insertLoadData (Integer batchId, String delimiter, String fileWithPath);
+    Integer insertLoadData (Integer batchId, String delimChar, String fileWithPath, String tableName);
     
-    Integer createLoadTable (String tableName);
+    Integer createLoadTable (String loadTableName);
     
-    Integer dropLoadTable (String tableName);
+    Integer dropLoadTable (String loadTableName);
    
-    Integer updateLoadTableId(String tableName);
+    Integer updateLoadTable(String loadTableName, Integer batchId);
+    
+    List <configurationTransport>  getConfigurationTransportForBatch (Integer batchId);
+    
+    Integer loadTransactionIn (String loadTableName, Integer batchId);
+    
+    Integer loadTransactionInRecords (Integer batchId);
+    
+    Integer loadTransactionInRecordsData (String loadTableName);
+    
+    Map<Integer,Integer> getConfigsForBatch(Integer batchId);
 }
