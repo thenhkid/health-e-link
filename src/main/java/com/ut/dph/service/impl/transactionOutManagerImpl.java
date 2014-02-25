@@ -989,12 +989,12 @@ public class transactionOutManagerImpl implements transactionOutManager {
 
         boolean hl7 = false;
         String fileType = (String) configurationManager.getFileTypesById(transportDetails.getfileType());
-
-        if(fileType == "hl7") {
+        
+        if("hl7".equals(fileType)) {
             fileType = "hr";
             hl7 = true;
         }
-
+        
         int findExt = batchDetails.getoutputFIleName().lastIndexOf(".");
 
         if(findExt >= 0) {
@@ -1068,9 +1068,9 @@ public class transactionOutManagerImpl implements transactionOutManager {
                     List<HL7Segments> hl7Segments = configurationManager.getHL7Segments(hl7Details.getId());
                     
                     if(!hl7Segments.isEmpty()) {
-                        StringBuilder hl7recordRow = new StringBuilder();
                         
                         for(HL7Segments segment : hl7Segments) {
+                            StringBuilder hl7recordRow = new StringBuilder();
                             
                             hl7recordRow.append(segment.getsegmentName()).append(hl7Details.getfieldSeparator());
                             
@@ -1127,7 +1127,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                 }
                             }
                            
-                            hl7recordRow.append(System.getProperty( "line.separator" )).append(System.getProperty( "line.separator" ));;
+                            hl7recordRow.append(System.getProperty( "line.separator" )).append(System.getProperty( "line.separator" ));
                             
                             if(!"".equals(hl7recordRow.toString())) {
                                 try {

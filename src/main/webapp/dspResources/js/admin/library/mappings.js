@@ -2,6 +2,7 @@
 require(['./main'], function () {
     require(['jquery'], function($) {
         
+        
         $("input:text,form").attr("autocomplete", "off");
         
         //Fade out the updated/created message after being displayed.
@@ -132,12 +133,12 @@ require(['./main'], function () {
 
             if (errorsFound == 0) {
                 
-               /* $('body').overlay({
+                /*$('body').overlay({
                     glyphicon : 'floppy-disk',
                     message : 'Saving...'
                 });*/
                 
-                var formData = $("#fieldMappings").serialize();
+               var formData = $("#fieldMappings").serialize();
                 
                 $.ajax({
                     url: 'mappings',
@@ -153,8 +154,8 @@ require(['./main'], function () {
                 });
                 event.preventDefault();
                 return false;
+               //$('#fieldMappings').submit();
                 
-                //$("#fieldMappings").submit();
             }
             else {
                 $('#mappingErrorMsgDiv').show();
