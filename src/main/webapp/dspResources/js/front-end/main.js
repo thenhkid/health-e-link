@@ -18,7 +18,7 @@ require.config({
 	}
 });
 
-require(['jquery', 'fixed-header', 'moment', 'bootstrap', 'responsive-tables', 'mediaModal', 'overlay', 'daterangepicker'], function ($, fixedHeader, moment) {
+define(['jquery', 'fixed-header', 'moment', 'bootstrap', 'responsive-tables', 'mediaModal', 'overlay', 'daterangepicker'], function ($, fixedHeader, moment) {
 
 	var primaryNav = $('.primary-nav');
 	var primaryNavHeight = primaryNav.outerHeight();

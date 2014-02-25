@@ -21,7 +21,7 @@
             <fieldset name="login-fields" form="form-admin-login" class="basic-clearfix">
                 <div class="form-group ${not empty error ? 'has-error' : '' }">
                     <label class="control-label" for="username">Username</label>
-                    <input id="username" name='j_username' class="form-control" type="text" value="admin" />
+                    <input id="username" name='j_username' class="form-control" type="text" value="admin" autofocus="true" />
                 </div>
                 <div class="form-group ${not empty error ? 'has-error' : '' }">
                     <label class="control-label" for="password">Password</label>
@@ -35,8 +35,3 @@
     <p class="login-note"><a href="">Forgot Password?</a></p>
 </div>
 
-<script type="text/javascript">
-    $(document).ready(function() {
-        document.f.j_username.focus();
-    });
-</script>

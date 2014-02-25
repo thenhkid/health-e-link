@@ -49,7 +49,7 @@ require(['./main'], function () {
         }
         }*/
     });
-})
+});
 
 
 

@@ -24,7 +24,6 @@
     <jsp:text><![CDATA[<!--[if lte IE 9]>]]></jsp:text>
             <link rel="stylesheet" href="<%=request.getContextPath()%>/dspResources/css/ie.css">
     <jsp:text><![CDATA[<![endif]-->]]></jsp:text>
-    <script src="<%=request.getContextPath()%>/dspResources/js/vendor/jquery-1.10.1.min.js"></script>
     <!%-- moderizer: for ie8 compatibility --%>
     <script type="text/javascript" src="<%=request.getContextPath()%>/dspResources/js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
     <script data-main="<%=request.getContextPath()%>/dspResources/js/front-end/main" src="<%=request.getContextPath()%>/dspResources/js/vendor/require.js"></script>
@@ -52,11 +51,15 @@
 </body>
 <tiles:importAttribute name="jscript" toName="script" ignore="true" />
 <c:if test="${not empty script}">
-<script src="<%=request.getContextPath()%><tiles:getAsString name='jscript' ignore='true' />" language="javascript"></script>
+    <script type="text/javascript">
+        require(["<%=request.getContextPath()%><tiles:getAsString name='jscript' ignore='true' />"]);
+    </script>
 </c:if>
 <tiles:importAttribute name="otherscript" toName="otherscript" ignore="true" />
 <c:if test="${not empty otherscript}">
-<script src="<%=request.getContextPath()%><tiles:getAsString name='otherscript' ignore='true' />" type="text/javascript"></script>
+    <script type="text/javascript">
+        require(["<%=request.getContextPath()%><tiles:getAsString name='otherscript' ignore='true' />"]);
+    </script>
 </c:if>
 </html>
 

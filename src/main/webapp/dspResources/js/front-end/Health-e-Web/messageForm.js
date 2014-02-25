@@ -4,140 +4,160 @@
  * and open the template in the editor.
  */
 
-$(document).ready(function() {
-    $("input:text,form").attr("autocomplete", "off");
-    
-    populateExistingAttachments();
-    
-    $('.submitMessage').click(function() {
-       var errorsFound = 0;
-       var clickedBtn = $(this).attr('id');
-       
-       $('#action').val(clickedBtn);
-       
-       //Only check form fields if Sending or Releasing the message
-       if(clickedBtn !== 'save') {
-            errorsFound = checkFormFields();
-            
-            if(errorsFound == 0) {
-                $('#messageForm').submit(); 
-            }
-            else {
-                $('.alert-danger').show();
-                $('.alert-danger').delay(2000).fadeOut(1000);
-            }
-       }
-       else {
-            $('#messageForm').submit(); 
-       }
-    });
-    
-    
-    //Function to upload an attachment to the message
-    new AjaxUpload('attachmentFileUpload', {
-        action: '/Health-e-Web/uploadMessageAttachment',
-        name: 'fileUpload',
-        onSubmit: function(file, extension){
-            this.setData({title: getTitle()});
-        },
-        onComplete: function(file, response) {
-           var currentIdList = $('#attachmentIds').val();
-           
-           if(currentIdList == '') {
-               $('#attachmentIds').val(response);
+require(['./main'], function () {
+    require(['jquery'], function($) {
+
+        $("input:text,form").attr("autocomplete", "off");
+
+        populateExistingAttachments();
+
+        $('.submitMessage').click(function() {
+           var errorsFound = 0;
+           var clickedBtn = $(this).attr('id');
+
+           $('#action').val(clickedBtn);
+
+           //Only check form fields if Sending or Releasing the message
+           if(clickedBtn !== 'save') {
+                errorsFound = checkFormFields();
+
+                if(errorsFound == 0) {
+                    $('#messageForm').submit(); 
+                }
+                else {
+                    $('.alert-danger').show();
+                    $('.alert-danger').delay(2000).fadeOut(1000);
+                }
            }
            else {
-               currentIdList = currentIdList + ',' + response;
-               $('#attachmentIds').val(currentIdList);
+                $('#messageForm').submit(); 
            }
-           
-           $('#attachmentTitle').val('');
-           
-           populateExistingAttachments();
-           
-        }
-    });
-    
-    //Function to remove the selected attachment
-    $(document).on('click', '.removeAttachment', function() {
-       
-        var confirmed = confirm("Are you sure you want to remove this attachment?");
-        
-        if(confirmed) {
-            
-            var attachmentId = $(this).attr('rel');
-            
-            $.ajax({
-                url: '/Health-e-Web/removeAttachment.do',
-                type: 'POST',
-                data: {'attachmentId': attachmentId},
-                success: function(data) {
-                   $('#attachmentRow-'+attachmentId).remove();
-                }
-            });
-            
-        }
-        
-    });
-    
-    //This function will launch the status detail overlay with the selected
-    //status
-    $(document).on('click', '.viewStatus', function() {
-        $.ajax({
-            url: '/Health-e-Web/viewStatus' + $(this).attr('rel'),
-            type: "GET",
-            success: function(data) {
-                $("#statusModal").html(data);
+        });
+
+
+        //Function to upload an attachment to the message
+        new AjaxUpload('attachmentFileUpload', {
+            action: '/Health-e-Web/uploadMessageAttachment',
+            name: 'fileUpload',
+            onSubmit: function(file, extension){
+                this.setData({title: getTitle()});
+            },
+            onComplete: function(file, response) {
+               var currentIdList = $('#attachmentIds').val();
+
+               if(currentIdList == '') {
+                   $('#attachmentIds').val(response);
+               }
+               else {
+                   currentIdList = currentIdList + ',' + response;
+                   $('#attachmentIds').val(currentIdList);
+               }
+
+               $('#attachmentTitle').val('');
+
+               populateExistingAttachments();
+
             }
         });
-    });
     
-    
-    //Function to go get providers as the user types in letters
-    $(document).on('change', '#orgProvider', function() {
-        
-        if($(this).val() > 0) {
-            $.ajax({
-                url: '/Health-e-Web/populateProvider.do',
-                type: 'GET',
-                data: {'providerId': $(this).val()},
-                success: function(data) {
-                    //fields 9 - 18
-                    $('#provider_9').val(data.firstName);
-                    $('#provider_10').val(data.lastName);
-                                
-                    if(data.providerAddresses.length > 0) {
-                        $('#provider_12').val(data.providerAddresses[0].line1);
-                        $('#provider_13').val(data.providerAddresses[0].line2);
-                        $('#provider_14').val(data.providerAddresses[0].city);
-                        $('#provider_15').val(data.providerAddresses[0].state);
-                        $('#provider_16').val(data.providerAddresses[0].postalCode);
-                        $('#provider_17').val(data.providerAddresses[0].phone1);
-                        $('#provider_18').val(data.providerAddresses[0].fax);
-                        
-                        $('#fromOrgProviderLine1').html(data.providerAddresses[0].line1);
-                        $('#fromOrgProviderLine2').html(data.providerAddresses[0].line2);
-                        $('#fromOrgProviderRegion').html(data.providerAddresses[0].city+" "+data.providerAddresses[0].state);
-                        $('#fromOrgProviderZip').html(data.providerAddresses[0].postalCode);
-                        if(data.providerAddresses[0].phone1 != "") {
-                            $('#fromOrgProviderPhone').html("phone: <span class='tel' >"+data.providerAddresses[0].phone1+"</span>");
-                        }
-                        if(data.providerAddresses[0].fax != "") {
-                            $('#fromOrgProviderFax').html("fax: <span class='tel'>"+data.providerAddresses[0].fax+"</span>");
-                        }
-                    }
+        //Function to remove the selected attachment
+        $(document).on('click', '.removeAttachment', function() {
 
-                    if(data.providerIds.length > 0) {
-                         $('#provider_11').val(data.providerIds[0].idNum);
+            var confirmed = confirm("Are you sure you want to remove this attachment?");
+
+            if(confirmed) {
+
+                var attachmentId = $(this).attr('rel');
+
+                $.ajax({
+                    url: '/Health-e-Web/removeAttachment.do',
+                    type: 'POST',
+                    data: {'attachmentId': attachmentId},
+                    success: function(data) {
+                       $('#attachmentRow-'+attachmentId).remove();
                     }
-                    $('#fromOrgProviderName').html(data.firstName+" "+data.lastName);
-                    
-                    $('#fromorgProvider').show();
-                    $('#fromOrgProviderChoose').hide();
+                });
+
+            }
+
+        });
+
+        //This function will launch the status detail overlay with the selected
+        //status
+        $(document).on('click', '.viewStatus', function() {
+            $.ajax({
+                url: '/Health-e-Web/viewStatus' + $(this).attr('rel'),
+                type: "GET",
+                success: function(data) {
+                    $("#statusModal").html(data);
                 }
             });
-        }
-        else {
+        });
+    
+    
+        //Function to go get providers as the user types in letters
+        $(document).on('change', '#orgProvider', function() {
+
+            if($(this).val() > 0) {
+                $.ajax({
+                    url: '/Health-e-Web/populateProvider.do',
+                    type: 'GET',
+                    data: {'providerId': $(this).val()},
+                    success: function(data) {
+                        //fields 9 - 18
+                        $('#provider_9').val(data.firstName);
+                        $('#provider_10').val(data.lastName);
+
+                        if(data.providerAddresses.length > 0) {
+                            $('#provider_12').val(data.providerAddresses[0].line1);
+                            $('#provider_13').val(data.providerAddresses[0].line2);
+                            $('#provider_14').val(data.providerAddresses[0].city);
+                            $('#provider_15').val(data.providerAddresses[0].state);
+                            $('#provider_16').val(data.providerAddresses[0].postalCode);
+                            $('#provider_17').val(data.providerAddresses[0].phone1);
+                            $('#provider_18').val(data.providerAddresses[0].fax);
+
+                            $('#fromOrgProviderLine1').html(data.providerAddresses[0].line1);
+                            $('#fromOrgProviderLine2').html(data.providerAddresses[0].line2);
+                            $('#fromOrgProviderRegion').html(data.providerAddresses[0].city+" "+data.providerAddresses[0].state);
+                            $('#fromOrgProviderZip').html(data.providerAddresses[0].postalCode);
+                            if(data.providerAddresses[0].phone1 != "") {
+                                $('#fromOrgProviderPhone').html("phone: <span class='tel' >"+data.providerAddresses[0].phone1+"</span>");
+                            }
+                            if(data.providerAddresses[0].fax != "") {
+                                $('#fromOrgProviderFax').html("fax: <span class='tel'>"+data.providerAddresses[0].fax+"</span>");
+                            }
+                        }
+
+                        if(data.providerIds.length > 0) {
+                             $('#provider_11').val(data.providerIds[0].idNum);
+                        }
+                        $('#fromOrgProviderName').html(data.firstName+" "+data.lastName);
+
+                        $('#fromorgProvider').show();
+                        $('#fromOrgProviderChoose').hide();
+                    }
+                });
+            }
+            else {
+                $('#provider_9').val("");
+                $('#provider_10').val("");
+                $('#provider_11').val("");
+                $('#provider_12').val("");
+                $('#provider_13').val("");
+                $('#provider_14').val("");
+                $('#provider_15').val("");
+                $('#provider_16').val("");
+                $('#provider_17').val("");
+                $('#provider_18').val("");
+                $('#fromorgProvider').hide();
+            }
+
+        });
+
+        //Function hide the selected provider and show the provider
+        //drop down.
+        $(document).on('click', '#fromOrgProviderChange', function() {
             $('#provider_9').val("");
             $('#provider_10').val("");
             $('#provider_11').val("");
@@ -149,41 +169,23 @@ $(document).ready(function() {
             $('#provider_17').val("");
             $('#provider_18').val("");
             $('#fromorgProvider').hide();
-        }
-        
-    });
-    
-    //Function hide the selected provider and show the provider
-    //drop down.
-    $(document).on('click', '#fromOrgProviderChange', function() {
-        $('#provider_9').val("");
-        $('#provider_10').val("");
-        $('#provider_11').val("");
-        $('#provider_12').val("");
-        $('#provider_13').val("");
-        $('#provider_14').val("");
-        $('#provider_15').val("");
-        $('#provider_16').val("");
-        $('#provider_17').val("");
-        $('#provider_18').val("");
-        $('#fromorgProvider').hide();
-        $('#orgProvider').val("");
-        $('#fromOrgProviderChoose').show();
-    });
-    
-    //Function to handle the form actions
-    $(document).on('change','#formAction',function() {
-        
-        if($(this).val() === 'print') {
-            window.print();
-        }
-        else if($.isNumeric($(this).val())) {
-            $('#originalTransactionId').val($(this).val());
-            $('#viewOriginalTransaction').submit();
-        }
-        
-    })
+            $('#orgProvider').val("");
+            $('#fromOrgProviderChoose').show();
+        });
 
+        //Function to handle the form actions
+        $(document).on('change','#formAction',function() {
+
+            if($(this).val() === 'print') {
+                window.print();
+            }
+            else if($.isNumeric($(this).val())) {
+                $('#originalTransactionId').val($(this).val());
+                $('#viewOriginalTransaction').submit();
+            }
+
+        });
+    });
 });
 
 function getTitle(){
