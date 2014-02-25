@@ -416,3 +416,12 @@ CREATE TABLE `universalTranslator`.`batchUploadConfirgurations` (
   `dateCreated` DATETIME NOT NULL DEFAULT current_timestamp,
   PRIMARY KEY (`id`));
 
+ALTER TABLE `universalTranslator`.`batchUploadConfirgurations` 
+ADD INDEX `bucBatchIdFK_idx` (`batchId` ASC);
+ALTER TABLE `universalTranslator`.`batchUploadConfirgurations` 
+ADD CONSTRAINT `bucBatchIdFK`
+  FOREIGN KEY (`batchId`)
+  REFERENCES `universalTranslator`.`batchUploads` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
