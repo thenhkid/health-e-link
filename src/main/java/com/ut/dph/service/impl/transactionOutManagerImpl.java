@@ -39,7 +39,6 @@ import com.ut.dph.service.transactionOutManager;
 import com.ut.dph.service.userManager;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -991,7 +990,6 @@ public class transactionOutManagerImpl implements transactionOutManager {
         String fileType = (String) configurationManager.getFileTypesById(transportDetails.getfileType());
         
         if("hl7".equals(fileType)) {
-            fileType = "hr";
             hl7 = true;
         }
         
@@ -1001,7 +999,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
             fileName = batchDetails.getoutputFIleName();
         }
         else {
-           fileName = new StringBuilder().append(batchDetails.getoutputFIleName()).append(".").append(fileType).toString(); 
+           fileName = new StringBuilder().append(batchDetails.getoutputFIleName()).append(".").append(transportDetails.getfileExt()).toString(); 
         }
 
         File newFile = new File(dir.getDir() + fileName);
@@ -1127,7 +1125,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                 }
                             }
                            
-                            hl7recordRow.append(System.getProperty( "line.separator" )).append(System.getProperty( "line.separator" ));
+                            hl7recordRow.append(System.getProperty( "line.separator" ));
                             
                             if(!"".equals(hl7recordRow.toString())) {
                                 try {

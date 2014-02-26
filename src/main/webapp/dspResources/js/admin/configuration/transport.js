@@ -16,7 +16,7 @@ require(['./main'], function () {
         }
 
         if(selMethodId !== "2" && selMethodId !== "") {
-            $('.assocMessageTypes').show();
+            $('.assocMessageTypes').hide();
         }
         
         //Fade out the updated/created message after being displayed.
@@ -40,7 +40,7 @@ require(['./main'], function () {
            }
 
            if(methodId !== "2" && methodId !== "") {
-                $('.assocMessageTypes').show();
+                $('.assocMessageTypes').hide();
             }
             else {
                 $('.assocMessageTypes').hide();
@@ -100,6 +100,41 @@ require(['./main'], function () {
 
         });
         
+        //Set the default file extension when the file type is selected
+        $('#fileType').change(function() {
+           
+           var fileType = $(this).val();
+           
+           if(fileType == 2) {
+              $('#fileExt').val('txt'); 
+           }
+           else if(fileType == 3) {
+              $('#fileExt').val('csv'); 
+           }
+           else if(fileType == 4) {
+              $('#fileExt').val('hr'); 
+           }
+           else if(fileType == 5) {
+              $('#fileExt').val('mdb'); 
+           }
+           else if(fileType == 6) {
+              $('#fileExt').val('pdf'); 
+           }
+           else if(fileType == 7) {
+              $('#fileExt').val('odbc'); 
+           }
+           else if(fileType == 8) {
+              $('#fileExt').val('xls'); 
+           }
+           else if(fileType == 9) {
+              $('#fileExt').val('xml'); 
+           }
+           else if(fileType == 10) {
+              $('#fileExt').val('doc'); 
+           }
+            
+        });
+        
     });
 });
 
@@ -139,6 +174,18 @@ function checkFormFields() {
            $('#fileTypeMsg').addClass("has-error");
            $('#fileTypeMsg').html('The file type is a required field.');
            hasErrors = 1;
+       }
+       
+       //Make sure the file ext is entered
+       if($('#fileExt').val() === "") {
+           $('#fileExtDiv').addClass("has-error");
+           $('#fileExtMsg').addClass("has-error");
+           $('#fileExtMsg').html('The file extension is a required field.');
+           hasErrors = 1;
+       }
+       else {
+           //Remove any '.' in the extension
+           $('#fileExt').val($('#fileExt').val().replace('.',''));
        }
        
        //Make sure the file delimiter is selected

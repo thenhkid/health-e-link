@@ -133,6 +133,17 @@
                                         </c:if>
                                     </div>
                                 </spring:bind>
+                                <spring:bind path="fileExt">
+                                    <div id="fileExtDiv" class="form-group ${status.error ? 'has-error' : '' }">
+                                        <label class="control-label" for="fileExt">File Extension *</label>
+                                        <form:input path="fileExt" id="fileExt" class="form-control" type="text" maxLength="4" disabled="${transportDetails.copiedTransportId > 0 ? 'true' : 'false'}" />
+                                        <form:errors path="fileExt" cssClass="control-label" element="label" />
+                                        <span id="fileExtMsg" class="control-label"></span>
+                                        <c:if test="${transportDetails.copiedTransportId > 0}">
+                                            <form:hidden path="fileExt" />
+                                        </c:if>
+                                   </div>
+                                </spring:bind>
                                 <spring:bind path="fileDelimiter">
                                     <div id="fileDelimiterDiv" class="form-group ${status.error ? 'has-error' : '' }">
                                         <label class="control-label" for="fileDelimiter">File Delimiter *</label>

@@ -19,10 +19,10 @@ public class configurationTransport {
 
     @Transient
     private List<configurationFTPFields> FTPfields = null;
-    
+
     @Transient
     private String delimChar = null;
-    
+
     @Transient
     private boolean containsHeaderRow;
 
@@ -48,33 +48,36 @@ public class configurationTransport {
 
     @Column(name = "STATUS", nullable = false)
     private boolean status = true;
-    
+
     @Column(name = "TARGETFILENAME", nullable = true)
     private String targetFileName = null;
-    
+
     @Column(name = "APPENDDATETIME", nullable = false)
     private boolean appendDateTime = false;
-    
+
     @Column(name = "MAXFILESIZE", nullable = false)
     private int maxFileSize = 0;
-    
+
     @Column(name = "CLEARRECORDS", nullable = false)
     private boolean clearRecords = false;
-    
+
     @Column(name = "FILELOCATION", nullable = true)
     private String fileLocation = null;
-    
+
     @Column(name = "AUTORELEASE", nullable = false)
     private boolean autoRelease = true;
-    
+
     @Column(name = "ERRORHANDLING", nullable = false)
     private int errorHandling = 1;
-    
+
     @Column(name = "MERGEBATCHES", nullable = false)
     private boolean mergeBatches = true;
-    
+
     @Column(name = "COPIEDTRANSPORTID", nullable = false)
     private int copiedTransportId = 0;
+
+    @Column(name = "FILEEXT", nullable = false)
+    private String fileExt = null;
 
     public int getId() {
         return id;
@@ -91,7 +94,7 @@ public class configurationTransport {
     public void setconfigId(int configId) {
         this.configId = configId;
     }
-    
+
     public int gettransportMethodId() {
         return transportMethodId;
     }
@@ -123,15 +126,15 @@ public class configurationTransport {
     public void setFields(List<configurationFormFields> fields) {
         this.fields = fields;
     }
-  
+
     public List<configurationFTPFields> getFTPFields() {
         return FTPfields;
     }
-    
+
     public void setFTPFields(List<configurationFTPFields> FTPFields) {
         this.FTPfields = FTPFields;
     }
-    
+
     public boolean getstatus() {
         return status;
     }
@@ -139,15 +142,15 @@ public class configurationTransport {
     public void setstatus(boolean status) {
         this.status = status;
     }
-    
+
     public String gettargetFileName() {
         return targetFileName;
     }
-    
+
     public void settargetFileName(String targetFileName) {
         this.targetFileName = targetFileName;
     }
-    
+
     public boolean getappendDateTime() {
         return appendDateTime;
     }
@@ -155,15 +158,15 @@ public class configurationTransport {
     public void setappendDateTime(boolean appendDateTime) {
         this.appendDateTime = appendDateTime;
     }
-    
+
     public int getmaxFileSize() {
         return maxFileSize;
     }
-    
+
     public void setmaxFileSize(int maxFileSize) {
         this.maxFileSize = maxFileSize;
     }
-    
+
     public boolean getclearRecords() {
         return clearRecords;
     }
@@ -171,7 +174,7 @@ public class configurationTransport {
     public void setclearRecords(boolean clearRecords) {
         this.clearRecords = clearRecords;
     }
-    
+
     public String getfileLocation() {
         return fileLocation;
     }
@@ -179,7 +182,7 @@ public class configurationTransport {
     public void setfileLocation(String fileLocation) {
         this.fileLocation = fileLocation;
     }
-    
+
     public boolean getautoRelease() {
         return autoRelease;
     }
@@ -187,15 +190,15 @@ public class configurationTransport {
     public void setautoRelease(boolean autoRelease) {
         this.autoRelease = autoRelease;
     }
-    
+
     public int geterrorHandling() {
         return errorHandling;
     }
-    
+
     public void seterrorHandling(int errorHandling) {
         this.errorHandling = errorHandling;
     }
-    
+
     public boolean getmergeBatches() {
         return mergeBatches;
     }
@@ -203,7 +206,7 @@ public class configurationTransport {
     public void setmergeBatches(boolean mergeBatches) {
         this.mergeBatches = mergeBatches;
     }
-    
+
     public List<Integer> getmessageTypes() {
         return messageTypes;
     }
@@ -211,7 +214,7 @@ public class configurationTransport {
     public void setmessageTypes(List<Integer> messageTypes) {
         this.messageTypes = messageTypes;
     }
-    
+
     public int getcopiedTransportId() {
         return copiedTransportId;
     }
@@ -219,20 +222,28 @@ public class configurationTransport {
     public void setcopiedTransportId(int copiedTransportId) {
         this.copiedTransportId = copiedTransportId;
     }
-   
+
     public String getDelimChar() {
-		return delimChar;
-	}
+        return delimChar;
+    }
 
-	public void setDelimChar(String delimChar) {
-		this.delimChar = delimChar;
-	}
-	
-	public boolean isContainsHeaderRow() {
-		return containsHeaderRow;
-	}
+    public void setDelimChar(String delimChar) {
+        this.delimChar = delimChar;
+    }
 
-	public void setContainsHeaderRow(boolean containsHeaderRow) {
-		this.containsHeaderRow = containsHeaderRow;
-	}
+    public boolean isContainsHeaderRow() {
+        return containsHeaderRow;
+    }
+
+    public void setContainsHeaderRow(boolean containsHeaderRow) {
+        this.containsHeaderRow = containsHeaderRow;
+    }
+    
+    public String getfileExt() {
+        return fileExt;
+    }
+    
+    public void setfileExt(String fileExt) {
+        this.fileExt = fileExt;
+    }
 }

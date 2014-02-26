@@ -443,4 +443,8 @@ update batchuploads set containsHeaderRow = 0;
 ALTER TABLE `universalTranslator`.`configurationMessageSpecs` 
 CHANGE COLUMN `containsHeaderRow` `containsHeaderRow` BIT(1) NOT NULL DEFAULT b'0' ;
 
+/** Chad 2-26-2014 @ 1:55 PM **/
+ALTER TABLE `universalTranslator`.`configurationTransportDetails` 
+ADD COLUMN `fileExt` VARCHAR(4) NULL DEFAULT NULL AFTER `copiedTransportId`;
+
 
