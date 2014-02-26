@@ -1,6 +1,7 @@
 package com.ut.dph.dao;
 
 import com.ut.dph.model.configurationFTPFields;
+
 import java.util.List;
 
 import com.ut.dph.model.configurationFormFields;
@@ -44,4 +45,6 @@ public interface configurationTransportDAO {
     
     List <configurationFormFields> getCffByValidationType(Integer configId, Integer validationTypeId);
     
+    List <configurationTransport> getDistinctConfigTransportForOrg(Integer orgId, Integer transportMethodId);
+	
 }

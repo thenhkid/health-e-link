@@ -10,12 +10,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.Transformers;
 
 import com.ut.dph.dao.configurationTransportDAO;
 import com.ut.dph.model.configurationFTPFields;
 import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.configurationTransport;
 import com.ut.dph.model.configurationTransportMessageTypes;
+
 import java.util.Iterator;
 
 @Service
@@ -360,6 +362,35 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
                 criteria.addOrder(Order.asc("fieldNo"));
                 
         return criteria.list();
+	}
+
+	@Override
+	@Transactional
+	@SuppressWarnings("unchecked")
+	public List<configurationTransport> getDistinctConfigTransportForOrg(Integer orgId, Integer transportMethodId) {
+		try {
+			
+			String sql = ("select distinct delimChar, errorHandling, autoRelease, fileLocation, fileType, containsHeaderRow, "
+					+ " transportMethodId from configurationTransportDetails, ref_delimiters , configurationMessageSpecs "
+					+ " where ref_delimiters.id = configurationTransportDetails.fileDelimiter "
+					+ " and configurationMessageSpecs.configId = configurationTransportDetails.configId "
+					+ " and transportMethodId = :transportMethodId and configurationTransportDetails.configId in "
+					+ "(select id from configurations where orgId = :orgId);");
+	        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
+                    Transformers.aliasToBean(configurationTransport.class));           
+	        query.setParameter("orgId", orgId);
+	        query.setParameter("transportMethodId", transportMethodId);
+	        
+	        List <configurationTransport> configurationTransports = query.list();
+			
+	        return configurationTransports;
+	        
+		} catch (Exception ex) {
+			System.err.println(ex.getClass() + " " + ex.getCause());
+			ex.printStackTrace();
+			
+			return null;
+		}
 	}
 
 }

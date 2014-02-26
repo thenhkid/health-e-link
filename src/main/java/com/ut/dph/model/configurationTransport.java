@@ -22,8 +22,11 @@ public class configurationTransport {
     
     @Transient
     private String delimChar = null;
+    
+    @Transient
+    private boolean containsHeaderRow;
 
-	@Transient
+    @Transient
     private List<Integer> messageTypes = null;
 
     @Id
@@ -223,5 +226,13 @@ public class configurationTransport {
 
 	public void setDelimChar(String delimChar) {
 		this.delimChar = delimChar;
+	}
+	
+	public boolean isContainsHeaderRow() {
+		return containsHeaderRow;
+	}
+
+	public void setContainsHeaderRow(boolean containsHeaderRow) {
+		this.containsHeaderRow = containsHeaderRow;
 	}
 }

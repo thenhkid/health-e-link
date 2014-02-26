@@ -4,6 +4,10 @@ import com.ut.dph.model.configurationFTPFields;
 
 import java.util.List;
 
+import org.hibernate.Query;
+import org.hibernate.transform.Transformers;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.configurationTransport;
 import com.ut.dph.model.configurationTransportMessageTypes;
@@ -44,4 +48,7 @@ public interface configurationTransportManager {
     List<configurationFormFields> getRequiredFieldsForConfig(Integer configId);
     
     List<configurationFormFields> getCffByValidationType(Integer configId, Integer validationTypeId);
+    
+    List <configurationTransport> getDistinctConfigTransportForOrg(Integer orgId, Integer transportMethodId);
+		
 }
