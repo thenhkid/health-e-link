@@ -185,7 +185,7 @@ public interface transactionInDAO {
     
     Integer loadTransactionTranslatedIn (Integer batchId);
     
-    Integer insertBatchUploadSummary (batchUploads batchUpload);
+    Integer insertBatchUploadSummary (batchUploads batchUpload, configurationConnection batchTargets);
     
     Integer insertBatchTargets (Integer batchId, configurationConnection batchTargets);
     

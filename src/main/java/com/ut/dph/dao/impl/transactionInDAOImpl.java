@@ -2695,7 +2695,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 
 		@Override
 		@Transactional
-		public Integer insertBatchUploadSummary(batchUploads batchUpload) {
+		public Integer insertBatchUploadSummary(batchUploads batchUpload, configurationConnection batchTargets) {
 			// TODO Auto-generated method stub
 			try {
 				String sql = ("");

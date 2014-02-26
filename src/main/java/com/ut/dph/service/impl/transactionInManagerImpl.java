@@ -531,11 +531,12 @@ public class transactionInManagerImpl implements transactionInManager {
  	    	List<configurationConnection> batchTargetList =  getBatchTargets(batchUploadId);
  	    	for (configurationConnection bt : batchTargetList) {
  	    		sysErrors = sysErrors + insertBatchTargets(batchUploadId, bt);
- 	            
+ 	    		//populate batchUploadSummary
+ 	    		// need batchId, transactionInId,  configId, sourceOrgId, messageTypeId - in configurations - missing targetOrgId, 
+ 	 	    	sysErrors = sysErrors + insertBatchUploadSummary(batch, bt);
  	    	}
  	    	
- 	    	//load batchUploadSummary
- 	    	sysErrors = sysErrors + insertBatchUploadSummary(batch);
+ 	    	
  	    	
              if (sysErrors > 0) {
             	insertProcessingError(5, null, batchUploadId, null, null, null, null, false, false, errorMessage);
@@ -1496,8 +1497,8 @@ public class transactionInManagerImpl implements transactionInManager {
 	}
 
 	@Override
-	public Integer insertBatchUploadSummary(batchUploads batchUpload) {
-		return transactionInDAO.insertBatchUploadSummary(batchUpload);
+	public Integer insertBatchUploadSummary (batchUploads batchUpload, configurationConnection batchTargets) {
+		return transactionInDAO.insertBatchUploadSummary(batchUpload, batchTargets);
 	}
 
 	@Override
