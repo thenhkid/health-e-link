@@ -30,7 +30,15 @@ public class batchUploads {
     @Transient
     private String statusValue;
     
-    @Transient
+    public String getDelimChar() {
+		return delimChar;
+	}
+
+	public void setDelimChar(String delimChar) {
+		this.delimChar = delimChar;
+	}
+
+	@Transient
     private String usersName;
     
     @Id
@@ -81,7 +89,35 @@ public class batchUploads {
     @Column(name = "DATESUBMITTED", nullable = false)
     private Date dateSubmitted = new Date();
     
-    public int getId() {
+    @Column(name = "configId", nullable = true)
+    private Integer configId;
+   
+    @Column(name = "CONTAINSHEADERROW", nullable = false)
+    private boolean containsHeaderRow = false;
+    
+	@Column(name = "delimChar", nullable = true)
+    private String delimChar;
+    
+    @Column(name = "fileLocation", nullable = true)
+    private String fileLocation;
+    
+    public boolean isContainsHeaderRow() {
+		return containsHeaderRow;
+	}
+
+	public void setContainsHeaderRow(boolean containsHeaderRow) {
+		this.containsHeaderRow = containsHeaderRow;
+	}
+
+	public String getFileLocation() {
+		return fileLocation;
+	}
+
+	public void setFileLocation(String fileLocation) {
+		this.fileLocation = fileLocation;
+	}
+
+	public int getId() {
         return id;
     }
 
@@ -220,5 +256,14 @@ public class batchUploads {
     public void setusersName(String usersName) {
        this.usersName = usersName;
     }
+    
+    public Integer getConfigId() {
+		return configId;
+	}
+
+	public void setConfigId(Integer configId) {
+		this.configId = configId;
+	}
+
     
 }

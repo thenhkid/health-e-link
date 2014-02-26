@@ -437,3 +437,10 @@ ADD COLUMN `fileLocation` VARCHAR(255) NULL AFTER `delimChar`;
 ALTER TABLE `universalTranslator`.`batchUploads` 
 ADD COLUMN `configId` INT NULL COMMENT 'configuration for message type if selected' AFTER `fileLocation`;
 
+/** 02262014 Grace 10:57PM **/
+update batchuploads set containsHeaderRow = 0;
+
+ALTER TABLE `universalTranslator`.`configurationMessageSpecs` 
+CHANGE COLUMN `containsHeaderRow` `containsHeaderRow` BIT(1) NOT NULL DEFAULT b'0' ;
+
+
