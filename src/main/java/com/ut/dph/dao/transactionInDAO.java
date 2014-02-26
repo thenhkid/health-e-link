@@ -190,4 +190,7 @@ public interface transactionInDAO {
     Integer insertBatchTargets (Integer batchId, configurationConnection batchTargets);
     
     List <configurationConnection> getBatchTargets (Integer batchId);
+    
+    Integer clearBatchUploadSummary(Integer batchId);
+    
 }

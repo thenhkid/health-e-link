@@ -1511,4 +1511,8 @@ public class transactionInManagerImpl implements transactionInManager {
 		return transactionInDAO.getBatchTargets(batchId);
 	}
 	
+	@Override
+	public Integer clearBatchUploadSummary(Integer batchId) {
+		return transactionInDAO.clearBatchUploadSummary(batchId);
+	}
 }

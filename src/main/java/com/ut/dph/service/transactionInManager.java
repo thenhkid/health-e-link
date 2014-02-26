@@ -232,4 +232,6 @@ public interface transactionInManager {
     
     List <configurationConnection> getBatchTargets (Integer batchId);
     
+    Integer clearBatchUploadSummary(Integer batchId);
+    
 }
