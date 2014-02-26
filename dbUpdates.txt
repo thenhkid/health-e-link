@@ -425,3 +425,11 @@ ADD CONSTRAINT `bucBatchIdFK`
   ON DELETE NO ACTION
   ON UPDATE NO ACTION;
 
+/** 02262014 **/
+DROP TABLE `universalTranslator`.`batchUploadConfirgurations`;
+
+ALTER TABLE `universalTranslator`.`batchUploads` 
+ADD COLUMN `containsHeaderRow` BIT NULL AFTER `errorRecordCount`,
+ADD COLUMN `delimChar` VARCHAR(1) NULL AFTER `containsHeaderRow`,
+ADD COLUMN `fileLocation` VARCHAR(255) NULL AFTER `delimChar`;
+
