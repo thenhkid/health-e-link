@@ -123,4 +123,10 @@ public class configurationTransportManagerImpl implements configurationTransport
 	public List <configurationFormFields> getCffByValidationType(Integer configId, Integer validationTypeId) {
 		 return configurationTransportDAO.getCffByValidationType(configId, validationTypeId );
 	}
+
+	@Override
+	public List<configurationTransport> getDistinctConfigTransportForOrg(Integer orgId, Integer transportMethodId) {
+		return configurationTransportDAO.getDistinctConfigTransportForOrg(orgId, transportMethodId);
+	}
+	
 }
