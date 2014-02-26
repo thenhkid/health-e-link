@@ -433,3 +433,7 @@ ADD COLUMN `containsHeaderRow` BIT NULL AFTER `errorRecordCount`,
 ADD COLUMN `delimChar` VARCHAR(1) NULL AFTER `containsHeaderRow`,
 ADD COLUMN `fileLocation` VARCHAR(255) NULL AFTER `delimChar`;
 
+/** 02262014 Grace 10:35PM **/
+ALTER TABLE `universalTranslator`.`batchUploads` 
+ADD COLUMN `configId` INT NULL COMMENT 'configuration for message type if selected' AFTER `fileLocation`;
+
