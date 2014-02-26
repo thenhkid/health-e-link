@@ -225,4 +225,8 @@ public interface transactionInManager {
     
     Integer loadTransactionTranslatedIn (Integer batchId);
     
+    Integer loadBatchUploadSummary (batchUploads batchUpload);
+    
+    Integer loadTargets (batchUploads batchUpload);
+    
 }

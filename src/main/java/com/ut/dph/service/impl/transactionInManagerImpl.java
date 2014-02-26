@@ -521,16 +521,22 @@ public class transactionInManagerImpl implements transactionInManager {
  	    	configurationTransport configurationTransport =  getConfigurationTransportForBatch(batchUploadId);
  	    	if (configurationTransport == null) {
  	    		sysErrors++;
- 	    		errorMessage = "Multiple delimiter or file location for file is found.  Please contact admin to review configurations.";
+ 	    		errorMessage = "Multiple or no delimiters, file locations for file are found.  Please contact admin to review configurations.";
 	    	} else if (configurationTransport.getfileType() == 2) {
  	    		sysErrors = sysErrors + loadTextBatch(batch, configurationTransport);
  	    	}
+ 	    	
+ 	    	//load targets
+ 	    	sysErrors = sysErrors + loadTargets(batch);
             
+ 	    	//load batchUploadSummary
+ 	    	sysErrors = sysErrors + loadBatchUploadSummary(batch);
+ 	    	
              if (sysErrors > 0) {
             	insertProcessingError(5, null, batchUploadId, null, null, null, null, false, false, errorMessage);
  				updateBatchStatus(batchUploadId, batchStausId, "endDateTime");
  				return false;
-             }
+             } 
            
 			//we check handling here for rejecting entire batch
             List <configurationTransport> batchHandling = getHandlingDetailsByBatch(batchUploadId);
@@ -893,8 +899,10 @@ public class transactionInManagerImpl implements transactionInManager {
 	    	
 	    	
 	    		fileSystem dir = new fileSystem();
+	    		dir.setDirByName("/");
 	            String fileWithPath = dir.getDir() +configurationTransport.getfileLocation() + batchUpload.getoriginalFileName();
-		    	System.out.println(fileWithPath);
+	            fileWithPath = fileWithPath.replace("bowlink///", "");
+	            
 		    	
 	            //2. we load data with my sql
 		    	sysError  = sysError  + insertLoadData (batchUpload.getId(),configurationTransport.getDelimChar() , fileWithPath, loadTableName);
@@ -959,7 +967,7 @@ public class transactionInManagerImpl implements transactionInManager {
         cleared = cleared + clearTransactionInErrors(batchUploadId);
        
         //we clear transactionIn
-        cleared = cleared + clearTransactionTarget(batchUploadId);
+        cleared = cleared + clearTransactionIn(batchUploadId);
        
         if (cleared > 0) {
             flagAndEmailAdmin(batchUploadId);
@@ -1485,6 +1493,16 @@ public class transactionInManagerImpl implements transactionInManager {
 	@Override
 	public Integer loadTransactionTranslatedIn(Integer batchId) {
 		return transactionInDAO.loadTransactionTranslatedIn(batchId);
+	}
+
+	@Override
+	public Integer loadBatchUploadSummary(batchUploads batchUpload) {
+		return transactionInDAO.loadBatchUploadSummary(batchUpload);
+	}
+
+	@Override
+	public Integer loadTargets(batchUploads batchUpload) {
+		return transactionInDAO.loadTargets(batchUpload);
 	}
 	
 }

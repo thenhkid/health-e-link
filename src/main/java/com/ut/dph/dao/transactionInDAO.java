@@ -183,4 +183,8 @@ public interface transactionInDAO {
     Integer updateConfigIdForBatch(Integer batchId, Integer configId);
     
     Integer loadTransactionTranslatedIn (Integer batchId);
+    
+    Integer loadBatchUploadSummary (batchUploads batchUpload);
+    
+    Integer loadTargets (batchUploads batchUpload);
 }
