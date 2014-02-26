@@ -10,6 +10,7 @@ import com.ut.dph.model.CrosswalkData;
 import com.ut.dph.model.Macros;
 import com.ut.dph.model.batchUploadSummary;
 import com.ut.dph.model.batchUploads;
+import com.ut.dph.model.configurationConnection;
 import com.ut.dph.model.configurationDataTranslations;
 import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.configurationTransport;
@@ -184,7 +185,9 @@ public interface transactionInDAO {
     
     Integer loadTransactionTranslatedIn (Integer batchId);
     
-    Integer loadBatchUploadSummary (batchUploads batchUpload);
+    Integer insertBatchUploadSummary (batchUploads batchUpload);
     
-    Integer loadTargets (batchUploads batchUpload);
+    Integer insertBatchTargets (Integer batchId, configurationConnection batchTargets);
+    
+    List <configurationConnection> getBatchTargets (Integer batchId);
 }

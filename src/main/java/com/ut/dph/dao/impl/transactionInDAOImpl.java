@@ -2695,7 +2695,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 
 		@Override
 		@Transactional
-		public Integer loadBatchUploadSummary(batchUploads batchUpload) {
+		public Integer insertBatchUploadSummary(batchUploads batchUpload) {
 			// TODO Auto-generated method stub
 			try {
 				String sql = ("");
@@ -2711,17 +2711,41 @@ public class transactionInDAOImpl implements transactionInDAO {
 
 		@Override
 		@Transactional
-		public Integer loadTargets(batchUploads batchUpload) {
+		public Integer insertBatchTargets (Integer batchId, configurationConnection batchTargets){
 			// TODO Auto-generated method stub
 			try {
-				String sql = ("");
+				String sql = ("INSERT INTO transactionTarget (batchUploadId, transactionInId, "
+						+ " configId, statusId) select " + batchId + ", id, " 
+						+ batchTargets.gettargetConfigId()+ ",9 from transactionIn where configId = :configId and "
+						+ "batchId = :batchId");
 		        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql); 
-		        //query.setParameter("batchId", batchId);
-		        //query.executeUpdate();
+		        query.setParameter("batchId", batchId);
+		        query.setParameter("configId", batchTargets.getsourceConfigId());
+		        query.executeUpdate();
 				return 0;
 			} catch (Exception ex) {
 				System.out.println(ex.getClass() + " " + ex.getCause());
 				return 1;
+			}
+		}
+
+		@Override
+		@Transactional
+		@SuppressWarnings("unchecked")
+		public List<configurationConnection> getBatchTargets(Integer batchId) {
+			try {
+				String sql = ("select sourceConfigId, targetConfigId from configurationconnections "
+						+ " where sourceconfigId in (select configId from transactionIn where "
+						+ " batchId = :batchId);");
+		        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
+                        Transformers.aliasToBean(configurationConnection.class)); 
+		        query.setParameter("batchId", batchId);
+		       
+				List<configurationConnection> cc = query.list();
+				return cc;
+			} catch (Exception ex) {
+				System.out.println(ex.getClass() + " " + ex.getCause());
+				return null;
 			}
 		}
 		

@@ -13,6 +13,7 @@ import com.ut.dph.model.Organization;
 import com.ut.dph.model.batchUploadSummary;
 import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.configuration;
+import com.ut.dph.model.configurationConnection;
 import com.ut.dph.model.configurationDataTranslations;
 import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.configurationTransport;
@@ -527,10 +528,14 @@ public class transactionInManagerImpl implements transactionInManager {
  	    	}
  	    	
  	    	//load targets
- 	    	sysErrors = sysErrors + loadTargets(batch);
-            
+ 	    	List<configurationConnection> batchTargetList =  getBatchTargets(batchUploadId);
+ 	    	for (configurationConnection bt : batchTargetList) {
+ 	    		sysErrors = sysErrors + insertBatchTargets(batchUploadId, bt);
+ 	            
+ 	    	}
+ 	    	
  	    	//load batchUploadSummary
- 	    	sysErrors = sysErrors + loadBatchUploadSummary(batch);
+ 	    	sysErrors = sysErrors + insertBatchUploadSummary(batch);
  	    	
              if (sysErrors > 0) {
             	insertProcessingError(5, null, batchUploadId, null, null, null, null, false, false, errorMessage);
@@ -754,13 +759,8 @@ public class transactionInManagerImpl implements transactionInManager {
     @Override
     public boolean processBatches() {
 		//0. grab all batches with SSA - 2
-
-        //2. validate type
-        //3. apply cw / macros to check for valid data
-        //4. check auto release / manual status 
-        //5. assuming all is well, call processTransactions(batchUploadId);
-        /**
-         * status at this point *
+    	/**
+         * loop and process
          */
         return false;
     }
@@ -1496,13 +1496,18 @@ public class transactionInManagerImpl implements transactionInManager {
 	}
 
 	@Override
-	public Integer loadBatchUploadSummary(batchUploads batchUpload) {
-		return transactionInDAO.loadBatchUploadSummary(batchUpload);
+	public Integer insertBatchUploadSummary(batchUploads batchUpload) {
+		return transactionInDAO.insertBatchUploadSummary(batchUpload);
 	}
 
 	@Override
-	public Integer loadTargets(batchUploads batchUpload) {
-		return transactionInDAO.loadTargets(batchUpload);
+	public Integer insertBatchTargets(Integer batchId, configurationConnection batchTargets) {
+		return transactionInDAO.insertBatchTargets(batchId, batchTargets);
+	}
+
+	@Override
+	public List<configurationConnection> getBatchTargets(Integer batchId) {
+		return transactionInDAO.getBatchTargets(batchId);
 	}
 	
 }
