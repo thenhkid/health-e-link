@@ -230,4 +230,8 @@ public interface transactionInManager {
     
     Integer clearBatchUploadSummary(Integer batchId);
     
+    void loadBatches();
+    
+    void loadBatch(Integer batchId);
+    
 }

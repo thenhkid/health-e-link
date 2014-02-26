@@ -1495,4 +1495,20 @@ public class transactionInManagerImpl implements transactionInManager {
 	public Integer clearBatchUploadSummary(Integer batchId) {
 		return transactionInDAO.clearBatchUploadSummary(batchId);
 	}
+
+	/** 
+	 * this method is called by scheduler.  It will take all batches with 
+	 * 
+	 */
+	@Override
+	public void loadBatches() {
+		
+		
+	}
+
+	@Override
+	public void loadBatch(Integer batchId) {
+		// TODO Auto-generated method stub
+		
+	}
 }

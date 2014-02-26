@@ -1093,7 +1093,7 @@ public class transactionInDAOImpl implements transactionInDAO {
             deleteTable.executeUpdate();
             return 0;
         } catch (Exception ex) {
-        	System.err.println(ex.getClass() + " " + ex.getCause());
+        	System.err.println("clearMessageTableForBatch " + ex.getCause());
             return 1;
 
         }
@@ -1225,7 +1225,7 @@ public class transactionInDAOImpl implements transactionInDAO {
         try {
             updateData.executeUpdate();
         } catch (Exception ex) {
-        	System.err.println(ex.getClass() + " " + ex.getCause());
+        	System.err.println("updateBatchStatus " + ex.getCause());
         }
 
     }
@@ -1263,7 +1263,7 @@ public class transactionInDAOImpl implements transactionInDAO {
         try {
             updateData.executeUpdate();
         } catch (Exception ex) {
-        	System.err.println(ex.getClass() + " " + ex.getCause());
+        	System.err.println("updateTransactionStatus " + ex.getCause());
         }
 
     }
@@ -1309,7 +1309,7 @@ public class transactionInDAOImpl implements transactionInDAO {
         try {
             updateData.executeUpdate();
         } catch (Exception ex) {
-        	System.err.println(ex.getClass() + " " + ex.getCause());
+        	System.err.println("updateTransactionTargetStatus " + ex.getCause());
         }
 
     }
@@ -1341,7 +1341,7 @@ public class transactionInDAOImpl implements transactionInDAO {
             deleteData.executeUpdate();
             return 0;
         } catch (Exception ex) {
-        	System.err.println(ex.getClass() + " " + ex.getCause());
+        	System.err.println("clearTransactionInRecords " + ex.getCause());
             return 1;
         }
     }
@@ -1359,7 +1359,7 @@ public class transactionInDAOImpl implements transactionInDAO {
             deleteData.executeUpdate();
             return 0;
         } catch (Exception ex) {
-        	System.err.println(ex.getClass() + " " + ex.getCause());
+        	System.err.println("clearTransactionTranslatedIn " + ex.getCause());
             return 1;
         }
     }
@@ -1376,7 +1376,7 @@ public class transactionInDAOImpl implements transactionInDAO {
             deleteData.executeUpdate();
             return 0;
         } catch (Exception ex) {
-        	System.err.println(ex.getClass() + " " + ex.getCause());
+        	System.err.println("clearTransactionTarget " + ex.getCause());
             return 1;
         }
     }
@@ -1391,7 +1391,7 @@ public class transactionInDAOImpl implements transactionInDAO {
             deleteData.executeUpdate();
             return 0;
         } catch (Exception ex) {
-        	System.err.println(ex.getClass() + " " + ex.getCause());
+        	System.err.println("clearTransactionIn " + ex.getCause());
             return 1;
         }
     }
@@ -1419,7 +1419,7 @@ public class transactionInDAOImpl implements transactionInDAO {
             insertData.executeUpdate();
             return 0;
         } catch (Exception ex) {
-        	System.err.println(ex.getClass() + " " + ex.getCause());
+        	System.err.println("insertFailedRequiredFields " + ex.getCause());
             
             return 1;
         }
@@ -1438,7 +1438,7 @@ public class transactionInDAOImpl implements transactionInDAO {
             deleteData.executeUpdate();
             return 0;
         } catch (Exception ex) {
-        	System.err.println(ex.getClass() + " " + ex.getCause());
+        	System.err.println("clearTransactionInErrors " + ex.getCause());
             return 1;
         }
     }
@@ -1468,7 +1468,7 @@ public class transactionInDAOImpl implements transactionInDAO {
             updateData.executeUpdate();
 
         } catch (Exception ex) {
-        	System.err.println(ex.getClass() + " " + ex.getCause());
+        	System.err.println("updateStatusForErrorTrans " + ex.getCause());
         }
     }
 
@@ -1489,9 +1489,9 @@ public class transactionInDAOImpl implements transactionInDAO {
             insertError.executeUpdate();
             return 0;
         } catch (Exception ex) {
-        	System.err.println(ex.getClass() + " " + ex.getCause());
+        	System.err.println("genericValidation " + ex.getCause());
             insertProcessingError(5, cff.getconfigId(), batchUploadId, cff.getId(),
-		    		null, null, validationTypeId, false, false, (ex.getClass() + "-" + ex.getCause().toString()));
+		    		null, null, validationTypeId, false, false, ("-" + ex.getCause().toString()));
             return 1; //we return error count of 1 when error
         }
     }
@@ -1512,7 +1512,7 @@ public class transactionInDAOImpl implements transactionInDAO {
         try {
             updateData.executeUpdate();
         } catch (Exception ex) {
-        	System.err.println(ex.getClass() + " " + ex.getCause());
+        	System.err.println("updateBlanksToNull " + ex.getCause());
         }
 
     }
@@ -1556,7 +1556,7 @@ public class transactionInDAOImpl implements transactionInDAO {
         try {
             updateData.executeUpdate();
         } catch (Exception ex) {
-        	System.err.println(ex.getClass() + " " + ex.getCause());
+        	System.err.println("updateFieldValue " + ex.getCause());
         }
 
     }
@@ -1578,7 +1578,7 @@ public class transactionInDAOImpl implements transactionInDAO {
             insertData.executeUpdate();
 
         } catch (Exception ex) {
-        	System.err.println(ex.getClass() + " " + ex.getCause());
+        	System.err.println("insertValidationError " + ex.getCause());
 
         }
     }
@@ -1640,7 +1640,7 @@ public class transactionInDAOImpl implements transactionInDAO {
         try {
             updateData.executeUpdate();
         } catch (Exception ex) {
-        	System.err.println(ex.getClass() + " " + ex.getCause());
+        	System.err.println("nullForCWCol " + ex.getCause());
         }
     }
 
@@ -1672,10 +1672,10 @@ public class transactionInDAOImpl implements transactionInDAO {
         try {
             updateData.executeUpdate();
         } catch (Exception ex) {
-        	System.err.println(ex.getClass() + " " + ex.getCause());
+        	System.err.println("executeCWData " + ex.getCause());
             insertProcessingError(5, configId, batchId, fieldId,
 		    		null, cwd.getCrosswalkId(), null,
-		    		false, foroutboundProcessing, (ex.getClass() + " " + ex.getCause().toString()));
+		    		false, foroutboundProcessing, ("executeCWData " + ex.getCause().toString()));
         }
 
     }
@@ -1708,7 +1708,7 @@ public class transactionInDAOImpl implements transactionInDAO {
         try {
             updateData.executeUpdate();
         } catch (Exception ex) {
-        	System.err.println(ex.getClass() + " " + ex.getCause());
+        	System.err.println("updateFieldNoWithCWData " + ex.getCause());
         }
     }
 
@@ -1749,7 +1749,7 @@ public class transactionInDAOImpl implements transactionInDAO {
         try {
             updateData.executeUpdate();
         } catch (Exception ex) {
-        	System.err.println(ex.getClass() + " " + ex.getCause());
+        	System.err.println("flagCWErrors " + ex.getCause());
         }
     }
     
@@ -1791,7 +1791,7 @@ public class transactionInDAOImpl implements transactionInDAO {
         try {
             updateData.executeUpdate();
         } catch (Exception ex) {
-        	System.err.println(ex.getClass() + " " + ex.getCause());
+        	System.err.println("flagMacroErrors " + ex.getCause());
         }
     }
 
@@ -2068,7 +2068,7 @@ public class transactionInDAOImpl implements transactionInDAO {
         try {
             updateData.executeUpdate();
         } catch (Exception ex) {
-        	System.err.println(ex.getClass() + " " + ex.getCause());
+        	System.err.println("resetTransactionTranslatedIn " + ex.getCause());
         }
 
     }
@@ -2108,8 +2108,8 @@ public class transactionInDAOImpl implements transactionInDAO {
 			   //insert system error
 			   insertProcessingError(5, configId, batchId, cdt.getFieldId(),
 			    		cdt.getMacroId(), null, null,
-			    		false, foroutboundProcessing, (ex.getClass() + " " + ex.getCause().toString()));
-			   System.err.println(ex.getClass() + " " + ex.getCause());
+			    		false, foroutboundProcessing, ("executeMacro " + ex.getCause().toString()));
+			   System.err.println("executeMacro " + ex.getCause());
 			   return 1;
 		   }
 
@@ -2148,7 +2148,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 	        try {
 	            updateData.executeUpdate();
 	        } catch (Exception ex) {
-	        	System.err.println(ex.getClass() + " " + ex.getCause());
+	        	System.err.println("insertProcessingError " + ex.getCause());
 	        }
 	    }
 
@@ -2169,7 +2169,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 		        	List<configurationTransport> ct = query.list();
 		        	return ct;
 	        } catch (Exception ex) {
-	        	System.err.println(ex.getClass() + " " + ex.getCause());
+	        	System.err.println("getHandlingDetailsByBatch " + ex.getCause());
 	        	return null;
 	        }
 	       
@@ -2202,7 +2202,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 	        	}
 	        	query.executeUpdate();
 	        } catch (Exception ex) {
-	        	System.err.println(ex.getClass() + " " + ex.getCause());
+	        	System.err.println("updateRecordCounts " + ex.getCause());
 	        }
 		}
 
@@ -2235,7 +2235,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 	        	
 	        	return (Integer) query.list().get(0);
 	        } catch (Exception ex) {
-	        	System.err.println(ex.getClass() + " " + ex.getCause());
+	        	System.err.println("getRecordCounts " + ex.getCause());
 	        	return null;
 	        }
 		}
@@ -2251,7 +2251,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 		        query.executeUpdate();
 				return 0;
 			} catch (Exception ex) {
-				System.err.println(ex.getClass() + " " + ex.getCause());
+				System.err.println("copyTransactionInStatusToTarget " + ex.getCause());
 				return 1;
 			}
 		}
@@ -2270,7 +2270,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 		        query.executeUpdate();
 				return 0;
 			} catch (Exception ex) {
-				System.err.println(ex.getClass() + " " + ex.getCause());
+				System.err.println("insertLoadData " + ex.getCause());
 				return 1;
 			}
 		}
@@ -2284,7 +2284,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 		        query.executeUpdate();
 				return 0;
 			} catch (Exception ex) {
-				System.err.println(ex.getClass() + " " + ex.getCause());
+				System.err.println("createLoadTable " + ex.getCause());
 				return 1;
 			}
 		}
@@ -2298,7 +2298,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 		        query.executeUpdate();
 				return 0;
 			} catch (Exception ex) {
-				System.err.println(ex.getClass() + " " + ex.getCause());
+				System.err.println("dropLoadTable " + ex.getCause());
 				return 1;
 			}
 		}
@@ -2313,7 +2313,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 		        query.executeUpdate();
 				return 0;
 			} catch (Exception ex) {
-				System.err.println(ex.getClass() + " " + ex.getCause());
+				System.err.println("updateLoadTable " + ex.getCause());
 				return 1;
 			}
 		}
@@ -2329,7 +2329,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 		        query.executeUpdate();
 				return 0;
 			} catch (Exception ex) {
-				System.err.println(ex.getClass() + " " + ex.getCause());
+				System.err.println("loadTransactionIn " + ex.getCause());
 				return 1;
 			}
 		}
@@ -2344,7 +2344,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 		        query.executeUpdate();
 				return 0;
 			} catch (Exception ex) {
-				System.err.println(ex.getClass() + " " + ex.getCause());
+				System.err.println("loadTransactionInRecords " + ex.getCause());
 				return 1;
 			}
 		}
@@ -2615,7 +2615,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 		        query.executeUpdate();
 				return 0;
 			} catch (Exception ex) {
-				System.err.println(ex.getClass() + " " + ex.getCause());
+				System.err.println("loadTransactionInRecordsData " + ex.getCause());
 				return 1;
 			}
 		}
@@ -2632,7 +2632,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 		        return 0;
 		        
 			} catch (Exception ex) {
-				System.err.println(ex.getClass() + " " + ex.getCause());
+				System.err.println("updateConfigIdForBatch " + ex.getCause());
 				return 1;
 			}
 		}
@@ -2647,7 +2647,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 			        query.executeUpdate();
 					return 0;
 				} catch (Exception ex) {
-					System.err.println(ex.getClass() + " " + ex.getCause());
+					System.err.println("loadTransactionTranslatedIn " + ex.getCause());
 					return 1;
 				}
 		}
@@ -2657,7 +2657,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 		public Integer insertBatchUploadSummary(batchUploads batch, configurationConnection batchTargets) {
 			try {
 				String sql = ("insert into batchuploadsummary (batchId, transactionInId, sourceOrgId, targetOrgId, messageTypeId, sourceConfigId)"
-						+ " select " + batch.getId() +", transactionInId, "+ batch.getOrgId() +", "
+						+ " abc select " + batch.getId() +", transactionInId, "+ batch.getOrgId() +", "
 						+ " configurations.orgId, messageTypeId, "+ batchTargets.getsourceConfigId() 
 						+" from transactionTarget, configurations where configurations.id = :targetConfigId "
 						+ "and transactionInId in (select id from transactionIn where configId = :sourceConfigId and batchId = :batchId) "
@@ -2670,7 +2670,8 @@ public class transactionInDAOImpl implements transactionInDAO {
 		        query.executeUpdate();
 				return 0;
 			} catch (Exception ex) {
-				System.err.println(ex.getClass() + " " + ex.getCause());
+				System.err.println("insertBatchUploadSummary " +  ex.getCause());
+				ex.printStackTrace();
 				return 1;
 			}
 		}
@@ -2690,7 +2691,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 		        query.executeUpdate();
 				return 0;
 			} catch (Exception ex) {
-				System.err.println(ex.getClass() + " " + ex.getCause());
+				System.err.println("insertBatchTargets " + ex.getCause());
 				return 1;
 			}
 		}
@@ -2710,7 +2711,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 				List<configurationConnection> cc = query.list();
 				return cc;
 			} catch (Exception ex) {
-				System.err.println(ex.getClass() + " " + ex.getCause());
+				System.err.println("getBatchTargets " + ex.getCause());
 				return null;
 			}
 		}
@@ -2724,8 +2725,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 	  	       	deleteTable.executeUpdate();
 	            return 0;
 	        } catch (Exception ex) {
-	        	System.err.println(ex.getClass() + " " + ex.getCause());
-	        	ex.printStackTrace();
+	        	System.err.println("clearBatchUploadSummary " + ex.getCause().getMessage());
 	        	return 1;
 
 	        }
