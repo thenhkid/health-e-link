@@ -2258,11 +2258,15 @@ public class transactionInDAOImpl implements transactionInDAO {
 
 		@Override
 		@Transactional
-		public Integer insertLoadData(Integer batchId, String delimChar, String fileWithPath, String loadTableName) {
+		public Integer insertLoadData(Integer batchId, String delimChar, String fileWithPath, String loadTableName, boolean containsHeaderRow) {
 			try {
 				String sql = ("LOAD DATA LOCAL INFILE '" + fileWithPath +"' INTO TABLE "
-						+ loadTableName +" fields terminated by '" + delimChar +"' LINES TERMINATED BY '\\n';");
-		        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);           
+						+ loadTableName +" fields terminated by '" + delimChar +"' LINES TERMINATED BY '\\n'");
+		        if (containsHeaderRow) {
+		        	sql = sql + "  IGNORE 1 LINES";
+		        }
+		        sql = sql + ";";
+				Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);           
 		        query.executeUpdate();
 				return 0;
 			} catch (Exception ex) {
@@ -2311,30 +2315,6 @@ public class transactionInDAOImpl implements transactionInDAO {
 			} catch (Exception ex) {
 				System.err.println(ex.getClass() + " " + ex.getCause());
 				return 1;
-			}
-		}
-
-		@Override
-		@Transactional
-		@SuppressWarnings("unchecked")
-		public List <configurationTransport> getConfigurationTransportForBatch(Integer batchId) {
-			try {
-				
-				String sql = ("select delimChar, errorHandling, autoRelease, fileLocation, fileType, transportMethodId"
-						+ " from configurationTransportDetails, ref_delimiters "
-						+ "	where ref_delimiters.id = configurationTransportDetails.fileDelimiter "
-						+ " and configId in ( select configId from batchUploadConfirgurations where batchId = :batchId) ;");
-		        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
-                        Transformers.aliasToBean(configurationTransport.class));           
-		        query.setParameter("batchId", batchId);
-		        
-		        List <configurationTransport> configurationTransports = query.list();
-				
-		        return configurationTransports;
-		        
-			} catch (Exception ex) {
-				System.err.println(ex.getClass() + " " + ex.getCause());
-				return null;
 			}
 		}
 
@@ -2642,26 +2622,6 @@ public class transactionInDAOImpl implements transactionInDAO {
 
 		@Override
 		@Transactional
-		@SuppressWarnings("unchecked")
-		public List <Integer> getConfigsForUploadBatch(Integer batchId){
-			try {
-				
-				String sql = ("select distinct configId "
-						+ " from batchUploadConfirgurations where batchId = :batchId"
-						+ " order by configId;");
-		        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setParameter("batchId", batchId);
-		        
-		        List <Integer> configIds = query.list();
-		        return configIds;
-		        
-			} catch (Exception ex) {
-				System.err.println(ex.getClass() + " " + ex.getCause());
-				return null;
-			}
-		}
-
-		@Override
-		@Transactional
 		public Integer updateConfigIdForBatch(Integer batchId, Integer configId) {
 			try {
 				
@@ -2694,13 +2654,20 @@ public class transactionInDAOImpl implements transactionInDAO {
 
 		@Override
 		@Transactional
-		public Integer insertBatchUploadSummary(batchUploads batchUpload, configurationConnection batchTargets) {
-			// TODO Auto-generated method stub
+		public Integer insertBatchUploadSummary(batchUploads batch, configurationConnection batchTargets) {
 			try {
-				String sql = ("");
+				String sql = ("insert into batchuploadsummary (batchId, transactionInId, sourceOrgId, targetOrgId, messageTypeId, sourceConfigId)"
+						+ " select " + batch.getId() +", transactionInId, "+ batch.getOrgId() +", "
+						+ " configurations.orgId, messageTypeId, "+ batchTargets.getsourceConfigId() 
+						+" from transactionTarget, configurations where configurations.id = :targetConfigId "
+						+ "and transactionInId in (select id from transactionIn where configId = :sourceConfigId and batchId = :batchId) "
+						+ "and transactionTarget.batchUploadId = :batchId and transactionTarget.configId = :targetConfigId");
 		        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql); 
-		        //query.setParameter("batchId", batchId);
-		        //query.executeUpdate();
+		        query.setParameter("batchId", batch.getId());
+		        query.setParameter("targetConfigId", batchTargets.gettargetConfigId());
+		        query.setParameter("sourceConfigId", batchTargets.getsourceConfigId());
+		        
+		        query.executeUpdate();
 				return 0;
 			} catch (Exception ex) {
 				System.err.println(ex.getClass() + " " + ex.getCause());
@@ -2749,16 +2716,16 @@ public class transactionInDAOImpl implements transactionInDAO {
 		}
 
 		@Override
+		@Transactional
 		public Integer clearBatchUploadSummary(Integer batchId) {
-			String sql = "delete from BatchUploadSummary where batchId = :id)"
-	                + ";";
-	        Query deleteTable = sessionFactory.getCurrentSession().createSQLQuery(sql)
-	                .addScalar("id", StandardBasicTypes.INTEGER).setParameter("id", batchId);
+			String sql = "delete from BatchUploadSummary where batchId = :batchId ";
 	        try {
-	            deleteTable.executeUpdate();
+	        	Query deleteTable = sessionFactory.getCurrentSession().createSQLQuery(sql).setParameter("batchId", batchId);
+	  	       	deleteTable.executeUpdate();
 	            return 0;
 	        } catch (Exception ex) {
 	        	System.err.println(ex.getClass() + " " + ex.getCause());
+	        	ex.printStackTrace();
 	        	return 1;
 
 	        }

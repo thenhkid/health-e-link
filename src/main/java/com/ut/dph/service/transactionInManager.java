@@ -128,7 +128,7 @@ public interface transactionInManager {
     
     boolean insertTransactions (Integer batchUploadId);
     
-    Integer loadTextBatch (batchUploads batchUpload, configurationTransport configurationTransport);
+    Integer loadTextBatch (batchUploads batchUpload);
     
     Integer clearTransactionIn(Integer batchUploadId);
     
@@ -204,7 +204,7 @@ public interface transactionInManager {
     
     Integer copyTransactionInStatusToTarget(Integer batchId);
     
-    Integer insertLoadData(Integer batchId, String delimChar, String fileWithPath, String loadTableName);
+    Integer insertLoadData(Integer batchId, String delimChar, String fileWithPath, String loadTableName, boolean containsHeaderRow);
    
     Integer createLoadTable (String loadTableName);
     
@@ -212,15 +212,11 @@ public interface transactionInManager {
     
     Integer updateLoadTable(String loadTableName, Integer batchId);
     
-    configurationTransport getConfigurationTransportForBatch (Integer batchId);
-    
     Integer loadTransactionIn(String loadTableName, Integer batchId);
     
     Integer loadTransactionInRecords(Integer batchId);
     
     Integer loadTransactionInRecordsData (String loadTableName);
-    
-    List <Integer> getConfigsForUploadBatch(Integer batchId);
     
     Integer updateConfigIdForBatch(Integer batchId, Integer configId);
     

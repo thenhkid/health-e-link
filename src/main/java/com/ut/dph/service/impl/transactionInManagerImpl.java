@@ -519,26 +519,20 @@ public class transactionInManagerImpl implements transactionInManager {
 			// loading batch will take it all the way to loaded (9) status for
 			
            //get delimiter, get fileWithPath etc
- 	    	configurationTransport configurationTransport =  getConfigurationTransportForBatch(batchUploadId);
- 	    	if (configurationTransport == null) {
- 	    		sysErrors++;
- 	    		errorMessage = "Multiple or no delimiters, file locations for file are found.  Please contact admin to review configurations.";
-	    	} else if (configurationTransport.getfileType() == 2) {
- 	    		sysErrors = sysErrors + loadTextBatch(batch, configurationTransport);
+             
+ 	    	if (batch.getoriginalFileName().endsWith(".txt")) {
+ 	    		sysErrors = sysErrors + loadTextBatch(batch);
  	    	}
  	    	
  	    	//load targets
  	    	List<configurationConnection> batchTargetList =  getBatchTargets(batchUploadId);
  	    	for (configurationConnection bt : batchTargetList) {
  	    		sysErrors = sysErrors + insertBatchTargets(batchUploadId, bt);
- 	    		//populate batchUploadSummary
- 	    		// need batchId, transactionInId,  configId, sourceOrgId, messageTypeId - in configurations - missing targetOrgId, 
+ 	    		//populate batchUploadSummary need batchId, transactionInId,  configId, sourceOrgId, messageTypeId - in configurations - missing targetOrgId, 
  	 	    	sysErrors = sysErrors + insertBatchUploadSummary(batch, bt);
  	    	}
  	    	
- 	    	
- 	    	
-             if (sysErrors > 0) {
+ 	    	if (sysErrors > 0) {
             	insertProcessingError(5, null, batchUploadId, null, null, null, null, false, false, errorMessage);
  				updateBatchStatus(batchUploadId, batchStausId, "endDateTime");
  				return false;
@@ -575,12 +569,12 @@ public class transactionInManagerImpl implements transactionInManager {
             // after loading is successful we update to SSL
             updateBatchStatus(batchUploadId, 3, "startDateTime");
            
-			// get batch details again for next set of processing
-			batch = getBatchDetails(batchUploadId);
 						
 		}
 		
-		
+		// get batch details again for next set of processing
+		batch = getBatchDetails(batchUploadId);
+					
 
 		//this should be the same point of both ERG and Uploaded File *
 		Integer systemErrorCount = 0;
@@ -887,7 +881,7 @@ public class transactionInManagerImpl implements transactionInManager {
      * 1. read file 2. parse row by row and a. figure out config b. insert into transactionIn c. insert into transacitonTarget d. flag transactions as Loaded or Invalid *
      */
     @Override
-    public Integer loadTextBatch(batchUploads batchUpload, configurationTransport configurationTransport) {
+    public Integer loadTextBatch(batchUploads batchUpload) {
     	try {
     		/**
 	         * SP can't call load Files with prepared statement, we have to load file to real table with dynamic statement created in java
@@ -901,12 +895,12 @@ public class transactionInManagerImpl implements transactionInManager {
 	    	
 	    		fileSystem dir = new fileSystem();
 	    		dir.setDirByName("/");
-	            String fileWithPath = dir.getDir() +configurationTransport.getfileLocation() + batchUpload.getoriginalFileName();
+	            String fileWithPath = dir.getDir() + batchUpload.getFileLocation() + batchUpload.getoriginalFileName();
 	            fileWithPath = fileWithPath.replace("bowlink///", "");
 	            
 		    	
 	            //2. we load data with my sql
-		    	sysError  = sysError  + insertLoadData (batchUpload.getId(),configurationTransport.getDelimChar() , fileWithPath, loadTableName);
+		    	sysError  = sysError  + insertLoadData (batchUpload.getId(), batchUpload.getDelimChar(), fileWithPath, loadTableName, batchUpload.isContainsHeaderRow());
 		    	
 		    	//3. we update batchId, loadRecordId
 		    	sysError  = sysError  + updateLoadTable(loadTableName, batchUpload.getId());
@@ -923,18 +917,20 @@ public class transactionInManagerImpl implements transactionInManager {
 		    	//7. we delete loadTable
 		    	sysError  = sysError  + dropLoadTable(loadTableName);
 	        	
-		    	//8. we see how many configs user selected from batchConfigurations
-		    	 List <Integer> configCount = getConfigsForUploadBatch(batchUpload.getId());
-		    	
+		    	//8. we see how if the file only has one upload type so we don't need to parse every line
 		    	 // if we only have one, we update the entire table 
-		    	 if (configCount.size() == 1) {
+		    	
+		    	if (batchUpload.getConfigId() != null && batchUpload.getConfigId() != 0) {
 		    		 // we update entire transactionIN with configId
-		    		 sysError  = sysError  +  updateConfigIdForBatch(batchUpload.getId(), configCount.get(0));
-		    	 } else if (configCount.size() == 0) {
-		    		 sysError++;
+		    		 sysError  = sysError  +  updateConfigIdForBatch(batchUpload.getId(), batchUpload.getConfigId());
 		    	 } else {
-		    		// we parse each record
-		    	 }
+		    		 // we parse every record to populate configId
+		    		 //TODO need to write
+		    		 sysError++;
+		    		 insertProcessingError(5,  null,  batchUpload.getId(), null, null, null, null,
+								false, false, "Files with multiple configurations are not supported yet.");
+				 }
+		    	 
 		    	 //we populate transactionTranslatedIn
 		    	 sysError  = sysError  +  loadTransactionTranslatedIn (batchUpload.getId());
 		    	 
@@ -966,7 +962,7 @@ public class transactionInManagerImpl implements transactionInManager {
         //we clear transactionTarget
         cleared = cleared + clearTransactionTarget(batchUploadId);
         cleared = cleared + clearTransactionInErrors(batchUploadId);
-       
+        cleared = cleared + clearBatchUploadSummary(batchUploadId);
         //we clear transactionIn
         cleared = cleared + clearTransactionIn(batchUploadId);
        
@@ -1435,8 +1431,8 @@ public class transactionInManagerImpl implements transactionInManager {
 	}
 
 	@Override
-	public Integer insertLoadData(Integer batchId, String delimChar, String fileWithPath, String loadTableName) {
-		return transactionInDAO.insertLoadData(batchId, delimChar, fileWithPath, loadTableName);
+	public Integer insertLoadData(Integer batchId, String delimChar, String fileWithPath, String loadTableName, boolean containsHeaderRow) {
+		return transactionInDAO.insertLoadData(batchId, delimChar, fileWithPath, loadTableName, containsHeaderRow);
 	}
 	
 	
@@ -1456,17 +1452,6 @@ public class transactionInManagerImpl implements transactionInManager {
 	}
 
 	@Override
-	public configurationTransport getConfigurationTransportForBatch(Integer batchId) {
-		//we expect one
-		List <configurationTransport> configurationTransports = transactionInDAO.getConfigurationTransportForBatch(batchId);
-		if (configurationTransports.size() == 1) {
-			return configurationTransports.get(0);
-		} else {
-			return null;
-		}
-	}
-
-	@Override
 	public Integer loadTransactionIn(String loadTableName, Integer batchId) {
 		return transactionInDAO.loadTransactionIn(loadTableName, batchId);
 	}
@@ -1479,11 +1464,6 @@ public class transactionInManagerImpl implements transactionInManager {
 	@Override
 	public Integer loadTransactionInRecordsData(String loadTableName) {
 		return transactionInDAO.loadTransactionInRecordsData(loadTableName);
-	}
-	
-	@Override
-	public List <Integer> getConfigsForUploadBatch(Integer batchId) {
-		return transactionInDAO.getConfigsForUploadBatch(batchId);
 	}
 	
 	@Override

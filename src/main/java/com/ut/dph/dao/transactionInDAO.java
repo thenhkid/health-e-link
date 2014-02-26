@@ -163,7 +163,7 @@ public interface transactionInDAO {
     
     Integer copyTransactionInStatusToTarget(Integer batchId);
     
-    Integer insertLoadData (Integer batchId, String delimChar, String fileWithPath, String tableName);
+    Integer insertLoadData (Integer batchId, String delimChar, String fileWithPath, String tableName, boolean containsHeaderRow);
     
     Integer createLoadTable (String loadTableName);
     
@@ -171,15 +171,11 @@ public interface transactionInDAO {
    
     Integer updateLoadTable(String loadTableName, Integer batchId);
     
-    List <configurationTransport>  getConfigurationTransportForBatch (Integer batchId);
-    
     Integer loadTransactionIn (String loadTableName, Integer batchId);
     
     Integer loadTransactionInRecords (Integer batchId);
     
     Integer loadTransactionInRecordsData (String loadTableName);
-    
-    List <Integer> getConfigsForUploadBatch(Integer batchId);
     
     Integer updateConfigIdForBatch(Integer batchId, Integer configId);
     
