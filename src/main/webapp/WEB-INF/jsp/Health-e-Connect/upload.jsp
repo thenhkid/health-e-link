@@ -20,14 +20,17 @@
                             <c:when test="${code == 2}">- The file uploaded exceeded the max size.</c:when>
                             <c:when test="${code == 3}">- The file uploaded was not the correct file type associated to your selected message type.</c:when>
                             <c:when test="${code == 4}">- The file uploaded did not contain the correct delimiter.</c:when>
+                            <c:when test="${code == 5}">- You tried to upload a file with multiple message types but your system is not configured for that.</c:when>
                         </c:choose>
                         <br />
                     </c:forEach>
                 </div>
             </c:if>
-            <div class="" style="overflow:hidden; margin-bottom:10px;">
-                <a href="#uploadFile" title="Upload File" data-toggle="modal" class="pull-right btn btn-primary uploadFile"><span class="glyphicon glyphicon-upload"></span> Upload File</a>
-            </div>
+            <c:if test="${hasConfigurations == true}">
+                <div class="" style="overflow:hidden; margin-bottom:10px;">
+                    <a href="#uploadFile" title="Upload File" data-toggle="modal" class="pull-right btn btn-primary uploadFile"><span class="glyphicon glyphicon-upload"></span> Upload File</a>
+                </div>
+            </c:if>
             <div class="form-container scrollable">
                 <table class="table table-striped table-hover table-default">
                     <thead>

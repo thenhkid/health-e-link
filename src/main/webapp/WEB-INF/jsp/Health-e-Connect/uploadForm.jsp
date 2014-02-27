@@ -17,12 +17,12 @@
             <form:form id="fileUploadForm" action="submitFileUpload" enctype="multipart/form-data" method="post" role="form">
                 <div id="configIdsDiv" class="form-group ${status.error ? 'has-error' : '' }">
                     <label for="crosswalkName">Select the message types that will be in the file *</label>
-                    <select id="configIds" name="configIds" class="form-control half">
+                    <select id="configIds" name="configId" class="form-control half">
                         <option  value="">- Message Types - </option>
                         <c:forEach items="${configurations}" var="config">
                             <option value="${config.key}">${config.value}</option>
                         </c:forEach>
-                        <option value="mix">Multiple Message Types</option>    
+                        <c:if test="${allowmultipleMessageTypes == true}"><option value="0">Multiple Message Types</option>  </c:if>  
                     </select>
                     <span id="configIdsMsg" class="control-label"></span>
                 </div>

@@ -6,14 +6,18 @@
 
 package com.ut.dph.controller;
 
+import com.ut.dph.dao.messageTypeDAO;
 import com.ut.dph.model.Organization;
 import com.ut.dph.model.User;
 import com.ut.dph.model.batchDownloads;
 import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.configuration;
+import com.ut.dph.model.configurationMessageSpecs;
+import com.ut.dph.model.configurationTransport;
 import com.ut.dph.model.lutables.lu_ProcessStatus;
 import com.ut.dph.model.transactionIn;
 import com.ut.dph.service.configurationManager;
+import com.ut.dph.service.configurationTransportManager;
 import com.ut.dph.service.messageTypeManager;
 import com.ut.dph.service.organizationManager;
 import com.ut.dph.service.sysAdminManager;
@@ -74,6 +78,12 @@ public class HealtheConnectController {
     @Autowired
     private transactionOutManager transactionOutManager;
     
+    @Autowired
+    private configurationTransportManager configurationtransportmanager;
+    
+    @Autowired
+    private messageTypeDAO messageTypeDAO;
+    
     /**
      * The private maxResults variable will hold the number of results to show per list page.
      */
@@ -116,8 +126,16 @@ public class HealtheConnectController {
 
                 }
             }
+            
+           List<configuration> configurations = configurationManager.getActiveConfigurationsByUserId(userInfo.getId(), 1);
+           boolean hasConfigurations = false;
+           if(configurations.size() >=1 ) {
+               hasConfigurations = true;
+           }
+           
+           mav.addObject("hasConfigurations", hasConfigurations);
 
-            mav.addObject("uploadedBatches", uploadedBatches);
+           mav.addObject("uploadedBatches", uploadedBatches);
         }
         catch (Exception e) {
             throw new Exception("Error occurred viewing the uploaded batches. userId: "+ userInfo.getId(),e);
@@ -150,7 +168,15 @@ public class HealtheConnectController {
             configMessageTypes.put(config.getId(),messagetypemanager.getMessageTypeById(config.getMessageTypeId()).getName());
         }
         
+        boolean allowmultipleMessageTypes = false;
+        List<configurationTransport> transportTypes = configurationtransportmanager.getDistinctConfigTransportForOrg(userInfo.getOrgId(), 1);
+        
+        if(transportTypes.size() == 1) {
+            allowmultipleMessageTypes = true;
+        }
+        
         mav.addObject("configurations", configMessageTypes);
+        mav.addObject("allowmultipleMessageTypes", allowmultipleMessageTypes);
         
         return mav;
     }
@@ -170,17 +196,49 @@ public class HealtheConnectController {
      *  - Does not exceed file size (as determined in the configuration set up)
      */
     @RequestMapping(value = "/submitFileUpload", method = RequestMethod.POST)
-    public @ResponseBody ModelAndView submitFileUpload(RedirectAttributes redirectAttr, HttpSession session, @RequestParam(value = "configIds", required = true) List<Integer> configIds, @RequestParam(value = "uploadedFile", required = true) MultipartFile uploadedFile) throws Exception {
+    public @ResponseBody ModelAndView submitFileUpload(RedirectAttributes redirectAttr, HttpSession session, @RequestParam(value = "configId", required = true) Integer configId, @RequestParam(value = "uploadedFile", required = true) MultipartFile uploadedFile) throws Exception {
         
         /* Get the organization details for the source (Sender) organization */
         User userInfo = (User)session.getAttribute("userDetails");
         Organization sendingOrgDetails = organizationmanager.getOrganizationById(userInfo.getOrgId());
         
-        /* Need to get the first configId */
-        Integer configId = configIds.get(0);
+        configuration configDetails = null;
+        configurationTransport transportDetails = null;
+        configurationMessageSpecs messageSpecs = null;
+        String delimChar = null;
+        boolean multipleMessageTypes = false;
         
-        /* Need to get the message type for the first config */
-        configuration configDetails = configurationManager.getConfigurationById(configId);
+        /* 
+        When Multiple Message Types is selected we need to find one config Id attached to the user in order
+        to pull the information to process the file.
+        */
+        if(configId == 0) {
+            
+            /* Need to get list of available configurations for the user */
+            List<configuration> configurations = configurationManager.getActiveConfigurationsByUserId(userInfo.getId(), 1);
+            
+            /* Pull the first configujration in the list */
+            configId = configurations.get(0).getId();
+            
+            /* Need to get the details of the configuration */
+            configDetails = configurationManager.getConfigurationById(configId);
+            transportDetails = configurationtransportmanager.getTransportDetails(configId);
+            messageSpecs = configurationManager.getMessageSpecs(configId);
+            
+            delimChar = (String) messageTypeDAO.getDelimiterChar(transportDetails.getfileDelimiter());
+            
+            multipleMessageTypes = true;
+        }
+        else {
+            /* Need to get the details of the configuration */
+            configDetails = configurationManager.getConfigurationById(configId);
+            transportDetails = configurationtransportmanager.getTransportDetails(configId);
+            messageSpecs = configurationManager.getMessageSpecs(configId);
+            
+            delimChar = (String) messageTypeDAO.getDelimiterChar(transportDetails.getfileDelimiter());
+
+        }
+        
         
         try {
             /* Upload the file */
@@ -200,6 +258,17 @@ public class HealtheConnectController {
             batchUpload.settransportMethodId(1);
             batchUpload.setoriginalFileName(batchName);
             batchUpload.setoriginalFileName(batchResults.get("fileName"));
+            batchUpload.setFileLocation(transportDetails.getfileLocation());
+            batchUpload.setContainsHeaderRow(messageSpecs.getcontainsHeaderRow());
+            batchUpload.setDelimChar(delimChar);
+            
+            if(multipleMessageTypes == true) {
+                batchUpload.setConfigId(0);
+            }
+            else {
+                batchUpload.setConfigId(configId);
+            }
+            
 
             /* Set the status to the batch as SFV (Source Failed Validation) */
             batchUpload.setstatusId(1);
@@ -227,6 +296,16 @@ public class HealtheConnectController {
             if(wrongDelimVal != null) {
                 errorCodes.add(4);
             }
+            
+            /* Make sure the org doesn't have multiple configurations with different delims, headers, etc */
+            if(multipleMessageTypes == true) {
+                 List<configurationTransport> transportTypes = configurationtransportmanager.getDistinctConfigTransportForOrg(userInfo.getOrgId(), 1);
+                 
+                 if(transportTypes.size() != 1) {
+                     errorCodes.add(5);
+                 }
+            }
+            
 
             /* If Passed validation update the status to Source Submission Accepted */
             if(0 == errorCodes.size()) {
