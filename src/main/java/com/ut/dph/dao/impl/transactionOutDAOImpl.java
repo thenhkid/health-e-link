@@ -1415,10 +1415,24 @@ public class transactionOutDAOImpl implements transactionOutDAO {
         latestLogQuery.add(Restrictions.eq("configId", configId));
         latestLogQuery.addOrder(Order.desc("lastRunTime"));
         
-        List<targetOutputRunLogs> latestRunLogs = latestLogQuery.list();
-
-        return latestRunLogs;
+        return latestLogQuery.list();
         
+    }
+    
+    /**
+     * The 'getTransactionsByBatchDLId' will get a list of transactions by the batch download Id.
+     * 
+     * @param   batchDLId   The batch Download Id to search with.
+     * 
+     * @return This function will return a list of transaction targets.
+     */
+    @Override
+    public  List<transactionTarget> getTransactionsByBatchDLId(int batchDLId) {
+        
+        Criteria targets = sessionFactory.getCurrentSession().createCriteria(transactionTarget.class);
+        targets.add(Restrictions.eq("batchDLId", batchDLId));
+        
+        return targets.list();
     }
     
 }

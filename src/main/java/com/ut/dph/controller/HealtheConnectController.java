@@ -16,6 +16,7 @@ import com.ut.dph.model.configurationMessageSpecs;
 import com.ut.dph.model.configurationTransport;
 import com.ut.dph.model.lutables.lu_ProcessStatus;
 import com.ut.dph.model.transactionIn;
+import com.ut.dph.model.transactionTarget;
 import com.ut.dph.service.configurationManager;
 import com.ut.dph.service.configurationTransportManager;
 import com.ut.dph.service.messageTypeManager;
@@ -463,6 +464,18 @@ public class HealtheConnectController {
             transactionOutManager.updateTargetBatchStatus(batchId, 22 , "");
         
             transactionOutManager.updateTargetTransasctionStatus(batchId, 20);
+            
+            /* Need to find the batch Upload Id */
+            List<transactionTarget> targets = transactionOutManager.getTransactionsByBatchDLId(batchId);
+
+            if(!targets.isEmpty()) {
+                for(transactionTarget target : targets) {
+                    transactionInManager.updateBatchStatus(target.getbatchUploadId(), 22, "");
+                    
+                    transactionInManager.updateTransactionStatus(target.getbatchUploadId(), 0, 0, 20);
+                    
+                }
+            }
 
             /* Update the last Downloaded field */
             transactionOutManager.updateLastDownloaded(batchId);

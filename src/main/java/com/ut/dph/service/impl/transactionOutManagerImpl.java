@@ -359,6 +359,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                     apply to scheduled and not continous settings. */
                                     if(transportDetails.gettransportMethodId() == 1) {
                                         transactionOutDAO.updateBatchStatus(batchId, 23);
+                                        transactionInManager.updateBatchStatus(transaction.getbatchUploadId(), 23, "");
                                     }
                                     /* If FTP Call the FTP Method */
                                     else if(transportDetails.gettransportMethodId() == 3) {
@@ -628,6 +629,16 @@ public class transactionOutManagerImpl implements transactionOutManager {
                             apply to scheduled and not continous settings. */
                             if(transportDetails.gettransportMethodId() == 1) {
                                 transactionOutDAO.updateBatchStatus(batchId, 23);
+                                
+                                /* Need to find the batch Upload Id */
+                                List<transactionTarget> targets = transactionOutDAO.getTransactionsByBatchDLId(batchId);
+                               
+                                if(!targets.isEmpty()) {
+                                    for(transactionTarget target : targets) {
+                                        transactionInManager.updateBatchStatus(target.getbatchUploadId(), 23, "");
+                                    }
+                                }
+                                
                             }
                             /* If FTP Call the FTP Method */
                             else if(transportDetails.gettransportMethodId() == 3) {
@@ -1197,6 +1208,12 @@ public class transactionOutManagerImpl implements transactionOutManager {
     @Transactional
     public void updateLastDownloaded(int batchId) throws Exception {
         transactionOutDAO.updateLastDownloaded(batchId);
+    }
+    
+    @Override
+    @Transactional
+    public List<transactionTarget> getTransactionsByBatchDLId(int batchDLId) {
+        return transactionOutDAO.getTransactionsByBatchDLId(batchDLId);
     }
     
     /**

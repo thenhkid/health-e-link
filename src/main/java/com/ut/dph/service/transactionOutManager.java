@@ -71,4 +71,6 @@ public interface transactionOutManager {
     
     void updateLastDownloaded(int batchId) throws Exception;
     
+    List<transactionTarget> getTransactionsByBatchDLId(int batchDLId);
+    
 }
