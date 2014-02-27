@@ -707,7 +707,8 @@ public class transactionInDAOImpl implements transactionInDAO {
                 Restrictions.eq("statusId", 25), /* Target Batch Creation in process */
                 Restrictions.eq("statusId", 28), /* Target Batch Creation in process */
                 Restrictions.eq("statusId", 29), /* Submission Processed Errored */
-                Restrictions.eq("statusId", 30) /* Target Creation Errored */
+                Restrictions.eq("statusId", 30), /* Target Creation Errored */
+                Restrictions.eq("statusId", 32) /* Submission Cancelled */
         )
         );
 

@@ -79,6 +79,7 @@
                 <form:hidden path="transactionId" id="transactionId" />
                 <form:hidden path="transactionTargetId" id="transactionTargetId" />
                 <input type="hidden" id="attachmentIds" name="attachmentIds" value="" />
+                <input type="hidden" name="sentTransactionId" id="sentTransactionId" value="${transactionInId}" />
                 <div class="panel-group form-accordion" id="accordion">
                     <div class="panel panel-default panel-form">
                         <div id="collapseThree" class="panel-collapse collapse in">
@@ -209,6 +210,12 @@
                         </section>
                     </div> 
                 </c:if> 
+                                       
+                <c:if test="${userDetails.cancelAuthority == true && transactionDetails.statusId != 32}">                             
+                    <div class="form-group">
+                       <input type="button" id="cancel" class="btn btn-primary btn-action cancelMessage" value="Cancel"/>
+                    </div>   
+                </c:if>
             </form:form>
         </div>
 

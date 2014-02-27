@@ -447,4 +447,8 @@ CHANGE COLUMN `containsHeaderRow` `containsHeaderRow` BIT(1) NOT NULL DEFAULT b'
 ALTER TABLE `universalTranslator`.`configurationTransportDetails` 
 ADD COLUMN `fileExt` VARCHAR(4) NULL DEFAULT NULL AFTER `copiedTransportId`;
 
+/** Chad 2-27-2014 @ 4:23 PM **/
+INSERT INTO `universalTranslator`.`lu_ProcessStatus` (`category`, `displayCode`, `displayText`, `status`) VALUES ('transaction', 'CNL', 'Canceled', 1);
+INSERT INTO `universalTranslator`.`lu_ProcessStatus` (`category`, `displayCode`, `displayText`, `status`) VALUES ('batch', 'SCN', 'Submission Canceled', 1);
+
 

@@ -551,6 +551,7 @@ public class HealtheWebController {
             mav.addObject("pendingTotal", pendingTotal);
             mav.addObject("inboxTotal", inboxTotal);
             mav.addObject("fromPage", "inbox");
+            mav.addObject("transactionInId", transactionInfo.gettransactionInId());
         }
         catch (Exception e) {
             throw new Exception("An error occurred in returning the details of the message, id: "+ transactionId, e);
@@ -1900,6 +1901,7 @@ public class HealtheWebController {
             mav.addObject("pendingTotal", pendingTotal);
             mav.addObject("inboxTotal", inboxTotal);
             mav.addObject("fromPage","sent");
+            mav.addObject("transactionInId", transactionTarget.gettransactionInId());
 
         }
         catch (Exception e) {
@@ -2519,5 +2521,35 @@ public class HealtheWebController {
        
        return cal.getTime();
    }
+   
+   
+   /**
+     * The 'cancelMessage.do' function will cancel the selected message.
+     * 
+     * @param transactionId  The id of the selected transaction
+     * 
+     * @return This function will simply return a 1.
+     */
+    @RequestMapping(value= "/cancelMessage.do", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody Integer cancelMessageTransaction(@RequestParam(value = "transactionId", required = false) Integer transactionId) throws Exception {
+        
+        try {
+            
+            /* Need to get batch for the transaction */
+            transactionTarget targetDetails = transactionOutManager.getTransactionDetails(transactionId);
+            
+            transactionOutManager.cancelMessageTransaction(transactionId, targetDetails.gettransactionInId());
+            
+            /* Need to update the batch status */
+            transactionOutManager.updateTargetBatchStatus(targetDetails.getbatchDLId(), 32, "");
+            transactionInManager.updateBatchStatus(targetDetails.getbatchUploadId(), 32, "");
+            
+            return 1;
+        }
+        catch (Exception e) {
+            throw new Exception("Error occurred trying to cancel a message transaction. transactionId: "+transactionId,e);
+        }
+        
+    }
     
 }

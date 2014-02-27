@@ -218,6 +218,11 @@ public class transactionOutDAOImpl implements transactionOutDAO {
 
         Criteria findBatches = sessionFactory.getCurrentSession().createCriteria(batchDownloads.class);
         findBatches.add(Restrictions.in("id", batchIdList));
+        findBatches.add(Restrictions.and(
+            Restrictions.ne("statusId", 29), /* Submission Processed Errored */
+            Restrictions.ne("statusId", 30), /* Target Creation Errored */
+            Restrictions.ne("statusId", 32) /* Submission Cancelled */
+        ));
         
         if(!"".equals(fromDate) && fromDate != null) {
             findBatches.add(Restrictions.ge("dateCreated", fromDate));
@@ -1427,12 +1432,52 @@ public class transactionOutDAOImpl implements transactionOutDAO {
      * @return This function will return a list of transaction targets.
      */
     @Override
-    public  List<transactionTarget> getTransactionsByBatchDLId(int batchDLId) {
+    public List<transactionTarget> getTransactionsByBatchDLId(int batchDLId) {
         
         Criteria targets = sessionFactory.getCurrentSession().createCriteria(transactionTarget.class);
         targets.add(Restrictions.eq("batchDLId", batchDLId));
         
         return targets.list();
+    }
+    
+    /**
+     * The 'cancelMessageTransaction' will cancel both the transactionIn and transactionTarget
+     * entries.
+     * 
+     * @param transactionId The id of the transaction we want to cancel.
+     * 
+     * @return This function will not return anything.
+     */
+    @Override
+    public void cancelMessageTransaction(int transactionId, int transactionInId) {
+        
+        /* Update the transactionTarget status */
+        String targetSQL = "update transactionTarget set statusId = :statusId ";
+        targetSQL = targetSQL + " where id = :transactionId ";
+        Query updateTargetData = sessionFactory.getCurrentSession().createSQLQuery(targetSQL)
+                .setParameter("statusId", 31)
+                .setParameter("transactionId", transactionId);
+        try {
+            updateTargetData.executeUpdate();
+        } catch (Exception ex) {
+            System.err.println("cancel transaction failed." + ex);
+        }
+        
+        /* Update the transactionIn status */
+        String sql = "update transactionIn set statusId = :statusId ";
+        sql = sql + " where id = :transactionInId ";
+        Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                .setParameter("statusId", 31)
+                .setParameter("transactionInId", transactionInId);
+        try {
+            updateData.executeUpdate();
+        } catch (Exception ex) {
+            System.err.println("cancel transaction failed." + ex);
+        }
+        
+        
+        
+        
     }
     
 }

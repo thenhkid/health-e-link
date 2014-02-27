@@ -1227,5 +1227,11 @@ public class transactionOutManagerImpl implements transactionOutManager {
         transactionOutDAO.updateBatchStatus(batchId, 22);
     }
     
+    @Override
+    @Transactional
+    public void cancelMessageTransaction(int transactionId, int transactionInId) {
+        transactionOutDAO.cancelMessageTransaction(transactionId, transactionInId);
+    }
+    
     
 }

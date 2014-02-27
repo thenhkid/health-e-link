@@ -91,4 +91,6 @@ public interface transactionOutDAO {
     
     List<transactionTarget> getTransactionsByBatchDLId(int batchDLId);
     
+    void cancelMessageTransaction(int transactionId, int transactionInId);
+    
 }
