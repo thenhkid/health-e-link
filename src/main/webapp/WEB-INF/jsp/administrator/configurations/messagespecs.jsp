@@ -44,8 +44,8 @@
                                 <c:if test="${not empty messageSpecs.templateFile}">
                                     <div class="form-group">
                                         <label class="control-label" for="templateFile">Current File</label>
+                                        <input type="text" disabled class="form-control" value="${messageSpecs.templateFile}" />
                                         <form:hidden path="templateFile" />
-                                        <br />${messageSpecs.templateFile}
                                     </div>
                                 </c:if>
                                 <spring:bind path="file">

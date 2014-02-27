@@ -19,7 +19,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
 @Controller
-@RequestMapping("/downloadFile.do")
+@RequestMapping("/FileDownload")
 public class fileDownloadController {
 
     @Autowired
@@ -30,7 +30,7 @@ public class fileDownloadController {
      */
     private static final int BUFFER_SIZE = 4096;
 
-    @RequestMapping(value = "/downloadFile", method = RequestMethod.GET)
+    @RequestMapping(value = "/downloadFile.do", method = RequestMethod.GET)
     public void downloadFile(HttpServletRequest request, @RequestParam String filename, @RequestParam String foldername, @RequestParam(value= "orgId", required = false) Integer orgId, HttpServletResponse response) {
         OutputStream outputStream = null;
         InputStream in = null;
