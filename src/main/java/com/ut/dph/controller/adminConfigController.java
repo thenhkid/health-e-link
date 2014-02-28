@@ -373,6 +373,9 @@ public class adminConfigController {
             if(transportDetails.getfileType() == 4) {
                 HL7 = true;
             }
+            else {
+                HL7 = false;
+            }
         }
         
         mav.addObject("mappings", mappings);
