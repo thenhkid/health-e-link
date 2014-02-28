@@ -2641,7 +2641,7 @@ public class transactionInDAOImpl implements transactionInDAO {
     public Integer insertBatchUploadSummary(batchUploads batch, configurationConnection batchTargets) {
         try {
             String sql = ("insert into batchuploadsummary (batchId, transactionInId, sourceOrgId, targetOrgId, messageTypeId, sourceConfigId)"
-                    + " abc select " + batch.getId() + ", transactionInId, " + batch.getOrgId() + ", "
+                    + " select " + batch.getId() + ", transactionInId, " + batch.getOrgId() + ", "
                     + " configurations.orgId, messageTypeId, " + batchTargets.getsourceConfigId()
                     + " from transactionTarget, configurations where configurations.id = :targetConfigId "
                     + "and transactionInId in (select id from transactionIn where configId = :sourceConfigId and batchId = :batchId) "
