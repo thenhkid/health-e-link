@@ -238,4 +238,6 @@ public interface transactionInManager {
     
     void setBatchToError(Integer batchId, String errorMessage) throws Exception;
     
+    void deleteMessage(int batchId, int transactionId) throws Exception;
+    
 }

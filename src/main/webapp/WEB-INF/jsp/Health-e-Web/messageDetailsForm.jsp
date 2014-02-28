@@ -291,13 +291,13 @@
                     <%-- Allow the user to delete saved messages --%>   
                     <c:choose>
                         <c:when test="${transaction.statusId == 15}"> 
-                            <input type="button" id="delete" class="btn btn-primary btn-action deleteMessage" value="Delete"/>
+                            <div class="pull-right"><input type="button" id="delete" class="btn btn-primary btn-action deleteMessage" value="Delete"/></div>
                         </c:when> 
                         <c:otherwise>
-                            <c:if test="${userDetails.cancelAuthority == true}">                             
-                                <input type="button" id="cancel" class="btn btn-primary btn-action cancelMessage" value="Cancel"/>
+                            <c:if test="${userDetails.cancelAuthority == true && transaction.statusId > 0}">                             
+                                <div class="pull-right"><input type="button" id="cancel" class="btn btn-primary btn-action cancelMessage" value="Cancel"/></div>
                             </c:if>
-                        </c:otherwise>  
+                        </c:otherwise>
                     </c:choose>    
                 </div>
            </form:form>

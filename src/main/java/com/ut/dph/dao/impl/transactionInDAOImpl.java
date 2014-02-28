@@ -2636,29 +2636,29 @@ public class transactionInDAOImpl implements transactionInDAO {
         }
     }
 
-		@Override
-		@Transactional
-		public Integer insertBatchUploadSummary(batchUploads batch, configurationConnection batchTargets) {
-			try {
-				String sql = ("insert into batchuploadsummary (batchId, transactionInId, sourceOrgId, targetOrgId, messageTypeId, sourceConfigId)"
-						+ " abc select " + batch.getId() +", transactionInId, "+ batch.getOrgId() +", "
-						+ " configurations.orgId, messageTypeId, "+ batchTargets.getsourceConfigId() 
-						+" from transactionTarget, configurations where configurations.id = :targetConfigId "
-						+ "and transactionInId in (select id from transactionIn where configId = :sourceConfigId and batchId = :batchId) "
-						+ "and transactionTarget.batchUploadId = :batchId and transactionTarget.configId = :targetConfigId");
-		        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql); 
-		        query.setParameter("batchId", batch.getId());
-		        query.setParameter("targetConfigId", batchTargets.gettargetConfigId());
-		        query.setParameter("sourceConfigId", batchTargets.getsourceConfigId());
-		        
-		        query.executeUpdate();
-				return 0;
-			} catch (Exception ex) {
-				System.err.println("insertBatchUploadSummary " +  ex.getCause());
-				ex.printStackTrace();
-				return 1;
-			}
-		}
+    @Override
+    @Transactional
+    public Integer insertBatchUploadSummary(batchUploads batch, configurationConnection batchTargets) {
+        try {
+            String sql = ("insert into batchuploadsummary (batchId, transactionInId, sourceOrgId, targetOrgId, messageTypeId, sourceConfigId)"
+                    + " abc select " + batch.getId() + ", transactionInId, " + batch.getOrgId() + ", "
+                    + " configurations.orgId, messageTypeId, " + batchTargets.getsourceConfigId()
+                    + " from transactionTarget, configurations where configurations.id = :targetConfigId "
+                    + "and transactionInId in (select id from transactionIn where configId = :sourceConfigId and batchId = :batchId) "
+                    + "and transactionTarget.batchUploadId = :batchId and transactionTarget.configId = :targetConfigId");
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+            query.setParameter("batchId", batch.getId());
+            query.setParameter("targetConfigId", batchTargets.gettargetConfigId());
+            query.setParameter("sourceConfigId", batchTargets.getsourceConfigId());
+
+            query.executeUpdate();
+            return 0;
+        } catch (Exception ex) {
+            System.err.println("insertBatchUploadSummary " + ex.getCause());
+            ex.printStackTrace();
+            return 1;
+        }
+    }
 
     @Override
     @Transactional
@@ -2712,29 +2712,71 @@ public class transactionInDAOImpl implements transactionInDAO {
             System.err.println("clearBatchUploadSummary " + ex.getCause().getMessage());
             return 1;
 
-	        }
-		}
-		
-		/**
-	     *  getBatchesByStatusIds - return uploaded batch info for specific statusIds
-	     *  @param list of statusIds
-	     *	@return This function will return a list of batches.
-	     */
-	    @SuppressWarnings("unchecked")
-	    @Override
-	    @Transactional
-	    public List<batchUploads> getBatchesByStatusIds(List <Integer> statusIds) {
-	    	try  {
-		        /* Get a list of uploaded batches for these statuses */
-		        Criteria findBatches = sessionFactory.getCurrentSession().createCriteria(batchUploads.class);
-		        findBatches.add(Restrictions.in("id", statusIds));
-		        findBatches.addOrder(Order.desc("dateSubmitted"));
-		        return findBatches.list();
-	    	} catch (Exception ex) {
-	    		System.err.println("getBatchesByStatusIds " + ex.getCause().getMessage());
-	    		return null;
-	    	}
-	    }
+        }
+    }
 
-		
+    /**
+     * getBatchesByStatusIds - return uploaded batch info for specific statusIds
+     *
+     * @param list of statusIds
+     * @return This function will return a list of batches.
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    @Transactional
+    public List<batchUploads> getBatchesByStatusIds(List<Integer> statusIds) {
+        try {
+            /* Get a list of uploaded batches for these statuses */
+            Criteria findBatches = sessionFactory.getCurrentSession().createCriteria(batchUploads.class);
+            findBatches.add(Restrictions.in("id", statusIds));
+            findBatches.addOrder(Order.desc("dateSubmitted"));
+            return findBatches.list();
+        } catch (Exception ex) {
+            System.err.println("getBatchesByStatusIds " + ex.getCause().getMessage());
+            return null;
+        }
+    }
+    
+    
+    /**
+     * The 'deleteMessage' function will delete the saved message completely from the system.
+     * 
+     * @param batchId The batchId associated to the selected message
+     * @param transactionId The selected message to be remvoed
+     */
+    @Override
+    @Transactional
+    public void deleteMessage(int batchId, int transactionId) throws Exception {
+        
+        /* Delete Batch Summary Records */
+        String deleteBatchSummarySQL = "delete from batchUploadSummary where batchId = :batchId";
+        Query deleteBatchSummaryQuery = sessionFactory.getCurrentSession().createSQLQuery(deleteBatchSummarySQL).setParameter("batchId", batchId);
+        deleteBatchSummaryQuery.executeUpdate();
+        
+        /* Delete the target data */
+        String deleteTargetSQL = "delete from transactionTarget where transactionInId = :transactionId";
+        Query deleteTargetQuery = sessionFactory.getCurrentSession().createSQLQuery(deleteTargetSQL).setParameter("transactionId", transactionId);
+        deleteTargetQuery.executeUpdate();
+        
+        /* Delete all the message data */
+        String deleteTransDataSQL = "delete from transactionTranslatedIn where transactionInId = :transactionId";
+        Query deleteTransDataQuery = sessionFactory.getCurrentSession().createSQLQuery(deleteTransDataSQL).setParameter("transactionId", transactionId);
+        deleteTransDataQuery.executeUpdate();
+        
+        String deleteDataSQL = "delete from transactionInRecords where transactionInId = :transactionId";
+        Query deleteDataQuery = sessionFactory.getCurrentSession().createSQLQuery(deleteDataSQL).setParameter("transactionId", transactionId);
+        deleteDataQuery.executeUpdate();
+        
+        /* Delete the transaction record */
+        String deleteTransactionSQL = "delete from transactionIn where id = :transactionId";
+        Query deleteTransactionQuery = sessionFactory.getCurrentSession().createSQLQuery(deleteTransactionSQL).setParameter("transactionId", transactionId);
+        deleteTransactionQuery.executeUpdate();
+        
+        /* Delete Batch Records */
+        String deleteBatchSQL = "delete from batchUploads where id = :batchId";
+        Query deleteBatchQuery = sessionFactory.getCurrentSession().createSQLQuery(deleteBatchSQL).setParameter("batchId", batchId);
+        deleteBatchQuery.executeUpdate();
+        
+    }
+
 }

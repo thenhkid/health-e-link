@@ -185,6 +185,30 @@ require(['./main'], function () {
             }
 
         });
+        
+        //Function to delete the message 
+        $(document).on('click','.deleteMessage', function() {
+           
+            var confirmed = confirm("Are you sure you want to delete this message?");
+
+            if(confirmed) {
+                
+                var transactionId = $('#transactionId').val();
+                
+                $.ajax({
+                    url: '/Health-e-Web/deleteMessage.do',
+                    type: 'POST',
+                    data: {'transactionId': transactionId},
+                    success: function(data) {
+                       //send the user back to the sent items box.
+                       window.location.href='/Health-e-Web/pending';
+                    }
+                });
+            }
+            
+        });
+        
+        
     });
 });
 

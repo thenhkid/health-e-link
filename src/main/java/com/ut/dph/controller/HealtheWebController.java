@@ -2552,4 +2552,26 @@ public class HealtheWebController {
         
     }
     
+    /**
+     * The 'deleteMessage.do' function will delete the selected message.
+     * 
+     * @param transactionId  The id of the selected transaction
+     * 
+     * @return This function will simply return a 1.
+     */
+    @RequestMapping(value= "/deleteMessage.do", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody Integer deleteMessageTransaction(@RequestParam(value = "transactionId", required = false) Integer transactionId) throws Exception {
+        
+        try {
+            int batchId = transactionInManager.getTransactionDetails(transactionId).getbatchId();
+            transactionInManager.deleteMessage(batchId, transactionId);
+            
+            return 1;
+        }
+        catch (Exception e) {
+            throw new Exception("Error occurred trying to delete a message transaction. transactionId: "+transactionId,e);
+        }
+        
+    }
+    
 }
