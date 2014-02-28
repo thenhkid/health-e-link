@@ -24,7 +24,7 @@
                         <td class="center-text">
                             <c:choose>
                                 <c:when test="${pageFrom == 'sent'}">
-                                    <a href="<c:url value="/fileDownloadController/downloadFile?filename=${attachment.fileName}&foldername=${attachment.fileLocation}"/>"  class="media-modal" title="Download this brochure">
+                                    <a href="<c:url value="/FileDownload/downloadFile.do?filename=${attachment.fileName}&foldername=${attachment.fileLocation}"/>"  class="media-modal" title="Download this brochure">
                                         <span class="glyphicon glyphicon-edit"></span>
                                         View	
                                     </a>

@@ -89,4 +89,8 @@ public interface transactionOutDAO {
     
     List<targetOutputRunLogs> getLatestRunLog(int configId) throws Exception;
     
+    List<transactionTarget> getTransactionsByBatchDLId(int batchDLId);
+    
+    void cancelMessageTransaction(int transactionId, int transactionInId);
+    
 }

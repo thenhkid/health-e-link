@@ -25,12 +25,13 @@ require(['./main'], function () {
         });
     
         //This function will update the status of the batch when the download link is clicked.
-        $(document).on('click', '.downloadFile', function() {
+        $(document).on('click', '.downloadFile', function(e) {
             var batchId = $(this).attr('rel');
             var fileName = $(this).attr('rel1');
             var orgId = $(this).attr('rel2');
-
-             $.ajax({
+            e.preventDefault();
+            
+            $.ajax({
                 url: '/Health-e-Connect/downloadBatch.do',
                 type: 'POST',
                 data: {'batchId': batchId},
@@ -70,11 +71,13 @@ require(['./main'], function () {
                     }
 
                    $('#lastDownloadDiv'+batchId).html(month + '/' + (day<10 ? '0' : '') + day + '/' + d.getFullYear() + '<br/>' + hourString + ':' + minString + ':' + d.getSeconds() + ' ' + amPm);
-
-                   window.location.href = "/downloadFile.do?filename="+fileName+"&foldername=output files&orgId="+orgId;
-
+                   
+                   window.location.href = "/FileDownload/downloadFile.do?filename="+fileName+"&foldername=output files&orgId="+orgId;
+                   
                 }
             });
+            
+             
         });
 
         $('#searchBatchesBtn').click(function() { 
@@ -87,6 +90,7 @@ require(['./main'], function () {
         });
     });
 });
+
 
 
 function searchByDateRange() {

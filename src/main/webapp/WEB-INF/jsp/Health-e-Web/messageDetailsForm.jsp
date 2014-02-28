@@ -287,7 +287,18 @@
                         <c:otherwise>
                             <input type="button" id="release" class="btn btn-primary btn-action submitMessage" value="Release"/>
                         </c:otherwise>
-                    </c:choose>
+                    </c:choose> 
+                    <%-- Allow the user to delete saved messages --%>   
+                    <c:choose>
+                        <c:when test="${transaction.statusId == 15}"> 
+                            <input type="button" id="delete" class="btn btn-primary btn-action deleteMessage" value="Delete"/>
+                        </c:when> 
+                        <c:otherwise>
+                            <c:if test="${userDetails.cancelAuthority == true}">                             
+                                <input type="button" id="cancel" class="btn btn-primary btn-action cancelMessage" value="Cancel"/>
+                            </c:if>
+                        </c:otherwise>  
+                    </c:choose>    
                 </div>
            </form:form>
         </div>

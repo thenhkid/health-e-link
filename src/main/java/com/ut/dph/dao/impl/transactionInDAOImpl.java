@@ -56,13 +56,13 @@ public class transactionInDAOImpl implements transactionInDAO {
 
     @Autowired
     private SessionFactory sessionFactory;
-    
+
     @Autowired
     private sysAdminManager sysAdminManager;
-    
+
     @Autowired
     private userManager usermanager;
-   	
+
     private String schemaName = "universalTranslator";
 
     private int transRELId = 12;
@@ -380,32 +380,32 @@ public class transactionInDAOImpl implements transactionInDAO {
                 Restrictions.eq("statusId", 8)
         )
         );
-        
-         if(!"".equals(fromDate) && fromDate != null) {
+
+        if (!"".equals(fromDate) && fromDate != null) {
             findBatches.add(Restrictions.ge("dateSubmitted", fromDate));
-        }  
-        
-        if(!"".equals(toDate) && toDate != null) {
+        }
+
+        if (!"".equals(toDate) && toDate != null) {
             findBatches.add(Restrictions.lt("dateSubmitted", toDate));
-        } 
-        
+        }
+
         findBatches.addOrder(Order.desc("dateSubmitted"));
-        
-         /* If a search term is entered conduct a search */
-        if(!"".equals(searchTerm)) {
-            
+
+        /* If a search term is entered conduct a search */
+        if (!"".equals(searchTerm)) {
+
             List<batchUploads> batches = findBatches.list();
-            
+
             List<Integer> batchFoundIdList = findBatches(batches, searchTerm);
-            
+
             if (batchFoundIdList.isEmpty()) {
                 batchFoundIdList.add(0);
             }
-            
+
             Criteria foundBatches = sessionFactory.getCurrentSession().createCriteria(batchUploads.class);
             foundBatches.add(Restrictions.in("id", batchFoundIdList));
             foundBatches.addOrder(Order.desc("dateSubmitted"));
-            
+
             if (page > 1) {
                 firstResult = (maxResults * (page - 1));
             }
@@ -416,12 +416,10 @@ public class transactionInDAOImpl implements transactionInDAO {
                 //Set the max results to display
                 foundBatches.setMaxResults(maxResults);
             }
-            
+
             return foundBatches.list();
-            
-        }
-        
-        else {
+
+        } else {
 
             if (page > 1) {
                 firstResult = (maxResults * (page - 1));
@@ -454,7 +452,7 @@ public class transactionInDAOImpl implements transactionInDAO {
         searchTerm = searchTerm.replace(".", "\\.");
 
         for (batchUploads batch : batches) {
-            
+
             lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
             batch.setstatusValue(processStatus.getDisplayCode());
 
@@ -698,7 +696,7 @@ public class transactionInDAOImpl implements transactionInDAO {
             }
 
         }
-        
+
         Criteria findBatches = sessionFactory.getCurrentSession().createCriteria(batchUploads.class);
         findBatches.add(Restrictions.in("id", batchIdList));
         findBatches.add(Restrictions.or(
@@ -709,37 +707,36 @@ public class transactionInDAOImpl implements transactionInDAO {
                 Restrictions.eq("statusId", 25), /* Target Batch Creation in process */
                 Restrictions.eq("statusId", 28), /* Target Batch Creation in process */
                 Restrictions.eq("statusId", 29), /* Submission Processed Errored */
-                Restrictions.eq("statusId", 30) /* Target Creation Errored */
-                
+                Restrictions.eq("statusId", 30), /* Target Creation Errored */
+                Restrictions.eq("statusId", 32) /* Submission Cancelled */
         )
         );
-        
-        if(!"".equals(fromDate)) {
+
+        if (!"".equals(fromDate)) {
             findBatches.add(Restrictions.ge("dateSubmitted", fromDate));
-        }  
-        
-        if(!"".equals(toDate)) {
+        }
+
+        if (!"".equals(toDate)) {
             findBatches.add(Restrictions.lt("dateSubmitted", toDate));
-        } 
-        
-        
+        }
+
         findBatches.addOrder(Order.desc("dateSubmitted"));
-        
+
         /* If a search term is entered conduct a search */
-        if(!"".equals(searchTerm)) {
-            
+        if (!"".equals(searchTerm)) {
+
             List<batchUploads> batches = findBatches.list();
-            
+
             List<Integer> batchFoundIdList = findBatches(batches, searchTerm);
-            
+
             if (batchFoundIdList.isEmpty()) {
                 batchFoundIdList.add(0);
             }
-            
+
             Criteria foundBatches = sessionFactory.getCurrentSession().createCriteria(batchUploads.class);
             foundBatches.add(Restrictions.in("id", batchFoundIdList));
             foundBatches.addOrder(Order.desc("dateSubmitted"));
-            
+
             if (page > 1) {
                 firstResult = (maxResults * (page - 1));
             }
@@ -750,12 +747,10 @@ public class transactionInDAOImpl implements transactionInDAO {
                 //Set the max results to display
                 foundBatches.setMaxResults(maxResults);
             }
-            
+
             return foundBatches.list();
-            
-        }
-        
-        else {
+
+        } else {
 
             if (page > 1) {
                 firstResult = (maxResults * (page - 1));
@@ -984,16 +979,16 @@ public class transactionInDAOImpl implements transactionInDAO {
 
         String sql = "select distinct configId from transactionTranslatedIn "
                 + " where transactionInId in (select id from transactionIn where batchId = :id ";
-                
-                if (!getAll) {
-                	sql = sql + " and statusId != :transRELId";
-                }
-                sql = sql + ");";
+
+        if (!getAll) {
+            sql = sql + " and statusId != :transRELId";
+        }
+        sql = sql + ");";
 
         Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
         query.setParameter("id", batchUploadId);
         if (!getAll) {
-        	query.setParameter("transRELId", transRELId);
+            query.setParameter("transRELId", transRELId);
         }
         List<Integer> configIds = query.list();
 
@@ -1092,7 +1087,7 @@ public class transactionInDAOImpl implements transactionInDAO {
             deleteTable.executeUpdate();
             return 0;
         } catch (Exception ex) {
-        	System.err.println("clearMessageTableForBatch " + ex.getCause());
+            System.err.println("clearMessageTableForBatch " + ex.getCause());
             return 1;
 
         }
@@ -1224,7 +1219,7 @@ public class transactionInDAOImpl implements transactionInDAO {
         try {
             updateData.executeUpdate();
         } catch (Exception ex) {
-        	System.err.println("updateBatchStatus " + ex.getCause());
+            System.err.println("updateBatchStatus " + ex.getCause());
         }
 
     }
@@ -1247,13 +1242,11 @@ public class transactionInDAOImpl implements transactionInDAO {
         }
         Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
                 .setParameter("toStatusId", toStatusId);
-                if (transactionId > 0) {
-                     updateData.setParameter("transactionId", transactionId);
-                }
-                else {
-                     updateData.setParameter("batchUploadId", batchUploadId);
-                }
-               
+        if (transactionId > 0) {
+            updateData.setParameter("transactionId", transactionId);
+        } else {
+            updateData.setParameter("batchUploadId", batchUploadId);
+        }
 
         if (fromStatusId != 0) {
             updateData.setParameter("fromStatusId", fromStatusId);
@@ -1262,7 +1255,7 @@ public class transactionInDAOImpl implements transactionInDAO {
         try {
             updateData.executeUpdate();
         } catch (Exception ex) {
-        	System.err.println("updateTransactionStatus " + ex.getCause());
+            System.err.println("updateTransactionStatus " + ex.getCause());
         }
 
     }
@@ -1278,7 +1271,7 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Override
     @Transactional
     public void updateTransactionTargetStatus(Integer batchUploadId, Integer transactionId, Integer fromStatusId, Integer toStatusId) throws Exception {
-        
+
         String sql = "update transactionTarget "
                 + " set statusId = :toStatusId, "
                 + "statusTime = CURRENT_TIMESTAMP";
@@ -1294,12 +1287,11 @@ public class transactionInDAOImpl implements transactionInDAO {
         }
         Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
                 .setParameter("toStatusId", toStatusId);
-                if (transactionId > 0) {
-                    updateData.setParameter("transactionId", transactionId);
-                }
-                else {
-                    updateData.setParameter("batchUploadId", batchUploadId);
-                }
+        if (transactionId > 0) {
+            updateData.setParameter("transactionId", transactionId);
+        } else {
+            updateData.setParameter("batchUploadId", batchUploadId);
+        }
 
         if (fromStatusId != 0) {
             updateData.setParameter("fromStatusId", fromStatusId);
@@ -1308,7 +1300,7 @@ public class transactionInDAOImpl implements transactionInDAO {
         try {
             updateData.executeUpdate();
         } catch (Exception ex) {
-        	System.err.println("updateTransactionTargetStatus " + ex.getCause());
+            System.err.println("updateTransactionTargetStatus " + ex.getCause());
         }
 
     }
@@ -1340,7 +1332,7 @@ public class transactionInDAOImpl implements transactionInDAO {
             deleteData.executeUpdate();
             return 0;
         } catch (Exception ex) {
-        	System.err.println("clearTransactionInRecords " + ex.getCause());
+            System.err.println("clearTransactionInRecords " + ex.getCause());
             return 1;
         }
     }
@@ -1358,7 +1350,7 @@ public class transactionInDAOImpl implements transactionInDAO {
             deleteData.executeUpdate();
             return 0;
         } catch (Exception ex) {
-        	System.err.println("clearTransactionTranslatedIn " + ex.getCause());
+            System.err.println("clearTransactionTranslatedIn " + ex.getCause());
             return 1;
         }
     }
@@ -1375,7 +1367,7 @@ public class transactionInDAOImpl implements transactionInDAO {
             deleteData.executeUpdate();
             return 0;
         } catch (Exception ex) {
-        	System.err.println("clearTransactionTarget " + ex.getCause());
+            System.err.println("clearTransactionTarget " + ex.getCause());
             return 1;
         }
     }
@@ -1390,20 +1382,19 @@ public class transactionInDAOImpl implements transactionInDAO {
             deleteData.executeUpdate();
             return 0;
         } catch (Exception ex) {
-        	System.err.println("clearTransactionIn " + ex.getCause());
+            System.err.println("clearTransactionIn " + ex.getCause());
             return 1;
         }
     }
 
     /**
-     * errorId = 1 is required field missing*
-     * we do not re-check REL records
+     * errorId = 1 is required field missing* we do not re-check REL records
      */
     @Override
     @Transactional
     public Integer insertFailedRequiredFields(configurationFormFields cff, Integer batchUploadId) {
         String sql = "insert into transactionInerrors (batchUploadId, configId, transactionInId, configurationFormFieldsId, errorid)"
-                + "(select " + batchUploadId + ", "+ cff.getconfigId() +", transactionInId, " + cff.getId()
+                + "(select " + batchUploadId + ", " + cff.getconfigId() + ", transactionInId, " + cff.getId()
                 + ", 1 from transactionTranslatedIn where configId = :configId "
                 + " and (F" + cff.getFieldNo()
                 + " is  null  or length(trim(F" + cff.getFieldNo() + ")) = 0)"
@@ -1418,8 +1409,8 @@ public class transactionInDAOImpl implements transactionInDAO {
             insertData.executeUpdate();
             return 0;
         } catch (Exception ex) {
-        	System.err.println("insertFailedRequiredFields " + ex.getCause());
-            
+            System.err.println("insertFailedRequiredFields " + ex.getCause());
+
             return 1;
         }
 
@@ -1437,7 +1428,7 @@ public class transactionInDAOImpl implements transactionInDAO {
             deleteData.executeUpdate();
             return 0;
         } catch (Exception ex) {
-        	System.err.println("clearTransactionInErrors " + ex.getCause());
+            System.err.println("clearTransactionInErrors " + ex.getCause());
             return 1;
         }
     }
@@ -1467,7 +1458,7 @@ public class transactionInDAOImpl implements transactionInDAO {
             updateData.executeUpdate();
 
         } catch (Exception ex) {
-        	System.err.println("updateStatusForErrorTrans " + ex.getCause());
+            System.err.println("updateStatusForErrorTrans " + ex.getCause());
         }
     }
 
@@ -1488,9 +1479,9 @@ public class transactionInDAOImpl implements transactionInDAO {
             insertError.executeUpdate();
             return 0;
         } catch (Exception ex) {
-        	System.err.println("genericValidation " + ex.getCause());
+            System.err.println("genericValidation " + ex.getCause());
             insertProcessingError(5, cff.getconfigId(), batchUploadId, cff.getId(),
-		    		null, null, validationTypeId, false, false, ("-" + ex.getCause().toString()));
+                    null, null, validationTypeId, false, false, ("-" + ex.getCause().toString()));
             return 1; //we return error count of 1 when error
         }
     }
@@ -1511,7 +1502,7 @@ public class transactionInDAOImpl implements transactionInDAO {
         try {
             updateData.executeUpdate();
         } catch (Exception ex) {
-        	System.err.println("updateBlanksToNull " + ex.getCause());
+            System.err.println("updateBlanksToNull " + ex.getCause());
         }
 
     }
@@ -1555,7 +1546,7 @@ public class transactionInDAOImpl implements transactionInDAO {
         try {
             updateData.executeUpdate();
         } catch (Exception ex) {
-        	System.err.println("updateFieldValue " + ex.getCause());
+            System.err.println("updateFieldValue " + ex.getCause());
         }
 
     }
@@ -1577,7 +1568,7 @@ public class transactionInDAOImpl implements transactionInDAO {
             insertData.executeUpdate();
 
         } catch (Exception ex) {
-        	System.err.println("insertValidationError " + ex.getCause());
+            System.err.println("insertValidationError " + ex.getCause());
 
         }
     }
@@ -1639,14 +1630,14 @@ public class transactionInDAOImpl implements transactionInDAO {
         try {
             updateData.executeUpdate();
         } catch (Exception ex) {
-        	System.err.println("nullForCWCol " + ex.getCause());
+            System.err.println("nullForCWCol " + ex.getCause());
         }
     }
 
     @Override
     @Transactional
-    public void executeCWData(Integer configId, Integer batchId, Integer fieldNo, 
-    		CrosswalkData cwd, boolean foroutboundProcessing, Integer fieldId) {
+    public void executeCWData(Integer configId, Integer batchId, Integer fieldNo,
+            CrosswalkData cwd, boolean foroutboundProcessing, Integer fieldId) {
 
         String sql;
 
@@ -1667,14 +1658,14 @@ public class transactionInDAOImpl implements transactionInDAO {
                 .setParameter("sourceValue", cwd.getSourceValue())
                 .setParameter("batchId", batchId)
                 .setParameter("configId", configId)
-                 .setParameter("transRELId", transRELId);
+                .setParameter("transRELId", transRELId);
         try {
             updateData.executeUpdate();
         } catch (Exception ex) {
-        	System.err.println("executeCWData " + ex.getCause());
+            System.err.println("executeCWData " + ex.getCause());
             insertProcessingError(5, configId, batchId, fieldId,
-		    		null, cwd.getCrosswalkId(), null,
-		    		false, foroutboundProcessing, ("executeCWData " + ex.getCause().toString()));
+                    null, cwd.getCrosswalkId(), null,
+                    false, foroutboundProcessing, ("executeCWData " + ex.getCause().toString()));
         }
 
     }
@@ -1707,7 +1698,7 @@ public class transactionInDAOImpl implements transactionInDAO {
         try {
             updateData.executeUpdate();
         } catch (Exception ex) {
-        	System.err.println("updateFieldNoWithCWData " + ex.getCause());
+            System.err.println("updateFieldNoWithCWData " + ex.getCause());
         }
     }
 
@@ -1720,11 +1711,11 @@ public class transactionInDAOImpl implements transactionInDAO {
         if (foroutboundProcessing == false) {
             sql = "insert into transactionInerrors (batchUploadId, configId, "
                     + "transactionInId, configurationFormFieldsId, errorid, cwId)"
-                    + " select " + batchId + ", " +configId +",transactionInId, " + cdt.getFieldId()
+                    + " select " + batchId + ", " + configId + ",transactionInId, " + cdt.getFieldId()
                     + ", 3,  " + cdt.getCrosswalkId() + " from transactionTranslatedIn where "
                     + "configId = :configId "
                     + " and (F" + cdt.getFieldNo()
-                    + " is not null and length(F"+cdt.getFieldNo()+") != 0  and forcw is null)"
+                    + " is not null and length(F" + cdt.getFieldNo() + ") != 0  and forcw is null)"
                     + "and transactionInId in (select id from transactionIn "
                     + "where batchId = :batchId"
                     + " and configId = :configId);";
@@ -1732,11 +1723,11 @@ public class transactionInDAOImpl implements transactionInDAO {
         } else {
             sql = "insert into transactionOutErrors (batchDownloadId, configId, "
                     + "transactionTargetId, configurationFormFieldsId, errorid, cwId)"
-                    + " select " + batchId + ", "+ configId+",  transactionTargetId, " + cdt.getFieldId()
+                    + " select " + batchId + ", " + configId + ",  transactionTargetId, " + cdt.getFieldId()
                     + ", 3,  " + cdt.getCrosswalkId() + " from transactionTranslatedOut where "
                     + " configId = :configId "
                     + " and (F" + cdt.getFieldNo()
-                    + " is not null and length(F"+cdt.getFieldNo()+") != 0 and forcw is null)"
+                    + " is not null and length(F" + cdt.getFieldNo() + ") != 0 and forcw is null)"
                     + " and transactionTargetId in (select id from transactionTarget "
                     + " where batchDLId = :batchId"
                     + " and configId = :configId);";
@@ -1748,11 +1739,10 @@ public class transactionInDAOImpl implements transactionInDAO {
         try {
             updateData.executeUpdate();
         } catch (Exception ex) {
-        	System.err.println("flagCWErrors " + ex.getCause());
+            System.err.println("flagCWErrors " + ex.getCause());
         }
     }
-    
-    
+
     @Override
     @Transactional
     public void flagMacroErrors(Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing) {
@@ -1762,7 +1752,7 @@ public class transactionInDAOImpl implements transactionInDAO {
         if (foroutboundProcessing == false) {
             sql = "insert into transactionInerrors (batchUploadId, configId, "
                     + "transactionInId, configurationFormFieldsId, errorid, macroId)"
-                    + " select " + batchId + ", "+ configId +", transactionInId, " + cdt.getFieldId()
+                    + " select " + batchId + ", " + configId + ", transactionInId, " + cdt.getFieldId()
                     + ", 4,  " + cdt.getMacroId() + " from transactionTranslatedIn where "
                     + "configId = :configId "
                     + " and (F" + cdt.getFieldNo()
@@ -1774,7 +1764,7 @@ public class transactionInDAOImpl implements transactionInDAO {
         } else {
             sql = "insert into transactionOutErrors (batchDownloadId, configId, "
                     + "transactionTargetId, configurationFormFieldsId, errorid, macroId)"
-                    + " select " + batchId + ", " + configId +",transactionTargetId, " + cdt.getFieldId()
+                    + " select " + batchId + ", " + configId + ",transactionTargetId, " + cdt.getFieldId()
                     + ", 4,  " + cdt.getMacroId() + " from transactionTranslatedOut where "
                     + "configId = :configId "
                     + " and (F" + cdt.getFieldNo()
@@ -1790,16 +1780,16 @@ public class transactionInDAOImpl implements transactionInDAO {
         try {
             updateData.executeUpdate();
         } catch (Exception ex) {
-        	System.err.println("flagMacroErrors " + ex.getCause());
+            System.err.println("flagMacroErrors " + ex.getCause());
         }
     }
 
-    /** this method will repalce transactionTranslatedIn data with
-     * 	data from transactionInRecords
-     * 
-     *  @param batchId - the batch to reset
-     *  @param resetAll - if true, we reset all records.  If false, we skip the REL records
-     *  
+    /**
+     * this method will repalce transactionTranslatedIn data with data from transactionInRecords
+     *
+     * @param batchId - the batch to reset
+     * @param resetAll - if true, we reset all records. If false, we skip the REL records
+     *
      */
     @Override
     @Transactional
@@ -1807,10 +1797,10 @@ public class transactionInDAOImpl implements transactionInDAO {
         String sql = "UPDATE transactionTranslatedIn INNER JOIN transactionInRecords ON "
                 + " (transactionTranslatedIn.transactionInId = transactionInRecords.transactionInId) and transactionTranslatedIn.transactionInId "
                 + " in (select id from transactionIn where batchId = :batchId ";
-                if (!resetAll) {
-                	sql = sql + " and statusId != :transRELId";
-                }
-                sql = sql + ") SET transactionTranslatedIn.F1 = transactionInRecords.F1,"
+        if (!resetAll) {
+            sql = sql + " and statusId != :transRELId";
+        }
+        sql = sql + ") SET transactionTranslatedIn.F1 = transactionInRecords.F1,"
                 + " transactionTranslatedIn.F2 = transactionInRecords.F2, transactionTranslatedIn.F3 = transactionInRecords.F3,"
                 + " transactionTranslatedIn.F4 = transactionInRecords.F4, transactionTranslatedIn.F5 = transactionInRecords.F5,"
                 + "transactionTranslatedIn.F6 = transactionInRecords.F6,transactionTranslatedIn.F7 = transactionInRecords.F7,"
@@ -2061,602 +2051,597 @@ public class transactionInDAOImpl implements transactionInDAO {
         Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
                 .setParameter("batchId", batchId);
         if (!resetAll) {
-        	updateData.setParameter("transRELId",transRELId);
+            updateData.setParameter("transRELId", transRELId);
         }
 
         try {
             updateData.executeUpdate();
         } catch (Exception ex) {
-        	System.err.println("resetTransactionTranslatedIn " + ex.getCause());
+            System.err.println("resetTransactionTranslatedIn " + ex.getCause());
         }
 
     }
-    
+
     /**
-     * This method looks for fieldA, fieldB, con1 and con2, fieldNo in the configurationDataTranslations
-     * and passes it to the formula (SP) stored in Macros
-     * 
-     * All macros will take the following parameter -
-     * configId, batchId, srcField, fieldA, fieldB, con1, con2, macroId, foroutboundProcessing,
-     * errorId
-     * 
-     * **/
-	@Override
-	@Transactional
-	public Integer executeMacro(Integer configId, Integer batchId,
-			configurationDataTranslations cdt, boolean foroutboundProcessing,
-			Macros macro) {
-		try {
-				String sql = ("CALL " + macro.getFormula() + " (:configId, :batchId, :srcField, "
-						+ ":fieldA, :fieldB, :con1, :con2, :macroId, :foroutboundProcessing, :passClear);");	
-		        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
-		        query.setParameter("configId", configId);
-		        query.setParameter("batchId", batchId);
-		        query.setParameter("srcField", ("F" + cdt.getFieldNo()));
-		        query.setParameter("fieldA", ("F" + cdt.getFieldA()));
-		        query.setParameter("fieldB", ("F" + cdt.getFieldB()));
-		        query.setParameter("con1", ("F" + cdt.getFieldNo()));
-		        query.setParameter("con2", cdt.getConstant2());
-		        query.setParameter("macroId", cdt.getMacroId());
-		        query.setParameter("foroutboundProcessing", foroutboundProcessing);
-		        query.setParameter("passClear", cdt.getPassClear());
-		       
-		        query.list();
-		        return 0; 
-		   } catch (Exception ex) {
-			   //insert system error
-			   insertProcessingError(5, configId, batchId, cdt.getFieldId(),
-			    		cdt.getMacroId(), null, null,
-			    		false, foroutboundProcessing, ("executeMacro " + ex.getCause().toString()));
-			   System.err.println("executeMacro " + ex.getCause());
-			   return 1;
-		   }
+     * This method looks for fieldA, fieldB, con1 and con2, fieldNo in the configurationDataTranslations and passes it to the formula (SP) stored in Macros
+     *
+     * All macros will take the following parameter - configId, batchId, srcField, fieldA, fieldB, con1, con2, macroId, foroutboundProcessing, errorId
+     *
+     * *
+     */
+    @Override
+    @Transactional
+    public Integer executeMacro(Integer configId, Integer batchId,
+            configurationDataTranslations cdt, boolean foroutboundProcessing,
+            Macros macro) {
+        try {
+            String sql = ("CALL " + macro.getFormula() + " (:configId, :batchId, :srcField, "
+                    + ":fieldA, :fieldB, :con1, :con2, :macroId, :foroutboundProcessing, :passClear);");
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+            query.setParameter("configId", configId);
+            query.setParameter("batchId", batchId);
+            query.setParameter("srcField", ("F" + cdt.getFieldNo()));
+            query.setParameter("fieldA", ("F" + cdt.getFieldA()));
+            query.setParameter("fieldB", ("F" + cdt.getFieldB()));
+            query.setParameter("con1", ("F" + cdt.getFieldNo()));
+            query.setParameter("con2", cdt.getConstant2());
+            query.setParameter("macroId", cdt.getMacroId());
+            query.setParameter("foroutboundProcessing", foroutboundProcessing);
+            query.setParameter("passClear", cdt.getPassClear());
 
-	}
+            query.list();
+            return 0;
+        } catch (Exception ex) {
+            //insert system error
+            insertProcessingError(5, configId, batchId, cdt.getFieldId(),
+                    cdt.getMacroId(), null, null,
+                    false, foroutboundProcessing, ("executeMacro " + ex.getCause().toString()));
+            System.err.println("executeMacro " + ex.getCause());
+            return 1;
+        }
 
+    }
 
-		@Override
-	    @Transactional
-	    public void insertProcessingError(Integer errorId, Integer configId, Integer batchId,
-	    		Integer fieldId,Integer macroId, Integer cwId, Integer validationTypeId,
-	    		boolean required, boolean foroutboundProcessing, String stackTrace) {
+    @Override
+    @Transactional
+    public void insertProcessingError(Integer errorId, Integer configId, Integer batchId,
+            Integer fieldId, Integer macroId, Integer cwId, Integer validationTypeId,
+            boolean required, boolean foroutboundProcessing, String stackTrace) {
 
-	        String tableName = "transactionInErrors";
-	        String batchType = "batchUploadId";
-	        if (foroutboundProcessing) {
-	        	tableName = "transactionOutErrors";
-	        	batchType = "batchDownloadId";
-	        }
-	        	String sql = " INSERT INTO " + tableName +" (errorId, " + batchType + ", configId, "
-	        			+ "configurationFormFieldsId, required,  "
-	        			+ "cwId, macroId, validationTypeId, stackTrace) "
-	        			+ "VALUES (:errorId, :batchId, :configId, "
-	        			+ " :configurationFormFieldsId, :required, "
-	        			+ ":cwId,:macroId,:validationTypeId,:stackTrace);";
-	        
-	        	Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
-	        		.setParameter("errorId", errorId)
-	        		.setParameter("batchId", batchId)
-	                .setParameter("configId", configId)
-	                .setParameter("configurationFormFieldsId", fieldId)
-	        		.setParameter("required", required)
-	                .setParameter("validationTypeId", validationTypeId)
-	                .setParameter("cwId", cwId)
-	        		.setParameter("macroId", macroId)
-	                .setParameter("stackTrace", stackTrace.toString());
-	        try {
-	            updateData.executeUpdate();
-	        } catch (Exception ex) {
-	        	System.err.println("insertProcessingError " + ex.getCause());
-	        }
-	    }
+        String tableName = "transactionInErrors";
+        String batchType = "batchUploadId";
+        if (foroutboundProcessing) {
+            tableName = "transactionOutErrors";
+            batchType = "batchDownloadId";
+        }
+        String sql = " INSERT INTO " + tableName + " (errorId, " + batchType + ", configId, "
+                + "configurationFormFieldsId, required,  "
+                + "cwId, macroId, validationTypeId, stackTrace) "
+                + "VALUES (:errorId, :batchId, :configId, "
+                + " :configurationFormFieldsId, :required, "
+                + ":cwId,:macroId,:validationTypeId,:stackTrace);";
 
-		@Override
-		@Transactional
-		@SuppressWarnings("unchecked")
-		public List<configurationTransport> getHandlingDetailsByBatch(
-				int batchId) throws Exception {
-			try {
-				String sql = ("select distinct clearRecords, autoRelease, errorHandling "
-						+ " from configurationtransportdetails where configId in "
-						+ "(select distinct configId from transactionIn where batchId = :batchId);");
-		        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
-		                .setResultTransformer(
-		                        Transformers.aliasToBean(configurationTransport.class))
-		                .setParameter("batchId", batchId);
-		       
-		        	List<configurationTransport> ct = query.list();
-		        	return ct;
-	        } catch (Exception ex) {
-	        	System.err.println("getHandlingDetailsByBatch " + ex.getCause());
-	        	return null;
-	        }
-	       
-	    }
+        Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                .setParameter("errorId", errorId)
+                .setParameter("batchId", batchId)
+                .setParameter("configId", configId)
+                .setParameter("configurationFormFieldsId", fieldId)
+                .setParameter("required", required)
+                .setParameter("validationTypeId", validationTypeId)
+                .setParameter("cwId", cwId)
+                .setParameter("macroId", macroId)
+                .setParameter("stackTrace", stackTrace.toString());
+        try {
+            updateData.executeUpdate();
+        } catch (Exception ex) {
+            System.err.println("insertProcessingError " + ex.getCause());
+        }
+    }
 
-		@Override
-		@Transactional
-		public void updateRecordCounts (Integer batchId, List <Integer> statusIds, boolean foroutboundProcessing, String colNameToUpdate) {
-			String sql = "";
-	        if (!foroutboundProcessing) {
-	        	sql = " update batchUploads set "+ colNameToUpdate  +" = "
-	        			+ "(select count(*) as total from transactionIn where batchId = :batchId ";
-	        } else {
-	        	sql = "update batchUploads set "+colNameToUpdate+" = (select count(*) as total "
-	        			+ " from transactionTarget where"
-						+ " batchDLId = :batchId ";
-	        }
-	        if (statusIds.size() > 0) {
-	        	sql = sql +  "and statusId in (:statusIds)";
-	        }
-	        sql = sql + ") where id = :batchId";
-	        
-	        try {
-	        	Query query = sessionFactory
-	                .getCurrentSession()
-	                .createSQLQuery(sql)
-	                .setParameter("batchId", batchId);
-	        	if (statusIds.size() > 0) {
-	                query.setParameterList("statusIds", statusIds);
-	        	}
-	        	query.executeUpdate();
-	        } catch (Exception ex) {
-	        	System.err.println("updateRecordCounts " + ex.getCause());
-	        }
-		}
+    @Override
+    @Transactional
+    @SuppressWarnings("unchecked")
+    public List<configurationTransport> getHandlingDetailsByBatch(
+            int batchId) throws Exception {
+        try {
+            String sql = ("select distinct clearRecords, autoRelease, errorHandling "
+                    + " from configurationtransportdetails where configId in "
+                    + "(select distinct configId from transactionIn where batchId = :batchId);");
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                    .setResultTransformer(
+                            Transformers.aliasToBean(configurationTransport.class))
+                    .setParameter("batchId", batchId);
 
-		@Override
-		@Transactional
-		public Integer getRecordCounts(Integer batchId, List<Integer> statusIds, boolean foroutboundProcessing) {
-			String tableName = "transactionIn";
-			String batchType = "batchId";
-	        if (foroutboundProcessing) {
-	        	tableName = "transactionTarget";
-	        	batchType = "batchDLId";
-	        }
-	        	String sql = "select count(*) as total from " + tableName+ " where " + batchType +" = :batchId ";
-	        if (statusIds.size() > 0) {
-	        	sql = sql +  " and statusId in (:statusIds)";
-	        }
-	        
-	        
-	        
-	        try {
-	        	Query query = sessionFactory
-	                .getCurrentSession()
-	                .createSQLQuery(sql).addScalar("total", StandardBasicTypes.INTEGER);
-	            
-	        	query.setParameter("batchId", batchId);
-	        	
-	            if (statusIds.size() > 0) {
-	                query.setParameterList("statusIds", statusIds);
-	        	}
-	        	
-	        	return (Integer) query.list().get(0);
-	        } catch (Exception ex) {
-	        	System.err.println("getRecordCounts " + ex.getCause());
-	        	return null;
-	        }
-		}
+            List<configurationTransport> ct = query.list();
+            return ct;
+        } catch (Exception ex) {
+            System.err.println("getHandlingDetailsByBatch " + ex.getCause());
+            return null;
+        }
 
-		@Override
-		@Transactional
-		public Integer copyTransactionInStatusToTarget(Integer batchId) {
-			try {
-				String sql = ("UPDATE transactionTarget INNER JOIN transactionIn  ON  transactionIn.id = transactionTarget.transactionInId "
-						+ " and transactionTarget.batchUploadId = :batchId set transactionTarget.statusId = transactionIn.statusId;");
-		        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
-		                .setParameter("batchId", batchId);
-		        query.executeUpdate();
-				return 0;
-			} catch (Exception ex) {
-				System.err.println("copyTransactionInStatusToTarget " + ex.getCause());
-				return 1;
-			}
-		}
+    }
 
-		@Override
-		@Transactional
-		public Integer insertLoadData(Integer batchId, String delimChar, String fileWithPath, String loadTableName, boolean containsHeaderRow) {
-			try {
-				String sql = ("LOAD DATA LOCAL INFILE '" + fileWithPath +"' INTO TABLE "
-						+ loadTableName +" fields terminated by '" + delimChar +"' LINES TERMINATED BY '\\n'");
-		        if (containsHeaderRow) {
-		        	sql = sql + "  IGNORE 1 LINES";
-		        }
-		        sql = sql + ";";
-				Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);           
-		        query.executeUpdate();
-				return 0;
-			} catch (Exception ex) {
-				System.err.println("insertLoadData " + ex.getCause());
-				return 1;
-			}
-		}
+    @Override
+    @Transactional
+    public void updateRecordCounts(Integer batchId, List<Integer> statusIds, boolean foroutboundProcessing, String colNameToUpdate) {
+        String sql = "";
+        if (!foroutboundProcessing) {
+            sql = " update batchUploads set " + colNameToUpdate + " = "
+                    + "(select count(*) as total from transactionIn where batchId = :batchId ";
+        } else {
+            sql = "update batchUploads set " + colNameToUpdate + " = (select count(*) as total "
+                    + " from transactionTarget where"
+                    + " batchDLId = :batchId ";
+        }
+        if (statusIds.size() > 0) {
+            sql = sql + "and statusId in (:statusIds)";
+        }
+        sql = sql + ") where id = :batchId";
 
-		@Override
-		@Transactional
-		public Integer createLoadTable(String loadTableName) {
-			try {
-				String sql = ("create TABLE " + loadTableName + "(f1 varchar(255) DEFAULT NULL,  f2 varchar(255) DEFAULT NULL,  f3 varchar(255) DEFAULT NULL,  f4 varchar(255) DEFAULT NULL,  f5 varchar(255) DEFAULT NULL,  f6 varchar(255) DEFAULT NULL,  f7 varchar(255) DEFAULT NULL,  f8 varchar(255) DEFAULT NULL,  f9 varchar(255) DEFAULT NULL,  f10 varchar(255) DEFAULT NULL,  f11 varchar(255) DEFAULT NULL,  f12 varchar(255) DEFAULT NULL,  f13 varchar(255) DEFAULT NULL,  f14 varchar(255) DEFAULT NULL,  f15 varchar(255) DEFAULT NULL,  f16 varchar(255) DEFAULT NULL,  f17 varchar(255) DEFAULT NULL,  f18 varchar(255) DEFAULT NULL,  f19 varchar(255) DEFAULT NULL,  f20 varchar(255) DEFAULT NULL,  f21 varchar(255) DEFAULT NULL,  f22 varchar(255) DEFAULT NULL,  f23 varchar(255) DEFAULT NULL,  f24 varchar(255) DEFAULT NULL,  f25 varchar(255) DEFAULT NULL,  f26 varchar(255) DEFAULT NULL,  f27 varchar(255) DEFAULT NULL,  f28 varchar(255) DEFAULT NULL,  f29 varchar(255) DEFAULT NULL,  f30 varchar(255) DEFAULT NULL,  f31 varchar(255) DEFAULT NULL,  f32 varchar(255) DEFAULT NULL,  f33 varchar(255) DEFAULT NULL,  f34 varchar(255) DEFAULT NULL,  f35 varchar(255) DEFAULT NULL,  f36 varchar(255) DEFAULT NULL,  f37 varchar(255) DEFAULT NULL,  f38 varchar(255) DEFAULT NULL,  f39 varchar(255) DEFAULT NULL,  f40 varchar(255) DEFAULT NULL,  f41 varchar(255) DEFAULT NULL,  f42 varchar(255) DEFAULT NULL,  f43 varchar(255) DEFAULT NULL,  f44 varchar(255) DEFAULT NULL,  f45 varchar(255) DEFAULT NULL,  f46 varchar(255) DEFAULT NULL,  f47 varchar(255) DEFAULT NULL,  f48 varchar(255) DEFAULT NULL,  f49 varchar(255) DEFAULT NULL,  f50 varchar(255) DEFAULT NULL,  f51 varchar(255) DEFAULT NULL,  f52 varchar(255) DEFAULT NULL,  f53 varchar(255) DEFAULT NULL,  f54 varchar(255) DEFAULT NULL,  f55 varchar(255) DEFAULT NULL,  f56 varchar(255) DEFAULT NULL,  f57 varchar(255) DEFAULT NULL,  f58 varchar(255) DEFAULT NULL,  f59 varchar(255) DEFAULT NULL,  f60 varchar(255) DEFAULT NULL,  f61 varchar(255) DEFAULT NULL,  f62 varchar(255) DEFAULT NULL,  f63 varchar(255) DEFAULT NULL,  f64 varchar(255) DEFAULT NULL,  f65 varchar(255) DEFAULT NULL,  f66 varchar(255) DEFAULT NULL,  f67 varchar(255) DEFAULT NULL,  f68 varchar(255) DEFAULT NULL,  f69 varchar(255) DEFAULT NULL,  f70 varchar(255) DEFAULT NULL,  f71 varchar(255) DEFAULT NULL,  f72 varchar(255) DEFAULT NULL,  f73 varchar(255) DEFAULT NULL,  f74 varchar(255) DEFAULT NULL,  f75 varchar(255) DEFAULT NULL,  f76 varchar(255) DEFAULT NULL,  f77 varchar(255) DEFAULT NULL,  f78 varchar(255) DEFAULT NULL,  f79 varchar(255) DEFAULT NULL,  f80 varchar(255) DEFAULT NULL,  f81 varchar(255) DEFAULT NULL,  f82 varchar(255) DEFAULT NULL,  f83 varchar(255) DEFAULT NULL,  f84 varchar(255) DEFAULT NULL,  f85 varchar(255) DEFAULT NULL,  f86 varchar(255) DEFAULT NULL,  f87 varchar(255) DEFAULT NULL,  f88 varchar(255) DEFAULT NULL,  f89 varchar(255) DEFAULT NULL,  f90 varchar(255) DEFAULT NULL,  f91 varchar(255) DEFAULT NULL,  f92 varchar(255) DEFAULT NULL,  f93 varchar(255) DEFAULT NULL,  f94 varchar(255) DEFAULT NULL,  f95 varchar(255) DEFAULT NULL,  f96 varchar(255) DEFAULT NULL,  f97 varchar(255) DEFAULT NULL,  f98 varchar(255) DEFAULT NULL,  f99 varchar(255) DEFAULT NULL,  f100 varchar(255) DEFAULT NULL,  f101 varchar(255) DEFAULT NULL,  f102 varchar(255) DEFAULT NULL,  f103 varchar(255) DEFAULT NULL,  f104 varchar(255) DEFAULT NULL,  f105 varchar(255) DEFAULT NULL,  f106 varchar(255) DEFAULT NULL,  f107 varchar(255) DEFAULT NULL,  f108 varchar(255) DEFAULT NULL,  f109 varchar(255) DEFAULT NULL,  f110 varchar(255) DEFAULT NULL,  f111 varchar(255) DEFAULT NULL,  f112 varchar(255) DEFAULT NULL,  f113 varchar(255) DEFAULT NULL,  f114 varchar(255) DEFAULT NULL,  f115 varchar(255) DEFAULT NULL,  f116 varchar(255) DEFAULT NULL,  f117 varchar(255) DEFAULT NULL,  f118 varchar(255) DEFAULT NULL,  f119 varchar(255) DEFAULT NULL,  f120 varchar(255) DEFAULT NULL,  f121 varchar(255) DEFAULT NULL,  f122 varchar(255) DEFAULT NULL,  f123 varchar(255) DEFAULT NULL,  f124 varchar(255) DEFAULT NULL,  f125 varchar(255) DEFAULT NULL,  f126 varchar(255) DEFAULT NULL,  f127 varchar(255) DEFAULT NULL,  f128 varchar(255) DEFAULT NULL,  f129 varchar(255) DEFAULT NULL,  f130 varchar(255) DEFAULT NULL,  f131 varchar(255) DEFAULT NULL,  f132 varchar(255) DEFAULT NULL,  f133 varchar(255) DEFAULT NULL,  f134 varchar(255) DEFAULT NULL,  f135 varchar(255) DEFAULT NULL,  f136 varchar(255) DEFAULT NULL,  f137 varchar(255) DEFAULT NULL,  f138 varchar(255) DEFAULT NULL,  f139 varchar(255) DEFAULT NULL,  f140 varchar(255) DEFAULT NULL,  f141 varchar(255) DEFAULT NULL,  f142 varchar(255) DEFAULT NULL,  f143 varchar(255) DEFAULT NULL,  f144 varchar(255) DEFAULT NULL,  f145 varchar(255) DEFAULT NULL,  f146 varchar(255) DEFAULT NULL,  f147 varchar(255) DEFAULT NULL,  f148 varchar(255) DEFAULT NULL,  f149 varchar(255) DEFAULT NULL,  f150 varchar(255) DEFAULT NULL,  f151 varchar(255) DEFAULT NULL,  f152 varchar(255) DEFAULT NULL,  f153 varchar(255) DEFAULT NULL,  f154 varchar(255) DEFAULT NULL,  f155 varchar(255) DEFAULT NULL,  f156 varchar(255) DEFAULT NULL,  f157 varchar(255) DEFAULT NULL,  f158 varchar(255) DEFAULT NULL,  f159 varchar(255) DEFAULT NULL,  f160 varchar(255) DEFAULT NULL,  f161 varchar(255) DEFAULT NULL,  f162 varchar(255) DEFAULT NULL,  f163 varchar(255) DEFAULT NULL,  f164 varchar(255) DEFAULT NULL,  f165 varchar(255) DEFAULT NULL,  f166 varchar(255) DEFAULT NULL,  f167 varchar(255) DEFAULT NULL,  f168 varchar(255) DEFAULT NULL,  f169 varchar(255) DEFAULT NULL,  f170 varchar(255) DEFAULT NULL,  f171 varchar(255) DEFAULT NULL,  f172 varchar(255) DEFAULT NULL,  f173 varchar(255) DEFAULT NULL,  f174 varchar(255) DEFAULT NULL,  f175 varchar(255) DEFAULT NULL,  f176 varchar(255) DEFAULT NULL,  f177 varchar(255) DEFAULT NULL,  f178 varchar(255) DEFAULT NULL,  f179 varchar(255) DEFAULT NULL,  f180 varchar(255) DEFAULT NULL,  f181 varchar(255) DEFAULT NULL,  f182 varchar(255) DEFAULT NULL,  f183 varchar(255) DEFAULT NULL,  f184 varchar(255) DEFAULT NULL,  f185 varchar(255) DEFAULT NULL,  f186 varchar(255) DEFAULT NULL,  f187 varchar(255) DEFAULT NULL,  f188 varchar(255) DEFAULT NULL,  f189 varchar(255) DEFAULT NULL,  f190 varchar(255) DEFAULT NULL,  f191 varchar(255) DEFAULT NULL,  f192 varchar(255) DEFAULT NULL,  f193 varchar(255) DEFAULT NULL,  f194 varchar(255) DEFAULT NULL,  f195 varchar(255) DEFAULT NULL,  f196 varchar(255) DEFAULT NULL,  f197 varchar(255) DEFAULT NULL,  f198 varchar(255) DEFAULT NULL,  f199 varchar(255) DEFAULT NULL,  f200 varchar(255) DEFAULT NULL,  f201 varchar(255) DEFAULT NULL,  f202 varchar(255) DEFAULT NULL,  f203 varchar(255) DEFAULT NULL,  f204 varchar(255) DEFAULT NULL,  f205 varchar(255) DEFAULT NULL,  f206 varchar(255) DEFAULT NULL,  f207 varchar(255) DEFAULT NULL,  f208 varchar(255) DEFAULT NULL,  f209 varchar(255) DEFAULT NULL,  f210 varchar(255) DEFAULT NULL,  f211 varchar(255) DEFAULT NULL,  f212 varchar(255) DEFAULT NULL,  f213 varchar(255) DEFAULT NULL,  f214 varchar(255) DEFAULT NULL,  f215 varchar(255) DEFAULT NULL,  f216 varchar(255) DEFAULT NULL,  f217 varchar(255) DEFAULT NULL,  f218 varchar(255) DEFAULT NULL,  f219 varchar(255) DEFAULT NULL,  f220 varchar(255) DEFAULT NULL,  f221 varchar(255) DEFAULT NULL,  f222 varchar(255) DEFAULT NULL,  f223 varchar(255) DEFAULT NULL,  f224 varchar(255) DEFAULT NULL,  f225 varchar(255) DEFAULT NULL,  f226 varchar(255) DEFAULT NULL,  f227 varchar(255) DEFAULT NULL,  f228 varchar(255) DEFAULT NULL,  f229 varchar(255) DEFAULT NULL,  f230 varchar(255) DEFAULT NULL,  f231 varchar(255) DEFAULT NULL,  f232 varchar(255) DEFAULT NULL,  f233 varchar(255) DEFAULT NULL,  f234 varchar(255) DEFAULT NULL,  f235 varchar(255) DEFAULT NULL,  f236 varchar(255) DEFAULT NULL,  f237 varchar(255) DEFAULT NULL,  f238 varchar(255) DEFAULT NULL,  f239 varchar(255) DEFAULT NULL,  f240 varchar(255) DEFAULT NULL,  f241 varchar(255) DEFAULT NULL,  f242 varchar(255) DEFAULT NULL,  f243 varchar(255) DEFAULT NULL,  f244 varchar(255) DEFAULT NULL,  f245 varchar(255) DEFAULT NULL,  f246 varchar(255) DEFAULT NULL,  f247 varchar(255) DEFAULT NULL,  f248 varchar(255) DEFAULT NULL,  f249 varchar(255) DEFAULT NULL,  f250 varchar(255) DEFAULT NULL,  f251 varchar(255) DEFAULT NULL,  f252 varchar(255) DEFAULT NULL,  f253 varchar(255) DEFAULT NULL,  f254 varchar(255) DEFAULT NULL,  f255 varchar(255) DEFAULT NULL,  batchId int(11),  loadTableId varchar(45) ,  id int(11) NOT NULL AUTO_INCREMENT,  PRIMARY KEY (id)) ENGINE=InnoDB AUTO_INCREMENT=1038 DEFAULT CHARSET=latin1;");
-		        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);           
-		        query.executeUpdate();
-				return 0;
-			} catch (Exception ex) {
-				System.err.println("createLoadTable " + ex.getCause());
-				return 1;
-			}
-		}
+        try {
+            Query query = sessionFactory
+                    .getCurrentSession()
+                    .createSQLQuery(sql)
+                    .setParameter("batchId", batchId);
+            if (statusIds.size() > 0) {
+                query.setParameterList("statusIds", statusIds);
+            }
+            query.executeUpdate();
+        } catch (Exception ex) {
+            System.err.println("updateRecordCounts " + ex.getCause());
+        }
+    }
 
-		@Override
-		@Transactional
-		public Integer dropLoadTable(String loadTableName) {
-			try {
-				String sql = ("drop TABLE if exists " + loadTableName + ";");
-		        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);           
-		        query.executeUpdate();
-				return 0;
-			} catch (Exception ex) {
-				System.err.println("dropLoadTable " + ex.getCause());
-				return 1;
-			}
-		}
-		
-		@Override
-		@Transactional
-		public Integer updateLoadTable(String loadTableName, Integer batchId) {
-			try {
-				String sql = ("update " + loadTableName +" set batchId = :batchId, loadTableId = concat('" + loadTableName + "_', id);");
-		        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql); 
-		        query.setParameter("batchId", batchId);
-		        query.executeUpdate();
-				return 0;
-			} catch (Exception ex) {
-				System.err.println("updateLoadTable " + ex.getCause());
-				return 1;
-			}
-		}
+    @Override
+    @Transactional
+    public Integer getRecordCounts(Integer batchId, List<Integer> statusIds, boolean foroutboundProcessing) {
+        String tableName = "transactionIn";
+        String batchType = "batchId";
+        if (foroutboundProcessing) {
+            tableName = "transactionTarget";
+            batchType = "batchDLId";
+        }
+        String sql = "select count(*) as total from " + tableName + " where " + batchType + " = :batchId ";
+        if (statusIds.size() > 0) {
+            sql = sql + " and statusId in (:statusIds)";
+        }
 
-		@Override
-		@Transactional
-		public Integer loadTransactionIn(String loadTableName, Integer batchId) {
-			try {
-				String sql = ("insert into transactionIn (batchId, statusId, loadTableId) "
-						+ " select :batchId, 11, loadTableId from "+ loadTableName +";");
-		        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql); 
-		        query.setParameter("batchId", batchId);
-		        query.executeUpdate();
-				return 0;
-			} catch (Exception ex) {
-				System.err.println("loadTransactionIn " + ex.getCause());
-				return 1;
-			}
-		}
-		
-		@Override
-		@Transactional
-		public Integer loadTransactionInRecords(Integer batchId) {
-			try {
-				String sql = ("insert into transactionInRecords (transactionInId, loadTableId) select id, loadTableId from transactionIn where batchId = :batchId");
-		        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql); 
-		        query.setParameter("batchId", batchId);
-		        query.executeUpdate();
-				return 0;
-			} catch (Exception ex) {
-				System.err.println("loadTransactionInRecords " + ex.getCause());
-				return 1;
-			}
-		}
-		
-		@Override
-		@Transactional
-		public Integer loadTransactionInRecordsData (String loadTableName) {
-			try {
-				String sql = ("UPDATE transactionInRecords "
-					+ "	INNER JOIN " + loadTableName + " loadTableTemp ON " 
-					+ "transactionInRecords.loadTableId = loadTableTemp.loadTableId "
-					+ "set  transactionInRecords.F1 = loadTableTemp.F1, " 
-	                + "transactionInRecords.F2 = loadTableTemp.F2, "  
-	                + "transactionInRecords.F3 = loadTableTemp.F3, " 
-	                + "transactionInRecords.F4 = loadTableTemp.F4, "  
-	                + "transactionInRecords.F5 = loadTableTemp.F5, " 
-	                + "transactionInRecords.F6 = loadTableTemp.F6, " 
-	                + "transactionInRecords.F7 = loadTableTemp.F7, " 
-	                + "transactionInRecords.F8 = loadTableTemp.F8, " 
-	                + "transactionInRecords.F9 = loadTableTemp.F9, " 
-	                + "transactionInRecords.F10 = loadTableTemp.F10, " 
-	                + "transactionInRecords.F11 = loadTableTemp.F11, " 
-	                + "transactionInRecords.F12 = loadTableTemp.F12, " 
-	                + "transactionInRecords.F13 = loadTableTemp.F13, " 
-	                + "transactionInRecords.F14 = loadTableTemp.F14, " 
-	                + "transactionInRecords.F15 = loadTableTemp.F15, " 
-	                + "transactionInRecords.F16 = loadTableTemp.F16, " 
-	                + "transactionInRecords.F17 = loadTableTemp.F17, " 
-	                + "transactionInRecords.F18 = loadTableTemp.F18, " 
-	                + "transactionInRecords.F19 = loadTableTemp.F19, " 
-	                + "transactionInRecords.F20 = loadTableTemp.F20, " 
-	                + "transactionInRecords.F21 = loadTableTemp.F21, " 
-	                + "transactionInRecords.F22 = loadTableTemp.F22, " 
-	                + "transactionInRecords.F23 = loadTableTemp.F23, " 
-	                + "transactionInRecords.F24 = loadTableTemp.F24, " 
-	                + "transactionInRecords.F25 = loadTableTemp.F25, " 
-	                + "transactionInRecords.F26 = loadTableTemp.F26, " 
-	                + "transactionInRecords.F27 = loadTableTemp.F27, " 
-	                + "transactionInRecords.F28 = loadTableTemp.F28, " 
-	                + "transactionInRecords.F29 = loadTableTemp.F29, " 
-	                + "transactionInRecords.F30 = loadTableTemp.F30, " 
-	                + "transactionInRecords.F31 = loadTableTemp.F31, " 
-	                + "transactionInRecords.F32 = loadTableTemp.F32, " 
-	                + "transactionInRecords.F33 = loadTableTemp.F33, " 
-	                + "transactionInRecords.F34 = loadTableTemp.F34, " 
-	                + "transactionInRecords.F35 = loadTableTemp.F35, " 
-	                + "transactionInRecords.F36 = loadTableTemp.F36, " 
-	                + "transactionInRecords.F37 = loadTableTemp.F37, " 
-	                + "transactionInRecords.F38 = loadTableTemp.F38, " 
-	                + "transactionInRecords.F39 = loadTableTemp.F39, " 
-	                + "transactionInRecords.F40 = loadTableTemp.F40, " 
-	                + "transactionInRecords.F41 = loadTableTemp.F41, " 
-	                + "transactionInRecords.F42 = loadTableTemp.F42, " 
-	                + "transactionInRecords.F43 = loadTableTemp.F43, " 
-	                + "transactionInRecords.F44 = loadTableTemp.F44, " 
-	                + "transactionInRecords.F45 = loadTableTemp.F45, " 
-	                + "transactionInRecords.F46 = loadTableTemp.F46, " 
-	                + "transactionInRecords.F47 = loadTableTemp.F47, " 
-	                + "transactionInRecords.F48 = loadTableTemp.F48, " 
-	                + "transactionInRecords.F49 = loadTableTemp.F49, " 
-	                + "transactionInRecords.F50 = loadTableTemp.F50, " 
-	                + "transactionInRecords.F51 = loadTableTemp.F51, " 
-	                + "transactionInRecords.F52 = loadTableTemp.F52, " 
-	                + "transactionInRecords.F53 = loadTableTemp.F53, " 
-	                + "transactionInRecords.F54 = loadTableTemp.F54, " 
-	                + "transactionInRecords.F55 = loadTableTemp.F55, " 
-	                + "transactionInRecords.F56 = loadTableTemp.F56, " 
-	                + "transactionInRecords.F57 = loadTableTemp.F57, " 
-	                + "transactionInRecords.F58 = loadTableTemp.F58, " 
-	                + "transactionInRecords.F59 = loadTableTemp.F59, " 
-	                + "transactionInRecords.F60 = loadTableTemp.F60, " 
-	                + "transactionInRecords.F61 = loadTableTemp.F61, " 
-	                + "transactionInRecords.F62 = loadTableTemp.F62, " 
-	                + "transactionInRecords.F63 = loadTableTemp.F63, " 
-	                + "transactionInRecords.F64 = loadTableTemp.F64, " 
-	                + "transactionInRecords.F65 = loadTableTemp.F65, " 
-	                + "transactionInRecords.F66 = loadTableTemp.F66, " 
-	                + "transactionInRecords.F67 = loadTableTemp.F67, " 
-	                + "transactionInRecords.F68 = loadTableTemp.F68, " 
-	                + "transactionInRecords.F69 = loadTableTemp.F69, " 
-	                + "transactionInRecords.F70 = loadTableTemp.F70, " 
-	                + "transactionInRecords.F71 = loadTableTemp.F71, " 
-	                + "transactionInRecords.F72 = loadTableTemp.F72, " 
-	                + "transactionInRecords.F73 = loadTableTemp.F73, " 
-	                + "transactionInRecords.F74 = loadTableTemp.F74, " 
-	                + "transactionInRecords.F75 = loadTableTemp.F75, " 
-	                + "transactionInRecords.F76 = loadTableTemp.F76, " 
-	                + "transactionInRecords.F77 = loadTableTemp.F77, " 
-	                + "transactionInRecords.F78 = loadTableTemp.F78, " 
-	                + "transactionInRecords.F79 = loadTableTemp.F79, " 
-	                + "transactionInRecords.F80 = loadTableTemp.F80, " 
-	                + "transactionInRecords.F81 = loadTableTemp.F81, " 
-	                + "transactionInRecords.F82 = loadTableTemp.F82, " 
-	                + "transactionInRecords.F83 = loadTableTemp.F83, " 
-	                + "transactionInRecords.F84 = loadTableTemp.F84, " 
-	                + "transactionInRecords.F85 = loadTableTemp.F85, " 
-	                + "transactionInRecords.F86 = loadTableTemp.F86, " 
-	                + "transactionInRecords.F87 = loadTableTemp.F87, " 
-	                + "transactionInRecords.F88 = loadTableTemp.F88, " 
-	                + "transactionInRecords.F89 = loadTableTemp.F89, " 
-	                + "transactionInRecords.F90 = loadTableTemp.F90, " 
-	                + "transactionInRecords.F91 = loadTableTemp.F91, " 
-	                + "transactionInRecords.F92 = loadTableTemp.F92, " 
-	                + "transactionInRecords.F93 = loadTableTemp.F93, " 
-	                + "transactionInRecords.F94 = loadTableTemp.F94, " 
-	                + "transactionInRecords.F95 = loadTableTemp.F95, " 
-	                + "transactionInRecords.F96 = loadTableTemp.F96, " 
-	                + "transactionInRecords.F97 = loadTableTemp.F97, " 
-	                + "transactionInRecords.F98 = loadTableTemp.F98, " 
-	                + "transactionInRecords.F99 = loadTableTemp.F99, " 
-	                + "transactionInRecords.F100 = loadTableTemp.F100, " 
-	                + "transactionInRecords.F101 = loadTableTemp.F101, " 
-	                + "transactionInRecords.F102 = loadTableTemp.F102, " 
-	                + "transactionInRecords.F103 = loadTableTemp.F103, " 
-	                + "transactionInRecords.F104 = loadTableTemp.F104, " 
-	                + "transactionInRecords.F105 = loadTableTemp.F105, " 
-	                + "transactionInRecords.F106 = loadTableTemp.F106, " 
-	                + "transactionInRecords.F107 = loadTableTemp.F107, " 
-	                + "transactionInRecords.F108 = loadTableTemp.F108, " 
-	                + "transactionInRecords.F109 = loadTableTemp.F109, " 
-	                + "transactionInRecords.F110 = loadTableTemp.F110, " 
-	                + "transactionInRecords.F111 = loadTableTemp.F111, " 
-	                + "transactionInRecords.F112 = loadTableTemp.F112, " 
-	                + "transactionInRecords.F113 = loadTableTemp.F113, " 
-	                + "transactionInRecords.F114 = loadTableTemp.F114, " 
-	                + "transactionInRecords.F115 = loadTableTemp.F115, " 
-	                + "transactionInRecords.F116 = loadTableTemp.F116, " 
-	                + "transactionInRecords.F117 = loadTableTemp.F117, " 
-	                + "transactionInRecords.F118 = loadTableTemp.F118, " 
-	                + "transactionInRecords.F119 = loadTableTemp.F119, " 
-	                + "transactionInRecords.F120 = loadTableTemp.F120, " 
-	                + "transactionInRecords.F121 = loadTableTemp.F121, " 
-	                + "transactionInRecords.F122 = loadTableTemp.F122, " 
-	                + "transactionInRecords.F123 = loadTableTemp.F123, " 
-	                + "transactionInRecords.F124 = loadTableTemp.F124, " 
-	                + "transactionInRecords.F125 = loadTableTemp.F125, " 
-	                + "transactionInRecords.F126 = loadTableTemp.F126, " 
-	                + "transactionInRecords.F127 = loadTableTemp.F127, " 
-	                + "transactionInRecords.F128 = loadTableTemp.F128, " 
-	                + "transactionInRecords.F129 = loadTableTemp.F129, " 
-	                + "transactionInRecords.F130 = loadTableTemp.F130, " 
-	                + "transactionInRecords.F131 = loadTableTemp.F131, " 
-	                + "transactionInRecords.F132 = loadTableTemp.F132, " 
-	                + "transactionInRecords.F133 = loadTableTemp.F133, " 
-	                + "transactionInRecords.F134 = loadTableTemp.F134, " 
-	                + "transactionInRecords.F135 = loadTableTemp.F135, " 
-	                + "transactionInRecords.F136 = loadTableTemp.F136, " 
-	                + "transactionInRecords.F137 = loadTableTemp.F137, " 
-	                + "transactionInRecords.F138 = loadTableTemp.F138, " 
-	                + "transactionInRecords.F139 = loadTableTemp.F139, " 
-	                + "transactionInRecords.F140 = loadTableTemp.F140, " 
-	                + "transactionInRecords.F141 = loadTableTemp.F141, " 
-	                + "transactionInRecords.F142 = loadTableTemp.F142, " 
-	                + "transactionInRecords.F143 = loadTableTemp.F143, " 
-	                + "transactionInRecords.F144 = loadTableTemp.F144, " 
-	                + "transactionInRecords.F145 = loadTableTemp.F145, " 
-	                + "transactionInRecords.F146 = loadTableTemp.F146, " 
-	                + "transactionInRecords.F147 = loadTableTemp.F147, " 
-	                + "transactionInRecords.F148 = loadTableTemp.F148, " 
-	                + "transactionInRecords.F149 = loadTableTemp.F149, " 
-	                + "transactionInRecords.F150 = loadTableTemp.F150, " 
-	                + "transactionInRecords.F151 = loadTableTemp.F151, " 
-	                + "transactionInRecords.F152 = loadTableTemp.F152, " 
-	                + "transactionInRecords.F153 = loadTableTemp.F153, " 
-	                + "transactionInRecords.F154 = loadTableTemp.F154, " 
-	                + "transactionInRecords.F155 = loadTableTemp.F155, " 
-	                + "transactionInRecords.F156 = loadTableTemp.F156, " 
-	                + "transactionInRecords.F157 = loadTableTemp.F157, " 
-	                + "transactionInRecords.F158 = loadTableTemp.F158, " 
-	                + "transactionInRecords.F159 = loadTableTemp.F159, " 
-	                + "transactionInRecords.F160 = loadTableTemp.F160, " 
-	                + "transactionInRecords.F161 = loadTableTemp.F161, " 
-	                + "transactionInRecords.F162 = loadTableTemp.F162, " 
-	                + "transactionInRecords.F163 = loadTableTemp.F163, " 
-	                + "transactionInRecords.F164 = loadTableTemp.F164, " 
-	                + "transactionInRecords.F165 = loadTableTemp.F165, " 
-	                + "transactionInRecords.F166 = loadTableTemp.F166, " 
-	                + "transactionInRecords.F167 = loadTableTemp.F167, " 
-	                + "transactionInRecords.F168 = loadTableTemp.F168, " 
-	                + "transactionInRecords.F169 = loadTableTemp.F169, " 
-	                + "transactionInRecords.F170 = loadTableTemp.F170, " 
-	                + "transactionInRecords.F171 = loadTableTemp.F171, " 
-	                + "transactionInRecords.F172 = loadTableTemp.F172, " 
-	                + "transactionInRecords.F173 = loadTableTemp.F173, " 
-	                + "transactionInRecords.F174 = loadTableTemp.F174, " 
-	                + "transactionInRecords.F175 = loadTableTemp.F175, " 
-	                + "transactionInRecords.F176 = loadTableTemp.F176, " 
-	                + "transactionInRecords.F177 = loadTableTemp.F177, " 
-	                + "transactionInRecords.F178 = loadTableTemp.F178, " 
-	                + "transactionInRecords.F179 = loadTableTemp.F179, " 
-	                + "transactionInRecords.F180 = loadTableTemp.F180, " 
-	                + "transactionInRecords.F181 = loadTableTemp.F181, " 
-	                + "transactionInRecords.F182 = loadTableTemp.F182, " 
-	                + "transactionInRecords.F183 = loadTableTemp.F183, " 
-	                + "transactionInRecords.F184 = loadTableTemp.F184, " 
-	                + "transactionInRecords.F185 = loadTableTemp.F185, " 
-	                + "transactionInRecords.F186 = loadTableTemp.F186, " 
-	                + "transactionInRecords.F187 = loadTableTemp.F187, " 
-	                + "transactionInRecords.F188 = loadTableTemp.F188, " 
-	                + "transactionInRecords.F189 = loadTableTemp.F189, " 
-	                + "transactionInRecords.F190 = loadTableTemp.F190, " 
-	                + "transactionInRecords.F191 = loadTableTemp.F191, " 
-	                + "transactionInRecords.F192 = loadTableTemp.F192, " 
-	                + "transactionInRecords.F193 = loadTableTemp.F193, " 
-	                + "transactionInRecords.F194 = loadTableTemp.F194, " 
-	                + "transactionInRecords.F195 = loadTableTemp.F195, " 
-	                + "transactionInRecords.F196 = loadTableTemp.F196, " 
-	                + "transactionInRecords.F197 = loadTableTemp.F197, " 
-	                + "transactionInRecords.F198 = loadTableTemp.F198, " 
-	                + "transactionInRecords.F199 = loadTableTemp.F199, " 
-	                + "transactionInRecords.F200 = loadTableTemp.F200, " 
-	                + "transactionInRecords.F201 = loadTableTemp.F201, " 
-	                + "transactionInRecords.F202 = loadTableTemp.F202, " 
-	                + "transactionInRecords.F203 = loadTableTemp.F203, " 
-	                + "transactionInRecords.F204 = loadTableTemp.F204, " 
-	                + "transactionInRecords.F205 = loadTableTemp.F205, " 
-	                + "transactionInRecords.F206 = loadTableTemp.F206, " 
-	                + "transactionInRecords.F207 = loadTableTemp.F207, " 
-	                + "transactionInRecords.F208 = loadTableTemp.F208, " 
-	                + "transactionInRecords.F209 = loadTableTemp.F209, " 
-	                + "transactionInRecords.F210 = loadTableTemp.F210, " 
-	                + "transactionInRecords.F211 = loadTableTemp.F211, " 
-	                + "transactionInRecords.F212 = loadTableTemp.F212, " 
-	                + "transactionInRecords.F213 = loadTableTemp.F213, " 
-	                + "transactionInRecords.F214 = loadTableTemp.F214, " 
-	                + "transactionInRecords.F215 = loadTableTemp.F215, " 
-	                + "transactionInRecords.F216 = loadTableTemp.F216, " 
-	                + "transactionInRecords.F217 = loadTableTemp.F217, " 
-	                + "transactionInRecords.F218 = loadTableTemp.F218, " 
-	                + "transactionInRecords.F219 = loadTableTemp.F219, " 
-	                + "transactionInRecords.F220 = loadTableTemp.F220, " 
-	                + "transactionInRecords.F221 = loadTableTemp.F221, " 
-	                + "transactionInRecords.F222 = loadTableTemp.F222, " 
-	                + "transactionInRecords.F223 = loadTableTemp.F223, " 
-	                + "transactionInRecords.F224 = loadTableTemp.F224, " 
-	                + "transactionInRecords.F225 = loadTableTemp.F225, " 
-	                + "transactionInRecords.F226 = loadTableTemp.F226, " 
-	                + "transactionInRecords.F227 = loadTableTemp.F227, " 
-	                + "transactionInRecords.F228 = loadTableTemp.F228, " 
-	                + "transactionInRecords.F229 = loadTableTemp.F229, " 
-	                + "transactionInRecords.F230 = loadTableTemp.F230, " 
-	                + "transactionInRecords.F231 = loadTableTemp.F231, " 
-	                + "transactionInRecords.F232 = loadTableTemp.F232, " 
-	                + "transactionInRecords.F233 = loadTableTemp.F233, " 
-	                + "transactionInRecords.F234 = loadTableTemp.F234, " 
-	                + "transactionInRecords.F235 = loadTableTemp.F235, " 
-	                + "transactionInRecords.F236 = loadTableTemp.F236, " 
-	                + "transactionInRecords.F237 = loadTableTemp.F237, " 
-	                + "transactionInRecords.F238 = loadTableTemp.F238, " 
-	                + "transactionInRecords.F239 = loadTableTemp.F239, " 
-	                + "transactionInRecords.F240 = loadTableTemp.F240, " 
-	                + "transactionInRecords.F241 = loadTableTemp.F241, " 
-	                + "transactionInRecords.F242 = loadTableTemp.F242, " 
-	                + "transactionInRecords.F243 = loadTableTemp.F243, " 
-	                + "transactionInRecords.F244 = loadTableTemp.F244, " 
-	                + "transactionInRecords.F245 = loadTableTemp.F245, " 
-	                + "transactionInRecords.F246 = loadTableTemp.F246, " 
-	                + "transactionInRecords.F247 = loadTableTemp.F247, " 
-	                + "transactionInRecords.F248 = loadTableTemp.F248, " 
-	                + "transactionInRecords.F249 = loadTableTemp.F249, " 
-	                + "transactionInRecords.F250 = loadTableTemp.F250, " 
-	                + "transactionInRecords.F251 = loadTableTemp.F251, " 
-	                + "transactionInRecords.F252 = loadTableTemp.F252, " 
-	                + "transactionInRecords.F253 = loadTableTemp.F253, " 
-	                + "transactionInRecords.F254 = loadTableTemp.F254, " 
-	                + "transactionInRecords.F255 = loadTableTemp.F255;");
-		        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql); 
-		        query.executeUpdate();
-				return 0;
-			} catch (Exception ex) {
-				System.err.println("loadTransactionInRecordsData " + ex.getCause());
-				return 1;
-			}
-		}
+        try {
+            Query query = sessionFactory
+                    .getCurrentSession()
+                    .createSQLQuery(sql).addScalar("total", StandardBasicTypes.INTEGER);
 
-		@Override
-		@Transactional
-		public Integer updateConfigIdForBatch(Integer batchId, Integer configId) {
-			try {
-				
-				String sql = ("update transactionIn set configId = :configId where batchId = :batchId");
-		        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
-		        		.setParameter("batchId", batchId).setParameter("configId", configId);
-		        query.executeUpdate();
-		        return 0;
-		        
-			} catch (Exception ex) {
-				System.err.println("updateConfigIdForBatch " + ex.getCause());
-				return 1;
-			}
-		}
-		
-		@Override
-		@Transactional
-		public Integer loadTransactionTranslatedIn(Integer batchId) {
-				try {
-					String sql = ("insert into transactionTranslatedIn (configId, transactionInId) select configId, id from transactionIn where batchId = :batchId and configId is not null;");
-			        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql); 
-			        query.setParameter("batchId", batchId);
-			        query.executeUpdate();
-					return 0;
-				} catch (Exception ex) {
-					System.err.println("loadTransactionTranslatedIn " + ex.getCause());
-					return 1;
-				}
-		}
+            query.setParameter("batchId", batchId);
+
+            if (statusIds.size() > 0) {
+                query.setParameterList("statusIds", statusIds);
+            }
+
+            return (Integer) query.list().get(0);
+        } catch (Exception ex) {
+            System.err.println("getRecordCounts " + ex.getCause());
+            return null;
+        }
+    }
+
+    @Override
+    @Transactional
+    public Integer copyTransactionInStatusToTarget(Integer batchId) {
+        try {
+            String sql = ("UPDATE transactionTarget INNER JOIN transactionIn  ON  transactionIn.id = transactionTarget.transactionInId "
+                    + " and transactionTarget.batchUploadId = :batchId set transactionTarget.statusId = transactionIn.statusId;");
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                    .setParameter("batchId", batchId);
+            query.executeUpdate();
+            return 0;
+        } catch (Exception ex) {
+            System.err.println("copyTransactionInStatusToTarget " + ex.getCause());
+            return 1;
+        }
+    }
+
+    @Override
+    @Transactional
+    public Integer insertLoadData(Integer batchId, String delimChar, String fileWithPath, String loadTableName, boolean containsHeaderRow) {
+        try {
+            String sql = ("LOAD DATA LOCAL INFILE '" + fileWithPath + "' INTO TABLE "
+                    + loadTableName + " fields terminated by '" + delimChar + "' LINES TERMINATED BY '\\n'");
+            if (containsHeaderRow) {
+                sql = sql + "  IGNORE 1 LINES";
+            }
+            sql = sql + ";";
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+            query.executeUpdate();
+            return 0;
+        } catch (Exception ex) {
+            System.err.println("insertLoadData " + ex.getCause());
+            return 1;
+        }
+    }
+
+    @Override
+    @Transactional
+    public Integer createLoadTable(String loadTableName) {
+        try {
+            String sql = ("create TABLE " + loadTableName + "(f1 varchar(255) DEFAULT NULL,  f2 varchar(255) DEFAULT NULL,  f3 varchar(255) DEFAULT NULL,  f4 varchar(255) DEFAULT NULL,  f5 varchar(255) DEFAULT NULL,  f6 varchar(255) DEFAULT NULL,  f7 varchar(255) DEFAULT NULL,  f8 varchar(255) DEFAULT NULL,  f9 varchar(255) DEFAULT NULL,  f10 varchar(255) DEFAULT NULL,  f11 varchar(255) DEFAULT NULL,  f12 varchar(255) DEFAULT NULL,  f13 varchar(255) DEFAULT NULL,  f14 varchar(255) DEFAULT NULL,  f15 varchar(255) DEFAULT NULL,  f16 varchar(255) DEFAULT NULL,  f17 varchar(255) DEFAULT NULL,  f18 varchar(255) DEFAULT NULL,  f19 varchar(255) DEFAULT NULL,  f20 varchar(255) DEFAULT NULL,  f21 varchar(255) DEFAULT NULL,  f22 varchar(255) DEFAULT NULL,  f23 varchar(255) DEFAULT NULL,  f24 varchar(255) DEFAULT NULL,  f25 varchar(255) DEFAULT NULL,  f26 varchar(255) DEFAULT NULL,  f27 varchar(255) DEFAULT NULL,  f28 varchar(255) DEFAULT NULL,  f29 varchar(255) DEFAULT NULL,  f30 varchar(255) DEFAULT NULL,  f31 varchar(255) DEFAULT NULL,  f32 varchar(255) DEFAULT NULL,  f33 varchar(255) DEFAULT NULL,  f34 varchar(255) DEFAULT NULL,  f35 varchar(255) DEFAULT NULL,  f36 varchar(255) DEFAULT NULL,  f37 varchar(255) DEFAULT NULL,  f38 varchar(255) DEFAULT NULL,  f39 varchar(255) DEFAULT NULL,  f40 varchar(255) DEFAULT NULL,  f41 varchar(255) DEFAULT NULL,  f42 varchar(255) DEFAULT NULL,  f43 varchar(255) DEFAULT NULL,  f44 varchar(255) DEFAULT NULL,  f45 varchar(255) DEFAULT NULL,  f46 varchar(255) DEFAULT NULL,  f47 varchar(255) DEFAULT NULL,  f48 varchar(255) DEFAULT NULL,  f49 varchar(255) DEFAULT NULL,  f50 varchar(255) DEFAULT NULL,  f51 varchar(255) DEFAULT NULL,  f52 varchar(255) DEFAULT NULL,  f53 varchar(255) DEFAULT NULL,  f54 varchar(255) DEFAULT NULL,  f55 varchar(255) DEFAULT NULL,  f56 varchar(255) DEFAULT NULL,  f57 varchar(255) DEFAULT NULL,  f58 varchar(255) DEFAULT NULL,  f59 varchar(255) DEFAULT NULL,  f60 varchar(255) DEFAULT NULL,  f61 varchar(255) DEFAULT NULL,  f62 varchar(255) DEFAULT NULL,  f63 varchar(255) DEFAULT NULL,  f64 varchar(255) DEFAULT NULL,  f65 varchar(255) DEFAULT NULL,  f66 varchar(255) DEFAULT NULL,  f67 varchar(255) DEFAULT NULL,  f68 varchar(255) DEFAULT NULL,  f69 varchar(255) DEFAULT NULL,  f70 varchar(255) DEFAULT NULL,  f71 varchar(255) DEFAULT NULL,  f72 varchar(255) DEFAULT NULL,  f73 varchar(255) DEFAULT NULL,  f74 varchar(255) DEFAULT NULL,  f75 varchar(255) DEFAULT NULL,  f76 varchar(255) DEFAULT NULL,  f77 varchar(255) DEFAULT NULL,  f78 varchar(255) DEFAULT NULL,  f79 varchar(255) DEFAULT NULL,  f80 varchar(255) DEFAULT NULL,  f81 varchar(255) DEFAULT NULL,  f82 varchar(255) DEFAULT NULL,  f83 varchar(255) DEFAULT NULL,  f84 varchar(255) DEFAULT NULL,  f85 varchar(255) DEFAULT NULL,  f86 varchar(255) DEFAULT NULL,  f87 varchar(255) DEFAULT NULL,  f88 varchar(255) DEFAULT NULL,  f89 varchar(255) DEFAULT NULL,  f90 varchar(255) DEFAULT NULL,  f91 varchar(255) DEFAULT NULL,  f92 varchar(255) DEFAULT NULL,  f93 varchar(255) DEFAULT NULL,  f94 varchar(255) DEFAULT NULL,  f95 varchar(255) DEFAULT NULL,  f96 varchar(255) DEFAULT NULL,  f97 varchar(255) DEFAULT NULL,  f98 varchar(255) DEFAULT NULL,  f99 varchar(255) DEFAULT NULL,  f100 varchar(255) DEFAULT NULL,  f101 varchar(255) DEFAULT NULL,  f102 varchar(255) DEFAULT NULL,  f103 varchar(255) DEFAULT NULL,  f104 varchar(255) DEFAULT NULL,  f105 varchar(255) DEFAULT NULL,  f106 varchar(255) DEFAULT NULL,  f107 varchar(255) DEFAULT NULL,  f108 varchar(255) DEFAULT NULL,  f109 varchar(255) DEFAULT NULL,  f110 varchar(255) DEFAULT NULL,  f111 varchar(255) DEFAULT NULL,  f112 varchar(255) DEFAULT NULL,  f113 varchar(255) DEFAULT NULL,  f114 varchar(255) DEFAULT NULL,  f115 varchar(255) DEFAULT NULL,  f116 varchar(255) DEFAULT NULL,  f117 varchar(255) DEFAULT NULL,  f118 varchar(255) DEFAULT NULL,  f119 varchar(255) DEFAULT NULL,  f120 varchar(255) DEFAULT NULL,  f121 varchar(255) DEFAULT NULL,  f122 varchar(255) DEFAULT NULL,  f123 varchar(255) DEFAULT NULL,  f124 varchar(255) DEFAULT NULL,  f125 varchar(255) DEFAULT NULL,  f126 varchar(255) DEFAULT NULL,  f127 varchar(255) DEFAULT NULL,  f128 varchar(255) DEFAULT NULL,  f129 varchar(255) DEFAULT NULL,  f130 varchar(255) DEFAULT NULL,  f131 varchar(255) DEFAULT NULL,  f132 varchar(255) DEFAULT NULL,  f133 varchar(255) DEFAULT NULL,  f134 varchar(255) DEFAULT NULL,  f135 varchar(255) DEFAULT NULL,  f136 varchar(255) DEFAULT NULL,  f137 varchar(255) DEFAULT NULL,  f138 varchar(255) DEFAULT NULL,  f139 varchar(255) DEFAULT NULL,  f140 varchar(255) DEFAULT NULL,  f141 varchar(255) DEFAULT NULL,  f142 varchar(255) DEFAULT NULL,  f143 varchar(255) DEFAULT NULL,  f144 varchar(255) DEFAULT NULL,  f145 varchar(255) DEFAULT NULL,  f146 varchar(255) DEFAULT NULL,  f147 varchar(255) DEFAULT NULL,  f148 varchar(255) DEFAULT NULL,  f149 varchar(255) DEFAULT NULL,  f150 varchar(255) DEFAULT NULL,  f151 varchar(255) DEFAULT NULL,  f152 varchar(255) DEFAULT NULL,  f153 varchar(255) DEFAULT NULL,  f154 varchar(255) DEFAULT NULL,  f155 varchar(255) DEFAULT NULL,  f156 varchar(255) DEFAULT NULL,  f157 varchar(255) DEFAULT NULL,  f158 varchar(255) DEFAULT NULL,  f159 varchar(255) DEFAULT NULL,  f160 varchar(255) DEFAULT NULL,  f161 varchar(255) DEFAULT NULL,  f162 varchar(255) DEFAULT NULL,  f163 varchar(255) DEFAULT NULL,  f164 varchar(255) DEFAULT NULL,  f165 varchar(255) DEFAULT NULL,  f166 varchar(255) DEFAULT NULL,  f167 varchar(255) DEFAULT NULL,  f168 varchar(255) DEFAULT NULL,  f169 varchar(255) DEFAULT NULL,  f170 varchar(255) DEFAULT NULL,  f171 varchar(255) DEFAULT NULL,  f172 varchar(255) DEFAULT NULL,  f173 varchar(255) DEFAULT NULL,  f174 varchar(255) DEFAULT NULL,  f175 varchar(255) DEFAULT NULL,  f176 varchar(255) DEFAULT NULL,  f177 varchar(255) DEFAULT NULL,  f178 varchar(255) DEFAULT NULL,  f179 varchar(255) DEFAULT NULL,  f180 varchar(255) DEFAULT NULL,  f181 varchar(255) DEFAULT NULL,  f182 varchar(255) DEFAULT NULL,  f183 varchar(255) DEFAULT NULL,  f184 varchar(255) DEFAULT NULL,  f185 varchar(255) DEFAULT NULL,  f186 varchar(255) DEFAULT NULL,  f187 varchar(255) DEFAULT NULL,  f188 varchar(255) DEFAULT NULL,  f189 varchar(255) DEFAULT NULL,  f190 varchar(255) DEFAULT NULL,  f191 varchar(255) DEFAULT NULL,  f192 varchar(255) DEFAULT NULL,  f193 varchar(255) DEFAULT NULL,  f194 varchar(255) DEFAULT NULL,  f195 varchar(255) DEFAULT NULL,  f196 varchar(255) DEFAULT NULL,  f197 varchar(255) DEFAULT NULL,  f198 varchar(255) DEFAULT NULL,  f199 varchar(255) DEFAULT NULL,  f200 varchar(255) DEFAULT NULL,  f201 varchar(255) DEFAULT NULL,  f202 varchar(255) DEFAULT NULL,  f203 varchar(255) DEFAULT NULL,  f204 varchar(255) DEFAULT NULL,  f205 varchar(255) DEFAULT NULL,  f206 varchar(255) DEFAULT NULL,  f207 varchar(255) DEFAULT NULL,  f208 varchar(255) DEFAULT NULL,  f209 varchar(255) DEFAULT NULL,  f210 varchar(255) DEFAULT NULL,  f211 varchar(255) DEFAULT NULL,  f212 varchar(255) DEFAULT NULL,  f213 varchar(255) DEFAULT NULL,  f214 varchar(255) DEFAULT NULL,  f215 varchar(255) DEFAULT NULL,  f216 varchar(255) DEFAULT NULL,  f217 varchar(255) DEFAULT NULL,  f218 varchar(255) DEFAULT NULL,  f219 varchar(255) DEFAULT NULL,  f220 varchar(255) DEFAULT NULL,  f221 varchar(255) DEFAULT NULL,  f222 varchar(255) DEFAULT NULL,  f223 varchar(255) DEFAULT NULL,  f224 varchar(255) DEFAULT NULL,  f225 varchar(255) DEFAULT NULL,  f226 varchar(255) DEFAULT NULL,  f227 varchar(255) DEFAULT NULL,  f228 varchar(255) DEFAULT NULL,  f229 varchar(255) DEFAULT NULL,  f230 varchar(255) DEFAULT NULL,  f231 varchar(255) DEFAULT NULL,  f232 varchar(255) DEFAULT NULL,  f233 varchar(255) DEFAULT NULL,  f234 varchar(255) DEFAULT NULL,  f235 varchar(255) DEFAULT NULL,  f236 varchar(255) DEFAULT NULL,  f237 varchar(255) DEFAULT NULL,  f238 varchar(255) DEFAULT NULL,  f239 varchar(255) DEFAULT NULL,  f240 varchar(255) DEFAULT NULL,  f241 varchar(255) DEFAULT NULL,  f242 varchar(255) DEFAULT NULL,  f243 varchar(255) DEFAULT NULL,  f244 varchar(255) DEFAULT NULL,  f245 varchar(255) DEFAULT NULL,  f246 varchar(255) DEFAULT NULL,  f247 varchar(255) DEFAULT NULL,  f248 varchar(255) DEFAULT NULL,  f249 varchar(255) DEFAULT NULL,  f250 varchar(255) DEFAULT NULL,  f251 varchar(255) DEFAULT NULL,  f252 varchar(255) DEFAULT NULL,  f253 varchar(255) DEFAULT NULL,  f254 varchar(255) DEFAULT NULL,  f255 varchar(255) DEFAULT NULL,  batchId int(11),  loadTableId varchar(45) ,  id int(11) NOT NULL AUTO_INCREMENT,  PRIMARY KEY (id)) ENGINE=InnoDB AUTO_INCREMENT=1038 DEFAULT CHARSET=latin1;");
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+            query.executeUpdate();
+            return 0;
+        } catch (Exception ex) {
+            System.err.println("createLoadTable " + ex.getCause());
+            return 1;
+        }
+    }
+
+    @Override
+    @Transactional
+    public Integer dropLoadTable(String loadTableName) {
+        try {
+            String sql = ("drop TABLE if exists " + loadTableName + ";");
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+            query.executeUpdate();
+            return 0;
+        } catch (Exception ex) {
+            System.err.println("dropLoadTable " + ex.getCause());
+            return 1;
+        }
+    }
+
+    @Override
+    @Transactional
+    public Integer updateLoadTable(String loadTableName, Integer batchId) {
+        try {
+            String sql = ("update " + loadTableName + " set batchId = :batchId, loadTableId = concat('" + loadTableName + "_', id);");
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+            query.setParameter("batchId", batchId);
+            query.executeUpdate();
+            return 0;
+        } catch (Exception ex) {
+            System.err.println("updateLoadTable " + ex.getCause());
+            return 1;
+        }
+    }
+
+    @Override
+    @Transactional
+    public Integer loadTransactionIn(String loadTableName, Integer batchId) {
+        try {
+            String sql = ("insert into transactionIn (batchId, statusId, loadTableId) "
+                    + " select :batchId, 11, loadTableId from " + loadTableName + ";");
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+            query.setParameter("batchId", batchId);
+            query.executeUpdate();
+            return 0;
+        } catch (Exception ex) {
+            System.err.println("loadTransactionIn " + ex.getCause());
+            return 1;
+        }
+    }
+
+    @Override
+    @Transactional
+    public Integer loadTransactionInRecords(Integer batchId) {
+        try {
+            String sql = ("insert into transactionInRecords (transactionInId, loadTableId) select id, loadTableId from transactionIn where batchId = :batchId");
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+            query.setParameter("batchId", batchId);
+            query.executeUpdate();
+            return 0;
+        } catch (Exception ex) {
+            System.err.println("loadTransactionInRecords " + ex.getCause());
+            return 1;
+        }
+    }
+
+    @Override
+    @Transactional
+    public Integer loadTransactionInRecordsData(String loadTableName) {
+        try {
+            String sql = ("UPDATE transactionInRecords "
+                    + "	INNER JOIN " + loadTableName + " loadTableTemp ON "
+                    + "transactionInRecords.loadTableId = loadTableTemp.loadTableId "
+                    + "set  transactionInRecords.F1 = loadTableTemp.F1, "
+                    + "transactionInRecords.F2 = loadTableTemp.F2, "
+                    + "transactionInRecords.F3 = loadTableTemp.F3, "
+                    + "transactionInRecords.F4 = loadTableTemp.F4, "
+                    + "transactionInRecords.F5 = loadTableTemp.F5, "
+                    + "transactionInRecords.F6 = loadTableTemp.F6, "
+                    + "transactionInRecords.F7 = loadTableTemp.F7, "
+                    + "transactionInRecords.F8 = loadTableTemp.F8, "
+                    + "transactionInRecords.F9 = loadTableTemp.F9, "
+                    + "transactionInRecords.F10 = loadTableTemp.F10, "
+                    + "transactionInRecords.F11 = loadTableTemp.F11, "
+                    + "transactionInRecords.F12 = loadTableTemp.F12, "
+                    + "transactionInRecords.F13 = loadTableTemp.F13, "
+                    + "transactionInRecords.F14 = loadTableTemp.F14, "
+                    + "transactionInRecords.F15 = loadTableTemp.F15, "
+                    + "transactionInRecords.F16 = loadTableTemp.F16, "
+                    + "transactionInRecords.F17 = loadTableTemp.F17, "
+                    + "transactionInRecords.F18 = loadTableTemp.F18, "
+                    + "transactionInRecords.F19 = loadTableTemp.F19, "
+                    + "transactionInRecords.F20 = loadTableTemp.F20, "
+                    + "transactionInRecords.F21 = loadTableTemp.F21, "
+                    + "transactionInRecords.F22 = loadTableTemp.F22, "
+                    + "transactionInRecords.F23 = loadTableTemp.F23, "
+                    + "transactionInRecords.F24 = loadTableTemp.F24, "
+                    + "transactionInRecords.F25 = loadTableTemp.F25, "
+                    + "transactionInRecords.F26 = loadTableTemp.F26, "
+                    + "transactionInRecords.F27 = loadTableTemp.F27, "
+                    + "transactionInRecords.F28 = loadTableTemp.F28, "
+                    + "transactionInRecords.F29 = loadTableTemp.F29, "
+                    + "transactionInRecords.F30 = loadTableTemp.F30, "
+                    + "transactionInRecords.F31 = loadTableTemp.F31, "
+                    + "transactionInRecords.F32 = loadTableTemp.F32, "
+                    + "transactionInRecords.F33 = loadTableTemp.F33, "
+                    + "transactionInRecords.F34 = loadTableTemp.F34, "
+                    + "transactionInRecords.F35 = loadTableTemp.F35, "
+                    + "transactionInRecords.F36 = loadTableTemp.F36, "
+                    + "transactionInRecords.F37 = loadTableTemp.F37, "
+                    + "transactionInRecords.F38 = loadTableTemp.F38, "
+                    + "transactionInRecords.F39 = loadTableTemp.F39, "
+                    + "transactionInRecords.F40 = loadTableTemp.F40, "
+                    + "transactionInRecords.F41 = loadTableTemp.F41, "
+                    + "transactionInRecords.F42 = loadTableTemp.F42, "
+                    + "transactionInRecords.F43 = loadTableTemp.F43, "
+                    + "transactionInRecords.F44 = loadTableTemp.F44, "
+                    + "transactionInRecords.F45 = loadTableTemp.F45, "
+                    + "transactionInRecords.F46 = loadTableTemp.F46, "
+                    + "transactionInRecords.F47 = loadTableTemp.F47, "
+                    + "transactionInRecords.F48 = loadTableTemp.F48, "
+                    + "transactionInRecords.F49 = loadTableTemp.F49, "
+                    + "transactionInRecords.F50 = loadTableTemp.F50, "
+                    + "transactionInRecords.F51 = loadTableTemp.F51, "
+                    + "transactionInRecords.F52 = loadTableTemp.F52, "
+                    + "transactionInRecords.F53 = loadTableTemp.F53, "
+                    + "transactionInRecords.F54 = loadTableTemp.F54, "
+                    + "transactionInRecords.F55 = loadTableTemp.F55, "
+                    + "transactionInRecords.F56 = loadTableTemp.F56, "
+                    + "transactionInRecords.F57 = loadTableTemp.F57, "
+                    + "transactionInRecords.F58 = loadTableTemp.F58, "
+                    + "transactionInRecords.F59 = loadTableTemp.F59, "
+                    + "transactionInRecords.F60 = loadTableTemp.F60, "
+                    + "transactionInRecords.F61 = loadTableTemp.F61, "
+                    + "transactionInRecords.F62 = loadTableTemp.F62, "
+                    + "transactionInRecords.F63 = loadTableTemp.F63, "
+                    + "transactionInRecords.F64 = loadTableTemp.F64, "
+                    + "transactionInRecords.F65 = loadTableTemp.F65, "
+                    + "transactionInRecords.F66 = loadTableTemp.F66, "
+                    + "transactionInRecords.F67 = loadTableTemp.F67, "
+                    + "transactionInRecords.F68 = loadTableTemp.F68, "
+                    + "transactionInRecords.F69 = loadTableTemp.F69, "
+                    + "transactionInRecords.F70 = loadTableTemp.F70, "
+                    + "transactionInRecords.F71 = loadTableTemp.F71, "
+                    + "transactionInRecords.F72 = loadTableTemp.F72, "
+                    + "transactionInRecords.F73 = loadTableTemp.F73, "
+                    + "transactionInRecords.F74 = loadTableTemp.F74, "
+                    + "transactionInRecords.F75 = loadTableTemp.F75, "
+                    + "transactionInRecords.F76 = loadTableTemp.F76, "
+                    + "transactionInRecords.F77 = loadTableTemp.F77, "
+                    + "transactionInRecords.F78 = loadTableTemp.F78, "
+                    + "transactionInRecords.F79 = loadTableTemp.F79, "
+                    + "transactionInRecords.F80 = loadTableTemp.F80, "
+                    + "transactionInRecords.F81 = loadTableTemp.F81, "
+                    + "transactionInRecords.F82 = loadTableTemp.F82, "
+                    + "transactionInRecords.F83 = loadTableTemp.F83, "
+                    + "transactionInRecords.F84 = loadTableTemp.F84, "
+                    + "transactionInRecords.F85 = loadTableTemp.F85, "
+                    + "transactionInRecords.F86 = loadTableTemp.F86, "
+                    + "transactionInRecords.F87 = loadTableTemp.F87, "
+                    + "transactionInRecords.F88 = loadTableTemp.F88, "
+                    + "transactionInRecords.F89 = loadTableTemp.F89, "
+                    + "transactionInRecords.F90 = loadTableTemp.F90, "
+                    + "transactionInRecords.F91 = loadTableTemp.F91, "
+                    + "transactionInRecords.F92 = loadTableTemp.F92, "
+                    + "transactionInRecords.F93 = loadTableTemp.F93, "
+                    + "transactionInRecords.F94 = loadTableTemp.F94, "
+                    + "transactionInRecords.F95 = loadTableTemp.F95, "
+                    + "transactionInRecords.F96 = loadTableTemp.F96, "
+                    + "transactionInRecords.F97 = loadTableTemp.F97, "
+                    + "transactionInRecords.F98 = loadTableTemp.F98, "
+                    + "transactionInRecords.F99 = loadTableTemp.F99, "
+                    + "transactionInRecords.F100 = loadTableTemp.F100, "
+                    + "transactionInRecords.F101 = loadTableTemp.F101, "
+                    + "transactionInRecords.F102 = loadTableTemp.F102, "
+                    + "transactionInRecords.F103 = loadTableTemp.F103, "
+                    + "transactionInRecords.F104 = loadTableTemp.F104, "
+                    + "transactionInRecords.F105 = loadTableTemp.F105, "
+                    + "transactionInRecords.F106 = loadTableTemp.F106, "
+                    + "transactionInRecords.F107 = loadTableTemp.F107, "
+                    + "transactionInRecords.F108 = loadTableTemp.F108, "
+                    + "transactionInRecords.F109 = loadTableTemp.F109, "
+                    + "transactionInRecords.F110 = loadTableTemp.F110, "
+                    + "transactionInRecords.F111 = loadTableTemp.F111, "
+                    + "transactionInRecords.F112 = loadTableTemp.F112, "
+                    + "transactionInRecords.F113 = loadTableTemp.F113, "
+                    + "transactionInRecords.F114 = loadTableTemp.F114, "
+                    + "transactionInRecords.F115 = loadTableTemp.F115, "
+                    + "transactionInRecords.F116 = loadTableTemp.F116, "
+                    + "transactionInRecords.F117 = loadTableTemp.F117, "
+                    + "transactionInRecords.F118 = loadTableTemp.F118, "
+                    + "transactionInRecords.F119 = loadTableTemp.F119, "
+                    + "transactionInRecords.F120 = loadTableTemp.F120, "
+                    + "transactionInRecords.F121 = loadTableTemp.F121, "
+                    + "transactionInRecords.F122 = loadTableTemp.F122, "
+                    + "transactionInRecords.F123 = loadTableTemp.F123, "
+                    + "transactionInRecords.F124 = loadTableTemp.F124, "
+                    + "transactionInRecords.F125 = loadTableTemp.F125, "
+                    + "transactionInRecords.F126 = loadTableTemp.F126, "
+                    + "transactionInRecords.F127 = loadTableTemp.F127, "
+                    + "transactionInRecords.F128 = loadTableTemp.F128, "
+                    + "transactionInRecords.F129 = loadTableTemp.F129, "
+                    + "transactionInRecords.F130 = loadTableTemp.F130, "
+                    + "transactionInRecords.F131 = loadTableTemp.F131, "
+                    + "transactionInRecords.F132 = loadTableTemp.F132, "
+                    + "transactionInRecords.F133 = loadTableTemp.F133, "
+                    + "transactionInRecords.F134 = loadTableTemp.F134, "
+                    + "transactionInRecords.F135 = loadTableTemp.F135, "
+                    + "transactionInRecords.F136 = loadTableTemp.F136, "
+                    + "transactionInRecords.F137 = loadTableTemp.F137, "
+                    + "transactionInRecords.F138 = loadTableTemp.F138, "
+                    + "transactionInRecords.F139 = loadTableTemp.F139, "
+                    + "transactionInRecords.F140 = loadTableTemp.F140, "
+                    + "transactionInRecords.F141 = loadTableTemp.F141, "
+                    + "transactionInRecords.F142 = loadTableTemp.F142, "
+                    + "transactionInRecords.F143 = loadTableTemp.F143, "
+                    + "transactionInRecords.F144 = loadTableTemp.F144, "
+                    + "transactionInRecords.F145 = loadTableTemp.F145, "
+                    + "transactionInRecords.F146 = loadTableTemp.F146, "
+                    + "transactionInRecords.F147 = loadTableTemp.F147, "
+                    + "transactionInRecords.F148 = loadTableTemp.F148, "
+                    + "transactionInRecords.F149 = loadTableTemp.F149, "
+                    + "transactionInRecords.F150 = loadTableTemp.F150, "
+                    + "transactionInRecords.F151 = loadTableTemp.F151, "
+                    + "transactionInRecords.F152 = loadTableTemp.F152, "
+                    + "transactionInRecords.F153 = loadTableTemp.F153, "
+                    + "transactionInRecords.F154 = loadTableTemp.F154, "
+                    + "transactionInRecords.F155 = loadTableTemp.F155, "
+                    + "transactionInRecords.F156 = loadTableTemp.F156, "
+                    + "transactionInRecords.F157 = loadTableTemp.F157, "
+                    + "transactionInRecords.F158 = loadTableTemp.F158, "
+                    + "transactionInRecords.F159 = loadTableTemp.F159, "
+                    + "transactionInRecords.F160 = loadTableTemp.F160, "
+                    + "transactionInRecords.F161 = loadTableTemp.F161, "
+                    + "transactionInRecords.F162 = loadTableTemp.F162, "
+                    + "transactionInRecords.F163 = loadTableTemp.F163, "
+                    + "transactionInRecords.F164 = loadTableTemp.F164, "
+                    + "transactionInRecords.F165 = loadTableTemp.F165, "
+                    + "transactionInRecords.F166 = loadTableTemp.F166, "
+                    + "transactionInRecords.F167 = loadTableTemp.F167, "
+                    + "transactionInRecords.F168 = loadTableTemp.F168, "
+                    + "transactionInRecords.F169 = loadTableTemp.F169, "
+                    + "transactionInRecords.F170 = loadTableTemp.F170, "
+                    + "transactionInRecords.F171 = loadTableTemp.F171, "
+                    + "transactionInRecords.F172 = loadTableTemp.F172, "
+                    + "transactionInRecords.F173 = loadTableTemp.F173, "
+                    + "transactionInRecords.F174 = loadTableTemp.F174, "
+                    + "transactionInRecords.F175 = loadTableTemp.F175, "
+                    + "transactionInRecords.F176 = loadTableTemp.F176, "
+                    + "transactionInRecords.F177 = loadTableTemp.F177, "
+                    + "transactionInRecords.F178 = loadTableTemp.F178, "
+                    + "transactionInRecords.F179 = loadTableTemp.F179, "
+                    + "transactionInRecords.F180 = loadTableTemp.F180, "
+                    + "transactionInRecords.F181 = loadTableTemp.F181, "
+                    + "transactionInRecords.F182 = loadTableTemp.F182, "
+                    + "transactionInRecords.F183 = loadTableTemp.F183, "
+                    + "transactionInRecords.F184 = loadTableTemp.F184, "
+                    + "transactionInRecords.F185 = loadTableTemp.F185, "
+                    + "transactionInRecords.F186 = loadTableTemp.F186, "
+                    + "transactionInRecords.F187 = loadTableTemp.F187, "
+                    + "transactionInRecords.F188 = loadTableTemp.F188, "
+                    + "transactionInRecords.F189 = loadTableTemp.F189, "
+                    + "transactionInRecords.F190 = loadTableTemp.F190, "
+                    + "transactionInRecords.F191 = loadTableTemp.F191, "
+                    + "transactionInRecords.F192 = loadTableTemp.F192, "
+                    + "transactionInRecords.F193 = loadTableTemp.F193, "
+                    + "transactionInRecords.F194 = loadTableTemp.F194, "
+                    + "transactionInRecords.F195 = loadTableTemp.F195, "
+                    + "transactionInRecords.F196 = loadTableTemp.F196, "
+                    + "transactionInRecords.F197 = loadTableTemp.F197, "
+                    + "transactionInRecords.F198 = loadTableTemp.F198, "
+                    + "transactionInRecords.F199 = loadTableTemp.F199, "
+                    + "transactionInRecords.F200 = loadTableTemp.F200, "
+                    + "transactionInRecords.F201 = loadTableTemp.F201, "
+                    + "transactionInRecords.F202 = loadTableTemp.F202, "
+                    + "transactionInRecords.F203 = loadTableTemp.F203, "
+                    + "transactionInRecords.F204 = loadTableTemp.F204, "
+                    + "transactionInRecords.F205 = loadTableTemp.F205, "
+                    + "transactionInRecords.F206 = loadTableTemp.F206, "
+                    + "transactionInRecords.F207 = loadTableTemp.F207, "
+                    + "transactionInRecords.F208 = loadTableTemp.F208, "
+                    + "transactionInRecords.F209 = loadTableTemp.F209, "
+                    + "transactionInRecords.F210 = loadTableTemp.F210, "
+                    + "transactionInRecords.F211 = loadTableTemp.F211, "
+                    + "transactionInRecords.F212 = loadTableTemp.F212, "
+                    + "transactionInRecords.F213 = loadTableTemp.F213, "
+                    + "transactionInRecords.F214 = loadTableTemp.F214, "
+                    + "transactionInRecords.F215 = loadTableTemp.F215, "
+                    + "transactionInRecords.F216 = loadTableTemp.F216, "
+                    + "transactionInRecords.F217 = loadTableTemp.F217, "
+                    + "transactionInRecords.F218 = loadTableTemp.F218, "
+                    + "transactionInRecords.F219 = loadTableTemp.F219, "
+                    + "transactionInRecords.F220 = loadTableTemp.F220, "
+                    + "transactionInRecords.F221 = loadTableTemp.F221, "
+                    + "transactionInRecords.F222 = loadTableTemp.F222, "
+                    + "transactionInRecords.F223 = loadTableTemp.F223, "
+                    + "transactionInRecords.F224 = loadTableTemp.F224, "
+                    + "transactionInRecords.F225 = loadTableTemp.F225, "
+                    + "transactionInRecords.F226 = loadTableTemp.F226, "
+                    + "transactionInRecords.F227 = loadTableTemp.F227, "
+                    + "transactionInRecords.F228 = loadTableTemp.F228, "
+                    + "transactionInRecords.F229 = loadTableTemp.F229, "
+                    + "transactionInRecords.F230 = loadTableTemp.F230, "
+                    + "transactionInRecords.F231 = loadTableTemp.F231, "
+                    + "transactionInRecords.F232 = loadTableTemp.F232, "
+                    + "transactionInRecords.F233 = loadTableTemp.F233, "
+                    + "transactionInRecords.F234 = loadTableTemp.F234, "
+                    + "transactionInRecords.F235 = loadTableTemp.F235, "
+                    + "transactionInRecords.F236 = loadTableTemp.F236, "
+                    + "transactionInRecords.F237 = loadTableTemp.F237, "
+                    + "transactionInRecords.F238 = loadTableTemp.F238, "
+                    + "transactionInRecords.F239 = loadTableTemp.F239, "
+                    + "transactionInRecords.F240 = loadTableTemp.F240, "
+                    + "transactionInRecords.F241 = loadTableTemp.F241, "
+                    + "transactionInRecords.F242 = loadTableTemp.F242, "
+                    + "transactionInRecords.F243 = loadTableTemp.F243, "
+                    + "transactionInRecords.F244 = loadTableTemp.F244, "
+                    + "transactionInRecords.F245 = loadTableTemp.F245, "
+                    + "transactionInRecords.F246 = loadTableTemp.F246, "
+                    + "transactionInRecords.F247 = loadTableTemp.F247, "
+                    + "transactionInRecords.F248 = loadTableTemp.F248, "
+                    + "transactionInRecords.F249 = loadTableTemp.F249, "
+                    + "transactionInRecords.F250 = loadTableTemp.F250, "
+                    + "transactionInRecords.F251 = loadTableTemp.F251, "
+                    + "transactionInRecords.F252 = loadTableTemp.F252, "
+                    + "transactionInRecords.F253 = loadTableTemp.F253, "
+                    + "transactionInRecords.F254 = loadTableTemp.F254, "
+                    + "transactionInRecords.F255 = loadTableTemp.F255;");
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+            query.executeUpdate();
+            return 0;
+        } catch (Exception ex) {
+            System.err.println("loadTransactionInRecordsData " + ex.getCause());
+            return 1;
+        }
+    }
+
+    @Override
+    @Transactional
+    public Integer updateConfigIdForBatch(Integer batchId, Integer configId) {
+        try {
+
+            String sql = ("update transactionIn set configId = :configId where batchId = :batchId");
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                    .setParameter("batchId", batchId).setParameter("configId", configId);
+            query.executeUpdate();
+            return 0;
+
+        } catch (Exception ex) {
+            System.err.println("updateConfigIdForBatch " + ex.getCause());
+            return 1;
+        }
+    }
+
+    @Override
+    @Transactional
+    public Integer loadTransactionTranslatedIn(Integer batchId) {
+        try {
+            String sql = ("insert into transactionTranslatedIn (configId, transactionInId) select configId, id from transactionIn where batchId = :batchId and configId is not null;");
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+            query.setParameter("batchId", batchId);
+            query.executeUpdate();
+            return 0;
+        } catch (Exception ex) {
+            System.err.println("loadTransactionTranslatedIn " + ex.getCause());
+            return 1;
+        }
+    }
 
 		@Override
 		@Transactional
 		public Integer insertBatchUploadSummary(batchUploads batch, configurationConnection batchTargets) {
 			try {
 				String sql = ("insert into batchuploadsummary (batchId, transactionInId, sourceOrgId, targetOrgId, messageTypeId, sourceConfigId)"
-						+ " select " + batch.getId() +", transactionInId, "+ batch.getOrgId() +", "
+						+ " abc select " + batch.getId() +", transactionInId, "+ batch.getOrgId() +", "
 						+ " configurations.orgId, messageTypeId, "+ batchTargets.getsourceConfigId() 
 						+" from transactionTarget, configurations where configurations.id = :targetConfigId "
 						+ "and transactionInId in (select id from transactionIn where configId = :sourceConfigId and batchId = :batchId) "
@@ -2675,57 +2660,57 @@ public class transactionInDAOImpl implements transactionInDAO {
 			}
 		}
 
-		@Override
-		@Transactional
-		public Integer insertBatchTargets (Integer batchId, configurationConnection batchTargets){
-			// TODO Auto-generated method stub
-			try {
-				String sql = ("INSERT INTO transactionTarget (batchUploadId, transactionInId, "
-						+ " configId, statusId) select " + batchId + ", id, " 
-						+ batchTargets.gettargetConfigId()+ ",9 from transactionIn where configId = :configId and "
-						+ "batchId = :batchId");
-		        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql); 
-		        query.setParameter("batchId", batchId);
-		        query.setParameter("configId", batchTargets.getsourceConfigId());
-		        query.executeUpdate();
-				return 0;
-			} catch (Exception ex) {
-				System.err.println("insertBatchTargets " + ex.getCause());
-				return 1;
-			}
-		}
+    @Override
+    @Transactional
+    public Integer insertBatchTargets(Integer batchId, configurationConnection batchTargets) {
+        // TODO Auto-generated method stub
+        try {
+            String sql = ("INSERT INTO transactionTarget (batchUploadId, transactionInId, "
+                    + " configId, statusId) select " + batchId + ", id, "
+                    + batchTargets.gettargetConfigId() + ",9 from transactionIn where configId = :configId and "
+                    + "batchId = :batchId");
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+            query.setParameter("batchId", batchId);
+            query.setParameter("configId", batchTargets.getsourceConfigId());
+            query.executeUpdate();
+            return 0;
+        } catch (Exception ex) {
+            System.err.println("insertBatchTargets " + ex.getCause());
+            return 1;
+        }
+    }
 
-		@Override
-		@Transactional
-		@SuppressWarnings("unchecked")
-		public List<configurationConnection> getBatchTargets(Integer batchId) {
-			try {
-				String sql = ("select sourceConfigId, targetConfigId, id from configurationconnections "
-						+ " where sourceconfigId in (select configId from transactionIn where "
-						+ " batchId = :batchId);");
-		        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
-                        Transformers.aliasToBean(configurationConnection.class)); 
-		        query.setParameter("batchId", batchId);
-		       
-				List<configurationConnection> cc = query.list();
-				return cc;
-			} catch (Exception ex) {
-				System.err.println("getBatchTargets " + ex.getCause());
-				return null;
-			}
-		}
+    @Override
+    @Transactional
+    @SuppressWarnings("unchecked")
+    public List<configurationConnection> getBatchTargets(Integer batchId) {
+        try {
+            String sql = ("select sourceConfigId, targetConfigId, id from configurationconnections "
+                    + " where sourceconfigId in (select configId from transactionIn where "
+                    + " batchId = :batchId);");
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
+                    Transformers.aliasToBean(configurationConnection.class));
+            query.setParameter("batchId", batchId);
 
-		@Override
-		@Transactional
-		public Integer clearBatchUploadSummary(Integer batchId) {
-			String sql = "delete from BatchUploadSummary where batchId = :batchId ";
-	        try {
-	        	Query deleteTable = sessionFactory.getCurrentSession().createSQLQuery(sql).setParameter("batchId", batchId);
-	  	       	deleteTable.executeUpdate();
-	            return 0;
-	        } catch (Exception ex) {
-	        	System.err.println("clearBatchUploadSummary " + ex.getCause().getMessage());
-	        	return 1;
+            List<configurationConnection> cc = query.list();
+            return cc;
+        } catch (Exception ex) {
+            System.err.println("getBatchTargets " + ex.getCause());
+            return null;
+        }
+    }
+
+    @Override
+    @Transactional
+    public Integer clearBatchUploadSummary(Integer batchId) {
+        String sql = "delete from BatchUploadSummary where batchId = :batchId ";
+        try {
+            Query deleteTable = sessionFactory.getCurrentSession().createSQLQuery(sql).setParameter("batchId", batchId);
+            deleteTable.executeUpdate();
+            return 0;
+        } catch (Exception ex) {
+            System.err.println("clearBatchUploadSummary " + ex.getCause().getMessage());
+            return 1;
 
 	        }
 		}

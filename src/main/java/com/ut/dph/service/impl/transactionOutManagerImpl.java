@@ -359,6 +359,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                     apply to scheduled and not continous settings. */
                                     if(transportDetails.gettransportMethodId() == 1) {
                                         transactionOutDAO.updateBatchStatus(batchId, 23);
+                                        transactionInManager.updateBatchStatus(transaction.getbatchUploadId(), 23, "");
                                     }
                                     /* If FTP Call the FTP Method */
                                     else if(transportDetails.gettransportMethodId() == 3) {
@@ -628,6 +629,16 @@ public class transactionOutManagerImpl implements transactionOutManager {
                             apply to scheduled and not continous settings. */
                             if(transportDetails.gettransportMethodId() == 1) {
                                 transactionOutDAO.updateBatchStatus(batchId, 23);
+                                
+                                /* Need to find the batch Upload Id */
+                                List<transactionTarget> targets = transactionOutDAO.getTransactionsByBatchDLId(batchId);
+                               
+                                if(!targets.isEmpty()) {
+                                    for(transactionTarget target : targets) {
+                                        transactionInManager.updateBatchStatus(target.getbatchUploadId(), 23, "");
+                                    }
+                                }
+                                
                             }
                             /* If FTP Call the FTP Method */
                             else if(transportDetails.gettransportMethodId() == 3) {
@@ -1199,6 +1210,12 @@ public class transactionOutManagerImpl implements transactionOutManager {
         transactionOutDAO.updateLastDownloaded(batchId);
     }
     
+    @Override
+    @Transactional
+    public List<transactionTarget> getTransactionsByBatchDLId(int batchDLId) {
+        return transactionOutDAO.getTransactionsByBatchDLId(batchDLId);
+    }
+    
     /**
      * The 'FTPTargetFile' function will get the FTP details and send off the generated file
      * 
@@ -1208,6 +1225,12 @@ public class transactionOutManagerImpl implements transactionOutManager {
         
         /* Update the status of the batch to locked */
         transactionOutDAO.updateBatchStatus(batchId, 22);
+    }
+    
+    @Override
+    @Transactional
+    public void cancelMessageTransaction(int transactionId, int transactionInId) {
+        transactionOutDAO.cancelMessageTransaction(transactionId, transactionInId);
     }
     
     

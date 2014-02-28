@@ -88,10 +88,10 @@ require(['./main'], function () {
 
         //This function will handle removing an existing note
         $(document).on('click', '.removeNote', function() {
+            
             var confirmed = confirm("Are you sure you want to remove this note?");
 
             if(confirmed) {
-
                 var noteId = $(this).attr('rel');
 
                 $.ajax({
@@ -102,7 +102,27 @@ require(['./main'], function () {
                        $('#noteRow-'+noteId).remove();
                     }
                 });
+            }
+        });
+        
+        //This function will handle canceling a message
+        $(document).on('click','.cancelMessage', function() {
+           
+            var confirmed = confirm("Are you sure you want to cancel this message?");
 
+            if(confirmed) {
+                
+                var transactionId = $('#transactionId').val();
+
+                $.ajax({
+                    url: '/Health-e-Web/cancelMessage.do',
+                    type: 'POST',
+                    data: {'transactionId': transactionId},
+                    success: function(data) {
+                       //send the user back to the sent items box.
+                       window.location.href='/Health-e-Web/sent';
+                    }
+                });
             }
         });
     });
@@ -114,13 +134,13 @@ function _RedirectToDetails() {
 
 function populateExistingAttachments() {
     var transactionId = $('#transactionId').val();
-    var transactionInId = $('#transactionInId').val();
+    var sentTransactionId = $('#sentTransactionId').val();
     var currentIdList = $('#attachmentIds').val();
     
     //If viewing an inbox transaction need to get attachments
     //for the orginating transaction=
-    if(transactionInId > 0) {
-        transactionId = transactionInId;
+    if(sentTransactionId > 0) {
+        transactionId = sentTransactionId;
     }
     
     $.ajax({

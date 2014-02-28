@@ -59,7 +59,7 @@
                                                     <span class="glyphicon glyphicon-edit"></span>
                                                     Edit	
                                                 </a>
-                                                <a href="<c:url value="/downloadFile.do?filename=${brochure.fileName}&foldername=brochures&orgId=${brochure.orgId}"/>"  class="media-modal" title="Download this brochure">
+                                                <a href="<c:url value="/FileDownload/downloadFile.do?filename=${brochure.fileName}&foldername=brochures&orgId=${brochure.orgId}"/>"  class="media-modal" title="Download this brochure">
                                                     <span class="glyphicon glyphicon-edit"></span>
                                                     View	
                                                 </a>
