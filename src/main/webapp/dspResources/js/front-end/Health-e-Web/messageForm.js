@@ -200,12 +200,33 @@ require(['./main'], function () {
                     type: 'POST',
                     data: {'transactionId': transactionId},
                     success: function(data) {
-                       //send the user back to the sent items box.
+                       //send the user back to the pending items box.
                        window.location.href='/Health-e-Web/pending';
                     }
                 });
             }
             
+        });
+        
+        //This function will handle canceling a message
+        $(document).on('click','.cancelMessage', function() {
+           
+            var confirmed = confirm("Are you sure you want to cancel this message?");
+
+            if(confirmed) {
+                
+                var transactionId = $('#transactionId').val();
+                
+                $.ajax({
+                    url: '/Health-e-Web/cancelMessage.do',
+                    type: 'POST',
+                    data: {'transactionId': transactionId, 'sent': false},
+                    success: function(data) {
+                       //send the user back to the pending items box.
+                       window.location.href='/Health-e-Web/pending';
+                    }
+                });
+            }
         });
         
         

@@ -1530,4 +1530,11 @@ public class transactionInManagerImpl implements transactionInManager {
         transactionInDAO.deleteMessage(batchId, transactionId);
     }
     
+    @Override
+    public void cancelMessageTransaction(int transactionId) throws Exception {
+        transactionInDAO.cancelMessageTransaction(transactionId);
+    }
+    
+    
+    
 }

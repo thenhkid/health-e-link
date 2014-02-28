@@ -192,4 +192,6 @@ public interface transactionInDAO {
     List<batchUploads> getBatchesByStatusIds (List <Integer> statusIds);
     
     void deleteMessage(int batchId, int transactionId) throws Exception;
+    
+    void cancelMessageTransaction(int transactionId) throws Exception;
 }

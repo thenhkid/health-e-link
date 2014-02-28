@@ -2779,4 +2779,40 @@ public class transactionInDAOImpl implements transactionInDAO {
         
     }
 
+    
+    /**
+     * The 'cancelMessageTransaction' function will cancel the message.
+     * 
+     * @param transactionId The selected message to be canceled
+     */
+    @Override
+    @Transactional
+    public void cancelMessageTransaction(int transactionId) throws Exception {
+        
+        /* Update the transactionTarget status */
+        String targetSQL = "update transactionTarget set statusId = :statusId ";
+        targetSQL = targetSQL + " where transactionInId = :transactionId ";
+        Query updateTargetData = sessionFactory.getCurrentSession().createSQLQuery(targetSQL)
+                .setParameter("statusId", 31)
+                .setParameter("transactionId", transactionId);
+        try {
+            updateTargetData.executeUpdate();
+        } catch (Exception ex) {
+            System.err.println("cancel transaction failed." + ex);
+        }
+        
+        /* Update the transactionIn status */
+        String sql = "update transactionIn set statusId = :statusId ";
+        sql = sql + " where id = :transactionId ";
+        Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                .setParameter("statusId", 31)
+                .setParameter("transactionId", transactionId);
+        try {
+            updateData.executeUpdate();
+        } catch (Exception ex) {
+            System.err.println("cancel transaction failed." + ex);
+        }
+        
+        
+    }
 }

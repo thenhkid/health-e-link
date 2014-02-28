@@ -2531,18 +2531,27 @@ public class HealtheWebController {
      * @return This function will simply return a 1.
      */
     @RequestMapping(value= "/cancelMessage.do", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody Integer cancelMessageTransaction(@RequestParam(value = "transactionId", required = false) Integer transactionId) throws Exception {
+    public @ResponseBody Integer cancelMessageTransaction(@RequestParam(value = "transactionId", required = true) Integer transactionId, @RequestParam(value = "sent", required = true) boolean sent) throws Exception {
         
         try {
             
-            /* Need to get batch for the transaction */
-            transactionTarget targetDetails = transactionOutManager.getTransactionDetails(transactionId);
-            
-            transactionOutManager.cancelMessageTransaction(transactionId, targetDetails.gettransactionInId());
-            
-            /* Need to update the batch status */
-            transactionOutManager.updateTargetBatchStatus(targetDetails.getbatchDLId(), 32, "");
-            transactionInManager.updateBatchStatus(targetDetails.getbatchUploadId(), 32, "");
+            if(sent == true) {
+                /* Need to get batch for the transaction */
+                transactionTarget targetDetails = transactionOutManager.getTransactionDetails(transactionId);
+
+                transactionOutManager.cancelMessageTransaction(transactionId, targetDetails.gettransactionInId());
+
+                /* Need to update the batch status */
+                transactionOutManager.updateTargetBatchStatus(targetDetails.getbatchDLId(), 32, "");
+                transactionInManager.updateBatchStatus(targetDetails.getbatchUploadId(), 32, "");
+            }
+            else {
+                transactionIn transactionDetails = transactionInManager.getTransactionDetails(transactionId);
+                
+                transactionInManager.cancelMessageTransaction(transactionId);
+                
+                transactionInManager.updateBatchStatus(transactionDetails.getbatchId(), 32, "");
+            }
             
             return 1;
         }

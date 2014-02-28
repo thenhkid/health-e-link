@@ -117,7 +117,7 @@ require(['./main'], function () {
                 $.ajax({
                     url: '/Health-e-Web/cancelMessage.do',
                     type: 'POST',
-                    data: {'transactionId': transactionId},
+                    data: {'transactionId': transactionId, 'sent': true},
                     success: function(data) {
                        //send the user back to the sent items box.
                        window.location.href='/Health-e-Web/sent';
