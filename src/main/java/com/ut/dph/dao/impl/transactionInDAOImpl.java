@@ -2728,8 +2728,8 @@ public class transactionInDAOImpl implements transactionInDAO {
         try {
             /* Get a list of uploaded batches for these statuses */
             Criteria findBatches = sessionFactory.getCurrentSession().createCriteria(batchUploads.class);
-            findBatches.add(Restrictions.in("id", statusIds));
-            findBatches.addOrder(Order.desc("dateSubmitted"));
+            findBatches.add(Restrictions.in("statusId", statusIds));
+            findBatches.addOrder(Order.asc("dateSubmitted"));
             return findBatches.list();
         } catch (Exception ex) {
             System.err.println("getBatchesByStatusIds " + ex.getCause().getMessage());
