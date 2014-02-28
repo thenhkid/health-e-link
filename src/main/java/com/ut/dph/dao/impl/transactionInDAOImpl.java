@@ -35,7 +35,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import org.hibernate.Criteria;
 import org.hibernate.Query;
@@ -2657,7 +2656,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 		public Integer insertBatchUploadSummary(batchUploads batch, configurationConnection batchTargets) {
 			try {
 				String sql = ("insert into batchuploadsummary (batchId, transactionInId, sourceOrgId, targetOrgId, messageTypeId, sourceConfigId)"
-						+ " abc select " + batch.getId() +", transactionInId, "+ batch.getOrgId() +", "
+						+ " select " + batch.getId() +", transactionInId, "+ batch.getOrgId() +", "
 						+ " configurations.orgId, messageTypeId, "+ batchTargets.getsourceConfigId() 
 						+" from transactionTarget, configurations where configurations.id = :targetConfigId "
 						+ "and transactionInId in (select id from transactionIn where configId = :sourceConfigId and batchId = :batchId) "
@@ -2731,7 +2730,26 @@ public class transactionInDAOImpl implements transactionInDAO {
 	        }
 		}
 		
-		
+		/**
+	     *  getBatchesByStatusIds - return uploaded batch info for specific statusIds
+	     *  @param list of statusIds
+	     *	@return This function will return a list of batches.
+	     */
+	    @SuppressWarnings("unchecked")
+	    @Override
+	    @Transactional
+	    public List<batchUploads> getBatchesByStatusIds(List <Integer> statusIds) {
+	    	try  {
+		        /* Get a list of uploaded batches for these statuses */
+		        Criteria findBatches = sessionFactory.getCurrentSession().createCriteria(batchUploads.class);
+		        findBatches.add(Restrictions.in("id", statusIds));
+		        findBatches.addOrder(Order.desc("dateSubmitted"));
+		        return findBatches.list();
+	    	} catch (Exception ex) {
+	    		System.err.println("getBatchesByStatusIds " + ex.getCause().getMessage());
+	    		return null;
+	    	}
+	    }
 
 		
 }

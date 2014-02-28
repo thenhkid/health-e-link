@@ -189,4 +189,6 @@ public interface transactionInDAO {
     
     Integer clearBatchUploadSummary(Integer batchId);
     
+    List<batchUploads> getBatchesByStatusIds (List <Integer> statusIds);
+    
 }

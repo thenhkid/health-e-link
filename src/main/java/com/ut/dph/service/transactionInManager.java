@@ -112,7 +112,7 @@ public interface transactionInManager {
     
     boolean processBatch(int batchUploadId) throws Exception;
     
-    boolean processBatches();
+    void processBatches();
     
     void updateBatchStatus (Integer batchUploadId, Integer statusId, String timeField) throws Exception;
     
@@ -232,6 +232,10 @@ public interface transactionInManager {
     
     void loadBatches();
     
-    void loadBatch(Integer batchId);
+    boolean loadBatch(Integer batchId);
+    
+    List<batchUploads> getBatchesByStatusIds (List <Integer> statusIds);
+    
+    void setBatchToError(Integer batchId, String errorMessage) throws Exception;
     
 }
