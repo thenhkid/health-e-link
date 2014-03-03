@@ -451,4 +451,8 @@ ADD COLUMN `fileExt` VARCHAR(4) NULL DEFAULT NULL AFTER `copiedTransportId`;
 INSERT INTO `universalTranslator`.`lu_ProcessStatus` (`category`, `displayCode`, `displayText`, `status`) VALUES ('transaction', 'CNL', 'Canceled', 1);
 INSERT INTO `universalTranslator`.`lu_ProcessStatus` (`category`, `displayCode`, `displayText`, `status`) VALUES ('batch', 'SCN', 'Submission Canceled', 1);
 
+/** Chad 3-3-2014 @ 11:26 AM **/
+ALTER TABLE `universalTranslator`.`rel_TransportFTPDetails` 
+CHANGE COLUMN `port` `port` INT NULL DEFAULT 0 ;
+
 

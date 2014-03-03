@@ -228,13 +228,50 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
     */
     @Override
     @Transactional
-    public List<configurationFTPFields> getTransportFTPDetails(int transportDetailId) {
+    public List<configurationFTPFields> getTransportFTPDetails(int transportDetailId) throws Exception {
         Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configurationFTPFields.class)
                 .add(Restrictions.eq("transportId", transportDetailId));
 
         return criteria.list();
     }
     
+    /**
+     * The 'getTransportFTPDetailsPush' function will return the PUSH FTP details for the
+     * passed in transportDetailsId.
+     * 
+     * @param transportDetailsId    The id of the selected transport method
+     * 
+     * @return This function will return the PUSH FTP details
+     */
+    @Override
+    @Transactional
+    public configurationFTPFields getTransportFTPDetailsPush(int transportDetailId) throws Exception {
+         Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configurationFTPFields.class)
+                .add(Restrictions.eq("transportId", transportDetailId))
+                .add(Restrictions.eq("method", 2));
+
+        return (configurationFTPFields) criteria.uniqueResult();
+        
+    }
+    
+    /**
+     * The 'getTransportFTPDetailsPull' function will return the PULL FTP details for the
+     * passed in transportDetailsId.
+     * 
+     * @param transportDetailsId    The id of the selected transport method
+     * 
+     * @return This function will return the PULL FTP details
+     */
+    @Override
+    @Transactional
+    public configurationFTPFields getTransportFTPDetailsPull(int transportDetailId) throws Exception {
+         Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configurationFTPFields.class)
+                .add(Restrictions.eq("transportId", transportDetailId))
+                .add(Restrictions.eq("method", 1));
+
+        return (configurationFTPFields) criteria.uniqueResult();
+        
+    }
     
     /**
      * The 'saveTransportFTP' function will save the transport FTP

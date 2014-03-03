@@ -74,8 +74,20 @@ public class configurationTransportManagerImpl implements configurationTransport
     
     @Override
     @Transactional
-    public List<configurationFTPFields> getTransportFTPDetails(int transportDetailId) {
+    public List<configurationFTPFields> getTransportFTPDetails(int transportDetailId) throws Exception {
         return configurationTransportDAO.getTransportFTPDetails(transportDetailId);
+    }
+    
+    @Override
+    @Transactional
+    public configurationFTPFields getTransportFTPDetailsPush(int transportDetailId) throws Exception {
+        return configurationTransportDAO.getTransportFTPDetailsPush(transportDetailId);
+    }
+    
+    @Override
+    @Transactional
+    public configurationFTPFields getTransportFTPDetailsPull(int transportDetailId) throws Exception {
+        return configurationTransportDAO.getTransportFTPDetailsPull(transportDetailId);
     }
     
     @Override

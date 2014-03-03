@@ -21,6 +21,7 @@ import com.ut.dph.model.configuration;
 import com.ut.dph.model.configurationConnection;
 import com.ut.dph.model.configurationConnectionReceivers;
 import com.ut.dph.model.configurationDataTranslations;
+import com.ut.dph.model.configurationFTPFields;
 import com.ut.dph.model.configurationSchedules;
 import com.ut.dph.model.configurationTransport;
 import com.ut.dph.service.emailMessageManager;
@@ -43,6 +44,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -54,6 +56,10 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.net.PrintCommandListener;
+import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPReply;
+import org.apache.commons.net.ftp.FTPSClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -363,7 +369,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                     }
                                     /* If FTP Call the FTP Method */
                                     else if(transportDetails.gettransportMethodId() == 3) {
-                                        FTPTargetFile(batchId);
+                                        FTPTargetFile(batchId, transportDetails);
                                     }
 
                                     if(batchId > 0) {
@@ -642,7 +648,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                             }
                             /* If FTP Call the FTP Method */
                             else if(transportDetails.gettransportMethodId() == 3) {
-                                FTPTargetFile(batchId);
+                                FTPTargetFile(batchId, transportDetails);
                             }
 
                             /* Log the last run time */
@@ -1221,10 +1227,74 @@ public class transactionOutManagerImpl implements transactionOutManager {
      * 
      * @param batchId   The id of the batch to FTP the file for
      */
-    private void FTPTargetFile(int batchId) throws Exception {
+    private void FTPTargetFile(int batchId, configurationTransport transportDetails) throws Exception {
         
         /* Update the status of the batch to locked */
         transactionOutDAO.updateBatchStatus(batchId, 22);
+        
+        /* get the batch details */
+        batchDownloads batchInfo = transactionOutDAO.getBatchDetails(batchId);
+        
+        /* Get the FTP Details */
+        configurationFTPFields ftpDetails = configurationTransportManager.getTransportFTPDetailsPush(transportDetails.getId());
+        
+        try {
+        
+            String protocol = null;
+
+            FTPClient ftp;
+
+            if(protocol == null) {
+                ftp = new FTPClient();
+            }
+            else {
+                FTPSClient ftps;
+                ftps = new FTPSClient(true);
+
+                ftp = ftps;
+                ftps.setTrustManager(null);
+            }
+
+            ftp.addProtocolCommandListener(new PrintCommandListener(new PrintWriter(System.out)));
+
+            if(ftpDetails.getport() > 0) {
+                //ftp.connect(ftpDetails.getip(),ftpDetails.getport());
+                ftp.connect(ftpDetails.getip());
+            }
+            else {
+                ftp.connect(ftpDetails.getip());
+            }
+
+
+            int reply = ftp.getReplyCode();
+
+            if(!FTPReply.isPositiveCompletion(reply)) {
+                 ftp.disconnect();
+            }
+            else {
+                 ftp.login(ftpDetails.getusername(), ftpDetails.getpassword());
+
+                 System.out.println("Remote System is "+ftp.getSystemName());
+
+                 ftp.enterLocalPassiveMode();
+
+                 File file = new File(transportDetails.getfileLocation() + batchInfo.getoutputFIleName());
+                 FileInputStream fileInput = new FileInputStream(file);
+                 
+                 ftp.changeWorkingDirectory(ftpDetails.getdirectory());
+                 ftp.storeFile(batchInfo.getoutputFIleName(),fileInput);
+                 ftp.logout();
+                 ftp.disconnect();
+
+            } 
+
+        }
+        catch(Exception e) {
+            throw new Exception("Error occurred trying to FTP a batch target. batchId: "+batchId,e);
+        }
+        
+        
+        
     }
     
     @Override

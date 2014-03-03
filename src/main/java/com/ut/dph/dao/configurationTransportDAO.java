@@ -27,7 +27,11 @@ public interface configurationTransportDAO {
 
     void setupOnlineForm(int transportId, int configId, int messageTypeId);
 
-    List<configurationFTPFields> getTransportFTPDetails(int transportDetailId);
+    List<configurationFTPFields> getTransportFTPDetails(int transportDetailId) throws Exception;
+    
+    configurationFTPFields getTransportFTPDetailsPush(int transportDetailId) throws Exception;
+    
+    configurationFTPFields getTransportFTPDetailsPull(int transportDetailId) throws Exception;
     
     void saveTransportFTP(configurationFTPFields FTPFields);
     
