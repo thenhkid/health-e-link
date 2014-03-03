@@ -1274,8 +1274,6 @@ public class transactionOutManagerImpl implements transactionOutManager {
             else {
                  ftp.login(ftpDetails.getusername(), ftpDetails.getpassword());
 
-                 System.out.println("Remote System is "+ftp.getSystemName());
-
                  ftp.enterLocalPassiveMode();
 
                  File file = new File(transportDetails.getfileLocation() + batchInfo.getoutputFIleName());

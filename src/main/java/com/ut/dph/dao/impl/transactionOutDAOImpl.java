@@ -863,7 +863,13 @@ public class transactionOutDAOImpl implements transactionOutDAO {
                 for the value only if pass through errors is set
                 */
                 
-                sql += "'"+getData.uniqueResult()+"'";
+                if(getData.uniqueResult() == null) {
+                    sql += null;
+                }
+                else {
+                    sql += "'"+getData.uniqueResult()+"'";
+                }
+                
                 
                 if(counter < formFields.size()) {
                     sql += ", ";

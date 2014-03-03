@@ -211,7 +211,7 @@
                     </div> 
                 </c:if> 
                                        
-                <c:if test="${userDetails.cancelAuthority == true && transactionDetails.statusId != 32}">                             
+                <c:if test="${userDetails.cancelAuthority == true && transactionDetails.statusId != 32 && transactionDetails.statusId != 23}">                             
                     <div class="form-group">
                        <input type="button" id="cancel" class="btn btn-primary btn-action cancelMessage" value="Cancel"/>
                     </div>   
