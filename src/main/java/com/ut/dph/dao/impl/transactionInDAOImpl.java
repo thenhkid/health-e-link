@@ -2083,7 +2083,7 @@ public class transactionInDAOImpl implements transactionInDAO {
             query.setParameter("srcField", ("F" + cdt.getFieldNo()));
             query.setParameter("fieldA", ("F" + cdt.getFieldA()));
             query.setParameter("fieldB", ("F" + cdt.getFieldB()));
-            query.setParameter("con1", ("F" + cdt.getFieldNo()));
+            query.setParameter("con1", (cdt.getConstant1()));
             query.setParameter("con2", cdt.getConstant2());
             query.setParameter("macroId", cdt.getMacroId());
             query.setParameter("foroutboundProcessing", foroutboundProcessing);
