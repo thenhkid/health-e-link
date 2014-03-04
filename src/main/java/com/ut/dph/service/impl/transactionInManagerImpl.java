@@ -7,6 +7,7 @@ package com.ut.dph.service.impl;
 
 import com.ut.dph.dao.messageTypeDAO;
 import com.ut.dph.dao.transactionInDAO;
+import com.ut.dph.dao.transactionOutDAO;
 import com.ut.dph.model.CrosswalkData;
 import com.ut.dph.model.Macros;
 import com.ut.dph.model.batchUploadSummary;
@@ -15,6 +16,7 @@ import com.ut.dph.model.configuration;
 import com.ut.dph.model.configurationConnection;
 import com.ut.dph.model.configurationDataTranslations;
 import com.ut.dph.model.configurationFormFields;
+import com.ut.dph.model.configurationSchedules;
 import com.ut.dph.model.configurationTransport;
 import com.ut.dph.model.fieldSelectOptions;
 import com.ut.dph.model.transactionAttachment;
@@ -81,6 +83,10 @@ public class transactionInManagerImpl implements transactionInManager {
     @Autowired
     private organizationManager organizationmanager;
 
+    @Autowired
+    private transactionOutDAO transactionOutDAO;
+
+    
     @Override
     @Transactional
     public String getFieldValue(String tableName, String tableCol, int idValue) {
@@ -1534,6 +1540,28 @@ public class transactionInManagerImpl implements transactionInManager {
     public void cancelMessageTransaction(int transactionId) throws Exception {
         transactionInDAO.cancelMessageTransaction(transactionId);
     }
+
+    /**
+     * the scheduler calls this method to see if there are any files with SSA status ready for load.
+     *
+     * **/
+	@Override
+	public void loadBatchesBySchedule() throws Exception {
+		//get a list of schedules
+		List<configurationSchedules> scheduledConfigs = getScheduledConfigurations();
+		//we process by schedule
+		
+	}
+
+	@Override
+	public List<configurationSchedules> getScheduledConfigurations() {
+		return transactionOutDAO.getScheduledConfigurations();
+	}
+
+	@Override
+	public List<batchUploads> getBatchesByConfigId(Integer configId) {
+		return transactionInDAO.getBatchesByConfigId(configId);
+	}
     
     
     

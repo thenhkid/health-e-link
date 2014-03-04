@@ -13,6 +13,7 @@ import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.configurationConnection;
 import com.ut.dph.model.configurationDataTranslations;
 import com.ut.dph.model.configurationFormFields;
+import com.ut.dph.model.configurationSchedules;
 import com.ut.dph.model.configurationTransport;
 import com.ut.dph.model.fieldSelectOptions;
 import com.ut.dph.model.transactionAttachment;
@@ -241,5 +242,11 @@ public interface transactionInManager {
     void deleteMessage(int batchId, int transactionId) throws Exception;
     
     void cancelMessageTransaction(int transactionId) throws Exception;
+    
+    void loadBatchesBySchedule() throws Exception;
+    
+    List<configurationSchedules> getScheduledConfigurations();
+    
+    List<batchUploads> getBatchesByConfigId (Integer configId);
     
 }
