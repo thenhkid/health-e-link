@@ -243,10 +243,4 @@ public interface transactionInManager {
     
     void cancelMessageTransaction(int transactionId) throws Exception;
     
-    void loadBatchesBySchedule() throws Exception;
-    
-    List<configurationSchedules> getScheduledConfigurations();
-    
-    List<batchUploads> getBatchesByConfigId (Integer configId);
-    
 }

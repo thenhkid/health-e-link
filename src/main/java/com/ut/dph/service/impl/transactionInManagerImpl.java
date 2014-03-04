@@ -1541,28 +1541,7 @@ public class transactionInManagerImpl implements transactionInManager {
         transactionInDAO.cancelMessageTransaction(transactionId);
     }
 
-    /**
-     * the scheduler calls this method to see if there are any files with SSA status ready for load.
-     *
-     * **/
-	@Override
-	public void loadBatchesBySchedule() throws Exception {
-		//get a list of schedules
-		List<configurationSchedules> scheduledConfigs = getScheduledConfigurations();
-		//we process by schedule
-		
-	}
-
-	@Override
-	public List<configurationSchedules> getScheduledConfigurations() {
-		return transactionOutDAO.getScheduledConfigurations();
-	}
-
-	@Override
-	public List<batchUploads> getBatchesByConfigId(Integer configId) {
-		return transactionInDAO.getBatchesByConfigId(configId);
-	}
-    
+        
     
     
 }

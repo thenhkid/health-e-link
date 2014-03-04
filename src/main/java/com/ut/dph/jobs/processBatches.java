@@ -18,7 +18,7 @@ import org.springframework.web.context.support.SpringBeanAutowiringSupport;
  *
  * @author gchan
  */
-public class loadBatchesBySchedule implements Job {
+public class processBatches implements Job {
     
     @Autowired
     private transactionInManager transactionInManager;
@@ -29,12 +29,12 @@ public class loadBatchesBySchedule implements Job {
         try {
             SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
         
-            transactionInManager.loadBatchesBySchedule();
+            transactionInManager.processBatches();
         } catch (Exception ex) {
             try {
-                throw new Exception("Error occurred trying to load batch files from schedule task",ex);
+                throw new Exception("Error occurred trying to process batch files from schedule task",ex);
             } catch (Exception ex1) {
-                Logger.getLogger(loadBatchesBySchedule.class.getName()).log(Level.SEVERE, null, ex1);
+                Logger.getLogger(processBatches.class.getName()).log(Level.SEVERE, null, ex1);
             }
         }
         

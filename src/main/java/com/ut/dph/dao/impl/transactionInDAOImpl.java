@@ -2815,18 +2815,4 @@ public class transactionInDAOImpl implements transactionInDAO {
         
         
     }
-
-	@Override
-	public List<batchUploads> getBatchesByConfigId(Integer configId) {
-		 try {
-	            /* Get a list of uploaded batches for these statuses */
-	            Criteria findBatches = sessionFactory.getCurrentSession().createCriteria(batchUploads.class);
-	            findBatches.add(Restrictions.eq("configId", configId));
-	            findBatches.addOrder(Order.asc("dateSubmitted"));
-	            return findBatches.list();
-	        } catch (Exception ex) {
-	            System.err.println("getBatchesByConfigId " + ex.getCause().getMessage());
-	            return null;
-	        }
-	}
 }
