@@ -1229,17 +1229,36 @@ public class transactionOutManagerImpl implements transactionOutManager {
      * @param batchId   The id of the batch to FTP the file for
      */
     private void FTPTargetFile(int batchId, configurationTransport transportDetails) throws Exception {
-       
-        /* Update the status of the batch to locked */
-        transactionOutDAO.updateBatchStatus(batchId, 22);
-        
-        /* get the batch details */
-        batchDownloads batchFTPFileInfo = transactionOutDAO.getBatchDetails(batchId);
-        
-        /* Get the FTP Details */
-        configurationFTPFields ftpDetails = configurationTransportManager.getTransportFTPDetailsPush(transportDetails.getId());
         
         try {
+       
+            /* Update the status of the batch to locked */
+            transactionOutDAO.updateBatchStatus(batchId, 22);
+
+            List<transactionTarget> targets = transactionOutDAO.getTransactionsByBatchDLId(batchId);
+
+            if(!targets.isEmpty()) {
+
+                for(transactionTarget target : targets) {
+
+                    /* Need to update the uploaded batch status */
+                    transactionInManager.updateBatchStatus(target.getbatchUploadId(), 22, "");
+
+                    /* Need to update the uploaded batch transaction status */
+                    transactionInManager.updateTransactionStatus(target.getbatchUploadId(), target.gettransactionInId(), 0, 20);
+
+                    /* Update the downloaded batch transaction status */
+                    transactionOutDAO.updateTargetTransasctionStatus(target.getbatchDLId(), 2);
+
+                }
+
+            }
+
+            /* get the batch details */
+            batchDownloads batchFTPFileInfo = transactionOutDAO.getBatchDetails(batchId);
+
+            /* Get the FTP Details */
+            configurationFTPFields ftpDetails = configurationTransportManager.getTransportFTPDetailsPush(transportDetails.getId());
         
             FTPClient ftp;
 
