@@ -539,3 +539,7 @@ select '';
 end proc_main$$
 DELIMITER ;
 
+
+/** Chad 3-04-14 @ 1:19 PM **/
+ALTER TABLE `universalTranslator`.`rel_TransportFTPDetails` 
+ADD COLUMN `protocol` VARCHAR(45) NULL DEFAULT 'FTP' AFTER `port`;

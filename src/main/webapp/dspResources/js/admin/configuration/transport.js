@@ -135,6 +135,46 @@ require(['./main'], function () {
             
         });
         
+        //Test the FTP Push Connection
+        $(document).on('click', '.testFTPPush', function() {
+            
+            var protocol = $('#protocol2').val();
+            var ip = $('#ip2').val();
+            var username = $('#username2').val();
+            var password = $('#password2').val();
+            var directory = $('#directory2').val();
+            var port = $('#port2').val();
+            
+            $.ajax({
+                url: 'testFTPConnection.do',
+                type: "GET",
+                data: {'protocol': protocol, 'ip': ip, 'username': username, 'password': password, 'directory': directory, 'port': port},
+                success: function(data) {
+                     alert(data);
+                }
+            });
+        });
+        
+        //Test the FTP Get Connection
+        $(document).on('click', '.testFTPGet', function() {
+          
+            var protocol = $('#protocol1').val();
+            var ip = $('#ip1').val();
+            var username = $('#username1').val();
+            var password = $('#password1').val();
+            var directory = $('#directory1').val();
+            var port = $('#port1').val();
+            
+            $.ajax({
+                url: 'testFTPConnection.do',
+                type: "GET",
+                data: {'protocol': protocol, 'ip': ip, 'username': username, 'password': password, 'directory': directory, 'port': port},
+                success: function(data) {
+                     alert(data);
+                }
+            });
+        });
+        
     });
 });
 

@@ -197,7 +197,7 @@
                                                     </c:when>
                                                     <c:otherwise>
                                                         <input <c:if test="${patientInfo.readOnly == true}">disabled</c:if> id="${patientInfo.fieldNo}" name="patientFields[${pfield.index}].fieldValue" value="${patientInfo.fieldValue}" class="form-control ${patientInfo.validation.replace(' ','-')} <c:if test="${patientInfo.required == true}"> required</c:if>" type="text">
-                                                   </c:otherwise>
+                                                    </c:otherwise>
                                                 </c:choose>
                                                 <span id="errorMsg_${patientInfo.fieldNo}" class="control-label"></span>  
                                             </div>

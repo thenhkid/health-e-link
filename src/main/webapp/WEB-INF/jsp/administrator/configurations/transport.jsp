@@ -242,6 +242,15 @@
                                             <input name="FTPFields[${field.index}].method" class="form-control" type="hidden" value="${ftpDetails.method}"  />
                                             <input name="FTPFields[${field.index}].id" class="form-control" type="hidden" value="${ftpDetails.id}"  />
                                         </div>
+                                        <div id="protocol${ftpDetails.method}Div" class="form-group">
+                                            <label class="control-label" for="protocol${ftpDetails.method}">Protocol *</label>
+                                            <select name="FTPFields[${field.index}].protocol" id="protocol${ftpDetails.method}" class="form-control">
+                                                <option value="">- Select -</option>
+                                                <option value="FTP" <c:if test="${ftpDetails.protocol == 'FTP'}">selected</c:if>>FTP</option>
+                                                <option value="FTPS" <c:if test="${ftpDetails.protocol == 'FTPS'}">selected</c:if>>FTPS</option>
+                                           </select>
+                                            <span id="protocol${ftpDetails.method}Msg" class="control-label"></span>
+                                        </div>
                                         <div id="ip${ftpDetails.method}Div" class="form-group">
                                             <label class="control-label" for="ip${ftpDetails.method}">IP Address *</label>
                                             <input name="FTPFields[${field.index}].ip" id="ip${ftpDetails.method}" class="form-control" type="text" maxLength="45" value="${ftpDetails.ip}"  />
@@ -266,6 +275,9 @@
                                             <label class="control-label" for="port${ftpDetails.method}">Port *</label>
                                             <input name="FTPFields[${field.index}].port" id="port${ftpDetails.method}" class="form-control" type="text" maxLength="45" value="${ftpDetails.port}"  />
                                              <span id="port${ftpDetails.method}Msg" class="control-label"></span>
+                                        </div>
+                                        <div class="pull-right">
+                                            <a href="javascript:void(0);" class="btn btn-primary btn-xs testFTP<c:choose><c:when test="${ftpDetails.method == 1}">Get</c:when><c:otherwise>Push</c:otherwise></c:choose>"  title="Test FTP Connection">Test FTP Connection</a>
                                         </div>
                                     </div>
                                     </c:forEach>

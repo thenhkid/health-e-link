@@ -47,6 +47,11 @@ import com.ut.dph.model.configurationTransport;
 import com.ut.dph.model.configurationTransportMessageTypes;
 import com.ut.dph.service.configurationTransportManager;
 import com.ut.dph.service.userManager;
+import java.io.PrintWriter;
+import org.apache.commons.net.PrintCommandListener;
+import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPReply;
+import org.apache.commons.net.ftp.FTPSClient;
 
 @Controller
 @RequestMapping("/administrator/configurations")
@@ -1969,6 +1974,70 @@ public class adminConfigController {
         redirectAttr.addFlashAttribute("savedStatus", "savedComponent");
         ModelAndView mav = new ModelAndView(new RedirectView("HL7"));
         return mav;
+    }
+    
+    /**
+     * The 'testFTPConnection.do' method will test the FTP connection paramenters.
+     */
+    @RequestMapping(value = "/testFTPConnection.do", method = RequestMethod.GET)
+    public @ResponseBody String testFTPPushConnection(@RequestParam String protocol, @RequestParam String ip, @RequestParam String username, @RequestParam String password, @RequestParam String directory, @RequestParam Integer port) {
+        
+        String connectionResponse = null;
+        
+        try {
+        
+            FTPClient ftp;
+
+            if("FTP".equals(protocol)) {
+                ftp = new FTPClient();
+            }
+            else {
+                FTPSClient ftps;
+                ftps = new FTPSClient(true);
+
+                ftp = ftps;
+                ftps.setTrustManager(null);
+                
+            }
+
+            ftp.addProtocolCommandListener(new PrintCommandListener(new PrintWriter(System.out)));
+            ftp.setDefaultTimeout(3000);
+            ftp.setConnectTimeout(2000);
+            
+            if(port > 0) {
+                ftp.connect(ip,port);
+            }
+            else {
+                ftp.connect(ip);
+            }
+
+
+            int reply = ftp.getReplyCode();
+            if(!FTPReply.isPositiveCompletion(reply)) {
+                 connectionResponse = ftp.getReplyString();
+                 ftp.disconnect();
+            }
+            else {
+                 ftp.login(username, password);
+                 ftp.enterLocalPassiveMode();
+                 
+                 if(!"".equals(directory)) {
+                     ftp.changeWorkingDirectory(directory);
+                 }
+                 
+                 connectionResponse = ftp.getReplyString();
+                 
+                 ftp.logout();
+                 ftp.disconnect();
+
+            } 
+        }
+        catch(Exception e) {
+            connectionResponse = "Connecton not valid";
+        }
+        
+        return connectionResponse;
+        
     }
     
     

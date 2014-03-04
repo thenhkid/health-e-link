@@ -36,6 +36,9 @@ public class configurationFTPFields {
     
     @Column(name = "PORT", nullable = true)
     private int port = 0;
+    
+    @Column(name = "PROTOCOL", nullable = true)
+    private String protocol = "FTP";
 
     public int getId() {
         return id;
@@ -99,6 +102,14 @@ public class configurationFTPFields {
     
     public void setport(int port) {
         this.port = port;
+    }
+    
+    public String getprotocol() {
+        return protocol;
+    }
+    
+    public void setprotocol(String protocol) {
+        this.protocol = protocol;
     }
 
 }

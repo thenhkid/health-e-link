@@ -625,42 +625,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                 }
                             }
 
-                            /* 
-                            Need to check the transport method for the configuration, if set to file download
-                            or set to FTP.
-                            */
-                            configurationTransport transportDetails = configurationTransportManager.getTransportDetails(schedule.getconfigId());
-
-                            /* if File Download update the status to Submission Delivery Completed ID = 23 status. This will only
-                            apply to scheduled and not continous settings. */
-                            if(transportDetails.gettransportMethodId() == 1) {
-                                transactionOutDAO.updateBatchStatus(batchId, 23);
-                                
-                                /* Need to find the batch Upload Id */
-                                List<transactionTarget> targets = transactionOutDAO.getTransactionsByBatchDLId(batchId);
-                               
-                                if(!targets.isEmpty()) {
-                                    for(transactionTarget target : targets) {
-                                        transactionInManager.updateBatchStatus(target.getbatchUploadId(), 23, "");
-                                    }
-                                }
-                                
-                            }
-                            /* If FTP Call the FTP Method */
-                            else if(transportDetails.gettransportMethodId() == 3) {
-                                FTPTargetFile(batchId, transportDetails);
-                            }
-
-                            /* Log the last run time */
-                            try {
-                                targetOutputRunLogs log = new targetOutputRunLogs();
-                                log.setconfigId(schedule.getconfigId());
-
-                                transactionOutDAO.saveOutputRunLog(log); 
-                            }
-                            catch (Exception e) {
-                                throw new Exception("Error occurred trying to save the run log. configId: "+schedule.getconfigId(),e);
-                            }
+                            
                         }
                     }
 
@@ -669,6 +634,42 @@ public class transactionOutManagerImpl implements transactionOutManager {
 
                         /* Get the batch Details */
                         batchDownloads batchDLInfo = transactionOutDAO.getBatchDetails(batchId);
+                        /* 
+                        Need to check the transport method for the configuration, if set to file download
+                        or set to FTP.
+                        */
+                        configurationTransport transportDetails = configurationTransportManager.getTransportDetails(schedule.getconfigId());
+
+                        /* if File Download update the status to Submission Delivery Completed ID = 23 status. This will only
+                        apply to scheduled and not continous settings. */
+                        if(transportDetails.gettransportMethodId() == 1) {
+                            transactionOutDAO.updateBatchStatus(batchId, 23);
+
+                            /* Need to find the batch Upload Id */
+                            List<transactionTarget> targets = transactionOutDAO.getTransactionsByBatchDLId(batchId);
+
+                            if(!targets.isEmpty()) {
+                                for(transactionTarget target : targets) {
+                                    transactionInManager.updateBatchStatus(target.getbatchUploadId(), 23, "");
+                                }
+                            }
+
+                        }
+                        /* If FTP Call the FTP Method */
+                        else if(transportDetails.gettransportMethodId() == 3) {
+                            FTPTargetFile(batchId, transportDetails);
+                        }
+
+                        /* Log the last run time */
+                        try {
+                            targetOutputRunLogs log = new targetOutputRunLogs();
+                            log.setconfigId(schedule.getconfigId());
+
+                            transactionOutDAO.saveOutputRunLog(log); 
+                        }
+                        catch (Exception e) {
+                            throw new Exception("Error occurred trying to save the run log. configId: "+schedule.getconfigId(),e);
+                        }
                         
                         try {
                             /* Get the list of primary and secondary contacts */
@@ -791,8 +792,8 @@ public class transactionOutManagerImpl implements transactionOutManager {
                 }
                 
             }
-            /* File Download */
-            else if(transportDetails.gettransportMethodId() == 1) {
+            /* File Download || FTP */
+            else if(transportDetails.gettransportMethodId() == 1 || transportDetails.gettransportMethodId() == 3) {
 
                 boolean createNewFile = true;
 
@@ -1228,23 +1229,21 @@ public class transactionOutManagerImpl implements transactionOutManager {
      * @param batchId   The id of the batch to FTP the file for
      */
     private void FTPTargetFile(int batchId, configurationTransport transportDetails) throws Exception {
-        
+       
         /* Update the status of the batch to locked */
         transactionOutDAO.updateBatchStatus(batchId, 22);
         
         /* get the batch details */
-        batchDownloads batchInfo = transactionOutDAO.getBatchDetails(batchId);
+        batchDownloads batchFTPFileInfo = transactionOutDAO.getBatchDetails(batchId);
         
         /* Get the FTP Details */
         configurationFTPFields ftpDetails = configurationTransportManager.getTransportFTPDetailsPush(transportDetails.getId());
         
         try {
         
-            String protocol = null;
-
             FTPClient ftp;
 
-            if(protocol == null) {
+            if("FTP".equals(ftpDetails.getprotocol())) {
                 ftp = new FTPClient();
             }
             else {
@@ -1256,10 +1255,11 @@ public class transactionOutManagerImpl implements transactionOutManager {
             }
 
             ftp.addProtocolCommandListener(new PrintCommandListener(new PrintWriter(System.out)));
+            ftp.setDefaultTimeout(3000);
+            ftp.setConnectTimeout(3000);
 
             if(ftpDetails.getport() > 0) {
-                //ftp.connect(ftpDetails.getip(),ftpDetails.getport());
-                ftp.connect(ftpDetails.getip());
+                ftp.connect(ftpDetails.getip(),ftpDetails.getport());
             }
             else {
                 ftp.connect(ftpDetails.getip());
@@ -1275,14 +1275,33 @@ public class transactionOutManagerImpl implements transactionOutManager {
                  ftp.login(ftpDetails.getusername(), ftpDetails.getpassword());
 
                  ftp.enterLocalPassiveMode();
-
-                 File file = new File(transportDetails.getfileLocation() + batchInfo.getoutputFIleName());
-                 FileInputStream fileInput = new FileInputStream(file);
                  
-                 ftp.changeWorkingDirectory(ftpDetails.getdirectory());
-                 ftp.storeFile(batchInfo.getoutputFIleName(),fileInput);
-                 ftp.logout();
-                 ftp.disconnect();
+                 String fileName = null;
+                 
+                 int findExt = batchFTPFileInfo.getoutputFIleName().lastIndexOf(".");
+                 
+                 if(findExt >= 0) {
+                    fileName = batchFTPFileInfo.getoutputFIleName();
+                 }
+                 else {
+                    fileName = new StringBuilder().append(batchFTPFileInfo.getoutputFIleName()).append(".").append(transportDetails.getfileExt()).toString(); 
+                 }
+                 
+                //Set the directory to save the brochures to
+                fileSystem dir = new fileSystem();
+
+                String filelocation = transportDetails.getfileLocation();
+                filelocation = filelocation.replace("/bowlink/", "");
+                dir.setDirByName(filelocation);
+
+                File file = new File(dir.getDir() + fileName);
+                 
+                FileInputStream fileInput = new FileInputStream(file);
+                 
+                ftp.changeWorkingDirectory(ftpDetails.getdirectory());
+                ftp.storeFile(fileName,fileInput);
+                ftp.logout();
+                ftp.disconnect();
 
             } 
 
