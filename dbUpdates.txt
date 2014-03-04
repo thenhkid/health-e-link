@@ -494,3 +494,45 @@ END IF;
 end proc_main$$
 DELIMITER ;
 
+
+/**  Grace 03042014 10:55AM **/
+drop procedure yyyymmddTommddyyyy;
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `yyyymmddTommddyyyy`(in configId int, 
+in batchId int, in srcField varchar(10),
+in fieldA varchar(10), in fieldB varchar(10), in con1 varchar(10), 
+in con2 varchar(10), in macroId int, in foroutboundProcessing boolean, in passClear int)
+proc_main:begin
+
+call setInboundOutBoundTables (foroutboundProcessing);
+select @translatedTable, @transactionTable, @batchTable, @batchIdType , @errorTable
+into @translatedTable, @transactionTable, @batchTable, @batchIdType , @errorTable;
+
+if (length(fieldA) = 0) then
+set fieldA = srcField;
+end if;
+
+if (length(con1) = 0) then
+set con1 = "/";
+end if;
+
+-- we build sql here 
+set @stmt = concat("update ", @translatedTable," set ",fieldA," = 
+concat(substring(",srcField, ", 6,2), '",con1, "',  
+substring(", srcField, ", 9,2),'",con1,"' ,substring(",srcField, ", 1,4))
+where ", @transactionTable ,"Id in (select id from ",@transactionTable,
+" where configId = ",configId," and ", @batchIdType," = ",batchId," and statusId != 12);");
+
+PREPARE stmt from @stmt;
+EXECUTE stmt;-- execute
+
+-- we check pass /clear
+if (passClear = 2) THEN
+BEGIN
+-- not sure how to pass clear this
+END;
+END IF;
+
+end proc_main$$
+DELIMITER ;
