@@ -495,7 +495,7 @@ end proc_main$$
 DELIMITER ;
 
 
-/**  Grace 03042014 10:55AM **/
+/**  Grace 03042014 12:20PM **/
 drop procedure yyyymmddTommddyyyy;
 
 DELIMITER $$
@@ -533,6 +533,9 @@ BEGIN
 -- not sure how to pass clear this
 END;
 END IF;
+-- see if we want to return something
+select '';
 
 end proc_main$$
 DELIMITER ;
+
