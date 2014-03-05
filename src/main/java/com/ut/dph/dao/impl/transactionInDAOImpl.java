@@ -2259,7 +2259,9 @@ public class transactionInDAOImpl implements transactionInDAO {
     public Integer insertLoadData(Integer batchId, String delimChar, String fileWithPath, String loadTableName, boolean containsHeaderRow) {
         try {
             String sql = ("LOAD DATA LOCAL INFILE '" + fileWithPath + "' INTO TABLE "
-                    + loadTableName + " fields terminated by '" + delimChar + "' LINES TERMINATED BY '\\n'");
+                    + loadTableName + " fields terminated by '" + delimChar + "' "
+                    		+ " ENCLOSED BY '\"' ESCAPED BY ''"
+                    		+ " LINES TERMINATED BY '\\n'");
             if (containsHeaderRow) {
                 sql = sql + "  IGNORE 1 LINES";
             }
