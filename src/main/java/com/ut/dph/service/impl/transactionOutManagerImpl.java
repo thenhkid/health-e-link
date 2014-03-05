@@ -431,8 +431,8 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                                       }
 
                                                       if(toSecondaryContact.size() > 0) {
-                                                         for(int i = 0; i <= toSecondaryContact.size(); i++) {
-                                                              ccAddressArray.add(toSecondaryContact.get(i).getEmail());
+                                                         for(int i = 0; i < toSecondaryContact.size(); i++) {
+                                                        	  ccAddressArray.add(toSecondaryContact.get(i).getEmail());                                                        
                                                           }
                                                       }
                                                   }
