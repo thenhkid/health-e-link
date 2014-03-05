@@ -1327,7 +1327,15 @@ public class transactionInManagerImpl implements transactionInManager {
     public void insertProcessingError(Integer errorId, Integer configId, Integer batchId, Integer fieldId,
             Integer macroId, Integer cwId, Integer validationTypeId, boolean required,
             boolean foroutboundProcessing, String errorCause) {
-        transactionInDAO.insertProcessingError(errorId, configId, batchId, fieldId, macroId, cwId, validationTypeId, required, foroutboundProcessing, errorCause);
+        insertProcessingError(errorId, configId, batchId, fieldId, macroId, cwId, validationTypeId, required, foroutboundProcessing, errorCause, null);
+
+    }
+    
+    @Override
+    public void insertProcessingError(Integer errorId, Integer configId, Integer batchId, Integer fieldId,
+            Integer macroId, Integer cwId, Integer validationTypeId, boolean required,
+            boolean foroutboundProcessing, String errorCause, Integer transactionId) {
+        transactionInDAO.insertProcessingError(errorId, configId, batchId, fieldId, macroId, cwId, validationTypeId, required, foroutboundProcessing, errorCause, transactionId);
 
     }
 
@@ -1540,8 +1548,5 @@ public class transactionInManagerImpl implements transactionInManager {
     public void cancelMessageTransaction(int transactionId) throws Exception {
         transactionInDAO.cancelMessageTransaction(transactionId);
     }
-
-        
-    
     
 }

@@ -2107,19 +2107,32 @@ public class transactionInDAOImpl implements transactionInDAO {
     public void insertProcessingError(Integer errorId, Integer configId, Integer batchId,
             Integer fieldId, Integer macroId, Integer cwId, Integer validationTypeId,
             boolean required, boolean foroutboundProcessing, String stackTrace) {
+    	insertProcessingError(errorId, configId, batchId,
+                fieldId, macroId, cwId, validationTypeId,
+                required, foroutboundProcessing, stackTrace, null);
+        
+    }
+    
+    @Override
+    @Transactional
+    public void insertProcessingError(Integer errorId, Integer configId, Integer batchId,
+            Integer fieldId, Integer macroId, Integer cwId, Integer validationTypeId,
+            boolean required, boolean foroutboundProcessing, String stackTrace, Integer transactionId) {
 
         String tableName = "transactionInErrors";
         String batchType = "batchUploadId";
+        String transactionColName = "transactionInId";
         if (foroutboundProcessing) {
             tableName = "transactionOutErrors";
             batchType = "batchDownloadId";
+            transactionColName = "transactionTargetId";
         }
         String sql = " INSERT INTO " + tableName + " (errorId, " + batchType + ", configId, "
                 + "configurationFormFieldsId, required,  "
-                + "cwId, macroId, validationTypeId, stackTrace) "
+                + "cwId, macroId, validationTypeId, stackTrace, " + transactionColName + ") "
                 + "VALUES (:errorId, :batchId, :configId, "
                 + " :configurationFormFieldsId, :required, "
-                + ":cwId,:macroId,:validationTypeId,:stackTrace);";
+                + ":cwId,:macroId,:validationTypeId,:stackTrace, :transactionId);";
 
         Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
                 .setParameter("errorId", errorId)
@@ -2130,7 +2143,8 @@ public class transactionInDAOImpl implements transactionInDAO {
                 .setParameter("validationTypeId", validationTypeId)
                 .setParameter("cwId", cwId)
                 .setParameter("macroId", macroId)
-                .setParameter("stackTrace", stackTrace.toString());
+                .setParameter("stackTrace", stackTrace.toString())
+        		.setParameter("transactionId", transactionId);
         try {
             updateData.executeUpdate();
         } catch (Exception ex) {
