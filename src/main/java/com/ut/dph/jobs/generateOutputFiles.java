@@ -34,7 +34,7 @@ public class generateOutputFiles implements Job {
             try {
                 throw new Exception("Error occurred trying to generate output files from schedule task",ex);
             } catch (Exception ex1) {
-                Logger.getLogger(processOutputRecords.class.getName()).log(Level.SEVERE, null, ex1);
+                Logger.getLogger(generateOutputFiles.class.getName()).log(Level.SEVERE, null, ex1);
             }
         }
         
