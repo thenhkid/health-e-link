@@ -58,7 +58,7 @@ public interface transactionOutManager {
     
     void updateTargetTransasctionStatus(int batchDLId, int statusId);
     
-    Integer translateTargetRecords(int transactionTargetId, int configId, int batchId) throws Exception;
+    Integer translateTargetRecords(int transactionTargetId, int configId, int batchId);
     
     void moveTranslatedRecords(int transactionTargetId) throws Exception;
     

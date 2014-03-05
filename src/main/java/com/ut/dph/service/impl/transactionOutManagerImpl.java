@@ -221,7 +221,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
      *         OR FALSE (If translation failed for any reason)
      */
     @Override
-    public Integer translateTargetRecords(int transactionTargetId, int configId, int batchId) throws Exception {
+    public Integer translateTargetRecords(int transactionTargetId, int configId, int batchId) {
         
         Integer errorCount = 0;
         
@@ -234,7 +234,9 @@ public class transactionOutManagerImpl implements transactionOutManager {
                     errorCount = errorCount + transactionInManager.processCrosswalk (configId, batchId, cdt, true);
                 }
                 catch (Exception e) {
-                    throw new Exception("Error occurred processing crosswalks. crosswalkId: "+cdt.getCrosswalkId()+" configId: "+configId,e);
+                    //throw new Exception("Error occurred processing crosswalks. crosswalkId: "+cdt.getCrosswalkId()+" configId: "+configId,e);
+                	e.printStackTrace();
+                	return 1;
                 }
             } 
             else if (cdt.getMacroId()!= 0)  {
@@ -242,7 +244,9 @@ public class transactionOutManagerImpl implements transactionOutManager {
                     errorCount = errorCount + transactionInManager.processMacro (configId, batchId, cdt, true);
                 }
                 catch (Exception e) {
-                    throw new Exception("Error occurred processing macro. macroId: "+ cdt.getMacroId() + " configId: "+configId,e);
+                    //throw new Exception("Error occurred processing macro. macroId: "+ cdt.getMacroId() + " configId: "+configId,e);
+                	e.printStackTrace();
+                	return 1;
                 }
             }
         }
@@ -284,24 +288,30 @@ public class transactionOutManagerImpl implements transactionOutManager {
                 for(transactionTarget transaction : pendingTransactions) {
 
                     boolean processed = false;
-                    /** we clean first **/
+                    String errorMessage = "Error occurred trying to process output transaction. transactionId: " + transaction.getId();
+                   
                     try {
                     	if (clearOutTables(transaction.getId()) > 0) {
-                    	 	transactionInManager.updateTransactionTargetStatus(0, transaction.getId(), 0, 33);
-                        	transactionInManager.insertProcessingError(5, null, 0, null, null, null, null, false, true, "error while cleaning up transaction out tables for output processing",transaction.getId());
-                       }
+                    		processed = false;
+                    	 }
                     } catch (Exception ex) {
+                    	processed = false;
                     	ex.printStackTrace();
                     }
+					
                     /* Process the output (transactionTargetId, targetConfigId, transactionInId) */
                     try {
-                    	
-                        processed = transactionOutDAO.processOutPutTransactions(transaction.getId(), transaction.getconfigId(), transaction.gettransactionInId());
-                    }
-                    catch (Exception e) {
-                        throw new Exception("Error occurred trying to process output transaction. transactionId: "+transaction.getId(),e);
-                    }
+                    	processed = transactionOutDAO.processOutPutTransactions(transaction.getId(), transaction.getconfigId(), transaction.gettransactionInId());
+                    } catch (Exception e) {
+                        //throw new Exception("Error occurred trying to process output transaction. transactionId: "+transaction.getId(),e);
+                    	processed = false;
+                    } 	
                     
+                    if (!processed) {
+                    	//we update and log
+                    	transactionInManager.updateTransactionTargetStatus(0, transaction.getId(), 0, 33);
+                    	transactionInManager.insertProcessingError(5, null, 0, null, null, null, null, false, true, errorMessage,transaction.getId());
+                    }
 
                     /* If processed == true update the status of the batch and transaction */
                     if(processed == true) {
@@ -312,10 +322,17 @@ public class transactionOutManagerImpl implements transactionOutManager {
                             processingErrors = translateTargetRecords(transaction.getId(), transaction.getconfigId(), transaction.getbatchDLId());
                         }
                         catch (Exception e) {
-                            throw new Exception("Error occurred trying to translate target records. transactionId: "+ transaction.getId(),e);
+                            // throw new Exception("Error occurred trying to translate target records. transactionId: "+ transaction.getId(),e);
+                        	//we log
+                        	e.printStackTrace();
+                        	processingErrors = 1;
                         }
                         
-
+                        if (processingErrors != 0) {
+                         	transactionInManager.updateTransactionTargetStatus(0, transaction.getId(), 0, 33);
+                        	transactionInManager.insertProcessingError(5, null, 0, null, null, null, null, false, true, "error applying macros and crosswalks",transaction.getId());
+                        }
+                        
                         /* Once all the processing has completed with no errors need to copy records to the transactionOutRecords to make available to view */
                         if(processingErrors == 0) { // no errors
                             
@@ -454,7 +471,11 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                                   msg.setmessageBody(sb.toString());
 
                                                   /* Send the email */
-                                                  emailMessageManager.sendEmail(msg);
+                                                  try {
+                                                	  emailMessageManager.sendEmail(msg);
+                                                  } catch (Exception exEmail)  {
+                                                	  exEmail.printStackTrace();
+                                                  }
 
                                               }
                                         }

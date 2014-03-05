@@ -823,7 +823,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
      */
     @Override
     @Transactional
-    public boolean processOutPutTransactions(int transactionTargetId, int configId, int transactionInId) throws Exception {
+    public boolean processOutPutTransactions(int transactionTargetId, int configId, int transactionInId) {
         
     	/* Need to pull all the data out of the appropriate message_ tables for the transaction */
         Criteria formFieldsQuery = sessionFactory.getCurrentSession().createCriteria(configurationFormFields.class);
@@ -883,10 +883,14 @@ public class transactionOutDAOImpl implements transactionOutDAO {
             Query insertData = sessionFactory.getCurrentSession().createSQLQuery(sql)
                 .setParameter("transactionTargetId", transactionTargetId)
                 .setParameter("configId", configId);
-            
-            insertData.executeUpdate();
-            
-            return true;
+            try {
+            	insertData.executeUpdate();
+            	return true;
+            } catch (Exception ex) {
+            	ex.printStackTrace();
+            	return false;
+            }
+           
             
         }
         else {

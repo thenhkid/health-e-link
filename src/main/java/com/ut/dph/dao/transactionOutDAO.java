@@ -55,7 +55,7 @@ public interface transactionOutDAO {
     
     List<transactionTarget> getpendingOutPutTransactions(int transactionTargetId) throws Exception;
     
-    boolean processOutPutTransactions(int transactionTargetId, int configId, int transactionInId) throws Exception;
+    boolean processOutPutTransactions(int transactionTargetId, int configId, int transactionInId);
     
     void updateTargetBatchStatus(Integer batchDLId, Integer statusId, String timeField) throws Exception;
     
