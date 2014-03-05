@@ -6,8 +6,10 @@
 
 package com.ut.dph.jobs;
 import com.ut.dph.service.transactionInManager;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -28,8 +30,9 @@ public class loadBatches implements Job {
         
         try {
             SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
-        
+            System.out.println(new java.util.Date() + " start of load batches");
             transactionInManager.loadBatches();
+            System.out.println(new java.util.Date() + " end of load batch");
         } catch (Exception ex) {
             try {
                 throw new Exception("Error occurred trying to load batch files from schedule task",ex);
