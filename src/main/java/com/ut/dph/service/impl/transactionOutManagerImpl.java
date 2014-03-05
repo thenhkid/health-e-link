@@ -471,11 +471,8 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                                   msg.setmessageBody(sb.toString());
 
                                                   /* Send the email */
-                                                  try {
-                                                	  emailMessageManager.sendEmail(msg);
-                                                  } catch (Exception exEmail)  {
-                                                	  exEmail.printStackTrace();
-                                                  }
+                                                  emailMessageManager.sendEmail(msg);
+                                                  
 
                                               }
                                         }
