@@ -284,9 +284,18 @@ public class transactionOutManagerImpl implements transactionOutManager {
                 for(transactionTarget transaction : pendingTransactions) {
 
                     boolean processed = false;
-
+                    /** we clean first **/
+                    try {
+                    	if (clearOutTables(transaction.getId()) > 0) {
+                    	 	transactionInManager.updateTransactionTargetStatus(0, transaction.getId(), 0, 33);
+                        	transactionInManager.insertProcessingError(5, null, 0, null, null, null, null, false, true, "error while cleaning up transaction out tables for output processing",transaction.getId());
+                       }
+                    } catch (Exception ex) {
+                    	ex.printStackTrace();
+                    }
                     /* Process the output (transactionTargetId, targetConfigId, transactionInId) */
                     try {
+                    	
                         processed = transactionOutDAO.processOutPutTransactions(transaction.getId(), transaction.getconfigId(), transaction.gettransactionInId());
                     }
                     catch (Exception e) {
@@ -1338,6 +1347,35 @@ public class transactionOutManagerImpl implements transactionOutManager {
     public void cancelMessageTransaction(int transactionId, int transactionInId) {
         transactionOutDAO.cancelMessageTransaction(transactionId, transactionInId);
     }
-    
-    
+
+	@Override
+	public void clearTransactionTranslatedOut(Integer transactionTargetId) {
+		transactionOutDAO.clearTransactionTranslatedOut(transactionTargetId);
+		
+	}
+
+	@Override
+	public void clearTransactionOutRecords(Integer transactionTargetId) {
+		transactionOutDAO.clearTransactionOutRecords(transactionTargetId);
+		
+	}
+
+	@Override
+	public void clearTransactionOutErrors(Integer transactionTargetId) {
+		transactionOutDAO.clearTransactionOutErrors(transactionTargetId);	
+	}
+	
+	@Override
+	public Integer clearOutTables(Integer transactionTargetId) {
+		try {
+			clearTransactionOutErrors(transactionTargetId);	
+			clearTransactionOutRecords(transactionTargetId);	
+			clearTransactionTranslatedOut(transactionTargetId);	
+			return 0;
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			return 1;
+		}
+	}
+
 }

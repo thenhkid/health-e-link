@@ -93,4 +93,10 @@ public interface transactionOutDAO {
     
     void cancelMessageTransaction(int transactionId, int transactionInId);
     
+    void clearTransactionTranslatedOut(Integer transactionTargetId);
+    
+    void clearTransactionOutRecords(Integer transactionTargetId);
+    
+    void clearTransactionOutErrors(Integer transactionTargetId);
+    
 }

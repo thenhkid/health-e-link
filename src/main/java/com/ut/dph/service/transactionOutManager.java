@@ -12,7 +12,6 @@ import com.ut.dph.model.transactionOutNotes;
 import com.ut.dph.model.transactionTarget;
 import com.ut.dph.model.transactionOutRecords;
 import java.util.Date;
-
 import java.util.List;
 
 /**
@@ -75,4 +74,11 @@ public interface transactionOutManager {
     
     void cancelMessageTransaction(int transactionId, int transactionInId);
     
+    void clearTransactionTranslatedOut(Integer transactionTargetId);
+    
+    void clearTransactionOutRecords(Integer transactionTargetId);
+    
+    void clearTransactionOutErrors(Integer transactionTargetId);
+  
+    Integer clearOutTables (Integer transactionTargetId);
 }

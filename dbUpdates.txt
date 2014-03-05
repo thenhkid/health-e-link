@@ -543,3 +543,22 @@ DELIMITER ;
 /** Chad 3-04-14 @ 1:19 PM **/
 ALTER TABLE `universalTranslator`.`rel_TransportFTPDetails` 
 ADD COLUMN `protocol` VARCHAR(45) NULL DEFAULT 'FTP' AFTER `port`;
+
+/** Grace 03042014 08:49PM **/
+ALTER TABLE `universalTranslator`.`transactionTranslatedIn` 
+ADD UNIQUE INDEX `transactionInId_UNIQUE` (`transactionInId` ASC);
+
+ALTER TABLE `universalTranslator`.`transactionTranslatedOut` 
+ADD UNIQUE INDEX `transactionTargetId_UNIQUE` (`transactionTargetId` ASC);
+
+ALTER TABLE `universalTranslator`.`transactionOutRecords` 
+ADD UNIQUE INDEX `transactionTargetId_UNIQUE` (`transactionTargetId` ASC);
+
+ALTER TABLE `universalTranslator`.`transactionInRecords` 
+ADD UNIQUE INDEX `transactionInId_UNIQUE` (`transactionInId` ASC);
+
+INSERT INTO `universaltranslator`.`lu_ProcessStatus` (`category`, `displayCode`, `displayText`) VALUES ('transaction', 'PE', 'Processing Error');
+
+ALTER TABLE `universalTranslator`.`transactionTarget` 
+CHANGE COLUMN `batchDLId` `batchDLId` INT(11) NULL DEFAULT 0 ;
+

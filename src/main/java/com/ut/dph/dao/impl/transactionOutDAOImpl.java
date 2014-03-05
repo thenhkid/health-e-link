@@ -26,6 +26,7 @@ import com.ut.dph.model.transactionOutRecords;
 import com.ut.dph.model.transactionTarget;
 import com.ut.dph.service.sysAdminManager;
 import com.ut.dph.service.userManager;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -824,7 +825,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
     @Transactional
     public boolean processOutPutTransactions(int transactionTargetId, int configId, int transactionInId) throws Exception {
         
-        /* Need to pull all the data out of the appropriate message_ tables for the transaction */
+    	/* Need to pull all the data out of the appropriate message_ tables for the transaction */
         Criteria formFieldsQuery = sessionFactory.getCurrentSession().createCriteria(configurationFormFields.class);
         formFieldsQuery.add(Restrictions.eq("configId", configId));
         
@@ -1480,10 +1481,55 @@ public class transactionOutDAOImpl implements transactionOutDAO {
         } catch (Exception ex) {
             System.err.println("cancel transaction failed." + ex);
         }
-        
-        
-        
-        
-    }
+ }
+
+	@Override
+	@Transactional
+	public void clearTransactionTranslatedOut(Integer transactionTargetId) {
+		 String sql = "delete from transactionTranslatedOut where transactionTargetId = :transactionTargetId";
+
+	        Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+	                .setParameter("transactionTargetId", transactionTargetId);
+
+	        try {
+	            deleteData.executeUpdate();
+	        } catch (Exception ex) {
+	            System.err.println("clearTransactionTranslatedOut " + ex.getCause());
+	        }
+		
+	}
+
+	@Override
+	@Transactional
+	public void clearTransactionOutRecords(Integer transactionTargetId) {
+		String sql = "delete from transactionOutRecords where transactionTargetId = :transactionTargetId";
+
+        Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                .setParameter("transactionTargetId", transactionTargetId);
+
+        try {
+            deleteData.executeUpdate();
+        } catch (Exception ex) {
+        	ex.printStackTrace();
+            System.err.println("clearTransactionOutRecords " + ex.getCause());
+        }
+		
+	}
+	
+	@Override
+	@Transactional
+	public void clearTransactionOutErrors(Integer transactionTargetId) {
+		 String sql = "delete from transactionOutErrors where transactionTargetId = :transactionTargetId";
+
+	        Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+	                .setParameter("transactionTargetId", transactionTargetId);
+
+	        try {
+	            deleteData.executeUpdate();
+	        } catch (Exception ex) {
+	            System.err.println("clearTransactionOutErrors " + ex.getCause());
+	        }
+		
+	}
     
 }
