@@ -257,7 +257,7 @@ require(['./main'], function () {
             var newDspPos = $(this).val();
 
             $('.processOrder').each(function() {
-                if ($(this).val() == newDspPos) {
+                if ($(this).attr('rel') == newDspPos) {
                     //Need to update the saved process order
                     $.ajax({
                         url: 'updateTranslationProcessOrder?currProcessOrder=' + currDspPos + '&newProcessOrder=' + newDspPos,
