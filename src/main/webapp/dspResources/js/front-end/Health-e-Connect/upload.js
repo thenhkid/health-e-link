@@ -9,11 +9,6 @@
 require(['./main'], function () {
     require(['jquery'], function($) {
         
-        $.ajaxSetup({
-            cache: false
-        });
-
-
         $("input:text,form").attr("autocomplete", "off");
 
         //This function will launch the new file upload overlay with a blank screen

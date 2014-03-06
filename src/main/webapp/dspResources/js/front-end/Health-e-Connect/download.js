@@ -8,10 +8,6 @@
 require(['./main'], function () {
     require(['jquery'], function($) {
 
-        $.ajaxSetup({
-            cache: false
-        });
-
         //This function will launch the status detail overlay with the selected
         //status
         $(document).on('click', '.viewStatus', function() {

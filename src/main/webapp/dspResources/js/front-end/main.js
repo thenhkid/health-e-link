@@ -22,6 +22,10 @@ define(['jquery', 'fixed-header', 'moment', 'bootstrap', 'responsive-tables', 'm
 
 	var primaryNav = $('.primary-nav');
 	var primaryNavHeight = primaryNav.outerHeight();
+        
+        $.ajaxSetup({
+            cache: false
+        });
     
         // left nav fixed nav bar
 	$('.fixed-region').affix({
