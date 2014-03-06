@@ -16,7 +16,6 @@ import com.ut.dph.model.configuration;
 import com.ut.dph.model.configurationConnection;
 import com.ut.dph.model.configurationDataTranslations;
 import com.ut.dph.model.configurationFormFields;
-import com.ut.dph.model.configurationSchedules;
 import com.ut.dph.model.configurationTransport;
 import com.ut.dph.model.fieldSelectOptions;
 import com.ut.dph.model.transactionAttachment;
@@ -89,8 +88,8 @@ public class transactionInManagerImpl implements transactionInManager {
     
     @Override
     @Transactional
-    public String getFieldValue(String tableName, String tableCol, int idValue) {
-        return transactionInDAO.getFieldValue(tableName, tableCol, idValue);
+    public String getFieldValue(String tableName, String tableCol, String idCol, int idValue) {
+        return transactionInDAO.getFieldValue(tableName, tableCol, idCol, idValue);
     }
 
     @Override

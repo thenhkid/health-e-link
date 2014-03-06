@@ -32,7 +32,7 @@ import java.util.Map;
  */
 public interface transactionInDAO {
     
-    String getFieldValue(String tableName, String tableCol, int idValue);
+    String getFieldValue(String tableName, String tableCol, String idCol, int idValue);
     
     List<fieldSelectOptions> getFieldSelectOptions(int fieldId, int configId);
     

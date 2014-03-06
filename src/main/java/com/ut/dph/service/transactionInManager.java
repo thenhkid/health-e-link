@@ -13,7 +13,6 @@ import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.configurationConnection;
 import com.ut.dph.model.configurationDataTranslations;
 import com.ut.dph.model.configurationFormFields;
-import com.ut.dph.model.configurationSchedules;
 import com.ut.dph.model.configurationTransport;
 import com.ut.dph.model.fieldSelectOptions;
 import com.ut.dph.model.transactionAttachment;
@@ -35,7 +34,7 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public interface transactionInManager {
     
-    String getFieldValue(String tableName, String tableCol, int idValue);
+    String getFieldValue(String tableName, String tableCol, String idCol, int idValue);
     
     List<fieldSelectOptions> getFieldSelectOptions(int fieldId, int configId);
     

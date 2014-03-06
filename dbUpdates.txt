@@ -562,3 +562,7 @@ INSERT INTO `universaltranslator`.`lu_ProcessStatus` (`category`, `displayCode`,
 ALTER TABLE `universalTranslator`.`transactionTarget` 
 CHANGE COLUMN `batchDLId` `batchDLId` INT(11) NULL DEFAULT 0 ;
 
+/** Chad 3-06-2014 @ 10:14 AM **/
+ALTER TABLE `universalTranslator`.`message_VisitInfo` 
+ADD COLUMN `originalReferralId` VARCHAR(45) NULL DEFAULT NULL AFTER `totalTimesSeen`;
+

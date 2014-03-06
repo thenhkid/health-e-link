@@ -77,10 +77,10 @@ public class transactionInDAOImpl implements transactionInDAO {
      * @return The function will return a String
      */
     @Override
-    public String getFieldValue(String tableName, String tableCol, int idValue) {
+    public String getFieldValue(String tableName, String tableCol, String idCol, int idValue) {
 
-        String sql = ("select " + tableCol + " from " + tableName + " where id = :id");
-
+        String sql = ("select " + tableCol + " from " + tableName + " where " + idCol + " = :id");
+        
         Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
         query.setParameter("id", idValue);
 

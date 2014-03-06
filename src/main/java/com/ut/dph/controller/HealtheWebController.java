@@ -335,7 +335,7 @@ public class HealtheWebController {
                 try {
                     List<configurationFormFields> sourceInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transaction.getconfigId(),transportDetails.getId(),1);
                     /* Set all the transaction SOURCE ORG fields */
-                    List<transactionRecords> fromFields = setInboxFormFields(sourceInfoFormFields, records, 0, true);
+                    List<transactionRecords> fromFields = setInboxFormFields(sourceInfoFormFields, records, 0, true, 0);
                     transactionDetails.setsourceOrgFields(fromFields);
                 }
                 catch (Exception e) {
@@ -345,7 +345,7 @@ public class HealtheWebController {
                 try {
                    List<configurationFormFields> targetInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transaction.getconfigId(),transportDetails.getId(),3);
                     /* Set all the transaction TARGET fields */
-                    List<transactionRecords> toFields = setInboxFormFields(targetInfoFormFields, records, 0, true);
+                    List<transactionRecords> toFields = setInboxFormFields(targetInfoFormFields, records, 0, true, 0);
                     transactionDetails.settargetOrgFields(toFields);
                 }
                 catch (Exception e) {
@@ -355,7 +355,7 @@ public class HealtheWebController {
                 try {
                     List<configurationFormFields> patientInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transaction.getconfigId(),transportDetails.getId(),5);
                     /* Set all the transaction PATIENT fields */
-                    List<transactionRecords> patientFields = setInboxFormFields(patientInfoFormFields, records, 0, true);
+                    List<transactionRecords> patientFields = setInboxFormFields(patientInfoFormFields, records, 0, true, 0);
                     transactionDetails.setpatientFields(patientFields);
                 }
                 catch (Exception e) {
@@ -365,7 +365,7 @@ public class HealtheWebController {
                 try {
                   List<configurationFormFields> detailFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transaction.getconfigId(),transportDetails.getId(),6);
                   /* Set all the transaction DETAIL fields */
-                  List<transactionRecords> detailFields = setInboxFormFields(detailFormFields, records, 0, true);
+                  List<transactionRecords> detailFields = setInboxFormFields(detailFormFields, records, 0, true, 0);
                   transactionDetails.setdetailFields(detailFields);
                 }
                 catch (Exception e) {
@@ -471,7 +471,7 @@ public class HealtheWebController {
             try {
                 List<configurationFormFields> senderInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),1);
                 /* Set all the transaction SOURCE ORG fields */
-                List<transactionRecords> fromFields = setInboxFormFields(senderInfoFormFields, records, transactionInfo.getconfigId(), true);
+                List<transactionRecords> fromFields = setInboxFormFields(senderInfoFormFields, records, transactionInfo.getconfigId(), true, 0);
                 transaction.setsourceOrgFields(fromFields);
             
             }
@@ -482,7 +482,7 @@ public class HealtheWebController {
             try {
               List<configurationFormFields> senderProviderFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),2);
               /* Set all the transaction SOURCE PROVIDER fields */
-              List<transactionRecords> fromProviderFields = setInboxFormFields(senderProviderFormFields, records, transactionInfo.getconfigId(), true);
+              List<transactionRecords> fromProviderFields = setInboxFormFields(senderProviderFormFields, records, transactionInfo.getconfigId(), true, 0);
               transaction.setsourceProviderFields(fromProviderFields);
               
             }
@@ -493,7 +493,7 @@ public class HealtheWebController {
             try {
                 List<configurationFormFields> targetInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),3);
                 /* Set all the transaction TARGET fields */
-                List<transactionRecords> toFields = setInboxFormFields(targetInfoFormFields, records, transactionInfo.getconfigId(), true);
+                List<transactionRecords> toFields = setInboxFormFields(targetInfoFormFields, records, transactionInfo.getconfigId(), true, 0);
                 transaction.settargetOrgFields(toFields);
             
             }
@@ -504,7 +504,7 @@ public class HealtheWebController {
             try {
                 List<configurationFormFields> targetProviderFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),4);
                 /* Set all the transaction TARGET PROVIDER fields */
-                List<transactionRecords> toProviderFields = setInboxFormFields(targetProviderFormFields, records, transactionInfo.getconfigId(), true);
+                List<transactionRecords> toProviderFields = setInboxFormFields(targetProviderFormFields, records, transactionInfo.getconfigId(), true, 0);
                 transaction.settargetProviderFields(toProviderFields);
             
             }
@@ -516,7 +516,7 @@ public class HealtheWebController {
                List<configurationFormFields> patientInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),5);
                
                /* Set all the transaction PATIENT fields */
-               List<transactionRecords> patientFields = setInboxFormFields(patientInfoFormFields, records, transactionInfo.getconfigId(), true);
+               List<transactionRecords> patientFields = setInboxFormFields(patientInfoFormFields, records, transactionInfo.getconfigId(), true, 0);
                transaction.setpatientFields(patientFields);
              
             }
@@ -527,7 +527,7 @@ public class HealtheWebController {
             try {
                 List<configurationFormFields> detailFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),6);
                 /* Set all the transaction DETAIL fields */
-                List<transactionRecords> detailFields = setInboxFormFields(detailFormFields, records, transactionInfo.getconfigId(), true);
+                List<transactionRecords> detailFields = setInboxFormFields(detailFormFields, records, transactionInfo.getconfigId(), true, 0);
                 transaction.setdetailFields(detailFields);
 
             }
@@ -678,7 +678,7 @@ public class HealtheWebController {
                 List<configurationFormFields> senderInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId,transportDetails.getId(),1);
            
                 /* Set all the transaction SOURCE ORG fields */
-                List<transactionRecords> fromFields = setInboxFormFields(senderInfoFormFields, records, configId, false);
+                List<transactionRecords> fromFields = setInboxFormFields(senderInfoFormFields, records, configId, false, transactionDetails.gettransactionInId());
                 transaction.setsourceOrgFields(fromFields);
             
             }
@@ -690,7 +690,7 @@ public class HealtheWebController {
                 List<configurationFormFields> senderProviderFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId,transportDetails.getId(),2);
             
                 /* Set all the transaction SOURCE PROVIDER fields */
-                List<transactionRecords> fromProviderFields = setInboxFormFields(senderProviderFormFields, records, configId, false);
+                List<transactionRecords> fromProviderFields = setInboxFormFields(senderProviderFormFields, records, configId, false, transactionDetails.gettransactionInId());
                 transaction.setsourceProviderFields(fromProviderFields);
             
             }
@@ -703,7 +703,7 @@ public class HealtheWebController {
                 List<configurationFormFields> targetInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId,transportDetails.getId(),3);
             
                 /* Set all the transaction TARGET fields */
-                List<transactionRecords> toFields = setInboxFormFields(targetInfoFormFields, records, configId, false);
+                List<transactionRecords> toFields = setInboxFormFields(targetInfoFormFields, records, configId, false, transactionDetails.gettransactionInId());
                 transaction.settargetOrgFields(toFields);
             
             }
@@ -715,7 +715,7 @@ public class HealtheWebController {
                 List<configurationFormFields> targetProviderFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId,transportDetails.getId(),4);
             
                 /* Set all the transaction TARGET PROVIDER fields */
-                List<transactionRecords> toProviderFields = setInboxFormFields(targetProviderFormFields, records, configId, false);
+                List<transactionRecords> toProviderFields = setInboxFormFields(targetProviderFormFields, records, configId, false, transactionDetails.gettransactionInId());
                 transaction.settargetProviderFields(toProviderFields);
             
             }
@@ -728,7 +728,7 @@ public class HealtheWebController {
                 List<configurationFormFields> patientInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId,transportDetails.getId(),5);
             
                 /* Set all the transaction PATIENT fields */
-                List<transactionRecords> patientFields = setInboxFormFields(patientInfoFormFields, records, configId, true);
+                List<transactionRecords> patientFields = setInboxFormFields(patientInfoFormFields, records, configId, true, transactionDetails.gettransactionInId());
                 transaction.setpatientFields(patientFields);
             
             }
@@ -740,7 +740,7 @@ public class HealtheWebController {
                 List<configurationFormFields> detailFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId,transportDetails.getId(),6);
 
                 /* Set all the transaction DETAIL fields */
-                List<transactionRecords> detailFields = setInboxFormFields(detailFormFields, null, configId, false);
+                List<transactionRecords> detailFields = setInboxFormFields(detailFormFields, null, configId, false, transactionDetails.gettransactionInId());
                 transaction.setdetailFields(detailFields);
 
             
@@ -2225,7 +2225,7 @@ public class HealtheWebController {
      * 
      * @throws NoSuchMethodException 
      */
-    public List<transactionRecords> setInboxFormFields(List<configurationFormFields> formfields, transactionOutRecords records, int configId, boolean readOnly) throws NoSuchMethodException {
+    public List<transactionRecords> setInboxFormFields(List<configurationFormFields> formfields, transactionOutRecords records, int configId, boolean readOnly, int transactionInId) throws NoSuchMethodException {
         
         List<transactionRecords> fields = new ArrayList<transactionRecords>();
         
@@ -2253,6 +2253,22 @@ public class HealtheWebController {
                 } catch (InvocationTargetException ex) {
                     Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
                 }
+            }
+            /* 
+                If records == null and an auto populate field is set for the field get the data from the
+                table/col for the transaction
+            */
+            else if(records == null && formfield.getautoPopulateTableName() != null && transactionInId > 0) {
+                
+                /* Get the pre-populated values */
+                String tableName = formfield.getautoPopulateTableName();
+                String tableCol = formfield.getautoPopulateTableCol();
+                
+                if(!tableName.isEmpty() && !tableCol.isEmpty()) {
+                    field.setfieldValue(transactionInManager.getFieldValue(tableName, tableCol, "transactionInId", transactionInId));
+                    field.setreadOnly(true);
+                }
+                
             }
             
             if(configId > 0) {
@@ -2312,8 +2328,8 @@ public class HealtheWebController {
                 String tableName = formfield.getautoPopulateTableName();
                 String tableCol = formfield.getautoPopulateTableCol();
 
-                if(!tableName.isEmpty() && !tableName.isEmpty()) {
-                    field.setfieldValue(transactionInManager.getFieldValue(tableName, tableCol, orgId));
+                if(!tableName.isEmpty() && !tableCol.isEmpty()) {
+                    field.setfieldValue(transactionInManager.getFieldValue(tableName, tableCol, "id", orgId));
                 }
             }
             
@@ -2397,19 +2413,19 @@ public class HealtheWebController {
                     List<configurationFormFields> detailFormFields = configurationTransportManager.getConfigurationFieldsByBucket(inboxFeedbackReport.getconfigId(),transportDetails.getId(),6);
 
                     /* Set all the transaction SOURCE ORG fields */
-                    List<transactionRecords> fromFields = setInboxFormFields(sourceInfoFormFields, records, 0, true);
+                    List<transactionRecords> fromFields = setInboxFormFields(sourceInfoFormFields, records, 0, true, 0);
                     transaction.setsourceOrgFields(fromFields);
 
                     /* Set all the transaction TARGET fields */
-                    List<transactionRecords> toFields = setInboxFormFields(targetInfoFormFields, records, 0, true);
+                    List<transactionRecords> toFields = setInboxFormFields(targetInfoFormFields, records, 0, true, 0);
                     transaction.settargetOrgFields(toFields);
 
                     /* Set all the transaction PATIENT fields */
-                    List<transactionRecords> patientFields = setInboxFormFields(patientInfoFormFields, records, 0, true);
+                    List<transactionRecords> patientFields = setInboxFormFields(patientInfoFormFields, records, 0, true, 0);
                     transaction.setpatientFields(patientFields);
 
                     /* Set all the transaction DETAIL fields */
-                    List<transactionRecords> detailFields = setInboxFormFields(detailFormFields, records, 0, true);
+                    List<transactionRecords> detailFields = setInboxFormFields(detailFormFields, records, 0, true, 0);
                     transaction.setdetailFields(detailFields);
 
                     /* get the message type name */
