@@ -41,7 +41,7 @@ require(['./main'], function () {
             var newDspPos = $(this).val();
 
             $('.dspPos_' + bucketVal).each(function() {
-                if ($(this).val() == newDspPos) {
+                if ($(this).attr('rel2') == newDspPos) {
                     $(this).val(currDspPos);
                     $(this).attr('rel2', currDspPos);
                 }

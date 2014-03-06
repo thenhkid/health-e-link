@@ -62,15 +62,12 @@
                             <table class="table table-striped table-hover bucketTable_${i}">
                                 <thead>
                                     <tr>
-                                        <th scope="col" style="width:150px; min-width:150px">Display POS</th>
-                                        <th scope="col" style="width:200px; min-width:200px;">Field Name</th>
-                                        <th scope="col" style="width:300px; min-width:300px;">Field Label *</th>
-                                        <th scope="col" style="width:100px; min-width:100px;" class="center-text">Required</th>
-                                        <th scope="col" style="width:150px; min-width:150px;">Validation Type</th>
-                                        <th scope="col" style="width:200px; min-width:200px;">Table Name *</th>
-                                        <th scope="col" style="width:150px; min-width:150px;">Table Column Name *</th>
-                                        <th scope="col" style="width:200px; min-width:200px;">Auto Populate Table Name</th>
-                                        <th scope="col" style="width:150px; min-width:150px;">Auto Populate Table Column Name</th>
+                                        <th scope="col" style="width:100px; min-width:100px">Display POS</th>
+                                        <th scope="col" style="width:150px; min-width:150px;">Field Name</th>
+                                        <th scope="col" style="width:150px; min-width:150px;">Field Label *</th>
+                                        <th scope="col" style="width:150px; min-width:150px;">Field Validation </th>
+                                        <th scope="col" style="width:200px; min-width:200px;">Save To Table *</th>
+                                        <th scope="col" style="width:200px; min-width:200px;">Auto Populate From Table</th>
                                     </tr>
                                 </thead>
                                 <tbody>  
@@ -115,58 +112,78 @@
                                                 </td>
                                                 <td>
                                                     <div id="fieldLabel_${field.index}" class="form-group ${status.error ? 'has-error' : '' }">
-                                                        <input type="text" name="fields[${field.index}].fieldLabel"  value="${mappings.fieldLabel}" rel="${field.index}" class="form-control fieldLabel" />
+                                                        <input type="text" name="fields[${field.index}].fieldLabel"  value="${mappings.fieldLabel}" rel="${field.index}" class="form-control fieldLabel" style="width:200px;" />
                                                         <span id="fieldLabelMsg_${field.index}" class="control-label"></span>
                                                     </div>
                                                 </td>
-                                                <td class="center-text">
-                                                    <input type="checkbox" name="fields[${field.index}].required" value="true" <c:if test="${mappings.required == true}">checked</c:if>  />
-                                                    </td>
-                                                    <td class="validationTypes">
+                                                <td>
+                                                    <div class="form-group validationTypes">
                                                         <select name="fields[${field.index}].validationType" class="form-control half">
-                                                        <c:forEach items="${validationTypes}"  var="fieldvalidationtypes" varStatus="vtype">
-                                                            <option value="${validationTypes[vtype.index][0]}" <c:if test="${mappings.validationType == validationTypes[vtype.index][0]}">selected</c:if>>${validationTypes[vtype.index][1]}</option>
-                                                        </c:forEach>
-                                                    </select>
+                                                            <c:forEach items="${validationTypes}"  var="fieldvalidationtypes" varStatus="vtype">
+                                                                <option value="${validationTypes[vtype.index][0]}" <c:if test="${mappings.validationType == validationTypes[vtype.index][0]}">selected</c:if>>${validationTypes[vtype.index][1]}</option>
+                                                            </c:forEach>
+                                                        </select>
+                                                    </div>
+                                                     <div class="form-group">
+                                                        Required? <input type="checkbox" name="fields[${field.index}].required" value="true" <c:if test="${mappings.required == true}">checked</c:if>  /><br />
+                                                    </div>
                                                 </td>
-                                                <td class="tableNames">
-                                                    <div id="tableName_${field.index}" class="form-group ${status.error ? 'has-error' : '' }">
+                                                <td>
+                                                    <div id="tableName_${field.index}" class="form-group ${status.error ? 'has-error' : '' } tableNames">
                                                         <select name="fields[${field.index}].saveToTableName" rel="${field.index}" class="form-control half tableName">
                                                             <option value="" label=" - Select - " ></option>
                                                             <c:forEach items="${infoTables}"  var="infotablenames" varStatus="tname">
                                                                 <option value="${infoTables[tname.index]}" <c:if test="${fn:toLowerCase(mappings.saveToTableName) == fn:toLowerCase(infoTables[tname.index])}">selected</c:if>>${infoTables[tname.index]}</option>
                                                             </c:forEach>
-                                                        </select><br />
+                                                        </select>
                                                         <span id="tableNameMsg_${field.index}" class="control-label"></span>
                                                     </div>
+                                                    <div class="tableCols">
+                                                        <div id="tableCol_${field.index}" class="form-group ${status.error ? 'has-error' : '' }">
+                                                            <strong>Table Column</strong><br/>
+                                                            <select id="tableCols${field.index}" name="fields[${field.index}].saveToTableCol" rel="${field.index}" rel2="${mappings.saveToTableCol}" class="form-control half tableCol">
+                                                                <option value="" label=" - Select - " ></option>
+                                                            </select>
+                                                            <span id="tableColMsg_${field.index}" class="control-label" ></span>
+                                                        </div>
+                                                    </div>
                                                 </td>
-                                                <td class="tableCols">
+                                                <!---<td class="tableCols">
                                                     <div id="tableCol_${field.index}" class="form-group ${status.error ? 'has-error' : '' }">
                                                         <select id="tableCols${field.index}" name="fields[${field.index}].saveToTableCol" rel="${field.index}" rel2="${mappings.saveToTableCol}" class="form-control half tableCol">
                                                             <option value="" label=" - Select - " ></option>
                                                         </select><br />
                                                         <span id="tableColMsg_${field.index}" class="control-label" ></span>
                                                     </div>
-                                                </td>
-                                                <td class="autoPopulatetableNames">
-                                                    <div id="autoPopulatetableName_${field.index}" class="form-group ${status.error ? 'has-error' : '' }">
+                                                </td>--->
+                                                <td>
+                                                    <div id="autoPopulatetableName_${field.index}" class="form-group ${status.error ? 'has-error' : '' } autoPopulatetableNames">
                                                         <select name="fields[${field.index}].autoPopulateTableName" rel="${field.index}" class="form-control half autoPopulatetableName">
                                                             <option value="" label=" - Select - " ></option>
                                                             <c:forEach items="${allTables}"  var="alltablenames" varStatus="tname">
                                                                 <option value="${allTables[tname.index]}" <c:if test="${fn:toLowerCase(mappings.autoPopulateTableName) == fn:toLowerCase(allTables[tname.index])}">selected</c:if>>${allTables[tname.index]}</option>
                                                             </c:forEach>
-                                                        </select><br />
+                                                        </select>
                                                         <span id="autoPopulatetableNameMsg_${field.index}" class="control-label"></span>
                                                     </div>
+                                                    <div class="autoPopulatetableCols">
+                                                        <div id="autoPopulatetableCol_${field.index}" class="form-group ${status.error ? 'has-error' : '' }">
+                                                            <strong>Table Column</strong><br/>
+                                                            <select id="autoPopulatetableCols${field.index}" name="fields[${field.index}].autoPopulateTableCol" rel="${field.index}" rel2="${mappings.autoPopulateTableCol}" class="form-control half autoPopulatetableCol">
+                                                                <option value="" label=" - Select - " ></option>
+                                                            </select>
+                                                            <span id="autoPopulatetableColMsg_${field.index}" class="control-label" ></span>
+                                                        </div>
+                                                    </div>
                                                 </td>
-                                                <td class="autoPopulatetableCols">
+                                                <!---<td class="autoPopulatetableCols">
                                                     <div id="autoPopulatetableCol_${field.index}" class="form-group ${status.error ? 'has-error' : '' }">
                                                         <select id="autoPopulatetableCols${field.index}" name="fields[${field.index}].autoPopulateTableCol" rel="${field.index}" rel2="${mappings.autoPopulateTableCol}" class="form-control half autoPopulatetableCol">
                                                             <option value="" label=" - Select - " ></option>
                                                         </select><br />
                                                         <span id="autoPopulatetableColMsg_${field.index}" class="control-label" ></span>
                                                     </div>
-                                                </td>
+                                                </td>--->
                                         </tr>
                                     </c:if>
                                 </c:forEach>
