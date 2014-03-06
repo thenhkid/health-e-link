@@ -2307,6 +2307,10 @@ public class HealtheWebController {
             field.setreadOnly(readOnly);
             field.setfieldValue(null);
             
+            /* Get the pre-populated values */
+            String tableName = formfield.getautoPopulateTableName();
+            String tableCol = formfield.getautoPopulateTableCol();
+            
             /* Get the validation */
             if(formfield.getValidationType() > 1) {
                 field.setvalidation(messagetypemanager.getValidationById(formfield.getValidationType()).toString());
@@ -2321,13 +2325,14 @@ public class HealtheWebController {
                 } catch (InvocationTargetException ex) {
                     Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
                 }
+                
+                /* If autopopulate field is set make it read only */
+                if(!tableName.isEmpty() && !tableCol.isEmpty()) {
+                    field.setreadOnly(true);
+                }
             }
             else if(orgId > 0)  {
             
-                /* Get the pre-populated values */
-                String tableName = formfield.getautoPopulateTableName();
-                String tableCol = formfield.getautoPopulateTableCol();
-
                 if(!tableName.isEmpty() && !tableCol.isEmpty()) {
                     field.setfieldValue(transactionInManager.getFieldValue(tableName, tableCol, "id", orgId));
                 }

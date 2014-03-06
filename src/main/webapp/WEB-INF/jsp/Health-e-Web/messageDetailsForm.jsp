@@ -222,7 +222,15 @@
                                                         </select>
                                                     </c:when>
                                                     <c:otherwise>
-                                                        <input <c:if test="${detailInfo.readOnly == true}">disabled</c:if> id="${detailInfo.fieldNo}" name="detailFields[${dfield.index}].fieldValue" value="${detailInfo.fieldValue}" class="form-control ${detailInfo.validation.replace(' ','-')} <c:if test="${detailInfo.required == true}"> required</c:if>" type="text">
+                                                        <c:choose>
+                                                            <c:when test="${detailInfo.readOnly == true}">
+                                                                <input disabled value="${detailInfo.fieldValue}" class="form-control ${detailInfo.validation.replace(' ','-')} type="text">
+                                                                <input type="hidden" id="${detailInfo.fieldNo}" name="detailFields[${dfield.index}].fieldValue" value="${detailInfo.fieldValue}" />
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <input id="${detailInfo.fieldNo}" name="detailFields[${dfield.index}].fieldValue" value="${detailInfo.fieldValue}" class="form-control ${detailInfo.validation.replace(' ','-')} <c:if test="${detailInfo.required == true}"> required</c:if>" type="text">
+                                                            </c:otherwise>
+                                                        </c:choose>
                                                     </c:otherwise>
                                                 </c:choose>
                                                 <span id="errorMsg_${detailInfo.fieldNo}" class="control-label"></span>                
