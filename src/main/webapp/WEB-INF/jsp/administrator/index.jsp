@@ -67,46 +67,7 @@
     </div>
 
     <div class="row-fluid contain basic-clearfix">
-        <div class="col-md-6">
-            <section class="panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Configurations</h3>
-                </div>
-                <div class="panel-body" >
-                    <h4>Latest Configurations:</h4>
-                    <c:choose>
-                        <c:when test="${not empty latestConfigs}"> 
-                            <table class="table table-striped table-hover table-default">
-                                <tbody>
-                                    <c:forEach var="config" items="${latestConfigs}">
-                                        <tr>
-                                            <td>
-                                                <a href="administrator/configurations/details?i=${config.id}" title="Edit this Configuration"><strong>${config.orgName}</strong></a>
-                                                <br/> <strong>Configuration Type:</strong> <c:choose><c:when test="${config.type == 1}">Source Configuration</c:when><c:otherwise>Target Configuration</c:otherwise></c:choose>
-                                                <br/> <strong>Message Type:</strong>  ${config.messageTypeName}
-                                                <br/> <strong>Transport Method:</strong> ${config.transportMethod}
-                                                <br/> <strong>Status:</strong>  <c:choose><c:when test="${config.status == true}">active</c:when><c:otherwise>inactive</c:otherwise></c:choose>
-                                            </td>
-                                            <td>
-                                                <fmt:formatDate value="${config.dateCreated}" type="date" pattern="M/dd/yyyy" />
-                                            </td>
-                                            <td class="actions-col">
-                                                <a href="administrator/configurations/details?i=${config.id}" class="btn btn-link" title="Edit this Configuration" role="button">
-                                                    <span class="glyphicon glyphicon-edit"></span>
-                                                    Edit
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    </c:forEach>
-                                </tbody>
-                            </table>
-                        </c:when>
-                        <c:otherwise><tr><td colspan="3" class="center-text">There are currently no configurations set up.</td></tr></c:otherwise>
-                    </c:choose>
-                </div>
-            </section>
-        </div>
-
+        
         <div class="col-md-6">
             <section class="panel panel-default">
                 <div class="panel-heading">
@@ -156,6 +117,48 @@
                 </div>
             </section>
         </div>
+        
+        <div class="col-md-6">
+            <section class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Configurations</h3>
+                </div>
+                <div class="panel-body" >
+                    <h4>Latest Configurations:</h4>
+                    <c:choose>
+                        <c:when test="${not empty latestConfigs}"> 
+                            <table class="table table-striped table-hover table-default">
+                                <tbody>
+                                    <c:forEach var="config" items="${latestConfigs}">
+                                        <tr>
+                                            <td>
+                                                <a href="administrator/configurations/details?i=${config.id}" title="Edit this Configuration"><strong>${config.orgName}</strong></a>
+                                                <br/> <strong>Configuration Type:</strong> <c:choose><c:when test="${config.type == 1}">Source Configuration</c:when><c:otherwise>Target Configuration</c:otherwise></c:choose>
+                                                <br/> <strong>Message Type:</strong>  ${config.messageTypeName}
+                                                <br/> <strong>Transport Method:</strong> ${config.transportMethod}
+                                                <br/> <strong>Status:</strong>  <c:choose><c:when test="${config.status == true}">active</c:when><c:otherwise>inactive</c:otherwise></c:choose>
+                                            </td>
+                                            <td>
+                                                <fmt:formatDate value="${config.dateCreated}" type="date" pattern="M/dd/yyyy" />
+                                            </td>
+                                            <td class="actions-col">
+                                                <a href="administrator/configurations/details?i=${config.id}" class="btn btn-link" title="Edit this Configuration" role="button">
+                                                    <span class="glyphicon glyphicon-edit"></span>
+                                                    Edit
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </c:forEach>
+                                </tbody>
+                            </table>
+                        </c:when>
+                        <c:otherwise><tr><td colspan="3" class="center-text">There are currently no configurations set up.</td></tr></c:otherwise>
+                    </c:choose>
+                </div>
+            </section>
+        </div>
+
+        
     </div>
 
     <div class="row-fluid contain">
