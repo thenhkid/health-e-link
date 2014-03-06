@@ -41,8 +41,8 @@
                                             <c:forEach items="${userAccess}" var="sections" varStatus="aStatus">
                                                 <li>
                                                     <c:choose>
-                                                        <c:when test="${sections.featureId == 3}"><a href="<c:url value='/Health-e-Web/inbox'/>" title="Health-e-Web">Health-e-Web</a></c:when>
-                                                        <c:when test="${sections.featureId == 4}"><a href="<c:url value='/Health-e-Connect/upload'/>" title="Health-e-Connect">Health-e-Connect</a></c:when>
+                                                        <c:when test="${sections.featureId == 3}"><a href="<c:url value='/Health-e-Web/inbox'/>" title="Health-e-Web">ERG</a></c:when>
+                                                        <c:when test="${sections.featureId == 4}"><a href="<c:url value='/Health-e-Connect/upload'/>" title="Health-e-Connect">File Exchange</a></c:when>
                                                     </c:choose>
                                                 </li>
                                             </c:forEach> 

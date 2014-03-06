@@ -1,6 +1,7 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %> 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
 <!-- Page variable to hold what dsp pos value to show -->
 <c:set var="endDspPostLoop" value="1" />
@@ -133,7 +134,7 @@
                                                         <select name="fields[${field.index}].saveToTableName" rel="${field.index}" class="form-control half tableName">
                                                             <option value="" label=" - Select - " ></option>
                                                             <c:forEach items="${infoTables}"  var="infotablenames" varStatus="tname">
-                                                                <option value="${infoTables[tname.index]}" <c:if test="${mappings.saveToTableName == infoTables[tname.index]}">selected</c:if>>${infoTables[tname.index]}</option>
+                                                                <option value="${infoTables[tname.index]}" <c:if test="${fn:toLowerCase(mappings.saveToTableName) == fn:toLowerCase(infoTables[tname.index])}">selected</c:if>>${infoTables[tname.index]}</option>
                                                             </c:forEach>
                                                         </select><br />
                                                         <span id="tableNameMsg_${field.index}" class="control-label"></span>
@@ -152,7 +153,7 @@
                                                         <select name="fields[${field.index}].autoPopulateTableName" rel="${field.index}" class="form-control half autoPopulatetableName">
                                                             <option value="" label=" - Select - " ></option>
                                                             <c:forEach items="${allTables}"  var="alltablenames" varStatus="tname">
-                                                                <option value="${allTables[tname.index]}" <c:if test="${mappings.autoPopulateTableName == allTables[tname.index]}">selected</c:if>>${allTables[tname.index]}</option>
+                                                                <option value="${allTables[tname.index]}" <c:if test="${fn:toLowerCase(mappings.autoPopulateTableName) == fn:toLowerCase(allTables[tname.index])}">selected</c:if>>${allTables[tname.index]}</option>
                                                             </c:forEach>
                                                         </select><br />
                                                         <span id="autoPopulatetableNameMsg_${field.index}" class="control-label"></span>

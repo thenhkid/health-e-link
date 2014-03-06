@@ -27,7 +27,7 @@
             </div>
         </aside>
         <div class="col-md-9 col-md-offset-0 col-sm-8 col-sm-offset-1 page-content">
-            <h2>OOps, An error has occurred.</h2>
+            <h2>Oops, An error has occurred.</h2>
             <p>
                 Lorem ipsum <em>emphasised text</em> dolor sit amet, <strong>strong text</strong> 
                 consectetur adipisicing elit, <abbr title="">abbreviated text</abbr> sed do eiusmod tempor 
