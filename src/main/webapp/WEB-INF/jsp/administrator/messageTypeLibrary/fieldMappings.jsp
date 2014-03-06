@@ -148,14 +148,6 @@
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <!---<td class="tableCols">
-                                                    <div id="tableCol_${field.index}" class="form-group ${status.error ? 'has-error' : '' }">
-                                                        <select id="tableCols${field.index}" name="fields[${field.index}].saveToTableCol" rel="${field.index}" rel2="${mappings.saveToTableCol}" class="form-control half tableCol">
-                                                            <option value="" label=" - Select - " ></option>
-                                                        </select><br />
-                                                        <span id="tableColMsg_${field.index}" class="control-label" ></span>
-                                                    </div>
-                                                </td>--->
                                                 <td>
                                                     <div id="autoPopulatetableName_${field.index}" class="form-group ${status.error ? 'has-error' : '' } autoPopulatetableNames">
                                                         <select name="fields[${field.index}].autoPopulateTableName" rel="${field.index}" class="form-control half autoPopulatetableName">
@@ -176,18 +168,9 @@
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <!---<td class="autoPopulatetableCols">
-                                                    <div id="autoPopulatetableCol_${field.index}" class="form-group ${status.error ? 'has-error' : '' }">
-                                                        <select id="autoPopulatetableCols${field.index}" name="fields[${field.index}].autoPopulateTableCol" rel="${field.index}" rel2="${mappings.autoPopulateTableCol}" class="form-control half autoPopulatetableCol">
-                                                            <option value="" label=" - Select - " ></option>
-                                                        </select><br />
-                                                        <span id="autoPopulatetableColMsg_${field.index}" class="control-label" ></span>
-                                                    </div>
-                                                </td>--->
-                                        </tr>
-                                    </c:if>
-                                </c:forEach>
-                                
+                                            </tr>
+                                        </c:if>
+                                    </c:forEach>
                                 </tbody>
                             </table>
                         </div>

@@ -80,11 +80,10 @@
                                                 <thead>
                                                     <tr>
                                                         <th scope="col" style="width:100px; min-width:100px" class="center-text">Use This Field</th>
-                                                        <th scope="col" style="width:150px; min-width:150px">Display POS</th>
-                                                        <th scope="col" style="width:200px; min-width:200px;">Field Name</th>
-                                                        <th scope="col" style="width:300px; min-width:300px;">Field Label *</th>
-                                                        <th scope="col" style="width:100px; min-width:100px;" class="center-text">Required</th>
-                                                        <th scope="col" style="width:150px; min-width:150px;">Validation Type</th>
+                                                        <th scope="col" style="width:100px; min-width:100px">Display POS</th>
+                                                        <th scope="col" style="width:150px; min-width:150px;">Field Name</th>
+                                                        <th scope="col" style="width:150px; min-width:150px;">Field Label *</th>
+                                                        <th scope="col" style="width:150px; min-width:150px;">Field Validation</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -137,19 +136,21 @@
                                                                 </td>
                                                                 <td>
                                                                     <div id="fieldLabel_${field.index}" class="form-group ${status.error ? 'has-error' : '' }">
-                                                                        <input type="text" name="fields[${field.index}].fieldLabel"  value="${fieldDetails.fieldLabel}" rel="${field.index}" class="form-control fieldLabel formField" />
+                                                                        <input type="text" name="fields[${field.index}].fieldLabel"  value="${fieldDetails.fieldLabel}" rel="${field.index}" class="form-control fieldLabel formField" style="width:200px;" />
                                                                         <span id="fieldLabelMsg_${field.index}" class="control-label"></span>
                                                                     </div>
                                                                 </td>
-                                                                <td class="center-text">
-                                                                    <input type="checkbox" name="fields[${field.index}].required" value="true" <c:if test="${fieldDetails.required == true}">checked="checked"</c:if> class="formField"  />
-                                                                </td>
-                                                                <td class="validationTypes">
-                                                                    <select name="fields[${field.index}].validationType" class="form-control half formField">
-                                                                        <c:forEach items="${validationTypes}"  var="fieldvalidationtypes" varStatus="vtype">
-                                                                            <option value="${validationTypes[vtype.index][0]}" <c:if test="${fieldDetails.validationType == validationTypes[vtype.index][0]}">selected</c:if>>${validationTypes[vtype.index][1]}</option>
-                                                                        </c:forEach>
-                                                                    </select>
+                                                                <td>
+                                                                    <div class="form-group validationTypes">
+                                                                        <select name="fields[${field.index}].validationType" class="form-control half formField">
+                                                                            <c:forEach items="${validationTypes}"  var="fieldvalidationtypes" varStatus="vtype">
+                                                                                <option value="${validationTypes[vtype.index][0]}" <c:if test="${fieldDetails.validationType == validationTypes[vtype.index][0]}">selected</c:if>>${validationTypes[vtype.index][1]}</option>
+                                                                            </c:forEach>
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="form-group">
+                                                                        Required? <input type="checkbox" name="fields[${field.index}].required" value="true" <c:if test="${fieldDetails.required == true}">checked="checked"</c:if> class="formField"  />
+                                                                    </div>
                                                                 </td>
                                                             </tr>
                                                         </c:if>
