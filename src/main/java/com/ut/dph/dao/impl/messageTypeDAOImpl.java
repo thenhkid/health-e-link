@@ -316,7 +316,7 @@ public class messageTypeDAOImpl implements messageTypeDAO {
             Integer transportDetailId = (Integer) transportDetails.uniqueResult();
 
             //Bulk insert the new fieldinto the configurationTransportDetails table for the online form
-            Query bulkInsert = sessionFactory.getCurrentSession().createSQLQuery("INSERT INTO configurationFormFields (messageTypeFieldId, configId, transportDetailId, fieldNo, fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, useField, saveToTableName, saveToTableCol) SELECT id, :configId, :transportDetailId, fieldNo,  fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, 0, saveToTableName, saveToTableCol FROM messageTypeFormFields where id = :newfieldId");
+            Query bulkInsert = sessionFactory.getCurrentSession().createSQLQuery("INSERT INTO configurationFormFields (messageTypeFieldId, configId, transportDetailId, fieldNo, fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, useField, saveToTableName, saveToTableCol, autoPopulateTableName, autoPopulateTableCol) SELECT id, :configId, :transportDetailId, fieldNo,  fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, 0, saveToTableName, saveToTableCol, autoPopulateTableName, autoPopulateTableCol FROM messageTypeFormFields where id = :newfieldId");
             bulkInsert.setParameter("configId", configuration.getId());
             bulkInsert.setParameter("transportDetailId", transportDetailId);
             bulkInsert.setParameter("newfieldId", lastId);
