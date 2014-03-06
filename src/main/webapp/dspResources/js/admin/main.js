@@ -18,6 +18,10 @@ require.config({
 
 
 define(['jquery',  'bootstrap', 'responsive-tables', 'mediaModal', 'overlay'], function ($) {
+    
+        $.ajaxSetup({
+            cache: false
+        });
 
 	// tooltip demo
 	$(document).tooltip({

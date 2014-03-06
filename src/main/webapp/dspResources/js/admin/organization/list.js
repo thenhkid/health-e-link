@@ -7,10 +7,6 @@
 require(['./main'], function () {
     require(['jquery'], function($) {
 
-        $.ajaxSetup({
-            cache: false
-        });
-
         //var searchTimeout;
 
         //Fade out the updated/created message after being displayed.
