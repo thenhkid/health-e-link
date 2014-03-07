@@ -243,5 +243,7 @@ public interface transactionInManager {
     void deleteMessage(int batchId, int transactionId) throws Exception;
     
     void cancelMessageTransaction(int transactionId) throws Exception;
+    
+    List <transactionInRecords> getTransactionInRecordsForBatch (Integer batchId);
 
 }

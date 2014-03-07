@@ -16,6 +16,7 @@ import com.ut.dph.model.configuration;
 import com.ut.dph.model.configurationConnection;
 import com.ut.dph.model.configurationDataTranslations;
 import com.ut.dph.model.configurationFormFields;
+import com.ut.dph.model.configurationMessageSpecs;
 import com.ut.dph.model.configurationTransport;
 import com.ut.dph.model.fieldSelectOptions;
 import com.ut.dph.model.transactionAttachment;
@@ -846,9 +847,23 @@ public class transactionInManagerImpl implements transactionInManager {
                 // we update entire transactionIN with configId
                 sysError = sysError + updateConfigIdForBatch(batchUpload.getId(), batchUpload.getConfigId());
             } else {
-		    		 // we parse every record to populate configId
-                //TODO need to write
-                sysError++;
+            	// we parse every record to populate configId, first we read record, then we test it with every config, update and break if match
+            	//1. we get all configs for org
+            	List<configurationMessageSpecs> configurationMessageSpecs = configurationtransportmanager.getConfigurationMessageSpecsForOrgTransport(batchUpload.getOrgId(), batchUpload.gettransportMethodId());
+                //2. we get all rows for batch
+            	List<transactionInRecords> tInRecords = getTransactionInRecordsForBatch(batchUpload.getId());
+            	if (tInRecords == null || tInRecords.size() == 0) {
+            		sysError++;
+                    insertProcessingError(5, null, batchUpload.getId(), null, null, null, null,
+                            false, false, "No transactions were found for this batch.");
+            	}
+            	if (configurationMessageSpecs == null || configurationMessageSpecs.size() == 0) {
+            		sysError++;
+                    insertProcessingError(5, null, batchUpload.getId(), null, null, null, null,
+                            false, false, ("No configurations for transport type of " + batchUpload.gettransportMethodId() +" were found for this batch."));
+            	}
+            	//3 loop through each record and look for a config match, we will break and update if we find a match
+            	sysError++;
                 insertProcessingError(5, null, batchUpload.getId(), null, null, null, null,
                         false, false, "Files with multiple configurations are not supported yet.");
             }
@@ -1547,5 +1562,10 @@ public class transactionInManagerImpl implements transactionInManager {
     public void cancelMessageTransaction(int transactionId) throws Exception {
         transactionInDAO.cancelMessageTransaction(transactionId);
     }
+    
+	@Override
+	public List<transactionInRecords> getTransactionInRecordsForBatch(Integer batchId) {
+		return transactionInDAO.getTransactionInRecordsForBatch(batchId);
+	}
     
 }

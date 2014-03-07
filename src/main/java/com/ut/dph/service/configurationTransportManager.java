@@ -5,6 +5,7 @@ import com.ut.dph.model.configurationFTPFields;
 import java.util.List;
 
 import com.ut.dph.model.configurationFormFields;
+import com.ut.dph.model.configurationMessageSpecs;
 import com.ut.dph.model.configurationTransport;
 import com.ut.dph.model.configurationTransportMessageTypes;
 
@@ -50,5 +51,6 @@ public interface configurationTransportManager {
     List<configurationFormFields> getCffByValidationType(Integer configId, Integer validationTypeId);
     
     List <configurationTransport> getDistinctConfigTransportForOrg(Integer orgId, Integer transportMethodId);
-		
+    
+    List<configurationMessageSpecs> getConfigurationMessageSpecsForOrgTransport(Integer orgId, Integer transportMethodId);
 }

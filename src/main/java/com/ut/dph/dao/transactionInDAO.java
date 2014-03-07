@@ -24,7 +24,6 @@ import com.ut.dph.model.custom.ConfigForInsert;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  *
@@ -196,5 +195,7 @@ public interface transactionInDAO {
     void deleteMessage(int batchId, int transactionId) throws Exception;
     
     void cancelMessageTransaction(int transactionId) throws Exception;
+    
+    List <transactionInRecords> getTransactionInRecordsForBatch (Integer batchId);
 
 }

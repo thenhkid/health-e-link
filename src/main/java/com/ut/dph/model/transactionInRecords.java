@@ -6,6 +6,8 @@
 
 package com.ut.dph.model;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -20,8 +22,8 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "TRANSACTIONINRECORDS")
 public class transactionInRecords {
-    
-    @Id
+
+	@Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID", nullable = false)
     private int id;
@@ -793,8 +795,30 @@ public class transactionInRecords {
     
     @Column(name = "F255", nullable = true)
     private String f255 = null;
+    
+    @Column(name = "dateCreated", nullable = true)
+    private Date dateCreated = new Date();
+    
+    @Column(name = "loadTableId", nullable = true)
+    private String loadTableId = null;
 
-    public int getId() {
+    public Date getDateCreated() {
+		return dateCreated;
+	}
+
+	public void setDateCreated(Date dateCreated) {
+		this.dateCreated = dateCreated;
+	}
+
+	public String getLoadTableId() {
+		return loadTableId;
+	}
+
+	public void setLoadTableId(String loadTableId) {
+		this.loadTableId = loadTableId;
+	}
+
+	public int getId() {
         return id;
     }
 

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ut.dph.model.configurationFormFields;
+import com.ut.dph.model.configurationMessageSpecs;
 import com.ut.dph.model.configurationTransport;
 import com.ut.dph.dao.configurationTransportDAO;
 import com.ut.dph.model.configurationFTPFields;
@@ -139,6 +140,11 @@ public class configurationTransportManagerImpl implements configurationTransport
 	@Override
 	public List<configurationTransport> getDistinctConfigTransportForOrg(Integer orgId, Integer transportMethodId) {
 		return configurationTransportDAO.getDistinctConfigTransportForOrg(orgId, transportMethodId);
+	}
+
+	@Override
+	public List<configurationMessageSpecs> getConfigurationMessageSpecsForOrgTransport(Integer orgId, Integer transportMethodId) {
+		return configurationTransportDAO.getConfigurationMessageSpecsForOrgTransport(orgId, transportMethodId);
 	}
 	
 }

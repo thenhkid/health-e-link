@@ -2831,4 +2831,27 @@ public class transactionInDAOImpl implements transactionInDAO {
         
         
     }
+
+	@Override
+	@Transactional
+	@SuppressWarnings("unchecked")
+	public List<transactionInRecords> getTransactionInRecordsForBatch(Integer batchId) {
+		try { 
+		String sql = ("select * from transactionInRecords where transactionInId in "
+				+ " (select id from transactionIn where batchId = :batchId);");
+	        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
+	                .setResultTransformer(
+	                        Transformers.aliasToBean(transactionInRecords.class))
+	                .setParameter("batchId", batchId);
+	        
+	        List<transactionInRecords> transactionInRecords = query.list();
+
+	        return transactionInRecords;
+	        
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			System.err.println("getTransactionRecordsForBatch " + ex.getCause());
+			return null;
+		}
+	}
 }
