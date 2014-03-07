@@ -798,7 +798,7 @@ public class configurationDAOImpl implements configurationDAO {
      */
     @Override
     public void updateMessageSpecs(configurationMessageSpecs messageSpecs, int transportDetailId, int clearFields) {
-
+       
         //if clearFields == 1 then we need to clear out the configuration form fields, mappings and data
         //translations. This will allow the admin to change the configuration transport method after
         //one was previously selected. This will only be available while the configuration is not active.

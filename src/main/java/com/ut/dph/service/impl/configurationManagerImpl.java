@@ -26,17 +26,16 @@ import com.ut.dph.reference.fileSystem;
 import com.ut.dph.service.configurationManager;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Iterator;
+import org.apache.poi.openxml4j.opc.OPCPackage;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
@@ -286,6 +285,7 @@ public class configurationManagerImpl implements configurationManager {
         String fileName = null;
         String cleanURL = null;
         int clearFields = 0;
+        fileSystem dir = null;
 
         MultipartFile file = messageSpecs.getFile();
         //If a file is uploaded
@@ -308,7 +308,7 @@ public class configurationManagerImpl implements configurationManager {
                 File newFile = null;
 
                 //Set the directory to save the uploaded message type template to
-                fileSystem dir = new fileSystem();
+                dir = new fileSystem();
                 dir.setDir(cleanURL, "templates");
 
                 newFile = new File(dir.getDir() + fileName);
@@ -331,6 +331,7 @@ public class configurationManagerImpl implements configurationManager {
                     outputStream.write(bytes, 0, read);
                 }
                 outputStream.close();
+                inputStream.close();
 
                 //Set the filename to the file name
                 messageSpecs.settemplateFile(fileName);
@@ -339,25 +340,32 @@ public class configurationManagerImpl implements configurationManager {
                 e.printStackTrace();
             }
         }
-
+        
         configurationDAO.updateMessageSpecs(messageSpecs, transportDetailId, clearFields);
 
         if (processFile == true) {
-            loadExcelContents(messageSpecs.getconfigId(), transportDetailId, fileName, cleanURL);
+            try {
+              loadExcelContents(messageSpecs.getconfigId(), transportDetailId, fileName, dir);  
+            }
+            catch (Exception e1) {
+                e1.printStackTrace();
+            }
+            
         }
 
     }
 
     /**
-     * The 'loadExcelContents' will take the contents of the uploaded excel template file and populate the corresponding configuration form fields table. This function will split up the contents into the appropriate buckets. Buckets (1 - 4) will be separated by spacer rows with in the excel file.
+     * The 'loadExcelContents' will take the contents of the uploaded excel template file and populate the corresponding configuration form fields table. This function will split 
+     * up the contents into the appropriate buckets. Buckets (1 - 4) will be separated by spacer rows with in the excel file.
      *
      * @param id id: value of the latest added configuration
      * @param fileName	fileName: file name of the uploaded excel file.
      * @param cleanURL	cleanURL: the cleanURL of the selected organization
      *
      */
-    public void loadExcelContents(int id, int transportDetailId, String fileName, String cleanURL) {
-
+    public void loadExcelContents(int id, int transportDetailId, String fileName, fileSystem dir) throws Exception {
+        
         try {
             //Set the initial value of the buckets (1);
             Integer bucketVal = new Integer(1);
@@ -368,27 +376,26 @@ public class configurationManagerImpl implements configurationManager {
             //Set the initial value of the display position for the field
             //within each bucket (0);
             Integer dspPos = new Integer(0);
-
-            //Set the directory that will hold the message type library excel files
-            fileSystem dir = new fileSystem();
-            dir.setDir(cleanURL, "templates");
-
-            FileInputStream file = new FileInputStream(new File(dir.getDir() + fileName));
-
+            
             //Create Workbook instance holding reference to .xlsx file
+            OPCPackage pkg = null;
             XSSFWorkbook workbook = null;
+            
             try {
-                workbook = new XSSFWorkbook(file);
-            } catch (IOException e1) {
+               pkg = OPCPackage.open(new File(dir.getDir() + fileName));
+               
+               workbook = new XSSFWorkbook(pkg);
+               
+            } catch (Exception e1) {
                 e1.printStackTrace();
             }
 
             //Get first/desired sheet from the workbook
-            XSSFSheet sheet = workbook.getSheetAt(0);
+            Sheet sheet = workbook.getSheetAt(0);
 
             //Iterate through each rows one by one
             Iterator<Row> rowIterator = sheet.iterator();
-
+            
             while (rowIterator.hasNext()) {
                 Row row = rowIterator.next();
 
@@ -445,11 +452,11 @@ public class configurationManagerImpl implements configurationManager {
                 }
             }
             try {
-                file.close();
+                pkg.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        } catch (FileNotFoundException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
