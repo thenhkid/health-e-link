@@ -7,7 +7,9 @@ import java.util.List;
 import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.configurationTransport;
 import com.ut.dph.model.configurationTransportMessageTypes;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public interface configurationTransportDAO {
 
     configurationTransport getTransportDetails(int configId) throws Exception;

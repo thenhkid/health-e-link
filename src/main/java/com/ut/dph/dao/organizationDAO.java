@@ -6,7 +6,9 @@ import com.ut.dph.model.Brochure;
 import com.ut.dph.model.Organization;
 import com.ut.dph.model.Provider;
 import com.ut.dph.model.User;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public interface organizationDAO {
 	
 	Integer createOrganization(Organization organization);

@@ -493,6 +493,11 @@ public class configurationManagerImpl implements configurationManager {
     public List<HL7ElementComponents> getHL7ElementComponents(int elementId) {
         return configurationDAO.getHL7ElementComponents(elementId);
     }
+    
+    @Override
+    public void updateHL7Details(HL7Details details) {
+        configurationDAO.updateHL7Details(details);
+    }
 
     @Override
     public void updateHL7Segments(HL7Segments segment) {

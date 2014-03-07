@@ -55,7 +55,7 @@
                                         </tr>
                                         <c:forEach items="${transportDetails.fields}" var="mappings" varStatus="field">
                                             <c:if test="${mappings.bucketNo == i}">
-                                                <tr class="uFieldRow" rel="${mappings.fieldNo}">
+                                                <tr class="uFieldRow" rel="${mappings.fieldNo}" rel2="${field.index}">
                                                     <td scope="row" class="center-text">
                                                         <input type="hidden" name="fields[${field.index}].id" value="${mappings.id}" />
                                                         <input type="hidden" name="fields[${field.index}].configId" value="${mappings.configId}" />
@@ -68,8 +68,8 @@
                                                         <input type="hidden" name="fields[${field.index}].required" value="${mappings.required}" />
                                                         <input type="hidden" name="fields[${field.index}].bucketDspPos" value="${mappings.bucketDspPos}" />
                                                         <input type="hidden" name="fields[${field.index}].validationType" value="${mappings.validationType}" />
-                                                        <input type="hidden" name="fields[${field.index}].saveToTableName" value="${mappings.saveToTableName}" />
-                                                        <input type="hidden" name="fields[${field.index}].saveToTableCol" value="${mappings.saveToTableCol}" />
+                                                        <input type="hidden" id="saveToTableName_${field.index}" name="fields[${field.index}].saveToTableName" value="${mappings.saveToTableName}" />
+                                                        <input type="hidden" id="saveToTableCol_${field.index}" name="fields[${field.index}].saveToTableCol" value="${mappings.saveToTableCol}" />
                                                         <input type="hidden" name="fields[${field.index}].autoPopulateTableName" value="${mappings.autoPopulateTableName}" />
                                                         <input type="hidden" name="fields[${field.index}].autoPopulateTableCol" value="${mappings.autoPopulateTableCol}" />
                                                         ${mappings.fieldNo}
@@ -79,7 +79,7 @@
                                                         <input type="checkbox" disabled="disabled" <c:if test="${mappings.required == true}">checked</c:if>  />
                                                         </td>
                                                         <td class="center-text">
-                                                            <select name="fields[${field.index}].messageTypeFieldId" id="matchingField_${mappings.fieldNo}" class="formField">
+                                                            <select name="fields[${field.index}].messageTypeFieldId" id="matchingField_${mappings.fieldNo}" rel="${field.index}" class="formField matchingField">
                                                             <option value="0">-</option>
                                                             <c:forEach var="tField" items="${templateFields}">
                                                                 <option value="${tField.id}" <c:if test="${mappings.messageTypeFieldId == tField.id}">selected</c:if>>${tField.fieldNo} - ${tField.fieldLabel}</option>
@@ -121,7 +121,11 @@
                                         <c:if test="${tField.bucketNo == i}">
                                             <tr>
                                                 <td scope="row" class="center-text">${tField.fieldNo}</td>
-                                                <td>${tField.fieldDesc}</td>
+                                                <td>
+                                                    ${tField.fieldDesc}
+                                                    <input type="hidden" id="tableName_${tField.id}" value="${tField.saveToTableName}" />
+                                                    <input type="hidden" id="tableCol_${tField.id}" value="${tField.saveToTableCol}" />
+                                                </td>
                                                 <td class="center-text">
                                                     <input type="checkbox" disabled="disabled" <c:if test="${tField.required == true}">checked</c:if>  />
                                                     </td>

@@ -3,7 +3,9 @@ package com.ut.dph.dao;
 import java.util.List;
 
 import com.ut.dph.model.Brochure;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public interface brochureDAO {
 	
 	Integer createBrochure(Brochure brochure);

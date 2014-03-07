@@ -1791,13 +1791,16 @@ public class adminConfigController {
     @RequestMapping(value = "/HL7", method = RequestMethod.POST)
     public ModelAndView saveHL7Customization(@ModelAttribute(value = "HL7Details") HL7Details HL7Details, RedirectAttributes redirectAttr) throws Exception {
         
+        /* Update the details of the hl7 */
+        configurationmanager.updateHL7Details(HL7Details);
+        
         List<HL7Segments> segments = HL7Details.getHL7Segments();
         
         if (null != segments && segments.size() > 0) {
             
             for (HL7Segments segment : segments) {
                 
-                //Update each segment
+                /* Update each segment */
                 configurationmanager.updateHL7Segments(segment);
                 
                 /* Get the list of segment elements */

@@ -16,11 +16,13 @@ import com.ut.dph.model.transactionOutRecords;
 import com.ut.dph.model.transactionTarget;
 import java.util.Date;
 import java.util.List;
+import org.springframework.stereotype.Repository;
 
 /**
  *
  * @author chadmccue
  */
+@Repository
 public interface transactionOutDAO {
     
     List<batchDownloads> getInboxBatches(int userId, int orgId, String searchTerm, Date fromDate, Date toDate, int page, int maxResults) throws Exception;

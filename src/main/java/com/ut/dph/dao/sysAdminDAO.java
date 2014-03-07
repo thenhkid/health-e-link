@@ -16,7 +16,9 @@ import com.ut.dph.model.lutables.lu_Procedures;
 import com.ut.dph.model.lutables.lu_ProcessStatus;
 import com.ut.dph.model.lutables.lu_Tests;
 import com.ut.dph.model.Macros;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public interface sysAdminDAO {
 	
 	List <LookUpTable> getLookUpTables(int page, int maxResults, String searchTerm);

@@ -11,7 +11,6 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ut.dph.dao.configurationDAO;
@@ -31,8 +30,9 @@ import com.ut.dph.model.configurationMessageSpecs;
 import com.ut.dph.model.configurationSchedules;
 import com.ut.dph.model.configurationTransport;
 import com.ut.dph.model.messageType;
+import org.springframework.stereotype.Repository;
 
-@Service
+@Repository
 public class configurationDAOImpl implements configurationDAO {
 
     @Autowired
@@ -1003,6 +1003,17 @@ public class configurationDAOImpl implements configurationDAO {
         criteria.addOrder(Order.asc("displayPos"));
         
         return criteria.list();
+    }
+    
+    /**
+     * the 'updateHL7Details' funciton will update/save the details of the HL7 message
+     * 
+     * @param details The Hl7 details object
+     */
+    @Override
+    @Transactional
+    public void updateHL7Details(HL7Details details) {
+        sessionFactory.getCurrentSession().saveOrUpdate(details);
     }
     
     
