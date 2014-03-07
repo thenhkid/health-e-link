@@ -90,17 +90,27 @@ require(['./main'], function () {
         //field select box to the appropiate template field
         $(document).on('click', '#meetsStandard', function() {
             var fieldNo = null;
+            var indexVal = null;
             var optionText = null;
             $('#saveMsgDiv').show();
 
             $('.uFieldRow').each(function() {
                 fieldNo = $(this).attr('rel');
+                indexVal = $(this).attr('rel2');
+                
                 $('#matchingField_' + fieldNo + ' > option').each(function() {
                     if ($(this).text().indexOf(fieldNo+" - ") != -1) {
                         $('#matchingField_' + fieldNo).val($(this).val());
                         return false;
                     }
                 });
+                
+                //Populate the savetotable and savetocol
+                var tableName = $('#tableName_'+$('#matchingField_' + fieldNo).val()).val();
+                var tableCol = $('#tableCol_'+$('#matchingField_' + fieldNo).val()).val();
+
+                $('#saveToTableName_'+indexVal).val(tableName);
+                $('#saveToTableCol_'+indexVal).val(tableCol);
             });
             //<span class='glyphicon glyphicon-ok'></span> 
             $(this).html("Clear Matching Fields");
@@ -112,15 +122,34 @@ require(['./main'], function () {
         //field select box.
         $(document).on('click', '#clearFields', function() {
             $('#saveMsgDiv').show();
+            var fieldNo = null;
+            var indexVal = null;
 
             $('.uFieldRow').each(function() {
                 fieldNo = $(this).attr('rel');
+                indexVal = $(this).attr('rel2');
                 $('#matchingField_' + fieldNo).val("0");
+                $('#saveToTableName_'+indexVal).val("");
+                $('#saveToTableCol_'+indexVal).val("");
             });
 
             $(this).html("Meets Standard");
             $(this).attr('id', 'meetsStandard');
             $(this).attr("data-original-title","Click here to match to the starndard fields.");
+        });
+        
+        
+        //When a matching field changes we need to get the selected field savetotable and savetocol
+        $(document).on('change', '.matchingField', function() {
+           
+           var indexVal = $(this).attr('rel');
+           var tableName = $('#tableName_'+$(this).val()).val();
+           var tableCol = $('#tableCol_'+$(this).val()).val();
+           
+           $('#saveToTableName_'+indexVal).val(tableName);
+           $('#saveToTableCol_'+indexVal).val(tableCol);
+            
+            
         });
         
         

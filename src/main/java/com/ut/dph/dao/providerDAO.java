@@ -5,7 +5,9 @@ import java.util.List;
 import com.ut.dph.model.Provider;
 import com.ut.dph.model.providerAddress;
 import com.ut.dph.model.providerIdNum;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public interface providerDAO {
 	
   Integer createProvider(Provider provider);

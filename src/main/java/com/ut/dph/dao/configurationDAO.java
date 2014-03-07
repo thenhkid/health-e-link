@@ -15,7 +15,9 @@ import com.ut.dph.model.configurationConnectionSenders;
 import com.ut.dph.model.configurationDataTranslations;
 import com.ut.dph.model.configurationMessageSpecs;
 import com.ut.dph.model.configurationSchedules;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public interface configurationDAO {
 	
   Integer createConfiguration(configuration configuration);
@@ -106,6 +108,8 @@ public interface configurationDAO {
   List<HL7Elements> getHL7Elements(int hl7Id, int segmentId);
   
   List<HL7ElementComponents> getHL7ElementComponents(int elementId);
+  
+  void updateHL7Details(HL7Details details);
   
   void updateHL7Segments(HL7Segments segment);
   

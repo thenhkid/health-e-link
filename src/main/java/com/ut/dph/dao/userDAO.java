@@ -5,7 +5,9 @@ import java.util.List;
 import com.ut.dph.model.User;
 import com.ut.dph.model.siteSections;
 import com.ut.dph.model.userAccess;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public interface userDAO {
 
     Integer createUser(User user);

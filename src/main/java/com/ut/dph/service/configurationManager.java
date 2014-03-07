@@ -107,6 +107,8 @@ public interface configurationManager {
   
   List<HL7ElementComponents> getHL7ElementComponents(int elementId);
   
+  void updateHL7Details(HL7Details details);
+  
   void updateHL7Segments(HL7Segments segment);
   
   void updateHL7Elements(HL7Elements element);

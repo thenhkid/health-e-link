@@ -24,11 +24,13 @@ import com.ut.dph.model.custom.ConfigForInsert;
 
 import java.util.Date;
 import java.util.List;
+import org.springframework.stereotype.Repository;
 
 /**
  *
  * @author chadmccue
  */
+@Repository
 public interface transactionInDAO {
     
     String getFieldValue(String tableName, String tableCol, String idCol, int idValue);

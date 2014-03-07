@@ -7,7 +7,9 @@ import com.ut.dph.model.messageType;
 import com.ut.dph.model.messageTypeDataTranslations;
 import com.ut.dph.model.messageTypeFormFields;
 import com.ut.dph.model.validationType;
+import org.springframework.stereotype.Repository;
 
+@Repository
 public interface messageTypeDAO {
 	
 	Integer createMessageType(messageType messagetype);

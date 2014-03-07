@@ -6,7 +6,6 @@ import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
@@ -20,8 +19,9 @@ import com.ut.dph.model.configurationTransport;
 import com.ut.dph.model.configurationTransportMessageTypes;
 
 import java.util.Iterator;
+import org.springframework.stereotype.Repository;
 
-@Service
+@Repository
 public class configurationTransportDAOImpl implements configurationTransportDAO {
 
     @Autowired
