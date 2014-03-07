@@ -15,6 +15,7 @@ import org.hibernate.transform.Transformers;
 import com.ut.dph.dao.configurationTransportDAO;
 import com.ut.dph.model.configurationFTPFields;
 import com.ut.dph.model.configurationFormFields;
+import com.ut.dph.model.configurationMessageSpecs;
 import com.ut.dph.model.configurationTransport;
 import com.ut.dph.model.configurationTransportMessageTypes;
 
@@ -423,7 +424,34 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
 	        return configurationTransports;
 	        
 		} catch (Exception ex) {
-			System.err.println(ex.getClass() + " " + ex.getCause());
+			System.err.println("getDistinctConfigTransportForOrg " + ex.getCause());
+			ex.printStackTrace();
+			
+			return null;
+		}
+	}
+
+	@Override
+	@Transactional
+	@SuppressWarnings("unchecked")
+	public List<configurationMessageSpecs> getConfigurationMessageSpecsForOrgTransport(
+			Integer orgId, Integer transportMethodId) {
+		try {
+			
+			String sql = ("select * from configurationMessageSpecs where configId in ("
+					+ "select configId from configurationTransportDetails where configId in (select id from configurations where orgId = :orgId)"
+					+ " and transportmethodId = :transportMethodId);");
+	        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
+                    Transformers.aliasToBean(configurationMessageSpecs.class));           
+	        query.setParameter("orgId", orgId);
+	        query.setParameter("transportMethodId", transportMethodId);
+	        
+	        List <configurationMessageSpecs> configurationMessageSpecs = query.list();
+			
+	        return configurationMessageSpecs;
+	        
+		} catch (Exception ex) {
+			System.err.println("getConfigurationMessageSpecs  " + ex.getCause());
 			ex.printStackTrace();
 			
 			return null;
