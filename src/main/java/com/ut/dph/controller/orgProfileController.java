@@ -180,6 +180,56 @@ public class orgProfileController {
     
     
     /**
+     * The '/providers/createProvider' GET request will handle displaying the blank provider form.
+     * 
+     * @return the organization provider form.
+     */
+    @RequestMapping(value = "/providers/createProvider", method = RequestMethod.GET)
+    public ModelAndView createProvider(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
+        
+        Provider providerDetails = new Provider();
+        
+        /* Need to get all the message types set up for the user */
+        User userInfo = (User)session.getAttribute("userDetails");
+        
+        providerDetails.setOrgId(userInfo.getOrgId());
+        
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/OrgProfile/createProvider");
+
+        mav.addObject("providerdetails", providerDetails);
+
+        return mav;
+    }
+    
+    /**
+     * The '/providers/createProvider' POST request will handle displaying the blank provider form.
+     * 
+     * @return the organization provider form.
+     */
+    @RequestMapping(value = "/providers/createProvider", method = RequestMethod.POST)
+    public ModelAndView submitNewProvider(@Valid @ModelAttribute(value = "providerdetails") Provider providerdetails, BindingResult result, RedirectAttributes redirectAttr) throws Exception {
+
+        if (result.hasErrors()) {
+            ModelAndView mav = new ModelAndView();
+            mav.setViewName("/OrgProfile/createProvider");
+
+            return mav;
+        }
+
+        //Update the provider
+        int providerId = providerManager.createProvider(providerdetails);
+
+        //This variable will be used to display the message on the details form
+        redirectAttr.addFlashAttribute("savedStatus", "created");
+
+        ModelAndView mav = new ModelAndView(new RedirectView("/OrgProfile/providers/"+providerId));
+        return mav;
+        
+
+    }
+    
+    /**
      * The '/providers/{id}' GET request will show the edit form for the selected provider id. If the provider
      * found with the {id} doesn't match the organization the user is logged in under we will return the user
      * back to the provider list page.
@@ -544,5 +594,26 @@ public class orgProfileController {
         providerManager.deleteId(id);
         return 1;
     }
+    
+    /**
+     * The '/providerDelete/{i}' GET request will be used to delete the selected provider.
+     *
+     * @param i	The id of the provider selected
+     *
+     * @return	Will return the provider list page on "Save"
+     *
+     */
+    @RequestMapping(value = "/providerDelete/{i}", method = RequestMethod.GET)
+    public ModelAndView deleteProvider(@RequestParam(value = "i", required = true) Integer providerId, RedirectAttributes redirectAttr) throws Exception {
+
+        providerManager.deleteProvider(providerId);
+
+        //This variable will be used to display the message on the details form
+        redirectAttr.addFlashAttribute("savedStatus", "deleted");
+
+        ModelAndView mav = new ModelAndView(new RedirectView("/OrgProfile/providers"));
+        return mav;
+    }
+    
     
 }

@@ -24,7 +24,10 @@
                 <c:when test="${not empty savedStatus}" >
                     <div class="alert alert-success" role="alert">
                         <strong>Success!</strong> 
-                        The provider has been successfully updated!
+                        <c:choose>
+                            <c:when test="${savedStatus == 'updated'}">The provider has been successfully updated!</c:when>
+                            <c:when test="${savedStatus == 'created'}">The provider has been successfully created!</c:when>
+                        </c:choose>
                     </div>
                 </c:when> 
                 <c:when test="${not empty param.msg}" >
