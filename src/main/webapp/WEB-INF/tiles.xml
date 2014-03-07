@@ -438,6 +438,26 @@
         <put-attribute name="jscript" value="/dspResources/js/front-end/Health-e-Connect/download.js" />
     </definition>
     
+    <!-- Organization Profile Pages -->
+    <definition name="/OrgProfile/editProfile" extends="base.definition.frontEnd">
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Org&amp;page=editProfile" />
+        <put-attribute name="body" value="/WEB-INF/jsp/OrgProfile/editProfile.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/front-end/OrgProfile/editProfile.js" />
+    </definition>
+    
+    <!-- Organization Providers -->
+    <definition name="/OrgProfile/providers" extends="base.definition.frontEnd">
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Org&amp;page=providers" />
+        <put-attribute name="body" value="/WEB-INF/jsp/OrgProfile/providers.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/front-end/OrgProfile/providers.js" />
+    </definition>
+    
+    <definition name="/OrgProfile/editProvider" extends="base.definition.frontEnd">
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Org&amp;page=providers" />
+        <put-attribute name="body" value="/WEB-INF/jsp/OrgProfile/editProvider.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/front-end/OrgProfile/editProvider.js" />
+    </definition>
+    
     
     <!-- Exception handling -->
     <definition name="/exception" extends="base.definition.frontEnd">

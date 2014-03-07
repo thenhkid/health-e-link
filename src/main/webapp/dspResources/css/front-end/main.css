@@ -6299,6 +6299,10 @@ td.visible-print {
   font-size: 18px;
   margin-bottom: 20px;
 }
+.form-title-sm {
+  font-size: 15px;
+  margin-bottom: 20px;
+}
 .form label {
   font-weight: normal;
 }

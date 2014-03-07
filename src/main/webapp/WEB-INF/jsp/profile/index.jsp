@@ -44,6 +44,12 @@
                             send, receive, and exchange patient healthcare information leveraging your existing business and clinical applications, and your current IT resources. 
                         </p>
                     </c:when>
+                    <c:when test="${sections.featureId == 5}">
+                        <h3><a href="<c:url value='/OrgProfile/editProfile'/>" title="Organization Profile">Organization Profile</a></h3>
+                        <p class="text">
+                            Update your organization profile.
+                        </p>
+                    </c:when>
                 </c:choose>
             </c:forEach> 
             
