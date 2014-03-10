@@ -817,7 +817,10 @@ public class transactionInManagerImpl implements transactionInManager {
             //make sure old table is dropped if exists
             Integer sysError = dropLoadTable(loadTableName);
             sysError = sysError + createLoadTable(loadTableName);
-
+            
+            //we need to index loadTable
+            sysError = sysError + indexLoadTable(loadTableName);
+            
             fileSystem dir = new fileSystem();
             dir.setDirByName("/");
             String fileWithPath = dir.getDir() + batchUpload.getFileLocation() + batchUpload.getoriginalFileName();
@@ -1617,6 +1620,11 @@ public class transactionInManagerImpl implements transactionInManager {
 	@Override
 	public Integer updateInvalidConfigStatus(Integer batchId) {
 		return transactionInDAO.updateInvalidConfigStatus(batchId);
+	}
+
+	@Override
+	public Integer indexLoadTable(String loadTableName) {
+		return transactionInDAO.indexLoadTable(loadTableName);
 	}
 
 	

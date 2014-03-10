@@ -96,7 +96,7 @@
                                     <th scope="col">Contact Information</th>
                                 </tr>
                             </thead>
-                            <tbody
+                            <tbody>
                                 <c:forEach var="mContact" items="${mainContacts}">
                                     <tr>
                                         <td scope="row">${mContact.firstName}&nbsp;${mContact.lastName}</td>
@@ -127,7 +127,7 @@
                                         <th scope="col">Contact Information</th>
                                     </tr>
                                 </thead>
-                                <tbody
+                                <tbody>
                                     <c:forEach var="sContact" items="${secondaryContacts}">
                                         <tr>
                                             <td scope="row">${sContact.firstName}&nbsp;${sContact.lastName}</td>

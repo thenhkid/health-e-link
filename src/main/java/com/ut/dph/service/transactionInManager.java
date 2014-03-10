@@ -254,4 +254,8 @@ public interface transactionInManager {
     Integer insertInvalidConfigError(Integer batchId);
     
     Integer updateInvalidConfigStatus(Integer batchId);
+    
+    Integer indexLoadTable(String loadTableName);
+    
+    
 }

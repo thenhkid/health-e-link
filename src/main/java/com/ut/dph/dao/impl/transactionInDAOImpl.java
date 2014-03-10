@@ -2914,6 +2914,22 @@ public class transactionInDAOImpl implements transactionInDAO {
 				return 1;
 		}
 	}
+
+	@Override
+	@Transactional
+	public Integer indexLoadTable(String loadTableName) {
+		try{
+			String sql = "ALTER TABLE " + loadTableName + " ADD INDEX loadTableId (loadTableId ASC);";
+			Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+		        query.executeUpdate();
+		        return 0;
+		        
+		} catch (Exception ex) {
+				ex.printStackTrace();
+				System.err.println("indexLoadTable " + ex.getCause());
+				return 1;
+		}
+	}
 	
 	
 }
