@@ -1116,6 +1116,7 @@ public class adminConfigController {
                 	crosswalkName = messagetypemanager.getCrosswalkName(translation.getCrosswalkId());
                 	translation.setcrosswalkName(crosswalkName);
                 }
+                
                 //Get the macro name by id
                 if(translation.getMacroId() > 0) {
                     Macros macroDetails = configurationmanager.getMacroById(translation.getMacroId());
