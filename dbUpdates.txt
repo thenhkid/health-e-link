@@ -569,4 +569,21 @@ ADD COLUMN `originalReferralId` VARCHAR(45) NULL DEFAULT NULL AFTER `totalTimesS
 /** Grace 3.10.14 **/
 INSERT INTO `universalTranslator`.`lu_ErrorCodes` (`displayText`, `description`) VALUES ('Invalid Configuration', 'Transaction does not match a valid configuration');
 
+CREATE TABLE `uploadBatchRunlogs` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `batchId` int(11) NOT NULL,
+  `statusId` int(11) NOT NULL,
+  `logTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=138 DEFAULT CHARSET=latin1;
+
+USE `universalTranslator`;
+DELIMITER $$
+
+CREATE DEFINER=`root`@`localhost` trigger uploadRunLogs after update on batchUploads
+for each row
+begin
+  insert into uploadBatchRunlogs (statusId, batchId) 
+values (new.statusId, new.id);
+end
 
