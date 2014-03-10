@@ -137,5 +137,11 @@ public class organizationManagerImpl implements organizationManager {
     public Long findTotalBrochures(int orgId) {
         return organizationDAO.findTotalBrochures(orgId);
     }
+    
+    @Override
+    @Transactional
+    public List<Organization> getAssociatedOrgs(int orgId) {
+        return organizationDAO.getAssociatedOrgs(orgId);
+    }
 
 }

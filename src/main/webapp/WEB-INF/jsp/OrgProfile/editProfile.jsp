@@ -14,7 +14,6 @@
 
             <ol class="breadcrumb">
                 <li><a href="<c:url value='/profile'/>">My Account</a></li>
-                <li><a href="#">Organization Profile</a></li>
                 <li class="active">
                     Edit Organization Profile
                 </li>
@@ -106,7 +105,7 @@
                                         <spring:bind path="city">
                                             <div class="form-group ${status.error ? 'has-error' : '' }">
                                                 <label class="control-label" for="city">City *</label>
-                                                <form:input path="city" id="postalCode" class="form-control xs-input" type="text" maxLength="15" />
+                                                <form:input path="city" id="postalCode" class="form-control xs-input" type="text" maxLength="45" />
                                                 <form:errors path="city" cssClass="control-label" element="label" />
                                             </div>
                                         </spring:bind>

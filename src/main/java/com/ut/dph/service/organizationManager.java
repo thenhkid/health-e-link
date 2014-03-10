@@ -43,5 +43,7 @@ public interface organizationManager {
   
   Long findTotalBrochures(int orgId);
   
+  List<Organization> getAssociatedOrgs(int orgId);
+  
 }
 

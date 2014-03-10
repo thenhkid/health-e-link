@@ -464,6 +464,18 @@
         <put-attribute name="jscript" value="/dspResources/js/front-end/OrgProfile/editProvider.js" />
     </definition>
     
+    <!-- Associated Organizations -->
+    <definition name="/organizations/associated" extends="base.definition.frontEnd">
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Org&amp;page=associations" />
+        <put-attribute name="body" value="/WEB-INF/jsp/organizations/associated.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/front-end/associations/associated.js" />
+    </definition>
+    
+    <definition name="/organizations/associated/orgDetails" extends="base.definition.frontEnd">
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Org&amp;page=associations" />
+        <put-attribute name="body" value="/WEB-INF/jsp/organizations/orgDetails.jsp" />
+    </definition>
+    
     
     <!-- Exception handling -->
     <definition name="/exception" extends="base.definition.frontEnd">

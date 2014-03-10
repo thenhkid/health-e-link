@@ -14,8 +14,11 @@ import com.ut.dph.model.Brochure;
 import com.ut.dph.model.Organization;
 import com.ut.dph.model.Provider;
 import com.ut.dph.model.User;
+import com.ut.dph.model.configuration;
+import com.ut.dph.model.configurationConnection;
 import com.ut.dph.reference.fileSystem;
 import com.ut.dph.service.brochureManager;
+import java.util.ArrayList;
 import org.hibernate.exception.SQLGrammarException;
 
 
@@ -500,6 +503,81 @@ public class organizationDAOImpl implements organizationDAO {
             throw ex;
         }
 
+    }
+    
+    /**
+     * The 'getAssociatedOrgs' function will return a list of organizations that are associated to
+     * the passed in orgId
+     * 
+     * @param   orgId   The id of the organization to find associated orgs
+     * 
+     * @return This function will return a list or organization objects
+     */
+    @Override
+    public List<Organization> getAssociatedOrgs(int orgId) {
+        
+        /* Get a list of configurations for the passed in org */
+        List<Integer> configs = new ArrayList<Integer>();
+        
+        Criteria configurations = sessionFactory.getCurrentSession().createCriteria(configuration.class);
+        configurations.add(Restrictions.eq("orgId", orgId));
+        List<configuration> orgConfigs = configurations.list();
+        
+        if (orgConfigs.isEmpty()) {
+            configs.add(0);
+        } 
+        else {
+            for (configuration config : orgConfigs) {
+                configs.add(config.getId());
+            }
+        }
+        
+        
+        /* Find all connections set up for the returned configurations */
+        List<Integer> targetOrgIds = new ArrayList<Integer>();
+      
+        Criteria connections = sessionFactory.getCurrentSession().createCriteria(configurationConnection.class);
+        connections.add(Restrictions.or(
+             Restrictions.in("sourceConfigId", configs),
+             Restrictions.in("targetConfigId", configs)   
+        ));
+        List<configurationConnection> orgConnections = connections.list();
+        
+        /* Find all organiations associated to the returend connections */
+        if (orgConnections.isEmpty()) {
+            targetOrgIds.add(0);
+        } 
+        else {
+            for (configurationConnection connection : orgConnections) {
+                
+                Criteria getSrcConfigDetails = sessionFactory.getCurrentSession().createCriteria(configuration.class);
+                getSrcConfigDetails.add(Restrictions.eq("id", connection.getsourceConfigId()));
+                
+                configuration srcconfigDetails = (configuration) getSrcConfigDetails.uniqueResult();
+                
+                if(srcconfigDetails.getorgId() != orgId && !targetOrgIds.contains(srcconfigDetails.getorgId())) {
+                    targetOrgIds.add(srcconfigDetails.getorgId());
+                }
+                
+                Criteria getTgtConfigDetails = sessionFactory.getCurrentSession().createCriteria(configuration.class);
+                getTgtConfigDetails.add(Restrictions.eq("id", connection.gettargetConfigId()));
+                
+                configuration TgtconfigDetails = (configuration) getTgtConfigDetails.uniqueResult();
+                
+                if(TgtconfigDetails.getorgId() != orgId && !targetOrgIds.contains(TgtconfigDetails.getorgId())) {
+                    targetOrgIds.add(TgtconfigDetails.getorgId());
+                }
+                
+            }
+        }
+        
+        Criteria orgs = sessionFactory.getCurrentSession().createCriteria(Organization.class);
+        orgs.add(Restrictions.eq("status",true));
+        orgs.add(Restrictions.eq("publicOrg", true));
+        orgs.add(Restrictions.in("id", targetOrgIds));
+        
+        return orgs.list();
+        
     }
 
 }

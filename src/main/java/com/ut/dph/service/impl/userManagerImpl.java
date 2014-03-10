@@ -81,6 +81,7 @@ public class userManagerImpl implements userManager {
     }
     
     @Override
+    @Transactional
     public List<User> getOrganizationContact(int orgId, int mainContact){
         return userDAO.getOrganizationContact(orgId, mainContact);
     }

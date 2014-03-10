@@ -40,10 +40,10 @@
                 <a href="/OrgProfile/providers/createProvider" class="btn btn-primary btn-xs " title="Create a new provider.">Create New Provider</a>
                 <br /><br /> 
             </div>
-                
+            
             <div class="col-md-12">
                 <c:forEach var="provider" varStatus="pStatus" items="${providers}">
-                    <section class="panel panel-default col-md-5 ${(pStatus.index mod 2) == 0 ? 'cb' : ''} providerBody" style="margin-right:35px;">
+                    <section class="panel panel-default col-md-5 ${(pStatus.index mod 2) == 0 ? 'cb' : 'pull-right'} providerBody">
                        <div class="panel-body">
                             <div class="form-container scrollable">
                                <div class="col-md-5" style="margin-right:30px;" >
