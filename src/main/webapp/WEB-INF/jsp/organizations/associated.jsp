@@ -20,8 +20,8 @@
            <form id="orgDetails" method="post">
                <input type="hidden" name="orgId" id="orgId" value="0" />
            </form>
+          <%--       
            <div class="row" style="overflow:hidden; margin-bottom:10px;">
-              
                <div class="col-md-3">
                     <form:form class="form form-inline" id="searchForm" action="/organizations/associations" method="post">
                         <div class="form-group">
@@ -34,7 +34,8 @@
                         </button>
                     </form:form>
                 </div>
-            </div>   
+            </div> 
+--%>
             <div class="form-container scrollable">
                 <table class="table table-striped table-hover table-default">
                     <thead>

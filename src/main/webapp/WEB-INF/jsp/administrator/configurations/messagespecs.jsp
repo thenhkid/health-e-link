@@ -126,7 +126,7 @@
                                                         </c:when>
                                                     </c:choose>
                                                 </c:if>
-                                                            <option value="${availableFields[fStatus.index].id}" <c:if test="${messageSpecs.rptField1 == availableFields[fStatus.index].id}">selected</c:if>>${availableFields[fStatus.index].fieldLabel} </option>
+                                                <option value="${availableFields[fStatus.index].fieldNo}" <c:if test="${messageSpecs.rptField1 == availableFields[fStatus.index].fieldNo}">selected</c:if>>${availableFields[fStatus.index].fieldLabel} </option>
                                             </c:forEach>
                                         </form:select>
                                         <form:errors path="rptField1" cssClass="control-label" element="label" />
@@ -162,7 +162,7 @@
                                                         </c:when>
                                                     </c:choose>
                                                 </c:if>
-                                                <option value="${availableFields[fStatus.index].id}" <c:if test="${messageSpecs.rptField2 == availableFields[fStatus.index].id}">selected</c:if>>${availableFields[fStatus.index].fieldLabel} </option>
+                                                <option value="${availableFields[fStatus.index].fieldNo}" <c:if test="${messageSpecs.rptField2 == availableFields[fStatus.index].fieldNo}">selected</c:if>>${availableFields[fStatus.index].fieldLabel} </option>
                                             </c:forEach>
                                         </form:select>
                                         <form:errors path="rptField2" cssClass="control-label" element="label" />
@@ -198,7 +198,7 @@
                                                         </c:when>
                                                     </c:choose>
                                                 </c:if>
-                                                <option value="${availableFields[fStatus.index].id}" <c:if test="${messageSpecs.rptField3 == availableFields[fStatus.index].id}">selected</c:if>>${availableFields[fStatus.index].fieldLabel} </option>
+                                                <option value="${availableFields[fStatus.index].fieldNo}" <c:if test="${messageSpecs.rptField3 == availableFields[fStatus.index].fieldNo}">selected</c:if>>${availableFields[fStatus.index].fieldLabel} </option>
                                             </c:forEach>
                                         </form:select>
                                         <form:errors path="rptField3" cssClass="control-label" element="label" />
@@ -234,7 +234,7 @@
                                                         </c:when>
                                                     </c:choose>
                                                 </c:if>
-                                                <option value="${availableFields[fStatus.index].id}" <c:if test="${messageSpecs.rptField4 == availableFields[fStatus.index].id}">selected</c:if>>${availableFields[fStatus.index].fieldLabel} </option>
+                                                <option value="${availableFields[fStatus.index].fieldNo}" <c:if test="${messageSpecs.rptField4 == availableFields[fStatus.index].fieldNo}">selected</c:if>>${availableFields[fStatus.index].fieldLabel} </option>
                                             </c:forEach>
                                         </form:select>
                                         <form:errors path="rptField4" cssClass="control-label" element="label" />

@@ -39,6 +39,7 @@
                         <form:form id="formFields" modelAttribute="transportDetails" method="post" role="form">
                             <input type="hidden" id="action" name="action" value="save" />
                             <input type="hidden" id="seltransportMethod" name="transportMethod" value="${selTransportMethod}" />
+                            <input type="hidden" name="errorHandling" value="${transportDetails.errorHandling}" />
                             <table class="table table-striped table-hover table-default">
                                 <thead>
                                     <tr>
