@@ -587,3 +587,5 @@ begin
 values (new.statusId, new.id);
 end
 
+INSERT INTO `universaltranslator`.`lu_ErrorCodes` (`displayText`, `description`) VALUES ('No Transactions Found', 'No Transactions were found for batch');
+
