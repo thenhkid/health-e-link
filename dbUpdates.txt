@@ -602,4 +602,48 @@ ADD INDEX `loadTableId` (`loadTableId` ASC);
 /** grace 03102014 16:33 **/
 INSERT INTO `universalTranslator`.`lu_ErrorCodes` (`displayText`, `description`) VALUES ('Batch Handling Error', 'Multiple batch handling found');
 
+/** grace 03102014 16:53 **/
+INSERT INTO `universaltranslator`.`macro_names` (`Category`, `Macro_Name`, `Macro_Short_Name`, `Formula`, `FieldA_Question`, `Con1_Question`) VALUES ('Date Manipulation', 'mmddyyyyToyyyymmdd', 'mm-dd-yyyyToyyyy-mm-dd', 'mmddyyyyToyyyymmdd', 'Please enter the field # to set source field date to', 'Please enter date part separator.  e.g. -, ., /');
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `mmddyyyytoyyyymmdd`(in configId int, 
+in batchId int, in srcField varchar(10),
+in fieldA varchar(10), in fieldB varchar(10), in con1 varchar(10), 
+in con2 varchar(10), in macroId int, in foroutboundProcessing boolean, in passClear int)
+proc_main:begin
+
+call setInboundOutBoundTables (foroutboundProcessing);
+select @translatedTable, @transactionTable, @batchTable, @batchIdType , @errorTable
+into @translatedTable, @transactionTable, @batchTable, @batchIdType , @errorTable;
+
+if (length(fieldA) = 0) then
+set fieldA = srcField;
+end if;
+
+if (length(con1) = 0) then
+set con1 = "/";
+end if;
+
+-- we build sql here 
+set @stmt = concat("update ", @translatedTable," set ",fieldA," = 
+concat(substring(",srcField, ", 7,4), '",con1, "',  
+substring(", srcField, ", 1,2),'",con1,"' ,substring(",srcField, ", 4,2))
+where ", @transactionTable ,"Id in (select id from ",@transactionTable,
+" where configId = ",configId," and ", @batchIdType," = ",batchId," and statusId != 12);");
+
+PREPARE stmt from @stmt;
+EXECUTE stmt;-- execute
+
+-- we check pass /clear
+if (passClear = 2) THEN
+BEGIN
+-- not sure how to pass clear this
+END;
+END IF;
+-- see if we want to return something
+select '';
+
+end proc_main$$
+DELIMITER ;
+
 

@@ -1112,10 +1112,10 @@ public class adminConfigController {
                 translation.setfieldName(fieldName);
 
                 //Get the crosswalk name by id
-                
-                crosswalkName = messagetypemanager.getCrosswalkName(translation.getCrosswalkId());
-                translation.setcrosswalkName(crosswalkName);
-                
+                if (translation.getCrosswalkId() != 0) {
+                	crosswalkName = messagetypemanager.getCrosswalkName(translation.getCrosswalkId());
+                	translation.setcrosswalkName(crosswalkName);
+                }
                 //Get the macro name by id
                 if(translation.getMacroId() > 0) {
                     Macros macroDetails = configurationmanager.getMacroById(translation.getMacroId());

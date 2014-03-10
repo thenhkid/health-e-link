@@ -2084,7 +2084,12 @@ public class transactionInDAOImpl implements transactionInDAO {
             query.setParameter("configId", configId);
             query.setParameter("batchId", batchId);
             query.setParameter("srcField", ("F" + cdt.getFieldNo()));
-            query.setParameter("fieldA", ("F" + cdt.getFieldA()));
+            
+            if (!cdt.getFieldA().equalsIgnoreCase("")) {
+            	query.setParameter("fieldA", ("F" + cdt.getFieldA()));
+            } else {
+            	query.setParameter("fieldA", ("F" + cdt.getFieldNo()));
+            }
             query.setParameter("fieldB", ("F" + cdt.getFieldB()));
             query.setParameter("con1", (cdt.getConstant1()));
             query.setParameter("con2", cdt.getConstant2());
