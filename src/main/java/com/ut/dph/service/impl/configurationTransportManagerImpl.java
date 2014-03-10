@@ -143,8 +143,8 @@ public class configurationTransportManagerImpl implements configurationTransport
 	}
 
 	@Override
-	public List<configurationMessageSpecs> getConfigurationMessageSpecsForOrgTransport(Integer orgId, Integer transportMethodId) {
-		return configurationTransportDAO.getConfigurationMessageSpecsForOrgTransport(orgId, transportMethodId);
+	public List<configurationMessageSpecs> getConfigurationMessageSpecsForOrgTransport(Integer orgId, Integer transportMethodId, boolean getZeroMessageTypeCol) {
+		return configurationTransportDAO.getConfigurationMessageSpecsForOrgTransport(orgId, transportMethodId, getZeroMessageTypeCol);
 	}
 	
 }

@@ -17,6 +17,7 @@ import com.ut.dph.model.configurationConnection;
 import com.ut.dph.model.configurationConnectionSenders;
 import com.ut.dph.model.configurationDataTranslations;
 import com.ut.dph.model.configurationFormFields;
+import com.ut.dph.model.configurationMessageSpecs;
 import com.ut.dph.model.configurationTransport;
 import com.ut.dph.model.fieldSelectOptions;
 import com.ut.dph.model.transactionAttachment;
@@ -2323,7 +2324,7 @@ public class transactionInDAOImpl implements transactionInDAO {
     public Integer loadTransactionIn(String loadTableName, Integer batchId) {
         try {
             String sql = ("insert into transactionIn (batchId, statusId, loadTableId) "
-                    + " select :batchId, 11, loadTableId from " + loadTableName + ";");
+                    + " select :batchId, 9, loadTableId from " + loadTableName + ";");
             Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
             query.setParameter("batchId", batchId);
             query.executeUpdate();
@@ -2854,4 +2855,65 @@ public class transactionInDAOImpl implements transactionInDAO {
 			return null;
 		}
 	}
+	
+	@Override
+	@Transactional
+	public Integer updateConfigIdForCMS(Integer batchId, configurationMessageSpecs cms) {
+		try { 
+		String sql = ("update transactionIn JOIN (SELECT transactionInId from transactionInRecords  "
+				+ " WHERE F" + cms.getmessageTypeCol() + " = :cmsVal and transactionInId in "
+						+ "	(select id from  transactionIn where batchId = :batchId and configId is null)) "
+						+ " as ti ON ti.transactionInId = transactionIn.id SET configId = :configId");
+	        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
+	                .setParameter("cmsVal", cms.getmessageTypeVal())
+	                .setParameter("batchId", batchId)
+	                .setParameter("configId", cms.getconfigId());
+	        query.executeUpdate();
+	        return 0;
+	        
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			System.err.println("updateConfigIdForCMS " + ex.getCause());
+			return 1;
+		}
+	}
+
+	@Override
+	@Transactional
+	public Integer insertInvalidConfigError(Integer batchId) {
+		try { 
+			String sql = "insert into transactionInerrors (batchUploadId, transactionInId, errorId) "
+	                + "select " + batchId + ", id, 7 from transactionIn where configId is null "
+	                + " and batchId = :batchId";   
+			Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
+		                .setParameter("batchId", batchId);
+		        query.executeUpdate();
+		        return 0;
+		        
+			} catch (Exception ex) {
+				ex.printStackTrace();
+				System.err.println("insertInvalidConfigError " + ex.getCause());
+				return 1;
+			}
+	
+	}
+	
+	@Override
+	@Transactional
+	public Integer updateInvalidConfigStatus(Integer batchId) {
+		try{
+			String sql = "update transactionIn set statusId = 11 where configId is null and batchId = :batchId ";
+			Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
+		                .setParameter("batchId", batchId);
+		        query.executeUpdate();
+		        return 0;
+		        
+		} catch (Exception ex) {
+				ex.printStackTrace();
+				System.err.println("updateInvalidConfigStatus " + ex.getCause());
+				return 1;
+		}
+	}
+	
+	
 }

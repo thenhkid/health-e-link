@@ -13,6 +13,7 @@ import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.configurationConnection;
 import com.ut.dph.model.configurationDataTranslations;
 import com.ut.dph.model.configurationFormFields;
+import com.ut.dph.model.configurationMessageSpecs;
 import com.ut.dph.model.configurationTransport;
 import com.ut.dph.model.fieldSelectOptions;
 import com.ut.dph.model.transactionAttachment;
@@ -245,5 +246,12 @@ public interface transactionInManager {
     void cancelMessageTransaction(int transactionId) throws Exception;
     
     List <transactionInRecords> getTransactionInRecordsForBatch (Integer batchId);
-
+    
+    Integer updateConfigIdForCMS(Integer batchId, configurationMessageSpecs cms);
+    
+    Integer flagInvalidConfig(Integer batchId);
+    
+    Integer insertInvalidConfigError(Integer batchId);
+    
+    Integer updateInvalidConfigStatus(Integer batchId);
 }

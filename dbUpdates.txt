@@ -566,3 +566,7 @@ CHANGE COLUMN `batchDLId` `batchDLId` INT(11) NULL DEFAULT 0 ;
 ALTER TABLE `universalTranslator`.`message_VisitInfo` 
 ADD COLUMN `originalReferralId` VARCHAR(45) NULL DEFAULT NULL AFTER `totalTimesSeen`;
 
+/** Grace 3.10.14 **/
+INSERT INTO `universalTranslator`.`lu_ErrorCodes` (`displayText`, `description`) VALUES ('Invalid Configuration', 'Transaction does not match a valid configuration');
+
+

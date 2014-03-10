@@ -849,23 +849,36 @@ public class transactionInManagerImpl implements transactionInManager {
             } else {
             	// we parse every record to populate configId, first we read record, then we test it with every config, update and break if match
             	//1. we get all configs for org
-            	List<configurationMessageSpecs> configurationMessageSpecs = configurationtransportmanager.getConfigurationMessageSpecsForOrgTransport(batchUpload.getOrgId(), batchUpload.gettransportMethodId());
+            	List<configurationMessageSpecs> configurationMessageSpecs = configurationtransportmanager.getConfigurationMessageSpecsForOrgTransport(batchUpload.getOrgId(), batchUpload.gettransportMethodId(), false);
                 //2. we get all rows for batch
             	List<transactionInRecords> tInRecords = getTransactionInRecordsForBatch(batchUpload.getId());
             	if (tInRecords == null || tInRecords.size() == 0) {
             		sysError++;
-                    insertProcessingError(5, null, batchUpload.getId(), null, null, null, null,
-                            false, false, "No transactions were found for this batch.");
+            		setBatchToError(batchUpload.getId(), "No transactions were found for this batch.");
+            		return sysError;
             	}
             	if (configurationMessageSpecs == null || configurationMessageSpecs.size() == 0) {
             		sysError++;
-                    insertProcessingError(5, null, batchUpload.getId(), null, null, null, null,
-                            false, false, ("No configurations for transport type of " + batchUpload.gettransportMethodId() +" were found for this batch."));
+            		setBatchToError(batchUpload.getId(), ("No configurations for transport type of " + batchUpload.gettransportMethodId() +" were found for this batch."));
+            		// update all transactions to invalid
+            		updateTransactionStatus(batchUpload.getId(), 0, 0, 11);
+            		return sysError;
             	}
-            	//3 loop through each record and look for a config match, we will break and update if we find a match
-            	sysError++;
-                insertProcessingError(5, null, batchUpload.getId(), null, null, null, null,
-                        false, false, "Files with multiple configurations are not supported yet.");
+            	
+            	//3 loop through each config and mass update by config
+            	for (configurationMessageSpecs cms : configurationMessageSpecs) {
+        			//we update by config
+            		if (updateConfigIdForCMS(batchUpload.getId(), cms) != 0) {
+            			sysError++;
+            			insertProcessingError(5, null, batchUpload.getId(), null, null, null, null,
+                                false, false, "System error while checking configuration");
+            			//system error - break
+            			break;
+            		}
+        		}
+            	
+            	// now we looped through config, we flag the invalid records.
+            	sysError = flagInvalidConfig(batchUpload.getId());	
             }
 
             //we populate transactionTranslatedIn
@@ -873,9 +886,6 @@ public class transactionInManagerImpl implements transactionInManager {
 
             //update data in transactionTranslatedIn
             resetTransactionTranslatedIn(batchUpload.getId(), true);
-
-            //records are loaded at this point
-            updateTransactionStatus(batchUpload.getId(), 0, 11, 9);
 
             return sysError;
         } catch (Exception ex) {
@@ -1492,7 +1502,14 @@ public class transactionInManagerImpl implements transactionInManager {
 
             //we check handling here for rejecting entire batch
             List<configurationTransport> batchHandling = getHandlingDetailsByBatch(batchId);
-            if (batchHandling.size() != 1) {
+            // if entire batch failed and have no configIds, there will be no error handling found
+            if (getRecordCounts(batchId, Arrays.asList(11), false) == getRecordCounts(batchId,  new ArrayList<Integer>(), false)) {
+            	//entire batch failed, we reject entire batch
+            	updateRecordCounts(batchId, errorStatusIds, false, "errorRecordCount");
+            	updateRecordCounts(batchId, new ArrayList<Integer>(), false, "totalRecordCount");
+                updateBatchStatus(batchId, 7, "endDateTime");
+                return false;
+        	}else if (batchHandling.size() != 1) {
                 //TODO email admin to fix problem
                 insertProcessingError(5, null, batchId, null, null, null, null, false, false, "Multiple or no file handling found, please check auto-release and error handling configurations");
                 updateRecordCounts(batchId, new ArrayList<Integer>(), false, "totalRecordCount");
@@ -1567,5 +1584,38 @@ public class transactionInManagerImpl implements transactionInManager {
 	public List<transactionInRecords> getTransactionInRecordsForBatch(Integer batchId) {
 		return transactionInDAO.getTransactionInRecordsForBatch(batchId);
 	}
-    
+
+
+
+	@Override
+	public Integer updateConfigIdForCMS(Integer batchId, configurationMessageSpecs cms) {
+		return transactionInDAO.updateConfigIdForCMS(batchId, cms);
+	}
+
+	@Override
+	public Integer flagInvalidConfig(Integer batchId) {
+		Integer sysErrors = 0;
+		try {
+			sysErrors = insertInvalidConfigError(batchId);
+			sysErrors = sysErrors+ updateInvalidConfigStatus(batchId);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			System.err.println("flagInvalidConfig " + ex.getCause());
+			sysErrors ++;
+		}
+		return sysErrors;
+	}
+
+	@Override
+	public Integer insertInvalidConfigError(Integer batchId) {
+		return transactionInDAO.insertInvalidConfigError(batchId);
+	}
+
+	@Override
+	public Integer updateInvalidConfigStatus(Integer batchId) {
+		return transactionInDAO.updateInvalidConfigStatus(batchId);
+	}
+
+	
+
 }
