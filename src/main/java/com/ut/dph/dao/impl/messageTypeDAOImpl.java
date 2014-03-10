@@ -120,7 +120,7 @@ public class messageTypeDAOImpl implements messageTypeDAO {
 
         int firstResult = 0;
 
-	//Set the parameters for paging
+        //Set the parameters for paging
         //Set the page to load
         if (page > 1) {
             firstResult = (maxResults * (page - 1));
@@ -132,10 +132,9 @@ public class messageTypeDAOImpl implements messageTypeDAO {
         return query.list();
 
     }
-    
+
     /**
-     * The 'getAvailableMessageTypes' function will return the list of message types in the system that
-     * have not already been set up for the passed in orgId.
+     * The 'getAvailableMessageTypes' function will return the list of message types in the system that have not already been set up for the passed in orgId.
      *
      * @Table	messageTypes
      *
@@ -148,8 +147,8 @@ public class messageTypeDAOImpl implements messageTypeDAO {
     public List<messageType> getAvailableMessageTypes(int orgId) {
 
         Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT id, name FROM messageTypes where status = 1 and id not in (select messageTypeId from configurations where orgId = :orgId)");
-              query.setParameter("orgId", orgId);
-              
+        query.setParameter("orgId", orgId);
+
         return query.list();
     }
 
@@ -234,9 +233,8 @@ public class messageTypeDAOImpl implements messageTypeDAO {
     /**
      * The 'findTotalCrosswalks' function will return the total number of generic crosswalks in the system
      *
-     * @param   orgId  Will pass the orgId this will help determine if I want all crosswalks or generic
-     *                 system only crosswalks
-     * 
+     * @param orgId Will pass the orgId this will help determine if I want all crosswalks or generic system only crosswalks
+     *
      * @Table	crosswalks
      *
      *
@@ -244,14 +242,14 @@ public class messageTypeDAOImpl implements messageTypeDAO {
      */
     @Override
     public double findTotalCrosswalks(int orgId) {
-        
+
         Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Crosswalks.class);
-        
-        if(orgId == 0) {
+
+        if (orgId == 0) {
             criteria.add(Restrictions.eq("orgId", 0));
         }
-        
-        double totalCrosswalks = (double)criteria.list().size();
+
+        double totalCrosswalks = (double) criteria.list().size();
 
         return totalCrosswalks;
     }
@@ -288,9 +286,7 @@ public class messageTypeDAOImpl implements messageTypeDAO {
     }
 
     /**
-     * The 'saveMessageTypeFields' function will save a new message type field. The function will also search for all configurations 
-     * that is using this message type and add the field as NOT USED in the online form transport method. It would be up to the administrator to go in 
-     * and mark the field as USED for what ever configuration will be using this new field.
+     * The 'saveMessageTypeFields' function will save a new message type field. The function will also search for all configurations that is using this message type and add the field as NOT USED in the online form transport method. It would be up to the administrator to go in and mark the field as USED for what ever configuration will be using this new field.
      *
      * @Table messageTypeFormFields
      *
@@ -301,7 +297,7 @@ public class messageTypeDAOImpl implements messageTypeDAO {
     public void saveMessageTypeFields(messageTypeFormFields formField) {
         Integer lastId = (Integer) sessionFactory.getCurrentSession().save(formField);
 
-            //Need to find out all configurations that use this message type and add the new
+        //Need to find out all configurations that use this message type and add the new
         //form field to the online form configuration.
         Query query = sessionFactory.getCurrentSession().createQuery("from configuration where messageTypeId = :messageTypeId");
         query.setParameter("messageTypeId", formField.getMessageTypeId());
@@ -336,10 +332,9 @@ public class messageTypeDAOImpl implements messageTypeDAO {
 
         return query.list();
     }
-    
+
     /**
-     * The 'getAllTables' function will return a list of all available tables where we can use to select
-     * which table to auto populate a form field.
+     * The 'getAllTables' function will return a list of all available tables where we can use to select which table to auto populate a form field.
      */
     @Override
     @SuppressWarnings("rawtypes")
@@ -349,7 +344,7 @@ public class messageTypeDAOImpl implements messageTypeDAO {
 
         return query.list();
     }
-    
+
     /**
      * The 'getTableColumns' function will return a list of columns from the passed in table name
      *
@@ -376,10 +371,10 @@ public class messageTypeDAOImpl implements messageTypeDAO {
 
         return query.list();
     }
-    
+
     /**
      * The 'getValidationById' function will return a validation by the passed in Id.
-     * 
+     *
      */
     @Override
     @SuppressWarnings("rawtypes")
@@ -467,14 +462,14 @@ public class messageTypeDAOImpl implements messageTypeDAO {
 
         int firstResult = 0;
 
-		//Set the parameters for paging
+        //Set the parameters for paging
         //Set the page to load
         if (page > 1) {
             firstResult = (maxResults * (page - 1));
         }
         query.setFirstResult(firstResult);
 
-		//Set the max results to display
+        //Set the max results to display
         //If 0 is passed then we want all crosswalks
         if (maxResults > 0) {
             query.setMaxResults(maxResults);
@@ -626,20 +621,29 @@ public class messageTypeDAOImpl implements messageTypeDAO {
     @Override
     @Transactional
     public String getCrosswalkName(int cwId) {
-        Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT name FROM crosswalks where id = :cwId")
-                .setParameter("cwId", cwId);
-
-        String cwName = (String) query.uniqueResult();
-
+        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Crosswalks.class);
+        criteria.add(Restrictions.eq("id", cwId));
+        
+        Crosswalks cwDetails = (Crosswalks) criteria.uniqueResult();
+        
+        String cwName = "";
+        
+        if(cwDetails.getOrgId() > 0) {
+            cwName = cwDetails.getName() + " (Org Specific)";
+        }
+        else {
+            cwName = cwDetails.getName();
+        }
+       
         return cwName;
     }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	@Transactional
-	public List<validationType> getValidationTypes1() {
-		Query query = sessionFactory.getCurrentSession().createQuery("from validationType order by id asc");
-		return query.list();
-	}
+    @SuppressWarnings("unchecked")
+    @Override
+    @Transactional
+    public List<validationType> getValidationTypes1() {
+        Query query = sessionFactory.getCurrentSession().createQuery("from validationType order by id asc");
+        return query.list();
+    }
 
 }

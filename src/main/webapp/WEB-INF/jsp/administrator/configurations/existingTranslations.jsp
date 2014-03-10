@@ -29,7 +29,7 @@
                             ${dataTranslations[tStatus.index].macroName} 
                         </td>
                         <td>
-                            ${dataTranslations[tStatus.index].crosswalkName} 
+                            ${dataTranslations[tStatus.index].crosswalkName}  
                         </td>
                         <td class="center-text">
                             <c:choose><c:when test="${dataTranslations[tStatus.index].passClear == 1}">Pass</c:when><c:otherwise>Clear</c:otherwise></c:choose>

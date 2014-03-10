@@ -608,10 +608,8 @@ public class adminConfigController {
          * to fix errors via ERG set up the online form
          */
         configuration configurationDetails = configurationmanager.getConfigurationById(configId);
-        if(currTransportId == 0 && (transportDetails.gettransportMethodId() == 2 || transportDetails.geterrorHandling() == 1)) {
-            configurationTransportManager.setupOnlineForm(transportId, configId, configurationDetails.getMessageTypeId());
-        }
-        
+        configurationTransportManager.setupOnlineForm(transportId, configId, configurationDetails.getMessageTypeId());
+       
         /* Need to set the mappings static variable */
         if(transportDetails.gettransportMethodId() == 2) {
             mappings = 2;
@@ -819,7 +817,7 @@ public class adminConfigController {
             return mav;
         } 
         else {
-            /** If transport method is ERG send to the ERG Cutomization page */
+            /** If transport method is ERG send to the ERG Customization page */
             if(transportDetails.gettransportMethodId() == 2) {
                 ModelAndView mav = new ModelAndView(new RedirectView("ERGCustomize"));
                 return mav;
@@ -917,6 +915,7 @@ public class adminConfigController {
         mav.addObject("templateFields", templateFields);
         
         mav.addObject("selTransportMethod", transportDetails.gettransportMethodId());
+       
         
         //Set the variable to hold the number of completed steps for this configuration;
         mav.addObject("stepsCompleted", stepsCompleted);
@@ -932,7 +931,7 @@ public class adminConfigController {
      * @return	This method will either redirect back to the Choose Fields page or redirect to the next step data translations page.
      */
     @RequestMapping(value = "/saveFields", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody Integer saveFormFields(@Valid @ModelAttribute(value = "transportDetails") configurationTransport transportDetails, RedirectAttributes redirectAttr, @RequestParam String action, @RequestParam int transportMethod) throws Exception {
+    public @ResponseBody Integer saveFormFields(@Valid @ModelAttribute(value = "transportDetails") configurationTransport transportDetails, RedirectAttributes redirectAttr, @RequestParam String action, @RequestParam int transportMethod, @RequestParam int errorHandling) throws Exception {
 
         /**
          * Need to update the configuration completed step
@@ -964,11 +963,11 @@ public class adminConfigController {
             return 1;
             
         } else {
-            if(transportMethod == 2) {
-                return 1;
-            }
-            else {
+            if(errorHandling == 1) {
                 return 2;
+            }
+            else  {
+                return 1;
             }
             
         }
@@ -1113,6 +1112,7 @@ public class adminConfigController {
                 translation.setfieldName(fieldName);
 
                 //Get the crosswalk name by id
+                
                 crosswalkName = messagetypemanager.getCrosswalkName(translation.getCrosswalkId());
                 translation.setcrosswalkName(crosswalkName);
                 
