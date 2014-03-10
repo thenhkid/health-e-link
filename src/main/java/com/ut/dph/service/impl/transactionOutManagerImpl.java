@@ -95,6 +95,9 @@ public class transactionOutManagerImpl implements transactionOutManager {
     @Autowired
     private emailMessageManager emailMessageManager;
     
+    private int processingSysErrorId = 6;
+
+    
     @Override
     @Transactional
     public List<batchDownloads> getInboxBatches(int userId, int orgId, String searchTerm, Date fromDate, Date toDate, int page, int maxResults) throws Exception {
@@ -310,7 +313,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                     if (!processed) {
                     	//we update and log
                     	transactionInManager.updateTransactionTargetStatus(0, transaction.getId(), 0, 33);
-                    	transactionInManager.insertProcessingError(5, null, 0, null, null, null, null, false, true, errorMessage,transaction.getId());
+                    	transactionInManager.insertProcessingError(processingSysErrorId, null, 0, null, null, null, null, false, true, errorMessage,transaction.getId());
                     }
 
                     /* If processed == true update the status of the batch and transaction */
@@ -330,7 +333,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                         
                         if (processingErrors != 0) {
                          	transactionInManager.updateTransactionTargetStatus(0, transaction.getId(), 0, 33);
-                        	transactionInManager.insertProcessingError(5, null, 0, null, null, null, null, false, true, "error applying macros and crosswalks",transaction.getId());
+                        	transactionInManager.insertProcessingError(processingSysErrorId, null, 0, null, null, null, null, false, true, "error applying macros and crosswalks",transaction.getId());
                         }
                         
                         /* Once all the processing has completed with no errors need to copy records to the transactionOutRecords to make available to view */

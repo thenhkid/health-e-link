@@ -86,7 +86,8 @@ public class transactionInManagerImpl implements transactionInManager {
     @Autowired
     private transactionOutDAO transactionOutDAO;
 
-    
+    private int processingSysErrorId = 6;
+
     @Override
     @Transactional
     public String getFieldValue(String tableName, String tableCol, String idCol, int idValue) {
@@ -873,7 +874,7 @@ public class transactionInManagerImpl implements transactionInManager {
         			//we update by config
             		if (updateConfigIdForCMS(batchUpload.getId(), cms) != 0) {
             			sysError++;
-            			insertProcessingError(5, null, batchUpload.getId(), null, null, null, null,
+            			insertProcessingError(processingSysErrorId, null, batchUpload.getId(), null, null, null, null,
                                 false, false, "System error while checking configuration");
             			//system error - break
             			break;
@@ -1046,7 +1047,7 @@ public class transactionInManagerImpl implements transactionInManager {
             return 0;
         } catch (Exception ex) {
             ex.printStackTrace();
-            insertProcessingError(5, cff.getconfigId(), batchUploadId, cff.getId(), null, null, validationTypeId, false, false, (ex.getClass() + " " + ex.getCause()));
+            insertProcessingError(processingSysErrorId, cff.getconfigId(), batchUploadId, cff.getId(), null, null, validationTypeId, false, false, (ex.getClass() + " " + ex.getCause()));
             return 1;
         }
 
@@ -1091,7 +1092,7 @@ public class transactionInManagerImpl implements transactionInManager {
             return 0;
         } catch (Exception ex) {
             ex.printStackTrace();
-            insertProcessingError(5, cff.getconfigId(), batchUploadId, cff.getId(), null, null, validationTypeId, false, false, (ex.getClass() + " " + ex.getCause()));
+            insertProcessingError(processingSysErrorId, cff.getconfigId(), batchUploadId, cff.getId(), null, null, validationTypeId, false, false, (ex.getClass() + " " + ex.getCause()));
             return 1;
         }
 
@@ -1498,7 +1499,7 @@ public class transactionInManagerImpl implements transactionInManager {
             }
 
             if (sysErrors > 0) {
-                insertProcessingError(5, null, batchId, null, null, null, null, false, false, errorMessage);
+                insertProcessingError(processingSysErrorId, null, batchId, null, null, null, null, false, false, errorMessage);
                 updateBatchStatus(batchId, 29, "endDateTime");
                 return false;
             }
@@ -1514,7 +1515,7 @@ public class transactionInManagerImpl implements transactionInManager {
                 return false;
         	}else if (batchHandling.size() != 1) {
                 //TODO email admin to fix problem
-                insertProcessingError(5, null, batchId, null, null, null, null, false, false, "Multiple or no file handling found, please check auto-release and error handling configurations");
+                insertProcessingError(9, null, batchId, null, null, null, null, false, false, "Multiple or no file handling found, please check auto-release and error handling configurations");
                 updateRecordCounts(batchId, new ArrayList<Integer>(), false, "totalRecordCount");
                 // do we count pass records as errors?
                 updateRecordCounts(batchId, errorStatusIds, false, "errorRecordCount");
@@ -1540,7 +1541,7 @@ public class transactionInManagerImpl implements transactionInManager {
             batchStatusId = 3;
 
         } catch (Exception ex) {
-            insertProcessingError(5, null, batchId, null, null, null, null, false, false, ("loadBatch error" + ex.getCause()));
+            insertProcessingError(processingSysErrorId, null, batchId, null, null, null, null, false, false, ("loadBatch error" + ex.getCause()));
             batchStatusId = 29;
         }
 
@@ -1566,7 +1567,7 @@ public class transactionInManagerImpl implements transactionInManager {
     public void setBatchToError(Integer batchId, String errorMessage) throws Exception {
         try {
             //TODO send email here
-            insertProcessingError(5, null, batchId, null, null, null, null,
+            insertProcessingError(processingSysErrorId, null, batchId, null, null, null, null,
                     false, false, errorMessage);
             updateBatchStatus(batchId, 29, "endDateTime");
         } catch (Exception ex1) {

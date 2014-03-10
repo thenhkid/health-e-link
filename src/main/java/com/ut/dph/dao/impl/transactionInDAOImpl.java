@@ -67,6 +67,8 @@ public class transactionInDAOImpl implements transactionInDAO {
     private String schemaName = "universalTranslator";
 
     private int transRELId = 12;
+    
+    private int processingSysErrorId = 6;
 
     /**
      * The 'getFieldValue' function will return the value saved for the passed in tableName, tableCol and idValue.
@@ -1481,7 +1483,7 @@ public class transactionInDAOImpl implements transactionInDAO {
             return 0;
         } catch (Exception ex) {
             System.err.println("genericValidation " + ex.getCause());
-            insertProcessingError(5, cff.getconfigId(), batchUploadId, cff.getId(),
+            insertProcessingError(processingSysErrorId, cff.getconfigId(), batchUploadId, cff.getId(),
                     null, null, validationTypeId, false, false, ("-" + ex.getCause().toString()));
             return 1; //we return error count of 1 when error
         }
@@ -1664,7 +1666,7 @@ public class transactionInDAOImpl implements transactionInDAO {
             updateData.executeUpdate();
         } catch (Exception ex) {
             System.err.println("executeCWData " + ex.getCause());
-            insertProcessingError(5, configId, batchId, fieldId,
+            insertProcessingError(processingSysErrorId, configId, batchId, fieldId,
                     null, cwd.getCrosswalkId(), null,
                     false, foroutboundProcessing, ("executeCWData " + ex.getCause().toString()));
         }
@@ -2094,7 +2096,7 @@ public class transactionInDAOImpl implements transactionInDAO {
             return 0;
         } catch (Exception ex) {
             //insert system error
-            insertProcessingError(5, configId, batchId, cdt.getFieldId(),
+            insertProcessingError(processingSysErrorId, configId, batchId, cdt.getFieldId(),
                     cdt.getMacroId(), null, null,
                     false, foroutboundProcessing, ("executeMacro " + ex.getCause().toString()));
             System.err.println("executeMacro " + ex.getCause());
