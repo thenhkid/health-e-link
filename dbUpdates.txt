@@ -595,3 +595,7 @@ INSERT INTO `universaltranslator`.`lu_ErrorCodes` (`displayText`, `description`)
 ALTER TABLE `universalTranslator`.`transactionIn` 
 ADD INDEX `batchAndIdIdx` (`id` ASC, `batchId` ASC);
 
+/** grace 03102014 12:41 PM  **?
+ALTER TABLE `universalTranslator`.`transactionInRecords` 
+ADD INDEX `loadTableId` (`loadTableId` ASC);
+

@@ -207,4 +207,5 @@ public interface transactionInDAO {
     
     Integer updateInvalidConfigStatus(Integer batchId);
 
+    Integer indexLoadTable(String loadTableName);
 }
