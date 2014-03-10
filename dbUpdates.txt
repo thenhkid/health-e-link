@@ -589,3 +589,7 @@ end
 
 INSERT INTO `universaltranslator`.`lu_ErrorCodes` (`displayText`, `description`) VALUES ('No Transactions Found', 'No Transactions were found for batch');
 
+/** grace 03102014 11:02AM **/
+ALTER TABLE `universalTranslator`.`transactionIn` 
+ADD INDEX `batchAndIdIdx` (`id` ASC, `batchId` ASC);
+
