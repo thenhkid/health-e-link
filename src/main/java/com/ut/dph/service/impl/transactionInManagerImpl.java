@@ -853,13 +853,13 @@ public class transactionInManagerImpl implements transactionInManager {
                 //2. we get all rows for batch
             	List<transactionInRecords> tInRecords = getTransactionInRecordsForBatch(batchUpload.getId());
             	if (tInRecords == null || tInRecords.size() == 0) {
-            		sysError++;
-            		setBatchToError(batchUpload.getId(), "No transactions were found for this batch.");
+            		insertProcessingError(8, null, batchUpload.getId(), null, null, null, null,
+                            false, false, "No transactions were found for batch.");
             		return sysError;
             	}
             	if (configurationMessageSpecs == null || configurationMessageSpecs.size() == 0) {
-            		sysError++;
-            		setBatchToError(batchUpload.getId(), ("No configurations for transport type of " + batchUpload.gettransportMethodId() +" were found for this batch."));
+            		insertProcessingError(7, null, batchUpload.getId(), null, null, null, null,
+                            false, false, "No valid configurations were found for loading batch.");
             		// update all transactions to invalid
             		updateTransactionStatus(batchUpload.getId(), 0, 0, 11);
             		return sysError;
@@ -1543,6 +1543,9 @@ public class transactionInManagerImpl implements transactionInManager {
 
         try {
             updateBatchStatus(batchId, batchStatusId, "endDateTime");
+            updateRecordCounts(batchId, new ArrayList<Integer>(), false, "totalRecordCount");
+            // do we count pass records as errors?
+            updateRecordCounts(batchId, errorStatusIds, false, "errorRecordCount");
         } catch (Exception ex1) {
             Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ("loadBatch error at updating batch status - " + ex1));
             return false;
