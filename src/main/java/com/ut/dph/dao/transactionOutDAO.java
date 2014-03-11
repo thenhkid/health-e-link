@@ -101,4 +101,6 @@ public interface transactionOutDAO {
     
     void clearTransactionOutErrors(Integer transactionTargetId);
     
+    batchDownloadSummary getDownloadSummaryDetails(int transactionTargetId);
+    
 }

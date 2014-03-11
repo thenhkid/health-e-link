@@ -208,4 +208,6 @@ public interface transactionInDAO {
     Integer updateInvalidConfigStatus(Integer batchId);
 
     Integer indexLoadTable(String loadTableName);
+    
+    batchUploadSummary getUploadSummaryDetails(int transactionInId);
 }

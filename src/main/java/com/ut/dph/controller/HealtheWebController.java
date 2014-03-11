@@ -335,8 +335,17 @@ public class HealtheWebController {
                 try {
                     List<configurationFormFields> sourceInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transaction.getconfigId(),transportDetails.getId(),1);
                     /* Set all the transaction SOURCE ORG fields */
-                    List<transactionRecords> fromFields = setInboxFormFields(sourceInfoFormFields, records, 0, true, 0);
+                    
+                    /* Set all the transaction SOURCE ORG fields */
+                    List<transactionRecords> fromFields;
+                    if(!sourceInfoFormFields.isEmpty()) {
+                        fromFields = setInboxFormFields(sourceInfoFormFields, records, 0, true, 0);
+                    }
+                    else {
+                        fromFields = setOrgDetails(transactionOutManager.getDownloadSummaryDetails(transaction.getId()).getsourceOrgId());
+                    }
                     transactionDetails.setsourceOrgFields(fromFields);
+                    
                 }
                 catch (Exception e) {
                     throw new Exception ("Error retrieving source fields for configuration id: "+ transaction.getconfigId(), e);
@@ -471,7 +480,13 @@ public class HealtheWebController {
             try {
                 List<configurationFormFields> senderInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),1);
                 /* Set all the transaction SOURCE ORG fields */
-                List<transactionRecords> fromFields = setInboxFormFields(senderInfoFormFields, records, transactionInfo.getconfigId(), true, 0);
+                List<transactionRecords> fromFields;
+                if(!senderInfoFormFields.isEmpty()) {
+                    fromFields = setInboxFormFields(senderInfoFormFields, records, transactionInfo.getconfigId(), true, 0);
+                }
+                else {
+                    fromFields = setOrgDetails(transactionOutManager.getDownloadSummaryDetails(transactionInfo.getId()).getsourceOrgId());
+                }
                 transaction.setsourceOrgFields(fromFields);
             
             }
@@ -1750,11 +1765,23 @@ public class HealtheWebController {
                 List<configurationFormFields> detailFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transaction.getconfigId(),transportDetails.getId(),6);
 
                 /* Set all the transaction SOURCE ORG fields */
-                List<transactionRecords> fromFields = setOutboundFormFields(sourceInfoFormFields, records, 0, true, 0);
+                List<transactionRecords> fromFields;
+                if(!sourceInfoFormFields.isEmpty()) {
+                    fromFields = setOutboundFormFields(sourceInfoFormFields, records, 0, true, 0);
+                }
+                else {
+                    fromFields = setOrgDetails(batchDetails.getOrgId());
+                }
                 transactionDetails.setsourceOrgFields(fromFields);
 
                 /* Set all the transaction TARGET fields */
-                List<transactionRecords> toFields = setOutboundFormFields(targetInfoFormFields, records, 0, true, 0);
+                List<transactionRecords> toFields;
+                if(!targetInfoFormFields.isEmpty()) {
+                    toFields = setOutboundFormFields(targetInfoFormFields, records, 0, true, 0);
+                }
+                else {
+                    toFields = setOrgDetails(transactionInManager.getUploadSummaryDetails(transaction.getId()).gettargetOrgId());
+                }
                 transactionDetails.settargetOrgFields(toFields);
 
                 /* Set all the transaction PATIENT fields */
@@ -1872,9 +1899,15 @@ public class HealtheWebController {
 
 
             /* Set all the transaction SOURCE ORG fields */
-            List<transactionRecords> fromFields = setOutboundFormFields(senderInfoFormFields, records, transactionInfo.getconfigId(), true, 0);
+            List<transactionRecords> fromFields;
+            if(!senderInfoFormFields.isEmpty()) {
+                fromFields = setOutboundFormFields(senderInfoFormFields, records, transactionInfo.getconfigId(), true, 0);
+            }
+            else {
+                fromFields = setOrgDetails(batchInfo.getOrgId());
+            }
             transaction.setsourceOrgFields(fromFields);
-
+            
             /* Set all the transaction SOURCE PROVIDER fields */
             List<transactionRecords> fromProviderFields = setOutboundFormFields(senderProviderFormFields, records, transactionInfo.getconfigId(), true, 0);
             transaction.setsourceProviderFields(fromProviderFields);
@@ -2294,7 +2327,7 @@ public class HealtheWebController {
      * @return This function will return a list of transactionRecords fields with the correct data
      * 
      * @throws NoSuchMethodException 
-     */
+     */ 
     public List<transactionRecords> setOutboundFormFields(List<configurationFormFields> formfields, transactionInRecords records, int configId, boolean readOnly, int orgId) throws NoSuchMethodException {
         
         List<transactionRecords> fields = new ArrayList<transactionRecords>();
@@ -2606,4 +2639,57 @@ public class HealtheWebController {
         
     }
     
+    
+    /**
+     * The 'setOrgDetails' function will set the field values to the passed in orgId if the
+     * organization information wasn't collected with the file upload.
+     * 
+     * @param orgId The organization id to get the details for
+     * 
+     * @return 
+     */
+    public List<transactionRecords> setOrgDetails(int orgId) {
+        
+        List<transactionRecords> fields = new ArrayList<transactionRecords>();
+        
+        /* Get the organization Details */
+        Organization orgDetails = organizationmanager.getOrganizationById(orgId);
+        
+        transactionRecords namefield = new transactionRecords();
+        
+        namefield.setFieldValue(orgDetails.getOrgName());
+        fields.add(namefield);
+        
+        transactionRecords addressfield = new transactionRecords();
+        
+        addressfield.setFieldValue(orgDetails.getAddress());
+        fields.add(addressfield);
+        
+        transactionRecords address2field = new transactionRecords();
+        address2field.setFieldValue(orgDetails.getAddress2());
+        fields.add(address2field);
+        
+        transactionRecords cityfield = new transactionRecords();
+        cityfield.setFieldValue(orgDetails.getCity());
+        fields.add(cityfield);
+        
+        transactionRecords statefield = new transactionRecords();
+        statefield.setFieldValue(orgDetails.getState());
+        fields.add(statefield);
+        
+        transactionRecords zipfield = new transactionRecords();
+        zipfield.setFieldValue(orgDetails.getPostalCode());
+        fields.add(zipfield);
+        
+        transactionRecords phonefield = new transactionRecords();
+        phonefield.setFieldValue(orgDetails.getPhone());
+        fields.add(phonefield);
+        
+        transactionRecords faxfield = new transactionRecords();
+        faxfield.setFieldValue(orgDetails.getFax());
+        fields.add(faxfield);
+        
+        return fields;
+        
+    } 
 }

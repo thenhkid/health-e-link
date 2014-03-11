@@ -20,7 +20,6 @@ import java.util.Iterator;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
@@ -35,6 +34,8 @@ import com.ut.dph.model.messageTypeDataTranslations;
 import com.ut.dph.model.messageTypeFormFields;
 import com.ut.dph.model.validationType;
 import com.ut.dph.reference.fileSystem;
+import org.apache.poi.openxml4j.opc.OPCPackage;
+import org.apache.poi.ss.usermodel.Sheet;
 
 @Service
 public class messageTypeManagerImpl implements messageTypeManager {
@@ -463,32 +464,37 @@ public class messageTypeManagerImpl implements messageTypeManager {
 
         try {
             //Set the initial value of the buckets (1);
-            Integer bucketVal = new Integer(1);
+            Integer bucketVal = 1;
 
             //Set the initial value of the field number (0);
-            Integer fieldNo = new Integer(0);
+            Integer fieldNo = 0;
 
 			//Set the initial value of the display position for the field
             //within each bucket (0);
-            Integer dspPos = new Integer(0);
+            Integer dspPos = 0;
 
             //Set the directory that will hold the message type library excel files
             fileSystem dir = new fileSystem();
             dir.setMessageTypeDir("libraryFiles");
+            
+            //Create Workbook instance holding reference to .xlsx file
+            OPCPackage pkg = null;
+            XSSFWorkbook workbook = null;
 
             FileInputStream file = new FileInputStream(new File(dir.getDir() + fileName));
 
-            //Create Workbook instance holding reference to .xlsx file
-            XSSFWorkbook workbook = null;
             try {
-                workbook = new XSSFWorkbook(file);
-            } catch (IOException e1) {
+               pkg = OPCPackage.open(new File(dir.getDir() + fileName));
+               
+               workbook = new XSSFWorkbook(pkg);
+               
+            } catch (Exception e1) {
                 e1.printStackTrace();
             }
 
             //Get first/desired sheet from the workbook
-            XSSFSheet sheet = workbook.getSheetAt(0);
-
+            Sheet sheet = workbook.getSheetAt(0);
+            
             //Iterate through each rows one by one
             Iterator<Row> rowIterator = sheet.iterator();
 
@@ -503,7 +509,7 @@ public class messageTypeManagerImpl implements messageTypeManager {
                     bucketVal++;
 
                     //When a spacer row is found need to reset the dspPos variable
-                    dspPos = new Integer(0);
+                    dspPos = 0;
                 } else {
                     //For each row, iterate through all the columns
                     Iterator<Cell> cellIterator = row.cellIterator();

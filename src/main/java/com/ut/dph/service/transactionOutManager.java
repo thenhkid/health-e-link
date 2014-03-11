@@ -6,6 +6,7 @@
 
 package com.ut.dph.service;
 
+import com.ut.dph.model.batchDownloadSummary;
 import com.ut.dph.model.batchDownloads;
 import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionOutNotes;
@@ -81,4 +82,6 @@ public interface transactionOutManager {
     void clearTransactionOutErrors(Integer transactionTargetId);
   
     Integer clearOutTables (Integer transactionTargetId);
+    
+    batchDownloadSummary getDownloadSummaryDetails(int transactionTargetId);
 }

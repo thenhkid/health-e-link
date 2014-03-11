@@ -257,5 +257,5 @@ public interface transactionInManager {
     
     Integer indexLoadTable(String loadTableName);
     
-    
+    batchUploadSummary getUploadSummaryDetails(int transactionInId);
 }

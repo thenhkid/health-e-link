@@ -67,7 +67,7 @@ public class transactionInDAOImpl implements transactionInDAO {
     private String schemaName = "universalTranslator";
 
     private int transRELId = 12;
-    
+
     private int processingSysErrorId = 6;
 
     /**
@@ -83,7 +83,7 @@ public class transactionInDAOImpl implements transactionInDAO {
     public String getFieldValue(String tableName, String tableCol, String idCol, int idValue) {
 
         String sql = ("select " + tableCol + " from " + tableName + " where " + idCol + " = :id");
-        
+
         Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
         query.setParameter("id", idValue);
 
@@ -1195,105 +1195,61 @@ public class transactionInDAOImpl implements transactionInDAO {
     public List<batchUploads> getuploadedBatches(int userId, int orgId, Date fromDate, Date toDate, String searchTerm, int page, int maxResults) throws Exception {
 
         int firstResult = 0;
-        
+
         /* Get a list of connections the user has access to */
         Criteria connections = sessionFactory.getCurrentSession().createCriteria(configurationConnectionSenders.class);
         connections.add(Restrictions.eq("userId", userId));
         List<configurationConnectionSenders> userConnections = connections.list();
 
-        List<Integer> messageTypeList = new ArrayList<Integer>();
-        List<Integer> targetOrgList = new ArrayList<Integer>();
+        List<Integer> configIdList = new ArrayList<Integer>();
 
         if (userConnections.isEmpty()) {
-            messageTypeList.add(0);
-            targetOrgList.add(0);
+            configIdList.add(0);
         } else {
 
             for (configurationConnectionSenders userConnection : userConnections) {
+
                 Criteria connection = sessionFactory.getCurrentSession().createCriteria(configurationConnection.class);
                 connection.add(Restrictions.eq("id", userConnection.getconnectionId()));
 
                 configurationConnection connectionInfo = (configurationConnection) connection.uniqueResult();
 
-                /* Get the message type for the configuration */
-                Criteria sourceconfigurationQuery = sessionFactory.getCurrentSession().createCriteria(configuration.class);
-                sourceconfigurationQuery.add(Restrictions.eq("id", connectionInfo.getsourceConfigId()));
-
-                configuration configDetails = (configuration) sourceconfigurationQuery.uniqueResult();
-                
-                /* Need to make sure only file download configurations are displayed */
-                Criteria transportDetailsQuery = sessionFactory.getCurrentSession().createCriteria(configurationTransport.class);
-                transportDetailsQuery.add(Restrictions.eq("configId", configDetails.getId()));
-                
-                configurationTransport transportDetails = (configurationTransport) transportDetailsQuery.uniqueResult();
-                
-                if(transportDetails.gettransportMethodId() == 1) {
-                    /* Add the message type to the message type list */
-                    messageTypeList.add(configDetails.getMessageTypeId()); 
+                if (!configIdList.contains(connectionInfo.getsourceConfigId())) {
+                    configIdList.add(connectionInfo.getsourceConfigId());
                 }
-
-                /* Get the list of target orgs */
-                Criteria targetconfigurationQuery = sessionFactory.getCurrentSession().createCriteria(configuration.class);
-                targetconfigurationQuery.add(Restrictions.eq("id", connectionInfo.gettargetConfigId()));
-                configuration targetconfigDetails = (configuration) targetconfigurationQuery.uniqueResult();
-
-                /* Add the target org to the target organization list */
-                targetOrgList.add(targetconfigDetails.getorgId());
             }
-        }
-        
-        if(messageTypeList.isEmpty()) {
-            messageTypeList.add(0);
-        }
-
-        /* Get a list of available batches */
-        Criteria batchSummaries = sessionFactory.getCurrentSession().createCriteria(batchUploadSummary.class);
-        batchSummaries.add(Restrictions.eq("sourceOrgId", orgId));
-        batchSummaries.add(Restrictions.in("messageTypeId", messageTypeList));
-        batchSummaries.add(Restrictions.in("targetOrgId", targetOrgList));
-        List<batchUploadSummary> batchUploadSummaryList = batchSummaries.list();
-
-        List<Integer> batchIdList = new ArrayList<Integer>();
-
-        if (batchUploadSummaryList.isEmpty()) {
-            batchIdList.add(0);
-        } else {
-
-            for (batchUploadSummary summary : batchUploadSummaryList) {
-                batchIdList.add(summary.getbatchId());
-            }
-
         }
 
         Criteria findBatches = sessionFactory.getCurrentSession().createCriteria(batchUploads.class);
-        findBatches.add(Restrictions.in("id", batchIdList));
+        findBatches.add(Restrictions.eq("orgId", orgId));
         findBatches.add(Restrictions.ne("statusId", 1));
-                
-        if(!"".equals(fromDate)) {
+        findBatches.add(Restrictions.in("configId", configIdList));
+
+        if (!"".equals(fromDate)) {
             findBatches.add(Restrictions.ge("dateSubmitted", fromDate));
-        }  
-        
-        if(!"".equals(toDate)) {
+        }
+
+        if (!"".equals(toDate)) {
             findBatches.add(Restrictions.lt("dateSubmitted", toDate));
-        } 
-         
+        }
+
         findBatches.addOrder(Order.desc("dateSubmitted"));
-        
+
         /* If a search term is entered conduct a search */
-        if(!"".equals(searchTerm)) {
-            
+        if (!"".equals(searchTerm)) {
+
             List<batchUploads> batches = findBatches.list();
-            
+
             List<Integer> batchFoundIdList = findUploadedBatches(batches, searchTerm);
-            
+
             if (batchFoundIdList.isEmpty()) {
                 batchFoundIdList.add(0);
             }
-            
+
             Criteria foundBatches = sessionFactory.getCurrentSession().createCriteria(batchUploads.class);
             foundBatches.add(Restrictions.in("id", batchFoundIdList));
             foundBatches.addOrder(Order.desc("dateSubmitted"));
-            
+
             if (page > 1) {
                 firstResult = (maxResults * (page - 1));
             }
@@ -1304,13 +1260,11 @@ public class transactionInDAOImpl implements transactionInDAO {
                 //Set the max results to display
                 foundBatches.setMaxResults(maxResults);
             }
-            
+
             return foundBatches.list();
-            
-        }
-        
-        else {
-            
+
+        } else {
+
             if (page > 1) {
                 firstResult = (maxResults * (page - 1));
             }
@@ -1326,7 +1280,7 @@ public class transactionInDAOImpl implements transactionInDAO {
         }
 
     }
-    
+
     /**
      * The 'findUploadedBatches' function will take a list of uploaded batches and apply the searchTerm to narrow down the results.
      *
@@ -1343,7 +1297,7 @@ public class transactionInDAOImpl implements transactionInDAO {
         searchTerm = searchTerm.replace(".", "\\.");
 
         for (batchUploads batch : batches) {
-           
+
             /* Search the submitted by */
             if (batch.getoriginalFileName().toLowerCase().matches(".*" + searchTerm + ".*")) {
                 if (!batchIdList.contains(batch.getId())) {
@@ -2309,11 +2263,11 @@ public class transactionInDAOImpl implements transactionInDAO {
             query.setParameter("configId", configId);
             query.setParameter("batchId", batchId);
             query.setParameter("srcField", ("F" + cdt.getFieldNo()));
-            
+
             if (!cdt.getFieldA().equalsIgnoreCase("")) {
-            	query.setParameter("fieldA", ("F" + cdt.getFieldA()));
+                query.setParameter("fieldA", ("F" + cdt.getFieldA()));
             } else {
-            	query.setParameter("fieldA", ("F" + cdt.getFieldNo()));
+                query.setParameter("fieldA", ("F" + cdt.getFieldNo()));
             }
             query.setParameter("fieldB", ("F" + cdt.getFieldB()));
             query.setParameter("con1", (cdt.getConstant1()));
@@ -2340,12 +2294,12 @@ public class transactionInDAOImpl implements transactionInDAO {
     public void insertProcessingError(Integer errorId, Integer configId, Integer batchId,
             Integer fieldId, Integer macroId, Integer cwId, Integer validationTypeId,
             boolean required, boolean foroutboundProcessing, String stackTrace) {
-    	insertProcessingError(errorId, configId, batchId,
+        insertProcessingError(errorId, configId, batchId,
                 fieldId, macroId, cwId, validationTypeId,
                 required, foroutboundProcessing, stackTrace, null);
-        
+
     }
-    
+
     @Override
     @Transactional
     public void insertProcessingError(Integer errorId, Integer configId, Integer batchId,
@@ -2377,7 +2331,7 @@ public class transactionInDAOImpl implements transactionInDAO {
                 .setParameter("cwId", cwId)
                 .setParameter("macroId", macroId)
                 .setParameter("stackTrace", stackTrace.toString())
-        		.setParameter("transactionId", transactionId);
+                .setParameter("transactionId", transactionId);
         try {
             updateData.executeUpdate();
         } catch (Exception ex) {
@@ -2493,8 +2447,8 @@ public class transactionInDAOImpl implements transactionInDAO {
         try {
             String sql = ("LOAD DATA LOCAL INFILE '" + fileWithPath + "' INTO TABLE "
                     + loadTableName + " fields terminated by '" + delimChar + "' "
-                    		+ " ENCLOSED BY '\"' ESCAPED BY ''"
-                    		+ " LINES TERMINATED BY '\\n'");
+                    + " ENCLOSED BY '\"' ESCAPED BY ''"
+                    + " LINES TERMINATED BY '\\n'");
             if (containsHeaderRow) {
                 sql = sql + "  IGNORE 1 LINES";
             }
@@ -2985,59 +2939,57 @@ public class transactionInDAOImpl implements transactionInDAO {
             return null;
         }
     }
-    
-    
+
     /**
      * The 'deleteMessage' function will delete the saved message completely from the system.
-     * 
+     *
      * @param batchId The batchId associated to the selected message
      * @param transactionId The selected message to be remvoed
      */
     @Override
     @Transactional
     public void deleteMessage(int batchId, int transactionId) throws Exception {
-        
+
         /* Delete Batch Summary Records */
         String deleteBatchSummarySQL = "delete from batchUploadSummary where batchId = :batchId";
         Query deleteBatchSummaryQuery = sessionFactory.getCurrentSession().createSQLQuery(deleteBatchSummarySQL).setParameter("batchId", batchId);
         deleteBatchSummaryQuery.executeUpdate();
-        
+
         /* Delete the target data */
         String deleteTargetSQL = "delete from transactionTarget where transactionInId = :transactionId";
         Query deleteTargetQuery = sessionFactory.getCurrentSession().createSQLQuery(deleteTargetSQL).setParameter("transactionId", transactionId);
         deleteTargetQuery.executeUpdate();
-        
+
         /* Delete all the message data */
         String deleteTransDataSQL = "delete from transactionTranslatedIn where transactionInId = :transactionId";
         Query deleteTransDataQuery = sessionFactory.getCurrentSession().createSQLQuery(deleteTransDataSQL).setParameter("transactionId", transactionId);
         deleteTransDataQuery.executeUpdate();
-        
+
         String deleteDataSQL = "delete from transactionInRecords where transactionInId = :transactionId";
         Query deleteDataQuery = sessionFactory.getCurrentSession().createSQLQuery(deleteDataSQL).setParameter("transactionId", transactionId);
         deleteDataQuery.executeUpdate();
-        
+
         /* Delete the transaction record */
         String deleteTransactionSQL = "delete from transactionIn where id = :transactionId";
         Query deleteTransactionQuery = sessionFactory.getCurrentSession().createSQLQuery(deleteTransactionSQL).setParameter("transactionId", transactionId);
         deleteTransactionQuery.executeUpdate();
-        
+
         /* Delete Batch Records */
         String deleteBatchSQL = "delete from batchUploads where id = :batchId";
         Query deleteBatchQuery = sessionFactory.getCurrentSession().createSQLQuery(deleteBatchSQL).setParameter("batchId", batchId);
         deleteBatchQuery.executeUpdate();
-        
+
     }
 
-    
     /**
      * The 'cancelMessageTransaction' function will cancel the message.
-     * 
+     *
      * @param transactionId The selected message to be canceled
      */
     @Override
     @Transactional
     public void cancelMessageTransaction(int transactionId) throws Exception {
-        
+
         /* Update the transactionTarget status */
         String targetSQL = "update transactionTarget set statusId = :statusId ";
         targetSQL = targetSQL + " where transactionInId = :transactionId ";
@@ -3049,7 +3001,7 @@ public class transactionInDAOImpl implements transactionInDAO {
         } catch (Exception ex) {
             System.err.println("cancel transaction failed." + ex);
         }
-        
+
         /* Update the transactionIn status */
         String sql = "update transactionIn set statusId = :statusId ";
         sql = sql + " where id = :transactionId ";
@@ -3061,107 +3013,126 @@ public class transactionInDAOImpl implements transactionInDAO {
         } catch (Exception ex) {
             System.err.println("cancel transaction failed." + ex);
         }
-        
-        
+
     }
 
-	@Override
-	@Transactional
-	@SuppressWarnings("unchecked")
-	public List<transactionInRecords> getTransactionInRecordsForBatch(Integer batchId) {
-		try { 
-		String sql = ("select * from transactionInRecords where transactionInId in "
-				+ " (select id from transactionIn where batchId = :batchId);");
-	        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
-	                .setResultTransformer(
-	                        Transformers.aliasToBean(transactionInRecords.class))
-	                .setParameter("batchId", batchId);
-	        
-	        List<transactionInRecords> transactionInRecords = query.list();
+    @Override
+    @Transactional
+    @SuppressWarnings("unchecked")
+    public List<transactionInRecords> getTransactionInRecordsForBatch(Integer batchId) {
+        try {
+            String sql = ("select * from transactionInRecords where transactionInId in "
+                    + " (select id from transactionIn where batchId = :batchId);");
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                    .setResultTransformer(
+                            Transformers.aliasToBean(transactionInRecords.class))
+                    .setParameter("batchId", batchId);
 
-	        return transactionInRecords;
-	        
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			System.err.println("getTransactionRecordsForBatch " + ex.getCause());
-			return null;
-		}
-	}
-	
-	@Override
-	@Transactional
-	public Integer updateConfigIdForCMS(Integer batchId, configurationMessageSpecs cms) {
-		try { 
-		String sql = ("update transactionIn JOIN (SELECT transactionInId from transactionInRecords  "
-				+ " WHERE F" + cms.getmessageTypeCol() + " = :cmsVal and transactionInId in "
-						+ "	(select id from  transactionIn where batchId = :batchId and configId is null)) "
-						+ " as ti ON ti.transactionInId = transactionIn.id SET configId = :configId");
-	        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
-	                .setParameter("cmsVal", cms.getmessageTypeVal())
-	                .setParameter("batchId", batchId)
-	                .setParameter("configId", cms.getconfigId());
-	        query.executeUpdate();
-	        return 0;
-	        
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			System.err.println("updateConfigIdForCMS " + ex.getCause());
-			return 1;
-		}
-	}
+            List<transactionInRecords> transactionInRecords = query.list();
 
-	@Override
-	@Transactional
-	public Integer insertInvalidConfigError(Integer batchId) {
-		try { 
-			String sql = "insert into transactionInerrors (batchUploadId, transactionInId, errorId) "
-	                + "select " + batchId + ", id, 7 from transactionIn where configId is null "
-	                + " and batchId = :batchId";   
-			Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
-		                .setParameter("batchId", batchId);
-		        query.executeUpdate();
-		        return 0;
-		        
-			} catch (Exception ex) {
-				ex.printStackTrace();
-				System.err.println("insertInvalidConfigError " + ex.getCause());
-				return 1;
-			}
-	
-	}
-	
-	@Override
-	@Transactional
-	public Integer updateInvalidConfigStatus(Integer batchId) {
-		try{
-			String sql = "update transactionIn set statusId = 11 where configId is null and batchId = :batchId ";
-			Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
-		                .setParameter("batchId", batchId);
-		        query.executeUpdate();
-		        return 0;
-		        
-		} catch (Exception ex) {
-				ex.printStackTrace();
-				System.err.println("updateInvalidConfigStatus " + ex.getCause());
-				return 1;
-		}
-	}
+            return transactionInRecords;
 
-	@Override
-	@Transactional
-	public Integer indexLoadTable(String loadTableName) {
-		try{
-			String sql = "ALTER TABLE " + loadTableName + " ADD INDEX loadTableId (loadTableId ASC);";
-			Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
-		        query.executeUpdate();
-		        return 0;
-		        
-		} catch (Exception ex) {
-				ex.printStackTrace();
-				System.err.println("indexLoadTable " + ex.getCause());
-				return 1;
-		}
-	}
-	
-	
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.err.println("getTransactionRecordsForBatch " + ex.getCause());
+            return null;
+        }
+    }
+
+    @Override
+    @Transactional
+    public Integer updateConfigIdForCMS(Integer batchId, configurationMessageSpecs cms) {
+        try {
+            String sql = ("update transactionIn JOIN (SELECT transactionInId from transactionInRecords  "
+                    + " WHERE F" + cms.getmessageTypeCol() + " = :cmsVal and transactionInId in "
+                    + "	(select id from  transactionIn where batchId = :batchId and configId is null)) "
+                    + " as ti ON ti.transactionInId = transactionIn.id SET configId = :configId");
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                    .setParameter("cmsVal", cms.getmessageTypeVal())
+                    .setParameter("batchId", batchId)
+                    .setParameter("configId", cms.getconfigId());
+            query.executeUpdate();
+            return 0;
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.err.println("updateConfigIdForCMS " + ex.getCause());
+            return 1;
+        }
+    }
+
+    @Override
+    @Transactional
+    public Integer insertInvalidConfigError(Integer batchId) {
+        try {
+            String sql = "insert into transactionInerrors (batchUploadId, transactionInId, errorId) "
+                    + "select " + batchId + ", id, 7 from transactionIn where configId is null "
+                    + " and batchId = :batchId";
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                    .setParameter("batchId", batchId);
+            query.executeUpdate();
+            return 0;
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.err.println("insertInvalidConfigError " + ex.getCause());
+            return 1;
+        }
+
+    }
+
+    @Override
+    @Transactional
+    public Integer updateInvalidConfigStatus(Integer batchId) {
+        try {
+            String sql = "update transactionIn set statusId = 11 where configId is null and batchId = :batchId ";
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                    .setParameter("batchId", batchId);
+            query.executeUpdate();
+            return 0;
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.err.println("updateInvalidConfigStatus " + ex.getCause());
+            return 1;
+        }
+    }
+
+    @Override
+    @Transactional
+    public Integer indexLoadTable(String loadTableName) {
+        try {
+            String sql = "ALTER TABLE " + loadTableName + " ADD INDEX loadTableId (loadTableId ASC);";
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+            query.executeUpdate();
+            return 0;
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.err.println("indexLoadTable " + ex.getCause());
+            return 1;
+        }
+    }
+    
+    
+    /**
+     * The 'batchUploadSummary' method will return the details for the batch summary
+     * for the passed in transactionid.
+     * 
+     * @param transactionInId The id of the transaction to search the summary for
+     * 
+     * @return This method will return the batchUploadSummary object 
+     */
+    @Override
+    @Transactional
+    public batchUploadSummary getUploadSummaryDetails(int transactionInId) {
+        
+        /* Get a list of available batches */
+        Criteria batchSummaries = sessionFactory.getCurrentSession().createCriteria(batchUploadSummary.class);
+        batchSummaries.add(Restrictions.eq("transactionInId", transactionInId));
+        
+        return (batchUploadSummary) batchSummaries.uniqueResult();
+        
+    }
+    
 }

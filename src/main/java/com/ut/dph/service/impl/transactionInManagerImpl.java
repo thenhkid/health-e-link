@@ -464,7 +464,7 @@ public class transactionInManagerImpl implements transactionInManager {
             //Set the directory that holds the crosswalk files
             int delimCount = (Integer) dir.checkFileDelimiter(dir, fileName, delimChar);
 
-            if (delimCount < 10) {
+            if (delimCount < 3) {
                 batchFileResults.put("wrongDelim", "4");
             }
 
@@ -511,7 +511,7 @@ public class transactionInManagerImpl implements transactionInManager {
         batchUploads batch = getBatchDetails(batchUploadId);
         //this should be the same point of both ERG and Uploaded File *
         Integer systemErrorCount = 0;
-		// Check to make sure the file is valid for processing, valid file is a batch with SSL (3) or SR (6)*
+        // Check to make sure the file is valid for processing, valid file is a batch with SSL (3) or SR (6)*
 
         if ((batch.getstatusId() == 3 || batch.getstatusId() == 6)) {
             // set batch to SBP - 4*
@@ -550,8 +550,7 @@ public class transactionInManagerImpl implements transactionInManager {
                     }
                 }
                 /**
-                 * if there are errors, those are system errors, they will be logged we get errorId 5 and email to admin, update batch to 29
-				 **
+                 * if there are errors, those are system errors, they will be logged we get errorId 5 and email to admin, update batch to 29 *
                  */
                 if (systemErrorCount > 0) {
                     setBatchToError(batchUploadId, "System error occurred during processBatch, please review errors in audit report");
@@ -564,8 +563,7 @@ public class transactionInManagerImpl implements transactionInManager {
             copyTransactionInStatusToTarget(batchUploadId);
 
             /**
-             * batches gets process again when user hits release button, maybe have separate method call for those that are just going from pending release to release, have to think about scenario when upload file is huge
-			 * *
+             * batches gets process again when user hits release button, maybe have separate method call for those that are just going from pending release to release, have to think about scenario when upload file is huge *
              */
             List<configurationTransport> handlingDetails = getHandlingDetailsByBatch(batchUploadId);
             // multiple config should be set to handle the batch the same way - we email admin if we don't have one way of handling a batch
@@ -581,7 +579,7 @@ public class transactionInManagerImpl implements transactionInManager {
             if (handlingDetails.size() == 1) {
                 /**
                  * 1 = Post errors to ERG 2 = Reject record on error 3 = Reject submission on error 4 = Pass through errors
-				 *
+                 *
                  */
                 if (getRecordCounts(batchUploadId, Arrays.asList(14), false) > 0 && batch.getstatusId() == 6) {
                     //batches with error should not be released, can only be Rejected/Invalid, set batch back to PR and go through auto/error handling
@@ -668,7 +666,7 @@ public class transactionInManagerImpl implements transactionInManager {
      */
     @Override
     public void processBatches() {
-		//0. grab all batches with SSL (3) - Loaded or ready for Release SR (6)
+        //0. grab all batches with SSL (3) - Loaded or ready for Release SR (6)
         //1. get all batches with SSA
         try {
             List<batchUploads> batches = getBatchesByStatusIds(Arrays.asList(3, 6));
@@ -812,16 +810,16 @@ public class transactionInManagerImpl implements transactionInManager {
         try {
             /**
              * SP can't call load Files with prepared statement, we have to load file to real table with dynamic statement created in java 1. we create batchLoadTable
-	         *
+             *
              */
             String loadTableName = "uploadTable_" + batchUpload.getId();
             //make sure old table is dropped if exists
             Integer sysError = dropLoadTable(loadTableName);
             sysError = sysError + createLoadTable(loadTableName);
-            
+
             //we need to index loadTable
             sysError = sysError + indexLoadTable(loadTableName);
-            
+
             fileSystem dir = new fileSystem();
             dir.setDirByName("/");
             String fileWithPath = dir.getDir() + batchUpload.getFileLocation() + batchUpload.getoriginalFileName();
@@ -845,44 +843,44 @@ public class transactionInManagerImpl implements transactionInManager {
             //7. we delete loadTable
             sysError = sysError + dropLoadTable(loadTableName);
 
-		    	//8. we see how if the file only has one upload type so we don't need to parse every line
+            //8. we see how if the file only has one upload type so we don't need to parse every line
             // if we only have one, we update the entire table 
             if (batchUpload.getConfigId() != null && batchUpload.getConfigId() != 0) {
                 // we update entire transactionIN with configId
                 sysError = sysError + updateConfigIdForBatch(batchUpload.getId(), batchUpload.getConfigId());
             } else {
             	// we parse every record to populate configId, first we read record, then we test it with every config, update and break if match
-            	//1. we get all configs for org
-            	List<configurationMessageSpecs> configurationMessageSpecs = configurationtransportmanager.getConfigurationMessageSpecsForOrgTransport(batchUpload.getOrgId(), batchUpload.gettransportMethodId(), false);
+                //1. we get all configs for org
+                List<configurationMessageSpecs> configurationMessageSpecs = configurationtransportmanager.getConfigurationMessageSpecsForOrgTransport(batchUpload.getOrgId(), batchUpload.gettransportMethodId(), false);
                 //2. we get all rows for batch
-            	List<transactionInRecords> tInRecords = getTransactionInRecordsForBatch(batchUpload.getId());
-            	if (tInRecords == null || tInRecords.size() == 0) {
-            		insertProcessingError(8, null, batchUpload.getId(), null, null, null, null,
+                List<transactionInRecords> tInRecords = getTransactionInRecordsForBatch(batchUpload.getId());
+                if (tInRecords == null || tInRecords.size() == 0) {
+                    insertProcessingError(8, null, batchUpload.getId(), null, null, null, null,
                             false, false, "No transactions were found for batch.");
-            		return sysError;
-            	}
-            	if (configurationMessageSpecs == null || configurationMessageSpecs.size() == 0) {
-            		insertProcessingError(7, null, batchUpload.getId(), null, null, null, null,
+                    return sysError;
+                }
+                if (configurationMessageSpecs == null || configurationMessageSpecs.size() == 0) {
+                    insertProcessingError(7, null, batchUpload.getId(), null, null, null, null,
                             false, false, "No valid configurations were found for loading batch.");
-            		// update all transactions to invalid
-            		updateTransactionStatus(batchUpload.getId(), 0, 0, 11);
-            		return sysError;
-            	}
-            	
-            	//3 loop through each config and mass update by config
-            	for (configurationMessageSpecs cms : configurationMessageSpecs) {
-        			//we update by config
-            		if (updateConfigIdForCMS(batchUpload.getId(), cms) != 0) {
-            			sysError++;
-            			insertProcessingError(processingSysErrorId, null, batchUpload.getId(), null, null, null, null,
+                    // update all transactions to invalid
+                    updateTransactionStatus(batchUpload.getId(), 0, 0, 11);
+                    return sysError;
+                }
+
+                //3 loop through each config and mass update by config
+                for (configurationMessageSpecs cms : configurationMessageSpecs) {
+                    //we update by config
+                    if (updateConfigIdForCMS(batchUpload.getId(), cms) != 0) {
+                        sysError++;
+                        insertProcessingError(processingSysErrorId, null, batchUpload.getId(), null, null, null, null,
                                 false, false, "System error while checking configuration");
-            			//system error - break
-            			break;
-            		}
-        		}
-            	
-            	// now we looped through config, we flag the invalid records.
-            	sysError = flagInvalidConfig(batchUpload.getId());	
+                        //system error - break
+                        break;
+                    }
+                }
+
+                // now we looped through config, we flag the invalid records.
+                sysError = flagInvalidConfig(batchUpload.getId());
             }
 
             //we populate transactionTranslatedIn
@@ -1358,7 +1356,7 @@ public class transactionInManagerImpl implements transactionInManager {
         insertProcessingError(errorId, configId, batchId, fieldId, macroId, cwId, validationTypeId, required, foroutboundProcessing, errorCause, null);
 
     }
-    
+
     @Override
     public void insertProcessingError(Integer errorId, Integer configId, Integer batchId, Integer fieldId,
             Integer macroId, Integer cwId, Integer validationTypeId, boolean required,
@@ -1485,7 +1483,7 @@ public class transactionInManagerImpl implements transactionInManager {
             String errorMessage = "Load errors, please contact admin to review logs";
 			// loading batch will take it all the way to loaded (9) status for
 
-           //get delimiter, get fileWithPath etc
+            //get delimiter, get fileWithPath etc
             if (batch.getoriginalFileName().endsWith(".txt")) {
                 sysErrors = sysErrors + loadTextBatch(batch);
             }
@@ -1507,13 +1505,13 @@ public class transactionInManagerImpl implements transactionInManager {
             //we check handling here for rejecting entire batch
             List<configurationTransport> batchHandling = getHandlingDetailsByBatch(batchId);
             // if entire batch failed and have no configIds, there will be no error handling found
-            if (getRecordCounts(batchId, Arrays.asList(11), false) == getRecordCounts(batchId,  new ArrayList<Integer>(), false)) {
-            	//entire batch failed, we reject entire batch
-            	updateRecordCounts(batchId, errorStatusIds, false, "errorRecordCount");
-            	updateRecordCounts(batchId, new ArrayList<Integer>(), false, "totalRecordCount");
+            if (getRecordCounts(batchId, Arrays.asList(11), false) == getRecordCounts(batchId, new ArrayList<Integer>(), false)) {
+                //entire batch failed, we reject entire batch
+                updateRecordCounts(batchId, errorStatusIds, false, "errorRecordCount");
+                updateRecordCounts(batchId, new ArrayList<Integer>(), false, "totalRecordCount");
                 updateBatchStatus(batchId, 7, "endDateTime");
                 return false;
-        	}else if (batchHandling.size() != 1) {
+            } else if (batchHandling.size() != 1) {
                 //TODO email admin to fix problem
                 insertProcessingError(9, null, batchId, null, null, null, null, false, false, "Multiple or no file handling found, please check auto-release and error handling configurations");
                 updateRecordCounts(batchId, new ArrayList<Integer>(), false, "totalRecordCount");
@@ -1576,58 +1574,60 @@ public class transactionInManagerImpl implements transactionInManager {
         }
 
     }
-    
+
     @Override
     public void deleteMessage(int batchId, int transactionId) throws Exception {
         transactionInDAO.deleteMessage(batchId, transactionId);
     }
-    
+
     @Override
     public void cancelMessageTransaction(int transactionId) throws Exception {
         transactionInDAO.cancelMessageTransaction(transactionId);
     }
+
+    @Override
+    public List<transactionInRecords> getTransactionInRecordsForBatch(Integer batchId) {
+        return transactionInDAO.getTransactionInRecordsForBatch(batchId);
+    }
+
+    @Override
+    public Integer updateConfigIdForCMS(Integer batchId, configurationMessageSpecs cms) {
+        return transactionInDAO.updateConfigIdForCMS(batchId, cms);
+    }
+
+    @Override
+    public Integer flagInvalidConfig(Integer batchId) {
+        Integer sysErrors = 0;
+        try {
+            sysErrors = insertInvalidConfigError(batchId);
+            sysErrors = sysErrors + updateInvalidConfigStatus(batchId);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.err.println("flagInvalidConfig " + ex.getCause());
+            sysErrors++;
+        }
+        return sysErrors;
+    }
+
+    @Override
+    public Integer insertInvalidConfigError(Integer batchId) {
+        return transactionInDAO.insertInvalidConfigError(batchId);
+    }
+
+    @Override
+    public Integer updateInvalidConfigStatus(Integer batchId) {
+        return transactionInDAO.updateInvalidConfigStatus(batchId);
+    }
+
+    @Override
+    public Integer indexLoadTable(String loadTableName) {
+        return transactionInDAO.indexLoadTable(loadTableName);
+    }
     
-	@Override
-	public List<transactionInRecords> getTransactionInRecordsForBatch(Integer batchId) {
-		return transactionInDAO.getTransactionInRecordsForBatch(batchId);
-	}
-
-
-
-	@Override
-	public Integer updateConfigIdForCMS(Integer batchId, configurationMessageSpecs cms) {
-		return transactionInDAO.updateConfigIdForCMS(batchId, cms);
-	}
-
-	@Override
-	public Integer flagInvalidConfig(Integer batchId) {
-		Integer sysErrors = 0;
-		try {
-			sysErrors = insertInvalidConfigError(batchId);
-			sysErrors = sysErrors+ updateInvalidConfigStatus(batchId);
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			System.err.println("flagInvalidConfig " + ex.getCause());
-			sysErrors ++;
-		}
-		return sysErrors;
-	}
-
-	@Override
-	public Integer insertInvalidConfigError(Integer batchId) {
-		return transactionInDAO.insertInvalidConfigError(batchId);
-	}
-
-	@Override
-	public Integer updateInvalidConfigStatus(Integer batchId) {
-		return transactionInDAO.updateInvalidConfigStatus(batchId);
-	}
-
-	@Override
-	public Integer indexLoadTable(String loadTableName) {
-		return transactionInDAO.indexLoadTable(loadTableName);
-	}
-
-	
+    @Override
+    @Transactional
+    public batchUploadSummary getUploadSummaryDetails(int transactionInId) {
+        return transactionInDAO.getUploadSummaryDetails(transactionInId);
+    }
 
 }
