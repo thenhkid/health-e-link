@@ -109,7 +109,7 @@ public interface transactionInManager {
     
     Integer countSubString(ConfigForInsert config, Integer transId);
     
-    List<batchUploads> getuploadedBatches(int userId, int orgId) throws Exception;
+    List<batchUploads> getuploadedBatches(int userId, int orgId, Date fromDate, Date toDate, String searchTerm, int page, int maxResults) throws Exception;
     
     boolean processBatch(int batchUploadId) throws Exception;
     

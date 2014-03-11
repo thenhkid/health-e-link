@@ -133,6 +133,15 @@
                            <li ${param['page'] == 'download' ? 'class="active"' : ''}><a href="<c:url value='/Health-e-Connect/download'/>" title="Download Files" class="btn btn-link"><span class="glyphicon glyphicon-download"></span>&nbsp; Download Files</a><span class="indicator-active arrow-up"></span></li>
                            <li ${param['page'] == 'audit' ? 'class="active"' : ''}><a href="<c:url value='/Health-e-Connect/audit-reports'/>" title="View Audit Reports" class="btn btn-link"><span class="glyphicon glyphicon-calendar"></span>&nbsp; Audit Reports</a><span class="indicator-active arrow-up"></span></li>
                         </ul>
+                        
+                        <c:if test="${userDetails.createAuthority == true && hasConfigurations == true}">
+                             <ul class="nav navbar-nav navbar-right navbar-actions">
+                                <li ${param['page'] == 'create'}>
+                                    <a href="#uploadFile" title="Upload File" data-toggle="modal" class="uploadFile">Upload New File</a>
+                                    <span class="indicator-active arrow-up"></span>
+                                </li>
+                            </ul>
+                         </c:if>
                     </div>
                 </nav>
             </c:when>

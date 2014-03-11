@@ -1742,7 +1742,8 @@ public class HealtheWebController {
                 transactionInRecords records = transactionInManager.getTransactionRecords(transaction.getId());
 
                 /* Get a list of form fields */
-                configurationTransport transportDetails = configurationTransportManager.getTransportDetailsByTransportMethod(transaction.getconfigId(), 2);
+                /*configurationTransport transportDetails = configurationTransportManager.getTransportDetailsByTransportMethod(transaction.getconfigId(), 2);*/
+                configurationTransport transportDetails = configurationTransportManager.getTransportDetails(transaction.getconfigId());
                 List<configurationFormFields> sourceInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transaction.getconfigId(),transportDetails.getId(),1);
                 List<configurationFormFields> targetInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transaction.getconfigId(),transportDetails.getId(),3);
                 List<configurationFormFields> patientInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transaction.getconfigId(),transportDetails.getId(),5);
@@ -1820,7 +1821,8 @@ public class HealtheWebController {
             User userInfo = (User)session.getAttribute("userDetails");
 
             /* Get a list of form fields */
-            configurationTransport transportDetails = configurationTransportManager.getTransportDetailsByTransportMethod(transactionInfo.getconfigId(), 2);
+            /*configurationTransport transportDetails = configurationTransportManager.getTransportDetailsByTransportMethod(transactionInfo.getconfigId(), 2);*/
+            configurationTransport transportDetails = configurationTransportManager.getTransportDetails(transactionInfo.getconfigId());
             List<configurationFormFields> senderInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),1);
             List<configurationFormFields> senderProviderFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),2);
             List<configurationFormFields> targetInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),3);

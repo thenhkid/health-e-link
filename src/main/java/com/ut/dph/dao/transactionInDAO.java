@@ -107,7 +107,7 @@ public interface transactionInDAO {
     
     Integer countSubString(ConfigForInsert config, Integer transId);
     
-    List<batchUploads> getuploadedBatches(int userId, int orgId) throws Exception;
+    List<batchUploads> getuploadedBatches(int userId, int orgId, Date fromDate, Date toDate, String searchTerm, int page, int maxResults) throws Exception;
     
     void updateBatchStatus (Integer batchUploadId, Integer statusId, String timeField) throws Exception;
     

@@ -6,6 +6,7 @@
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 
 <div class="container main-container" role="main">
     <div class="row">
@@ -26,11 +27,39 @@
                     </c:forEach>
                 </div>
             </c:if>
-            <c:if test="${hasConfigurations == true}">
+            
+            <%--<c:if test="${hasConfigurations == true}">
                 <div class="" style="overflow:hidden; margin-bottom:10px;">
                     <a href="#uploadFile" title="Upload File" data-toggle="modal" class="pull-right btn btn-primary uploadFile"><span class="glyphicon glyphicon-upload"></span> Upload File</a>
                 </div>
-            </c:if>
+            </c:if>--%>
+            
+            <div class="row" style="overflow:hidden; margin-bottom:10px;">
+                    <div class="col-md-3">
+                        <form:form class="form form-inline" id="searchForm" action="/Health-e-Connect/upload" method="post">
+                            <div class="form-group">
+                                <label class="sr-only" for="searchTerm">Search</label>
+                                <input type="text" name="searchTerm" id="searchTerm" value="${searchTerm}" class="form-control" placeholder="Search"/>
+                                <input type="hidden" name="fromDate" id="fromDate" rel="<fmt:formatDate value="${fromDate}" type="date" pattern="MM/dd/yyyy" />" rel2="<fmt:formatDate value="${userDetails.dateOrgWasCreated}" type="date" pattern="MM/dd/yyyy" />" value="${fromDate}" />
+                                <input type="hidden" name="toDate" id="toDate" rel="<fmt:formatDate value="${toDate}" type="date" pattern="MM/dd/yyyy" />" value="${toDate}" />
+                                <input type="hidden" name="page" id="page" value="${currentPage}" />
+                            </div>
+                            <button id="searchBatchesBtn" class="btn btn-primary btn-sm" title="Search Inbox">
+                                <span class="glyphicon glyphicon-search"></span>
+                            </button>
+                        </form:form>
+                    </div>
+
+                    <div class="col-md-2 col-md-offset-3"></div>
+
+                    <div class="col-md-4">
+                        <div class="date-range-picker-trigger form-control pull-right daterange">
+                            <i class="glyphicon glyphicon-calendar"></i>
+                            <span class="date-label" rel="" rel2=""><fmt:formatDate value="${fromDate}" type="date" pattern="MMMM dd, yyyy" /> - <fmt:formatDate value="${toDate}" type="date" pattern="MMMM dd, yyyy" /></span> <b class="caret"></b>
+                        </div>
+                    </div>
+            </div>
+            
             <div class="form-container scrollable">
                 <table class="table table-striped table-hover table-default">
                     <thead>
@@ -74,6 +103,15 @@
                         </c:choose>    
                     </tbody>
                 </table>
+                <c:if test="${totalPages > 0}">            
+                    <ul class="pagination pull-right" role="navigation" aria-labelledby="Paging">
+                        <c:if test="${currentPage > 1}"><li><a href="javascript:void(0);" rel="${currentPage-1}" class="changePage">&laquo;</a></li></c:if>
+                        <c:forEach var="i" begin="1" end="${totalPages}">
+                        <li><a href="javascript:void(0);" rel="${i}" class="changePage">${i}</a></li>
+                        </c:forEach>
+                        <c:if test="${currentPage < totalPages}"><li><a href="javascript:void(0);" rel="${currentPage+1}" class="changePage">&raquo;</a></li></c:if>
+                    </ul>
+                </c:if>
             </div>
         </div>
     </div>

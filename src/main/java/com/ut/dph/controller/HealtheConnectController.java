@@ -105,13 +105,20 @@ public class HealtheConnectController {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/Health-e-Connect/upload");
         
+        Date fromDate = getMonthDate("START");
+        Date toDate = getMonthDate("END");
+        
+        mav.addObject("fromDate", fromDate);
+        mav.addObject("toDate", toDate);
+        mav.addObject("currentPage", 1);
         
         /* Need to get a list of uploaded files */
         User userInfo = (User)session.getAttribute("userDetails");
         
         try {
             /* Need to get a list of all uploaded batches */
-            List<batchUploads> uploadedBatches = transactionInManager.getuploadedBatches(userInfo.getId(), userInfo.getOrgId());
+            Integer totaluploadedBatches = transactionInManager.getuploadedBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, "", 1, 0).size();
+            List<batchUploads> uploadedBatches = transactionInManager.getuploadedBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, "", 1, maxResults);
 
             if(!uploadedBatches.isEmpty()) {
                 for(batchUploads batch : uploadedBatches) {
@@ -137,6 +144,9 @@ public class HealtheConnectController {
            mav.addObject("hasConfigurations", hasConfigurations);
 
            mav.addObject("uploadedBatches", uploadedBatches);
+           
+           Integer totalPages = (int)Math.ceil((double)totaluploadedBatches / maxResults);
+           mav.addObject("totalPages", totalPages);
         }
         catch (Exception e) {
             throw new Exception("Error occurred viewing the uploaded batches. userId: "+ userInfo.getId(),e);
@@ -144,6 +154,74 @@ public class HealtheConnectController {
         
         return mav;
     }
+    
+    /**
+     * The '/upload' POST request will serve up the Health-e-Connect upload batch page.
+     *
+     * @param request
+     * @param response
+     * @return	the health-e-Connect upload view
+     * @throws Exception
+     */
+    @RequestMapping(value = "/upload", method = RequestMethod.POST)
+    public ModelAndView findUploads(@RequestParam(value = "page", required = false) Integer page, @RequestParam String searchTerm, @RequestParam Date fromDate, @RequestParam Date toDate,HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
+       
+        
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/Health-e-Connect/upload");
+        
+        System.out.println(fromDate);
+        
+        mav.addObject("fromDate", fromDate);
+        mav.addObject("toDate", toDate);
+        
+        /* Need to get a list of uploaded files */
+        User userInfo = (User)session.getAttribute("userDetails");
+        
+        try {
+            /* Need to get a list of all uploaded batches */
+            Integer totaluploadedBatches = transactionInManager.getuploadedBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, searchTerm, 1, 0).size();
+            List<batchUploads> uploadedBatches = transactionInManager.getuploadedBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, searchTerm, page, maxResults);
+
+            if(!uploadedBatches.isEmpty()) {
+                for(batchUploads batch : uploadedBatches) {
+                    List<transactionIn> batchTransactions = transactionInManager.getBatchTransactions(batch.getId(), userInfo.getId());
+                    batch.settotalTransactions(batchTransactions.size());
+
+                    lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
+                    batch.setstatusValue(processStatus.getDisplayCode());
+
+                    User userDetails = usermanager.getUserById(batch.getuserId());
+                    String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
+                    batch.setusersName(usersName);
+
+                }
+            }
+            
+            List<configuration> configurations = configurationManager.getActiveConfigurationsByUserId(userInfo.getId(), 1);
+            boolean hasConfigurations = false;
+            if(configurations.size() >=1 ) {
+               hasConfigurations = true;
+            }
+           
+            mav.addObject("hasConfigurations", hasConfigurations);
+            
+            mav.addObject("uploadedBatches", uploadedBatches); 
+
+            Integer totalPages = (int)Math.ceil((double)totaluploadedBatches / maxResults);
+            mav.addObject("totalPages", totalPages);
+            mav.addObject("searchTerm", searchTerm);
+            mav.addObject("currentPage", page);
+
+
+            return mav;
+        }
+        catch (Exception e) {
+            throw new Exception("Error occurred searching uploaded batches.",e);
+        }
+        
+    }
+    
     
     /**
      * The '/fileUploadForm' GET request will be used to display the blank file upload screen (In a modal)
@@ -181,6 +259,8 @@ public class HealtheConnectController {
         
         return mav;
     }
+    
+    
     
     
     /**

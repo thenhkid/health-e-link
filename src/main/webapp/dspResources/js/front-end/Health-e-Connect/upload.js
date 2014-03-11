@@ -10,6 +10,15 @@ require(['./main'], function () {
     require(['jquery'], function($) {
         
         $("input:text,form").attr("autocomplete", "off");
+        
+        $('#searchBatchesBtn').click(function() { 
+            $('#searchForm').submit();
+        });
+
+        $(document).on('click','.changePage', function() {
+           $('#page').val($(this).attr('rel'));
+           $('#searchForm').submit();
+        });
 
         //This function will launch the new file upload overlay with a blank screen
         $(document).on('click', '.uploadFile', function() {
@@ -86,4 +95,15 @@ require(['./main'], function () {
     });
 });
 
+
+function searchByDateRange() {
+   var fromDate = $('.daterange span').attr('rel');
+   var toDate = $('.daterange span').attr('rel2');
+    
+   $('#fromDate').val(fromDate);
+   $('#toDate').val(toDate);
+   
+   $('#searchForm').submit();
+
+}
 

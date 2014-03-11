@@ -1192,16 +1192,241 @@ public class transactionInDAOImpl implements transactionInDAO {
     @SuppressWarnings("unchecked")
     @Override
     @Transactional
-    public List<batchUploads> getuploadedBatches(int userId, int orgId) throws Exception {
+    public List<batchUploads> getuploadedBatches(int userId, int orgId, Date fromDate, Date toDate, String searchTerm, int page, int maxResults) throws Exception {
 
-        /* Get a list of uploaded batches for the organization */
+        int firstResult = 0;
+        
+        /* Get a list of connections the user has access to */
+        Criteria connections = sessionFactory.getCurrentSession().createCriteria(configurationConnectionSenders.class);
+        connections.add(Restrictions.eq("userId", userId));
+        List<configurationConnectionSenders> userConnections = connections.list();
+
+        List<Integer> messageTypeList = new ArrayList<Integer>();
+        List<Integer> targetOrgList = new ArrayList<Integer>();
+
+        if (userConnections.isEmpty()) {
+            messageTypeList.add(0);
+            targetOrgList.add(0);
+        } else {
+
+            for (configurationConnectionSenders userConnection : userConnections) {
+                Criteria connection = sessionFactory.getCurrentSession().createCriteria(configurationConnection.class);
+                connection.add(Restrictions.eq("id", userConnection.getconnectionId()));
+
+                configurationConnection connectionInfo = (configurationConnection) connection.uniqueResult();
+
+                /* Get the message type for the configuration */
+                Criteria sourceconfigurationQuery = sessionFactory.getCurrentSession().createCriteria(configuration.class);
+                sourceconfigurationQuery.add(Restrictions.eq("id", connectionInfo.getsourceConfigId()));
+
+                configuration configDetails = (configuration) sourceconfigurationQuery.uniqueResult();
+                
+                /* Need to make sure only file download configurations are displayed */
+                Criteria transportDetailsQuery = sessionFactory.getCurrentSession().createCriteria(configurationTransport.class);
+                transportDetailsQuery.add(Restrictions.eq("configId", configDetails.getId()));
+                
+                configurationTransport transportDetails = (configurationTransport) transportDetailsQuery.uniqueResult();
+                
+                if(transportDetails.gettransportMethodId() == 1) {
+                    /* Add the message type to the message type list */
+                    messageTypeList.add(configDetails.getMessageTypeId()); 
+                }
+
+                /* Get the list of target orgs */
+                Criteria targetconfigurationQuery = sessionFactory.getCurrentSession().createCriteria(configuration.class);
+                targetconfigurationQuery.add(Restrictions.eq("id", connectionInfo.gettargetConfigId()));
+                configuration targetconfigDetails = (configuration) targetconfigurationQuery.uniqueResult();
+
+                /* Add the target org to the target organization list */
+                targetOrgList.add(targetconfigDetails.getorgId());
+            }
+        }
+        
+        if(messageTypeList.isEmpty()) {
+            messageTypeList.add(0);
+        }
+
+        /* Get a list of available batches */
+        Criteria batchSummaries = sessionFactory.getCurrentSession().createCriteria(batchUploadSummary.class);
+        batchSummaries.add(Restrictions.eq("sourceOrgId", orgId));
+        batchSummaries.add(Restrictions.in("messageTypeId", messageTypeList));
+        batchSummaries.add(Restrictions.in("targetOrgId", targetOrgList));
+        List<batchUploadSummary> batchUploadSummaryList = batchSummaries.list();
+
+        List<Integer> batchIdList = new ArrayList<Integer>();
+
+        if (batchUploadSummaryList.isEmpty()) {
+            batchIdList.add(0);
+        } else {
+
+            for (batchUploadSummary summary : batchUploadSummaryList) {
+                batchIdList.add(summary.getbatchId());
+            }
+
+        }
+
         Criteria findBatches = sessionFactory.getCurrentSession().createCriteria(batchUploads.class);
-        findBatches.add(Restrictions.eq("orgId", orgId));
-        findBatches.add(Restrictions.eq("transportMethodId", 1));
+        findBatches.add(Restrictions.in("id", batchIdList));
         findBatches.add(Restrictions.ne("statusId", 1));
+                
+        if(!"".equals(fromDate)) {
+            findBatches.add(Restrictions.ge("dateSubmitted", fromDate));
+        }  
+        
+        if(!"".equals(toDate)) {
+            findBatches.add(Restrictions.lt("dateSubmitted", toDate));
+        } 
+         
         findBatches.addOrder(Order.desc("dateSubmitted"));
+        
+        /* If a search term is entered conduct a search */
+        if(!"".equals(searchTerm)) {
+            
+            List<batchUploads> batches = findBatches.list();
+            
+            List<Integer> batchFoundIdList = findUploadedBatches(batches, searchTerm);
+            
+            if (batchFoundIdList.isEmpty()) {
+                batchFoundIdList.add(0);
+            }
+            
+            Criteria foundBatches = sessionFactory.getCurrentSession().createCriteria(batchUploads.class);
+            foundBatches.add(Restrictions.in("id", batchFoundIdList));
+            foundBatches.addOrder(Order.desc("dateSubmitted"));
+            
+            if (page > 1) {
+                firstResult = (maxResults * (page - 1));
+            }
 
-        return findBatches.list();
+            foundBatches.setFirstResult(firstResult);
+
+            if (maxResults > 0) {
+                //Set the max results to display
+                foundBatches.setMaxResults(maxResults);
+            }
+            
+            return foundBatches.list();
+            
+        }
+        
+        else {
+            
+            if (page > 1) {
+                firstResult = (maxResults * (page - 1));
+            }
+
+            findBatches.setFirstResult(firstResult);
+
+            if (maxResults > 0) {
+                //Set the max results to display
+                findBatches.setMaxResults(maxResults);
+            }
+
+            return findBatches.list();
+        }
+
+    }
+    
+    /**
+     * The 'findUploadedBatches' function will take a list of uploaded batches and apply the searchTerm to narrow down the results.
+     *
+     * @param batches The object containing the returned batches
+     * @param searchTerm The term to search the batches on
+     *
+     * @return This function will return a list of batches that match the search term.
+     */
+    public List<Integer> findUploadedBatches(List<batchUploads> batches, String searchTerm) {
+
+        List<Integer> batchIdList = new ArrayList<Integer>();
+
+        searchTerm = searchTerm.toLowerCase();
+        searchTerm = searchTerm.replace(".", "\\.");
+
+        for (batchUploads batch : batches) {
+           
+            /* Search the submitted by */
+            if (batch.getoriginalFileName().toLowerCase().matches(".*" + searchTerm + ".*")) {
+                if (!batchIdList.contains(batch.getId())) {
+                    batchIdList.add(batch.getId());
+                }
+            }
+
+            /* Search the batch name */
+            if (batch.getutBatchName().toLowerCase().matches(".*" + searchTerm + ".*")) {
+                if (!batchIdList.contains(batch.getId())) {
+                    batchIdList.add(batch.getId());
+                }
+            }
+
+            /* Search the batch date */
+            String dateAsString = new SimpleDateFormat("MM/dd/yyyy").format(batch.getdateSubmitted());
+
+            if (dateAsString.matches(".*" + searchTerm + ".*")) {
+                if (!batchIdList.contains(batch.getId())) {
+                    batchIdList.add(batch.getId());
+                }
+            }
+
+            /* Search message types included in the batch */
+            Criteria transactionQuery = sessionFactory.getCurrentSession().createCriteria(transactionIn.class);
+            transactionQuery.add(Restrictions.eq("batchId", batch.getId()));
+            List<transactionIn> transactions = transactionQuery.list();
+
+            if (!transactions.isEmpty()) {
+
+                /* Loop through the transactions to get the config details */
+                for (transactionIn transaction : transactions) {
+
+                    Criteria configQuery = sessionFactory.getCurrentSession().createCriteria(configuration.class);
+                    configQuery.add(Restrictions.eq("id", transaction.getconfigId()));
+                    List<configuration> configs = configQuery.list();
+
+                    if (!configs.isEmpty()) {
+
+                        /* Loop through the configurations to get the config details */
+                        for (configuration config : configs) {
+
+                            messageType messageTypeDetails = (messageType) sessionFactory.getCurrentSession().get(messageType.class, config.getMessageTypeId());
+
+                            /* Search the status */
+                            if (messageTypeDetails.getName().toLowerCase().matches(".*" + searchTerm + ".*")) {
+                                if (!batchIdList.contains(batch.getId())) {
+                                    batchIdList.add(batch.getId());
+                                }
+                            }
+                        }
+                    }
+
+                }
+
+            }
+
+            /* Search Source data */
+            Criteria sourceQuery = sessionFactory.getCurrentSession().createCriteria(batchUploadSummary.class);
+            sourceQuery.add(Restrictions.eq("batchId", batch.getId()));
+            List<batchUploadSummary> sources = sourceQuery.list();
+
+            if (!sources.isEmpty()) {
+
+                for (batchUploadSummary source : sources) {
+                    Organization orgDetails = (Organization) sessionFactory.getCurrentSession().get(Organization.class, source.gettargetOrgId());
+
+                    /* Search the organization name */
+                    if (orgDetails.getOrgName().toLowerCase().matches(".*" + searchTerm + ".*")) {
+                        if (!batchIdList.contains(batch.getId())) {
+                            batchIdList.add(batch.getId());
+                        }
+                    }
+                }
+
+            }
+        }
+
+        if (batchIdList.isEmpty()) {
+            batchIdList.add(0);
+        }
+
+        return batchIdList;
     }
 
     @Override

@@ -488,8 +488,8 @@ public class transactionInManagerImpl implements transactionInManager {
     }
 
     @Override
-    public List<batchUploads> getuploadedBatches(int userId, int orgId) throws Exception {
-        return transactionInDAO.getuploadedBatches(userId, orgId);
+    public List<batchUploads> getuploadedBatches(int userId, int orgId, Date fromDate, Date toDate, String searchTerm, int page, int maxResults) throws Exception {
+        return transactionInDAO.getuploadedBatches(userId, orgId, fromDate, toDate, searchTerm, page, maxResults);
     }
 
     /**
