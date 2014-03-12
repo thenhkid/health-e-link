@@ -1808,19 +1808,28 @@ public class transactionInDAOImpl implements transactionInDAO {
         if (foroutboundProcessing == false) {
 
             sql = "update transactionTranslatedIn set forcw = null where "
-                    + "transactionInId in (select id from transactionIn where configId = :configId "
-                    + " and batchId = :batchId and statusId not in ( :transRELId ));";
+                    + " transactionInId in (select id from transactionIn where ";
+            if (configId != 0) {
+            	sql = sql + " configId = :configId and ";
+            }
+            sql = sql +  " batchId = :batchId and statusId not in ( :transRELId ));";
 
         } else {
-            sql = "update transactionTranslatedOut set forcw = null where "
-                    + "transactionTargetId in (select id from transactionTarget where configId = :configId "
-                    + " and batchDLId = :batchId and statusId not in ( :transRELId ));";
+            	sql = "update transactionTranslatedOut set forcw = null where "
+            			+ "transactionTargetId in (select id from transactionTarget where ";
+            if (configId != 0) {
+                sql = sql + "configId = :configId and ";
+            }
+               sql = sql + " batchDLId = :batchId and statusId not in ( :transRELId ));";
         }
 
         Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
                 .setParameter("batchId", batchId)
-                .setParameter("configId", configId)
                 .setParameterList("transRELId", transRELId);
+        if (configId != 0) {
+        	updateData.setParameter("configId", configId);	
+        }
+        
         try {
             updateData.executeUpdate();
         } catch (Exception ex) {

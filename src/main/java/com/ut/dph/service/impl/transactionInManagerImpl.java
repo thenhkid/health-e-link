@@ -1498,7 +1498,9 @@ public class transactionInManagerImpl implements transactionInManager {
                 sysErrors = sysErrors + loadTextBatch(batch);
             }
 
-            //load targets
+            nullForCWCol(0, batch.getId(), false);
+            
+            //load targets - we need to loadTarget only if field for target is blank, otherwise we load what user sent
             List<configurationConnection> batchTargetList = getBatchTargets(batchId);
             for (configurationConnection bt : batchTargetList) {
                 sysErrors = sysErrors + insertBatchTargets(batchId, bt);
