@@ -646,4 +646,9 @@ select '';
 end proc_main$$
 DELIMITER ;
 
+/** gc 03122014 11:19AM **/
+UPDATE `universalTranslator`.`lu_errorcodes` SET `id`='4' WHERE `id`='5';
+UPDATE `universalTranslator`.`lu_errorcodes` SET `id`='5' WHERE `id`='6';
+UPDATE `universalTranslator`.`lu_errorcodes` SET `id`='6' WHERE `id`='7';
+UPDATE `universalTranslator`.`lu_errorcodes` SET `id`='7' WHERE `id`='8';
 
