@@ -86,7 +86,7 @@ public class transactionInManagerImpl implements transactionInManager {
     @Autowired
     private transactionOutDAO transactionOutDAO;
 
-    private int processingSysErrorId = 6;
+    private int processingSysErrorId = 5;
 
     @Override
     @Transactional
@@ -855,12 +855,12 @@ public class transactionInManagerImpl implements transactionInManager {
                 //2. we get all rows for batch
                 List<transactionInRecords> tInRecords = getTransactionInRecordsForBatch(batchUpload.getId());
                 if (tInRecords == null || tInRecords.size() == 0) {
-                    insertProcessingError(8, null, batchUpload.getId(), null, null, null, null,
+                    insertProcessingError(7, null, batchUpload.getId(), null, null, null, null,
                             false, false, "No transactions were found for batch.");
                     return sysError;
                 }
                 if (configurationMessageSpecs == null || configurationMessageSpecs.size() == 0) {
-                    insertProcessingError(7, null, batchUpload.getId(), null, null, null, null,
+                    insertProcessingError(6, null, batchUpload.getId(), null, null, null, null,
                             false, false, "No valid configurations were found for loading batch.");
                     // update all transactions to invalid
                     updateTransactionStatus(batchUpload.getId(), 0, 0, 11);
@@ -1293,9 +1293,13 @@ public class transactionInManagerImpl implements transactionInManager {
         nullForCWCol(configId, batchId, foroutboundProcessing);
         try {
             Macros macro = configurationManager.getMacroById(cdt.getMacroId());
+            int sysError = 0;
             try {
                 // we expect the target field back so we can figure out clear pass option
-                return executeMacro(configId, batchId, cdt, foroutboundProcessing, macro);
+            	sysError = sysError + executeMacro(configId, batchId, cdt, foroutboundProcessing, macro);
+            	// insert macro errors
+            	flagMacroErrors(configId, batchId, cdt,  foroutboundProcessing);
+            	return sysError;
             } catch (Exception e) {
                 e.printStackTrace();
                 return 1;
@@ -1304,6 +1308,7 @@ public class transactionInManagerImpl implements transactionInManager {
             e.printStackTrace();
             return 1;
         }
+        
     }
 
     @Override
@@ -1513,7 +1518,7 @@ public class transactionInManagerImpl implements transactionInManager {
                 return false;
             } else if (batchHandling.size() != 1) {
                 //TODO email admin to fix problem
-                insertProcessingError(9, null, batchId, null, null, null, null, false, false, "Multiple or no file handling found, please check auto-release and error handling configurations");
+                insertProcessingError(8, null, batchId, null, null, null, null, false, false, "Multiple or no file handling found, please check auto-release and error handling configurations");
                 updateRecordCounts(batchId, new ArrayList<Integer>(), false, "totalRecordCount");
                 // do we count pass records as errors?
                 updateRecordCounts(batchId, errorStatusIds, false, "errorRecordCount");

@@ -94,7 +94,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
     @Autowired
     private emailMessageManager emailMessageManager;
 
-    private int processingSysErrorId = 6;
+    private int processingSysErrorId = 5;
 
     @Override
     @Transactional
