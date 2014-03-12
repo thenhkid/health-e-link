@@ -646,9 +646,13 @@ select '';
 end proc_main$$
 DELIMITER ;
 
-/** gc 03122014 11:19AM **/
-UPDATE `universalTranslator`.`lu_errorcodes` SET `id`='4' WHERE `id`='5';
-UPDATE `universalTranslator`.`lu_errorcodes` SET `id`='5' WHERE `id`='6';
-UPDATE `universalTranslator`.`lu_errorcodes` SET `id`='6' WHERE `id`='7';
-UPDATE `universalTranslator`.`lu_errorcodes` SET `id`='7' WHERE `id`='8';
+/** gc 03122014 11:33AM **/
+update lu_errorCodes set id = 1 where displayText = 'Required Field Check Failed';
+update lu_errorCodes set id = 2 where displayText = 'Failed Validation';
+update lu_errorCodes set id = 3 where displayText = 'Failed Crosswalk';
+update lu_errorCodes set id = 4 where displayText = 'Failed Macros';
+update lu_errorCodes set id = 5 where displayText = 'System Error';
+update lu_errorCodes set id = 6 where displayText = 'Invalid Configuration';
+update lu_errorCodes set id = 7 where displayText = 'No Transactions Found';
+update lu_errorCodes set id = 8 where displayText = 'Batch Handling Error';
 
