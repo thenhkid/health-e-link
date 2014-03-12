@@ -438,6 +438,13 @@
         <put-attribute name="jscript" value="/dspResources/js/front-end/Health-e-Connect/download.js" />
     </definition>
     
+    <!-- Audit Reports -->
+    <definition name="/Health-e-Connect/auditReports" extends="base.definition.frontEnd">
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Health-e-Connect&amp;page=audit" />
+        <put-attribute name="body" value="/WEB-INF/jsp/Health-e-Connect/auditReports.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/front-end/Health-e-Connect/auditReports.js" />
+    </definition>
+    
     <!-- Organization Profile Pages -->
     <definition name="/OrgProfile/editProfile" extends="base.definition.frontEnd">
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Org&amp;page=editProfile" />
@@ -475,8 +482,7 @@
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Org&amp;page=associations" />
         <put-attribute name="body" value="/WEB-INF/jsp/organizations/orgDetails.jsp" />
     </definition>
-    
-    
+        
     <!-- Exception handling -->
     <definition name="/exception" extends="base.definition.frontEnd">
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp" />
