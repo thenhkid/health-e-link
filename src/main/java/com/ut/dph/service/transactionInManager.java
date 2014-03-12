@@ -135,7 +135,7 @@ public interface transactionInManager {
     
     Integer clearTransactionTranslatedIn(Integer batchUploadId);
     
-    Integer clearTransactionTables(Integer batchUploadId);
+    Integer clearTransactionTables(Integer batchUploadId, boolean leaveFinalStatusIds);
     
     Integer clearTransactionTarget(Integer batchUploadId);
 
@@ -145,7 +145,7 @@ public interface transactionInManager {
     
     Integer insertFailedRequiredFields(configurationFormFields cff, Integer batchUploadId);
     
-    Integer clearTransactionInErrors(Integer batchUploadId);
+    Integer clearTransactionInErrors(Integer batchUploadId, boolean leaveFinalStatus);
     
     void updateStatusForErrorTrans(Integer batchId, Integer statusId, boolean foroutboundProcessing);
     
@@ -202,6 +202,8 @@ public interface transactionInManager {
     void updateRecordCounts (Integer batchId, List <Integer> statusIds, boolean foroutboundProcessing, String colNameToUpdate);
     
     Integer getRecordCounts (Integer batchId, List <Integer> statusIds, boolean foroutboundProcessing);
+    
+    Integer getRecordCounts (Integer batchId, List <Integer> statusIds, boolean foroutboundProcessing, boolean inStatusIds);
     
     void resetTransactionTranslatedIn(Integer batchId, boolean resetAll);
     

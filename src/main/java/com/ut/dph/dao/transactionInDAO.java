@@ -127,7 +127,7 @@ public interface transactionInDAO {
      
     Integer insertFailedRequiredFields(configurationFormFields cff, Integer batchUploadId);
     
-    Integer clearTransactionInErrors(Integer batchUploadId);
+    Integer clearTransactionInErrors(Integer batchUploadId, boolean leaveFinalStatusIds);
     
     void updateStatusForErrorTrans(Integer batchId, Integer statusId, boolean foroutboundProcessing);
     
@@ -164,6 +164,8 @@ public interface transactionInDAO {
     void updateRecordCounts (Integer batchId, List <Integer> statusIds, boolean foroutboundProcessing, String colNameToUpdate);
     
     Integer getRecordCounts (Integer batchId, List <Integer> statusIds, boolean foroutboundProcessing);
+    
+    Integer getRecordCounts (Integer batchId, List <Integer> statusIds, boolean foroutboundProcessing, boolean inStatusIds);
     
     Integer copyTransactionInStatusToTarget(Integer batchId);
     

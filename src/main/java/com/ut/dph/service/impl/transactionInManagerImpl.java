@@ -506,7 +506,7 @@ public class transactionInManagerImpl implements transactionInManager {
     public boolean processBatch(int batchUploadId) throws Exception {
 
         Integer batchStausId = 29;
-        List<Integer> errorStatusIds = Arrays.asList(11, 13, 14);
+        List<Integer> errorStatusIds = Arrays.asList(11, 13, 14, 16);
         //get batch details
         batchUploads batch = getBatchDetails(batchUploadId);
         //this should be the same point of both ERG and Uploaded File *
@@ -521,6 +521,9 @@ public class transactionInManagerImpl implements transactionInManager {
              * we should only process the ones that are not REL status, to be safe, we copy over data from transactionInRecords*
              */
             resetTransactionTranslatedIn(batchUploadId, false);
+            
+            //clear transactionInError table for batch
+            systemErrorCount = systemErrorCount + clearTransactionInErrors(batchUploadId, false);
 
             List<Integer> configIds = getConfigIdsForBatch(batchUploadId, false);
             for (Integer configId : configIds) {
@@ -586,14 +589,11 @@ public class transactionInManagerImpl implements transactionInManager {
                     batch.setstatusId(5);
                     batchStausId = 5;
                 }
-                if ((handlingDetails.get(0).getautoRelease() && handlingDetails.get(0).geterrorHandling() == 1)
-                        && (batch.getstatusId() != 6)) {
-                    updateRecordCounts(batchUploadId, new ArrayList<Integer>(), false, "totalRecordCount");
-                    // do we count pass records as errors?
-                    updateRecordCounts(batchUploadId, errorStatusIds, false, "errorRecordCount");
-                    setBatchToError(batchUploadId, "A batch cannot be set to auto-release and post errors to ERG.  Please modify configuration settings.");
-
-                    return false;
+                // if auto and batch contains transactions that are not final status
+                if (handlingDetails.get(0).getautoRelease() && 
+                		getRecordCounts (batchUploadId, Arrays.asList(11,12,13,16), false, false) > 0) {
+                    batch.setstatusId(5);
+                    batchStausId = 5;
                 } else if (batch.getstatusId() == 6 || (handlingDetails.get(0).getautoRelease()
                         && (handlingDetails.get(0).geterrorHandling() == 2 || handlingDetails.get(0).geterrorHandling() == 4))) {
 
@@ -714,13 +714,13 @@ public class transactionInManagerImpl implements transactionInManager {
             if (sysError == 0) {
                 int toBatchStatusId = 3; //SSA
                 if (getBatchDetails(batchUploadId).gettransportMethodId() == 2) {
-                    sysError = clearTransactionInErrors(batchUploadId);
+                    sysError = clearTransactionInErrors(batchUploadId, false);
                     toBatchStatusId = 5;
                     resetTransactionTranslatedIn(batchUploadId, true);
                     transactionInDAO.updateTransactionStatus(batchUploadId, 0, 0, 15);
                 } else {
                     //we clear transactionInRecords here as for batch upload we start over
-                    sysError = clearTransactionTables(batchUploadId);
+                    sysError = clearTransactionTables(batchUploadId, false);
                 }
                 transactionInDAO.updateBatchStatus(batchUploadId, toBatchStatusId, "");
             }
@@ -903,14 +903,14 @@ public class transactionInManagerImpl implements transactionInManager {
     }
 
     @Override
-    public Integer clearTransactionTables(Integer batchUploadId) {
+    public Integer clearTransactionTables(Integer batchUploadId, boolean leaveFinalStatusIds) {
         //we clear transactionTranslatedIn
         Integer cleared = clearTransactionTranslatedIn(batchUploadId);
         //we clear transactionInRecords
         cleared = cleared + clearTransactionInRecords(batchUploadId);
         //we clear transactionTarget
         cleared = cleared + clearTransactionTarget(batchUploadId);
-        cleared = cleared + clearTransactionInErrors(batchUploadId);
+        cleared = cleared + clearTransactionInErrors(batchUploadId, leaveFinalStatusIds);
         cleared = cleared + clearBatchUploadSummary(batchUploadId);
         //we clear transactionIn
         cleared = cleared + clearTransactionIn(batchUploadId);
@@ -948,8 +948,8 @@ public class transactionInManagerImpl implements transactionInManager {
     }
 
     @Override
-    public Integer clearTransactionInErrors(Integer batchUploadId) {
-        return transactionInDAO.clearTransactionInErrors(batchUploadId);
+    public Integer clearTransactionInErrors(Integer batchUploadId, boolean leaveFinalStatusIds) {
+        return transactionInDAO.clearTransactionInErrors(batchUploadId, leaveFinalStatusIds);
     }
 
     /**
@@ -1378,7 +1378,12 @@ public class transactionInManagerImpl implements transactionInManager {
 
     @Override
     public Integer getRecordCounts(Integer batchId, List<Integer> statusIds, boolean foroutboundProcessing) {
-        return transactionInDAO.getRecordCounts(batchId, statusIds, foroutboundProcessing);
+        return transactionInDAO.getRecordCounts(batchId, statusIds, foroutboundProcessing, true);
+    }
+    
+    @Override
+    public Integer getRecordCounts(Integer batchId, List<Integer> statusIds, boolean foroutboundProcessing, boolean inStatusIds) {
+        return transactionInDAO.getRecordCounts(batchId, statusIds, foroutboundProcessing, inStatusIds);
     }
 
     @Override
@@ -1475,7 +1480,7 @@ public class transactionInManagerImpl implements transactionInManager {
     @Override
     public boolean loadBatch(Integer batchId) {
         Integer batchStatusId = 4;
-        List<Integer> errorStatusIds = Arrays.asList(11, 13, 14);
+        List<Integer> errorStatusIds = Arrays.asList(11, 13, 14, 16);
 
         try {
             //first thing we do is get details, then we set it to  4
@@ -1484,7 +1489,7 @@ public class transactionInManagerImpl implements transactionInManager {
             updateBatchStatus(batchId, batchStatusId, "startDateTime");
 
             // let's clear all tables first as we are starting over
-            Integer sysErrors = clearTransactionTables(batchId);
+            Integer sysErrors = clearTransactionTables(batchId, false);
             String errorMessage = "Load errors, please contact admin to review logs";
 			// loading batch will take it all the way to loaded (9) status for
 
