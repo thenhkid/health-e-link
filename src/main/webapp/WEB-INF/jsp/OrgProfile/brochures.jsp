@@ -60,7 +60,7 @@
                                                  <a href="javascript:void(0);" rel="${brochure.id}" class="btn btn-link brochureDelete" title="Delete this brochure">
                                                     <span class="glyphicon glyphicon-remove"></span>
                                                     Delete
-                                                </a    
+                                                </a>
                                            </div>
                                       </td>
                                     </tr>
