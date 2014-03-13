@@ -155,13 +155,22 @@
                            <li ${param['page'] == 'associations' ? 'class="active"' : ''}><a href="<c:url value='/associations/'/>" title="View Associated Organizations" class="btn btn-link"><span class="glyphicon glyphicon-tower"></span>&nbsp; Associated Organizations</a><span class="indicator-active arrow-up"></span></li>
                         </ul>
                         
-                         <c:if test="${userDetails.createAuthority == true && param['page'] == 'providers'}">
-                             <ul class="nav navbar-nav navbar-right navbar-actions">
-                                <li>
-                                    <a href="/OrgProfile/providers/createProvider" title="Create a new provider.">Create New Provider</a>
-                                </li>
-                            </ul>
-                         </c:if>
+                        <c:choose>
+                            <c:when test="${userDetails.createAuthority == true && param['page'] == 'providers'}">
+                                <ul class="nav navbar-nav navbar-right navbar-actions">
+                                   <li>
+                                       <a href="/OrgProfile/providers/createProvider" title="Create a new provider.">Create New Provider</a>
+                                   </li>
+                               </ul>
+                            </c:when>
+                            <c:when test="${userDetails.createAuthority == true && param['page'] == 'brochures'}">
+                                <ul class="nav navbar-nav navbar-right navbar-actions">
+                                   <li>
+                                      <a href="#systemBrochureModal" id="createNewBrochure" data-toggle="modal" title="Create a new brochure">Create New Brochure</a>
+                                   </li>
+                               </ul>
+                            </c:when>
+                        </c:choose>
                     </div>
                 </nav>
             </c:when>

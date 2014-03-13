@@ -60,7 +60,7 @@
                                                     Edit	
                                                 </a>
                                                 <a href="<c:url value="/FileDownload/downloadFile.do?filename=${brochure.fileName}&foldername=brochures&orgId=${brochure.orgId}"/>"  class="media-modal" title="Download this brochure">
-                                                    <span class="glyphicon glyphicon-edit"></span>
+                                                    <span class="glyphicon glyphicon-open"></span>
                                                     View	
                                                 </a>
                                                 <a href="javascript:void(0);" rel="${brochure.id}" class="btn btn-link brochureDelete" title="Delete this brochure">

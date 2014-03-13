@@ -471,6 +471,13 @@
         <put-attribute name="jscript" value="/dspResources/js/front-end/OrgProfile/editProvider.js" />
     </definition>
     
+    <!-- Organization Brochures -->
+    <definition name="/OrgProfile/brochures" extends="base.definition.frontEnd">
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Org&amp;page=brochures" />
+        <put-attribute name="body" value="/WEB-INF/jsp/OrgProfile/brochures.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/front-end/OrgProfile/brochures.js" />
+    </definition>
+    
     <!-- Associated Organizations -->
     <definition name="/organizations/associated" extends="base.definition.frontEnd">
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Org&amp;page=associations" />

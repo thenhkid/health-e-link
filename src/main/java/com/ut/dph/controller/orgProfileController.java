@@ -6,12 +6,14 @@
 
 package com.ut.dph.controller;
 
+import com.ut.dph.model.Brochure;
 import com.ut.dph.model.Organization;
 import com.ut.dph.model.Provider;
 import com.ut.dph.model.User;
 import com.ut.dph.model.providerAddress;
 import com.ut.dph.model.providerIdNum;
 import com.ut.dph.reference.USStateList;
+import com.ut.dph.service.brochureManager;
 import com.ut.dph.service.organizationManager;
 import com.ut.dph.service.providerManager;
 import java.util.List;
@@ -47,6 +49,9 @@ public class orgProfileController {
     
     @Autowired
     private providerManager providerManager;
+    
+    @Autowired
+    private brochureManager brochureManager;
     
     /**
      * The '/editProfile' request will serve up the organization profile edit page.
@@ -405,9 +410,8 @@ public class orgProfileController {
      * @Objects	(1) An object that will hold all the details of the clicked address
      *
      */
-    @RequestMapping(value = "/newProviderAddress", method = RequestMethod.GET)
-    @ResponseBody
-    public ModelAndView newProviderAddress(@RequestParam(value = "providerId", required = true) Integer providerId) throws Exception {
+    @RequestMapping(value = "/newProviderAddress", method = RequestMethod.GET)    
+    public @ResponseBody ModelAndView newProviderAddress(@RequestParam(value = "providerId", required = true) Integer providerId) throws Exception {
 
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/organizations/providers/addressDetails");
@@ -437,8 +441,7 @@ public class orgProfileController {
      * @throws Exception
      */
     @RequestMapping(value = "/address/create", method = RequestMethod.POST)
-    public @ResponseBody
-    ModelAndView createProviderAddress(@Valid @ModelAttribute(value = "addressDetails") providerAddress addressDetails, BindingResult result) throws Exception {
+    public @ResponseBody ModelAndView createProviderAddress(@Valid @ModelAttribute(value = "addressDetails") providerAddress addressDetails, BindingResult result) throws Exception {
 
         if (result.hasErrors()) {
             ModelAndView mav = new ModelAndView("/administrator/organizations/providers/addressDetails");
@@ -469,8 +472,7 @@ public class orgProfileController {
      *
      */
     @RequestMapping(value = "/addressDelete/{title}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody
-    Integer deleteAddress(@RequestParam(value = "i", required = true) Integer addressId) throws Exception {
+    public @ResponseBody Integer deleteAddress(@RequestParam(value = "i", required = true) Integer addressId) throws Exception {
         providerManager.deleteAddress(addressId);
         return 1;
     }
@@ -486,8 +488,7 @@ public class orgProfileController {
      *
      */
     @RequestMapping(value = "/providerId/{id}", method = RequestMethod.GET)
-    @ResponseBody
-    public ModelAndView viewIdDetails(@RequestParam(value = "i", required = true) Integer id) throws Exception {
+    public @ResponseBody ModelAndView viewIdDetails(@RequestParam(value = "i", required = true) Integer id) throws Exception {
 
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/organizations/providers/idDetails");
@@ -512,8 +513,7 @@ public class orgProfileController {
      * @throws Exception
      */
     @RequestMapping(value = "/providerId/update", method = RequestMethod.POST)
-    public @ResponseBody
-    ModelAndView updateProviderId(@Valid @ModelAttribute(value = "idDetails") providerIdNum idDetails, BindingResult result) throws Exception {
+    public @ResponseBody ModelAndView updateProviderId(@Valid @ModelAttribute(value = "idDetails") providerIdNum idDetails, BindingResult result) throws Exception {
 
         if (result.hasErrors()) {
             ModelAndView mav = new ModelAndView("/administrator/organizations/providers/idDetails");
@@ -539,9 +539,8 @@ public class orgProfileController {
      * @Objects	(1) An object that will hold all the details of a new providerId object
      *
      */
-    @RequestMapping(value = "/newProviderId", method = RequestMethod.GET)
-    @ResponseBody
-    public ModelAndView newProviderId(@RequestParam(value = "providerId", required = true) Integer providerId) throws Exception {
+    @RequestMapping(value = "/newProviderId", method = RequestMethod.GET)    
+    public @ResponseBody ModelAndView newProviderId(@RequestParam(value = "providerId", required = true) Integer providerId) throws Exception {
 
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/organizations/providers/idDetails");
@@ -564,8 +563,7 @@ public class orgProfileController {
      * @throws Exception
      */
     @RequestMapping(value = "/providerId/create", method = RequestMethod.POST)
-    public @ResponseBody
-    ModelAndView createProviderId(@Valid @ModelAttribute(value = "idDetails") providerIdNum idDetails, BindingResult result) throws Exception {
+    public @ResponseBody ModelAndView createProviderId(@Valid @ModelAttribute(value = "idDetails") providerIdNum idDetails, BindingResult result) throws Exception {
 
         if (result.hasErrors()) {
             ModelAndView mav = new ModelAndView("/administrator/organizations/providers/idDetails");
@@ -589,8 +587,7 @@ public class orgProfileController {
      *
      */
     @RequestMapping(value = "/providerIdDelete/{title}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody
-    Integer deleteProviderId(@RequestParam(value = "i", required = true) Integer id) throws Exception {
+    public @ResponseBody Integer deleteProviderId(@RequestParam(value = "i", required = true) Integer id) throws Exception {
         providerManager.deleteId(id);
         return 1;
     }
@@ -615,5 +612,101 @@ public class orgProfileController {
         return mav;
     }
     
+    
+    /**
+     * The '/brochures' GET request will handle displaying the brochures for the organization.
+     * 
+     * @return the organization brochure list
+     */
+    @RequestMapping(value = "/brochures", method = RequestMethod.GET)
+    public ModelAndView viewOrgBrochures(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
+        
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/OrgProfile/brochures");
+        
+        /* Need to get all the message types set up for the user */
+        User userInfo = (User)session.getAttribute("userDetails");
+        
+        try {
+        
+            List<Brochure> brochures = organizationManager.getOrganizationBrochures(userInfo.getOrgId(), 1, 0);
+
+            mav.addObject("brochures", brochures);
+
+            return mav;
+        
+        }
+        catch(Exception e) {
+            throw new Exception ("Error trying to list the brochures. OrgId: "+ userInfo.getOrgId(), e);
+        }
+        
+    }
+    
+    /**
+     * The '/newBrochure' GET request will be used to display the blank new brochure screen (In a modal)
+     *
+     *
+     * @return	The organization brochure blank form page
+     *
+     * @Objects	(1) An object that will hold all the form fields of a new brochure (2) An object to hold the button value "Create"
+     *
+     */
+    @RequestMapping(value = "/newBrochure", method = RequestMethod.GET)
+    public @ResponseBody ModelAndView newBrochure(HttpSession session) throws Exception {
+
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/organizations/brochures/details");
+        Brochure brochuredetails = new Brochure();
+        
+        /* Need to get all the message types set up for the user */
+        User userInfo = (User)session.getAttribute("userDetails");
+
+        //Set the id of the organization for the new provider
+        brochuredetails.setOrgId(userInfo.getOrgId());
+        mav.addObject("btnValue", "Create");
+        mav.addObject("brochuredetails", brochuredetails);
+
+        return mav;
+    }
+    
+    
+    /**
+     * The '}/createBrochure' POST request will handle submitting the new organization brochure.
+     *
+     * @param brochure	The object containing the brochure form fields
+     * @param result	The validation result
+     * @param redirectAttr	The variable that will hold values that can be read after the redirect
+     *
+     * @return	Will return the brochure list page on "Save" Will return the brochure form page on error
+     *
+     * @Objects	(1) The object containing all the information for the clicked org
+     * @throws Exception
+     */
+    @RequestMapping(value = "/createBrochure", method = RequestMethod.POST)
+    public ModelAndView createBrochure(@ModelAttribute(value = "brochuredetails") Brochure brochuredetails, RedirectAttributes redirectAttr) throws Exception {
+
+        brochureManager.createBrochure(brochuredetails);
+
+        ModelAndView mav = new ModelAndView(new RedirectView("/OrgProfile/brochures?msg=created"));
+        return mav;
+    }
+    
+    
+    /**
+     * The '/brochureDelete/{title}?i=##' GET request will be used to delete the selected brochure.
+     *
+     * @param i	The id of the brochure selected
+     *
+     * @return	Will return the brochure list page on "Save"
+     *
+     */
+    @RequestMapping(value = "/brochureDelete/{title}", method = RequestMethod.GET)
+    public ModelAndView deleteBrochure(@RequestParam(value = "i", required = true) Integer brochureId) throws Exception {
+
+        brochureManager.deleteBrochure(brochureId);
+
+        ModelAndView mav = new ModelAndView(new RedirectView("/OrgProfile/brochures?msg=deleted"));
+        return mav;
+    }
     
 }
