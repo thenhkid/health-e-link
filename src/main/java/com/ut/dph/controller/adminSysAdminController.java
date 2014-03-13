@@ -54,9 +54,6 @@ public class adminSysAdminController {
 	
 	@Autowired private ServletContext servletContext;
 	
-	@Autowired
-	private transactionInManager transactionInManager;
-
 	
 	/**
 	 * The private maxResults variable will hold the number of results to show per
