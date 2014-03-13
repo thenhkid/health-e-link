@@ -212,4 +212,11 @@ public interface transactionInDAO {
     Integer indexLoadTable(String loadTableName);
     
     batchUploadSummary getUploadSummaryDetails(int transactionInId);
+    
+    Integer clearBatchDownloadSummaryByUploadBatchId(Integer batchId);
+    
+    Integer clearTransactionTranslatedOutByUploadBatchId(Integer batchId);
+    
+    Integer clearTransactionOutRecordsByUploadBatchId(Integer batchId);
+ 
 }

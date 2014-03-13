@@ -904,14 +904,22 @@ public class transactionInManagerImpl implements transactionInManager {
 
     @Override
     public Integer clearTransactionTables(Integer batchUploadId, boolean leaveFinalStatusIds) {
-        //we clear transactionTranslatedIn
+    	//TODO have in transaction block for roll back?
+    	//we clear transactionTranslatedIn
         Integer cleared = clearTransactionTranslatedIn(batchUploadId);
         //we clear transactionInRecords
         cleared = cleared + clearTransactionInRecords(batchUploadId);
+        //clear batchDownloadSummary
+        cleared = cleared + clearBatchDownloadSummaryByUploadBatchId(batchUploadId);
+        //clear transactionoutrecords
+        cleared = cleared + clearTransactionOutRecordsByUploadBatchId(batchUploadId);
+        //clear tto
+        cleared = cleared + clearTransactionTranslatedOutByUploadBatchId(batchUploadId);
         //we clear transactionTarget
         cleared = cleared + clearTransactionTarget(batchUploadId);
         cleared = cleared + clearTransactionInErrors(batchUploadId, leaveFinalStatusIds);
         cleared = cleared + clearBatchUploadSummary(batchUploadId);
+        cleared = cleared + clearMessageTables(batchUploadId);
         //we clear transactionIn
         cleared = cleared + clearTransactionIn(batchUploadId);
 
@@ -1492,13 +1500,18 @@ public class transactionInManagerImpl implements transactionInManager {
             Integer sysErrors = clearTransactionTables(batchId, false);
             String errorMessage = "Load errors, please contact admin to review logs";
 			// loading batch will take it all the way to loaded (9) status for
-
+            if (sysErrors > 0) {
+            	insertProcessingError(5, null, batchId, null, null, null, null, false, false, "Error cleaning out transaction tables.  Batch cannot be processed.");
+            	updateBatchStatus(batchId, 29, "endDateTime");
+            	return false;
+            }
             //get delimiter, get fileWithPath etc
             if (batch.getoriginalFileName().endsWith(".txt")) {
                 sysErrors = sysErrors + loadTextBatch(batch);
             }
 
             nullForCWCol(0, batch.getId(), false);
+            //loop through configs for target, check to see if config has a col **/
             
             //load targets - we need to loadTarget only if field for target is blank, otherwise we load what user sent
             List<configurationConnection> batchTargetList = getBatchTargets(batchId);
@@ -1641,5 +1654,20 @@ public class transactionInManagerImpl implements transactionInManager {
     public batchUploadSummary getUploadSummaryDetails(int transactionInId) {
         return transactionInDAO.getUploadSummaryDetails(transactionInId);
     }
+
+	@Override
+	public Integer clearBatchDownloadSummaryByUploadBatchId(Integer batchId) {
+		 return transactionInDAO.clearBatchDownloadSummaryByUploadBatchId(batchId);
+	}
+	
+	@Override
+	public Integer clearTransactionOutRecordsByUploadBatchId(Integer batchId) {
+		 return transactionInDAO.clearTransactionOutRecordsByUploadBatchId(batchId);
+	}
+	
+	@Override
+	public Integer clearTransactionTranslatedOutByUploadBatchId(Integer batchId) {
+		 return transactionInDAO.clearTransactionTranslatedOutByUploadBatchId(batchId);
+	}
 
 }

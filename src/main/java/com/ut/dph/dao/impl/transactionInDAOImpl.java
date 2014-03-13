@@ -3168,4 +3168,53 @@ public class transactionInDAOImpl implements transactionInDAO {
         
     }
     
+    @Override
+    @Transactional
+    public Integer clearBatchDownloadSummaryByUploadBatchId(Integer batchId) {
+        String sql = "delete from batchDownloadSummary where transactionTargetId in ("
+        		+ "select id from transactionTarget where batchUploadId = :batchId);";
+        try {
+            Query deleteTable = sessionFactory.getCurrentSession().createSQLQuery(sql).setParameter("batchId", batchId);
+            deleteTable.executeUpdate();
+            return 0;
+        } catch (Exception ex) {
+            System.err.println("clearBatchDownloadSummaryByUploadBatchId " + ex.getCause().getMessage());
+            return 1;
+
+        }
+    }
+    
+    @Override
+    @Transactional
+    public Integer clearTransactionOutRecordsByUploadBatchId(Integer batchId) {
+        String sql = "delete from transactionOutRecords where transactionTargetId in ("
+        		+ "select id from transactionTarget where batchUploadId = :batchId);";
+        try {
+            Query deleteTable = sessionFactory.getCurrentSession().createSQLQuery(sql).setParameter("batchId", batchId);
+            deleteTable.executeUpdate();
+            return 0;
+        } catch (Exception ex) {
+            System.err.println("clearTransactionOutRecordsByUploadBatchId " + ex.getCause().getMessage());
+            return 1;
+
+        }
+    }
+    
+    
+    @Override
+    @Transactional
+    public Integer clearTransactionTranslatedOutByUploadBatchId(Integer batchId) {
+        String sql = "delete from TransactionTranslatedOut where transactionTargetId in ("
+        		+ "select id from transactionTarget where batchUploadId = :batchId);";
+        try {
+            Query deleteTable = sessionFactory.getCurrentSession().createSQLQuery(sql).setParameter("batchId", batchId);
+            deleteTable.executeUpdate();
+            return 0;
+        } catch (Exception ex) {
+            System.err.println("clearTransactionTranslatedOutByUploadBatchId " + ex.getCause().getMessage());
+            return 1;
+
+        }
+    }
+    
 }
