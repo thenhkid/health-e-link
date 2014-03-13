@@ -28,8 +28,6 @@
                 <div class="collapse navbar-collapse navbar-ex1-collapse">
                     <ul class="nav navbar-nav navbar-right">
                         <li ${param['page'] == 'about' ? 'class="active"' : ''}><a href="" title="About">About</a></li>
-                        <li ${param['page'] == 'productSuite' ? 'class="active"' : ''}><a href="<c:url value='product-suite' />" title="Product Suite">Product Suite</a></li>
-                        <li ${param['page'] == 'solutions' ? 'class="active"' : ''}><a href="" title="Solutions">Solutions</a></li>
                         <li ${param['page'] == 'contact' ? 'class="active"' : ''}><a href="" title="Contact">Contact</a></li>
                         <li ${param['page-id'] == 'profile' ? 'class="active"': ''}>
                             <c:choose>

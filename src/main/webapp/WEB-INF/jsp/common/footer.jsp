@@ -1,4 +1,6 @@
-
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<jsp:useBean id="date" class="java.util.Date" />
 
 <footer class="footer">
     <div class="container">
@@ -6,26 +8,19 @@
             <ul class="nav-inline">
                 <li><a href="" title="">Home</a></li>
                 <li><a href="" title="">About</a></li>
-                <li><a href="" title="">Product Suite</a></li>
-                <li><a href="" title="">Solutions</a></li>
-                <li><a href="" title="">Contact</a></li>
-                <li><a href="" title="">Partners</a></li>
-                <li><a href="" title="">My Account</a></li>
-                <li><a href="" title="">Site Map</a></li>
-                <li><a href="" title="">Privacy</a></li>
+                <c:if test="${not empty pageContext.request.userPrincipal.name}"><li><a href="<c:url value='/profile'/>" title="My Account">My Account</a></li></c:if>
             </ul>
         </nav>
 
         <p class="vcard">
-            <span class="fn">BOWlink Technologies, Inc</span> |
-            <span class="adr"><span class="post-office-box">P.O. Box 275</span>,
-                <span class="region">Auburn, MA</span>
-                <span class="postal-code">01501</span></span> |
-            Phone: <span class="tel">(508) 721-1977</span> |
-            <a class="email" href="mailto:info@health-e-link.net">mailto:info@health-e-link.net</a>
+            <span class="fn">Massachusetts Department of Public Health</span> |
+            <span class="adr"><span class="post-office-box">250 Washington Street</span>,
+                <span class="region">Boston, MA</span>
+                <span class="postal-code">02108</span></span> |
+            Phone: <span class="tel">(617) 624-6000</span> |
         </p>
         <p>
-            Copyright 2013 BOWlink Technologies Inc. All rights reserved</p>
+            Copyright <fmt:formatDate value="${date}" pattern="yyyy" /> Massachusetts Department of Public Health All rights reserved</p>
         </p>
     </div>
 </footer>

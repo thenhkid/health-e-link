@@ -53,12 +53,16 @@
 
             </div>
             <div class="col-md-6">
-                <h3> Health-e-Link?s Solution to Healthcare Information Exchange</h3>
+                <h3> The Solution to Healthcare Information Exchange</h3>
                 <p>
-                    Introducing the Health-e-Link Suite of data exchange and software 
-                    solutions that solve the technical challenges associated with sharing and accessing up-to-date, relevant clinical data.</p>
-
-                <p>                Health-e-Link is a suite of data exchange software solutions built around a common platform that allows your healthcare provider community to easily manage, share, analyze and report data across virtual boundaries and platforms, and ultimately improve quality of care. Read More.</p>
+                    Introducing the Universal Translator! A suite of data exchange and software 
+                    solutions that solve the technical challenges associated with sharing and accessing up-to-date, relevant clinical data.
+                </p>
+                <p>
+                    The Universal Translator is a suite of data exchange software solutions built around a common platform that allows your healthcare 
+                    provider community to easily manage, share, analyze and report data across virtual boundaries and platforms, and ultimately 
+                    improve quality of care. Read More.
+                 </p>
             </div>
         </div>
     </div>
