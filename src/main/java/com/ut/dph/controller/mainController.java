@@ -92,4 +92,28 @@ public class mainController {
         mav.addObject("pageTitle","Product Suite");
         return mav;
     }
+    
+    /**
+     * The '/about' GET request will display the about page.
+     */
+    @RequestMapping(value="/about", method = RequestMethod.GET)
+    public ModelAndView aboutPage() throws Exception {
+        
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/about");
+        mav.addObject("pageTitle","About Us");
+        return mav;
+    }
+    
+    /**
+     * The '/contact' GEt request will display the contact page.
+     */
+    @RequestMapping(value="/contact", method = RequestMethod.GET)
+    public ModelAndView contactPage() throws Exception {
+        
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/contact");
+        mav.addObject("pageTitle","Contact Us");
+        return mav;
+    }
 }

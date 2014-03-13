@@ -27,8 +27,8 @@
                 </div>
                 <div class="collapse navbar-collapse navbar-ex1-collapse">
                     <ul class="nav navbar-nav navbar-right">
-                        <li ${param['page'] == 'about' ? 'class="active"' : ''}><a href="" title="About">About</a></li>
-                        <li ${param['page'] == 'contact' ? 'class="active"' : ''}><a href="" title="Contact">Contact</a></li>
+                        <li ${param['page'] == 'about' ? 'class="active"' : ''}><a href="<c:url value='/about'/>" title="About">About</a></li>
+                        <li ${param['page'] == 'contact' ? 'class="active"' : ''}><a href="<c:url value='/contact'/>" title="Contact">Contact</a></li>
                         <li ${param['page-id'] == 'profile' ? 'class="active"': ''}>
                             <c:choose>
                                 <c:when test="${not empty pageContext.request.userPrincipal.name}">

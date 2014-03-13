@@ -3,10 +3,10 @@
 <div class="product-suite">
     <div class="product-suite-header">
         <div class="container">
-            <a href="http://www.youtube.com/watch?v=DMJKG6jyHYg" data-title="Product Demo" data-toggle="modal" data-target="#mediaModal" class="pull-right product-demo font-large media-modal hidden-xs">
+            <%--<a href="http://www.youtube.com/watch?v=DMJKG6jyHYg" data-title="Product Demo" data-toggle="modal" data-target="#mediaModal" class="pull-right product-demo font-large media-modal hidden-xs">
                 <span class="icon-play"></span>
                 Play Product Demo
-            </a>
+            </a>--%>
             <h2>
                 <span class="icon-health-e-link"></span>
                 Product Suite
@@ -34,10 +34,10 @@
                 <a href="" title="" class="btn-secondary">Learn More</a>
             </div>
         </div>
-        <a href="http://www.youtube.com/watch?v=DMJKG6jyHYg" data-title="Product Demo" data-toggle="modal" data-target="#mediaModal" class="product-demo center-text font-large media-modal visible-xs">
+        <%--<a href="http://www.youtube.com/watch?v=DMJKG6jyHYg" data-title="Product Demo" data-toggle="modal" data-target="#mediaModal" class="product-demo center-text font-large media-modal visible-xs">
             <span class="icon-play"></span>
             Play Product Demo
-        </a>
+        </a>--%>
     </div>
 </div>
 

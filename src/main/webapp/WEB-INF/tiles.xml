@@ -350,8 +350,21 @@
 
     <!-- Information Pages -->
     <definition name="/productSuite" extends="base.definition.frontEnd">
+        <put-attribute name="title" value="Universal Translator - Product Suite" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page=productSuite" />
         <put-attribute name="body" value="/WEB-INF/jsp/informationPages/productSuite.jsp" />
+    </definition>
+    
+    <definition name="/about" extends="base.definition.frontEnd">
+        <put-attribute name="title" value="Universal Translator - About Us" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page=about" />
+        <put-attribute name="body" value="/WEB-INF/jsp/informationPages/about.jsp" />
+    </definition>
+    
+    <definition name="/contact" extends="base.definition.frontEnd">
+        <put-attribute name="title" value="Universal Translator - Contact Us" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page=contact" />
+        <put-attribute name="body" value="/WEB-INF/jsp/informationPages/contact.jsp" />
     </definition>
 
     <!-- Profile (Account) Pages -->
