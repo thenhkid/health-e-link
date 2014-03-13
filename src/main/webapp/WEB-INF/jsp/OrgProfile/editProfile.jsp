@@ -129,10 +129,8 @@
                                         </spring:bind>
                                     </div>            
                                 </div>
-                            </div>
-                        </div>
-                        <div>
-                            <input type="button" id="save" class="btn btn-primary btn-action submitMessage" value="Save"/>
+                                <input type="button" id="save" class="btn btn-primary btn-action-sm submitMessage" value="Save"/>
+                            </div>           
                         </div>
                     </div>                   
                 </div>

@@ -15,7 +15,7 @@
 
             <ol class="breadcrumb">
                 <li><a href="<c:url value='/profile'/>">My Account</a></li>
-                <li><a href="/organizations/associations">Associated Organizations</a></li>
+                <li><a href="/associations/">Associated Organizations</a></li>
                 <li class="active">
                     ${orgDetails.orgName}
                 </li>

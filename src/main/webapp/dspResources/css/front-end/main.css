@@ -6676,6 +6676,9 @@ td.visible-print {
 .btn-action {
   padding: 10px 30px;
 }
+.btn-action-sm {
+  padding: 5px 15px;
+}
 .margin-small {
   margin: 5px;
 }

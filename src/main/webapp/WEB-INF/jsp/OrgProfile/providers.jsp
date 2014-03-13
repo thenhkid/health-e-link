@@ -36,10 +36,6 @@
             </c:if>     
             
             <h2 class="form-title">Organization Providers</h2>
-            <div class="pull-left">
-                <a href="/OrgProfile/providers/createProvider" class="btn btn-primary btn-xs " title="Create a new provider.">Create New Provider</a>
-                <br /><br /> 
-            </div>
             
             <div class="col-md-12">
                 <c:forEach var="provider" varStatus="pStatus" items="${providers}">

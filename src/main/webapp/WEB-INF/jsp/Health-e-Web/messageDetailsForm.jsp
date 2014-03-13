@@ -287,23 +287,23 @@
                     <div id="translationMsgDiv"  class="alert alert-danger" style="display:none;">
                         <strong>An error has occurred in one of the above fields!</strong>
                     </div>
-                    <input type="button" id="save" class="btn btn-primary btn-action submitMessage" value="Save ${pageHeader == 'feedback' ? 'Feedback Report' : 'Referral'}"/>
+                    <input type="button" id="save" class="btn btn-primary btn-action-sm submitMessage" value="Save ${pageHeader == 'feedback' ? 'Feedback Report' : 'Referral'}"/>
                     <c:choose>
                         <c:when test="${transaction.autoRelease == true}">
-                            <input type="button" id="send" class="btn btn-primary btn-action submitMessage" value="Send Referral"/>
+                            <input type="button" id="send" class="btn btn-primary btn-action-sm submitMessage" value="Send Referral"/>
                         </c:when>
                         <c:otherwise>
-                            <input type="button" id="release" class="btn btn-primary btn-action submitMessage" value="Release"/>
+                            <input type="button" id="release" class="btn btn-primary btn-action-sm submitMessage" value="Release"/>
                         </c:otherwise>
                     </c:choose> 
                     <%-- Allow the user to delete saved messages --%>   
                     <c:choose>
                         <c:when test="${transaction.statusId == 15}"> 
-                            <div class="pull-right"><input type="button" id="delete" class="btn btn-primary btn-action deleteMessage" value="Delete"/></div>
+                            <div class="pull-right"><input type="button" id="delete" class="btn btn-primary btn-action-sm deleteMessage" value="Delete"/></div>
                         </c:when> 
                         <c:otherwise>
                             <c:if test="${userDetails.cancelAuthority == true && transaction.statusId > 0}">                             
-                                <div class="pull-right"><input type="button" id="cancel" class="btn btn-primary btn-action cancelMessage" value="Cancel"/></div>
+                                <div class="pull-right"><input type="button" id="cancel" class="btn btn-primary btn-action-sm cancelMessage" value="Cancel"/></div>
                             </c:if>
                         </c:otherwise>
                     </c:choose>    

@@ -132,9 +132,8 @@
                                         </spring:bind>
                                     </div>  
                                     
-                                    <div class="form-group">
-                                        <input type="button" id="save" class="btn btn-primary btn-action submitMessage" value="Save"/>
-                                    </div>
+                                    <input type="button" id="save" class="btn btn-primary btn-action-sm submitMessage" value="Save"/>
+                                   
                                 </div>
                             </div>
                         </div>
@@ -150,7 +149,7 @@
                         </div>
                         <div class="panel-body">
                             <div class="form-container scrollable">
-                                 <a href="#systemAddressModal" id="createNewAddress" data-toggle="modal" class="btn btn-primary btn-sm pull-right" title="Create a new address">
+                                 <a href="#systemAddressModal" id="createNewAddress" data-toggle="modal" class="btn btn-primary btn-xs pull-right" title="Create a new address">
                                     <span class="glyphicon glyphicon-plus"></span>
                                 </a>
                                 <table class="table table-striped table-hover responsive">
@@ -211,7 +210,7 @@
                         </div>
                         <div class="panel-body">
                             <div class="form-container scrollable">
-                                 <a href="#providerIdModal" id="createNewId" data-toggle="modal" class="btn btn-primary btn-sm pull-right" title="Create a new provider Id">
+                                 <a href="#providerIdModal" id="createNewId" data-toggle="modal" class="btn btn-primary btn-xs pull-right" title="Create a new provider Id">
                                     <span class="glyphicon glyphicon-plus"></span>
                                 </a>    
                                 <table class="table table-striped table-hover responsive">

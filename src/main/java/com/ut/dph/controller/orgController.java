@@ -30,7 +30,7 @@ import org.springframework.web.servlet.ModelAndView;
  * @author chadmccue
  */
 @Controller
-@RequestMapping("/organizations")
+@RequestMapping("/associations")
 public class orgController {
     
     @Autowired
@@ -57,7 +57,7 @@ public class orgController {
      * @return	the associated organization list page
      * @throws Exception
      */
-    @RequestMapping(value = "/associations", method = RequestMethod.GET)
+    @RequestMapping(value = "/", method = RequestMethod.GET)
     public ModelAndView viewAssociations(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
         
         ModelAndView mav = new ModelAndView();
@@ -80,7 +80,7 @@ public class orgController {
      * @return The details page of the selected organization
      * 
      */
-    @RequestMapping(value = "/associations/{orgName}", method = RequestMethod.POST)
+    @RequestMapping(value = "/{orgName}", method = RequestMethod.POST)
     public ModelAndView viewOrgDetails(HttpServletRequest request, HttpServletResponse response, HttpSession session, @RequestParam Integer orgId) throws Exception {
         
         ModelAndView mav = new ModelAndView();

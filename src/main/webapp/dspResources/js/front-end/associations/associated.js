@@ -10,7 +10,7 @@ require(['./main'], function () {
         
         $('.viewLink').click(function() {
            
-           $('#orgDetails').attr('action','/organizations/associations/'+$(this).attr('rel2'));
+           $('#orgDetails').attr('action','/associations/'+$(this).attr('rel2'));
            $('#orgId').val($(this).attr('rel'));
            
            $('#orgDetails').submit();

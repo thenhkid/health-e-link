@@ -460,7 +460,7 @@
     </definition>
     
     <definition name="/OrgProfile/createProvider" extends="base.definition.frontEnd">
-        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Org&amp;page=providers" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Org&amp;page=createProvider" />
         <put-attribute name="body" value="/WEB-INF/jsp/OrgProfile/createProvider.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/front-end/OrgProfile/createProvider.js" />
     </definition>
