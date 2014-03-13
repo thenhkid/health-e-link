@@ -177,17 +177,19 @@
                                                             (o) ${providerdetails.providerAddresses[pStatus.index].phone1}
                                                             <c:if test="${not empty providerdetails.providerAddresses[pStatus.index].phone2}"><br />(toll free) ${providerdetails.providerAddresses[pStatus.index].phone2}</c:if>
                                                             <c:if test="${not empty providerdetails.providerAddresses[pStatus.index].fax}"><br />(f) ${providerdetails.providerAddresses[pStatus.index].fax}</c:if>
-                                                            </td>
-                                                            <td>
-                                                                <a href="#systemAddressModal" data-toggle="modal" class="btn btn-link editAddress" rel="address?i=${providerdetails.providerAddresses[pStatus.index].id}" title="Edit this address">
-                                                                <span class="glyphicon glyphicon-edit"></span>
-                                                                Edit
-                                                            </a>
-                                                            <a href="javascript:void(0);"  class="btn btn-link deleteAddress" rel="${providerdetails.providerAddresses[pStatus.index].id}" title="Delete this address">
-                                                                <span class="glyphicon glyphicon-remove"></span>
-                                                                Delete
-                                                            </a>
                                                         </td>
+                                                        <td>
+                                                            <div class="pull-right">
+                                                                <a href="#systemAddressModal" data-toggle="modal" class="btn btn-link editAddress" rel="address?i=${providerdetails.providerAddresses[pStatus.index].id}" title="Edit this address">
+                                                                    <span class="glyphicon glyphicon-edit"></span>
+                                                                    Edit
+                                                                </a>
+                                                                <a href="javascript:void(0);"  class="btn btn-link deleteAddress" rel="${providerdetails.providerAddresses[pStatus.index].id}" title="Delete this address">
+                                                                    <span class="glyphicon glyphicon-remove"></span>
+                                                                    Delete
+                                                                </a>  
+                                                            </div>
+                                                       </td>
                                                     </tr>
                                                 </c:forEach>
                                             </c:when>
@@ -236,14 +238,16 @@
                                                             ${providerdetails.providerIds[pStatus.index].issuedBy}
                                                         </td>
                                                         <td>
-                                                            <a href="#providerIdModal" data-toggle="modal" class="btn btn-link editId" rel="address?i=${providerdetails.providerIds[pStatus.index].id}" title="Edit this provider Id">
-                                                                <span class="glyphicon glyphicon-edit"></span>
-                                                                Edit
-                                                            </a>
-                                                            <a href="javascript:void(0);"  class="btn btn-link deleteId" rel="${providerdetails.providerIds[pStatus.index].id}" title="Delete this provider Id">
-                                                                <span class="glyphicon glyphicon-remove"></span>
-                                                                Delete
-                                                            </a>
+                                                            <div class="pull-right">
+                                                                <a href="#providerIdModal" data-toggle="modal" class="btn btn-link editId" rel="address?i=${providerdetails.providerIds[pStatus.index].id}" title="Edit this provider Id">
+                                                                    <span class="glyphicon glyphicon-edit"></span>
+                                                                    Edit
+                                                                </a>
+                                                                <a href="javascript:void(0);"  class="btn btn-link deleteId" rel="${providerdetails.providerIds[pStatus.index].id}" title="Delete this provider Id">
+                                                                    <span class="glyphicon glyphicon-remove"></span>
+                                                                    Delete
+                                                                </a>
+                                                            </div>
                                                         </td>
                                                     </tr>
                                                 </c:forEach>
