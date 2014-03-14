@@ -31,5 +31,7 @@ public interface userDAO {
     List<userAccess> getuserSections(int userId);
     
     List<User> getOrganizationContact(int orgId, int mainContact);
+    
+    User getUserByIdentifier(String identifier);
 
 }

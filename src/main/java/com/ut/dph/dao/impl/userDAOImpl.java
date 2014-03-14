@@ -240,5 +240,37 @@ public class userDAOImpl implements userDAO {
         return query.list();
        
     }
+    
+    /**
+     * The 'getUserByIdentifier' function will try to location a user based on the identifier
+     * passed in.
+     * 
+     * @param identifier The value that will be used to find a user.
+     * 
+     * @return The function will return a user object
+     */
+    @Override
+    public User getUserByIdentifier(String identifier) {
+        
+        Criteria findUser = sessionFactory.getCurrentSession().createCriteria(User.class);
+        findUser.add(Restrictions.or(
+               Restrictions.eq("email", identifier),
+               Restrictions.eq("username", identifier),
+               Restrictions.like("fullName", identifier)
+        ));
+        
+           
+        if(findUser.list().size() > 1) {
+            return null;
+        }
+        else {
+            if(findUser.uniqueResult() == null) {
+                return null;
+            }
+            else {
+                return (User) findUser.uniqueResult();
+            }
+        }
+    }
 
 }
