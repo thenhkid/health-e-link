@@ -43,7 +43,7 @@ public interface messageTypeDAO {
 	@SuppressWarnings("rawtypes")
 	List getInformationTables();
         
-        @SuppressWarnings("rawtypes")
+    @SuppressWarnings("rawtypes")
 	List getAllTables();
        
 	@SuppressWarnings("rawtypes")
@@ -52,7 +52,6 @@ public interface messageTypeDAO {
 	@SuppressWarnings("rawtypes")
 	List getValidationTypes();
         
-        @SuppressWarnings("rawtypes")
 	String getValidationById(int id);
 	
 	@SuppressWarnings("rawtypes")

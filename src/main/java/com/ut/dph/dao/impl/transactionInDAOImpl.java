@@ -1492,7 +1492,7 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Transactional
     public boolean allowBatchClear(Integer batchUploadId) {
         String sql
-                = "select count(*) as rowCount from batchUploads where id = :id and statusId in (22,23,1);";
+                = "select count(id) as rowCount from batchUploads where id = :id and statusId in (22,23,1);";
         Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).addScalar("rowCount", StandardBasicTypes.INTEGER);
         query.setParameter("id", batchUploadId);
         Integer rowCount = (Integer) query.list().get(0);
@@ -2391,9 +2391,9 @@ public class transactionInDAOImpl implements transactionInDAO {
         String sql = "";
         if (!foroutboundProcessing) {
             sql = " update batchUploads set " + colNameToUpdate + " = "
-                    + "(select count(*) as total from transactionIn where batchId = :batchId ";
+                    + "(select count(id) as total from transactionIn where batchId = :batchId ";
         } else {
-            sql = "update batchUploads set " + colNameToUpdate + " = (select count(*) as total "
+            sql = "update batchUploads set " + colNameToUpdate + " = (select count(id) as total "
                     + " from transactionTarget where"
                     + " batchDLId = :batchId ";
         }
@@ -2431,7 +2431,7 @@ public class transactionInDAOImpl implements transactionInDAO {
             tableName = "transactionTarget";
             batchType = "batchDLId";
         }
-        String sql = "select count(*) as total from " + tableName + " where " + batchType + " = :batchId ";
+        String sql = "select count(id) as total from " + tableName + " where " + batchType + " = :batchId ";
         if (statusIds.size() > 0) {
             sql = sql + " and statusId ";
 	        if (!inStatusIds) {

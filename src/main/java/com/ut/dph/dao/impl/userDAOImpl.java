@@ -166,7 +166,7 @@ public class userDAOImpl implements userDAO {
     @Override
     public Long findTotalLogins(int userId) {
 
-        Query query = sessionFactory.getCurrentSession().createQuery("select count(*) as totalLogins from userLogin where userId = :userId");
+        Query query = sessionFactory.getCurrentSession().createQuery("select count(id) as totalLogins from userLogin where userId = :userId");
         query.setParameter("userId", userId);
 
         Long totalLogins = (Long) query.uniqueResult();

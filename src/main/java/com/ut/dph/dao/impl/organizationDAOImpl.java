@@ -137,7 +137,7 @@ public class organizationDAOImpl implements organizationDAO {
      */
     @Override
     public Long findTotalOrgs() {
-        Query query = sessionFactory.getCurrentSession().createQuery("select count(*) as totalOrgs from Organization where cleanURL is not ''");
+        Query query = sessionFactory.getCurrentSession().createQuery("select count(id) as totalOrgs from Organization where cleanURL is not ''");
 
         Long totalOrgs = (Long) query.uniqueResult();
 
@@ -225,7 +225,7 @@ public class organizationDAOImpl implements organizationDAO {
     @Override
     public Long findTotalUsers(int orgId) {
 
-        Query query = sessionFactory.getCurrentSession().createQuery("select count(*) as totalUsers from User where orgId = :orgId");
+        Query query = sessionFactory.getCurrentSession().createQuery("select count(id) as totalUsers from User where orgId = :orgId");
         query.setParameter("orgId", orgId);
 
         Long totalUsers = (Long) query.uniqueResult();
@@ -246,7 +246,7 @@ public class organizationDAOImpl implements organizationDAO {
     @Override
     public Long findTotalConfigurations(int orgId) {
 
-        Query query = sessionFactory.getCurrentSession().createQuery("select count(*) as totalConfigs from configuration where orgId = :orgId");
+        Query query = sessionFactory.getCurrentSession().createQuery("select count(id) as totalConfigs from configuration where orgId = :orgId");
         query.setParameter("orgId", orgId);
 
         Long totalConfigs = (Long) query.uniqueResult();
@@ -298,7 +298,7 @@ public class organizationDAOImpl implements organizationDAO {
     @Override
     public Long findTotalProviders(int orgId) {
 
-        Query query = sessionFactory.getCurrentSession().createQuery("select count(*) as totalProviders from Provider where orgId = :orgId");
+        Query query = sessionFactory.getCurrentSession().createQuery("select count(id) as totalProviders from Provider where orgId = :orgId");
         query.setParameter("orgId", orgId);
 
         Long totalProviders = (Long) query.uniqueResult();
@@ -352,7 +352,7 @@ public class organizationDAOImpl implements organizationDAO {
     @Override
     public Long findTotalBrochures(int orgId) {
 
-        Query query = sessionFactory.getCurrentSession().createQuery("select count(*) as totalBrochures from Brochure where orgId = :orgId");
+        Query query = sessionFactory.getCurrentSession().createQuery("select count(id) as totalBrochures from Brochure where orgId = :orgId");
         query.setParameter("orgId", orgId);
 
         Long totalBrochures = (Long) query.uniqueResult();

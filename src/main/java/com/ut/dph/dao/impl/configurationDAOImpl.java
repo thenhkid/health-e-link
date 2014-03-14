@@ -291,7 +291,7 @@ public class configurationDAOImpl implements configurationDAO {
      */
     @Override
     public Long findTotalConfigs() {
-        Query query = sessionFactory.getCurrentSession().createQuery("select count(*) as totalConfigs from configuration");
+        Query query = sessionFactory.getCurrentSession().createQuery("select count(id) as totalConfigs from configuration");
 
         Long totalConfigs = (Long) query.uniqueResult();
 
@@ -332,7 +332,7 @@ public class configurationDAOImpl implements configurationDAO {
     @Override
     public Long getTotalConnections(int configId) {
 
-        Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT count(*) FROM configurationConnections where configId = :configId and status = 1")
+        Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT count(id) FROM configurationConnections where configId = :configId and status = 1")
                 .setParameter("configId", configId);
 
         BigInteger totalCount = (BigInteger) query.uniqueResult();
@@ -576,6 +576,7 @@ public class configurationDAOImpl implements configurationDAO {
      */
     @Override
     @Transactional
+    @SuppressWarnings("unchecked")
     public List<configurationConnection> getConnectionsByConfiguration(int configId) {
         Query query = sessionFactory.getCurrentSession().createQuery("from configurationConnection where sourceConfigId = :configId");
         query.setParameter("configId", configId);
