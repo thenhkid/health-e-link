@@ -858,3 +858,22 @@ ADD INDEX `DLInfo` (`batchDLId` ASC, `id` ASC, `configId` ASC);
 ALTER TABLE `universaltranslator`.`configurationschedule` 
 ADD INDEX `type` (`type` ASC);
 
+/** grace 03142014 2:59PM **/
+INSERT INTO `universaltranslator`.`lu_errorcodes`
+(`id`,
+`displayText`,
+`description`)
+VALUES
+(9,
+'Invalid Source Organization for Configuration',
+'Invalid Source Organization for Configuration');
+
+INSERT INTO `universaltranslator`.`lu_errorcodes`
+(`id`,
+`displayText`,
+`description`)
+VALUES
+(10,
+'Invalid Target Organization for Configuration',
+'Invalid Target Organization for Configuration');
+
