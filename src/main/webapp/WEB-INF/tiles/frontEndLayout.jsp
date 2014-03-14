@@ -20,7 +20,7 @@
     <link rel="stylesheet" href="<%=request.getContextPath()%>/dspResources/css/front-end/main.css?v=2">
 
     <!%-- Health-e-link theme --%>
-    <link rel="stylesheet" href="<%=request.getContextPath()%>/dspResources/css/front-end/themes/theme-health-e-link.css">
+    <link rel="stylesheet" href="<%=request.getContextPath()%>/dspResources/css/front-end/themes/theme-mdh.css">
     <jsp:text><![CDATA[<!--[if lte IE 9]>]]></jsp:text>
             <link rel="stylesheet" href="<%=request.getContextPath()%>/dspResources/css/ie.css">
     <jsp:text><![CDATA[<![endif]-->]]></jsp:text>
