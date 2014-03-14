@@ -1,11 +1,21 @@
 package com.ut.dph.controller;
 
+import com.ut.dph.model.User;
+import com.ut.dph.model.mailMessage;
+import com.ut.dph.service.emailMessageManager;
+import com.ut.dph.service.userManager;
+import java.util.Random;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.view.RedirectView;
 
 /**
  * The mainController class will handle all URL requests that fall outside of specific user or admin controllers
@@ -17,6 +27,12 @@ import org.springframework.web.servlet.ModelAndView;
  */
 @Controller
 public class mainController {
+    
+    @Autowired
+    private userManager usermanager;
+    
+    @Autowired
+    private emailMessageManager emailMessageManager;
     
     /**
      * The '/login' request will serve up the login page.
@@ -115,5 +131,73 @@ public class mainController {
         mav.setViewName("/contact");
         mav.addObject("pageTitle","Contact Us");
         return mav;
+    }
+    
+    /**
+     * The '/forgotPassword' GET request will be used to display the forget password form (In a modal)
+     *
+     *
+     * @return	The forget password form page
+     *
+     *
+     */
+    @RequestMapping(value = "/forgotPassword", method = RequestMethod.GET)
+    public ModelAndView forgotPassword(HttpSession session) throws Exception {
+
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/forgotPassword");
+       
+
+        return mav;
+    }
+    
+    /**
+     * The '/forgotPassword' POST request will be used to find the account information for the user
+     * and send an email.
+     *
+     *
+     */
+    @RequestMapping(value = "/forgotPassword", method = RequestMethod.POST)
+    public ModelAndView findPassword(@RequestParam String identifier, RedirectAttributes redirectAttr) throws Exception {
+        
+        User userDetails = usermanager.getUserByIdentifier(identifier);
+        
+        if(userDetails == null) {
+            ModelAndView mav = new ModelAndView(new RedirectView("/forgotPassword?msg=notfound"));
+            return mav;
+        }
+        else {
+            
+            StringBuilder code = new StringBuilder();
+            
+            /* Generate a random 6 digit number for a confirmation code */
+            for(int i=1;i<=7;i++) {
+                Random rand = new Random();
+                int r = rand.nextInt(8) + 1;
+                code.append(r);
+            }
+            
+            /* Sent Reset Email */
+            mailMessage messageDetails = new mailMessage();
+            
+            messageDetails.settoEmailAddress(userDetails.getEmail());
+            messageDetails.setmessageSubject("Universal Translator Reset Password");
+            
+            StringBuilder sb = new StringBuilder();
+            
+            sb.append("Dear "+userDetails.getFirstName()+",<br />");
+            sb.append("You have recently asked to reset your Universal Translator password.<br /><br />");
+            sb.append("<a href='http://localhost:8085/resetPassword?b="+code+"'>Click here to reset your password.</a>");
+            
+            messageDetails.setmessageBody(sb.toString());
+            messageDetails.setfromEmailAddress("dphuniversaltranslator@gmail.com");
+            
+            emailMessageManager.sendEmail(messageDetails);
+            
+            ModelAndView mav = new ModelAndView(new RedirectView("/forgotPassword?msg=sent"));
+            return mav;
+        }
+
+        
     }
 }

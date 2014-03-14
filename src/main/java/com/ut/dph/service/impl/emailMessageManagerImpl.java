@@ -8,8 +8,10 @@ package com.ut.dph.service.impl;
 
 import com.ut.dph.model.mailMessage;
 import com.ut.dph.service.emailMessageManager;
-import org.springframework.mail.MailSender;
+import javax.mail.internet.MimeMessage;
 import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -20,29 +22,39 @@ import org.springframework.stereotype.Service;
 @Service
 public class emailMessageManagerImpl implements emailMessageManager {
     
-    private MailSender mailSender;
+    private JavaMailSender mailSender;
     
-    public void setMailSender(MailSender mailSender) {
-            this.mailSender = mailSender;
+    public void setMailSender(JavaMailSender mailSender) {
+       this.mailSender = mailSender;
     }
     
     @Async
     public void sendEmail(mailMessage messageDetails) throws Exception {
         
-        SimpleMailMessage msg = new SimpleMailMessage();
-       
-        msg.setTo(messageDetails.gettoEmailAddress());
+        MimeMessage msg = mailSender.createMimeMessage();
         
-        if(messageDetails.getccEmailAddress() != null) {
-            msg.setCc(messageDetails.getccEmailAddress());
+        try {
+            MimeMessageHelper helper = new MimeMessageHelper(msg, true);
+            
+            helper.setFrom(messageDetails.getfromEmailAddress());
+            helper.setTo(messageDetails.gettoEmailAddress());
+            
+            if(messageDetails.getccEmailAddress() != null) {
+                helper.setCc(messageDetails.getccEmailAddress());
+            }
+            
+            helper.setSubject(messageDetails.getmessageSubject());
+            
+            helper.setText("",messageDetails.getmessageBody());
+            helper.setReplyTo(messageDetails.getfromEmailAddress());
+            
+             mailSender.send(msg);
+             
+        }
+        catch (Exception e) {
+            throw new Exception(e);
         }
         
-        msg.setFrom(messageDetails.getfromEmailAddress());
-        msg.setSubject(messageDetails.getmessageSubject());
-        msg.setReplyTo(messageDetails.getfromEmailAddress());
-        msg.setText(messageDetails.getmessageBody());
-        
-        mailSender.send(msg);
         
     }
 }

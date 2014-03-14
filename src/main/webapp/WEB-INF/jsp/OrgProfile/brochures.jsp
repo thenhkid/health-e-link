@@ -77,5 +77,5 @@
         </div>
     </div>
 </div>
-<!-- Brochure Form modal -->
+<%-- Brochure Form modal --%>
 <div class="modal fade" id="systemBrochureModal" role="dialog" tabindex="-1" aria-labeledby="Brochures" aria-hidden="true" aria-describedby="Brochures"></div>

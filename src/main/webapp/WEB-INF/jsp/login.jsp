@@ -32,6 +32,5 @@
             </fieldset>
         </form>
     </div>
-    <p class="login-note"><a href="">Forgot Password?</a></p>
+    <p class="login-note"><a href="/forgotPassword" id="forgotPassword" title="Forget Your Password?">Forgot Password?</a></p>
 </div>
-
