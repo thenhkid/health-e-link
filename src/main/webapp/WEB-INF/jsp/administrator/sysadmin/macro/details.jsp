@@ -13,6 +13,13 @@
                 <form:hidden path="id" id="id" />
                 
                 <div class="form-container">
+                          <spring:bind path="category">
+                            <div class="form-group ${status.error ? 'has-error' : '' }">
+                                <label class="control-label" for="category">Category</label>
+                                <form:input path="category" id="category" class="form-control" type="text" maxLength="50" />
+                                <form:errors path="category" cssClass="control-label" element="label" />
+                            </div>
+                        </spring:bind>
                          <spring:bind path="macroShortName">
                             <div class="form-group ${status.error ? 'has-error' : '' }">
                                 <label class="control-label" for="macroShortName">Macro Short Name*</label>
