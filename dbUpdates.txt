@@ -854,4 +854,7 @@ ADD INDEX `IdAndBatchIndex` (`id` ASC, `batchDLId` ASC),
 ADD INDEX `UploadInfo` (`transactionInId` ASC, `batchUploadId` ASC),
 ADD INDEX `DLInfo` (`batchDLId` ASC, `id` ASC, `configId` ASC);
 
+/** grace 03142014 12:03PM **/
+ALTER TABLE `universaltranslator`.`configurationschedule` 
+ADD INDEX `type` (`type` ASC);
 
