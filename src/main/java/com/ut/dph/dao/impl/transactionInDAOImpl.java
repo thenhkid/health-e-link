@@ -1492,7 +1492,7 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Transactional
     public boolean allowBatchClear(Integer batchUploadId) {
         String sql
-                = "select count(*) as rowCount from batchUploads where id = :id and statusId in (22,23,1);";
+                = "select count(id) as rowCount from batchUploads where id = :id and statusId in (22,23,1);";
         Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).addScalar("rowCount", StandardBasicTypes.INTEGER);
         query.setParameter("id", batchUploadId);
         Integer rowCount = (Integer) query.list().get(0);
@@ -2391,9 +2391,9 @@ public class transactionInDAOImpl implements transactionInDAO {
         String sql = "";
         if (!foroutboundProcessing) {
             sql = " update batchUploads set " + colNameToUpdate + " = "
-                    + "(select count(*) as total from transactionIn where batchId = :batchId ";
+                    + "(select count(id) as total from transactionIn where batchId = :batchId ";
         } else {
-            sql = "update batchUploads set " + colNameToUpdate + " = (select count(*) as total "
+            sql = "update batchUploads set " + colNameToUpdate + " = (select count(id) as total "
                     + " from transactionTarget where"
                     + " batchDLId = :batchId ";
         }
@@ -2431,7 +2431,7 @@ public class transactionInDAOImpl implements transactionInDAO {
             tableName = "transactionTarget";
             batchType = "batchDLId";
         }
-        String sql = "select count(*) as total from " + tableName + " where " + batchType + " = :batchId ";
+        String sql = "select count(id) as total from " + tableName + " where " + batchType + " = :batchId ";
         if (statusIds.size() > 0) {
             sql = sql + " and statusId ";
 	        if (!inStatusIds) {
@@ -3166,6 +3166,55 @@ public class transactionInDAOImpl implements transactionInDAO {
         
         return (batchUploadSummary) batchSummaries.uniqueResult();
         
+    }
+    
+    @Override
+    @Transactional
+    public Integer clearBatchDownloadSummaryByUploadBatchId(Integer batchId) {
+        String sql = "delete from batchDownloadSummary where transactionTargetId in ("
+        		+ "select id from transactionTarget where batchUploadId = :batchId);";
+        try {
+            Query deleteTable = sessionFactory.getCurrentSession().createSQLQuery(sql).setParameter("batchId", batchId);
+            deleteTable.executeUpdate();
+            return 0;
+        } catch (Exception ex) {
+            System.err.println("clearBatchDownloadSummaryByUploadBatchId " + ex.getCause().getMessage());
+            return 1;
+
+        }
+    }
+    
+    @Override
+    @Transactional
+    public Integer clearTransactionOutRecordsByUploadBatchId(Integer batchId) {
+        String sql = "delete from transactionOutRecords where transactionTargetId in ("
+        		+ "select id from transactionTarget where batchUploadId = :batchId);";
+        try {
+            Query deleteTable = sessionFactory.getCurrentSession().createSQLQuery(sql).setParameter("batchId", batchId);
+            deleteTable.executeUpdate();
+            return 0;
+        } catch (Exception ex) {
+            System.err.println("clearTransactionOutRecordsByUploadBatchId " + ex.getCause().getMessage());
+            return 1;
+
+        }
+    }
+    
+    
+    @Override
+    @Transactional
+    public Integer clearTransactionTranslatedOutByUploadBatchId(Integer batchId) {
+        String sql = "delete from TransactionTranslatedOut where transactionTargetId in ("
+        		+ "select id from transactionTarget where batchUploadId = :batchId);";
+        try {
+            Query deleteTable = sessionFactory.getCurrentSession().createSQLQuery(sql).setParameter("batchId", batchId);
+            deleteTable.executeUpdate();
+            return 0;
+        } catch (Exception ex) {
+            System.err.println("clearTransactionTranslatedOutByUploadBatchId " + ex.getCause().getMessage());
+            return 1;
+
+        }
     }
     
 }

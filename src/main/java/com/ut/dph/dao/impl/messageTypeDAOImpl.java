@@ -223,7 +223,7 @@ public class messageTypeDAOImpl implements messageTypeDAO {
     @Override
     public Long findTotalMessageTypes() {
 
-        Query query = sessionFactory.getCurrentSession().createQuery("select count(*) as totalMessageTypes from messageType");
+        Query query = sessionFactory.getCurrentSession().createQuery("select count(id) as totalMessageTypes from messageType");
 
         Long totalMessageTypes = (Long) query.uniqueResult();
 
@@ -427,7 +427,7 @@ public class messageTypeDAOImpl implements messageTypeDAO {
      */
     public Long getTotalFields(int messageTypeId) {
 
-        Query query = sessionFactory.getCurrentSession().createQuery("select count(*) as totalFields from messageTypeFormFields where messageTypeId = :messageTypeId")
+        Query query = sessionFactory.getCurrentSession().createQuery("select count(id) as totalFields from messageTypeFormFields where messageTypeId = :messageTypeId")
                 .setParameter("messageTypeId", messageTypeId);
 
         Long totalFields = (Long) query.uniqueResult();

@@ -848,4 +848,10 @@ end proc_main$$
 DELIMITER ;
 
 
+/** grace 15:06 031314 **/
+ALTER TABLE `universalTranslator`.`transactionTarget` 
+ADD INDEX `IdAndBatchIndex` (`id` ASC, `batchDLId` ASC),
+ADD INDEX `UploadInfo` (`transactionInId` ASC, `batchUploadId` ASC),
+ADD INDEX `DLInfo` (`batchDLId` ASC, `id` ASC, `configId` ASC);
+
 

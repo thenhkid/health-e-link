@@ -39,7 +39,8 @@ public interface transactionOutDAO {
 
     void changeDeliveryStatus(int batchDLId, int batchUploadId, int transactionTargetId, int transactionInId);
     
-    List getInternalStatusCodes();
+    @SuppressWarnings("rawtypes")
+	List getInternalStatusCodes();
     
     void updateTransactionDetails(transactionTarget transactionDetails) throws Exception;
     

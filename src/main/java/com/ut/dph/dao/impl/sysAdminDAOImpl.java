@@ -114,7 +114,7 @@ public class sysAdminDAOImpl implements sysAdminDAO {
         Query query = sessionFactory
                 .getCurrentSession()
                 .createSQLQuery(
-                        "select count(*) as totalLookUpTables from lookUpTables").addScalar("totalLookUpTables", StandardBasicTypes.INTEGER);
+                        "select count(id) as totalLookUpTables from lookUpTables").addScalar("totalLookUpTables", StandardBasicTypes.INTEGER);
         Integer totalTables = (Integer) query.list().get(0);
 
         return totalTables;
@@ -170,7 +170,7 @@ public class sysAdminDAOImpl implements sysAdminDAO {
     @Override
     @Transactional
     public Integer findTotalDataRows(String utTableName) {
-        String sql = "select count(*) as rowCount from " + utTableName;
+        String sql = "select count(id) as rowCount from " + utTableName;
         Query query = sessionFactory
                 .getCurrentSession()
                 .createSQLQuery(sql).addScalar("rowCount", StandardBasicTypes.INTEGER);
@@ -382,7 +382,7 @@ public class sysAdminDAOImpl implements sysAdminDAO {
     @Override
     @Transactional
     public Long findTotalMacroRows() {
-        Query query = sessionFactory.getCurrentSession().createQuery("select count(*) as totalMacros from Macros");
+        Query query = sessionFactory.getCurrentSession().createQuery("select count(id) as totalMacros from Macros");
         Long totalMacros = (Long) query.uniqueResult();
         return totalMacros;
     }
