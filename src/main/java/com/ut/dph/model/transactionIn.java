@@ -87,9 +87,8 @@ public class transactionIn {
     public int gettransactionTargetId() {
         return transactionTargetId;
     }
-    
+
     public void settransactionTargetId(int transactionTargetId) {
         this.transactionTargetId = transactionTargetId;
     }
-  
 }
