@@ -187,7 +187,7 @@ public interface transactionInDAO {
     
     Integer loadTransactionTranslatedIn (Integer batchId);
     
-    Integer insertBatchUploadSummary (batchUploads batchUpload, configurationConnection batchTargets);
+    Integer insertBatchUploadSummaryAll (batchUploads batchUpload, configurationConnection batchTargets);
     
     Integer insertBatchTargets (Integer batchId, configurationConnection batchTargets);
     
@@ -218,5 +218,12 @@ public interface transactionInDAO {
     Integer clearTransactionTranslatedOutByUploadBatchId(Integer batchId);
     
     Integer clearTransactionOutRecordsByUploadBatchId(Integer batchId);
- 
+    
+    Integer rejectInvalidTargetOrg (Integer batchId, configurationConnection batchTargets);
+    
+    Integer insertBatchUploadSumByOrg (batchUploads batchUpload, configurationConnection confConn);
+    
+    Integer cleanUpInvalidTargets (batchUploads batchUpload);
+    
+    Integer setStatusForErrorCode(Integer batchId, Integer statusId, Integer errorId, boolean foroutboundProcessing);
 }

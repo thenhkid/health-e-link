@@ -2874,7 +2874,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 
     @Override
     @Transactional
-    public Integer insertBatchUploadSummary(batchUploads batch, configurationConnection batchTargets) {
+    public Integer insertBatchUploadSummaryAll(batchUploads batch, configurationConnection batchTargets) {
         try {
             String sql = ("insert into batchuploadsummary (batchId, transactionInId, sourceOrgId, targetOrgId, messageTypeId, sourceConfigId)"
                     + " select " + batch.getId() + ", transactionInId, " + batch.getOrgId() + ", "
@@ -2921,9 +2921,11 @@ public class transactionInDAOImpl implements transactionInDAO {
     @SuppressWarnings("unchecked")
     public List<configurationConnection> getBatchTargets(Integer batchId) {
         try {
-            String sql = ("select sourceConfigId, targetConfigId, id from configurationconnections "
-                    + " where sourceconfigId in (select configId from transactionIn where "
-                    + " batchId = :batchId);");
+            String sql = ("select sourceConfigId, targetConfigId, configurationconnections.id, "
+            		+ " targetOrgCol, orgId as targetOrgId, messageTypeId from configurations, configurationconnections , configurationMessageSpecs  "
+            		+ " where sourceconfigId in (select configId from transactionIn where  batchId = :batchId)"
+            		+ " and sourceConfigId = configurationMessageSpecs.configId"
+            		+ " and targetConfigId = configurations.id order by sourceConfigId;");
             Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
                     Transformers.aliasToBean(configurationConnection.class));
             query.setParameter("batchId", batchId);
@@ -3077,7 +3079,7 @@ public class transactionInDAOImpl implements transactionInDAO {
     public Integer updateConfigIdForCMS(Integer batchId, configurationMessageSpecs cms) {
         try {
             String sql = ("update transactionIn JOIN (SELECT transactionInId from transactionInRecords  "
-                    + " WHERE F" + cms.getmessageTypeCol() + " = :cmsVal and transactionInId in "
+                    + " WHERE replace(F" + cms.getmessageTypeCol() + ", '\r', '') = :cmsVal and transactionInId in "
                     + "	(select id from  transactionIn where batchId = :batchId and configId is null)) "
                     + " as ti ON ti.transactionInId = transactionIn.id SET configId = :configId");
             Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
@@ -3217,4 +3219,111 @@ public class transactionInDAOImpl implements transactionInDAO {
         }
     }
     
+    
+	@Override
+    @Transactional
+    public Integer rejectInvalidTargetOrg(Integer batchId, configurationConnection bt) {
+        try {
+        	//error Id 9 - invalid target org
+        	System.out.println("rejecting bt" + bt.getsourceConfigId());
+        	String sql = ("insert into transactionInErrors (batchUploadId, configId, transactionInId, errorId)"
+            		+ " select "+ batchId +", "+ bt.getsourceConfigId() + ", transactionInId, 9 "
+            		+ " from transactionTranslatedIn where configId = :sourceConfigId "
+            		+ " and transactionInId in (select id from transactionIn where batchId = :batchId)"
+            		+ " and f" + bt.getTargetOrgCol() + "  not in (select  orgId  from configurationConnections cc, "
+            		+ " configurations c WHERE cc.targetConfigId = c.id and sourceConfigId = :sourceConfigId)"
+            		+ " and f"+ bt.getTargetOrgCol() + " is not null and f"+ bt.getTargetOrgCol() + " != 0"
+            		+ " and transactionInId not in (Select transactionInId from transactionINerrors "
+            		+ " where batchUPloadid = :batchId and errorId = 9);");
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+            query.setParameter("batchId", batchId);
+            query.setParameter("sourceConfigId", bt.getsourceConfigId());
+
+            query.executeUpdate();
+            return 0;
+        } catch (Exception ex) {
+            System.err.println("rejectInvalidTargetOrg " + ex.getCause());
+            ex.printStackTrace();
+            return 1;
+        }
+    }
+	
+	@Override
+    @Transactional
+    public Integer insertBatchUploadSumByOrg(batchUploads batchUpload, configurationConnection bt) {
+        try {
+        	String sql = ("insert into batchuploadsummary (batchId, transactionInId, "
+        			+ " sourceOrgId, targetOrgId, messageTypeId, sourceConfigId) "
+        			+ "select "+ batchUpload.getId() +", transactionInId, "+ batchUpload.getOrgId()+",  "
+        			+bt.gettargetOrgId()+", "+bt.getMessageTypeId()+", "
+        			+ bt.getsourceConfigId() +" from transactionTranslatedIn "
+        			+ "where configId = " + bt.getsourceConfigId() + " and (f"+ bt.getTargetOrgCol()+" = :targetOrgId "
+       				+ " or f"+ bt.getTargetOrgCol() +" = 0 or f"+ bt.getTargetOrgCol() +" is null) "
+        			+ "and transactionInId in (select id from transactionIn where configId = :configId "
+        			+ "and batchId = :batchId);");
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+            query.setParameter("batchId", batchUpload);
+            query.setParameter("targetOrgId", bt.gettargetOrgId());
+            query.setParameter("configId", bt.getsourceConfigId());
+
+            query.executeUpdate();
+            return 0;
+        } catch (Exception ex) {
+            System.err.println("insertBatchUploadSumByOrg " + ex.getCause());
+            ex.printStackTrace();
+            return 1;
+        }
+    }
+
+	@Override
+	@Transactional
+	public Integer cleanUpInvalidTargets(batchUploads batchUpload) {
+		try {
+			String sql = ("delete from transactionTarget where transactionInId in (select id from transactionIn where statusId = 11 "
+					+ "and batchId = :batchId)");
+	        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+	        query.setParameter("batchId", batchUpload);
+	        query.executeUpdate();
+	        return 0;
+	    } catch (Exception ex) {
+	        System.err.println("cleanUpInvalidTargets " + ex.getCause());
+	        ex.printStackTrace();
+	        return 1;
+	    }
+	}
+
+	@Override
+	@Transactional
+	public Integer setStatusForErrorCode(Integer batchId, Integer statusId,
+			Integer errorId, boolean foroutboundProcessing) {
+        String sql;
+
+        if (foroutboundProcessing == false) {
+            sql = "update transactionIn set statusId = :statusId where"
+                    + " id in (select distinct transactionInId"
+                    + " from transactionInErrors where batchUploadId = :batchId"
+                    + " and errorId = :errorId); ";
+        } else {
+            sql = "update transactionTarget set statusId = :statusId where"
+                    + " id in (select distinct transactionTargetId"
+                    + " from transactionOutErrors where batchDownLoadId = :batchId"
+                    + " and errorId = :errorId); ";
+
+        }
+
+        Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                .setParameter("batchId", batchId)
+                .setParameter("statusId", statusId)
+                .setParameter("errorId", errorId);
+
+        try {
+            updateData.executeUpdate();
+            return 0;
+
+        } catch (Exception ex) {
+            System.err.println("setStatusForErrorCode " + ex.getCause());
+            return 1;
+        }
+	}
+
 }

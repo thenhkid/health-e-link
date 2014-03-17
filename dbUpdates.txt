@@ -876,3 +876,10 @@ VALUES
 (10,
 'Invalid Target Organization for Configuration',
 'Invalid Target Organization for Configuration');
+
+
+/** grace 03172014 2:03 AM **/
+UPDATE `universalTranslator`.`lu_ErrorCodes` SET `displayText`='Invalid Target Organization for Configuration', `description`='Invalid Target Organization for Configuration' WHERE `id`='9';
+DELETE FROM `universalTranslator`.`lu_ErrorCodes` WHERE `id`='10';
+
+
