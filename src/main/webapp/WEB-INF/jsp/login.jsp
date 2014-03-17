@@ -2,7 +2,7 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %> 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
-<div class="login-container">
+<div class="login-container" style="width:500px; margin-left: -250px;">
     <div class="login clearfix">
         <header class="login-header" role="banner">
             <div class="login-header-content">
@@ -17,6 +17,20 @@
                 - ${sessionScope["SPRING_SECURITY_LAST_EXCEPTION"].message} -
             </div>
         </c:if>
+        <c:if test="${not empty msg}">
+            <c:choose>
+                <c:when test="${msg == 'notfound'}">
+                    <div class="alert alert-danger center-text" role="alert">
+                        No user was found with that reset code.
+                    </div>
+                </c:when>
+                <c:otherwise>
+                    <div class="alert alert-success center-text" role="alert">
+                        Your password has been updated.
+                    </div>
+                </c:otherwise>
+            </c:choose>
+        </c:if>            
         <form role="form" id="form-admin-login" name='f' action="<c:url value='j_spring_security_check' />" method='POST'>
             <fieldset name="login-fields" form="form-admin-login" class="basic-clearfix">
                 <div class="form-group ${not empty error ? 'has-error' : '' }">

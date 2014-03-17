@@ -875,6 +875,9 @@ INSERT INTO `universaltranslator`.`lu_errorcodes`
 VALUES
 (10,
 'Invalid Target Organization for Configuration',
+<<<<<<< HEAD
+'Invalid Target Organization for Configuration');
+=======
 'Invalid Target Organization for Configuration');
 
 
@@ -883,6 +886,4 @@ UPDATE `universalTranslator`.`lu_ErrorCodes` SET `displayText`='Invalid Target O
 DELETE FROM `universalTranslator`.`lu_ErrorCodes` WHERE `id`='10';
 
 
-/** Chad 3-17-2014 @ 1:36 PM  **/
-ALTER TABLE `universalTranslator`.`users` 
-ADD COLUMN `resetCode` VARCHAR(8) NULL DEFAULT NULL AFTER `cancelAuthority`;
+>>>>>>> 767218a7d53048164e5b3eb6292a711fb53fd6e5

@@ -88,8 +88,13 @@ public class userManagerImpl implements userManager {
     
     @Override
     @Transactional
-    public User getUserByIdentifier(String identifier) {
+    public Integer getUserByIdentifier(String identifier) {
         return userDAO.getUserByIdentifier(identifier);
     }
 
+    @Override
+    @Transactional
+    public User getUserByResetCode(String resetCode) {
+        return userDAO.getUserByResetCode(resetCode);
+    }
 }

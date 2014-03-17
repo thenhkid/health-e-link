@@ -11,7 +11,6 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.constraints.Size;
-import org.hibernate.annotations.Formula;
 
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -87,9 +86,9 @@ public class User {
     @Column(name = "CANCELAUTHORITY", nullable = false)
     private boolean cancelAuthority = false;
     
-    @Formula(value="firstName || ' ' || lastName")
-    protected String fullName;
-
+    @Column(name = "RESETCODE", nullable = true)
+    private String resetCode = null;
+    
     public int getId() {
         return id;
     }
@@ -242,11 +241,12 @@ public class User {
         this.dateOrgWasCreated = dateOrgWasCreated;
     }
     
-    public String getfullname() {
-        return fullName;
+    public String getresetCode() {
+        return resetCode;
     }
     
-    public void setfullname(String fullName) {
-        this.fullName = fullName;
+    public void setresetCode(String resetCode) {
+        this.resetCode = resetCode;
     }
+   
 }

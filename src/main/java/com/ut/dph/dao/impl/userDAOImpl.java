@@ -14,6 +14,9 @@ import com.ut.dph.dao.userDAO;
 import com.ut.dph.model.User;
 import com.ut.dph.model.siteSections;
 import com.ut.dph.model.userAccess;
+import org.hibernate.Hibernate;
+import org.hibernate.annotations.Formula;
+import org.hibernate.criterion.Property;
 
 /**
  * The userDAOImpl class will implement the DAO access layer to handle updates for organization system users
@@ -250,16 +253,12 @@ public class userDAOImpl implements userDAO {
      * @return The function will return a user object
      */
     @Override
-    public User getUserByIdentifier(String identifier) {
+    public Integer getUserByIdentifier(String identifier) {
         
-        Criteria findUser = sessionFactory.getCurrentSession().createCriteria(User.class);
-        findUser.add(Restrictions.or(
-               Restrictions.eq("email", identifier),
-               Restrictions.eq("username", identifier),
-               Restrictions.like("fullName", identifier)
-        ));
+        String sql = ("select id from users where lower(email) = '" + identifier + "' or lower(username) = '" + identifier + "' or lower(concat(concat(firstName,' '),lastName)) = '" + identifier + "'");
         
-           
+        Query findUser = sessionFactory.getCurrentSession().createSQLQuery(sql);
+         
         if(findUser.list().size() > 1) {
             return null;
         }
@@ -268,9 +267,36 @@ public class userDAOImpl implements userDAO {
                 return null;
             }
             else {
-                return (User) findUser.uniqueResult();
+                return (Integer) findUser.uniqueResult();
             }
         }
     }
+    
+    /**
+     * The 'getUserByResetCode' function will try to location a user based on the a reset code
+     * 
+     * @param resetCode The value that will be used to find a user.
+     * 
+     * @return The function will return a user object
+     */
+    @Override
+    public User getUserByResetCode(String resetCode) {
+        
+        Query query = sessionFactory.getCurrentSession().createQuery("from User where resetCode = :resetCode");
+        query.setParameter("resetCode", resetCode);
+        
+        if(query.list().size() > 1) {
+            return null;
+        }
+        else {
+            if(query.uniqueResult() == null) {
+                return null;
+            }
+            else {
+                return (User) query.uniqueResult();
+            }
+        }
+    }
+   
 
 }

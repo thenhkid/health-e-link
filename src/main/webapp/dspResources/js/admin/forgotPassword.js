@@ -10,5 +10,34 @@ require(['./main'], function () {
         
         $("input:text,form").attr("autocomplete", "off");
         
+        
+        $('#submitButton').click(function() {
+              $.ajax({
+                url: '/forgotPassword.do',
+                type: "Post",
+                data: {'identifier': $('#identifier').val()},
+                success: function(data) {
+                    if(data > 0) {
+                        sendEmail(data);
+                    }
+                    else {
+                        $('#noResults').show();
+                        $('.alert').delay(2000).fadeOut(1000);
+                    }
+                }
+            });
+        });
+        
     }); 
 });
+
+function sendEmail(userId) {
+    $('#noResults').hide();
+    $('#emailSent').show();
+     $('.alert').delay(2000).fadeOut(1000);
+    $.ajax({
+        url: '/sendPassword.do',
+        type: "Post",
+        data: {'userId': userId}
+    });
+}

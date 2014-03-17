@@ -30,7 +30,9 @@ public interface userManager {
   
   List<User> getOrganizationContact(int orgId, int mainContact);
   
-  User getUserByIdentifier(String identifier);
+  Integer getUserByIdentifier(String identifier);
+  
+  User getUserByResetCode(String resetCode);
   
 
 }

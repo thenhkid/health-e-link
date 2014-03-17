@@ -37,6 +37,14 @@
         <put-attribute name="body" value="/WEB-INF/jsp/forgotPassword.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/admin/forgotPassword.js" />
     </definition>
+    
+    <definition name="/resetPassword" extends="base.definition.admin">
+        <put-attribute name="page-id" value="login" />
+        <put-attribute name="page-section" value="section-login" />
+        <put-attribute name="title" value="Universal Translator Reset Password" />
+        <put-attribute name="body" value="/WEB-INF/jsp/resetPassword.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/admin/resetPassword.js" />
+    </definition>
 
    <!-- Admin Dashboard -->
     <definition name="/administrator/dashboard" extends="base.definition.admin">

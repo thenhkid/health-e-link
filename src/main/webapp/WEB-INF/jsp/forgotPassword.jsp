@@ -16,22 +16,14 @@
                 </a>
             </div>
         </header>
-        <c:if test="${not empty param['msg']}">
-            <c:choose>
-                <c:when test="${param['msg'] == 'notfound'}">
-                    <div class="alert alert-danger center-text" role="alert">
-                        <strong>No Search Results</strong><br />
-                        Your search did not return any results. Please try again with other information.
-                    </div>
-                </c:when>
-                <c:when test="${param['msg'] == 'sent'}">
-                    <div class="alert alert-success center-text" role="alert">
-                        <strong>Email Sent</strong><br />
-                        An email has been sent that will contain a link to reset your password.
-                    </div>
-                </c:when> 
-            </c:choose>
-        </c:if>
+        <div id="noResults" class="alert alert-danger center-text" role="alert" style="display:none">
+            <strong>No Search Results</strong><br />
+            Your search did not return any results. Please try again with other information.
+        </div>            
+        <div id="emailSent" class="alert alert-success center-text" role="alert" style="display:none">
+            <strong>Email Sent</strong><br />
+            An email has been sent that will contain a link to reset your password.
+        </div>
         <form:form id="passwordForm" method="post" role="form">
             <div class="form-container">
                 <div id="brochureTitleDiv" class="form-group ${status.error ? 'has-error' : '' }">
@@ -39,7 +31,7 @@
                     <input id="identifier" name="identifier" class="form-control" type="text" maxLength="255" />
                 </div>
                 <div class="form-group">
-                    <input type="submit" id="submitButton" class="btn btn-primary" value="Search"/>
+                    <input type="button" id="submitButton" class="btn btn-primary" value="Search"/>
                 </div>
             </div>
         </form:form>
