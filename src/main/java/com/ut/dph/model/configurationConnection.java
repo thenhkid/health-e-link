@@ -38,10 +38,16 @@ public class configurationConnection {
     private int targetOrgId = 0;
     
     @Transient
+    private int messageTypeId = 0;
+     
+	@Transient
     private List<User> connectionSenders = null;
     
     @Transient
     private List<User> connectionReceivers = null;
+    
+    @Transient
+    private Integer targetOrgCol = 0;
     
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -149,5 +155,22 @@ public class configurationConnection {
     public void setconnectionReceivers(List<User> receivers) {
         this.connectionReceivers = receivers;
     }
+    
+    public Integer getTargetOrgCol() {
+		return targetOrgCol;
+	}
+
+	public void setTargetOrgCol(Integer targetOrgCol) {
+		this.targetOrgCol = targetOrgCol;
+	}
+    
+	public int getMessageTypeId() {
+		return messageTypeId;
+	}
+
+	public void setMessageTypeId(int messageTypeId) {
+		this.messageTypeId = messageTypeId;
+	}
+
     
 }

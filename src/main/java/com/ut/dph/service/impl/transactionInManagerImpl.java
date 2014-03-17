@@ -849,8 +849,7 @@ public class transactionInManagerImpl implements transactionInManager {
                 // we update entire transactionIN with configId
                 sysError = sysError + updateConfigIdForBatch(batchUpload.getId(), batchUpload.getConfigId());
             } else {
-            	// we parse every record to populate configId, first we read record, then we test it with every config, update and break if match
-                //1. we get all configs for org
+            	//1. we get all configs for org
                 List<configurationMessageSpecs> configurationMessageSpecs = configurationtransportmanager.getConfigurationMessageSpecsForOrgTransport(batchUpload.getOrgId(), batchUpload.gettransportMethodId(), false);
                 //2. we get all rows for batch
                 List<transactionInRecords> tInRecords = getTransactionInRecordsForBatch(batchUpload.getId());
@@ -1451,7 +1450,14 @@ public class transactionInManagerImpl implements transactionInManager {
 
     @Override
     public Integer insertBatchUploadSummary(batchUploads batchUpload, configurationConnection batchTargets) {
-        return transactionInDAO.insertBatchUploadSummary(batchUpload, batchTargets);
+    	int sysErrors = 0;
+        //1. if no targetCol is given, we mass insert
+    	if (batchTargets.getTargetOrgCol() == 0) {
+    		sysErrors = sysErrors + transactionInDAO.insertBatchUploadSummaryAll(batchUpload, batchTargets);
+    	} else {
+    		sysErrors = sysErrors + insertBatchUploadSumByOrg (batchUpload, batchTargets);
+    	}
+    	return sysErrors;
     }
 
     @Override
@@ -1505,22 +1511,39 @@ public class transactionInManagerImpl implements transactionInManager {
             	updateBatchStatus(batchId, 29, "endDateTime");
             	return false;
             }
+            //all upload file should be the same, goes into transactionIn, transactionInReocords
+            
             //get delimiter, get fileWithPath etc
             if (batch.getoriginalFileName().endsWith(".txt")) {
                 sysErrors = sysErrors + loadTextBatch(batch);
             }
 
-            nullForCWCol(0, batch.getId(), false);
-            //loop through configs for target, check to see if config has a col **/
-            
             //load targets - we need to loadTarget only if field for target is blank, otherwise we load what user sent
             List<configurationConnection> batchTargetList = getBatchTargets(batchId);
+            int sourceConfigId = 0;
             for (configurationConnection bt : batchTargetList) {
+            	
                 sysErrors = sysErrors + insertBatchTargets(batchId, bt);
-                //populate batchUploadSummary need batchId, transactionInId,  configId, sourceOrgId, messageTypeId - in configurations - missing targetOrgId, 
+                
+                /* populate batchUploadSummary need batchId, transactionInId,  configId, 
+                 * sourceOrgId, messageTypeId - in configurations - missing targetOrgId, 
+                 * if targetOrgCol has value, we populate - cms's target col could be 0, if spec has no target column,
+                 * we insert all connections
+                 * if targetOrgCol has value, we make sure value is value
+                */
                 sysErrors = sysErrors + insertBatchUploadSummary(batch, bt);
-            }
-
+                System.out.println(sourceConfigId);
+                if (sourceConfigId != bt.getsourceConfigId()){
+                	sysErrors = sysErrors + rejectInvalidTargetOrg (batch.getId(), bt);
+                	sourceConfigId = bt.getsourceConfigId();
+                }
+             }
+            
+            sysErrors = sysErrors +  setStatusForErrorCode(batch.getId(), 11, 9, false);
+            //clean up the transactionTargets that are invalid
+             sysErrors = sysErrors + cleanUpInvalidTargets (batch);
+           
+            
             if (sysErrors > 0) {
                 insertProcessingError(processingSysErrorId, null, batchId, null, null, null, null, false, false, errorMessage);
                 updateBatchStatus(batchId, 29, "endDateTime");
@@ -1668,6 +1691,27 @@ public class transactionInManagerImpl implements transactionInManager {
 	@Override
 	public Integer clearTransactionTranslatedOutByUploadBatchId(Integer batchId) {
 		 return transactionInDAO.clearTransactionTranslatedOutByUploadBatchId(batchId);
+	}
+	
+	@Override
+	public Integer rejectInvalidTargetOrg (Integer batchId, configurationConnection batchTargets) {
+		 return transactionInDAO.rejectInvalidTargetOrg(batchId, batchTargets);
+	}
+	
+	@Override
+	public Integer insertBatchUploadSumByOrg (batchUploads batchUpload, configurationConnection batchTargets) {
+		 return transactionInDAO.insertBatchUploadSumByOrg(batchUpload, batchTargets);
+	}
+	
+	@Override
+	public Integer cleanUpInvalidTargets (batchUploads batchUpload) {
+		 return transactionInDAO.cleanUpInvalidTargets(batchUpload);
+	}
+
+	@Override
+	public Integer setStatusForErrorCode(Integer batchId, Integer statusId,
+			Integer errorId, boolean foroutboundProcessing) {
+		 return transactionInDAO.setStatusForErrorCode(batchId, statusId, errorId, foroutboundProcessing);
 	}
 
 }

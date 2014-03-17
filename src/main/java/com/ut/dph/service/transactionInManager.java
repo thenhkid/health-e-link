@@ -267,5 +267,13 @@ public interface transactionInManager {
     
     Integer clearTransactionOutRecordsByUploadBatchId(Integer batchId);
     
+    Integer rejectInvalidTargetOrg (Integer batchId, configurationConnection confConn);
+    
+    Integer insertBatchUploadSumByOrg (batchUploads batchUpload, configurationConnection confConn);
+    
+    Integer cleanUpInvalidTargets (batchUploads batchUpload);
+    
+    Integer setStatusForErrorCode(Integer batchId, Integer statusId, Integer errorId, boolean foroutboundProcessing);
+    
     
 }
