@@ -65,6 +65,7 @@
                         <form:form id="formFields" modelAttribute="transportDetails" method="post" role="form">
                             <input type="hidden" id="action" name="action" value="save" />
                             <input type="hidden" name="transportMethod" value="2" />
+                            <input type="hidden" name="errorHandling" value="1" />
                             <c:forEach var="i" begin="1" end="6">	
                                 <section class="panel panel-default">
                                     <div class="panel-heading">

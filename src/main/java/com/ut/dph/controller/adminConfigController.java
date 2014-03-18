@@ -931,7 +931,7 @@ public class adminConfigController {
      * @return	This method will either redirect back to the Choose Fields page or redirect to the next step data translations page.
      */
     @RequestMapping(value = "/saveFields", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody Integer saveFormFields(@Valid @ModelAttribute(value = "transportDetails") configurationTransport transportDetails, RedirectAttributes redirectAttr, @RequestParam String action, @RequestParam int transportMethod, @RequestParam int errorHandling) throws Exception {
+    public @ResponseBody Integer saveFormFields(@ModelAttribute(value = "transportDetails") configurationTransport transportDetails, RedirectAttributes redirectAttr, @RequestParam String action, @RequestParam int transportMethod, @RequestParam int errorHandling) throws Exception {
 
         /**
          * Need to update the configuration completed step
@@ -953,6 +953,7 @@ public class adminConfigController {
                 } else {
                     formfield.setUseField(true);
                 }
+                
                 //Update each field
                 configurationTransportManager.updateConfigurationFormFields(formfield);
             }
