@@ -1527,6 +1527,9 @@ public class transactionInManagerImpl implements transactionInManager {
             //handle duplicates, need to insert again and let it be its own row
             sysErrors = sysErrors + newEntryForMultiTargets(batchId);
             
+            //update transactionTarget in transactionInTable
+            sysErrors = sysErrors + updateTTIdInTransactionIn(batchId);
+            
             //we reset transactionTranslatedIn
             resetTransactionTranslatedIn(batchId, true);
             
@@ -1778,6 +1781,11 @@ public class transactionInManagerImpl implements transactionInManager {
 	public Integer insertTransactionTranslated(Integer newTInId,
 			batchUploadSummary bus) {
 		return transactionInDAO.insertTransactionTranslated(newTInId, bus);
+	}
+
+	@Override
+	public Integer updateTTIdInTransactionIn(Integer batchId) {
+		return transactionInDAO.updateTTIdInTransactionIn(batchId);
 	}
    
 }
