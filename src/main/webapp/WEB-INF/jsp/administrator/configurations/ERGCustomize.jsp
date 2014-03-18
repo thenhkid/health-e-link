@@ -42,7 +42,7 @@
                 <div class="panel-body">
                     <dt>
                         <dt>Configuration Summary:</dt>
-                        <dd><strong>Organization:</strong> ${configurationDetails.orgName}</dd>
+                        <dd><strong>Organization:</strong> ${configurationDetails.orgName}&nbsp;<span id="configtype" rel="${configurationDetails.type}"><c:choose><c:when test="${configurationDetails.type == 1}">(Source)</c:when><c:otherwise>(Target)</c:otherwise></c:choose></span></dd>
                         <dd><strong>Configuration Name:</strong> ${configurationDetails.configName}</dd>
                         <dd><strong>Message Type:</strong> ${configurationDetails.messageTypeName}</dd>
                         <dd><strong>Transport Method:</strong> ${configurationDetails.transportMethod}</dd>
