@@ -1510,7 +1510,9 @@ public class transactionInManagerImpl implements transactionInManager {
                  */
                 sysErrors = sysErrors + insertBatchUploadSummary(batch, bt);
                 if (sourceConfigId != bt.getsourceConfigId()) {
-                    sysErrors = sysErrors + rejectInvalidTargetOrg(batchId, bt);
+                	if (bt.getTargetOrgCol() != 0) {
+                		sysErrors = sysErrors + rejectInvalidTargetOrg(batchId, bt);
+                	}
                     sourceConfigId = bt.getsourceConfigId();
                 }
             }            

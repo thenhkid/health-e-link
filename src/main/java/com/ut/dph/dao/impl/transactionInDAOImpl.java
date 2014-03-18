@@ -2874,25 +2874,23 @@ public class transactionInDAOImpl implements transactionInDAO {
 
     @Override
     @Transactional
-    public Integer insertBatchUploadSummaryAll(batchUploads batch, configurationConnection batchTargets) {
+    public Integer insertBatchUploadSummaryAll(batchUploads batch, configurationConnection bt) {
         try {
-            String sql = ("insert into batchuploadsummary "
-            		+ "(batchId, transactionInId, sourceOrgId, targetOrgId, messageTypeId, sourceConfigId, targetConfigId)"
-                    + " select " + batch.getId() + ", transactionInId, " + batch.getOrgId() + ", "
-                    + " configurations.orgId, messageTypeId, " + batchTargets.getsourceConfigId() + ","
-                    + batchTargets.gettargetConfigId()
-                    + " from transactionTarget, configurations where configurations.id = :targetConfigId "
-                    + "and transactionInId in (select id from transactionIn where configId = :sourceConfigId and batchId = :batchId) "
-                    + "and transactionTarget.batchUploadId = :batchId and transactionTarget.configId = :targetConfigId");
+            String sql = ("insert into batchuploadsummary (batchId, transactionInId, sourceOrgId, targetOrgId, messageTypeId, sourceConfigId, targetConfigId) "
+            		+ " select "+ batch.getId()+", transactionInId, " + batch.getOrgId()+",  "
+            		+ "configurations.orgId, messageTypeId, " + bt.getsourceConfigId() +"," +bt.gettargetConfigId() 
+            		+ " from transactionTranslatedIn, configurations where configurations.id = :targetConfigId" 
+            		+ " and configId = :sourceConfigId and transactionInId in "
+            		+ "(select id from transactionIn where configId = :sourceConfigId and batchId = :batchId);");
             Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
             query.setParameter("batchId", batch.getId());
-            query.setParameter("targetConfigId", batchTargets.gettargetConfigId());
-            query.setParameter("sourceConfigId", batchTargets.getsourceConfigId());
+            query.setParameter("targetConfigId", bt.gettargetConfigId());
+            query.setParameter("sourceConfigId", bt.getsourceConfigId());
 
             query.executeUpdate();
             return 0;
         } catch (Exception ex) {
-            System.err.println("insertBatchUploadSummary " + ex.getCause());
+            System.err.println("insertBatchUploadSummaryAll " + ex.getCause());
             ex.printStackTrace();
             return 1;
         }
