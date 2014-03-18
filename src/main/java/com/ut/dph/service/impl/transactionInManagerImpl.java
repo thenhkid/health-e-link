@@ -800,101 +800,6 @@ public class transactionInManagerImpl implements transactionInManager {
         return processTransactions;
     }
 
-    /**
-     * this process will load an upload file with status of SSA and take it all the way to SSL
-     *
-     * 1. read file 2. parse row by row and a. figure out config b. insert into transactionIn c. insert into transacitonTarget d. flag transactions as Loaded or Invalid *
-     */
-    @Override
-    public Integer loadTextBatch(batchUploads batchUpload) {
-        try {
-            /**
-             * SP can't call load Files with prepared statement, we have to load file to real table with dynamic statement created in java 1. we create batchLoadTable
-             *
-             */
-            String loadTableName = "uploadTable_" + batchUpload.getId();
-            //make sure old table is dropped if exists
-            Integer sysError = dropLoadTable(loadTableName);
-            sysError = sysError + createLoadTable(loadTableName);
-
-            //we need to index loadTable
-            sysError = sysError + indexLoadTable(loadTableName);
-
-            fileSystem dir = new fileSystem();
-            dir.setDirByName("/");
-            String fileWithPath = dir.getDir() + batchUpload.getFileLocation() + batchUpload.getoriginalFileName();
-            fileWithPath = fileWithPath.replace("bowlink///", "");
-
-            //2. we load data with my sql
-            sysError = sysError + insertLoadData(batchUpload.getId(), batchUpload.getDelimChar(), fileWithPath, loadTableName, batchUpload.isContainsHeaderRow());
-
-            //3. we update batchId, loadRecordId
-            sysError = sysError + updateLoadTable(loadTableName, batchUpload.getId());
-
-            // 4. we insert into transactionIn - status of invalid (11), batchId, loadRecordId
-            sysError = sysError + loadTransactionIn(loadTableName, batchUpload.getId());
-
-            //5. we insert into transactionInRecords - we select transactionIn batchId, transactionInId
-            sysError = sysError + loadTransactionInRecords(batchUpload.getId());
-
-            //6. we match loadRecordId and update transactionInRecords's F1-F255 data
-            sysError = sysError + loadTransactionInRecordsData(loadTableName);
-
-            //7. we delete loadTable
-            sysError = sysError + dropLoadTable(loadTableName);
-
-            //8. we see how if the file only has one upload type so we don't need to parse every line
-            // if we only have one, we update the entire table 
-            if (batchUpload.getConfigId() != null && batchUpload.getConfigId() != 0) {
-                // we update entire transactionIN with configId
-                sysError = sysError + updateConfigIdForBatch(batchUpload.getId(), batchUpload.getConfigId());
-            } else {
-                //1. we get all configs for org
-                List<configurationMessageSpecs> configurationMessageSpecs = configurationtransportmanager.getConfigurationMessageSpecsForOrgTransport(batchUpload.getOrgId(), batchUpload.gettransportMethodId(), false);
-                //2. we get all rows for batch
-                List<transactionInRecords> tInRecords = getTransactionInRecordsForBatch(batchUpload.getId());
-                if (tInRecords == null || tInRecords.size() == 0) {
-                    insertProcessingError(7, null, batchUpload.getId(), null, null, null, null,
-                            false, false, "No transactions were found for batch.");
-                    return sysError;
-                }
-                if (configurationMessageSpecs == null || configurationMessageSpecs.size() == 0) {
-                    insertProcessingError(6, null, batchUpload.getId(), null, null, null, null,
-                            false, false, "No valid configurations were found for loading batch.");
-                    // update all transactions to invalid
-                    updateTransactionStatus(batchUpload.getId(), 0, 0, 11);
-                    return sysError;
-                }
-
-                //3 loop through each config and mass update by config
-                for (configurationMessageSpecs cms : configurationMessageSpecs) {
-                    //we update by config
-                    if (updateConfigIdForCMS(batchUpload.getId(), cms) != 0) {
-                        sysError++;
-                        insertProcessingError(processingSysErrorId, null, batchUpload.getId(), null, null, null, null,
-                                false, false, "System error while checking configuration");
-                        //system error - break
-                        break;
-                    }
-                }
-
-                // now we looped through config, we flag the invalid records.
-                sysError = flagInvalidConfig(batchUpload.getId());
-            }
-
-            //we populate transactionTranslatedIn
-            sysError = sysError + loadTransactionTranslatedIn(batchUpload.getId());
-
-            //update data in transactionTranslatedIn
-            resetTransactionTranslatedIn(batchUpload.getId(), true);
-
-            return sysError;
-        } catch (Exception ex) {
-            System.out.println(ex.getClass() + " " + ex.getCause());
-            return 1;
-        }
-
-    }
 
     @Override
     public Integer clearTransactionTranslatedIn(Integer batchUploadId) {
@@ -1461,8 +1366,8 @@ public class transactionInManagerImpl implements transactionInManager {
     }
 
     @Override
-    public Integer insertBatchTargets(Integer batchId, configurationConnection batchTargets) {
-        return transactionInDAO.insertBatchTargets(batchId, batchTargets);
+    public Integer insertBatchTargets(Integer batchId) {
+        return transactionInDAO.insertBatchTargets(batchId);
     }
 
     @Override
@@ -1511,22 +1416,91 @@ public class transactionInManagerImpl implements transactionInManager {
                 updateBatchStatus(batchId, 29, "endDateTime");
                 return false;
             }
-            //all upload file should be the same, goes into transactionIn, transactionInReocords
 
+            String loadTableName = "uploadTable_" + batch.getId();
+            //make sure old table is dropped if exists
+            Integer sysError = dropLoadTable(loadTableName);
+            sysError = sysError + createLoadTable(loadTableName);
+
+            //we need to index loadTable
+            sysError = sysError + indexLoadTable(loadTableName);
+
+            fileSystem dir = new fileSystem();
+            dir.setDirByName("/");
+            String fileWithPath = dir.getDir() + batch.getFileLocation() + batch.getoriginalFileName();
+            fileWithPath = fileWithPath.replace("bowlink///", "");
+
+            //2. we load data with my sql
             //get delimiter, get fileWithPath etc
             if (batch.getoriginalFileName().endsWith(".txt")) {
-                sysErrors = sysErrors + loadTextBatch(batch);
+            	sysError = sysError + insertLoadData(batch.getId(), batch.getDelimChar(), fileWithPath, loadTableName, batch.isContainsHeaderRow());
+
+            }
+            
+            //3. we update batchId, loadRecordId
+            sysError = sysError + updateLoadTable(loadTableName, batch.getId());
+
+            // 4. we insert into transactionIn - status of invalid (11), batchId, loadRecordId
+            sysError = sysError + loadTransactionIn(loadTableName, batch.getId());
+
+            //5. we insert into transactionInRecords - we select transactionIn batchId, transactionInId
+            sysError = sysError + loadTransactionInRecords(batch.getId());
+
+            //6. we match loadRecordId and update transactionInRecords's F1-F255 data
+            sysError = sysError + loadTransactionInRecordsData(loadTableName);
+
+            //7. we delete loadTable
+            sysError = sysError + dropLoadTable(loadTableName);
+
+            //8. we see how if the file only has one upload type so we don't need to parse every line
+            // if we only have one, we update the entire table 
+            if (batch.getConfigId() != null && batch.getConfigId() != 0) {
+                // we update entire transactionIN with configId
+                sysError = sysError + updateConfigIdForBatch(batch.getId(), batch.getConfigId());
+            } else {
+                //1. we get all configs for org
+                List<configurationMessageSpecs> configurationMessageSpecs = configurationtransportmanager.getConfigurationMessageSpecsForOrgTransport(batch.getOrgId(), batch.gettransportMethodId(), false);
+                //2. we get all rows for batch
+                List<transactionInRecords> tInRecords = getTransactionInRecordsForBatch(batch.getId());
+                if (tInRecords == null || tInRecords.size() == 0) {
+                    insertProcessingError(7, null, batchId, null, null, null, null,
+                            false, false, "No transactions were found for batch.");
+                    return false;
+                }
+                if (configurationMessageSpecs == null || configurationMessageSpecs.size() == 0) {
+                    insertProcessingError(6, null, batchId, null, null, null, null,
+                            false, false, "No valid configurations were found for loading batch.");
+                    // update all transactions to invalid
+                    updateTransactionStatus(batchId, 0, 0, 11);
+                    return false;
+                }
+
+                //3 loop through each config and mass update by config
+                for (configurationMessageSpecs cms : configurationMessageSpecs) {
+                    //we update by config
+                    if (updateConfigIdForCMS(batchId, cms) != 0) {
+                        sysError++;
+                        insertProcessingError(processingSysErrorId, null, batch.getId(), null, null, null, null,
+                                false, false, "System error while checking configuration");
+                        //system error - break
+                        break;
+                    }
+                }
+
+                // now we looped through config, we flag the invalid records.
+                sysError = flagInvalidConfig(batchId);
             }
 
-            nullForCWCol(0, batch.getId(), false);
-            //loop through configs for target, check to see if config has a col **/
+            //we populate transactionTranslatedIn
+            sysError = sysError + loadTransactionTranslatedIn(batchId);
+
+            //update data in transactionTranslatedIn
+            resetTransactionTranslatedIn(batchId, true);
 
             //load targets - we need to loadTarget only if field for target is blank, otherwise we load what user sent
             List<configurationConnection> batchTargetList = getBatchTargets(batchId);
             int sourceConfigId = 0;
             for (configurationConnection bt : batchTargetList) {
-
-                sysErrors = sysErrors + insertBatchTargets(batchId, bt);
 
                 /* populate batchUploadSummary need batchId, transactionInId,  configId, 
                  * sourceOrgId, messageTypeId - in configurations - missing targetOrgId, 
@@ -1535,17 +1509,27 @@ public class transactionInManagerImpl implements transactionInManager {
                  * if targetOrgCol has value, we make sure value is value
                  */
                 sysErrors = sysErrors + insertBatchUploadSummary(batch, bt);
-                System.out.println(sourceConfigId);
                 if (sourceConfigId != bt.getsourceConfigId()) {
-                    sysErrors = sysErrors + rejectInvalidTargetOrg(batch.getId(), bt);
+                	if (bt.getTargetOrgCol() != 0) {
+                		sysErrors = sysErrors + rejectInvalidTargetOrg(batchId, bt);
+                	}
                     sourceConfigId = bt.getsourceConfigId();
                 }
-            }
-
-            sysErrors = sysErrors + setStatusForErrorCode(batch.getId(), 11, 9, false);
-            //clean up the transactionTargets that are invalid
-            sysErrors = sysErrors + cleanUpInvalidTargets(batch);
-
+            }            
+            sysErrors = sysErrors + setStatusForErrorCode(batchId, 11, 9, false);
+            
+            //reject transactions with config that do not connections
+            sysErrors = sysErrors + rejectNoConnections(batch);
+            sysErrors = sysErrors + setStatusForErrorCode(batchId, 11, 10, false);
+            
+            sysErrors = sysErrors + insertBatchTargets(batchId);
+            
+            //handle duplicates, need to insert again and let it be its own row
+            sysErrors = sysErrors + newEntryForMultiTargets(batchId);
+            
+            //we reset transactionTranslatedIn
+            resetTransactionTranslatedIn(batchId, true);
+            
             if (sysErrors > 0) {
                 insertProcessingError(processingSysErrorId, null, batchId, null, null, null, null, false, false, errorMessage);
                 updateBatchStatus(batchId, 29, "endDateTime");
@@ -1706,14 +1690,94 @@ public class transactionInManagerImpl implements transactionInManager {
     }
 
     @Override
-    public Integer cleanUpInvalidTargets(batchUploads batchUpload) {
-        return transactionInDAO.cleanUpInvalidTargets(batchUpload);
-    }
-
-    @Override
     public Integer setStatusForErrorCode(Integer batchId, Integer statusId,
             Integer errorId, boolean foroutboundProcessing) {
         return transactionInDAO.setStatusForErrorCode(batchId, statusId, errorId, foroutboundProcessing);
     }
+    
+    @Override
+    public Integer rejectNoConnections(batchUploads batch) {
+        return transactionInDAO.rejectNoConnections(batch);
+    }
 
+    
+    /** 
+     * we need to have one transactionIn entry for each transaction/target pair - 
+     * there is no easy way to do it except to insert each duplicate one by one
+     */
+    
+	@Override
+	public Integer newEntryForMultiTargets(Integer batchId) {
+		Integer sysError = 0;
+		try {
+			//1. we get duplicated transactionInIds
+			List <Integer> transactionInIds = getDuplicatedIds (batchId);
+			for (Integer transactionInId : transactionInIds) {
+                //2. we get BATCHUPLOADSUMMARY
+				List <batchUploadSummary> buses = getBatchUploadSummary(transactionInId);
+				for (batchUploadSummary bus : buses) {
+					//we take each target and insert a new transaction into the transactionIn table
+					sysError = sysError + insertTransactionInByTargetId(bus);
+					//we get new tInId
+					Integer newTInId = getTransactionInIdByTargetId (bus);
+					//with new id, we update transactiontarget, batchUploadSummary
+					sysError = sysError + updateTInIdForTransactiontarget(bus, newTInId);
+					sysError = sysError + updateTINIDForBatchUploadSummary(bus, newTInId);
+					//we insert new entry into transactionInRecords and transactionTranslated In
+					sysError = sysError + copyTransactionInRecord(newTInId, bus.gettransactionInId());
+				    sysError = sysError + insertTransactionTranslated(newTInId, bus);
+					
+				}
+				
+            }
+			
+			return sysError;
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			System.err.println("newEntryForMultiTargets " + ex.getCause());
+            return 1;
+		}
+	}
+
+	@Override
+    public List <Integer> getDuplicatedIds(Integer batchId) {
+        return transactionInDAO.getDuplicatedIds(batchId);
+    }
+
+	@Override
+    public List <batchUploadSummary> getBatchUploadSummary(Integer transactionInId) {
+        return transactionInDAO.getBatchUploadSummary(transactionInId);
+    }
+    
+    @Override
+    public Integer insertTransactionInByTargetId(batchUploadSummary batchUploadSummary) {
+        return transactionInDAO.insertTransactionInByTargetId(batchUploadSummary);
+    }
+
+	@Override
+	public Integer getTransactionInIdByTargetId(batchUploadSummary bus) {
+		 return transactionInDAO.getTransactionInIdByTargetId(bus);
+	}
+
+	@Override
+	public Integer updateTInIdForTransactiontarget(batchUploadSummary bus, Integer newTInId) {
+		return transactionInDAO.updateTInIdForTransactiontarget(bus, newTInId);
+	}
+
+	@Override
+	public Integer updateTINIDForBatchUploadSummary(batchUploadSummary bus, Integer newTInId) {
+		return transactionInDAO.updateTINIDForBatchUploadSummary(bus, newTInId);
+	}
+
+	@Override
+	public Integer copyTransactionInRecord(Integer newTInId, Integer oldTInId) {
+		return transactionInDAO.copyTransactionInRecord(newTInId, oldTInId);
+	}
+
+	@Override
+	public Integer insertTransactionTranslated(Integer newTInId,
+			batchUploadSummary bus) {
+		return transactionInDAO.insertTransactionTranslated(newTInId, bus);
+	}
+   
 }

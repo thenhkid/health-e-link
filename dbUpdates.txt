@@ -887,5 +887,20 @@ DELETE FROM `universalTranslator`.`lu_ErrorCodes` WHERE `id`='10';
 ALTER TABLE `universalTranslator`.`users` 
 ADD COLUMN `resetCode` VARCHAR(8) NULL DEFAULT NULL AFTER `cancelAuthority`;
 
+/** Grace 03172014 4:39PM **/
+UPDATE `universalTranslator`.`lu_ErrorCodes` SET `displayText`='No Valid Transactions Found for Batch', `description`='No Valid Transactions Found for Batch' WHERE `id`='7';
+
+INSERT INTO `universaltranslator`.`lu_errorcodes`
+(`id`,
+`displayText`,
+`description`)
+VALUES
+(10,
+'No Connections',
+'Source Configuration does not have target configurations set up');
+
+ALTER TABLE `universaltranslator`.`batchuploadsummary` 
+ADD COLUMN `targetConfigId` INT NULL DEFAULT 0 AFTER `sourceConfigId`;
+
 /** Chad 3-18-2014 @ 11:50 AM **/
 UPDATE `universaltranslator`.`lu_processstatus` SET `displayCode`='SS' WHERE `id`='8';

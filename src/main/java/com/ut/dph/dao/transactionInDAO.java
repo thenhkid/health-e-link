@@ -25,6 +25,7 @@ import com.ut.dph.model.custom.ConfigForInsert;
 
 import java.util.Date;
 import java.util.List;
+
 import org.springframework.stereotype.Repository;
 
 /**
@@ -189,7 +190,7 @@ public interface transactionInDAO {
     
     Integer insertBatchUploadSummaryAll (batchUploads batchUpload, configurationConnection batchTargets);
     
-    Integer insertBatchTargets (Integer batchId, configurationConnection batchTargets);
+    Integer insertBatchTargets (Integer batchId);
     
     List <configurationConnection> getBatchTargets (Integer batchId);
     
@@ -223,7 +224,24 @@ public interface transactionInDAO {
     
     Integer insertBatchUploadSumByOrg (batchUploads batchUpload, configurationConnection confConn);
     
-    Integer cleanUpInvalidTargets (batchUploads batchUpload);
-    
     Integer setStatusForErrorCode(Integer batchId, Integer statusId, Integer errorId, boolean foroutboundProcessing);
+    
+    Integer rejectNoConnections (batchUploads batch);
+    
+    List <Integer> getDuplicatedIds (Integer batchId);
+    
+    List <batchUploadSummary> getBatchUploadSummary (Integer transactionInId);
+    
+    Integer insertTransactionInByTargetId(batchUploadSummary bus);
+    
+    Integer getTransactionInIdByTargetId(batchUploadSummary bus);
+    
+    Integer updateTInIdForTransactiontarget(batchUploadSummary bus, Integer newTInId);
+    
+    Integer updateTINIDForBatchUploadSummary(batchUploadSummary bus, Integer newTInId);
+    
+    Integer copyTransactionInRecord(Integer newTInId, Integer oldTInId);
+    
+    Integer insertTransactionTranslated(Integer newTInId, batchUploadSummary bus);
+    
 }
