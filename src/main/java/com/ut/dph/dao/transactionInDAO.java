@@ -244,4 +244,6 @@ public interface transactionInDAO {
     
     Integer insertTransactionTranslated(Integer newTInId, batchUploadSummary bus);
     
+    Integer updateTTIdInTransactionIn(Integer batchId);
+    
 }

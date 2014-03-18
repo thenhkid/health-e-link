@@ -1073,6 +1073,8 @@ public class transactionInDAOImpl implements transactionInDAO {
             insertData.executeUpdate();
             insertSuccess = true;
         } catch (Exception ex) {
+        	//insert error into error log
+        	
             System.err.println("insertSingleToMessageTables." + ex);
 
         }
@@ -3498,6 +3500,28 @@ public class transactionInDAOImpl implements transactionInDAO {
             
         } catch (Exception ex) {
             System.err.println("insertTransactionTranslated " + ex.getCause());
+            ex.printStackTrace();
+            return 1;
+        }
+	}
+
+	@Override
+	@Transactional
+	public Integer updateTTIdInTransactionIn(Integer batchId) {
+		
+		try {
+        	String sql = ("UPDATE transactionIn INNER JOIN transactionTarget "
+        			+ "ON (transactionIn.id = transactionTarget.transactionInId) "
+        			+ "SET transactionIn.transactionTargetId = transactionTarget.id "
+        			+ "where batchId = :batchId");
+        	Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+            query.setParameter("batchId", batchId);
+            query.executeUpdate();
+            
+            return 0;
+            
+        } catch (Exception ex) {
+            System.err.println("updateTTIdInTransactionIn " + ex.getCause());
             ex.printStackTrace();
             return 1;
         }

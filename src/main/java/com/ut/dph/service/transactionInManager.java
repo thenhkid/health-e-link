@@ -291,4 +291,6 @@ public interface transactionInManager {
     
     Integer insertTransactionTranslated(Integer newTInId, batchUploadSummary bus);
     
+    Integer updateTTIdInTransactionIn(Integer batchId);
+    
 }
