@@ -1223,7 +1223,8 @@ public class transactionInDAOImpl implements transactionInDAO {
                 }
             }
         }
-
+        // multiconfig is 0 so we need to add
+        configIdList.add(0);
         Criteria findBatches = sessionFactory.getCurrentSession().createCriteria(batchUploads.class);
         findBatches.add(Restrictions.eq("orgId", orgId));
         findBatches.add(Restrictions.ne("statusId", 1));
