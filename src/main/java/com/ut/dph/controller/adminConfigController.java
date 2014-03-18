@@ -608,7 +608,10 @@ public class adminConfigController {
          * to fix errors via ERG set up the online form
          */
         configuration configurationDetails = configurationmanager.getConfigurationById(configId);
-        configurationTransportManager.setupOnlineForm(transportId, configId, configurationDetails.getMessageTypeId());
+        
+        if(currTransportId == 0) {
+            configurationTransportManager.setupOnlineForm(transportId, configId, configurationDetails.getMessageTypeId());
+        }
        
         /* Need to set the mappings static variable */
         if(transportDetails.gettransportMethodId() == 2) {
