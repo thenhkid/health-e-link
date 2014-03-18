@@ -614,7 +614,7 @@ public class transactionInManagerImpl implements transactionInManager {
                         updateRecordCounts(batchUploadId, new ArrayList<Integer>(), false, "totalRecordCount");
                         // do we count pass records as errors?
                         updateRecordCounts(batchUploadId, errorStatusIds, false, "errorRecordCount");
-                        setBatchToError(batchUploadId, "An error occurred while inserting into message tables.");
+                        updateBatchStatus(batchUploadId, 29, "endDateTime");
                         return false;
                     }
                     // all went well
@@ -781,7 +781,7 @@ public class transactionInManagerImpl implements transactionInManager {
 
                 //we insert single values
                 if (!insertSingleToMessageTables(config)) {
-                    return false;
+                	return false;
                 }
 
                 //we loop through transactions with multiple values and use SP to loop values with delimiters
@@ -790,7 +790,7 @@ public class transactionInManagerImpl implements transactionInManager {
                     Integer subStringTotal = countSubString(config, transId);
                     for (int i = 0; i <= subStringTotal; i++) {
                         if (!insertMultiValToMessageTables(config, i + 1, transId)) {
-                            return false;
+                        	return false;
                         }
                     }
                 }

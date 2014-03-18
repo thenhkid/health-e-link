@@ -1073,10 +1073,10 @@ public class transactionInDAOImpl implements transactionInDAO {
             insertData.executeUpdate();
             insertSuccess = true;
         } catch (Exception ex) {
-        	//insert error into error log
-        	
+        	//log first
+        	insertProcessingError(5, config.getConfigId(), config.getBatchUploadId(), null, null, null, null, false, false, ("insertSingleToMessageTables - Error inserting into message tables " + ex.getCause()));
             System.err.println("insertSingleToMessageTables." + ex);
-
+            return false;
         }
         return insertSuccess;
     }
@@ -1163,6 +1163,7 @@ public class transactionInDAOImpl implements transactionInDAO {
             insertData.executeUpdate();
             return true;
         } catch (Exception ex) {
+        	insertProcessingError(5, config.getConfigId(), config.getBatchUploadId(), null, null, null, null, false, false, ("Error inserting into message tables " + ex.getCause()));
             System.err.println("insertMultiValToMessageTables." + ex);
             return false;
         }
