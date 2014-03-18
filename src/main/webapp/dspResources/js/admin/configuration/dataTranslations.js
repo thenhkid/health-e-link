@@ -85,11 +85,19 @@ require(['./main'], function () {
         //The function that will be called when the "Save" button
         //is clicked
         $('#next').click(function() {
+             
+             var configType = $('#configtype').attr('rel');
+            
              $.ajax({
                 url: 'translations',
                 type: "POST",
                 success: function(data) {
-                    window.location.href = "translations?msg=updated";
+                    if(configType == 1) {
+                        window.location.href = "translations?msg=updated";
+                    }
+                    else {
+                       window.location.href = "scheduling?msg=updated"; 
+                    }
                 }
             });
         });

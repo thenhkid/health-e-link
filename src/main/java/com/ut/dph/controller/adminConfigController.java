@@ -718,10 +718,10 @@ public class adminConfigController {
                      *
                     */
                     if (stepsCompleted < 2) {
-                       configurationmanager.updateCompletedSteps(configId, 3);
-                       stepsCompleted = 3;
+                       configurationmanager.updateCompletedSteps(configId, 2);
+                       stepsCompleted = 2;
                     }
-                    ModelAndView mav = new ModelAndView(new RedirectView("mappings"));
+                    ModelAndView mav = new ModelAndView(new RedirectView("messagespecs"));
                     return mav;
                 } 
             }
