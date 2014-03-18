@@ -129,8 +129,6 @@ public interface transactionInManager {
     
     boolean insertTransactions (Integer batchUploadId);
     
-    Integer loadTextBatch (batchUploads batchUpload);
-    
     Integer clearTransactionIn(Integer batchUploadId);
     
     Integer clearTransactionTranslatedIn(Integer batchUploadId);
@@ -229,7 +227,7 @@ public interface transactionInManager {
     
     Integer insertBatchUploadSummary (batchUploads batchUpload, configurationConnection batchTargets);
     
-    Integer insertBatchTargets (Integer batchId, configurationConnection batchTargets);
+    Integer insertBatchTargets (Integer batchId);
     
     List <configurationConnection> getBatchTargets (Integer batchId);
     
@@ -271,9 +269,26 @@ public interface transactionInManager {
     
     Integer insertBatchUploadSumByOrg (batchUploads batchUpload, configurationConnection confConn);
     
-    Integer cleanUpInvalidTargets (batchUploads batchUpload);
-    
     Integer setStatusForErrorCode(Integer batchId, Integer statusId, Integer errorId, boolean foroutboundProcessing);
     
+    Integer rejectNoConnections (batchUploads batch);
+    
+    Integer newEntryForMultiTargets(Integer batchId);
+    
+    List <Integer> getDuplicatedIds (Integer batchId);
+    
+    List <batchUploadSummary> getBatchUploadSummary (Integer transactionInId);
+    
+    Integer insertTransactionInByTargetId(batchUploadSummary bus);
+    
+    Integer getTransactionInIdByTargetId(batchUploadSummary bus);
+    
+    Integer updateTInIdForTransactiontarget(batchUploadSummary bus, Integer newTInId);
+    
+    Integer updateTINIDForBatchUploadSummary(batchUploadSummary bus, Integer newTInId);
+    
+    Integer copyTransactionInRecord(Integer newTInId, Integer oldTInId);
+    
+    Integer insertTransactionTranslated(Integer newTInId, batchUploadSummary bus);
     
 }

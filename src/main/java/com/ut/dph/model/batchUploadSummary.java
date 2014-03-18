@@ -12,6 +12,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 /**
  *
@@ -21,7 +22,10 @@ import javax.persistence.Table;
 @Table(name = "BATCHUPLOADSUMMARY")
 public class batchUploadSummary {
     
-    @Id
+	@Transient
+    private Integer transactionTargetId = 0;
+	
+	@Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID", nullable = false)
     private int id;
@@ -43,6 +47,9 @@ public class batchUploadSummary {
     
     @Column(name = "SOURCECONFIGID", nullable = false)
     private int sourceConfigId;
+    
+    @Column(name = "TARGETCONFIGID", nullable = true)
+    private int targetConfigId = 0;
     
     public int getId() {
         return id;
@@ -99,5 +106,21 @@ public class batchUploadSummary {
     public void setsourceConfigId(int sourceConfigId) {
         this.sourceConfigId = sourceConfigId;
     }
+    
+    public int getTargetConfigId() {
+		return targetConfigId;
+	}
+
+	public void setTargetConfigId(int targetConfigId) {
+		this.targetConfigId = targetConfigId;
+	}
+	
+    public Integer getTransactionTargetId() {
+		return transactionTargetId;
+	}
+
+	public void setTransactionTargetId(Integer transactionTargetId) {
+		this.transactionTargetId = transactionTargetId;
+	}
     
 }
