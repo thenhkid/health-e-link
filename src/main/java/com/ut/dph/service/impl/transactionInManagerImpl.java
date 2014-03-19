@@ -1465,14 +1465,16 @@ public class transactionInManagerImpl implements transactionInManager {
                 //2. we get all rows for batch
                 List<transactionInRecords> tInRecords = getTransactionInRecordsForBatch(batch.getId());
                 if (tInRecords == null || tInRecords.size() == 0) {
+                	updateBatchStatus(batchId, 7, "endDateTime");
                     insertProcessingError(7, null, batchId, null, null, null, null,
-                            false, false, "No transactions were found for batch.");
+                            false, false, "No valid transactions were found for batch.");
                     return false;
                 }
                 if (configurationMessageSpecs == null || configurationMessageSpecs.size() == 0) {
                     insertProcessingError(6, null, batchId, null, null, null, null,
                             false, false, "No valid configurations were found for loading batch.");
                     // update all transactions to invalid
+                    updateBatchStatus(batchId, 7, "endDateTime");
                     updateTransactionStatus(batchId, 0, 0, 11);
                     return false;
                 }
