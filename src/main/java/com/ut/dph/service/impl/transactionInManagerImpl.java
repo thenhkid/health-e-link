@@ -609,15 +609,19 @@ public class transactionInManagerImpl implements transactionInManager {
                         //target should still be pending output
                         updateTransactionTargetStatus(batchUploadId, 0, 14, 19);
                     }
-                    //we insert here
-                    if (!insertTransactions(batchUploadId)) {
-                        //something went wrong, we removed all inserted entries
-                        clearMessageTables(batchUploadId);
-                        updateRecordCounts(batchUploadId, new ArrayList<Integer>(), false, "totalRecordCount");
-                        // do we count pass records as errors?
-                        updateRecordCounts(batchUploadId, errorStatusIds, false, "errorRecordCount");
-                        updateBatchStatus(batchUploadId, 29, "endDateTime");
-                        return false;
+                    
+                    //run check to make sure we have records 
+                    if (getRecordCounts(batchUploadId, Arrays.asList(12), false, false) > 0) {
+                    	//we insert here
+	                    if (!insertTransactions(batchUploadId)) {
+	                        //something went wrong, we removed all inserted entries
+	                        clearMessageTables(batchUploadId);
+	                        updateRecordCounts(batchUploadId, new ArrayList<Integer>(), false, "totalRecordCount");
+	                        // do we count pass records as errors?
+	                        updateRecordCounts(batchUploadId, errorStatusIds, false, "errorRecordCount");
+	                        updateBatchStatus(batchUploadId, 29, "endDateTime");
+	                        return false;
+	                    }
                     }
                     // all went well
                     updateTransactionStatus(batchUploadId, 0, 12, 19);
