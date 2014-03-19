@@ -384,8 +384,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
 
                                     if (batchId > 0) {
                                         /* Send the email to primary contact */
-
-                                        try {
+                                    	try {
                                             /* Get the batch Details */
                                             batchDownloads batchDLInfo = transactionOutDAO.getBatchDetails(batchId);
 
@@ -453,8 +452,11 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                                 msg.setmessageBody(sb.toString());
 
                                                 /* Send the email */
-                                                emailMessageManager.sendEmail(msg);
-
+                                                try {
+                                                	emailMessageManager.sendEmail(msg);
+                                                } catch(Exception ex) {
+                                                	ex.printStackTrace();
+                                                }
                                             }
                                         } catch (Exception e) {
                                             throw new Exception("Error occurred trying to send the alert email for batchId: " + batchId, e);
