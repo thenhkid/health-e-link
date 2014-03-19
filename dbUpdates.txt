@@ -1,0 +1,92 @@
+/** Grace 03192014 01:24PM **/
+ALTER TABLE `universaltranslator`.`transactioninerrors` 
+DROP FOREIGN KEY `configFFFKId`;
+ALTER TABLE `universaltranslator`.`transactioninerrors` 
+CHANGE COLUMN `configurationFormFieldsId` `fieldNo` INT(11) NULL DEFAULT NULL ;
+
+
+ALTER TABLE `universaltranslator`.`transactionouterrors` 
+DROP FOREIGN KEY `configFFIdFK`;
+ALTER TABLE `universaltranslator`.`transactionouterrors` 
+CHANGE COLUMN `configurationFormFieldsId` `fieldNo` INT(11) NULL DEFAULT NULL ;
+
+
+drop procedure insertValidationErrors;
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `insertValidationErrors`(in vtType int, in fieldNo int,
+in batchUploadId int, in configId int)
+BEGIN
+
+DECLARE regEx varchar(100) DEFAULT '';
+
+CASE vtType
+	WHEN 2 THEN set regEx = '^[A-Z0-9._%-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$';
+    WHEN 3 THEN 
+		BEGIN 
+			CALL `universalTranslator`.`stripPhoneChars`(vtType, fieldNo, batchUploadId, configId);
+			set regEx ='^[0-9]{7,11}$';
+		END;
+	WHEN 5 THEN set regEx = '^-?[0-9]+[.]?[0-9]*$|^-?[.][0-9]+$';
+    ELSE
+        BEGIN
+        END;
+	END 
+	CASE;
+ 
+set @stmt = concat(
+'insert into transactionInerrors (batchUploadId, transactionInId, fieldNo, errorid, 
+validationTypeId) SELECT ', batchUploadId, ', transactionInId, ',fieldNo,',2, ', vtType,'  
+ FROM transactionTranslatedIn WHERE F' ,fieldNo, ' not REGEXP  "', regEx, '" and F',fieldNo, ' is not null 
+and length(F', fieldNO, ') != 0
+and configId = ', configId, ' and transactionInId 
+in (select id from transactionIn where batchId = ', batchUploadId,' and configId = ', configId,' and statusId != 12);');
+
+PREPARE stmt from @stmt;
+EXECUTE stmt;
+
+ END$$
+DELIMITER ;
+
+
+drop procedure stripPhoneChars;
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `stripPhoneChars`(in vtType int, in fieldNo int,
+in batchUploadId int, in configId int)
+BEGIN
+	DECLARE varToReplace varchar(100) DEFAULT '.';
+	DECLARE part1 varchar(255) DEFAULT '.';
+	DECLARE part2 varchar(25) DEFAULT '.';
+
+	set part1 = concat("update transactiontranslatedIn JOIN (SELECT id from transactionIn WHERE configId = ",
+	  configId,"  and batchId = ", batchUploadId, ") as ti ON transactiontranslatedIn.transactionInId = ti.id SET transactiontranslatedIn.F"
+	  , fieldNo, " = replace(F", fieldNo, ", '");
+	set part2 = "', '');";
+	set @stmt = concat(part1, varToReplace, part2);
+  	PREPARE stmt from @stmt;
+	EXECUTE stmt;
+
+	set varToReplace = '-';
+	set @stmt = concat(part1, varToReplace, part2);
+	PREPARE stmt from @stmt;
+	EXECUTE stmt;
+
+	set varToReplace = ')';
+	set @stmt = concat(part1, varToReplace, part2);
+	PREPARE stmt from @stmt;
+	EXECUTE stmt;
+
+	set varToReplace = '(';
+	set @stmt = concat(part1, varToReplace, part2);
+	PREPARE stmt from @stmt;
+	EXECUTE stmt;
+
+	set varToReplace = ' ';
+	set @stmt = concat(part1, varToReplace, part2);
+	PREPARE stmt from @stmt;
+	EXECUTE stmt;
+
+ END$$
+DELIMITER ;
+

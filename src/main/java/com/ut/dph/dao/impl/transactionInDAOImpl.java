@@ -1580,8 +1580,8 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Override
     @Transactional
     public Integer insertFailedRequiredFields(configurationFormFields cff, Integer batchUploadId) {
-        String sql = "insert into transactionInerrors (batchUploadId, configId, transactionInId, configurationFormFieldsId, errorid)"
-                + "(select " + batchUploadId + ", " + cff.getconfigId() + ", transactionInId, " + cff.getId()
+        String sql = "insert into transactionInerrors (batchUploadId, configId, transactionInId, fieldNo, errorid)"
+                + "(select " + batchUploadId + ", " + cff.getconfigId() + ", transactionInId, " + cff.getFieldNo()
                 + ", 1 from transactionTranslatedIn where configId = :configId "
                 + " and (F" + cff.getFieldNo()
                 + " is  null  or length(trim(F" + cff.getFieldNo() + ")) = 0)"
@@ -1664,14 +1664,14 @@ public class transactionInDAOImpl implements transactionInDAO {
     public Integer genericValidation(configurationFormFields cff,
             Integer validationTypeId, Integer batchUploadId, String regEx) {
 
-        String sql = "call insertValidationErrors(:vtType, :fieldNo, :batchUploadId, :configId, :cffId)";
+        String sql = "call insertValidationErrors(:vtType, :fieldNo, :batchUploadId, :configId)";
 
         Query insertError = sessionFactory.getCurrentSession().createSQLQuery(sql);
         insertError.setParameter("vtType", cff.getValidationType());
         insertError.setParameter("fieldNo", cff.getFieldNo());
         insertError.setParameter("batchUploadId", batchUploadId);
         insertError.setParameter("configId", cff.getconfigId());
-        insertError.setParameter("cffId", cff.getId());
+        
         try {
             insertError.executeUpdate();
             return 0;
@@ -1752,11 +1752,11 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Transactional
     public void insertValidationError(transactionRecords tr, configurationFormFields cff, Integer batchUploadId) {
         String sql = "insert into transactionInerrors "
-                + "(batchUploadId, configId, transactionInId, configurationFormFieldsId, errorid, validationTypeId)"
-                + " values (:batchUploadId, :configId, :ttiId, :cffId, 2, :validationId);";
+                + "(batchUploadId, configId, transactionInId, fieldNo, errorid, validationTypeId)"
+                + " values (:batchUploadId, :configId, :ttiId, :fieldNo, 2, :validationId);";
         Query insertData = sessionFactory.getCurrentSession().createSQLQuery(sql)
                 .setParameter("batchUploadId", batchUploadId)
-                .setParameter("cffId", cff.getId())
+                .setParameter("fieldNo", cff.getFieldNo())
                 .setParameter("configId", cff.getconfigId())
                 .setParameter("ttiId", tr.getTransactionId())
                 .setParameter("validationId", cff.getValidationType());
@@ -1919,8 +1919,8 @@ public class transactionInDAOImpl implements transactionInDAO {
 
         if (foroutboundProcessing == false) {
             sql = "insert into transactionInerrors (batchUploadId, configId, "
-                    + "transactionInId, configurationFormFieldsId, errorid, cwId)"
-                    + " select " + batchId + ", " + configId + ",transactionInId, " + cdt.getFieldId()
+                    + "transactionInId, fieldNo, errorid, cwId)"
+                    + " select " + batchId + ", " + configId + ",transactionInId, " + cdt.getFieldNo()
                     + ", 3,  " + cdt.getCrosswalkId() + " from transactionTranslatedIn where "
                     + "configId = :configId "
                     + " and (F" + cdt.getFieldNo()
@@ -1931,8 +1931,8 @@ public class transactionInDAOImpl implements transactionInDAO {
 
         } else {
             sql = "insert into transactionOutErrors (batchDownloadId, configId, "
-                    + "transactionTargetId, configurationFormFieldsId, errorid, cwId)"
-                    + " select " + batchId + ", " + configId + ",  transactionTargetId, " + cdt.getFieldId()
+                    + "transactionTargetId, fieldNo, errorid, cwId)"
+                    + " select " + batchId + ", " + configId + ",  transactionTargetId, " + cdt.getFieldNo()
                     + ", 3,  " + cdt.getCrosswalkId() + " from transactionTranslatedOut where "
                     + " configId = :configId "
                     + " and (F" + cdt.getFieldNo()
@@ -1961,8 +1961,8 @@ public class transactionInDAOImpl implements transactionInDAO {
 
         if (foroutboundProcessing == false) {
             sql = "insert into transactionInerrors (batchUploadId, configId, "
-                    + "transactionInId, configurationFormFieldsId, errorid, macroId)"
-                    + " select " + batchId + ", " + configId + ", transactionInId, " + cdt.getFieldId()
+                    + "transactionInId, fieldNo, errorid, macroId)"
+                    + " select " + batchId + ", " + configId + ", transactionInId, " + cdt.getFieldNo()
                     + ", 4,  " + cdt.getMacroId() + " from transactionTranslatedIn where "
                     + "configId = :configId "
                     + " and forcw = 'MACRO_ERROR'"
@@ -1972,8 +1972,8 @@ public class transactionInDAOImpl implements transactionInDAO {
 
         } else {
             sql = "insert into transactionOutErrors (batchDownloadId, configId, "
-                    + "transactionTargetId, configurationFormFieldsId, errorid, macroId)"
-                    + " select " + batchId + ", " + configId + ",transactionTargetId, " + cdt.getFieldId()
+                    + "transactionTargetId, fieldNo, errorid, macroId)"
+                    + " select " + batchId + ", " + configId + ",transactionTargetId, " + cdt.getFieldNo()
                     + ", 4,  " + cdt.getMacroId() + " from transactionTranslatedOut where "
                     + "configId = :configId "
                     + " and forcw = 'MACRO_ERROR'"
@@ -2319,10 +2319,10 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Override
     @Transactional
     public void insertProcessingError(Integer errorId, Integer configId, Integer batchId,
-            Integer fieldId, Integer macroId, Integer cwId, Integer validationTypeId,
+            Integer fieldNo, Integer macroId, Integer cwId, Integer validationTypeId,
             boolean required, boolean foroutboundProcessing, String stackTrace) {
         insertProcessingError(errorId, configId, batchId,
-                fieldId, macroId, cwId, validationTypeId,
+                fieldNo, macroId, cwId, validationTypeId,
                 required, foroutboundProcessing, stackTrace, null);
 
     }
@@ -2330,7 +2330,7 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Override
     @Transactional
     public void insertProcessingError(Integer errorId, Integer configId, Integer batchId,
-            Integer fieldId, Integer macroId, Integer cwId, Integer validationTypeId,
+            Integer fieldNo, Integer macroId, Integer cwId, Integer validationTypeId,
             boolean required, boolean foroutboundProcessing, String stackTrace, Integer transactionId) {
 
         String tableName = "transactionInErrors";
@@ -2342,17 +2342,17 @@ public class transactionInDAOImpl implements transactionInDAO {
             transactionColName = "transactionTargetId";
         }
         String sql = " INSERT INTO " + tableName + " (errorId, " + batchType + ", configId, "
-                + "configurationFormFieldsId, required,  "
+                + "fieldNo, required,  "
                 + "cwId, macroId, validationTypeId, stackTrace, " + transactionColName + ") "
                 + "VALUES (:errorId, :batchId, :configId, "
-                + " :configurationFormFieldsId, :required, "
+                + " :fieldNo, :required, "
                 + ":cwId,:macroId,:validationTypeId,:stackTrace, :transactionId);";
 
         Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
                 .setParameter("errorId", errorId)
                 .setParameter("batchId", batchId)
                 .setParameter("configId", configId)
-                .setParameter("configurationFormFieldsId", fieldId)
+                .setParameter("fieldNo", fieldNo)
                 .setParameter("required", required)
                 .setParameter("validationTypeId", validationTypeId)
                 .setParameter("cwId", cwId)

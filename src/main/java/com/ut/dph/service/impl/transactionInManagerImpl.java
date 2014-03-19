@@ -595,7 +595,9 @@ public class transactionInManagerImpl implements transactionInManager {
                     batch.setstatusId(5);
                     batchStausId = 5;
                 } else if (batch.getstatusId() == 6 || (handlingDetails.get(0).getautoRelease()
-                        && (handlingDetails.get(0).geterrorHandling() == 2 || handlingDetails.get(0).geterrorHandling() == 4))) {
+                        && (handlingDetails.get(0).geterrorHandling() == 2 
+                        || handlingDetails.get(0).geterrorHandling() == 4 
+                        || handlingDetails.get(0).geterrorHandling() == 1))) {
 
                     if (handlingDetails.get(0).geterrorHandling() == 2) {
                         //reject errors
