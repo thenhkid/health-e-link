@@ -611,7 +611,7 @@ public class transactionInManagerImpl implements transactionInManager {
                     }
                     
                     //run check to make sure we have records 
-                    if (getRecordCounts(batchUploadId, Arrays.asList(12), false, false) > 0) {
+                    if (getRecordCounts(batchUploadId, Arrays.asList(12), false, true) > 0) {
                     	//we insert here
 	                    if (!insertTransactions(batchUploadId)) {
 	                        //something went wrong, we removed all inserted entries
