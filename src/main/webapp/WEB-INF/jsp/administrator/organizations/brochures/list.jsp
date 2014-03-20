@@ -16,8 +16,21 @@
                 </c:choose>
             </div>
         </c:if>
+        
+        <section class="panel panel-default">
+            <div class="panel-body">
+                <dt>
+                    <dt>Organization Summary:</dt>
+                    <dd><strong>Organization:</strong> ${orgName}</dd>
+                </dt>
+            </div>
+        </section>
+        
         <section class="panel panel-default">
             <div class="panel-heading">
+                <div class="pull-right">
+                    <a href="#systemBrochureModal" data-toggle="modal" class="btn btn-primary btn-xs btn-action" id="createNewBrochure" title="Add New Brochure">Add New Brochure</a>
+                </div>
                 <h3 class="panel-title">Brochures</h3>
             </div>
             <div class="panel-body">
@@ -33,9 +46,6 @@
                             </button>
                         </form:form>
                     </div>
-                    <a href="#systemBrochureModal" id="createNewBrochure" data-toggle="modal" class="btn btn-primary btn-sm pull-right" title="Create a new brochure">
-                        <span class="glyphicon glyphicon-plus"></span>
-                    </a>
                 </div>
 
                 <div class="form-container scrollable">

@@ -152,7 +152,7 @@
             <section class="panel panel-default">
                 <div class="panel-heading">
                     <div class="pull-right">
-                        <a href="#crosswalkModal" data-toggle="modal" class="btn btn-primary btn-xs btn-action" id="createNewCrosswalk"  title="Create a new Crosswalk"><span class="glyphicon glyphicon-plus"></span></a>
+                        <a href="#crosswalkModal" data-toggle="modal" class="btn btn-primary btn-xs btn-action" id="createNewCrosswalk" title="Add New Crosswalk">Add New Crosswalk</a>
                     </div>
                     <h3 class="panel-title">Available Crosswalks</h3>
                 </div>

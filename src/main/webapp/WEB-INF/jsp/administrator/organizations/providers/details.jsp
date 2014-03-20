@@ -30,7 +30,18 @@
                 </div>
             </c:when>
         </c:choose>
+        
+        <section class="panel panel-default">
+            <div class="panel-body">
+                <dt>
+                    <dt>Organization Summary:</dt>
+                    <dd><strong>Organization:</strong> ${orgName}</dd>
+                </dt>
+            </div>
+        </section>
+        
     </div>
+    
 
     <div class="col-md-6">
 

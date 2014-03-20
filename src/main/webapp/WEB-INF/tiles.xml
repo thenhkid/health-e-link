@@ -51,7 +51,7 @@
         <put-attribute name="page-id" value="dashboard-details" />
         <put-attribute name="page-section" value="section-dashboard" />
         <put-attribute name="title" value="Administrator" />
-        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=dash" />
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/index.jsp" />
     </definition>
 

@@ -372,6 +372,9 @@ public class adminOrgContoller {
 
         List<configuration> configurations = configurationmanager.getConfigurationsByOrgId(orgId,"");
         
+        String orgName = organizationManager.getOrganizationById(orgId).getOrgName();
+        mav.addObject("orgName", orgName);
+        
         mav.addObject("id", orgId);
         mav.addObject("configs", configurations);
         
@@ -411,6 +414,9 @@ public class adminOrgContoller {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/organizations/configurations");
         mav.addObject("searchTerm", searchTerm);
+        
+        String orgName = organizationManager.getOrganizationById(orgId).getOrgName();
+        mav.addObject("orgName", orgName);
 
         List<configuration> configurations = configurationmanager.getConfigurationsByOrgId(orgId,searchTerm);
         mav.addObject("id", orgId);
@@ -459,6 +465,9 @@ public class adminOrgContoller {
 
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/organizations/users");
+        
+        String orgName = organizationManager.getOrganizationById(orgId).getOrgName();
+        mav.addObject("orgName", orgName);
 
         List<User> users = organizationManager.getOrganizationUsers(orgId, page, maxResults);
         mav.addObject("id", orgId);
@@ -490,6 +499,9 @@ public class adminOrgContoller {
 
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/organizations/users");
+        
+        String orgName = organizationManager.getOrganizationById(orgId).getOrgName();
+        mav.addObject("orgName", orgName);
 
         List<User> users = userManager.findUsers(orgId, searchTerm);
         mav.addObject("id", orgId);
@@ -688,6 +700,9 @@ public class adminOrgContoller {
 
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/organizations/providers/list");
+        
+        String orgName = organizationManager.getOrganizationById(orgId).getOrgName();
+        mav.addObject("orgName", orgName);
 
         List<Provider> providers = organizationManager.getOrganizationProviders(orgId, page, maxResults);
         mav.addObject("id", orgId);
@@ -718,6 +733,9 @@ public class adminOrgContoller {
 
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/organizations/providers/list");
+        
+        String orgName = organizationManager.getOrganizationById(orgId).getOrgName();
+        mav.addObject("orgName", orgName);
 
         List<Provider> providers = providerManager.findProviders(orgId, searchTerm);
         mav.addObject("id", orgId);
@@ -804,6 +822,9 @@ public class adminOrgContoller {
 
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/organizations/providers/details");
+        
+        String orgName = organizationManager.getOrganizationById(orgId).getOrgName();
+        mav.addObject("orgName", orgName);
 
         //Get all the details for the clicked provider
         Provider providerDetails = providerManager.getProviderById(providerId);
@@ -842,6 +863,9 @@ public class adminOrgContoller {
         if (result.hasErrors()) {
             ModelAndView mav = new ModelAndView();
             mav.setViewName("/administrator/organizations/providers/details");
+            
+            String orgName = organizationManager.getOrganizationById(orgId).getOrgName();
+            mav.addObject("orgName", orgName);
 
             //Set the provider addresses
             List<providerAddress> addresses = providerManager.getProviderAddresses(providerdetails.getId());
@@ -863,6 +887,10 @@ public class adminOrgContoller {
         if (action.equals("save")) {
             ModelAndView mav = new ModelAndView();
             mav.setViewName("/administrator/organizations/providers/details");
+            
+            String orgName = organizationManager.getOrganizationById(orgId).getOrgName();
+            mav.addObject("orgName", orgName);
+            
             //Set the provider addresses
             List<providerAddress> addresses = providerManager.getProviderAddresses(providerdetails.getId());
             providerdetails.setProviderAddresses(addresses);
@@ -1197,6 +1225,9 @@ public class adminOrgContoller {
 
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/organizations/brochures");
+        
+        String orgName = organizationManager.getOrganizationById(orgId).getOrgName();
+        mav.addObject("orgName", orgName);
 
         List<Brochure> brochures = organizationManager.getOrganizationBrochures(orgId, page, maxResults);
         mav.addObject("id", orgId);
@@ -1226,6 +1257,9 @@ public class adminOrgContoller {
 
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/organizations/brochures");
+        
+        String orgName = organizationManager.getOrganizationById(orgId).getOrgName();
+        mav.addObject("orgName", orgName);
 
         List<Brochure> brochures = brochureManager.findBrochures(orgId, searchTerm);
         mav.addObject("id", orgId);

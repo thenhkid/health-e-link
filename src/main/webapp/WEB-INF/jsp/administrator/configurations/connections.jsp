@@ -37,9 +37,6 @@
                             </form:form>
                         </div>
                     </div>
-                    <a href="#connectionsModal" id="createNewConnection" data-toggle="modal" class="btn btn-primary btn-sm pull-right" title="Create Configuration Connection">
-                        <span class="glyphicon glyphicon-plus"></span>
-                    </a>
                 </div>
                 <div class="form-container scrollable">
                     <table class="table table-striped table-hover table-default">

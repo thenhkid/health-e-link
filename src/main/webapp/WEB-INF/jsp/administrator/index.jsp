@@ -59,7 +59,7 @@
             <section class="panel panel-default panel-stats" role="widget" aria-labelleby="Number of Files to Process">
                 <div class="panel-body">
                     <span class="stat-number"><a href="" title="" title="Total number of files to process">0</a></span>
-                    <h3>Files to Process</h3>
+                    <h3>Processing Activity</h3>
                     <a href="" title="" class="btn btn-primary btn-small" role="button">View all</a>
                 </div>
             </section>

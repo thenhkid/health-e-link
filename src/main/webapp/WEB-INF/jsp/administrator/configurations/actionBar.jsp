@@ -45,7 +45,7 @@
                     <li><a href="create" title="Create New Configuration" role="button"><span class="glyphicon icon-stacked glyphicon glyphicon-plus"></span>Create New</a></li>
                 </c:when>
                 <c:when test="${param['page'] == 'connections'}">
-                    <li>&nbsp;</li>
+                <li><a href="#connectionsModal" id="createNewConnection" data-toggle="modal" role="button" title="Create Configuration Connection"><span class="glyphicon icon-stacked glyphicon glyphicon-plus"></span>Create New</a></li>
                 </c:when>  
                 <c:otherwise>
                     <li><a href="javascript:void(0);" id="saveDetails" title="Save this Configuration initial setup" role="button"><span class="glyphicon glyphicon-ok icon-stacked"></span> Save </a></li>
