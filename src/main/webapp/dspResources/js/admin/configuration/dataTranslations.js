@@ -87,7 +87,8 @@ require(['./main'], function () {
         $('#next').click(function() {
              
              var configType = $('#configtype').attr('rel');
-            
+             var mappings = $('#configtype').attr('rel2');
+                                 
              $.ajax({
                 url: 'translations',
                 type: "POST",
@@ -96,7 +97,12 @@ require(['./main'], function () {
                         window.location.href = "translations?msg=updated";
                     }
                     else {
-                       window.location.href = "scheduling?msg=updated"; 
+                       if(mappings == 2) {
+                           window.location.href = "translations?msg=updated";
+                       } 
+                       else {
+                         window.location.href = "scheduling?msg=updated";   
+                       }
                     }
                 }
             });

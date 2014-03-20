@@ -6,23 +6,13 @@
 <nav class="navbar navbar-default actions-nav">
     <div class="contain">
         <div class="navbar-header">
-            <h1 class="section-title navbar-brand"><a href="" title="Section Title" class="unstyled-link">Dashboard</a></h1>
+            <h1 class="section-title navbar-brand"><a href="" title="Section Title" class="unstyled-link">Administrator Dashboard</a></h1>
         </div>
     </div>
 </nav>
 
 <!-- End Actions Nav -->
 <div class="main clearfix full-width" role="main">
-
-    <div class="row-fluid contain">
-        <div class="col-md-12">
-            <section class="panel panel-default panel-intro">
-                <div class="panel-body" >
-                    <h2>Welcome <c:out value="${pageContext.request.userPrincipal.name}" />!</h2>
-                </div>
-            </section>
-        </div>
-    </div>
 
     <div class="row-fluid contain basic-clearfix">
         <div class="col-md-3 col-sm-3 col-xs-6">
@@ -34,6 +24,17 @@
                 </div>
             </section>
         </div>
+                    
+        <div class="col-md-3 col-sm-3 col-xs-6">
+            <section class="panel panel-default panel-stats" role="widget" aria-labelleby="Number of Message Types">
+                <div class="panel-body">
+                    <span class="stat-number"><a href="administrator/library/list" title="Total number of message types">${totalMessageTypes}</a></span>
+                    <h3>Message Types</h3>
+                    <a href="administrator/library/list" title="Message Type Library Manager" class="btn btn-primary btn-small">View all</a>
+                </div>
+            </section>
+        </div>
+
 
         <div class="col-md-3 col-sm-3 col-xs-6">
             <section class="panel panel-default panel-stats" role="widget" aria-labelleby="Number of Configurations">
@@ -45,25 +46,21 @@
             </section>
         </div>
 
-        <div class="col-md-3 col-sm-3 col-xs-6">
-            <section class="panel panel-default panel-stats" role="widget" aria-labelleby="Number of Message Types">
-                <div class="panel-body">
-                    <span class="stat-number"><a href="administrator/library/list" title="Total number of message types">${totalMessageTypes}</a></span>
-                    <h3>Message Types</h3>
-                    <a href="administrator/library/list" title="Message Type Library Manager" class="btn btn-primary btn-small">View all</a>
-                </div>
-            </section>
-        </div>
-
+        
         <div class="col-md-3 col-sm-3 col-xs-6">
             <section class="panel panel-default panel-stats" role="widget" aria-labelleby="Number of Files to Process">
+              
                 <div class="panel-body">
-                    <span class="stat-number"><a href="" title="" title="Total number of files to process">0</a></span>
-                    <h3>Processing Activity</h3>
-                    <a href="" title="" class="btn btn-primary btn-small" role="button">View all</a>
+                    <div>
+                        <span class="stat-number"><a href="administrator/processing-activity" title="Total number of batches to process">0</a></span>
+                        <h3> Batches To Process</h3>
+                        <a href="administrator/processing-activity" title="Total number of batches to process" class="btn btn-primary btn-small" role="button">View all</a>
+                     </div>
                 </div>
+                
             </section>
         </div>
+                    
     </div>
 
     <div class="row-fluid contain basic-clearfix">
@@ -121,50 +118,6 @@
         <div class="col-md-6">
             <section class="panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title">Configurations</h3>
-                </div>
-                <div class="panel-body" >
-                    <h4>Latest Configurations:</h4>
-                    <c:choose>
-                        <c:when test="${not empty latestConfigs}"> 
-                            <table class="table table-striped table-hover table-default">
-                                <tbody>
-                                    <c:forEach var="config" items="${latestConfigs}">
-                                        <tr>
-                                            <td>
-                                                <a href="administrator/configurations/details?i=${config.id}" title="Edit this Configuration"><strong>${config.orgName}</strong></a>
-                                                <br/> <strong>Configuration Type:</strong> <c:choose><c:when test="${config.type == 1}">Source Configuration</c:when><c:otherwise>Target Configuration</c:otherwise></c:choose>
-                                                <br/> <strong>Message Type:</strong>  ${config.messageTypeName}
-                                                <br/> <strong>Transport Method:</strong> ${config.transportMethod}
-                                                <br/> <strong>Status:</strong>  <c:choose><c:when test="${config.status == true}">active</c:when><c:otherwise>inactive</c:otherwise></c:choose>
-                                            </td>
-                                            <td>
-                                                <fmt:formatDate value="${config.dateCreated}" type="date" pattern="M/dd/yyyy" />
-                                            </td>
-                                            <td class="actions-col">
-                                                <a href="administrator/configurations/details?i=${config.id}" class="btn btn-link" title="Edit this Configuration" role="button">
-                                                    <span class="glyphicon glyphicon-edit"></span>
-                                                    Edit
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    </c:forEach>
-                                </tbody>
-                            </table>
-                        </c:when>
-                        <c:otherwise><tr><td colspan="3" class="center-text">There are currently no configurations set up.</td></tr></c:otherwise>
-                    </c:choose>
-                </div>
-            </section>
-        </div>
-
-        
-    </div>
-
-    <div class="row-fluid contain">
-        <div class="col-md-6">
-            <section class="panel panel-default">
-                <div class="panel-heading">
                     <h3 class="panel-title">Message Types</h3>
                 </div>
                 <div class="panel-body" >
@@ -198,14 +151,92 @@
                 </div>
             </section>
         </div>
+        
+    </div>
+
+    <div class="row-fluid contain">
+        
+        <div class="col-md-6">
+            <section class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Configurations</h3>
+                </div>
+                <div class="panel-body" >
+                    <h4>Latest Configurations:</h4>
+                    <c:choose>
+                        <c:when test="${not empty latestConfigs}"> 
+                            <table class="table table-striped table-hover table-default">
+                                <tbody>
+                                    <c:forEach var="config" items="${latestConfigs}">
+                                        <tr>
+                                            <td>
+                                                <a href="administrator/configurations/details?i=${config.id}" title="Edit this Configuration"><strong>${config.orgName}</strong></a>
+                                                <br/> <strong>Configuration Type:</strong> <c:choose><c:when test="${config.type == 1}">Source Configuration</c:when><c:otherwise>Target Configuration</c:otherwise></c:choose>
+                                                <br/> <strong>Message Type:</strong>  ${config.messageTypeName}
+                                                <br/> <strong>Transport Method:</strong> <c:choose><c:when test="${config.transportMethod == 'File Upload'}"><c:choose><c:when test="${config.type == 1}">File Upload</c:when><c:otherwise>File Download</c:otherwise></c:choose></c:when><c:otherwise>${config.transportMethod}</c:otherwise></c:choose>
+                                                <br/> <strong>Status:</strong>  <c:choose><c:when test="${config.status == true}">active</c:when><c:otherwise>inactive</c:otherwise></c:choose>
+                                            </td>
+                                            <td>
+                                                <fmt:formatDate value="${config.dateCreated}" type="date" pattern="M/dd/yyyy" />
+                                            </td>
+                                            <td class="actions-col">
+                                                <a href="administrator/configurations/details?i=${config.id}" class="btn btn-link" title="Edit this Configuration" role="button">
+                                                    <span class="glyphicon glyphicon-edit"></span>
+                                                    Edit
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </c:forEach>
+                                </tbody>
+                            </table>
+                        </c:when>
+                        <c:otherwise><tr><td colspan="3" class="center-text">There are currently no configurations set up.</td></tr></c:otherwise>
+                    </c:choose>
+                </div>
+            </section>
+        </div>
 
         <div class="col-md-6">
             <section class="panel panel-default">
                 <div class="panel-heading">
-                    <h3 class="panel-title">Scheduler</h3>
+                    <h3 class="panel-title">Connections</h3>
                 </div>
                 <div class="panel-body" >
-                    <h4>Latest Schedules:</h4>
+                    <h4>Latest Connections</h4>
+                    <c:choose>
+                        <c:when test="${not empty connections}">
+                            <table class="table table-striped table-hover table-default">
+                                <tbody>
+                                    <c:forEach var="connection" items="${connections}">
+                                        <tr>
+                                            <td scope="row">
+                                                <a href="administrator/configurations/connections" title="Edit this Connection"><strong>${connection.srcConfigDetails.getOrgName()}</strong></a>
+                                                <br/> <strong>Message Type:</strong>  ${connection.srcConfigDetails.getMessageTypeName()}
+                                                <br/> <strong>Transport Method:</strong> ${connection.srcConfigDetails.gettransportMethod()}
+                                                <br /><br />Authorized User(s): <br />
+                                                <c:forEach items="${connection.connectionSenders}" var="sender" varStatus="sIndex">
+                                                    ${sIndex.index+1}. ${sender.firstName}&nbsp;${sender.lastName} (<c:choose><c:when test="${sender.userType == 1}">Manager</c:when><c:otherwise>Staff Member</c:otherwise></c:choose>)<br />
+                                                </c:forEach>
+                                            </td>
+                                            <td>
+                                                <strong><---SENDING TO ---></strong>
+                                            </td>
+                                            <td>
+                                                <a href="administrator/configurations/connections" title="Edit this Connection"><strong>${connection.tgtConfigDetails.getOrgName()}</strong></a>
+                                                <br/> <strong>Message Type:</strong>  ${connection.srcConfigDetails.getMessageTypeName()}
+                                                <br/> <strong>Transport Method:</strong> ${connection.tgtConfigDetails.gettransportMethod()}
+                                                <br /><br />Authorized User(s): <br />
+                                                <c:forEach items="${connection.connectionReceivers}" var="receiver" varStatus="rIndex">
+                                                    ${rIndex.index+1}. ${receiver.firstName}&nbsp;${receiver.lastName} (<c:choose><c:when test="${receiver.userType == 1}">Manager</c:when><c:otherwise>Staff Member</c:otherwise></c:choose>)<br />
+                                                </c:forEach>
+                                            </td>
+                                        </tr>
+                                    </c:forEach>
+                                </tbody>
+                            </table>
+                        </c:when>
+                        <c:otherwise><tr><td colspan="3" class="center-text">There are currently no connections set up.</td></tr></c:otherwise>
+                    </c:choose>
                 </div>
             </section>
         </div>

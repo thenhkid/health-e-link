@@ -362,6 +362,8 @@ public class adminConfigController {
         
         configurationTransport transportDetails = configurationTransportManager.getTransportDetails(configId);
         if(transportDetails != null) {
+            configurationDetails.settransportMethod(configurationTransportManager.getTransportMethodById(transportDetails.gettransportMethodId()));
+            
             //Need to set the mappings static variable
             if(transportDetails.gettransportMethodId() == 2) {
                 mappings = 2;
@@ -382,6 +384,7 @@ public class adminConfigController {
                 HL7 = false;
             }
         }
+        
         
         mav.addObject("mappings", mappings);
         mav.addObject("HL7", HL7);

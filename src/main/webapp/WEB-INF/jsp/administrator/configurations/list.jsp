@@ -93,7 +93,7 @@
                                                 ${config.messageTypeName}
                                             </td>
                                             <td class="center-text">
-                                                ${config.transportMethod}
+                                                <c:choose><c:when test="${config.transportMethod == 'File Upload'}"><c:choose><c:when test="${config.type == 1}">File Upload</c:when><c:otherwise>File Download</c:otherwise></c:choose></c:when><c:otherwise>${config.transportMethod}</c:otherwise></c:choose>
                                             </td>
                                             <td class="center-text"><fmt:formatDate value="${config.dateCreated}" type="date" pattern="M/dd/yyyy" /></td>
                                             <td class="actions-col">

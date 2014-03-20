@@ -12,13 +12,19 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.ut.dph.model.Organization;
+import com.ut.dph.model.User;
 import com.ut.dph.model.messageType;
 import com.ut.dph.model.configuration;
+import com.ut.dph.model.configurationConnection;
+import com.ut.dph.model.configurationConnectionReceivers;
+import com.ut.dph.model.configurationConnectionSenders;
 import com.ut.dph.model.configurationTransport;
 import com.ut.dph.service.messageTypeManager;
 import com.ut.dph.service.organizationManager;
 import com.ut.dph.service.configurationManager;
 import com.ut.dph.service.configurationTransportManager;
+import com.ut.dph.service.userManager;
+import java.util.ArrayList;
 
 /**
  * The adminController class will handle administrator page requests that fall outside specific sections.
@@ -41,6 +47,9 @@ public class adminController {
     
     @Autowired
     private configurationTransportManager configurationTransportManager;
+    
+    @Autowired
+    private userManager userManager;
 
     private int maxResults = 3;
 
@@ -99,6 +108,69 @@ public class adminController {
              config.settransportMethod(configurationTransportManager.getTransportMethodById(transportDetails.gettransportMethodId()));
             }
         }
+        
+        /* get a list of all connections in the sysetm */
+        List<configurationConnection> connections = configurationmanager.getAllConnections(1, maxResults);
+        
+        /* Loop over the connections to get the configuration details */
+        if(connections != null) {
+            for(configurationConnection connection : connections) {
+                /* Array to holder the users */
+                List<User> connectionSenders = new ArrayList<User>();
+                List<User> connectonReceivers = new ArrayList<User>();
+                
+                configuration srcconfigDetails = configurationmanager.getConfigurationById(connection.getsourceConfigId());
+                configurationTransport srctransportDetails = configurationTransportManager.getTransportDetails(srcconfigDetails.getId());
+                
+                srcconfigDetails.setOrgName(organizationManager.getOrganizationById(srcconfigDetails.getorgId()).getOrgName());
+                srcconfigDetails.setMessageTypeName(messagetypemanager.getMessageTypeById(srcconfigDetails.getMessageTypeId()).getName());
+                srcconfigDetails.settransportMethod(configurationTransportManager.getTransportMethodById(srctransportDetails.gettransportMethodId()));
+                if(srctransportDetails.gettransportMethodId() == 1 && srcconfigDetails.getType() == 2) {
+                     srcconfigDetails.settransportMethod("File Download");
+                }
+                else {
+                    srcconfigDetails.settransportMethod(configurationTransportManager.getTransportMethodById(srctransportDetails.gettransportMethodId()));
+                }
+                
+                connection.setsrcConfigDetails(srcconfigDetails);
+                
+                configuration tgtconfigDetails = configurationmanager.getConfigurationById(connection.gettargetConfigId());
+                configurationTransport tgttransportDetails = configurationTransportManager.getTransportDetails(tgtconfigDetails.getId());
+                
+                tgtconfigDetails.setOrgName(organizationManager.getOrganizationById(tgtconfigDetails.getorgId()).getOrgName());
+                tgtconfigDetails.setMessageTypeName(messagetypemanager.getMessageTypeById(tgtconfigDetails.getMessageTypeId()).getName());
+                if(tgttransportDetails.gettransportMethodId() == 1 && tgtconfigDetails.getType() == 2) {
+                     tgtconfigDetails.settransportMethod("File Download");
+                }
+                else {
+                    tgtconfigDetails.settransportMethod(configurationTransportManager.getTransportMethodById(tgttransportDetails.gettransportMethodId()));
+                }
+                
+                /* Get the list of connection senders */
+                List<configurationConnectionSenders> senders = configurationmanager.getConnectionSenders(connection.getId());
+                
+                for(configurationConnectionSenders sender : senders) {
+                    User userDetail = userManager.getUserById(sender.getuserId());
+                    connectionSenders.add(userDetail);
+                }
+                connection.setconnectionSenders(connectionSenders);
+                
+                /* Get the list of connection receivers */
+                List<configurationConnectionReceivers> receivers = configurationmanager.getConnectionReceivers(connection.getId());
+                
+                for(configurationConnectionReceivers receiver : receivers) {
+                    User userDetail = userManager.getUserById(receiver.getuserId());
+                    connectonReceivers.add(userDetail);
+                }
+                connection.setconnectionReceivers(connectonReceivers);
+                
+                
+                connection.settgtConfigDetails(tgtconfigDetails);
+            }
+            
+        }
+        
+        mav.addObject("connections",connections);
 
         return mav;
     }
