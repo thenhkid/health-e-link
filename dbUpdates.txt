@@ -90,3 +90,86 @@ BEGIN
  END$$
 DELIMITER ;
 
+/** grace 03202014 01:06 PM **/
+ALTER TABLE `universaltranslator`.`message_visitinfo` 
+DROP COLUMN `incomeUnit`,
+CHANGE COLUMN `income` `wklyIncome` FLOAT NULL DEFAULT NULL ,
+ADD COLUMN `localFeeScale` VARCHAR(45) NULL AFTER `height`
+ADD COLUMN `residenceCode` VARCHAR(45) NULL AFTER `wklyIncome`;
+
+CREATE TABLE `universaltranslator`.`message_races` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `transactionInId` INT NOT NULL,
+  `sourceId` VARCHAR(45) NULL,
+  `sourceDate` VARCHAR(45) NULL,
+  `sourceDateType` VARCHAR(45) NULL,
+  `white` BIT NULL,
+  `black` BIT NULL,
+  `am_indian_alaskan` BIT NULL,
+  `asian` BIT NULL,
+  `Hawaiian_pi` BIT NULL,
+  `notReported` BIT NULL,
+  `moreThanOneRace` BIT NULL,
+  `dateCreated` DATETIME NOT NULL DEFAULT current_timestamp,
+  PRIMARY KEY (`id`));
+
+ALTER TABLE `universaltranslator`.`message_races` 
+ADD INDEX `transactionInId_idx` (`transactionInId` ASC);
+ALTER TABLE `universaltranslator`.`message_races` 
+ADD CONSTRAINT `transactionInId`
+  FOREIGN KEY (`transactionInId`)
+  REFERENCES `universaltranslator`.`transactionin` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+CREATE TABLE `universaltranslator`.`lu_providerTypes` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `displayText` VARCHAR(45) NOT NULL,
+  `description` VARCHAR(200) NULL,
+  `isCustom` BIT NOT NULL DEFAULT 0,
+  `status` BIT NOT NULL DEFAULT 1,
+  `dateCreated` DATETIME NOT NULL DEFAULT current_timestamp,
+  PRIMARY KEY (`id`));
+
+INSERT INTO `universaltranslator`.`lu_providerTypes` (`displayText`) VALUES ('Physician');
+INSERT INTO `universaltranslator`.`lu_providerTypes` (`displayText`) VALUES ('NP/APRN/CNM/PA');
+INSERT INTO `universaltranslator`.`lu_providerTypes` (`displayText`) VALUES ('RN/LPN');
+INSERT INTO `universaltranslator`.`lu_providerTypes` (`displayText`) VALUES ('Counselor/CHE');
+
+ALTER TABLE `universaltranslator`.`message_visitinfo` 
+ADD COLUMN `providerTypeId` INT NULL AFTER `localFeeScale`,
+ADD INDEX `providerTypeId_idx` (`providerTypeId` ASC);
+ALTER TABLE `universaltranslator`.`message_visitinfo` 
+ADD CONSTRAINT `providerTypeId`
+  FOREIGN KEY (`providerTypeId`)
+  REFERENCES `universaltranslator`.`lu_providerTypes` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+
+ALTER TABLE `universaltranslator`.`message_visitinfo` 
+DROP FOREIGN KEY `messContraFK`;
+ALTER TABLE `universaltranslator`.`message_visitinfo` 
+CHANGE COLUMN `contraceptiveId` `primaryContraceptiveId` INT(11) NULL DEFAULT NULL COMMENT 'id in lu_Contractives' ,
+ADD COLUMN `secondContraceptiveId` INT NULL AFTER `primaryContraceptiveId`,
+ADD COLUMN `noContraceptiveId` INT NULL AFTER `secondContraceptiveId`,
+ADD INDEX `noContraFK_idx` (`noContraceptiveId` ASC),
+ADD INDEX `secondContraFK_idx` (`secondContraceptiveId` ASC);
+ALTER TABLE `universaltranslator`.`message_visitinfo` 
+ADD CONSTRAINT `messContraFK`
+  FOREIGN KEY (`primaryContraceptiveId`)
+  REFERENCES `universaltranslator`.`lu_contraceptives` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION,
+ADD CONSTRAINT `secondContraFK`
+  FOREIGN KEY (`secondContraceptiveId`)
+  REFERENCES `universaltranslator`.`lu_contraceptives` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION,
+ADD CONSTRAINT `noContraFK`
+  FOREIGN KEY (`noContraceptiveId`)
+  REFERENCES `universaltranslator`.`lu_contraceptives` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+
+
