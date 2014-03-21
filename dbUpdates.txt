@@ -249,5 +249,41 @@ CREATE TABLE `universaltranslator`.`lu_noContraceptiveReasons` (
  INSERT INTO `universaltranslator`.`macro_names` (`id`,`Category`, `Macro_Name`, `Macro_Short_Name`, `Formula`, `Con1_Question`, `Con2_Question`) VALUES (71, 'String manipulation', 'Add character to specific locations on strings', 'addCharsToString', 'addCharsToString', 'Please enter char to add', 'Please enter position for character');
   
   
+/** grace 03212014 12:13 PM **/
+UPDATE `universaltranslator`.`lu_PayerTypes` SET `displayText`='Self-Pay - Full' WHERE `id`='1';
+  
+INSERT INTO `universaltranslator`.`lu_PayerTypes` (`id`,`displayText`) VALUES (11,'Self-Pay - Partial');
+INSERT INTO `universaltranslator`.`lu_PayerTypes` (`id`,`displayText`) VALUES (12,'Medicaid');
+INSERT INTO `universaltranslator`.`lu_PayerTypes` (`id`,`displayText`) VALUES (13,'Private Insurance');
+INSERT INTO `universaltranslator`.`lu_PayerTypes` (`id`,`displayText`) VALUES (14,'No Charge / Title X');
+INSERT INTO `universaltranslator`.`lu_PayerTypes` (`id`,`displayText`) VALUES (15, 'State Funding / DPH (MA Only)');
+INSERT INTO `universaltranslator`.`lu_PayerTypes` (`id`,`displayText`) VALUES (16, 'Health Safety Net (MA Only)');
+INSERT INTO `universaltranslator`.`lu_PayerTypes` (`id`,`displayText`) VALUES (17, 'Insurance Exchange');
+  
+INSERT INTO `universaltranslator`.`lu_contraceptives` (`id`, `displaytext`) VALUES ('1', 'Oral Contraceptive');
+INSERT INTO `universaltranslator`.`lu_contraceptives` (`id`, `displaytext`) VALUES ('2', 'IUD');
+INSERT INTO `universaltranslator`.`lu_contraceptives` (`id`, `displaytext`) VALUES ('4', 'Spermicide (Used Alone)');
+INSERT INTO `universaltranslator`.`lu_contraceptives` (`id`, `displaytext`) VALUES ('5', 'Male Condom');
+INSERT INTO `universaltranslator`.`lu_contraceptives` (`id`, `displaytext`) VALUES ('6', 'Contraceptive Sponge');
+INSERT INTO `universaltranslator`.`lu_contraceptives` (`id`, `displaytext`) VALUES ('7', 'Female Sterilization');
+INSERT INTO `universaltranslator`.`lu_contraceptives` (`id`, `displaytext`) VALUES ('8', 'Fertility Awareness');
+INSERT INTO `universaltranslator`.`lu_contraceptives` (`id`, `displaytext`) VALUES ('9', 'Hormonal injection - 3 month');
+INSERT INTO `universaltranslator`.`lu_contraceptives` (`id`, `displaytext`) VALUES ('10', 'Female Condom');
+INSERT INTO `universaltranslator`.`lu_contraceptives` (`id`, `displaytext`) VALUES ('11', 'Diaphragm / Cervical Cap');
+INSERT INTO `universaltranslator`.`lu_contraceptives` (`id`, `displaytext`) VALUES ('13', 'Hormonal Implant');
+INSERT INTO `universaltranslator`.`lu_contraceptives` (`id`, `displaytext`) VALUES ('14', 'Abstinence');
+INSERT INTO `universaltranslator`.`lu_contraceptives` (`id`, `displaytext`) VALUES ('15', 'Other Method');
+INSERT INTO `universaltranslator`.`lu_contraceptives` (`id`, `displaytext`) VALUES ('16', 'No Method');
+INSERT INTO `universaltranslator`.`lu_contraceptives` (`id`, `displaytext`) VALUES ('23', 'Vasectomy');
+INSERT INTO `universaltranslator`.`lu_contraceptives` (`id`, `displaytext`) VALUES ('24', 'Vaginal Ring');
+INSERT INTO `universaltranslator`.`lu_contraceptives` (`id`, `displaytext`) VALUES ('25', 'Hormonal Patch');
+INSERT INTO `universaltranslator`.`lu_contraceptives` (`id`, `displaytext`) VALUES ('27', 'Hormonal injection - 1 month');
+INSERT INTO `universaltranslator`.`lu_contraceptives` (`id`, `displaytext`) VALUES ('28', 'Method Unknown');
+
+INSERT INTO `universaltranslator`.`lu_noContraceptiveReasons` (`id`, `displaytext`) VALUES ('1', 'Pregnant');
+INSERT INTO `universaltranslator`.`lu_noContraceptiveReasons` (`id`, `displaytext`) VALUES ('2', 'Seeking Pregnancy');
+INSERT INTO `universaltranslator`.`lu_noContraceptiveReasons` (`id`, `displaytext`) VALUES ('3', 'Relying on Female Method');
+INSERT INTO `universaltranslator`.`lu_noContraceptiveReasons` (`id`, `displaytext`) VALUES ('4', 'Other Reason');
+  
   
   
