@@ -94,7 +94,7 @@ DELIMITER ;
 ALTER TABLE `universaltranslator`.`message_visitinfo` 
 DROP COLUMN `incomeUnit`,
 CHANGE COLUMN `income` `wklyIncome` FLOAT NULL DEFAULT NULL ,
-ADD COLUMN `localFeeScale` VARCHAR(45) NULL AFTER `height`
+ADD COLUMN `localFeeScale` VARCHAR(45) NULL AFTER `height`,
 ADD COLUMN `residenceCode` VARCHAR(45) NULL AFTER `wklyIncome`;
 
 CREATE TABLE `universaltranslator`.`message_races` (
