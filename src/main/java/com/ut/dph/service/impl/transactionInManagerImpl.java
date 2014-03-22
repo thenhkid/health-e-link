@@ -1377,8 +1377,8 @@ public class transactionInManagerImpl implements transactionInManager {
     }
 
     @Override
-    public List<configurationConnection> getBatchTargets(Integer batchId) {
-        return transactionInDAO.getBatchTargets(batchId);
+    public List<configurationConnection> getBatchTargets(Integer batchId, boolean active) {
+        return transactionInDAO.getBatchTargets(batchId, active);
     }
 
     @Override
@@ -1506,7 +1506,7 @@ public class transactionInManagerImpl implements transactionInManager {
             resetTransactionTranslatedIn(batchId, true);
 
             //load targets - we need to loadTarget only if field for target is blank, otherwise we load what user sent
-            List<configurationConnection> batchTargetList = getBatchTargets(batchId);
+            List<configurationConnection> batchTargetList = getBatchTargets(batchId, true);
             int sourceConfigId = 0;
             for (configurationConnection bt : batchTargetList) {
 

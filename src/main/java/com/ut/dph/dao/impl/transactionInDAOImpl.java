@@ -2919,13 +2919,18 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Override
     @Transactional
     @SuppressWarnings("unchecked")
-    public List<configurationConnection> getBatchTargets(Integer batchId) {
+    public List<configurationConnection> getBatchTargets(Integer batchId, boolean active) {
         try {
             String sql = ("select sourceConfigId, targetConfigId, configurationconnections.id, "
             		+ " targetOrgCol, orgId as targetOrgId, messageTypeId from configurations, configurationconnections , configurationMessageSpecs  "
             		+ " where sourceconfigId in (select configId from transactionIn where  batchId = :batchId)"
             		+ " and sourceConfigId = configurationMessageSpecs.configId"
-            		+ " and targetConfigId = configurations.id order by sourceConfigId;");
+            		+ " and targetConfigId = configurations.id ");
+            if (active) {
+            	 sql =  sql	+ " and configurations.status = 1 and configurationconnections.status = 1 and messageTypeId in (select id from messageTypes where status = 1)";
+            }
+            sql =  sql	+ " order by sourceConfigId;";
+            
             Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
                     Transformers.aliasToBean(configurationConnection.class));
             query.setParameter("batchId", batchId);

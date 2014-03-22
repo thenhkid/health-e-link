@@ -229,7 +229,7 @@ public interface transactionInManager {
     
     Integer insertBatchTargets (Integer batchId);
     
-    List <configurationConnection> getBatchTargets (Integer batchId);
+    List <configurationConnection> getBatchTargets (Integer batchId, boolean active);
     
     Integer clearBatchUploadSummary(Integer batchId);
     
