@@ -1606,19 +1606,21 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Override
     @Transactional
     public Integer clearTransactionInErrors(Integer batchUploadId,  boolean leaveFinalStatusIds) {
-        String sql = "delete from transactionInErrors where batchUploadId = :batchUploadId";
+        try {
+        	String sql = "delete from transactionInErrors where batchUploadId = :batchUploadId";
        
-        if (!leaveFinalStatusIds) {
-        	sql = sql + " and transactionInId not in (select id from "
+        	if (leaveFinalStatusIds) {
+        		sql = sql + " and transactionInId not in (select id from "
         			+ "transactionIn where statusId in (:transRELId) and "
         			+ " batchId = :batchUploadId)";
-        }
+        	}
         
-        Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
-                .setParameter("batchUploadId", batchUploadId)
-                .setParameterList("transRELId", transRELId);
-
-        try {
+        	Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                .setParameter("batchUploadId", batchUploadId);
+        	if (leaveFinalStatusIds) {
+        		deleteData.setParameterList("transRELId", transRELId);
+        	}
+ 
             deleteData.executeUpdate();
             return 0;
         } catch (Exception ex) {
@@ -3106,7 +3108,7 @@ public class transactionInDAOImpl implements transactionInDAO {
     public Integer insertInvalidConfigError(Integer batchId) {
         try {
             String sql = "insert into transactionInerrors (batchUploadId, transactionInId, errorId) "
-                    + "select " + batchId + ", id, 7 from transactionIn where configId is null "
+                    + "select " + batchId + ", id, 6 from transactionIn where configId is null "
                     + " and batchId = :batchId";
             Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
                     .setParameter("batchId", batchId);

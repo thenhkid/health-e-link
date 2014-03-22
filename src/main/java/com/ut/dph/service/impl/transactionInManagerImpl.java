@@ -1508,39 +1508,46 @@ public class transactionInManagerImpl implements transactionInManager {
             //load targets - we need to loadTarget only if field for target is blank, otherwise we load what user sent
             List<configurationConnection> batchTargetList = getBatchTargets(batchId, true);
             int sourceConfigId = 0;
-            for (configurationConnection bt : batchTargetList) {
-
-                /* populate batchUploadSummary need batchId, transactionInId,  configId, 
-                 * sourceOrgId, messageTypeId - in configurations - missing targetOrgId, 
-                 * if targetOrgCol has value, we populate - cms's target col could be 0, if spec has no target column,
-                 * we insert all connections
-                 * if targetOrgCol has value, we make sure value is value
-                 */
-                sysErrors = sysErrors + insertBatchUploadSummary(batch, bt);
-                if (sourceConfigId != bt.getsourceConfigId()) {
-                	if (bt.getTargetOrgCol() != 0) {
-                		sysErrors = sysErrors + rejectInvalidTargetOrg(batchId, bt);
-                	}
-                    sourceConfigId = bt.getsourceConfigId();
-                }
-            }            
-            sysErrors = sysErrors + setStatusForErrorCode(batchId, 11, 9, false);
-            
-            //reject transactions with config that do not connections
-            sysErrors = sysErrors + rejectNoConnections(batch);
-            sysErrors = sysErrors + setStatusForErrorCode(batchId, 11, 10, false);
-            
-            sysErrors = sysErrors + insertBatchTargets(batchId);
-            
-            //handle duplicates, need to insert again and let it be its own row
-            sysErrors = sysErrors + newEntryForMultiTargets(batchId);
-            
-            //update transactionTarget in transactionInTable
-            sysErrors = sysErrors + updateTTIdInTransactionIn(batchId);
-            
-            //we reset transactionTranslatedIn
-            resetTransactionTranslatedIn(batchId, true);
-            
+            if (batchTargetList.size() <= 0) { 
+            	insertProcessingError(10, null, batchId, null, null, null, null, false, false, "No valid connections were found for loading batch.");
+            	updateTransactionStatus(batchId, 0, 0, 13);
+            	updateRecordCounts(batchId, new ArrayList<Integer>(), false, "errorRecordCount");
+                updateRecordCounts(batchId, new ArrayList<Integer>(), false, "totalRecordCount");
+                updateBatchStatus(batchId, 7, "endDateTime");
+                return false;
+            }	else {
+	            for (configurationConnection bt : batchTargetList) {
+	            	/* populate batchUploadSummary need batchId, transactionInId,  configId, 
+	                 * sourceOrgId, messageTypeId - in configurations - missing targetOrgId, 
+	                 * if targetOrgCol has value, we populate - cms's target col could be 0, if spec has no target column,
+	                 * we insert all connections
+	                 * if targetOrgCol has value, we make sure value is value
+	                 */
+	                sysErrors = sysErrors + insertBatchUploadSummary(batch, bt);
+	                if (sourceConfigId != bt.getsourceConfigId()) {
+	                	if (bt.getTargetOrgCol() != 0) {
+	                		sysErrors = sysErrors + rejectInvalidTargetOrg(batchId, bt);
+	                	}
+	                    sourceConfigId = bt.getsourceConfigId();
+	                }
+	            }            
+	            sysErrors = sysErrors + setStatusForErrorCode(batchId, 11, 9, false);
+	            
+	            //reject transactions with config that do not connections
+	            sysErrors = sysErrors + rejectNoConnections(batch);
+	            sysErrors = sysErrors + setStatusForErrorCode(batchId, 11, 10, false);
+	            
+	            sysErrors = sysErrors + insertBatchTargets(batchId);
+	            
+	            //handle duplicates, need to insert again and let it be its own row
+	            sysErrors = sysErrors + newEntryForMultiTargets(batchId);
+	            
+	            //update transactionTarget in transactionInTable
+	            sysErrors = sysErrors + updateTTIdInTransactionIn(batchId);
+	            
+	            //we reset transactionTranslatedIn
+	            resetTransactionTranslatedIn(batchId, true);
+            }
             if (sysErrors > 0) {
                 insertProcessingError(processingSysErrorId, null, batchId, null, null, null, null, false, false, errorMessage);
                 updateBatchStatus(batchId, 29, "endDateTime");

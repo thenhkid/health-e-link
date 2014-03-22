@@ -324,6 +324,44 @@ DELIMITER ;
 
 UPDATE `universaltranslator`.`macro_names` SET `Macro_Short_Name`='addCharToString', `Formula`='addCharToString', `Con1_Question`='Please enter char to add to string', `Con2_Question`='Please enter character position.' WHERE `ID`='71';
 
+/** grace 03212014 11:22PM **/
+UPDATE `universaltranslator`.`lu_ErrorCodes` SET `description`='Source Configuration does not have valid connections set up' WHERE `id`='10';
+
+drop procedure addCharToString;
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `addCharToString`(in configId int, 
+in batchId int, in srcField varchar(10),
+in fieldA varchar(10), in fieldB varchar(10), in con1 varchar(10), 
+in con2 varchar(10), in macroId int, in foroutboundProcessing boolean, in passClear int)
+proc_main:begin
+
+call setInboundOutBoundTables (foroutboundProcessing);
+select @translatedTable, @transactionTable, @batchTable, @batchIdType , @errorTable
+into @translatedTable, @transactionTable, @batchTable, @batchIdType , @errorTable;
+
+call getFinalStatusIds;
+select @finalStatusIds into @finalStatusIds;
+
+-- we build sql here 
+set @stmt = concat("update ", @translatedTable," set ",fieldA,
+" = concat(substring(",fieldA,", 1,",con2,"-1), '",con1,"', substring(",fieldA,", ",con2,",(length(",fieldA,")))) where ", @transactionTable ,"Id in (select id from ",@transactionTable,
+" where configId = ",configId," and ", @batchIdType," = ",batchId," and statusId not in (",@finalStatusIds,"));");
+
+PREPARE stmt from @stmt;
+EXECUTE stmt;-- execute
+
+-- we check pass /clear
+if (passClear = 2) THEN
+BEGIN
+-- not sure how to pass clear this
+END;
+END IF;
+-- see if we want to return something
+select '';
+
+end proc_main$$
+DELIMITER ;
 
  
   
