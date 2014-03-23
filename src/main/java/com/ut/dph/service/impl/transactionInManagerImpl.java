@@ -584,17 +584,14 @@ public class transactionInManagerImpl implements transactionInManager {
                  * 1 = Post errors to ERG 2 = Reject record on error 3 = Reject submission on error 4 = Pass through errors
                  *
                  */
-                if (getRecordCounts(batchUploadId, Arrays.asList(14), false) > 0 && batch.getstatusId() == 6) {
+            	 
+                if (getRecordCounts(batchUploadId, Arrays.asList(11, 12, 13, 16), false, false) > 0 && batch.getstatusId() == 6) {
                     //batches with error should not be released, can only be Rejected/Invalid, set batch back to PR and go through auto/error handling
                     batch.setstatusId(5);
                     batchStausId = 5;
                 }
                 // if auto and batch contains transactions that are not final status
-                if (handlingDetails.get(0).getautoRelease()
-                        && getRecordCounts(batchUploadId, Arrays.asList(11, 12, 13, 16), false, false) > 0) {
-                    batch.setstatusId(5);
-                    batchStausId = 5;
-                } else if (batch.getstatusId() == 6 || (handlingDetails.get(0).getautoRelease()
+                if (batch.getstatusId() == 6 || (handlingDetails.get(0).getautoRelease()
                         && (handlingDetails.get(0).geterrorHandling() == 2 
                         || handlingDetails.get(0).geterrorHandling() == 4 
                         || handlingDetails.get(0).geterrorHandling() == 1))) {
