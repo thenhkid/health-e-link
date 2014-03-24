@@ -387,7 +387,7 @@ ORDER BY saveToTableName;
 end proc_main$$
 DELIMITER ;
 
-/** grace 03232014 10:08 PM **/
+/** grace 03232014 10:08 PM (received) **/
 ALTER TABLE `universaltranslator`.`message_races` 
 CHANGE COLUMN `white` `white` INT NULL DEFAULT NULL,
 CHANGE COLUMN `black` `black` INT NULL DEFAULT NULL,

@@ -854,10 +854,11 @@ public class HealtheWebController {
                 transaction.setautoRelease(transportDetails.getautoRelease());
                 transaction.setbatchId(batchInfo.getId());
                 transaction.settransactionId(transactionId);
-                transaction.settransactionTargetId(transactionInfo.gettransactionTargetId());
+                transaction.settransactionTargetId(transactionTarget.getId());
                 transaction.setdateSubmitted(transactionInfo.getdateCreated());
                 transaction.setsourceType(configDetails.getsourceType());
                 transaction.settargetConfigId(transactionTarget.getconfigId());
+                transaction.setorginialTransactionId(transactionInfo.gettransactionTargetId());
 
                 lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(transaction.getstatusId());
                 transaction.setstatusValue(processStatus.getDisplayCode());

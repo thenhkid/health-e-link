@@ -53,7 +53,7 @@
                                 <label class="sr-only">Select Action</label>
                                 <select class="form-control" id="formAction">
                                     <option value="">-Select Action-</option>
-                                    <c:if test="${transaction.sourceType == 2}"><option value="${transaction.transactionTargetId}">View Original Referral</option></c:if>
+                                    <c:if test="${transaction.sourceType == 2}"><option value="${transaction.orginialTransactionId}">View Original Referral</option></c:if>
                                     <option value="print">Print / Save As</option>
                                 </select>
                             </div>
@@ -287,7 +287,7 @@
                     <div id="translationMsgDiv"  class="alert alert-danger" style="display:none;">
                         <strong>An error has occurred in one of the above fields!</strong>
                     </div>
-                    <input type="button" id="save" class="btn btn-primary btn-action-sm submitMessage" value="Save ${pageHeader == 'feedback' ? 'Feedback Report' : 'Referral'}"/>
+                    <input type="button" id="save" class="btn btn-primary btn-action-sm submitMessage" value="Save ${transaction.sourceType == 1 && pageHeader == 'create' ? 'Referral' : 'Feedback Report'}"/>
                     <c:choose>
                         <c:when test="${transaction.autoRelease == true}">
                             <input type="button" id="send" class="btn btn-primary btn-action-sm submitMessage" value="Send Referral"/>
