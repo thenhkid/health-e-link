@@ -117,9 +117,14 @@ require(['./main'], function () {
                             $('#provider_17').val(data.providerAddresses[0].phone1);
                             $('#provider_18').val(data.providerAddresses[0].fax);
 
-                            $('#fromOrgProviderLine1').html(data.providerAddresses[0].line1);
-                            $('#fromOrgProviderLine2').html(data.providerAddresses[0].line2);
-                            $('#fromOrgProviderRegion').html(data.providerAddresses[0].city+" "+data.providerAddresses[0].state);
+                            $('#fromOrgProviderLine1').html(data.providerAddresses[0].line1+'<br />');
+                            if(data.providerAddresses[0].line2 != '') {
+                                $('#fromOrgProviderLine2').html(data.providerAddresses[0].line2+'<br />');
+                            }
+                            else {
+                                $('#fromOrgProviderLine2').html("");
+                            }
+                            $('#fromOrgProviderRegion').html(data.providerAddresses[0].city+" "+data.providerAddresses[0].state+", ");
                             $('#fromOrgProviderZip').html(data.providerAddresses[0].postalCode);
                             if(data.providerAddresses[0].phone1 != "") {
                                 $('#fromOrgProviderPhone').html("phone: <span class='tel' >"+data.providerAddresses[0].phone1+"</span>");
@@ -127,6 +132,14 @@ require(['./main'], function () {
                             if(data.providerAddresses[0].fax != "") {
                                 $('#fromOrgProviderFax').html("fax: <span class='tel'>"+data.providerAddresses[0].fax+"</span>");
                             }
+                        }
+                         else {
+                            $('#fromOrgProviderLine1').html("");
+                            $('#fromOrgProviderLine2').html("");
+                            $('#fromOrgProviderRegion').html("");
+                            $('#fromOrgProviderZip').html("");
+                            $('#fromOrgProviderPhone').html("");
+                            $('#fromOrgProviderFax').html("");
                         }
 
                         if(data.providerIds.length > 0) {
@@ -170,6 +183,97 @@ require(['./main'], function () {
             $('#provider_18').val("");
             $('#fromorgProvider').hide();
             $('#orgProvider').val("");
+            $('#fromOrgProviderChoose').show();
+        });
+        
+        //Function to go get providers as the user types in letters
+        $(document).on('change', '#targetorgProvider', function() {
+
+            if($(this).val() > 0) {
+                $.ajax({
+                    url: '/Health-e-Web/populateProvider.do',
+                    type: 'GET',
+                    data: {'providerId': $(this).val()},
+                    success: function(data) {
+                        //fields 9 - 18
+                        $('#tgtprovider_27').val(data.firstName);
+                        $('#tgtprovider_28').val(data.lastName);
+
+                        if(data.providerAddresses.length > 0) {
+                            $('#tgtprovider_30').val(data.providerAddresses[0].line1);
+                            $('#tgtprovider_31').val(data.providerAddresses[0].line2);
+                            $('#tgtprovider_32').val(data.providerAddresses[0].city);
+                            $('#tgtprovider_33').val(data.providerAddresses[0].state);
+                            $('#tgtprovider_34').val(data.providerAddresses[0].postalCode);
+                            $('#tgtprovider_35').val(data.providerAddresses[0].phone1);
+                            $('#tgtprovider_36').val(data.providerAddresses[0].fax);
+
+                            $('#toOrgProviderLine1').html(data.providerAddresses[0].line1+'<br />');
+                            if(data.providerAddresses[0].line2 != '') {
+                                $('#toOrgProviderLine2').html(data.providerAddresses[0].line2+'<br />');
+                            }
+                            else {
+                                $('#toOrgProviderLine2').html("");
+                            }
+                            $('#toOrgProviderRegion').html(data.providerAddresses[0].city+" "+data.providerAddresses[0].state+", ");
+                            $('#toOrgProviderZip').html(data.providerAddresses[0].postalCode);
+                            if(data.providerAddresses[0].phone1 != "") {
+                                $('#toOrgProviderPhone').html("phone: <span class='tel' >"+data.providerAddresses[0].phone1+"</span>");
+                            }
+                            if(data.providerAddresses[0].fax != "") {
+                                $('#toOrgProviderFax').html("fax: <span class='tel'>"+data.providerAddresses[0].fax+"</span>");
+                            }
+                        }
+                        else {
+                            $('#toOrgProviderLine1').html("");
+                            $('#toOrgProviderLine2').html("");
+                            $('#toOrgProviderRegion').html("");
+                            $('#toOrgProviderZip').html("");
+                            $('#toOrgProviderPhone').html("");
+                            $('#toOrgProviderFax').html("");
+                        }
+
+                        if(data.providerIds.length > 0) {
+                            $('#tgtprovider_29').val(data.providerIds[0].idNum);
+                        }
+                        $('#toOrgProviderName').html(data.firstName+" "+data.lastName);
+
+                        $('#toorgProvider').show();
+                        $('#fromOrgProviderChoose').hide();
+                    }
+                });
+            }
+            else {
+                $('#tgtprovider_27').val("");
+                $('#tgtprovider_28').val("");
+                $('#tgtprovider_29').val("");
+                $('#tgtprovider_30').val("");
+                $('#tgtprovider_31').val("");
+                $('#tgtprovider_32').val("");
+                $('#tgtprovider_33').val("");
+                $('#tgtprovider_34').val("");
+                $('#tgtprovider_35').val("");
+                $('#tgtprovider_36').val("");
+                $('#fromorgProvider').hide();
+            }
+
+        });
+
+        //Function hide the selected provider and show the provider
+        //drop down.
+        $(document).on('click', '#toOrgProviderChange', function() {
+            $('#tgtprovider_27').val("");
+            $('#tgtprovider_28').val("");
+            $('#tgtprovider_29').val("");
+            $('#tgtprovider_30').val("");
+            $('#tgtprovider_31').val("");
+            $('#tgtprovider_32').val("");
+            $('#tgtprovider_33').val("");
+            $('#tgtprovider_34').val("");
+            $('#tgtprovider_36').val("");
+           // $('#provider_18').val("");
+            $('#fromorgProvider').hide();
+            $('#targetorgProvider').val("");
             $('#fromOrgProviderChoose').show();
         });
 

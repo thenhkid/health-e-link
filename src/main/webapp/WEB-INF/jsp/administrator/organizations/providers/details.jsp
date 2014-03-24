@@ -136,13 +136,13 @@
         <div class="col-md-6">
             <section class="panel panel-default">
                 <div class="panel-heading">
+                    <div class="pull-right">
+                        <a href="#systemAddressModal" data-toggle="modal" class="btn btn-primary btn-xs btn-action" id="createNewAddress" title="Create a new address">Add New Address</a>
+                    </div>
                     <h3 class="panel-title">Provider Addresses</h3>
                 </div>
                 <div class="panel-body">
                     <div class="form-container scrollable">
-                        <a href="#systemAddressModal" id="createNewAddress" data-toggle="modal" class="btn btn-primary btn-sm pull-right" title="Create a new address">
-                            <span class="glyphicon glyphicon-plus"></span>
-                        </a>
                         <table class="table table-striped table-hover responsive">
                             <thead>
                                 <tr>
@@ -194,14 +194,14 @@
 
             <section class="panel panel-default">
                 <div class="panel-heading">
+                    <div class="pull-right">
+                        <a href="#providerIdModal" data-toggle="modal" class="btn btn-primary btn-xs btn-action" id="createNewId" title="Create a new provider Id">Add New Provider Id</a>
+                    </div>
                     <h3 class="panel-title">Provider Ids</h3>
                 </div>
                 <div class="panel-body">
                     <div class="form-container scrollable">
-                        <a href="#providerIdModal" id="createNewId" data-toggle="modal" class="btn btn-primary btn-sm pull-right" title="Create a new provider Id">
-                            <span class="glyphicon glyphicon-plus"></span>
-                        </a>
-                        <table class="table table-striped table-hover responsive">
+                       <table class="table table-striped table-hover responsive">
                             <thead>
                                 <tr>
                                     <th scope="col">ID Number</th>

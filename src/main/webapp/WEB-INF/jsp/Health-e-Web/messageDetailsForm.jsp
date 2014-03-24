@@ -92,10 +92,6 @@
                     <form:hidden path="targetOrgFields[${t.index}].fieldValue" />
                     <form:hidden path="targetOrgFields[${t.index}].fieldNo" />
                 </c:forEach>
-                <c:forEach items="${transaction.targetProviderFields}" varStatus="tp">
-                    <form:hidden path="targetProviderFields[${tp.index}].fieldValue" />
-                    <form:hidden path="targetProviderFields[${tp.index}].fieldNo" />
-                </c:forEach>
                 <div class="panel-group form-accordion" id="accordion">
 
                     <div class="panel panel-default panel-form">
@@ -107,8 +103,7 @@
                                         <dl class="vcard">
                                             <dd class="fn">${transaction.sourceOrgFields[0].fieldValue}</dd>
                                             <dd class="adr">
-                                                <span class="street-address">${transaction.sourceOrgFields[1].fieldValue}</span><br/>
-                                                <c:if test="${not empty transaction.sourceOrgFields[2].fieldValue}"><span class="street-address">${transaction.sourceOrgFields[2].fieldValue}</span><br/></c:if>
+                                                <span class="street-address">${transaction.sourceOrgFields[1].fieldValue}</span>< c:if test="${not empty transaction.sourceOrgFields[2].fieldValue}"><span class="street-address">&nbsp;${transaction.sourceOrgFields[2].fieldValue}</span></c:if><br/>
                                                 <span class="region">${transaction.sourceOrgFields[3].fieldValue}&nbsp;${transaction.sourceOrgFields[4].fieldValue}</span>, <span class="postal-code">${transaction.sourceOrgFields[5].fieldValue}</span>
                                             </dd>
                                             <c:if test="${not empty transaction.sourceOrgFields[6].fieldValue}"><dd>phone: <span class="tel">${transaction.sourceOrgFields[6].fieldValue}</span></dd></c:if>
@@ -152,9 +147,9 @@
                                            <dl class="vcard">
                                                <dd class="fn" id="fromOrgProviderName"></dd>
                                                <dd class="adr">
-                                                <span class="street-address" id="fromOrgProviderLine1"></span><br/>
-                                                <span class="street-address" id="fromOrgProviderLine2"></span><br/>
-                                                <span class="region" id="fromOrgProviderRegion"></span>, <span class="postal-code" id="fromOrgProviderZip"></span>
+                                                <span class="street-address" id="fromOrgProviderLine1"></span>
+                                                <span class="street-address" id="fromOrgProviderLine2"></span>
+                                                <span class="region" id="fromOrgProviderRegion"></span><span class="postal-code" id="fromOrgProviderZip"></span>
                                                </dd>
                                                <dd id="fromOrgProviderPhone"></dd>
                                                <dd id="fromOrgProviderFax"></dd>
@@ -166,13 +161,60 @@
                                         <dl class="vcard">
                                             <dd class="fn">${transaction.targetOrgFields[0].fieldValue}</dd>
                                             <dd class="adr">
-                                                <span class="street-address">${transaction.targetOrgFields[1].fieldValue}</span><br/>
-                                                <c:if test="${not empty transaction.targetOrgFields[2].fieldValue}"><span class="street-address">${transaction.targetOrgFields[2].fieldValue}</span><br/></c:if>
+                                                <span class="street-address">${transaction.targetOrgFields[1].fieldValue}<c:if test="${not empty transaction.targetOrgFields[2].fieldValue}"><span class="street-address"> ${transaction.targetOrgFields[2].fieldValue}</span></c:if></span><br/>
                                                 <span class="region">${transaction.targetOrgFields[3].fieldValue}&nbsp;${transaction.targetOrgFields[4].fieldValue}</span>, <span class="postal-code">${transaction.targetOrgFields[5].fieldValue}</span>
                                             </dd>
                                             <c:if test="${not empty transaction.targetOrgFields[6].fieldValue}"><dd>phone: <span class="tel">${transaction.targetOrgFields[6].fieldValue}</span></dd></c:if>
                                             <c:if test="${not empty transaction.targetOrgFields[7].fieldValue}"><dd>fax: <span class="tel">${transaction.targetOrgFields[7].fieldValue}</span></dd></c:if>
                                         </dl>
+                                        <c:if test="${pageHeader == 'feedback' || transaction.sourceType == 2}">
+                                            <c:choose>
+                                                <c:when test="${not empty transaction.targetProviderFields[0].fieldValue}">
+                                                    <h4 class="form-section-heading">Recipient Organization Provider: </h4>
+                                                    <dl class="vcard">
+                                                        <dd class="fn">${transaction.targetProviderFields[0].fieldValue}&nbsp;${transaction.targetProviderFields[1].fieldValue}</dd>
+                                                        <dd class="fn">Id: ${transaction.targetProviderFields[2].fieldValue}</dd>
+                                                        <dd class="adr">
+                                                            <span class="street-address">${transaction.targetProviderFields[3].fieldValue}</span><br/>
+                                                            <c:if test="${not empty transaction.targetProviderFields[4].fieldValue}"><span class="street-address">${transaction.targetProviderFields[4].fieldValue}</span><br/></c:if>
+                                                            <span class="region">${transaction.targetProviderFields[5].fieldValue}&nbsp;${transaction.targetProviderFields[6].fieldValue}</span>, <span class="postal-code">${transaction.targetProviderFields[7].fieldValue}</span>
+                                                        </dd>
+                                                        <c:if test="${not empty transaction.targetProviderFields[8].fieldValue}"><dd>phone: <span class="tel">${transaction.targetProviderFields[8].fieldValue}</span></dd></c:if>
+                                                        <c:if test="${not empty transaction.targetProviderFields[9].fieldValue}"><dd>fax: <span class="tel">${transaction.targetProviderFields[9].fieldValue}</span></dd></c:if>
+                                                   </dl>
+                                                </c:when>
+                                                <c:when test="${not empty providers}">
+                                                    <dl id="fromOrgProviderChoose">
+                                                        <dd>
+                                                            Choose Provider: 
+                                                            <select class="form-control" id="targetorgProvider">
+                                                                <option value="">-Choose-</option>
+                                                                 <c:forEach items="${providers}" var="provider">
+                                                                         <option value="${provider.id}">${provider.firstName}&nbsp;${provider.lastName}</option>
+                                                                 </c:forEach>
+                                                            </select>
+                                                        </dd>
+                                                    </dl>
+                                                </c:when>
+                                            </c:choose>
+                                        </c:if>
+                                        <c:forEach items="${transaction.targetProviderFields}" var="tarproviderInfo" varStatus="tp">
+                                            <form:hidden id="tgtprovider_${tarproviderInfo.fieldNo}" path="targetProviderFields[${tp.index}].fieldValue" value="" />
+                                            <form:hidden path="targetProviderFields[${tp.index}].fieldNo" />
+                                        </c:forEach>
+                                       <div id="toorgProvider" style="display:none">
+                                           <h4 class="form-section-heading">Recipient Organization Provider:  - <a href="javascript:void(0)" title="Change selected provider." id="toOrgProviderChange">Change</a></h4>
+                                           <dl class="vcard">
+                                               <dd class="fn" id="toOrgProviderName"></dd>
+                                               <dd class="adr">
+                                                <span class="street-address" id="toOrgProviderLine1"></span>
+                                                <span class="street-address" id="toOrgProviderLine2"></span>
+                                                <span class="region" id="toOrgProviderRegion"></span><span class="postal-code" id="toOrgProviderZip"></span>
+                                               </dd>
+                                               <dd id="toOrgProviderPhone"></dd>
+                                               <dd id="toOrgProviderFax"></dd>
+                                           </dl>
+                                       </div>
                                     </div>
                                 </div>
                                 <div class="form-section row">

@@ -38,6 +38,8 @@ public interface organizationDAO {
     void deleteOrganization(int orgId);
 
     List<Provider> getOrganizationProviders(int orgId, int page, int MaxResults);
+    
+    List<Provider> getOrganizationActiveProviders(int orgId);
 
     Long findTotalProviders(int orgId);
 

@@ -90,13 +90,12 @@
                                         <dl class="vcard">
                                             <dd class="fn">${transactionDetails.sourceOrgFields[0].fieldValue}</dd>
                                             <dd class="adr">
-                                                <span class="street-address">${transactionDetails.sourceOrgFields[1].fieldValue}</span><br/>
-                                                <c:if test="${not empty transactionDetails.sourceOrgFields[2].fieldValue}"><span class="street-address">${transactionDetails.sourceOrgFields[2].fieldValue}</span><br/></c:if>
+                                                <span class="street-address">${transactionDetails.sourceOrgFields[1].fieldValue}</span><c:if test="${not empty transactionDetails.sourceOrgFields[2].fieldValue}"><span class="street-address"> ${transactionDetails.sourceOrgFields[2].fieldValue}</span></c:if><br/>
                                                 <span class="region">${transactionDetails.sourceOrgFields[3].fieldValue}&nbsp;${transactionDetails.sourceOrgFields[4].fieldValue}</span>, <span class="postal-code">${transactionDetails.sourceOrgFields[5].fieldValue}</span>
                                             </dd>
                                             <c:if test="${not empty transactionDetails.sourceOrgFields[6].fieldValue}"><dd>phone: <span class="tel">${transactionDetails.sourceOrgFields[6].fieldValue}</span></dd></c:if>
                                             <c:if test="${not empty transactionDetails.sourceOrgFields[7].fieldValue}"><dd>fax: <span class="tel">${transactionDetails.sourceOrgFields[7].fieldValue}</span></dd></c:if>
-                                            </dl>
+                                        </dl>
 
                                         <c:if test="${not empty transactionDetails.sourceProviderFields[0].fieldValue}">
                                             <h4 class="form-section-heading">Originating Organization Provider: </h4>
@@ -110,7 +109,7 @@
                                                 </dd>
                                                 <c:if test="${not empty transactionDetails.sourceProviderFields[8].fieldValue}"><dd>phone: <span class="tel">${transactionDetails.sourceProviderFields[8].fieldValue}</span></dd></c:if>
                                                 <c:if test="${not empty transactionDetails.sourceProviderFields[9].fieldValue}"><dd>fax: <span class="tel">${transactionDetails.sourceProviderFields[9].fieldValue}</span></dd></c:if>
-                                                </dl>
+                                            </dl>
                                         </c:if>
                                     </div>
                                     <div class="col-md-6">
@@ -118,16 +117,30 @@
                                         <dl class="vcard">
                                             <dd class="fn">${transactionDetails.targetOrgFields[0].fieldValue}</dd>
                                             <dd class="adr">
-                                                <span class="street-address">${transactionDetails.targetOrgFields[1].fieldValue}</span><br/>
-                                                <c:if test="${not empty transactionDetails.targetOrgFields[2].fieldValue}"><span class="street-address">${transactionDetails.targetOrgFields[2].fieldValue}</span><br/></c:if>
+                                                <span class="street-address">${transactionDetails.targetOrgFields[1].fieldValue}</span><c:if test="${not empty transactionDetails.targetOrgFields[2].fieldValue}"><span class="street-address"> ${transactionDetails.targetOrgFields[2].fieldValue}</span></c:if><br/>
                                                 <span class="region">${transactionDetails.targetOrgFields[3].fieldValue}&nbsp;${transactionDetails.targetOrgFields[4].fieldValue}</span>, <span class="postal-code">${transactionDetails.targetOrgFields[5].fieldValue}</span>
                                             </dd>
                                             <c:if test="${not empty transactionDetails.targetOrgFields[6].fieldValue}"><dd>phone: <span class="tel">${transactionDetails.targetOrgFields[6].fieldValue}</span></dd></c:if>
                                             <c:if test="${not empty transactionDetails.targetOrgFields[7].fieldValue}"><dd>fax: <span class="tel">${transactionDetails.targetOrgFields[7].fieldValue}</span></dd></c:if>
+                                        </dl>
+                                        
+                                        <c:if test="${not empty transactionDetails.targetProviderFields[0].fieldValue}">
+                                            <h4 class="form-section-heading">Recipient Organization Provider: </h4>
+                                            <dl class="vcard">
+                                                <dd class="fn">${transactionDetails.targetProviderFields[0].fieldValue}&nbsp;${transactionDetails.targetProviderFields[1].fieldValue}</dd>
+                                                <dd class="fn">Id: ${transactionDetails.targetProviderFields[2].fieldValue}</dd>
+                                                <dd class="adr">
+                                                    <span class="street-address">${transactionDetails.targetProviderFields[3].fieldValue}</span><br/>
+                                                    <c:if test="${not empty transactionDetails.targetProviderFields[4].fieldValue}"><span class="street-address">${transactionDetails.targetProviderFields[4].fieldValue}</span><br/></c:if>
+                                                    <span class="region">${transactionDetails.targetProviderFields[5].fieldValue}&nbsp;${transactionDetails.targetProviderFields[6].fieldValue}</span>, <span class="postal-code">${transactionDetails.targetProviderFields[7].fieldValue}</span>
+                                                </dd>
+                                                <c:if test="${not empty transactionDetails.targetProviderFields[8].fieldValue}"><dd>phone: <span class="tel">${transactionDetails.targetProviderFields[8].fieldValue}</span></dd></c:if>
+                                                <c:if test="${not empty transactionDetails.targetProviderFields[9].fieldValue}"><dd>fax: <span class="tel">${transactionDetails.targetProviderFields[9].fieldValue}</span></dd></c:if>
                                             </dl>
-                                        </div>
+                                        </c:if>
                                     </div>
-                                    <div class="form-section row">
+                                </div>
+                                <div class="form-section row">
                                         <div class="col-md-12"><h4 class="form-section-heading">Patient Information:</h4></div>
                                     <c:forEach items="${transactionDetails.patientFields}" var="patientInfo" varStatus="pfield">
                                         <div class="col-md-6">

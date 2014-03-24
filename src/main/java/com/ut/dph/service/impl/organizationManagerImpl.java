@@ -143,5 +143,11 @@ public class organizationManagerImpl implements organizationManager {
     public List<Organization> getAssociatedOrgs(int orgId) {
         return organizationDAO.getAssociatedOrgs(orgId);
     }
+    
+    @Override
+    @Transactional
+    public List<Provider> getOrganizationActiveProviders(int orgId) {
+        return organizationDAO.getOrganizationActiveProviders(orgId);
+    }
 
 }

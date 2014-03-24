@@ -37,6 +37,8 @@ public interface organizationManager {
   
   List<Provider> getOrganizationProviders(int orgId, int page, int MaxResults);
   
+  List<Provider> getOrganizationActiveProviders(int orgId);
+  
   Long findTotalProviders(int orgId);
   
   List<Brochure> getOrganizationBrochures(int orgId, int page, int MaxResults);

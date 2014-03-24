@@ -311,7 +311,9 @@ public class organizationDAOImpl implements organizationDAO {
      *
      * @Table	providers
      *
-     * @Param	orgId	This will hold the organization id to search on page	This will hold the current page to view maxResults	This will hold the total number of results to return back to the list page
+     * @Param	orgId	This will hold the organization id to search on	
+     * @param   page    This will hold the current page to view	T
+     * @param   maxResults This will hold the total number of results to return back to the list page
      *
      * @Return	This function will return a list of provider objects
      */
@@ -339,6 +341,25 @@ public class organizationDAOImpl implements organizationDAO {
         return query.list();
 
     }
+    
+    /**
+     * The 'getOrganizationActiveProviders' function will return the list of active providers for a specific organization.
+     *
+     * @Table	providers
+     *
+     * @Param	orgId	This will hold the organization id to search on page
+     *
+     * @Return	This function will return a list of provider objects
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<Provider> getOrganizationActiveProviders(int orgId) {
+        Query query = sessionFactory.getCurrentSession().createQuery("from Provider where orgId = :orgId and status = 1 order by lastName asc, firstName asc");
+        query.setParameter("orgId", orgId);
+        
+         return query.list();
+    }
+    
 
     /**
      * The 'findTotalBrochures' function will return the total number of brochures set up for a specific organization.

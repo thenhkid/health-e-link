@@ -765,10 +765,15 @@ public class HealtheWebController {
             }
             
             
+            
             mav.addObject(transaction);
 
             /* Set the header totals */
             setTotals(session);
+            
+             /* Get a list of organization providers */
+            List<Provider> providers = organizationmanager.getOrganizationActiveProviders(configDetails.getorgId());
+            mav.addObject("providers", providers);
 
             mav.addObject("pendingTotal", pendingTotal);
             mav.addObject("inboxTotal", inboxTotal);
@@ -970,7 +975,7 @@ public class HealtheWebController {
             mav.addObject(transaction);
 
             /* Get a list of organization providers */
-            List<Provider> providers = organizationmanager.getOrganizationProviders(configDetails.getorgId(), 1, 0);
+            List<Provider> providers = organizationmanager.getOrganizationActiveProviders(configDetails.getorgId());
             mav.addObject("providers", providers);
 
             /* Set the header totals */
