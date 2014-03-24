@@ -816,15 +816,13 @@ public class transactionOutDAOImpl implements transactionOutDAO {
             sql = "insert into transactionTranslatedOut (transactionTargetId, configId, ";
             Integer counter = 1;
             for (configurationFormFields formField : formFields) {
-
-                sql += "f" + formField.getFieldNo();
-
-                if (counter < formFields.size()) {
-                    sql += ", ";
-                    counter += 1;
-                }
+            	if(!formField.getsaveToTableName().equalsIgnoreCase("")) {
+            		sql += "f" + formField.getFieldNo() + ",";
+            	}
             }
-
+            
+            sql = sql.substring(0,sql.length()-1);
+            
             sql += ") ";
 
             sql += "VALUES( :transactionTargetId, :configId, ";
@@ -832,28 +830,27 @@ public class transactionOutDAOImpl implements transactionOutDAO {
             String dataSQL;
             counter = 1;
             for (configurationFormFields formField : formFields) {
-
-                dataSQL = "SELECT " + formField.getsaveToTableCol() + " from " + formField.getsaveToTableName()
+            	if(!formField.getsaveToTableName().equalsIgnoreCase("")) {
+            		dataSQL = "SELECT " + formField.getsaveToTableCol() + " from " + formField.getsaveToTableName()
                         + " WHERE transactionInId = :transactionInId";
 
-                Query getData = sessionFactory.getCurrentSession().createSQLQuery(dataSQL)
+            		Query getData = sessionFactory.getCurrentSession().createSQLQuery(dataSQL)
                         .setParameter("transactionInId", transactionInId);
 
-                /* if no result is found then we need to look at the main transactionTranslatedIn table 
-                 for the value only if pass through errors is set
-                 */
-                if (getData.uniqueResult() == null) {
-                    sql += null;
-                } else {
-                    sql += "'" + getData.uniqueResult() + "'";
-                }
-
-                if (counter < formFields.size()) {
-                    sql += ", ";
-                    counter += 1;
-                }
+	                /* if no result is found then we need to look at the main transactionTranslatedIn table 
+	                 for the value only if pass through errors is set
+	                 */
+	                if (getData.uniqueResult() == null) {
+	                    sql += null + ",";
+	                } else {
+	                	sql += "'" + getData.uniqueResult() + "', ";
+	                }
+            	} 
             }
-
+            
+            sql = sql.trim();
+            //remove last comma
+            sql = sql.substring(0,sql.length()-1);
             sql += ") ";
 
             Query insertData = sessionFactory.getCurrentSession().createSQLQuery(sql)
