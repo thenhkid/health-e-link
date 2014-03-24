@@ -103,7 +103,7 @@
                                         <dl class="vcard">
                                             <dd class="fn">${transaction.sourceOrgFields[0].fieldValue}</dd>
                                             <dd class="adr">
-                                                <span class="street-address">${transaction.sourceOrgFields[1].fieldValue}</span>< c:if test="${not empty transaction.sourceOrgFields[2].fieldValue}"><span class="street-address">&nbsp;${transaction.sourceOrgFields[2].fieldValue}</span></c:if><br/>
+                                                <span class="street-address">${transaction.sourceOrgFields[1].fieldValue}</span><c:if test="${not empty transaction.sourceOrgFields[2].fieldValue}"><span class="street-address">&nbsp;${transaction.sourceOrgFields[2].fieldValue}</span></c:if><br/>
                                                 <span class="region">${transaction.sourceOrgFields[3].fieldValue}&nbsp;${transaction.sourceOrgFields[4].fieldValue}</span>, <span class="postal-code">${transaction.sourceOrgFields[5].fieldValue}</span>
                                             </dd>
                                             <c:if test="${not empty transaction.sourceOrgFields[6].fieldValue}"><dd>phone: <span class="tel">${transaction.sourceOrgFields[6].fieldValue}</span></dd></c:if>
