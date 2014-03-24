@@ -14,11 +14,12 @@
         </property>
     </bean>
 
-    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+    <bean id="dataSource" class="org.apache.tomcat.jdbc.pool.DataSource">
         <property name="driverClassName" value="${jdbc.driver}" />
         <property name="url" value="${jdbc.url}" />
         <property name="username" value="${jdbc.user}" />
         <property name="password" value="${jdbc.password}" />
+        <property name="logAbandoned" value="${jdbc.logAbandoned}" />
     </bean>
     
     <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">

@@ -35,6 +35,7 @@
         <jboss-logging.version>3.1.4.GA</jboss-logging.version>
         <jboss-transaction-api.version>1.0.1.Final</jboss-transaction-api.version>
         <commons-validator.version>1.4.0</commons-validator.version>
+        <tomcat-jdbc.version>7.0.47</tomcat-jdbc.version>
     </properties>
   
  
@@ -74,12 +75,6 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-orm</artifactId>
-            <version>${org.springframework.version}</version>
-        </dependency>
-       
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-jdbc</artifactId>
             <version>${org.springframework.version}</version>
         </dependency>
 
@@ -141,6 +136,13 @@
             <artifactId>mysql-connector-java</artifactId>
             <version>${mysql-connector.version}</version>
         </dependency>
+       
+       <!-- JDBC -->
+        <dependency>
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>tomcat-jdbc</artifactId>
+			<version>${tomcat-jdbc.version}</version>
+		</dependency>
        
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -277,7 +279,7 @@
             <groupId>commons-validator</groupId>
             <artifactId>commons-validator</artifactId>
             <version>${commons-validator.version}</version>
-        </dependency>    
+        </dependency>   
     
     </dependencies>
     <build>
