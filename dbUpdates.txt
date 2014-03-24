@@ -386,6 +386,16 @@ GROUP BY saveToTableName
 ORDER BY saveToTableName;
 end proc_main$$
 DELIMITER ;
+
+/** grace 03232014 10:08 PM **/
+ALTER TABLE `universaltranslator`.`message_races` 
+CHANGE COLUMN `white` `white` INT NULL DEFAULT NULL,
+CHANGE COLUMN `black` `black` INT NULL DEFAULT NULL,
+CHANGE COLUMN `am_indian_alaskan` `am_indian_alaskan` INT NULL DEFAULT NULL,
+CHANGE COLUMN `asian` `asian` INT NULL DEFAULT NULL,
+CHANGE COLUMN `hawaiian_pi` `hawaiian_pi` INT NULL DEFAULT NULL,
+CHANGE COLUMN `notReported` `notReported` INT NULL DEFAULT NULL,
+CHANGE COLUMN `moreThanOneRace` `moreThanOneRace` INT NULL DEFAULT NULL;
  
   
   
