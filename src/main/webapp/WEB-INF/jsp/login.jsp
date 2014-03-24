@@ -7,7 +7,7 @@
         <header class="login-header" role="banner">
             <div class="login-header-content">
                 <a href="<c:url value='/' />" title="Return to home page.">
-                    <span class="logo" alt="{Company Name Logo}"></span>
+                    <span class="logo" alt="{Company Name Logo}">Massachusetts Department of Public Health</span>
                 </a>
             </div>
         </header>
