@@ -25,7 +25,6 @@ public class transactionInRecords {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @NoHtml
     @Column(name = "ID", nullable = false)
     private int id;
 
@@ -1052,11 +1051,9 @@ public class transactionInRecords {
     @Column(name = "F255", nullable = true)
     private String f255 = null;
 
-    @NoHtml
     @Column(name = "dateCreated", nullable = true)
     private Date dateCreated = new Date();
 
-    @NoHtml
     @Column(name = "loadTableId", nullable = true)
     private String loadTableId = null;
 

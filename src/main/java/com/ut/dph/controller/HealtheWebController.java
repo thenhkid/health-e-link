@@ -1299,7 +1299,7 @@ public class HealtheWebController {
                 transactionInManager.submitTransactionInRecordsUpdates(records);
             }
             
-        }
+       }
         catch (Exception e) {
             throw new Exception("Error occurred in saving transaction field values", e);
         }

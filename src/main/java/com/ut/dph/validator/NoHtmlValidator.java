@@ -16,7 +16,6 @@ public class NoHtmlValidator implements ConstraintValidator<NoHtml, String> {
    /* http://owasp-java-html-sanitizer.googlecode.com/svn/trunk/distrib/javadoc/org/owasp/html/HtmlPolicyBuilder.html */
    /* builder is not thread safe, so make local */
    private static final PolicyFactory DISALLOW_ALL = new HtmlPolicyBuilder()
-           .allowElements("@",".")
            .allowStandardUrlProtocols()
            .toFactory();
  
@@ -30,11 +29,20 @@ public class NoHtmlValidator implements ConstraintValidator<NoHtml, String> {
    @Override
    public boolean isValid(String value, ConstraintValidatorContext context)
    {
-      String sanitized = DISALLOW_ALL.sanitize(value);
       
-      //Need to replace &#64; back to @
-      sanitized = sanitized.replace("&#64;", "@");
+      if(value == null) {
+           return true;
+      }
+      else {
+          String sanitized = DISALLOW_ALL.sanitize(value);
+          
+          //Need to replace &#64; back to @
+          sanitized = sanitized.replace("&#64;", "@").replace("&amp;", "&");
+          
+          
+          return sanitized.equals(value);
+      }
+       
       
-      return sanitized.equals(value);
    }
 }

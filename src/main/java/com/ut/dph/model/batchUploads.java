@@ -55,11 +55,9 @@ public class batchUploads {
     @Column(name = "USERID", nullable = false)
     private int userId;
 
-    @NoHtml
     @Column(name = "UTBATCHCONFNAME", nullable = true)
     private String utBatchConfName = null;
 
-    @NoHtml
     @Column(name = "UTBATCHNAME", nullable = false)
     private String utBatchName;
 
@@ -73,11 +71,9 @@ public class batchUploads {
     @Column(name = "STATUSID", nullable = false)
     private int statusId;
 
-    @NoHtml
     @Column(name = "STARTDATETIME", nullable = true)
     private Date startDateTime = null;
 
-    @NoHtml
     @Column(name = "ENDDATETIME", nullable = true)
     private Date endDateTime = null;
 
@@ -94,18 +90,15 @@ public class batchUploads {
     @Column(name = "DATESUBMITTED", nullable = false)
     private Date dateSubmitted = new Date();
 
-    @NoHtml
     @Column(name = "configId", nullable = true)
     private Integer configId;
 
     @Column(name = "CONTAINSHEADERROW", nullable = false)
     private boolean containsHeaderRow = false;
 
-    @NoHtml
     @Column(name = "delimChar", nullable = true)
     private String delimChar;
 
-    @NoHtml
     @Column(name = "fileLocation", nullable = true)
     private String fileLocation;
 

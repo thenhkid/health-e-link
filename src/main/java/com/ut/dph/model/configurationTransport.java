@@ -63,7 +63,6 @@ public class configurationTransport {
     @Column(name = "CLEARRECORDS", nullable = false)
     private boolean clearRecords = false;
 
-    @NoHtml
     @Column(name = "FILELOCATION", nullable = true)
     private String fileLocation = null;
 
