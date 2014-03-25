@@ -29,9 +29,6 @@
             <h2 class="form-title">Edit Organization Profile</h2>
             
             <form:form id="orgProfileForm"  commandName="organization" role="form" class="form" method="post">
-                <input type="hidden" id="action" name="action" value="save" />
-                <form:hidden path="id" />
-                <form:hidden path="cleanURL" id="cleanURL" />
                 <div class="panel-group form-accordion" id="accordion">
 
                     <div class="panel panel-default panel-form">

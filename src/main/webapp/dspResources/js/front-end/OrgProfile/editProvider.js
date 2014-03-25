@@ -73,7 +73,7 @@ require(['./main'], function () {
         //Function to submit the changes to an existing address or 
         //submit the new address fields from the modal window.
         $(document).on('click', '#submitButton', function(event) {
-
+           
             var formData = $("#addressdetailsform").serialize();
 
             var actionValue = '/OrgProfile/address/' + $(this).attr('rel').toLowerCase();

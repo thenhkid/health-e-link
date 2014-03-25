@@ -49,7 +49,6 @@
             <h2 class="form-title">Edit Provider Profile</h2>
             
             <form:form id="providerForm"  commandName="providerdetails" modelAttribute="providerdetails" role="form" class="form" method="post">
-                <form:hidden path="id" id="id" />
                 <form:hidden path="orgId" id="orgId" />
                 <form:hidden path="dateCreated" />
                 <div class="panel-group form-accordion" id="accordion">
