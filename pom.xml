@@ -32,8 +32,6 @@
         <poi-ooxml.version>3.9</poi-ooxml.version>
         <log4j.version>2.0-beta8</log4j.version>
         <quartz.version>2.2.1</quartz.version>
-        <jboss-logging.version>3.1.4.GA</jboss-logging.version>
-        <jboss-transaction-api.version>1.0.1.Final</jboss-transaction-api.version>
         <commons-validator.version>1.4.0</commons-validator.version>
     </properties>
   
@@ -262,17 +260,7 @@
             <artifactId>quartz-jobs</artifactId>
             <version>${quartz.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.jboss.logging</groupId>
-            <artifactId>jboss-logging</artifactId>
-            <version>${jboss-logging.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.spec.javax.transaction</groupId>
-            <artifactId>jboss-transaction-api_1.1_spec</artifactId>
-            <version>${jboss-transaction-api.version}</version>
-        </dependency>
- 
+        
         <dependency>
             <groupId>commons-validator</groupId>
             <artifactId>commons-validator</artifactId>

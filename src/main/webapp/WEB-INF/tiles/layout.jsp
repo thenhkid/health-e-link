@@ -1,6 +1,7 @@
+<!DOCTYPE html>
 <%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<!DOCTYPE html>
+
 <jsp:text><![CDATA[<!--[if lte IE 7]>]]></jsp:text><html role="application" class="no-js lt-ie9 lt-ie8 lt-ie7"><jsp:text><![CDATA[<![endif]-->]]></jsp:text>
 <jsp:text><![CDATA[<!--[if IE 7]>]]></jsp:text><html role="application" class="no-js lt-ie9 lt-ie8"><jsp:text><![CDATA[<![endif]-->]]></jsp:text>
 <jsp:text><![CDATA[<!--[if IE 8]>]]></jsp:text><html role="application" class="no-js lt-ie9"><jsp:text><![CDATA[<![endif]-->]]></jsp:text>
