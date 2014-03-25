@@ -332,7 +332,7 @@
                     <input type="button" id="save" class="btn btn-primary btn-action-sm submitMessage" value="Save ${transaction.sourceType == 1 && pageHeader == 'create' ? 'Referral' : 'Feedback Report'}"/>
                     <c:choose>
                         <c:when test="${transaction.autoRelease == true}">
-                            <input type="button" id="send" class="btn btn-primary btn-action-sm submitMessage" value="Send Referral"/>
+                            <input type="button" id="send" class="btn btn-primary btn-action-sm submitMessage" value="Send ${transaction.sourceType == 1 && pageHeader == 'create' ? 'Referral' : 'Feedback Report'}"/>
                         </c:when>
                         <c:otherwise>
                             <input type="button" id="release" class="btn btn-primary btn-action-sm submitMessage" value="Release"/>

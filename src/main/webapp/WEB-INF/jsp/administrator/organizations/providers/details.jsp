@@ -225,14 +225,16 @@
                                                     ${providerdetails.providerIds[pStatus.index].issuedBy}
                                                 </td>
                                                 <td>
-                                                    <a href="#providerIdModal" data-toggle="modal" class="btn btn-link editId" rel="address?i=${providerdetails.providerIds[pStatus.index].id}" title="Edit this provider Id">
-                                                        <span class="glyphicon glyphicon-edit"></span>
-                                                        Edit
-                                                    </a>
-                                                    <a href="javascript:void(0);"  class="btn btn-link deleteId" rel="${providerdetails.providerIds[pStatus.index].id}" title="Delete this provider Id">
-                                                        <span class="glyphicon glyphicon-remove"></span>
-                                                        Delete
-                                                    </a>
+                                                    <div class="pull-right">
+                                                        <a href="#providerIdModal" data-toggle="modal" class="btn btn-link editId" rel="address?i=${providerdetails.providerIds[pStatus.index].id}" title="Edit this provider Id">
+                                                            <span class="glyphicon glyphicon-edit"></span>
+                                                            Edit
+                                                        </a>
+                                                        <a href="javascript:void(0);"  class="btn btn-link deleteId" rel="${providerdetails.providerIds[pStatus.index].id}" title="Delete this provider Id">
+                                                            <span class="glyphicon glyphicon-remove"></span>
+                                                            Delete
+                                                        </a>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         </c:forEach>

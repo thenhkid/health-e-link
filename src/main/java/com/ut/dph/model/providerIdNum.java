@@ -22,17 +22,17 @@ public class providerIdNum {
     @Column(name = "ID", nullable = false)
     private int id;
     
+    @NoHtml
     @Column(name = "TYPE", nullable = true)
-    private int providerId;
+    private String type;
     
     @NotEmpty
     @NoHtml
     @Column(name = "IDNUM", nullable = false)
     private String idNum;
     
-    @NoHtml
     @Column(name = "PROVIDERID", nullable = false)
-    private String type;
+    private int providerId;
     
     @NotEmpty
     @NoHtml

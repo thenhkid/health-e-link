@@ -1,5 +1,6 @@
 package com.ut.dph.model;
 
+import com.ut.dph.validator.NoHtml;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -25,7 +26,7 @@ public class configurationDataTranslations {
     @Transient
     int fieldNo;
 
-	@Id
+    @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID", nullable = false)
     private int id;
@@ -44,20 +45,20 @@ public class configurationDataTranslations {
 
     @Column(name = "PASSCLEAR", nullable = true)
     private int passClear = 1;
-    
-    @NotEmpty
+
+    @NoHtml
     @Column(name = "FIELDA", nullable = true)
     private String fieldA = null;
 
-    @NotEmpty
+    @NoHtml
     @Column(name = "FIELDB", nullable = true)
     private String fieldB = null;
 
-    @NotEmpty
+    @NoHtml
     @Column(name = "CONSTANT1", nullable = true)
     private String constant1 = null;
 
-    @NotEmpty
+    @NoHtml
     @Column(name = "CONSTANT2", nullable = true)
     private String constant2 = null;
 
@@ -175,14 +176,13 @@ public class configurationDataTranslations {
     public String getMacroName() {
         return macroName;
     }
-    
+
     public int getFieldNo() {
-		return fieldNo;
-	}
+        return fieldNo;
+    }
 
-	public void setFieldNo(int fieldNo) {
-		this.fieldNo = fieldNo;
-	}
-
+    public void setFieldNo(int fieldNo) {
+        this.fieldNo = fieldNo;
+    }
 
 }

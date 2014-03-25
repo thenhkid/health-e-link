@@ -1083,9 +1083,10 @@ public class adminConfigController {
 	//Delete all the data translations before creating
         //This will help with the jquery removing translations
         configurationmanager.deleteDataTranslations(configId);
-
+        
         //Loop through the list of translations
         for (configurationDataTranslations translation : translations) {
+            System.out.println(translation.getconfigId());
             configurationmanager.saveDataTranslations(translation);
         }
 

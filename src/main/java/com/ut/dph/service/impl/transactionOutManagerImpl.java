@@ -568,7 +568,9 @@ public class transactionOutManagerImpl implements transactionOutManager {
                             }
 
                         }
-                    } /* WEEKLY SCHEDULE */ else if (schedule.gettype() == 3) {
+                    } 
+                    /* WEEKLY SCHEDULE */ 
+                    else if (schedule.gettype() == 3) {
                         long diffInWeeks = 0;
 
                         if (logs.size() > 0) {
@@ -583,7 +585,9 @@ public class transactionOutManagerImpl implements transactionOutManager {
 
                         }
 
-                    } /* MONTHLY SCHEDULE */ else if (schedule.gettype() == 4) {
+                    } 
+                    /* MONTHLY SCHEDULE */ 
+                    else if (schedule.gettype() == 4) {
 
                         long diffInDays = 0;
 
