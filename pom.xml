@@ -135,12 +135,12 @@
             <version>${mysql-connector.version}</version>
         </dependency>
        
-       <!-- JDBC -->
+        <!-- JDBC -->
         <dependency>
-			<groupId>org.apache.tomcat</groupId>
-			<artifactId>tomcat-jdbc</artifactId>
-			<version>${tomcat-jdbc.version}</version>
-		</dependency>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>tomcat-jdbc</artifactId>
+            <version>${tomcat-jdbc.version}</version>
+        </dependency>
        
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -268,6 +268,12 @@
             <artifactId>commons-validator</artifactId>
             <version>${commons-validator.version}</version>
         </dependency>   
+        
+        <dependency>
+            <groupId>com.googlecode.owasp-java-html-sanitizer</groupId>
+            <artifactId>owasp-java-html-sanitizer</artifactId>
+            <version>[r136,)</version>
+        </dependency>
     
     </dependencies>
     <build>

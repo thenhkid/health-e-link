@@ -6,6 +6,7 @@
 
 package com.ut.dph.model;
 
+import com.ut.dph.validator.NoHtml;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -47,12 +48,14 @@ public class batchDownloads {
     @Column(name = "USERID", nullable = false)
     private int userId;
     
+    @NoHtml
     @Column(name = "UTBATCHNAME", nullable = false)
     private String utBatchName;
     
     @Column(name = "TRANSPORTMETHODID", nullable = false)
     private int transportMethodId;
     
+    @NoHtml
     @Column(name = "OUTPUTFILENAME", nullable = true)
     private String outputFIleName = null;
     

@@ -1,5 +1,6 @@
 package com.ut.dph.model;
 
+import com.ut.dph.validator.NoHtml;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -22,12 +23,15 @@ public class configurationFTPFields {
     @Column(name = "IP", nullable = true)
     private String ip = null;
 
+    @NoHtml
     @Column(name = "DIRECTORY", nullable = true)
     private String directory = null;
 
+    @NoHtml
     @Column(name = "USERNAME", nullable = true)
     private String username = null;
 
+    @NoHtml
     @Column(name = "PASSWORD", nullable = true)
     private String password = null;
 
@@ -37,6 +41,7 @@ public class configurationFTPFields {
     @Column(name = "PORT", nullable = true)
     private int port = 0;
     
+    @NoHtml
     @Column(name = "PROTOCOL", nullable = true)
     private String protocol = "FTP";
 

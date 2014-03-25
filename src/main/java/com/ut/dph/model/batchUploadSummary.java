@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package com.ut.dph.model;
 
 import javax.persistence.Column;
@@ -21,36 +20,36 @@ import javax.persistence.Transient;
 @Entity
 @Table(name = "BATCHUPLOADSUMMARY")
 public class batchUploadSummary {
-    
-	@Transient
+
+    @Transient
     private Integer transactionTargetId = 0;
-	
-	@Id
+
+    @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID", nullable = false)
     private int id;
-    
+
     @Column(name = "BATCHID", nullable = false)
     private int batchId;
-    
+
     @Column(name = "TRANSACTIONINID", nullable = false)
     private int transactionInId;
-    
+
     @Column(name = "SOURCEORGID", nullable = false)
     private int sourceOrgId;
-    
+
     @Column(name = "TARGETORGID", nullable = false)
     private int targetOrgId;
-    
+
     @Column(name = "MESSAGETYPEID", nullable = false)
     private int messageTypeId;
-    
+
     @Column(name = "SOURCECONFIGID", nullable = false)
     private int sourceConfigId;
-    
+
     @Column(name = "TARGETCONFIGID", nullable = true)
     private int targetConfigId = 0;
-    
+
     public int getId() {
         return id;
     }
@@ -58,7 +57,7 @@ public class batchUploadSummary {
     public void setId(int id) {
         this.id = id;
     }
-    
+
     public int getbatchId() {
         return batchId;
     }
@@ -66,7 +65,7 @@ public class batchUploadSummary {
     public void setbatchId(int batchId) {
         this.batchId = batchId;
     }
-    
+
     public int gettransactionInId() {
         return transactionInId;
     }
@@ -74,7 +73,7 @@ public class batchUploadSummary {
     public void settransactionInId(int transactionInId) {
         this.transactionInId = transactionInId;
     }
-    
+
     public int getsourceOrgId() {
         return sourceOrgId;
     }
@@ -82,7 +81,7 @@ public class batchUploadSummary {
     public void setsourceOrgId(int sourceOrgId) {
         this.sourceOrgId = sourceOrgId;
     }
-    
+
     public int gettargetOrgId() {
         return targetOrgId;
     }
@@ -90,7 +89,7 @@ public class batchUploadSummary {
     public void settargetOrgId(int targetOrgId) {
         this.targetOrgId = targetOrgId;
     }
-    
+
     public int getmessageTypeId() {
         return messageTypeId;
     }
@@ -98,7 +97,7 @@ public class batchUploadSummary {
     public void setmessageTypeId(int messageTypeId) {
         this.messageTypeId = messageTypeId;
     }
-    
+
     public int getsourceConfigId() {
         return sourceConfigId;
     }
@@ -106,21 +105,21 @@ public class batchUploadSummary {
     public void setsourceConfigId(int sourceConfigId) {
         this.sourceConfigId = sourceConfigId;
     }
-    
+
     public int getTargetConfigId() {
-		return targetConfigId;
-	}
+        return targetConfigId;
+    }
 
-	public void setTargetConfigId(int targetConfigId) {
-		this.targetConfigId = targetConfigId;
-	}
-	
+    public void setTargetConfigId(int targetConfigId) {
+        this.targetConfigId = targetConfigId;
+    }
+
     public Integer getTransactionTargetId() {
-		return transactionTargetId;
-	}
+        return transactionTargetId;
+    }
 
-	public void setTransactionTargetId(Integer transactionTargetId) {
-		this.transactionTargetId = transactionTargetId;
-	}
-    
+    public void setTransactionTargetId(Integer transactionTargetId) {
+        this.transactionTargetId = transactionTargetId;
+    }
+
 }

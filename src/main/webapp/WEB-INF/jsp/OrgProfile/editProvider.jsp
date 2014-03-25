@@ -132,9 +132,9 @@
                                         </spring:bind>
                                     </div>  
                                     
-                                    <input type="button" id="save" class="btn btn-primary btn-action-sm submitMessage" value="Save"/>
-                                   
                                 </div>
+                                
+                                <input type="button" id="save" class="btn btn-primary btn-action-sm submitMessage" value="Save"/>
                             </div>
                         </div>
                         

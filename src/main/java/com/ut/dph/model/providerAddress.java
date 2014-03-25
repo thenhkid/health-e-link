@@ -1,5 +1,6 @@
 package com.ut.dph.model;
 
+import com.ut.dph.validator.NoHtml;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -18,25 +19,74 @@ import org.springframework.format.annotation.DateTimeFormat;
 @Table(name = "INFO_PROVIDERADDRESSES")
 public class providerAddress {
 
-    private int id;
-    private String type;
-    private String line1;
-    private String line2;
-    private String city;
-    private String county;
-    private String state;
-    private String postalCode;
-    private String priority;
-    private String status;
-    private String phone1;
-    private String phone2;
-    private String fax;
-    private Date dateCreated = new Date();
-    private int providerId;
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID", nullable = false)
+    private int id;
+    
+    @Column(name = "TYPE", nullable = true)
+    private String type;
+    
+    @NotEmpty
+    @NoHtml
+    @Column(name = "LINE1", nullable = false)
+    private String line1;
+    
+    @NoHtml
+    @Column(name = "LINE2", nullable = true)
+    private String line2;
+    
+    @NotEmpty
+    @NoHtml
+    @Column(name = "CITY", nullable = false)
+    private String city;
+    
+    @NoHtml
+    @Column(name = "COUNTY", nullable = true)
+    private String county;
+    
+    @NotEmpty
+    @NoHtml
+    @Column(name = "STATE", nullable = false)
+    private String state;
+    
+    @NotEmpty
+    @NoHtml
+    @Column(name = "POSTALCODE", nullable = false)
+    private String postalCode;
+    
+    @NoHtml
+    @Column(name = "PRIORITY", nullable = true)
+    private String priority;
+    
+    @NoHtml
+    @Column(name = "STATUS", nullable = true)
+    private String status;
+    
+    @NotEmpty
+    @Phone
+    @NoHtml
+    @Column(name = "PHONE1", nullable = false)
+    private String phone1;
+    
+    @Phone
+    @NoHtml
+    @Column(name = "PHONE2", nullable = true)
+    private String phone2;
+    
+    @Phone
+    @NoHtml
+    @Column(name = "FAX", nullable = true)
+    private String fax;
+    
+    @DateTimeFormat(pattern = "dd/MM/yyyy hh:mm:ss")
+    @Column(name = "DATECREATED", nullable = true)
+    private Date dateCreated = new Date();
+    
+    @Column(name = "PROVIDERID", nullable = false)
+    private int providerId;
+
+    
     public int getId() {
         return this.id;
     }
@@ -45,7 +95,6 @@ public class providerAddress {
         this.id = id;
     }
 
-    @Column(name = "TYPE", nullable = true)
     public String getType() {
         return this.type;
     }
@@ -53,9 +102,7 @@ public class providerAddress {
     public void setType(String type) {
         this.type = type;
     }
-
-    @NotEmpty
-    @Column(name = "LINE1", nullable = false)
+    
     public String getLine1() {
         return this.line1;
     }
@@ -64,7 +111,6 @@ public class providerAddress {
         this.line1 = line1;
     }
 
-    @Column(name = "LINE2", nullable = true)
     public String getLine2() {
         return this.line2;
     }
@@ -73,8 +119,6 @@ public class providerAddress {
         this.line2 = line2;
     }
 
-    @NotEmpty
-    @Column(name = "CITY", nullable = false)
     public String getCity() {
         return this.city;
     }
@@ -83,7 +127,6 @@ public class providerAddress {
         this.city = city;
     }
 
-    @Column(name = "COUNTY", nullable = true)
     public String getCounty() {
         return this.county;
     }
@@ -91,9 +134,7 @@ public class providerAddress {
     public void setCounty(String county) {
         this.county = county;
     }
-
-    @NotEmpty
-    @Column(name = "STATE", nullable = false)
+    
     public String getState() {
         return this.state;
     }
@@ -101,10 +142,6 @@ public class providerAddress {
     public void setState(String state) {
         this.state = state;
     }
-
-    @NotEmpty
-    @Phone
-    @Column(name = "PHONE1", nullable = false)
 
     public String getPhone1() {
         return phone1;
@@ -114,9 +151,6 @@ public class providerAddress {
         this.phone1 = phone;
     }
 
-    @Phone
-    @Column(name = "PHONE2", nullable = true)
-
     public String getPhone2() {
         return phone2;
     }
@@ -124,9 +158,6 @@ public class providerAddress {
     public void setPhone2(String phone) {
         this.phone2 = phone;
     }
-
-    @Phone
-    @Column(name = "FAX", nullable = true)
 
     public String getFax() {
         return fax;
@@ -136,8 +167,6 @@ public class providerAddress {
         this.fax = fax;
     }
 
-    @NotEmpty
-    @Column(name = "POSTALCODE", nullable = false)
     public String getPostalCode() {
         return this.postalCode;
     }
@@ -146,7 +175,6 @@ public class providerAddress {
         this.postalCode = postalCode;
     }
 
-    @Column(name = "PRIORITY", nullable = true)
     public String getPriority() {
         return this.priority;
     }
@@ -155,7 +183,6 @@ public class providerAddress {
         this.priority = priority;
     }
 
-    @Column(name = "STATUS", nullable = true)
     public String getStatus() {
         return this.status;
     }
@@ -164,8 +191,6 @@ public class providerAddress {
         this.status = status;
     }
 
-    @DateTimeFormat(pattern = "dd/MM/yyyy hh:mm:ss")
-    @Column(name = "DATECREATED", nullable = true)
     public Date getDateCreated() {
         return dateCreated;
     }
@@ -174,7 +199,6 @@ public class providerAddress {
         this.dateCreated = dateCreated;
     }
 
-    @Column(name = "PROVIDERID", nullable = false)
     public int getProviderId() {
         return this.providerId;
     }

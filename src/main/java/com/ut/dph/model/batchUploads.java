@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package com.ut.dph.model;
 
+import com.ut.dph.validator.NoHtml;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -23,101 +23,109 @@ import org.springframework.format.annotation.DateTimeFormat;
 @Entity
 @Table(name = "BATCHUPLOADS")
 public class batchUploads {
-    
+
     @Transient
     private Integer totalTransactions = 0;
-    
+
     @Transient
     private String statusValue;
-    
+
     public String getDelimChar() {
-		return delimChar;
-	}
+        return delimChar;
+    }
 
-	public void setDelimChar(String delimChar) {
-		this.delimChar = delimChar;
-	}
+    public void setDelimChar(String delimChar) {
+        this.delimChar = delimChar;
+    }
 
-	@Transient
+    @Transient
     private String usersName;
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID", nullable = false)
     private int id;
-    
+
     @Column(name = "ORGID", nullable = false)
     private int orgId;
-    
+
     @Column(name = "PROVIDERID", nullable = true)
     private int providerId = 0;
-    
+
     @Column(name = "USERID", nullable = false)
     private int userId;
-    
+
+    @NoHtml
     @Column(name = "UTBATCHCONFNAME", nullable = true)
     private String utBatchConfName = null;
-    
+
+    @NoHtml
     @Column(name = "UTBATCHNAME", nullable = false)
     private String utBatchName;
-    
+
     @Column(name = "TRANSPORTMETHODID", nullable = false)
     private int transportMethodId;
-    
+
+    @NoHtml
     @Column(name = "ORIGINALFILENAME", nullable = false)
     private String originalFileName;
-    
+
     @Column(name = "STATUSID", nullable = false)
     private int statusId;
-    
+
+    @NoHtml
     @Column(name = "STARTDATETIME", nullable = true)
     private Date startDateTime = null;
-    
+
+    @NoHtml
     @Column(name = "ENDDATETIME", nullable = true)
     private Date endDateTime = null;
-    
+
     @Column(name = "TOTALRECORDCOUNT", nullable = false)
     private int totalRecordCount = 0;
-    
+
     @Column(name = "DELETED", nullable = false)
     private boolean deleted = false;
-    
+
     @Column(name = "ERRORRECORDCOUNT", nullable = false)
     private int errorRecordCount = 0;
-    
+
     @DateTimeFormat(pattern = "dd/MM/yyyy hh:mm:ss")
     @Column(name = "DATESUBMITTED", nullable = false)
     private Date dateSubmitted = new Date();
-    
+
+    @NoHtml
     @Column(name = "configId", nullable = true)
     private Integer configId;
-   
+
     @Column(name = "CONTAINSHEADERROW", nullable = false)
     private boolean containsHeaderRow = false;
-    
-	@Column(name = "delimChar", nullable = true)
+
+    @NoHtml
+    @Column(name = "delimChar", nullable = true)
     private String delimChar;
-    
+
+    @NoHtml
     @Column(name = "fileLocation", nullable = true)
     private String fileLocation;
-    
+
     public boolean isContainsHeaderRow() {
-		return containsHeaderRow;
-	}
+        return containsHeaderRow;
+    }
 
-	public void setContainsHeaderRow(boolean containsHeaderRow) {
-		this.containsHeaderRow = containsHeaderRow;
-	}
+    public void setContainsHeaderRow(boolean containsHeaderRow) {
+        this.containsHeaderRow = containsHeaderRow;
+    }
 
-	public String getFileLocation() {
-		return fileLocation;
-	}
+    public String getFileLocation() {
+        return fileLocation;
+    }
 
-	public void setFileLocation(String fileLocation) {
-		this.fileLocation = fileLocation;
-	}
+    public void setFileLocation(String fileLocation) {
+        this.fileLocation = fileLocation;
+    }
 
-	public int getId() {
+    public int getId() {
         return id;
     }
 
@@ -132,7 +140,7 @@ public class batchUploads {
     public void setOrgId(int orgId) {
         this.orgId = orgId;
     }
-    
+
     public int getproviderId() {
         return providerId;
     }
@@ -140,7 +148,7 @@ public class batchUploads {
     public void setproviderId(int providerId) {
         this.providerId = providerId;
     }
-    
+
     public int getuserId() {
         return userId;
     }
@@ -148,122 +156,121 @@ public class batchUploads {
     public void setuserId(int userId) {
         this.userId = userId;
     }
-    
+
     public String getutBatchConfName() {
         return utBatchConfName;
     }
-    
+
     public void setutBatchConfName(String utBatchConfName) {
         this.utBatchConfName = utBatchConfName;
     }
-    
+
     public String getutBatchName() {
         return utBatchName;
     }
-    
+
     public void setutBatchName(String utBatchName) {
         this.utBatchName = utBatchName;
     }
-    
+
     public int gettransportMethodId() {
         return transportMethodId;
     }
-    
+
     public void settransportMethodId(int transportMethodId) {
         this.transportMethodId = transportMethodId;
     }
-    
+
     public String getoriginalFileName() {
         return originalFileName;
     }
-    
+
     public void setoriginalFileName(String originalFileName) {
         this.originalFileName = originalFileName;
     }
-    
+
     public int getstatusId() {
         return statusId;
     }
-    
+
     public void setstatusId(int statusId) {
         this.statusId = statusId;
     }
-    
+
     public Date getstartDateTime() {
         return startDateTime;
     }
-    
+
     public void setstartDateTime(Date startDateTime) {
         this.startDateTime = startDateTime;
     }
-    
+
     public Date getendDateTime() {
         return endDateTime;
     }
-    
+
     public void setendDateTime(Date endDateTime) {
         this.endDateTime = endDateTime;
     }
-    
+
     public int gettotalRecordCount() {
         return totalRecordCount;
     }
-    
+
     public void settotalRecordCount(int totalRecordCount) {
         this.totalRecordCount = totalRecordCount;
     }
-    
+
     public boolean getdeleted() {
         return deleted;
     }
-    
+
     public void setdeleted(boolean deleted) {
         this.deleted = deleted;
     }
-    
+
     public int geterrorRecordCount() {
         return errorRecordCount;
     }
-    
+
     public void seterrorRecordCount(int errorRecordCount) {
         this.errorRecordCount = errorRecordCount;
     }
-    
+
     public Date getdateSubmitted() {
-       return dateSubmitted;
+        return dateSubmitted;
     }
-    
+
     public void settotalTransactions(int totalTransactions) {
         this.totalTransactions = totalTransactions;
-    } 
-    
+    }
+
     public int gettotalTransactions() {
         return totalTransactions;
     }
-    
+
     public String getstatusValue() {
-       return statusValue;
+        return statusValue;
     }
-   
+
     public void setstatusValue(String statusValue) {
-       this.statusValue = statusValue;
+        this.statusValue = statusValue;
     }
-    
+
     public String getusersName() {
-       return usersName;
+        return usersName;
     }
-   
+
     public void setusersName(String usersName) {
-       this.usersName = usersName;
+        this.usersName = usersName;
     }
-    
+
     public Integer getConfigId() {
-		return configId;
-	}
+        return configId;
+    }
 
-	public void setConfigId(Integer configId) {
-		this.configId = configId;
-	}
+    public void setConfigId(Integer configId) {
+        this.configId = configId;
+    }
 
-    
 }

@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package com.ut.dph.model;
 
 import java.util.Date;
@@ -24,31 +23,31 @@ import org.springframework.format.annotation.DateTimeFormat;
 @Entity
 @Table(name = "CONFIGURATIONCONNECTIONS")
 public class configurationConnection {
-    
+
     @Transient
     private configuration srcConfigDetails = null;
-    
+
     @Transient
     private configuration tgtConfigDetails = null;
-    
+
     @Transient
     private String targetOrgName = null;
-    
+
     @Transient
     private int targetOrgId = 0;
-    
+
     @Transient
     private int messageTypeId = 0;
-     
-	@Transient
+
+    @Transient
     private List<User> connectionSenders = null;
-    
+
     @Transient
     private List<User> connectionReceivers = null;
-    
+
     @Transient
     private Integer targetOrgCol = 0;
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID", nullable = false)
@@ -56,18 +55,17 @@ public class configurationConnection {
 
     @Column(name = "SOURCECONFIGID", nullable = false)
     private int sourceConfigId;
-    
+
     @Column(name = "TARGETCONFIGID", nullable = false)
     private int targetConfigId;
-    
+
     @DateTimeFormat(pattern = "dd/MM/yyyy hh:mm:ss")
     @Column(name = "DATECREATED", nullable = true)
     private Date dateCreated = new Date();
 
     @Column(name = "STATUS", nullable = false)
     private boolean status = true;
-    
-    
+
     public int getId() {
         return id;
     }
@@ -75,7 +73,7 @@ public class configurationConnection {
     public void setId(int id) {
         this.id = id;
     }
-    
+
     public int getsourceConfigId() {
         return sourceConfigId;
     }
@@ -83,7 +81,7 @@ public class configurationConnection {
     public void setsourceConfigId(int sourceConfigId) {
         this.sourceConfigId = sourceConfigId;
     }
-    
+
     public int gettargetConfigId() {
         return targetConfigId;
     }
@@ -91,7 +89,7 @@ public class configurationConnection {
     public void settargetConfigId(int targetConfigId) {
         this.targetConfigId = targetConfigId;
     }
-    
+
     public Date getDateCreated() {
         return dateCreated;
     }
@@ -107,70 +105,69 @@ public class configurationConnection {
     public void setStatus(boolean status) {
         this.status = status;
     }
-    
+
     public configuration getsrcConfigDetails() {
         return srcConfigDetails;
     }
-    
+
     public void setsrcConfigDetails(configuration srcConfigDetails) {
         this.srcConfigDetails = srcConfigDetails;
     }
-    
+
     public configuration gettgtConfigDetails() {
         return tgtConfigDetails;
     }
-    
+
     public void settgtConfigDetails(configuration tgtConfigDetails) {
         this.tgtConfigDetails = tgtConfigDetails;
     }
-    
+
     public String gettargetOrgName() {
         return targetOrgName;
     }
-    
+
     public void settargetOrgName(String targetOrgName) {
         this.targetOrgName = targetOrgName;
     }
-    
+
     public int gettargetOrgId() {
         return targetOrgId;
     }
-    
+
     public void settargetOrgId(int targetOrgId) {
         this.targetOrgId = targetOrgId;
     }
-    
+
     public List<User> getconnectionSenders() {
         return connectionSenders;
     }
-    
+
     public void setconnectionSenders(List<User> senders) {
         this.connectionSenders = senders;
     }
-    
+
     public List<User> getconnectionReceivers() {
         return connectionReceivers;
     }
-    
+
     public void setconnectionReceivers(List<User> receivers) {
         this.connectionReceivers = receivers;
     }
-    
+
     public Integer getTargetOrgCol() {
-		return targetOrgCol;
-	}
+        return targetOrgCol;
+    }
 
-	public void setTargetOrgCol(Integer targetOrgCol) {
-		this.targetOrgCol = targetOrgCol;
-	}
-    
-	public int getMessageTypeId() {
-		return messageTypeId;
-	}
+    public void setTargetOrgCol(Integer targetOrgCol) {
+        this.targetOrgCol = targetOrgCol;
+    }
 
-	public void setMessageTypeId(int messageTypeId) {
-		this.messageTypeId = messageTypeId;
-	}
+    public int getMessageTypeId() {
+        return messageTypeId;
+    }
 
-    
+    public void setMessageTypeId(int messageTypeId) {
+        this.messageTypeId = messageTypeId;
+    }
+
 }

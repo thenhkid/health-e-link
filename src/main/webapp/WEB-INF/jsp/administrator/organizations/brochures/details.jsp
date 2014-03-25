@@ -20,6 +20,7 @@
                         <div id="brochureTitleDiv" class="form-group ${status.error ? 'has-error' : '' }">
                             <label class="control-label" for="brochureTitle">Brochure Title *</label>
                             <form:input path="title" id="brochureTitle" class="form-control" type="text" maxLength="255" />
+                            <form:errors path="title" cssClass="control-label" element="label" />
                             <span id="brochureTitleMsg" class="control-label"></span>
                         </div>
                     </spring:bind>

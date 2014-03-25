@@ -7,6 +7,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import org.hibernate.validator.constraints.NotEmpty;
 
 @Entity
 @Table(name = "CONFIGURATIONDATATRANSLATIONS")
@@ -43,16 +44,20 @@ public class configurationDataTranslations {
 
     @Column(name = "PASSCLEAR", nullable = true)
     private int passClear = 1;
-
+    
+    @NotEmpty
     @Column(name = "FIELDA", nullable = true)
     private String fieldA = null;
 
+    @NotEmpty
     @Column(name = "FIELDB", nullable = true)
     private String fieldB = null;
 
+    @NotEmpty
     @Column(name = "CONSTANT1", nullable = true)
     private String constant1 = null;
 
+    @NotEmpty
     @Column(name = "CONSTANT2", nullable = true)
     private String constant2 = null;
 

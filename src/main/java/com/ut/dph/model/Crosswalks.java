@@ -1,5 +1,6 @@
 package com.ut.dph.model;
 
+import com.ut.dph.validator.NoHtml;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -27,12 +28,14 @@ public class Crosswalks {
     private int id;
 
     @NotEmpty
+    @NoHtml
     @Column(name = "NAME", nullable = false)
     private String name;
 
     @Column(name = "FILEDELIMITER", nullable = false)
     private int fileDelimiter = 0;
 
+    @NoHtml
     @Column(name = "FILENAME", nullable = false)
     private String fileName;
 

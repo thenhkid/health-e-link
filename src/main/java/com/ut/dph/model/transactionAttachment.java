@@ -6,6 +6,7 @@
 
 package com.ut.dph.model;
 
+import com.ut.dph.validator.NoHtml;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -29,12 +30,15 @@ public class transactionAttachment {
     @Column(name = "TRANSACTIONINID", nullable = false)
     private int transactionInId;
     
+    @NoHtml
     @Column(name = "FILENAME", nullable = false)
     private String fileName = null;
     
+    @NoHtml
     @Column(name = "FILELOCATION", nullable = false)
     private String fileLocation = null;
     
+    @NoHtml
     @Column(name = "TITLE", nullable = true)
     private String title = null;
     

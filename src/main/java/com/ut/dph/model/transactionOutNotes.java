@@ -6,6 +6,7 @@
 
 package com.ut.dph.model;
 
+import com.ut.dph.validator.NoHtml;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -35,6 +36,7 @@ public class transactionOutNotes {
     @Column(name = "TRANSACTIONTARGETID", nullable = false)
     private int transactionTargetId;
     
+    @NoHtml
     @Column(name = "NOTE", nullable = true)
     private String note;
     

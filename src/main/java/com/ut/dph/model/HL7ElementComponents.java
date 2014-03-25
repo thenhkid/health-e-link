@@ -6,6 +6,7 @@
 
 package com.ut.dph.model;
 
+import com.ut.dph.validator.NoHtml;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -29,9 +30,11 @@ public class HL7ElementComponents {
     @Column(name = "ELEMENTID", nullable = false)
     private int elementId;
     
+    @NoHtml
     @Column(name = "fieldDescriptor", nullable = true)
     private String fieldDescriptor = "";
     
+    @NoHtml
     @Column(name = "fieldValue", nullable = true)
     private String fieldValue = "";
     

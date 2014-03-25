@@ -1,5 +1,6 @@
 package com.ut.dph.model;
 
+import com.ut.dph.validator.NoHtml;
 import java.util.Date;
 import java.util.List;
 
@@ -52,6 +53,7 @@ public class Provider {
     }
 
     @NotEmpty
+    @NoHtml
     @Column(name = "FIRSTNAME", nullable = false)
     private String firstName;
 
@@ -64,6 +66,7 @@ public class Provider {
     }
 
     @NotEmpty
+    @NoHtml
     @Column(name = "LASTNAME", nullable = true)
     private String lastName;
 
@@ -76,6 +79,7 @@ public class Provider {
     }
 
     @Email
+    @NoHtml
     @Column(name = "EMAIL", nullable = true)
     private String email;
 
@@ -87,6 +91,7 @@ public class Provider {
         this.email = email;
     }
 
+    @NoHtml
     @Column(name = "URL", nullable = true)
     private String website;
 
@@ -98,6 +103,7 @@ public class Provider {
         this.website = website;
     }
 
+    @NoHtml
     @Column(name = "SPECIALTY", nullable = true)
     private String specialty;
 
@@ -111,6 +117,7 @@ public class Provider {
 
     @NotEmpty
     @Phone
+    @NoHtml
     @Column(name = "PHONE1", nullable = true)
     private String phone1;
 
@@ -123,6 +130,7 @@ public class Provider {
     }
 
     @Phone
+    @NoHtml
     @Column(name = "PHONE2", nullable = true)
     private String phone2;
 
@@ -135,6 +143,7 @@ public class Provider {
     }
 
     @Phone
+    @NoHtml
     @Column(name = "FAX", nullable = true)
     private String fax;
 

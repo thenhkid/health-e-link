@@ -1,5 +1,6 @@
 package com.ut.dph.model;
 
+import com.ut.dph.validator.NoHtml;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -49,6 +50,7 @@ public class configurationTransport {
     @Column(name = "STATUS", nullable = false)
     private boolean status = true;
 
+    @NoHtml
     @Column(name = "TARGETFILENAME", nullable = true)
     private String targetFileName = null;
 
@@ -61,6 +63,7 @@ public class configurationTransport {
     @Column(name = "CLEARRECORDS", nullable = false)
     private boolean clearRecords = false;
 
+    @NoHtml
     @Column(name = "FILELOCATION", nullable = true)
     private String fileLocation = null;
 
@@ -76,6 +79,7 @@ public class configurationTransport {
     @Column(name = "COPIEDTRANSPORTID", nullable = false)
     private int copiedTransportId = 0;
 
+    @NoHtml
     @Column(name = "FILEEXT", nullable = false)
     private String fileExt = null;
 

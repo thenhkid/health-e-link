@@ -1,5 +1,6 @@
 package com.ut.dph.model;
 
+import com.ut.dph.validator.NoHtml;
 import java.util.Date;
 import java.util.List;
 
@@ -11,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.format.annotation.DateTimeFormat;
 
 
@@ -59,6 +61,7 @@ public class configuration {
     @Column(name = "STEPSCOMPLETED", nullable = false)
     private int stepsCompleted = 0;
     
+    @NoHtml
     @Column(name = "CONFIGNAME", nullable = false)
     private String configName;
     

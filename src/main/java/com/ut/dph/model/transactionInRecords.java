@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package com.ut.dph.model;
 
+import com.ut.dph.validator.NoHtml;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -23,802 +23,1060 @@ import javax.persistence.Table;
 @Table(name = "TRANSACTIONINRECORDS")
 public class transactionInRecords {
 
-	@Id
+    @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @NoHtml
     @Column(name = "ID", nullable = false)
     private int id;
-    
+
     @Column(name = "TRANSACTIONINID", nullable = false)
     private int transactionInId;
-    
+
+    @NoHtml
     @Column(name = "F1", nullable = true)
     private String f1 = null;
-    
+
+    @NoHtml
     @Column(name = "F2", nullable = true)
     private String f2 = null;
-    
+
+    @NoHtml
     @Column(name = "F3", nullable = true)
     private String f3 = null;
-    
+
+    @NoHtml
     @Column(name = "F4", nullable = true)
     private String f4 = null;
-    
+
+    @NoHtml
     @Column(name = "F5", nullable = true)
     private String f5 = null;
-    
+
+    @NoHtml
     @Column(name = "F6", nullable = true)
     private String f6 = null;
-    
+
+    @NoHtml
     @Column(name = "F7", nullable = true)
     private String f7 = null;
-    
+
+    @NoHtml
     @Column(name = "F8", nullable = true)
     private String f8 = null;
-    
+
+    @NoHtml
     @Column(name = "F9", nullable = true)
     private String f9 = null;
-    
+
+    @NoHtml
     @Column(name = "F10", nullable = true)
     private String f10 = null;
-    
+
+    @NoHtml
     @Column(name = "F11", nullable = true)
     private String f11 = null;
-    
+
+    @NoHtml
     @Column(name = "F12", nullable = true)
     private String f12 = null;
-    
+
+    @NoHtml
     @Column(name = "F13", nullable = true)
     private String f13 = null;
-    
+
+    @NoHtml
     @Column(name = "F14", nullable = true)
     private String f14 = null;
-    
+
+    @NoHtml
     @Column(name = "F15", nullable = true)
     private String f15 = null;
-    
+
+    @NoHtml
     @Column(name = "F16", nullable = true)
     private String f16 = null;
-    
+
+    @NoHtml
     @Column(name = "F17", nullable = true)
     private String f17 = null;
-    
+
+    @NoHtml
     @Column(name = "F18", nullable = true)
     private String f18 = null;
-    
+
+    @NoHtml
     @Column(name = "F19", nullable = true)
     private String f19 = null;
-    
+
+    @NoHtml
     @Column(name = "F20", nullable = true)
     private String f20 = null;
-    
+
+    @NoHtml
     @Column(name = "F21", nullable = true)
     private String f21 = null;
-    
+
+    @NoHtml
     @Column(name = "F22", nullable = true)
     private String f22 = null;
-    
+
+    @NoHtml
     @Column(name = "F23", nullable = true)
     private String f23 = null;
-    
+
+    @NoHtml
     @Column(name = "F24", nullable = true)
     private String f24 = null;
-    
+
+    @NoHtml
     @Column(name = "F25", nullable = true)
     private String f25 = null;
-    
+
+    @NoHtml
     @Column(name = "F26", nullable = true)
     private String f26 = null;
-    
+
+    @NoHtml
     @Column(name = "F27", nullable = true)
     private String f27 = null;
-    
+
+    @NoHtml
     @Column(name = "F28", nullable = true)
     private String f28 = null;
-    
+
+    @NoHtml
     @Column(name = "F29", nullable = true)
     private String f29 = null;
-    
+
+    @NoHtml
     @Column(name = "F30", nullable = true)
     private String f30 = null;
-    
+
+    @NoHtml
     @Column(name = "F31", nullable = true)
     private String f31 = null;
-    
+
+    @NoHtml
     @Column(name = "F32", nullable = true)
     private String f32 = null;
-    
+
+    @NoHtml
     @Column(name = "F33", nullable = true)
     private String f33 = null;
-    
+
+    @NoHtml
     @Column(name = "F34", nullable = true)
     private String f34 = null;
-    
+
+    @NoHtml
     @Column(name = "F35", nullable = true)
     private String f35 = null;
-    
+
+    @NoHtml
     @Column(name = "F36", nullable = true)
     private String f36 = null;
-    
+
+    @NoHtml
     @Column(name = "F37", nullable = true)
     private String f37 = null;
-    
+
+    @NoHtml
     @Column(name = "F38", nullable = true)
     private String f38 = null;
-    
+
+    @NoHtml
     @Column(name = "F39", nullable = true)
     private String f39 = null;
-    
+
+    @NoHtml
     @Column(name = "F40", nullable = true)
     private String f40 = null;
-    
+
+    @NoHtml
     @Column(name = "F41", nullable = true)
     private String f41 = null;
-    
+
+    @NoHtml
     @Column(name = "F42", nullable = true)
     private String f42 = null;
-    
+
+    @NoHtml
     @Column(name = "F43", nullable = true)
     private String f43 = null;
-    
+
+    @NoHtml
     @Column(name = "F44", nullable = true)
     private String f44 = null;
-    
+
+    @NoHtml
     @Column(name = "F45", nullable = true)
     private String f45 = null;
-    
+
+    @NoHtml
     @Column(name = "F46", nullable = true)
     private String f46 = null;
-    
+
+    @NoHtml
     @Column(name = "F47", nullable = true)
     private String f47 = null;
-    
+
+    @NoHtml
     @Column(name = "F48", nullable = true)
     private String f48 = null;
-    
+
+    @NoHtml
     @Column(name = "F49", nullable = true)
     private String f49 = null;
-    
+
+    @NoHtml
     @Column(name = "F50", nullable = true)
     private String f50 = null;
-    
+
+    @NoHtml
     @Column(name = "F51", nullable = true)
     private String f51 = null;
-    
+
+    @NoHtml
     @Column(name = "F52", nullable = true)
     private String f52 = null;
-    
+
+    @NoHtml
     @Column(name = "F53", nullable = true)
     private String f53 = null;
-    
+
+    @NoHtml
     @Column(name = "F54", nullable = true)
     private String f54 = null;
-    
+
+    @NoHtml
     @Column(name = "F55", nullable = true)
     private String f55 = null;
-    
+
+    @NoHtml
     @Column(name = "F56", nullable = true)
     private String f56 = null;
-    
+
+    @NoHtml
     @Column(name = "F57", nullable = true)
     private String f57 = null;
-    
+
+    @NoHtml
     @Column(name = "F58", nullable = true)
     private String f58 = null;
-    
+
+    @NoHtml
     @Column(name = "F59", nullable = true)
     private String f59 = null;
-    
+
+    @NoHtml
     @Column(name = "F60", nullable = true)
     private String f60 = null;
-    
+
+    @NoHtml
     @Column(name = "F61", nullable = true)
     private String f61 = null;
-    
+
+    @NoHtml
     @Column(name = "F62", nullable = true)
     private String f62 = null;
-    
+
+    @NoHtml
     @Column(name = "F63", nullable = true)
     private String f63 = null;
-    
+
+    @NoHtml
     @Column(name = "F64", nullable = true)
     private String f64 = null;
-    
+
+    @NoHtml
     @Column(name = "F65", nullable = true)
     private String f65 = null;
-    
+
+    @NoHtml
     @Column(name = "F66", nullable = true)
     private String f66 = null;
-    
+
+    @NoHtml
     @Column(name = "F67", nullable = true)
     private String f67 = null;
-    
+
+    @NoHtml
     @Column(name = "F68", nullable = true)
     private String f68 = null;
-    
+
+    @NoHtml
     @Column(name = "F69", nullable = true)
     private String f69 = null;
-    
+
+    @NoHtml
     @Column(name = "F70", nullable = true)
     private String f70 = null;
-    
+
+    @NoHtml
     @Column(name = "F71", nullable = true)
     private String f71 = null;
-    
+
+    @NoHtml
     @Column(name = "F72", nullable = true)
     private String f72 = null;
-    
+
+    @NoHtml
     @Column(name = "F73", nullable = true)
     private String f73 = null;
-    
+
+    @NoHtml
     @Column(name = "F74", nullable = true)
     private String f74 = null;
-    
+
+    @NoHtml
     @Column(name = "F75", nullable = true)
     private String f75 = null;
-    
+
+    @NoHtml
     @Column(name = "F76", nullable = true)
     private String f76 = null;
-    
+
+    @NoHtml
     @Column(name = "F77", nullable = true)
     private String f77 = null;
-    
+
+    @NoHtml
     @Column(name = "F78", nullable = true)
     private String f78 = null;
-    
+
+    @NoHtml
     @Column(name = "F79", nullable = true)
     private String f79 = null;
-    
+
+    @NoHtml
     @Column(name = "F80", nullable = true)
     private String f80 = null;
-    
+
+    @NoHtml
     @Column(name = "F81", nullable = true)
     private String f81 = null;
-    
+
+    @NoHtml
     @Column(name = "F82", nullable = true)
     private String f82 = null;
-    
+
+    @NoHtml
     @Column(name = "F83", nullable = true)
     private String f83 = null;
-    
+
+    @NoHtml
     @Column(name = "F84", nullable = true)
     private String f84 = null;
-    
+
+    @NoHtml
     @Column(name = "F85", nullable = true)
     private String f85 = null;
-    
+
+    @NoHtml
     @Column(name = "F86", nullable = true)
     private String f86 = null;
-    
+
+    @NoHtml
     @Column(name = "F87", nullable = true)
     private String f87 = null;
-    
+
+    @NoHtml
     @Column(name = "F88", nullable = true)
     private String f88 = null;
-    
+
+    @NoHtml
     @Column(name = "F89", nullable = true)
     private String f89 = null;
-    
+
+    @NoHtml
     @Column(name = "F90", nullable = true)
     private String f90 = null;
-    
+
+    @NoHtml
     @Column(name = "F91", nullable = true)
     private String f91 = null;
-    
+
+    @NoHtml
     @Column(name = "F92", nullable = true)
     private String f92 = null;
-    
+
+    @NoHtml
     @Column(name = "F93", nullable = true)
     private String f93 = null;
-    
+
+    @NoHtml
     @Column(name = "F94", nullable = true)
     private String f94 = null;
-    
+
+    @NoHtml
     @Column(name = "F95", nullable = true)
     private String f95 = null;
-    
+
+    @NoHtml
     @Column(name = "F96", nullable = true)
     private String f96 = null;
-    
+
+    @NoHtml
     @Column(name = "F97", nullable = true)
     private String f97 = null;
-    
+
+    @NoHtml
     @Column(name = "F98", nullable = true)
     private String f98 = null;
-    
+
+    @NoHtml
     @Column(name = "F99", nullable = true)
     private String f99 = null;
-    
+
+    @NoHtml
     @Column(name = "F100", nullable = true)
     private String f100 = null;
-    
+
+    @NoHtml
     @Column(name = "F101", nullable = true)
     private String f101 = null;
-    
+
+    @NoHtml
     @Column(name = "F102", nullable = true)
     private String f102 = null;
-    
+
+    @NoHtml
     @Column(name = "F103", nullable = true)
     private String f103 = null;
-    
+
+    @NoHtml
     @Column(name = "F104", nullable = true)
     private String f104 = null;
-    
+
+    @NoHtml
     @Column(name = "F105", nullable = true)
     private String f105 = null;
-    
+
+    @NoHtml
     @Column(name = "F106", nullable = true)
     private String f106 = null;
-    
+
+    @NoHtml
     @Column(name = "F107", nullable = true)
     private String f107 = null;
-    
+
+    @NoHtml
     @Column(name = "F108", nullable = true)
     private String f108 = null;
-    
+
+    @NoHtml
     @Column(name = "F109", nullable = true)
     private String f109 = null;
-    
+
+    @NoHtml
     @Column(name = "F110", nullable = true)
     private String f110 = null;
-    
+
+    @NoHtml
     @Column(name = "F111", nullable = true)
     private String f111 = null;
-    
+
+    @NoHtml
     @Column(name = "F112", nullable = true)
     private String f112 = null;
-    
+
+    @NoHtml
     @Column(name = "F113", nullable = true)
     private String f113 = null;
-    
+
+    @NoHtml
     @Column(name = "F114", nullable = true)
     private String f114 = null;
-    
+
+    @NoHtml
     @Column(name = "F115", nullable = true)
     private String f115 = null;
-    
+
+    @NoHtml
     @Column(name = "F116", nullable = true)
     private String f116 = null;
-    
+
+    @NoHtml
     @Column(name = "F117", nullable = true)
     private String f117 = null;
-    
+
+    @NoHtml
     @Column(name = "F118", nullable = true)
     private String f118 = null;
-    
+
+    @NoHtml
     @Column(name = "F119", nullable = true)
     private String f119 = null;
-    
+
+    @NoHtml
     @Column(name = "F120", nullable = true)
     private String f120 = null;
-    
+
+    @NoHtml
     @Column(name = "F121", nullable = true)
     private String f121 = null;
-    
+
+    @NoHtml
     @Column(name = "F122", nullable = true)
     private String f122 = null;
-    
+
+    @NoHtml
     @Column(name = "F123", nullable = true)
     private String f123 = null;
-    
+
+    @NoHtml
     @Column(name = "F124", nullable = true)
     private String f124 = null;
-    
+
+    @NoHtml
     @Column(name = "F125", nullable = true)
     private String f125 = null;
-    
+
+    @NoHtml
     @Column(name = "F126", nullable = true)
     private String f126 = null;
-    
+
+    @NoHtml
     @Column(name = "F127", nullable = true)
     private String f127 = null;
-    
+
+    @NoHtml
     @Column(name = "F128", nullable = true)
     private String f128 = null;
-    
+
+    @NoHtml
     @Column(name = "F129", nullable = true)
     private String f129 = null;
-    
+
+    @NoHtml
     @Column(name = "F130", nullable = true)
     private String f130 = null;
-    
+
+    @NoHtml
     @Column(name = "F131", nullable = true)
     private String f131 = null;
-    
+
+    @NoHtml
     @Column(name = "F132", nullable = true)
     private String f132 = null;
-    
+
+    @NoHtml
     @Column(name = "F133", nullable = true)
     private String f133 = null;
-    
+
+    @NoHtml
     @Column(name = "F134", nullable = true)
     private String f134 = null;
-    
+
+    @NoHtml
     @Column(name = "F135", nullable = true)
     private String f135 = null;
-    
+
+    @NoHtml
     @Column(name = "F136", nullable = true)
     private String f136 = null;
-    
+
+    @NoHtml
     @Column(name = "F137", nullable = true)
     private String f137 = null;
-    
+
+    @NoHtml
     @Column(name = "F138", nullable = true)
     private String f138 = null;
-    
+
+    @NoHtml
     @Column(name = "F139", nullable = true)
     private String f139 = null;
-    
+
+    @NoHtml
     @Column(name = "F140", nullable = true)
     private String f140 = null;
-    
+
+    @NoHtml
     @Column(name = "F141", nullable = true)
     private String f141 = null;
-    
+
+    @NoHtml
     @Column(name = "F142", nullable = true)
     private String f142 = null;
-    
+
+    @NoHtml
     @Column(name = "F143", nullable = true)
     private String f143 = null;
-    
+
+    @NoHtml
     @Column(name = "F144", nullable = true)
     private String f144 = null;
-    
+
+    @NoHtml
     @Column(name = "F145", nullable = true)
     private String f145 = null;
-    
+
+    @NoHtml
     @Column(name = "F146", nullable = true)
     private String f146 = null;
-    
+
+    @NoHtml
     @Column(name = "F147", nullable = true)
     private String f147 = null;
-    
+
+    @NoHtml
     @Column(name = "F148", nullable = true)
     private String f148 = null;
-    
+
+    @NoHtml
     @Column(name = "F149", nullable = true)
     private String f149 = null;
-    
+
+    @NoHtml
     @Column(name = "F150", nullable = true)
     private String f150 = null;
-    
+
+    @NoHtml
     @Column(name = "F151", nullable = true)
     private String f151 = null;
-    
+
+    @NoHtml
     @Column(name = "F152", nullable = true)
     private String f152 = null;
-    
+
+    @NoHtml
     @Column(name = "F153", nullable = true)
     private String f153 = null;
-    
+
+    @NoHtml
     @Column(name = "F154", nullable = true)
     private String f154 = null;
-    
+
+    @NoHtml
     @Column(name = "F155", nullable = true)
     private String f155 = null;
-    
+
+    @NoHtml
     @Column(name = "F156", nullable = true)
     private String f156 = null;
-    
+
+    @NoHtml
     @Column(name = "F157", nullable = true)
     private String f157 = null;
-    
+
+    @NoHtml
     @Column(name = "F158", nullable = true)
     private String f158 = null;
-    
+
+    @NoHtml
     @Column(name = "F159", nullable = true)
     private String f159 = null;
-    
+
+    @NoHtml
     @Column(name = "F160", nullable = true)
     private String f160 = null;
-    
+
+    @NoHtml
     @Column(name = "F161", nullable = true)
     private String f161 = null;
-    
+
+    @NoHtml
     @Column(name = "F162", nullable = true)
     private String f162 = null;
-    
+
+    @NoHtml
     @Column(name = "F163", nullable = true)
     private String f163 = null;
-    
+
+    @NoHtml
     @Column(name = "F164", nullable = true)
     private String f164 = null;
-    
+
+    @NoHtml
     @Column(name = "F165", nullable = true)
     private String f165 = null;
-    
+
+    @NoHtml
     @Column(name = "F166", nullable = true)
     private String f166 = null;
-    
+
+    @NoHtml
     @Column(name = "F167", nullable = true)
     private String f167 = null;
-    
+
+    @NoHtml
     @Column(name = "F168", nullable = true)
     private String f168 = null;
-    
+
+    @NoHtml
     @Column(name = "F169", nullable = true)
     private String f169 = null;
-    
+
+    @NoHtml
     @Column(name = "F170", nullable = true)
     private String f170 = null;
-    
+
+    @NoHtml
     @Column(name = "F171", nullable = true)
     private String f171 = null;
-    
+
+    @NoHtml
     @Column(name = "F172", nullable = true)
     private String f172 = null;
-    
+
+    @NoHtml
     @Column(name = "F173", nullable = true)
     private String f173 = null;
-    
+
+    @NoHtml
     @Column(name = "F174", nullable = true)
     private String f174 = null;
-    
+
+    @NoHtml
     @Column(name = "F175", nullable = true)
     private String f175 = null;
-    
+
+    @NoHtml
     @Column(name = "F176", nullable = true)
     private String f176 = null;
-    
+
+    @NoHtml
     @Column(name = "F177", nullable = true)
     private String f177 = null;
-    
+
+    @NoHtml
     @Column(name = "F178", nullable = true)
     private String f178 = null;
-    
+
+    @NoHtml
     @Column(name = "F179", nullable = true)
     private String f179 = null;
-    
+
+    @NoHtml
     @Column(name = "F180", nullable = true)
     private String f180 = null;
-    
+
+    @NoHtml
     @Column(name = "F181", nullable = true)
     private String f181 = null;
-    
+
+    @NoHtml
     @Column(name = "F182", nullable = true)
     private String f182 = null;
-    
+
+    @NoHtml
     @Column(name = "F183", nullable = true)
     private String f183 = null;
-    
+
+    @NoHtml
     @Column(name = "F184", nullable = true)
     private String f184 = null;
-    
+
+    @NoHtml
     @Column(name = "F185", nullable = true)
     private String f185 = null;
-    
+
+    @NoHtml
     @Column(name = "F186", nullable = true)
     private String f186 = null;
-    
+
+    @NoHtml
     @Column(name = "F187", nullable = true)
     private String f187 = null;
-    
+
+    @NoHtml
     @Column(name = "F188", nullable = true)
     private String f188 = null;
-    
+
+    @NoHtml
     @Column(name = "F189", nullable = true)
     private String f189 = null;
-    
+
+    @NoHtml
     @Column(name = "F190", nullable = true)
     private String f190 = null;
-    
+
+    @NoHtml
     @Column(name = "F191", nullable = true)
     private String f191 = null;
-    
+
+    @NoHtml
     @Column(name = "F192", nullable = true)
     private String f192 = null;
-    
+
+    @NoHtml
     @Column(name = "F193", nullable = true)
     private String f193 = null;
-    
+
+    @NoHtml
     @Column(name = "F194", nullable = true)
     private String f194 = null;
-    
+
+    @NoHtml
     @Column(name = "F195", nullable = true)
     private String f195 = null;
-    
+
+    @NoHtml
     @Column(name = "F196", nullable = true)
     private String f196 = null;
-    
+
+    @NoHtml
     @Column(name = "F197", nullable = true)
     private String f197 = null;
-    
+
+    @NoHtml
     @Column(name = "F198", nullable = true)
     private String f198 = null;
-    
+
+    @NoHtml
     @Column(name = "F199", nullable = true)
     private String f199 = null;
-    
+
+    @NoHtml
     @Column(name = "F200", nullable = true)
     private String f200 = null;
-    
+
+    @NoHtml
     @Column(name = "F201", nullable = true)
     private String f201 = null;
-    
+
+    @NoHtml
     @Column(name = "F202", nullable = true)
     private String f202 = null;
-    
+
+    @NoHtml
     @Column(name = "F203", nullable = true)
     private String f203 = null;
-    
+
+    @NoHtml
     @Column(name = "F204", nullable = true)
     private String f204 = null;
-    
+
+    @NoHtml
     @Column(name = "F205", nullable = true)
     private String f205 = null;
-    
+
+    @NoHtml
     @Column(name = "F206", nullable = true)
     private String f206 = null;
-    
+
+    @NoHtml
     @Column(name = "F207", nullable = true)
     private String f207 = null;
-    
+
+    @NoHtml
     @Column(name = "F208", nullable = true)
     private String f208 = null;
-    
+
+    @NoHtml
     @Column(name = "F209", nullable = true)
     private String f209 = null;
-    
+
+    @NoHtml
     @Column(name = "F210", nullable = true)
     private String f210 = null;
-    
+
+    @NoHtml
     @Column(name = "F211", nullable = true)
     private String f211 = null;
-    
+
+    @NoHtml
     @Column(name = "F212", nullable = true)
     private String f212 = null;
-    
+
+    @NoHtml
     @Column(name = "F213", nullable = true)
     private String f213 = null;
-    
+
+    @NoHtml
     @Column(name = "F214", nullable = true)
     private String f214 = null;
-    
+
+    @NoHtml
     @Column(name = "F215", nullable = true)
     private String f215 = null;
-    
+
+    @NoHtml
     @Column(name = "F216", nullable = true)
     private String f216 = null;
-    
+
+    @NoHtml
     @Column(name = "F217", nullable = true)
     private String f217 = null;
-    
+
+    @NoHtml
     @Column(name = "F218", nullable = true)
     private String f218 = null;
-    
+
+    @NoHtml
     @Column(name = "F219", nullable = true)
     private String f219 = null;
-    
+
+    @NoHtml
     @Column(name = "F220", nullable = true)
     private String f220 = null;
-    
+
+    @NoHtml
     @Column(name = "F221", nullable = true)
     private String f221 = null;
-    
+
+    @NoHtml
     @Column(name = "F222", nullable = true)
     private String f222 = null;
-    
+
+    @NoHtml
     @Column(name = "F223", nullable = true)
     private String f223 = null;
-    
+
+    @NoHtml
     @Column(name = "F224", nullable = true)
     private String f224 = null;
-    
+
+    @NoHtml
     @Column(name = "F225", nullable = true)
     private String f225 = null;
-    
+
+    @NoHtml
     @Column(name = "F226", nullable = true)
     private String f226 = null;
-    
+
+    @NoHtml
     @Column(name = "F227", nullable = true)
     private String f227 = null;
-    
+
+    @NoHtml
     @Column(name = "F228", nullable = true)
     private String f228 = null;
-    
+
+    @NoHtml
     @Column(name = "F229", nullable = true)
     private String f229 = null;
-    
+
+    @NoHtml
     @Column(name = "F230", nullable = true)
     private String f230 = null;
-    
+
+    @NoHtml
     @Column(name = "F231", nullable = true)
     private String f231 = null;
-    
+
+    @NoHtml
     @Column(name = "F232", nullable = true)
     private String f232 = null;
-    
+
+    @NoHtml
     @Column(name = "F233", nullable = true)
     private String f233 = null;
-    
+
+    @NoHtml
     @Column(name = "F234", nullable = true)
     private String f234 = null;
-    
+
+    @NoHtml
     @Column(name = "F235", nullable = true)
     private String f235 = null;
-    
+
+    @NoHtml
     @Column(name = "F236", nullable = true)
     private String f236 = null;
-    
+
+    @NoHtml
     @Column(name = "F237", nullable = true)
     private String f237 = null;
-    
+
+    @NoHtml
     @Column(name = "F238", nullable = true)
     private String f238 = null;
-    
+
+    @NoHtml
     @Column(name = "F239", nullable = true)
     private String f239 = null;
-    
+
+    @NoHtml
     @Column(name = "F240", nullable = true)
     private String f240 = null;
-    
+
+    @NoHtml
     @Column(name = "F241", nullable = true)
     private String f241 = null;
-    
+
+    @NoHtml
     @Column(name = "F242", nullable = true)
     private String f242 = null;
-    
+
+    @NoHtml
     @Column(name = "F243", nullable = true)
     private String f243 = null;
-    
+
+    @NoHtml
     @Column(name = "F244", nullable = true)
     private String f244 = null;
-    
+
+    @NoHtml
     @Column(name = "F245", nullable = true)
     private String f245 = null;
-    
+
+    @NoHtml
     @Column(name = "F246", nullable = true)
     private String f246 = null;
-    
+
+    @NoHtml
     @Column(name = "F247", nullable = true)
     private String f247 = null;
-    
+
+    @NoHtml
     @Column(name = "F248", nullable = true)
     private String f248 = null;
-    
+
+    @NoHtml
     @Column(name = "F249", nullable = true)
     private String f249 = null;
-    
+
+    @NoHtml
     @Column(name = "F250", nullable = true)
     private String f250 = null;
-    
+
+    @NoHtml
     @Column(name = "F251", nullable = true)
     private String f251 = null;
-    
+
+    @NoHtml
     @Column(name = "F252", nullable = true)
     private String f252 = null;
-    
+
+    @NoHtml
     @Column(name = "F253", nullable = true)
     private String f253 = null;
-    
+
+    @NoHtml
     @Column(name = "F254", nullable = true)
     private String f254 = null;
-    
+
+    @NoHtml
     @Column(name = "F255", nullable = true)
     private String f255 = null;
-    
+
+    @NoHtml
     @Column(name = "dateCreated", nullable = true)
     private Date dateCreated = new Date();
-    
+
+    @NoHtml
     @Column(name = "loadTableId", nullable = true)
     private String loadTableId = null;
 
     public Date getDateCreated() {
-		return dateCreated;
-	}
+        return dateCreated;
+    }
 
-	public void setDateCreated(Date dateCreated) {
-		this.dateCreated = dateCreated;
-	}
+    public void setDateCreated(Date dateCreated) {
+        this.dateCreated = dateCreated;
+    }
 
-	public String getLoadTableId() {
-		return loadTableId;
-	}
+    public String getLoadTableId() {
+        return loadTableId;
+    }
 
-	public void setLoadTableId(String loadTableId) {
-		this.loadTableId = loadTableId;
-	}
+    public void setLoadTableId(String loadTableId) {
+        this.loadTableId = loadTableId;
+    }
 
-	public int getId() {
+    public int getId() {
         return id;
     }
 
@@ -857,7 +1115,7 @@ public class transactionInRecords {
     public void setF3(String f3) {
         this.f3 = f3;
     }
-    
+
     public String getF4() {
         return f4;
     }
@@ -865,7 +1123,6 @@ public class transactionInRecords {
     public void setF4(String f4) {
         this.f4 = f4;
     }
-
 
     public String getF5() {
         return f5;

@@ -6,6 +6,7 @@
 
 package com.ut.dph.model;
 
+import com.ut.dph.validator.NoHtml;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -34,6 +35,7 @@ public class HL7Segments {
     @Column(name = "HL7ID", nullable = false)
     private int hl7Id;
     
+    @NoHtml
     @Column(name = "segmentName", nullable = false)
     private String segmentName = "";
     

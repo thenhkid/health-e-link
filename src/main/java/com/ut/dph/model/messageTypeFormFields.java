@@ -1,5 +1,6 @@
 package com.ut.dph.model;
 
+import com.ut.dph.validator.NoHtml;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -24,10 +25,12 @@ public class messageTypeFormFields {
     @Column(name = "FIELDNO", nullable = false)
     private int fieldNo;
 
+    @NoHtml
     @Column(name = "FIELDDESC", nullable = true)
     private String fieldDesc;
 
     @NotEmpty
+    @NoHtml
     @Column(name = "FIELDLABEL", nullable = false)
     private String fieldLabel;
 
@@ -37,9 +40,11 @@ public class messageTypeFormFields {
     @Column(name = "REQUIRED", nullable = false)
     private boolean required = false;
 
+    @NoHtml
     @Column(name = "SAVETOTABLENAME", nullable = true)
     private String saveToTableName;
 
+    @NoHtml
     @Column(name = "SAVETOTABLECOL", nullable = true)
     private String saveToTableCol;
 
@@ -49,9 +54,11 @@ public class messageTypeFormFields {
     @Column(name = "BUCKETDSPPOS", nullable = false)
     private int bucketDspPos;
     
-     @Column(name = "AUTOPOPULATETABLENAME", nullable = true)
+    @NoHtml
+    @Column(name = "AUTOPOPULATETABLENAME", nullable = true)
     private String autoPopulateTableName;
 
+    @NoHtml
     @Column(name = "AUTOPOPULATETABLECOL", nullable = true)
     private String autoPopulateTableCol;
 

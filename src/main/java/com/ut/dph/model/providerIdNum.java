@@ -1,5 +1,6 @@
 package com.ut.dph.model;
 
+import com.ut.dph.validator.NoHtml;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -16,16 +17,33 @@ import org.springframework.format.annotation.DateTimeFormat;
 @Table(name = "INFO_PROVIDERIDS")
 public class providerIdNum {
 
-    private int id;
-    private int providerId;
-    private String idNum;
-    private String type;
-    private String issuedBy;
-    private Date dateCreated = new Date();
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID", nullable = false)
+    private int id;
+    
+    @Column(name = "TYPE", nullable = true)
+    private int providerId;
+    
+    @NotEmpty
+    @NoHtml
+    @Column(name = "IDNUM", nullable = false)
+    private String idNum;
+    
+    @NoHtml
+    @Column(name = "PROVIDERID", nullable = false)
+    private String type;
+    
+    @NotEmpty
+    @NoHtml
+    @Column(name = "ISSUEDBY", nullable = false)
+    private String issuedBy;
+    
+    @DateTimeFormat(pattern = "dd/MM/yyyy hh:mm:ss")
+    @Column(name = "DATECREATED", nullable = true)
+    private Date dateCreated = new Date();
+
+    
     public int getId() {
         return this.id;
     }
@@ -34,7 +52,6 @@ public class providerIdNum {
         this.id = id;
     }
 
-    @Column(name = "TYPE", nullable = true)
     public String getType() {
         return this.type;
     }
@@ -43,8 +60,6 @@ public class providerIdNum {
         this.type = type;
     }
 
-    @NotEmpty
-    @Column(name = "IDNUM", nullable = false)
     public String getIdNum() {
         return this.idNum;
     }
@@ -53,8 +68,6 @@ public class providerIdNum {
         this.idNum = idNum;
     }
 
-    @NotEmpty
-    @Column(name = "ISSUEDBY", nullable = false)
     public String getIssuedBy() {
         return this.issuedBy;
     }
@@ -63,8 +76,6 @@ public class providerIdNum {
         this.issuedBy = issuedBy;
     }
 
-    @DateTimeFormat(pattern = "dd/MM/yyyy hh:mm:ss")
-    @Column(name = "DATECREATED", nullable = true)
     public Date getDateCreated() {
         return dateCreated;
     }
@@ -73,8 +84,6 @@ public class providerIdNum {
         this.dateCreated = dateCreated;
     }
 
-
-    @Column(name = "PROVIDERID", nullable = false)
     public int getProviderId() {
         return this.providerId;
     }

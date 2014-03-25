@@ -1,5 +1,6 @@
 package com.ut.dph.model;
 
+import com.ut.dph.validator.NoHtml;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -30,9 +31,11 @@ public class Brochure {
     private int orgId;
 
     @NotEmpty
+    @NoHtml
     @Column(name = "TITLE", nullable = false)
     private String title;
 
+    @NoHtml
     @Column(name = "FILENAME", nullable = false)
     private String fileName;
 

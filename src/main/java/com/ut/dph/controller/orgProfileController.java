@@ -683,8 +683,16 @@ public class orgProfileController {
      * @throws Exception
      */
     @RequestMapping(value = "/createBrochure", method = RequestMethod.POST)
-    public ModelAndView createBrochure(@ModelAttribute(value = "brochuredetails") Brochure brochuredetails, RedirectAttributes redirectAttr) throws Exception {
+    public @ResponseBody ModelAndView createBrochure(@Valid @ModelAttribute(value = "brochuredetails") Brochure brochuredetails, RedirectAttributes redirectAttr, BindingResult result, HttpSession session) throws Exception {
 
+        if (result.hasErrors()) {
+            ModelAndView mav = new ModelAndView();
+            mav.setViewName("/administrator/organizations/brochures/details");
+            mav.addObject("btnValue", "Create");
+          
+            return mav;
+        }
+        
         brochureManager.createBrochure(brochuredetails);
 
         ModelAndView mav = new ModelAndView(new RedirectView("/OrgProfile/brochures?msg=created"));

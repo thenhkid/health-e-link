@@ -6,7 +6,6 @@
 
 package com.ut.dph.model;
 
-import java.util.List;
 
 /**
  *

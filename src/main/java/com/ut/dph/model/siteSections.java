@@ -1,5 +1,6 @@
 package com.ut.dph.model;
 
+import com.ut.dph.validator.NoHtml;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -19,6 +20,7 @@ public class siteSections {
     private int id;
 
     @NotEmpty
+    @NoHtml
     @Column(name = "FEATURENAME", nullable = false)
     private String featureName;
 

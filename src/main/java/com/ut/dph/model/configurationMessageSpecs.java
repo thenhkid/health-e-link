@@ -6,6 +6,7 @@
 
 package com.ut.dph.model;
 
+import com.ut.dph.validator.NoHtml;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -34,12 +35,14 @@ public class configurationMessageSpecs {
     @Column(name = "CONFIGID", nullable = false)
     private int configId;
     
+    @NoHtml
     @Column(name = "TEMPLATEFILE", nullable = true)
     private String templateFile = null;
     
     @Column(name = "MESSAGETYPECOL", nullable = false)
     private int messageTypeCol = 0;
     
+    @NoHtml
     @Column(name = "MESSAGETYPEVAL", nullable = true)
     private String messageTypeVal = null;
     

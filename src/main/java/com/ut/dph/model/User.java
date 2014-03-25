@@ -1,5 +1,6 @@
 package com.ut.dph.model;
 
+import com.ut.dph.validator.NoHtml;
 import java.util.Date;
 import java.util.List;
 
@@ -38,19 +39,23 @@ public class User {
     private int orgId;
 
     @NotEmpty
+    @NoHtml
     @Column(name = "FIRSTNAME", nullable = false)
     private String firstName;
 
     @NotEmpty
+    @NoHtml
     @Column(name = "LASTNAME", nullable = true)
     private String lastName;
 
     @NotEmpty
+    @NoHtml
     @Size(min = 5, max = 10)
     @Column(name = "USERNAME", nullable = false)
     private String username;
 
     @NotEmpty
+    @NoHtml
     @Column(name = "PASSWORD", nullable = false)
     private String password;
 
@@ -64,6 +69,7 @@ public class User {
     private boolean sendEmailAlert = false;
 
     @Email
+    @NoHtml
     @Column(name = "EMAIL", nullable = false)
     private String email;
 
@@ -86,6 +92,7 @@ public class User {
     @Column(name = "CANCELAUTHORITY", nullable = false)
     private boolean cancelAuthority = false;
     
+    @NoHtml
     @Column(name = "RESETCODE", nullable = true)
     private String resetCode = null;
     

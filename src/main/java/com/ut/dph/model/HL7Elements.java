@@ -6,6 +6,7 @@
 
 package com.ut.dph.model;
 
+import com.ut.dph.validator.NoHtml;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -37,9 +38,11 @@ public class HL7Elements {
     @Column(name = "segmentId", nullable = false)
     private int segmentId;
     
+    @NoHtml
     @Column(name = "elementName", nullable = false)
     private String elementName = "";
     
+    @NoHtml
     @Column(name = "defaultValue", nullable = true)
     private String defaultValue = "";
     

@@ -1,7 +1,6 @@
 package com.ut.dph.model;
 
-
-
+import com.ut.dph.validator.NoHtml;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -15,34 +14,30 @@ import org.hibernate.validator.constraints.NotEmpty;
 @Table(name = "ref_validationTypes")
 public class validationType {
 
-    
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID", nullable = false)
     private Integer id;
 
     @NotEmpty
+    @NoHtml
     @Column(name = "validationType", nullable = false)
     private String validationType;
 
-	public Integer getId() {
-		return id;
-	}
+    public Integer getId() {
+        return id;
+    }
 
-	public void setId(Integer id) {
-		this.id = id;
-	}
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
-	public String getValidationType() {
-		return validationType;
-	}
+    public String getValidationType() {
+        return validationType;
+    }
 
-	public void setValidationType(String validationType) {
-		this.validationType = validationType;
-	}
-
-	
-    
+    public void setValidationType(String validationType) {
+        this.validationType = validationType;
+    }
 
 }

@@ -1,5 +1,6 @@
 package com.ut.dph.model;
 
+import com.ut.dph.validator.NoHtml;
 import java.util.Date;
 import java.util.List;
 
@@ -32,6 +33,22 @@ public class messageType {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID", nullable = false)
     private int id;
+    
+    @Column(name = "STATUS", nullable = false)
+    private int status;
+    
+    @DateTimeFormat(pattern = "dd/MM/yyyy hh:mm:ss")
+    @Column(name = "DATECREATED", nullable = true)
+    private Date dateCreated = new Date();
+    
+    @NotEmpty
+    @NoHtml
+    @Column(name = "NAME", nullable = false)
+    private String name;
+    
+    @NoHtml
+    @Column(name = "TEMPLATEFILE", nullable = true)
+    private String templateFile;
 
     public int getId() {
         return id;
@@ -41,9 +58,6 @@ public class messageType {
         this.id = id;
     }
 
-    @Column(name = "STATUS", nullable = false)
-    private int status;
-
     public int getStatus() {
         return status;
     }
@@ -51,10 +65,6 @@ public class messageType {
     public void setStatus(int status) {
         this.status = status;
     }
-
-    @DateTimeFormat(pattern = "dd/MM/yyyy hh:mm:ss")
-    @Column(name = "DATECREATED", nullable = true)
-    private Date dateCreated = new Date();
 
     public Date getdateCreated() {
         return dateCreated;
@@ -64,10 +74,6 @@ public class messageType {
         this.dateCreated = dateCreated;
     }
 
-    @NotEmpty
-    @Column(name = "NAME", nullable = false)
-    private String name;
-
     public String getName() {
         return name;
     }
@@ -75,9 +81,6 @@ public class messageType {
     public void setName(String name) {
         this.name = name;
     }
-
-    @Column(name = "TEMPLATEFILE", nullable = true)
-    private String templateFile;
 
     public String getTemplateFile() {
         return templateFile;

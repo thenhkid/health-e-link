@@ -1,5 +1,6 @@
 package com.ut.dph.model;
 
+import com.ut.dph.validator.NoHtml;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -24,25 +25,31 @@ public class Organization {
     private int id;
 
     @NotEmpty
+    @NoHtml
     @Column(name = "ORGNAME", nullable = false)
     private String orgName;
 
     @NotEmpty
+    @NoHtml
     @Column(name = "ADDRESS", nullable = false)
     private String address;
 
+    @NoHtml
     @Column(name = "ADDRESS2", nullable = true)
     private String address2;
 
     @NotEmpty
+    @NoHtml
     @Column(name = "CITY", nullable = false)
     private String city;
 
     @NotEmpty
+    @NoHtml
     @Column(name = "STATE", nullable = false)
     private String state;
 
     @NotEmpty
+    @NoHtml
     @Column(name = "POSTALCODE", nullable = false)
     private String postalCode;
 
@@ -50,7 +57,8 @@ public class Organization {
     @Phone
     @Column(name = "PHONE", nullable = false)
     private String phone;
-
+    
+    @NoHtml
     @Column(name = "FAX", nullable = true)
     private String fax;
 
@@ -64,6 +72,7 @@ public class Organization {
     @Column(name = "STATUS", nullable = false)
     private boolean status = true;
 
+    @NoHtml
     @Column(name = "CLEANURL", nullable = false)
     private String cleanURL;
 

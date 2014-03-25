@@ -62,10 +62,13 @@
                                 <form:errors path="address" cssClass="control-label" element="label" />
                             </div>
                         </spring:bind>
-                        <div class="form-group">
-                            <label for="Address 2">Address 2</label>
-                            <form:input path="address2" class="form-control" type="text" />
-                        </div>
+                         <spring:bind path="address2">
+                            <div class="form-group ${status.error ? 'has-error' : '' }">
+                                <label class="control-label" for="address2">Address 2</label>
+                                <form:input path="address2" id="address2" class="form-control" type="text" maxLength="45" />
+                                <form:errors path="address2" cssClass="control-label" element="label" />
+                            </div>
+                        </spring:bind>    
                         <spring:bind path="city">
                             <div class="form-group ${status.error ? 'has-error' : '' }">
                                 <label class="control-label" for="city">City *</label>
@@ -97,10 +100,13 @@
                                 <form:errors path="phone" cssClass="control-label" element="label" />
                             </div>
                         </spring:bind>
-                        <div class="form-group">
-                            <label for="fax">Fax</label>
-                            <form:input path="fax" class="form-control sm-input" type="text" maxLength="45" />
-                        </div>
+                        <spring:bind path="fax">
+                            <div class="form-group ${status.error ? 'has-error' : '' }">
+                                <label class="control-label" for="fax">Fax</label>
+                                <form:input path="fax" id="fax" class="form-control sm-input" type="text" maxLength="45" />
+                                <form:errors path="fax" cssClass="control-label" element="label" />
+                            </div>
+                        </spring:bind>
                     </div>
                 </div>
             </section>

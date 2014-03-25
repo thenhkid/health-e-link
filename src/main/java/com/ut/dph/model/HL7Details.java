@@ -6,6 +6,7 @@
 
 package com.ut.dph.model;
 
+import com.ut.dph.validator.NoHtml;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -34,12 +35,15 @@ public class HL7Details {
     @Column(name = "CONFIGID", nullable = false)
     private int configId;
     
+    @NoHtml
     @Column(name = "fieldSeparator", nullable = false)
     private String fieldSeparator = "|";
     
+    @NoHtml
     @Column(name = "componentSeparator", nullable = false)
     private String componentSeparator = "^";
     
+    @NoHtml
     @Column(name = "EscapeChar", nullable = false)
     private String EscapeChar = "";
     
