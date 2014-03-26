@@ -1441,7 +1441,7 @@ public class transactionInManagerImpl implements transactionInManager {
 
             //2. we load data with my sql
             //get delimiter, get fileWithPath etc
-            if (batch.getoriginalFileName().endsWith(".txt")) {
+            if (batch.getoriginalFileName().endsWith(".txt") || batch.getoriginalFileName().endsWith(".csv")) {
             	sysError = sysError + insertLoadData(batch.getId(), batch.getDelimChar(), fileWithPath, loadTableName, batch.isContainsHeaderRow());
 
             }
