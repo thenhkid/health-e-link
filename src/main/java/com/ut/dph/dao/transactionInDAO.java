@@ -110,6 +110,8 @@ public interface transactionInDAO {
     
     List<batchUploads> getuploadedBatches(int userId, int orgId, Date fromDate, Date toDate, String searchTerm, int page, int maxResults) throws Exception;
     
+    List<batchUploads> getuploadedBatches(int userId, int orgId, Date fromDate, Date toDate, String searchTerm, int page, int maxResults, List <Integer> excludedStatusIds) throws Exception;
+    
     void updateBatchStatus (Integer batchUploadId, Integer statusId, String timeField) throws Exception;
     
     void updateTransactionStatus (Integer batchUploadId, Integer transactionId, Integer fromStatusId, Integer toStatusId) throws Exception;

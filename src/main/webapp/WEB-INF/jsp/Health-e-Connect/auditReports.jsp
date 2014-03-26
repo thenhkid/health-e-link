@@ -66,11 +66,12 @@
                         <tr>
                             <th scope="col">Batch Name</th>
                             <th scope="col">File Name</th>
-                            <th scope="col" class="center-text">Status</th>
                             <th scope="col" class="center-text">Total Transactions</th>
                             <th scope="col" class="center-text">Transactions with Errors</th>
-                            <th scope="col" class="center-text">Date Processed</th>
-                            
+                            <th scope="col" class="center-text">Status</th>
+                            <th scope="col" class="center-text">Status Date</th>
+                            <th scope="col" class="center-text">File Submission Date</th>
+                            <th scope="col" class="center-text">View Audit Report</th>
                             <th scope="col"></th>
                         </tr>
                     </thead>
@@ -83,24 +84,24 @@
                                         <td>
                                             ${batch.originalFileName}
                                         </td>
+                                        <td class="center-text">${batch.totalRecordCount}</td>
+                                        <td class="center-text">${batch.errorRecordCount}</td>
                                         <td class="center-text">
                                             <a href="#statusModal" data-toggle="modal" class="btn btn-link viewStatus" rel="${batch.statusId}" title="View this Status">${batch.statusValue}&nbsp;<span class="badge badge-help" data-placement="top" title="" data-original-title="">?</span></a>
                                         </td>
-                                        <td class="center-text">${batch.usersName}</td>
+                                        <td class="center-text"><fmt:formatDate value="${batch.endDateTime}" type="date" pattern="M/dd/yyyy" /><br /><fmt:formatDate value="${batch.endDateTime}" type="time" pattern="h:mm:ss a" /></td>
                                         <td class="center-text"><fmt:formatDate value="${batch.dateSubmitted}" type="date" pattern="M/dd/yyyy" /><br /><fmt:formatDate value="${batch.dateSubmitted}" type="time" pattern="h:mm:ss a" /></td>
                                         <td class="actions-col" style="width:50px;">
-                                            <c:if test="${batch.statusId != 2}">
                                             <a href="javascript:void(0);" rel="${batch.id}" class="btn btn-link viewLink">
                                                 <span class="glyphicon glyphicon-edit"></span>
-                                                View Audit Report
-                                            </a>
-                                            </c:if>    
+                                                Detail Audit Report
+                                               </a>   
                                         </td>
                                     </tr>
                                 </c:forEach>
                             </c:when>
                             <c:otherwise>
-                                <tr><td colspan="6" class="center-text">There are currently no messages</td></tr>
+                                <tr><td colspan="6" class="center-text">There are currently no audit reports.</td></tr>
                             </c:otherwise>
                         </c:choose>    
                     </tbody>

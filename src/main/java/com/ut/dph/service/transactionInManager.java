@@ -111,6 +111,8 @@ public interface transactionInManager {
     
     List<batchUploads> getuploadedBatches(int userId, int orgId, Date fromDate, Date toDate, String searchTerm, int page, int maxResults) throws Exception;
     
+    List<batchUploads> getuploadedBatches(int userId, int orgId, Date fromDate, Date toDate, String searchTerm, int page, int maxResults, List <Integer> excludedStatusIds) throws Exception;
+    
     boolean processBatch(int batchUploadId) throws Exception;
     
     void processBatches();

@@ -814,7 +814,6 @@ public class transactionOutDAOImpl implements transactionOutDAO {
 
             String sql;
             sql = "insert into transactionTranslatedOut (transactionTargetId, configId, ";
-            Integer counter = 1;
             for (configurationFormFields formField : formFields) {
             	if(!formField.getsaveToTableName().equalsIgnoreCase("")) {
             		sql += "f" + formField.getFieldNo() + ",";
@@ -828,7 +827,6 @@ public class transactionOutDAOImpl implements transactionOutDAO {
             sql += "VALUES( :transactionTargetId, :configId, ";
 
             String dataSQL;
-            counter = 1;
             for (configurationFormFields formField : formFields) {
             	if(!formField.getsaveToTableName().equalsIgnoreCase("")) {
             		dataSQL = "SELECT " + formField.getsaveToTableCol() + " from " + formField.getsaveToTableName()
@@ -843,12 +841,11 @@ public class transactionOutDAOImpl implements transactionOutDAO {
 	                if (getData.uniqueResult() == null) {
 	                    sql += null + ",";
 	                } else {
-	                	sql += "'" + getData.uniqueResult() + "', ";
+	                	sql += "'" + getData.uniqueResult() + "',";
 	                }
             	} 
             }
             
-            sql = sql.trim();
             //remove last comma
             sql = sql.substring(0,sql.length()-1);
             sql += ") ";

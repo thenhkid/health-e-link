@@ -28,6 +28,7 @@ import com.ut.dph.service.userManager;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -90,6 +91,8 @@ public class HealtheConnectController {
      */
     private static int maxResults = 20;
     
+    /** this list holds the status that we do not want the audit reports to show **/
+    private	static List<Integer> excludedStatusIds = Arrays.asList(1,2);
     
     /**
      * The '/upload' request will serve up the Health-e-Connect upload page.
@@ -591,13 +594,13 @@ public class HealtheConnectController {
         mav.addObject("toDate", toDate);
         mav.addObject("currentPage", 1);
         
-        /* Need to get a list of uploaded files with status of 5 (PR), 6 (REL), 29 (Sys Error)*/
+        /* Need to get a list of uploaded files with status of 5 (PR), 6 (REL), 29 (Sys Error) ?*/
         User userInfo = (User)session.getAttribute("userDetails");
         
         try {
             /* Need to get a list of all uploaded batches */
-            Integer totaluploadedBatches = transactionInManager.getuploadedBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, "", 1, 0).size();
-            List<batchUploads> uploadedBatches = transactionInManager.getuploadedBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, "", 1, maxResults);
+            Integer totaluploadedBatches = transactionInManager.getuploadedBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, "", 1, 0, excludedStatusIds).size();
+            List<batchUploads> uploadedBatches = transactionInManager.getuploadedBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, "", 1, maxResults, excludedStatusIds);
 
             if(!uploadedBatches.isEmpty()) {
                 for(batchUploads batch : uploadedBatches) {
@@ -659,8 +662,8 @@ public class HealtheConnectController {
         
         try {
             /* Need to get a list of all uploaded batches */
-            Integer totaluploadedBatches = transactionInManager.getuploadedBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, searchTerm, 1, 0).size();
-            List<batchUploads> uploadedBatches = transactionInManager.getuploadedBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, searchTerm, page, maxResults);
+            Integer totaluploadedBatches = transactionInManager.getuploadedBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, searchTerm, 1, 0, excludedStatusIds).size();
+            List<batchUploads> uploadedBatches = transactionInManager.getuploadedBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, searchTerm, page, maxResults, excludedStatusIds);
 
             if(!uploadedBatches.isEmpty()) {
                 for(batchUploads batch : uploadedBatches) {

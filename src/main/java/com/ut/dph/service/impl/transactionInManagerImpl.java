@@ -487,9 +487,15 @@ public class transactionInManagerImpl implements transactionInManager {
         return transactionInDAO.countSubString(config, transId);
     }
 
+    /** orginal method only excludes 1, need the ability to exclude different statusIds **/
     @Override
     public List<batchUploads> getuploadedBatches(int userId, int orgId, Date fromDate, Date toDate, String searchTerm, int page, int maxResults) throws Exception {
-        return transactionInDAO.getuploadedBatches(userId, orgId, fromDate, toDate, searchTerm, page, maxResults);
+        return getuploadedBatches(userId, orgId, fromDate, toDate, searchTerm, page, maxResults, Arrays.asList(1));
+    }
+    
+    @Override
+    public List<batchUploads> getuploadedBatches(int userId, int orgId, Date fromDate, Date toDate, String searchTerm, int page, int maxResults, List <Integer> excludedStatusIds) throws Exception {
+        return transactionInDAO.getuploadedBatches(userId, orgId, fromDate, toDate, searchTerm, page, maxResults, excludedStatusIds);
     }
 
     /**
@@ -725,7 +731,7 @@ public class transactionInManagerImpl implements transactionInManager {
                     //we clear transactionInRecords here as for batch upload we start over
                     sysError = clearTransactionTables(batchUploadId, false);
                 }
-                transactionInDAO.updateBatchStatus(batchUploadId, toBatchStatusId, "");
+                transactionInDAO.updateBatchStatus(batchUploadId, toBatchStatusId, "startOver");
             }
         }
         if (sysError == 0) {

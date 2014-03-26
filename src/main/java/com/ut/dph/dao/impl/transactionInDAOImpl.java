@@ -1192,11 +1192,18 @@ public class transactionInDAOImpl implements transactionInDAO {
      * @param orgId The id of the organization the logged in user belongs to
      *
      * @return This function will return a list of batches.
+     * 
+     * added the ability to exclude selected statusIds. Original method only exclude statusId of 1 for uploadBatch
      */
+    @Override
+    public List<batchUploads> getuploadedBatches(int userId, int orgId, Date fromDate, Date toDate, String searchTerm, int page, int maxResults) throws Exception {
+    	return getuploadedBatches(userId, orgId, fromDate, toDate, searchTerm, page, maxResults, Arrays.asList(1));
+    }
+    
     @SuppressWarnings("unchecked")
     @Override
     @Transactional
-    public List<batchUploads> getuploadedBatches(int userId, int orgId, Date fromDate, Date toDate, String searchTerm, int page, int maxResults) throws Exception {
+    public List<batchUploads> getuploadedBatches(int userId, int orgId, Date fromDate, Date toDate, String searchTerm, int page, int maxResults, List <Integer> excludedStatusIds) throws Exception {
 
         int firstResult = 0;
 
@@ -1227,7 +1234,7 @@ public class transactionInDAOImpl implements transactionInDAO {
         configIdList.add(0);
         Criteria findBatches = sessionFactory.getCurrentSession().createCriteria(batchUploads.class);
         findBatches.add(Restrictions.eq("orgId", orgId));
-        findBatches.add(Restrictions.ne("statusId", 1));
+        findBatches.add(Restrictions.not(Restrictions.in("statusId", excludedStatusIds)));
         findBatches.add(Restrictions.in("configId", configIdList));
 
         if (!"".equals(fromDate)) {
@@ -1395,9 +1402,11 @@ public class transactionInDAOImpl implements transactionInDAO {
         String sql = "update batchUploads set statusId = :statusId ";
         if (!timeField.equalsIgnoreCase("")) {
             sql = sql + ", " + timeField + " = CURRENT_TIMESTAMP";
-        } else {
-            // we reset time
+        } else if (timeField.equalsIgnoreCase("startOver")) {
+        	 // we reset time
             sql = sql + ", startDateTime = null, endDateTime = null";
+    	} else {
+            sql = sql + ", startDateTime = CURRENT_TIMESTAMP, endDateTime = CURRENT_TIMESTAMP";
         }
         sql = sql + " where id = :id ";
         Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
