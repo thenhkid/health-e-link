@@ -1069,17 +1069,16 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Transactional
     @SuppressWarnings("unchecked")
     public List<Integer> getTransWithMultiValues(ConfigForInsert config) {
-
+    	//should only be inserting 12
         String sql = ("select transactionInId from "
                 + " transactionTranslatedIn where (" + config.getCheckForDelim()
-                + ") and transactionInId in (select id from transactionIn where statusId in (:transRELId) "
+                + ") and transactionInId in (select id from transactionIn where statusId in (12) "
                 + " and batchId = :batchUploadId"
                 + " and configId = :configId); ");
 
         Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
         query.setParameter("configId", config.getConfigId());
         query.setParameter("batchUploadId", config.getBatchUploadId());
-        query.setParameterList("transRELId", transRELId);
 
         List<Integer> transId = query.list();
 
@@ -1192,15 +1191,15 @@ public class transactionInDAOImpl implements transactionInDAO {
                 + replaceSplitField
                 + " from transactionTranslatedIn where "
                 + " transactionInId in (select id from transactionIn where batchId = :batchId"
-                + " and configId = :configId and statusId in (:transRELId) and id = :id";
+                + " and configId = :configId and statusId in (12) and id = :id";
 
         sql = sql + ");";
 
         Query insertData = sessionFactory.getCurrentSession().createSQLQuery(sql)
                 .setParameter("batchId", config.getBatchUploadId())
                 .setParameter("configId", config.getConfigId())
-                .setParameter("id", transId)
-                .setParameterList("transRELId", transRELId);
+                .setParameter("id", transId);
+                
         try {
             insertData.executeUpdate();
             return true;
@@ -1214,7 +1213,11 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Override
     @Transactional
     public Integer countSubString(ConfigForInsert config, Integer transId) {
-        String col = config.getSingleValueFields().substring(0, config.getSingleValueFields().indexOf(","));
+    	try {
+    	String col = config.getSingleValueFields();
+    	if (config.getSingleValueFields().contains(",")) {
+    		col = config.getSingleValueFields().substring(0, config.getSingleValueFields().indexOf(","));
+        }
         String sql
                 = "(SELECT ROUND(((LENGTH(" + col
                 + ") - LENGTH(REPLACE(LCASE(" + col
@@ -1225,6 +1228,10 @@ public class transactionInDAOImpl implements transactionInDAO {
         Integer stringCount = (Integer) query.list().get(0);
 
         return stringCount;
+    	} catch (Exception ex) {
+    		ex.printStackTrace();
+    		return null;
+    	}
     }
 
     /**

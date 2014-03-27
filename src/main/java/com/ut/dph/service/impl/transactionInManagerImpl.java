@@ -627,16 +627,7 @@ public class transactionInManagerImpl implements transactionInManager {
 	                    updateRecordCounts(batchUploadId, errorStatusIds, false, "errorRecordCount");
 	                    updateBatchStatus(batchUploadId, batchStausId, "endDateTime");
 	                    return true;
-                	} else  if (handlingDetails.get(0).geterrorHandling() == 2) {
-                        //reject errors
-                        updateTransactionStatus(batchUploadId, 0, 14, 13);
-                        copyTransactionInStatusToTarget(batchUploadId);
-                    } else if (handlingDetails.get(0).geterrorHandling() == 4) {
-                        //update to pass - 16
-                        updateTransactionStatus(batchUploadId, 0, 14, 16);
-                        //target should still be pending output
-                        updateTransactionTargetStatus(batchUploadId, 0, 14, 19);
-                    }
+                	} 
 
                     //run check to make sure we have records 
                     if (getRecordCounts(batchUploadId, Arrays.asList(12), false, true) > 0) {
@@ -652,6 +643,17 @@ public class transactionInManagerImpl implements transactionInManager {
                         }
                     }
                     // all went well
+	                if (handlingDetails.get(0).geterrorHandling() == 4) {
+	                    //update to pass - 16
+	                    updateTransactionStatus(batchUploadId, 0, 14, 16);
+	                    //target should still be pending output
+	                    updateTransactionTargetStatus(batchUploadId, 0, 14, 19);
+	                }
+	                if (handlingDetails.get(0).geterrorHandling() == 2) {
+                        //reject errors
+                        updateTransactionStatus(batchUploadId, 0, 14, 13);
+                        copyTransactionInStatusToTarget(batchUploadId);
+                    }
                     updateTransactionStatus(batchUploadId, 0, 12, 19);
                     updateTransactionTargetStatus(batchUploadId, 0, 12, 19);
                     batchStausId = 24;
@@ -711,6 +713,7 @@ public class transactionInManagerImpl implements transactionInManager {
                         processBatch(batch.getId());
                     } catch (Exception ex) {
                         setBatchToError(batch.getId(), ("Errored at processBatches  " + ex.getCause()));
+                        ex.printStackTrace();
                     }
                 }
             }
@@ -812,7 +815,9 @@ public class transactionInManagerImpl implements transactionInManager {
                  */
                 List<Integer> skipTheseIds = getBlankTransIds(config);
                 config.setBlankValueTransId(skipTheseIds);
-
+                if (config.getCheckForDelim().contains("F22")) {
+                	System.out.println("stop here");
+                }
                 //we insert single values
                 if (!insertSingleToMessageTables(config)) {
                     return false;
