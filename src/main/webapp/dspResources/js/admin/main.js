@@ -7,17 +7,20 @@ require.config({
 		'responsive-tables' : '../vendor/responsive-tables',
 		'mediaModal' : '../mediaModal',
 		'overlay' : '../overlay',
-		'sprintf' : '../vendor/sprintf'
+		'sprintf' : '../vendor/sprintf',
+		'moment' : '../vendor/moment',
+		'daterangepicker' : '../vendor/daterangepicker'
 	},
 	shim: {
 		'bootstrap': ['jquery'],
-		'responsive-tables': ['jquery']
+		'responsive-tables': ['jquery'],
+		'daterangepicker': ['jquery', 'bootstrap']
 	}
 });
 
 
 
-define(['jquery',  'bootstrap', 'responsive-tables', 'mediaModal', 'overlay'], function ($) {
+define(['jquery', 'moment', 'bootstrap', 'responsive-tables', 'mediaModal', 'overlay', 'daterangepicker'], function ($, moment) {
     
         $.ajaxSetup({
             cache: false
@@ -71,5 +74,28 @@ define(['jquery',  'bootstrap', 'responsive-tables', 'mediaModal', 'overlay'], f
 
 	// hide overlay:
 	// $('body').overlay('hide');
+        
+        $('.date-range-picker-trigger').daterangepicker(
+	{
+            ranges: {
+                    'See All': [$('#fromDate').attr('rel2'), moment()],
+                    'Today': [moment(), moment()],
+                    'Yesterday': [moment().subtract('days', 1), moment().subtract('days', 1)],
+                    'Last 7 Days': [moment().subtract('days', 6), moment()],
+                    'Last 30 Days': [moment().subtract('days', 29), moment()],
+                    'This Month': [moment().startOf('month'), moment().endOf('month')],
+                    'Last Month': [moment().subtract('month', 1).startOf('month'), moment().subtract('month', 1).endOf('month')]
+            },
+            startDate: $('#fromDate').attr('rel'),
+            endDate: $('#toDate').attr('rel')
+            },
+            function(start, end) { 
+                $('.daterange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+                $('.daterange span').attr('rel',start.format('MMM DD 00:00:00 YYYY'));
+                $('.daterange span').attr('rel2',end.format('MMM DD 23:59:59 YYYY'));
+                searchByDateRange();
+            }
+	);
+
 
 });

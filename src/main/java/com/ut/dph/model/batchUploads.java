@@ -30,16 +30,14 @@ public class batchUploads {
     @Transient
     private String statusValue;
 
-    public String getDelimChar() {
-        return delimChar;
-    }
-
-    public void setDelimChar(String delimChar) {
-        this.delimChar = delimChar;
-    }
-
     @Transient
     private String usersName;
+    
+    @Transient
+    private String orgName;
+    
+    @Transient
+    private String transportMethod;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -264,6 +262,30 @@ public class batchUploads {
 
     public void setConfigId(Integer configId) {
         this.configId = configId;
+    }
+    
+    public String getDelimChar() {
+        return delimChar;
+    }
+
+    public void setDelimChar(String delimChar) {
+        this.delimChar = delimChar;
+    }
+    
+    public String getorgName() {
+        return orgName;
+    }
+
+    public void setorgName(String orgName) {
+        this.orgName = orgName;
+    }
+    
+    public String gettransportMethod() {
+        return transportMethod;
+    }
+
+    public void settransportMethod(String transportMethod) {
+        this.transportMethod = transportMethod;
     }
 
 }

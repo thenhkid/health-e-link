@@ -3,12 +3,12 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="s" uri="http://www.springframework.org/tags" %>
 
-<div class="main clearfix full-width" role="main">
+<div class="main clearfix" role="main">
     <div class="col-md-12">
          <section class="panel panel-default">
             <div class="panel-body">
                 <div class="table-actions">
-                    <div role="search">
+                    <div class="col-md-3" role="search">
                         <form:form class="form form-inline" action="/administrator/processing-activity/inbound" method="post">
                             <div class="form-group">
                                 <label class="sr-only" for="searchTerm">Search</label>
@@ -19,18 +19,27 @@
                             </button>
                         </form:form>
                     </div>
+                    
+                    <div class="col-md-2 col-md-offset-3"></div>
+
+                    <div class="col-md-4">
+                        <div class="date-range-picker-trigger form-control pull-right daterange">
+                            <i class="glyphicon glyphicon-calendar"></i>
+                            <span class="date-label" rel="" rel2=""><fmt:formatDate value="${fromDate}" type="date" pattern="MMMM dd, yyyy" /> - <fmt:formatDate value="${toDate}" type="date" pattern="MMMM dd, yyyy" /></span> <b class="caret"></b>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="form-container scrollable">
                     <table class="table table-striped table-hover table-default">
                         <thead>
                             <tr>
-                                <th scope="col">Organization Name ${result}</th>
-                                <th scope="col">Contact Information</th>
-                                <th scope="col" class="center-text"># of Users</th>
-                                <th scope="col" class="center-text"># of Configurations</th>
+                                <th scope="col">Organization</th>
+                                <th scope="col">Batch ID</th>
+                                <th scope="col" class="center-text">Transport Method</th>
+                                <th scope="col" class="center-text">Status</th>
+                                <th scope="col" class="center-text"># of Transactions</th>
                                 <th scope="col" class="center-text">Date Created</th>
-                                <th scope="col" class="center-text">Access Level</th>
                                 <th scope="col"></th>
                             </tr>
                         </thead>
@@ -40,31 +49,34 @@
                                     <c:forEach var="batch" items="${batches}">
                                         <tr  style="cursor: pointer">
                                             <td scope="row">
-                                               
+                                                ${batch.orgName}
+                                            </td>
+                                            <td>
+                                                ${batch.utBatchName}
                                             </td>
                                             <td class="center-text">
-                                                
+                                                ${batch.transportMethod}
                                             </td>
                                             <td class="center-text">
-                                               
+                                               SDC
                                             </td>
-                                            <td class="center-text"><fmt:formatDate value="" type="date" pattern="M/dd/yyyy" /></td>
                                             <td class="center-text">
-                                               
+                                               10
                                             </td>
-                                            <td class="actions-col">
+                                            <td class="center-text">3/25/2014</td>
+                                             <td class="actions-col">
                                                 <a href="javascript:void(0);" class="btn btn-link" title="View Batch Transactions" role="button">
                                                     <span class="glyphicon glyphicon-edit"></span>
                                                     View Transactions
                                                 </a>
                                             </td>
                                         </tr>
-                                    </c:forEach>
-                                </c:when>
-                                <c:otherwise>
-                                    <tr><td colspan="7" class="center-text">There are currently no outbound batches to review.</td></tr>
+                                   </c:forEach>     
+                                 </c:when>   
+                                 <c:otherwise>
+                                    <tr><td colspan="7" class="center-text">There are currently no submitted batches.</td></tr>
                                 </c:otherwise>
-                            </c:choose>
+                             </c:choose>           
                         </tbody>
                     </table>
                     <ul class="pagination pull-right" role="navigation" aria-labelledby="Paging ">

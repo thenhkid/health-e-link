@@ -105,7 +105,6 @@ public interface transactionInDAO {
     
     Integer genericValidation(configurationFormFields cff, Integer validationTypeId, Integer batchUploadId, String regEx);
     
-    
     Integer countSubString(ConfigForInsert config, Integer transId);
     
     List<batchUploads> getuploadedBatches(int userId, int orgId, Date fromDate, Date toDate, String searchTerm, int page, int maxResults) throws Exception;
@@ -247,5 +246,7 @@ public interface transactionInDAO {
     Integer insertTransactionTranslated(Integer newTInId, batchUploadSummary bus);
     
     Integer updateTTIdInTransactionIn(Integer batchId);
+    
+    List <batchUploads> getAllUploadedBatches(Date fromDate, Date toDate, String searchTerm, int page, int maxResults) throws Exception;
     
 }

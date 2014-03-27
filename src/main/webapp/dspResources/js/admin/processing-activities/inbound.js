@@ -5,3 +5,22 @@
  */
 
 
+require(['./main'], function () {
+    require(['jquery'], function($) {
+        
+        $("input:text,form").attr("autocomplete", "off");
+        
+     });
+});
+
+
+function searchByDateRange() {
+   var fromDate = $('.daterange span').attr('rel');
+   var toDate = $('.daterange span').attr('rel2');
+    
+   $('#fromDate').val(fromDate);
+   $('#toDate').val(toDate);
+   
+   $('#searchForm').submit();
+
+}

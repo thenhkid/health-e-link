@@ -295,4 +295,6 @@ public interface transactionInManager {
     
     Integer updateTTIdInTransactionIn(Integer batchId);
     
+    List <batchUploads> getAllUploadedBatches(Date fromDate, Date toDate, String searchTerm, int page, int maxResults) throws Exception;
+    
 }
