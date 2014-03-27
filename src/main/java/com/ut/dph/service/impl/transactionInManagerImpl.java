@@ -600,9 +600,13 @@ public class transactionInManagerImpl implements transactionInManager {
                  */
             	 
                 if (getRecordCounts(batchUploadId, Arrays.asList(11, 12, 13, 16), false, false) > 0 && batch.getstatusId() == 6) {
-                    //batches with error should not be released, can only be Rejected/Invalid, set batch back to PR and go through auto/error handling
-                    batch.setstatusId(5);
-                    batchStausId = 5;
+                	//we stop here as batch is not in final status and release batch was triggered
+                	batch.setstatusId(5);
+                    batchStausId = 5;		
+                    updateRecordCounts(batchUploadId, new ArrayList<Integer>(), false, "totalRecordCount");
+                    updateRecordCounts(batchUploadId, errorStatusIds, false, "errorRecordCount");
+                    updateBatchStatus(batchUploadId, batchStausId, "endDateTime");
+                    return true;
                 }
                 // if auto and batch contains transactions that are not final status
                 if (batch.getstatusId() == 6 || (handlingDetails.get(0).getautoRelease()
