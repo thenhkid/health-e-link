@@ -568,61 +568,79 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Override
     @Transactional
     public List<transactionIn> getBatchTransactions(int batchId, int userId) throws Exception {
-        /* Get a list of connections the user has access to */
+        
+        List<Integer> transactionInIdList = new ArrayList<Integer>();
+        
+        if(userId > 0) {
+            /* Get a list of connections the user has access to */
+            Criteria connections = sessionFactory.getCurrentSession().createCriteria(configurationConnectionSenders.class);
+            connections.add(Restrictions.eq("userId", userId));
+            List<configurationConnectionSenders> userConnections = connections.list();
 
-        Criteria connections = sessionFactory.getCurrentSession().createCriteria(configurationConnectionSenders.class);
-        connections.add(Restrictions.eq("userId", userId));
-        List<configurationConnectionSenders> userConnections = connections.list();
+            List<Integer> messageTypeList = new ArrayList<Integer>();
+            List<Integer> OrgList = new ArrayList<Integer>();
 
-        List<Integer> messageTypeList = new ArrayList<Integer>();
-        List<Integer> OrgList = new ArrayList<Integer>();
+            if (userConnections.isEmpty()) {
+                messageTypeList.add(0);
+                OrgList.add(0);
+            } else {
 
-        if (userConnections.isEmpty()) {
-            messageTypeList.add(0);
-            OrgList.add(0);
-        } else {
+                for (configurationConnectionSenders userConnection : userConnections) {
+                    Criteria connection = sessionFactory.getCurrentSession().createCriteria(configurationConnection.class);
+                    connection.add(Restrictions.eq("id", userConnection.getconnectionId()));
 
-            for (configurationConnectionSenders userConnection : userConnections) {
-                Criteria connection = sessionFactory.getCurrentSession().createCriteria(configurationConnection.class);
-                connection.add(Restrictions.eq("id", userConnection.getconnectionId()));
+                    configurationConnection connectionInfo = (configurationConnection) connection.uniqueResult();
 
-                configurationConnection connectionInfo = (configurationConnection) connection.uniqueResult();
+                    /* Get the message type for the configuration */
+                    Criteria sourceconfigurationQuery = sessionFactory.getCurrentSession().createCriteria(configuration.class);
+                    sourceconfigurationQuery.add(Restrictions.eq("id", connectionInfo.getsourceConfigId()));
+                    configuration configDetails = (configuration) sourceconfigurationQuery.uniqueResult();
 
-                /* Get the message type for the configuration */
-                Criteria sourceconfigurationQuery = sessionFactory.getCurrentSession().createCriteria(configuration.class);
-                sourceconfigurationQuery.add(Restrictions.eq("id", connectionInfo.getsourceConfigId()));
-                configuration configDetails = (configuration) sourceconfigurationQuery.uniqueResult();
+                    /* Add the message type to the message type list */
+                    messageTypeList.add(configDetails.getMessageTypeId());
 
-                /* Add the message type to the message type list */
-                messageTypeList.add(configDetails.getMessageTypeId());
+                    /* Get the list of target orgs */
+                    Criteria targetconfigurationQuery = sessionFactory.getCurrentSession().createCriteria(configuration.class);
+                    targetconfigurationQuery.add(Restrictions.eq("id", connectionInfo.gettargetConfigId()));
+                    configuration targetconfigDetails = (configuration) targetconfigurationQuery.uniqueResult();
 
-                /* Get the list of target orgs */
-                Criteria targetconfigurationQuery = sessionFactory.getCurrentSession().createCriteria(configuration.class);
-                targetconfigurationQuery.add(Restrictions.eq("id", connectionInfo.gettargetConfigId()));
-                configuration targetconfigDetails = (configuration) targetconfigurationQuery.uniqueResult();
+                    /* Add the target org to the target organization list */
+                    OrgList.add(targetconfigDetails.getorgId());
+                }
+            }
 
-                /* Add the target org to the target organization list */
-                OrgList.add(targetconfigDetails.getorgId());
+            /* Get a list of available batches */
+            Criteria batchSummaries = sessionFactory.getCurrentSession().createCriteria(batchUploadSummary.class);
+            batchSummaries.add(Restrictions.eq("batchId", batchId));
+            batchSummaries.add(Restrictions.in("messageTypeId", messageTypeList));
+            batchSummaries.add(Restrictions.in("targetOrgId", OrgList));
+            List<batchUploadSummary> batchUploadSummaryList = batchSummaries.list();
+
+            if (batchUploadSummaryList.isEmpty()) {
+                transactionInIdList.add(0);
+            } else {
+
+                for (batchUploadSummary summary : batchUploadSummaryList) {
+                    transactionInIdList.add(summary.gettransactionInId());
+                }
+
             }
         }
+        else {
+             /* Get a list of available batches */
+            Criteria batchSummaries = sessionFactory.getCurrentSession().createCriteria(batchUploadSummary.class);
+            batchSummaries.add(Restrictions.eq("batchId", batchId));
+            List<batchUploadSummary> batchUploadSummaryList = batchSummaries.list();
 
-        /* Get a list of available batches */
-        Criteria batchSummaries = sessionFactory.getCurrentSession().createCriteria(batchUploadSummary.class);
-        batchSummaries.add(Restrictions.eq("batchId", batchId));
-        batchSummaries.add(Restrictions.in("messageTypeId", messageTypeList));
-        batchSummaries.add(Restrictions.in("targetOrgId", OrgList));
-        List<batchUploadSummary> batchUploadSummaryList = batchSummaries.list();
+            if (batchUploadSummaryList.isEmpty()) {
+                transactionInIdList.add(0);
+            } else {
 
-        List<Integer> transactionInIdList = new ArrayList<Integer>();
+                for (batchUploadSummary summary : batchUploadSummaryList) {
+                    transactionInIdList.add(summary.gettransactionInId());
+                }
 
-        if (batchUploadSummaryList.isEmpty()) {
-            transactionInIdList.add(0);
-        } else {
-
-            for (batchUploadSummary summary : batchUploadSummaryList) {
-                transactionInIdList.add(summary.gettransactionInId());
             }
-
         }
 
         Criteria findTransactions = sessionFactory.getCurrentSession().createCriteria(transactionIn.class);
@@ -783,7 +801,29 @@ public class transactionInDAOImpl implements transactionInDAO {
         return (batchUploads) sessionFactory.getCurrentSession().get(batchUploads.class, batchId);
 
     }
+    
+    /**
+     * The 'getBatchDetailsByBatchName' will return a batch by name
+     * 
+     * @param batchName The name of the batch to search form.
+     * 
+     * @return This function will return a batchUpload object
+     */
+    @Override
+    @Transactional
+    public batchUploads getBatchDetailsByBatchName(String batchName) throws Exception {
+        Query query = sessionFactory.getCurrentSession().createQuery("from batchUploads where utBatchName = :batchName");
+        query.setParameter("batchName", batchName);
+        
+        if(query.list().size() > 1) {
+            return null;
+        }
+        else {
+            return (batchUploads) query.uniqueResult();
+        }
 
+    }
+    
     /**
      * The 'getTransactionDetails' function will return the transaction IN details for the passed in transactionId.
      *
@@ -1454,6 +1494,15 @@ public class transactionInDAOImpl implements transactionInDAO {
 
                     /* Search the organization name */
                     if (orgDetails.getOrgName().toLowerCase().matches(".*" + searchTerm + ".*")) {
+                        if (!batchIdList.contains(batch.getId())) {
+                            batchIdList.add(batch.getId());
+                        }
+                    }
+                    
+                    Organization srcorgDetails = (Organization) sessionFactory.getCurrentSession().get(Organization.class, source.getsourceOrgId());
+
+                    /* Search the organization name */
+                    if (srcorgDetails.getOrgName().toLowerCase().matches(".*" + searchTerm + ".*")) {
                         if (!batchIdList.contains(batch.getId())) {
                             batchIdList.add(batch.getId());
                         }

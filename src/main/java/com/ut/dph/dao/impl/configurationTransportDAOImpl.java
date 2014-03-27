@@ -207,6 +207,26 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
 
         return criteria.list();
     }
+    
+    /**
+     * The 'getConfigurationFieldsByFieldNo' function will return a list of form fields for the selected configuration
+     * and selected Field No
+     * 
+     * @param configId              The id of the selected configuration
+     * @param transporetDetailId    The id of the selected transport method
+     * @param fieldNo               The integer value of the field you want to return fields 
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    @Transactional
+    public configurationFormFields getConfigurationFieldsByFieldNo(int configId, int transportDetailId, int fieldNo) throws Exception {
+         Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configurationFormFields.class)
+                .add(Restrictions.eq("configId", configId))
+                .add(Restrictions.eq("transportDetailId", transportDetailId))
+                .add(Restrictions.eq("fieldNo", fieldNo));
+
+        return (configurationFormFields) criteria.uniqueResult();
+    }
 
     /**
      * The 'updateConfigurationFormFields' function will update the configuration form field settings

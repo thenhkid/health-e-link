@@ -66,6 +66,12 @@ public class configurationTransportManagerImpl implements configurationTransport
     public List<configurationFormFields> getConfigurationFieldsByBucket(int configId, int transportDetailId, int bucket) throws Exception {
         return configurationTransportDAO.getConfigurationFieldsByBucket(configId, transportDetailId, bucket);
     }
+    
+    @Override
+    @Transactional
+    public configurationFormFields getConfigurationFieldsByFieldNo(int configId, int transportDetailId, int fieldNo) throws Exception {
+        return configurationTransportDAO.getConfigurationFieldsByFieldNo(configId, transportDetailId, fieldNo);
+    }
 
     @Override
     @Transactional

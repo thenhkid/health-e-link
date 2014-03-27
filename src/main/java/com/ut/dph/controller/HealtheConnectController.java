@@ -173,8 +173,6 @@ public class HealtheConnectController {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/Health-e-Connect/upload");
         
-        System.out.println(fromDate);
-        
         mav.addObject("fromDate", fromDate);
         mav.addObject("toDate", toDate);
         

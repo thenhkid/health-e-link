@@ -22,6 +22,8 @@ public interface configurationTransportDAO {
     List<configurationFormFields> getConfigurationFields(int configId, int transportDetailId);
     
     List<configurationFormFields> getConfigurationFieldsByBucket(int configId, int transportDetailId, int bucket) throws Exception;
+    
+    configurationFormFields getConfigurationFieldsByFieldNo(int configId, int transportDetailId, int fieldNo) throws Exception;
 
     void updateConfigurationFormFields(configurationFormFields formField);
 

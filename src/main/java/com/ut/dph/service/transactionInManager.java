@@ -63,6 +63,8 @@ public interface transactionInManager {
     
     batchUploads getBatchDetails(int batchId) throws Exception;
     
+    batchUploads getBatchDetailsByBatchName(String batchName) throws Exception;
+    
     transactionIn getTransactionDetails(int transactionId) throws Exception;
     
     transactionInRecords getTransactionRecords(int transactionId);

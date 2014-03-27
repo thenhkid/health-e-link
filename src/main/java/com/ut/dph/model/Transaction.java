@@ -37,6 +37,14 @@ public class Transaction {
    private int sourceType = 1;
    private int internalStatusId = 0;
    private int orginialTransactionId = 0;
+   private String reportableField1 = null;
+   private String reportableField2 = null;
+   private String reportableField3 = null;
+   private String reportableField4 = null;
+   private String reportableFieldHeading1 = null;
+   private String reportableFieldHeading2 = null;
+   private String reportableFieldHeading3 = null;
+   private String reportableFieldHeading4 = null;
    
    private List<transactionRecords> sourceOrgFields = null;
    private List<transactionRecords> sourceProviderFields = null;
@@ -268,6 +276,70 @@ public class Transaction {
    
    public void setorginialTransactionId(int orginialTransactionId) {
        this.orginialTransactionId = orginialTransactionId;
+   }
+   
+   public String getreportableField1() {
+       return reportableField1;
+   }
+   
+   public void setreportableField1(String reportableField1) {
+       this.reportableField1 = reportableField1;
+   }
+   
+   public String getreportableField2() {
+       return reportableField2;
+   }
+   
+   public void setreportableField2(String reportableField2) {
+       this.reportableField2 = reportableField2;
+   }
+   
+   public String getreportableField3() {
+       return reportableField3;
+   }
+   
+   public void setreportableField3(String reportableField3) {
+       this.reportableField3 = reportableField3;
+   }
+   
+   public String getreportableField4() {
+       return reportableField4;
+   }
+   
+   public void setreportableField4(String reportableField4) {
+       this.reportableField4 = reportableField4;
+   }
+   
+   public String getreportableFieldHeading1() {
+       return reportableFieldHeading1;
+   }
+   
+   public void setreportableFieldHeading1(String reportableFieldHeading1) {
+       this.reportableFieldHeading1 = reportableFieldHeading1;
+   }
+   
+   public String getreportableFieldHeading2() {
+       return reportableFieldHeading2;
+   }
+   
+   public void setreportableFieldHeading2(String reportableFieldHeading2) {
+       this.reportableFieldHeading2 = reportableFieldHeading2;
+   }
+   
+   public String getreportableFieldHeading3() {
+       return reportableFieldHeading3;
+   }
+   
+   public void setreportableFieldHeading3(String reportableFieldHeading3) {
+       this.reportableFieldHeading3 = reportableFieldHeading3;
+   }
+   
+   public String getreportableFieldHeading4() {
+       return reportableFieldHeading4;
+   }
+   
+   public void setreportableFieldHeading4(String reportableFieldHeading4) {
+       this.reportableFieldHeading4 = reportableFieldHeading4;
    }
    
 }

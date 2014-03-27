@@ -9,10 +9,13 @@
             <div class="panel-body">
                 <div class="table-actions">
                     <div class="col-md-3" role="search">
-                        <form:form class="form form-inline" action="/administrator/processing-activity/inbound" method="post">
+                        <form:form class="form form-inline" id="searchForm" action="/administrator/processing-activity/inbound" method="post">
                             <div class="form-group">
                                 <label class="sr-only" for="searchTerm">Search</label>
                                 <input type="text" name="searchTerm" id="searchTerm" value="${searchTerm}" class="form-control" id="search-batches" placeholder="Search"/>
+                                <input type="hidden" name="fromDate" id="fromDate" rel="<fmt:formatDate value="${fromDate}" type="date" pattern="MM/dd/yyyy" />" rel2="<fmt:formatDate value="${userDetails.dateOrgWasCreated}" type="date" pattern="MM/dd/yyyy" />" value="${fromDate}" />
+                                <input type="hidden" name="toDate" id="toDate" rel="<fmt:formatDate value="${toDate}" type="date" pattern="MM/dd/yyyy" />" value="${toDate}" />
+                                <input type="hidden" name="page" id="page" value="${currentPage}" />
                             </div>
                             <button id="searchOrgBtn" class="btn btn-primary btn-sm" title="Search Inbound Batches" role="button">
                                 <span class="glyphicon glyphicon-search"></span>
@@ -23,9 +26,9 @@
                     <div class="col-md-2 col-md-offset-3"></div>
 
                     <div class="col-md-4">
-                        <div class="date-range-picker-trigger form-control pull-right daterange">
+                        <div class="date-range-picker-trigger form-control pull-right daterange" style="width:245px;">
                             <i class="glyphicon glyphicon-calendar"></i>
-                            <span class="date-label" rel="" rel2=""><fmt:formatDate value="${fromDate}" type="date" pattern="MMMM dd, yyyy" /> - <fmt:formatDate value="${toDate}" type="date" pattern="MMMM dd, yyyy" /></span> <b class="caret"></b>
+                            <span class="date-label"><fmt:formatDate value="${fromDate}" type="date" pattern="MMMM dd, yyyy" /> - <fmt:formatDate value="${toDate}" type="date" pattern="MMMM dd, yyyy" /></span> <b class="caret"></b>
                         </div>
                     </div>
                 </div>
@@ -53,19 +56,30 @@
                                             </td>
                                             <td>
                                                 ${batch.utBatchName}
+                                                <c:if test="${batch.transportMethodId == 1}">
+                                                    <br />
+                                                    <a href="/FileDownload/downloadFile.do?filename=${batch.originalFileName}&foldername=input files&orgId=${batch.orgId}" title="View Original File">
+                                                        ${batch.originalFileName}
+                                                    </a>
+                                                </c:if>
                                             </td>
                                             <td class="center-text">
                                                 ${batch.transportMethod}
                                             </td>
                                             <td class="center-text">
-                                               SDC
+                                                <a href="#statusModal" data-toggle="modal" class="viewStatus" rel="${batch.statusId}" title="View this Status">${batch.statusValue}</a>
                                             </td>
                                             <td class="center-text">
-                                               10
+                                               ${batch.totalTransactions}
                                             </td>
-                                            <td class="center-text">3/25/2014</td>
-                                             <td class="actions-col">
-                                                <a href="javascript:void(0);" class="btn btn-link" title="View Batch Transactions" role="button">
+                                            <td class="center-text"><fmt:formatDate value="${batch.dateSubmitted}" type="date" pattern="M/dd/yyyy" /><br /><fmt:formatDate value="${batch.dateSubmitted}" type="time" pattern="h:mm:ss a" /></td>
+                                            <td class="actions-col">
+                                                <a href="javascript:void(0);" class="btn btn-link viewAuditReport" title="View Audit Report" role="button">
+                                                    <span class="glyphicon glyphicon-edit"></span>
+                                                    View Audit Report
+                                                </a>
+                                                <br />
+                                                <a href="<c:url value='/administrator/processing-activity/batch/${batch.utBatchName}' />" class="btn btn-link viewTransactions" title="View Batch Transactions" role="button">
                                                     <span class="glyphicon glyphicon-edit"></span>
                                                     View Transactions
                                                 </a>
@@ -91,3 +105,4 @@
         </section>
     </div>
 </div>
+<div class="modal fade" id="statusModal" role="dialog" tabindex="-1" aria-labeledby="Status Details" aria-hidden="true" aria-describedby="Status Details"></div>
