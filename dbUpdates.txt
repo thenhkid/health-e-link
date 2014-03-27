@@ -398,4 +398,29 @@ CHANGE COLUMN `notReported` `notReported` INT NULL DEFAULT NULL,
 CHANGE COLUMN `moreThanOneRace` `moreThanOneRace` INT NULL DEFAULT NULL;
  
   
+/** Grace 03272014 02:47PM **/
+drop procedure setSqlForConfig;
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `setSqlForConfig`(in inConfigId int, in batchUploadId int)
+proc_main:begin
+drop TEMPORARY TABLE if exists temp1;
+CREATE TEMPORARY TABLE temp1
+as (select min(fieldNo) as fieldNo, saveToTableName, savetotablecol, configId, batchUploadId
+from configurationFormFields where configId = inConfigId
+and saveToTableName != ''
+group by savetotablecol, saveToTableName);
+SELECT  batchUploadId, saveToTableName, 
+group_concat(distinct savetotablecol ORDER BY fieldNo SEPARATOR ',') as savetotablecol,
+group_concat( concat('F',fieldNo) ORDER BY fieldNo SEPARATOR ',') as singleValueFields, 
+group_concat( concat('strSplit(F',fieldNo, ', ''^^^^^'',@valPos)') ORDER BY fieldNo SEPARATOR ',') as splitFields, 
+group_concat( concat('F',fieldNo, ' like ''%^^^^^%''') ORDER BY fieldNo SEPARATOR ' or ') as checkForDelim,
+configId
+FROM temp1 
+where configId = inConfigId
+GROUP BY saveToTableName
+ORDER BY saveToTableName;
+end proc_main$$
+DELIMITER ;
+
   

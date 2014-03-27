@@ -1216,7 +1216,7 @@ public class transactionInDAOImpl implements transactionInDAO {
         String sql
                 = "(SELECT ROUND(((LENGTH(" + col
                 + ") - LENGTH(REPLACE(LCASE(" + col
-                + "), '||^||', '')))/LENGTH('||^||')),0) as stringCount from transactionTranslatedin "
+                + "), '^^^^^', '')))/LENGTH('^^^^^')),0) as stringCount from transactionTranslatedin "
                 + " where transactionInId = :id);";
         Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).addScalar("stringCount", StandardBasicTypes.INTEGER);
         query.setParameter("id", transId);
