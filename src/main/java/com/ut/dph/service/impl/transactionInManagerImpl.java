@@ -815,9 +815,7 @@ public class transactionInManagerImpl implements transactionInManager {
                  */
                 List<Integer> skipTheseIds = getBlankTransIds(config);
                 config.setBlankValueTransId(skipTheseIds);
-                if (config.getCheckForDelim().contains("F22")) {
-                	System.out.println("stop here");
-                }
+
                 //we insert single values
                 if (!insertSingleToMessageTables(config)) {
                     return false;
