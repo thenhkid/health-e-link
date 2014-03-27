@@ -609,8 +609,17 @@ public class transactionInManagerImpl implements transactionInManager {
                         && (handlingDetails.get(0).geterrorHandling() == 2 
                         || handlingDetails.get(0).geterrorHandling() == 4 
                         || handlingDetails.get(0).geterrorHandling() == 1))) {
-
-                    if (handlingDetails.get(0).geterrorHandling() == 2) {
+                	
+                if (handlingDetails.get(0).getautoRelease() && handlingDetails.get(0).geterrorHandling() == 1
+                			&& getRecordCounts(batchUploadId, Arrays.asList(11, 12, 13, 16), false, false) > 0) {
+	                	//post records to ERG
+	                	batch.setstatusId(5);
+	                    batchStausId = 5;		
+	                    updateRecordCounts(batchUploadId, new ArrayList<Integer>(), false, "totalRecordCount");
+	                    updateRecordCounts(batchUploadId, errorStatusIds, false, "errorRecordCount");
+	                    updateBatchStatus(batchUploadId, batchStausId, "endDateTime");
+	                    return true;
+                	} else  if (handlingDetails.get(0).geterrorHandling() == 2) {
                         //reject errors
                         updateTransactionStatus(batchUploadId, 0, 14, 13);
                         copyTransactionInStatusToTarget(batchUploadId);
