@@ -16,6 +16,7 @@ import com.ut.dph.model.configurationTransport;
 import com.ut.dph.model.custom.searchParameters;
 import com.ut.dph.model.fieldSelectOptions;
 import com.ut.dph.model.lutables.lu_ProcessStatus;
+import com.ut.dph.model.systemSummary;
 import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionInRecords;
 import com.ut.dph.model.transactionRecords;
@@ -122,6 +123,10 @@ public class adminProcessingActivity {
         mav.addObject("fromDate", fromDate);
         mav.addObject("toDate", toDate);
         mav.addObject("searchTerm", searchTerm);
+        
+        /* Get system inbound summary */
+        systemSummary summaryDetails = transactionInManager.generateSystemInboundSummary();
+        mav.addObject("summaryDetails", summaryDetails);
         
         
         /* Get all inbound transactions */
@@ -232,8 +237,7 @@ public class adminProcessingActivity {
     }
     
    /**
-     * The '/batch/{batchName}' POST request will serve up the existing list of generated referrals and feedback reports
-     * based on a search or date
+     * The '/batch/{batchName}' POST request will retrieve a list of transactions that are associated to the clicked batch 
      *
      * @param batchName	The name of the batch to retreive transactions for
      * @return          The list of inbound batch transactions
@@ -244,6 +248,159 @@ public class adminProcessingActivity {
      */
     @RequestMapping(value = "/batch/{batchName}", method = RequestMethod.GET)
     public ModelAndView listBatchTransactions(@PathVariable String batchName) throws Exception {
+  
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/processing-activity/transactions");
+        
+        /* Get the details of the batch */
+        batchUploads batchDetails = transactionInManager.getBatchDetailsByBatchName(batchName);
+        
+        if(batchDetails != null) {
+            
+            Organization orgDetails = organizationmanager.getOrganizationById(batchDetails.getOrgId());
+            batchDetails.setorgName(orgDetails.getOrgName());
+        
+            mav.addObject("batchDetails", batchDetails);
+
+            try {
+                /* Get all the transactions for the batch */
+                List<transactionIn> batchTransactions = transactionInManager.getBatchTransactions(batchDetails.getId(), 0);
+
+                List<Transaction> transactionList = new ArrayList<Transaction>();
+                
+                if(batchTransactions.size() > 100) {
+                    mav.addObject("toomany","toomany");
+                    mav.addObject("size", batchTransactions.size());
+                }
+                else {
+
+                    for(transactionIn transaction : batchTransactions) {
+
+                        Transaction transactionDetails = new Transaction();
+                        transactionDetails.settransactionRecordId(transaction.getId());
+                        transactionDetails.setstatusId(transaction.getstatusId());
+                        transactionDetails.setdateSubmitted(transaction.getdateCreated());
+                        transactionDetails.setconfigId(transaction.getconfigId());
+
+                        lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(transaction.getstatusId());
+                        transactionDetails.setstatusValue(processStatus.getDisplayCode());
+
+                        transactionInRecords records = transactionInManager.getTransactionRecords(transaction.getId());
+
+                        /* Get a list of form fields */
+                        configurationTransport transportDetails = configurationTransportManager.getTransportDetails(transaction.getconfigId());
+                        List<configurationFormFields> targetInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transaction.getconfigId(),transportDetails.getId(),3);
+
+                        /* Set all the transaction TARGET fields */
+                        List<transactionRecords> toFields;
+                        if(!targetInfoFormFields.isEmpty()) {
+                            toFields = setOutboundFormFields(targetInfoFormFields, records, 0, true, 0);
+                        }
+                        else {
+                            toFields = setOrgDetails(transactionInManager.getUploadSummaryDetails(transaction.getId()).gettargetOrgId());
+                        }
+                        transactionDetails.settargetOrgFields(toFields);
+
+                        /* get the message type name */
+                        configuration configDetails = configurationManager.getConfigurationById(transaction.getconfigId());
+                        transactionDetails.setmessageTypeName(messagetypemanager.getMessageTypeById(configDetails.getMessageTypeId()).getName());
+
+                        configurationMessageSpecs messageSpecs  = configurationManager.getMessageSpecs(transaction.getconfigId());
+
+                        if(messageSpecs.getrptField1() > 0) {
+
+                            configurationFormFields formField1 = configurationTransportManager.getConfigurationFieldsByFieldNo(transaction.getconfigId(),transportDetails.getId(),messageSpecs.getrptField1());
+
+                            transactionDetails.setreportableFieldHeading1(formField1.getFieldLabel());
+
+                            String rptFieldCol1 = new StringBuilder().append("f").append(messageSpecs.getrptField1()).toString();
+                            try {
+                                transactionDetails.setreportableField1(BeanUtils.getProperty(records, rptFieldCol1));
+                            } catch (IllegalAccessException ex) {
+                                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+                            } catch (InvocationTargetException ex) {
+                                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+
+                        if(messageSpecs.getrptField2() > 0) {
+
+                            configurationFormFields formField2 = configurationTransportManager.getConfigurationFieldsByFieldNo(transaction.getconfigId(),transportDetails.getId(),messageSpecs.getrptField2());
+
+                            transactionDetails.setreportableFieldHeading2(formField2.getFieldLabel());
+
+                            String rptFieldCol2 = new StringBuilder().append("f").append(messageSpecs.getrptField2()).toString();
+                            try {
+                                transactionDetails.setreportableField2(BeanUtils.getProperty(records, rptFieldCol2));
+                            } catch (IllegalAccessException ex) {
+                                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+                            } catch (InvocationTargetException ex) {
+                                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+
+                        if(messageSpecs.getrptField3() > 0) {
+
+                            configurationFormFields formField3 = configurationTransportManager.getConfigurationFieldsByFieldNo(transaction.getconfigId(),transportDetails.getId(),messageSpecs.getrptField3());
+
+                            transactionDetails.setreportableFieldHeading3(formField3.getFieldLabel());
+
+                            String rptFieldCol3 = new StringBuilder().append("f").append(messageSpecs.getrptField3()).toString();
+                            try {
+                                transactionDetails.setreportableField3(BeanUtils.getProperty(records, rptFieldCol3));
+                            } catch (IllegalAccessException ex) {
+                                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+                            } catch (InvocationTargetException ex) {
+                                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+
+                        if(messageSpecs.getrptField4() > 0) {
+
+                            configurationFormFields formField4 = configurationTransportManager.getConfigurationFieldsByFieldNo(transaction.getconfigId(),transportDetails.getId(),messageSpecs.getrptField4());
+
+                            transactionDetails.setreportableFieldHeading4(formField4.getFieldLabel());
+
+                            String rptFieldCol4 = new StringBuilder().append("f").append(messageSpecs.getrptField4()).toString();
+                            try {
+                                transactionDetails.setreportableField4(BeanUtils.getProperty(records, rptFieldCol4));
+                            } catch (IllegalAccessException ex) {
+                                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+                            } catch (InvocationTargetException ex) {
+                                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+
+                        transactionList.add(transactionDetails);
+                    }
+                 }
+
+                mav.addObject("transactions", transactionList);
+
+            }
+            catch (Exception e) {
+                throw new Exception("(Admin) Error occurred in getting transactions for a sent batch. batchId: "+ batchDetails.getId()+" ERROR: "+e.getMessage(),e);
+            }
+        }
+        
+        return mav;
+    }
+    
+    /**
+     * The '/batch/{batchName}' POST request will retrieve a list of transactions that are associated to the clicked batch and
+     * match the entered search term.
+     *
+     * @param batchName	 The name of the batch to retreive transactions for
+     * @param searchTerm The term to narrow down the results
+     * 
+     * @return          The list of inbound batch transactions
+     *
+     * @Objects	(1) An object containing all the found batch transactions
+     *
+     * @throws Exception
+     */
+    @RequestMapping(value = "/batch/{batchName}", method = RequestMethod.POST)
+    public ModelAndView listBatchTransactions(@PathVariable String batchName, @RequestParam String searchTerm) throws Exception {
   
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/processing-activity/transactions");
@@ -363,12 +520,47 @@ public class adminProcessingActivity {
                     
                     transactionList.add(transactionDetails);
                 }
-
-                mav.addObject("transactions", transactionList);
+                
+                if(!"".equals(searchTerm)) {
+                    List<Transaction> matchedtransactionList = new ArrayList<Transaction>();
+                    
+                    if(transactionList.size() > 0) {
+                        
+                        for(Transaction transaction : transactionList) {
+                           
+                            boolean matchFound = transactionInManager.searchTransactions(transaction, searchTerm);
+                            if(matchFound == true) {
+                                matchedtransactionList.add(transaction);
+                            }
+                        }
+                        
+                    }
+                    
+                    if(matchedtransactionList.size() > 100) {
+                        mav.addObject("transactions", "");
+                        mav.addObject("stilltoomany","stilltoomany");
+                        mav.addObject("size", matchedtransactionList.size());
+                    }
+                    else {
+                        mav.addObject("transactions", matchedtransactionList);
+                    }
+                    
+                }
+                else {
+                    
+                    if(transactionList.size() > 100) {
+                        mav.addObject("transactions", "");
+                        mav.addObject("toomany","toomany");
+                        mav.addObject("size", transactionList.size());
+                    }
+                    else {
+                        mav.addObject("transactions", transactionList);
+                    }
+                }
 
             }
             catch (Exception e) {
-                throw new Exception("(Admin) Error occurred in getting transactions for a sent batch. batchId: "+ batchDetails.getId()+" ERROR: "+e.getMessage(),e);
+                throw new Exception("(Admin) Error occurred in searching transactions for a sent batch. batchId: "+ batchDetails.getId()+" ERROR: "+e.getMessage(),e);
             }
         }
         

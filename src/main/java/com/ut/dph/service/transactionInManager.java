@@ -8,6 +8,7 @@ package com.ut.dph.service;
 
 import com.ut.dph.model.CrosswalkData;
 import com.ut.dph.model.Macros;
+import com.ut.dph.model.Transaction;
 import com.ut.dph.model.batchUploadSummary;
 import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.configurationConnection;
@@ -22,6 +23,7 @@ import com.ut.dph.model.transactionInRecords;
 import com.ut.dph.model.transactionRecords;
 import com.ut.dph.model.transactionTarget;
 import com.ut.dph.model.custom.ConfigForInsert;
+import com.ut.dph.model.systemSummary;
 
 import java.util.Date;
 import java.util.List;
@@ -298,5 +300,9 @@ public interface transactionInManager {
     Integer updateTTIdInTransactionIn(Integer batchId);
     
     List <batchUploads> getAllUploadedBatches(Date fromDate, Date toDate, String searchTerm, int page, int maxResults) throws Exception;
+    
+    boolean searchTransactions(Transaction transaction, String searchTerm) throws Exception;
+    
+    systemSummary generateSystemInboundSummary();
     
 }

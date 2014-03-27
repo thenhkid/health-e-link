@@ -37,6 +37,8 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.hibernate.Criteria;
 import org.hibernate.Query;
@@ -1424,6 +1426,20 @@ public class transactionInDAOImpl implements transactionInDAO {
         searchTerm = searchTerm.replace(".", "\\.");
 
         for (batchUploads batch : batches) {
+            
+            String processStatus = "";
+            try {
+                processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId()).getDisplayCode();
+            } catch (Exception ex) {
+                Logger.getLogger(transactionInDAOImpl.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+            /* Search the by status  */
+            if (processStatus.toLowerCase().matches(".*" + searchTerm + ".*")) {
+                if (!batchIdList.contains(batch.getId())) {
+                    batchIdList.add(batch.getId());
+                }
+            }
 
             /* Search the submitted by */
             if (batch.getoriginalFileName().toLowerCase().matches(".*" + searchTerm + ".*")) {

@@ -10,6 +10,7 @@ import com.ut.dph.dao.transactionInDAO;
 import com.ut.dph.dao.transactionOutDAO;
 import com.ut.dph.model.CrosswalkData;
 import com.ut.dph.model.Macros;
+import com.ut.dph.model.Transaction;
 import com.ut.dph.model.batchUploadSummary;
 import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.configuration;
@@ -25,6 +26,7 @@ import com.ut.dph.model.transactionInRecords;
 import com.ut.dph.model.transactionRecords;
 import com.ut.dph.model.transactionTarget;
 import com.ut.dph.model.custom.ConfigForInsert;
+import com.ut.dph.model.systemSummary;
 import com.ut.dph.reference.fileSystem;
 import com.ut.dph.service.configurationManager;
 import com.ut.dph.service.configurationTransportManager;
@@ -47,7 +49,9 @@ import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -171,7 +175,7 @@ public class transactionInManagerImpl implements transactionInManager {
     public batchUploads getBatchDetails(int batchId) throws Exception {
         return transactionInDAO.getBatchDetails(batchId);
     }
-    
+
     @Override
     @Transactional
     public batchUploads getBatchDetailsByBatchName(String batchName) throws Exception {
@@ -598,7 +602,7 @@ public class transactionInManagerImpl implements transactionInManager {
                  * 1 = Post errors to ERG 2 = Reject record on error 3 = Reject submission on error 4 = Pass through errors
                  *
                  */
-            	 
+
                 if (getRecordCounts(batchUploadId, Arrays.asList(11, 12, 13, 16), false, false) > 0 && batch.getstatusId() == 6) {
                     //batches with error should not be released, can only be Rejected/Invalid, set batch back to PR and go through auto/error handling
                     batch.setstatusId(5);
@@ -606,8 +610,8 @@ public class transactionInManagerImpl implements transactionInManager {
                 }
                 // if auto and batch contains transactions that are not final status
                 if (batch.getstatusId() == 6 || (handlingDetails.get(0).getautoRelease()
-                        && (handlingDetails.get(0).geterrorHandling() == 2 
-                        || handlingDetails.get(0).geterrorHandling() == 4 
+                        && (handlingDetails.get(0).geterrorHandling() == 2
+                        || handlingDetails.get(0).geterrorHandling() == 4
                         || handlingDetails.get(0).geterrorHandling() == 1))) {
 
                     if (handlingDetails.get(0).geterrorHandling() == 2) {
@@ -623,16 +627,16 @@ public class transactionInManagerImpl implements transactionInManager {
 
                     //run check to make sure we have records 
                     if (getRecordCounts(batchUploadId, Arrays.asList(12), false, true) > 0) {
-                    	//we insert here
-	                    if (!insertTransactions(batchUploadId)) {
-	                        //something went wrong, we removed all inserted entries
-	                        clearMessageTables(batchUploadId);
-	                        updateRecordCounts(batchUploadId, new ArrayList<Integer>(), false, "totalRecordCount");
-	                        // do we count pass records as errors?
-	                        updateRecordCounts(batchUploadId, errorStatusIds, false, "errorRecordCount");
-	                        updateBatchStatus(batchUploadId, 29, "endDateTime");
-	                        return false;
-	                    }
+                        //we insert here
+                        if (!insertTransactions(batchUploadId)) {
+                            //something went wrong, we removed all inserted entries
+                            clearMessageTables(batchUploadId);
+                            updateRecordCounts(batchUploadId, new ArrayList<Integer>(), false, "totalRecordCount");
+                            // do we count pass records as errors?
+                            updateRecordCounts(batchUploadId, errorStatusIds, false, "errorRecordCount");
+                            updateBatchStatus(batchUploadId, 29, "endDateTime");
+                            return false;
+                        }
                     }
                     // all went well
                     updateTransactionStatus(batchUploadId, 0, 12, 19);
@@ -798,7 +802,7 @@ public class transactionInManagerImpl implements transactionInManager {
 
                 //we insert single values
                 if (!insertSingleToMessageTables(config)) {
-                	return false;
+                    return false;
                 }
 
                 //we loop through transactions with multiple values and use SP to loop values with delimiters
@@ -807,7 +811,7 @@ public class transactionInManagerImpl implements transactionInManager {
                     Integer subStringTotal = countSubString(config, transId);
                     for (int i = 0; i <= subStringTotal; i++) {
                         if (!insertMultiValToMessageTables(config, i + 1, transId)) {
-                        	return false;
+                            return false;
                         }
                     }
                 }
@@ -816,7 +820,6 @@ public class transactionInManagerImpl implements transactionInManager {
 
         return processTransactions;
     }
-
 
     @Override
     public Integer clearTransactionTranslatedIn(Integer batchUploadId) {
@@ -1450,10 +1453,10 @@ public class transactionInManagerImpl implements transactionInManager {
             //2. we load data with my sql
             //get delimiter, get fileWithPath etc
             if (batch.getoriginalFileName().endsWith(".txt") || batch.getoriginalFileName().endsWith(".csv")) {
-            	sysError = sysError + insertLoadData(batch.getId(), batch.getDelimChar(), fileWithPath, loadTableName, batch.isContainsHeaderRow());
+                sysError = sysError + insertLoadData(batch.getId(), batch.getDelimChar(), fileWithPath, loadTableName, batch.isContainsHeaderRow());
 
             }
-            
+
             //3. we update batchId, loadRecordId
             sysError = sysError + updateLoadTable(loadTableName, batch.getId());
 
@@ -1480,7 +1483,7 @@ public class transactionInManagerImpl implements transactionInManager {
                 //2. we get all rows for batch
                 List<transactionInRecords> tInRecords = getTransactionInRecordsForBatch(batch.getId());
                 if (tInRecords == null || tInRecords.size() == 0) {
-                	updateBatchStatus(batchId, 7, "endDateTime");
+                    updateBatchStatus(batchId, 7, "endDateTime");
                     insertProcessingError(7, null, batchId, null, null, null, null,
                             false, false, "No valid transactions were found for batch.");
                     return false;
@@ -1519,45 +1522,45 @@ public class transactionInManagerImpl implements transactionInManager {
             //load targets - we need to loadTarget only if field for target is blank, otherwise we load what user sent
             List<configurationConnection> batchTargetList = getBatchTargets(batchId, true);
             int sourceConfigId = 0;
-            if (batchTargetList.size() <= 0) { 
-            	insertProcessingError(10, null, batchId, null, null, null, null, false, false, "No valid connections were found for loading batch.");
-            	updateTransactionStatus(batchId, 0, 0, 13);
-            	updateRecordCounts(batchId, new ArrayList<Integer>(), false, "errorRecordCount");
+            if (batchTargetList.size() <= 0) {
+                insertProcessingError(10, null, batchId, null, null, null, null, false, false, "No valid connections were found for loading batch.");
+                updateTransactionStatus(batchId, 0, 0, 13);
+                updateRecordCounts(batchId, new ArrayList<Integer>(), false, "errorRecordCount");
                 updateRecordCounts(batchId, new ArrayList<Integer>(), false, "totalRecordCount");
                 updateBatchStatus(batchId, 7, "endDateTime");
                 return false;
-            }	else {
-	            for (configurationConnection bt : batchTargetList) {
-	            	/* populate batchUploadSummary need batchId, transactionInId,  configId, 
-	                 * sourceOrgId, messageTypeId - in configurations - missing targetOrgId, 
-	                 * if targetOrgCol has value, we populate - cms's target col could be 0, if spec has no target column,
-	                 * we insert all connections
-	                 * if targetOrgCol has value, we make sure value is value
-	                 */
-	                sysErrors = sysErrors + insertBatchUploadSummary(batch, bt);
-	                if (sourceConfigId != bt.getsourceConfigId()) {
-	                	if (bt.getTargetOrgCol() != 0) {
-	                		sysErrors = sysErrors + rejectInvalidTargetOrg(batchId, bt);
-	                	}
-	                    sourceConfigId = bt.getsourceConfigId();
-	                }
-	            }            
-	            sysErrors = sysErrors + setStatusForErrorCode(batchId, 11, 9, false);
-	            
-	            //reject transactions with config that do not connections
-	            sysErrors = sysErrors + rejectNoConnections(batch);
-	            sysErrors = sysErrors + setStatusForErrorCode(batchId, 11, 10, false);
-	            
-	            sysErrors = sysErrors + insertBatchTargets(batchId);
-	            
-	            //handle duplicates, need to insert again and let it be its own row
-	            sysErrors = sysErrors + newEntryForMultiTargets(batchId);
-	            
-	            //update transactionTarget in transactionInTable
-	            sysErrors = sysErrors + updateTTIdInTransactionIn(batchId);
-	            
-	            //we reset transactionTranslatedIn
-	            resetTransactionTranslatedIn(batchId, true);
+            } else {
+                for (configurationConnection bt : batchTargetList) {
+                    /* populate batchUploadSummary need batchId, transactionInId,  configId, 
+                     * sourceOrgId, messageTypeId - in configurations - missing targetOrgId, 
+                     * if targetOrgCol has value, we populate - cms's target col could be 0, if spec has no target column,
+                     * we insert all connections
+                     * if targetOrgCol has value, we make sure value is value
+                     */
+                    sysErrors = sysErrors + insertBatchUploadSummary(batch, bt);
+                    if (sourceConfigId != bt.getsourceConfigId()) {
+                        if (bt.getTargetOrgCol() != 0) {
+                            sysErrors = sysErrors + rejectInvalidTargetOrg(batchId, bt);
+                        }
+                        sourceConfigId = bt.getsourceConfigId();
+                    }
+                }
+                sysErrors = sysErrors + setStatusForErrorCode(batchId, 11, 9, false);
+
+                //reject transactions with config that do not connections
+                sysErrors = sysErrors + rejectNoConnections(batch);
+                sysErrors = sysErrors + setStatusForErrorCode(batchId, 11, 10, false);
+
+                sysErrors = sysErrors + insertBatchTargets(batchId);
+
+                //handle duplicates, need to insert again and let it be its own row
+                sysErrors = sysErrors + newEntryForMultiTargets(batchId);
+
+                //update transactionTarget in transactionInTable
+                sysErrors = sysErrors + updateTTIdInTransactionIn(batchId);
+
+                //we reset transactionTranslatedIn
+                resetTransactionTranslatedIn(batchId, true);
             }
             if (sysErrors > 0) {
                 insertProcessingError(processingSysErrorId, null, batchId, null, null, null, null, false, false, errorMessage);
@@ -1723,101 +1726,217 @@ public class transactionInManagerImpl implements transactionInManager {
             Integer errorId, boolean foroutboundProcessing) {
         return transactionInDAO.setStatusForErrorCode(batchId, statusId, errorId, foroutboundProcessing);
     }
-    
+
     @Override
     public Integer rejectNoConnections(batchUploads batch) {
         return transactionInDAO.rejectNoConnections(batch);
     }
 
-    
-    /** 
-     * we need to have one transactionIn entry for each transaction/target pair - 
-     * there is no easy way to do it except to insert each duplicate one by one
+    /**
+     * we need to have one transactionIn entry for each transaction/target pair - there is no easy way to do it except to insert each duplicate one by one
      */
-    
-	@Override
-	public Integer newEntryForMultiTargets(Integer batchId) {
-		Integer sysError = 0;
-		try {
-			//1. we get duplicated transactionInIds
-			List <Integer> transactionInIds = getDuplicatedIds (batchId);
-			for (Integer transactionInId : transactionInIds) {
+    @Override
+    public Integer newEntryForMultiTargets(Integer batchId) {
+        Integer sysError = 0;
+        try {
+            //1. we get duplicated transactionInIds
+            List<Integer> transactionInIds = getDuplicatedIds(batchId);
+            for (Integer transactionInId : transactionInIds) {
                 //2. we get BATCHUPLOADSUMMARY
-				List <batchUploadSummary> buses = getBatchUploadSummary(transactionInId);
-				for (batchUploadSummary bus : buses) {
-					//we take each target and insert a new transaction into the transactionIn table
-					sysError = sysError + insertTransactionInByTargetId(bus);
-					//we get new tInId
-					Integer newTInId = getTransactionInIdByTargetId (bus);
-					//with new id, we update transactiontarget, batchUploadSummary
-					sysError = sysError + updateTInIdForTransactiontarget(bus, newTInId);
-					sysError = sysError + updateTINIDForBatchUploadSummary(bus, newTInId);
-					//we insert new entry into transactionInRecords and transactionTranslated In
-					sysError = sysError + copyTransactionInRecord(newTInId, bus.gettransactionInId());
-				    sysError = sysError + insertTransactionTranslated(newTInId, bus);
-					
-				}
-				
-            }
-			
-			return sysError;
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			System.err.println("newEntryForMultiTargets " + ex.getCause());
-            return 1;
-		}
-	}
+                List<batchUploadSummary> buses = getBatchUploadSummary(transactionInId);
+                for (batchUploadSummary bus : buses) {
+                    //we take each target and insert a new transaction into the transactionIn table
+                    sysError = sysError + insertTransactionInByTargetId(bus);
+                    //we get new tInId
+                    Integer newTInId = getTransactionInIdByTargetId(bus);
+                    //with new id, we update transactiontarget, batchUploadSummary
+                    sysError = sysError + updateTInIdForTransactiontarget(bus, newTInId);
+                    sysError = sysError + updateTINIDForBatchUploadSummary(bus, newTInId);
+                    //we insert new entry into transactionInRecords and transactionTranslated In
+                    sysError = sysError + copyTransactionInRecord(newTInId, bus.gettransactionInId());
+                    sysError = sysError + insertTransactionTranslated(newTInId, bus);
 
-	@Override
-    public List <Integer> getDuplicatedIds(Integer batchId) {
+                }
+
+            }
+
+            return sysError;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.err.println("newEntryForMultiTargets " + ex.getCause());
+            return 1;
+        }
+    }
+
+    @Override
+    public List<Integer> getDuplicatedIds(Integer batchId) {
         return transactionInDAO.getDuplicatedIds(batchId);
     }
 
-	@Override
-    public List <batchUploadSummary> getBatchUploadSummary(Integer transactionInId) {
+    @Override
+    public List<batchUploadSummary> getBatchUploadSummary(Integer transactionInId) {
         return transactionInDAO.getBatchUploadSummary(transactionInId);
     }
-    
+
     @Override
     public Integer insertTransactionInByTargetId(batchUploadSummary batchUploadSummary) {
         return transactionInDAO.insertTransactionInByTargetId(batchUploadSummary);
     }
 
-	@Override
-	public Integer getTransactionInIdByTargetId(batchUploadSummary bus) {
-		 return transactionInDAO.getTransactionInIdByTargetId(bus);
-	}
+    @Override
+    public Integer getTransactionInIdByTargetId(batchUploadSummary bus) {
+        return transactionInDAO.getTransactionInIdByTargetId(bus);
+    }
 
-	@Override
-	public Integer updateTInIdForTransactiontarget(batchUploadSummary bus, Integer newTInId) {
-		return transactionInDAO.updateTInIdForTransactiontarget(bus, newTInId);
-	}
+    @Override
+    public Integer updateTInIdForTransactiontarget(batchUploadSummary bus, Integer newTInId) {
+        return transactionInDAO.updateTInIdForTransactiontarget(bus, newTInId);
+    }
 
-	@Override
-	public Integer updateTINIDForBatchUploadSummary(batchUploadSummary bus, Integer newTInId) {
-		return transactionInDAO.updateTINIDForBatchUploadSummary(bus, newTInId);
-	}
+    @Override
+    public Integer updateTINIDForBatchUploadSummary(batchUploadSummary bus, Integer newTInId) {
+        return transactionInDAO.updateTINIDForBatchUploadSummary(bus, newTInId);
+    }
 
-	@Override
-	public Integer copyTransactionInRecord(Integer newTInId, Integer oldTInId) {
-		return transactionInDAO.copyTransactionInRecord(newTInId, oldTInId);
-	}
+    @Override
+    public Integer copyTransactionInRecord(Integer newTInId, Integer oldTInId) {
+        return transactionInDAO.copyTransactionInRecord(newTInId, oldTInId);
+    }
 
-	@Override
-	public Integer insertTransactionTranslated(Integer newTInId,
-			batchUploadSummary bus) {
-		return transactionInDAO.insertTransactionTranslated(newTInId, bus);
-	}
+    @Override
+    public Integer insertTransactionTranslated(Integer newTInId,
+            batchUploadSummary bus) {
+        return transactionInDAO.insertTransactionTranslated(newTInId, bus);
+    }
 
     @Override
     public Integer updateTTIdInTransactionIn(Integer batchId) {
         return transactionInDAO.updateTTIdInTransactionIn(batchId);
     }
-    
+
     @Override
     @Transactional
-    public List <batchUploads> getAllUploadedBatches(Date fromDate, Date toDate, String searchTerm, int page, int maxResults) throws Exception {
+    public List<batchUploads> getAllUploadedBatches(Date fromDate, Date toDate, String searchTerm, int page, int maxResults) throws Exception {
         return transactionInDAO.getAllUploadedBatches(fromDate, toDate, searchTerm, page, maxResults);
+    }
+
+    @Override
+    public boolean searchTransactions(Transaction transaction, String searchTerm) throws Exception {
+
+        boolean matchFound = false;
+
+        if (transaction.getmessageTypeName().toLowerCase().matches(".*" + searchTerm + ".*")) {
+            matchFound = true;
+        }
+
+        if (transaction.getreportableField1() != null && transaction.getreportableField1().toLowerCase().matches(".*" + searchTerm + ".*")) {
+            matchFound = true;
+        }
+
+        if (transaction.getreportableField2() != null && transaction.getreportableField2().toLowerCase().matches(".*" + searchTerm + ".*")) {
+            matchFound = true;
+        }
+
+        if (transaction.getreportableField3() != null && transaction.getreportableField3().toLowerCase().matches(".*" + searchTerm + ".*")) {
+            matchFound = true;
+        }
+
+        if (transaction.getreportableField4() != null && transaction.getreportableField4().toLowerCase().matches(".*" + searchTerm + ".*")) {
+            matchFound = true;
+        }
+        
+        if(transaction.getstatusValue().toLowerCase().matches(".*" + searchTerm + ".*")) {
+            matchFound = true;
+        }
+
+        if (transaction.gettargetOrgFields().size() > 0) {
+
+            for (int i = 0; i < transaction.gettargetOrgFields().size(); i++) {
+                if (transaction.gettargetOrgFields().get(i).getFieldValue().toLowerCase().matches(".*" + searchTerm + ".*")) {
+                    matchFound = true;
+                }
+            }
+
+        }
+
+        return matchFound;
+
+    }
+    
+    @Override
+    public systemSummary generateSystemInboundSummary() {
+        
+        systemSummary systemSummary = new systemSummary();
+        
+        try {
+            
+            /* Get batches submitted this hour */
+            Calendar thishour = new GregorianCalendar();
+            thishour.set(Calendar.MINUTE, 0);
+            thishour.set(Calendar.SECOND, 0);
+            thishour.set(Calendar.MILLISECOND, 0);
+            
+            Calendar nexthour = new GregorianCalendar();
+            nexthour.set(Calendar.MINUTE, 0);
+            nexthour.set(Calendar.SECOND, 0);
+            nexthour.set(Calendar.MILLISECOND, 0);
+            nexthour.add(Calendar.HOUR_OF_DAY,1);
+            
+            System.out.println("This Hour: " + thishour.getTime() + " Next Hour: " + nexthour.getTime());
+            
+            Integer batchesThisHour = transactionInDAO.getAllUploadedBatches(thishour.getTime(), nexthour.getTime(), "", 1, 0).size();
+            
+            /* Get batches submitted today */
+            Calendar starttoday = new GregorianCalendar();
+            starttoday.set(Calendar.HOUR_OF_DAY, 0);
+            starttoday.set(Calendar.MINUTE, 0);
+            starttoday.set(Calendar.SECOND, 0);
+            starttoday.set(Calendar.MILLISECOND, 0);
+            
+            Calendar starttomorrow = new GregorianCalendar();
+            starttomorrow.set(Calendar.HOUR_OF_DAY, 0);
+            starttomorrow.set(Calendar.MINUTE, 0);
+            starttomorrow.set(Calendar.SECOND, 0);
+            starttomorrow.set(Calendar.MILLISECOND, 0);
+            starttomorrow.add(Calendar.DAY_OF_MONTH,1);
+            
+            System.out.println("Today: " + starttoday.getTime() + " Tomorrow: " + starttomorrow.getTime());
+            
+            Integer batchesToday = transactionInDAO.getAllUploadedBatches(starttoday.getTime(), starttomorrow.getTime(), "", 1, 0).size();
+            
+            /* Get batches submitted this week */
+            Calendar thisweek = new GregorianCalendar();
+            thisweek.set(Calendar.HOUR_OF_DAY, 0);
+            thisweek.set(Calendar.MINUTE, 0);
+            thisweek.set(Calendar.SECOND, 0);
+            thisweek.set(Calendar.MILLISECOND, 0);
+            thisweek.set(Calendar.DAY_OF_WEEK, thisweek.getFirstDayOfWeek());
+            
+            Calendar nextweek = new GregorianCalendar();
+            nextweek.set(Calendar.HOUR_OF_DAY, 0);
+            nextweek.set(Calendar.MINUTE, 0);
+            nextweek.set(Calendar.SECOND, 0);
+            nextweek.set(Calendar.MILLISECOND, 0);
+            nextweek.set(Calendar.DAY_OF_WEEK, thisweek.getFirstDayOfWeek());
+            nextweek.add(Calendar.WEEK_OF_YEAR, 1);
+            
+            System.out.println("This Week: " + thisweek.getTime() + " Next Week: " + nextweek.getTime());
+            
+            Integer batchesThisWeek = transactionInDAO.getAllUploadedBatches(thisweek.getTime(), nextweek.getTime(), "", 1, 0).size();
+            
+            
+            systemSummary.setBatchesPastHour(batchesThisHour);
+            systemSummary.setBatchesToday(batchesToday);
+            systemSummary.setBatchesThisWeek(batchesThisWeek);
+            
+            
+            /* Get batches submitted yesterday */
+        } catch (Exception ex) {
+            Logger.getLogger(transactionInManagerImpl.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return systemSummary;
+        
     }
 
 }

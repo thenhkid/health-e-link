@@ -23,7 +23,7 @@
             <div class="panel-body">
                 <div class="table-actions">
                     <div class="col-md-3" role="search">
-                        <form:form class="form form-inline" id="searchForm" action="/administrator/processing-activity/inbound" method="post">
+                        <form:form class="form form-inline" id="searchForm" method="post">
                             <div class="form-group">
                                 <label class="sr-only" for="searchTerm">Search</label>
                                 <input type="text" name="searchTerm" id="searchTerm" value="${searchTerm}" class="form-control" id="search-batches" placeholder="Search"/>
@@ -118,6 +118,21 @@
                                           </td>
                                       </tr>
                                    </c:forEach>     
+                                 </c:when>  
+                                 <c:when test="${not empty toomany}">
+                                    <tr>
+                                        <td colspan="7">
+                                            There were a total of ${size} transactions found, please enter a parameter to narrow down the results.
+                                            <br />You can search by Message Type, Target Org or anything reportable field.
+                                        </td>
+                                    </tr>
+                                 </c:when>
+                                 <c:when test="${not empty stilltoomany}">
+                                    <tr>
+                                        <td colspan="7">T
+                                           Your search produced ${size} results, please narrow down further.
+                                        </td>
+                                    </tr>
                                  </c:when>   
                                  <c:otherwise>
                                     <tr><td colspan="7" class="center-text">There are currently no transactions within this batch.</td></tr>

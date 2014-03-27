@@ -4,6 +4,21 @@
 <%@ taglib prefix="s" uri="http://www.springframework.org/tags" %>
 
 <div class="main clearfix" role="main">
+    <div class="row-fluid">
+        <div class="col-md-12">
+            <section class="panel panel-default">
+                <div class="panel-body">
+                    <dt>
+                        <dt>System Summary:</dt>
+                        <dd><strong>Batches Sent in the Past Hour:</strong> <fmt:formatNumber value="${summaryDetails.batchesPastHour}" /></dd>
+                        <dd><strong>Batches Sent in today:</strong> <fmt:formatNumber value="${summaryDetails.batchesToday}" /></dd>
+                        <dd><strong>Batches Sent in This Week:</strong> <fmt:formatNumber value="${summaryDetails.batchesThisWeek}" /></dd>
+                        <dd><strong>Total Batches in Error:</strong> <fmt:formatNumber value="${summaryDetails.batchesPastHour}" /></dd>
+                    </dt>
+                </div>
+            </section>
+        </div>
+    </div>
     <div class="col-md-12">
          <section class="panel panel-default">
             <div class="panel-body">
