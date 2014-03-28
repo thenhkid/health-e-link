@@ -57,15 +57,12 @@
                                         <td>
                                             ${batch.originalFileName}
                                         </td>
-                                        <td>${error.transactionInId}</td>
-                                        <c:if test="${error.transactionInId != 0}">
-                                        <td class="actions-col" style="width:50px;">
-                                            <a href="javascript:void(0);" rel="${error.transactionInId}" class="btn btn-link viewLink">
-                                                <span class="glyphicon glyphicon-edit"></span>
-                                                Go to ERG
-                                               </a>   
-                                        </td>
+                                        <td>${error.transactionInId}&nbsp;</td>
+                                        <td class="actions-col">&nbsp;
+                                        <c:if test="${not empty error.transactionInId}">                                  
+                                          <a href="javascript:void(0);" rel="${error.transactionInId}" class="btn btn-link viewLink"><span class="glyphicon glyphicon-edit"></span>ERG</a>     
                                         </c:if>
+                                        </td> 
                                     </tr>  
                                     </c:forEach>
                                   
