@@ -9,6 +9,7 @@ import com.ut.dph.dao.transactionInDAO;
 import com.ut.dph.model.CrosswalkData;
 import com.ut.dph.model.Macros;
 import com.ut.dph.model.Organization;
+import com.ut.dph.model.TransactionInError;
 import com.ut.dph.model.User;
 import com.ut.dph.model.batchUploadSummary;
 import com.ut.dph.model.batchUploads;
@@ -3684,4 +3685,51 @@ public class transactionInDAOImpl implements transactionInDAO {
         }
     }
 
+    @Override
+    @Transactional
+    public boolean checkPermissionForBatch(User userInfo, batchUploads batchInfo) {
+
+        try {
+            String sql = ("select count(id) as idCount from configurationConnectionSenders where "
+            		+ "connectionid in (select id from configurationConnections "
+            		+ "where sourceConfigId = :batchConfigId) and userId = :userId");
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).addScalar("idCount", StandardBasicTypes.INTEGER);
+            query.setParameter("batchConfigId", batchInfo.getConfigId());
+            query.setParameter("userId", userInfo.getId());
+            
+            Integer idCount = (Integer) query.list().get(0);
+            
+			if (idCount > 0) {
+				return true;
+			}
+        } catch (Exception ex) {
+            System.err.println("checkPermissionForBatch " + ex.getCause());
+            ex.printStackTrace();  
+        }
+        return false;
+    }
+
+    @Override
+    @Transactional
+    @SuppressWarnings("unchecked")
+    public List <TransactionInError> getErrorList(Integer batchId) {
+
+        try {
+            String sql = ("select * from transactionInErrors where batchUploadId = :batchId order by configId");
+            Query query = sessionFactory.getCurrentSession()
+            		.createSQLQuery(sql).setResultTransformer(
+                            Transformers.aliasToBean(TransactionInError.class));
+            query.setParameter("batchId", batchId);
+            
+            List <TransactionInError> errorList = query.list();
+            return errorList;
+         	
+        } catch (Exception ex) {
+            System.err.println("getErrorList " + ex.getCause());
+            ex.printStackTrace();  
+            return null;
+        }
+        
+    }    
+    
 }

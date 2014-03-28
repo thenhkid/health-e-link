@@ -22,9 +22,9 @@ require(['./main'], function () {
 
         //this function will submit the batchId for viewing detailed audit report
         $(document).on('click', '.viewLink', function() {
-        	$('input[name="batchId"]').val($(this).attr('rel'));
+        	$('input[name="transactionInId"]').val($(this).attr('rel'));
         	//somehow we need to submit form
-        	$('#searchForm').attr('action', 'auditReport');
+        	$('#searchForm').attr('action', 'ERG');
         	//$('#searchForm').get(0).setAttribute('action', 'auditReport');
         	$('#searchForm').submit();
         });

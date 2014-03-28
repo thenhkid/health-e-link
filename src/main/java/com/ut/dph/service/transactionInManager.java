@@ -9,6 +9,8 @@ package com.ut.dph.service;
 import com.ut.dph.model.CrosswalkData;
 import com.ut.dph.model.Macros;
 import com.ut.dph.model.Transaction;
+import com.ut.dph.model.TransactionInError;
+import com.ut.dph.model.User;
 import com.ut.dph.model.batchUploadSummary;
 import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.configurationConnection;
@@ -304,5 +306,9 @@ public interface transactionInManager {
     boolean searchTransactions(Transaction transaction, String searchTerm) throws Exception;
     
     systemSummary generateSystemInboundSummary();
+    
+    boolean checkPermissionForBatch (User userInfo, batchUploads batchInfo);
+    
+    List <TransactionInError> getErrorList (Integer batchId);
     
 }

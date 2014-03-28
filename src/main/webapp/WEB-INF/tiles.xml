@@ -495,6 +495,18 @@
         <put-attribute name="jscript" value="/dspResources/js/front-end/Health-e-Connect/auditReports.js" />
     </definition>
     
+    <definition name="/Health-e-Connect/auditReport" extends="base.definition.frontEnd">
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Health-e-Connect&amp;page=audit" />
+        <put-attribute name="body" value="/WEB-INF/jsp/Health-e-Connect/auditReport.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/front-end/Health-e-Connect/auditReport.js" />
+    </definition>
+    <!--  upload ERG -->
+    <definition name="/Health-e-Connect/ERG" extends="base.definition.frontEnd">
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Health-e-Connect&amp;page=audit" />
+        <put-attribute name="body" value="/WEB-INF/jsp/Health-e-Connect/ERG.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/front-end/Health-e-Connect/ERG.js" />
+    </definition>    
+    
     <!-- Organization Profile Pages -->
     <definition name="/OrgProfile/editProfile" extends="base.definition.frontEnd">
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Org&amp;page=editProfile" />
