@@ -6,6 +6,7 @@
 
 package com.ut.dph.dao;
 
+import com.ut.dph.model.Transaction;
 import com.ut.dph.model.batchDownloadSummary;
 import com.ut.dph.model.batchDownloads;
 import com.ut.dph.model.configurationSchedules;
@@ -28,6 +29,8 @@ public interface transactionOutDAO {
     List<batchDownloads> getInboxBatches(int userId, int orgId, String searchTerm, Date fromDate, Date toDate, int page, int maxResults) throws Exception;
     
     batchDownloads getBatchDetails(int batchId) throws Exception;
+    
+    batchDownloads getBatchDetailsByBatchName(String batchName) throws Exception;
     
     List<transactionTarget> getInboxBatchTransactions(int batchId, int userId) throws Exception;
     
@@ -103,5 +106,7 @@ public interface transactionOutDAO {
     void clearTransactionOutErrors(Integer transactionTargetId);
     
     batchDownloadSummary getDownloadSummaryDetails(int transactionTargetId);
+    
+    List <batchDownloads> getAllBatches(Date fromDate, Date toDate, String searchTerm, int page, int maxResults) throws Exception;
     
 }

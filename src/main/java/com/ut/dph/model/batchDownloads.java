@@ -34,6 +34,13 @@ public class batchDownloads {
     @Transient
     private String usersName;
     
+    @Transient
+    private String orgName;
+    
+    @Transient
+    private String transportMethod;
+
+    
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID", nullable = false)
@@ -233,5 +240,21 @@ public class batchDownloads {
     
     public void setlastDownloaded(Date lastDownloaded) {
         this.lastDownloaded = lastDownloaded;
+    }
+    
+    public String getorgName() {
+        return orgName;
+    }
+
+    public void setorgName(String orgName) {
+        this.orgName = orgName;
+    }
+    
+    public String gettransportMethod() {
+        return transportMethod;
+    }
+
+    public void settransportMethod(String transportMethod) {
+        this.transportMethod = transportMethod;
     }
 }

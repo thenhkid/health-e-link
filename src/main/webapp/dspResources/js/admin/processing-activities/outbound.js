@@ -5,7 +5,6 @@
  */
 
 
-
 require(['./main'], function () {
     require(['jquery'], function($) {
         
@@ -15,7 +14,7 @@ require(['./main'], function () {
         //status
         $(document).on('click', '.viewStatus', function() {
             $.ajax({
-                url: '../../viewStatus' + $(this).attr('rel'),
+                url: 'viewStatus' + $(this).attr('rel'),
                 type: "GET",
                 success: function(data) {
                     $("#statusModal").html(data);
@@ -23,21 +22,17 @@ require(['./main'], function () {
             });
         });
         
-        $(document).on('click', '.viewLink', function() {
-            
-            var transactionId = $(this).attr('rel');
-            var configId = $(this).attr('rel2');
-           
-            $.ajax({
-                url: '../../ViewMessageDetails',
-                data: {'transactionId': transactionId, 'configId': configId},
-                type: "GET",
-                success: function(data) {
-                    $("#messageDetailsModal").html(data);
-                }
-            });
-            
-        });
-        
-    });
+   });
 });
+
+
+function searchByDateRange() {
+   var fromDate = $('.daterange span').attr('rel');
+   var toDate = $('.daterange span').attr('rel2');
+    
+   $('#fromDate').val(fromDate);
+   $('#toDate').val(toDate);
+   
+   $('#searchForm').submit();
+
+}

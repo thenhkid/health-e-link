@@ -9,6 +9,7 @@ package com.ut.dph.controller;
 import com.ut.dph.model.Organization;
 import com.ut.dph.model.Transaction;
 import com.ut.dph.model.User;
+import com.ut.dph.model.batchDownloads;
 import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.configuration;
 import com.ut.dph.model.configurationFormFields;
@@ -20,6 +21,7 @@ import com.ut.dph.model.lutables.lu_ProcessStatus;
 import com.ut.dph.model.systemSummary;
 import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionInRecords;
+import com.ut.dph.model.transactionOutRecords;
 import com.ut.dph.model.transactionRecords;
 import com.ut.dph.model.transactionTarget;
 import com.ut.dph.service.configurationManager;
@@ -28,6 +30,7 @@ import com.ut.dph.service.messageTypeManager;
 import com.ut.dph.service.organizationManager;
 import com.ut.dph.service.sysAdminManager;
 import com.ut.dph.service.transactionInManager;
+import com.ut.dph.service.transactionOutManager;
 import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -62,6 +65,9 @@ public class adminProcessingActivity {
     
     @Autowired
     private transactionInManager transactionInManager;
+    
+    @Autowired
+    private transactionOutManager transactionOutManager;
     
     @Autowired
     private sysAdminManager sysAdminManager;
@@ -254,8 +260,183 @@ public class adminProcessingActivity {
         return mav;
     }
     
-   /**
-     * The '/batch/{batchName}' POST request will retrieve a list of transactions that are associated to the clicked batch 
+   
+    /**
+     * The '/outbound' GET request will serve up the existing list of generated referrals and feedback reports to for the
+     * target
+     *
+     * @param page	The page parameter will hold the page to view when pagination is built.
+     * @return          The list of inbound batch list
+     *
+     * @Objects	(1) An object containing all the found batches
+     *
+     * @throws Exception
+     */
+    @RequestMapping(value = "/outbound", method = RequestMethod.GET)
+    public ModelAndView listOutBoundBatches(HttpSession session) throws Exception {
+        
+        int page = 1;
+        
+        int year = 114;
+        int month = 0;
+        int day = 1;
+        Date originalDate = new Date(year,month,day);
+        
+        Date fromDate = getMonthDate("START");
+        Date toDate = getMonthDate("END");
+        String searchTerm = "";
+        
+        /* Retrieve search parameters from session */
+        searchParameters searchParameters = (searchParameters)session.getAttribute("searchParameters");
+
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/processing-activity/outbound");
+        
+        if("".equals(searchParameters.getsection()) || !"outbound".equals(searchParameters.getsection())) {
+            searchParameters.setfromDate(fromDate);
+            searchParameters.settoDate(toDate);
+            searchParameters.setpage(1);
+            searchParameters.setsection("outbound");
+            searchParameters.setsearchTerm("");
+        }
+        else {
+            fromDate = searchParameters.getfromDate();
+            toDate = searchParameters.gettoDate();
+            page = searchParameters.getpage();
+            searchTerm = searchParameters.getsearchTerm();
+        }
+            
+        mav.addObject("fromDate", fromDate);
+        mav.addObject("toDate", toDate);
+        mav.addObject("searchTerm", searchTerm);
+        mav.addObject("originalDate",originalDate);
+        
+        /* Get system inbound summary */
+        systemSummary summaryDetails = transactionOutManager.generateSystemOutboundSummary();
+        mav.addObject("summaryDetails", summaryDetails);
+        
+        
+        /* Get all inbound transactions */
+        try {
+            /* Need to get a list of all uploaded batches */
+            Integer totalBatches = transactionOutManager.getAllBatches(fromDate, toDate, searchTerm, 1, 0).size();
+            List<batchDownloads> Batches = transactionOutManager.getAllBatches(fromDate, toDate, searchTerm, 1, maxResults);
+            
+            List<Integer> statusIds = new ArrayList();
+
+            if(!Batches.isEmpty()) {
+                for(batchDownloads batch : Batches) {
+                    batch.settotalTransactions(transactionInManager.getRecordCounts(batch.getId(), statusIds, true, false));
+
+                    lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
+                    batch.setstatusValue(processStatus.getDisplayCode());
+
+                    Organization orgDetails = organizationmanager.getOrganizationById(batch.getOrgId());
+                    batch.setorgName(orgDetails.getOrgName());
+                    
+                    batch.settransportMethod(configurationTransportManager.getTransportMethodById(batch.gettransportMethodId()));
+
+                }
+            }
+            
+
+           mav.addObject("batches", Batches);
+           
+           Integer totalPages = (int)Math.ceil((double)totalBatches / maxResults);
+           mav.addObject("totalPages", totalPages);
+        }
+        catch (Exception e) {
+            throw new Exception("Error occurred viewing the all downloaded batches. Error:"+e.getMessage(),e);
+        }
+        
+        return mav;
+        
+    }
+    
+    
+    /**
+     * The '/outbound' POST request will serve up the existing list of generated referrals and feedback reports
+     * for a target based on a search or date
+     *
+     * @param page	The page parameter will hold the page to view when pagination is built.
+     * @return          The list of inbound batch list
+     *
+     * @Objects	(1) An object containing all the found batches
+     *
+     * @throws Exception
+     */
+    @RequestMapping(value = "/outbound", method = RequestMethod.POST)
+    public ModelAndView listOutBoundBatches(@RequestParam(value = "page", required = false) Integer page, @RequestParam String searchTerm, @RequestParam Date fromDate, @RequestParam Date toDate,HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
+        
+        if(page == null || page < 1) {
+            page = 1;
+        }
+        
+        int year = 114;
+        int month = 0;
+        int day = 1;
+        Date originalDate = new Date(year,month,day);
+        
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/processing-activity/outbound");
+        
+        mav.addObject("fromDate", fromDate);
+        mav.addObject("toDate", toDate);
+        mav.addObject("searchTerm", searchTerm);
+        mav.addObject("originalDate",originalDate);
+        
+        /* Retrieve search parameters from session */
+        searchParameters searchParameters = (searchParameters)session.getAttribute("searchParameters");
+        searchParameters.setfromDate(fromDate);
+        searchParameters.settoDate(toDate);
+        searchParameters.setpage(page);
+        searchParameters.setsection("outbound");
+        searchParameters.setsearchTerm(searchTerm);
+        
+        /* Get system inbound summary */
+        systemSummary summaryDetails = transactionOutManager.generateSystemOutboundSummary();
+        mav.addObject("summaryDetails", summaryDetails);
+        
+        
+        /* Get all inbound transactions */
+        try {
+            /* Need to get a list of all uploaded batches */
+            Integer totalBatches = transactionOutManager.getAllBatches(fromDate, toDate, searchTerm, 1, 0).size();
+            List<batchDownloads> Batches = transactionOutManager.getAllBatches(fromDate, toDate, searchTerm, page, maxResults);
+            
+            List<Integer> statusIds = new ArrayList();
+
+            if(!Batches.isEmpty()) {
+                for(batchDownloads batch : Batches) {
+                    batch.settotalTransactions(transactionInManager.getRecordCounts(batch.getId(), statusIds, true, false));
+
+                    lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
+                    batch.setstatusValue(processStatus.getDisplayCode());
+
+                    Organization orgDetails = organizationmanager.getOrganizationById(batch.getOrgId());
+                    batch.setorgName(orgDetails.getOrgName());
+                    
+                    batch.settransportMethod(configurationTransportManager.getTransportMethodById(batch.gettransportMethodId()));
+
+                }
+            }
+            
+
+           mav.addObject("batches", Batches);
+           
+           Integer totalPages = (int)Math.ceil((double)totalBatches / maxResults);
+           mav.addObject("totalPages", totalPages);
+        }
+        catch (Exception e) {
+            throw new Exception("Error occurred viewing the all downloaded batches. Error:"+e.getMessage(),e);
+        }
+        
+        return mav;
+    }
+    
+    
+    /**
+     * The '/inbound/batch/{batchName}' POST request will retrieve a list of transactions that are associated to the clicked batch 
      *
      * @param batchName	The name of the batch to retreive transactions for
      * @return          The list of inbound batch transactions
@@ -264,7 +445,7 @@ public class adminProcessingActivity {
      *
      * @throws Exception
      */
-    @RequestMapping(value = "/batch/{batchName}", method = RequestMethod.GET)
+    @RequestMapping(value = "/inbound/batch/{batchName}", method = RequestMethod.GET)
     public ModelAndView listBatchTransactions(@PathVariable String batchName) throws Exception {
   
         ModelAndView mav = new ModelAndView();
@@ -405,7 +586,7 @@ public class adminProcessingActivity {
     }
     
     /**
-     * The '/batch/{batchName}' POST request will retrieve a list of transactions that are associated to the clicked batch and
+     * The '/inbound/batch/{batchName}' POST request will retrieve a list of transactions that are associated to the clicked batch and
      * match the entered search term.
      *
      * @param batchName	 The name of the batch to retreive transactions for
@@ -417,7 +598,7 @@ public class adminProcessingActivity {
      *
      * @throws Exception
      */
-    @RequestMapping(value = "/batch/{batchName}", method = RequestMethod.POST)
+    @RequestMapping(value = "/inbound/batch/{batchName}", method = RequestMethod.POST)
     public ModelAndView listBatchTransactions(@PathVariable String batchName, @RequestParam String searchTerm) throws Exception {
   
         ModelAndView mav = new ModelAndView();
@@ -585,7 +766,204 @@ public class adminProcessingActivity {
         return mav;
     }
    
-   
+    /**
+     * The '/outbound/batch/{batchName}' POST request will retrieve a list of transactions that are associated to the clicked batch 
+     *
+     * @param batchName	The name of the batch to retreive transactions for
+     * @return          The list of outbound batch transactions
+     *
+     * @Objects	(1) An object containing all the found batch transactions
+     *
+     * @throws Exception
+     */
+    @RequestMapping(value = "/outbound/batch/{batchName}", method = RequestMethod.GET)
+    public ModelAndView listoutboundBatchTransactions(@PathVariable String batchName) throws Exception {
+  
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/processing-activity/outboundtransactions");
+        
+        /* Get the details of the batch */
+        batchDownloads batchDetails = transactionOutManager.getBatchDetailsByBatchName(batchName);
+        
+        if(batchDetails != null) {
+            
+            Organization orgDetails = organizationmanager.getOrganizationById(batchDetails.getOrgId());
+            batchDetails.setorgName(orgDetails.getOrgName());
+        
+            mav.addObject("batchDetails", batchDetails);
+
+            try {
+                /* Get all the transactions for the batch */
+                List<transactionTarget> batchTransactions = transactionOutManager.getInboxBatchTransactions(batchDetails.getId(), 0);
+
+                List<Transaction> transactionList = new ArrayList<Transaction>();
+                
+                if(batchTransactions.size() > 100) {
+                    mav.addObject("toomany","toomany");
+                    mav.addObject("size", batchTransactions.size());
+                }
+                else {
+
+                    for(transactionTarget transaction : batchTransactions) {
+
+                        Transaction transactionDetails = new Transaction();
+                        transactionDetails.settransactionRecordId(transaction.getId());
+                        transactionDetails.setstatusId(transaction.getstatusId());
+                        transactionDetails.setdateSubmitted(transaction.getdateCreated());
+                        transactionDetails.setconfigId(transaction.getconfigId());
+
+                        lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(transaction.getstatusId());
+                        transactionDetails.setstatusValue(processStatus.getDisplayCode());
+
+                        transactionOutRecords records = transactionOutManager.getTransactionRecords(transaction.getId());
+
+                        /* Get a list of form fields */
+                        configurationTransport transportDetails = configurationTransportManager.getTransportDetails(transaction.getconfigId());
+                        List<configurationFormFields> sourceInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transaction.getconfigId(),transportDetails.getId(),1);
+
+                        /* Set all the transaction TARGET fields */
+                        List<transactionRecords> fromFields;
+                        if(!sourceInfoFormFields.isEmpty()) {
+                            fromFields = setInboxFormFields(sourceInfoFormFields, records, 0, true, 0);
+                        }
+                        else {
+                            fromFields = setOrgDetails(transactionOutManager.getDownloadSummaryDetails(transaction.getId()).getsourceOrgId());
+                        }
+                        transactionDetails.setsourceOrgFields(fromFields);
+
+                        /* get the message type name */
+                        configuration configDetails = configurationManager.getConfigurationById(transaction.getconfigId());
+                        transactionDetails.setmessageTypeName(messagetypemanager.getMessageTypeById(configDetails.getMessageTypeId()).getName());
+
+                        transactionList.add(transactionDetails);
+                    }
+                 }
+
+                mav.addObject("transactions", transactionList);
+
+            }
+            catch (Exception e) {
+                throw new Exception("(Admin) Error occurred in getting transactions for a target batch. batchId: "+ batchDetails.getId()+" ERROR: "+e.getMessage(),e);
+            }
+        }
+        
+        return mav;
+    }
+    
+    /**
+     * The '/outbound/batch/{batchName}' POST request will retrieve a list of transactions that are associated to the clicked batch and
+     * match the entered search term.
+     *
+     * @param batchName	 The name of the batch to retreive transactions for
+     * @param searchTerm The term to narrow down the results
+     * 
+     * @return          The list of inbound batch transactions
+     *
+     * @Objects	(1) An object containing all the found batch transactions
+     *
+     * @throws Exception
+     */
+    @RequestMapping(value = "/outbound/batch/{batchName}", method = RequestMethod.POST)
+    public ModelAndView listoutboundBatchTransactions(@PathVariable String batchName, @RequestParam String searchTerm) throws Exception {
+  
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/processing-activity/outboundtransactions");
+        
+        /* Get the details of the batch */
+        batchDownloads batchDetails = transactionOutManager.getBatchDetailsByBatchName(batchName);
+        
+        if(batchDetails != null) {
+            
+            Organization orgDetails = organizationmanager.getOrganizationById(batchDetails.getOrgId());
+            batchDetails.setorgName(orgDetails.getOrgName());
+        
+            mav.addObject("batchDetails", batchDetails);
+
+            try {
+                /* Get all the transactions for the batch */
+                List<transactionTarget> batchTransactions = transactionOutManager.getInboxBatchTransactions(batchDetails.getId(), 0);
+
+                List<Transaction> transactionList = new ArrayList<Transaction>();
+
+                for(transactionTarget transaction : batchTransactions) {
+
+                    Transaction transactionDetails = new Transaction();
+                    transactionDetails.settransactionRecordId(transaction.getId());
+                    transactionDetails.setstatusId(transaction.getstatusId());
+                    transactionDetails.setdateSubmitted(transaction.getdateCreated());
+                    transactionDetails.setconfigId(transaction.getconfigId());
+
+                    lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(transaction.getstatusId());
+                    transactionDetails.setstatusValue(processStatus.getDisplayCode());
+
+                    transactionOutRecords records = transactionOutManager.getTransactionRecords(transaction.getId());
+
+                    /* Get a list of form fields */
+                    configurationTransport transportDetails = configurationTransportManager.getTransportDetails(transaction.getconfigId());
+                    List<configurationFormFields> sourceInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transaction.getconfigId(),transportDetails.getId(),1);
+
+                    /* Set all the transaction TARGET fields */
+                    List<transactionRecords> fromFields;
+                    if(!sourceInfoFormFields.isEmpty()) {
+                        fromFields = setInboxFormFields(sourceInfoFormFields, records, 0, true, 0);
+                    }
+                    else {
+                        fromFields = setOrgDetails(transactionOutManager.getDownloadSummaryDetails(transaction.getId()).getsourceOrgId());
+                    }
+                    transactionDetails.setsourceOrgFields(fromFields);
+
+                    /* get the message type name */
+                    configuration configDetails = configurationManager.getConfigurationById(transaction.getconfigId());
+                    transactionDetails.setmessageTypeName(messagetypemanager.getMessageTypeById(configDetails.getMessageTypeId()).getName());
+
+                    transactionList.add(transactionDetails);
+                }
+                
+                if(!"".equals(searchTerm)) {
+                    List<Transaction> matchedtransactionList = new ArrayList<Transaction>();
+                    
+                    if(transactionList.size() > 0) {
+                        
+                        for(Transaction transaction : transactionList) {
+                           
+                            boolean matchFound = transactionOutManager.searchTransactions(transaction, searchTerm);
+                            if(matchFound == true) {
+                                matchedtransactionList.add(transaction);
+                            }
+                        }
+                        
+                    }
+                    
+                    if(matchedtransactionList.size() > 100) {
+                        mav.addObject("transactions", "");
+                        mav.addObject("stilltoomany","stilltoomany");
+                        mav.addObject("size", matchedtransactionList.size());
+                    }
+                    else {
+                        mav.addObject("transactions", matchedtransactionList);
+                    }
+                    
+                }
+                else {
+                    
+                    if(transactionList.size() > 100) {
+                        mav.addObject("transactions", "");
+                        mav.addObject("toomany","toomany");
+                        mav.addObject("size", transactionList.size());
+                    }
+                    else {
+                        mav.addObject("transactions", transactionList);
+                    }
+                }
+
+            }
+            catch (Exception e) {
+                throw new Exception("(Admin) Error occurred in searching transactions for a target batch. batchId: "+ batchDetails.getId()+" ERROR: "+e.getMessage(),e);
+            }
+        }
+        
+        return mav;
+    }
     
     /**
      * The '/ViewMessageDetails' POST request will display the selected transaction details. This page is 
@@ -876,5 +1254,73 @@ public class adminProcessingActivity {
         return fields;
         
     } 
+    
+    /**
+     * The 'setInboxFormFields' will create and populate the form field object
+     * 
+     * @param formfields  The list of form fields
+     * @param records     The values of the form fields to populate with.
+     * 
+     * @return This function will return a list of transactionRecords fields with the correct data
+     * 
+     * @throws NoSuchMethodException 
+     */
+    public List<transactionRecords> setInboxFormFields(List<configurationFormFields> formfields, transactionOutRecords records, int configId, boolean readOnly, int transactionInId) throws NoSuchMethodException {
+        
+        List<transactionRecords> fields = new ArrayList<transactionRecords>();
+        
+        for(configurationFormFields formfield : formfields) {
+            transactionRecords field = new transactionRecords();
+            field.setfieldNo(formfield.getFieldNo());
+            field.setrequired(formfield.getRequired());
+            field.setsaveToTable(formfield.getsaveToTableName());
+            field.setsaveToTableCol(formfield.getsaveToTableCol());
+            field.setfieldLabel(formfield.getFieldLabel());
+            field.setreadOnly(readOnly);
+            field.setfieldValue(null);
+            
+            /* Get the validation */
+            if(formfield.getValidationType() > 1) {
+                field.setvalidation(messagetypemanager.getValidationById(formfield.getValidationType()).toString());
+            }
+            
+            if(records != null) {
+                String colName = new StringBuilder().append("f").append(formfield.getFieldNo()).toString();
+                try {
+                    field.setfieldValue(BeanUtils.getProperty(records, colName));
+                } catch (IllegalAccessException ex) {
+                    Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (InvocationTargetException ex) {
+                    Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            /* 
+                If records == null and an auto populate field is set for the field get the data from the
+                table/col for the transaction
+            */
+            else if(records == null && formfield.getautoPopulateTableName() != null && transactionInId > 0) {
+                
+                /* Get the pre-populated values */
+                String tableName = formfield.getautoPopulateTableName();
+                String tableCol = formfield.getautoPopulateTableCol();
+                
+                if(!tableName.isEmpty() && !tableCol.isEmpty()) {
+                    field.setfieldValue(transactionInManager.getFieldValue(tableName, tableCol, "transactionInId", transactionInId));
+                    field.setreadOnly(true);
+                }
+                
+            }
+            
+            if(configId > 0) {
+                /* See if any fields have crosswalks associated to it */
+                List<fieldSelectOptions> fieldSelectOptions = transactionInManager.getFieldSelectOptions(formfield.getId(),configId);
+                field.setfieldSelectOptions(fieldSelectOptions);
+            }
+            
+            fields.add(field);
+        }
+        
+        return fields;
+    }
     
 }

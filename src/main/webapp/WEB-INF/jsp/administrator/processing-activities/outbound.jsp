@@ -3,21 +3,47 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="s" uri="http://www.springframework.org/tags" %>
 
-<div class="main clearfix full-width" role="main">
+<div class="main clearfix" role="main">
+    <div class="row-fluid">
+        <div class="col-md-12">
+            <section class="panel panel-default">
+                <div class="panel-body">
+                    <dt>
+                        <dt>System Summary:</dt>
+                        <dd><strong>Batches Sent out the Past Hour:</strong> <fmt:formatNumber value="${summaryDetails.batchesPastHour}" /></dd>
+                        <dd><strong>Batches Sent out today:</strong> <fmt:formatNumber value="${summaryDetails.batchesToday}" /></dd>
+                        <dd><strong>Batches Sent out This Week:</strong> <fmt:formatNumber value="${summaryDetails.batchesThisWeek}" /></dd>
+                    </dt>
+                </div>
+            </section>
+        </div>
+    </div>
     <div class="col-md-12">
          <section class="panel panel-default">
             <div class="panel-body">
                 <div class="table-actions">
-                    <div role="search">
-                        <form:form class="form form-inline" action="/administrator/processing-activity/outbound" method="post">
+                    <div class="col-md-3" role="search">
+                     <form:form class="form form-inline" id="searchForm" action="/administrator/processing-activity/outbound" method="post">
                             <div class="form-group">
                                 <label class="sr-only" for="searchTerm">Search</label>
                                 <input type="text" name="searchTerm" id="searchTerm" value="${searchTerm}" class="form-control" id="search-batches" placeholder="Search"/>
+                                <input type="hidden" name="fromDate" id="fromDate" rel="<fmt:formatDate value="${fromDate}" type="date" pattern="MM/dd/yyyy" />" rel2="<fmt:formatDate value="${originalDate}" type="date" pattern="MM/dd/yyyy" />" value="${fromDate}" />
+                                <input type="hidden" name="toDate" id="toDate" rel="<fmt:formatDate value="${toDate}" type="date" pattern="MM/dd/yyyy" />" value="${toDate}" />
+                                <input type="hidden" name="page" id="page" value="${currentPage}" />
                             </div>
-                            <button id="searchOrgBtn" class="btn btn-primary btn-sm" title="Search Outbound Batches" role="button">
+                            <button id="searchOrgBtn" class="btn btn-primary btn-sm" title="Search Inbound Batches" role="button">
                                 <span class="glyphicon glyphicon-search"></span>
                             </button>
                         </form:form>
+                    </div>
+                    
+                    <div class="col-md-2 col-md-offset-3"></div>
+
+                    <div class="col-md-4">
+                        <div class="date-range-picker-trigger form-control pull-right daterange" style="width:245px;">
+                            <i class="glyphicon glyphicon-calendar"></i>
+                            <span class="date-label"><fmt:formatDate value="${fromDate}" type="date" pattern="MMMM dd, yyyy" /> - <fmt:formatDate value="${toDate}" type="date" pattern="MMMM dd, yyyy" /></span> <b class="caret"></b>
+                        </div>
                     </div>
                 </div>
 
@@ -25,12 +51,12 @@
                     <table class="table table-striped table-hover table-default">
                         <thead>
                             <tr>
-                                <th scope="col">Organization Name ${result}</th>
-                                <th scope="col">Contact Information</th>
-                                <th scope="col" class="center-text"># of Users</th>
-                                <th scope="col" class="center-text"># of Configurations</th>
+                                <th scope="col">Organization</th>
+                                <th scope="col">Batch ID</th>
+                                <th scope="col" class="center-text">Transport Method</th>
+                                <th scope="col" class="center-text">Status</th>
+                                <th scope="col" class="center-text"># of Transactions</th>
                                 <th scope="col" class="center-text">Date Created</th>
-                                <th scope="col" class="center-text">Access Level</th>
                                 <th scope="col"></th>
                             </tr>
                         </thead>
@@ -40,31 +66,40 @@
                                     <c:forEach var="batch" items="${batches}">
                                         <tr  style="cursor: pointer">
                                             <td scope="row">
-                                               
+                                                ${batch.orgName}
+                                            </td>
+                                            <td>
+                                                ${batch.utBatchName}
+                                                <c:if test="${batch.transportMethodId == 1}">
+                                                    <br />
+                                                    <a href="/FileDownload/downloadFile.do?filename=${batch.outputFileName}&foldername=output files&orgId=${batch.orgId}" title="View Original File">
+                                                        ${batch.outputFileName}
+                                                    </a>
+                                                </c:if>
                                             </td>
                                             <td class="center-text">
-                                                
+                                                ${batch.transportMethod}
                                             </td>
                                             <td class="center-text">
-                                               
+                                                <a href="#statusModal" data-toggle="modal" class="viewStatus" rel="${batch.statusId}" title="View this Status">${batch.statusValue}</a>
                                             </td>
-                                            <td class="center-text"><fmt:formatDate value="" type="date" pattern="M/dd/yyyy" /></td>
                                             <td class="center-text">
-                                               
+                                               ${batch.totalTransactions}
                                             </td>
+                                            <td class="center-text"><fmt:formatDate value="${batch.dateCreated}" type="date" pattern="M/dd/yyyy" /><br /><fmt:formatDate value="${batch.dateCreated}" type="time" pattern="h:mm:ss a" /></td>
                                             <td class="actions-col">
-                                                <a href="javascript:void(0);" class="btn btn-link" title="View Batch Transactions" role="button">
+                                                <a href="<c:url value='/administrator/processing-activity/outbound/batch/${batch.utBatchName}' />" class="btn btn-link viewTransactions" title="View Batch Transactions" role="button">
                                                     <span class="glyphicon glyphicon-edit"></span>
                                                     View Transactions
                                                 </a>
                                             </td>
                                         </tr>
-                                    </c:forEach>
-                                </c:when>
-                                <c:otherwise>
-                                    <tr><td colspan="7" class="center-text">There are currently no inbound batches to review.</td></tr>
+                                   </c:forEach>     
+                                 </c:when>   
+                                 <c:otherwise>
+                                    <tr><td colspan="7" class="center-text">There are currently no submitted batches.</td></tr>
                                 </c:otherwise>
-                            </c:choose>
+                             </c:choose>           
                         </tbody>
                     </table>
                     <ul class="pagination pull-right" role="navigation" aria-labelledby="Paging ">
@@ -79,3 +114,4 @@
         </section>
     </div>
 </div>
+<div class="modal fade" id="statusModal" role="dialog" tabindex="-1" aria-labeledby="Status Details" aria-hidden="true" aria-describedby="Status Details"></div>

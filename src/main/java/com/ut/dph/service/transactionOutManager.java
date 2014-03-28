@@ -6,8 +6,10 @@
 
 package com.ut.dph.service;
 
+import com.ut.dph.model.Transaction;
 import com.ut.dph.model.batchDownloadSummary;
 import com.ut.dph.model.batchDownloads;
+import com.ut.dph.model.systemSummary;
 import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionOutNotes;
 import com.ut.dph.model.transactionTarget;
@@ -24,6 +26,8 @@ public interface transactionOutManager {
     List<batchDownloads> getInboxBatches(int userId, int orgId, String searchTerm, Date fromDate, Date toDate, int page, int maxResults) throws Exception;
     
     batchDownloads getBatchDetails(int batchId) throws Exception;
+    
+    batchDownloads getBatchDetailsByBatchName(String batchName) throws Exception;
     
     List<transactionTarget> getInboxBatchTransactions(int batchId, int userId) throws Exception;
     
@@ -84,4 +88,11 @@ public interface transactionOutManager {
     Integer clearOutTables (Integer transactionTargetId);
     
     batchDownloadSummary getDownloadSummaryDetails(int transactionTargetId);
+    
+    systemSummary generateSystemOutboundSummary();
+    
+    List <batchDownloads> getAllBatches(Date fromDate, Date toDate, String searchTerm, int page, int maxResults) throws Exception;
+    
+    boolean searchTransactions(Transaction transaction, String searchTerm) throws Exception;
+    
 }

@@ -12,6 +12,7 @@ import com.ut.dph.model.HL7ElementComponents;
 import com.ut.dph.model.HL7Elements;
 import com.ut.dph.model.HL7Segments;
 import com.ut.dph.model.Organization;
+import com.ut.dph.model.Transaction;
 import com.ut.dph.model.User;
 import com.ut.dph.model.batchDownloadSummary;
 import com.ut.dph.model.batchDownloads;
@@ -25,6 +26,7 @@ import com.ut.dph.model.configurationSchedules;
 import com.ut.dph.model.configurationTransport;
 import com.ut.dph.service.emailMessageManager;
 import com.ut.dph.model.mailMessage;
+import com.ut.dph.model.systemSummary;
 import com.ut.dph.model.targetOutputRunLogs;
 import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionOutNotes;
@@ -106,6 +108,12 @@ public class transactionOutManagerImpl implements transactionOutManager {
     @Transactional
     public batchDownloads getBatchDetails(int batchId) throws Exception {
         return transactionOutDAO.getBatchDetails(batchId);
+    }
+    
+    @Override
+    @Transactional
+    public batchDownloads getBatchDetailsByBatchName(String batchName) throws Exception {
+        return transactionOutDAO.getBatchDetailsByBatchName(batchName);
     }
 
     @Override
@@ -1336,5 +1344,114 @@ public class transactionOutManagerImpl implements transactionOutManager {
     public batchDownloadSummary getDownloadSummaryDetails(int transactionTargetId) {
         return transactionOutDAO.getDownloadSummaryDetails(transactionTargetId);
     }
+    
+    @Override
+    public systemSummary generateSystemOutboundSummary() {
+
+        systemSummary systemSummary = new systemSummary();
+
+        try {
+
+            /* Get batches submitted this hour */
+            Calendar thishour = new GregorianCalendar();
+            thishour.set(Calendar.MINUTE, 0);
+            thishour.set(Calendar.SECOND, 0);
+            thishour.set(Calendar.MILLISECOND, 0);
+
+            Calendar nexthour = new GregorianCalendar();
+            nexthour.set(Calendar.MINUTE, 0);
+            nexthour.set(Calendar.SECOND, 0);
+            nexthour.set(Calendar.MILLISECOND, 0);
+            nexthour.add(Calendar.HOUR_OF_DAY, 1);
+
+            System.out.println("This Hour: " + thishour.getTime() + " Next Hour: " + nexthour.getTime());
+
+            Integer batchesThisHour = transactionOutDAO.getAllBatches(thishour.getTime(), nexthour.getTime(), "", 1, 0).size();
+
+            /* Get batches submitted today */
+            Calendar starttoday = new GregorianCalendar();
+            starttoday.set(Calendar.HOUR_OF_DAY, 0);
+            starttoday.set(Calendar.MINUTE, 0);
+            starttoday.set(Calendar.SECOND, 0);
+            starttoday.set(Calendar.MILLISECOND, 0);
+
+            Calendar starttomorrow = new GregorianCalendar();
+            starttomorrow.set(Calendar.HOUR_OF_DAY, 0);
+            starttomorrow.set(Calendar.MINUTE, 0);
+            starttomorrow.set(Calendar.SECOND, 0);
+            starttomorrow.set(Calendar.MILLISECOND, 0);
+            starttomorrow.add(Calendar.DAY_OF_MONTH, 1);
+
+            System.out.println("Today: " + starttoday.getTime() + " Tomorrow: " + starttomorrow.getTime());
+
+            Integer batchesToday = transactionOutDAO.getAllBatches(starttoday.getTime(), starttomorrow.getTime(), "", 1, 0).size();
+
+            /* Get batches submitted this week */
+            Calendar thisweek = new GregorianCalendar();
+            thisweek.set(Calendar.HOUR_OF_DAY, 0);
+            thisweek.set(Calendar.MINUTE, 0);
+            thisweek.set(Calendar.SECOND, 0);
+            thisweek.set(Calendar.MILLISECOND, 0);
+            thisweek.set(Calendar.DAY_OF_WEEK, thisweek.getFirstDayOfWeek());
+
+            Calendar nextweek = new GregorianCalendar();
+            nextweek.set(Calendar.HOUR_OF_DAY, 0);
+            nextweek.set(Calendar.MINUTE, 0);
+            nextweek.set(Calendar.SECOND, 0);
+            nextweek.set(Calendar.MILLISECOND, 0);
+            nextweek.set(Calendar.DAY_OF_WEEK, thisweek.getFirstDayOfWeek());
+            nextweek.add(Calendar.WEEK_OF_YEAR, 1);
+
+            System.out.println("This Week: " + thisweek.getTime() + " Next Week: " + nextweek.getTime());
+
+            Integer batchesThisWeek = transactionOutDAO.getAllBatches(thisweek.getTime(), nextweek.getTime(), "", 1, 0).size();
+
+            systemSummary.setBatchesPastHour(batchesThisHour);
+            systemSummary.setBatchesToday(batchesToday);
+            systemSummary.setBatchesThisWeek(batchesThisWeek);
+
+            /* Get batches submitted yesterday */
+        } catch (Exception ex) {
+            Logger.getLogger(transactionInManagerImpl.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return systemSummary;
+
+    }
+    
+    @Override
+    @Transactional
+    public List <batchDownloads> getAllBatches(Date fromDate, Date toDate, String searchTerm, int page, int maxResults) throws Exception {
+        return transactionOutDAO.getAllBatches(fromDate, toDate, searchTerm, page, maxResults);
+    }
+    
+    @Override
+    public boolean searchTransactions(Transaction transaction, String searchTerm) throws Exception {
+
+        boolean matchFound = false;
+
+        if (transaction.getmessageTypeName().toLowerCase().matches(".*" + searchTerm + ".*")) {
+            matchFound = true;
+        }
+
+
+        if (transaction.getstatusValue().toLowerCase().matches(".*" + searchTerm + ".*")) {
+            matchFound = true;
+        }
+
+        if (transaction.gettargetOrgFields().size() > 0) {
+
+            for (int i = 0; i < transaction.gettargetOrgFields().size(); i++) {
+                if (transaction.gettargetOrgFields().get(i).getFieldValue().toLowerCase().matches(".*" + searchTerm + ".*")) {
+                    matchFound = true;
+                }
+            }
+
+        }
+
+        return matchFound;
+
+    }
+    
 
 }

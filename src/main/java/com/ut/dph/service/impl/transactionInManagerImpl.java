@@ -606,9 +606,9 @@ public class transactionInManagerImpl implements transactionInManager {
                  */
 
                 if (getRecordCounts(batchUploadId, Arrays.asList(11, 12, 13, 16), false, false) > 0 && batch.getstatusId() == 6) {
-                	//we stop here as batch is not in final status and release batch was triggered
-                	batch.setstatusId(5);
-                    batchStausId = 5;		
+                    //we stop here as batch is not in final status and release batch was triggered
+                    batch.setstatusId(5);
+                    batchStausId = 5;
                     updateRecordCounts(batchUploadId, new ArrayList<Integer>(), false, "totalRecordCount");
                     updateRecordCounts(batchUploadId, errorStatusIds, false, "errorRecordCount");
                     updateBatchStatus(batchUploadId, batchStausId, "endDateTime");
@@ -619,17 +619,17 @@ public class transactionInManagerImpl implements transactionInManager {
                         && (handlingDetails.get(0).geterrorHandling() == 2
                         || handlingDetails.get(0).geterrorHandling() == 4
                         || handlingDetails.get(0).geterrorHandling() == 1))) {
-                	
-                if (handlingDetails.get(0).getautoRelease() && handlingDetails.get(0).geterrorHandling() == 1
-                			&& getRecordCounts(batchUploadId, Arrays.asList(11, 12, 13, 16), false, false) > 0) {
-	                	//post records to ERG
-	                	batch.setstatusId(5);
-	                    batchStausId = 5;		
-	                    updateRecordCounts(batchUploadId, new ArrayList<Integer>(), false, "totalRecordCount");
-	                    updateRecordCounts(batchUploadId, errorStatusIds, false, "errorRecordCount");
-	                    updateBatchStatus(batchUploadId, batchStausId, "endDateTime");
-	                    return true;
-                	} 
+
+                    if (handlingDetails.get(0).getautoRelease() && handlingDetails.get(0).geterrorHandling() == 1
+                            && getRecordCounts(batchUploadId, Arrays.asList(11, 12, 13, 16), false, false) > 0) {
+                        //post records to ERG
+                        batch.setstatusId(5);
+                        batchStausId = 5;
+                        updateRecordCounts(batchUploadId, new ArrayList<Integer>(), false, "totalRecordCount");
+                        updateRecordCounts(batchUploadId, errorStatusIds, false, "errorRecordCount");
+                        updateBatchStatus(batchUploadId, batchStausId, "endDateTime");
+                        return true;
+                    }
 
                     //run check to make sure we have records 
                     if (getRecordCounts(batchUploadId, Arrays.asList(12), false, true) > 0) {
@@ -645,13 +645,13 @@ public class transactionInManagerImpl implements transactionInManager {
                         }
                     }
                     // all went well
-	                if (handlingDetails.get(0).geterrorHandling() == 4) {
-	                    //update to pass - 16
-	                    updateTransactionStatus(batchUploadId, 0, 14, 16);
-	                    //target should still be pending output
-	                    updateTransactionTargetStatus(batchUploadId, 0, 14, 19);
-	                }
-	                if (handlingDetails.get(0).geterrorHandling() == 2) {
+                    if (handlingDetails.get(0).geterrorHandling() == 4) {
+                        //update to pass - 16
+                        updateTransactionStatus(batchUploadId, 0, 14, 16);
+                        //target should still be pending output
+                        updateTransactionTargetStatus(batchUploadId, 0, 14, 19);
+                    }
+                    if (handlingDetails.get(0).geterrorHandling() == 2) {
                         //reject errors
                         updateTransactionStatus(batchUploadId, 0, 14, 13);
                         copyTransactionInStatusToTarget(batchUploadId);
@@ -1862,8 +1862,8 @@ public class transactionInManagerImpl implements transactionInManager {
         if (transaction.getreportableField4() != null && transaction.getreportableField4().toLowerCase().matches(".*" + searchTerm + ".*")) {
             matchFound = true;
         }
-        
-        if(transaction.getstatusValue().toLowerCase().matches(".*" + searchTerm + ".*")) {
+
+        if (transaction.getstatusValue().toLowerCase().matches(".*" + searchTerm + ".*")) {
             matchFound = true;
         }
 
@@ -1880,48 +1880,48 @@ public class transactionInManagerImpl implements transactionInManager {
         return matchFound;
 
     }
-    
+
     @Override
     public systemSummary generateSystemInboundSummary() {
-        
+
         systemSummary systemSummary = new systemSummary();
-        
+
         try {
-            
+
             /* Get batches submitted this hour */
             Calendar thishour = new GregorianCalendar();
             thishour.set(Calendar.MINUTE, 0);
             thishour.set(Calendar.SECOND, 0);
             thishour.set(Calendar.MILLISECOND, 0);
-            
+
             Calendar nexthour = new GregorianCalendar();
             nexthour.set(Calendar.MINUTE, 0);
             nexthour.set(Calendar.SECOND, 0);
             nexthour.set(Calendar.MILLISECOND, 0);
-            nexthour.add(Calendar.HOUR_OF_DAY,1);
-            
+            nexthour.add(Calendar.HOUR_OF_DAY, 1);
+
             System.out.println("This Hour: " + thishour.getTime() + " Next Hour: " + nexthour.getTime());
-            
+
             Integer batchesThisHour = transactionInDAO.getAllUploadedBatches(thishour.getTime(), nexthour.getTime(), "", 1, 0).size();
-            
+
             /* Get batches submitted today */
             Calendar starttoday = new GregorianCalendar();
             starttoday.set(Calendar.HOUR_OF_DAY, 0);
             starttoday.set(Calendar.MINUTE, 0);
             starttoday.set(Calendar.SECOND, 0);
             starttoday.set(Calendar.MILLISECOND, 0);
-            
+
             Calendar starttomorrow = new GregorianCalendar();
             starttomorrow.set(Calendar.HOUR_OF_DAY, 0);
             starttomorrow.set(Calendar.MINUTE, 0);
             starttomorrow.set(Calendar.SECOND, 0);
             starttomorrow.set(Calendar.MILLISECOND, 0);
-            starttomorrow.add(Calendar.DAY_OF_MONTH,1);
-            
+            starttomorrow.add(Calendar.DAY_OF_MONTH, 1);
+
             System.out.println("Today: " + starttoday.getTime() + " Tomorrow: " + starttomorrow.getTime());
-            
+
             Integer batchesToday = transactionInDAO.getAllUploadedBatches(starttoday.getTime(), starttomorrow.getTime(), "", 1, 0).size();
-            
+
             /* Get batches submitted this week */
             Calendar thisweek = new GregorianCalendar();
             thisweek.set(Calendar.HOUR_OF_DAY, 0);
@@ -1929,7 +1929,7 @@ public class transactionInManagerImpl implements transactionInManager {
             thisweek.set(Calendar.SECOND, 0);
             thisweek.set(Calendar.MILLISECOND, 0);
             thisweek.set(Calendar.DAY_OF_WEEK, thisweek.getFirstDayOfWeek());
-            
+
             Calendar nextweek = new GregorianCalendar();
             nextweek.set(Calendar.HOUR_OF_DAY, 0);
             nextweek.set(Calendar.MINUTE, 0);
@@ -1937,34 +1937,32 @@ public class transactionInManagerImpl implements transactionInManager {
             nextweek.set(Calendar.MILLISECOND, 0);
             nextweek.set(Calendar.DAY_OF_WEEK, thisweek.getFirstDayOfWeek());
             nextweek.add(Calendar.WEEK_OF_YEAR, 1);
-            
+
             System.out.println("This Week: " + thisweek.getTime() + " Next Week: " + nextweek.getTime());
-            
+
             Integer batchesThisWeek = transactionInDAO.getAllUploadedBatches(thisweek.getTime(), nextweek.getTime(), "", 1, 0).size();
-            
-            
+
             systemSummary.setBatchesPastHour(batchesThisHour);
             systemSummary.setBatchesToday(batchesToday);
             systemSummary.setBatchesThisWeek(batchesThisWeek);
-            
-            
+
             /* Get batches submitted yesterday */
         } catch (Exception ex) {
             Logger.getLogger(transactionInManagerImpl.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+
         return systemSummary;
-        
+
     }
 
-	@Override
-	public boolean checkPermissionForBatch(User userInfo, batchUploads batchInfo) {
-		return transactionInDAO.checkPermissionForBatch(userInfo, batchInfo);
-	}
-	
-	@Override
-	public List <TransactionInError> getErrorList(Integer batchId) {
-		return transactionInDAO.getErrorList(batchId);
-	}
+    @Override
+    public boolean checkPermissionForBatch(User userInfo, batchUploads batchInfo) {
+        return transactionInDAO.checkPermissionForBatch(userInfo, batchInfo);
+    }
+
+    @Override
+    public List<TransactionInError> getErrorList(Integer batchId) {
+        return transactionInDAO.getErrorList(batchId);
+    }
 
 }

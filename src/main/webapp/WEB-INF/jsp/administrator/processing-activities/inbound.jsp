@@ -94,7 +94,7 @@
                                                     View Audit Report
                                                 </a>
                                                 <br />
-                                                <a href="<c:url value='/administrator/processing-activity/batch/${batch.utBatchName}' />" class="btn btn-link viewTransactions" title="View Batch Transactions" role="button">
+                                                <a href="<c:url value='/administrator/processing-activity/inbound/batch/${batch.utBatchName}' />" class="btn btn-link viewTransactions" title="View Batch Transactions" role="button">
                                                     <span class="glyphicon glyphicon-edit"></span>
                                                     View Transactions
                                                 </a>
