@@ -111,7 +111,7 @@
                                                <a href="#statusModal" data-toggle="modal" class="btn btn-link viewStatus" rel="${transaction.statusId}" title="View this Status">${transaction.statusValue}</a>
                                            </td>
                                            <td class="actions-col" style="width:50px;">
-                                               <a href="javascript:void(0);" rel="${transaction.transactionRecordId}" rel3="${userDetails.editAuthority}" rel2="${transaction.configId}" class="btn btn-link viewLink">
+                                               <a href="#messageDetailsModal" data-toggle="modal" rel="${transaction.transactionRecordId}" rel2="${transaction.configId}" class="btn btn-link viewLink">
                                                 <span class="glyphicon glyphicon-edit"></span>
                                                 View
                                               </a>
@@ -146,3 +146,4 @@
     </div>
 </div>
 <div class="modal fade" id="statusModal" role="dialog" tabindex="-1" aria-labeledby="Status Details" aria-hidden="true" aria-describedby="Status Details"></div>
+<div class="modal fade" id="messageDetailsModal" role="dialog" tabindex="-1" aria-labeledby="Message Details" aria-hidden="true" aria-describedby="Message Details"></div>

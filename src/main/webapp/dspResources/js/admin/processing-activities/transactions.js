@@ -23,5 +23,21 @@ require(['./main'], function () {
             });
         });
         
+        $(document).on('click', '.viewLink', function() {
+            
+            var transactionId = $(this).attr('rel');
+            var configId = $(this).attr('rel2');
+           
+            $.ajax({
+                url: '../ViewMessageDetails',
+                data: {'transactionId': transactionId, 'configId': configId},
+                type: "GET",
+                success: function(data) {
+                    $("#messageDetailsModal").html(data);
+                }
+            });
+            
+        });
+        
     });
 });

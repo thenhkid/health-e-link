@@ -8,6 +8,7 @@ package com.ut.dph.controller;
 
 import com.ut.dph.model.Organization;
 import com.ut.dph.model.Transaction;
+import com.ut.dph.model.User;
 import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.configuration;
 import com.ut.dph.model.configurationFormFields;
@@ -20,6 +21,7 @@ import com.ut.dph.model.systemSummary;
 import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionInRecords;
 import com.ut.dph.model.transactionRecords;
+import com.ut.dph.model.transactionTarget;
 import com.ut.dph.service.configurationManager;
 import com.ut.dph.service.configurationTransportManager;
 import com.ut.dph.service.messageTypeManager;
@@ -96,6 +98,11 @@ public class adminProcessingActivity {
         
         int page = 1;
         
+        int year = 114;
+        int month = 0;
+        int day = 1;
+        Date originalDate = new Date(year,month,day);
+        
         Date fromDate = getMonthDate("START");
         Date toDate = getMonthDate("END");
         String searchTerm = "";
@@ -123,6 +130,7 @@ public class adminProcessingActivity {
         mav.addObject("fromDate", fromDate);
         mav.addObject("toDate", toDate);
         mav.addObject("searchTerm", searchTerm);
+        mav.addObject("originalDate",originalDate);
         
         /* Get system inbound summary */
         systemSummary summaryDetails = transactionInManager.generateSystemInboundSummary();
@@ -184,12 +192,18 @@ public class adminProcessingActivity {
             page = 1;
         }
         
+        int year = 114;
+        int month = 0;
+        int day = 1;
+        Date originalDate = new Date(year,month,day);
+        
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/processing-activity/inbound");
         
         mav.addObject("fromDate", fromDate);
         mav.addObject("toDate", toDate);
         mav.addObject("searchTerm", searchTerm);
+        mav.addObject("originalDate",originalDate);
         
         /* Retrieve search parameters from session */
         searchParameters searchParameters = (searchParameters)session.getAttribute("searchParameters");
@@ -198,6 +212,10 @@ public class adminProcessingActivity {
         searchParameters.setpage(page);
         searchParameters.setsection("inbound");
         searchParameters.setsearchTerm(searchTerm);
+        
+        /* Get system inbound summary */
+        systemSummary summaryDetails = transactionInManager.generateSystemInboundSummary();
+        mav.addObject("summaryDetails", summaryDetails);
         
         
         /* Get all inbound transactions */
@@ -567,7 +585,123 @@ public class adminProcessingActivity {
         return mav;
     }
    
-   /**
+   
+    
+    /**
+     * The '/ViewMessageDetails' POST request will display the selected transaction details. This page is 
+     * served up from inbox batch transaction list page. So the form will be readOnly.
+     * 
+     * @param transactionId  The id of the selected transaction
+     * @param fromPage       The page the request is coming from (inbox) 
+     * 
+     * @return this request will return the messageDetailsForm
+     */
+    @RequestMapping(value="/ViewMessageDetails", method = RequestMethod.GET)
+    public @ResponseBody ModelAndView showInboxMessageDetails(@RequestParam(value = "transactionId", required = true) Integer transactionId, @RequestParam(value = "configId", required = true) Integer configId) throws Exception {
+       
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/processing-activities/messageDetails");
+        
+        try {
+            transactionIn transactionInfo = transactionInManager.getTransactionDetails(transactionId);
+          
+            /* Get the configuration details */
+            configuration configDetails = configurationManager.getConfigurationById(transactionInfo.getconfigId());
+
+            /* Get a list of form fields */
+            /*configurationTransport transportDetails = configurationTransportManager.getTransportDetailsByTransportMethod(transactionInfo.getconfigId(), 2);*/
+            configurationTransport transportDetails = configurationTransportManager.getTransportDetails(transactionInfo.getconfigId());
+            List<configurationFormFields> senderInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),1);
+            List<configurationFormFields> senderProviderFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),2);
+            List<configurationFormFields> targetInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),3);
+            List<configurationFormFields> targetProviderFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),4);
+            List<configurationFormFields> patientInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),5);
+            List<configurationFormFields> detailFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),6);
+
+            Transaction transaction = new Transaction();
+            transactionInRecords records = null;
+
+            batchUploads batchInfo = transactionInManager.getBatchDetails(transactionInfo.getbatchId());
+            transactionTarget transactionTarget = transactionInManager.getTransactionTarget(transactionInfo.getbatchId(), transactionId);
+
+            transaction.setorgId(batchInfo.getOrgId());
+            transaction.settransportMethodId(2);
+            transaction.setmessageTypeId(configDetails.getMessageTypeId());
+            transaction.setuserId(batchInfo.getuserId());
+            transaction.setbatchName(batchInfo.getutBatchName());
+            transaction.setoriginalFileName(batchInfo.getoriginalFileName());
+            transaction.setstatusId(batchInfo.getstatusId());
+            transaction.settransactionStatusId(transactionInfo.getstatusId());
+            transaction.settargetOrgId(0);
+            transaction.setconfigId(transactionInfo.getconfigId());
+            transaction.setautoRelease(transportDetails.getautoRelease());
+            transaction.setbatchId(batchInfo.getId());
+            transaction.settransactionId(transactionTarget.getId());
+            transaction.settransactionTargetId(transactionTarget.getId());
+            transaction.setdateSubmitted(transactionInfo.getdateCreated());
+
+            /* Check to see if the message is a feedback report */
+            if(transactionInfo.gettransactionTargetId() > 0) {
+                transaction.setsourceType(2); /* Feedback report */
+                transaction.setorginialTransactionId(transactionInfo.gettransactionTargetId());
+            }
+            else {
+                transaction.setsourceType(configDetails.getsourceType());
+            }
+
+            lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(transaction.getstatusId());
+            transaction.setstatusValue(processStatus.getDisplayCode());
+
+            /* get the message type name */
+            transaction.setmessageTypeName(messagetypemanager.getMessageTypeById(configDetails.getMessageTypeId()).getName());
+
+            records = transactionInManager.getTransactionRecords(transactionId);
+            transaction.settransactionRecordId(records.getId());
+
+
+            /* Set all the transaction SOURCE ORG fields */
+            List<transactionRecords> fromFields;
+            if(!senderInfoFormFields.isEmpty()) {
+                fromFields = setOutboundFormFields(senderInfoFormFields, records, transactionInfo.getconfigId(), true, 0);
+            }
+            else {
+                fromFields = setOrgDetails(batchInfo.getOrgId());
+            }
+            transaction.setsourceOrgFields(fromFields);
+            
+            /* Set all the transaction SOURCE PROVIDER fields */
+            List<transactionRecords> fromProviderFields = setOutboundFormFields(senderProviderFormFields, records, transactionInfo.getconfigId(), true, 0);
+            transaction.setsourceProviderFields(fromProviderFields);
+
+            /* Set all the transaction TARGET fields */
+            List<transactionRecords> toFields = setOutboundFormFields(targetInfoFormFields, records, transactionInfo.getconfigId(), true, 0);
+            transaction.settargetOrgFields(toFields);
+
+            /* Set all the transaction TARGET PROVIDER fields */
+            List<transactionRecords> toProviderFields = setOutboundFormFields(targetProviderFormFields, records, transactionInfo.getconfigId(), true, 0);
+            transaction.settargetProviderFields(toProviderFields);
+
+            /* Set all the transaction PATIENT fields */
+            List<transactionRecords> patientFields = setOutboundFormFields(patientInfoFormFields, records, transactionInfo.getconfigId(), true, 0);
+            transaction.setpatientFields(patientFields);
+
+            /* Set all the transaction DETAIL fields */
+            List<transactionRecords> detailFields = setOutboundFormFields(detailFormFields, records, transactionInfo.getconfigId(), true, 0);
+            transaction.setdetailFields(detailFields);
+
+            mav.addObject("transactionDetails", transaction);
+
+        }
+        catch (Exception e) {
+            throw new Exception("Error occurred in viewing the sent batch details. transactionId: "+transactionId,e);
+        }
+        
+        return mav;
+        
+    }
+    
+    
+    /**
      * The '/viewStatus{statusId}' function will return the details of the selected status. 
      * The results will be displayed in the overlay.
      *
