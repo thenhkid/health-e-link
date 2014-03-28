@@ -1,7 +1,6 @@
 <%-- 
-    Document   : upload
-    Created on : Jan 21, 2014, 11:08:43 AM
-    Author     : chadmccue
+    Document   : auditReports
+    Author     : Grace Chan
 --%>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
@@ -10,30 +9,7 @@
 
 <div class="container main-container" role="main">
     <div class="row">
-        <div class="col-md-12 page-content">
-            <c:if test="${not empty errorCodes}" >
-                <div class="alert alert-danger">
-                    <strong>The last file uploaded failed our validation!</strong> 
-                    <br />
-                    <c:forEach items="${errorCodes}" var="code">
-                        <c:choose>
-                            <c:when test="${code == 1}">- The file uploaded was empty.</c:when>
-                            <c:when test="${code == 2}">- The file uploaded exceeded the max size.</c:when>
-                            <c:when test="${code == 3}">- The file uploaded was not the correct file type associated to your selected message type.</c:when>
-                            <c:when test="${code == 4}">- The file uploaded did not contain the correct delimiter.</c:when>
-                            <c:when test="${code == 5}">- You tried to upload a file with multiple message types but your system is not configured for that.</c:when>
-                        </c:choose>
-                        <br />
-                    </c:forEach>
-                </div>
-            </c:if>
-            
-            <%--<c:if test="${hasConfigurations == true}">
-                <div class="" style="overflow:hidden; margin-bottom:10px;">
-                    <a href="#uploadFile" title="Upload File" data-toggle="modal" class="pull-right btn btn-primary uploadFile"><span class="glyphicon glyphicon-upload"></span> Upload File</a>
-                </div>
-            </c:if>--%>
-            
+        <div class="col-md-12 page-content">        
             <div class="row" style="overflow:hidden; margin-bottom:10px;">
                     <div class="col-md-3">
                         <form:form class="form form-inline" id="searchForm" action="/Health-e-Connect/auditReports" method="post">
@@ -43,6 +19,7 @@
                                 <input type="hidden" name="fromDate" id="fromDate" rel="<fmt:formatDate value="${fromDate}" type="date" pattern="MM/dd/yyyy" />" rel2="<fmt:formatDate value="${userDetails.dateOrgWasCreated}" type="date" pattern="MM/dd/yyyy" />" value="${fromDate}" />
                                 <input type="hidden" name="toDate" id="toDate" rel="<fmt:formatDate value="${toDate}" type="date" pattern="MM/dd/yyyy" />" value="${toDate}" />
                                 <input type="hidden" name="page" id="page" value="${currentPage}" />
+                          		<input type="hidden" name="batchId" id="batchId" value=""/>
                             </div>
                             <button id="searchBatchesBtn" class="btn btn-primary btn-sm" title="Search Inbox">
                                 <span class="glyphicon glyphicon-search"></span>
@@ -101,7 +78,7 @@
                                 </c:forEach>
                             </c:when>
                             <c:otherwise>
-                                <tr><td colspan="6" class="center-text">There are currently no audit reports.</td></tr>
+                                <tr><td colspan="9" class="center-text">There are currently no audit reports.</td></tr>
                             </c:otherwise>
                         </c:choose>    
                     </tbody>

@@ -8,6 +8,8 @@ package com.ut.dph.dao;
 
 import com.ut.dph.model.CrosswalkData;
 import com.ut.dph.model.Macros;
+import com.ut.dph.model.TransactionInError;
+import com.ut.dph.model.User;
 import com.ut.dph.model.batchUploadSummary;
 import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.configurationConnection;
@@ -251,4 +253,7 @@ public interface transactionInDAO {
     
     List <batchUploads> getAllUploadedBatches(Date fromDate, Date toDate, String searchTerm, int page, int maxResults) throws Exception;
     
+    boolean checkPermissionForBatch (User userInfo, batchUploads batchInfo);
+    
+    List <TransactionInError> getErrorList (Integer batchId);
 }

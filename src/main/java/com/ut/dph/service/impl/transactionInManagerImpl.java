@@ -11,6 +11,8 @@ import com.ut.dph.dao.transactionOutDAO;
 import com.ut.dph.model.CrosswalkData;
 import com.ut.dph.model.Macros;
 import com.ut.dph.model.Transaction;
+import com.ut.dph.model.TransactionInError;
+import com.ut.dph.model.User;
 import com.ut.dph.model.batchUploadSummary;
 import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.configuration;
@@ -1954,5 +1956,15 @@ public class transactionInManagerImpl implements transactionInManager {
         return systemSummary;
         
     }
+
+	@Override
+	public boolean checkPermissionForBatch(User userInfo, batchUploads batchInfo) {
+		return transactionInDAO.checkPermissionForBatch(userInfo, batchInfo);
+	}
+	
+	@Override
+	public List <TransactionInError> getErrorList(Integer batchId) {
+		return transactionInDAO.getErrorList(batchId);
+	}
 
 }

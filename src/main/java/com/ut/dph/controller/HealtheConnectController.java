@@ -8,6 +8,7 @@ package com.ut.dph.controller;
 
 import com.ut.dph.dao.messageTypeDAO;
 import com.ut.dph.model.Organization;
+import com.ut.dph.model.TransactionInError;
 import com.ut.dph.model.User;
 import com.ut.dph.model.batchDownloads;
 import com.ut.dph.model.batchUploads;
@@ -25,6 +26,7 @@ import com.ut.dph.service.sysAdminManager;
 import com.ut.dph.service.transactionInManager;
 import com.ut.dph.service.transactionOutManager;
 import com.ut.dph.service.userManager;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -93,6 +95,9 @@ public class HealtheConnectController {
     
     /** this list holds the status that we do not want the audit reports to show **/
     private	static List<Integer> excludedStatusIds = Arrays.asList(1,2);
+    
+    //final status Ids
+    private List<Integer> finalStatusIds = Arrays.asList(11, 12, 13, 16);
     
     /**
      * The '/upload' request will serve up the Health-e-Connect upload page.
@@ -701,6 +706,128 @@ public class HealtheConnectController {
         }
         
     }
+    
+    
+    
+    /**
+     * The '/auditReport POST request will serve up the requested Health-e-Connect audit report .
+     *
+     * @param request
+     * @param response
+     * @return	the health-e-Connect audit reports search view
+     * @throws Exception
+     */
+    @RequestMapping(value = "/auditReport", method = RequestMethod.POST)
+    public ModelAndView viewAuditRpt(@RequestParam(value = "page", required = false) Integer page, 
+    		@RequestParam(value = "batchId", required = false) Integer batchId, 
+    		HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
+       
+    try {
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/Health-e-Connect/auditReport");
+        
+        /* Need to get a list of uploaded files */
+        User userInfo = (User)session.getAttribute("userDetails");
+        batchUploads batchInfo = transactionInManager.getBatchDetails(batchId);
+        
+        /**   make sure user has permission to batch 
+         * 1. if user uploaded the batch
+         * 2. if user has permission to the configs in the batch
+         * 3. sometimes entire batch is errored and have no configIds to go by, we let user see it if they have configurations
+         **/
+        
+        boolean hasPermission = false;
+        List<configuration> configurations = configurationManager.getActiveConfigurationsByUserId(userInfo.getId(), 1);
+        boolean hasConfigurations = false;
+        
+        if(configurations.size() >=1 ) {
+           hasConfigurations = true;
+        }
+        
+        if (batchInfo.getuserId() == userInfo.getId()) {
+        	hasPermission = true;
+        } else if (batchInfo.getConfigId() == 0 && hasConfigurations){
+        	hasPermission = true;
+        } else if (transactionInManager.checkPermissionForBatch(userInfo, batchInfo)) {
+        	hasPermission = true;
+        }
+        
+        //TODO make sure the batch is send to ERG
+        
+        if (hasPermission) {
+        	/** grab org info**/
+        	Organization org = organizationmanager.getOrganizationById(batchInfo.getOrgId());
+        	mav.addObject("org", org);
+        	/** grab error info **/
+        	List <TransactionInError> getErrorList = transactionInManager.getErrorList(batchInfo.getId());
+        	mav.addObject("getErrorList", getErrorList);       	
+        }
+        
+        /** check final status - a batch should all be 11,12,13 or 16 to get released **/
+        boolean sendBatch = false;
+        if (userInfo.getdeliverAuthority() && transactionInManager.getRecordCounts(batchId, finalStatusIds, false, false) == 0) {
+        	sendBatch = true;
+        }
+        
+                
+       
+        
+ 
+            //show button
+        	mav.addObject("sendBatch", sendBatch);
+        
+        	mav.addObject("batch", batchInfo);
+        	mav.addObject("hasPermission", hasPermission);
+            mav.addObject("hasConfigurations", hasConfigurations);
+            
+           
+            Integer totalPages = 0;
+           
+            //(int)Math.ceil((double)totalErrorPages / maxResults);
+            mav.addObject("totalPages", totalPages);
+            //for errors
+            mav.addObject("currentPage", page);
+
+
+            return mav;
+        }
+        catch (Exception e) {
+        	e.printStackTrace();
+            throw new Exception("Error occurred displaying audit report.",e);
+        }
+        
+    }
+    
+    /**
+     * The '/ERG POST request will serve up the requested Health-e-Connect audit report .
+     *
+     * @param request
+     * @param response
+     * @return	the ERG form
+     * @throws Exception
+     */
+    @RequestMapping(value = "/ERG", method = RequestMethod.POST)
+    public ModelAndView uploadERG(@RequestParam(value = "page", required = false) Integer page, 
+    		@RequestParam(value = "transactionInId", required = false) Integer transactionInId, 
+    		HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
+       
+    try {
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/Health-e-Connect/ERG");
+        
+        User userInfo = (User)session.getAttribute("userDetails");
+        mav.addObject("hasPermission", userInfo.geteditAuthority());
+        mav.addObject("transactionInId", transactionInId);
+        
+        return mav;
+    }
+        catch (Exception e) {
+        	e.printStackTrace();
+            throw new Exception("Error occurred displaying upload ERG form.",e);
+        }
+        
+    }
+    
     
     
     /**
