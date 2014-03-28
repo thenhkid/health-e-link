@@ -975,98 +975,125 @@ public class adminProcessingActivity {
      * @return this request will return the messageDetailsForm
      */
     @RequestMapping(value="/ViewMessageDetails", method = RequestMethod.GET)
-    public @ResponseBody ModelAndView showInboxMessageDetails(@RequestParam(value = "transactionId", required = true) Integer transactionId, @RequestParam(value = "configId", required = true) Integer configId) throws Exception {
+    public @ResponseBody ModelAndView showInboxMessageDetails(@RequestParam(value="Type", required = true) Integer Type, @RequestParam(value = "transactionId", required = true) Integer transactionId, @RequestParam(value = "configId", required = true) Integer configId) throws Exception {
        
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/processing-activities/messageDetails");
         
         try {
-            transactionIn transactionInfo = transactionInManager.getTransactionDetails(transactionId);
-          
-            /* Get the configuration details */
-            configuration configDetails = configurationManager.getConfigurationById(transactionInfo.getconfigId());
-
-            /* Get a list of form fields */
-            /*configurationTransport transportDetails = configurationTransportManager.getTransportDetailsByTransportMethod(transactionInfo.getconfigId(), 2);*/
-            configurationTransport transportDetails = configurationTransportManager.getTransportDetails(transactionInfo.getconfigId());
-            List<configurationFormFields> senderInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),1);
-            List<configurationFormFields> senderProviderFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),2);
-            List<configurationFormFields> targetInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),3);
-            List<configurationFormFields> targetProviderFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),4);
-            List<configurationFormFields> patientInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),5);
-            List<configurationFormFields> detailFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),6);
-
-            Transaction transaction = new Transaction();
-            transactionInRecords records = null;
-
-            batchUploads batchInfo = transactionInManager.getBatchDetails(transactionInfo.getbatchId());
-            transactionTarget transactionTarget = transactionInManager.getTransactionTarget(transactionInfo.getbatchId(), transactionId);
-
-            transaction.setorgId(batchInfo.getOrgId());
-            transaction.settransportMethodId(2);
-            transaction.setmessageTypeId(configDetails.getMessageTypeId());
-            transaction.setuserId(batchInfo.getuserId());
-            transaction.setbatchName(batchInfo.getutBatchName());
-            transaction.setoriginalFileName(batchInfo.getoriginalFileName());
-            transaction.setstatusId(batchInfo.getstatusId());
-            transaction.settransactionStatusId(transactionInfo.getstatusId());
-            transaction.settargetOrgId(0);
-            transaction.setconfigId(transactionInfo.getconfigId());
-            transaction.setautoRelease(transportDetails.getautoRelease());
-            transaction.setbatchId(batchInfo.getId());
-            transaction.settransactionId(transactionTarget.getId());
-            transaction.settransactionTargetId(transactionTarget.getId());
-            transaction.setdateSubmitted(transactionInfo.getdateCreated());
-
-            /* Check to see if the message is a feedback report */
-            if(transactionInfo.gettransactionTargetId() > 0) {
-                transaction.setsourceType(2); /* Feedback report */
-                transaction.setorginialTransactionId(transactionInfo.gettransactionTargetId());
-            }
-            else {
-                transaction.setsourceType(configDetails.getsourceType());
-            }
-
-            lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(transaction.getstatusId());
-            transaction.setstatusValue(processStatus.getDisplayCode());
-
-            /* get the message type name */
-            transaction.setmessageTypeName(messagetypemanager.getMessageTypeById(configDetails.getMessageTypeId()).getName());
-
-            records = transactionInManager.getTransactionRecords(transactionId);
-            transaction.settransactionRecordId(records.getId());
-
-
-            /* Set all the transaction SOURCE ORG fields */
-            List<transactionRecords> fromFields;
-            if(!senderInfoFormFields.isEmpty()) {
-                fromFields = setOutboundFormFields(senderInfoFormFields, records, transactionInfo.getconfigId(), true, 0);
-            }
-            else {
-                fromFields = setOrgDetails(batchInfo.getOrgId());
-            }
-            transaction.setsourceOrgFields(fromFields);
             
-            /* Set all the transaction SOURCE PROVIDER fields */
-            List<transactionRecords> fromProviderFields = setOutboundFormFields(senderProviderFormFields, records, transactionInfo.getconfigId(), true, 0);
-            transaction.setsourceProviderFields(fromProviderFields);
+            Transaction transaction = new Transaction();
+            
+            /* Type = 1 (Source) */
+            if(Type == 1) {
+                
+                 transactionIn transactionInfo = transactionInManager.getTransactionDetails(transactionId);
+                 
+                 /* Get the configuration details */
+                configuration configDetails = configurationManager.getConfigurationById(transactionInfo.getconfigId());
+                
+                /* Get a list of form fields */
+                /*configurationTransport transportDetails = configurationTransportManager.getTransportDetailsByTransportMethod(transactionInfo.getconfigId(), 2);*/
+                configurationTransport transportDetails = configurationTransportManager.getTransportDetails(transactionInfo.getconfigId());
+                List<configurationFormFields> senderInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),1);
+                List<configurationFormFields> senderProviderFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),2);
+                List<configurationFormFields> targetInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),3);
+                List<configurationFormFields> targetProviderFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),4);
+                List<configurationFormFields> patientInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),5);
+                List<configurationFormFields> detailFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),6);
 
-            /* Set all the transaction TARGET fields */
-            List<transactionRecords> toFields = setOutboundFormFields(targetInfoFormFields, records, transactionInfo.getconfigId(), true, 0);
-            transaction.settargetOrgFields(toFields);
+                transactionInRecords records = null;
 
-            /* Set all the transaction TARGET PROVIDER fields */
-            List<transactionRecords> toProviderFields = setOutboundFormFields(targetProviderFormFields, records, transactionInfo.getconfigId(), true, 0);
-            transaction.settargetProviderFields(toProviderFields);
+                batchUploads batchInfo = transactionInManager.getBatchDetails(transactionInfo.getbatchId());
+                
+                records = transactionInManager.getTransactionRecords(transactionId);
+                
+                /* Set all the transaction SOURCE ORG fields */
+                List<transactionRecords> fromFields;
+                if(!senderInfoFormFields.isEmpty()) {
+                    fromFields = setOutboundFormFields(senderInfoFormFields, records, transactionInfo.getconfigId(), true, 0);
+                }
+                else {
+                    fromFields = setOrgDetails(batchInfo.getOrgId());
+                }
+                transaction.setsourceOrgFields(fromFields);
 
-            /* Set all the transaction PATIENT fields */
-            List<transactionRecords> patientFields = setOutboundFormFields(patientInfoFormFields, records, transactionInfo.getconfigId(), true, 0);
-            transaction.setpatientFields(patientFields);
+                /* Set all the transaction SOURCE PROVIDER fields */
+                List<transactionRecords> fromProviderFields = setOutboundFormFields(senderProviderFormFields, records, transactionInfo.getconfigId(), true, 0);
+                transaction.setsourceProviderFields(fromProviderFields);
 
-            /* Set all the transaction DETAIL fields */
-            List<transactionRecords> detailFields = setOutboundFormFields(detailFormFields, records, transactionInfo.getconfigId(), true, 0);
-            transaction.setdetailFields(detailFields);
+                /* Set all the transaction TARGET fields */
+                List<transactionRecords> toFields = setOutboundFormFields(targetInfoFormFields, records, transactionInfo.getconfigId(), true, 0);
+                transaction.settargetOrgFields(toFields);
 
+                /* Set all the transaction TARGET PROVIDER fields */
+                List<transactionRecords> toProviderFields = setOutboundFormFields(targetProviderFormFields, records, transactionInfo.getconfigId(), true, 0);
+                transaction.settargetProviderFields(toProviderFields);
+
+                /* Set all the transaction PATIENT fields */
+                List<transactionRecords> patientFields = setOutboundFormFields(patientInfoFormFields, records, transactionInfo.getconfigId(), true, 0);
+                transaction.setpatientFields(patientFields);
+
+                /* Set all the transaction DETAIL fields */
+                List<transactionRecords> detailFields = setOutboundFormFields(detailFormFields, records, transactionInfo.getconfigId(), true, 0);
+                transaction.setdetailFields(detailFields);
+                
+            }
+            else {
+                
+                transactionTarget transactionInfo = transactionOutManager.getTransactionDetails(transactionId);
+                
+                /* Get the configuration details */
+                configuration configDetails = configurationManager.getConfigurationById(transactionInfo.getconfigId());
+                
+                /* Get a list of form fields */
+                /*configurationTransport transportDetails = configurationTransportManager.getTransportDetailsByTransportMethod(transactionInfo.getconfigId(), 2);*/
+                configurationTransport transportDetails = configurationTransportManager.getTransportDetails(transactionInfo.getconfigId());
+                List<configurationFormFields> senderInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),1);
+                List<configurationFormFields> senderProviderFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),2);
+                List<configurationFormFields> targetInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),3);
+                List<configurationFormFields> targetProviderFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),4);
+                List<configurationFormFields> patientInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),5);
+                List<configurationFormFields> detailFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),6);
+
+                transactionOutRecords records = null;
+                
+                batchDownloads batchInfo = transactionOutManager.getBatchDetails(transactionInfo.getbatchDLId());
+                
+                records = transactionOutManager.getTransactionRecords(transactionId);
+                
+                /* Set all the transaction SOURCE ORG fields */
+                List<transactionRecords> fromFields;
+                if(!senderInfoFormFields.isEmpty()) {
+                    fromFields = setInboxFormFields(senderInfoFormFields, records, transactionInfo.getconfigId(), true, 0);
+                }
+                else {
+                    fromFields = setOrgDetails(batchInfo.getOrgId());
+                }
+                transaction.setsourceOrgFields(fromFields);
+
+                /* Set all the transaction SOURCE PROVIDER fields */
+                List<transactionRecords> fromProviderFields = setInboxFormFields(senderProviderFormFields, records, transactionInfo.getconfigId(), true, 0);
+                transaction.setsourceProviderFields(fromProviderFields);
+
+                /* Set all the transaction TARGET fields */
+                List<transactionRecords> toFields = setInboxFormFields(targetInfoFormFields, records, transactionInfo.getconfigId(), true, 0);
+                transaction.settargetOrgFields(toFields);
+
+                /* Set all the transaction TARGET PROVIDER fields */
+                List<transactionRecords> toProviderFields = setInboxFormFields(targetProviderFormFields, records, transactionInfo.getconfigId(), true, 0);
+                transaction.settargetProviderFields(toProviderFields);
+
+                /* Set all the transaction PATIENT fields */
+                List<transactionRecords> patientFields = setInboxFormFields(patientInfoFormFields, records, transactionInfo.getconfigId(), true, 0);
+                transaction.setpatientFields(patientFields);
+
+                /* Set all the transaction DETAIL fields */
+                List<transactionRecords> detailFields = setInboxFormFields(detailFormFields, records, transactionInfo.getconfigId(), true, 0);
+                transaction.setdetailFields(detailFields);
+                
+            }
+            
             mav.addObject("transactionDetails", transaction);
 
         }

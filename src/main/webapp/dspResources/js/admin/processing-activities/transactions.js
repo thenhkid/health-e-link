@@ -30,7 +30,7 @@ require(['./main'], function () {
            
             $.ajax({
                 url: '../../ViewMessageDetails',
-                data: {'transactionId': transactionId, 'configId': configId},
+                data: {'Type': 1, 'transactionId': transactionId, 'configId': configId},
                 type: "GET",
                 success: function(data) {
                     $("#messageDetailsModal").html(data);
