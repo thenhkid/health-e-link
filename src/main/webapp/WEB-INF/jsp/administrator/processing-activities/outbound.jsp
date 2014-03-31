@@ -67,18 +67,24 @@
                                         <tr  style="cursor: pointer">
                                             <td scope="row">
                                                 ${batch.orgName}
+                                                <br />User: ${batch.usersName}
                                             </td>
                                             <td>
                                                 ${batch.utBatchName}
                                                 <c:if test="${batch.transportMethodId == 1}">
                                                     <br />
-                                                    <a href="/FileDownload/downloadFile.do?filename=${batch.outputFileName}&foldername=output files&orgId=${batch.orgId}" title="View Original File">
-                                                        ${batch.outputFileName}
+                                                    <a href="/FileDownload/downloadFile.do?filename=${batch.outputFIleName}&foldername=output files&orgId=${batch.orgId}" title="View Original File">
+                                                        ${batch.outputFIleName}
                                                     </a>
                                                 </c:if>
                                             </td>
                                             <td class="center-text">
-                                                ${batch.transportMethod}
+                                                <c:choose>
+                                                    <c:when test="${batch.transportMethod == 'File Upload'}">
+                                                        File Download
+                                                    </c:when>
+                                                    <c:otherwise>${batch.transportMethod}</c:otherwise>
+                                                </c:choose>
                                             </td>
                                             <td class="center-text">
                                                 <a href="#statusModal" data-toggle="modal" class="viewStatus" rel="${batch.statusId}" title="View this Status">${batch.statusValue}</a>

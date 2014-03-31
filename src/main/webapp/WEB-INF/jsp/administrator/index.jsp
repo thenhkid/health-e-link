@@ -48,13 +48,13 @@
 
         
         <div class="col-md-3 col-sm-3 col-xs-6">
-            <section class="panel panel-default panel-stats" role="widget" aria-labelleby="Number of Files to Process">
+            <section class="panel panel-default panel-stats" role="widget" aria-labelleby="Number of Transactions to Process">
               
                 <div class="panel-body">
                     <div>
-                        <span class="stat-number"><a href="administrator/processing-activity" title="Total number of batches to process">0</a></span>
-                        <h3> Batches To Process</h3>
-                        <a href="administrator/processing-activity" title="Total number of batches to process" class="btn btn-primary btn-small" role="button">View all</a>
+                        <span class="stat-number"><a href="administrator/processing-activity/waiting" title="Total number of Transactions to process"><fmt:formatNumber value="${summaryDetails.batchesToProcess}" /></a></span>
+                        <h3>Waiting to be Processed</h3>
+                        <a href="administrator/processing-activity/waiting" title="Total number of Transactions to process" class="btn btn-primary btn-small" role="button">View all</a>
                      </div>
                 </div>
                 

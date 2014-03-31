@@ -754,7 +754,20 @@ public class transactionOutManagerImpl implements transactionOutManager {
         }
 
     }
-
+    
+    /**
+     * The 'processManualTransaction' function will start the processing of a transaction 
+     * that is set to manual.
+     * 
+     * @param transaction The transaction object that needs to be translated.
+     * 
+     * @return This function returns the created batchId.
+     */
+    @Override
+    public int processManualTransaction(transactionTarget transaction) throws Exception {
+        return beginOutputProcess(transaction);
+    }
+    
     /**
      * The 'beginOutputProcess' function will start the process to creating the target download transaction
      *
@@ -790,10 +803,12 @@ public class transactionOutManagerImpl implements transactionOutManager {
                     throw new Exception("Error occurred trying to generate a batch. transactionId: " + transaction.getId(), e);
                 }
 
-            } /* File Download || FTP */ else if (transportDetails.gettransportMethodId() == 1 || transportDetails.gettransportMethodId() == 3) {
+            } 
+            /* File Download || FTP */ 
+            else if (transportDetails.gettransportMethodId() == 1 || transportDetails.gettransportMethodId() == 3) {
 
                 boolean createNewFile = true;
-
+                
                 /* 
                  If the merge batches option is not checked create the batch right away
                  */
@@ -1029,7 +1044,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
             transactionOutDAO.updateBatchOutputFileName(batchDetails.getId(), fileName);
 
         }
-
+        
         /* Read in the file */
         FileInputStream fileInput = null;
         File file = new File(dir.getDir() + fileName);
@@ -1037,15 +1052,15 @@ public class transactionOutManagerImpl implements transactionOutManager {
 
         /* Need to get the records for the transaction */
         String recordRow = "";
-
+        
         transactionOutRecords records = transactionOutDAO.getTransactionRecords(transactionTargetId);
 
         /* Need to get the max field number */
         int maxFieldNo = transactionOutDAO.getMaxFieldNo(transportDetails.getconfigId());
-
+        
         /* Need to get the correct delimiter for the output file */
         String delimChar = (String) messageTypeDAO.getDelimiterChar(transportDetails.getfileDelimiter());
-
+         
         if (records != null) {
             FileWriter fw = null;
 
@@ -1142,7 +1157,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                 }
 
             } else {
-
+               
                 for (int i = 1; i <= maxFieldNo; i++) {
 
                     String colName = new StringBuilder().append("f").append(i).toString();
@@ -1345,6 +1360,12 @@ public class transactionOutManagerImpl implements transactionOutManager {
         return transactionOutDAO.getDownloadSummaryDetails(transactionTargetId);
     }
     
+    /**
+     * The 'generateSystemOutboundSummary' function will return the summary object for
+     * outbound system batches
+     * 
+     * @return This function will return a systemSummary object 
+     */
     @Override
     public systemSummary generateSystemOutboundSummary() {
 
@@ -1364,8 +1385,6 @@ public class transactionOutManagerImpl implements transactionOutManager {
             nexthour.set(Calendar.MILLISECOND, 0);
             nexthour.add(Calendar.HOUR_OF_DAY, 1);
 
-            System.out.println("This Hour: " + thishour.getTime() + " Next Hour: " + nexthour.getTime());
-
             Integer batchesThisHour = transactionOutDAO.getAllBatches(thishour.getTime(), nexthour.getTime(), "", 1, 0).size();
 
             /* Get batches submitted today */
@@ -1381,8 +1400,6 @@ public class transactionOutManagerImpl implements transactionOutManager {
             starttomorrow.set(Calendar.SECOND, 0);
             starttomorrow.set(Calendar.MILLISECOND, 0);
             starttomorrow.add(Calendar.DAY_OF_MONTH, 1);
-
-            System.out.println("Today: " + starttoday.getTime() + " Tomorrow: " + starttomorrow.getTime());
 
             Integer batchesToday = transactionOutDAO.getAllBatches(starttoday.getTime(), starttomorrow.getTime(), "", 1, 0).size();
 
@@ -1402,13 +1419,37 @@ public class transactionOutManagerImpl implements transactionOutManager {
             nextweek.set(Calendar.DAY_OF_WEEK, thisweek.getFirstDayOfWeek());
             nextweek.add(Calendar.WEEK_OF_YEAR, 1);
 
-            System.out.println("This Week: " + thisweek.getTime() + " Next Week: " + nextweek.getTime());
-
             Integer batchesThisWeek = transactionOutDAO.getAllBatches(thisweek.getTime(), nextweek.getTime(), "", 1, 0).size();
 
             systemSummary.setBatchesPastHour(batchesThisHour);
             systemSummary.setBatchesToday(batchesToday);
             systemSummary.setBatchesThisWeek(batchesThisWeek);
+
+            /* Get batches submitted yesterday */
+        } catch (Exception ex) {
+            Logger.getLogger(transactionInManagerImpl.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return systemSummary;
+
+    }
+    
+    /**
+     * The 'generateSystemWaitingSummary' function will return the summary object for
+     * waiting to be processed system transactions
+     * 
+     * @return This function will return a systemSummary object 
+     */
+    @Override
+    public systemSummary generateSystemWaitingSummary() {
+
+        systemSummary systemSummary = new systemSummary();
+
+        try {
+
+            Integer transactionsToProcess = transactionOutDAO.getTransactionsToProcess(null,null,"",1,0).size();
+
+            systemSummary.setbatchesToProcess(transactionsToProcess);
 
             /* Get batches submitted yesterday */
         } catch (Exception ex) {
@@ -1435,22 +1476,37 @@ public class transactionOutManagerImpl implements transactionOutManager {
         }
 
 
-        if (transaction.getstatusValue().toLowerCase().matches(".*" + searchTerm + ".*")) {
+        if (transaction.getstatusValue() != null && transaction.getstatusValue().toLowerCase().matches(".*" + searchTerm + ".*")) {
             matchFound = true;
         }
+        
+        if (transaction.getsourceOrgFields().size() > 0) {
 
-        if (transaction.gettargetOrgFields().size() > 0) {
-
-            for (int i = 0; i < transaction.gettargetOrgFields().size(); i++) {
-                if (transaction.gettargetOrgFields().get(i).getFieldValue().toLowerCase().matches(".*" + searchTerm + ".*")) {
+            for (int i = 0; i < transaction.getsourceOrgFields().size(); i++) {
+                if (transaction.getsourceOrgFields().get(i).getFieldValue() != null && transaction.getsourceOrgFields().get(i).getFieldValue().toLowerCase().matches(".*" + searchTerm + ".*")) {
                     matchFound = true;
                 }
             }
+        }
+        
+        if (transaction.gettargetOrgFields().size() > 0) {
 
+            for (int i = 0; i < transaction.gettargetOrgFields().size(); i++) {
+                if (transaction.gettargetOrgFields().get(i).getFieldValue() != null && transaction.gettargetOrgFields().get(i).getFieldValue().toLowerCase().matches(".*" + searchTerm + ".*")) {
+                    matchFound = true;
+                }
+            }
         }
 
         return matchFound;
 
+    }
+    
+    
+    @Override
+    @Transactional
+    public List<transactionTarget> getTransactionsToProcess(Date fromDate, Date toDate, String searchTerm, int page, int maxResults) throws Exception {
+        return transactionOutDAO.getTransactionsToProcess(fromDate, toDate, searchTerm, page, maxResults);
     }
     
 

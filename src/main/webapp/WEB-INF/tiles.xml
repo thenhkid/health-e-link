@@ -387,6 +387,17 @@
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/processing-activities/outboundtransactions.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/admin/processing-activities/outboundtransactions.js" />
     </definition>
+    
+    <definition name="/administrator/processing-activity/waiting" extends="base.definition.admin">
+        <put-attribute name="page-id" value="processing-waiting" />
+        <put-attribute name="page-section" value="section-processing" />
+        <put-attribute name="title" value="Administrator - Processing Activities" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=activity" />
+        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/processing-activities/actionBar.jsp?page=waiting" />
+        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/processing-activities/menu.jsp?page=waiting" />
+        <put-attribute name="body" value="/WEB-INF/jsp/administrator/processing-activities/waiting.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/admin/processing-activities/waiting.js" />
+    </definition>
 
 
     <!--  end sysadmin definitions -->

@@ -17,6 +17,7 @@ public class systemSummary {
     int batchesThisWeek = 0;
     int batchesThisMonth = 0;
     int batchesInError = 0;
+    int batchesToProcess = 0;
 
     public int getBatchesPastHour() {
         return batchesPastHour;
@@ -58,5 +59,11 @@ public class systemSummary {
         this.batchesInError = batchesInError;
     }
    
-    
+    public int getbatchesToProcess() {
+        return batchesToProcess;
+    }
+
+    public void setbatchesToProcess(int batchesToProcess) {
+        this.batchesToProcess = batchesToProcess;
+    }
 }

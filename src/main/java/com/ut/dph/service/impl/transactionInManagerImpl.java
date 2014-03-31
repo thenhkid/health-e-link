@@ -1870,7 +1870,7 @@ public class transactionInManagerImpl implements transactionInManager {
         if (transaction.gettargetOrgFields().size() > 0) {
 
             for (int i = 0; i < transaction.gettargetOrgFields().size(); i++) {
-                if (transaction.gettargetOrgFields().get(i).getFieldValue().toLowerCase().matches(".*" + searchTerm + ".*")) {
+                if (transaction.gettargetOrgFields().get(i).getFieldValue() != null && transaction.gettargetOrgFields().get(i).getFieldValue().toLowerCase().matches(".*" + searchTerm + ".*")) {
                     matchFound = true;
                 }
             }

@@ -68,6 +68,7 @@
                                         <tr  style="cursor: pointer">
                                             <td scope="row">
                                                 ${batch.orgName}
+                                                <br />User: ${batch.usersName}
                                             </td>
                                             <td>
                                                 ${batch.utBatchName}

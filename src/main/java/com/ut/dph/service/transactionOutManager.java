@@ -95,4 +95,9 @@ public interface transactionOutManager {
     
     boolean searchTransactions(Transaction transaction, String searchTerm) throws Exception;
     
+    systemSummary generateSystemWaitingSummary();
+    
+    List<transactionTarget> getTransactionsToProcess(Date fromDate, Date toDate, String searchTerm, int page, int maxResults) throws Exception;
+    
+    int processManualTransaction(transactionTarget transaction) throws Exception;
 }

@@ -19,10 +19,12 @@ import com.ut.dph.model.configurationConnection;
 import com.ut.dph.model.configurationConnectionReceivers;
 import com.ut.dph.model.configurationConnectionSenders;
 import com.ut.dph.model.configurationTransport;
+import com.ut.dph.model.systemSummary;
 import com.ut.dph.service.messageTypeManager;
 import com.ut.dph.service.organizationManager;
 import com.ut.dph.service.configurationManager;
 import com.ut.dph.service.configurationTransportManager;
+import com.ut.dph.service.transactionOutManager;
 import com.ut.dph.service.userManager;
 import java.util.ArrayList;
 
@@ -50,6 +52,9 @@ public class adminController {
     
     @Autowired
     private userManager userManager;
+    
+    @Autowired
+    private transactionOutManager transactionOutManager;
 
     private int maxResults = 3;
 
@@ -91,6 +96,10 @@ public class adminController {
         //Return the latest configurations
         List<configuration> configurations = configurationmanager.getLatestConfigurations(maxResults);
         mav.addObject("latestConfigs", configurations);
+        
+        /* Get system inbound summary */
+        systemSummary summaryDetails = transactionOutManager.generateSystemWaitingSummary();
+        mav.addObject("summaryDetails", summaryDetails);
         
         Organization org;
         messageType messagetype;

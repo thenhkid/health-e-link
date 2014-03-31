@@ -81,7 +81,7 @@ public interface transactionOutDAO {
     
     void updateBatchOutputFileName(int batchId, String fileName);
     
-    int getMaxFieldNo(int configId);
+    int getMaxFieldNo(int configId) throws Exception;
     
     List<batchDownloads> getdownloadableBatches(int userId, int orgId, Date fromDate, Date toDate, String searchTerm, int page, int maxResults) throws Exception;
     
@@ -108,5 +108,7 @@ public interface transactionOutDAO {
     batchDownloadSummary getDownloadSummaryDetails(int transactionTargetId);
     
     List <batchDownloads> getAllBatches(Date fromDate, Date toDate, String searchTerm, int page, int maxResults) throws Exception;
+    
+    List<transactionTarget> getTransactionsToProcess(Date fromDate, Date toDate, String searchTerm, int page, int maxResults) throws Exception;
     
 }

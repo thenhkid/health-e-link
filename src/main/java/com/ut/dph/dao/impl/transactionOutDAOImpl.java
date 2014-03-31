@@ -1149,17 +1149,17 @@ public class transactionOutDAOImpl implements transactionOutDAO {
      *
      * @return This function will return the max field number.
      */
-    public int getMaxFieldNo(int configId) {
+    @Override
+    @Transactional
+    public int getMaxFieldNo(int configId) throws Exception {
+        
+        String sql = "select max(fieldNo) as maxFieldNo from configurationFormFields where configId = :configId";
 
         /* Need to make sure no duplicates */
-        Query query = sessionFactory.getCurrentSession().createQuery(""
-                + "select max(fieldNo) as maxFieldNo from configurationFormFields where configId = :configId ");
-
+        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).addScalar("maxFieldNo", StandardBasicTypes.INTEGER);
         query.setParameter("configId", configId);
-
-        int maxFieldNo = (Integer) query.uniqueResult();
-
-        return maxFieldNo;
+        
+        return (Integer) query.list().get(0);
 
     }
 
@@ -1623,6 +1623,47 @@ public class transactionOutDAOImpl implements transactionOutDAO {
         
     }
     
+    
+    /**
+     * The 'getTransactionsToProcess' will return a llist of transactions that need to be processed.
+     * 
+     * @return This methid will return a list of transactionTarget objects
+     */
+    @Override
+    @Transactional
+    public List<transactionTarget> getTransactionsToProcess(Date fromDate, Date toDate, String searchTerm, int page, int maxResults) throws Exception {
+        
+        int firstResult = 0;
+        
+        Criteria transactions = sessionFactory.getCurrentSession().createCriteria(transactionTarget.class);
+        transactions.add(Restrictions.eq("batchDLId", 0));
+        transactions.add(Restrictions.eq("statusId",9));
+        
+        
+        if (fromDate != null && !"".equals(fromDate)) {
+            transactions.add(Restrictions.ge("dateCreated", fromDate));
+        }
+
+        if (toDate != null && !"".equals(toDate)) {
+            transactions.add(Restrictions.lt("dateCreated", toDate));
+        }
+        
+        transactions.addOrder(Order.desc("dateCreated"));
+        
+        if (page > 1) {
+            firstResult = (maxResults * (page - 1));
+        }
+
+        transactions.setFirstResult(firstResult);
+
+        if (maxResults > 0) {
+            //Set the max results to display
+            transactions.setMaxResults(maxResults);
+        }
+        
+        return transactions.list();
+        
+    }
     
 
 }
