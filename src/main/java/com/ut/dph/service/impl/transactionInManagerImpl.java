@@ -543,7 +543,7 @@ public class transactionInManagerImpl implements transactionInManager {
             resetTransactionTranslatedIn(batchUploadId, false);
 
             //clear transactionInError table for batch
-            systemErrorCount = systemErrorCount + clearTransactionInErrors(batchUploadId, false);
+            systemErrorCount = systemErrorCount + clearTransactionInErrors(batchUploadId, true);
 
             List<Integer> configIds = getConfigIdsForBatch(batchUploadId, false);
             for (Integer configId : configIds) {
