@@ -38,7 +38,10 @@ public class batchUploads {
     
     @Transient
     private String transportMethod;
-
+    
+    @Transient
+    private String configName;
+    
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID", nullable = false)
@@ -287,5 +290,13 @@ public class batchUploads {
     public void settransportMethod(String transportMethod) {
         this.transportMethod = transportMethod;
     }
+    
+    public String getConfigName() {
+		return configName;
+	}
+
+	public void setConfigName(String configName) {
+		this.configName = configName;
+	}
 
 }

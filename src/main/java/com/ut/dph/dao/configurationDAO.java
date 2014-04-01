@@ -123,4 +123,6 @@ public interface configurationDAO {
   
   void saveHL7Component(HL7ElementComponents newcomponent);
   
+  String getMessageTypeNameByConfigId (Integer configId);
+  
 }

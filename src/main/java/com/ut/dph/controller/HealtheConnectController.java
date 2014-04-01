@@ -730,6 +730,11 @@ public class HealtheConnectController {
         User userInfo = (User)session.getAttribute("userDetails");
         batchUploads batchInfo = transactionInManager.getBatchDetails(batchId);
         
+        if (batchInfo.getConfigId() != 0) {
+        	batchInfo.setConfigName(configurationManager.getMessageTypeNameByConfigId(batchInfo.getConfigId()));
+        } else {
+        	batchInfo.setConfigName("Multiple Message Types");
+        }
         /**   make sure user has permission to batch 
          * 1. if user uploaded the batch
          * 2. if user has permission to the configs in the batch
@@ -751,31 +756,43 @@ public class HealtheConnectController {
         } else if (transactionInManager.checkPermissionForBatch(userInfo, batchInfo)) {
         	hasPermission = true;
         }
-        
-        //TODO make sure the batch is send to ERG
-        
+         
         if (hasPermission) {
         	/** grab org info**/
         	Organization org = organizationmanager.getOrganizationById(batchInfo.getOrgId());
         	mav.addObject("org", org);
-        	/** grab error info **/
+        	
+        	
+        	/** grab error info  - need to filter this by error type **/
+        	
         	List <TransactionInError> getErrorList = transactionInManager.getErrorList(batchInfo.getId());
         	mav.addObject("getErrorList", getErrorList);       	
         }
         
-        /** check final status - a batch should all be 11,12,13 or 16 to get released **/
-        boolean sendBatch = false;
-        if (userInfo.getdeliverAuthority() && transactionInManager.getRecordCounts(batchId, finalStatusIds, false, false) == 0) {
-        	sendBatch = true;
-        }
         
-                
+        /** buttons **/
+        
+        /** check final status - a batch should all be 11,12,13 or 16 to get released & batch status is PR **/
+        boolean canSend = false;
+        if (userInfo.getdeliverAuthority() && batchInfo.getstatusId() == 5) {
+        	// now we check so we don't have to make a db hit if batch status is not 5 
+        	if (transactionInManager.getRecordCounts(batchId, finalStatusIds, false, false) == 0) {
+        		canSend = true;
+        	}
+        }
+        // check to see if it can be cancelled - 
+        boolean canCancel = false;
+        List<Integer> cancelStatusList = Arrays.asList(21,22,23,1,8);
+        if (userInfo.getcancelAuthority() && !cancelStatusList.contains(batchInfo.getstatusId())) {
+        	canCancel = true;
+        }       
        
         
  
-            //show button
-        	mav.addObject("sendBatch", sendBatch);
-        
+            //buttons
+        	mav.addObject("canSend", canSend);
+        	mav.addObject("canCancel", canCancel);
+        	mav.addObject("canEdit", userInfo.geteditAuthority());
         	mav.addObject("batch", batchInfo);
         	mav.addObject("hasPermission", hasPermission);
             mav.addObject("hasConfigurations", hasConfigurations);

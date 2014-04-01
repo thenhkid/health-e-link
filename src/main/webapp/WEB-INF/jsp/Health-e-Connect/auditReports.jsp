@@ -43,11 +43,11 @@
                         <tr>
                             <th scope="col">Batch Name</th>
                             <th scope="col">File Name</th>
-                            <th scope="col" class="center-text">Total Transactions</th>
-                            <th scope="col" class="center-text">Transactions with Errors</th>
+                            <th scope="col" class="center-text"># of Transactions</th>
+                            <th scope="col" class="center-text"># of Errors</th>
                             <th scope="col" class="center-text">Status</th>
                             <th scope="col" class="center-text">Status Date</th>
-                            <th scope="col" class="center-text">File Submission Date</th>
+                            <th scope="col" class="center-text">Submission Date</th>
                             <th scope="col" class="center-text">View Audit Report</th>
                             <th scope="col"></th>
                         </tr>

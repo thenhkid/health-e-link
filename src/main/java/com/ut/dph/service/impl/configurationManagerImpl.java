@@ -32,7 +32,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Iterator;
 import org.apache.poi.openxml4j.opc.OPCPackage;
-
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -528,4 +527,9 @@ public class configurationManagerImpl implements configurationManager {
     public void saveHL7Component(HL7ElementComponents newcomponent) {
         configurationDAO.saveHL7Component(newcomponent);
     }
+
+	@Override
+	public String getMessageTypeNameByConfigId(Integer configId) {
+		return configurationDAO.getMessageTypeNameByConfigId(configId);		
+	}
 }

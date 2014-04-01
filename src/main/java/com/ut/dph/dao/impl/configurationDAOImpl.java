@@ -10,6 +10,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
+import org.hibernate.type.StandardBasicTypes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +31,7 @@ import com.ut.dph.model.configurationMessageSpecs;
 import com.ut.dph.model.configurationSchedules;
 import com.ut.dph.model.configurationTransport;
 import com.ut.dph.model.messageType;
+
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -1084,5 +1086,23 @@ public class configurationDAOImpl implements configurationDAO {
     public void saveHL7Component(HL7ElementComponents newcomponent) {
         sessionFactory.getCurrentSession().save(newcomponent);
     }
+
+	@Override
+	@Transactional
+	public String getMessageTypeNameByConfigId(Integer configId) {
+		try {
+            String sql = ("select name from messageTypes where id in (select messageTypeId from configurations where id = :configId);");
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).addScalar("name", StandardBasicTypes.STRING);
+            query.setParameter("configId", configId);
+            
+            String mtName = (String) query.list().get(0);
+            
+			return mtName;
+        } catch (Exception ex) {
+            System.err.println("getMessageTypeNameByConfigId " + ex.getCause());
+            ex.printStackTrace();
+            return null;
+        }
+	}
     
 }

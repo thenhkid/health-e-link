@@ -120,5 +120,7 @@ public interface configurationManager {
   void saveHL7Element(HL7Elements newElement);
   
   void saveHL7Component(HL7ElementComponents newcomponent);
+  
+  String getMessageTypeNameByConfigId (Integer configId);
  
 }
