@@ -93,7 +93,7 @@ public class adminProcessingActivity {
     /**
      * The private maxResults variable will hold the number of results to show per list page.
      */
-    private static int maxResults = 30;
+    private static int maxResults = 10;
     
     /**
      * The '/inbound' GET request will serve up the existing list of generated referrals and feedback reports
@@ -1051,12 +1051,14 @@ public class adminProcessingActivity {
                     
                     /* Need to get uploaded Config */
                     batchUploadSummary batchDetails = transactionInManager.getUploadSummaryDetails(transaction.gettransactionInId());
+                    batchUploads batchUploadDetails = transactionInManager.getBatchDetails(batchDetails.getbatchId());
                     
                     Transaction transactionDetails = new Transaction();
                     transactionDetails.settransactionRecordId(transaction.getId());
                     transactionDetails.setstatusId(transaction.getstatusId());
                     transactionDetails.setdateSubmitted(transaction.getdateCreated());
                     transactionDetails.setconfigId(transaction.getconfigId());
+                    transactionDetails.setbatchName(batchUploadDetails.getutBatchName());
 
                     transactionInRecords records = transactionInManager.getTransactionRecords(transaction.gettransactionInId());
 
@@ -1161,12 +1163,14 @@ public class adminProcessingActivity {
                     
                     /* Need to get uploaded Config */
                     batchUploadSummary batchDetails = transactionInManager.getUploadSummaryDetails(transaction.gettransactionInId());
+                    batchUploads batchUploadDetails = transactionInManager.getBatchDetails(batchDetails.getbatchId());
                     
                     Transaction transactionDetails = new Transaction();
                     transactionDetails.settransactionRecordId(transaction.getId());
                     transactionDetails.setstatusId(transaction.getstatusId());
                     transactionDetails.setdateSubmitted(transaction.getdateCreated());
                     transactionDetails.setconfigId(transaction.getconfigId());
+                    transactionDetails.setbatchName(batchUploadDetails.getutBatchName());
 
                     transactionInRecords records = transactionInManager.getTransactionRecords(transaction.gettransactionInId());
 

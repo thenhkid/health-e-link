@@ -59,6 +59,7 @@
                         <thead>
                             <tr>
                                 <th scope="col">Source Organization</th>
+                                <th scope="col">Inbound Batch ID</th>
                                 <th scope="col">Target Organization</th>
                                 <th scope="col">Message Type</th>
                                 <th scope="col" class="center-text">Date Created</th>
@@ -79,6 +80,9 @@
                                                 </dd>
                                                 <c:if test="${not empty transaction.sourceOrgFields[6].fieldValue and transaction.sourceOrgFields[6].fieldValue != 'null'}"><dd>phone: <span class="tel">${transaction.sourceOrgFields[6].fieldValue}</span></dd></c:if>
                                                 <c:if test="${not empty transaction.sourceOrgFields[7].fieldValue and transaction.sourceOrgFields[7].fieldValue != 'null'}"><dd>fax: <span class="tel">${transaction.sourceOrgFields[7].fieldValue}</span></dd></c:if>
+                                            </td>
+                                            <td>
+                                                ${transaction.batchName}
                                             </td>
                                             <td>
                                                 ${transaction.targetOrgFields[0].fieldValue}
