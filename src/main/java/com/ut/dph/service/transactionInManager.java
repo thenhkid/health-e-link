@@ -24,7 +24,9 @@ import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionInRecords;
 import com.ut.dph.model.transactionRecords;
 import com.ut.dph.model.transactionTarget;
+import com.ut.dph.model.custom.ConfigErrorInfo;
 import com.ut.dph.model.custom.ConfigForInsert;
+import com.ut.dph.model.custom.TransErrorDetail;
 import com.ut.dph.model.systemSummary;
 
 import java.util.Date;
@@ -311,4 +313,9 @@ public interface transactionInManager {
     
     List <TransactionInError> getErrorList (Integer batchId);
     
+    List <ConfigErrorInfo> populateErrorListByErrorCode(batchUploads batchInfo, Integer errorCode);
+    
+    ConfigErrorInfo setConfigErrorInfo(Integer batchId, Integer errorCode, ConfigErrorInfo configErrorInfo);
+    
+    List <TransErrorDetail> getTransErrorDetailsForNoRptFields(Integer batchId, List<Integer> errorCodes);
 }

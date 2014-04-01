@@ -23,7 +23,9 @@ import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionInRecords;
 import com.ut.dph.model.transactionRecords;
 import com.ut.dph.model.transactionTarget;
+import com.ut.dph.model.custom.ConfigErrorInfo;
 import com.ut.dph.model.custom.ConfigForInsert;
+import com.ut.dph.model.custom.TransErrorDetail;
 
 import java.util.Date;
 import java.util.List;
@@ -256,4 +258,8 @@ public interface transactionInDAO {
     boolean checkPermissionForBatch (User userInfo, batchUploads batchInfo);
     
     List <TransactionInError> getErrorList (Integer batchId);
+    
+    ConfigErrorInfo setConfigErrorInfo(Integer batchId, Integer errorCode, ConfigErrorInfo configErrorInfo);
+    
+    List <TransErrorDetail> getTransErrorDetailsForNoRptFields(Integer batchId, List<Integer> errorCodes);
 }

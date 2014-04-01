@@ -15,6 +15,7 @@ import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.configuration;
 import com.ut.dph.model.configurationMessageSpecs;
 import com.ut.dph.model.configurationTransport;
+import com.ut.dph.model.custom.ConfigErrorInfo;
 import com.ut.dph.model.lutables.lu_ProcessStatus;
 import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionTarget;
@@ -35,12 +36,15 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -764,6 +768,26 @@ public class HealtheConnectController {
         	
         	
         	/** grab error info  - need to filter this by error type **/
+        	List <ConfigErrorInfo> confErrorList = new LinkedList<ConfigErrorInfo>();
+        	/** if statusId is 29, we only display error code of 5 as that is a system error,
+        	 * admin will need to fix the error so this batch can only be cancel**/
+        	
+        	if (batchInfo.getstatusId() == 29) {
+        		confErrorList = transactionInManager.populateErrorListByErrorCode(batchInfo, 5);      		
+        	} else {
+        		// everything else we can just loop and display by configId
+        		/**
+        		 * 0. errorId 7 & 8 are general batch error and are not tied to specific configs or transactions
+        		 * 1. get configId
+        		 * 2. order by transactionInId, errorId, fieldNo
+        		 * **/
+        		confErrorList = transactionInManager.populateErrorListByErrorCode(batchInfo, 0);
+        		
+        	}
+        	
+        	
+        	
+        	mav.addObject("confErrorList", confErrorList);
         	
         	List <TransactionInError> getErrorList = transactionInManager.getErrorList(batchInfo.getId());
         	mav.addObject("getErrorList", getErrorList);       	

@@ -26,7 +26,9 @@ import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionInRecords;
 import com.ut.dph.model.transactionRecords;
 import com.ut.dph.model.transactionTarget;
+import com.ut.dph.model.custom.ConfigErrorInfo;
 import com.ut.dph.model.custom.ConfigForInsert;
+import com.ut.dph.model.custom.TransErrorDetail;
 import com.ut.dph.model.lutables.lu_ProcessStatus;
 import com.ut.dph.model.messageType;
 import com.ut.dph.service.sysAdminManager;
@@ -3730,6 +3732,37 @@ public class transactionInDAOImpl implements transactionInDAO {
             return null;
         }
         
-    }    
+    }
+
+	@Override
+	public ConfigErrorInfo setConfigErrorInfo(Integer batchId, Integer errorCode, ConfigErrorInfo configErrorInfo) {
+		
+		//depending on errorCode 
+		
+		
+		return configErrorInfo;
+	}  
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	@Transactional
+	public List <TransErrorDetail> getTransErrorDetailsForNoRptFields(Integer batchId, List<Integer> errorCodes) {
+		try  {
+			String sql = "select transactionInErrors.id, errorId as errorCode, displayText as errorDisplayText, stackTrace as errorData  "
+					+ " from transactionInErrors, lu_errorCodes where  transactionInErrors.errorId = lu_errorCodes.id "
+					+ " and transactionInErrors.errorId  in ( :errorCodes ) and batchuploadid = :batchId order by errorId, id;";
+			
+			Query query = sessionFactory.getCurrentSession()
+            		.createSQLQuery(sql).setResultTransformer(
+                            Transformers.aliasToBean(TransErrorDetail.class));
+            query.setParameter("batchId", batchId);
+            query.setParameterList("errorCodes", errorCodes);
+            return query.list();
+		} catch (Exception ex) {
+			System.err.println("getTransErrorDetailsForNoRptFields " + ex.getCause());
+            ex.printStackTrace();  
+		}
+		return null;
+	}
     
 }

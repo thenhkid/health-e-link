@@ -27,7 +27,9 @@ import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionInRecords;
 import com.ut.dph.model.transactionRecords;
 import com.ut.dph.model.transactionTarget;
+import com.ut.dph.model.custom.ConfigErrorInfo;
 import com.ut.dph.model.custom.ConfigForInsert;
+import com.ut.dph.model.custom.TransErrorDetail;
 import com.ut.dph.model.systemSummary;
 import com.ut.dph.reference.fileSystem;
 import com.ut.dph.service.configurationManager;
@@ -55,6 +57,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -1964,5 +1967,73 @@ public class transactionInManagerImpl implements transactionInManager {
     public List<TransactionInError> getErrorList(Integer batchId) {
         return transactionInDAO.getErrorList(batchId);
     }
+    
+    @Override
+	public List<ConfigErrorInfo> populateErrorListByErrorCode(
+			batchUploads batchInfo, Integer errorCode) {
+    	
+    	List <ConfigErrorInfo> confErrorList = new LinkedList<ConfigErrorInfo>();
+    	try {
+    	
+	    	ConfigErrorInfo configErrorInfo = new ConfigErrorInfo();
+	        if (errorCode == 5) {
+		        //system error - these has to be one if batch status is 29
+		        configErrorInfo.setTransErrorDetails(getTransErrorDetailsForNoRptFields(batchInfo.getId(), Arrays.asList(5)));
+		        configErrorInfo.setMessageTypeName("Submission Process Errored");
+		        confErrorList.add(configErrorInfo);      
+			} else {
+				List <TransErrorDetail> tedList = getTransErrorDetailsForNoRptFields(batchInfo.getId(), Arrays.asList(7,8));
+				if (tedList.size() > 0) {
+					configErrorInfo.setTransErrorDetails(tedList);
+			        configErrorInfo.setMessageTypeName("Configuration Errors");
+			        confErrorList.add(configErrorInfo); 
+				}
+		        /** now get invalid configIds, errorId 6 - these are tied to transaction but not reportable fields since we don't know what 
+		         * configId it is.  For these we display the column that holds the info as our reportable field
+		         */
+				
+				
+		        
+		        //now get the rest by configId
+		    }  
+	        
+    	} catch (Exception ex) {
+    		ex.printStackTrace();
+            System.err.println("populateErrorListByErrorCode " + ex.getCause());
+    	}
+		return confErrorList;
+	}
+    
+    @Override
+    public ConfigErrorInfo setConfigErrorInfo(Integer batchId, Integer errorCode, ConfigErrorInfo configErrorInfo) {
+    	try {
+    		
+    		List<Integer> errorCodesWithNoConfigs = Arrays.asList(5,6,7,8,10);
+    		configErrorInfo.setBatchId(batchId);
+    		
+    		if (!errorCodesWithNoConfigs.contains(errorCode)) {
+    			
+    			//we look up info such as batch name etc
+    			/**
+    			 * 1. we get error configIds for this batch
+    			 * 2. we loop 
+    			 * 		A. populate configErrorInfo's header values for config
+    			 * 		B. populate individual transactionError for config
+    			 * **/
+    		} 
+    		
+    	} catch (Exception ex) {
+    		ex.printStackTrace();
+            System.err.println("setConfigErrorInfo " + ex.getCause());
+    	}
+    	
+        return configErrorInfo;
+    }
+    
+    @Override
+    public List <TransErrorDetail> getTransErrorDetailsForNoRptFields(Integer batchId, List<Integer> errorCodes) {
+    	return transactionInDAO.getTransErrorDetailsForNoRptFields(batchId, errorCodes);
+    }
+  
 
 }
