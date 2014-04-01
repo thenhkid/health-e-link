@@ -38,20 +38,13 @@ public class TransactionInError {
     @Column(name = "transactionInId", nullable = true)
     private Integer transactionInId = 0;
 
+    @NoHtml
     @Column(name = "fieldNo", nullable = true)
     private Integer fieldNo = 0;
 
     @NoHtml
     @Column(name = "required", nullable = true)
     private Integer required = 0;
-
-    public Integer getRequired() {
-		return required;
-	}
-
-	public void setRequired(Integer required) {
-		this.required = required;
-	}
 
 	@NoHtml
     @Column(name = "errorId", nullable = true)
@@ -166,5 +159,12 @@ public class TransactionInError {
 		this.dateCreated = dateCreated;
 	}
     
+	public Integer getRequired() {
+		return required;
+	}
+
+	public void setRequired(Integer required) {
+		this.required = required;
+	}
 	
 }
