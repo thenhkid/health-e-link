@@ -516,6 +516,10 @@ public class adminProcessingActivity {
                         List<transactionRecords> toFields;
                         if(!targetInfoFormFields.isEmpty()) {
                             toFields = setOutboundFormFields(targetInfoFormFields, records, 0, true, 0);
+
+                            if("".equals(toFields.get(0).getFieldValue()) || toFields.get(0).getFieldValue() == null) {
+                                toFields = setOrgDetails(transactionInManager.getUploadSummaryDetails(transaction.getId()).gettargetOrgId());
+                            }
                         }
                         else {
                             toFields = setOrgDetails(transactionInManager.getUploadSummaryDetails(transaction.getId()).gettargetOrgId());
@@ -663,6 +667,10 @@ public class adminProcessingActivity {
                     List<transactionRecords> toFields;
                     if(!targetInfoFormFields.isEmpty()) {
                         toFields = setOutboundFormFields(targetInfoFormFields, records, 0, true, 0);
+
+                        if("".equals(toFields.get(0).getFieldValue()) || toFields.get(0).getFieldValue() == null) {
+                            toFields = setOrgDetails(transactionInManager.getUploadSummaryDetails(transaction.getId()).gettargetOrgId());
+                        }
                     }
                     else {
                         toFields = setOrgDetails(transactionInManager.getUploadSummaryDetails(transaction.getId()).gettargetOrgId());
@@ -989,17 +997,17 @@ public class adminProcessingActivity {
     
     
     /**
-     * The '/waiting' GET request will retrieve a list of transactions that are awaiting to be processed.
+     * The '/pending' GET request will retrieve a list of transactions that are waiting to be processed.
      * 
-     * @return The list of awaiting transactions to be processed
+     * @return The list of pending transactions to be processed
      * 
      * @throws Exception
      */
-    @RequestMapping(value="/waiting", method = RequestMethod.GET)
+    @RequestMapping(value="/pending", method = RequestMethod.GET)
     public ModelAndView showWaitingMessages(HttpSession session) throws Exception {
         
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("/administrator/processing-activity/waiting");
+        mav.setViewName("/administrator/processing-activity/pending");
         
         int page = 1;
         
@@ -1015,11 +1023,11 @@ public class adminProcessingActivity {
         /* Retrieve search parameters from session */
         searchParameters searchParameters = (searchParameters)session.getAttribute("searchParameters");
 
-        if("".equals(searchParameters.getsection()) || !"waiting".equals(searchParameters.getsection())) {
+        if("".equals(searchParameters.getsection()) || !"pending".equals(searchParameters.getsection())) {
             searchParameters.setfromDate(fromDate);
             searchParameters.settoDate(toDate);
             searchParameters.setpage(1);
-            searchParameters.setsection("waiting");
+            searchParameters.setsection("pending");
             searchParameters.setsearchTerm("");
         }
         else {
@@ -1102,7 +1110,7 @@ public class adminProcessingActivity {
            mav.addObject("totalPages", totalPages);
        }
         catch (Exception e) {
-            throw new Exception("(Admin) Error occurred viewing the all waiting transactions. Error: "+e.getMessage(),e);
+            throw new Exception("(Admin) Error occurred viewing the all pending transactions. Error: "+e.getMessage(),e);
         }
         
         return mav;
@@ -1110,18 +1118,18 @@ public class adminProcessingActivity {
     }
     
     /**
-     * The '/waiting' POST request will retrieve a list of transactions that are awaiting to be processed based on a 
+     * The '/pending' POST request will retrieve a list of transactions that are awaiting to be processed based on a 
      * search term or date range.
      * 
      * @return The list of awaiting transactions to be processed
      * 
      * @throws Exception
      */
-    @RequestMapping(value="/waiting", method = RequestMethod.POST)
+    @RequestMapping(value="/pending", method = RequestMethod.POST)
     public ModelAndView searchWaitingMessages(@RequestParam(value = "page", required = false) Integer page, @RequestParam String searchTerm, @RequestParam Date fromDate, @RequestParam Date toDate, HttpSession session) throws Exception {
         
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("/administrator/processing-activity/waiting");
+        mav.setViewName("/administrator/processing-activity/pending");
         
         if(page == null || page < 1) {
             page = 1;
@@ -1302,8 +1310,19 @@ public class adminProcessingActivity {
                 transaction.setsourceProviderFields(fromProviderFields);
 
                 /* Set all the transaction TARGET fields */
-                List<transactionRecords> toFields = setOutboundFormFields(targetInfoFormFields, records, transactionInfo.getconfigId(), true, 0);
+                List<transactionRecords> toFields;
+                if(!targetInfoFormFields.isEmpty()) {
+                    toFields = setOutboundFormFields(targetInfoFormFields, records, transactionInfo.getconfigId(), true, 0);
+                    
+                    if("".equals(toFields.get(0).getFieldValue()) || toFields.get(0).getFieldValue() == null) {
+                        toFields = setOrgDetails(transactionInManager.getUploadSummaryDetails(transactionInfo.getId()).gettargetOrgId());
+                    }
+                }
+                else {
+                    toFields = setOrgDetails(transactionInManager.getUploadSummaryDetails(transactionInfo.getId()).gettargetOrgId());
+                }
                 transaction.settargetOrgFields(toFields);
+                
 
                 /* Set all the transaction TARGET PROVIDER fields */
                 List<transactionRecords> toProviderFields = setOutboundFormFields(targetProviderFormFields, records, transactionInfo.getconfigId(), true, 0);
@@ -1356,8 +1375,19 @@ public class adminProcessingActivity {
                 transaction.setsourceProviderFields(fromProviderFields);
 
                 /* Set all the transaction TARGET fields */
-                List<transactionRecords> toFields = setInboxFormFields(targetInfoFormFields, records, transactionInfo.getconfigId(), true, 0);
+                List<transactionRecords> toFields;
+                if(!targetInfoFormFields.isEmpty()) {
+                    toFields = setInboxFormFields(targetInfoFormFields, records, transactionInfo.getconfigId(), true, 0);
+                    
+                    if("".equals(toFields.get(0).getFieldValue()) || toFields.get(0).getFieldValue() == null) {
+                        toFields = setOrgDetails(transactionOutManager.getDownloadSummaryDetails(transactionInfo.getId()).gettargetOrgId());
+                    }
+                }
+                else {
+                    toFields = setOrgDetails(transactionOutManager.getDownloadSummaryDetails(transactionInfo.getId()).gettargetOrgId());
+                }
                 transaction.settargetOrgFields(toFields);
+                
 
                 /* Set all the transaction TARGET PROVIDER fields */
                 List<transactionRecords> toProviderFields = setInboxFormFields(targetProviderFormFields, records, transactionInfo.getconfigId(), true, 0);

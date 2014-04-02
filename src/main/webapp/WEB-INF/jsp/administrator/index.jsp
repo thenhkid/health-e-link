@@ -52,9 +52,9 @@
               
                 <div class="panel-body">
                     <div>
-                        <span class="stat-number"><a href="administrator/processing-activity/waiting" title="Total number of Transactions to process"><fmt:formatNumber value="${summaryDetails.batchesToProcess}" /></a></span>
-                        <h3>Waiting to be Processed</h3>
-                        <a href="administrator/processing-activity/waiting" title="Total number of Transactions to process" class="btn btn-primary btn-small" role="button">View all</a>
+                        <span class="stat-number"><a href="administrator/processing-activity/pending" title="Pending Delivery"><fmt:formatNumber value="${summaryDetails.batchesToProcess}" /></a></span>
+                        <h3>Pending Delivery</h3>
+                        <a href="administrator/processing-activity/pending" title="Pending Delivery" class="btn btn-primary btn-small" role="button">View all</a>
                      </div>
                 </div>
                 

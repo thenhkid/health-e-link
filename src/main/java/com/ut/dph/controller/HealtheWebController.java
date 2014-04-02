@@ -508,7 +508,18 @@ public class HealtheWebController {
             try {
                 List<configurationFormFields> targetInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(),transportDetails.getId(),3);
                 /* Set all the transaction TARGET fields */
-                List<transactionRecords> toFields = setInboxFormFields(targetInfoFormFields, records, transactionInfo.getconfigId(), true, 0);
+                
+                List<transactionRecords> toFields;
+                if(!targetInfoFormFields.isEmpty()) {
+                    toFields = setInboxFormFields(targetInfoFormFields, records, transactionInfo.getconfigId(), true, 0);
+                    
+                    if("".equals(toFields.get(0).getFieldValue()) || toFields.get(0).getFieldValue() == null) {
+                        toFields = setOrgDetails(transactionOutManager.getDownloadSummaryDetails(transactionInfo.getId()).gettargetOrgId());
+                    }
+                }
+                else {
+                    toFields = setOrgDetails(transactionOutManager.getDownloadSummaryDetails(transactionInfo.getId()).gettargetOrgId());
+                }
                 transaction.settargetOrgFields(toFields);
             
             }
@@ -718,8 +729,25 @@ public class HealtheWebController {
                 List<configurationFormFields> targetInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId,transportDetails.getId(),3);
             
                 /* Set all the transaction TARGET fields */
-                List<transactionRecords> toFields = setInboxFormFields(targetInfoFormFields, records, configId, false, transactionDetails.gettransactionInId());
+                List<transactionRecords> toFields;
+                if(!targetInfoFormFields.isEmpty()) {
+                    toFields = setInboxFormFields(targetInfoFormFields, records, configId, false, transactionDetails.gettransactionInId());
+                    
+                    if("".equals(toFields.get(0).getFieldValue()) || toFields.get(0).getFieldValue() == null) {
+                        List<transactionRecords> orgDetailFields = setOrgDetails(transactionOutManager.getDownloadSummaryDetails(transactionDetails.getId()).gettargetOrgId());
+                        
+                        int index = 0;
+                        for(transactionRecords record : toFields) {
+                            record.setFieldValue(orgDetailFields.get(index).getFieldValue());
+                            index++;
+                        }
+                    }
+                }
+                else {
+                    toFields = setOrgDetails(transactionOutManager.getDownloadSummaryDetails(transactionDetails.getId()).gettargetOrgId());
+                }
                 transaction.settargetOrgFields(toFields);
+                
             
             }
             catch (Exception e) {
