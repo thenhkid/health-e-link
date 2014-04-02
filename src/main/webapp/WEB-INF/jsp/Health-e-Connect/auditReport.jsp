@@ -39,7 +39,21 @@
 								</dd>
 							</dl>
 						</div>
-						<div class="col-md-6"></div>
+						<div class="col-md-2 col-md-offset-3"></div>
+
+                    <div class="col-md-4">
+                    <h4 class="form-section-heading">Originating Organization: </h4>
+                                <dl class="vcard">
+                                    <dd class="fn">${org.orgName}</dd>
+                                    <dd class="adr">
+                                        <span class="street-address">${org.address}</span><c:if test="${not empty org.address2}"><span class="street-address"> ${org.address2}</span></c:if><br/>
+                                        <span class="region">${org.city}&nbsp;${org.state}</span>, <span class="postal-code">${org.postalCode}</span>
+                                    </dd>
+                                    <c:if test="${not empty org.phone}"><dd>phone: <span class="tel">${org.phone}</span></dd></c:if>
+                                    <c:if test="${not empty org.fax}"><dd>fax: <span class="tel">${org.fax}</span></dd></c:if>
+                                    </dl>
+                    
+                    </div>
 					</div>
 					
 					
