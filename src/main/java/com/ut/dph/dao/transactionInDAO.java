@@ -262,4 +262,14 @@ public interface transactionInDAO {
     ConfigErrorInfo setConfigErrorInfo(Integer batchId, Integer errorCode, ConfigErrorInfo configErrorInfo);
     
     List <TransErrorDetail> getTransErrorDetailsForNoRptFields(Integer batchId, List<Integer> errorCodes);
+    
+    Integer getCountForErrorId (Integer batchId, Integer errorId);
+    
+    List <TransErrorDetail> getTransErrorDetailsForInvConfig(Integer batchId);
+    
+    List <ConfigErrorInfo> getErrorConfigForBatch(Integer batchId);
+     
+    ConfigErrorInfo getHeaderForConfigErrorInfo(Integer batchId, ConfigErrorInfo configErrorInfo, List<Integer> rptFieldArray );
+    
+    List <TransErrorDetail> getTransErrorDetails(batchUploads batchInfo, ConfigErrorInfo configErrorInfo);
 }

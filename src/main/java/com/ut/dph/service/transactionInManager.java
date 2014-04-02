@@ -315,7 +315,15 @@ public interface transactionInManager {
     
     List <ConfigErrorInfo> populateErrorListByErrorCode(batchUploads batchInfo, Integer errorCode);
     
-    ConfigErrorInfo setConfigErrorInfo(Integer batchId, Integer errorCode, ConfigErrorInfo configErrorInfo);
-    
     List <TransErrorDetail> getTransErrorDetailsForNoRptFields(Integer batchId, List<Integer> errorCodes);
+    
+    Integer getCountForErrorId (Integer batchId, Integer errorId);
+    
+    List <TransErrorDetail> getTransErrorDetailsForInvConfig(Integer batchId);
+    
+    List <ConfigErrorInfo> getErrorConfigForBatch(Integer batchId);
+    
+    ConfigErrorInfo getHeaderForConfigErrorInfo(Integer batchId, ConfigErrorInfo configErrorInfo);
+    
+    List <TransErrorDetail> getTransErrorDetails(batchUploads batchInfo, ConfigErrorInfo configErrorInfo);
 }

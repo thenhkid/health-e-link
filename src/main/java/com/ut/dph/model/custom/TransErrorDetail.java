@@ -12,14 +12,16 @@ package com.ut.dph.model.custom;
  */
 public class TransErrorDetail {
 	
-	private Integer id;
+	private Integer id = 0;
+	
+	private Integer configId = 0;
 	
 	private Integer transactionInId;
 
-	private String rptField1Value = "N/A";
-	private String rptField2Value = "N/A";
-	private String rptField3Value = "N/A";
-	private String rptField4Value = "N/A";
+	private String rptField1Value =" ";
+	private String rptField2Value =" ";
+	private String rptField3Value =" ";
+	private String rptField4Value =" ";
 
 	private Integer errorFieldNo;
 	
@@ -31,7 +33,44 @@ public class TransErrorDetail {
 	private String errorFieldLabel;
 	private String errorData; // from stack trace if error code
 	
+	private Integer validationTypeId;
+	private Integer cwId;
+	private Integer macroId;
+	
 	private Integer transactionStatus;
+
+	
+	public Integer getValidationTypeId() {
+		return validationTypeId;
+	}
+
+	public void setValidationTypeId(Integer validationTypeId) {
+		this.validationTypeId = validationTypeId;
+	}
+
+	public Integer getCwId() {
+		return cwId;
+	}
+
+	public void setCwId(Integer cwId) {
+		this.cwId = cwId;
+	}
+
+	public Integer getMacroId() {
+		return macroId;
+	}
+
+	public void setMacroId(Integer macroId) {
+		this.macroId = macroId;
+	}
+
+	public Integer getConfigId() {
+		return configId;
+	}
+
+	public void setConfigId(Integer configId) {
+		this.configId = configId;
+	}
 
 	public Integer getId() {
 		return id;

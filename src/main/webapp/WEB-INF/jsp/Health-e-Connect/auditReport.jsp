@@ -5,6 +5,7 @@
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 
 <div class="container main-container" role="main">
@@ -40,11 +41,15 @@
 						</div>
 						<div class="col-md-6"></div>
 					</div>
-					<%--
+					
+					
             <div class="row" style="overflow:hidden; margin-bottom:10px;">
                     <div class="col-md-3">
                         <form:form class="form form-inline" id="searchForm" action="/Health-e-Connect/auditReports" method="post">
-                            <div class="form-group">
+                          <input type="hidden" name="transactionInId" id="transactionInId" value=""/>
+                           <!-- <div class="form-group">
+                         	 
+                            
                                 <label class="sr-only" for="searchTerm">Search</label>
                                 <input type="text" name="searchTerm" id="searchTerm" value="${searchTerm}" class="form-control" placeholder="Search"/>
                                 <input type="hidden" name="batchId" id="batchId" value="${batch.id}"/>
@@ -54,6 +59,7 @@
                             <button id="searchBatchesBtn" class="btn btn-primary btn-sm" title="Search Errors">
                                 <span class="glyphicon glyphicon-search"></span>
                             </button>
+                            -->
                         </form:form>
                     </div>
 
@@ -61,7 +67,7 @@
 
                     <div class="col-md-4"></div>
             </div>
-             --%>
+          
 					<div class="form-container scrollable">
 						<c:forEach var="confError" items="${confErrorList}">
 						<div>
@@ -71,20 +77,25 @@
 								<thead>
 									<tr>
 										<%-- not all will have reportable fields --%>
-										
+										<c:if test="${fn:length(confError.rptFieldHeading1) != 0}">
+											<th scope="col">${confError.rptFieldHeading1}</th>
+											<th scope="col">${confError.rptFieldHeading2}</th>
+											<th scope="col">${confError.rptFieldHeading3}</th>
+											<th scope="col">${confError.rptFieldHeading4}</th>
+										</c:if>
 										<th scope="col">Error Code</th>
 										<th scope="col">Error Desc</th>
 										<%-- doesn't apply to system errors --%>
 
 										
 										<%-- doesn't apply to system errors --%>
-										<c:if test="${not empty confError.rptFieldHeadings}">
+										<c:if test="${fn:length(confError.rptFieldHeading1) != 0 && confError.errorId != 6}">
 											<th scope="col">Error Field</th>
 											<th scope="col">Error Value</th>
 											<th scope="col">Go to ERG</th>
 										</c:if>
 										<%-- if system error --%>
-										<c:if test="${empty confError.rptFieldHeadings}">
+										<c:if test="${confError.errorId == 5}">
 											<th scope="col">Error</th>
 										</c:if>
 										
@@ -94,15 +105,22 @@
 								<tbody>
 									<c:forEach var="error" items="${confError.transErrorDetails}">
 										<tr>
-											<td scope="row">${error.errorCode}&nbsp;</td>
-											<td>${error.errorDisplayText}&nbsp;</td>
+											<c:if test="${fn:length(confError.rptFieldHeading1) != 0}">
+													<td>${error.rptField1Value}</td>
+													<td>${error.rptField2Value}</td>
+													<td>${error.rptField3Value}</td>
+													<td>${error.rptField4Value}</td>
+											</c:if>
 											
-											<c:if test="${not empty confError.rptFieldHeadings}">
-												<td>error field</td>
+											<td>${error.errorCode}&nbsp;</td>
+											<td>${error.errorDisplayText}&nbsp; ${error.errorInfo}</td>
+											
+											<c:if test="${fn:length(confError.rptFieldHeading1) != 0 && confError.errorId != 6}">
+												<td>${error.errorFieldLabel}</td>
 												<td>error value</td>
 												<td class="actions-col">&nbsp; 
 												<c:if
-														test="${not empty error.transactionInId && canEdit}">
+														test="${not empty error.transactionInId && canEdit && error.errorCode != 9}">
 														<a href="javascript:void(0);"
 															rel="${error.transactionInId}"
 															class="btn btn-link viewLink"><span
@@ -111,7 +129,7 @@
 												</c:if>
 												</td>
 											</c:if>
-											<c:if test="${empty confError.rptFieldHeadings}">
+											<c:if test="${confError.errorId == 5}">
 												<td>${error.errorData}&nbsp;</td>
 											</c:if>
 										</tr>
@@ -121,41 +139,7 @@
 								</tbody>
 							</table>
 						</c:forEach>
-						<!--  this will be replaced -->
-						<table class="table table-striped table-hover table-default">
-								<thead>
-									<tr>
-										<%-- not all will have reportable fields --%>
-										
-										<th scope="col">Error Code</th>
-										<th scope="col">Error Desc</th>
-										<th scope="col">Error Field</th>
-										<th scope="col">Error Data</th>
-										<th scope="col">ERG</th>
-									</tr>
-									</thead><tbody>
-						<c:forEach var="transError" items="${getErrorList}">
-										<tr>
-											<td scope="row">${transError.errorId}&nbsp;</td>
-											<td>error desc&nbsp;</td>
-											<td>${transError.fieldNo}</td>
-												<td>error value</td>
-												<td class="actions-col">&nbsp; 
-												<c:if
-														test="${not empty transError.transactionInId && canEdit}">
-														<a href="javascript:void(0);"
-															rel="${transError.transactionInId}"
-															class="btn btn-link viewLink"><span
-															class="glyphicon glyphicon-edit"></span>ERG</a>
-												
-												</c:if>
-												</td>
-											
-											
-										</tr>
-									</c:forEach>
-									</tbody>
-						</table>
+						
 						<c:if test="${totalPages > 0}">
 							<ul class="pagination pull-right" role="navigation"
 								aria-labelledby="Paging">

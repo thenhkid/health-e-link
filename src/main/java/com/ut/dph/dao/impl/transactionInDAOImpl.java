@@ -3764,5 +3764,146 @@ public class transactionInDAOImpl implements transactionInDAO {
 		}
 		return null;
 	}
+	
+	@Override
+    @Transactional
+    public Integer getCountForErrorId(Integer batchId, Integer errorId) {
+       
+        String sql = "select count(id) as total from transactionInErrors where batchUploadId = :batchId and errorId = :errorId";
+        
+        try {
+            Query query = sessionFactory
+                    .getCurrentSession()
+                    .createSQLQuery(sql).addScalar("total", StandardBasicTypes.INTEGER);
+
+            query.setParameter("batchId", batchId);
+            query.setParameter("errorId", errorId);
+            
+
+            return (Integer) query.list().get(0);
+        } catch (Exception ex) {
+            System.err.println("getCountForErrorId " + ex.getCause());
+            return null;
+        }
+    }
+	
+	@SuppressWarnings("unchecked")
+	@Override
+    @Transactional
+    public List <TransErrorDetail> getTransErrorDetailsForInvConfig(Integer batchId) {
+		try {
+        	String sql = "select F1 as rptField1Value, F2 as rptField2Value, F3 as rptField3Value, F4 as rptField4Value,"
+        			+ " errorId as errorCode, lu_errorcodes.displayText as errorDisplayText "
+        			+ " from transactionInErrors, transactionInRecords, lu_errorcodes "
+        			+ " where batchuploadId = :batchId and errorId = :errorId and lu_errorcodes.id = transactionInErrors.errorId"
+        			+ " and transactionInErrors.transactionInId = transactionInRecords.transactionInId order  by transactionInRecords.transactionInId;";
+            Query query = sessionFactory
+                    .getCurrentSession()
+                    .createSQLQuery(sql).setResultTransformer(Transformers.aliasToBean(TransErrorDetail.class));
+
+            query.setParameter("batchId", batchId);
+            query.setParameter("errorId", 6);
+            return query.list();
+            
+        } catch (Exception ex) {
+            System.err.println("getTransErrorDetailsForInvConfig " + ex.getCause());
+            return null;
+        }
+    }
+	
+	@Override
+    @Transactional
+    @SuppressWarnings("unchecked")
+    public List <ConfigErrorInfo> getErrorConfigForBatch(Integer batchId) {
+		try {
+        String sql = "select configId, rptField1, rptField2, rptField3, rptField4, configName, name as messageTypeName "
+        		+ " from configurationmessagespecs, configurations, messagetypes"
+        		+ " where configurationmessagespecs.configId = configurations.Id and configurations.messageTypeId = messageTypes.id "
+        		+ " and configId in (select distinct configId from transactionInErrors where batchUploadId = :batchId) "
+        		+ " order by configId;";
+        
+       
+            Query query = sessionFactory
+                    .getCurrentSession()
+                    .createSQLQuery(sql).setResultTransformer(Transformers.aliasToBean(ConfigErrorInfo.class));
+
+            query.setParameter("batchId", batchId);
+            
+            List <ConfigErrorInfo> cei =  query.list();
+            return cei;
+        
+        } catch (Exception ex) {
+            System.err.println("getErrorConfigForBatch " + ex.getCause());
+            ex.printStackTrace();
+            return null;
+        }
+    }
+	
+	@Override
+    @Transactional
+    @SuppressWarnings("unchecked")
+    public ConfigErrorInfo getHeaderForConfigErrorInfo(Integer batchId, ConfigErrorInfo configErrorInfo, List<Integer> rptFieldArray ){
+       
+        String sql = "select fieldLabel from configurationFormFields "
+        		+ " where fieldNo in (:rptFieldArray) and configId = :configId order by field(fieldNo, :rptFieldArray)";
+        
+        try {
+            Query query = sessionFactory
+                    .getCurrentSession()
+                    .createSQLQuery(sql).addScalar("fieldLabel", StandardBasicTypes.STRING);
+
+            query.setParameterList("rptFieldArray", rptFieldArray);
+            query.setParameter("configId", configErrorInfo.getConfigId());
+            
+            
+            List <String> labels = query.list();
+            if (rptFieldArray.get(0) != 0) {
+            	configErrorInfo.setRptFieldHeading1(labels.get(0));
+            }
+            if (rptFieldArray.get(1) != 0) {
+            	configErrorInfo.setRptFieldHeading2(labels.get(1));
+            }
+            if (rptFieldArray.get(2) != 0) {
+            	configErrorInfo.setRptFieldHeading3(labels.get(2));
+            }
+            if (rptFieldArray.get(3) != 0) {
+            	configErrorInfo.setRptFieldHeading4(labels.get(3));
+            }
+            
+            
+            return configErrorInfo;
+        } catch (Exception ex) {
+            System.err.println("getErrorConfigForBatch " + ex.getCause());
+            return null;
+        }
+    }
+	
+	
+	@Override
+    @Transactional
+    @SuppressWarnings("unchecked")
+    public  List <TransErrorDetail> getTransErrorDetails(batchUploads batchInfo, ConfigErrorInfo configErrorInfo) {
+       
+        String sql = "select transactionInErrors.id, configId, transactionInId, errorId as errorCode, "
+        		+ " displayText as errorDisplayText, fieldNo as errorFieldNo,"
+        		+ " cwId, macroId, validationTypeId from transactionInErrors, lu_errorCodes where errorId = lu_errorCodes.id "
+        		+ " and configId = :configId and batchUploadId = :batchId order by errorCode, transactionInId";
+        
+        try {
+            Query query = sessionFactory
+                    .getCurrentSession()
+                    .createSQLQuery(sql).setResultTransformer(Transformers.aliasToBean(TransErrorDetail.class));
+
+            query.setParameter("configId", configErrorInfo.getConfigId());
+            query.setParameter("batchId", batchInfo.getId());
+            
+            List <TransErrorDetail> teds = query.list();
+            return teds;
+        } catch (Exception ex) {
+            System.err.println("getTransErrorDetails " + ex.getCause());
+            ex.printStackTrace();
+            return null;
+        }
+    }
     
 }

@@ -1976,25 +1976,49 @@ public class transactionInManagerImpl implements transactionInManager {
     	try {
     	
 	    	ConfigErrorInfo configErrorInfo = new ConfigErrorInfo();
+	    	configErrorInfo.setBatchId(batchInfo.getId());
 	        if (errorCode == 5) {
 		        //system error - these has to be one if batch status is 29
+	        	configErrorInfo.setErrorId(5);
 		        configErrorInfo.setTransErrorDetails(getTransErrorDetailsForNoRptFields(batchInfo.getId(), Arrays.asList(5)));
 		        configErrorInfo.setMessageTypeName("Submission Process Errored");
 		        confErrorList.add(configErrorInfo);      
 			} else {
-				List <TransErrorDetail> tedList = getTransErrorDetailsForNoRptFields(batchInfo.getId(), Arrays.asList(7,8));
+				List <TransErrorDetail> tedList = getTransErrorDetailsForNoRptFields(batchInfo.getId(), Arrays.asList(7,8,10));
 				if (tedList.size() > 0) {
 					configErrorInfo.setTransErrorDetails(tedList);
 			        configErrorInfo.setMessageTypeName("Configuration Errors");
 			        confErrorList.add(configErrorInfo); 
 				}
 		        /** now get invalid configIds, errorId 6 - these are tied to transaction but not reportable fields since we don't know what 
-		         * configId it is.  For these we display the column that holds the info as our reportable field
+		         * configId it is.  we don't know column that holds the field either since it didn't match with any for org, we display the first
+		         * 4 columns
 		         */
+				configErrorInfo = new ConfigErrorInfo();
+				configErrorInfo.setBatchId(batchInfo.getId());
+				tedList =  getTransErrorDetailsForInvConfig(batchInfo.getId());
+				if (tedList.size() > 0) {
+					//we grab f1-f4 and report off those
+					configErrorInfo.setErrorId(6);
+					configErrorInfo.setMessageTypeName("Configurations Unknown");
+					configErrorInfo.setRptFieldHeading1("Field 1");
+					configErrorInfo.setRptFieldHeading2("Field 2");
+					configErrorInfo.setRptFieldHeading3("Field 3");
+					configErrorInfo.setRptFieldHeading4("Field 4");
+					configErrorInfo.setTransErrorDetails(tedList);
+					confErrorList.add(configErrorInfo);
+				}
+				//now get the rest by configId
+				List <ConfigErrorInfo> confErrorListByConfig = getErrorConfigForBatch(batchInfo.getId());
+				for (ConfigErrorInfo cei : confErrorListByConfig) {
+					//we populate the rest of the info 1. headers
+					configErrorInfo.setBatchId(batchInfo.getId());
+					configErrorInfo = getHeaderForConfigErrorInfo(batchInfo.getId(), cei);
+					//add error details
+					configErrorInfo.setTransErrorDetails(getTransErrorDetails(batchInfo, configErrorInfo));
+				}
+				confErrorList.addAll(confErrorListByConfig);
 				
-				
-		        
-		        //now get the rest by configId
 		    }  
 	        
     	} catch (Exception ex) {
@@ -2003,37 +2027,68 @@ public class transactionInManagerImpl implements transactionInManager {
     	}
 		return confErrorList;
 	}
-    
-    @Override
-    public ConfigErrorInfo setConfigErrorInfo(Integer batchId, Integer errorCode, ConfigErrorInfo configErrorInfo) {
-    	try {
-    		
-    		List<Integer> errorCodesWithNoConfigs = Arrays.asList(5,6,7,8,10);
-    		configErrorInfo.setBatchId(batchId);
-    		
-    		if (!errorCodesWithNoConfigs.contains(errorCode)) {
-    			
-    			//we look up info such as batch name etc
-    			/**
-    			 * 1. we get error configIds for this batch
-    			 * 2. we loop 
-    			 * 		A. populate configErrorInfo's header values for config
-    			 * 		B. populate individual transactionError for config
-    			 * **/
-    		} 
-    		
-    	} catch (Exception ex) {
-    		ex.printStackTrace();
-            System.err.println("setConfigErrorInfo " + ex.getCause());
-    	}
-    	
-        return configErrorInfo;
-    }
-    
+       
     @Override
     public List <TransErrorDetail> getTransErrorDetailsForNoRptFields(Integer batchId, List<Integer> errorCodes) {
     	return transactionInDAO.getTransErrorDetailsForNoRptFields(batchId, errorCodes);
     }
+    
+    @Override
+    public Integer getCountForErrorId(Integer batchId, Integer errorId) {
+    	return transactionInDAO.getCountForErrorId(batchId, errorId);
+    }
+    
+    @Override
+    public List <TransErrorDetail> getTransErrorDetailsForInvConfig(Integer batchId) {
+    	return transactionInDAO.getTransErrorDetailsForInvConfig(batchId);
+    }
   
-
+    @Override
+    public List <ConfigErrorInfo> getErrorConfigForBatch(Integer batchId) {
+    	return transactionInDAO.getErrorConfigForBatch(batchId);
+    }
+    
+    @Override
+    public ConfigErrorInfo getHeaderForConfigErrorInfo(Integer batchId, ConfigErrorInfo configErrorInfo) {
+    	//we create header string
+    	List<Integer> rptFieldArray = Arrays.asList(configErrorInfo.getRptField1(),configErrorInfo.getRptField2(),configErrorInfo.getRptField3(),configErrorInfo.getRptField4());
+    	return transactionInDAO.getHeaderForConfigErrorInfo(batchId, configErrorInfo, rptFieldArray);
+    }
+    
+    @Override
+    public List <TransErrorDetail> getTransErrorDetails(batchUploads batchInfo, ConfigErrorInfo configErrorInfo) {
+    	List <TransErrorDetail> transErrorDetails;
+    	try {
+    		transErrorDetails = transactionInDAO.getTransErrorDetails(batchInfo, configErrorInfo);
+    		for (TransErrorDetail trd : transErrorDetails) {
+    			switch (trd.getErrorCode()) {
+	    			case 2:
+	    				trd.setErrorInfo(messageTypeDAO.getValidationById(trd.getValidationTypeId()));
+	    				break;
+	    			case 3:
+	    				trd.setErrorInfo(messagetypemanager.getCrosswalk(trd.getCwId()).getName());
+	    				break;
+	    			case 4:
+	    				trd.setErrorInfo(configurationManager.getMacroById(trd.getMacroId()).getMacroName());
+	    				break;
+	    			default:
+	    			break;
+    			}
+    				if (trd.getErrorFieldNo() != null)  {
+    					trd.setErrorFieldLabel(configurationtransportmanager.getCFFByFieldNo(configErrorInfo.getConfigId(), trd.getErrorFieldNo()).getFieldLabel());
+    				}
+    			}
+    		
+    		
+    		return transErrorDetails;
+    		
+    	
+    	} catch (Exception ex) {
+    		ex.printStackTrace();
+            System.err.println("getTransErrorDetails " + ex.getCause());
+            return null;
+    	}
+    }
+    
+    
 }

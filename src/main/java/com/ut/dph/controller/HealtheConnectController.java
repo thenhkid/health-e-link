@@ -789,7 +789,8 @@ public class HealtheConnectController {
         	
         	mav.addObject("confErrorList", confErrorList);
         	
-        	List <TransactionInError> getErrorList = transactionInManager.getErrorList(batchInfo.getId());
+        	//List <TransactionInError> getErrorList = transactionInManager.getErrorList(batchInfo.getId());
+        	List <TransactionInError> getErrorList = new LinkedList<TransactionInError>();
         	mav.addObject("getErrorList", getErrorList);       	
         }
         
