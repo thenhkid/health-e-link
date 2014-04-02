@@ -70,14 +70,19 @@
           
 					<div class="form-container scrollable">
 						<c:forEach var="confError" items="${confErrorList}">
+						<c:set var="rptField" value="${fn:trim(confError.rptFieldHeading1)}"/>
 						<div>
 						<h3>${confError.messageTypeName}</h3> 
 						</div>
 							<table class="table table-striped table-hover table-default">
 								<thead>
 									<tr>
+										
 										<%-- not all will have reportable fields --%>
-										<c:if test="${fn:length(confError.rptFieldHeading1) != 0}">
+										<c:if test="${fn:length(rptField) > 0}">
+										<c:if test="${confError.errorId != 6}">
+											<th scope="col">Transaction Status</th>	
+										</c:if>
 											<th scope="col">${confError.rptFieldHeading1}</th>
 											<th scope="col">${confError.rptFieldHeading2}</th>
 											<th scope="col">${confError.rptFieldHeading3}</th>
@@ -89,10 +94,10 @@
 
 										
 										<%-- doesn't apply to system errors --%>
-										<c:if test="${fn:length(confError.rptFieldHeading1) != 0 && confError.errorId != 6}">
+										<c:if test="${fn:length(rptField) > 0 && confError.errorId != 6}">
 											<th scope="col">Error Field</th>
 											<th scope="col">Error Value</th>
-											<th scope="col">Go to ERG</th>
+											<th scope="col">ERG/Reject</th>																					
 										</c:if>
 										<%-- if system error --%>
 										<c:if test="${confError.errorId == 5}">
@@ -104,8 +109,16 @@
 								</thead>
 								<tbody>
 									<c:forEach var="error" items="${confError.transErrorDetails}">
+									
 										<tr>
-											<c:if test="${fn:length(confError.rptFieldHeading1) != 0}">
+										<c:if test="${fn:length(rptField) > 0}">
+											<td>
+											<c:if test="${not empty error.transactionStatus}">
+										<a href="#statusModal"
+										data-toggle="modal" class="btn btn-link viewStatus"
+										rel="${error.transactionStatus}" title="View this Status">${error.transactionStatus}&nbsp;<span
+										class="badge badge-help" data-placement="top" title=""
+										data-original-title="">?</span></a></c:if>&nbsp;</td>
 													<td>${error.rptField1Value}</td>
 													<td>${error.rptField2Value}</td>
 													<td>${error.rptField3Value}</td>
@@ -120,11 +133,15 @@
 												<td>error value</td>
 												<td class="actions-col">&nbsp; 
 												<c:if
-														test="${not empty error.transactionInId && canEdit && error.errorCode != 9}">
+														test="${not empty error.transactionInId && canEdit && error.transactionStatus == 14}">
 														<a href="javascript:void(0);"
 															rel="${error.transactionInId}"
 															class="btn btn-link viewLink"><span
 															class="glyphicon glyphicon-edit"></span>ERG</a>
+														<a href="javascript:void(0);"
+															rel="${error.transactionInId}"
+															class="btn btn-link viewLink"><span
+															class="glyphicon glyphicon-reject"></span>Reject</a>	
 												
 												</c:if>
 												</td>

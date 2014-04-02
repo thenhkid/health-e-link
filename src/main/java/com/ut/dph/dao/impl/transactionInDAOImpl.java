@@ -3884,10 +3884,10 @@ public class transactionInDAOImpl implements transactionInDAO {
     @SuppressWarnings("unchecked")
     public  List <TransErrorDetail> getTransErrorDetails(batchUploads batchInfo, ConfigErrorInfo configErrorInfo) {
        
-        String sql = "select transactionInErrors.id, configId, transactionInId, errorId as errorCode, "
-        		+ " displayText as errorDisplayText, fieldNo as errorFieldNo,"
-        		+ " cwId, macroId, validationTypeId from transactionInErrors, lu_errorCodes where errorId = lu_errorCodes.id "
-        		+ " and configId = :configId and batchUploadId = :batchId order by errorCode, transactionInId";
+        String sql = "select transactionInErrors.id, transactionInErrors.configId, transactionInId, errorId as errorCode, displayText as errorDisplayText, fieldNo as errorFieldNo,"
+        		+ " cwId, macroId, validationTypeId , statusId as transactionStatus from transactionInErrors, lu_errorCodes, transactionIn "
+        		+ " where errorId = lu_errorCodes.id and transactionInErrors.transactionInId = transactionIn.Id and transactionInErrors.configId = :configId "
+        		+ "and batchuploadid = :batchId order by errorCode, transactionInId;";
         
         try {
             Query query = sessionFactory

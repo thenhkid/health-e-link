@@ -1986,6 +1986,7 @@ public class transactionInManagerImpl implements transactionInManager {
 			} else {
 				List <TransErrorDetail> tedList = getTransErrorDetailsForNoRptFields(batchInfo.getId(), Arrays.asList(7,8,10));
 				if (tedList.size() > 0) {
+					configErrorInfo.setErrorId(6);
 					configErrorInfo.setTransErrorDetails(tedList);
 			        configErrorInfo.setMessageTypeName("Configuration Errors");
 			        confErrorList.add(configErrorInfo); 
