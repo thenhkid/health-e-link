@@ -2058,10 +2058,35 @@ public class transactionInManagerImpl implements transactionInManager {
     
     @Override
     public List <TransErrorDetail> getTransErrorDetails(batchUploads batchInfo, ConfigErrorInfo configErrorInfo) {
+    	//get field values
+		String sqlStmt = "";
+    	if (configErrorInfo.getRptField1() !=0) {
+    		sqlStmt = sqlStmt + "F" + configErrorInfo.getRptField1() + " as rptField1Value, ";
+    	} else {
+    		sqlStmt = sqlStmt + "'' as rptField1Value, ";
+    	}
+    	if (configErrorInfo.getRptField2() !=0) {
+    		sqlStmt = sqlStmt + "F" + configErrorInfo.getRptField2() + " as rptField2Value, ";
+    	} else {
+    		sqlStmt = sqlStmt + "'' as rptField2Value, ";
+    	}
+    	if (configErrorInfo.getRptField3() !=0) {
+    		sqlStmt = sqlStmt + "F" + configErrorInfo.getRptField3() + " as rptField3Value, ";
+    	} else {
+    		sqlStmt = sqlStmt + "'' as rptField3Value, ";
+    	}
+    	if (configErrorInfo.getRptField4() !=0) {
+    		sqlStmt = sqlStmt + "F" + configErrorInfo.getRptField4() + " as rptField4Value ";
+    	} else {
+    		sqlStmt = sqlStmt + "'' as rptField4Value ";
+    	}
+    	
+    	
     	List <TransErrorDetail> transErrorDetails;
     	try {
     		transErrorDetails = transactionInDAO.getTransErrorDetails(batchInfo, configErrorInfo);
     		for (TransErrorDetail trd : transErrorDetails) {
+    			String newSQL = "";
     			switch (trd.getErrorCode()) {
 	    			case 2:
 	    				trd.setErrorInfo(messageTypeDAO.getValidationById(trd.getValidationTypeId()));
@@ -2077,7 +2102,9 @@ public class transactionInManagerImpl implements transactionInManager {
     			}
     				if (trd.getErrorFieldNo() != null)  {
     					trd.setErrorFieldLabel(configurationtransportmanager.getCFFByFieldNo(configErrorInfo.getConfigId(), trd.getErrorFieldNo()).getFieldLabel());
+    					newSQL = ", F" + trd.getErrorFieldNo() + " as errorData ";
     				}
+    				trd = getTransErrorData(trd, sqlStmt + newSQL);
     			}
     		
     		
@@ -2091,5 +2118,12 @@ public class transactionInManagerImpl implements transactionInManager {
     	}
     }
     
+    @Override
+    public TransErrorDetail getTransErrorData(TransErrorDetail ted, String sqlStmt) {
+    	//we create header string
+    	return transactionInDAO.getTransErrorData(ted, sqlStmt);
+    	
+    
+    }
     
 }

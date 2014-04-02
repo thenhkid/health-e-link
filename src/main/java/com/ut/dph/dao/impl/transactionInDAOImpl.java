@@ -3905,5 +3905,36 @@ public class transactionInDAOImpl implements transactionInDAO {
             return null;
         }
     }
+	
+	@Override
+    @Transactional
+    @SuppressWarnings("unchecked")
+    public  TransErrorDetail getTransErrorData(TransErrorDetail ted, String sqlStmt) {
+       
+        String sql = "select  " + sqlStmt 
+        		+ " from transactionInRecords where transactionInId =  :transactionInId";
+        
+        try {
+            Query query = sessionFactory
+                    .getCurrentSession()
+                    .createSQLQuery(sql).setResultTransformer(Transformers.aliasToBean(TransErrorDetail.class));
+
+            query.setParameter("transactionInId", ted.getTransactionInId());
+           
+            List <TransErrorDetail> newTed = query.list();
+            ted.setRptField1Value(newTed.get(0).getRptField1Value());
+            ted.setRptField2Value(newTed.get(0).getRptField2Value());
+            ted.setRptField3Value(newTed.get(0).getRptField3Value());
+            ted.setRptField4Value(newTed.get(0).getRptField4Value());
+            ted.setErrorData(newTed.get(0).getErrorData());
+            
+            return ted;
+        } catch (Exception ex) {
+            System.err.println("getTransErrorDetails " + ex.getCause());
+            ex.printStackTrace();
+            return null;
+        }
+        
+    }
     
 }

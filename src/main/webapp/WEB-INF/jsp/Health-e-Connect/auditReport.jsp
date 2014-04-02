@@ -130,7 +130,7 @@
 											
 											<c:if test="${fn:length(confError.rptFieldHeading1) != 0 && confError.errorId != 6}">
 												<td>${error.errorFieldLabel}</td>
-												<td>error value</td>
+												<td>${error.errorData}</td>
 												<td class="actions-col">&nbsp; 
 												<c:if
 														test="${not empty error.transactionInId && canEdit && error.transactionStatus == 14}">

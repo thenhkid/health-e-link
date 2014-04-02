@@ -272,4 +272,6 @@ public interface transactionInDAO {
     ConfigErrorInfo getHeaderForConfigErrorInfo(Integer batchId, ConfigErrorInfo configErrorInfo, List<Integer> rptFieldArray );
     
     List <TransErrorDetail> getTransErrorDetails(batchUploads batchInfo, ConfigErrorInfo configErrorInfo);
+    
+    TransErrorDetail getTransErrorData(TransErrorDetail ted, String sqlStmt);
 }

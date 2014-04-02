@@ -326,4 +326,6 @@ public interface transactionInManager {
     ConfigErrorInfo getHeaderForConfigErrorInfo(Integer batchId, ConfigErrorInfo configErrorInfo);
     
     List <TransErrorDetail> getTransErrorDetails(batchUploads batchInfo, ConfigErrorInfo configErrorInfo);
+    
+    TransErrorDetail getTransErrorData(TransErrorDetail ted, String sqlStmt);
 }
