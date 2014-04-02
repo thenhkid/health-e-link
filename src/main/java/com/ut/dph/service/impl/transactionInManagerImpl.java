@@ -1501,7 +1501,7 @@ public class transactionInManagerImpl implements transactionInManager {
             } else {
                 //1. we get all configs for user - user might not have permission to submit but someone else in org does
             	
-                List<configurationMessageSpecs> configurationMessageSpecs = configurationtransportmanager.getConfigurationMessageSpecsForUserTransport(batch.getuserId(), batch.gettransportMethodId(), false);
+                List<configurationMessageSpecs> configurationMessageSpecs = configurationtransportmanager.getConfigurationMessageSpecsForOrgTransport(batch.getOrgId(), batch.gettransportMethodId(), false);
                 //2. we get all rows for batch
                 List<transactionInRecords> tInRecords = getTransactionInRecordsForBatch(batch.getId());
                 if (tInRecords == null || tInRecords.size() == 0) {
@@ -1533,6 +1533,8 @@ public class transactionInManagerImpl implements transactionInManager {
 
                 // now we looped through config, we flag the invalid records.
                 sysError = flagInvalidConfig(batchId);
+                //we also need to flag and error the ones that a user is not supposed to upload for
+                sysError = flagNoPermissionConfig(batch);
             }
 
             //we populate transactionTranslatedIn
@@ -2123,8 +2125,20 @@ public class transactionInManagerImpl implements transactionInManager {
     public TransErrorDetail getTransErrorData(TransErrorDetail ted, String sqlStmt) {
     	//we create header string
     	return transactionInDAO.getTransErrorData(ted, sqlStmt);
-    	
+    }
     
+    @Override
+    public Integer flagNoPermissionConfig(batchUploads batch) {
+        Integer sysErrors = 0;
+        try {
+            sysErrors = transactionInDAO.insertNoPermissionConfig(batch);
+            sysErrors = sysErrors + transactionInDAO.updateStatusByErrorCode(batch.getId(), 11, 11);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.err.println("flagNoPermissionConfig " + ex.getCause());
+            sysErrors++;
+        }
+        return sysErrors;
     }
     
 }

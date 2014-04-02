@@ -423,4 +423,8 @@ ORDER BY saveToTableName;
 end proc_main$$
 DELIMITER ;
 
+
+/** 04022014 grace 10:30AM **/
+INSERT INTO `universaltranslator`.`lu_ErrorCodes` (`displayText`, `description`) VALUES ('Submitter is not a valid sender', 'User is not a valid sender');
+
   

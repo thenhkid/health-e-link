@@ -274,4 +274,8 @@ public interface transactionInDAO {
     List <TransErrorDetail> getTransErrorDetails(batchUploads batchInfo, ConfigErrorInfo configErrorInfo);
     
     TransErrorDetail getTransErrorData(TransErrorDetail ted, String sqlStmt);
+    
+    Integer insertNoPermissionConfig(batchUploads batch);
+    
+    Integer updateStatusByErrorCode(Integer batchId, Integer errorId, Integer statusId);
 }

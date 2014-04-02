@@ -159,4 +159,9 @@ public class configurationTransportManagerImpl implements configurationTransport
 		return configurationTransportDAO.getCFFByFieldNo(configId, fieldNo);
 	}
 	
+	@Override
+	public List<configurationMessageSpecs> getConfigurationMessageSpecsForOrgTransport(Integer orgId, Integer transportMethodId, boolean getZeroMessageTypeCol) {
+		return configurationTransportDAO.getConfigurationMessageSpecsForOrgTransport(orgId, transportMethodId, getZeroMessageTypeCol);
+	}
+	
 }

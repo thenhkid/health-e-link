@@ -3936,5 +3936,52 @@ public class transactionInDAOImpl implements transactionInDAO {
         }
         
     }
-    
+	
+	    @Override
+	    @Transactional
+	    public Integer insertNoPermissionConfig(batchUploads batch) {
+	        try {
+	            String sql = "insert into transactionInerrors (batchUploadId, transactionInId, errorId, configId) "
+	            		+ " select " + batch.getId() +", id, 11, configId from transactionIn "
+	            				+ " where configId not in (select configId from configurationTransportDetails where configId in "
+	            				+ "(select sourceconfigId from configurationconnectionsenders, configurationconnections where "
+	            				+ " configurationconnectionsenders.connectionId = configurationconnections.id and userId  = :userId) "
+	            				+ "and transportmethodId = :transportmethodId) and batchId = :batchId";
+	            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+	                  query.setParameter("batchId", batch.getId());
+	                  query.setParameter("userId", batch.getuserId());
+	                  query.setParameter("transportmethodId", batch.gettransportMethodId());
+				
+	            query.executeUpdate();
+	            return 0;
+
+	        } catch (Exception ex) {
+	            ex.printStackTrace();
+	            System.err.println("insertNoPermissionConfig " + ex.getCause());
+	            return 1;
+	        }
+
+	    }
+	    
+	    @Override
+	    @Transactional
+	    public Integer updateStatusByErrorCode(Integer batchId, Integer errorId, Integer statusId) {
+	        try {
+	            String sql = "update transactionIn set statusId = :statusId where id in (select transactionInId from transactionInerrors"
+	            		+ " where errorId = :errorId and batchId = :batchId)";
+	            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+	                  query.setParameter("batchId", batchId);
+	                  query.setParameter("errorId", errorId);
+	                  query.setParameter("statusId", statusId);
+				
+	            query.executeUpdate();
+	            return 0;
+
+	        } catch (Exception ex) {
+	            ex.printStackTrace();
+	            System.err.println("updateStatusByErrorCode " + ex.getCause());
+	            return 1;
+	        }
+
+	    }    
 }
