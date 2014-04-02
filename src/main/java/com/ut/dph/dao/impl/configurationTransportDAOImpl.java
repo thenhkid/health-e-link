@@ -454,19 +454,18 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
 	@Override
 	@Transactional
 	@SuppressWarnings("unchecked")
-	public List<configurationMessageSpecs> getConfigurationMessageSpecsForOrgTransport(
-			Integer orgId, Integer transportMethodId, boolean getZeroMessageTypeCol) {
+	public List<configurationMessageSpecs> getConfigurationMessageSpecsForUserTransport(Integer userId, Integer transportMethodId, boolean getZeroMessageTypeCol) {
 		try {
 			
-			String sql = ("select * from configurationMessageSpecs where configId in ("
-					+ "select configId from configurationTransportDetails where configId in (select id from configurations where orgId = :orgId)"
-					+ " and transportmethodId = :transportMethodId)");
+			String sql = ("select * from configurationMessageSpecs where configId in (select configId from configurationTransportDetails where configId in "
+					+ "(select sourceconfigId from configurationconnectionsenders, configurationconnections where configurationconnectionsenders.connectionId = configurationconnections.id"
+					+ " and userId  = :userId) and transportmethodId = :transportMethodId)");
 			if (!getZeroMessageTypeCol) {
 				sql = sql + " and messageTypeCol != 0";
 			}
 	        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
                     Transformers.aliasToBean(configurationMessageSpecs.class));           
-	        query.setParameter("orgId", orgId);
+	        query.setParameter("userId", userId);
 	        query.setParameter("transportMethodId", transportMethodId);
 	        
 	        List <configurationMessageSpecs> configurationMessageSpecs = query.list();
@@ -474,7 +473,7 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
 	        return configurationMessageSpecs;
 	        
 		} catch (Exception ex) {
-			System.err.println("getConfigurationMessageSpecs  " + ex.getCause());
+			System.err.println("getConfigurationMessageSpecsForUserTransport  " + ex.getCause());
 			ex.printStackTrace();
 			
 			return null;

@@ -54,7 +54,10 @@ public interface configurationTransportManager {
     
     List <configurationTransport> getDistinctConfigTransportForOrg(Integer orgId, Integer transportMethodId);
     
-    List<configurationMessageSpecs> getConfigurationMessageSpecsForOrgTransport(Integer orgId, Integer transportMethodId, boolean getZeroMessageTypeCol);
+    List<configurationMessageSpecs> getConfigurationMessageSpecsForUserTransport(Integer userId, Integer transportMethodId, boolean getZeroMessageTypeCol);
     
     configurationFormFields getCFFByFieldNo(int configId, int fieldNo) throws Exception;
+    
+    
+    
 }

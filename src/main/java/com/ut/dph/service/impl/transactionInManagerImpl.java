@@ -1499,8 +1499,9 @@ public class transactionInManagerImpl implements transactionInManager {
                 // we update entire transactionIN with configId
                 sysError = sysError + updateConfigIdForBatch(batch.getId(), batch.getConfigId());
             } else {
-                //1. we get all configs for org
-                List<configurationMessageSpecs> configurationMessageSpecs = configurationtransportmanager.getConfigurationMessageSpecsForOrgTransport(batch.getOrgId(), batch.gettransportMethodId(), false);
+                //1. we get all configs for user - user might not have permission to submit but someone else in org does
+            	
+                List<configurationMessageSpecs> configurationMessageSpecs = configurationtransportmanager.getConfigurationMessageSpecsForUserTransport(batch.getuserId(), batch.gettransportMethodId(), false);
                 //2. we get all rows for batch
                 List<transactionInRecords> tInRecords = getTransactionInRecordsForBatch(batch.getId());
                 if (tInRecords == null || tInRecords.size() == 0) {
