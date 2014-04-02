@@ -766,32 +766,14 @@ public class HealtheConnectController {
         	Organization org = organizationmanager.getOrganizationById(batchInfo.getOrgId());
         	mav.addObject("org", org);
         	
-        	
         	/** grab error info  - need to filter this by error type **/
         	List <ConfigErrorInfo> confErrorList = new LinkedList<ConfigErrorInfo>();
-        	/** if statusId is 29, we only display error code of 5 as that is a system error,
-        	 * admin will need to fix the error so this batch can only be cancel**/
         	
-        	if (batchInfo.getstatusId() == 29) {
-        		confErrorList = transactionInManager.populateErrorListByErrorCode(batchInfo, 5);      		
-        	} else {
-        		// everything else we can just loop and display by configId
-        		/**
-        		 * 0. errorId 7 & 8 are general batch error and are not tied to specific configs or transactions
-        		 * 1. get configId
-        		 * 2. order by transactionInId, errorId, fieldNo
-        		 * **/
+        		confErrorList = transactionInManager.populateErrorListByErrorCode(batchInfo, 5);
         		confErrorList = transactionInManager.populateErrorListByErrorCode(batchInfo, 0);
         		
-        	}
-        	
-        	
-        	
-        	mav.addObject("confErrorList", confErrorList);
-        	
-        	//List <TransactionInError> getErrorList = transactionInManager.getErrorList(batchInfo.getId());
-        	List <TransactionInError> getErrorList = new LinkedList<TransactionInError>();
-        	mav.addObject("getErrorList", getErrorList);       	
+        		mav.addObject("confErrorList", confErrorList);
+        	  	
         }
         
         

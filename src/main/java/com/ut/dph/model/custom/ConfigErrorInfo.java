@@ -18,7 +18,7 @@ public class ConfigErrorInfo {
 	private Integer configId = 0;
 	private String configName;
 	private String messageTypeName;
-	private Integer errorId = 0;
+	private Integer errorViewId = 0;
 	
 	/** labels stays the same for each config **/
 	private List <TransErrorDetail> transErrorDetails;
@@ -82,11 +82,11 @@ public class ConfigErrorInfo {
 		this.rptFieldHeading4 = rptFieldHeading4;
 	}
 	
-	public Integer getErrorId() {
-		return errorId;
+	public Integer getErrorViewId() {
+		return errorViewId;
 	}
-	public void setErrorId(Integer errorId) {
-		this.errorId = errorId;
+	public void setErrorViewId(Integer errorViewId) {
+		this.errorViewId = errorViewId;
 	}
 	public Integer getBatchId() {
 		return batchId;

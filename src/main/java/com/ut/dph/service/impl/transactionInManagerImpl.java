@@ -1980,16 +1980,18 @@ public class transactionInManagerImpl implements transactionInManager {
     	
 	    	ConfigErrorInfo configErrorInfo = new ConfigErrorInfo();
 	    	configErrorInfo.setBatchId(batchInfo.getId());
-	        if (errorCode == 5) {
-		        //system error - these has to be one if batch status is 29
-	        	configErrorInfo.setErrorId(5);
-		        configErrorInfo.setTransErrorDetails(getTransErrorDetailsForNoRptFields(batchInfo.getId(), Arrays.asList(5)));
-		        configErrorInfo.setMessageTypeName("Submission Process Errored");
-		        confErrorList.add(configErrorInfo);      
-			} else {
-				List <TransErrorDetail> tedList = getTransErrorDetailsForNoRptFields(batchInfo.getId(), Arrays.asList(7,8,10));
+	    		
+	    		List <TransErrorDetail> tedList = getTransErrorDetailsForNoRptFields(batchInfo.getId(), Arrays.asList(5));
+	    		if (tedList.size() > 0) {
+	    			configErrorInfo.setErrorViewId(1);
+			        configErrorInfo.setTransErrorDetails(tedList);
+			        configErrorInfo.setMessageTypeName("Submission Process Errored");
+			        confErrorList.add(configErrorInfo);      
+	    		}
+	    		configErrorInfo = new ConfigErrorInfo();
+		        tedList = getTransErrorDetailsForNoRptFields(batchInfo.getId(), Arrays.asList(7,8,10));
 				if (tedList.size() > 0) {
-					configErrorInfo.setErrorId(6);
+					configErrorInfo.setErrorViewId(1);
 					configErrorInfo.setTransErrorDetails(tedList);
 			        configErrorInfo.setMessageTypeName("Configuration Errors");
 			        confErrorList.add(configErrorInfo); 
@@ -2003,7 +2005,7 @@ public class transactionInManagerImpl implements transactionInManager {
 				tedList =  getTransErrorDetailsForInvConfig(batchInfo.getId());
 				if (tedList.size() > 0) {
 					//we grab f1-f4 and report off those
-					configErrorInfo.setErrorId(6);
+					configErrorInfo.setErrorViewId(2);
 					configErrorInfo.setMessageTypeName("Configurations Unknown");
 					configErrorInfo.setRptFieldHeading1("Field 1");
 					configErrorInfo.setRptFieldHeading2("Field 2");
@@ -2022,8 +2024,6 @@ public class transactionInManagerImpl implements transactionInManager {
 					configErrorInfo.setTransErrorDetails(getTransErrorDetails(batchInfo, configErrorInfo));
 				}
 				confErrorList.addAll(confErrorListByConfig);
-				
-		    }  
 	        
     	} catch (Exception ex) {
     		ex.printStackTrace();

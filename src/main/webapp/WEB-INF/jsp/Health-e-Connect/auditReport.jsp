@@ -39,10 +39,14 @@
 								</dd>
 							</dl>
 						</div>
-						<div class="col-md-2 col-md-offset-3"></div>
+						<div class="col-md-2 col-md-offset-3">
+                   
+                    <a href="javascript:void(0);" title="Reject Transactions" class="pull-right btn btn-primary sendBatches"><span class="glyphicon glyphicon-send"></span> Reject Marked Transactions</a> 
+                    <c:if test="${canSend}"></c:if>
+                </div>
 
                     <div class="col-md-4">
-                    <h4 class="form-section-heading">Originating Organization: </h4>
+                    <h4>Originating Organization: </h4>
                                 <dl class="vcard">
                                     <dd class="fn">${org.orgName}</dd>
                                     <dd class="adr">
@@ -59,21 +63,8 @@
 					
             <div class="row" style="overflow:hidden; margin-bottom:10px;">
                     <div class="col-md-3">
-                        <form:form class="form form-inline" id="searchForm" action="/Health-e-Connect/auditReports" method="post">
-                          <input type="hidden" name="transactionInId" id="transactionInId" value=""/>
-                           <!-- <div class="form-group">
-                         	 
-                            
-                                <label class="sr-only" for="searchTerm">Search</label>
-                                <input type="text" name="searchTerm" id="searchTerm" value="${searchTerm}" class="form-control" placeholder="Search"/>
-                                <input type="hidden" name="batchId" id="batchId" value="${batch.id}"/>
-                                <input type="hidden" name="transactionInId" id="transactionInId" value=""/>
-                                <input type="hidden" name="page" id="page" value="${currentPage}" />
-                            </div>
-                            <button id="searchBatchesBtn" class="btn btn-primary btn-sm" title="Search Errors">
-                                <span class="glyphicon glyphicon-search"></span>
-                            </button>
-                            -->
+                        <form:form class="form form-inline" id="searchForm" action="/Health-e-Connect/auditReport" method="post">
+                          	<input type="hidden" name="transactionInId" id="transactionInId" value=""/>
                         </form:form>
                     </div>
 
@@ -91,78 +82,101 @@
 							<table class="table table-striped table-hover table-default">
 								<thead>
 									<tr>
+									<c:choose>
+									
+										<c:when test="${confError.errorViewId == 1}">
+											<th scope="col">Error Code</th>
+											<th scope="col">Error Desc</th>
+											<th scope="col">Error Info</th>
+										</c:when>
 										
-										<%-- not all will have reportable fields --%>
-										<c:if test="${fn:length(rptField) > 0}">
-										<c:if test="${confError.errorId != 6}">
-											<th scope="col">Transaction Status</th>	
-										</c:if>
+										<c:when test="${batch.statusId == 5 && confError.errorViewId != 2}">
+											<th scope="col">Reject?</th>
+											<th scope="col">Transaction Status</th>
 											<th scope="col">${confError.rptFieldHeading1}</th>
 											<th scope="col">${confError.rptFieldHeading2}</th>
 											<th scope="col">${confError.rptFieldHeading3}</th>
 											<th scope="col">${confError.rptFieldHeading4}</th>
-										</c:if>
-										<th scope="col">Error Code</th>
-										<th scope="col">Error Desc</th>
-										<%-- doesn't apply to system errors --%>
-
+											<th scope="col">Error Code</th>
+											<th scope="col">Error Desc</th>
+											<th scope="col">Field Label</th>
+											<th scope="col">Error Data</th>
+											<th scope="col">ERG</th>		
+										</c:when>
 										
-										<%-- doesn't apply to system errors --%>
-										<c:if test="${fn:length(rptField) > 0 && confError.errorId != 6}">
-											<th scope="col">Error Field</th>
-											<th scope="col">Error Value</th>
-											<th scope="col">ERG/Reject</th>																					
-										</c:if>
-										<%-- if system error --%>
-										<c:if test="${confError.errorId == 5}">
-											<th scope="col">Error</th>
-										</c:if>
+										<c:when test="${confError.errorViewId == 2}">
+											<th scope="col">${confError.rptFieldHeading1}</th>
+											<th scope="col">${confError.rptFieldHeading2}</th>
+											<th scope="col">${confError.rptFieldHeading3}</th>
+											<th scope="col">${confError.rptFieldHeading4}</th>
+											<th scope="col">Error Code</th>
+											<th scope="col">Error Desc</th>		
+										</c:when>
 										
-
+										<c:otherwise>
+											<th scope="col">${confError.rptFieldHeading1}</th>
+											<th scope="col">${confError.rptFieldHeading2}</th>
+											<th scope="col">${confError.rptFieldHeading3}</th>
+											<th scope="col">${confError.rptFieldHeading4}</th>
+											<th scope="col">Error Code</th>
+											<th scope="col">Error Desc</th>
+											<th scope="col">Field Label</th>
+											<th scope="col">Error Data</th>
+										</c:otherwise>
+									</c:choose>
 									</tr>
 								</thead>
 								<tbody>
 									<c:forEach var="error" items="${confError.transErrorDetails}">
 									
 										<tr>
-										<c:if test="${fn:length(rptField) > 0}">
-											<td>
-											<c:if test="${not empty error.transactionStatus}">
-										<a href="#statusModal"
-										data-toggle="modal" class="btn btn-link viewStatus"
-										rel="${error.transactionStatus}" title="View this Status">${error.transactionStatus}&nbsp;<span
-										class="badge badge-help" data-placement="top" title=""
-										data-original-title="">?</span></a></c:if>&nbsp;</td>
+											<c:choose>
+												<c:when test="${confError.errorViewId == 1}">
+													<td>${error.errorCode}</td>
+													<td>${error.errorDisplayText}</td>
+													<td>${error.errorData}</td>
+												</c:when>
+												<c:when test="${batch.statusId == 5 && confError.errorViewId != 2}">
+													<td>Reject?</td>
+													<td><a href="#statusModal" data-toggle="modal" class="btn btn-link viewStatus" rel="${error.transactionStatus}" title="View this Status">${error.transactionStatus}&nbsp;
+													<span class="badge badge-help" data-placement="top" title="" data-original-title="">?</span></a></td>
 													<td>${error.rptField1Value}</td>
 													<td>${error.rptField2Value}</td>
 													<td>${error.rptField3Value}</td>
 													<td>${error.rptField4Value}</td>
-											</c:if>
-											
-											<td>${error.errorCode}&nbsp;</td>
-											<td>${error.errorDisplayText}&nbsp; ${error.errorInfo}</td>
-											
-											<c:if test="${fn:length(confError.rptFieldHeading1) != 0 && confError.errorId != 6}">
-												<td>${error.errorFieldLabel}</td>
-												<td>${error.errorData}</td>
-												<td class="actions-col">&nbsp; 
-												<c:if
-														test="${not empty error.transactionInId && canEdit && error.transactionStatus == 14}">
-														<a href="javascript:void(0);"
-															rel="${error.transactionInId}"
-															class="btn btn-link viewLink"><span
-															class="glyphicon glyphicon-edit"></span>ERG</a>
-														<a href="javascript:void(0);"
-															rel="${error.transactionInId}"
-															class="btn btn-link viewLink"><span
-															class="glyphicon glyphicon-reject"></span>Reject</a>	
+													<td>${error.errorCode}</td>
+													<td>${error.errorDisplayText}<c:if test="${not empty error.errorInfo}"> - ${error.errorInfo}</c:if></td>
+													<td>${error.errorFieldLabel}</td>
+													<td>${error.errorData}</td>
+													<td>&nbsp;
+														<c:if test="${not empty error.transactionInId && canEdit && error.transactionStatus == 14 && batch.statusId == 5}">
+															<a href="javascript:void(0);"
+																rel="${error.transactionInId}"
+																class="btn btn-link viewLink"><span
+																class="glyphicon glyphicon-edit"></span>ERG</a>
+														</c:if>
+													</td>
+												</c:when>
+												<c:when test="${confError.errorViewId == 2}">
+													<td>${error.rptField1Value}</td>
+													<td>${error.rptField2Value}</td>
+													<td>${error.rptField3Value}</td>
+													<td>${error.rptField4Value}</td>
+													<td>${error.errorCode}</td>
+													<td>${error.errorDisplayText}</td>
+												</c:when>
 												
-												</c:if>
-												</td>
-											</c:if>
-											<c:if test="${confError.errorId == 5}">
-												<td>${error.errorData}&nbsp;</td>
-											</c:if>
+												<c:otherwise>
+													<td>${error.rptField1Value}</td>
+													<td>${error.rptField2Value}</td>
+													<td>${error.rptField3Value}</td>
+													<td>${error.rptField4Value}</td>
+													<td>${error.errorCode}</td>
+													<td>${error.errorDisplayText} ${error.errorInfo}</td>
+													<td>${error.errorFieldLabel}</td>
+													<td>${error.errorData}</td>
+												</c:otherwise>
+											</c:choose>
 										</tr>
 									</c:forEach>
 									
