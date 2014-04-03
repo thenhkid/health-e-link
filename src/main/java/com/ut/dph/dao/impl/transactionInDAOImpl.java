@@ -3045,7 +3045,7 @@ public class transactionInDAOImpl implements transactionInDAO {
                     + "configurations.orgId, messageTypeId, " + bt.getsourceConfigId() + "," + bt.gettargetConfigId()
                     + " from transactionTranslatedIn, configurations where configurations.id = :targetConfigId"
                     + " and configId = :sourceConfigId and transactionInId in "
-                    + "(select id from transactionIn where configId = :sourceConfigId and batchId = :batchId);");
+                    + "(select id from transactionIn where configId = :sourceConfigId and batchId = :batchId and statusId != 11);");
             Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
             query.setParameter("batchId", batch.getId());
             query.setParameter("targetConfigId", bt.gettargetConfigId());
@@ -3421,7 +3421,7 @@ public class transactionInDAOImpl implements transactionInDAO {
                     + "where configId = " + bt.getsourceConfigId() + " and (f" + bt.getTargetOrgCol() + " = :targetOrgId "
                     + " or f" + bt.getTargetOrgCol() + " = 0 or f" + bt.getTargetOrgCol() + " is null) "
                     + "and transactionInId in (select id from transactionIn where configId = :configId "
-                    + "and batchId = :batchId);");
+                    + "and batchId = :batchId and statusId != 11);");
             Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
             query.setParameter("batchId", batchUpload);
             query.setParameter("targetOrgId", bt.gettargetOrgId());
@@ -3983,5 +3983,5 @@ public class transactionInDAOImpl implements transactionInDAO {
 	            return 1;
 	        }
 
-	    }    
+	    }	    
 }

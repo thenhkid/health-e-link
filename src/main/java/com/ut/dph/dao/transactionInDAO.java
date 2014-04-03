@@ -278,4 +278,5 @@ public interface transactionInDAO {
     Integer insertNoPermissionConfig(batchUploads batch);
     
     Integer updateStatusByErrorCode(Integer batchId, Integer errorId, Integer statusId);
+    
 }
