@@ -792,14 +792,19 @@ public class HealtheConnectController {
         List<Integer> cancelStatusList = Arrays.asList(21,22,23,1,8);
         if (userInfo.getcancelAuthority() && !cancelStatusList.contains(batchInfo.getstatusId())) {
         	canCancel = true;
-        }       
+        } 
+        
+        boolean canEdit = false;
+        if (userInfo.geteditAuthority() && batchInfo.getstatusId() == 5) {
+        	canEdit = true;
+        }
        
         
  
             //buttons
         	mav.addObject("canSend", canSend);
         	mav.addObject("canCancel", canCancel);
-        	mav.addObject("canEdit", userInfo.geteditAuthority());
+        	mav.addObject("canEdit", canEdit );
         	mav.addObject("batch", batchInfo);
         	mav.addObject("hasPermission", hasPermission);
             mav.addObject("hasConfigurations", hasConfigurations);

@@ -39,11 +39,7 @@
 								</dd>
 							</dl>
 						</div>
-						<div class="col-md-2 col-md-offset-3">
-                   
-                    <a href="javascript:void(0);" title="Reject Transactions" class="pull-right btn btn-primary sendBatches"><span class="glyphicon glyphicon-send"></span> Reject Marked Transactions</a> 
-                    <c:if test="${canSend}"></c:if>
-                </div>
+						<div class="col-md-2 col-md-offset-3"></div>
 
                     <div class="col-md-4">
                     <h4>Originating Organization: </h4>
@@ -101,16 +97,7 @@
 											<th scope="col">Error Desc</th>
 											<th scope="col">Field Label</th>
 											<th scope="col">Error Data</th>
-											<th scope="col">ERG</th>		
-										</c:when>
-										
-										<c:when test="${confError.errorViewId == 2}">
-											<th scope="col">${confError.rptFieldHeading1}</th>
-											<th scope="col">${confError.rptFieldHeading2}</th>
-											<th scope="col">${confError.rptFieldHeading3}</th>
-											<th scope="col">${confError.rptFieldHeading4}</th>
-											<th scope="col">Error Code</th>
-											<th scope="col">Error Desc</th>		
+											<th scope="col" class="center-text">ERG</th>		
 										</c:when>
 										
 										<c:otherwise>
@@ -120,26 +107,33 @@
 											<th scope="col">${confError.rptFieldHeading4}</th>
 											<th scope="col">Error Code</th>
 											<th scope="col">Error Desc</th>
-											<th scope="col">Field Label</th>
-											<th scope="col">Error Data</th>
+											<c:if test="${confError.errorViewId == 2}">
+												<th scope="col">Field Label</th>
+												<th scope="col">Error Data</th>
+											</c:if>
 										</c:otherwise>
 									</c:choose>
 									</tr>
 								</thead>
 								<tbody>
+									<c:set var="newTransId" value="0"/>
 									<c:forEach var="error" items="${confError.transErrorDetails}">
 									
 										<tr>
 											<c:choose>
 												<c:when test="${confError.errorViewId == 1}">
-													<td>${error.errorCode}</td>
+													<td class="center-text">${error.errorCode}</td>
 													<td>${error.errorDisplayText}</td>
 													<td>${error.errorData}</td>
 												</c:when>
+												
 												<c:when test="${batch.statusId == 5 && confError.errorViewId != 2}">
-													<td>
-														<c:if test="${not empty error.transactionInId && canEdit && error.transactionStatus == 14 && batch.statusId == 5}">
-															<input type="checkbox" id="transactionInId" name="transactionInId" class="transactionInId" value="${error.transactionInId}" />
+												 	<td class="center-text">
+														<c:if test="${error.transactionInId != newTransId}">
+															<c:set var="newTransId" value="${error.transactionInId}"/> 
+															<c:if test="${not empty error.transactionInId && canEdit && error.transactionStatus == 14}">
+																<input type="checkbox" id="transactionInId" name="transactionInId" class="transactionInId" value="${error.transactionInId}" />
+															</c:if>
 														</c:if>
 													</td>
 													<td><a href="#statusModal" data-toggle="modal" class="btn btn-link viewStatus" rel="${error.transactionStatus}" title="View this Status">${error.transactionStatus}&nbsp;
@@ -148,12 +142,12 @@
 													<td>${error.rptField2Value}</td>
 													<td>${error.rptField3Value}</td>
 													<td>${error.rptField4Value}</td>
-													<td>${error.errorCode}</td>
+													<td class="center-text">${error.errorCode}</td>
 													<td>${error.errorDisplayText}<c:if test="${not empty error.errorInfo}"> - ${error.errorInfo}</c:if></td>
 													<td>${error.errorFieldLabel}</td>
 													<td>${error.errorData}</td>
 													<td>&nbsp;
-														<c:if test="${not empty error.transactionInId && canEdit && error.transactionStatus == 14 && batch.statusId == 5}">
+														<c:if test="${not empty error.transactionInId && canEdit && error.transactionStatus == 14}">
 															<a href="javascript:void(0);"
 																rel="${error.transactionInId}"
 																class="btn btn-link viewLink"><span
@@ -161,24 +155,18 @@
 														</c:if>
 													</td>
 												</c:when>
-												<c:when test="${confError.errorViewId == 2}">
-													<td>${error.rptField1Value}</td>
-													<td>${error.rptField2Value}</td>
-													<td>${error.rptField3Value}</td>
-													<td>${error.rptField4Value}</td>
-													<td>${error.errorCode}</td>
-													<td>${error.errorDisplayText}</td>
-												</c:when>
 												
 												<c:otherwise>
 													<td>${error.rptField1Value}</td>
 													<td>${error.rptField2Value}</td>
 													<td>${error.rptField3Value}</td>
 													<td>${error.rptField4Value}</td>
-													<td>${error.errorCode}</td>
+													<td class="center-text">${error.errorCode}</td>
 													<td>${error.errorDisplayText} ${error.errorInfo}</td>
-													<td>${error.errorFieldLabel}</td>
-													<td>${error.errorData}</td>
+													<c:if test="${confError.errorViewId != 2}">
+														<td>${error.errorFieldLabel}</td>
+														<td>${error.errorData}</td>
+													</c:if>
 												</c:otherwise>
 											</c:choose>
 										</tr>
@@ -208,6 +196,12 @@
 						</c:if>
 					</div>
 					<div>
+					
+					<c:if test="${canEdit || canSend || canCancel}">
+                    	 <input type="button" id="release"
+								class="btn btn-primary btn-action-sm submitMessage"
+								value="Reject Marked Transactions" />
+                    </c:if>
 					<c:if test="${canSend}">
 						<input type="button" id="release"
 								class="btn btn-primary btn-action-sm submitMessage"
