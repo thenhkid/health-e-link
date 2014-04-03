@@ -137,7 +137,11 @@
 													<td>${error.errorData}</td>
 												</c:when>
 												<c:when test="${batch.statusId == 5 && confError.errorViewId != 2}">
-													<td>Reject?</td>
+													<td>
+														<c:if test="${not empty error.transactionInId && canEdit && error.transactionStatus == 14 && batch.statusId == 5}">
+															<input type="checkbox" id="transactionInId" name="transactionInId" class="transactionInId" value="${error.transactionInId}" />
+														</c:if>
+													</td>
 													<td><a href="#statusModal" data-toggle="modal" class="btn btn-link viewStatus" rel="${error.transactionStatus}" title="View this Status">${error.transactionStatus}&nbsp;
 													<span class="badge badge-help" data-placement="top" title="" data-original-title="">?</span></a></td>
 													<td>${error.rptField1Value}</td>
@@ -203,24 +207,21 @@
 							</ul>
 						</c:if>
 					</div>
+					<div>
 					<c:if test="${canSend}">
-						<div>
-							<input type="button" id="release"
+						<input type="button" id="release"
 								class="btn btn-primary btn-action-sm submitMessage"
 								value="Release" />
-						</div>
 					</c:if>
 					<c:if test="${canCancel}">
-						<div>
 							<input type="button" id="cancel"
 								class="btn btn-primary btn-action-sm cancelMessage"
 								value="Do Not Process" />
 							<input type="button" id="reset"
 								class="btn btn-primary btn-action-sm resetMessage"
 								value="Reset" />
-						</div>
-						
 					</c:if>
+					</div>
 				</c:when>
 				<c:otherwise>
                                You do not have permission to view this audit report.  Your request has been logged.

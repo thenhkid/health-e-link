@@ -1579,12 +1579,10 @@ public class transactionInManagerImpl implements transactionInManager {
 
                 //handle duplicates, need to insert again and let it be its own row
                 sysErrors = sysErrors + newEntryForMultiTargets(batchId);
-
-                //update transactionTarget in transactionInTable
-                sysErrors = sysErrors + updateTTIdInTransactionIn(batchId);
-
+                
                 //we reset transactionTranslatedIn
                 resetTransactionTranslatedIn(batchId, true);
+                
             }
             if (sysErrors > 0) {
                 insertProcessingError(processingSysErrorId, null, batchId, null, null, null, null, false, false, errorMessage);
