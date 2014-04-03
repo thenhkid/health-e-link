@@ -32,8 +32,8 @@
                         <tr>
                             <th scope="col">Message Type</th>
                             <th scope="col">Patient Information</th>
-                            <th scope="col">Source Organization</th>
-                            <th scope="col">Target Organization</th>
+                            <th scope="col">Sent To</th>
+                            <th scope="col">Sent By</th>
                             <th scope="col" class="center-text">Status</th>
                             <th scope="col" class="center-text">Date Submitted</th>
                             <th scope="col"></th>
@@ -76,7 +76,7 @@
                                        <td class="center-text">
                                            <a href="#statusModal" data-toggle="modal" class="btn btn-link viewStatus" rel="${transaction.statusId}" title="View this Status">${transaction.statusValue}&nbsp;<span class="badge badge-help" data-placement="top" title="" data-original-title="">?</span></a>
                                        </td>
-                                       <td class="center-text"><fmt:formatDate value="${transaction.dateSubmitted}" type="date" pattern="M/dd/yyyy" /></td>
+                                       <td class="center-text"><fmt:formatDate value="${transaction.dateSubmitted}" type="date" pattern="M/dd/yyyy" /><br /><fmt:formatDate value="${transaction.dateSubmitted}" type="time" pattern="h:mm:ss a" /></td>
                                        <td class="actions-col" style="width:50px;">
                                            <a href="javascript:void(0);" rel="${transaction.transactionRecordId}" rel2="${transaction.configId}" rel3="${userDetails.editAuthority}" rel4="${transaction.statusId}" class="btn btn-link viewLink">
                                             <span class="glyphicon glyphicon-edit"></span>

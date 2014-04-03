@@ -64,7 +64,7 @@
                             <th scope="col">Batch Name</th>
                             <th scope="col" class="center-text">Total Transactions</th>
                             <th scope="col" class="center-text">Status</th>
-                            <th scope="col" class="center-text">Submitted By</th>
+                            <th scope="col">Sent By</th>
                             <th scope="col" class="center-text">Date Received</th>
                             <th scope="col"></th>
                         </tr>
@@ -81,7 +81,9 @@
                                         <td class="center-text">
                                             <a href="#statusModal" data-toggle="modal" class="btn btn-link viewStatus" rel="${batch.statusId}" title="View this Status">${batch.statusValue}&nbsp;<span class="badge badge-help" data-placement="top" title="" data-original-title="">?</span></a>
                                         </td>
-                                        <td class="center-text">${batch.usersName}</td>
+                                        <td>
+                                            ${batch.usersName}
+                                        </td>
                                         <td class="center-text"><fmt:formatDate value="${batch.dateCreated}" type="date" pattern="M/dd/yyyy" /><br /><fmt:formatDate value="${batch.dateCreated}" type="time" pattern="h:mm:ss a" /></td>
                                         <td class="actions-col" style="width:50px;">
                                             <a href="javascript:void(0);" rel="${batch.id}" class="btn btn-link viewLink">

@@ -5,6 +5,10 @@
 --%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+
+
+<c:set var="referralId" value="N/A"/>
 <c:set var="urgencyVal" value="Not Reported" />
 <div class="container main-container" role="main">
     <div class="row">
@@ -41,9 +45,9 @@
                     <thead>
                         <tr>
                             <th scope="col">Message Type</th>
+                            <c:if test="${fromPage == 'inbox'}"><th scope="col">Referral ID</th></c:if>
                             <th scope="col">Patient Information</th>
-                            <th scope="col">Source Organization</th>
-                            <th scope="col">Target Organization</th>
+                            <c:if test="${fromPage != 'inbox'}"><th scope="col">Sent To</th></c:if>
                             <th scope="col" class="center-text">Status</th>
                             <th scope="col" class="center-text">Date Submitted</th>
                             <th scope="col"></th>
@@ -55,6 +59,16 @@
                                 <c:forEach var="transaction" items="${transactions}">
                                     <tr>
                                         <td scope="row">${transaction.messageTypeName}</td>
+                                        <c:if test="${fromPage == 'inbox'}">
+                                            <td>
+                                                <c:forEach begin="0" var="dStatus" end="${transaction.detailFields.size()}">
+                                                    <c:if test="${fn:toLowerCase(transaction.detailFields[dStatus].fieldLabel) == 'referral id'}">
+                                                        <c:set var="referralId" value="${transaction.detailFields[dStatus].fieldValue}"/>
+                                                    </c:if>
+                                                </c:forEach>
+                                                ${referralId}
+                                            </td>
+                                        </c:if>
                                         <td>
                                             ${transaction.patientFields[0].fieldValue}&nbsp;${transaction.patientFields[1].fieldValue}
                                             <dd class="adr">
@@ -63,30 +77,22 @@
                                                 <c:if test="${not empty transaction.patientFields[6].fieldValue and transaction.patientFields[6].fieldValue != 'null'}"><span class="region">${transaction.patientFields[6].fieldValue}&nbsp;${transaction.patientFields[7].fieldValue}</span>,</c:if> <span class="postal-code">${transaction.patientFields[8].fieldValue}</span>
                                             </dd>
                                         </td>
-                                        <td>
-                                            ${transaction.sourceOrgFields[0].fieldValue}
-                                            <dd class="adr">
-                                                <span class="street-address">${transaction.sourceOrgFields[1].fieldValue}</span><br/>
-                                                <c:if test="${not empty transaction.sourceOrgFields[2].fieldValue and transaction.sourceOrgFields[2].fieldValue != 'null'}"><span class="street-address">${transaction.sourceOrgFields[2].fieldValue}</span><br/></c:if>
-                                                <c:if test="${not empty transaction.sourceOrgFields[4].fieldValue and transaction.sourceOrgFields[4].fieldValue != 'null'}"><span class="region">${transaction.sourceOrgFields[3].fieldValue}&nbsp;${transaction.sourceOrgFields[4].fieldValue}</span>,</c:if> <span class="postal-code">${transaction.sourceOrgFields[5].fieldValue}</span>
-                                            </dd>
-                                            <c:if test="${not empty transaction.sourceOrgFields[6].fieldValue and transaction.sourceOrgFields[6].fieldValue != 'null'}"><dd>phone: <span class="tel">${transaction.sourceOrgFields[6].fieldValue}</span></dd></c:if>
-                                            <c:if test="${not empty transaction.sourceOrgFields[7].fieldValue and transaction.sourceOrgFields[7].fieldValue != 'null'}"><dd>fax: <span class="tel">${transaction.sourceOrgFields[7].fieldValue}</span></dd></c:if>
-                                        </td>
-                                        <td>
-                                            ${transaction.targetOrgFields[0].fieldValue}
-                                            <dd class="adr">
-                                                <span class="street-address">${transaction.targetOrgFields[1].fieldValue}</span><br/>
-                                                <c:if test="${not empty transaction.targetOrgFields[2].fieldValue and transaction.targetOrgFields[2].fieldValue != 'null'}"><span class="street-address">${transaction.targetOrgFields[2].fieldValue}</span><br/></c:if>
-                                                <c:if test="${not empty transaction.targetOrgFields[4].fieldValue and transaction.targetOrgFields[4].fieldValue != 'null'}"><span class="region">${transaction.targetOrgFields[3].fieldValue}&nbsp;${transaction.targetOrgFields[4].fieldValue}</span>,</c:if> <span class="postal-code">${transaction.targetOrgFields[5].fieldValue}</span>
-                                            </dd>
-                                            <c:if test="${not empty transaction.targetOrgFields[6].fieldValue and transaction.targetOrgFields[6].fieldValue != 'null'}"><dd>phone: <span class="tel">${transaction.targetOrgFields[6].fieldValue}</span></dd></c:if>
-                                            <c:if test="${not empty transaction.targetOrgFields[7].fieldValue and transaction.targetOrgFields[7].fieldValue != 'null'}"><dd>fax: <span class="tel">${transaction.targetOrgFields[7].fieldValue}</span></dd></c:if>
-                                        </td>
+                                        <c:if test="${fromPage != 'inbox'}">
+                                            <td>
+                                                ${transaction.targetOrgFields[0].fieldValue}
+                                                <dd class="adr">
+                                                    <span class="street-address">${transaction.targetOrgFields[1].fieldValue}</span><br/>
+                                                    <c:if test="${not empty transaction.targetOrgFields[2].fieldValue and transaction.targetOrgFields[2].fieldValue != 'null'}"><span class="street-address">${transaction.targetOrgFields[2].fieldValue}</span><br/></c:if>
+                                                    <c:if test="${not empty transaction.targetOrgFields[4].fieldValue and transaction.targetOrgFields[4].fieldValue != 'null'}"><span class="region">${transaction.targetOrgFields[3].fieldValue}&nbsp;${transaction.targetOrgFields[4].fieldValue}</span>,</c:if> <span class="postal-code">${transaction.targetOrgFields[5].fieldValue}</span>
+                                                </dd>
+                                                <c:if test="${not empty transaction.targetOrgFields[6].fieldValue and transaction.targetOrgFields[6].fieldValue != 'null'}"><dd>phone: <span class="tel">${transaction.targetOrgFields[6].fieldValue}</span></dd></c:if>
+                                                <c:if test="${not empty transaction.targetOrgFields[7].fieldValue and transaction.targetOrgFields[7].fieldValue != 'null'}"><dd>fax: <span class="tel">${transaction.targetOrgFields[7].fieldValue}</span></dd></c:if>
+                                            </td>
+                                       </c:if>
                                        <td class="center-text">
                                            <a href="#statusModal" data-toggle="modal" class="btn btn-link viewStatus" rel="${transaction.statusId}" title="View this Status">${transaction.statusValue}&nbsp;<span class="badge badge-help" data-placement="top" title="" data-original-title="">?</span></a>
                                        </td>
-                                       <td class="center-text"><fmt:formatDate value="${transaction.dateSubmitted}" type="date" pattern="M/dd/yyyy" /></td>
+                                       <td class="center-text"><fmt:formatDate value="${transaction.dateSubmitted}" type="date" pattern="M/dd/yyyy" /><br /><fmt:formatDate value="${transaction.dateSubmitted}" type="time" pattern="h:mm:ss a" /></td>
                                        <td class="actions-col" style="width:50px;">
                                            <a href="javascript:void(0);" rel="${transaction.transactionRecordId}" rel3="${userDetails.editAuthority}" rel2="${transaction.configId}" class="btn btn-link viewLink">
                                             <span class="glyphicon glyphicon-edit"></span>

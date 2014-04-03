@@ -10,6 +10,7 @@ import com.ut.dph.model.Organization;
 import com.ut.dph.model.Provider;
 import com.ut.dph.model.Transaction;
 import com.ut.dph.model.User;
+import com.ut.dph.model.batchDownloadSummary;
 import com.ut.dph.model.batchDownloads;
 import com.ut.dph.model.batchUploadSummary;
 import com.ut.dph.model.batchUploads;
@@ -187,10 +188,25 @@ public class HealtheWebController {
 
                     lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
                     batch.setstatusValue(processStatus.getDisplayCode());
-
-                    User userDetails = usermanager.getUserById(batch.getuserId());
-                    String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
-                    batch.setusersName(usersName);
+                    
+                    /* Get the details of the sender */
+                   batchDownloadSummary downloadSummaryDetails = transactionOutManager.getDownloadSummaryDetails(batchTransactions.get(0).getId());
+                   int senderOrgId = downloadSummaryDetails.getsourceOrgId();
+                   int senderUserId = transactionInManager.getBatchDetails(batchTransactions.get(0).getbatchUploadId()).getuserId();
+                    
+                   Organization orgDetails = organizationmanager.getOrganizationById(senderOrgId);
+                   User userDetails = usermanager.getUserById(senderUserId);
+                   
+                   String senderDetails = new StringBuilder()
+                           .append(orgDetails.getOrgName())
+                           .append("<br />")
+                           .append(orgDetails.getAddress()).append(" ").append(orgDetails.getAddress2())
+                           .append("<br />")
+                           .append(orgDetails.getCity()).append(" ").append(orgDetails.getState()).append(",").append(orgDetails.getPostalCode())
+                           .append("<br />")
+                           .append("(User:").append(" ").append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).append(")").toString();
+                   
+                   batch.setusersName(senderDetails);
                 }
             }
 
@@ -262,9 +278,24 @@ public class HealtheWebController {
                     lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
                     batch.setstatusValue(processStatus.getDisplayCode());
 
-                    User userDetails = usermanager.getUserById(batch.getuserId());
-                    String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
-                    batch.setusersName(usersName);
+                    /* Get the details of the sender */
+                    batchDownloadSummary downloadSummaryDetails = transactionOutManager.getDownloadSummaryDetails(batchTransactions.get(0).getId());
+                    int senderOrgId = downloadSummaryDetails.getsourceOrgId();
+                    int senderUserId = transactionInManager.getBatchDetails(batchTransactions.get(0).getbatchUploadId()).getuserId();
+                    
+                    Organization orgDetails = organizationmanager.getOrganizationById(senderOrgId);
+                    User userDetails = usermanager.getUserById(senderUserId);
+                   
+                    String senderDetails = new StringBuilder()
+                           .append(orgDetails.getOrgName())
+                           .append("<br />")
+                           .append(orgDetails.getAddress()).append(" ").append(orgDetails.getAddress2())
+                           .append("<br />")
+                           .append(orgDetails.getCity()).append(" ").append(orgDetails.getState()).append(",").append(orgDetails.getPostalCode())
+                           .append("<br />")
+                           .append("(User:").append(" ").append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).append(")").toString();
+                   
+                    batch.setusersName(senderDetails);
                 }
             }
 
@@ -1810,12 +1841,7 @@ public class HealtheWebController {
 
                 /* Set all the transaction TARGET fields */
                 List<transactionRecords> toFields;
-                if(!targetInfoFormFields.isEmpty()) {
-                    toFields = setOutboundFormFields(targetInfoFormFields, records, 0, true, 0);
-                }
-                else {
-                    toFields = setOrgDetails(transactionInManager.getUploadSummaryDetails(transaction.getId()).gettargetOrgId());
-                }
+                toFields = setOrgDetails(transactionInManager.getUploadSummaryDetails(transaction.getId()).gettargetOrgId());
                 transactionDetails.settargetOrgFields(toFields);
 
                 /* Set all the transaction PATIENT fields */
@@ -1947,7 +1973,18 @@ public class HealtheWebController {
             transaction.setsourceProviderFields(fromProviderFields);
 
             /* Set all the transaction TARGET fields */
-            List<transactionRecords> toFields = setOutboundFormFields(targetInfoFormFields, records, transactionInfo.getconfigId(), true, 0);
+            List<transactionRecords> toFields;
+            if(!targetInfoFormFields.isEmpty()) {
+                toFields = setOutboundFormFields(targetInfoFormFields, records, transactionInfo.getconfigId(), true, 0);
+
+                if("".equals(toFields.get(0).getFieldValue()) || toFields.get(0).getFieldValue() == null) {
+                    toFields = setOrgDetails(transactionInManager.getUploadSummaryDetails(transactionInfo.getId()).gettargetOrgId());
+                }
+
+            }
+            else {
+                toFields = setOrgDetails(transactionInManager.getUploadSummaryDetails(transactionInfo.getId()).gettargetOrgId());
+            }
             transaction.settargetOrgFields(toFields);
 
             /* Set all the transaction TARGET PROVIDER fields */
@@ -2420,7 +2457,7 @@ public class HealtheWebController {
     }
     
     /**
-     * The '/feedbackReports' GET request will display a list of feedback reports for the selected transaction.
+     * The '/feedbackReports' POST request will display a list of feedback reports for the selected transaction.
      *
      * @param request
      * @param response
@@ -2487,11 +2524,11 @@ public class HealtheWebController {
                     List<configurationFormFields> detailFormFields = configurationTransportManager.getConfigurationFieldsByBucket(inboxFeedbackReport.getconfigId(),transportDetails.getId(),6);
 
                     /* Set all the transaction SOURCE ORG fields */
-                    List<transactionRecords> fromFields = setInboxFormFields(sourceInfoFormFields, records, 0, true, 0);
+                    List<transactionRecords> fromFields = setOrgDetails(transactionOutManager.getDownloadSummaryDetails(transactionDetails.getId()).getsourceOrgId());
                     transaction.setsourceOrgFields(fromFields);
 
                     /* Set all the transaction TARGET fields */
-                    List<transactionRecords> toFields = setInboxFormFields(targetInfoFormFields, records, 0, true, 0);
+                    List<transactionRecords> toFields = setOrgDetails(transactionOutManager.getDownloadSummaryDetails(transactionDetails.getId()).gettargetOrgId());
                     transaction.settargetOrgFields(toFields);
 
                     /* Set all the transaction PATIENT fields */
