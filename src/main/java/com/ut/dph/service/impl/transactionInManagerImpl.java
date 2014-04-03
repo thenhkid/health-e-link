@@ -1832,11 +1832,6 @@ public class transactionInManagerImpl implements transactionInManager {
     }
 
     @Override
-    public Integer updateTTIdInTransactionIn(Integer batchId) {
-        return transactionInDAO.updateTTIdInTransactionIn(batchId);
-    }
-
-    @Override
     @Transactional
     public List<batchUploads> getAllUploadedBatches(Date fromDate, Date toDate, String searchTerm, int page, int maxResults) throws Exception {
         return transactionInDAO.getAllUploadedBatches(fromDate, toDate, searchTerm, page, maxResults);
