@@ -2081,6 +2081,7 @@ public class transactionInManagerImpl implements transactionInManager {
     	List <TransErrorDetail> transErrorDetails;
     	try {
     		transErrorDetails = transactionInDAO.getTransErrorDetails(batchInfo, configErrorInfo);
+    		
     		for (TransErrorDetail trd : transErrorDetails) {
     			String newSQL = "";
     			switch (trd.getErrorCode()) {
@@ -2097,7 +2098,11 @@ public class transactionInManagerImpl implements transactionInManager {
 	    			break;
     			}
     				if (trd.getErrorFieldNo() != null)  {
-    					trd.setErrorFieldLabel(configurationtransportmanager.getCFFByFieldNo(configErrorInfo.getConfigId(), trd.getErrorFieldNo()).getFieldLabel());
+    					if (trd.getErrorCode() == 9) {
+    						trd.setErrorFieldLabel("Target Org");
+    					} else {
+    						trd.setErrorFieldLabel(configurationtransportmanager.getCFFByFieldNo(configErrorInfo.getConfigId(), trd.getErrorFieldNo()).getFieldLabel());
+    					}
     					newSQL = ", F" + trd.getErrorFieldNo() + " as errorData ";
     				}
     				trd = getTransErrorData(trd, sqlStmt + newSQL);

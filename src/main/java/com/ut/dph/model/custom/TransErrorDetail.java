@@ -6,6 +6,10 @@
 
 package com.ut.dph.model.custom;
 
+import java.util.List;
+
+import com.ut.dph.model.TransactionInError;
+
 /**
  * 
  * @author gchan
@@ -38,6 +42,8 @@ public class TransErrorDetail {
 	private Integer macroId;
 	
 	private Integer transactionStatus;
+	
+	private List <TransactionInError> transactionInErrorsList;
 
 	
 	public Integer getValidationTypeId() {
@@ -176,6 +182,13 @@ public class TransErrorDetail {
 		this.transactionStatus = transactionStatus;
 	}
 
-	
+	public List<TransactionInError> getTransactionInErrorsList() {
+		return transactionInErrorsList;
+	}
+
+	public void setTransactionInErrorsList(
+			List<TransactionInError> transactionInErrorsList) {
+		this.transactionInErrorsList = transactionInErrorsList;
+	}
 
 }

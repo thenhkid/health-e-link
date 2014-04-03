@@ -107,7 +107,7 @@
 											<th scope="col">${confError.rptFieldHeading4}</th>
 											<th scope="col">Error Code</th>
 											<th scope="col">Error Desc</th>
-											<c:if test="${confError.errorViewId == 2}">
+											<c:if test="${confError.errorViewId != 2}">
 												<th scope="col">Field Label</th>
 												<th scope="col">Error Data</th>
 											</c:if>
@@ -197,17 +197,17 @@
 					</div>
 					<div>
 					
-					<c:if test="${canEdit || canSend || canCancel}">
+					<c:if test="${canEdit == true}">
                     	 <input type="button" id="release"
 								class="btn btn-primary btn-action-sm submitMessage"
 								value="Reject Marked Transactions" />
                     </c:if>
-					<c:if test="${canSend}">
+					<c:if test="${canSend == true}">
 						<input type="button" id="release"
 								class="btn btn-primary btn-action-sm submitMessage"
 								value="Release" />
 					</c:if>
-					<c:if test="${canCancel}">
+					<c:if test="${canCancel == true}">
 							<input type="button" id="cancel"
 								class="btn btn-primary btn-action-sm cancelMessage"
 								value="Do Not Process" />

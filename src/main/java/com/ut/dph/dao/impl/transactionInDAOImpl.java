@@ -3386,8 +3386,8 @@ public class transactionInDAOImpl implements transactionInDAO {
     public Integer rejectInvalidTargetOrg(Integer batchId, configurationConnection bt) {
         try {
             //error Id 9 - invalid target org
-            String sql = ("insert into transactionInErrors (batchUploadId, configId, transactionInId, errorId)"
-                    + " select " + batchId + ", " + bt.getsourceConfigId() + ", transactionInId, 9 "
+            String sql = ("insert into transactionInErrors (batchUploadId, configId, transactionInId, errorId, fieldNo)"
+                    + " select " + batchId + ", " + bt.getsourceConfigId() + ", transactionInId, 9,  " + bt.getTargetOrgCol()
                     + " from transactionTranslatedIn where configId = :sourceConfigId "
                     + " and transactionInId in (select id from transactionIn where batchId = :batchId)"
                     + " and f" + bt.getTargetOrgCol() + "  not in (select  orgId  from configurationConnections cc, "
@@ -3909,7 +3909,7 @@ public class transactionInDAOImpl implements transactionInDAO {
             
             return ted;
         } catch (Exception ex) {
-            System.err.println("getTransErrorDetails " + ex.getCause());
+            System.err.println("getTransErrorData " + ex.getCause());
             ex.printStackTrace();
             return null;
         }
