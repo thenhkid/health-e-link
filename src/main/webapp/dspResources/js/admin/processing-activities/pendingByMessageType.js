@@ -14,19 +14,19 @@ require(['./main'], function () {
         if ($('.alert').length > 0) {
             $('.alert').delay(2000).fadeOut(1000);
         }
-        
-        //This function will launch the status detail overlay with the selected
-        //status
-        $(document).on('click', '.process', function() {
-            $.ajax({
-                url: 'processTransaction',
-                data:{'transactionId': $(this).attr('rel')},
-                type: "GET",
-                success: function(data) {
-                    window.location.href = "/administrator/processing-activity/waiting?msg=processed";
-                }
-            });
-        });
+       
         
    });
 });
+
+
+function searchByDateRange() {
+   var fromDate = $('.daterange span').attr('rel');
+   var toDate = $('.daterange span').attr('rel2');
+    
+   $('#fromDate').val(fromDate);
+   $('#toDate').val(toDate);
+   
+   $('#searchForm').submit();
+
+}

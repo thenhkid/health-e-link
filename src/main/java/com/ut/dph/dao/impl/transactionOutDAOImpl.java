@@ -276,7 +276,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
         }
 
     }
-    
+
     /**
      * The 'getAllBatches' function will return a list of batches for the admin in the processing activities section.
      *
@@ -351,8 +351,6 @@ public class transactionOutDAOImpl implements transactionOutDAO {
         }
 
     }
-    
-    
 
     /**
      * The 'findInboxBatches' function will take a list of batches and apply the searchTerm to narrow down the results.
@@ -481,12 +479,12 @@ public class transactionOutDAOImpl implements transactionOutDAO {
         return (batchDownloads) sessionFactory.getCurrentSession().get(batchDownloads.class, batchId);
 
     }
-    
+
     /**
      * The 'getBatchDetailsByBatchName' will return a batch by name
-     * 
+     *
      * @param batchName The name of the batch to search form.
-     * 
+     *
      * @return This function will return a batchUpload object
      */
     @Override
@@ -494,11 +492,10 @@ public class transactionOutDAOImpl implements transactionOutDAO {
     public batchDownloads getBatchDetailsByBatchName(String batchName) throws Exception {
         Query query = sessionFactory.getCurrentSession().createQuery("from batchDownloads where utBatchName = :batchName");
         query.setParameter("batchName", batchName);
-        
-        if(query.list().size() > 1) {
+
+        if (query.list().size() > 1) {
             return null;
-        }
-        else {
+        } else {
             return (batchDownloads) query.uniqueResult();
         }
 
@@ -515,10 +512,10 @@ public class transactionOutDAOImpl implements transactionOutDAO {
     @Override
     @Transactional
     public List<transactionTarget> getInboxBatchTransactions(int batchId, int userId) throws Exception {
-        
+
         List<Integer> transactionTargetList = new ArrayList<Integer>();
-        
-        if(userId > 0) {
+
+        if (userId > 0) {
             /* Get a list of connections the user has access to */
             Criteria connections = sessionFactory.getCurrentSession().createCriteria(configurationConnectionReceivers.class);
             connections.add(Restrictions.eq("userId", userId));
@@ -572,9 +569,8 @@ public class transactionOutDAOImpl implements transactionOutDAO {
                 }
 
             }
-        }
-        else {
-             /* Get a list of available batches */
+        } else {
+            /* Get a list of available batches */
             Criteria batchSummaries = sessionFactory.getCurrentSession().createCriteria(batchDownloadSummary.class);
             batchSummaries.add(Restrictions.eq("batchId", batchId));
             List<batchDownloadSummary> batchDownloadSummaryList = batchSummaries.list();
@@ -933,39 +929,39 @@ public class transactionOutDAOImpl implements transactionOutDAO {
             String sql;
             sql = "insert into transactionTranslatedOut (transactionTargetId, configId, ";
             for (configurationFormFields formField : formFields) {
-            	if(!formField.getsaveToTableName().equalsIgnoreCase("")) {
-            		sql += "f" + formField.getFieldNo() + ",";
-            	}
+                if (!formField.getsaveToTableName().equalsIgnoreCase("")) {
+                    sql += "f" + formField.getFieldNo() + ",";
+                }
             }
-            
-            sql = sql.substring(0,sql.length()-1);
-            
+
+            sql = sql.substring(0, sql.length() - 1);
+
             sql += ") ";
 
             sql += "VALUES( :transactionTargetId, :configId, ";
 
             String dataSQL;
             for (configurationFormFields formField : formFields) {
-            	if(!formField.getsaveToTableName().equalsIgnoreCase("")) {
-            		dataSQL = "SELECT " + formField.getsaveToTableCol() + " from " + formField.getsaveToTableName()
-                        + " WHERE transactionInId = :transactionInId";
+                if (!formField.getsaveToTableName().equalsIgnoreCase("")) {
+                    dataSQL = "SELECT " + formField.getsaveToTableCol() + " from " + formField.getsaveToTableName()
+                            + " WHERE transactionInId = :transactionInId";
 
-            		Query getData = sessionFactory.getCurrentSession().createSQLQuery(dataSQL)
-                        .setParameter("transactionInId", transactionInId);
+                    Query getData = sessionFactory.getCurrentSession().createSQLQuery(dataSQL)
+                            .setParameter("transactionInId", transactionInId);
 
-	                /* if no result is found then we need to look at the main transactionTranslatedIn table 
-	                 for the value only if pass through errors is set
-	                 */
-	                if (getData.uniqueResult() == null) {
-	                    sql += null + ",";
-	                } else {
-	                	sql += "'" + getData.uniqueResult() + "',";
-	                }
-            	} 
+                    /* if no result is found then we need to look at the main transactionTranslatedIn table 
+                     for the value only if pass through errors is set
+                     */
+                    if (getData.uniqueResult() == null) {
+                        sql += null + ",";
+                    } else {
+                        sql += "'" + getData.uniqueResult() + "',";
+                    }
+                }
             }
-            
+
             //remove last comma
-            sql = sql.substring(0,sql.length()-1);
+            sql = sql.substring(0, sql.length() - 1);
             sql += ") ";
 
             Query insertData = sessionFactory.getCurrentSession().createSQLQuery(sql)
@@ -1152,13 +1148,13 @@ public class transactionOutDAOImpl implements transactionOutDAO {
     @Override
     @Transactional
     public int getMaxFieldNo(int configId) throws Exception {
-        
+
         String sql = "select max(fieldNo) as maxFieldNo from configurationFormFields where configId = :configId";
 
         /* Need to make sure no duplicates */
         Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).addScalar("maxFieldNo", StandardBasicTypes.INTEGER);
         query.setParameter("configId", configId);
-        
+
         return (Integer) query.list().get(0);
 
     }
@@ -1602,53 +1598,128 @@ public class transactionOutDAOImpl implements transactionOutDAO {
         }
 
     }
-    
+
     /**
-     * The 'getDownloadSummaryDetails' method will return the details for the batch summary
-     * for the passed in transactionTargetId.
-     * 
+     * The 'getDownloadSummaryDetails' method will return the details for the batch summary for the passed in transactionTargetId.
+     *
      * @param transactionTargetId The id of the transaction to search the summary for
-     * 
-     * @return This method will return the batchDownloadSummary object 
+     *
+     * @return This method will return the batchDownloadSummary object
      */
     @Override
     @Transactional
     public batchDownloadSummary getDownloadSummaryDetails(int transactionTargetId) {
-        
+
         /* Get a list of available batches */
         Criteria batchSummaries = sessionFactory.getCurrentSession().createCriteria(batchDownloadSummary.class);
         batchSummaries.add(Restrictions.eq("transactionTargetId", transactionTargetId));
-        
+
         return (batchDownloadSummary) batchSummaries.uniqueResult();
-        
+
     }
-    
-    
+
     /**
      * The 'getTransactionsToProcess' will return a llist of transactions that need to be processed.
-     * 
-     * @return This methid will return a list of transactionTarget objects
+     *
+     * @return This methid will return a list
      */
     @Override
     @Transactional
-    public List<transactionTarget> getTransactionsToProcess(Date fromDate, Date toDate, String searchTerm, int page, int maxResults) throws Exception {
+    public List getTransactionsToProcess(int page, int maxResults) throws Exception {
+
+        int firstResult = 0;
+
+        String SQL = "SELECT c.orgId, count(tt.id) as total\n"
+                + "FROM transactionTarget tt inner join configurations c on c.id = tt.configId\n"
+                + "where tt.batchDLId = 0 and tt.statusID = 9\n"
+                + "Group by c.orgId\n"
+                + "Order by total desc";
+        
+        Query transactions = sessionFactory.getCurrentSession().createSQLQuery(SQL);
+       
+        if (page > 1) {
+            firstResult = (maxResults * (page - 1));
+        }
+        transactions.setFirstResult(firstResult);
+
+        if (maxResults > 0) {
+            //Set the max results to display
+            transactions.setMaxResults(maxResults);
+        }
+
+        return transactions.list();
+
+    }
+    
+    /**
+     * The 'getTransactionsToProcessByMessageType' will return a llist of transactions that need to be processed grouped by
+     * message type.
+     *
+     * @return This methid will return a list
+     */
+    @Override
+    @Transactional
+    public List getTransactionsToProcessByMessageType(int orgId, int page, int maxResults) throws Exception {
+
+        int firstResult = 0;
+
+        String SQL = "SELECT c.orgId, m.name, c.messageTypeId, count(tt.id) as total\n"
+                + "FROM transactionTarget tt inner join configurations c on c.id = tt.configId inner join messagetypes m on m.id = c.messageTypeId\n"
+                + "where tt.batchDLId = 0 and tt.statusID = 9 and c.orgId = "+ orgId + "\n"
+                + "Group by c.messageTypeId\n"
+                + "Order by total desc";
+        
+        Query transactions = sessionFactory.getCurrentSession().createSQLQuery(SQL);
+       
+        if (page > 1) {
+            firstResult = (maxResults * (page - 1));
+        }
+
+        transactions.setFirstResult(firstResult);
+
+        if (maxResults > 0) {
+            //Set the max results to display
+            transactions.setMaxResults(maxResults);
+        }
+
+        return transactions.list();
+
+    }
+    
+    /**
+     * The 'getPendingTransactions' method will return all pending target transactions based on the org and message type
+     * passed in.
+     * 
+     * @param orgId         The id of the organzition to return pending transactions
+     * @param messageType   The id of the message type to return pending transactions
+     * 
+     * @return This function will return a list of transactionTargets
+     */
+    @Override
+    @Transactional
+    public List<transactionTarget> getPendingDeliveryTransactions(int orgId, int messageType, int page, int maxResults) throws Exception {
         
         int firstResult = 0;
         
+        List<Integer> configIds = new ArrayList<Integer>();
+        
+        Criteria listConfigs = sessionFactory.getCurrentSession().createCriteria(configuration.class);
+        listConfigs.add(Restrictions.eq("orgId", orgId));
+        listConfigs.add(Restrictions.eq("messageTypeId", messageType));
+        
+        List<configuration> configs = listConfigs.list();
+        
+        for(configuration config : configs) {
+            
+            if(!configIds.contains(config.getId())) {
+                configIds.add(config.getId());
+            }
+        }
+        
         Criteria transactions = sessionFactory.getCurrentSession().createCriteria(transactionTarget.class);
+        transactions.add(Restrictions.in("configId", configIds));
+        transactions.add(Restrictions.eq("statusId", 9));
         transactions.add(Restrictions.eq("batchDLId", 0));
-        transactions.add(Restrictions.eq("statusId",9));
-        
-        
-        if (fromDate != null && !"".equals(fromDate)) {
-            transactions.add(Restrictions.ge("dateCreated", fromDate));
-        }
-
-        if (toDate != null && !"".equals(toDate)) {
-            transactions.add(Restrictions.lt("dateCreated", toDate));
-        }
-        
-        transactions.addOrder(Order.desc("dateCreated"));
         
         if (page > 1) {
             firstResult = (maxResults * (page - 1));
@@ -1661,9 +1732,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
             transactions.setMaxResults(maxResults);
         }
         
-        return transactions.list();
-        
+        return transactions.list(); 
     }
-    
 
 }

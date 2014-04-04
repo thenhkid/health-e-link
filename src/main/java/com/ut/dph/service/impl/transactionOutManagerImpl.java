@@ -1447,7 +1447,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
 
         try {
 
-            Integer transactionsToProcess = transactionOutDAO.getTransactionsToProcess(null,null,"",1,0).size();
+            Integer transactionsToProcess = transactionOutDAO.getTransactionsToProcess(1,0).size();
 
             systemSummary.setbatchesToProcess(transactionsToProcess);
 
@@ -1505,9 +1505,19 @@ public class transactionOutManagerImpl implements transactionOutManager {
     
     @Override
     @Transactional
-    public List<transactionTarget> getTransactionsToProcess(Date fromDate, Date toDate, String searchTerm, int page, int maxResults) throws Exception {
-        return transactionOutDAO.getTransactionsToProcess(fromDate, toDate, searchTerm, page, maxResults);
+    public List getTransactionsToProcess(int page, int maxResults) throws Exception {
+        return transactionOutDAO.getTransactionsToProcess(page, maxResults);
     }
     
+    @Override
+    @Transactional
+    public List getTransactionsToProcessByMessageType(int orgId, int page, int maxResults) throws Exception {
+        return transactionOutDAO.getTransactionsToProcessByMessageType(orgId, page, maxResults);
+    }
 
+    @Override
+    @Transactional
+    public List<transactionTarget> getPendingDeliveryTransactions(int orgId, int messageType, int page, int maxResults) throws Exception {
+        return transactionOutDAO.getPendingDeliveryTransactions(orgId, messageType, page, maxResults);
+    }
 }

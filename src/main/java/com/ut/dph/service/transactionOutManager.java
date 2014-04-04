@@ -97,7 +97,11 @@ public interface transactionOutManager {
     
     systemSummary generateSystemWaitingSummary();
     
-    List<transactionTarget> getTransactionsToProcess(Date fromDate, Date toDate, String searchTerm, int page, int maxResults) throws Exception;
+    List getTransactionsToProcess(int page, int maxResults) throws Exception;
     
     int processManualTransaction(transactionTarget transaction) throws Exception;
+    
+    List getTransactionsToProcessByMessageType(int orgId, int page, int maxResults) throws Exception;
+    
+    List<transactionTarget> getPendingDeliveryTransactions(int orgId, int messageType, int page, int maxResults) throws Exception;
 }

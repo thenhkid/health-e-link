@@ -13,18 +13,6 @@
             </div>
         </div>
     </c:if>
-    <div class="row-fluid">
-        <div class="col-md-12">
-            <section class="panel panel-default">
-                <div class="panel-body">
-                    <dt>
-                        <dt>System Summary:</dt>
-                        <dd><strong>Total Transactions to be Processed:</strong> <fmt:formatNumber value="${summaryDetails.batchesToProcess}" /></dd>
-                    </dt>
-                </div>
-            </section>
-        </div>
-    </div>
     <div class="col-md-12">
          <section class="panel panel-default">
             <div class="panel-body">
@@ -51,6 +39,7 @@
                         <thead>
                             <tr>
                                 <th scope="col">Target Organization</th>
+                                <th scope="col">Message Type</th>
                                 <th scope="col" class="center-text">Total Pending Deliveries</th>
                                 <th scope="col"></th>
                             </tr>
@@ -62,16 +51,19 @@
                                         <tr  style="cursor: pointer">
                                             <td scope="row">
                                                 ${transaction.orgDetails}
-                                             </td>
+                                            </td>
+                                            <td>
+                                                ${transaction.messageType}
+                                            </td>
                                             <td class="center-text">
                                                 ${transaction.totalPending}
                                             </td>
                                              <td class="actions-col">
-                                                <a href="pending/${transaction.orgId}" class="btn btn-link" title="View Transactions" role="button">
+                                                <a href="${transaction.orgId}/${transaction.messageTypeId}" class="btn btn-link" title="View Transactions" role="button">
                                                     <span class="glyphicon glyphicon-edit"></span>
                                                     View
                                                 </a>
-                                                <a href="javascript:void(0);" class="btn btn-link processAll" rel="${transaction.orgId}" title="Process All" role="button">
+                                                <a href="javascript:void(0);" class="btn btn-link processAll" rel="${transaction.orgId}" rel2="${transaction.messageTypeId}" title="Process All" role="button">
                                                     <span class="glyphicon glyphicon-edit"></span>
                                                     Process All
                                                 </a>
