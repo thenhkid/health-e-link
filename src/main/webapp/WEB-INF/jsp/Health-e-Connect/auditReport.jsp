@@ -97,7 +97,7 @@
 											<th scope="col">Error Desc</th>
 											<th scope="col">Field Label</th>
 											<th scope="col">Error Data</th>
-											<th scope="col" class="center-text">ERG</th>		
+											<th scope="col" class="center-text">&nbsp;</th>		
 										</c:when>
 										
 										<c:otherwise>
@@ -130,7 +130,6 @@
 												<c:when test="${batch.statusId == 5 && confError.errorViewId != 2}">
 												 	<td class="center-text">
 														<c:if test="${error.transactionInId != newTransId}">
-															<c:set var="newTransId" value="${error.transactionInId}"/> 
 															<c:if test="${not empty error.transactionInId && canEdit && error.transactionStatus == 14}">
 																<input type="checkbox" id="transactionInId" name="transactionInId" class="transactionInId" value="${error.transactionInId}" />
 															</c:if>
@@ -147,12 +146,14 @@
 													<td>${error.errorFieldLabel}</td>
 													<td>${error.errorData}</td>
 													<td>&nbsp;
+													<c:if test="${error.transactionInId != newTransId}">
 														<c:if test="${not empty error.transactionInId && canEdit && error.transactionStatus == 14}">
 															<a href="javascript:void(0);"
 																rel="${error.transactionInId}"
 																class="btn btn-link viewLink"><span
 																class="glyphicon glyphicon-edit"></span>ERG</a>
 														</c:if>
+													</c:if>
 													</td>
 												</c:when>
 												
@@ -170,6 +171,7 @@
 												</c:otherwise>
 											</c:choose>
 										</tr>
+										<c:set var="newTransId" value="${error.transactionInId}"/> 
 									</c:forEach>
 									
 

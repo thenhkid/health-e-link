@@ -43,9 +43,6 @@ public class TransErrorDetail {
 	
 	private Integer transactionStatus;
 	
-	private List <TransactionInError> transactionInErrorsList;
-
-	
 	public Integer getValidationTypeId() {
 		return validationTypeId;
 	}
@@ -180,15 +177,6 @@ public class TransErrorDetail {
 
 	public void setTransactionStatus(Integer transactionStatus) {
 		this.transactionStatus = transactionStatus;
-	}
-
-	public List<TransactionInError> getTransactionInErrorsList() {
-		return transactionInErrorsList;
-	}
-
-	public void setTransactionInErrorsList(
-			List<TransactionInError> transactionInErrorsList) {
-		this.transactionInErrorsList = transactionInErrorsList;
 	}
 
 }
