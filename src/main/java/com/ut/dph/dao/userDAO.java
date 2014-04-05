@@ -3,8 +3,10 @@ package com.ut.dph.dao;
 import java.util.List;
 
 import com.ut.dph.model.User;
+import com.ut.dph.model.UserActivity;
 import com.ut.dph.model.siteSections;
 import com.ut.dph.model.userAccess;
+
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -36,4 +38,5 @@ public interface userDAO {
     
     User getUserByResetCode(String resetCode);
 
+    void insertUserLog (UserActivity userActivity);
 }

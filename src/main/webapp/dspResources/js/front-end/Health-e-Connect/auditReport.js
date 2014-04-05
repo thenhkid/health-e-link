@@ -11,22 +11,62 @@ require(['./main'], function () {
         
         $("input:text,form").attr("autocomplete", "off");
         
-        $('#searchBatchesBtn').click(function() { 
-            $('#searchForm').submit();
-        });
+      //This function will handle sending rejected transactions
+        $(document).on('click','.rejectMessages', function() {
 
-        $(document).on('click','.changePage', function() {
-           $('#page').val($(this).attr('rel'));
-           $('#searchForm').submit();
-        });
+           $('.alert-danger').hide();
 
-        //this function will submit the batchId for viewing detailed audit report
+           var idList = "";
+
+           //Loop through all batch ids
+           $('input[type=checkbox]').each(function() {
+               if(this.checked) {
+            	   idList += (idList ==="" ? this.value : "," + this.value);
+                }
+           });
+
+           if(idList === "") {
+               $('.alert-danger').html("At lease one transaction must be selected to delete!");
+               $('.alert-danger').show();
+           }
+           else {
+               $('#idList').val(idList);
+               $('#rejectMessages').submit();
+           }
+        });
+        
+        //click this will release batch
+        $('.releaseBatch').click(function() {
+        	$('input[name="actionItem"]').val("releaseBatch");
+        	$('#transAction').submit();
+        });
+        
+        //click this will cancel batch
+        $('.cancelBatch').click(function() {
+        	$('input[name="actionItem"]').val("cancelBatch");
+        	$('#transAction').submit();
+        });    
+        
+        //click this will reset batch
+        $('.resetBatch').click(function() {
+        	$('input[name="actionItem"]').val("resetBatch");
+        	$('#transAction').submit();
+        });  
+        
+        
+        //this function will submit the transactionInId to the ERG form for edit
+        $(document).on('click', '.viewLink', function() {
+        	$('input[name="transactionInId"]').val($(this).attr('rel'));
+        	$('#transAction').submit();
+        });
+        
+      //this function will submit the batchId for viewing detailed audit report
         $(document).on('click', '.viewLink', function() {
         	$('input[name="transactionInId"]').val($(this).attr('rel'));
         	//somehow we need to submit form
-        	$('#searchForm').attr('action', 'ERG');
+        	$('#transAction').attr('action', 'ERG');
         	//$('#searchForm').get(0).setAttribute('action', 'auditReport');
-        	$('#searchForm').submit();
+        	$('#transAction').submit();
         });
 
         
@@ -106,15 +146,9 @@ require(['./main'], function () {
 });
 
 
-function searchByDateRange() {
-   var fromDate = $('.daterange span').attr('rel');
-   var toDate = $('.daterange span').attr('rel2');
-    
-   $('#fromDate').val(fromDate);
-   $('#toDate').val(toDate);
-   
-   $('#searchForm').submit();
 
-}
+
+
+
 
 

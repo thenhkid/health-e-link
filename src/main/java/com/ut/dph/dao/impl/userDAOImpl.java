@@ -9,11 +9,14 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ut.dph.dao.userDAO;
 import com.ut.dph.model.User;
+import com.ut.dph.model.UserActivity;
 import com.ut.dph.model.siteSections;
 import com.ut.dph.model.userAccess;
+
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.Formula;
 import org.hibernate.criterion.Property;
@@ -298,5 +301,20 @@ public class userDAOImpl implements userDAO {
         }
     }
    
-
+    /**
+     * The 'insertUserLog' function will take a userActivity and insert the information into the database
+     * 
+     * @userActivity       An activity of the user
+     * @return no return is expected
+     */
+    @Override
+    
+    public void insertUserLog(UserActivity userActivity) {
+    	try {
+    		sessionFactory.getCurrentSession().save(userActivity);
+    	} catch (Exception ex) {
+    		System.err.println("insertUserLog " + ex.getCause());
+    		ex.printStackTrace();
+    	}
+    }
 }

@@ -10,6 +10,7 @@ import com.ut.dph.dao.messageTypeDAO;
 import com.ut.dph.model.Organization;
 import com.ut.dph.model.TransactionInError;
 import com.ut.dph.model.User;
+import com.ut.dph.model.UserActivity;
 import com.ut.dph.model.batchDownloads;
 import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.configuration;
@@ -591,7 +592,18 @@ public class HealtheConnectController {
     @RequestMapping(value = "/auditReports", method = RequestMethod.GET)
     public ModelAndView viewAuditRpts(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
         
-        ModelAndView mav = new ModelAndView();
+    	/* Need to get a list of uploaded files with status of 5 (PR), 6 (REL), 29 (Sys Error) ?*/
+        User userInfo = (User)session.getAttribute("userDetails");
+        
+        /** log user activity **/
+    	UserActivity ua = new UserActivity();
+    	ua.setUserId(userInfo.getId());
+    	ua.setAccessMethod(request.getMethod());
+    	ua.setPageAccess("/auditReports");
+    	ua.setActivity("view audit page");
+    	usermanager.insertUserLog(ua);
+    	
+    	ModelAndView mav = new ModelAndView();
         mav.setViewName("/Health-e-Connect/auditReports");
         
         Date fromDate = getMonthDate("START");
@@ -601,8 +613,6 @@ public class HealtheConnectController {
         mav.addObject("toDate", toDate);
         mav.addObject("currentPage", 1);
         
-        /* Need to get a list of uploaded files with status of 5 (PR), 6 (REL), 29 (Sys Error) ?*/
-        User userInfo = (User)session.getAttribute("userDetails");
         
         try {
             /* Need to get a list of all uploaded batches */
@@ -653,14 +663,13 @@ public class HealtheConnectController {
      * @throws Exception
      */
     @RequestMapping(value = "/auditReports", method = RequestMethod.POST)
-    public ModelAndView findAuditRpts(@RequestParam(value = "page", required = false) Integer page, @RequestParam String searchTerm, @RequestParam Date fromDate, @RequestParam Date toDate,HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
+    public ModelAndView findAuditRpts(@RequestParam(value = "page", required = false) Integer page, @RequestParam String searchTerm, 
+    		@RequestParam Date fromDate, @RequestParam Date toDate,HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
        
         
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/Health-e-Connect/auditReports");
-        
-        System.out.println(fromDate);
-        
+       
         mav.addObject("fromDate", fromDate);
         mav.addObject("toDate", toDate);
         
@@ -703,6 +712,8 @@ public class HealtheConnectController {
             mav.addObject("currentPage", page);
 
 
+            
+            
             return mav;
         }
         catch (Exception e) {
@@ -799,7 +810,18 @@ public class HealtheConnectController {
         	canEdit = true;
         }
        
-        
+        /** log user activity **/
+    	UserActivity ua = new UserActivity();
+    	ua.setUserId(userInfo.getId());
+    	ua.setAccessMethod(request.getMethod());
+    	ua.setPageAccess("/auditReport");
+    	ua.setActivity("Audit Report Request");
+    	ua.setBatchIds(String.valueOf(batchInfo.getId()));
+    	if (!hasPermission) {
+    		ua.setActivityDesc("without permission");
+    	}
+    	usermanager.insertUserLog(ua);
+    	
  
             //buttons
         	mav.addObject("canSend", canSend);

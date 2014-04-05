@@ -11,7 +11,9 @@
 <div class="container main-container" role="main">
 	<div class="row">
 		<div class="col-md-12 page-content">
-
+		
+		<div style="display:none;" class="alert alert-danger" role="alert"></div> 
+			
 			<c:choose>
 				<c:when test="${hasPermission}">
 					<div class="row">
@@ -59,8 +61,10 @@
 					
             <div class="row" style="overflow:hidden; margin-bottom:10px;">
                     <div class="col-md-3">
-                        <form:form class="form form-inline" id="searchForm" action="/Health-e-Connect/auditReport" method="post">
+                        <form:form class="form form-inline" id="transAction" action="/Health-e-Connect/batchActions" method="post">
                           	<input type="hidden" name="transactionInId" id="transactionInId" value=""/>
+                          	<input type="hidden" name="actionItem" id="actionItem" value=""/>
+                          	<input type="hidden" name="batchId" id="batchId" value="${batch.id}"/>
                         </form:form>
                     </div>
 
@@ -131,7 +135,7 @@
 												 	<td class="center-text">
 														<c:if test="${error.transactionInId != newTransId}">
 															<c:if test="${not empty error.transactionInId && canEdit && error.transactionStatus == 14}">
-																<input type="checkbox" id="transactionInId" name="transactionInId" class="transactionInId" value="${error.transactionInId}" />
+																<input type="checkbox" id="rejTransInId" name="rejTransInId" class="rejTransInId" value="${error.transactionInId}" />
 															</c:if>
 														</c:if>
 													</td>
@@ -200,21 +204,21 @@
 					<div>
 					
 					<c:if test="${canEdit == true}">
-                    	 <input type="button" id="release"
-								class="btn btn-primary btn-action-sm submitMessage"
+                    	 <input type="button" id="reject"
+								class="btn btn-primary btn-action-sm rejectMessages"
 								value="Reject Marked Transactions" />
                     </c:if>
 					<c:if test="${canSend == true}">
 						<input type="button" id="release"
-								class="btn btn-primary btn-action-sm submitMessage"
+								class="btn btn-primary btn-action-sm releaseBatch"
 								value="Release" />
 					</c:if>
 					<c:if test="${canCancel == true}">
 							<input type="button" id="cancel"
-								class="btn btn-primary btn-action-sm cancelMessage"
+								class="btn btn-primary btn-action-sm cancelBatch"
 								value="Do Not Process" />
 							<input type="button" id="reset"
-								class="btn btn-primary btn-action-sm resetMessage"
+								class="btn btn-primary btn-action-sm resetBatch"
 								value="Reset" />
 					</c:if>
 					</div>
@@ -228,6 +232,10 @@
 		</div>
 	</div>
 </div>
+
+<form action="rejectMessages" id="rejectMessages" method="post">
+                <input type="hidden" id="isList" name="idList" value="" />
+</form>
 
 <div class="modal fade" id="uploadFile" role="dialog" tabindex="-1"
 	aria-labeledby="Upload New File" aria-hidden="true"

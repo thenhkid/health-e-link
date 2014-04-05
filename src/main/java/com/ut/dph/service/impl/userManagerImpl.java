@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ut.dph.dao.userDAO;
 import com.ut.dph.model.User;
 import com.ut.dph.service.userManager;
+import com.ut.dph.model.UserActivity;
 import com.ut.dph.model.siteSections;
 import com.ut.dph.model.userAccess;
 
@@ -96,5 +97,11 @@ public class userManagerImpl implements userManager {
     @Transactional
     public User getUserByResetCode(String resetCode) {
         return userDAO.getUserByResetCode(resetCode);
+    }
+    
+    @Override
+    @Transactional
+    public void insertUserLog (UserActivity userActivity) {
+        userDAO.insertUserLog(userActivity);
     }
 }

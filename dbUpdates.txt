@@ -427,4 +427,18 @@ DELIMITER ;
 /** 04022014 grace 10:30AM **/
 INSERT INTO `universaltranslator`.`lu_ErrorCodes` (`displayText`, `description`) VALUES ('Submitter is not a valid sender', 'User is not a valid sender');
 
-  
+/** 04042014 Grace 11:16AM **/
+CREATE TABLE `userActivity` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `userId` int(11) NOT NULL,
+  `accessMethod` varchar(10) DEFAULT NULL,
+  `pageAccess` varchar(255) DEFAULT NULL,
+  `activity` varchar(45) DEFAULT NULL,
+  `activityDesc` text,
+  `batchIds` varchar(255) DEFAULT NULL,
+  `transactionInIds` varchar(255) DEFAULT NULL,
+  `transactionTargetIds` varchar(255) DEFAULT NULL,
+  `dateCreated` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+
