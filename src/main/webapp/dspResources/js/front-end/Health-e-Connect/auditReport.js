@@ -31,41 +31,33 @@ require(['./main'], function () {
            }
            else {
                $('#idList').val(idList);
-               $('#rejectMessages').submit();
+               $('input[name="batchOption"]').val("rejectMessages"); 
+               $('#batchOptions').submit();
            }
         });
         
         //click this will release batch
         $('.releaseBatch').click(function() {
-        	$('input[name="actionItem"]').val("releaseBatch");
-        	$('#transAction').submit();
+        	$('input[name="batchOption"]').val("releaseBatch");       	
+        	$('#batchOptions').submit();
         });
         
         //click this will cancel batch
         $('.cancelBatch').click(function() {
-        	$('input[name="actionItem"]').val("cancelBatch");
-        	$('#transAction').submit();
+        	$('input[name="batchOption"]').val("cancelBatch");
+        	$('#batchOptions').submit();
         });    
         
         //click this will reset batch
         $('.resetBatch').click(function() {
-        	$('input[name="actionItem"]').val("resetBatch");
-        	$('#transAction').submit();
+        	$('input[name="batchOption"]').val("resetBatch");
+        	$('#batchOptions').submit();
         });  
         
         
         //this function will submit the transactionInId to the ERG form for edit
         $(document).on('click', '.viewLink', function() {
         	$('input[name="transactionInId"]').val($(this).attr('rel'));
-        	$('#transAction').submit();
-        });
-        
-      //this function will submit the batchId for viewing detailed audit report
-        $(document).on('click', '.viewLink', function() {
-        	$('input[name="transactionInId"]').val($(this).attr('rel'));
-        	//somehow we need to submit form
-        	$('#transAction').attr('action', 'ERG');
-        	//$('#searchForm').get(0).setAttribute('action', 'auditReport');
         	$('#transAction').submit();
         });
 

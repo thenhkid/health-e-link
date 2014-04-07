@@ -600,7 +600,7 @@ public class HealtheConnectController {
     	ua.setUserId(userInfo.getId());
     	ua.setAccessMethod(request.getMethod());
     	ua.setPageAccess("/auditReports");
-    	ua.setActivity("view audit page");
+    	ua.setActivity("View Audit Reports Page");
     	usermanager.insertUserLog(ua);
     	
     	ModelAndView mav = new ModelAndView();
@@ -646,6 +646,7 @@ public class HealtheConnectController {
            
            Integer totalPages = (int)Math.ceil((double)totaluploadedBatches / maxResults);
            mav.addObject("totalPages", totalPages);
+            
         }
         catch (Exception e) {
             throw new Exception("Error occurred viewing the audit reports. userId: "+ userInfo.getId(),e);
@@ -666,15 +667,22 @@ public class HealtheConnectController {
     public ModelAndView findAuditRpts(@RequestParam(value = "page", required = false) Integer page, @RequestParam String searchTerm, 
     		@RequestParam Date fromDate, @RequestParam Date toDate,HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
        
+    	/* Need to get a list of uploaded files */
+        User userInfo = (User)session.getAttribute("userDetails");
+        
+    	/** log user activity **/
+    	UserActivity ua = new UserActivity();
+    	ua.setUserId(userInfo.getId());
+    	ua.setAccessMethod(request.getMethod());
+    	ua.setPageAccess("/auditReports");
+    	ua.setActivity("Audit Reports Page");
+    	usermanager.insertUserLog(ua);
         
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/Health-e-Connect/auditReports");
        
         mav.addObject("fromDate", fromDate);
         mav.addObject("toDate", toDate);
-        
-        /* Need to get a list of uploaded files */
-        User userInfo = (User)session.getAttribute("userDetails");
         
         try {
             /* Need to get a list of all uploaded batches */
@@ -710,10 +718,6 @@ public class HealtheConnectController {
             mav.addObject("totalPages", totalPages);
             mav.addObject("searchTerm", searchTerm);
             mav.addObject("currentPage", page);
-
-
-            
-            
             return mav;
         }
         catch (Exception e) {
@@ -756,7 +760,6 @@ public class HealtheConnectController {
          * 3. sometimes entire batch is errored and have no configIds to go by, we let user see it if they have configurations
          **/
         
-        boolean hasPermission = false;
         List<configuration> configurations = configurationManager.getActiveConfigurationsByUserId(userInfo.getId(), 1);
         boolean hasConfigurations = false;
         
@@ -764,13 +767,8 @@ public class HealtheConnectController {
            hasConfigurations = true;
         }
         
-        if (batchInfo.getuserId() == userInfo.getId()) {
-        	hasPermission = true;
-        } else if (batchInfo.getConfigId() == 0 && hasConfigurations){
-        	hasPermission = true;
-        } else if (transactionInManager.checkPermissionForBatch(userInfo, batchInfo)) {
-        	hasPermission = true;
-        }
+        boolean hasPermission = transactionInManager.hasPermissionForBatch(batchInfo, userInfo, hasConfigurations);
+        
          
         if (hasPermission) {
         	/** grab org info**/
@@ -779,17 +777,13 @@ public class HealtheConnectController {
         	
         	/** grab error info  - need to filter this by error type **/
         	List <ConfigErrorInfo> confErrorList = new LinkedList<ConfigErrorInfo>();
-        	
-        		confErrorList = transactionInManager.populateErrorListByErrorCode(batchInfo, 5);
-        		confErrorList = transactionInManager.populateErrorListByErrorCode(batchInfo, 0);
-        		
+        		confErrorList = transactionInManager.populateErrorListByErrorCode(batchInfo);       		
         		mav.addObject("confErrorList", confErrorList);
         	  	
         }
         
         
         /** buttons **/
-        
         /** check final status - a batch should all be 11,12,13 or 16 to get released & batch status is PR **/
         boolean canSend = false;
         if (userInfo.getdeliverAuthority() && batchInfo.getstatusId() == 5) {
@@ -806,7 +800,7 @@ public class HealtheConnectController {
         } 
         
         boolean canEdit = false;
-        if (userInfo.geteditAuthority() && batchInfo.getstatusId() == 5) {
+        if (userInfo.geteditAuthority() && batchInfo.getstatusId() == 5 && transactionInManager.getRecordCounts(batchId, Arrays.asList(14), false, true) > 0) {
         	canEdit = true;
         }
        
@@ -823,24 +817,22 @@ public class HealtheConnectController {
     	usermanager.insertUserLog(ua);
     	
  
-            //buttons
-        	mav.addObject("canSend", canSend);
-        	mav.addObject("canCancel", canCancel);
-        	mav.addObject("canEdit", canEdit );
-        	mav.addObject("batch", batchInfo);
-        	mav.addObject("hasPermission", hasPermission);
-            mav.addObject("hasConfigurations", hasConfigurations);
-            
-           
-            Integer totalPages = 0;
-           
-            //(int)Math.ceil((double)totalErrorPages / maxResults);
-            mav.addObject("totalPages", totalPages);
-            //for errors
-            mav.addObject("currentPage", page);
+        //buttons
+        mav.addObject("canSend", canSend);
+    	mav.addObject("canCancel", canCancel);
+    	mav.addObject("canEdit", canEdit );
+    	mav.addObject("batch", batchInfo);
+    	mav.addObject("hasPermission", hasPermission);
+        mav.addObject("hasConfigurations", hasConfigurations);
+        
+        Integer totalPages = 0;
+       
+        //(int)Math.ceil((double)totalErrorPages / maxResults);
+        mav.addObject("totalPages", totalPages);
+        //for errors
+        mav.addObject("currentPage", page);
 
-
-            return mav;
+        return mav;
         }
         catch (Exception e) {
         	e.printStackTrace();
@@ -859,18 +851,58 @@ public class HealtheConnectController {
      */
     @RequestMapping(value = "/ERG", method = RequestMethod.POST)
     public ModelAndView uploadERG(@RequestParam(value = "page", required = false) Integer page, 
-    		@RequestParam(value = "transactionInId", required = false) Integer transactionInId, 
+    		@RequestParam(value = "transactionInId", required = false) Integer transactionInId,
     		HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
        
     try {
+    	boolean hasPermission = false;
+    	boolean canEdit = false;
+    	boolean hasConfigurations = false;
+    	
+    	/**check for permission**/
+        User userInfo = (User)session.getAttribute("userDetails");
+        batchUploads batchInfo = transactionInManager.getBatchDetailsByTInId(transactionInId);
+        if (batchInfo != null) {
+        	List<configuration> configurations = configurationManager.getActiveConfigurationsByUserId(userInfo.getId(), 1);
+            
+            if(configurations.size() >=1 ) {
+               hasConfigurations = true;
+            }
+            
+           hasPermission = transactionInManager.hasPermissionForBatch(batchInfo, userInfo, hasConfigurations);
+          
+           /** get transaction details **/
+           
+           /**for button to save/release**/ 
+           if (batchInfo.getstatusId() == 5 && userInfo.geteditAuthority()) {
+        	   canEdit = true;
+           }
+        }
+        
+        
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/Health-e-Connect/ERG");
-        
-        User userInfo = (User)session.getAttribute("userDetails");
-        mav.addObject("hasPermission", userInfo.geteditAuthority());
+        mav.addObject("canEdit", canEdit);
+        mav.addObject("hasConfigurations", hasConfigurations);
+        mav.addObject("hasPermission", hasPermission);
         mav.addObject("transactionInId", transactionInId);
         
-        return mav;
+        
+        /** log user activity **/
+    	UserActivity ua = new UserActivity();
+    	ua.setUserId(userInfo.getId());
+    	ua.setAccessMethod(request.getMethod());
+    	ua.setPageAccess("/Health-e-Connect/ERG");
+    	ua.setActivity("ERG View");
+    	ua.setTransactionInIds(String.valueOf(transactionInId));
+    	if (batchInfo != null) {
+    		ua.setBatchIds(String.valueOf(batchInfo.getId()));
+        }
+    	if (!hasPermission) {
+    		ua.setActivityDesc("without permission");
+    	}
+    	usermanager.insertUserLog(ua);
+    	return mav;
     }
         catch (Exception e) {
         	e.printStackTrace();
@@ -879,7 +911,69 @@ public class HealtheConnectController {
         
     }
     
-    
+    /**
+     * The '/batchOptions POST request will serve up the requested Health-e-Connect audit report .
+     *
+     * @param request
+     * @param response
+     * @return	we redirect back to /auditReports
+     * @throws Exception
+     */
+    @RequestMapping(value = "/batchOptions", method = RequestMethod.POST)
+    public ModelAndView batchOptions(@RequestParam(value = "batchId", required = false) Integer batchId, 
+    		@RequestParam(value = "idList", required = false) List <Integer> idList,
+    		@RequestParam(value = "batchOption", required = false) String batchOption,
+    		HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
+       
+    try {
+       
+    	/**
+    	 * Four options - 
+    	 * rejectMessages - canEdit
+    	 * releaseBatch - canSend
+    	 * resetBatch, cancelBatch - canCancel
+    	 * 
+    	 * **/
+    	System.out.println(batchOption);
+    	/**
+    	User userInfo = (User)session.getAttribute("userDetails");
+        batchUploads batchInfo = transactionInManager.getBatchDetails(batchId);
+        
+        List<configuration> configurations = configurationManager.getActiveConfigurationsByUserId(userInfo.getId(), 1);
+        boolean hasConfigurations = false;
+        
+        if(configurations.size() >=1 ) {
+           hasConfigurations = true;
+        }
+        
+        boolean hasPermission = transactionInManager.hasPermissionForBatch(batchInfo, userInfo, hasConfigurations);
+        
+        
+        
+        //log user activity
+    	UserActivity ua = new UserActivity();
+    	ua.setUserId(userInfo.getId());
+    	ua.setAccessMethod(request.getMethod());
+    	ua.setPageAccess("/batchOptions");
+    	ua.setActivity("Batch Options");
+    	ua.setBatchIds(String.valueOf(batchInfo.getId()));
+    	if (!hasPermission) {
+    		ua.setActivityDesc("without permission");
+    	}
+    	usermanager.insertUserLog(ua);
+    	**/
+    	/** set error message for display **/
+    	
+    	ModelAndView mav = new ModelAndView(new RedirectView("auditReports"));
+		return mav;	
+		
+        }
+        catch (Exception e) {
+        	e.printStackTrace();
+            throw new Exception("Error at batch options.",e);
+        }
+        
+    }
     
     /**
     * @param filter 

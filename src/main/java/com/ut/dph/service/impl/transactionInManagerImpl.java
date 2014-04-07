@@ -1964,14 +1964,15 @@ public class transactionInManagerImpl implements transactionInManager {
         return transactionInDAO.getErrorList(batchId);
     }
     
+    /**
+     * **/
+    
     @Override
-	public List<ConfigErrorInfo> populateErrorListByErrorCode(
-			batchUploads batchInfo, Integer errorCode) {
+	public List<ConfigErrorInfo> populateErrorListByErrorCode(batchUploads batchInfo) {
     	
     	List <ConfigErrorInfo> confErrorList = new LinkedList<ConfigErrorInfo>();
     	try {
-    	
-	    	ConfigErrorInfo configErrorInfo = new ConfigErrorInfo();
+    		ConfigErrorInfo configErrorInfo = new ConfigErrorInfo();
 	    	configErrorInfo.setBatchId(batchInfo.getId());
 	    		
 	    		List <TransErrorDetail> tedList = getTransErrorDetailsForNoRptFields(batchInfo.getId(), Arrays.asList(5));
@@ -2138,5 +2139,33 @@ public class transactionInManagerImpl implements transactionInManager {
         }
         return sysErrors;
     }
+
+	@Override
+	public boolean hasPermissionForBatch(batchUploads batchInfo, User userInfo, boolean hasConfigurations) {
+		boolean hasPermission = false;
+        /** 
+         * user can view audit report if 
+         * 1. uploaded by user  
+         * 2. file type uploaded was for multiple types and user has configurations
+         * 3. user is in connection sender list for batch's configId
+         */
+		try {
+		if (batchInfo.getuserId() == userInfo.getId()) {
+        	hasPermission = true;
+		} else if (batchInfo.getConfigId() == 0 && hasConfigurations){
+        	hasPermission = true;
+        } else if (checkPermissionForBatch(userInfo, batchInfo)) {
+        	hasPermission = true;
+        }
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			System.err.println("checkPermissionForBatch " + ex.getCause());
+		}
+		return hasPermission;
+	}
     
+	@Override
+    public batchUploads getBatchDetailsByTInId(Integer transactionInId){
+        return transactionInDAO.getBatchDetailsByTInId(transactionInId);
+    }
 }

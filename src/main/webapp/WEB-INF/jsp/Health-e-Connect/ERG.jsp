@@ -32,7 +32,7 @@
                             ${transactionInId}
                             </c:when>
                             <c:otherwise>
-                               You do not have edit to fix this ERG.  Your request has been logged.
+                               You do not have edit to fix permission to this ERG.  Your request has been logged.
                             </c:otherwise>
                         </c:choose>   
             </div>

@@ -277,4 +277,5 @@ public interface transactionInDAO {
     
     Integer updateStatusByErrorCode(Integer batchId, Integer errorId, Integer statusId);
     
+    batchUploads getBatchDetailsByTInId(Integer transactionInId); 
 }

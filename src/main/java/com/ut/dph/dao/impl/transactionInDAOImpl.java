@@ -3962,5 +3962,29 @@ public class transactionInDAOImpl implements transactionInDAO {
 	            return 1;
 	        }
 
-	    }	    
+	    }
+	    
+	    @Override
+	    @Transactional
+	    public batchUploads getBatchDetailsByTInId(Integer transactionInId) {
+	        try {
+	            String sql = "select * from batchUploads where id in (select batchId from transactionIn where"
+	            		+ " id = :transactionInId);";
+	            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
+	            		.setResultTransformer(Transformers.aliasToBean(batchUploads.class));
+	                  query.setParameter("transactionInId", transactionInId);
+				if (query.list().size() > 0) {
+					return (batchUploads) query.list().get(0);
+				} else {
+					// no permission or id doesn't exist
+					return null;
+				}	            
+	        
+	        } catch (Exception ex) {
+	            ex.printStackTrace();
+	            System.err.println("getBatchDetailsByTInId " + ex.getCause());
+	            return null;
+	        }
+
+	    }	
 }

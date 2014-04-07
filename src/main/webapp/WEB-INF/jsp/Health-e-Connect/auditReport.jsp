@@ -37,7 +37,7 @@
 								</dd>
 								<dd>
 									<strong>Total Transactions: </strong>${batch.totalRecordCount}
-									<strong>Total Errors: </strong>${batch.errorRecordCount}
+									<strong>Transactions with errors: </strong>${batch.errorRecordCount}
 								</dd>
 							</dl>
 						</div>
@@ -61,10 +61,9 @@
 					
             <div class="row" style="overflow:hidden; margin-bottom:10px;">
                     <div class="col-md-3">
-                        <form:form class="form form-inline" id="transAction" action="/Health-e-Connect/batchActions" method="post">
+                        <form:form class="form form-inline" id="transAction" action="/Health-e-Connect/ERG" method="post">
                           	<input type="hidden" name="transactionInId" id="transactionInId" value=""/>
-                          	<input type="hidden" name="actionItem" id="actionItem" value=""/>
-                          	<input type="hidden" name="batchId" id="batchId" value="${batch.id}"/>
+                          	<input type="hidden" name="batchIdERG" id="batchIdERG" value="${batch.statusId}"/>
                         </form:form>
                     </div>
 
@@ -233,8 +232,10 @@
 	</div>
 </div>
 
-<form action="rejectMessages" id="rejectMessages" method="post">
-                <input type="hidden" id="isList" name="idList" value="" />
+<form action="batchOptions" id="batchOptions" method="post">
+                <input type="hidden" id="idList" name="idList" value="" />
+                <input type="hidden" name="batchId" id="batchId" value="${batch.id}"/> 
+                <input type="hidden" name="batchOption" id="batchOption" value=""/>                    
 </form>
 
 <div class="modal fade" id="uploadFile" role="dialog" tabindex="-1"

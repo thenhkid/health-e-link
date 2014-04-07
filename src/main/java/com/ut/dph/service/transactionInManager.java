@@ -311,7 +311,7 @@ public interface transactionInManager {
     
     List <TransactionInError> getErrorList (Integer batchId);
     
-    List <ConfigErrorInfo> populateErrorListByErrorCode(batchUploads batchInfo, Integer errorCode);
+    List <ConfigErrorInfo> populateErrorListByErrorCode(batchUploads batchInfo);
     
     List <TransErrorDetail> getTransErrorDetailsForNoRptFields(Integer batchId, List<Integer> errorCodes);
     
@@ -329,4 +329,7 @@ public interface transactionInManager {
     
     Integer flagNoPermissionConfig(batchUploads batch);
     
+    boolean hasPermissionForBatch(batchUploads batchInfo, User userInfo, boolean hasConfigurations);
+    
+    batchUploads getBatchDetailsByTInId(Integer transactionInId);
 }
