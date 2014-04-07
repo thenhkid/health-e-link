@@ -9,6 +9,7 @@ package com.ut.dph.service;
 import com.ut.dph.model.Transaction;
 import com.ut.dph.model.batchDownloadSummary;
 import com.ut.dph.model.batchDownloads;
+import com.ut.dph.model.pendingDeliveryTargets;
 import com.ut.dph.model.systemSummary;
 import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionOutNotes;
@@ -103,5 +104,13 @@ public interface transactionOutManager {
     
     List getTransactionsToProcessByMessageType(int orgId, int page, int maxResults) throws Exception;
     
-    List<transactionTarget> getPendingDeliveryTransactions(int orgId, int messageType, int page, int maxResults) throws Exception;
+    List getAllransactionsToProcessByMessageType(int orgId, int messageTypeId) throws Exception;
+    
+    List<transactionTarget> getPendingDeliveryTransactions(int orgId, int messageType, Date fromDate, Date toDate, int page, int maxResults) throws Exception;
+    
+    boolean searchTransactionsByMessageType(pendingDeliveryTargets transaction, String searchTerm) throws Exception;
+    
+    boolean searchPendingTransactions(Transaction tran, String searchTerm) throws Exception;
+    
+    void doNotProcessTransaction(int transactionId) throws Exception;
 }

@@ -9,11 +9,18 @@
         <div class="col-md-12">
             <div class="alert alert-success">
                 <strong>Success!</strong> 
-                The selected transaction is now being processed.
+                <c:choose>
+                    <c:when test="${param.msg == 'processed'}">
+                        The transactions for the selected organization and message type are now being processed.
+                    </c:when>
+                    <c:when test="${param.msg == 'notprocessed'}">
+                        The transactions for the selected organization and message type were all updated to Do Not Process.
+                    </c:when>
+                </c:choose>
             </div>
         </div>
     </c:if>
-    <div class="row-fluid">
+    <%--<div class="row-fluid">
         <div class="col-md-12">
             <section class="panel panel-default">
                 <div class="panel-body">
@@ -24,18 +31,19 @@
                 </div>
             </section>
         </div>
-    </div>
+    </div>--%>
     <div class="col-md-12">
          <section class="panel panel-default">
             <div class="panel-body">
                 <div class="table-actions">
                     <div class="col-md-3" role="search">
-                     <form:form class="form form-inline" id="searchForm" action="/administrator/processing-activity/waiting" method="post">
+                     <form id="showMessageTypes" action="/administrator/processing-activity/pending/messageTypes" method="post">
+                          <input type="hidden" name="orgId" id="orgId" value="0" />  
+                     </form>
+                     <form:form class="form form-inline" id="searchForm" action="/administrator/processing-activity/pending" method="post">
                             <div class="form-group">
                                 <label class="sr-only" for="searchTerm">Search</label>
                                 <input type="text" name="searchTerm" id="searchTerm" value="${searchTerm}" class="form-control" id="search-batches" placeholder="Search"/>
-                                <input type="hidden" name="fromDate" id="fromDate" rel="<fmt:formatDate value="${fromDate}" type="date" pattern="MM/dd/yyyy" />" rel2="<fmt:formatDate value="${originalDate}" type="date" pattern="MM/dd/yyyy" />" value="${fromDate}" />
-                                <input type="hidden" name="toDate" id="toDate" rel="<fmt:formatDate value="${toDate}" type="date" pattern="MM/dd/yyyy" />" value="${toDate}" />
                                 <input type="hidden" name="page" id="page" value="${currentPage}" />
                             </div>
                             <button id="searchOrgBtn" class="btn btn-primary btn-sm" title="Search Waiting Transactions" role="button">
@@ -67,13 +75,17 @@
                                                 ${transaction.totalPending}
                                             </td>
                                              <td class="actions-col">
-                                                <a href="pending/${transaction.orgId}" class="btn btn-link" title="View Transactions" role="button">
+                                                <a href="javascript:void(0);" rel="${transaction.orgId}" class="btn btn-link viewLink" title="View Transactions" role="button">
                                                     <span class="glyphicon glyphicon-edit"></span>
                                                     View
                                                 </a>
                                                 <a href="javascript:void(0);" class="btn btn-link processAll" rel="${transaction.orgId}" title="Process All" role="button">
                                                     <span class="glyphicon glyphicon-edit"></span>
                                                     Process All
+                                                </a>
+                                                <a href="javascript:void(0);" class="btn btn-link donotprocess" rel="${transaction.orgId}" title="Do Not Process" role="button">
+                                                    <span class="glyphicon glyphicon-edit"></span>
+                                                    Do Not Process
                                                 </a>
                                             </td>
                                         </tr>
@@ -86,11 +98,11 @@
                         </tbody>
                     </table>
                     <ul class="pagination pull-right" role="navigation" aria-labelledby="Paging ">
-                        <c:if test="${currentPage > 1}"><li><a href="?page=${currentPage-1}">&laquo;</a></li></c:if>
+                        <c:if test="${currentPage > 1}"><li><a href="javascript:void(0);" rel="${currentPage-1}" class="nxtPage">&laquo;</a></li></c:if>
                         <c:forEach var="i" begin="1" end="${totalPages}">
-                        <li><a href="?page=${i}">${i}</a></li>
+                        <li><a href="javascript:void(0);" rel="${i}" class="nxtPage">${i}</a></li>
                         </c:forEach>
-                        <c:if test="${currentPage < totalPages}"><li><a href="?page=${currentPage+1}">&raquo;</a></li></c:if>
+                        <c:if test="${currentPage < totalPages}"><li><a href="javascript:void(0);" rel="${currentPage+1}" class="nxtPage">&raquo;</a></li></c:if>
                     </ul>
                 </div>
             </div>

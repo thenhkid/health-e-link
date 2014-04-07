@@ -15,18 +15,64 @@ require(['./main'], function () {
             $('.alert').delay(2000).fadeOut(1000);
         }
         
-        //This function will launch the status detail overlay with the selected
-        //status
+        //This function will process the selected transaction
         $(document).on('click', '.process', function() {
-            $.ajax({
-                url: 'processTransaction',
-                data:{'transactionId': $(this).attr('rel')},
-                type: "GET",
-                success: function(data) {
-                    window.location.href = "/administrator/processing-activity/waiting?msg=processed";
-                }
-            });
+            
+            var confirmed = confirm("Are you sure you want to process this transaction?");
+
+             if (confirmed) {
+             
+                $.ajax({
+                  url: '../processTransaction',
+                  data:{'transactionId': $(this).attr('rel')},
+                  type: "GET",
+                  success: function(data) {
+                     $('#searchForm').attr('action','/administrator/processing-activity/pending/transactions?msg=processed');
+                     $('#searchForm').submit();
+                  }
+                });
+             }
+           
         });
+        
+        //This function will not process the selected transaction
+        $(document).on('click', '.donotprocess', function() {
+             
+             var confirmed = confirm("Are you sure you do not want to process this transaction?");
+
+             if (confirmed) {
+             
+                $.ajax({
+                  url: '../donotprocessTransaction',
+                  data:{'transactionId': $(this).attr('rel')},
+                  type: "GET",
+                  success: function(data) {
+                     $('#searchForm').attr('action','/administrator/processing-activity/pending/transactions?msg=notprocessed');
+                     $('#searchForm').submit();
+                  }
+              });
+            
+             }
+           
+        });
+        
+        $(document).on('click', '.nxtPage', function() {
+           var page = $(this).attr('rel');
+           
+           $('#page').val(page);
+           $('#searchForm').submit();
+        }); 
         
    });
 });
+
+function searchByDateRange() {
+   var fromDate = $('.daterange span').attr('rel');
+   var toDate = $('.daterange span').attr('rel2');
+    
+   $('#fromDate').val(fromDate);
+   $('#toDate').val(toDate);
+   
+   $('#searchForm').submit();
+
+}

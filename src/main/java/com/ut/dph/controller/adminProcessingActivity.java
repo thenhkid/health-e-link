@@ -1034,25 +1034,6 @@ public class adminProcessingActivity {
         
         String searchTerm = "";
         
-        /* Retrieve search parameters from session */
-        searchParameters searchParameters = (searchParameters)session.getAttribute("searchParameters");
-
-        if("".equals(searchParameters.getsection()) || !"pending".equals(searchParameters.getsection())) {
-            searchParameters.setpage(page);
-            searchParameters.setsection("pending");
-            searchParameters.setsearchTerm("");
-        }
-        else {
-            if(page > 1) {
-                searchParameters.setpage(page);
-            }
-            else {
-                page = searchParameters.getpage();
-            }
-            searchTerm = searchParameters.getsearchTerm();
-        }
-            
-        mav.addObject("searchTerm", searchTerm);
         
         /* Get system inbound summary */
         systemSummary summaryDetails = transactionOutManager.generateSystemWaitingSummary();
@@ -1124,28 +1105,72 @@ public class adminProcessingActivity {
             page = 1;
         }
         
-        mav.addObject("searchTerm", searchTerm);
-        
-        /* Retrieve search parameters from session */
-        searchParameters searchParameters = (searchParameters)session.getAttribute("searchParameters");
-        searchParameters.setpage(page);
-        searchParameters.setsection("pending");
-        searchParameters.setsearchTerm(searchTerm);
-            
-        
         /* Get system inbound summary */
         systemSummary summaryDetails = transactionOutManager.generateSystemWaitingSummary();
         mav.addObject("summaryDetails", summaryDetails);
         
+        /* Get all waiting transactions */
         try {
+            int totaltransactions = 0;
+            List batchTransactions = transactionOutManager.getTransactionsToProcess(page, maxResults);
+            
+            List<pendingDeliveryTargets> transactionList = new ArrayList<pendingDeliveryTargets>();
+            
+            if(!batchTransactions.isEmpty()) {
+                 for(ListIterator iter = batchTransactions.listIterator(); iter.hasNext(); ) {
+                     
+                    Object[] row = (Object[]) iter.next();
+                     
+                    
+                    /* Get the target Org */
+                    Organization tgtOrgDetails = organizationmanager.getOrganizationById(Integer.valueOf(Integer.parseInt(String.valueOf(row[0]))));
+                            
+                    pendingDeliveryTargets targetDetails = new pendingDeliveryTargets();
+                    targetDetails.setOrgId(tgtOrgDetails.getId());
+                    targetDetails.setTotalPending(Integer.valueOf(Integer.parseInt(String.valueOf(row[1]))));
+                        
+                    String OrgDetails = new StringBuilder()
+                      .append(tgtOrgDetails.getOrgName())
+                      .append("<br />")
+                      .append(tgtOrgDetails.getAddress()).append(" ").append(tgtOrgDetails.getAddress2())
+                      .append("<br />")
+                      .append(tgtOrgDetails.getCity()).append(" ").append(tgtOrgDetails.getState()).append(",").append(tgtOrgDetails.getPostalCode()).toString();
+                       
+                    targetDetails.setOrgDetails(OrgDetails);
+                     
+                    transactionList.add(targetDetails);
+                }
+            }
+            
+            if(searchTerm != null && !"".equals(searchTerm)) {
+                List<pendingDeliveryTargets> matchedTransactions = new ArrayList<pendingDeliveryTargets>();
+
+                for(pendingDeliveryTargets tran : transactionList) {
+
+                    boolean matchFound = transactionOutManager.searchTransactionsByMessageType(tran, searchTerm);
+
+                    if(matchFound == true) {
+                        matchedTransactions.add(tran);
+                    }
+
+                }
+
+                totaltransactions = matchedTransactions.size();
+                mav.addObject("transactions", matchedTransactions);
+                
+            }
+            else {
+                totaltransactions = transactionList.size();
+                mav.addObject("transactions", transactionList);
+            }
+            
            
-          // Integer totalPages = (int)Math.ceil((double)totaltransactions / maxResults);
-          // mav.addObject("totalPages", totalPages);
-        }
+           Integer totalPages = (int)Math.ceil((double)totaltransactions / maxResults);
+           mav.addObject("totalPages", totalPages);
+       }
         catch (Exception e) {
-            throw new Exception("(Admin) Error occurred viewing the all waiting transactions. Error: "+e.getMessage(),e);
+            throw new Exception("(Admin) Error occurred viewing the all pending transactions. Error: "+e.getMessage(),e);
         }
-        
         
         return mav;
         
@@ -1159,8 +1184,8 @@ public class adminProcessingActivity {
      * 
      * 
      */
-    @RequestMapping(value="/pending/{orgId}", method = RequestMethod.GET)
-    public ModelAndView viewOrgPendingMessages(@PathVariable Integer orgId, @RequestParam(value = "page", required = false) Integer page) throws Exception {
+    @RequestMapping(value="/pending/messageTypes", method = RequestMethod.POST)
+    public ModelAndView viewOrgPendingMessages(@RequestParam(value = "orgId", required = true) int orgId, @RequestParam(value = "page", required = false) Integer page, @RequestParam(value = "searchTerm", required = false) String searchTerm) throws Exception {
         
         if(page == null || page < 1) {
             page = 1;
@@ -1169,11 +1194,15 @@ public class adminProcessingActivity {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/processing-activity/pendingByMessageType");
         
+        mav.addObject("orgId", orgId);
+        mav.addObject("searchTerm", searchTerm);
+        mav.addObject("currentPage", page);
+        
         
         /* Get all waiting transactions */
         try {
             /* Need to get a list of all uploaded batches */
-            Integer totaltransactions = transactionOutManager.getTransactionsToProcessByMessageType(orgId, 1, 0).size();
+            Integer totaltransactions = 0;
             List batchTransactions = transactionOutManager.getTransactionsToProcessByMessageType(orgId, page, maxResults);
             
             List<pendingDeliveryTargets> transactionList = new ArrayList<pendingDeliveryTargets>();
@@ -1205,11 +1234,30 @@ public class adminProcessingActivity {
                      
                     transactionList.add(targetDetails);
                 }
+                 
+                if(searchTerm != null && !"".equals(searchTerm)) {
+                    List<pendingDeliveryTargets> matchedTransactions = new ArrayList<pendingDeliveryTargets>();
+                    
+                    for(pendingDeliveryTargets tran : transactionList) {
+                        
+                        boolean matchFound = transactionOutManager.searchTransactionsByMessageType(tran, searchTerm);
+                        
+                        if(matchFound == true) {
+                            matchedTransactions.add(tran);
+                        }
+                        
+                    }
+                    
+                    totaltransactions = matchedTransactions.size();
+                    mav.addObject("transactions", matchedTransactions);
+                }
+                else {
+                    totaltransactions = transactionList.size();
+                    mav.addObject("transactions", transactionList);
+                }
+                 
             }
             
-
-           mav.addObject("transactions", transactionList);
-           
            Integer totalPages = (int)Math.ceil((double)totaltransactions / maxResults);
            mav.addObject("totalPages", totalPages);
        }
@@ -1224,18 +1272,38 @@ public class adminProcessingActivity {
     
     /**
      * The '/pending/{orgId}/{messageTypeId}' GET method will return all pending output transactions based on the the
-     * passed in organization Id and selected message type. T
+     * passed in organization Id and selected message type. 
      * 
      */
-    @RequestMapping(value="/pending/{orgId}/{messageTypeId}", method = RequestMethod.GET)
-    public ModelAndView viewOrgPendingMessages(@PathVariable Integer orgId, @PathVariable Integer messageTypeId, @RequestParam(value = "page", required = false) Integer page) throws Exception {
+    @RequestMapping(value="/pending/transactions", method = RequestMethod.POST)
+    public ModelAndView viewOrgPendingMessages(@RequestParam(value = "orgId", required = true) int orgId, @RequestParam(value = "messageTypeId", required = true) int messageTypeId, @RequestParam(value = "page", required = false) Integer page, @RequestParam(value = "searchTerm", required = false) String searchTerm, @RequestParam(value = "fromDate", required = false) Date fromDate, @RequestParam(value= "toDate", required = false) Date toDate) throws Exception {
         
         if(page == null || page < 1) {
             page = 1;
         }
         
+        int year = 114;
+        int month = 0;
+        int day = 1;
+        Date originalDate = new Date(year,month,day);
+        
+        if(fromDate == null) {
+            fromDate = getMonthDate("START");
+        }
+        if(toDate == null) {
+            toDate = getMonthDate("END");
+        }
+        
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/processing-activity/pendingTransactions");
+        
+        mav.addObject("fromDate", fromDate);
+        mav.addObject("toDate", toDate);
+        mav.addObject("originalDate",originalDate);
+        mav.addObject("orgId", orgId);
+        mav.addObject("messageTypeId", messageTypeId);
+        mav.addObject("searchTerm", searchTerm);
+        mav.addObject("currentPage", page);
         
         
         /* Get all waiting transactions */
@@ -1245,46 +1313,76 @@ public class adminProcessingActivity {
             mav.addObject("targetOrg", organizationmanager.getOrganizationById(orgId).getOrgName());
             
             /* Need to get a list of all uploaded batches */
-            Integer totaltransactions = transactionOutManager.getPendingDeliveryTransactions(orgId, messageTypeId, 1, 0).size();
-            List<transactionTarget> transactions = transactionOutManager.getPendingDeliveryTransactions(orgId, messageTypeId, page, maxResults);
+            Integer totaltransactions = 0;
+            List<transactionTarget> transactions = transactionOutManager.getPendingDeliveryTransactions(orgId, messageTypeId, fromDate, toDate, page, maxResults);
             
             List<Transaction> transactionList = new ArrayList<Transaction>();
-            
+
             if(!transactions.isEmpty()) {
-                
                 for(transactionTarget transaction : transactions) {
+                    
+                    /* Need to get uploaded Config */
+                    batchUploadSummary batchDetails = transactionInManager.getUploadSummaryDetails(transaction.gettransactionInId());
+                    batchUploads batchUploadDetails = transactionInManager.getBatchDetails(batchDetails.getbatchId());
                     
                     Transaction transactionDetails = new Transaction();
                     transactionDetails.settransactionRecordId(transaction.getId());
+                    transactionDetails.setstatusId(transaction.getstatusId());
                     transactionDetails.setdateSubmitted(transaction.getdateCreated());
                     transactionDetails.setconfigId(transaction.getconfigId());
+                    transactionDetails.setbatchName(batchUploadDetails.getutBatchName());
 
                     transactionInRecords records = transactionInManager.getTransactionRecords(transaction.gettransactionInId());
-                    batchUploadSummary batchSummary = transactionInManager.getUploadSummaryDetails(transaction.gettransactionInId());
 
                     /* Get a list of form fields */
-                    configurationTransport transportDetails = configurationTransportManager.getTransportDetails(batchSummary.getsourceConfigId());
-                    List<configurationFormFields> sourceInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(batchSummary.getsourceConfigId(),transportDetails.getId(),1);
+                    configurationTransport transportDetails = configurationTransportManager.getTransportDetails(batchDetails.getsourceConfigId());
+                    List<configurationFormFields> sourceInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(batchDetails.getsourceConfigId(),transportDetails.getId(),1);
+                    List<configurationFormFields> patientInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(batchDetails.getsourceConfigId(),transportDetails.getId(),5);
 
-                    /* Set all the transaction TARGET fields */
+                    /* Set all the transaction SOURCE fields */
                     List<transactionRecords> fromFields;
                     if(!sourceInfoFormFields.isEmpty()) {
                         fromFields = setOutboundFormFields(sourceInfoFormFields, records, 0, true, 0);
                     }
                     else {
-                        fromFields = setOrgDetails(batchSummary.getsourceOrgId());
+                        fromFields = setOrgDetails(batchDetails.getsourceOrgId());
                     }
                     transactionDetails.setsourceOrgFields(fromFields);
+                    
+                    /* Set all the transaction TARGET fields */
+                    List<transactionRecords> patientFields;
+                    patientFields = setOutboundFormFields(patientInfoFormFields, records, 0, true, 0);
+                    transactionDetails.setpatientFields(patientFields);
+
+                    /* get the message type name */
+                    configuration configDetails = configurationManager.getConfigurationById(transaction.getconfigId());
+                    transactionDetails.setmessageTypeName(messagetypemanager.getMessageTypeById(configDetails.getMessageTypeId()).getName());
 
                     transactionList.add(transactionDetails);
-                    
                 }
-                 
+                
+                if(searchTerm != null && !"".equals(searchTerm)) {
+                    List<Transaction> matchedTransactions = new ArrayList<Transaction>();
+                    
+                    for(Transaction tran : transactionList) {
+                        
+                        boolean matchFound = transactionOutManager.searchPendingTransactions(tran, searchTerm);
+                        
+                        if(matchFound == true) {
+                            matchedTransactions.add(tran);
+                        }
+                        
+                    }
+                    
+                    totaltransactions = matchedTransactions.size();
+                    mav.addObject("transactions", matchedTransactions);
+                }
+                else {
+                    totaltransactions = transactionList.size();
+                    mav.addObject("transactions", transactionList);
+                }
             }
             
-
-           mav.addObject("transactions", transactionList);
-           
            Integer totalPages = (int)Math.ceil((double)totaltransactions / maxResults);
            mav.addObject("totalPages", totalPages);
        }
@@ -1704,6 +1802,58 @@ public class adminProcessingActivity {
         return fields;
     }
     
+    /**
+     * The 'processAllTransactions' function will process all transactions based on the passed in organziation id and message type id.
+     */
+    @RequestMapping(value = "/processAllTransactions", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody boolean processAllTransactions(@RequestParam(value = "orgId", required = true) Integer orgId, @RequestParam(value = "messageTypeId", required = false) Integer messageTypeId) throws Exception {
+        
+       
+        if(messageTypeId == null || "".equals(messageTypeId)) {
+            messageTypeId = 0;
+        }
+        
+        /* Need to get all transactions for the passed in org and message type id (IF PASSED IN) */
+        List transactions = transactionOutManager.getAllransactionsToProcessByMessageType(orgId, messageTypeId);
+        
+        for(ListIterator iter = transactions.listIterator(); iter.hasNext(); ) {
+            
+            Object[] row = (Object[]) iter.next();
+            
+            transactionTarget transaction = transactionOutManager.getTransactionDetails(Integer.valueOf(Integer.parseInt(String.valueOf(row[0]))));
+            
+            int batchId = transactionOutManager.processManualTransaction(transaction);
+            
+        }
+        
+        return true;
+    }
+    
+    
+    /**
+     * The 'donotprocessAllTransactions' function will update all transactions based on the passed in organziation id and message type id to
+     * DO NOT PROCESS.
+     */
+    @RequestMapping(value = "/donotprocessAllTransactions", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody boolean donotprocessAllTransactions(@RequestParam(value = "orgId", required = true) Integer orgId, @RequestParam(value = "messageTypeId", required = false) Integer messageTypeId) throws Exception {
+        
+       
+        if(messageTypeId == null || "".equals(messageTypeId)) {
+            messageTypeId = 0;
+        }
+        
+        /* Need to get all transactions for the passed in org and message type id (IF PASSED IN) */
+        List transactions = transactionOutManager.getAllransactionsToProcessByMessageType(orgId, messageTypeId);
+        
+        for(ListIterator iter = transactions.listIterator(); iter.hasNext(); ) {
+            Object[] row = (Object[]) iter.next();
+            transactionOutManager.doNotProcessTransaction(Integer.valueOf(Integer.parseInt(String.valueOf(row[0]))));
+            
+        }
+        
+        return true;
+    }
+    
     
     /**
      * The 'processTransaction' function will take an outbound transaction and start the processing.
@@ -1716,6 +1866,19 @@ public class adminProcessingActivity {
         transactionTarget transaction = transactionOutManager.getTransactionDetails(transactionId);
         
         int batchId = transactionOutManager.processManualTransaction(transaction);
+        
+        return true;
+    }
+    
+    /**
+     * The 'donotprocessTransaction' function will update the transaction to Do Not Process.
+     * 
+     * @param transactionId The id of the transaction that needs to be processed.
+     */
+    @RequestMapping(value = "/donotprocessTransaction", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody boolean donotprocessTransaction(@RequestParam(value = "transactionId", required = true) Integer transactionId) throws Exception {
+        
+        transactionOutManager.doNotProcessTransaction(transactionId);
         
         return true;
     }

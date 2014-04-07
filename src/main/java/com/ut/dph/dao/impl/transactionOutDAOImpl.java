@@ -1652,10 +1652,10 @@ public class transactionOutDAOImpl implements transactionOutDAO {
     }
     
     /**
-     * The 'getTransactionsToProcessByMessageType' will return a llist of transactions that need to be processed grouped by
+     * The 'getTransactionsToProcessByMessageType' will return a list of transactions that need to be processed grouped by
      * message type.
      *
-     * @return This methid will return a list
+     * @return This method will return a list
      */
     @Override
     @Transactional
@@ -1697,7 +1697,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
      */
     @Override
     @Transactional
-    public List<transactionTarget> getPendingDeliveryTransactions(int orgId, int messageType, int page, int maxResults) throws Exception {
+    public List<transactionTarget> getPendingDeliveryTransactions(int orgId, int messageType, Date fromDate, Date toDate, int page, int maxResults) throws Exception {
         
         int firstResult = 0;
         
@@ -1721,6 +1721,14 @@ public class transactionOutDAOImpl implements transactionOutDAO {
         transactions.add(Restrictions.eq("statusId", 9));
         transactions.add(Restrictions.eq("batchDLId", 0));
         
+        if (!"".equals(fromDate)) {
+            transactions.add(Restrictions.ge("dateCreated", fromDate));
+        }
+
+        if (!"".equals(toDate)) {
+            transactions.add(Restrictions.lt("dateCreated", toDate));
+        }
+        
         if (page > 1) {
             firstResult = (maxResults * (page - 1));
         }
@@ -1733,6 +1741,61 @@ public class transactionOutDAOImpl implements transactionOutDAO {
         }
         
         return transactions.list(); 
+    }
+    
+    @Override
+    @Transactional
+    public void doNotProcessTransaction(int transactionId) throws Exception {
+        
+        Criteria transactionDetails = sessionFactory.getCurrentSession().createCriteria(transactionTarget.class);
+        transactionDetails.add(Restrictions.eq("id", transactionId));
+        
+        transactionTarget targetDetails = (transactionTarget) transactionDetails.uniqueResult();
+        
+        /* Update the transaction Target status to DNP (Do Not Process) */
+        targetDetails.setstatusId(34);
+        sessionFactory.getCurrentSession().update(targetDetails);
+        
+        /* Update the transaction in status to DNP (Do Not Process) */
+        String sql = "update transactionIn set statusId = 34 where id = :transactionInId";
+
+        Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                .setParameter("transactionInId", targetDetails.gettransactionInId());
+        updateData.executeUpdate();
+        
+        /* Need to check to see if this is the only transaction for the uploaded batch */
+        String updateBatchSQL = "update batchUploads set statusId = 21 where id = :batchId and 0 in (select count(id) as total from transactionIn where batchId = :batchId and statusId != 34)";
+        
+        Query updateBatchStatus = sessionFactory.getCurrentSession().createSQLQuery(updateBatchSQL);
+        updateBatchStatus.setParameter("batchId", targetDetails.getbatchUploadId());
+        updateBatchStatus.executeUpdate();
+                
+    }
+    
+    /**
+     * The 'getAllransactionsToProcessByMessageType' will return a list of transactions that need to be processed by the passed in
+     * organizationId and message type id.
+     *
+     * @return This method will return a list
+     */
+    @Override
+    @Transactional
+    public List getAllransactionsToProcessByMessageType(int orgId, int messageTypeId) throws Exception {
+
+        int firstResult = 0;
+
+        String SQL = "SELECT tt.id, c.id as configId\n"
+                + "FROM transactionTarget tt inner join configurations c on c.id = tt.configId \n"
+                + "where tt.batchDLId = 0 and tt.statusID = 9 and c.orgId = "+ orgId;
+        
+        if(messageTypeId > 0) {
+            SQL += " and c.messageTypeId = " + messageTypeId;
+        }
+        
+        Query transactions = sessionFactory.getCurrentSession().createSQLQuery(SQL);
+       
+        return transactions.list();
+
     }
 
 }

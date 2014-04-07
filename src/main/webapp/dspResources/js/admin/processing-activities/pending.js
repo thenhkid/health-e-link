@@ -15,17 +15,53 @@ require(['./main'], function () {
             $('.alert').delay(2000).fadeOut(1000);
         }
         
-        //This function will launch the status detail overlay with the selected
-        //status
-        $(document).on('click', '.process', function() {
-            $.ajax({
-                url: 'processTransaction',
-                data:{'transactionId': $(this).attr('rel')},
-                type: "GET",
-                success: function(data) {
-                    window.location.href = "/administrator/processing-activity/waiting?msg=processed";
-                }
-            });
+        //This function will process the selected transaction
+        $(document).on('click', '.processAll', function() {
+            
+            var confirmed = confirm("Are you sure you want to process these transactions?");
+
+             if (confirmed) {
+                 
+                $.ajax({
+                  url: 'processAllTransactions',
+                  data:{'orgId': $(this).attr('rel'), 'messageTypeId': 0},
+                  type: "POST",
+                  success: function(data) {
+                     $('#searchForm').attr('action','/administrator/processing-activity/pending?msg=processed');
+                     $('#searchForm').submit();
+                  }
+                });
+             }
+           
+        });
+        
+        //This function will not process the selected transaction
+        $(document).on('click', '.donotprocess', function() {
+             
+             var confirmed = confirm("Are you sure you do not want to process these transactions?");
+
+             if (confirmed) {
+                 
+                $.ajax({
+                  url: 'donotprocessAllTransactions',
+                  data:{'orgId': $(this).attr('rel'), 'messageTypeId': 0},
+                  type: "POST",
+                  success: function(data) {
+                     $('#searchForm').attr('action','/administrator/processing-activity/pending?msg=notprocessed');
+                     $('#searchForm').submit();
+                  }
+              });
+            
+             }
+           
+        });
+        
+        //This function will handle clicking the "View" link for each target org in the list
+        $(document).on('click', '.viewLink', function() {
+           var orgId = $(this).attr('rel');
+           
+           $('#orgId').val(orgId);
+           $('#showMessageTypes').submit();
         });
         
    });

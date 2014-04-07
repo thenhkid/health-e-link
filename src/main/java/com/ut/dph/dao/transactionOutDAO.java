@@ -113,6 +113,10 @@ public interface transactionOutDAO {
     
     List getTransactionsToProcessByMessageType(int orgId, int page, int maxResults) throws Exception;
     
-    List<transactionTarget> getPendingDeliveryTransactions(int orgId, int messageType, int page, int maxResults) throws Exception;
+    List getAllransactionsToProcessByMessageType(int orgId, int messageTypeId) throws Exception;
+    
+    List<transactionTarget> getPendingDeliveryTransactions(int orgId, int messageType, Date fromDate, Date toDate, int page, int maxResults) throws Exception;
+    
+    void doNotProcessTransaction(int transactionId) throws Exception;
     
 }

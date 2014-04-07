@@ -70,7 +70,7 @@
                 <div class="panel-heading">
                     <h3 class="panel-title">Organizations</h3>
                 </div>
-                <div class="panel-body" >
+                <div class="panel-body"  style="height:385px;" >
                     <h4>Latest Organizations:</h4>
                     <c:choose>
                         <c:when test="${not empty latestOrgs}">
@@ -120,7 +120,7 @@
                 <div class="panel-heading">
                     <h3 class="panel-title">Message Types</h3>
                 </div>
-                <div class="panel-body" >
+                <div class="panel-body" style="height:385px;" >
                     <h4>Latest Message Types:</h4>
                     <c:choose>
                         <c:when test="${not empty latestMessageTypes}">
@@ -161,7 +161,7 @@
                 <div class="panel-heading">
                     <h3 class="panel-title">Configurations</h3>
                 </div>
-                <div class="panel-body" >
+                <div class="panel-body"  style="height:385px;" >
                     <h4>Latest Configurations:</h4>
                     <c:choose>
                         <c:when test="${not empty latestConfigs}"> 
@@ -201,7 +201,7 @@
                 <div class="panel-heading">
                     <h3 class="panel-title">Connections</h3>
                 </div>
-                <div class="panel-body" >
+                <div class="panel-body"  style="height:385px;" >
                     <h4>Latest Connections</h4>
                     <c:choose>
                         <c:when test="${not empty connections}">
@@ -219,7 +219,7 @@
                                                 </c:forEach>
                                             </td>
                                             <td>
-                                                <strong><---SENDING TO ---></strong>
+                                                Sending To <span class="glyphicon  glyphicon-arrow-right"></span>
                                             </td>
                                             <td>
                                                 <a href="administrator/configurations/connections" title="Edit this Connection"><strong>${connection.tgtConfigDetails.getOrgName()}</strong></a>

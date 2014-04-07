@@ -26,6 +26,7 @@ import com.ut.dph.model.configurationSchedules;
 import com.ut.dph.model.configurationTransport;
 import com.ut.dph.service.emailMessageManager;
 import com.ut.dph.model.mailMessage;
+import com.ut.dph.model.pendingDeliveryTargets;
 import com.ut.dph.model.systemSummary;
 import com.ut.dph.model.targetOutputRunLogs;
 import com.ut.dph.model.transactionIn;
@@ -1470,20 +1471,22 @@ public class transactionOutManagerImpl implements transactionOutManager {
     public boolean searchTransactions(Transaction transaction, String searchTerm) throws Exception {
 
         boolean matchFound = false;
+        
+        String lcaseSearchTerm = searchTerm.toLowerCase();
 
-        if (transaction.getmessageTypeName().toLowerCase().matches(".*" + searchTerm + ".*")) {
+        if (transaction.getmessageTypeName() != null && transaction.getmessageTypeName().toLowerCase().matches(".*" + lcaseSearchTerm + ".*")) {
             matchFound = true;
         }
 
 
-        if (transaction.getstatusValue() != null && transaction.getstatusValue().toLowerCase().matches(".*" + searchTerm + ".*")) {
+        if (transaction.getstatusValue() != null && transaction.getstatusValue().toLowerCase().matches(".*" + lcaseSearchTerm + ".*")) {
             matchFound = true;
         }
         
         if (transaction.getsourceOrgFields().size() > 0) {
 
             for (int i = 0; i < transaction.getsourceOrgFields().size(); i++) {
-                if (transaction.getsourceOrgFields().get(i).getFieldValue() != null && transaction.getsourceOrgFields().get(i).getFieldValue().toLowerCase().matches(".*" + searchTerm + ".*")) {
+                if (transaction.getsourceOrgFields().get(i).getFieldValue() != null && transaction.getsourceOrgFields().get(i).getFieldValue().toLowerCase().matches(".*" + lcaseSearchTerm + ".*")) {
                     matchFound = true;
                 }
             }
@@ -1492,7 +1495,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
         if (transaction.gettargetOrgFields().size() > 0) {
 
             for (int i = 0; i < transaction.gettargetOrgFields().size(); i++) {
-                if (transaction.gettargetOrgFields().get(i).getFieldValue() != null && transaction.gettargetOrgFields().get(i).getFieldValue().toLowerCase().matches(".*" + searchTerm + ".*")) {
+                if (transaction.gettargetOrgFields().get(i).getFieldValue() != null && transaction.gettargetOrgFields().get(i).getFieldValue().toLowerCase().matches(".*" + lcaseSearchTerm + ".*")) {
                     matchFound = true;
                 }
             }
@@ -1514,10 +1517,73 @@ public class transactionOutManagerImpl implements transactionOutManager {
     public List getTransactionsToProcessByMessageType(int orgId, int page, int maxResults) throws Exception {
         return transactionOutDAO.getTransactionsToProcessByMessageType(orgId, page, maxResults);
     }
+    
+    @Override
+    @Transactional
+    public List getAllransactionsToProcessByMessageType(int orgId, int messageTypeId) throws Exception {
+        return transactionOutDAO.getAllransactionsToProcessByMessageType(orgId, messageTypeId);
+    }
 
     @Override
     @Transactional
-    public List<transactionTarget> getPendingDeliveryTransactions(int orgId, int messageType, int page, int maxResults) throws Exception {
-        return transactionOutDAO.getPendingDeliveryTransactions(orgId, messageType, page, maxResults);
+    public List<transactionTarget> getPendingDeliveryTransactions(int orgId, int messageType, Date fromDate, Date toDate, int page, int maxResults) throws Exception {
+        return transactionOutDAO.getPendingDeliveryTransactions(orgId, messageType, fromDate, toDate, page, maxResults);
+    }
+    
+    @Override
+    public boolean searchTransactionsByMessageType(pendingDeliveryTargets transaction, String searchTerm) throws Exception {
+        boolean matchFound = false;
+        
+        String lcaseSearchTerm = searchTerm.toLowerCase();
+        
+        if (transaction.getMessageType() != null && transaction.getMessageType().toLowerCase().matches(".*" + lcaseSearchTerm + ".*")) {
+            matchFound = true;
+        }
+        
+        if (transaction.getOrgDetails().toLowerCase().matches(".*" + lcaseSearchTerm + ".*")) {
+            matchFound = true;
+        }
+        
+        return matchFound;
+    }
+    
+    @Override
+    public boolean searchPendingTransactions(Transaction transaction, String searchTerm) throws Exception {
+        
+        boolean matchFound = false;
+        
+        String lcaseSearchTerm = searchTerm.toLowerCase();
+        
+        if (transaction.getbatchName() != null && transaction.getbatchName().toLowerCase().matches(".*" + lcaseSearchTerm + ".*")) {
+            matchFound = true;
+        }
+
+        if (transaction.getsourceOrgFields().size() > 0) {
+
+            for (int i = 0; i < transaction.getsourceOrgFields().size(); i++) {
+                if (transaction.getsourceOrgFields().get(i).getFieldValue() != null && transaction.getsourceOrgFields().get(i).getFieldValue().toLowerCase().matches(".*" + lcaseSearchTerm + ".*")) {
+                    matchFound = true;
+                }
+            }
+        }
+        
+        if (transaction.getpatientFields().size() > 0) {
+
+            for (int i = 0; i < transaction.getpatientFields().size(); i++) {
+                if (transaction.getpatientFields().get(i).getFieldValue() != null && transaction.getpatientFields().get(i).getFieldValue().toLowerCase().matches(".*" + lcaseSearchTerm + ".*")) {
+                    matchFound = true;
+                }
+            }
+        }
+        
+        return matchFound;
+        
+        
+    }
+    
+    @Override
+    @Transactional
+    public void doNotProcessTransaction(int transactionId) throws Exception {
+        transactionOutDAO.doNotProcessTransaction(transactionId);
     }
 }
