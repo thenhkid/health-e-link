@@ -113,8 +113,14 @@ public class HealtheConnectController {
      * @throws Exception
      */
     @RequestMapping(value = "/upload", method = RequestMethod.GET)
-    public ModelAndView viewUploadForm(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
+    public ModelAndView viewUploadForm(
+    		@RequestParam(value = "searchTerm", required = false) String searchTerm,
+    		HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
         
+    	if (searchTerm == null) {
+    		searchTerm = "";
+    	}
+    	
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/Health-e-Connect/upload");
         
@@ -130,8 +136,8 @@ public class HealtheConnectController {
         
         try {
             /* Need to get a list of all uploaded batches */
-            Integer totaluploadedBatches = transactionInManager.getuploadedBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, "", 1, 0).size();
-            List<batchUploads> uploadedBatches = transactionInManager.getuploadedBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, "", 1, maxResults);
+            Integer totaluploadedBatches = transactionInManager.getuploadedBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, searchTerm, 1, 0).size();
+            List<batchUploads> uploadedBatches = transactionInManager.getuploadedBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, searchTerm, 1, maxResults);
 
             if(!uploadedBatches.isEmpty()) {
                 for(batchUploads batch : uploadedBatches) {
@@ -926,7 +932,7 @@ public class HealtheConnectController {
     		HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
        
     try {
-       
+    	batchUploads batchInfo = transactionInManager.getBatchDetails(batchId);
     	/**
     	 * Four options - 
     	 * rejectMessages - canEdit
@@ -935,6 +941,13 @@ public class HealtheConnectController {
     	 * 
     	 * **/
     	System.out.println(batchOption);
+    	System.out.println("idList is " + idList);
+    	String redirectPage = "auditReports";
+    	
+    	if (batchOption.equalsIgnoreCase("resetBatch")) {
+    		redirectPage = "upload?searchTerm=" + batchInfo.getutBatchName();
+    	}
+    	
     	/**
     	User userInfo = (User)session.getAttribute("userDetails");
         batchUploads batchInfo = transactionInManager.getBatchDetails(batchId);
@@ -964,7 +977,7 @@ public class HealtheConnectController {
     	**/
     	/** set error message for display **/
     	
-    	ModelAndView mav = new ModelAndView(new RedirectView("auditReports"));
+    	ModelAndView mav = new ModelAndView(new RedirectView(redirectPage));
 		return mav;	
 		
         }
