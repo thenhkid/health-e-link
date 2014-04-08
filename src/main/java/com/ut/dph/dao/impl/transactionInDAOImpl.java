@@ -1485,7 +1485,7 @@ public class transactionInDAOImpl implements transactionInDAO {
                 for (transactionIn transaction : transactions) {
 
                     Criteria configQuery = sessionFactory.getCurrentSession().createCriteria(configuration.class);
-                    configQuery.add(Restrictions.eq("id", transaction.getconfigId()));
+                    configQuery.add(Restrictions.eq("id", transaction.getConfigId()));
                     List<configuration> configs = configQuery.list();
 
                     if (!configs.isEmpty()) {

@@ -32,8 +32,8 @@ public class transactionIn {
     private int batchId;
     
     @Column(name = "CONFIGID", nullable = false)
-    private int configId;
-    
+    private Integer configId;
+
     @Column(name = "STATUSID", nullable = false)
     private int statusId;
     
@@ -91,4 +91,12 @@ public class transactionIn {
     public void settransactionTargetId(int transactionTargetId) {
         this.transactionTargetId = transactionTargetId;
     }
+    
+    public Integer getConfigId() {
+		return configId;
+	}
+
+	public void setConfigId(Integer configId) {
+		this.configId = configId;
+	}
 }
