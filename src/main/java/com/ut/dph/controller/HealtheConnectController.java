@@ -876,7 +876,7 @@ public class HealtheConnectController {
                 ua.setActivity("ERG View");
                 ua.setTransactionInIds(String.valueOf(transactionInId));
                 if (batchInfo != null) {
-                    ua.setBatchIds(String.valueOf(batchInfo.getId()));
+                    ua.setBatchId(batchInfo.getId());
                 }
                 if (!hasPermission) {
                     ua.setActivityDesc("without permission");
