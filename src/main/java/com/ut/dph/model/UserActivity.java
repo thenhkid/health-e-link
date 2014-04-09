@@ -36,7 +36,7 @@ public class UserActivity {
 	
 	@NoHtml
     @Column(name = "batchId", nullable = true)
-    private Integer batchId;
+    private Integer batchId = 0;
 	
 	@NoHtml
 	@Column(name = "accessMethod", nullable = true)
