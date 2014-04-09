@@ -8,10 +8,11 @@
 
 require(['./main'], function() {
     require(['jquery'], function($) {
+        
+        $("input:text,form").attr("autocomplete", "off");
 
         //this function will submit the batchId for viewing detailed audit report
         $(document).on('click', '.viewLink', function() {
-            $('#auditbatchId').val($(this).attr('rel'));
             $('#viewBatchAuditReport').submit();
         });
 
@@ -34,7 +35,21 @@ require(['./main'], function() {
             errorsFound = checkFormFields();
 
             if(errorsFound == 0) {
-                $('#messageForm').submit(); 
+               
+                 var formData = $("#messageForm").serialize();
+                 
+                 $.ajax({
+                    url: '/Health-e-Connect/editMessage',
+                    data: formData,
+                    type: "POST",
+                    async: false,
+                    dataType: "json",
+                    success: function(data) {
+                       $('#viewBatchAuditReport').submit();
+                    }
+                });
+                
+                
             }
             else {
                 $('.alert-danger').show();

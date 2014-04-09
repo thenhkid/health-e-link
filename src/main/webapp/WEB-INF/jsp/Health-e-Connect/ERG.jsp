@@ -15,7 +15,7 @@
 
             <ol class="breadcrumb">
                 <li><a href="<c:url value='/Health-e-Connect/upload'/>">Uploaded Files</a></li>
-                <li><a href="javascript:void(0);" rel="${transaction.batchId}" class="viewLink">Audit Report - #${transaction.batchName}</a></li>
+                <li><a href="javascript:void(0);" class="viewLink">Audit Report - #${transaction.batchName}</a></li>
                 <li class="active">Edit Transaction</li>
             </ol>
             
@@ -32,22 +32,11 @@
              </div>
             
             <form action="auditReport" id="viewBatchAuditReport" method="post">
-                <input type="hidden" id="auditbatchId" name="batchId" value="" />
+                <input type="hidden" id="auditbatchId" name="batchId" value="${transaction.batchId}" />
             </form> 
             <form:form id="messageForm" action="/Health-e-Connect/editMessage" modelAttribute="transaction" role="form" class="form" method="post">
-                <input type="hidden" id="action" name="action" value="save" />
-                <form:hidden path="orgId" />
-                <form:hidden path="configId" />
-                <form:hidden path="messageTypeId" />
-                <form:hidden path="batchName" />
-                <form:hidden path="originalFileName" />
-                <form:hidden path="transactionRecordId" />
-                <form:hidden path="batchId" />
-                <form:hidden path="transactionId" id="transactionId" />
-                <form:hidden path="targetConfigId" />
-                <form:hidden path="transactionTargetId" />
-                <form:hidden path="targetOrgId" />
-                <form:hidden path="orginialTransactionId" />
+                <form:hidden path="transactionId"  />
+                <form:hidden path="batchId"  />
                 <c:forEach items="${transaction.sourceOrgFields}" varStatus="i">
                     <form:hidden path="sourceOrgFields[${i.index}].fieldValue" />
                     <form:hidden path="sourceOrgFields[${i.index}].fieldNo" />

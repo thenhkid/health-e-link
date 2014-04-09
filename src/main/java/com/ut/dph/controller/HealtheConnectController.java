@@ -58,6 +58,7 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -720,12 +721,13 @@ public class HealtheConnectController {
      * @return	the health-e-Connect audit reports search view
      * @throws Exception
      */
-    @RequestMapping(value = "/auditReport", method = RequestMethod.POST)
+    @RequestMapping(value = "/auditReport", method = {RequestMethod.GET, RequestMethod.POST})
     public ModelAndView viewAuditRpt(@RequestParam(value = "page", required = false) Integer page,
             @RequestParam(value = "batchId", required = false) Integer batchId,
             HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
 
         try {
+        
             ModelAndView mav = new ModelAndView();
             mav.setViewName("/Health-e-Connect/auditReport");
 
@@ -904,22 +906,12 @@ public class HealtheConnectController {
 
                     transactionTarget transactionTarget = transactionInManager.getTransactionTarget(transactionInfo.getbatchId(), transactionId);
 
-                    transaction.setorgId(batchInfo.getOrgId());
-                    transaction.settransportMethodId(2);
-                    transaction.setmessageTypeId(configDetails.getMessageTypeId());
-                    transaction.setuserId(batchInfo.getuserId());
-                    transaction.setbatchName(batchInfo.getutBatchName());
-                    transaction.setoriginalFileName(batchInfo.getoriginalFileName());
-                    transaction.setstatusId(batchInfo.getstatusId());
-                    transaction.settransactionStatusId(transactionInfo.getstatusId());
-                    transaction.settargetOrgId(0);
-                    transaction.setconfigId(transactionInfo.getconfigId());
-                    transaction.setautoRelease(transportDetails.getautoRelease());
+                    transaction.settransactionId(transactionId);
                     transaction.setbatchId(batchInfo.getId());
-                    transaction.settransactionId(transactionTarget.getId());
-                    transaction.settransactionTargetId(transactionTarget.getId());
+                    transaction.setbatchName(batchInfo.getutBatchName());
                     transaction.setdateSubmitted(transactionInfo.getdateCreated());
-
+                    transaction.setstatusId(batchInfo.getstatusId());
+                   
                     /* Check to see if the message is a feedback report */
                     if (transactionInfo.gettransactionTargetId() > 0) {
                         transaction.setsourceType(2); /* Feedback report */
@@ -1016,6 +1008,113 @@ public class HealtheConnectController {
             throw new Exception("Error occurred displaying upload ERG form.", e);
         }
 
+    }
+    
+    /**
+     * The '/editMessage' POST request will submit the changes to the passed in transaction. The
+     * transaction will be updated to a status of 12 (Release) and the error records will be cleared
+     * 
+     * @param transactionDetails The object to hold the transaction fields
+     * 
+     */
+    @RequestMapping(value = "/editMessage", method = RequestMethod.POST)
+    public @ResponseBody Integer submitTransactionChanges(@ModelAttribute(value = "transactionDetails") Transaction transactionDetails,HttpServletRequest request, HttpServletResponse response, HttpSession session,RedirectAttributes redirectAttributes) throws Exception {
+        
+       
+        /* Update the transactionInRecords */
+        List<transactionRecords> sourceOrgFields = transactionDetails.getsourceOrgFields();
+        List<transactionRecords> sourceProviderFields = transactionDetails.getsourceProviderFields();
+        List<transactionRecords> targetOrgFields = transactionDetails.gettargetOrgFields();
+        List<transactionRecords> targetProviderFields = transactionDetails.gettargetProviderFields();
+        List<transactionRecords> patientFields = transactionDetails.getpatientFields();
+        List<transactionRecords> detailFields = transactionDetails.getdetailFields(); 
+        
+        
+        transactionInRecords records = transactionInManager.getTransactionRecord(transactionDetails.gettransactionRecordId());
+       
+        String colName;
+        for(transactionRecords field : sourceOrgFields) {
+            colName = new StringBuilder().append("f").append(field.getfieldNo()).toString();
+            try {
+                BeanUtils.setProperty(records, colName, field.getfieldValue());
+            } catch (IllegalAccessException ex) {
+                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InvocationTargetException ex) {
+                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+        for(transactionRecords field : sourceProviderFields) {
+            colName = new StringBuilder().append("f").append(field.getfieldNo()).toString();
+            try {
+                BeanUtils.setProperty(records, colName, field.getfieldValue());
+            } catch (IllegalAccessException ex) {
+                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InvocationTargetException ex) {
+                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+        for(transactionRecords field : targetOrgFields) {
+            colName = new StringBuilder().append("f").append(field.getfieldNo()).toString();
+            try {
+                BeanUtils.setProperty(records, colName, field.getfieldValue());
+            } catch (IllegalAccessException ex) {
+                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InvocationTargetException ex) {
+                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+        for(transactionRecords field : targetProviderFields) {
+            colName = new StringBuilder().append("f").append(field.getfieldNo()).toString();
+            try {
+                BeanUtils.setProperty(records, colName, field.getfieldValue());
+            } catch (IllegalAccessException ex) {
+                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InvocationTargetException ex) {
+                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+        for(transactionRecords field : patientFields) {
+            colName = new StringBuilder().append("f").append(field.getfieldNo()).toString();
+            try {
+                BeanUtils.setProperty(records, colName, field.getfieldValue());
+            } catch (IllegalAccessException ex) {
+                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InvocationTargetException ex) {
+                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+        for(transactionRecords field : detailFields) {
+            colName = new StringBuilder().append("f").append(field.getfieldNo()).toString();
+            try {
+                BeanUtils.setProperty(records, colName, field.getfieldValue());
+            } catch (IllegalAccessException ex) {
+                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InvocationTargetException ex) {
+                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        
+        records.setId(transactionDetails.gettransactionRecordId());
+        transactionInManager.submitTransactionInRecordsUpdates(records);
+        
+        
+        /* Update the transactionTranslatedIn records */
+        transactionInManager.submitTransactionTranslatedInRecords(transactionDetails.gettransactionId(), transactionDetails.gettransactionRecordId(), transactionDetails.getconfigId());
+         
+        
+        /* Remove the transaction errors */
+        
+       
+        /* Update the transaction status to 12 (Released) */
+       
+        
+      return 1;
+        
     }
 
     /**
@@ -1222,8 +1321,8 @@ public class HealtheConnectController {
                      
                      for(TransErrorDetail error : fieldErrors) {
                            errorDetails.append(error.getErrorDisplayText());
-                           if(error.getErrorInfo() != "" && error.getErrorInfo() != null) {
-                               errorDetails.append(" - "+error.getErrorInfo());
+                           if(!"".equals(error.getErrorInfo()) && error.getErrorInfo() != null) {
+                               errorDetails.append(" - ").append(error.getErrorInfo());
                            }
                            errorDetails.append("<br />");
                      }
