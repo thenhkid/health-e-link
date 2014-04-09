@@ -635,6 +635,7 @@ public class HealtheConnectController {
            mav.addObject("hasConfigurations", hasConfigurations);
            mav.addObject("uploadedBatches", uploadedBatches);
            mav.addObject("searchTerm", searchTerm);
+           mav.addObject("user", userInfo);
            
            Integer totalPages = (int)Math.ceil((double)totaluploadedBatches / maxResults);
            mav.addObject("totalPages", totalPages);

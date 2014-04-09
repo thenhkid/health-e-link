@@ -28,10 +28,8 @@
                     </div>
 
                     <div class="col-md-2 col-md-offset-3">
-                    
-                    <a href="javascript:void(0);" title="Send Batches" class="pull-right btn btn-primary sendBatches"><span class="glyphicon glyphicon-send"></span> Release Marked Batches</a> 
-                  <c:if test="${canSend == true && not empty pendingBatches}"> </c:if>
-                </div>
+                    	<a href="javascript:void(0);" title="Send Batches" class="pull-right btn btn-primary sendBatches"><span class="glyphicon glyphicon-send"></span> Release Marked Batches</a> 
+               		</div>
                     <div class="col-md-4">
                         <div class="date-range-picker-trigger form-control pull-right daterange">
                             <i class="glyphicon glyphicon-calendar"></i>
@@ -39,7 +37,7 @@
                         </div>
                     </div>
             </div>
-            
+            <c:set var="showButton" value="false"/>
             <div class="form-container scrollable">
                 <table class="table table-striped table-hover table-default">
                     <thead>
@@ -62,7 +60,7 @@
                                 <c:forEach var="batch" items="${uploadedBatches}">
                                     <tr>
                                    	    <td scope="row"  class="center-text">
-	                                   	    <c:if test="${batch.statusId == 5 && user.deliverAuthority && batch.transTotalNotFinal == 0}">
+	                                   	    <c:if test="${batch.statusId == 5 && userDetails.deliverAuthority == true && batch.transTotalNotFinal == 0}">
 	                                   	    	<input type="checkbox" id="batchId" name="batchId" class="batchIds" value="${batch.id}" />
 	                                   	    </c:if>
                                    	    </td>
@@ -108,5 +106,7 @@
         </div>
     </div>
 </div>
+<c:if test="${show}">
+</c:if>
 <div class="modal fade" id="uploadFile" role="dialog" tabindex="-1" aria-labeledby="Upload New File" aria-hidden="true" aria-describedby="Upload New File"></div>
 <div class="modal fade" id="statusModal" role="dialog" tabindex="-1" aria-labeledby="Status Details" aria-hidden="true" aria-describedby="Status Details"></div>
