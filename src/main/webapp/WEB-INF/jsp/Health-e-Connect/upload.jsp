@@ -86,7 +86,7 @@
                                         <td class="center-text">${batch.usersName}</td>
                                         <td class="center-text"><fmt:formatDate value="${batch.dateSubmitted}" type="date" pattern="M/dd/yyyy" /><br /><fmt:formatDate value="${batch.dateSubmitted}" type="time" pattern="h:mm:ss a" /></td>
                                         <td class="actions-col" style="width:50px;">&nbsp;
-                                            <c:if test="${batch.statusId != 2 && batch.statusId != 21}">
+                                            <c:if test="${batch.statusId != 2}">
                                             <a href="javascript:void(0);" rel="${batch.id}" class="btn btn-link viewLink">
                                                 <span class="glyphicon glyphicon-edit"></span>
                                                 View Audit Report

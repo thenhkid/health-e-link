@@ -980,16 +980,12 @@ public class HealtheConnectController {
     		} else if (batchOption.equalsIgnoreCase("cancelBatch")) {
     			//check authority
     			if (allowBatchClear && userInfo.getcancelAuthority()) {
-    				transactionInManager.updateBatchStatus(batchId, 4, "startDateTime");
-    				
-    				boolean cleared = transactionInManager.clearBatch(batchId);
-    				if (cleared) {
+    					transactionInManager.updateBatchStatus(batchId, 4, "startDateTime");
+    					transactionInManager.updateTransactionStatus(batchId, 0, 0, 34);
+    					transactionInManager.updateTransactionTargetStatus(batchId, 0, 0, 34);
     					transactionInManager.updateBatchStatus(batchId, 21, "endDateTime");
     					systemMessage = "Batch is set to 'Do Not Process'.";
-    				} else {
-    					transactionInManager.updateBatchStatus(batchId, 29, "endDateTime");
-    					systemMessage = "An error occurred while resetting batch.  Please review logs.";
-    				}
+    				
     			} else {
     				systemMessage = "You do not have permission to cancel a batch.";
     				hasPermission = false;
