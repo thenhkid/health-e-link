@@ -35,8 +35,8 @@ public class UserActivity {
     private int userId = 0;
 	
 	@NoHtml
-    @Column(name = "batchIds", nullable = true)
-    private String batchIds;
+    @Column(name = "batchId", nullable = true)
+    private Integer batchId;
 	
 	@NoHtml
 	@Column(name = "accessMethod", nullable = true)
@@ -81,14 +81,6 @@ public class UserActivity {
 
 	public void setUserId(int userId) {
 		this.userId = userId;
-	}
-
-	public String getBatchIds() {
-		return batchIds;
-	}
-
-	public void setBatchIds(String batchIds) {
-		this.batchIds = batchIds;
 	}
 
 	public String getAccessMethod() {
@@ -146,6 +138,15 @@ public class UserActivity {
 	public void setDateCreated(Date dateCreated) {
 		this.dateCreated = dateCreated;
 	}
+
+	public Integer getBatchId() {
+		return batchId;
+	}
+
+	public void setBatchId(Integer batchId) {
+		this.batchId = batchId;
+	}
+
 	
     
 }

@@ -806,7 +806,7 @@ public class HealtheConnectController {
     	ua.setAccessMethod(request.getMethod());
     	ua.setPageAccess("/auditReport");
     	ua.setActivity("Audit Report Request");
-    	ua.setBatchIds(String.valueOf(batchInfo.getId()));
+    	ua.setBatchId(batchInfo.getId());
     	if (!hasPermission) {
     		ua.setActivityDesc("without permission");
     	}
@@ -892,7 +892,7 @@ public class HealtheConnectController {
     	ua.setActivity("ERG View");
     	ua.setTransactionInIds(String.valueOf(transactionInId));
     	if (batchInfo != null) {
-    		ua.setBatchIds(String.valueOf(batchInfo.getId()));
+    		ua.setBatchId(batchInfo.getId());
         }
     	if (!hasPermission) {
     		ua.setActivityDesc("without permission");
@@ -1033,7 +1033,7 @@ public class HealtheConnectController {
     	ua.setAccessMethod(request.getMethod());
     	ua.setPageAccess("/batchOptions");
     	ua.setActivity("Batch Options -" + batchOption);
-    	ua.setBatchIds(String.valueOf(batchInfo.getId()));
+    	ua.setBatchId(batchInfo.getId());
     	ua.setTransactionInIds(idList.toString());
     	if (!hasPermission) {
     		ua.setActivityDesc("without permission" + systemMessage);

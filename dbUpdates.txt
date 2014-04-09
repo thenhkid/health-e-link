@@ -445,3 +445,8 @@ CREATE TABLE `userActivity` (
 
 /** Chad - 04072014 @ 12:42 PM **/
 INSERT INTO `universalTranslator`.`lu_ProcessStatus` (`category`, `displayCode`, `displayText`, `status`, `isCustom`) VALUES ('transaction', 'DNP', 'Do Not Process', 1, 0);
+
+
+/** grace 04092014 **/
+ALTER TABLE `universaltranslator`.`userActivity` 
+CHANGE COLUMN `batchIds` `batchId` INT NULL DEFAULT NULL ;
