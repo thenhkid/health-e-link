@@ -27,8 +27,11 @@
                         </form:form>
                     </div>
 
-                    <div class="col-md-2 col-md-offset-3"></div>
-
+                    <div class="col-md-2 col-md-offset-3">
+                    
+                    <a href="javascript:void(0);" title="Send Batches" class="pull-right btn btn-primary sendBatches"><span class="glyphicon glyphicon-send"></span> Release Marked Batches</a> 
+                  <c:if test="${canSend == true && not empty pendingBatches}"> </c:if>
+                </div>
                     <div class="col-md-4">
                         <div class="date-range-picker-trigger form-control pull-right daterange">
                             <i class="glyphicon glyphicon-calendar"></i>
@@ -41,6 +44,7 @@
                 <table class="table table-striped table-hover table-default">
                     <thead>
                         <tr>
+                            <th scope="col">Release?</th>
                             <th scope="col">Batch Name</th>
                             <th scope="col">File Name</th>
                             <th scope="col" class="center-text"># of Transactions</th>
@@ -57,7 +61,13 @@
                             <c:when test="${not empty uploadedBatches}">
                                 <c:forEach var="batch" items="${uploadedBatches}">
                                     <tr>
-                                        <td scope="row">${batch.utBatchName}</td>
+                                   	    <td scope="row"  class="center-text">
+	                                   	    <c:if test="${batch.statusId == 5 && user.deliverAuthority && batch.transTotalNotFinal == 0}">
+	                                   	    	<input type="checkbox" id="batchId" name="batchId" class="batchIds" value="${batch.id}" />
+	                                   	    </c:if>
+                                   	    </td>
+                                        
+                                        <td>${batch.utBatchName}</td>
                                         <td>
                                             ${batch.originalFileName}
                                         </td>
@@ -68,11 +78,13 @@
                                         </td>
                                         <td class="center-text"><fmt:formatDate value="${batch.endDateTime}" type="date" pattern="M/dd/yyyy" /><br /><fmt:formatDate value="${batch.endDateTime}" type="time" pattern="h:mm:ss a" /></td>
                                         <td class="center-text"><fmt:formatDate value="${batch.dateSubmitted}" type="date" pattern="M/dd/yyyy" /><br /><fmt:formatDate value="${batch.dateSubmitted}" type="time" pattern="h:mm:ss a" /></td>
-                                        <td class="actions-col" style="width:50px;">
+                                        <td class="actions-col" style="width:50px;">&nbsp;
+                                        <c:if test="${batch.statusId != 21}">
                                             <a href="javascript:void(0);" rel="${batch.id}" class="btn btn-link viewLink">
                                                 <span class="glyphicon glyphicon-edit"></span>
                                                 Detail Audit Report
-                                               </a>   
+                                               </a>  
+                                          </c:if>
                                         </td>
                                     </tr>
                                 </c:forEach>

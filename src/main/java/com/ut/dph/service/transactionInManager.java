@@ -332,4 +332,11 @@ public interface transactionInManager {
     boolean hasPermissionForBatch(batchUploads batchInfo, User userInfo, boolean hasConfigurations);
     
     batchUploads getBatchDetailsByTInId(Integer transactionInId);
+    
+    boolean allowBatchClear (Integer batchUploadId);
+    
+    void updateTranStatusByTInId (Integer transactionInId, Integer statusId) throws Exception;
+    
+    List<batchUploads> populateBatchInfo (List<batchUploads> uploadedBatches, User userInfo);
+    
 }

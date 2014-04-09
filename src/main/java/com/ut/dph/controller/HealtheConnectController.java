@@ -8,7 +8,6 @@ package com.ut.dph.controller;
 
 import com.ut.dph.dao.messageTypeDAO;
 import com.ut.dph.model.Organization;
-import com.ut.dph.model.TransactionInError;
 import com.ut.dph.model.User;
 import com.ut.dph.model.UserActivity;
 import com.ut.dph.model.batchDownloads;
@@ -18,7 +17,6 @@ import com.ut.dph.model.configurationMessageSpecs;
 import com.ut.dph.model.configurationTransport;
 import com.ut.dph.model.custom.ConfigErrorInfo;
 import com.ut.dph.model.lutables.lu_ProcessStatus;
-import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionTarget;
 import com.ut.dph.service.configurationManager;
 import com.ut.dph.service.configurationTransportManager;
@@ -140,18 +138,7 @@ public class HealtheConnectController {
             List<batchUploads> uploadedBatches = transactionInManager.getuploadedBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, searchTerm, 1, maxResults);
 
             if(!uploadedBatches.isEmpty()) {
-                for(batchUploads batch : uploadedBatches) {
-                    List<transactionIn> batchTransactions = transactionInManager.getBatchTransactions(batch.getId(), userInfo.getId());
-                    batch.settotalTransactions(batchTransactions.size());
-
-                    lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
-                    batch.setstatusValue(processStatus.getDisplayCode());
-
-                    User userDetails = usermanager.getUserById(batch.getuserId());
-                    String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
-                    batch.setusersName(usersName);
-
-                }
+            	uploadedBatches = transactionInManager.populateBatchInfo(uploadedBatches, userInfo);
             }
             
            List<configuration> configurations = configurationManager.getActiveConfigurationsByUserId(userInfo.getId(), 1);
@@ -161,11 +148,26 @@ public class HealtheConnectController {
            }
            
            mav.addObject("hasConfigurations", hasConfigurations);
-
            mav.addObject("uploadedBatches", uploadedBatches);
+           mav.addObject("searchTerm", searchTerm);
            
            Integer totalPages = (int)Math.ceil((double)totaluploadedBatches / maxResults);
            mav.addObject("totalPages", totalPages);
+           
+           /** log user activity **/
+       	UserActivity ua = new UserActivity();
+       	ua.setUserId(userInfo.getId());
+       	ua.setAccessMethod(request.getMethod());
+       	ua.setPageAccess("/upload");
+       	ua.setActivity("View Uploads Page");
+       	if (!searchTerm.equalsIgnoreCase("")) {
+       		String logString = "Search Term - " + searchTerm;
+       		if (uploadedBatches.size() < 1) {
+       			logString = " without permission - " + logString + " returned zero results.";
+       		}
+       		ua.setActivityDesc(logString);
+       	}
+       		usermanager.insertUserLog(ua);
         }
         catch (Exception e) {
             throw new Exception("Error occurred viewing the uploaded batches. userId: "+ userInfo.getId(),e);
@@ -201,18 +203,7 @@ public class HealtheConnectController {
             List<batchUploads> uploadedBatches = transactionInManager.getuploadedBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, searchTerm, page, maxResults);
 
             if(!uploadedBatches.isEmpty()) {
-                for(batchUploads batch : uploadedBatches) {
-                    List<transactionIn> batchTransactions = transactionInManager.getBatchTransactions(batch.getId(), userInfo.getId());
-                    batch.settotalTransactions(batchTransactions.size());
-
-                    lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
-                    batch.setstatusValue(processStatus.getDisplayCode());
-
-                    User userDetails = usermanager.getUserById(batch.getuserId());
-                    String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
-                    batch.setusersName(usersName);
-
-                }
+            	uploadedBatches = transactionInManager.populateBatchInfo(uploadedBatches, userInfo);
             }
             
             List<configuration> configurations = configurationManager.getActiveConfigurationsByUserId(userInfo.getId(), 1);
@@ -230,7 +221,15 @@ public class HealtheConnectController {
             mav.addObject("searchTerm", searchTerm);
             mav.addObject("currentPage", page);
 
-
+            /** log user activity **/
+           	UserActivity ua = new UserActivity();
+           	ua.setUserId(userInfo.getId());
+           	ua.setAccessMethod(request.getMethod());
+           	ua.setPageAccess("/upload");
+           	ua.setActivity("View Uploads Page");
+           	ua.setActivityDesc("Page - " + page +" Search Term - " + searchTerm + " From Date -" + fromDate + " To Date - " + toDate);
+           	usermanager.insertUserLog(ua);
+            
             return mav;
         }
         catch (Exception e) {
@@ -596,18 +595,16 @@ public class HealtheConnectController {
      * @throws Exception
      */
     @RequestMapping(value = "/auditReports", method = RequestMethod.GET)
-    public ModelAndView viewAuditRpts(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
+    public ModelAndView viewAuditRpts(
+    		@RequestParam(value = "searchTerm", required = false) String searchTerm,
+    		HttpServletRequest request, HttpServletResponse response, HttpSession session) 
+    		throws Exception {
         
-    	/* Need to get a list of uploaded files with status of 5 (PR), 6 (REL), 29 (Sys Error) ?*/
-        User userInfo = (User)session.getAttribute("userDetails");
+    	User userInfo = (User)session.getAttribute("userDetails");
         
-        /** log user activity **/
-    	UserActivity ua = new UserActivity();
-    	ua.setUserId(userInfo.getId());
-    	ua.setAccessMethod(request.getMethod());
-    	ua.setPageAccess("/auditReports");
-    	ua.setActivity("View Audit Reports Page");
-    	usermanager.insertUserLog(ua);
+        if (searchTerm == null) {
+    		searchTerm = "";
+    	}
     	
     	ModelAndView mav = new ModelAndView();
         mav.setViewName("/Health-e-Connect/auditReports");
@@ -622,22 +619,11 @@ public class HealtheConnectController {
         
         try {
             /* Need to get a list of all uploaded batches */
-            Integer totaluploadedBatches = transactionInManager.getuploadedBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, "", 1, 0, excludedStatusIds).size();
-            List<batchUploads> uploadedBatches = transactionInManager.getuploadedBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, "", 1, maxResults, excludedStatusIds);
+            Integer totaluploadedBatches = transactionInManager.getuploadedBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, searchTerm, 1, 0, excludedStatusIds).size();
+            List<batchUploads> uploadedBatches = transactionInManager.getuploadedBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, searchTerm, 1, maxResults, excludedStatusIds);
 
             if(!uploadedBatches.isEmpty()) {
-                for(batchUploads batch : uploadedBatches) {
-                    List<transactionIn> batchTransactions = transactionInManager.getBatchTransactions(batch.getId(), userInfo.getId());
-                    batch.settotalTransactions(batchTransactions.size());
-
-                    lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
-                    batch.setstatusValue(processStatus.getDisplayCode());
-
-                    User userDetails = usermanager.getUserById(batch.getuserId());
-                    String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
-                    batch.setusersName(usersName);
-
-                }
+            	uploadedBatches = transactionInManager.populateBatchInfo(uploadedBatches, userInfo);
             }
             
            List<configuration> configurations = configurationManager.getActiveConfigurationsByUserId(userInfo.getId(), 1);
@@ -647,12 +633,26 @@ public class HealtheConnectController {
            }
            
            mav.addObject("hasConfigurations", hasConfigurations);
-
            mav.addObject("uploadedBatches", uploadedBatches);
+           mav.addObject("searchTerm", searchTerm);
            
            Integer totalPages = (int)Math.ceil((double)totaluploadedBatches / maxResults);
            mav.addObject("totalPages", totalPages);
-            
+           
+           /** log user activity **/
+	       UserActivity ua = new UserActivity();
+	       ua.setUserId(userInfo.getId());
+	       ua.setAccessMethod(request.getMethod());
+	       ua.setPageAccess("/auditReports");
+	       ua.setActivity("View Audit Reports Page");
+	       if (!searchTerm.equalsIgnoreCase("")) {
+	       		String logString = "Search Term - " + searchTerm;
+	       		if (uploadedBatches.size() < 1) {
+	       			logString = " without permission - " + logString + " returned zero results.";
+	       		}
+	       		ua.setActivityDesc(logString);
+	       	}
+	       usermanager.insertUserLog(ua);
         }
         catch (Exception e) {
             throw new Exception("Error occurred viewing the audit reports. userId: "+ userInfo.getId(),e);
@@ -696,18 +696,7 @@ public class HealtheConnectController {
             List<batchUploads> uploadedBatches = transactionInManager.getuploadedBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, searchTerm, page, maxResults, excludedStatusIds);
 
             if(!uploadedBatches.isEmpty()) {
-                for(batchUploads batch : uploadedBatches) {
-                    List<transactionIn> batchTransactions = transactionInManager.getBatchTransactions(batch.getId(), userInfo.getId());
-                    batch.settotalTransactions(batchTransactions.size());
-
-                    lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
-                    batch.setstatusValue(processStatus.getDisplayCode());
-
-                    User userDetails = usermanager.getUserById(batch.getuserId());
-                    String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
-                    batch.setusersName(usersName);
-
-                }
+            	uploadedBatches = transactionInManager.populateBatchInfo(uploadedBatches, userInfo);
             }
             
             List<configuration> configurations = configurationManager.getActiveConfigurationsByUserId(userInfo.getId(), 1);
@@ -929,56 +918,131 @@ public class HealtheConnectController {
     public ModelAndView batchOptions(@RequestParam(value = "batchId", required = false) Integer batchId, 
     		@RequestParam(value = "idList", required = false) List <Integer> idList,
     		@RequestParam(value = "batchOption", required = false) String batchOption,
+    		RedirectAttributes redirectAttr,
     		HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
        
     try {
-    	batchUploads batchInfo = transactionInManager.getBatchDetails(batchId);
+    	
     	/**
     	 * Four options - 
-    	 * rejectMessages - canEdit
+    	 * rejectMessages - canEdit - need to POST form and refresh audit report 
     	 * releaseBatch - canSend
     	 * resetBatch, cancelBatch - canCancel
-    	 * 
     	 * **/
     	System.out.println(batchOption);
     	System.out.println("idList is " + idList);
-    	String redirectPage = "auditReports";
     	
-    	if (batchOption.equalsIgnoreCase("resetBatch")) {
-    		redirectPage = "upload?searchTerm=" + batchInfo.getutBatchName();
-    	}
     	
-    	/**
-    	User userInfo = (User)session.getAttribute("userDetails");
+    	/**check for permission**/
+        User userInfo = (User)session.getAttribute("userDetails");
         batchUploads batchInfo = transactionInManager.getBatchDetails(batchId);
-        
-        List<configuration> configurations = configurationManager.getActiveConfigurationsByUserId(userInfo.getId(), 1);
         boolean hasConfigurations = false;
+        boolean hasPermission = false;
+        String redirectPage = "auditReports?searchTerm=" + batchInfo.getutBatchName();
+    	String systemMessage = "";
         
-        if(configurations.size() >=1 ) {
-           hasConfigurations = true;
+        if (batchInfo != null) {
+        	List<configuration> configurations = configurationManager.getActiveConfigurationsByUserId(userInfo.getId(), 1);
+            
+            if(configurations.size() >=1 ) {
+               hasConfigurations = true;
+            }
+            
+           hasPermission = transactionInManager.hasPermissionForBatch(batchInfo, userInfo, hasConfigurations);
         }
-        
-        boolean hasPermission = transactionInManager.hasPermissionForBatch(batchInfo, userInfo, hasConfigurations);
-        
-        
-        
-        //log user activity
+    	if (hasPermission) {
+    		
+    		boolean allowBatchClear = transactionInManager.allowBatchClear(batchId);
+	        /** make sure user has the appropriate permission to this batch **/
+    		if (batchOption.equalsIgnoreCase("resetBatch")) { // canCancel
+    			redirectPage = "upload?searchTerm=" + batchInfo.getutBatchName();
+    			//check to make sure we can clear batch and then delete info and reset
+    			if (allowBatchClear && userInfo.getcancelAuthority()) {
+    				//reset batch takes batch back to statusId of 2
+    				//1. set batch process to 4
+    				transactionInManager.updateBatchStatus(batchId, 4, "");
+    				//2. clear
+    				boolean cleared = transactionInManager.clearBatch(batchId);
+    				if (cleared) {
+    					transactionInManager.updateBatchStatus(batchId, 2, "startOver");
+    					systemMessage = "Batch is reset.";
+    				} else {
+    					transactionInManager.updateBatchStatus(batchId, 29, "endDateTime");
+    					systemMessage = "An error occurred while resetting batch.  Please review logs.";
+    				}
+    			} else {
+    				systemMessage = "You do not have permission to reset a batch.";
+    				hasPermission = false;
+    				
+    			}
+    			
+    		} else if (batchOption.equalsIgnoreCase("cancelBatch")) {
+    			//check authority
+    			if (allowBatchClear && userInfo.getcancelAuthority()) {
+    				transactionInManager.updateBatchStatus(batchId, 4, "startDateTime");
+    				
+    				boolean cleared = transactionInManager.clearBatch(batchId);
+    				if (cleared) {
+    					transactionInManager.updateBatchStatus(batchId, 21, "endDateTime");
+    					systemMessage = "Batch is set to 'Do Not Process'.";
+    				} else {
+    					transactionInManager.updateBatchStatus(batchId, 29, "endDateTime");
+    					systemMessage = "An error occurred while resetting batch.  Please review logs.";
+    				}
+    			} else {
+    				systemMessage = "You do not have permission to cancel a batch.";
+    				hasPermission = false;
+    			}
+    		} else if (batchOption.equalsIgnoreCase("releaseBatch")) {
+    			if (allowBatchClear && userInfo.getdeliverAuthority()) {
+    				transactionInManager.updateBatchStatus(batchId, 4, "startDateTime");
+    				//check once again to make sure all transactions are in final status
+    				if (transactionInManager.getRecordCounts(batchId, Arrays.asList(11, 12, 13, 16), false, false) == 0 ) {
+    					transactionInManager.updateBatchStatus(batchId, 6, "endDateTime");
+    				} else {
+    					transactionInManager.updateBatchStatus(batchId, 5, "endDateTime");
+    					systemMessage = "All transactions must be in final status before it can be release.  Please review audit report";
+    				}
+    			}	else {
+    					transactionInManager.updateBatchStatus(batchId, 5, "endDateTime");
+        				systemMessage = "You do not have permission to release a batch.";
+        				hasPermission = false;
+        		}
+    		} else if (batchOption.equalsIgnoreCase("rejectMessages")) {
+    			if (batchInfo.getstatusId() == 5 && userInfo.geteditAuthority()) {
+    				if (idList.size() > 0) {
+    					for (Integer transactionInId: idList) {
+    						transactionInManager.updateTranStatusByTInId(transactionInId, 13);
+    					}
+    					systemMessage = "Transactions are marked as rejected.";
+    				}
+    				
+    			} else {
+    				systemMessage = "You do not have permission to reject these transactions.";
+    				hasPermission = false;
+    			}
+    			
+    		}
+    	} // end of permission
+    	
+    	
+    	 //log user activity
     	UserActivity ua = new UserActivity();
     	ua.setUserId(userInfo.getId());
     	ua.setAccessMethod(request.getMethod());
     	ua.setPageAccess("/batchOptions");
-    	ua.setActivity("Batch Options");
+    	ua.setActivity("Batch Options -" + batchOption);
     	ua.setBatchIds(String.valueOf(batchInfo.getId()));
+    	ua.setTransactionInIds(idList.toString());
     	if (!hasPermission) {
-    		ua.setActivityDesc("without permission");
+    		ua.setActivityDesc("without permission" + systemMessage);
     	}
     	usermanager.insertUserLog(ua);
-    	**/
-    	/** set error message for display **/
     	
-    	ModelAndView mav = new ModelAndView(new RedirectView(redirectPage));
-		return mav;	
+    	redirectAttr.addFlashAttribute("batchOptionStatus", systemMessage);
+		ModelAndView mav = new ModelAndView(new RedirectView(redirectPage));
+    	//add messages
+    	return mav;	
 		
         }
         catch (Exception e) {

@@ -42,6 +42,9 @@ public class batchUploads {
     @Transient
     private String configName;
     
+    @Transient
+    private Integer transTotalNotFinal = 10; // set to random number that is not 0
+    
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID", nullable = false)
@@ -297,6 +300,14 @@ public class batchUploads {
 
 	public void setConfigName(String configName) {
 		this.configName = configName;
+	}
+
+	public Integer getTransTotalNotFinal() {
+		return transTotalNotFinal;
+	}
+
+	public void setTransTotalNotFinal(Integer transTotalNotFinal) {
+		this.transTotalNotFinal = transTotalNotFinal;
 	}
 
 }

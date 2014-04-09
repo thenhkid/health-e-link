@@ -30,12 +30,15 @@ import com.ut.dph.model.transactionTarget;
 import com.ut.dph.model.custom.ConfigErrorInfo;
 import com.ut.dph.model.custom.ConfigForInsert;
 import com.ut.dph.model.custom.TransErrorDetail;
+import com.ut.dph.model.lutables.lu_ProcessStatus;
 import com.ut.dph.model.systemSummary;
 import com.ut.dph.reference.fileSystem;
 import com.ut.dph.service.configurationManager;
 import com.ut.dph.service.configurationTransportManager;
 import com.ut.dph.service.messageTypeManager;
 import com.ut.dph.service.organizationManager;
+import com.ut.dph.service.sysAdminManager;
+import com.ut.dph.service.userManager;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -95,8 +98,17 @@ public class transactionInManagerImpl implements transactionInManager {
     @Autowired
     private transactionOutDAO transactionOutDAO;
 
+    @Autowired
+    private sysAdminManager sysAdminManager;
+    
+    @Autowired
+    private userManager usermanager;
+    
     private int processingSysErrorId = 5;
-
+    
+    //final status Ids
+    private List<Integer> finalStatusIds = Arrays.asList(11, 12, 13, 16);
+    
     @Override
     @Transactional
     public String getFieldValue(String tableName, String tableCol, String idCol, int idValue) {
@@ -748,7 +760,7 @@ public class transactionInManagerImpl implements transactionInManager {
      */
     @Override
     public boolean clearBatch(Integer batchUploadId) throws Exception {
-        boolean canDelete = transactionInDAO.allowBatchClear(batchUploadId);
+        boolean canDelete = allowBatchClear(batchUploadId);
         Integer sysError = 0;
         if (canDelete) {
             //TODO how much should we clear? Is it different for ERG and Upload?
@@ -760,11 +772,11 @@ public class transactionInManagerImpl implements transactionInManager {
                     toBatchStatusId = 5;
                     resetTransactionTranslatedIn(batchUploadId, true);
                     transactionInDAO.updateTransactionStatus(batchUploadId, 0, 0, 15);
+                    transactionInDAO.updateBatchStatus(batchUploadId, toBatchStatusId, "startOver");
                 } else {
-                    //we clear transactionInRecords here as for batch upload we start over
+                	toBatchStatusId = 2;
                     sysError = clearTransactionTables(batchUploadId, false);
                 }
-                transactionInDAO.updateBatchStatus(batchUploadId, toBatchStatusId, "startOver");
             }
         }
         if (sysError == 0) {
@@ -2168,4 +2180,44 @@ public class transactionInManagerImpl implements transactionInManager {
     public batchUploads getBatchDetailsByTInId(Integer transactionInId){
         return transactionInDAO.getBatchDetailsByTInId(transactionInId);
     }
+	
+	@Override
+    public boolean allowBatchClear(Integer batchUploadId) {
+        return transactionInDAO.allowBatchClear(batchUploadId);
+    }
+
+	@Override
+	public void updateTranStatusByTInId(Integer transactionInId, Integer statusId) throws Exception {
+		 transactionInDAO.updateTranStatusByTInId(transactionInId, statusId);
+		
+	}
+
+	@Override
+	public List<batchUploads> populateBatchInfo(
+			List<batchUploads> uploadedBatches, User userInfo) {
+		try {
+			for(batchUploads batch : uploadedBatches) {
+	            List<transactionIn> batchTransactions = getBatchTransactions(batch.getId(), userInfo.getId());
+	            batch.settotalTransactions(batchTransactions.size());
+	
+	            lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
+	            batch.setstatusValue(processStatus.getDisplayCode());
+	            if (batch.getstatusId() == 5) {
+	            	batch.setTransTotalNotFinal(getRecordCounts(batch.getId(), finalStatusIds, true, false));
+	            }
+	            
+	            User userDetails = usermanager.getUserById(batch.getuserId());
+	            String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
+	            batch.setusersName(usersName);
+	
+	        }
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			System.err.println("populateBatchInfo " + ex.getCause());
+		}
+		return uploadedBatches;
+	}
+	
+	
+	
 }

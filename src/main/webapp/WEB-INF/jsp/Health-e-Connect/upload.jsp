@@ -27,13 +27,11 @@
                     </c:forEach>
                 </div>
             </c:if>
-            
-            <%--<c:if test="${hasConfigurations == true}">
-                <div class="" style="overflow:hidden; margin-bottom:10px;">
-                    <a href="#uploadFile" title="Upload File" data-toggle="modal" class="pull-right btn btn-primary uploadFile"><span class="glyphicon glyphicon-upload"></span> Upload File</a>
+            <c:if test="${not empty batchOptionStatus}">
+				<div class="alert alert-danger">
+                    ${batchOptionStatus}
                 </div>
-            </c:if>--%>
-            
+			</c:if>            
             <div class="row" style="overflow:hidden; margin-bottom:10px;">
                     <div class="col-md-3">
                         <form:form class="form form-inline" id="searchForm" action="/Health-e-Connect/upload" method="post">
@@ -87,8 +85,8 @@
                                         </td>
                                         <td class="center-text">${batch.usersName}</td>
                                         <td class="center-text"><fmt:formatDate value="${batch.dateSubmitted}" type="date" pattern="M/dd/yyyy" /><br /><fmt:formatDate value="${batch.dateSubmitted}" type="time" pattern="h:mm:ss a" /></td>
-                                        <td class="actions-col" style="width:50px;">
-                                            <c:if test="${batch.statusId != 2}">
+                                        <td class="actions-col" style="width:50px;">&nbsp;
+                                            <c:if test="${batch.statusId != 2 && batch.statusId != 21}">
                                             <a href="javascript:void(0);" rel="${batch.id}" class="btn btn-link viewLink">
                                                 <span class="glyphicon glyphicon-edit"></span>
                                                 View Audit Report

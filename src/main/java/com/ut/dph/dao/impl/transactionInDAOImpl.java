@@ -1550,11 +1550,11 @@ public class transactionInDAOImpl implements transactionInDAO {
     public void updateBatchStatus(Integer batchUploadId, Integer statusId, String timeField) throws Exception {
 
         String sql = "update batchUploads set statusId = :statusId ";
-        if (!timeField.equalsIgnoreCase("")) {
-            sql = sql + ", " + timeField + " = CURRENT_TIMESTAMP";
-        } else if (timeField.equalsIgnoreCase("startOver")) {
-            // we reset time
-            sql = sql + ", startDateTime = null, endDateTime = null";
+        if (timeField.equalsIgnoreCase("startover")) {
+        	 // we reset time
+        	sql = sql + ", startDateTime = null, endDateTime = null";
+        } else if (!timeField.equalsIgnoreCase("")) {
+           sql = sql + ", " + timeField + " = CURRENT_TIMESTAMP";
         } else {
             sql = sql + ", startDateTime = CURRENT_TIMESTAMP, endDateTime = CURRENT_TIMESTAMP";
         }
@@ -3986,5 +3986,36 @@ public class transactionInDAOImpl implements transactionInDAO {
 	            return null;
 	        }
 
-	    }	
+	    }
+
+		@Override
+		@Transactional
+		public void updateTranStatusByTInId(Integer transactionInId, Integer statusId)
+				throws Exception {
+			/* Update the transactionTarget status */
+	        String targetSQL = "update transactionTarget set statusId = :statusId ";
+	        targetSQL = targetSQL + " where transactionInId = :transactionId ";
+	        Query updateTargetData = sessionFactory.getCurrentSession().createSQLQuery(targetSQL)
+	                .setParameter("statusId", statusId)
+	                .setParameter("transactionId", transactionInId);
+	        try {
+	            updateTargetData.executeUpdate();
+	        } catch (Exception ex) {
+	            System.err.println("cancel transaction failed." + ex);
+	        }
+
+	        /* Update the transactionIn status */
+	        String sql = "update transactionIn set statusId = :statusId ";
+	        sql = sql + " where id = :transactionId ";
+	        Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+	                .setParameter("statusId", statusId)
+	                .setParameter("transactionId", transactionInId);
+	        try {
+	            updateData.executeUpdate();
+	        } catch (Exception ex) {
+	            System.err.println("updateTranStatusByTInId failed." + ex);
+	        }
+
+			
+		}	
 }
