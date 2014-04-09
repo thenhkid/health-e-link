@@ -34,8 +34,7 @@ public class UserActivity {
     @Column(name = "userId", nullable = false)
     private int userId = 0;
 	
-	@NoHtml
-    @Column(name = "batchId", nullable = true)
+	@Column(name = "batchId", nullable = true)
     private Integer batchId = 0;
 	
 	@NoHtml
