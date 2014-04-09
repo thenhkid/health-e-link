@@ -709,106 +709,100 @@ public class HealtheConnectController {
      * @throws Exception
      */
     @RequestMapping(value = "/auditReport", method = RequestMethod.POST)
-    public ModelAndView viewAuditRpt(@RequestParam(value = "page", required = false) Integer page,
-            @RequestParam(value = "batchId", required = false) Integer batchId,
-            HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
-
-        try {
-            ModelAndView mav = new ModelAndView();
-            mav.setViewName("/Health-e-Connect/auditReport");
-
-            /* Need to get a list of uploaded files */
-            User userInfo = (User) session.getAttribute("userDetails");
-            batchUploads batchInfo = transactionInManager.getBatchDetails(batchId);
-
-            if (batchInfo.getConfigId() != 0) {
-                batchInfo.setConfigName(configurationManager.getMessageTypeNameByConfigId(batchInfo.getConfigId()));
-            } else {
-                batchInfo.setConfigName("Multiple Message Types");
-            }
-            /**
-             * make sure user has permission to batch 1. if user uploaded the batch 2. if user has permission to the configs in the batch 3. sometimes entire batch is errored and have no configIds to go by, we let user see it if they have configurations
-         *
-             */
-
-            List<configuration> configurations = configurationManager.getActiveConfigurationsByUserId(userInfo.getId(), 1);
-            boolean hasConfigurations = false;
-
-            if (configurations.size() >= 1) {
-                hasConfigurations = true;
-            }
-
-            boolean hasPermission = transactionInManager.hasPermissionForBatch(batchInfo, userInfo, hasConfigurations);
-
-            if (hasPermission) {
-                /**
-                 * grab org info*
-                 */
-                Organization org = organizationmanager.getOrganizationById(batchInfo.getOrgId());
-                mav.addObject("org", org);
-
-                /**
-                 * grab error info - need to filter this by error type *
-                 */
-                List<ConfigErrorInfo> confErrorList = new LinkedList<ConfigErrorInfo>();
-                confErrorList = transactionInManager.populateErrorListByErrorCode(batchInfo);
-                mav.addObject("confErrorList", confErrorList);
-
-            }
-
-            /**
-             * buttons *
-             */
-            /**
-             * check final status - a batch should all be 11,12,13 or 16 to get released & batch status is PR *
-             */
-            boolean canSend = false;
-            if (userInfo.getdeliverAuthority() && batchInfo.getstatusId() == 5) {
-                // now we check so we don't have to make a db hit if batch status is not 5 
-                if (transactionInManager.getRecordCounts(batchId, finalStatusIds, false, false) == 0) {
-                    canSend = true;
-                }
-            }
-            // check to see if it can be cancelled - 
-            boolean canCancel = false;
-            List<Integer> cancelStatusList = Arrays.asList(21, 22, 23, 1, 8);
-            if (userInfo.getcancelAuthority() && !cancelStatusList.contains(batchInfo.getstatusId())) {
-                canCancel = true;
-            }
-
-            boolean canEdit = false;
-            if (userInfo.geteditAuthority() && batchInfo.getstatusId() == 5 && transactionInManager.getRecordCounts(batchId, Arrays.asList(14), false, true) > 0) {
-                canEdit = true;
-            }
-
-            /**
-             * log user activity *
-             */
-            UserActivity ua = new UserActivity();
-            ua.setUserId(userInfo.getId());
-            ua.setAccessMethod(request.getMethod());
-            ua.setPageAccess("/auditReport");
-            ua.setActivity("Audit Report Request");
-            ua.setBatchIds(String.valueOf(batchInfo.getId()));
-            if (!hasPermission) {
-                ua.setActivityDesc("without permission");
-            }
-            usermanager.insertUserLog(ua);
-
-            //buttons
-            mav.addObject("canSend", canSend);
-            mav.addObject("canCancel", canCancel);
-            mav.addObject("canEdit", canEdit);
-            mav.addObject("batch", batchInfo);
-            mav.addObject("hasPermission", hasPermission);
-            mav.addObject("hasConfigurations", hasConfigurations);
-
-            Integer totalPages = 0;
-
-            //(int)Math.ceil((double)totalErrorPages / maxResults);
-            mav.addObject("totalPages", totalPages);
-            //for errors
-            mav.addObject("currentPage", page);
+    public ModelAndView viewAuditRpt(@RequestParam(value = "page", required = false) Integer page, 
+    		@RequestParam(value = "batchId", required = false) Integer batchId, 
+    		HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
+       
+    try {
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/Health-e-Connect/auditReport");
+        
+        /* Need to get a list of uploaded files */
+        User userInfo = (User)session.getAttribute("userDetails");
+        batchUploads batchInfo = transactionInManager.getBatchDetails(batchId);
+        
+        if (batchInfo.getConfigId() != 0) {
+        	batchInfo.setConfigName(configurationManager.getMessageTypeNameByConfigId(batchInfo.getConfigId()));
+        } else {
+        	batchInfo.setConfigName("Multiple Message Types");
+        }
+        /**   make sure user has permission to batch 
+         * 1. if user uploaded the batch
+         * 2. if user has permission to the configs in the batch
+         * 3. sometimes entire batch is errored and have no configIds to go by, we let user see it if they have configurations
+         **/
+        
+        List<configuration> configurations = configurationManager.getActiveConfigurationsByUserId(userInfo.getId(), 1);
+        boolean hasConfigurations = false;
+        
+        if(configurations.size() >=1 ) {
+           hasConfigurations = true;
+        }
+        
+        boolean hasPermission = transactionInManager.hasPermissionForBatch(batchInfo, userInfo, hasConfigurations);
+        
+         
+        if (hasPermission) {
+        	/** grab org info**/
+        	Organization org = organizationmanager.getOrganizationById(batchInfo.getOrgId());
+        	mav.addObject("org", org);
+        	
+        	/** grab error info  - need to filter this by error type **/
+        	List <ConfigErrorInfo> confErrorList = new LinkedList<ConfigErrorInfo>();
+        		confErrorList = transactionInManager.populateErrorListByErrorCode(batchInfo);       		
+        		mav.addObject("confErrorList", confErrorList);
+        	  	
+        }
+        
+        
+        /** buttons **/
+        /** check final status - a batch should all be 11,12,13 or 16 to get released & batch status is PR **/
+        boolean canSend = false;
+        if (userInfo.getdeliverAuthority() && batchInfo.getstatusId() == 5) {
+        	// now we check so we don't have to make a db hit if batch status is not 5 
+        	if (transactionInManager.getRecordCounts(batchId, finalStatusIds, false, false) == 0) {
+        		canSend = true;
+        	}
+        }
+        // check to see if it can be cancelled - 
+        boolean canCancel = false;
+        List<Integer> cancelStatusList = Arrays.asList(21,22,23,1,8);
+        if (userInfo.getcancelAuthority() && !cancelStatusList.contains(batchInfo.getstatusId())) {
+        	canCancel = true;
+        } 
+        
+        boolean canEdit = false;
+        if (userInfo.geteditAuthority() && batchInfo.getstatusId() == 5 && transactionInManager.getRecordCounts(batchId, Arrays.asList(14), false, true) > 0) {
+        	canEdit = true;
+        }
+       
+        /** log user activity **/
+    	UserActivity ua = new UserActivity();
+    	ua.setUserId(userInfo.getId());
+    	ua.setAccessMethod(request.getMethod());
+    	ua.setPageAccess("/auditReport");
+    	ua.setActivity("Audit Report Request");
+    	ua.setBatchId(batchInfo.getId());
+    	if (!hasPermission) {
+    		ua.setActivityDesc("without permission");
+    	}
+    	usermanager.insertUserLog(ua);
+    	
+ 
+        //buttons
+        mav.addObject("canSend", canSend);
+    	mav.addObject("canCancel", canCancel);
+    	mav.addObject("canEdit", canEdit );
+    	mav.addObject("batch", batchInfo);
+    	mav.addObject("hasPermission", hasPermission);
+        mav.addObject("hasConfigurations", hasConfigurations);
+        
+        Integer totalPages = 0;
+       
+        //(int)Math.ceil((double)totalErrorPages / maxResults);
+        mav.addObject("totalPages", totalPages);
+        //for errors
+        mav.addObject("currentPage", page);
 
             return mav;
         } catch (Exception e) {
@@ -960,93 +954,91 @@ public class HealtheConnectController {
                     //check to make sure we can clear batch and then delete info and reset
                     if (allowBatchClear && userInfo.getcancelAuthority()) {
     				//reset batch takes batch back to statusId of 2
-                        //1. set batch process to 4
-                        transactionInManager.updateBatchStatus(batchId, 4, "");
-                        //2. clear
-                        boolean cleared = transactionInManager.clearBatch(batchId);
-                        if (cleared) {
-                            transactionInManager.updateBatchStatus(batchId, 2, "startOver");
-                            systemMessage = "Batch is reset.";
-                        } else {
-                            transactionInManager.updateBatchStatus(batchId, 29, "endDateTime");
-                            systemMessage = "An error occurred while resetting batch.  Please review logs.";
-                        }
-                    } else {
-                        systemMessage = "You do not have permission to reset a batch.";
-                        hasPermission = false;
-
-                    }
-
-                } else if (batchOption.equalsIgnoreCase("cancelBatch")) {
-                    //check authority
-                    if (allowBatchClear && userInfo.getcancelAuthority()) {
-                        transactionInManager.updateBatchStatus(batchId, 4, "startDateTime");
-
-                        boolean cleared = transactionInManager.clearBatch(batchId);
-                        if (cleared) {
-                            transactionInManager.updateBatchStatus(batchId, 21, "endDateTime");
-                            systemMessage = "Batch is set to 'Do Not Process'.";
-                        } else {
-                            transactionInManager.updateBatchStatus(batchId, 29, "endDateTime");
-                            systemMessage = "An error occurred while resetting batch.  Please review logs.";
-                        }
-                    } else {
-                        systemMessage = "You do not have permission to cancel a batch.";
-                        hasPermission = false;
-                    }
-                } else if (batchOption.equalsIgnoreCase("releaseBatch")) {
-                    if (allowBatchClear && userInfo.getdeliverAuthority()) {
-                        transactionInManager.updateBatchStatus(batchId, 4, "startDateTime");
-                        //check once again to make sure all transactions are in final status
-                        if (transactionInManager.getRecordCounts(batchId, Arrays.asList(11, 12, 13, 16), false, false) == 0) {
-                            transactionInManager.updateBatchStatus(batchId, 6, "endDateTime");
-                        } else {
-                            transactionInManager.updateBatchStatus(batchId, 5, "endDateTime");
-                            systemMessage = "All transactions must be in final status before it can be release.  Please review audit report";
-                        }
-                    } else {
-                        transactionInManager.updateBatchStatus(batchId, 5, "endDateTime");
-                        systemMessage = "You do not have permission to release a batch.";
-                        hasPermission = false;
-                    }
-                } else if (batchOption.equalsIgnoreCase("rejectMessages")) {
-                    if (batchInfo.getstatusId() == 5 && userInfo.geteditAuthority()) {
-                        if (idList.size() > 0) {
-                            for (Integer transactionInId : idList) {
-                                transactionInManager.updateTranStatusByTInId(transactionInId, 13);
-                            }
-                            systemMessage = "Transactions are marked as rejected.";
-                        }
-
-                    } else {
-                        systemMessage = "You do not have permission to reject these transactions.";
-                        hasPermission = false;
-                    }
-
-                }
-            } // end of permission
-
-            //log user activity
-            UserActivity ua = new UserActivity();
-            ua.setUserId(userInfo.getId());
-            ua.setAccessMethod(request.getMethod());
-            ua.setPageAccess("/batchOptions");
-            ua.setActivity("Batch Options -" + batchOption);
-            ua.setBatchIds(String.valueOf(batchInfo.getId()));
-            ua.setTransactionInIds(idList.toString());
-            if (!hasPermission) {
-                ua.setActivityDesc("without permission" + systemMessage);
-            }
-            usermanager.insertUserLog(ua);
-
-            redirectAttr.addFlashAttribute("batchOptionStatus", systemMessage);
-            ModelAndView mav = new ModelAndView(new RedirectView(redirectPage));
-            //add messages
-            return mav;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new Exception("Error at batch options.", e);
+    				//1. set batch process to 4
+    				transactionInManager.updateBatchStatus(batchId, 4, "");
+    				//2. clear
+    				boolean cleared = transactionInManager.clearBatch(batchId);
+    				if (cleared) {
+    					transactionInManager.updateBatchStatus(batchId, 2, "startOver");
+    					systemMessage = "Batch is reset.";
+    				} else {
+    					transactionInManager.updateBatchStatus(batchId, 29, "endDateTime");
+    					systemMessage = "An error occurred while resetting batch.  Please review logs.";
+    				}
+    			} else {
+    				systemMessage = "You do not have permission to reset a batch.";
+    				hasPermission = false;
+    				
+    			}
+    			
+    		} else if (batchOption.equalsIgnoreCase("cancelBatch")) {
+    			//check authority
+    			if (allowBatchClear && userInfo.getcancelAuthority()) {
+    					transactionInManager.updateBatchStatus(batchId, 4, "startDateTime");
+    					transactionInManager.updateTransactionStatus(batchId, 0, 0, 34);
+    					transactionInManager.updateTransactionTargetStatus(batchId, 0, 0, 34);
+    					transactionInManager.updateBatchStatus(batchId, 21, "endDateTime");
+    					systemMessage = "Batch is set to 'Do Not Process'.";
+    				
+    			} else {
+    				systemMessage = "You do not have permission to cancel a batch.";
+    				hasPermission = false;
+    			}
+    		} else if (batchOption.equalsIgnoreCase("releaseBatch")) {
+    			if (allowBatchClear && userInfo.getdeliverAuthority()) {
+    				transactionInManager.updateBatchStatus(batchId, 4, "startDateTime");
+    				//check once again to make sure all transactions are in final status
+    				if (transactionInManager.getRecordCounts(batchId, Arrays.asList(11, 12, 13, 16), false, false) == 0 ) {
+    					transactionInManager.updateBatchStatus(batchId, 6, "endDateTime");
+    				} else {
+    					transactionInManager.updateBatchStatus(batchId, 5, "endDateTime");
+    					systemMessage = "All transactions must be in final status before it can be release.  Please review audit report";
+    				}
+    			}	else {
+    					transactionInManager.updateBatchStatus(batchId, 5, "endDateTime");
+        				systemMessage = "You do not have permission to release a batch.";
+        				hasPermission = false;
+        		}
+    		} else if (batchOption.equalsIgnoreCase("rejectMessages")) {
+    			if (batchInfo.getstatusId() == 5 && userInfo.geteditAuthority()) {
+    				if (idList.size() > 0) {
+    					for (Integer transactionInId: idList) {
+    						transactionInManager.updateTranStatusByTInId(transactionInId, 13);
+    					}
+    					systemMessage = "Transactions are marked as rejected.";
+    				}
+    				
+    			} else {
+    				systemMessage = "You do not have permission to reject these transactions.";
+    				hasPermission = false;
+    			}
+    			
+    		}
+    	} // end of permission
+    	
+    	
+    	 //log user activity
+    	UserActivity ua = new UserActivity();
+    	ua.setUserId(userInfo.getId());
+    	ua.setAccessMethod(request.getMethod());
+    	ua.setPageAccess("/batchOptions");
+    	ua.setActivity("Batch Options -" + batchOption);
+    	ua.setBatchId(batchInfo.getId());
+    	ua.setTransactionInIds(idList.toString());
+    	if (!hasPermission) {
+    		ua.setActivityDesc("without permission" + systemMessage);
+    	}
+    	usermanager.insertUserLog(ua);
+    	
+    	redirectAttr.addFlashAttribute("batchOptionStatus", systemMessage);
+		ModelAndView mav = new ModelAndView(new RedirectView(redirectPage));
+    	//add messages
+    	return mav;	
+		
+        }
+        catch (Exception e) {
+        	e.printStackTrace();
+            throw new Exception("Error at batch options.",e);
         }
 
     }
