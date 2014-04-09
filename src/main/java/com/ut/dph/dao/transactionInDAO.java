@@ -280,4 +280,6 @@ public interface transactionInDAO {
     batchUploads getBatchDetailsByTInId(Integer transactionInId); 
     
     void updateTranStatusByTInId (Integer transactionInId, Integer statusId) throws Exception;
+    
+    List<TransErrorDetail> getTransactionErrorsByFieldNo(int transactionInId, int fieldNo) throws Exception;
 }

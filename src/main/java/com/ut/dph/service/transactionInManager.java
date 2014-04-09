@@ -339,4 +339,6 @@ public interface transactionInManager {
     
     List<batchUploads> populateBatchInfo (List<batchUploads> uploadedBatches, User userInfo);
     
+    List<TransErrorDetail> getTransactionErrorsByFieldNo(int transactionInId, int fieldNo) throws Exception;
+    
 }

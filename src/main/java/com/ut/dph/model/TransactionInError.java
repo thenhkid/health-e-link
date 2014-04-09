@@ -19,8 +19,8 @@ import org.springframework.web.multipart.commons.CommonsMultipartFile;
 @Entity
 @Table(name = "transactionInErrors")
 public class TransactionInError {
-	
-	@Id
+
+    @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID", nullable = false)
     private Integer id;
@@ -30,12 +30,10 @@ public class TransactionInError {
     @Column(name = "batchUploadId", nullable = false)
     private Integer batchUploadId;
 
-    
     @NoHtml
     @Column(name = "configId", nullable = true)
     private Integer configId = 0;
-   
-    
+
     @NoHtml
     @Column(name = "transactionInId", nullable = true)
     private Integer transactionInId = 0;
@@ -48,7 +46,7 @@ public class TransactionInError {
     @Column(name = "required", nullable = true)
     private Integer required = 0;
 
-	@NoHtml
+    @NoHtml
     @Column(name = "errorId", nullable = true)
     private Integer errorId = 0;
 
@@ -72,101 +70,100 @@ public class TransactionInError {
     @Column(name = "DATECREATED", nullable = true)
     private Date dateCreated = new Date();
 
-	public Integer getId() {
-		return id;
-	}
+    public Integer getId() {
+        return id;
+    }
 
-	public void setId(Integer id) {
-		this.id = id;
-	}
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
-	public Integer getBatchUploadId() {
-		return batchUploadId;
-	}
+    public Integer getBatchUploadId() {
+        return batchUploadId;
+    }
 
-	public void setBatchUploadId(Integer batchUploadId) {
-		this.batchUploadId = batchUploadId;
-	}
+    public void setBatchUploadId(Integer batchUploadId) {
+        this.batchUploadId = batchUploadId;
+    }
 
-	public Integer getConfigId() {
-		return configId;
-	}
+    public Integer getConfigId() {
+        return configId;
+    }
 
-	public void setConfigId(Integer configId) {
-		this.configId = configId;
-	}
+    public void setConfigId(Integer configId) {
+        this.configId = configId;
+    }
 
-	public Integer getTransactionInId() {
-		return transactionInId;
-	}
+    public Integer getTransactionInId() {
+        return transactionInId;
+    }
 
-	public void setTransactionInId(Integer transactionInId) {
-		this.transactionInId = transactionInId;
-	}
+    public void setTransactionInId(Integer transactionInId) {
+        this.transactionInId = transactionInId;
+    }
 
-	public Integer getFieldNo() {
-		return fieldNo;
-	}
+    public Integer getFieldNo() {
+        return fieldNo;
+    }
 
-	public void setFieldNo(Integer fieldNo) {
-		this.fieldNo = fieldNo;
-	}
+    public void setFieldNo(Integer fieldNo) {
+        this.fieldNo = fieldNo;
+    }
 
+    public Integer getErrorId() {
+        return errorId;
+    }
 
-	public Integer getErrorId() {
-		return errorId;
-	}
+    public void setErrorId(Integer errorId) {
+        this.errorId = errorId;
+    }
 
-	public void setErrorId(Integer errorId) {
-		this.errorId = errorId;
-	}
+    public Integer getCwId() {
+        return cwId;
+    }
 
-	public Integer getCwId() {
-		return cwId;
-	}
+    public void setCwId(Integer cwId) {
+        this.cwId = cwId;
+    }
 
-	public void setCwId(Integer cwId) {
-		this.cwId = cwId;
-	}
+    public Integer getMacroId() {
+        return macroId;
+    }
 
-	public Integer getMacroId() {
-		return macroId;
-	}
+    public void setMacroId(Integer macroId) {
+        this.macroId = macroId;
+    }
 
-	public void setMacroId(Integer macroId) {
-		this.macroId = macroId;
-	}
+    public Integer getValidationTypeId() {
+        return validationTypeId;
+    }
 
-	public Integer getValidationTypeId() {
-		return validationTypeId;
-	}
+    public void setValidationTypeId(Integer validationTypeId) {
+        this.validationTypeId = validationTypeId;
+    }
 
-	public void setValidationTypeId(Integer validationTypeId) {
-		this.validationTypeId = validationTypeId;
-	}
+    public String getStackTrace() {
+        return stackTrace;
+    }
 
-	public String getStackTrace() {
-		return stackTrace;
-	}
+    public void setStackTrace(String stackTrace) {
+        this.stackTrace = stackTrace;
+    }
 
-	public void setStackTrace(String stackTrace) {
-		this.stackTrace = stackTrace;
-	}
+    public Date getDateCreated() {
+        return dateCreated;
+    }
 
-	public Date getDateCreated() {
-		return dateCreated;
-	}
+    public void setDateCreated(Date dateCreated) {
+        this.dateCreated = dateCreated;
+    }
 
-	public void setDateCreated(Date dateCreated) {
-		this.dateCreated = dateCreated;
-	}
-    
-	public Integer getRequired() {
-		return required;
-	}
+    public Integer getRequired() {
+        return required;
+    }
 
-	public void setRequired(Integer required) {
-		this.required = required;
-	}
+    public void setRequired(Integer required) {
+        this.required = required;
+    }
 
 }

@@ -100,15 +100,15 @@ public class transactionInManagerImpl implements transactionInManager {
 
     @Autowired
     private sysAdminManager sysAdminManager;
-    
+
     @Autowired
     private userManager usermanager;
-    
+
     private int processingSysErrorId = 5;
-    
+
     //final status Ids
     private List<Integer> finalStatusIds = Arrays.asList(11, 12, 13, 16);
-    
+
     @Override
     @Transactional
     public String getFieldValue(String tableName, String tableCol, String idCol, int idValue) {
@@ -774,7 +774,7 @@ public class transactionInManagerImpl implements transactionInManager {
                     transactionInDAO.updateTransactionStatus(batchUploadId, 0, 0, 15);
                     transactionInDAO.updateBatchStatus(batchUploadId, toBatchStatusId, "startOver");
                 } else {
-                	toBatchStatusId = 2;
+                    toBatchStatusId = 2;
                     sysError = clearTransactionTables(batchUploadId, false);
                 }
             }
@@ -1512,7 +1512,7 @@ public class transactionInManagerImpl implements transactionInManager {
                 sysError = sysError + updateConfigIdForBatch(batch.getId(), batch.getConfigId());
             } else {
                 //1. we get all configs for user - user might not have permission to submit but someone else in org does
-            	
+
                 List<configurationMessageSpecs> configurationMessageSpecs = configurationtransportmanager.getConfigurationMessageSpecsForOrgTransport(batch.getOrgId(), batch.gettransportMethodId(), false);
                 //2. we get all rows for batch
                 List<transactionInRecords> tInRecords = getTransactionInRecordsForBatch(batch.getId());
@@ -1591,10 +1591,10 @@ public class transactionInManagerImpl implements transactionInManager {
 
                 //handle duplicates, need to insert again and let it be its own row
                 sysErrors = sysErrors + newEntryForMultiTargets(batchId);
-                
+
                 //we reset transactionTranslatedIn
                 resetTransactionTranslatedIn(batchId, true);
-                
+
             }
             if (sysErrors > 0) {
                 insertProcessingError(processingSysErrorId, null, batchId, null, null, null, null, false, false, errorMessage);
@@ -1975,169 +1975,165 @@ public class transactionInManagerImpl implements transactionInManager {
     public List<TransactionInError> getErrorList(Integer batchId) {
         return transactionInDAO.getErrorList(batchId);
     }
-    
+
     /**
-     * **/
-    
+     * *
+     */
     @Override
-	public List<ConfigErrorInfo> populateErrorListByErrorCode(batchUploads batchInfo) {
-    	
-    	List <ConfigErrorInfo> confErrorList = new LinkedList<ConfigErrorInfo>();
-    	try {
-    		ConfigErrorInfo configErrorInfo = new ConfigErrorInfo();
-	    	configErrorInfo.setBatchId(batchInfo.getId());
-	    		
-	    		List <TransErrorDetail> tedList = getTransErrorDetailsForNoRptFields(batchInfo.getId(), Arrays.asList(5));
-	    		if (tedList.size() > 0) {
-	    			configErrorInfo.setErrorViewId(1);
-			        configErrorInfo.setTransErrorDetails(tedList);
-			        configErrorInfo.setMessageTypeName("Submission Process Errored");
-			        confErrorList.add(configErrorInfo);      
-	    		}
-	    		configErrorInfo = new ConfigErrorInfo();
-		        tedList = getTransErrorDetailsForNoRptFields(batchInfo.getId(), Arrays.asList(7,8,10));
-				if (tedList.size() > 0) {
-					configErrorInfo.setErrorViewId(1);
-					configErrorInfo.setTransErrorDetails(tedList);
-			        configErrorInfo.setMessageTypeName("Configuration Errors");
-			        confErrorList.add(configErrorInfo); 
-				}
-		        /** now get invalid configIds, errorId 6 - these are tied to transaction but not reportable fields since we don't know what 
-		         * configId it is.  we don't know column that holds the field either since it didn't match with any for org, we display the first
-		         * 4 columns
-		         */
-				configErrorInfo = new ConfigErrorInfo();
-				configErrorInfo.setBatchId(batchInfo.getId());
-				tedList =  getTransErrorDetailsForInvConfig(batchInfo.getId());
-				if (tedList.size() > 0) {
-					//we grab f1-f4 and report off those
-					configErrorInfo.setErrorViewId(2);
-					configErrorInfo.setMessageTypeName("Configurations Unknown");
-					configErrorInfo.setRptFieldHeading1("Field 1");
-					configErrorInfo.setRptFieldHeading2("Field 2");
-					configErrorInfo.setRptFieldHeading3("Field 3");
-					configErrorInfo.setRptFieldHeading4("Field 4");
-					configErrorInfo.setTransErrorDetails(tedList);
-					confErrorList.add(configErrorInfo);
-				}
-				//now get the rest by configId
-				List <ConfigErrorInfo> confErrorListByConfig = getErrorConfigForBatch(batchInfo.getId());
-				for (ConfigErrorInfo cei : confErrorListByConfig) {
-					//we populate the rest of the info 1. headers
-					configErrorInfo.setBatchId(batchInfo.getId());
-					configErrorInfo = getHeaderForConfigErrorInfo(batchInfo.getId(), cei);
-					//add error details
-					configErrorInfo.setTransErrorDetails(getTransErrorDetails(batchInfo, configErrorInfo));
-				}
-				confErrorList.addAll(confErrorListByConfig);
-	        
-    	} catch (Exception ex) {
-    		ex.printStackTrace();
+    public List<ConfigErrorInfo> populateErrorListByErrorCode(batchUploads batchInfo) {
+
+        List<ConfigErrorInfo> confErrorList = new LinkedList<ConfigErrorInfo>();
+        try {
+            ConfigErrorInfo configErrorInfo = new ConfigErrorInfo();
+            configErrorInfo.setBatchId(batchInfo.getId());
+
+            List<TransErrorDetail> tedList = getTransErrorDetailsForNoRptFields(batchInfo.getId(), Arrays.asList(5));
+            if (tedList.size() > 0) {
+                configErrorInfo.setErrorViewId(1);
+                configErrorInfo.setTransErrorDetails(tedList);
+                configErrorInfo.setMessageTypeName("Submission Process Errored");
+                confErrorList.add(configErrorInfo);
+            }
+            configErrorInfo = new ConfigErrorInfo();
+            tedList = getTransErrorDetailsForNoRptFields(batchInfo.getId(), Arrays.asList(7, 8, 10));
+            if (tedList.size() > 0) {
+                configErrorInfo.setErrorViewId(1);
+                configErrorInfo.setTransErrorDetails(tedList);
+                configErrorInfo.setMessageTypeName("Configuration Errors");
+                confErrorList.add(configErrorInfo);
+            }
+            /**
+             * now get invalid configIds, errorId 6 - these are tied to transaction but not reportable fields since we don't know what configId it is. we don't know column that holds the field either since it didn't match with any for org, we display the first 4 columns
+             */
+            configErrorInfo = new ConfigErrorInfo();
+            configErrorInfo.setBatchId(batchInfo.getId());
+            tedList = getTransErrorDetailsForInvConfig(batchInfo.getId());
+            if (tedList.size() > 0) {
+                //we grab f1-f4 and report off those
+                configErrorInfo.setErrorViewId(2);
+                configErrorInfo.setMessageTypeName("Configurations Unknown");
+                configErrorInfo.setRptFieldHeading1("Field 1");
+                configErrorInfo.setRptFieldHeading2("Field 2");
+                configErrorInfo.setRptFieldHeading3("Field 3");
+                configErrorInfo.setRptFieldHeading4("Field 4");
+                configErrorInfo.setTransErrorDetails(tedList);
+                confErrorList.add(configErrorInfo);
+            }
+            //now get the rest by configId
+            List<ConfigErrorInfo> confErrorListByConfig = getErrorConfigForBatch(batchInfo.getId());
+            for (ConfigErrorInfo cei : confErrorListByConfig) {
+                //we populate the rest of the info 1. headers
+                configErrorInfo.setBatchId(batchInfo.getId());
+                configErrorInfo = getHeaderForConfigErrorInfo(batchInfo.getId(), cei);
+                //add error details
+                configErrorInfo.setTransErrorDetails(getTransErrorDetails(batchInfo, configErrorInfo));
+            }
+            confErrorList.addAll(confErrorListByConfig);
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
             System.err.println("populateErrorListByErrorCode " + ex.getCause());
-    	}
-		return confErrorList;
-	}
-       
-    @Override
-    public List <TransErrorDetail> getTransErrorDetailsForNoRptFields(Integer batchId, List<Integer> errorCodes) {
-    	return transactionInDAO.getTransErrorDetailsForNoRptFields(batchId, errorCodes);
+        }
+        return confErrorList;
     }
-    
+
+    @Override
+    public List<TransErrorDetail> getTransErrorDetailsForNoRptFields(Integer batchId, List<Integer> errorCodes) {
+        return transactionInDAO.getTransErrorDetailsForNoRptFields(batchId, errorCodes);
+    }
+
     @Override
     public Integer getCountForErrorId(Integer batchId, Integer errorId) {
-    	return transactionInDAO.getCountForErrorId(batchId, errorId);
+        return transactionInDAO.getCountForErrorId(batchId, errorId);
     }
-    
+
     @Override
-    public List <TransErrorDetail> getTransErrorDetailsForInvConfig(Integer batchId) {
-    	return transactionInDAO.getTransErrorDetailsForInvConfig(batchId);
+    public List<TransErrorDetail> getTransErrorDetailsForInvConfig(Integer batchId) {
+        return transactionInDAO.getTransErrorDetailsForInvConfig(batchId);
     }
-  
+
     @Override
-    public List <ConfigErrorInfo> getErrorConfigForBatch(Integer batchId) {
-    	return transactionInDAO.getErrorConfigForBatch(batchId);
+    public List<ConfigErrorInfo> getErrorConfigForBatch(Integer batchId) {
+        return transactionInDAO.getErrorConfigForBatch(batchId);
     }
-    
+
     @Override
     public ConfigErrorInfo getHeaderForConfigErrorInfo(Integer batchId, ConfigErrorInfo configErrorInfo) {
-    	//we create header string
-    	List<Integer> rptFieldArray = Arrays.asList(configErrorInfo.getRptField1(),configErrorInfo.getRptField2(),configErrorInfo.getRptField3(),configErrorInfo.getRptField4());
-    	return transactionInDAO.getHeaderForConfigErrorInfo(batchId, configErrorInfo, rptFieldArray);
+        //we create header string
+        List<Integer> rptFieldArray = Arrays.asList(configErrorInfo.getRptField1(), configErrorInfo.getRptField2(), configErrorInfo.getRptField3(), configErrorInfo.getRptField4());
+        return transactionInDAO.getHeaderForConfigErrorInfo(batchId, configErrorInfo, rptFieldArray);
     }
-    
+
     @Override
-    public List <TransErrorDetail> getTransErrorDetails(batchUploads batchInfo, ConfigErrorInfo configErrorInfo) {
-    	//get field values
-		String sqlStmt = "";
-    	if (configErrorInfo.getRptField1() !=0) {
-    		sqlStmt = sqlStmt + "F" + configErrorInfo.getRptField1() + " as rptField1Value, ";
-    	} else {
-    		sqlStmt = sqlStmt + "'' as rptField1Value, ";
-    	}
-    	if (configErrorInfo.getRptField2() !=0) {
-    		sqlStmt = sqlStmt + "F" + configErrorInfo.getRptField2() + " as rptField2Value, ";
-    	} else {
-    		sqlStmt = sqlStmt + "'' as rptField2Value, ";
-    	}
-    	if (configErrorInfo.getRptField3() !=0) {
-    		sqlStmt = sqlStmt + "F" + configErrorInfo.getRptField3() + " as rptField3Value, ";
-    	} else {
-    		sqlStmt = sqlStmt + "'' as rptField3Value, ";
-    	}
-    	if (configErrorInfo.getRptField4() !=0) {
-    		sqlStmt = sqlStmt + "F" + configErrorInfo.getRptField4() + " as rptField4Value ";
-    	} else {
-    		sqlStmt = sqlStmt + "'' as rptField4Value ";
-    	}
-    	
-    	
-    	List <TransErrorDetail> transErrorDetails;
-    	try {
-    		transErrorDetails = transactionInDAO.getTransErrorDetails(batchInfo, configErrorInfo);
-    		
-    		for (TransErrorDetail trd : transErrorDetails) {
-    			String newSQL = "";
-    			switch (trd.getErrorCode()) {
-	    			case 2:
-	    				trd.setErrorInfo(messageTypeDAO.getValidationById(trd.getValidationTypeId()));
-	    				break;
-	    			case 3:
-	    				trd.setErrorInfo(messagetypemanager.getCrosswalk(trd.getCwId()).getName());
-	    				break;
-	    			case 4:
-	    				trd.setErrorInfo(configurationManager.getMacroById(trd.getMacroId()).getMacroName());
-	    				break;
-	    			default:
-	    			break;
-    			}
-    				if (trd.getErrorFieldNo() != null)  {
-    					if (trd.getErrorCode() == 9) {
-    						trd.setErrorFieldLabel("Target Org");
-    					} else {
-    						trd.setErrorFieldLabel(configurationtransportmanager.getCFFByFieldNo(configErrorInfo.getConfigId(), trd.getErrorFieldNo()).getFieldLabel());
-    					}
-    					newSQL = ", F" + trd.getErrorFieldNo() + " as errorData ";
-    				}
-    				trd = getTransErrorData(trd, sqlStmt + newSQL);
-    			}
-    		
-    		
-    		return transErrorDetails;
-    		
-    	
-    	} catch (Exception ex) {
-    		ex.printStackTrace();
+    public List<TransErrorDetail> getTransErrorDetails(batchUploads batchInfo, ConfigErrorInfo configErrorInfo) {
+        //get field values
+        String sqlStmt = "";
+        if (configErrorInfo.getRptField1() != 0) {
+            sqlStmt = sqlStmt + "F" + configErrorInfo.getRptField1() + " as rptField1Value, ";
+        } else {
+            sqlStmt = sqlStmt + "'' as rptField1Value, ";
+        }
+        if (configErrorInfo.getRptField2() != 0) {
+            sqlStmt = sqlStmt + "F" + configErrorInfo.getRptField2() + " as rptField2Value, ";
+        } else {
+            sqlStmt = sqlStmt + "'' as rptField2Value, ";
+        }
+        if (configErrorInfo.getRptField3() != 0) {
+            sqlStmt = sqlStmt + "F" + configErrorInfo.getRptField3() + " as rptField3Value, ";
+        } else {
+            sqlStmt = sqlStmt + "'' as rptField3Value, ";
+        }
+        if (configErrorInfo.getRptField4() != 0) {
+            sqlStmt = sqlStmt + "F" + configErrorInfo.getRptField4() + " as rptField4Value ";
+        } else {
+            sqlStmt = sqlStmt + "'' as rptField4Value ";
+        }
+
+        List<TransErrorDetail> transErrorDetails;
+        try {
+            transErrorDetails = transactionInDAO.getTransErrorDetails(batchInfo, configErrorInfo);
+
+            for (TransErrorDetail trd : transErrorDetails) {
+                String newSQL = "";
+                switch (trd.getErrorCode()) {
+                    case 2:
+                        trd.setErrorInfo(messageTypeDAO.getValidationById(trd.getValidationTypeId()));
+                        break;
+                    case 3:
+                        trd.setErrorInfo(messagetypemanager.getCrosswalk(trd.getCwId()).getName());
+                        break;
+                    case 4:
+                        trd.setErrorInfo(configurationManager.getMacroById(trd.getMacroId()).getMacroName());
+                        break;
+                    default:
+                        break;
+                }
+                if (trd.getErrorFieldNo() != null) {
+                    if (trd.getErrorCode() == 9) {
+                        trd.setErrorFieldLabel("Target Org");
+                    } else {
+                        trd.setErrorFieldLabel(configurationtransportmanager.getCFFByFieldNo(configErrorInfo.getConfigId(), trd.getErrorFieldNo()).getFieldLabel());
+                    }
+                    newSQL = ", F" + trd.getErrorFieldNo() + " as errorData ";
+                }
+                trd = getTransErrorData(trd, sqlStmt + newSQL);
+            }
+
+            return transErrorDetails;
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
             System.err.println("getTransErrorDetails " + ex.getCause());
             return null;
-    	}
+        }
     }
-    
+
     @Override
     public TransErrorDetail getTransErrorData(TransErrorDetail ted, String sqlStmt) {
-    	//we create header string
-    	return transactionInDAO.getTransErrorData(ted, sqlStmt);
+        //we create header string
+        return transactionInDAO.getTransErrorData(ted, sqlStmt);
     }
-    
+
     @Override
     public Integer flagNoPermissionConfig(batchUploads batch) {
         Integer sysErrors = 0;
@@ -2152,72 +2148,72 @@ public class transactionInManagerImpl implements transactionInManager {
         return sysErrors;
     }
 
-	@Override
-	public boolean hasPermissionForBatch(batchUploads batchInfo, User userInfo, boolean hasConfigurations) {
-		boolean hasPermission = false;
-        /** 
-         * user can view audit report if 
-         * 1. uploaded by user  
-         * 2. file type uploaded was for multiple types and user has configurations
-         * 3. user is in connection sender list for batch's configId
+    @Override
+    public boolean hasPermissionForBatch(batchUploads batchInfo, User userInfo, boolean hasConfigurations) {
+        boolean hasPermission = false;
+        /**
+         * user can view audit report if 1. uploaded by user 2. file type uploaded was for multiple types and user has configurations 3. user is in connection sender list for batch's configId
          */
-		try {
-		if (batchInfo.getuserId() == userInfo.getId()) {
-        	hasPermission = true;
-		} else if (batchInfo.getConfigId() == 0 && hasConfigurations){
-        	hasPermission = true;
-        } else if (checkPermissionForBatch(userInfo, batchInfo)) {
-        	hasPermission = true;
+        try {
+            if (batchInfo.getuserId() == userInfo.getId()) {
+                hasPermission = true;
+            } else if (batchInfo.getConfigId() == 0 && hasConfigurations) {
+                hasPermission = true;
+            } else if (checkPermissionForBatch(userInfo, batchInfo)) {
+                hasPermission = true;
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.err.println("checkPermissionForBatch " + ex.getCause());
         }
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			System.err.println("checkPermissionForBatch " + ex.getCause());
-		}
-		return hasPermission;
-	}
-    
-	@Override
-    public batchUploads getBatchDetailsByTInId(Integer transactionInId){
+        return hasPermission;
+    }
+
+    @Override
+    public batchUploads getBatchDetailsByTInId(Integer transactionInId) {
         return transactionInDAO.getBatchDetailsByTInId(transactionInId);
     }
-	
-	@Override
+
+    @Override
     public boolean allowBatchClear(Integer batchUploadId) {
         return transactionInDAO.allowBatchClear(batchUploadId);
     }
 
-	@Override
-	public void updateTranStatusByTInId(Integer transactionInId, Integer statusId) throws Exception {
-		 transactionInDAO.updateTranStatusByTInId(transactionInId, statusId);
-		
-	}
+    @Override
+    public void updateTranStatusByTInId(Integer transactionInId, Integer statusId) throws Exception {
+        transactionInDAO.updateTranStatusByTInId(transactionInId, statusId);
 
-	@Override
-	public List<batchUploads> populateBatchInfo(
-			List<batchUploads> uploadedBatches, User userInfo) {
-		try {
-			for(batchUploads batch : uploadedBatches) {
-	            List<transactionIn> batchTransactions = getBatchTransactions(batch.getId(), userInfo.getId());
-	            batch.settotalTransactions(batchTransactions.size());
-	
-	            lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
-	            batch.setstatusValue(processStatus.getDisplayCode());
-	            if (batch.getstatusId() == 5) {
-	            	batch.setTransTotalNotFinal(getRecordCounts(batch.getId(), finalStatusIds, true, false));
-	            }
-	            
-	            User userDetails = usermanager.getUserById(batch.getuserId());
-	            String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
-	            batch.setusersName(usersName);
-	
-	        }
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			System.err.println("populateBatchInfo " + ex.getCause());
-		}
-		return uploadedBatches;
-	}
-	
-	
-	
+    }
+
+    @Override
+    public List<batchUploads> populateBatchInfo(
+            List<batchUploads> uploadedBatches, User userInfo) {
+        try {
+            for (batchUploads batch : uploadedBatches) {
+                List<transactionIn> batchTransactions = getBatchTransactions(batch.getId(), userInfo.getId());
+                batch.settotalTransactions(batchTransactions.size());
+
+                lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
+                batch.setstatusValue(processStatus.getDisplayCode());
+                if (batch.getstatusId() == 5) {
+                    batch.setTransTotalNotFinal(getRecordCounts(batch.getId(), finalStatusIds, true, false));
+                }
+
+                User userDetails = usermanager.getUserById(batch.getuserId());
+                String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
+                batch.setusersName(usersName);
+
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.err.println("populateBatchInfo " + ex.getCause());
+        }
+        return uploadedBatches;
+    }
+    
+    @Override
+    public List<TransErrorDetail> getTransactionErrorsByFieldNo(int transactionInId, int fieldNo) throws Exception {
+        return transactionInDAO.getTransactionErrorsByFieldNo(transactionInId, fieldNo);
+    }
+
 }

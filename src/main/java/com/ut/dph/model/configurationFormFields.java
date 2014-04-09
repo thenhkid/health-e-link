@@ -17,7 +17,7 @@ public class configurationFormFields {
     
     @Transient
     private String fieldValue = null;
-
+    
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID", nullable = false)
@@ -210,5 +210,5 @@ public class configurationFormFields {
     public String getautoPopulateTableCol() {
         return autoPopulateTableCol;
     }
-
+    
 }

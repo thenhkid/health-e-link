@@ -341,5 +341,5 @@ public class Transaction {
    public void setreportableFieldHeading4(String reportableFieldHeading4) {
        this.reportableFieldHeading4 = reportableFieldHeading4;
    }
-   
+
 }

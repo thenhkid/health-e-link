@@ -33,7 +33,7 @@
                     <h3>${transactionDetails.messageTypeName} Transaction</h3>
                     <dl>
                         <dd><strong>Date Submitted:</strong> <fmt:formatDate value="${transactionDetails.dateSubmitted}" type="both" dateStyle="long" timeStyle="long" /></dd>
-                        <dd><strong>System ID:</strong> ${transactionDetails.batchName}</dd>
+                        <dd><strong>Batch ID:</strong> ${transactionDetails.batchName}</dd>
                         <dd><strong>Transaction Type:</strong> <c:choose><c:when test="${transactionDetails.sourceType == 1}">Original Message</c:when><c:otherwise>Feedback Report</c:otherwise></c:choose></dd>
                         <dd><strong>Status:</strong> <a href="#statusModal" data-toggle="modal" class="btn btn-link viewStatus" rel="${transactionDetails.statusId}" title="View this Status">${transactionDetails.statusValue}&nbsp;<span class="badge badge-help" data-placement="top" title="" data-original-title="">?</span></a></dd>
                     </dl>

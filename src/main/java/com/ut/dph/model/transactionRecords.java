@@ -22,6 +22,9 @@ public class transactionRecords {
     private String fieldLabel = null;
     private int transactionId;
     private boolean readOnly = false;
+    
+    private String errorDesc = null;
+    private String errorData = null;
 
     public int getTransactionId() {
         return transactionId;
@@ -111,6 +114,22 @@ public class transactionRecords {
 
     public boolean getreadOnly() {
         return readOnly;
+    }
+    
+    public String getErrorDesc() {
+        return errorDesc;
+    }
+
+    public void setErrorDesc(String errorDesc) {
+        this.errorDesc = errorDesc;
+    }
+
+    public String getErrorData() {
+        return errorData;
+    }
+
+    public void setErrorData(String errorData) {
+        this.errorData = errorData;
     }
 
 }
