@@ -108,11 +108,7 @@ public class adminProcessingActivity {
      * @throws Exception
      */
     @RequestMapping(value = "/inbound", method = RequestMethod.GET)
-    public ModelAndView listInBoundBatches(@RequestParam(value = "page", required = false) Integer page, HttpSession session) throws Exception {
-        
-        if(page == null || page < 1) {
-            page = 1;
-        }
+    public ModelAndView listInBoundBatches(HttpSession session) throws Exception {
         
         int year = 114;
         int month = 0;
@@ -121,7 +117,6 @@ public class adminProcessingActivity {
         
         Date fromDate = getMonthDate("START");
         Date toDate = getMonthDate("END");
-        String searchTerm = "";
         
         /* Retrieve search parameters from session */
         searchParameters searchParameters = (searchParameters)session.getAttribute("searchParameters");
@@ -132,27 +127,15 @@ public class adminProcessingActivity {
         if("".equals(searchParameters.getsection()) || !"inbound".equals(searchParameters.getsection())) {
             searchParameters.setfromDate(fromDate);
             searchParameters.settoDate(toDate);
-            searchParameters.setpage(page);
             searchParameters.setsection("inbound");
-            searchParameters.setsearchTerm("");
         }
         else {
             fromDate = searchParameters.getfromDate();
             toDate = searchParameters.gettoDate();
-            
-            if(page > 1) {
-                searchParameters.setpage(page);
-            }
-            else {
-                page = searchParameters.getpage();
-            }
-            
-            searchTerm = searchParameters.getsearchTerm();
         }
             
         mav.addObject("fromDate", fromDate);
         mav.addObject("toDate", toDate);
-        mav.addObject("searchTerm", searchTerm);
         mav.addObject("originalDate",originalDate);
         
         /* Get system inbound summary */
@@ -163,8 +146,7 @@ public class adminProcessingActivity {
         /* Get all inbound transactions */
         try {
             /* Need to get a list of all uploaded batches */
-            Integer totaluploadedBatches = transactionInManager.getAllUploadedBatches(fromDate, toDate, searchTerm, 1, 0).size();
-            List<batchUploads> uploadedBatches = transactionInManager.getAllUploadedBatches(fromDate, toDate, searchTerm, page, maxResults);
+            List<batchUploads> uploadedBatches = transactionInManager.getAllUploadedBatches(fromDate, toDate);
             
             List<Integer> statusIds = new ArrayList();
 
@@ -187,11 +169,8 @@ public class adminProcessingActivity {
                 }
             }
             
-
            mav.addObject("batches", uploadedBatches);
            
-           Integer totalPages = (int)Math.ceil((double)totaluploadedBatches / maxResults);
-           mav.addObject("totalPages", totalPages);
         }
         catch (Exception e) {
             throw new Exception("Error occurred viewing the all uploaded batches.",e);
@@ -213,11 +192,7 @@ public class adminProcessingActivity {
      * @throws Exception
      */
     @RequestMapping(value = "/inbound", method = RequestMethod.POST)
-    public ModelAndView listInBoundBatches(@RequestParam(value = "page", required = false) Integer page, @RequestParam String searchTerm, @RequestParam Date fromDate, @RequestParam Date toDate,HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
-        
-        if(page == null || page < 1) {
-            page = 1;
-        }
+    public ModelAndView listInBoundBatches(@RequestParam Date fromDate, @RequestParam Date toDate,HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
         
         int year = 114;
         int month = 0;
@@ -229,16 +204,13 @@ public class adminProcessingActivity {
         
         mav.addObject("fromDate", fromDate);
         mav.addObject("toDate", toDate);
-        mav.addObject("searchTerm", searchTerm);
         mav.addObject("originalDate",originalDate);
         
         /* Retrieve search parameters from session */
         searchParameters searchParameters = (searchParameters)session.getAttribute("searchParameters");
         searchParameters.setfromDate(fromDate);
         searchParameters.settoDate(toDate);
-        searchParameters.setpage(page);
         searchParameters.setsection("inbound");
-        searchParameters.setsearchTerm(searchTerm);
         
         /* Get system inbound summary */
         systemSummary summaryDetails = transactionInManager.generateSystemInboundSummary();
@@ -248,8 +220,7 @@ public class adminProcessingActivity {
         /* Get all inbound transactions */
         try {
             /* Need to get a list of all uploaded batches */
-            Integer totaluploadedBatches = transactionInManager.getAllUploadedBatches(fromDate, toDate, searchTerm, 1, 0).size();
-            List<batchUploads> uploadedBatches = transactionInManager.getAllUploadedBatches(fromDate, toDate, searchTerm, page, maxResults);
+            List<batchUploads> uploadedBatches = transactionInManager.getAllUploadedBatches(fromDate, toDate);
             
             List<Integer> statusIds = new ArrayList();
 
@@ -272,11 +243,8 @@ public class adminProcessingActivity {
                 }
             }
             
-
            mav.addObject("batches", uploadedBatches);
            
-           Integer totalPages = (int)Math.ceil((double)totaluploadedBatches / maxResults);
-           mav.addObject("totalPages", totalPages);
         }
         catch (Exception e) {
             throw new Exception("Error occurred viewing the all uploaded batches.",e);

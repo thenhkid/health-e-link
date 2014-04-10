@@ -253,7 +253,7 @@ public interface transactionInDAO {
     
     Integer insertTransactionTranslated(Integer newTInId, batchUploadSummary bus);
     
-    List <batchUploads> getAllUploadedBatches(Date fromDate, Date toDate, String searchTerm, int page, int maxResults) throws Exception;
+    List <batchUploads> getAllUploadedBatches(Date fromDate, Date toDate) throws Exception;
     
     boolean checkPermissionForBatch (User userInfo, batchUploads batchInfo);
     

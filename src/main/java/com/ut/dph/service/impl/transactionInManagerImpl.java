@@ -1857,8 +1857,8 @@ public class transactionInManagerImpl implements transactionInManager {
 
     @Override
     @Transactional
-    public List<batchUploads> getAllUploadedBatches(Date fromDate, Date toDate, String searchTerm, int page, int maxResults) throws Exception {
-        return transactionInDAO.getAllUploadedBatches(fromDate, toDate, searchTerm, page, maxResults);
+    public List<batchUploads> getAllUploadedBatches(Date fromDate, Date toDate) throws Exception {
+        return transactionInDAO.getAllUploadedBatches(fromDate, toDate);
     }
 
     @Override
@@ -1925,7 +1925,7 @@ public class transactionInManagerImpl implements transactionInManager {
 
             System.out.println("This Hour: " + thishour.getTime() + " Next Hour: " + nexthour.getTime());
 
-            Integer batchesThisHour = transactionInDAO.getAllUploadedBatches(thishour.getTime(), nexthour.getTime(), "", 1, 0).size();
+            Integer batchesThisHour = transactionInDAO.getAllUploadedBatches(thishour.getTime(), nexthour.getTime()).size();
 
             /* Get batches submitted today */
             Calendar starttoday = new GregorianCalendar();
@@ -1943,7 +1943,7 @@ public class transactionInManagerImpl implements transactionInManager {
 
             System.out.println("Today: " + starttoday.getTime() + " Tomorrow: " + starttomorrow.getTime());
 
-            Integer batchesToday = transactionInDAO.getAllUploadedBatches(starttoday.getTime(), starttomorrow.getTime(), "", 1, 0).size();
+            Integer batchesToday = transactionInDAO.getAllUploadedBatches(starttoday.getTime(), starttomorrow.getTime()).size();
 
             /* Get batches submitted this week */
             Calendar thisweek = new GregorianCalendar();
@@ -1963,7 +1963,7 @@ public class transactionInManagerImpl implements transactionInManager {
 
             System.out.println("This Week: " + thisweek.getTime() + " Next Week: " + nextweek.getTime());
 
-            Integer batchesThisWeek = transactionInDAO.getAllUploadedBatches(thisweek.getTime(), nextweek.getTime(), "", 1, 0).size();
+            Integer batchesThisWeek = transactionInDAO.getAllUploadedBatches(thisweek.getTime(), nextweek.getTime()).size();
 
             systemSummary.setBatchesPastHour(batchesThisHour);
             systemSummary.setBatchesToday(batchesToday);
