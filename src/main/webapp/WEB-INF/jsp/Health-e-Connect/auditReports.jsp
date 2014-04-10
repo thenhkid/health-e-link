@@ -10,6 +10,15 @@
 <div class="container main-container" role="main">
     <div class="row">
         <div class="col-md-12 page-content">        
+            
+            <div style="display:none;" class="alert alert-danger" role="alert"></div> 
+            <c:set var="alertClass" value="alert alert-danger"/>
+            <c:if test="${noErrors}">
+            	<c:set var="alertClass" value="alert alert-success"/>
+            </c:if>
+            <c:if test="${not empty batchOptionStatus}"><div class="${alertClass}">${batchOptionStatus}</div></c:if> 
+
+            
             <div class="row" style="overflow:hidden; margin-bottom:10px;">
                     <div class="col-md-3">
                         <form:form class="form form-inline" id="searchForm" action="/Health-e-Connect/auditReports" method="post">
@@ -37,7 +46,6 @@
                         </div>
                     </div>
             </div>
-            <c:set var="showButton" value="false"/>
             <div class="form-container scrollable">
                 <table class="table table-striped table-hover table-default">
                     <thead>
@@ -61,7 +69,7 @@
                                     <tr>
                                    	    <td scope="row"  class="center-text">
 	                                   	    <c:if test="${batch.statusId == 5 && userDetails.deliverAuthority == true && batch.transTotalNotFinal == 0}">
-	                                   	    	<input type="checkbox" id="batchId" name="batchId" class="batchIds" value="${batch.id}" />
+	                                   	    	<input type="checkbox" id="relBatchId" name="relBatchId" class="relBatchId" value="${batch.id}" />
 	                                   	    </c:if>
                                    	    </td>
                                         
@@ -104,7 +112,8 @@
         </div>
     </div>
 </div>
-<c:if test="${show}">
-</c:if>
+<form action="releaseBatches" id="releaseBatches" method="post">
+    <input type="hidden" id="idList" name="idList" value="" />                        
+</form>
 <div class="modal fade" id="uploadFile" role="dialog" tabindex="-1" aria-labeledby="Upload New File" aria-hidden="true" aria-describedby="Upload New File"></div>
 <div class="modal fade" id="statusModal" role="dialog" tabindex="-1" aria-labeledby="Status Details" aria-hidden="true" aria-describedby="Status Details"></div>

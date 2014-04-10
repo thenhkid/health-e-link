@@ -26,7 +26,7 @@ require(['./main'], function () {
            });
 
            if(idList === "") {
-               $('.alert-danger').html("At lease one transaction must be selected to delete!");
+               $('.alert-danger').html("At least one transaction must be selected to reject!");
                $('.alert-danger').show();
            }
            else {

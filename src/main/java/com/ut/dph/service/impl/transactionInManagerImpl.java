@@ -2196,7 +2196,7 @@ public class transactionInManagerImpl implements transactionInManager {
                 lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
                 batch.setstatusValue(processStatus.getDisplayCode());
                 if (batch.getstatusId() == 5) {
-                    batch.setTransTotalNotFinal(getRecordCounts(batch.getId(), finalStatusIds, true, false));
+                	batch.setTransTotalNotFinal(getRecordCounts(batch.getId(), finalStatusIds, false, false));                    
                 }
 
                 User userDetails = usermanager.getUserById(batch.getuserId());

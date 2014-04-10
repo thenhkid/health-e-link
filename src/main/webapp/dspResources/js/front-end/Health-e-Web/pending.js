@@ -66,7 +66,7 @@ require(['./main'], function () {
            });
 
            if(batchIdList === "") {
-               $('.alert-danger').html("At lease one batch must be marked to send!");
+               $('.alert-danger').html("At least one batch must be marked to send!");
                $('.alert-danger').show();
            }
            else {

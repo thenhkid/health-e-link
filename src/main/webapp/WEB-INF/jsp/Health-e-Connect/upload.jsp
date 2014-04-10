@@ -27,11 +27,12 @@
                     </c:forEach>
                 </div>
             </c:if>
-            <c:if test="${not empty batchOptionStatus}">
-				<div class="alert alert-danger">
-                    ${batchOptionStatus}
-                </div>
-			</c:if>            
+            <c:set var="alertClass" value="alert alert-danger"/>
+            <c:if test="${noErrors}">
+            	<c:set var="alertClass" value="alert alert-success"/>
+            </c:if>
+            <c:if test="${not empty batchOptionStatus}"><div class="${alertClass}">${batchOptionStatus}</div></c:if> 
+           
             <div class="row" style="overflow:hidden; margin-bottom:10px;">
                     <div class="col-md-3">
                         <form:form class="form form-inline" id="searchForm" action="/Health-e-Connect/upload" method="post">

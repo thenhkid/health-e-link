@@ -29,6 +29,29 @@ require(['./main'], function () {
         	$('#searchForm').submit();
         });
 
+        //this function checks for marked batches and sets them to release status
+        $(document).on('click','.sendBatches', function() {
+        	$('.alert-danger').hide();
+
+           var idList = "";
+
+           //Loop through all batch ids
+           $('input[type=checkbox]').each(function() {
+               if(this.checked) {
+            	   idList += (idList ==="" ? this.value : "," + this.value);
+                }
+           });
+
+           if(idList === "") {
+               $('.alert-danger').html("At least one batch must be selected to release!");
+               $('.alert-danger').show();
+           }
+           else {
+               $('#idList').val(idList);
+               $('#releaseBatches').submit();
+           }
+        });
+        
         
         //This function will launch the new file upload overlay with a blank screen
         $(document).on('click', '.uploadFile', function() {

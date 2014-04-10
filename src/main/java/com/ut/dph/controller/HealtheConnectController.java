@@ -1137,9 +1137,6 @@ public class HealtheConnectController {
             /**
              * Four options - rejectMessages - canEdit - need to POST form and refresh audit report releaseBatch - canSend resetBatch, cancelBatch - canCancel *
              */
-            System.out.println(batchOption);
-            System.out.println("idList is " + idList);
-
             /**
              * check for permission*
              */
@@ -1201,7 +1198,15 @@ public class HealtheConnectController {
                         hasPermission = false;
                     }
                 } else if (batchOption.equalsIgnoreCase("releaseBatch")) {
-                    if (allowBatchClear && userInfo.getdeliverAuthority()) {
+                	boolean canReleaseBatch = false;
+                	if (batchInfo.getstatusId() == 5 && userInfo.getdeliverAuthority()) { // do the check that doesn't require a hit to db first
+	   	        		 if (batchInfo.getConfigId() != 0) {
+	   	        			 canReleaseBatch = transactionInManager.checkPermissionForBatch(userInfo, batchInfo);
+	   	        		 } else if (configurationManager.getActiveConfigurationsByUserId(userInfo.getId(), batchInfo.gettransportMethodId()).size() > 0) {
+	   	        			 canReleaseBatch = true;
+	   	        		 }
+                	}
+                	if (canReleaseBatch) {
                         transactionInManager.updateBatchStatus(batchId, 4, "startDateTime");
                         //check once again to make sure all transactions are in final status
                         if (transactionInManager.getRecordCounts(batchId, Arrays.asList(11, 12, 13, 16), false, false) == 0) {
@@ -1212,7 +1217,7 @@ public class HealtheConnectController {
                         }
                     } else {
                         transactionInManager.updateBatchStatus(batchId, 5, "endDateTime");
-                        systemMessage = "You do not have permission to release a batch.";
+                        systemMessage = "You do not have permission to release this batch.";
                         hasPermission = false;
                     }
                 } else if (batchOption.equalsIgnoreCase("rejectMessages")) {
@@ -1231,7 +1236,7 @@ public class HealtheConnectController {
 
                 }
             } // end of permission
-
+            
             //log user activity
             UserActivity ua = new UserActivity();
             ua.setUserId(userInfo.getId());
@@ -1244,7 +1249,9 @@ public class HealtheConnectController {
                 ua.setActivityDesc("without permission" + systemMessage);
             }
             usermanager.insertUserLog(ua);
-
+            
+            
+            redirectAttr.addFlashAttribute("noErrors", hasPermission);
             redirectAttr.addFlashAttribute("batchOptionStatus", systemMessage);
             ModelAndView mav = new ModelAndView(new RedirectView(redirectPage));
             //add messages
@@ -1429,4 +1436,84 @@ public class HealtheConnectController {
         return fields;
 
     }
+    
+    
+    /**
+     * The '/releaseBatches POST request will serve up the requested Health-e-Connect audit report .
+     *
+     * @param request
+     * @param response
+     * @return	we redirect back to /auditReports
+     * @throws Exception
+     */
+    @RequestMapping(value = "/releaseBatches", method = RequestMethod.POST)
+    public ModelAndView massReleaseBatches(@RequestParam(value = "idList", required = false) List<Integer> idList,
+            RedirectAttributes redirectAttr, HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
+
+    	boolean canReleaseBatch = false;
+        String redirectPage = "auditReports";
+        String systemMessage = "";
+        boolean noErrors = true;
+        
+        try {
+        	User userInfo = (User) session.getAttribute("userDetails");
+        	/**
+            * we loop batch and check for all final status, permission and then we release
+            * **/
+        	for (Integer batchId : idList) {
+        		 String forInsert = "";
+        		 batchUploads batchInfo = transactionInManager.getBatchDetails(batchId);
+        		 //check to see if user is a valid sender for config, if 0, we check to see if user belong to batch's org and user need to have deliver authority
+        		 if (batchInfo.getstatusId() == 5 && userInfo.getdeliverAuthority()) { // do the check that doesn't require a hit to db first
+	        		 if (batchInfo.getConfigId() != 0) {
+	        			 canReleaseBatch = transactionInManager.checkPermissionForBatch(userInfo, batchInfo);
+	        		 } else if (configurationManager.getActiveConfigurationsByUserId(userInfo.getId(), batchInfo.gettransportMethodId()).size() > 0) {
+	        			 canReleaseBatch = true;
+	        		 }
+        		 }
+                 if (canReleaseBatch) {
+                         transactionInManager.updateBatchStatus(batchId, 4, "startDateTime");
+                         //check once again to make sure all transactions are in final status
+                         if (transactionInManager.getRecordCounts(batchId, Arrays.asList(11, 12, 13, 16), false, false) == 0) {
+                             transactionInManager.updateBatchStatus(batchId, 6, "endDateTime");
+                             forInsert = "Batch "+ batchInfo.getutBatchName() + " is released.";
+                             systemMessage = systemMessage + forInsert + "<br/>";                           		 
+                         } else {
+                             transactionInManager.updateBatchStatus(batchId, 5, "endDateTime");
+                             forInsert= "Batch "+ batchInfo.getutBatchName() + " has transactions that are not in final status. It is not released.";
+                             systemMessage = systemMessage + forInsert + "<br/>";  
+                         }
+                   } else {
+                         transactionInManager.updateBatchStatus(batchId, 5, "endDateTime");
+                         forInsert = "You do not have permission to release Batch " + batchInfo.getutBatchName();
+                         systemMessage = systemMessage + forInsert + "<br/>";
+                         canReleaseBatch = false;
+                         noErrors = false;
+                   }
+             		//log user activity
+                     UserActivity ua = new UserActivity();
+                     ua.setUserId(userInfo.getId());
+                     ua.setAccessMethod(request.getMethod());
+                     ua.setPageAccess("/releaseBatches");
+                     ua.setActivity("Release batch");
+                     ua.setBatchId(batchId);
+                     if (!canReleaseBatch) {
+                         ua.setActivityDesc("without permission" + forInsert);
+                     }
+                     	usermanager.insertUserLog(ua);
+                     	
+                 }
+               
+        	redirectAttr.addFlashAttribute("noErrors", noErrors);
+            redirectAttr.addFlashAttribute("batchOptionStatus", systemMessage);
+            ModelAndView mav = new ModelAndView(new RedirectView(redirectPage));
+            return mav;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception("Error at release batches.", e);
+        }
+
+    }
+
 }

@@ -12,12 +12,8 @@
     <div class="row">
         <div class="col-md-12 page-content">
 
-            <div style="display:none;" class="alert alert-danger" role="alert">
-                <c:if test="${not empty batchOptionStatus}">
-                    ${batchOptionStatus}
-                </c:if> 
-            </div> 
-
+            <div style="display:none;" class="alert alert-danger" role="alert"></div> 
+            
             <c:choose>
                 <c:when test="${hasPermission}">
                     <div class="row">

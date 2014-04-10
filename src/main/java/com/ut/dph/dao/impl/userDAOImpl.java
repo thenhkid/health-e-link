@@ -308,7 +308,6 @@ public class userDAOImpl implements userDAO {
      * @return no return is expected
      */
     @Override
-    
     public void insertUserLog(UserActivity userActivity) {
     	try {
     		sessionFactory.getCurrentSession().save(userActivity);
