@@ -30,22 +30,24 @@
                                 <input type="hidden" name="page" id="page" value="${currentPage}" />
                           		<input type="hidden" name="batchId" id="batchId" value=""/>
                             </div>
-                            <div class="form-group">
-                            	<label class="sr-only">Source</label>
-                                <select name="statusType" class="form-control">
-                                    <option value="0">- Status -</option>
-                                    <option value="1">available status goes here</option>
-                                    
-                                </select> </div>
                             <button id="searchBatchesBtn" class="btn btn-primary btn-sm" title="Search Audit Reports">
                                 <span class="glyphicon glyphicon-search"></span>
                             </button>
+                            <div class="form-group">
+	                            	<label class="sr-only">Source</label>
+	                                <select name="statusType" class="form-control">
+	                                    <option value="0">- Status -</option>
+	                                    <option value="1">available status goes here</option>
+	                                </select>
+	                    </div>
                         </form:form>
                     </div>
+                    
                     
                     <div class="col-md-2 col-md-offset-1">
                     	<c:if test="${showRelButton == true}"><a href="javascript:void(0);" title="Send Batches" class="pull-right btn btn-primary sendBatches"><span class="glyphicon glyphicon-send"></span> Release Marked Batches</a></c:if>
                		</div>
+                    
                     <div class="col-md-4">
                         <div class="date-range-picker-trigger form-control pull-right daterange">
                             <i class="glyphicon glyphicon-calendar"></i>
