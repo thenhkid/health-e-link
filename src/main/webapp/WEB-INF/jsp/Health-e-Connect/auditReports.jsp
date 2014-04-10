@@ -37,7 +37,7 @@
                     </div>
 
                     <div class="col-md-2 col-md-offset-3">
-                    	<a href="javascript:void(0);" title="Send Batches" class="pull-right btn btn-primary sendBatches"><span class="glyphicon glyphicon-send"></span> Release Marked Batches</a> 
+                    	<c:if test="${showRelButton == true}"><a href="javascript:void(0);" title="Send Batches" class="pull-right btn btn-primary sendBatches"><span class="glyphicon glyphicon-send"></span> Release Marked Batches</a></c:if>
                		</div>
                     <div class="col-md-4">
                         <div class="date-range-picker-trigger form-control pull-right daterange">
@@ -50,7 +50,7 @@
                 <table class="table table-striped table-hover table-default">
                     <thead>
                         <tr>
-                            <th scope="col">Release?</th>
+                            <th scope="col"><c:if test="${showRelButton == true}">Release?</c:if>&nbsp;</th>
                             <th scope="col">Batch Name</th>
                             <th scope="col">File Name</th>
                             <th scope="col" class="center-text"># of Transactions</th>

@@ -33,8 +33,8 @@ import com.ut.dph.service.sysAdminManager;
 import com.ut.dph.service.transactionInManager;
 import com.ut.dph.service.transactionOutManager;
 import com.ut.dph.service.userManager;
-import java.lang.reflect.InvocationTargetException;
 
+import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -53,8 +53,8 @@ import java.util.logging.Logger;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import org.apache.commons.beanutils.BeanUtils;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -591,7 +591,7 @@ public class HealtheConnectController {
             throws Exception {
 
         User userInfo = (User) session.getAttribute("userDetails");
-
+        boolean showRelButton = false;
         if (searchTerm == null) {
             searchTerm = "";
         }
@@ -612,7 +612,25 @@ public class HealtheConnectController {
             List<batchUploads> uploadedBatches = transactionInManager.getuploadedBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, searchTerm, 1, maxResults, excludedStatusIds);
 
             if (!uploadedBatches.isEmpty()) {
-                uploadedBatches = transactionInManager.populateBatchInfo(uploadedBatches, userInfo);
+            	for (batchUploads batch : uploadedBatches) {
+                    List<transactionIn> batchTransactions = transactionInManager.getBatchTransactions(batch.getId(), userInfo.getId());
+                    batch.settotalTransactions(batchTransactions.size());
+
+                    lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
+                    batch.setstatusValue(processStatus.getDisplayCode());
+                    if (batch.getstatusId() == 5) {
+                    	Integer transTotalNotFinal = transactionInManager.getRecordCounts(batch.getId(), finalStatusIds, false, false);
+                    	batch.setTransTotalNotFinal(transTotalNotFinal); 
+                    	if (transTotalNotFinal == 0) {
+                    		showRelButton = true;
+                    	}
+                    }
+
+                    User userDetails = usermanager.getUserById(batch.getuserId());
+                    String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
+                    batch.setusersName(usersName);
+
+                }
             }
 
             List<configuration> configurations = configurationManager.getActiveConfigurationsByUserId(userInfo.getId(), 1);
@@ -621,6 +639,7 @@ public class HealtheConnectController {
                 hasConfigurations = true;
             }
 
+            mav.addObject("showRelButton", showRelButton);
             mav.addObject("hasConfigurations", hasConfigurations);
             mav.addObject("uploadedBatches", uploadedBatches);
             mav.addObject("searchTerm", searchTerm);
@@ -683,13 +702,32 @@ public class HealtheConnectController {
         mav.addObject("fromDate", fromDate);
         mav.addObject("toDate", toDate);
 
+        boolean showRelButton = false;
         try {
             /* Need to get a list of all uploaded batches */
             Integer totaluploadedBatches = transactionInManager.getuploadedBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, searchTerm, 1, 0, excludedStatusIds).size();
             List<batchUploads> uploadedBatches = transactionInManager.getuploadedBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, searchTerm, page, maxResults, excludedStatusIds);
 
             if (!uploadedBatches.isEmpty()) {
-                uploadedBatches = transactionInManager.populateBatchInfo(uploadedBatches, userInfo);
+            	for (batchUploads batch : uploadedBatches) {
+                    List<transactionIn> batchTransactions = transactionInManager.getBatchTransactions(batch.getId(), userInfo.getId());
+                    batch.settotalTransactions(batchTransactions.size());
+
+                    lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
+                    batch.setstatusValue(processStatus.getDisplayCode());
+                    if (batch.getstatusId() == 5) {
+                    	Integer transTotalNotFinal = transactionInManager.getRecordCounts(batch.getId(), finalStatusIds, false, false);
+                    	batch.setTransTotalNotFinal(transTotalNotFinal); 
+                    	if (transTotalNotFinal == 0) {
+                    		showRelButton = true;
+                    	}
+                    }
+
+                    User userDetails = usermanager.getUserById(batch.getuserId());
+                    String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
+                    batch.setusersName(usersName);
+
+                }
             }
 
             List<configuration> configurations = configurationManager.getActiveConfigurationsByUserId(userInfo.getId(), 1);
@@ -699,7 +737,7 @@ public class HealtheConnectController {
             }
 
             mav.addObject("hasConfigurations", hasConfigurations);
-
+            mav.addObject("showRelButton", showRelButton);
             mav.addObject("uploadedBatches", uploadedBatches);
 
             Integer totalPages = (int) Math.ceil((double) totaluploadedBatches / maxResults);
