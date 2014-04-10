@@ -59,50 +59,17 @@ public class adminLibController {
      * @throws Exception
      */
     @RequestMapping(value = "/list", method = RequestMethod.GET)
-    public ModelAndView listMessageTypes(@RequestParam(value = "page", required = false) Integer page) throws Exception {
-
-        if (page == null) {
-            page = 1;
-        }
+    public ModelAndView listMessageTypes() throws Exception {
 
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/messageTypeLibrary/list");
 
-        List<messageType> messageTypes = messagetypemanager.getMessageTypes(page, maxResults);
-        mav.addObject("messageTypesList", messageTypes);
-
-        //Return the total list of message types
-        Long totalMessageTypes = messagetypemanager.findTotalMessageTypes();
-        
-        Integer totalPages = (int)Math.ceil((double)totalMessageTypes / maxResults);
-        mav.addObject("totalPages", totalPages);
-        mav.addObject("currentPage", page);
-        return mav;
-
-    }
-
-    /**
-     * The '/list' POST request will be used to search message types from the search form on the message type library manager list page.
-     *
-     * @param searchTerm	The searchTerm parameter will hold the string to search on
-     * @return	The message type page list
-     *
-     * @Objects	(1) An object will be returned holding the requested search term used to populate the search box (3) An object containing the found message types
-     * @throws Exception
-     */
-    @RequestMapping(value = "/list", method = RequestMethod.POST)
-    public ModelAndView findMessageTYpes(@RequestParam String searchTerm) throws Exception {
-
-        ModelAndView mav = new ModelAndView();
-        mav.setViewName("/administrator/messageTypeLibrary/list");
-
-        List<messageType> messageTypes = messagetypemanager.findMessageTypes(searchTerm);
-        mav.addObject("searchTerm", searchTerm);
+        List<messageType> messageTypes = messagetypemanager.getMessageTypes();
         mav.addObject("messageTypesList", messageTypes);
 
         return mav;
-
     }
+
 
     /**
      * The '/create' GET request will serve up the create new message type page

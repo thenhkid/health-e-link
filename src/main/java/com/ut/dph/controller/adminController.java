@@ -119,7 +119,7 @@ public class adminController {
         }
         
         /* get a list of all connections in the sysetm */
-        List<configurationConnection> connections = configurationmanager.getAllConnections(1, maxResults);
+        List<configurationConnection> connections = configurationmanager.getLatestConnections(maxResults);
         
         /* Loop over the connections to get the configuration details */
         if(connections != null) {

@@ -177,28 +177,12 @@ public class configurationDAOImpl implements configurationDAO {
      *
      * @Table	configurations
      *
-     * @param	page	This will hold the value of page being viewed (used for pagination)
-     * @param maxResults	This will hold the value of the maximum number of results we want to send back to the list page
-     *
      * @Return	This function will return a list of configuration objects
      */
     @Override
     @SuppressWarnings("unchecked")
-    public List<configuration> getConfigurations(int page, int maxResults) {
+    public List<configuration> getConfigurations() {
         Query query = sessionFactory.getCurrentSession().createQuery("from configuration order by dateCreated desc");
-
-        //By default we want to return the first result
-        int firstResult = 0;
-
-        //If viewing a page other than the first we then need to figure out
-        //which result to start with
-        if (page > 1) {
-            firstResult = (maxResults * (page - 1));
-        }
-        query.setFirstResult(firstResult);
-
-        //Set the max results to display
-        query.setMaxResults(maxResults);
 
         List<configuration> configurationList = query.list();
         return configurationList;
@@ -222,67 +206,6 @@ public class configurationDAOImpl implements configurationDAO {
         return query.list();
     }
 
-    /**
-     * The 'findConfigurations' function will return a list of configurations based on a search term passed in. The function will search configurations on the following fields configName, orgName and messageTypeName
-     *
-     * @Table	configurations
-     *
-     * @param	searchTerm	Will hold the term used search configurations on
-     *
-     * @return	This function will return a list of configuration objects
-     */
-    @Override
-    @SuppressWarnings("unchecked")
-    public List<configuration> findConfigurations(String searchTerm, int configType) {
-        
-        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configuration.class);
-
-        if (!"".equals(searchTerm)) {
-            //get a list of organization id's that match the term passed in
-            List<Integer> orgIdList = new ArrayList<Integer>();
-            Criteria findOrgs = sessionFactory.getCurrentSession().createCriteria(Organization.class);
-            findOrgs.add(Restrictions.like("orgName", "%" + searchTerm + "%"));
-            List<Organization> orgs = findOrgs.list();
-
-            for (Organization org : orgs) {
-                orgIdList.add(org.getId());
-            }
-
-            //get a list of message type id's that match the term passed in
-            List<Integer> msgTypeIdList = new ArrayList<Integer>();
-            Criteria findMsgTypes = sessionFactory.getCurrentSession().createCriteria(messageType.class);
-            findMsgTypes.add(Restrictions.like("name", "%" + searchTerm + "%"));
-            List<messageType> msgTypes = findMsgTypes.list();
-
-            for (messageType msgType : msgTypes) {
-                msgTypeIdList.add(msgType.getId());
-            }
-
-            if (orgIdList.isEmpty()) {
-                orgIdList.add(0);
-            }
-            if (msgTypeIdList.isEmpty()) {
-                msgTypeIdList.add(0);
-            }
-
-            criteria.add(Restrictions.or(
-                    Restrictions.in("orgId", orgIdList),
-                    Restrictions.in("messageTypeId", msgTypeIdList),
-                    Restrictions.like("configName", "%" + searchTerm + "%")
-            )
-            );
-        } 
-        
-        if(configType > 0) {
-            
-            criteria.add(Restrictions.eq("type", configType));
-            
-        }
-        
-        criteria.addOrder(Order.desc("dateCreated"));
-        return criteria.list();
-
-    }
 
     /**
      * The 'totalConfigs' function will return the total number of active configurations in the system. This will be used for pagination when viewing the list of configurations
@@ -468,7 +391,24 @@ public class configurationDAOImpl implements configurationDAO {
      *
      * @Table	configurationConnections
      *
-     * @param	page This will hold the value of page being viewed (used for pagination)
+     *
+     * @Return	This function will return a list of configurationConnection objects
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    @Transactional
+    public List<configurationConnection> getAllConnections() {
+        Query query = sessionFactory.getCurrentSession().createQuery("from configurationConnection order by dateCreated desc");
+
+        List<configurationConnection> connections = query.list();
+        return connections;
+    }
+    
+    /**
+     * The 'getLatestConnections' function will return the list of configuration connections in the system.
+     *
+     * @Table	configurationConnections
+     *
      * @param maxResults This will hold the value of the maximum number of results we want to send back to the list page
      *
      * @Return	This function will return a list of configurationConnection objects
@@ -476,19 +416,9 @@ public class configurationDAOImpl implements configurationDAO {
     @SuppressWarnings("unchecked")
     @Override
     @Transactional
-    public List<configurationConnection> getAllConnections(int page, int maxResults) {
+    public List<configurationConnection> getLatestConnections(int maxResults) {
         Query query = sessionFactory.getCurrentSession().createQuery("from configurationConnection order by dateCreated desc");
-
-        //By default we want to return the first result
-        int firstResult = 0;
-
-        //If viewing a page other than the first we then need to figure out
-        //which result to start with
-        if (page > 1) {
-            firstResult = (maxResults * (page - 1));
-        }
-        query.setFirstResult(firstResult);
-
+        
         //Set the max results to display
         query.setMaxResults(maxResults);
 
@@ -496,78 +426,6 @@ public class configurationDAOImpl implements configurationDAO {
         return connections;
     }
     
-    /**
-     * The 'findConnections' function will return the list of configuration connections based on the search
-     * term entered.
-     * 
-     * @param searchTerm  The term to search connections on
-     *
-     * @Table	configurationConnections
-     *
-     * @Return	This function will return a list of configurationConnection objects
-     */
-    @SuppressWarnings("unchecked")
-    @Override
-    @Transactional
-    public List<configurationConnection> findConnections(String searchTerm) {
-        
-        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configurationConnection.class);
-
-        if (!"".equals(searchTerm)) {
-            //get a list of organization id's that match the term passed in
-            List<Integer> orgIdList = new ArrayList<Integer>();
-            Criteria findOrgs = sessionFactory.getCurrentSession().createCriteria(Organization.class);
-            findOrgs.add(Restrictions.like("orgName", "%" + searchTerm + "%"));
-            List<Organization> orgs = findOrgs.list();
-
-            for (Organization org : orgs) {
-                orgIdList.add(org.getId());
-            }
-
-            //get a list of message type id's that match the term passed in
-            List<Integer> msgTypeIdList = new ArrayList<Integer>();
-            Criteria findMsgTypes = sessionFactory.getCurrentSession().createCriteria(messageType.class);
-            findMsgTypes.add(Restrictions.like("name", "%" + searchTerm + "%"));
-            List<messageType> msgTypes = findMsgTypes.list();
-
-            for (messageType msgType : msgTypes) {
-                msgTypeIdList.add(msgType.getId());
-            }
-
-            if (orgIdList.isEmpty()) {
-                orgIdList.add(0);
-            }
-            if (msgTypeIdList.isEmpty()) {
-                msgTypeIdList.add(0);
-            }
-            
-            List<Integer> configIdList = new ArrayList<Integer>();
-            Criteria configCriteria = sessionFactory.getCurrentSession().createCriteria(configuration.class);
-            configCriteria.add(Restrictions.or(
-                    Restrictions.in("orgId", orgIdList),
-                    Restrictions.in("messageTypeId", msgTypeIdList),
-                    Restrictions.like("configName", "%" + searchTerm + "%")
-            ));
-            
-            List<configuration> configurations = configCriteria.list();
-
-            for (configuration config : configurations) {
-                configIdList.add(config.getId());
-            }
-            
-            if (configIdList.isEmpty()) {
-                configIdList.add(0);
-            }
-            
-            criteria.add(Restrictions.or(
-                    Restrictions.in("sourceConfigId", configIdList),
-                    Restrictions.in("targetConfigId", configIdList)
-            ));
-        }
-        
-        criteria.addOrder(Order.desc("dateCreated"));
-        return criteria.list();
-    }
 
     /**
      * The 'getConnectionsByConfiguration' will return a list of target connections for a passed in configuration;

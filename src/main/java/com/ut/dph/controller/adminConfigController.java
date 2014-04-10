@@ -119,16 +119,12 @@ public class adminConfigController {
      * @throws Exception
      */
     @RequestMapping(value = "/list", method = RequestMethod.GET)
-    public ModelAndView listConfigurations(@RequestParam(value = "page", required = false) Integer page) throws Exception {
-
-        if (page == null) {
-            page = 1;
-        }
+    public ModelAndView listConfigurations() throws Exception {
 
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/configurations/list");
         
-        List<configuration> configurations = configurationmanager.getConfigurations(page, maxResults);
+        List<configuration> configurations = configurationmanager.getConfigurations();
         
         Organization org;
         messageType messagetype;
@@ -150,56 +146,10 @@ public class adminConfigController {
         
         mav.addObject("configurationList", configurations);
 
-        //Return the total list of configurations
-        Long totalConfigs = configurationmanager.findTotalConfigs();
-
-        Integer totalPages = (int) Math.ceil((double)totalConfigs / maxResults);
-        mav.addObject("totalPages", totalPages);
-        mav.addObject("currentPage", page);
         return mav;
 
     }
 
-    /**
-     * The '/list' POST request will be used to search configurations from the search form on the configuration list page.
-     *
-     * @param searchTerm	The searchTerm parameter will hold the string to search on
-     * @return	The configuration page list
-     *
-     * @Objects	(1) An object will be returned holding the requested search term used to populate the search box (2) An object containing the found configurations
-     * @throws Exception
-     */
-    @RequestMapping(value = "/list", method = RequestMethod.POST)
-    public ModelAndView findConfigurations(@RequestParam String searchTerm, @RequestParam int configType) throws Exception {
-
-        ModelAndView mav = new ModelAndView();
-        mav.setViewName("/administrator/configurations/list");
-
-        List<configuration> configurations = configurationmanager.findConfigurations(searchTerm, configType);
-        mav.addObject("searchTerm", searchTerm);
-        mav.addObject("searchConfigType", configType);
-        mav.addObject("configurationList", configurations);
-
-        Organization org;
-        messageType messagetype;
-        configurationTransport transportDetails;
-
-        for (configuration config : configurations) {
-            org = organizationmanager.getOrganizationById(config.getorgId());
-            config.setOrgName(org.getOrgName());
-
-            messagetype = messagetypemanager.getMessageTypeById(config.getMessageTypeId());
-            config.setMessageTypeName(messagetype.getName());
-            
-            transportDetails = configurationTransportManager.getTransportDetails(config.getId());
-            if(transportDetails != null) {
-             config.settransportMethod(configurationTransportManager.getTransportMethodById(transportDetails.gettransportMethodId()));
-            }
-        }
-
-        return mav;
-
-    }
 
     /**
      * The '/create' GET request will serve up the create new configuration page
@@ -1264,12 +1214,8 @@ public class adminConfigController {
      *         connections  - list of currently associated organizations
      */
     @RequestMapping(value = "/connections", method = RequestMethod.GET)
-    public ModelAndView getConnections(@RequestParam(value = "page", required = false) Integer page) throws Exception {
-        
-        if (page == null) {
-            page = 1;
-        }
-
+    public ModelAndView getConnections() throws Exception {
+       
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/configurations/connections");
         mav.addObject("id", configId);
@@ -1277,7 +1223,7 @@ public class adminConfigController {
         mav.addObject("HL7", HL7);
         
         /* get a list of all connections in the sysetm */
-        List<configurationConnection> connections = configurationmanager.getAllConnections(page, maxResults);
+        List<configurationConnection> connections = configurationmanager.getAllConnections();
         
         Long totalConnections = (long) 0;
         
@@ -1343,110 +1289,12 @@ public class adminConfigController {
         
         mav.addObject("connections", connections);
         
-        Integer totalPages = (int) Math.ceil((double)totalConnections / maxResults);
-        
-        mav.addObject("totalPages", totalPages);
-        mav.addObject("currentPage", page);
-       
         /* Set the variable to hold the number of completed steps for this configuration */
         mav.addObject("stepsCompleted", stepsCompleted);
 
         return mav;
     }
     
-    /**
-     * The '/connections' POST function will search the existing connection list by the entered search term.
-     * 
-     * @param searchTerm The term to search for.
-     */
-    @RequestMapping(value = "/connections", method = RequestMethod.POST)
-    public ModelAndView getConnections(@RequestParam(value = "searchTerm", required = false) String searchTerm) throws Exception {
-        
-
-        ModelAndView mav = new ModelAndView();
-        mav.setViewName("/administrator/configurations/connections");
-        mav.addObject("id", configId);
-        mav.addObject("mappings", mappings);
-        mav.addObject("searchTerm", searchTerm);
-        mav.addObject("HL7", HL7);
-        
-        /* get a list of all connections in the sysetm */
-        List<configurationConnection> connections = configurationmanager.findConnections(searchTerm);
-        
-        Long totalConnections = (long) 0;
-        
-        /* Loop over the connections to get the configuration details */
-        if(connections != null) {
-            for(configurationConnection connection : connections) {
-                /* Array to holder the users */
-                List<User> connectionSenders = new ArrayList<User>();
-                List<User> connectonReceivers = new ArrayList<User>();
-                
-                configuration srcconfigDetails = configurationmanager.getConfigurationById(connection.getsourceConfigId());
-                configurationTransport srctransportDetails = configurationTransportManager.getTransportDetails(srcconfigDetails.getId());
-                
-                srcconfigDetails.setOrgName(organizationmanager.getOrganizationById(srcconfigDetails.getorgId()).getOrgName());
-                srcconfigDetails.setMessageTypeName(messagetypemanager.getMessageTypeById(srcconfigDetails.getMessageTypeId()).getName());
-                srcconfigDetails.settransportMethod(configurationTransportManager.getTransportMethodById(srctransportDetails.gettransportMethodId()));
-                if(srctransportDetails.gettransportMethodId() == 1 && srcconfigDetails.getType() == 2) {
-                     srcconfigDetails.settransportMethod("File Download");
-                }
-                else {
-                    srcconfigDetails.settransportMethod(configurationTransportManager.getTransportMethodById(srctransportDetails.gettransportMethodId()));
-                }
-                
-                connection.setsrcConfigDetails(srcconfigDetails);
-                
-                configuration tgtconfigDetails = configurationmanager.getConfigurationById(connection.gettargetConfigId());
-                configurationTransport tgttransportDetails = configurationTransportManager.getTransportDetails(tgtconfigDetails.getId());
-                
-                tgtconfigDetails.setOrgName(organizationmanager.getOrganizationById(tgtconfigDetails.getorgId()).getOrgName());
-                tgtconfigDetails.setMessageTypeName(messagetypemanager.getMessageTypeById(tgtconfigDetails.getMessageTypeId()).getName());
-                if(tgttransportDetails.gettransportMethodId() == 1 && tgtconfigDetails.getType() == 2) {
-                     tgtconfigDetails.settransportMethod("File Download");
-                }
-                else {
-                    tgtconfigDetails.settransportMethod(configurationTransportManager.getTransportMethodById(tgttransportDetails.gettransportMethodId()));
-                }
-                
-                /* Get the list of connection senders */
-                List<configurationConnectionSenders> senders = configurationmanager.getConnectionSenders(connection.getId());
-                
-                for(configurationConnectionSenders sender : senders) {
-                    User userDetail = userManager.getUserById(sender.getuserId());
-                    connectionSenders.add(userDetail);
-                }
-                connection.setconnectionSenders(connectionSenders);
-                
-                /* Get the list of connection receivers */
-                List<configurationConnectionReceivers> receivers = configurationmanager.getConnectionReceivers(connection.getId());
-                
-                for(configurationConnectionReceivers receiver : receivers) {
-                    User userDetail = userManager.getUserById(receiver.getuserId());
-                    connectonReceivers.add(userDetail);
-                }
-                connection.setconnectionReceivers(connectonReceivers);
-                
-                
-                connection.settgtConfigDetails(tgtconfigDetails);
-            }
-            
-            /* Return the total list of connections */
-            totalConnections = (long) connections.size();
-        }
-        
-        mav.addObject("connections", connections);
-        
-        Integer totalPages = (int) Math.ceil((double)totalConnections / maxResults);
-        
-        mav.addObject("totalPages", totalPages);
-        mav.addObject("currentPage", 1);
-       
-        /* Set the variable to hold the number of completed steps for this configuration */
-        mav.addObject("stepsCompleted", stepsCompleted);
-
-        return mav;
-    }
     
     /**
      * The '/createConnection' function will handle displaying the create configuration connection screen.

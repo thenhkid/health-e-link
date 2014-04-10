@@ -91,14 +91,8 @@ public class configurationManagerImpl implements configurationManager {
 
     @Override
     @Transactional
-    public List<configuration> getConfigurations(int page, int maxResults) {
-        return configurationDAO.getConfigurations(page, maxResults);
-    }
-
-    @Override
-    @Transactional
-    public List<configuration> findConfigurations(String searchTerm, int configType) {
-        return configurationDAO.findConfigurations(searchTerm, configType);
+    public List<configuration> getConfigurations() {
+        return configurationDAO.getConfigurations();
     }
 
     @Override
@@ -176,14 +170,14 @@ public class configurationManagerImpl implements configurationManager {
 
     @Override
     @Transactional
-    public List<configurationConnection> getAllConnections(int page, int maxResults) {
-        return configurationDAO.getAllConnections(page, maxResults);
+    public List<configurationConnection> getAllConnections() {
+        return configurationDAO.getAllConnections();
     }
-
+    
     @Override
     @Transactional
-    public List<configurationConnection> findConnections(String searchTerm) {
-        return configurationDAO.findConnections(searchTerm);
+    public List<configurationConnection> getLatestConnections(int maxResults) {
+        return configurationDAO.getLatestConnections(maxResults);
     }
 
     @Override

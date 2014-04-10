@@ -30,11 +30,9 @@ public interface configurationDAO {
   
   List<configuration> getActiveConfigurationsByOrgId(int orgId);
   
-  List<configuration> findConfigurations(String searchTerm, int configType);
-  
   configuration getConfigurationByName(String configName, int orgId);
   
-  List<configuration> getConfigurations(int page, int maxResults);
+  List<configuration> getConfigurations();
   
   List<configuration> getLatestConfigurations(int maxResults);
   
@@ -63,9 +61,9 @@ public interface configurationDAO {
   
   Macros getMacroById(int macroId);
   
-  List<configurationConnection> getAllConnections(int page, int maxResults);
+  List<configurationConnection> getAllConnections();
   
-  List<configurationConnection> findConnections(String searchTerm);
+  List<configurationConnection> getLatestConnections(int maxResults);
   
   List<configurationConnection> getConnectionsByConfiguration(int configId);
   

@@ -114,20 +114,9 @@ public class messageTypeDAOImpl implements messageTypeDAO {
      */
     @Override
     @SuppressWarnings("unchecked")
-    public List<messageType> getMessageTypes(int page, int maxResults) {
+    public List<messageType> getMessageTypes() {
 
         Query query = sessionFactory.getCurrentSession().createQuery("from messageType order by name asc");
-
-        int firstResult = 0;
-
-        //Set the parameters for paging
-        //Set the page to load
-        if (page > 1) {
-            firstResult = (maxResults * (page - 1));
-        }
-        query.setFirstResult(firstResult);
-        //Set the max results to display
-        query.setMaxResults(maxResults);
 
         return query.list();
 
@@ -188,28 +177,6 @@ public class messageTypeDAOImpl implements messageTypeDAO {
         Query query = sessionFactory.getCurrentSession().createQuery("from messageType where status = 1 order by name asc");
 
         return query.list();
-    }
-
-    /**
-     * The 'findMessageTypes' function will return a list of message type objects based on a search term. The search will look for message types whose title or file name match the search term provided.
-     *
-     * @param	searchTerm	This will be used to query the title and file name field
-     *
-     * @return	The function will return a list of message type objects
-     */
-    @Override
-    @SuppressWarnings("unchecked")
-    public List<messageType> findMessageTypes(String searchTerm) {
-        //Order by title
-        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(messageType.class)
-                .add(Restrictions.or(
-                                Restrictions.like("name", "%" + searchTerm + "%"),
-                                Restrictions.like("templateFile", "%" + searchTerm + "%")
-                        )
-                )
-                .addOrder(Order.asc("name"));
-
-        return criteria.list();
     }
 
     /**

@@ -20,7 +20,7 @@ public interface messageTypeManager {
 	
 	messageType getMessageTypeByName(String name);
 	
-	List<messageType> getMessageTypes(int page, int maxResults);
+	List<messageType> getMessageTypes();
 	
 	List<messageType> getLatestMessageTypes(int maxResults);
 	
@@ -28,8 +28,6 @@ public interface messageTypeManager {
         
         List<messageType> getAvailableMessageTypes(int orgId);
 	  
-	List<messageType> findMessageTypes(String searchTerm);
-	
 	Long findTotalMessageTypes();
 	
 	List<messageTypeFormFields> getMessageTypeFields(int messageTypeId);

@@ -121,8 +121,8 @@ public class messageTypeManagerImpl implements messageTypeManager {
 
     @Override
     @Transactional
-    public List<messageType> getMessageTypes(int page, int maxResults) {
-        return messageTypeDAO.getMessageTypes(page, maxResults);
+    public List<messageType> getMessageTypes() {
+        return messageTypeDAO.getMessageTypes();
     }
     
     @Override
@@ -153,12 +153,6 @@ public class messageTypeManagerImpl implements messageTypeManager {
     @Transactional
     public messageType getMessageTypeByName(String name) {
         return messageTypeDAO.getMessageTypeByName(name);
-    }
-
-    @Override
-    @Transactional
-    public List<messageType> findMessageTypes(String searchTerm) {
-        return messageTypeDAO.findMessageTypes(searchTerm);
     }
 
     @Override

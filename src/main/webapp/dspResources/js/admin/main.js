@@ -134,8 +134,8 @@ define(['jquery', 'moment', 'bootstrap', 'responsive-tables', 'mediaModal', 'ove
 
                 $(nPaging).append(
                         '<ul class="pagination pull-right">' +
-                        '<li class="prev disabled"><a href="#">&larr; ' + oLang.sPrevious + '</a></li>' +
-                        '<li class="next disabled"><a href="#">' + oLang.sNext + ' &rarr; </a></li>' +
+                        '<li class="prev disabled"><a href="#">&laquo;</a></li>' +
+                        '<li class="next disabled"><a href="#">&raquo;</a></li>' +
                         '</ul>'
                         );
                 var els = $('a', nPaging);
