@@ -527,6 +527,7 @@ public class transactionInManagerImpl implements transactionInManager {
         return transactionInDAO.getuploadedBatches(userId, orgId, fromDate, toDate, searchTerm, page, maxResults, excludedStatusIds);
     }
 
+    
     /**
      * We will take a batch and then from its status etc we will decide if we want to process transactions or not. This allow the admin to run just one batch
      *
@@ -537,8 +538,13 @@ public class transactionInManagerImpl implements transactionInManager {
      *
      * *
      */
-    @Override
+    /** needed to add boolean, made new method **/
     public boolean processBatch(int batchUploadId) throws Exception {
+    	return processBatch(batchUploadId, false);
+    }
+    
+    @Override
+    public boolean processBatch(int batchUploadId, boolean doNotClearErrors) throws Exception {
 
         Integer batchStausId = 29;
         List<Integer> errorStatusIds = Arrays.asList(11, 13, 14, 16);
@@ -555,8 +561,9 @@ public class transactionInManagerImpl implements transactionInManager {
             /**
              * we should only process the ones that are not REL status, to be safe, we copy over data from transactionInRecords*
              */
-            resetTransactionTranslatedIn(batchUploadId, false);
-
+            if (!doNotClearErrors) {
+            	resetTransactionTranslatedIn(batchUploadId, false);
+            }
             //clear transactionInError table for batch
             systemErrorCount = systemErrorCount + clearTransactionInErrors(batchUploadId, true);
 
