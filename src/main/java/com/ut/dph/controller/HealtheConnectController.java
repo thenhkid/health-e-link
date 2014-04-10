@@ -771,6 +771,9 @@ public class HealtheConnectController {
             /* Need to get a list of uploaded files */
             User userInfo = (User) session.getAttribute("userDetails");
             batchUploads batchInfo = transactionInManager.getBatchDetails(batchId);
+            lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batchInfo.getstatusId());
+            batchInfo.setstatusValue(processStatus.getDisplayCode());
+
 
             if (batchInfo.getConfigId() != 0) {
                 batchInfo.setConfigName(configurationManager.getMessageTypeNameByConfigId(batchInfo.getConfigId()));
@@ -802,7 +805,7 @@ public class HealtheConnectController {
                  * grab error info - need to filter this by error type *
                  */
                 List<ConfigErrorInfo> confErrorList = new LinkedList<ConfigErrorInfo>();
-                confErrorList = transactionInManager.populateErrorListByErrorCode(batchInfo);
+                confErrorList = transactionInManager.populateErrorList(batchInfo);
                 mav.addObject("confErrorList", confErrorList);
 
             }

@@ -1992,7 +1992,7 @@ public class transactionInManagerImpl implements transactionInManager {
      * *
      */
     @Override
-    public List<ConfigErrorInfo> populateErrorListByErrorCode(batchUploads batchInfo) {
+    public List<ConfigErrorInfo> populateErrorList(batchUploads batchInfo) {
 
         List<ConfigErrorInfo> confErrorList = new LinkedList<ConfigErrorInfo>();
         try {
@@ -2044,7 +2044,7 @@ public class transactionInManagerImpl implements transactionInManager {
 
         } catch (Exception ex) {
             ex.printStackTrace();
-            System.err.println("populateErrorListByErrorCode " + ex.getCause());
+            System.err.println("populateErrorList " + ex.getCause());
         }
         return confErrorList;
     }

@@ -315,7 +315,7 @@ public interface transactionInManager {
     
     List <TransactionInError> getErrorList (Integer batchId);
     
-    List <ConfigErrorInfo> populateErrorListByErrorCode(batchUploads batchInfo);
+    List <ConfigErrorInfo> populateErrorList(batchUploads batchInfo);
     
     List <TransErrorDetail> getTransErrorDetailsForNoRptFields(Integer batchId, List<Integer> errorCodes);
     

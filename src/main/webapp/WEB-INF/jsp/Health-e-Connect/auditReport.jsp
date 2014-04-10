@@ -26,17 +26,19 @@
                                                     dateStyle="long" timeStyle="long" />
                                 </dd>
                                 <dd>
-                                    <strong>System ID:</strong> ${batch.utBatchName}
+                                    <strong>Batch Name:</strong> ${batch.utBatchName}
                                 </dd>
                                 <dd>
                                     <strong>Status:</strong> <a href="#statusModal"
                                                                 data-toggle="modal" class="btn btn-link viewStatus"
-                                                                rel="${batch.statusId}" title="View this Status">${batch.statusId}&nbsp;<span
+                                                                rel="${batch.statusId}" title="View this Status">${batch.statusValue}&nbsp;<span
                                             class="badge badge-help" data-placement="top" title=""
                                             data-original-title="">?</span></a>
                                 </dd>
                                 <dd>
                                     <strong>Total Transactions: </strong>${batch.totalRecordCount}
+                                </dd>
+                                 <dd>
                                     <strong>Transactions with errors: </strong>${batch.errorRecordCount}
                                 </dd>
                             </dl>
@@ -104,6 +106,7 @@
                                                 </c:when>
 
                                             <c:otherwise>
+                                            	<th scope="col">Transaction Status</th>
                                                 <th scope="col">${confError.rptFieldHeading1}</th>
                                                 <th scope="col">${confError.rptFieldHeading2}</th>
                                                 <th scope="col">${confError.rptFieldHeading3}</th>
@@ -138,14 +141,14 @@
                                                             </c:if>
                                                         </c:if>
                                                     </td>
-                                                    <td><a href="#statusModal" data-toggle="modal" class="btn btn-link viewStatus" rel="${error.transactionStatus}" title="View this Status">${error.transactionStatus}&nbsp;
+                                                    <td><a href="#statusModal" data-toggle="modal" class="btn btn-link viewStatus" rel="${error.transactionStatus}" title="View this Status">${error.transactionStatusValue}&nbsp;
                                                             <span class="badge badge-help" data-placement="top" title="" data-original-title="">?</span></a></td>
                                                     <td>${error.rptField1Value}</td>
                                                     <td>${error.rptField2Value}</td>
                                                     <td>${error.rptField3Value}</td>
                                                     <td>${error.rptField4Value}</td>
                                                     <td class="center-text">${error.errorCode}</td>
-                                                    <td>${error.errorDisplayText}<c:if test="${not empty error.errorInfo}"> - ${error.errorInfo}</c:if></td>
+                                                    <td>${error.errorDisplayText}<c:if test="${not empty error.errorInfo}">${error.errorInfo}</c:if></td>
                                                     <td>${error.errorFieldLabel}</td>
                                                     <td>${error.errorData}</td>
                                                     <td>&nbsp;
@@ -161,6 +164,8 @@
                                                 </c:when>
 
                                                 <c:otherwise>
+                                                    <td><a href="#statusModal" data-toggle="modal" class="btn btn-link viewStatus" rel="${error.transactionStatus}" title="View this Status">${error.transactionStatusValue}&nbsp;
+                                                            <span class="badge badge-help" data-placement="top" title="" data-original-title="">?</span></a></td>
                                                     <td>${error.rptField1Value}</td>
                                                     <td>${error.rptField2Value}</td>
                                                     <td>${error.rptField3Value}</td>

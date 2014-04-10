@@ -3693,7 +3693,7 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Transactional
     public List<TransErrorDetail> getTransErrorDetailsForNoRptFields(Integer batchId, List<Integer> errorCodes) {
         try {
-            String sql = "select transactionInErrors.id, errorId as errorCode, displayText as errorDisplayText, stackTrace as errorData  "
+            String sql = "select transactionInErrors.transactionInId, transactionInErrors.id, errorId as errorCode, displayText as errorDisplayText, stackTrace as errorData  "
                     + " from transactionInErrors, lu_errorCodes where  transactionInErrors.errorId = lu_errorCodes.id "
                     + " and transactionInErrors.errorId  in ( :errorCodes ) and batchuploadid = :batchId order by errorId, id;";
 
@@ -3736,11 +3736,15 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Transactional
     public List<TransErrorDetail> getTransErrorDetailsForInvConfig(Integer batchId) {
         try {
-            String sql = "select F1 as rptField1Value, F2 as rptField2Value, F3 as rptField3Value, F4 as rptField4Value,"
-                    + " errorId as errorCode, lu_errorcodes.displayText as errorDisplayText "
-                    + " from transactionInErrors, transactionInRecords, lu_errorcodes "
-                    + " where batchuploadId = :batchId and errorId = :errorId and lu_errorcodes.id = transactionInErrors.errorId"
-                    + " and transactionInErrors.transactionInId = transactionInRecords.transactionInId order  by transactionInRecords.transactionInId;";
+            String sql = "select transactionIn.statusId as transactionStatus, lu_processstatus.displayCode as transactionStatusValue, "
+            		+ " transactionIn.id as transactionInId, F1 as rptField1Value, F2 as rptField2Value, F3 as rptField3Value, F4 as rptField4Value,"
+            		+ " errorId as errorCode, lu_errorcodes.displayText as errorDisplayText "
+            		+ " from transactionInErrors, transactionInRecords, lu_errorcodes, transactionIn, lu_processstatus "
+            		+ " where batchuploadId = :batchId and errorId = :errorId and lu_errorcodes.id = transactionInErrors.errorId"
+            		+ " and transactionIn.id = transactionInRecords.transactionInId "
+            		+ " and transactionIn.statusId = lu_processstatus.id "
+            		+ " and transactionInErrors.transactionInId = transactionInRecords.transactionInId  "
+            		+ " order  by transactionInRecords.transactionInId;";
             Query query = sessionFactory
                     .getCurrentSession()
                     .createSQLQuery(sql).setResultTransformer(Transformers.aliasToBean(TransErrorDetail.class));
@@ -3824,10 +3828,14 @@ public class transactionInDAOImpl implements transactionInDAO {
     @SuppressWarnings("unchecked")
     public List<TransErrorDetail> getTransErrorDetails(batchUploads batchInfo, ConfigErrorInfo configErrorInfo) {
 
-        String sql = "select transactionInErrors.id, transactionInErrors.configId, transactionInId, errorId as errorCode, displayText as errorDisplayText, fieldNo as errorFieldNo,"
-                + " cwId, macroId, validationTypeId , statusId as transactionStatus from transactionInErrors, lu_errorCodes, transactionIn "
-                + " where errorId = lu_errorCodes.id and transactionInErrors.transactionInId = transactionIn.Id and transactionInErrors.configId = :configId "
-                + "and batchuploadid = :batchId order by errorCode, transactionInId;";
+        String sql = "select transactionInErrors.id, transactionInErrors.configId, transactionInId, errorId as errorCode, lu_errorCodes.displayText as errorDisplayText, "
+        		+ "fieldNo as errorFieldNo, cwId, macroId, validationTypeId , "
+        		+ "transactionIn.statusId as transactionStatus, "
+        		+ "lu_processstatus.displayCode as transactionStatusValue "
+        		+ "from transactionInErrors, lu_errorCodes, transactionIn , lu_processstatus "
+        		+ "where lu_processstatus.id = transactionIn.statusId and "
+        		+ "errorId = lu_errorCodes.id and transactionInErrors.transactionInId = transactionIn.Id "
+        		+ "and transactionInErrors.configId = :configId and batchuploadid = :batchId order by errorCode, transactionInId;";
 
         try {
             Query query = sessionFactory

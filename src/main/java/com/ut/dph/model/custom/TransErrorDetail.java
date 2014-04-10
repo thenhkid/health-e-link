@@ -43,6 +43,8 @@ public class TransErrorDetail {
 	
 	private Integer transactionStatus;
 	
+	private String transactionStatusValue;
+	
 	public Integer getValidationTypeId() {
 		return validationTypeId;
 	}
@@ -179,4 +181,13 @@ public class TransErrorDetail {
 		this.transactionStatus = transactionStatus;
 	}
 
+	public String getTransactionStatusValue() {
+		return transactionStatusValue;
+	}
+
+	public void setTransactionStatusValue(String transactionStatusValue) {
+		this.transactionStatusValue = transactionStatusValue;
+	}
+
+	
 }

@@ -20,7 +20,7 @@
 
             
             <div class="row" style="overflow:hidden; margin-bottom:10px;">
-                    <div class="col-md-5">
+                    <div class="col-md-3">
                         <form:form class="form form-inline" id="searchForm" action="/Health-e-Connect/auditReports" method="post">
                             <div class="form-group">
                                 <label class="sr-only" for="searchTerm">Search</label>
@@ -30,21 +30,15 @@
                                 <input type="hidden" name="page" id="page" value="${currentPage}" />
                           		<input type="hidden" name="batchId" id="batchId" value=""/>
                             </div>
-                            <button id="searchBatchesBtn" class="btn btn-primary btn-sm" title="Search Audit Reports">
+                           
+	                    <button id="searchBatchesBtn" class="btn btn-primary btn-sm" title="Search Audit Reports">
                                 <span class="glyphicon glyphicon-search"></span>
                             </button>
-                            <div class="form-group">
-	                            	<label class="sr-only">Source</label>
-	                                <select name="statusType" class="form-control">
-	                                    <option value="0">- Status -</option>
-	                                    <option value="1">available status goes here</option>
-	                                </select>
-	                    </div>
                         </form:form>
                     </div>
                     
                     
-                    <div class="col-md-2 col-md-offset-1">
+                    <div class="col-md-2 col-md-offset-3">
                     	<c:if test="${showRelButton == true}"><a href="javascript:void(0);" title="Send Batches" class="pull-right btn btn-primary sendBatches"><span class="glyphicon glyphicon-send"></span> Release Marked Batches</a></c:if>
                		</div>
                     
@@ -63,10 +57,9 @@
                             <th scope="col">Batch Name</th>
                             <th scope="col">File Name</th>
                             <th scope="col" class="center-text"># of Transactions</th>
-                            <th scope="col" class="center-text"># of Errors</th>
+                            <th scope="col" class="center-text"># with Errors</th>
                             <th scope="col" class="center-text">Status</th>
-                            <th scope="col" class="center-text">Status Date</th>
-                            <th scope="col" class="center-text">Submission Date</th>
+                            <th scope="col" class="center-text">Date Uploaded</th>
                             <th scope="col" class="center-text">View Audit Report</th>
                             <th scope="col"></th>
                         </tr>
@@ -91,12 +84,11 @@
                                         <td class="center-text">
                                             <a href="#statusModal" data-toggle="modal" class="btn btn-link viewStatus" rel="${batch.statusId}" title="View this Status">${batch.statusValue}&nbsp;<span class="badge badge-help" data-placement="top" title="" data-original-title="">?</span></a>
                                         </td>
-                                        <td class="center-text"><fmt:formatDate value="${batch.endDateTime}" type="date" pattern="M/dd/yyyy" /><br /><fmt:formatDate value="${batch.endDateTime}" type="time" pattern="h:mm:ss a" /></td>
                                         <td class="center-text"><fmt:formatDate value="${batch.dateSubmitted}" type="date" pattern="M/dd/yyyy" /><br /><fmt:formatDate value="${batch.dateSubmitted}" type="time" pattern="h:mm:ss a" /></td>
                                         <td class="actions-col" style="width:50px;">
                                         	<a href="javascript:void(0);" rel="${batch.id}" class="btn btn-link viewLink">
                                                 <span class="glyphicon glyphicon-edit"></span>
-                                                Detail Audit Report
+                                                View
                                             </a>  
                                         </td>
                                     </tr>
