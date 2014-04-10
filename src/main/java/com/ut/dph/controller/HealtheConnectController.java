@@ -8,7 +8,6 @@ package com.ut.dph.controller;
 import com.ut.dph.dao.messageTypeDAO;
 import com.ut.dph.model.Organization;
 import com.ut.dph.model.Transaction;
-import com.ut.dph.model.TransactionInError;
 import com.ut.dph.model.User;
 import com.ut.dph.model.UserActivity;
 import com.ut.dph.model.batchDownloads;
@@ -949,6 +948,7 @@ public class HealtheConnectController {
                     transaction.setbatchName(batchInfo.getutBatchName());
                     transaction.setdateSubmitted(transactionInfo.getdateCreated());
                     transaction.setstatusId(batchInfo.getstatusId());
+                    transaction.setconfigId(transactionInfo.getConfigId());
                    
                     /* Check to see if the message is a feedback report */
                     if (transactionInfo.gettransactionTargetId() > 0) {
@@ -1056,7 +1056,7 @@ public class HealtheConnectController {
      * 
      */
     @RequestMapping(value = "/editMessage", method = RequestMethod.POST)
-    public @ResponseBody Integer submitTransactionChanges(@ModelAttribute(value = "transactionDetails") Transaction transactionDetails,HttpServletRequest request, HttpServletResponse response, HttpSession session,RedirectAttributes redirectAttributes) throws Exception {
+    public @ResponseBody Integer submitTransactionChanges(@ModelAttribute(value = "transactionDetails") Transaction transactionDetails,HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
         
        
         /* Update the transactionInRecords */
@@ -1067,9 +1067,8 @@ public class HealtheConnectController {
         List<transactionRecords> patientFields = transactionDetails.getpatientFields();
         List<transactionRecords> detailFields = transactionDetails.getdetailFields(); 
         
+        transactionInRecords records = transactionInManager.getTransactionRecords(transactionDetails.gettransactionId());
         
-        transactionInRecords records = transactionInManager.getTransactionRecord(transactionDetails.gettransactionRecordId());
-       
         String colName;
         for(transactionRecords field : sourceOrgFields) {
             colName = new StringBuilder().append("f").append(field.getfieldNo()).toString();
@@ -1081,7 +1080,7 @@ public class HealtheConnectController {
                 Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-
+        
         for(transactionRecords field : sourceProviderFields) {
             colName = new StringBuilder().append("f").append(field.getfieldNo()).toString();
             try {
@@ -1137,21 +1136,19 @@ public class HealtheConnectController {
             }
         }
         
-        records.setId(transactionDetails.gettransactionRecordId());
+        records.setId(records.getId());
         transactionInManager.submitTransactionInRecordsUpdates(records);
         
-        
-        /* Update the transactionTranslatedIn records */
-        transactionInManager.submitTransactionTranslatedInRecords(transactionDetails.gettransactionId(), transactionDetails.gettransactionRecordId(), transactionDetails.getconfigId());
-         
+        /* Update the transactionTranslatedIn records  */
+        transactionInManager.submitTransactionTranslatedInRecords(transactionDetails.gettransactionId(), records.getId(), transactionDetails.getconfigId());
         
         /* Remove the transaction errors */
-        
+        transactionInManager.deleteTransactionInErrorsByTransactionId(transactionDetails.gettransactionId());
        
         /* Update the transaction status to 12 (Released) */
-       
+        transactionInManager.updateTransactionStatus(0, transactionDetails.gettransactionId(), 14, 12);
         
-      return 1;
+        return 1;
         
     }
 

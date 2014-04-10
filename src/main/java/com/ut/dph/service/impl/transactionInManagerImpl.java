@@ -916,6 +916,11 @@ public class transactionInManagerImpl implements transactionInManager {
     public Integer clearTransactionInErrors(Integer batchUploadId, boolean leaveFinalStatusIds) {
         return transactionInDAO.clearTransactionInErrors(batchUploadId, leaveFinalStatusIds);
     }
+    
+    @Override
+    public Integer deleteTransactionInErrorsByTransactionId(Integer transactionInId) {
+        return transactionInDAO.deleteTransactionInErrorsByTransactionId(transactionInId);
+    }
 
     /**
      * This method finds all error transactionInId in TransactionInErrors / TransactionOutErrors and update transactionIn with the appropriate error status It can be passed, reject and error

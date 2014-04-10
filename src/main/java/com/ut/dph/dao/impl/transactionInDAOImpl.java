@@ -1785,6 +1785,23 @@ public class transactionInDAOImpl implements transactionInDAO {
             return 1;
         }
     }
+    
+    @Override
+    @Transactional
+    public Integer deleteTransactionInErrorsByTransactionId(Integer transactionInId) {
+        try {
+            String sql = "delete from transactionInErrors where transactionInId = :transactionInId";
+
+            Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                    .setParameter("transactionInId", transactionInId);
+            
+            deleteData.executeUpdate();
+            return 0;
+        } catch (Exception ex) {
+            System.err.println("clearTransactionInErrors by transactionId " + ex.getCause());
+            return 1;
+        }
+    }
 
     @Override
     @Transactional

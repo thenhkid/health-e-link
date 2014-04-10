@@ -155,6 +155,8 @@ public interface transactionInManager {
     
     Integer clearTransactionInErrors(Integer batchUploadId, boolean leaveFinalStatus);
     
+    Integer deleteTransactionInErrorsByTransactionId(Integer transactionInId);
+    
     void updateStatusForErrorTrans(Integer batchId, Integer statusId, boolean foroutboundProcessing);
     
     Integer runValidations(Integer batchUploadId, Integer configId);

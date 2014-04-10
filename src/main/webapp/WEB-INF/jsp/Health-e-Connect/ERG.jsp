@@ -37,6 +37,7 @@
             <form:form id="messageForm" action="/Health-e-Connect/editMessage" modelAttribute="transaction" role="form" class="form" method="post">
                 <form:hidden path="transactionId"  />
                 <form:hidden path="batchId"  />
+                <form:hidden path="configId" />
                 <c:forEach items="${transaction.sourceOrgFields}" varStatus="i">
                     <form:hidden path="sourceOrgFields[${i.index}].fieldValue" />
                     <form:hidden path="sourceOrgFields[${i.index}].fieldNo" />
