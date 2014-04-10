@@ -17,9 +17,7 @@ public interface organizationManager {
   
   List<Organization> getOrganizationByName(String cleanURL);
   
-  List<Organization> findOrganizations(String searchTerm);
-  
-  List<Organization> getOrganizations(int page, int maxResults);
+  List<Organization> getOrganizations();
   
   List<Organization> getLatestOrganizations(int maxResults);
   
@@ -31,19 +29,15 @@ public interface organizationManager {
   
   Long findTotalConfigurations(int orgId);
   
-  List<User> getOrganizationUsers(int orgId, int page, int maxResults);
+  List<User> getOrganizationUsers(int orgId);
   
   void deleteOrganization(int orgId);
   
-  List<Provider> getOrganizationProviders(int orgId, int page, int MaxResults);
+  List<Provider> getOrganizationProviders(int orgId);
   
   List<Provider> getOrganizationActiveProviders(int orgId);
   
-  Long findTotalProviders(int orgId);
-  
-  List<Brochure> getOrganizationBrochures(int orgId, int page, int MaxResults);
-  
-  Long findTotalBrochures(int orgId);
+  List<Brochure> getOrganizationBrochures(int orgId);
   
   List<Organization> getAssociatedOrgs(int orgId);
   

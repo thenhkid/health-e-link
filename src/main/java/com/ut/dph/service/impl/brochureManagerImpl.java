@@ -5,7 +5,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -175,12 +174,6 @@ public class brochureManagerImpl implements brochureManager {
     @Transactional
     public Brochure getBrochureById(int brochureId) {
         return brochureDAO.getBrochureById(brochureId);
-    }
-
-    @Override
-    @Transactional
-    public List<Brochure> findBrochures(int orgId, String searchTerm) {
-        return brochureDAO.findBrochures(orgId, searchTerm);
     }
 
 }

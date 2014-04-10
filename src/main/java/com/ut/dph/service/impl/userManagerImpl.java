@@ -41,12 +41,6 @@ public class userManagerImpl implements userManager {
 
     @Override
     @Transactional
-    public List<User> findUsers(int orgId, String searchTerm) {
-        return userDAO.findUsers(orgId, searchTerm);
-    }
-    
-    @Override
-    @Transactional
     public List<User> getUsersByOrganization(int orgId) {
         return userDAO.getUsersByOrganization(orgId);
     }

@@ -97,47 +97,12 @@ public class adminOrgContoller {
      * @throws Exception
      */
     @RequestMapping(value = "/list", method = RequestMethod.GET)
-    public ModelAndView listOrganizations(@RequestParam(value = "page", required = false) Integer page) throws Exception {
-
-        if (page == null) {
-            page = 1;
-        }
+    public ModelAndView listOrganizations() throws Exception {
 
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/organizations/listOrganizations");
 
-        List<Organization> organizations = organizationManager.getOrganizations(page, maxResults);
-        mav.addObject("orgFunctions", organizationManager);
-        mav.addObject("organizationList", organizations);
-
-        //Return the total list of organizations
-        Long totalOrgs = organizationManager.findTotalOrgs();
-
-        Integer totalPages = (int) Math.ceil((double)totalOrgs / maxResults);
-        
-        mav.addObject("totalPages", totalPages);
-        mav.addObject("currentPage", page);
-        return mav;
-
-    }
-
-    /**
-     * The '/list' POST request will be used to search organization from the search form on the organization list page.
-     *
-     * @param searchTerm	The searchTerm parameter will hold the string to search on
-     * @return	The organization page list
-     *
-     * @Objects	(1) An object will be returned holding the requested search term used to populate the search box (2) An object will be returned that hold the organizationManager so we can run some functions on each returned org in the list (3) An object containing the found organizations
-     * @throws Exception
-     */
-    @RequestMapping(value = "/list", method = RequestMethod.POST)
-    public ModelAndView findOrganizations(@RequestParam String searchTerm) throws Exception {
-
-        ModelAndView mav = new ModelAndView();
-        mav.setViewName("/administrator/organizations/listOrganizations");
-
-        List<Organization> organizations = organizationManager.findOrganizations(searchTerm);
-        mav.addObject("searchTerm", searchTerm);
+        List<Organization> organizations = organizationManager.getOrganizations();
         mav.addObject("orgFunctions", organizationManager);
         mav.addObject("organizationList", organizations);
 
@@ -394,50 +359,6 @@ public class adminOrgContoller {
         return mav;
     }
     
-    /**
-     * The '/{cleanURL/configurations' POST request will display the list of configurations set up for the selected organization
-     * by organization id and configuration name.
-     *
-     * @param cleanURL      The variable that holds the organization that is being viewed
-     * @param searchTerm    The term that will be used to narrow down the organization configs
-     *
-     * @return	Will return the organization configuration list page
-     *
-     * @Objects	(1) An object that holds configurations found for the organization 
-     *          (2) The orgId used for the menu and action bar
-     *
-     * @throws Exception
-     */
-    @RequestMapping(value = "/{cleanURL}/configurations", method = RequestMethod.POST)
-    public ModelAndView findOrganizationConfigs(@RequestParam String searchTerm, @PathVariable String cleanURL) throws Exception {
-
-        ModelAndView mav = new ModelAndView();
-        mav.setViewName("/administrator/organizations/configurations");
-        mav.addObject("searchTerm", searchTerm);
-        
-        String orgName = organizationManager.getOrganizationById(orgId).getOrgName();
-        mav.addObject("orgName", orgName);
-
-        List<configuration> configurations = configurationmanager.getConfigurationsByOrgId(orgId,searchTerm);
-        mav.addObject("id", orgId);
-        mav.addObject("configs", configurations);
-        
-        messageType messagetype;
-        configurationTransport transportDetails;
-        
-        for (configuration config : configurations) {
-            messagetype = messagetypemanager.getMessageTypeById(config.getMessageTypeId());
-            config.setMessageTypeName(messagetype.getName());
-            
-            transportDetails = configurationTransportManager.getTransportDetails(config.getId());
-            if(transportDetails != null) {
-             config.settransportMethod(configurationTransportManager.getTransportMethodById(transportDetails.gettransportMethodId()));
-            }
-        }
-
-        return mav;
-    }
-    
 
     /**
      * *********************************************************
@@ -457,11 +378,7 @@ public class adminOrgContoller {
      * @throws Exception
      */
     @RequestMapping(value = "/{cleanURL}/users", method = RequestMethod.GET)
-    public ModelAndView listOrganizationUsers(@PathVariable String cleanURL, @RequestParam(value = "page", required = false) Integer page) throws Exception {
-
-        if (page == null) {
-            page = 1;
-        }
+    public ModelAndView listOrganizationUsers(@PathVariable String cleanURL) throws Exception {
 
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/organizations/users");
@@ -469,43 +386,8 @@ public class adminOrgContoller {
         String orgName = organizationManager.getOrganizationById(orgId).getOrgName();
         mav.addObject("orgName", orgName);
 
-        List<User> users = organizationManager.getOrganizationUsers(orgId, page, maxResults);
+        List<User> users = organizationManager.getOrganizationUsers(orgId);
         mav.addObject("id", orgId);
-        mav.addObject("userFunctions", userManager);
-        mav.addObject("userList", users);
-
-        //Return the total list of users for the organization
-        Long totalUsers = organizationManager.findTotalUsers(orgId);
-
-        Integer totalPages = (int)Math.ceil((double)totalUsers / maxResults);
-        mav.addObject("totalPages", totalPages);
-        mav.addObject("currentPage", page);
-
-        return mav;
-
-    }
-
-    /**
-     * The '/{cleanURL}/users' POST request will be used to search users for the selected organization
-     *
-     * @param searchTerm	The searchTerm parameter will hold the string to search on
-     * @return	The organization user list page
-     *
-     * @Objects	(1) An object will be returned holding the requested search term used to populate the search box (2) An object will be returned that hold the userManager so we can run some functions on each returned user in the list (3) An object containing the found users
-     * @throws Exception
-     */
-    @RequestMapping(value = "/{cleanURL}/users", method = RequestMethod.POST)
-    public ModelAndView findUsers(@RequestParam String searchTerm, @PathVariable String cleanURL) throws Exception {
-
-        ModelAndView mav = new ModelAndView();
-        mav.setViewName("/administrator/organizations/users");
-        
-        String orgName = organizationManager.getOrganizationById(orgId).getOrgName();
-        mav.addObject("orgName", orgName);
-
-        List<User> users = userManager.findUsers(orgId, searchTerm);
-        mav.addObject("id", orgId);
-        mav.addObject("searchTerm", searchTerm);
         mav.addObject("userFunctions", userManager);
         mav.addObject("userList", users);
 
@@ -692,11 +574,7 @@ public class adminOrgContoller {
      * @throws Exception
      */
     @RequestMapping(value = "/{cleanURL}/providers", method = RequestMethod.GET)
-    public ModelAndView listOrganizationProviders(@PathVariable String cleanURL, @RequestParam(value = "page", required = false) Integer page) throws Exception {
-
-        if (page == null) {
-            page = 1;
-        }
+    public ModelAndView listOrganizationProviders(@PathVariable String cleanURL) throws Exception {
 
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/organizations/providers/list");
@@ -704,16 +582,9 @@ public class adminOrgContoller {
         String orgName = organizationManager.getOrganizationById(orgId).getOrgName();
         mav.addObject("orgName", orgName);
 
-        List<Provider> providers = organizationManager.getOrganizationProviders(orgId, page, maxResults);
+        List<Provider> providers = organizationManager.getOrganizationProviders(orgId);
         mav.addObject("id", orgId);
         mav.addObject("providerList", providers);
-
-        //Return the total list of providers for the organization
-        Long totalProviders = organizationManager.findTotalProviders(orgId);
-
-        Integer totalPages = (int)Math.ceil((double)totalProviders / maxResults);
-        mav.addObject("totalPages", totalPages);
-        mav.addObject("currentPage", page);
 
         return mav;
 
@@ -1217,11 +1088,7 @@ public class adminOrgContoller {
      * @throws Exception
      */
     @RequestMapping(value = "/{cleanURL}/brochures", method = RequestMethod.GET)
-    public ModelAndView listOrganizationBrochures(@PathVariable String cleanURL, @RequestParam(value = "page", required = false) Integer page) throws Exception {
-
-        if (page == null) {
-            page = 1;
-        }
+    public ModelAndView listOrganizationBrochures(@PathVariable String cleanURL) throws Exception {
 
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/organizations/brochures");
@@ -1229,46 +1096,15 @@ public class adminOrgContoller {
         String orgName = organizationManager.getOrganizationById(orgId).getOrgName();
         mav.addObject("orgName", orgName);
 
-        List<Brochure> brochures = organizationManager.getOrganizationBrochures(orgId, page, maxResults);
+        List<Brochure> brochures = organizationManager.getOrganizationBrochures(orgId);
         mav.addObject("id", orgId);
         mav.addObject("brochureList", brochures);
 
-        //Return the total list of brochures for the organization
-        Long totalBrochures = organizationManager.findTotalBrochures(orgId);
-
-        Integer totalPages = (int)Math.ceil((double)totalBrochures / maxResults);
-        mav.addObject("totalPages", totalPages);
-        mav.addObject("currentPage", page);
 
         return mav;
     }
 
-    /**
-     * The '/{cleanURL}/brochures' POST request will be used to search brochures for the selected organization
-     *
-     * @param searchTerm	The searchTerm parameter will hold the string to search on
-     * @return	The organization brochure list page
-     *
-     * @Objects	(1) An object will be returned holding the requested search term used to populate the search box (2) An object containing the found brochures
-     * @throws Exception
-     */
-    @RequestMapping(value = "/{cleanURL}/brochures", method = RequestMethod.POST)
-    public ModelAndView findBrochures(@RequestParam String searchTerm, @PathVariable String cleanURL) throws Exception {
-
-        ModelAndView mav = new ModelAndView();
-        mav.setViewName("/administrator/organizations/brochures");
-        
-        String orgName = organizationManager.getOrganizationById(orgId).getOrgName();
-        mav.addObject("orgName", orgName);
-
-        List<Brochure> brochures = brochureManager.findBrochures(orgId, searchTerm);
-        mav.addObject("id", orgId);
-        mav.addObject("searchTerm", searchTerm);
-        mav.addObject("brochureList", brochures);
-
-        return mav;
-    }
-
+   
     /**
      * The '/{cleanURL}/brochure/{title}?i=##' GET request will be used to return the details of the selected brochure.
      *

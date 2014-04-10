@@ -1,7 +1,5 @@
 package com.ut.dph.dao;
 
-import java.util.List;
-
 import com.ut.dph.model.Brochure;
 import org.springframework.stereotype.Repository;
 
@@ -16,6 +14,4 @@ public interface brochureDAO {
 		  
 	Brochure getBrochureById(int brochureId);
 	  
-	List<Brochure> findBrochures(int orgId, String searchTerm);
-
 }

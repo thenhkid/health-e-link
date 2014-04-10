@@ -153,7 +153,7 @@ public class orgProfileController {
         
         try {
         
-            List<Provider> providers = organizationManager.getOrganizationProviders(userInfo.getOrgId(), 1, 0);
+            List<Provider> providers = organizationManager.getOrganizationProviders(userInfo.getOrgId());
 
             if(!providers.isEmpty()) {
 
@@ -628,7 +628,7 @@ public class orgProfileController {
         
         try {
         
-            List<Brochure> brochures = organizationManager.getOrganizationBrochures(userInfo.getOrgId(), 1, 0);
+            List<Brochure> brochures = organizationManager.getOrganizationBrochures(userInfo.getOrgId());
 
             mav.addObject("brochures", brochures);
 

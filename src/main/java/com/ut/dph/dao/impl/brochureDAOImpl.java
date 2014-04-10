@@ -1,11 +1,6 @@
 package com.ut.dph.dao.impl;
 
-import java.util.List;
-
-import org.hibernate.Criteria;
 import org.hibernate.Query;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -81,29 +76,6 @@ public class brochureDAOImpl implements brochureDAO {
     @Override
     public Brochure getBrochureById(int brochureId) {
         return (Brochure) sessionFactory.getCurrentSession().get(Brochure.class, brochureId);
-    }
-
-    /**
-     * The 'findBrochures' function will return a list of brochure objects based on a specific organization Id and a search term. The search will look for brochures for a specific organization and whose title or file name match the search term provided.
-     *
-     * @param	orgId	This will be the orgId used to find providers searchTerm	This will be used to query the title and file name field
-     *
-     * @return	The function will return a list of brochure objects
-     */
-    @Override
-    @SuppressWarnings("unchecked")
-    public List<Brochure> findBrochures(int orgId, String searchTerm) {
-        //Order by title
-        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Brochure.class)
-                .add(Restrictions.eq("orgId", orgId))
-                .add(Restrictions.or(
-                                Restrictions.like("title", "%" + searchTerm + "%"),
-                                Restrictions.like("fileName", "%" + searchTerm + "%")
-                        )
-                )
-                .addOrder(Order.asc("title"));
-
-        return criteria.list();
     }
 
 }

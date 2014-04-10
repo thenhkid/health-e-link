@@ -4,12 +4,10 @@ import java.util.List;
 
 import org.hibernate.Query;
 import org.hibernate.Criteria;
-import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.ut.dph.dao.userDAO;
 import com.ut.dph.model.User;
@@ -17,9 +15,6 @@ import com.ut.dph.model.UserActivity;
 import com.ut.dph.model.siteSections;
 import com.ut.dph.model.userAccess;
 
-import org.hibernate.Hibernate;
-import org.hibernate.annotations.Formula;
-import org.hibernate.criterion.Property;
 
 /**
  * The userDAOImpl class will implement the DAO access layer to handle updates for organization system users
@@ -136,30 +131,6 @@ public class userDAOImpl implements userDAO {
         Criteria criteria = sessionFactory.getCurrentSession().createCriteria(User.class);
         criteria.add(Restrictions.like("username", username));
         return (User) criteria.uniqueResult();
-    }
-
-    /**
-     * The 'findUsers' function will return a list of user objects based on a specific organization Id and a search term. The search will look for users for a specific organization and whose first name or last name match the search term provided.
-     *
-     * @param	orgId	This will be the orgId used to find users searchTerm	This will be used to query the firstname field and lastname field
-     *
-     * @return	The function will return a list of user objects
-     */
-    @Override
-    @SuppressWarnings("unchecked")
-    public List<User> findUsers(int orgId, String searchTerm) {
-        //Order by lastname then firstname 
-        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(User.class)
-                .add(Restrictions.eq("orgId", orgId))
-                .add(Restrictions.or(
-                                Restrictions.like("firstName", "%" + searchTerm + "%"),
-                                Restrictions.like("lastName", "%" + searchTerm + "%")
-                        )
-                )
-                .addOrder(Order.asc("lastName"))
-                .addOrder(Order.asc("firstName"));
-
-        return criteria.list();
     }
 
     /**

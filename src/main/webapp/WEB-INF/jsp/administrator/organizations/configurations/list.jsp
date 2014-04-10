@@ -19,22 +19,9 @@
                <h3 class="panel-title">Configurations</h3>
             </div>
             <div class="panel-body">
-                <div class="table-actions">
-                    <div role="search">
-                        <form:form class="form form-inline" method="post">
-                            <div class="form-group">
-                                <label class="sr-only" for="searchTerm">Search</label>
-                                <input type="text" name="searchTerm" id="searchTerm" value="${searchTerm}" class="form-control" id="search-configurations" placeholder="Search"/>
-                            </div>
-                            <button id="searchConfigBtn" class="btn btn-primary btn-sm" title="Search Configurations">
-                                <span class="glyphicon glyphicon-search"></span>
-                            </button>
-                         </form:form>
-                    </div>
-                </div>
-
+                
                 <div class="form-container scrollable">
-                    <table class="table table-striped table-hover table-default">
+                    <table class="table table-striped table-hover table-default" id="dataTable">
                         <thead>
                             <tr>
                                 <th scope="col">Configuration Name</th>

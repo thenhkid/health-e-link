@@ -15,8 +15,6 @@ public interface userManager {
 	  
   User getUserById(int userId);
   
-  List<User> findUsers(int orgId, String searchTerm);
-  
   List<User> getUsersByOrganization(int orgId);
   
   User getUserByUserName(String username);

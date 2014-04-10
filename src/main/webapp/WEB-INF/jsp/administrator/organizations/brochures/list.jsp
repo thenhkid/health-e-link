@@ -34,22 +34,9 @@
                 <h3 class="panel-title">Brochures</h3>
             </div>
             <div class="panel-body">
-                <div class="table-actions">
-                    <div class="form form-inline pull-left">
-                        <form:form class="form form-inline" action="brochures" method="post">
-                            <div class="form-group">
-                                <label class="sr-only" for="searchTerm">Search</label>
-                                <input type="text" name="searchTerm" id="searchTerm" value="${searchTerm}" class="form-control" id="search-brochures" placeholder="Search"/>
-                            </div>
-                            <button id="searchBrochureBtn" class="btn btn-primary btn-sm">
-                                <span class="glyphicon glyphicon-search"></span>
-                            </button>
-                        </form:form>
-                    </div>
-                </div>
-
-                <div class="form-container scrollable">
-                    <table class="table table-striped table-hover table-default">
+                
+                <div class="form-container scrollable"><br />
+                    <table class="table table-striped table-hover table-default" id="dataTable">
                         <thead>
                             <tr>
                                 <th scope="col">Brochure Title</th>
@@ -87,13 +74,6 @@
                             </c:choose>
                         </tbody>
                     </table>
-                    <ul class="pagination pull-right" role="navigation" aria-labelledby="Paging ">
-                        <c:if test="${currentPage > 1}"><li><a href="?page=${currentPage-1}">&laquo;</a></li></c:if>
-                            <c:forEach var="i" begin="1" end="${totalPages}">
-                            <li><a href="?page=${i}">${i}</a></li>
-                            </c:forEach>
-                            <c:if test="${currentPage < totalPages}"><li><a href="?page=${currentPage+1}">&raquo;</a></li></c:if>
-                        </ul>
                 </div>
             </div>
         </section>

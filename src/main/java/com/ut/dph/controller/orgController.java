@@ -93,7 +93,7 @@ public class orgController {
             orgDetails = organizationManager.getOrganizationById(orgId);
             mav.addObject("orgDetails", orgDetails);
         
-            List<Provider> providers = organizationManager.getOrganizationProviders(orgDetails.getId(), 1, 0);
+            List<Provider> providers = organizationManager.getOrganizationProviders(orgDetails.getId());
 
             if(!providers.isEmpty()) {
 

@@ -103,32 +103,6 @@ public class organizationDAOImpl implements organizationDAO {
     }
 
     /**
-     * The 'findOrganizations' function will return a list of organizations based on a search term passed in. The function will search organizations on the following fields cleanURL, orgName, city, address
-     *
-     * The cleanURL field will contain the organization name with spaces removed. This will be used in the url when you select an organization.
-     *
-     * @Table	organizations
-     *
-     * @param	searchTerm	Will hold the term used search organizations on
-     *
-     * @return	This function will return a list of organization objects
-     */
-    @Override
-    @SuppressWarnings("unchecked")
-    public List<Organization> findOrganizations(String searchTerm) {
-        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(Organization.class)
-                .add(Restrictions.not(Restrictions.eq("cleanURL", "")))
-                .add(Restrictions.or(
-                    Restrictions.like("orgName", "%" + searchTerm + "%"),
-                    Restrictions.like("city", "%" + searchTerm + "%"),
-                    Restrictions.like("address", "%" + searchTerm + "%")
-                 )
-                );
-
-        return criteria.list();
-    }
-
-    /**
      * The 'findTotalOrgs' function will return the total number of organizations in the system. This will be used for pagination when viewing the list of organizations
      *
      * @Table organizations
@@ -155,20 +129,8 @@ public class organizationDAOImpl implements organizationDAO {
      */
     @Override
     @SuppressWarnings("unchecked")
-    public List<Organization> getOrganizations(int page, int maxResults) {
+    public List<Organization> getOrganizations() {
         Query query = sessionFactory.getCurrentSession().createQuery("from Organization where cleanURL is not '' order by orgName asc");
-
-        //By default we want to return the first result
-        int firstResult = 0;
-
-		//If viewing a page other than the first we then need to figure out
-        //which result to start with
-        if (page > 1) {
-            firstResult = (maxResults * (page - 1));
-        }
-        query.setFirstResult(firstResult);
-        //Set the max results to display
-        query.setMaxResults(maxResults);
 
         List<Organization> organizationList = query.list();
         return organizationList;
@@ -266,44 +228,13 @@ public class organizationDAOImpl implements organizationDAO {
      */
     @Override
     @SuppressWarnings("unchecked")
-    public List<User> getOrganizationUsers(int orgId, int page, int maxResults) {
+    public List<User> getOrganizationUsers(int orgId) {
 
         Query query = sessionFactory.getCurrentSession().createQuery("from User where orgId = :orgId order by lastName asc, firstName asc");
         query.setParameter("orgId", orgId);
 
-        int firstResult = 0;
-
-	//Set the parameters for paging
-        //Set the page to load
-        if (page > 1) {
-            firstResult = (maxResults * (page - 1));
-        }
-        query.setFirstResult(firstResult);
-        //Set the max results to display
-        query.setMaxResults(maxResults);
-
         return query.list();
 
-    }
-
-    /**
-     * The 'findTotalProviders' function will return the total number of providers set up for a specific organization.
-     *
-     * @Table	providers
-     *
-     * @Param	orgId	This will hold the organization id we want to search on
-     *
-     * @Return	This function will return the total number of providers for the organization
-     */
-    @Override
-    public Long findTotalProviders(int orgId) {
-
-        Query query = sessionFactory.getCurrentSession().createQuery("select count(id) as totalProviders from Provider where orgId = :orgId");
-        query.setParameter("orgId", orgId);
-
-        Long totalProviders = (Long) query.uniqueResult();
-
-        return totalProviders;
     }
 
     /**
@@ -312,31 +243,15 @@ public class organizationDAOImpl implements organizationDAO {
      * @Table	providers
      *
      * @Param	orgId	This will hold the organization id to search on	
-     * @param   page    This will hold the current page to view	T
-     * @param   maxResults This will hold the total number of results to return back to the list page
      *
      * @Return	This function will return a list of provider objects
      */
     @Override
     @SuppressWarnings("unchecked")
-    public List<Provider> getOrganizationProviders(int orgId, int page, int maxResults) {
+    public List<Provider> getOrganizationProviders(int orgId) {
 
         Query query = sessionFactory.getCurrentSession().createQuery("from Provider where orgId = :orgId order by lastName asc, firstName asc");
         query.setParameter("orgId", orgId);
-
-        int firstResult = 0;
-
-		//Set the parameters for paging
-        //Set the page to load
-        if (page > 1) {
-            firstResult = (maxResults * (page - 1));
-        }
-        query.setFirstResult(firstResult);
-        //Set the max results to display
-        
-        if(maxResults > 0) {
-            query.setMaxResults(maxResults);
-        }
 
         return query.list();
 
@@ -359,57 +274,23 @@ public class organizationDAOImpl implements organizationDAO {
         
          return query.list();
     }
-    
-
-    /**
-     * The 'findTotalBrochures' function will return the total number of brochures set up for a specific organization.
-     *
-     * @Table	brochures
-     *
-     * @Param	orgId	This will hold the organization id we want to search on
-     *
-     * @Return	This function will return the total number of brochures for the organization
-     */
-    @Override
-    public Long findTotalBrochures(int orgId) {
-
-        Query query = sessionFactory.getCurrentSession().createQuery("select count(id) as totalBrochures from Brochure where orgId = :orgId");
-        query.setParameter("orgId", orgId);
-
-        Long totalBrochures = (Long) query.uniqueResult();
-
-        return totalBrochures;
-    }
+   
 
     /**
      * The 'getOrganizationBrochures' function will return the list of brochures for a specific organization.
      *
      * @Table	brochures
      *
-     * @Param	orgId	This will hold the organization id to search on page	This will hold the current page to view maxResults	This will hold the total number of results to return back to the list page
+     * @Param	orgId	This will hold the organization id to search on
      *
      * @Return	This function will return a list of brochure objects
      */
     @Override
     @SuppressWarnings("unchecked")
-    public List<Brochure> getOrganizationBrochures(int orgId, int page, int maxResults) {
+    public List<Brochure> getOrganizationBrochures(int orgId) {
 
         Query query = sessionFactory.getCurrentSession().createQuery("from Brochure where orgId = :orgId order by title asc");
         query.setParameter("orgId", orgId);
-
-        int firstResult = 0;
-
-		//Set the parameters for paging
-        //Set the page to load
-        if (page > 1) {
-            firstResult = (maxResults * (page - 1));
-        }
-        query.setFirstResult(firstResult);
-        
-        if(maxResults > 0) {
-            //Set the max results to display
-            query.setMaxResults(maxResults);
-        }
 
         return query.list();
 

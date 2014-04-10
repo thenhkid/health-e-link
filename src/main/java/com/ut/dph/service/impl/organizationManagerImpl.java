@@ -68,14 +68,8 @@ public class organizationManagerImpl implements organizationManager {
 
     @Override
     @Transactional
-    public List<Organization> findOrganizations(String searchTerm) {
-        return organizationDAO.findOrganizations(searchTerm);
-    }
-
-    @Override
-    @Transactional
-    public List<Organization> getOrganizations(int page, int maxResults) {
-        return organizationDAO.getOrganizations(page, maxResults);
+    public List<Organization> getOrganizations() {
+        return organizationDAO.getOrganizations();
     }
 
     @Override
@@ -110,34 +104,22 @@ public class organizationManagerImpl implements organizationManager {
 
     @Override
     @Transactional
-    public List<User> getOrganizationUsers(int orgId, int page, int maxResults) {
-        return organizationDAO.getOrganizationUsers(orgId, page, maxResults);
+    public List<User> getOrganizationUsers(int orgId) {
+        return organizationDAO.getOrganizationUsers(orgId);
     }
 
     @Override
     @Transactional
-    public List<Provider> getOrganizationProviders(int orgId, int page, int maxResults) {
-        return organizationDAO.getOrganizationProviders(orgId, page, maxResults);
+    public List<Provider> getOrganizationProviders(int orgId) {
+        return organizationDAO.getOrganizationProviders(orgId);
     }
 
     @Override
     @Transactional
-    public Long findTotalProviders(int orgId) {
-        return organizationDAO.findTotalProviders(orgId);
+    public List<Brochure> getOrganizationBrochures(int orgId) {
+        return organizationDAO.getOrganizationBrochures(orgId);
     }
 
-    @Override
-    @Transactional
-    public List<Brochure> getOrganizationBrochures(int orgId, int page, int maxResults) {
-        return organizationDAO.getOrganizationBrochures(orgId, page, maxResults);
-    }
-
-    @Override
-    @Transactional
-    public Long findTotalBrochures(int orgId) {
-        return organizationDAO.findTotalBrochures(orgId);
-    }
-    
     @Override
     @Transactional
     public List<Organization> getAssociatedOrgs(int orgId) {
