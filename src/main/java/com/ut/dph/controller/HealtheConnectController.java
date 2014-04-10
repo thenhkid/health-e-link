@@ -1282,7 +1282,9 @@ public class HealtheConnectController {
             ua.setPageAccess("/batchOptions");
             ua.setActivity("Batch Options -" + batchOption);
             ua.setBatchId(batchInfo.getId());
-            ua.setTransactionInIds(idList.toString());
+            if (idList.size() > 0) {
+            	ua.setTransactionInIds(idList.toString());
+            }
             if (!hasPermission) {
                 ua.setActivityDesc("without permission" + systemMessage);
             }
