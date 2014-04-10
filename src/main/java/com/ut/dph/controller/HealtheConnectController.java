@@ -1145,8 +1145,14 @@ public class HealtheConnectController {
         /* Remove the transaction errors */
         transactionInManager.deleteTransactionInErrorsByTransactionId(transactionDetails.gettransactionId());
        
-        /* Update the transaction status to 12 (Released) */
-        transactionInManager.updateTransactionStatus(0, transactionDetails.gettransactionId(), 14, 12);
+        /* Update the transaction status to 10 (PR Released) */
+        transactionInManager.updateTransactionStatus(0, transactionDetails.gettransactionId(), 14, 10);
+        
+        /** update status so it will re-process **/
+        transactionInManager.updateBatchStatus(transactionDetails.getbatchId(), 3, "startDateTime");
+        
+        /** re-process batch **/
+        transactionInManager.processBatch(transactionDetails.getbatchId(), true);
         
         return 1;
         
