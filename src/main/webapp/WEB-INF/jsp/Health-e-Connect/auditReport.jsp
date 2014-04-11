@@ -125,6 +125,7 @@
                     	<c:if test="${transactionIn.transactionStatus == 14 && batch.statusId == 5 && canEdit}">            
 								<div class="col-md-4">
 								<input type="button" id="reject" rel="${transactionIn.transactionInId}"
+								rel2="${batch.id}"
 				                                   class="btn btn-primary btn-action-sm rejectMessage"
 				                                   value="Reject" />
 				                 </div>
@@ -186,6 +187,9 @@
     <input type="hidden" id="idList" name="idList" value="" />
     <input type="hidden" name="batchId" id="batchId" value="${batch.id}"/> 
     <input type="hidden" name="batchOption" id="batchOption" value=""/>                    
+</form>
+<form action="auditReport" id="viewBatchAuditReport" method="post">
+                <input type="hidden" id="auditbatchId" name="batchId" value="${batch.id}" />
 </form>
 
 <div class="modal fade" id="uploadFile" role="dialog" tabindex="-1"

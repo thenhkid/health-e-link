@@ -29,14 +29,6 @@ require(['./main'], function () {
                $('#batchOptions').submit();
         });
         
-        //click this will reject message
-        $('.rejectMessage').click(function() {
-        	$('input[name="batchOption"]').val("rejectMessage");       	
-        	$('#idList').val($(this).attr('rel'));
-        	$('#batchOptions').submit();
-        });
-        
-        
         //click this will release batch
         $('.releaseBatch').click(function() {
         	$('input[name="batchOption"]').val("releaseBatch");       	
@@ -135,6 +127,30 @@ require(['./main'], function () {
                 }
             });
         });
+        
+        
+  
+        
+        /** reject single message should bring user back to audit report **/
+        $('.rejectMessage').click(function() {
+        		
+        			var transactionId = $(this).attr('rel');
+        			var batchId = $(this).attr('rel2');
+                  $.ajax({
+                     url: '/Health-e-Connect/rejectMessage',
+                     data: {'transactionId': transactionId, 'batchId': batchId},
+                     type: "POST",
+                     async: false,
+                     dataType: "json",
+                     success: function(data) {
+                        $('#viewBatchAuditReport').submit();
+                     }
+                 });
+
+             
+         });
+        
+        
     });
 });
 

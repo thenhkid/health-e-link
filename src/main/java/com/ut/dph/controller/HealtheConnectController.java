@@ -1582,5 +1582,61 @@ public class HealtheConnectController {
         }
 
     }
+    
+    /**
+     * The '/editMessage' POST request will submit the changes to the passed in transaction. The
+     * transaction will be updated to a status of 10 (Pending Release) and the error records will be cleared
+     * 
+     * @param transactionDetails The object to hold the transaction fields
+     * 
+     */
+    @RequestMapping(value = "/rejectMessage", method = RequestMethod.POST)
+    public @ResponseBody Integer rejectMessage(
+    		@RequestParam(value = "batchId", required = false) Integer batchId,
+            @RequestParam(value = "transactionId", required = false) Integer transactionId,
+            RedirectAttributes redirectAttr,
+            HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
+    	
+    	User userInfo = (User) session.getAttribute("userDetails");
+        batchUploads batchInfo = transactionInManager.getBatchDetails(batchId);
+        boolean hasConfigurations = false;
+        boolean hasPermission = false;
+        
+        if (batchInfo != null) {
+            List<configuration> configurations = configurationManager.getActiveConfigurationsByUserId(userInfo.getId(), 1);
+
+            if (configurations.size() >= 1) {
+                hasConfigurations = true;
+            }
+
+            hasPermission = transactionInManager.hasPermissionForBatch(batchInfo, userInfo, hasConfigurations);
+        }
+        
+        if (hasPermission) {
+            if (batchInfo.getstatusId() == 5 && userInfo.geteditAuthority()) {
+                	transactionInManager.updateTranStatusByTInId(transactionId, 13);
+            } else {
+                hasPermission = false;
+            }
+        } 
+            
+          //log user activity
+            UserActivity ua = new UserActivity();
+            ua.setUserId(userInfo.getId());
+            ua.setAccessMethod(request.getMethod());
+            ua.setPageAccess("/rejectMessage");
+            ua.setActivity("Release batch");
+            ua.setBatchId(batchId);
+            ua.setTransactionInIds(transactionId.toString());
+            if (!hasPermission) {
+                ua.setActivityDesc("without permission");
+            }
+            	usermanager.insertUserLog(ua);
+            	
+      return 1;
+        
+    }
+    
+    
 
 }
