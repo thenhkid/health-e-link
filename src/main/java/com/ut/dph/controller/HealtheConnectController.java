@@ -580,7 +580,7 @@ public class HealtheConnectController {
      *
      * @param request
      * @param response
-     * @return	the health-e-Connect report view
+     * @return	the health-e-Connect audit report list
      * @throws Exception
      */
     @RequestMapping(value = "/auditReports", method = RequestMethod.GET)
@@ -753,9 +753,9 @@ public class HealtheConnectController {
     /**
      * The '/auditReport POST request will serve up the requested Health-e-Connect audit report .
      *
-     * @param request
+     * @param request - batchId
      * @param response
-     * @return	the health-e-Connect audit reports search view
+     * @return	the health-e-Connect detailed audit report view
      * @throws Exception
      */
     @RequestMapping(value = "/auditReport", method = {RequestMethod.GET, RequestMethod.POST})
@@ -1166,11 +1166,16 @@ public class HealtheConnectController {
     }
 
     /**
-     * The '/batchOptions POST request will serve up the requested Health-e-Connect audit report .
-     *
+     * The '/batchOptions POST request will perform option for batch as selected by the user .
+     * Four options - 
+     * rejectMessages - canEdit - need to POST form and refresh audit report 
+     * releaseBatch - canSend resetBatch 
+     * cancelBatch - canEdit - need to POST form and refresh audit report - reject one transaction
+     * resetBatch - canCancel
      * @param request
      * @param response
-     * @return	we redirect back to /auditReports
+     * @return	we redirect all back to /auditReports except for resetBatch. resetBatch sends user back to 
+     * 			uploads.
      * @throws Exception
      */
     @RequestMapping(value = "/batchOptions", method = RequestMethod.POST)
@@ -1182,12 +1187,6 @@ public class HealtheConnectController {
 
         try {
 
-            /**
-             * Five options - 
-             * rejectMessages - canEdit - need to POST form and refresh audit report 
-             * releaseBatch - canSend resetBatch, cancelBatch - canCancel 
-             * rejectMessage - canEdit - need to POST form and refresh audit report - reject one transaction
-             */
             /**
              * check for permission*
              */
@@ -1506,11 +1505,12 @@ public class HealtheConnectController {
     
     
     /**
-     * The '/releaseBatches POST request will serve up the requested Health-e-Connect audit report .
+     * The '/releaseBatches POST request will loop through batches, check permission and set batches
+     * to release status. .
      *
-     * @param request
-     * @param response
-     * @return	we redirect back to /auditReports
+     * @param request - idList with batch Ids to be release
+     * @param response 
+     * @return	we redirect back to /auditReports views
      * @throws Exception
      */
     @RequestMapping(value = "/releaseBatches", method = RequestMethod.POST)
@@ -1605,7 +1605,6 @@ public class HealtheConnectController {
         
         if (batchInfo != null) {
             List<configuration> configurations = configurationManager.getActiveConfigurationsByUserId(userInfo.getId(), 1);
-
             if (configurations.size() >= 1) {
                 hasConfigurations = true;
             }
