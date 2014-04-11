@@ -6,10 +6,6 @@
 
 package com.ut.dph.model.custom;
 
-import java.util.List;
-
-import com.ut.dph.model.TransactionInError;
-
 /**
  * 
  * @author gchan
@@ -20,12 +16,17 @@ public class TransErrorDetail {
 	
 	private Integer configId = 0;
 	
-	private Integer transactionInId;
+	private Integer transactionInId = 0;
 
 	private String rptField1Value =" ";
 	private String rptField2Value =" ";
 	private String rptField3Value =" ";
 	private String rptField4Value =" ";
+	
+	private String rptField1Label =" ";
+	private String rptField2Label =" ";
+	private String rptField3Label =" ";
+	private String rptField4Label =" ";
 
 	private Integer errorFieldNo;
 	
@@ -41,9 +42,9 @@ public class TransErrorDetail {
 	private Integer cwId;
 	private Integer macroId;
 	
-	private Integer transactionStatus;
+	private Integer transactionStatus = 0;
 	
-	private String transactionStatusValue;
+	private String transactionStatusValue = "N/A";
 	
 	public Integer getValidationTypeId() {
 		return validationTypeId;
@@ -187,6 +188,38 @@ public class TransErrorDetail {
 
 	public void setTransactionStatusValue(String transactionStatusValue) {
 		this.transactionStatusValue = transactionStatusValue;
+	}
+
+	public String getRptField1Label() {
+		return rptField1Label;
+	}
+
+	public void setRptField1Label(String rptField1Label) {
+		this.rptField1Label = rptField1Label;
+	}
+
+	public String getRptField2Label() {
+		return rptField2Label;
+	}
+
+	public void setRptField2Label(String rptField2Label) {
+		this.rptField2Label = rptField2Label;
+	}
+
+	public String getRptField3Label() {
+		return rptField3Label;
+	}
+
+	public void setRptField3Label(String rptField3Label) {
+		this.rptField3Label = rptField3Label;
+	}
+
+	public String getRptField4Label() {
+		return rptField4Label;
+	}
+
+	public void setRptField4Label(String rptField4Label) {
+		this.rptField4Label = rptField4Label;
 	}
 
 	

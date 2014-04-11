@@ -57,7 +57,7 @@
                                 <c:if test="${not empty org.fax}"><dd>fax: <span class="tel">${org.fax}</span></dd></c:if>
                                 </dl>
 
-                            </div>
+                           </div>
                         </div>
 
 
@@ -73,169 +73,114 @@
 
                         <div class="col-md-4"></div>
                     </div>
-
-                    <div class="form-container scrollable">
-                        <c:forEach var="confError" items="${confErrorList}">
-                            <c:set var="rptField" value="${fn:trim(confError.rptFieldHeading1)}"/>
-                            <div>
-                                <h3>${confError.messageTypeName}</h3> 
-                            </div>
-                            <table class="table table-striped table-hover table-default">
-                                <thead>
-                                    <tr>
-                                        <c:choose>
-
-                                            <c:when test="${confError.errorViewId == 1}">
-                                                <th scope="col">Error Code</th>
-                                                <th scope="col">Error Desc</th>
-                                                <th scope="col">Error Info</th>
-                                                </c:when>
-
-                                            <c:when test="${batch.statusId == 5 && confError.errorViewId != 2}">
-                                                <th scope="col">Reject?</th>
-                                                <th scope="col">Transaction Status</th>
-                                                <th scope="col">${confError.rptFieldHeading1}</th>
-                                                <th scope="col">${confError.rptFieldHeading2}</th>
-                                                <th scope="col">${confError.rptFieldHeading3}</th>
-                                                <th scope="col">${confError.rptFieldHeading4}</th>
-                                                <th scope="col">Error Code</th>
-                                                <th scope="col">Error Desc</th>
-                                                <th scope="col">Field Label</th>
-                                                <th scope="col">Error Data</th>
-                                                <th scope="col" class="center-text">&nbsp;</th>		
-                                                </c:when>
-
-                                            <c:otherwise>
-                                            	<th scope="col">Transaction Status</th>
-                                                <th scope="col">${confError.rptFieldHeading1}</th>
-                                                <th scope="col">${confError.rptFieldHeading2}</th>
-                                                <th scope="col">${confError.rptFieldHeading3}</th>
-                                                <th scope="col">${confError.rptFieldHeading4}</th>
-                                                <th scope="col">Error Code</th>
-                                                <th scope="col">Error Desc</th>
-                                                    <c:if test="${confError.errorViewId != 2}">
-                                                    <th scope="col">Field Label</th>
-                                                    <th scope="col">Error Data</th>
-                                                    </c:if>
-                                                </c:otherwise>
-                                            </c:choose>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <c:set var="newTransId" value="0"/>
-                                    <c:forEach var="error" items="${confError.transErrorDetails}">
-
-                                        <tr>
-                                            <c:choose>
-                                                <c:when test="${confError.errorViewId == 1}">
-                                                    <td class="center-text">${error.errorCode}</td>
-                                                    <td>${error.errorDisplayText}</td>
-                                                    <td>${error.errorData}</td>
-                                                </c:when>
-
-                                                <c:when test="${batch.statusId == 5 && confError.errorViewId != 2}">
-                                                    <td class="center-text">
-                                                        <c:if test="${error.transactionInId != newTransId}">
-                                                            <c:if test="${not empty error.transactionInId && canEdit && error.transactionStatus == 14}">
-                                                                <input type="checkbox" id="rejTransInId" name="rejTransInId" class="rejTransInId" value="${error.transactionInId}" />
-                                                            </c:if>
-                                                        </c:if>
-                                                    </td>
-                                                    <td><a href="#statusModal" data-toggle="modal" class="btn btn-link viewStatus" rel="${error.transactionStatus}" title="View this Status">${error.transactionStatusValue}&nbsp;
-                                                            <span class="badge badge-help" data-placement="top" title="" data-original-title="">?</span></a></td>
-                                                    <td>${error.rptField1Value}</td>
-                                                    <td>${error.rptField2Value}</td>
-                                                    <td>${error.rptField3Value}</td>
-                                                    <td>${error.rptField4Value}</td>
-                                                    <td class="center-text">${error.errorCode}</td>
-                                                    <td>${error.errorDisplayText}<c:if test="${not empty error.errorInfo}">${error.errorInfo}</c:if></td>
-                                                    <td>${error.errorFieldLabel}</td>
-                                                    <td>${error.errorData}</td>
-                                                    <td>&nbsp;
-                                                        <c:if test="${error.transactionInId != newTransId}">
-                                                            <c:if test="${not empty error.transactionInId && canEdit && error.transactionStatus == 14}">
-                                                                <a href="javascript:void(0);"
-                                                                   rel="${error.transactionInId}"
-                                                                   class="btn btn-link viewLink"><span
-                                                                        class="glyphicon glyphicon-edit"></span>ERG</a>
-                                                                </c:if>
-                                                            </c:if>
-                                                    </td>
-                                                </c:when>
-
-                                                <c:otherwise>
-                                                    <td><a href="#statusModal" data-toggle="modal" class="btn btn-link viewStatus" rel="${error.transactionStatus}" title="View this Status">${error.transactionStatusValue}&nbsp;
-                                                            <span class="badge badge-help" data-placement="top" title="" data-original-title="">?</span></a></td>
-                                                    <td>${error.rptField1Value}</td>
-                                                    <td>${error.rptField2Value}</td>
-                                                    <td>${error.rptField3Value}</td>
-                                                    <td>${error.rptField4Value}</td>
-                                                    <td class="center-text">${error.errorCode}</td>
-                                                    <td>${error.errorDisplayText} ${error.errorInfo}</td>
-                                                    <c:if test="${confError.errorViewId != 2}">
-                                                        <td>${error.errorFieldLabel}</td>
-                                                        <td>${error.errorData}</td>
-                                                    </c:if>
-                                                </c:otherwise>
-                                            </c:choose>
-                                        </tr>
-                                        <c:set var="newTransId" value="${error.transactionInId}"/> 
-                                    </c:forEach>
-
-
-                                </tbody>
-                            </table>
-                        </c:forEach>
-
-                        <c:if test="${totalPages > 0}">
-                            <ul class="pagination pull-right" role="navigation"
-                                aria-labelledby="Paging">
-                                <c:if test="${currentPage > 1}">
-                                    <li><a href="javascript:void(0);" rel="${currentPage-1}"
-                                           class="changePage">&laquo;</a></li>
-                                    </c:if>
-                                    <c:forEach var="i" begin="1" end="${totalPages}">
-                                    <li><a href="javascript:void(0);" rel="${i}"
-                                           class="changePage">${i}</a></li>
-                                    </c:forEach>
-                                    <c:if test="${currentPage < totalPages}">
-                                    <li><a href="javascript:void(0);" rel="${currentPage+1}"
-                                           class="changePage">&raquo;</a></li>
-                                    </c:if>
-                            </ul>
-                        </c:if>
-                    </div>
-                    <div>
-
+                    
+                    
+					 <div class="row" style="overflow:hidden;margin-top:10px; margin-bottom:20px;">
                         <c:if test="${canEdit == true}">
-                            <input type="button" id="reject"
-                                   class="btn btn-primary btn-action-sm rejectMessages"
-                                   value="Reject Marked Transactions" />
+	                        <div class="col-md-4">
+	                            <input type="button" id="reject"
+	                                   class="btn btn-primary btn-action-sm rejectMessages"
+	                                   value="Reject All Transactions" />
+	                        </div>
                         </c:if>
                         <c:if test="${canSend == true}">
-                            <input type="button" id="release"
-                                   class="btn btn-primary btn-action-sm releaseBatch"
-                                   value="Release" />
+	                        <div class="col-md-4">
+	                            <input type="button" id="release"
+	                                   class="btn btn-primary btn-action-sm releaseBatch"
+	                                   value="Release" />
+	                         </div>         
                         </c:if>
                         <c:if test="${canCancel == true}">
+                        <div class="col-md-3">
                             <input type="button" id="cancel"
                                    class="btn btn-primary btn-action-sm cancelBatch"
                                    value="Do Not Process" />
+                         </div> 
+                         <div class="col-md-3">       
                             <input type="button" id="reset"
                                    class="btn btn-primary btn-action-sm resetBatch"
                                    value="Reset" />
+                          </div>         
                         </c:if>
                     </div>
+                   
+                   
+                   
+                    <c:set var="transactionCounter" value="1"/>
+                    <c:set var="newTransId" value="0"/>
+                    <c:set var="idList" value=""/>
+                     
+                     <c:forEach var="transactionIn" items="${errorList}">
+                    	<div class="row" style="overflow:hidden;margin-top:10px; margin-bottom:20px;"> 
+                    	   <div class="col-md-4">
+	                    	   <h3>Transaction ${transactionCounter}</h3>
+	                    	   <c:if test="${transactionIn.transactionStatus != 0}"> <strong>Status:</strong> <a href="#statusModal"
+                                                                data-toggle="modal" class="btn btn-link viewStatus"
+                                                                rel="${transactionIn.transactionStatus}" title="View this Status">${transactionIn.transactionStatusValue}&nbsp;<span
+                                            class="badge badge-help" data-placement="top" title=""
+                                            data-original-title="">?</span></a></c:if>
+                                
+	                    	   <c:set var="transactionCounter" value="${transactionCounter + 1}"/>
+                    	   </div>
+                    	<c:if test="${transactionIn.transactionStatus == 14 && batch.statusId == 5 && canEdit}">            
+								<div class="col-md-4">
+								<input type="button" id="reject" rel="${transactionIn.transactionInId}"
+				                                   class="btn btn-primary btn-action-sm rejectMessage"
+				                                   value="Reject" />
+				                 </div>
+				                 <div class="col-md-4">                 
+				               		 <input type="button" id="fixErrors"  rel="${transactionIn.transactionInId}"
+						                                   class="btn btn-primary btn-action-sm fixErrors"
+						                                   value="Fix Errors" />                        
+								</div>
+							</c:if> 
+							</div>
+					<div class="row">
+					<table class="table table-striped table-hover table-default">
+						<thead>
+							<tr>
+								<th scope="col">Error Desc</th>
+                                <th scope="col">${transactionIn.rptField1Label}</th>
+                                <th scope="col">${transactionIn.rptField2Label}</th>
+                                <th scope="col">${transactionIn.rptField3Label}</th>
+                                <th scope="col">${transactionIn.rptField4Label}</th>
+                                <th scope="col">Field Label</th>
+                                <th scope="col">Error Data</th> 
+							</tr>
+						</thead>
+						<tbody>
+							<c:forEach var="error" items="${transactionIn.tedList}">
+								<tr>
+								<td scope="col">${error.errorDisplayText}<c:if test="${not empty error.errorInfo}">${error.errorInfo}</c:if></td>
+                                <td scope="col">${error.rptField1Value}</td>
+                                <td scope="col">${error.rptField2Value}</td>
+                                <td scope="col">${error.rptField3Value}</td>
+                                <td scope="col">${error.rptField4Value}</td>
+                                <td>${error.errorFieldLabel}</td>
+                                <td>${error.errorData}</td>
+							</tr>
+						 </c:forEach> 
+		</tbody>
+		</table>
+		</div>
+		</c:forEach> 
+    	              
+                            
+                          
+
+                       
+                   
+                    
                 </c:when>
                 <c:otherwise>
                     You do not have permission to view this audit report.  Your request has been logged.
                 </c:otherwise>
             </c:choose>
-
+ 			</div>
 
         </div>
     </div>
-</div>
+
 
 <form action="batchOptions" id="batchOptions" method="post">
     <input type="hidden" id="idList" name="idList" value="" />

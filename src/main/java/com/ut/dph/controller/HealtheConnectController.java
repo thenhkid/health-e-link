@@ -16,8 +16,8 @@ import com.ut.dph.model.configuration;
 import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.configurationMessageSpecs;
 import com.ut.dph.model.configurationTransport;
-import com.ut.dph.model.custom.ConfigErrorInfo;
 import com.ut.dph.model.custom.TransErrorDetail;
+import com.ut.dph.model.custom.TransErrorDetailDisplay;
 import com.ut.dph.model.fieldSelectOptions;
 import com.ut.dph.model.lutables.lu_ProcessStatus;
 import com.ut.dph.model.transactionIn;
@@ -803,10 +803,14 @@ public class HealtheConnectController {
 
                 /**
                  * grab error info - need to filter this by error type *
-                 */
+                 
                 List<ConfigErrorInfo> confErrorList = new LinkedList<ConfigErrorInfo>();
                 confErrorList = transactionInManager.populateErrorList(batchInfo);
                 mav.addObject("confErrorList", confErrorList);
+                */
+                List<TransErrorDetailDisplay> errorList = new LinkedList<TransErrorDetailDisplay>();
+                errorList = transactionInManager.populateErrorList(batchInfo);
+                mav.addObject("errorList", errorList);
 
             }
 
@@ -1053,7 +1057,7 @@ public class HealtheConnectController {
     
     /**
      * The '/editMessage' POST request will submit the changes to the passed in transaction. The
-     * transaction will be updated to a status of 12 (Release) and the error records will be cleared
+     * transaction will be updated to a status of 10 (Pending Release) and the error records will be cleared
      * 
      * @param transactionDetails The object to hold the transaction fields
      * 
@@ -1179,7 +1183,10 @@ public class HealtheConnectController {
         try {
 
             /**
-             * Four options - rejectMessages - canEdit - need to POST form and refresh audit report releaseBatch - canSend resetBatch, cancelBatch - canCancel *
+             * Five options - 
+             * rejectMessages - canEdit - need to POST form and refresh audit report 
+             * releaseBatch - canSend resetBatch, cancelBatch - canCancel 
+             * rejectMessage - canEdit - need to POST form and refresh audit report - reject one transaction
              */
             /**
              * check for permission*
@@ -1275,6 +1282,20 @@ public class HealtheConnectController {
 
                     } else {
                         systemMessage = "You do not have permission to reject these transactions.";
+                        hasPermission = false;
+                    }
+
+                } else if (batchOption.equalsIgnoreCase("rejectMessage")) {
+                    if (batchInfo.getstatusId() == 5 && userInfo.geteditAuthority()) {
+                        if (idList.size() > 0) {
+                            for (Integer transactionInId : idList) {
+                                transactionInManager.updateTranStatusByTInId(transactionInId, 13);
+                            }
+                            systemMessage = "Transaction is marked as rejected.";
+                        }
+
+                    } else {
+                        systemMessage = "You do not have permission to reject this transaction.";
                         hasPermission = false;
                     }
 

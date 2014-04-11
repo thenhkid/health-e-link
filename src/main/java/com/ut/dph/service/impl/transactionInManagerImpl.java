@@ -30,6 +30,7 @@ import com.ut.dph.model.transactionTarget;
 import com.ut.dph.model.custom.ConfigErrorInfo;
 import com.ut.dph.model.custom.ConfigForInsert;
 import com.ut.dph.model.custom.TransErrorDetail;
+import com.ut.dph.model.custom.TransErrorDetailDisplay;
 import com.ut.dph.model.lutables.lu_ProcessStatus;
 import com.ut.dph.model.systemSummary;
 import com.ut.dph.reference.fileSystem;
@@ -60,7 +61,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -1988,31 +1988,20 @@ public class transactionInManagerImpl implements transactionInManager {
         return transactionInDAO.getErrorList(batchId);
     }
 
-    /**
-     * *
-     */
+    
+    //TODO need to write this better
     @Override
-    public List<ConfigErrorInfo> populateErrorList(batchUploads batchInfo) {
-
-        List<ConfigErrorInfo> confErrorList = new LinkedList<ConfigErrorInfo>();
+    public List<TransErrorDetailDisplay> populateErrorList(batchUploads batchInfo) {
+    	//we want to group by transaction
+        List<TransErrorDetail> masterTedList = new ArrayList <TransErrorDetail>();
+        List<TransErrorDetailDisplay> tedDisplayList = new ArrayList <TransErrorDetailDisplay>();
         try {
             ConfigErrorInfo configErrorInfo = new ConfigErrorInfo();
             configErrorInfo.setBatchId(batchInfo.getId());
-
-            List<TransErrorDetail> tedList = getTransErrorDetailsForNoRptFields(batchInfo.getId(), Arrays.asList(5));
+            
+            List<TransErrorDetail> tedList = getTransErrorDetailsForNoRptFields(batchInfo.getId(), Arrays.asList(5,7,8,10));
             if (tedList.size() > 0) {
-                configErrorInfo.setErrorViewId(1);
-                configErrorInfo.setTransErrorDetails(tedList);
-                configErrorInfo.setMessageTypeName("Submission Process Errored");
-                confErrorList.add(configErrorInfo);
-            }
-            configErrorInfo = new ConfigErrorInfo();
-            tedList = getTransErrorDetailsForNoRptFields(batchInfo.getId(), Arrays.asList(7, 8, 10));
-            if (tedList.size() > 0) {
-                configErrorInfo.setErrorViewId(1);
-                configErrorInfo.setTransErrorDetails(tedList);
-                configErrorInfo.setMessageTypeName("Configuration Errors");
-                confErrorList.add(configErrorInfo);
+            	masterTedList.addAll(tedList);
             }
             /**
              * now get invalid configIds, errorId 6 - these are tied to transaction but not reportable fields since we don't know what configId it is. we don't know column that holds the field either since it didn't match with any for org, we display the first 4 columns
@@ -2021,34 +2010,90 @@ public class transactionInManagerImpl implements transactionInManager {
             configErrorInfo.setBatchId(batchInfo.getId());
             tedList = getTransErrorDetailsForInvConfig(batchInfo.getId());
             if (tedList.size() > 0) {
-                //we grab f1-f4 and report off those
-                configErrorInfo.setErrorViewId(2);
-                configErrorInfo.setMessageTypeName("Configurations Unknown");
-                configErrorInfo.setRptFieldHeading1("Field 1");
-                configErrorInfo.setRptFieldHeading2("Field 2");
-                configErrorInfo.setRptFieldHeading3("Field 3");
-                configErrorInfo.setRptFieldHeading4("Field 4");
-                configErrorInfo.setTransErrorDetails(tedList);
-                confErrorList.add(configErrorInfo);
+            	masterTedList.addAll(tedList);
             }
             //now get the rest by configId
             List<ConfigErrorInfo> confErrorListByConfig = getErrorConfigForBatch(batchInfo.getId());
             for (ConfigErrorInfo cei : confErrorListByConfig) {
-                //we populate the rest of the info 1. headers
                 configErrorInfo.setBatchId(batchInfo.getId());
                 configErrorInfo = getHeaderForConfigErrorInfo(batchInfo.getId(), cei);
                 //add error details
-                configErrorInfo.setTransErrorDetails(getTransErrorDetails(batchInfo, configErrorInfo));
-            }
-            confErrorList.addAll(confErrorListByConfig);
+                String sqlStmt = "";
+                if (configErrorInfo.getRptField1() != 0) {
+                    sqlStmt = sqlStmt + "F" + configErrorInfo.getRptField1() + " as rptField1Value, ";                    
+                } else {
+                    sqlStmt = sqlStmt + "'' as rptField1Value, ";
+                }
+                if (configErrorInfo.getRptField2() != 0) {
+                    sqlStmt = sqlStmt + "F" + configErrorInfo.getRptField2() + " as rptField2Value, ";
+                } else {
+                    sqlStmt = sqlStmt + "'' as rptField2Value, ";
+                }
+                if (configErrorInfo.getRptField3() != 0) {
+                    sqlStmt = sqlStmt + "F" + configErrorInfo.getRptField3() + " as rptField3Value, ";
+                } else {
+                    sqlStmt = sqlStmt + "'' as rptField3Value, ";
+                }
+                if (configErrorInfo.getRptField4() != 0) {
+                    sqlStmt = sqlStmt + "F" + configErrorInfo.getRptField4() + " as rptField4Value ";
+                } else {
+                    sqlStmt = sqlStmt + "'' as rptField4Value ";
+                }
+                
+                tedList = getTransErrorDetails(batchInfo, configErrorInfo, sqlStmt);
+                if (tedList.size() > 0) {
+                	masterTedList.addAll(tedList);
+                }
+              }
+            
+            
+            /** custom group by - need to check if it is faster to just hit the db **/
+            if (masterTedList.size() > 0) {
+            	Integer transactionInId = -1;
+                TransErrorDetailDisplay tedd = new TransErrorDetailDisplay();
+                List<TransErrorDetail> transErrorDetailList = new ArrayList<TransErrorDetail>();
+                Integer counter = 0;
+                
+            	/** we need to group them by transactionInId **/
+            	for (TransErrorDetail ted : masterTedList) {
+            		counter++;
+            		if (!ted.getTransactionInId().equals(transactionInId)) {
+            			if (transactionInId != -1) {
+            				tedd.setTedList(transErrorDetailList);
+            				transErrorDetailList = new ArrayList<TransErrorDetail>();
+            				tedDisplayList.add(tedd);
+            			}
+            			
+            			transactionInId = ted.getTransactionInId();
+            			tedd = new TransErrorDetailDisplay();
+            			tedd.setTransactionInId(transactionInId);
+            			tedd.setTransactionStatus(ted.getTransactionStatus());
+            			tedd.setRptField1Label(ted.getRptField1Label());
+            			tedd.setRptField2Label(ted.getRptField2Label());
+            			tedd.setRptField3Label(ted.getRptField3Label());
+            			tedd.setRptField4Label(ted.getRptField4Label());
+            			tedd.setTransactionStatusValue(ted.getTransactionStatusValue());
+            		} 
+            		transErrorDetailList.add(ted);
+            		if (counter == masterTedList.size()) {
+            			tedd.setTedList(transErrorDetailList);
+            			transErrorDetailList = new ArrayList<TransErrorDetail>();
+            			tedDisplayList.add(tedd);
+            			
+            		} 	
+            	}
+              }
+            
 
         } catch (Exception ex) {
             ex.printStackTrace();
             System.err.println("populateErrorList " + ex.getCause());
         }
-        return confErrorList;
+        
+        return tedDisplayList;
     }
-
+    
+    
     @Override
     public List<TransErrorDetail> getTransErrorDetailsForNoRptFields(Integer batchId, List<Integer> errorCodes) {
         return transactionInDAO.getTransErrorDetailsForNoRptFields(batchId, errorCodes);
@@ -2077,31 +2122,8 @@ public class transactionInManagerImpl implements transactionInManager {
     }
 
     @Override
-    public List<TransErrorDetail> getTransErrorDetails(batchUploads batchInfo, ConfigErrorInfo configErrorInfo) {
-        //get field values
-        String sqlStmt = "";
-        if (configErrorInfo.getRptField1() != 0) {
-            sqlStmt = sqlStmt + "F" + configErrorInfo.getRptField1() + " as rptField1Value, ";
-        } else {
-            sqlStmt = sqlStmt + "'' as rptField1Value, ";
-        }
-        if (configErrorInfo.getRptField2() != 0) {
-            sqlStmt = sqlStmt + "F" + configErrorInfo.getRptField2() + " as rptField2Value, ";
-        } else {
-            sqlStmt = sqlStmt + "'' as rptField2Value, ";
-        }
-        if (configErrorInfo.getRptField3() != 0) {
-            sqlStmt = sqlStmt + "F" + configErrorInfo.getRptField3() + " as rptField3Value, ";
-        } else {
-            sqlStmt = sqlStmt + "'' as rptField3Value, ";
-        }
-        if (configErrorInfo.getRptField4() != 0) {
-            sqlStmt = sqlStmt + "F" + configErrorInfo.getRptField4() + " as rptField4Value ";
-        } else {
-            sqlStmt = sqlStmt + "'' as rptField4Value ";
-        }
-
-        List<TransErrorDetail> transErrorDetails;
+    public List<TransErrorDetail> getTransErrorDetails(batchUploads batchInfo, ConfigErrorInfo configErrorInfo, String sqlStmt) {
+    	List<TransErrorDetail> transErrorDetails;
         try {
             transErrorDetails = transactionInDAO.getTransErrorDetails(batchInfo, configErrorInfo);
 
@@ -2129,6 +2151,10 @@ public class transactionInManagerImpl implements transactionInManager {
                     newSQL = ", F" + trd.getErrorFieldNo() + " as errorData ";
                 }
                 trd = getTransErrorData(trd, sqlStmt + newSQL);
+                trd.setRptField1Label(configErrorInfo.getRptFieldHeading1());
+                trd.setRptField2Label(configErrorInfo.getRptFieldHeading2());
+                trd.setRptField3Label(configErrorInfo.getRptFieldHeading3());
+                trd.setRptField4Label(configErrorInfo.getRptFieldHeading4());
             }
 
             return transErrorDetails;

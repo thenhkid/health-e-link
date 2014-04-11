@@ -11,30 +11,31 @@ require(['./main'], function () {
         
         $("input:text,form").attr("autocomplete", "off");
         
-      //This function will handle sending rejected transactions
+        //This function will reject all errored transactions
         $(document).on('click','.rejectMessages', function() {
-
+        	
            $('.alert-danger').hide();
 
            var idList = "";
-
-           //Loop through all batch ids
-           $('input[type=checkbox]').each(function() {
-               if(this.checked) {
-            	   idList += (idList ==="" ? this.value : "," + this.value);
-                }
-           });
-
-           if(idList === "") {
-               $('.alert-danger').html("At least one transaction must be selected to reject!");
-               $('.alert-danger').show();
-           }
-           else {
-               $('#idList').val(idList);
+	
+	           //Loop through all batch ids
+	           $('input[type=button]').each(function() {  
+	        	   if (this.value == 'Reject') {
+	        		   idList += (idList ==="" ? $(this).attr('rel') : "," + $(this).attr('rel'));
+	           		}
+	           });
+           	   $('#idList').val(idList);
                $('input[name="batchOption"]').val("rejectMessages"); 
                $('#batchOptions').submit();
-           }
         });
+        
+        //click this will reject message
+        $('.rejectMessage').click(function() {
+        	$('input[name="batchOption"]').val("rejectMessage");       	
+        	$('#idList').val($(this).attr('rel'));
+        	$('#batchOptions').submit();
+        });
+        
         
         //click this will release batch
         $('.releaseBatch').click(function() {
@@ -56,7 +57,7 @@ require(['./main'], function () {
         
         
         //this function will submit the transactionInId to the ERG form for edit
-        $(document).on('click', '.viewLink', function() {
+        $(document).on('click', '.fixErrors', function() {
         	$('input[name="transactionInId"]').val($(this).attr('rel'));
         	$('#transAction').submit();
         });

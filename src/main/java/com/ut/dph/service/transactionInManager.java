@@ -27,6 +27,7 @@ import com.ut.dph.model.transactionTarget;
 import com.ut.dph.model.custom.ConfigErrorInfo;
 import com.ut.dph.model.custom.ConfigForInsert;
 import com.ut.dph.model.custom.TransErrorDetail;
+import com.ut.dph.model.custom.TransErrorDetailDisplay;
 import com.ut.dph.model.systemSummary;
 
 import java.util.Date;
@@ -315,8 +316,6 @@ public interface transactionInManager {
     
     List <TransactionInError> getErrorList (Integer batchId);
     
-    List <ConfigErrorInfo> populateErrorList(batchUploads batchInfo);
-    
     List <TransErrorDetail> getTransErrorDetailsForNoRptFields(Integer batchId, List<Integer> errorCodes);
     
     Integer getCountForErrorId (Integer batchId, Integer errorId);
@@ -327,7 +326,7 @@ public interface transactionInManager {
     
     ConfigErrorInfo getHeaderForConfigErrorInfo(Integer batchId, ConfigErrorInfo configErrorInfo);
     
-    List <TransErrorDetail> getTransErrorDetails(batchUploads batchInfo, ConfigErrorInfo configErrorInfo);
+    List <TransErrorDetail> getTransErrorDetails(batchUploads batchInfo, ConfigErrorInfo configErrorInfo, String sqlStmt);
     
     TransErrorDetail getTransErrorData(TransErrorDetail ted, String sqlStmt);
     
@@ -344,5 +343,7 @@ public interface transactionInManager {
     List<batchUploads> populateBatchInfo (List<batchUploads> uploadedBatches, User userInfo);
     
     List<TransErrorDetail> getTransactionErrorsByFieldNo(int transactionInId, int fieldNo) throws Exception;
+    
+    List <TransErrorDetailDisplay> populateErrorList(batchUploads batchInfo);
     
 }

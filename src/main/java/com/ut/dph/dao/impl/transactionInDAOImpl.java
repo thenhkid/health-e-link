@@ -3693,13 +3693,16 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Transactional
     public List<TransErrorDetail> getTransErrorDetailsForNoRptFields(Integer batchId, List<Integer> errorCodes) {
         try {
-            String sql = "select transactionInErrors.transactionInId, transactionInErrors.id, errorId as errorCode, displayText as errorDisplayText, stackTrace as errorData  "
+            String sql = "select "
+            		+ "'N/A' as transactionStatusValue, 'N/A' as errorFieldLabel, "
+            		+ " transactionInErrors.id, errorId as errorCode, displayText as errorDisplayText, stackTrace as errorData  "
                     + " from transactionInErrors, lu_errorCodes where  transactionInErrors.errorId = lu_errorCodes.id "
                     + " and transactionInErrors.errorId  in ( :errorCodes ) and batchuploadid = :batchId order by errorId, id;";
 
             Query query = sessionFactory.getCurrentSession()
-                    .createSQLQuery(sql).setResultTransformer(
-                            Transformers.aliasToBean(TransErrorDetail.class));
+                    .createSQLQuery(sql)
+                    .setResultTransformer(Transformers.aliasToBean(TransErrorDetail.class));
+            
             query.setParameter("batchId", batchId);
             query.setParameterList("errorCodes", errorCodes);
             return query.list();
@@ -3737,7 +3740,9 @@ public class transactionInDAOImpl implements transactionInDAO {
     public List<TransErrorDetail> getTransErrorDetailsForInvConfig(Integer batchId) {
         try {
             String sql = "select transactionIn.statusId as transactionStatus, lu_processstatus.displayCode as transactionStatusValue, "
-            		+ " transactionIn.id as transactionInId, F1 as rptField1Value, F2 as rptField2Value, F3 as rptField3Value, F4 as rptField4Value,"
+            		+ " transactionIn.id as transactionInId, 'N/A' as errorFieldLabel, 'N/A' as errorData,"
+            		+ " F1 as rptField1Value, F2 as rptField2Value, F3 as rptField3Value, F4 as rptField4Value,"
+            		+ " 'Field 1' as rptField1Label, 'Field 2' as rptField2Label, 'Field 3' as rptField3Label, 'Field 4' as rptField4Label,"
             		+ " errorId as errorCode, lu_errorcodes.displayText as errorDisplayText "
             		+ " from transactionInErrors, transactionInRecords, lu_errorcodes, transactionIn, lu_processstatus "
             		+ " where batchuploadId = :batchId and errorId = :errorId and lu_errorcodes.id = transactionInErrors.errorId"
