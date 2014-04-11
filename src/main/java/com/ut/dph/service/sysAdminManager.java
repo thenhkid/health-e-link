@@ -31,13 +31,13 @@ public interface sysAdminManager {
     /**
      * about 90% of our tables fall into the standard table category, which is id, displayText, description, status and isCustom)      *
      */
-    List<LookUpTable> getTableList(int maxResults, int page, String searchTerm);
+    List<LookUpTable> getTableList(String searchTerm);
 
     Integer findTotalLookUpTable();
 
     LookUpTable getTableInfo(String urlId);
 
-    List<TableData> getDataList(int maxResults, int page, String utTableName, String searchTerm);
+    List<TableData> getDataList(String utTableName, String searchTerm);
 
     Integer findTotalDataRows(String utTableName);
 
@@ -51,7 +51,7 @@ public interface sysAdminManager {
 
     boolean updateTableData(TableData tableData, String utTableName);
 
-    List<Macros> getMarcoList(int maxResults, int page, String searchTerm);
+    List<Macros> getMarcoList(String searchTerm);
 
     Long findTotalMacroRows();
 

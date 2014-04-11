@@ -51,7 +51,7 @@ public class sysAdminDAOImpl implements sysAdminDAO {
     @Override
     @Transactional
     @SuppressWarnings("unchecked")
-    public List<LookUpTable> getLookUpTables(int page, int maxResults, String searchTerm) {
+    public List<LookUpTable> getLookUpTables(String searchTerm) {
         Query query = sessionFactory
                 .getCurrentSession()
                 .createSQLQuery(
@@ -82,21 +82,7 @@ public class sysAdminDAOImpl implements sysAdminDAO {
                 .setParameter("schemaName", schemaName)
                 .setParameter("searchTerm", searchTerm);
 
-        //By default we want to return the first result
-        int firstResult = 0;
-
-		//If viewing a page other than the first we then need to figure out
-        //which result to start with
-        if (page > 1) {
-            firstResult = (maxResults * (page - 1));
-        }
-
-        /**
-         * add codes for paging *
-         */
-        query.setFirstResult(firstResult);
-        //Set the max results to display
-        query.setMaxResults(maxResults);
+       
 
         List<LookUpTable> tableList = query.list();
 
@@ -127,7 +113,7 @@ public class sysAdminDAOImpl implements sysAdminDAO {
     @Override
     @Transactional
     @SuppressWarnings("unchecked")
-    public List<TableData> getDataList(int page, int maxResults, String utTableName, String searchTerm) {
+    public List<TableData> getDataList(String utTableName, String searchTerm) {
 
         String sql = "select id, displayText, description, "
                 + " isCustom as custom, status as status, dateCreated as dateCreated from "
@@ -142,20 +128,6 @@ public class sysAdminDAOImpl implements sysAdminDAO {
                 .setResultTransformer(Transformers.aliasToBean(TableData.class))
                 .setParameter("searchTerm", searchTerm);
 
-        //By default we want to return the first result
-        int firstResult = 0;
-
-		//If viewing a page other than the first we then need to figure out
-        //which result to start with
-        if (page > 1) {
-            firstResult = (maxResults * (page - 1));
-        }
-        /**
-         * add codes for paging *
-         */
-        query.setFirstResult(firstResult);
-        //Set the max results to display
-        query.setMaxResults(maxResults);
 
         List<TableData> dataList = query.list();
         // TODO
@@ -355,27 +327,13 @@ public class sysAdminDAOImpl implements sysAdminDAO {
     @SuppressWarnings("unchecked")
     @Override
     @Transactional
-    public List<Macros> getMarcoList(int maxResults, int page, String searchTerm) {
+    public List<Macros> getMarcoList(String searchTerm) {
 
         Query query = sessionFactory.getCurrentSession().createQuery("from Macros where "
                 + "macro_short_name like :searchTerm "
                 + "order by category asc");
         query.setParameter("searchTerm", searchTerm);
 
-        //By default we want to return the first result
-        int firstResult = 0;
-
-			//If viewing a page other than the first we then need to figure out
-        //which result to start with
-        if (page > 1) {
-            firstResult = (maxResults * (page - 1));
-        }
-        /**
-         * codes for paging *
-         */
-        query.setFirstResult(firstResult);
-        //Set the max results to display
-        query.setMaxResults(maxResults);
         return query.list();
     }
 

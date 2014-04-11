@@ -21,11 +21,11 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface sysAdminDAO {
 	
-	List <LookUpTable> getLookUpTables(int page, int maxResults, String searchTerm);
+	List <LookUpTable> getLookUpTables(String searchTerm);
 	
 	Integer findTotalLookUpTable();
 	
-	List <TableData> getDataList(int page, int maxResults, String utTableName, String searchTerm);
+	List <TableData> getDataList(String utTableName, String searchTerm);
 	
 	Integer findTotalDataRows(String utTableName);
 	
@@ -41,7 +41,7 @@ public interface sysAdminDAO {
 	
 	boolean updateTableData (TableData tableData, String utTableName);
 	
-	List <Macros> getMarcoList(int maxResults, int page, String searchTerm);
+	List <Macros> getMarcoList(String searchTerm);
 	
 	Long findTotalMacroRows();
 	

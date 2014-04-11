@@ -47,9 +47,9 @@ public class sysAdminManagerImpl implements sysAdminManager {
 	private sysAdminDAO sysAdminDAO;
 
 	@Override
-	public List<LookUpTable> getTableList(int maxResults, int page, String searchTerm) {
+	public List<LookUpTable> getTableList(String searchTerm) {
 		/** this calls DAO to get a list of tables**/ 
-		return sysAdminDAO.getLookUpTables(page, maxResults, addWildCardSearch(searchTerm));
+		return sysAdminDAO.getLookUpTables(addWildCardSearch(searchTerm));
 	}
 
 	@Override
@@ -59,8 +59,8 @@ public class sysAdminManagerImpl implements sysAdminManager {
 
 
 	@Override
-	public List<TableData> getDataList(int maxResults, int page, String utTableName, String searchTerm) {
-		return sysAdminDAO.getDataList(page, maxResults, utTableName, addWildCardSearch(searchTerm));
+	public List<TableData> getDataList(String utTableName, String searchTerm) {
+		return sysAdminDAO.getDataList(utTableName, addWildCardSearch(searchTerm));
 	}
 
 	@Override
@@ -100,8 +100,8 @@ public class sysAdminManagerImpl implements sysAdminManager {
 	}
 
 	@Override
-	public List<Macros> getMarcoList(int maxResults, int page, String searchTerm) {
-		return sysAdminDAO.getMarcoList(maxResults, page, addWildCardSearch(searchTerm));
+	public List<Macros> getMarcoList(String searchTerm) {
+		return sysAdminDAO.getMarcoList(addWildCardSearch(searchTerm));
 	}
 
 	@Override

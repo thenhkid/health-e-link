@@ -6,15 +6,15 @@
 
 <div class="main clearfix" role="main" rel="dataForTable">
     <div class="col-md-12">
-			<div class="alert alert-success">
-               <c:choose>
-               <c:when test="${param.msg == 'updated'}">The look up data has been successfully updated!</c:when>
-               <c:when test="${param.msg == 'created'}">The look up data has been successfully added!</c:when>
-               <c:when test="${savedStatus == 'deleted'}">The look up data has been successfully deleted!</c:when>
-               <c:when test="${savedStatus == 'notDeleted'}">The look up data has NOT been deleted!  Please try again.</c:when>
-               </c:choose>
-            </div>
-       
+        <div class="alert alert-success">
+            <c:choose>
+                <c:when test="${param.msg == 'updated'}">The look up data has been successfully updated!</c:when>
+                <c:when test="${param.msg == 'created'}">The look up data has been successfully added!</c:when>
+                <c:when test="${savedStatus == 'deleted'}">The look up data has been successfully deleted!</c:when>
+                <c:when test="${savedStatus == 'notDeleted'}">The look up data has NOT been deleted!  Please try again.</c:when>
+            </c:choose>
+        </div>
+
         <section class="panel panel-default">
             <div class="panel-heading">
                 <h3 class="panel-title"><c:if test="${not empty tableInfo}">Data for "${tableInfo.displayName}" Table</c:if></h3>
@@ -22,23 +22,15 @@
                 <div class="panel-body">
                     <div class="table-actions">
                         <div class="form form-inline pull-left">
-                        <form:form class="form form-inline" action="" method="post">
-                            <div class="form-group">
-                                <label class="sr-only" for="searchTerm">Search</label>
-                                <input type="text" name="searchTerm" id="searchTerm" value="${searchTerm}" class="form-control" id="search-dataItems" placeholder="Search"/>
-                            </div>
-                            <button id="searchdataItemBtn" class="btn btn-primary btn-sm">
-                                <span class="glyphicon glyphicon-search"></span>
-                            </button>
-                        </form:form>
+                            
+                        </div>
+                        <a href="#addLUDataModal" id="createNewdataItem" data-toggle="modal" class="btn btn-primary btn-sm pull-right" title="Add look up data">  
+                            <span class="glyphicon glyphicon-plus"></span>
+                        </a>
                     </div>
-                     <a href="#addLUDataModal" id="createNewdataItem" data-toggle="modal" class="btn btn-primary btn-sm pull-right" title="Add look up data">  
-                        <span class="glyphicon glyphicon-plus"></span>
-                    </a>
-                </div>
 
                 <div class="form-container scrollable">
-                    <table class="table table-striped table-hover table-default">
+                    <table class="table table-striped table-hover table-default" <c:if test="${not empty dataList}">id="dataTable"</c:if>>
                         <thead>
                             <tr>
                                 <th scope="col">Universal Translator<br/>Crosswalk Value</th>
@@ -79,19 +71,12 @@
                             </c:choose>
                         </tbody>
                     </table>
-                    <ul class="pagination pull-right" role="navigation" aria-labelledby="Paging ">
-                        <c:if test="${currentPage > 1}"><li><a href="?page=${currentPage-1}">&laquo;</a></li></c:if>
-                            <c:forEach var="i" begin="1" end="${totalPages}">
-                            <li><a href="?page=${i}">${i}</a></li>
-                            </c:forEach>
-                            <c:if test="${currentPage < totalPages}"><li><a href="?page=${currentPage+1}">&raquo;</a></li></c:if>
-                        </ul>
+                    </div>
                 </div>
-            </div>
-        </section>
-    </div>		
-</div>	
-<p rel="${currentPage}" id="currentPageHolder" style="display:none"></p>
+            </section>
+        </div>		
+    </div>	
+   
 <p rel="${goToURL}" id="goToURL" style="display:none"></p>
 <p rel="${urlIdInfo}" id="urlIdInfo" style="display:none"></p>
 
