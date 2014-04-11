@@ -1625,7 +1625,7 @@ public class HealtheConnectController {
             ua.setUserId(userInfo.getId());
             ua.setAccessMethod(request.getMethod());
             ua.setPageAccess("/rejectMessage");
-            ua.setActivity("Release batch");
+            ua.setActivity("Reject Message");
             ua.setBatchId(batchId);
             ua.setTransactionInIds(transactionId.toString());
             if (!hasPermission) {
