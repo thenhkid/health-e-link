@@ -1584,10 +1584,11 @@ public class HealtheConnectController {
     }
     
     /**
-     * The '/editMessage' POST request will submit the changes to the passed in transaction. The
-     * transaction will be updated to a status of 10 (Pending Release) and the error records will be cleared
+     * The '/rejectMessage' POST request will submit batchId and transactionId 
+     * method will flag the transaction as rejected
      * 
-     * @param transactionDetails The object to hold the transaction fields
+     * @param batchId - holds the batch
+     * @transactionId - hold the transactionId
      * 
      */
     @RequestMapping(value = "/rejectMessage", method = RequestMethod.POST)
