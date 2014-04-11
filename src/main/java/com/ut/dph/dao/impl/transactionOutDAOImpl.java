@@ -282,15 +282,12 @@ public class transactionOutDAOImpl implements transactionOutDAO {
      *
      * @param fromDate
      * @param toDate
-     * @param searchTerm
-     * @param page
-     * @param maxResults
-     * @return This function will return a list of batch uploads
+      * @return This function will return a list of batch uploads
      * @throws Exception
      */
     @Override
     @Transactional
-    public List<batchDownloads> getAllBatches(Date fromDate, Date toDate, String searchTerm, int page, int maxResults) throws Exception {
+    public List<batchDownloads> getAllBatches(Date fromDate, Date toDate) throws Exception {
 
         int firstResult = 0;
 
@@ -306,49 +303,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
 
         findBatches.addOrder(Order.desc("dateCreated"));
 
-        /* If a search term is entered conduct a search */
-        if (!"".equals(searchTerm)) {
-
-            List<batchDownloads> batches = findBatches.list();
-
-            List<Integer> batchFoundIdList = findInboxBatches(batches, searchTerm);
-
-            if (batchFoundIdList.isEmpty()) {
-                batchFoundIdList.add(0);
-            }
-
-            Criteria foundBatches = sessionFactory.getCurrentSession().createCriteria(batchDownloads.class);
-            foundBatches.add(Restrictions.in("id", batchFoundIdList));
-            foundBatches.addOrder(Order.desc("dateCreated"));
-
-            if (page > 1) {
-                firstResult = (maxResults * (page - 1));
-            }
-
-            foundBatches.setFirstResult(firstResult);
-
-            if (maxResults > 0) {
-                //Set the max results to display
-                foundBatches.setMaxResults(maxResults);
-            }
-
-            return foundBatches.list();
-
-        } else {
-
-            if (page > 1) {
-                firstResult = (maxResults * (page - 1));
-            }
-
-            findBatches.setFirstResult(firstResult);
-
-            if (maxResults > 0) {
-                //Set the max results to display
-                findBatches.setMaxResults(maxResults);
-            }
-
-            return findBatches.list();
-        }
+        return findBatches.list();
 
     }
 
@@ -1625,7 +1580,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
      */
     @Override
     @Transactional
-    public List getTransactionsToProcess(int page, int maxResults) throws Exception {
+    public List getTransactionsToProcess() throws Exception {
 
         int firstResult = 0;
 
@@ -1637,16 +1592,6 @@ public class transactionOutDAOImpl implements transactionOutDAO {
         
         Query transactions = sessionFactory.getCurrentSession().createSQLQuery(SQL);
        
-        if (page > 1) {
-            firstResult = (maxResults * (page - 1));
-        }
-        transactions.setFirstResult(firstResult);
-
-        if (maxResults > 0) {
-            //Set the max results to display
-            transactions.setMaxResults(maxResults);
-        }
-
         return transactions.list();
 
     }
@@ -1659,7 +1604,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
      */
     @Override
     @Transactional
-    public List getTransactionsToProcessByMessageType(int orgId, int page, int maxResults) throws Exception {
+    public List getTransactionsToProcessByMessageType(int orgId) throws Exception {
 
         int firstResult = 0;
 
@@ -1671,17 +1616,6 @@ public class transactionOutDAOImpl implements transactionOutDAO {
         
         Query transactions = sessionFactory.getCurrentSession().createSQLQuery(SQL);
        
-        if (page > 1) {
-            firstResult = (maxResults * (page - 1));
-        }
-
-        transactions.setFirstResult(firstResult);
-
-        if (maxResults > 0) {
-            //Set the max results to display
-            transactions.setMaxResults(maxResults);
-        }
-
         return transactions.list();
 
     }
@@ -1697,9 +1631,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
      */
     @Override
     @Transactional
-    public List<transactionTarget> getPendingDeliveryTransactions(int orgId, int messageType, Date fromDate, Date toDate, int page, int maxResults) throws Exception {
-        
-        int firstResult = 0;
+    public List<transactionTarget> getPendingDeliveryTransactions(int orgId, int messageType, Date fromDate, Date toDate) throws Exception {
         
         List<Integer> configIds = new ArrayList<Integer>();
         
@@ -1727,17 +1659,6 @@ public class transactionOutDAOImpl implements transactionOutDAO {
 
         if (!"".equals(toDate)) {
             transactions.add(Restrictions.lt("dateCreated", toDate));
-        }
-        
-        if (page > 1) {
-            firstResult = (maxResults * (page - 1));
-        }
-
-        transactions.setFirstResult(firstResult);
-
-        if (maxResults > 0) {
-            //Set the max results to display
-            transactions.setMaxResults(maxResults);
         }
         
         return transactions.list(); 

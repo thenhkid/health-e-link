@@ -107,15 +107,15 @@ public interface transactionOutDAO {
     
     batchDownloadSummary getDownloadSummaryDetails(int transactionTargetId);
     
-    List <batchDownloads> getAllBatches(Date fromDate, Date toDate, String searchTerm, int page, int maxResults) throws Exception;
+    List <batchDownloads> getAllBatches(Date fromDate, Date toDate) throws Exception;
     
-    List getTransactionsToProcess(int page, int maxResults) throws Exception;
+    List getTransactionsToProcess() throws Exception;
     
-    List getTransactionsToProcessByMessageType(int orgId, int page, int maxResults) throws Exception;
+    List getTransactionsToProcessByMessageType(int orgId) throws Exception;
     
     List getAllransactionsToProcessByMessageType(int orgId, int messageTypeId) throws Exception;
     
-    List<transactionTarget> getPendingDeliveryTransactions(int orgId, int messageType, Date fromDate, Date toDate, int page, int maxResults) throws Exception;
+    List<transactionTarget> getPendingDeliveryTransactions(int orgId, int messageType, Date fromDate, Date toDate) throws Exception;
     
     void doNotProcessTransaction(int transactionId) throws Exception;
     

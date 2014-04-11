@@ -21,24 +21,9 @@
     <div class="col-md-12">
          <section class="panel panel-default">
             <div class="panel-body">
-                <div class="table-actions">
-                    <div class="col-md-3" role="search">
-                        <form:form class="form form-inline" id="searchForm" method="post">
-                            <div class="form-group">
-                                <label class="sr-only" for="searchTerm">Search</label>
-                                <input type="text" name="searchTerm" id="searchTerm" value="${searchTerm}" class="form-control" id="search-batches" placeholder="Search"/>
-                                <input type="hidden" name="page" id="page" value="${currentPage}" />
-                            </div>
-                            <button id="searchOrgBtn" class="btn btn-primary btn-sm" title="Search Inbound Batches" role="button">
-                                <span class="glyphicon glyphicon-search"></span>
-                            </button>
-                        </form:form>
-                    </div>
-                    
-                </div>
-
-                <div class="form-container scrollable">
-                    <table class="table table-striped table-hover table-default">
+               
+                <div class="form-container scrollable"><br />
+                    <table class="table table-striped table-hover table-default" <c:if test="${not empty transactions}">id="dataTable"</c:if>>
                         <thead>
                             <tr>
                                 <th scope="col">Message Type</th>

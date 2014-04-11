@@ -92,21 +92,21 @@ public interface transactionOutManager {
     
     systemSummary generateSystemOutboundSummary();
     
-    List <batchDownloads> getAllBatches(Date fromDate, Date toDate, String searchTerm, int page, int maxResults) throws Exception;
+    List <batchDownloads> getAllBatches(Date fromDate, Date toDate) throws Exception;
     
     boolean searchTransactions(Transaction transaction, String searchTerm) throws Exception;
     
     systemSummary generateSystemWaitingSummary();
     
-    List getTransactionsToProcess(int page, int maxResults) throws Exception;
+    List getTransactionsToProcess() throws Exception;
     
     int processManualTransaction(transactionTarget transaction) throws Exception;
     
-    List getTransactionsToProcessByMessageType(int orgId, int page, int maxResults) throws Exception;
+    List getTransactionsToProcessByMessageType(int orgId) throws Exception;
     
     List getAllransactionsToProcessByMessageType(int orgId, int messageTypeId) throws Exception;
     
-    List<transactionTarget> getPendingDeliveryTransactions(int orgId, int messageType, Date fromDate, Date toDate, int page, int maxResults) throws Exception;
+    List<transactionTarget> getPendingDeliveryTransactions(int orgId, int messageType, Date fromDate, Date toDate) throws Exception;
     
     boolean searchTransactionsByMessageType(pendingDeliveryTargets transaction, String searchTerm) throws Exception;
     

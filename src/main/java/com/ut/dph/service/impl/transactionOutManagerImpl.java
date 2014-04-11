@@ -1386,7 +1386,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
             nexthour.set(Calendar.MILLISECOND, 0);
             nexthour.add(Calendar.HOUR_OF_DAY, 1);
 
-            Integer batchesThisHour = transactionOutDAO.getAllBatches(thishour.getTime(), nexthour.getTime(), "", 1, 0).size();
+            Integer batchesThisHour = transactionOutDAO.getAllBatches(thishour.getTime(), nexthour.getTime()).size();
 
             /* Get batches submitted today */
             Calendar starttoday = new GregorianCalendar();
@@ -1402,7 +1402,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
             starttomorrow.set(Calendar.MILLISECOND, 0);
             starttomorrow.add(Calendar.DAY_OF_MONTH, 1);
 
-            Integer batchesToday = transactionOutDAO.getAllBatches(starttoday.getTime(), starttomorrow.getTime(), "", 1, 0).size();
+            Integer batchesToday = transactionOutDAO.getAllBatches(starttoday.getTime(), starttomorrow.getTime()).size();
 
             /* Get batches submitted this week */
             Calendar thisweek = new GregorianCalendar();
@@ -1420,7 +1420,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
             nextweek.set(Calendar.DAY_OF_WEEK, thisweek.getFirstDayOfWeek());
             nextweek.add(Calendar.WEEK_OF_YEAR, 1);
 
-            Integer batchesThisWeek = transactionOutDAO.getAllBatches(thisweek.getTime(), nextweek.getTime(), "", 1, 0).size();
+            Integer batchesThisWeek = transactionOutDAO.getAllBatches(thisweek.getTime(), nextweek.getTime()).size();
 
             systemSummary.setBatchesPastHour(batchesThisHour);
             systemSummary.setBatchesToday(batchesToday);
@@ -1448,7 +1448,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
 
         try {
 
-            Integer transactionsToProcess = transactionOutDAO.getTransactionsToProcess(1,0).size();
+            Integer transactionsToProcess = transactionOutDAO.getTransactionsToProcess().size();
 
             systemSummary.setbatchesToProcess(transactionsToProcess);
 
@@ -1463,8 +1463,8 @@ public class transactionOutManagerImpl implements transactionOutManager {
     
     @Override
     @Transactional
-    public List <batchDownloads> getAllBatches(Date fromDate, Date toDate, String searchTerm, int page, int maxResults) throws Exception {
-        return transactionOutDAO.getAllBatches(fromDate, toDate, searchTerm, page, maxResults);
+    public List <batchDownloads> getAllBatches(Date fromDate, Date toDate) throws Exception {
+        return transactionOutDAO.getAllBatches(fromDate, toDate);
     }
     
     @Override
@@ -1508,14 +1508,14 @@ public class transactionOutManagerImpl implements transactionOutManager {
     
     @Override
     @Transactional
-    public List getTransactionsToProcess(int page, int maxResults) throws Exception {
-        return transactionOutDAO.getTransactionsToProcess(page, maxResults);
+    public List getTransactionsToProcess() throws Exception {
+        return transactionOutDAO.getTransactionsToProcess();
     }
     
     @Override
     @Transactional
-    public List getTransactionsToProcessByMessageType(int orgId, int page, int maxResults) throws Exception {
-        return transactionOutDAO.getTransactionsToProcessByMessageType(orgId, page, maxResults);
+    public List getTransactionsToProcessByMessageType(int orgId) throws Exception {
+        return transactionOutDAO.getTransactionsToProcessByMessageType(orgId);
     }
     
     @Override
@@ -1526,8 +1526,8 @@ public class transactionOutManagerImpl implements transactionOutManager {
 
     @Override
     @Transactional
-    public List<transactionTarget> getPendingDeliveryTransactions(int orgId, int messageType, Date fromDate, Date toDate, int page, int maxResults) throws Exception {
-        return transactionOutDAO.getPendingDeliveryTransactions(orgId, messageType, fromDate, toDate, page, maxResults);
+    public List<transactionTarget> getPendingDeliveryTransactions(int orgId, int messageType, Date fromDate, Date toDate) throws Exception {
+        return transactionOutDAO.getPendingDeliveryTransactions(orgId, messageType, fromDate, toDate);
     }
     
     @Override
