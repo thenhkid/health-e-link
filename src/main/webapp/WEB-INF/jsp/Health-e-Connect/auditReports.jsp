@@ -29,12 +29,6 @@
                         </div>
                     </form:form>
                 </div>
-
-
-                <div class="col-md-2 col-md-offset-3">
-                    <c:if test="${showRelButton == true}"><a href="javascript:void(0);" title="Send Batches" class="pull-right btn btn-primary sendBatches"><span class="glyphicon glyphicon-send"></span> Release Marked Batches</a></c:if>
-                    </div>
-
                 </div>
                 <div class="form-container scrollable">
                     <div class="date-range-picker-trigger form-control pull-right daterange" style="width:255px; margin-left: 10px;">
@@ -92,6 +86,11 @@
                         </c:choose>    
                     </tbody>
                 </table>
+                <div class="row pull-left" style="margin-left: 1px; margin-top: 20px">
+              	 <c:if test="${showRelButton == true}">
+                <a href="javascript:void(0);" title="Send Batches" class="pull-right btn btn-primary sendBatches"><span class="glyphicon glyphicon-send"></span> Release Marked Batches</a> 
+               </c:if>
+            </div>
             </div>
         </div>
     </div>
