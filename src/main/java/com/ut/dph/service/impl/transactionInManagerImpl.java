@@ -561,12 +561,13 @@ public class transactionInManagerImpl implements transactionInManager {
             /**
              * we should only process the ones that are not REL status, to be safe, we copy over data from transactionInRecords*
              */
-            if (!doNotClearErrors) {
+           
             	resetTransactionTranslatedIn(batchUploadId, false);
-            }
+           
             //clear transactionInError table for batch
-            systemErrorCount = systemErrorCount + clearTransactionInErrors(batchUploadId, true);
-
+            	if (!doNotClearErrors) {
+            		systemErrorCount = systemErrorCount + clearTransactionInErrors(batchUploadId, true);
+            	}
             List<Integer> configIds = getConfigIdsForBatch(batchUploadId, false);
             for (Integer configId : configIds) {
 				//we need to run all checks before insert regardless *

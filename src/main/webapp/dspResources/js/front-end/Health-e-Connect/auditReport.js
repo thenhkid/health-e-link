@@ -15,18 +15,8 @@ require(['./main'], function () {
         $(document).on('click','.rejectMessages', function() {
         	
            $('.alert-danger').hide();
-
-           var idList = "";
-	
-	           //Loop through all batch ids
-	           $('input[type=button]').each(function() {  
-	        	   if (this.value == 'Reject') {
-	        		   idList += (idList ==="" ? $(this).attr('rel') : "," + $(this).attr('rel'));
-	           		}
-	           });
-           	   $('#idList').val(idList);
-               $('input[name="batchOption"]').val("rejectMessages"); 
-               $('#batchOptions').submit();
+           $('input[name="batchOption"]').val("rejectMessages"); 
+           $('#batchOptions').submit();
         });
         
         //click this will release batch

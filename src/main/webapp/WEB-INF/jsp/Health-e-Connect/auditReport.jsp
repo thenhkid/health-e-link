@@ -75,13 +75,11 @@
 
                     <div class="row" style="overflow:hidden;margin-top:10px; margin-bottom:20px;">
                         <div class="col-md-12">
-                            <c:if test="${canEdit == true}">
-                                <div class="pull-left">
-                                    <input type="button" id="reject" class="btn btn-primary btn-xs rejectMessages" value="Reject All Transactions" />
-                                    <c:if test="${canSend == true}">
-                                        <input type="button" id="release" class="btn btn-primary btn-xs releaseBatch" value="Release" />
-                                    </c:if>
-                                    <c:if test="${canSend == true}">
+                            	<div class="pull-left">
+	                                <c:if test="${canEdit == true}">
+	                                    <input type="button" id="reject" class="btn btn-primary btn-xs rejectMessages" value="Reject All Transactions" />
+	                                </c:if>   
+	                                <c:if test="${canSend == true}">
                                         <input type="button" id="release" class="btn btn-primary btn-xs releaseBatch" value="Release" />
                                     </c:if>
                                     <c:if test="${canCancel == true}">
@@ -89,7 +87,6 @@
                                         <input type="button" id="reset" class="btn btn-primary btn-xs resetBatch" value="Reset" />
                                     </c:if>
                                 </div>
-                            </c:if>
                         </div>
                     </div>
 
@@ -99,6 +96,7 @@
                                 <div class="panel-heading">
                                     <div class="pull-right" style="margin-top: -5px">
                                         <c:if test="${transactionIn.transactionStatus == 14 && batch.statusId == 5 && canEdit}">
+                                        	<c:set var="idList" value="${idList},${transactionIn.transactionInId}"/>
                                             <a href="javascript:void(0);" id="reject" rel="${transactionIn.transactionInId}" rel2="${batch.id}" class="btn btn-primary btn-xs rejectMessage">Reject</a>
                                             <a href="javascript:void(0);" id="fixErrors"  rel="${transactionIn.transactionInId}" class="btn btn-primary btn-xs fixErrors">Fix Errors</a>
                                         </c:if>
@@ -141,6 +139,22 @@
                         </div> 
                         <c:set var="transactionCounter" value="${transactionCounter + 1}"/>
                     </c:forEach>
+                                       <div class="row" style="overflow:hidden;margin-top:10px; margin-bottom:20px;">
+                        <div class="col-md-12">
+                            	<div class="pull-left">
+	                                <c:if test="${canEdit == true}">
+	                                    <input type="button" id="reject" class="btn btn-primary btn-xs rejectMessages" value="Reject All Transactions" />
+	                                </c:if>   
+	                                <c:if test="${canSend == true}">
+                                        <input type="button" id="release" class="btn btn-primary btn-xs releaseBatch" value="Release" />
+                                    </c:if>
+                                    <c:if test="${canCancel == true}">
+                                        <input type="button" id="cancel" class="btn btn-primary btn-xs cancelBatch" value="Do Not Process" />
+                                        <input type="button" id="reset" class="btn btn-primary btn-xs resetBatch" value="Reset" />
+                                    </c:if>
+                                </div>
+                        </div>
+                    </div>
                 </c:when>
                 <c:otherwise>
                     You do not have permission to view this audit report.  Your request has been logged.
@@ -153,7 +167,7 @@
 
 
 <form action="batchOptions" id="batchOptions" method="post">
-    <input type="hidden" id="idList" name="idList" value="" />
+    <input type="hidden" id="idList" name="idList" value="${fn:substring(idList,1,fn:length(idList))}" />
     <input type="hidden" name="batchId" id="batchId" value="${batch.id}"/>
     <input type="hidden" name="batchOption" id="batchOption" value=""/>
 </form>
