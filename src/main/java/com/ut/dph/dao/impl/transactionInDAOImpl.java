@@ -1160,16 +1160,14 @@ public class transactionInDAOImpl implements transactionInDAO {
      * added the ability to exclude selected statusIds. Original method only exclude statusId of 1 for uploadBatch
      */
     @Override
-    public List<batchUploads> getuploadedBatches(int userId, int orgId, Date fromDate, Date toDate, String searchTerm, int page, int maxResults) throws Exception {
-        return getuploadedBatches(userId, orgId, fromDate, toDate, searchTerm, page, maxResults, Arrays.asList(1));
+    public List<batchUploads> getuploadedBatches(int userId, int orgId, Date fromDate, Date toDate) throws Exception {
+        return getuploadedBatches(userId, orgId, fromDate, toDate, Arrays.asList(1));
     }
 
     @SuppressWarnings("unchecked")
     @Override
     @Transactional
-    public List<batchUploads> getuploadedBatches(int userId, int orgId, Date fromDate, Date toDate, String searchTerm, int page, int maxResults, List<Integer> excludedStatusIds) throws Exception {
-
-        int firstResult = 0;
+    public List<batchUploads> getuploadedBatches(int userId, int orgId, Date fromDate, Date toDate, List<Integer> excludedStatusIds) throws Exception {
 
         /* Get a list of connections the user has access to */
         Criteria connections = sessionFactory.getCurrentSession().createCriteria(configurationConnectionSenders.class);
@@ -1211,49 +1209,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 
         findBatches.addOrder(Order.desc("dateSubmitted"));
 
-        /* If a search term is entered conduct a search */
-        if (!"".equals(searchTerm)) {
-
-            List<batchUploads> batches = findBatches.list();
-
-            List<Integer> batchFoundIdList = findUploadedBatches(batches, searchTerm);
-
-            if (batchFoundIdList.isEmpty()) {
-                batchFoundIdList.add(0);
-            }
-
-            Criteria foundBatches = sessionFactory.getCurrentSession().createCriteria(batchUploads.class);
-            foundBatches.add(Restrictions.in("id", batchFoundIdList));
-            foundBatches.addOrder(Order.desc("dateSubmitted"));
-
-            if (page > 1) {
-                firstResult = (maxResults * (page - 1));
-            }
-
-            foundBatches.setFirstResult(firstResult);
-
-            if (maxResults > 0) {
-                //Set the max results to display
-                foundBatches.setMaxResults(maxResults);
-            }
-
-            return foundBatches.list();
-
-        } else {
-
-            if (page > 1) {
-                firstResult = (maxResults * (page - 1));
-            }
-
-            findBatches.setFirstResult(firstResult);
-
-            if (maxResults > 0) {
-                //Set the max results to display
-                findBatches.setMaxResults(maxResults);
-            }
-
-            return findBatches.list();
-        }
+        return findBatches.list();
 
     }
 

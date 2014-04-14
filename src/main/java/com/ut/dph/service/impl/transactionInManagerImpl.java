@@ -518,13 +518,13 @@ public class transactionInManagerImpl implements transactionInManager {
      * orginal method only excludes 1, need the ability to exclude different statusIds *
      */
     @Override
-    public List<batchUploads> getuploadedBatches(int userId, int orgId, Date fromDate, Date toDate, String searchTerm, int page, int maxResults) throws Exception {
-        return getuploadedBatches(userId, orgId, fromDate, toDate, searchTerm, page, maxResults, Arrays.asList(1));
+    public List<batchUploads> getuploadedBatches(int userId, int orgId, Date fromDate, Date toDate) throws Exception {
+        return getuploadedBatches(userId, orgId, fromDate, toDate, Arrays.asList(1));
     }
 
     @Override
-    public List<batchUploads> getuploadedBatches(int userId, int orgId, Date fromDate, Date toDate, String searchTerm, int page, int maxResults, List<Integer> excludedStatusIds) throws Exception {
-        return transactionInDAO.getuploadedBatches(userId, orgId, fromDate, toDate, searchTerm, page, maxResults, excludedStatusIds);
+    public List<batchUploads> getuploadedBatches(int userId, int orgId, Date fromDate, Date toDate, List<Integer> excludedStatusIds) throws Exception {
+        return transactionInDAO.getuploadedBatches(userId, orgId, fromDate, toDate, excludedStatusIds);
     }
 
     

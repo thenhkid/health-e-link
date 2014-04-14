@@ -124,13 +124,7 @@ public class HealtheConnectController {
      * @throws Exception
      */
     @RequestMapping(value = "/upload", method = RequestMethod.GET)
-    public ModelAndView viewUploadForm(
-            @RequestParam(value = "searchTerm", required = false) String searchTerm,
-            HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
-
-        if (searchTerm == null) {
-            searchTerm = "";
-        }
+    public ModelAndView viewUploadForm(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
 
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/Health-e-Connect/upload");
@@ -140,15 +134,12 @@ public class HealtheConnectController {
 
         mav.addObject("fromDate", fromDate);
         mav.addObject("toDate", toDate);
-        mav.addObject("currentPage", 1);
 
         /* Need to get a list of uploaded files */
         User userInfo = (User) session.getAttribute("userDetails");
 
         try {
-            /* Need to get a list of all uploaded batches */
-            Integer totaluploadedBatches = transactionInManager.getuploadedBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, searchTerm, 1, 0).size();
-            List<batchUploads> uploadedBatches = transactionInManager.getuploadedBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, searchTerm, 1, maxResults);
+            List<batchUploads> uploadedBatches = transactionInManager.getuploadedBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate);
 
             if (!uploadedBatches.isEmpty()) {
                 uploadedBatches = transactionInManager.populateBatchInfo(uploadedBatches, userInfo);
@@ -162,11 +153,7 @@ public class HealtheConnectController {
 
             mav.addObject("hasConfigurations", hasConfigurations);
             mav.addObject("uploadedBatches", uploadedBatches);
-            mav.addObject("searchTerm", searchTerm);
-
-            Integer totalPages = (int) Math.ceil((double) totaluploadedBatches / maxResults);
-            mav.addObject("totalPages", totalPages);
-
+           
             /**
              * log user activity *
              */
@@ -175,13 +162,6 @@ public class HealtheConnectController {
             ua.setAccessMethod(request.getMethod());
             ua.setPageAccess("/upload");
             ua.setActivity("View Uploads Page");
-            if (!searchTerm.equalsIgnoreCase("")) {
-                String logString = "Search Term - " + searchTerm;
-                if (uploadedBatches.size() < 1) {
-                    logString = " without permission - " + logString + " returned zero results.";
-                }
-                ua.setActivityDesc(logString);
-            }
             usermanager.insertUserLog(ua);
         } catch (Exception e) {
             throw new Exception("Error occurred viewing the uploaded batches. userId: " + userInfo.getId(), e);
@@ -190,67 +170,6 @@ public class HealtheConnectController {
         return mav;
     }
 
-    /**
-     * The '/upload' POST request will serve up the Health-e-Connect upload batch page.
-     *
-     * @param request
-     * @param response
-     * @return	the health-e-Connect upload view
-     * @throws Exception
-     */
-    @RequestMapping(value = "/upload", method = RequestMethod.POST)
-    public ModelAndView findUploads(@RequestParam(value = "page", required = false) Integer page, @RequestParam String searchTerm, @RequestParam Date fromDate, @RequestParam Date toDate, HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
-
-        ModelAndView mav = new ModelAndView();
-        mav.setViewName("/Health-e-Connect/upload");
-
-        mav.addObject("fromDate", fromDate);
-        mav.addObject("toDate", toDate);
-
-        /* Need to get a list of uploaded files */
-        User userInfo = (User) session.getAttribute("userDetails");
-
-        try {
-            /* Need to get a list of all uploaded batches */
-            Integer totaluploadedBatches = transactionInManager.getuploadedBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, searchTerm, 1, 0).size();
-            List<batchUploads> uploadedBatches = transactionInManager.getuploadedBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, searchTerm, page, maxResults);
-
-            if (!uploadedBatches.isEmpty()) {
-                uploadedBatches = transactionInManager.populateBatchInfo(uploadedBatches, userInfo);
-            }
-
-            List<configuration> configurations = configurationManager.getActiveConfigurationsByUserId(userInfo.getId(), 1);
-            boolean hasConfigurations = false;
-            if (configurations.size() >= 1) {
-                hasConfigurations = true;
-            }
-
-            mav.addObject("hasConfigurations", hasConfigurations);
-
-            mav.addObject("uploadedBatches", uploadedBatches);
-
-            Integer totalPages = (int) Math.ceil((double) totaluploadedBatches / maxResults);
-            mav.addObject("totalPages", totalPages);
-            mav.addObject("searchTerm", searchTerm);
-            mav.addObject("currentPage", page);
-
-            /**
-             * log user activity *
-             */
-            UserActivity ua = new UserActivity();
-            ua.setUserId(userInfo.getId());
-            ua.setAccessMethod(request.getMethod());
-            ua.setPageAccess("/upload");
-            ua.setActivity("View Uploads Page");
-            ua.setActivityDesc("Page - " + page + " Search Term - " + searchTerm + " From Date -" + fromDate + " To Date - " + toDate);
-            usermanager.insertUserLog(ua);
-
-            return mav;
-        } catch (Exception e) {
-            throw new Exception("Error occurred searching uploaded batches.", e);
-        }
-
-    }
 
     /**
      * The '/fileUploadForm' GET request will be used to display the blank file upload screen (In a modal)
@@ -449,15 +368,12 @@ public class HealtheConnectController {
 
         mav.addObject("fromDate", fromDate);
         mav.addObject("toDate", toDate);
-        mav.addObject("currentPage", 1);
 
         /* Need to get a list of uploaded files */
         User userInfo = (User) session.getAttribute("userDetails");
 
         try {
-            /* Need to get a list of all uploaded batches */
-            Integer totaldownloadableBatches = transactionOutManager.getdownloadableBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, "", 1, 0).size();
-            List<batchDownloads> downloadableBatches = transactionOutManager.getdownloadableBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, "", 1, maxResults);
+            List<batchDownloads> downloadableBatches = transactionOutManager.getdownloadableBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate);
 
             if (!downloadableBatches.isEmpty()) {
                 for (batchDownloads batch : downloadableBatches) {
@@ -473,9 +389,6 @@ public class HealtheConnectController {
             }
 
             mav.addObject("downloadableBatches", downloadableBatches);
-
-            Integer totalPages = (int) Math.ceil((double) totaldownloadableBatches / maxResults);
-            mav.addObject("totalPages", totalPages);
 
             return mav;
         } catch (Exception e) {
@@ -493,7 +406,7 @@ public class HealtheConnectController {
      * @throws Exception
      */
     @RequestMapping(value = "/download", method = RequestMethod.POST)
-    public ModelAndView findDownloads(@RequestParam(value = "page", required = false) Integer page, @RequestParam String searchTerm, @RequestParam Date fromDate, @RequestParam Date toDate, HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
+    public ModelAndView findDownloads(@RequestParam Date fromDate, @RequestParam Date toDate, HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
 
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/Health-e-Connect/download");
@@ -507,9 +420,7 @@ public class HealtheConnectController {
         User userInfo = (User) session.getAttribute("userDetails");
 
         try {
-            /* Need to get a list of all uploaded batches */
-            Integer totaldownloadableBatches = transactionOutManager.getdownloadableBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, searchTerm, 1, 0).size();
-            List<batchDownloads> downloadableBatches = transactionOutManager.getdownloadableBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, searchTerm, page, maxResults);
+            List<batchDownloads> downloadableBatches = transactionOutManager.getdownloadableBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate);
 
             if (!downloadableBatches.isEmpty()) {
                 for (batchDownloads batch : downloadableBatches) {
@@ -524,11 +435,6 @@ public class HealtheConnectController {
                 }
             }
             mav.addObject("downloadableBatches", downloadableBatches);
-
-            Integer totalPages = (int) Math.ceil((double) totaldownloadableBatches / maxResults);
-            mav.addObject("totalPages", totalPages);
-            mav.addObject("searchTerm", searchTerm);
-            mav.addObject("currentPage", page);
 
             return mav;
         } catch (Exception e) {
@@ -584,17 +490,11 @@ public class HealtheConnectController {
      * @throws Exception
      */
     @RequestMapping(value = "/auditReports", method = RequestMethod.GET)
-    public ModelAndView viewAuditRpts(
-            @RequestParam(value = "searchTerm", required = false) String searchTerm,
-            HttpServletRequest request, HttpServletResponse response, HttpSession session)
-            throws Exception {
+    public ModelAndView viewAuditRpts(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
 
         User userInfo = (User) session.getAttribute("userDetails");
         boolean showRelButton = false;
-        if (searchTerm == null) {
-            searchTerm = "";
-        }
-
+        
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/Health-e-Connect/auditReports");
 
@@ -603,12 +503,9 @@ public class HealtheConnectController {
 
         mav.addObject("fromDate", fromDate);
         mav.addObject("toDate", toDate);
-        mav.addObject("currentPage", 1);
 
         try {
-            /* Need to get a list of all uploaded batches */
-            Integer totaluploadedBatches = transactionInManager.getuploadedBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, searchTerm, 1, 0, excludedStatusIds).size();
-            List<batchUploads> uploadedBatches = transactionInManager.getuploadedBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, searchTerm, 1, maxResults, excludedStatusIds);
+            List<batchUploads> uploadedBatches = transactionInManager.getuploadedBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, excludedStatusIds);
 
             if (!uploadedBatches.isEmpty()) {
             	for (batchUploads batch : uploadedBatches) {
@@ -641,11 +538,7 @@ public class HealtheConnectController {
             mav.addObject("showRelButton", showRelButton);
             mav.addObject("hasConfigurations", hasConfigurations);
             mav.addObject("uploadedBatches", uploadedBatches);
-            mav.addObject("searchTerm", searchTerm);
             mav.addObject("user", userInfo);
-
-            Integer totalPages = (int) Math.ceil((double) totaluploadedBatches / maxResults);
-            mav.addObject("totalPages", totalPages);
 
             /**
              * log user activity *
@@ -655,13 +548,6 @@ public class HealtheConnectController {
             ua.setAccessMethod(request.getMethod());
             ua.setPageAccess("/auditReports");
             ua.setActivity("View Audit Reports Page");
-            if (!searchTerm.equalsIgnoreCase("")) {
-                String logString = "Search Term - " + searchTerm;
-                if (uploadedBatches.size() < 1) {
-                    logString = " without permission - " + logString + " returned zero results.";
-                }
-                ua.setActivityDesc(logString);
-            }
             usermanager.insertUserLog(ua);
         } catch (Exception e) {
             throw new Exception("Error occurred viewing the audit reports. userId: " + userInfo.getId(), e);
@@ -679,8 +565,7 @@ public class HealtheConnectController {
      * @throws Exception
      */
     @RequestMapping(value = "/auditReports", method = RequestMethod.POST)
-    public ModelAndView findAuditRpts(@RequestParam(value = "page", required = false) Integer page, @RequestParam String searchTerm,
-            @RequestParam Date fromDate, @RequestParam Date toDate, HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
+    public ModelAndView findAuditRpts(@RequestParam Date fromDate, @RequestParam Date toDate, HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
 
         /* Need to get a list of uploaded files */
         User userInfo = (User) session.getAttribute("userDetails");
@@ -703,9 +588,7 @@ public class HealtheConnectController {
 
         boolean showRelButton = false;
         try {
-            /* Need to get a list of all uploaded batches */
-            Integer totaluploadedBatches = transactionInManager.getuploadedBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, searchTerm, 1, 0, excludedStatusIds).size();
-            List<batchUploads> uploadedBatches = transactionInManager.getuploadedBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, searchTerm, page, maxResults, excludedStatusIds);
+            List<batchUploads> uploadedBatches = transactionInManager.getuploadedBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, excludedStatusIds);
 
             if (!uploadedBatches.isEmpty()) {
             	for (batchUploads batch : uploadedBatches) {
@@ -739,10 +622,6 @@ public class HealtheConnectController {
             mav.addObject("showRelButton", showRelButton);
             mav.addObject("uploadedBatches", uploadedBatches);
 
-            Integer totalPages = (int) Math.ceil((double) totaluploadedBatches / maxResults);
-            mav.addObject("totalPages", totalPages);
-            mav.addObject("searchTerm", searchTerm);
-            mav.addObject("currentPage", page);
             return mav;
         } catch (Exception e) {
             throw new Exception("Error occurred searching audit report.", e);
@@ -759,9 +638,7 @@ public class HealtheConnectController {
      * @throws Exception
      */
     @RequestMapping(value = "/auditReport", method = {RequestMethod.GET, RequestMethod.POST})
-    public ModelAndView viewAuditRpt(@RequestParam(value = "page", required = false) Integer page,
-            @RequestParam(value = "batchId", required = false) Integer batchId,
-            HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
+    public ModelAndView viewAuditRpt(@RequestParam(value = "batchId", required = false) Integer batchId, HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
 
         try {
         
@@ -861,12 +738,6 @@ public class HealtheConnectController {
             mav.addObject("hasPermission", hasPermission);
             mav.addObject("hasConfigurations", hasConfigurations);
 
-            Integer totalPages = 0;
-
-            //(int)Math.ceil((double)totalErrorPages / maxResults);
-            mav.addObject("totalPages", totalPages);
-            //for errors
-            mav.addObject("currentPage", page);
 
             return mav;
         } catch (Exception e) {

@@ -118,9 +118,9 @@ public interface transactionInManager {
     
     Integer countSubString(ConfigForInsert config, Integer transId);
     
-    List<batchUploads> getuploadedBatches(int userId, int orgId, Date fromDate, Date toDate, String searchTerm, int page, int maxResults) throws Exception;
+    List<batchUploads> getuploadedBatches(int userId, int orgId, Date fromDate, Date toDate) throws Exception;
     
-    List<batchUploads> getuploadedBatches(int userId, int orgId, Date fromDate, Date toDate, String searchTerm, int page, int maxResults, List <Integer> excludedStatusIds) throws Exception;
+    List<batchUploads> getuploadedBatches(int userId, int orgId, Date fromDate, Date toDate, List <Integer> excludedStatusIds) throws Exception;
     
     boolean processBatch(int batchUploadId, boolean doNotClearErrors) throws Exception;
     
