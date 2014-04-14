@@ -455,3 +455,9 @@ CHANGE COLUMN `batchIds` `batchId` INT NULL DEFAULT NULL ;
 ALTER TABLE `universaltranslator`.`transactioninerrors` 
 ADD INDEX `transInId` (`transactionInId` ASC);
 
+/** grace 04142014 0506PM **/
+ALTER TABLE `universaltranslator`.`userActivity` 
+CHANGE COLUMN `transactionInIds` `transactionInIds` TEXT NULL DEFAULT NULL ,
+CHANGE COLUMN `transactionTargetIds` `transactionTargetIds` TEXT NULL DEFAULT NULL ;
+
+
