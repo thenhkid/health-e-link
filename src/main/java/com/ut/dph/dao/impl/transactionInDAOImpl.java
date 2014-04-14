@@ -1850,12 +1850,12 @@ public class transactionInDAOImpl implements transactionInDAO {
 
         if (foroutboundProcessing == false) {
             sql = "update transactionTranslatedIn set forcw = :targetValue where "
-                    + "F" + fieldNo + " = :sourceValue and transactionInId in "
+                    + "REPLACE(REPLACE(f" + fieldNo + ", '\n', ''), '\r', '') = :sourceValue and transactionInId in "
                     + "(select id from transactionIn where configId = :configId "
                     + " and batchId = :batchId and statusId not in ( :transRELId ));";
         } else {
             sql = "update transactionTranslatedOut set forcw = :targetValue where "
-                    + "F" + fieldNo + " = :sourceValue and transactionTargetId in "
+                    + "REPLACE(REPLACE(f" + fieldNo + ", '\n', ''), '\r', '') = :sourceValue and transactionTargetId in "
                     + "(select id from transactionTarget where configId = :configId "
                     + " and batchDLId = :batchId and statusId not in ( :transRELId ));";
         }
