@@ -83,7 +83,7 @@ public interface transactionOutDAO {
     
     int getMaxFieldNo(int configId) throws Exception;
     
-    List<batchDownloads> getdownloadableBatches(int userId, int orgId, Date fromDate, Date toDate, String searchTerm, int page, int maxResults) throws Exception;
+    List<batchDownloads> getdownloadableBatches(int userId, int orgId, Date fromDate, Date toDate) throws Exception;
     
     void updateLastDownloaded(int batchId) throws Exception;
     

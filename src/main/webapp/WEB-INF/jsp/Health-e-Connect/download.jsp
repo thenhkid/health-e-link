@@ -10,38 +10,28 @@
 
 <div class="container main-container" role="main">
     <div class="row">
-        
+
         <div class="col-md-12 page-content">
-            
-            <div class="row" style="overflow:hidden; margin-bottom:10px;">
 
-                    <div class="col-md-3">
-                        <form:form class="form form-inline" id="searchForm" action="/Health-e-Connect/download" method="post">
-                            <div class="form-group">
-                                <label class="sr-only" for="searchTerm">Search</label>
-                                <input type="text" name="searchTerm" id="searchTerm" value="${searchTerm}" class="form-control" placeholder="Search"/>
-                                <input type="hidden" name="fromDate" id="fromDate" rel="<fmt:formatDate value="${fromDate}" type="date" pattern="MM/dd/yyyy" />" rel2="<fmt:formatDate value="${userDetails.dateOrgWasCreated}" type="date" pattern="MM/dd/yyyy" />" value="${fromDate}" />
-                                <input type="hidden" name="toDate" id="toDate" rel="<fmt:formatDate value="${toDate}" type="date" pattern="MM/dd/yyyy" />" value="${toDate}" />
-                                <input type="hidden" name="page" id="page" value="${currentPage}" />
-                            </div>
-                            <button id="searchBatchesBtn" class="btn btn-primary btn-sm" title="Search Inbox">
-                                <span class="glyphicon glyphicon-search"></span>
-                            </button>
-                        </form:form>
-                    </div>
+            <div class="row" style="overflow:hidden;">
 
-                    <div class="col-md-2 col-md-offset-3"></div>
-
-                    <div class="col-md-4">
-                        <div class="date-range-picker-trigger form-control pull-right daterange">
-                            <i class="glyphicon glyphicon-calendar"></i>
-                            <span class="date-label" rel="" rel2=""><fmt:formatDate value="${fromDate}" type="date" pattern="MMMM dd, yyyy" /> - <fmt:formatDate value="${toDate}" type="date" pattern="MMMM dd, yyyy" /></span> <b class="caret"></b>
+                <div class="col-md-3">
+                    <form:form class="form form-inline" id="searchForm" action="/Health-e-Connect/download" method="post">
+                        <div class="form-group">
+                            <input type="hidden" name="fromDate" id="fromDate" rel="<fmt:formatDate value="${fromDate}" type="date" pattern="MM/dd/yyyy" />" rel2="<fmt:formatDate value="${userDetails.dateOrgWasCreated}" type="date" pattern="MM/dd/yyyy" />" value="${fromDate}" />
+                            <input type="hidden" name="toDate" id="toDate" rel="<fmt:formatDate value="${toDate}" type="date" pattern="MM/dd/yyyy" />" value="${toDate}" />
                         </div>
-                    </div>
+                    </form:form>
+                </div>
+
             </div>
-            
+
             <div class="form-container scrollable">
-                <table class="table table-striped table-hover table-default">
+                <div class="date-range-picker-trigger form-control pull-right daterange" style="width:255px; margin-left: 10px;">
+                    <i class="glyphicon glyphicon-calendar"></i>
+                    <span class="date-label"  rel="" rel2=""><fmt:formatDate value="${fromDate}" type="date" pattern="MMM dd, yyyy" /> - <fmt:formatDate value="${toDate}" type="date" pattern="MMM dd, yyyy" /></span> <b class="caret"></b>
+                </div>
+                <table class="table table-striped table-hover table-default" <c:if test="${not empty downloadableBatches}">id="dataTable"</c:if>>
                     <thead>
                         <tr>
                             <th scope="col">Batch Name</th>
@@ -67,7 +57,7 @@
                                         <td class="center-text"><fmt:formatDate value="${batch.dateCreated}" type="date" pattern="M/dd/yyyy" /><br /><fmt:formatDate value="${batch.dateCreated}" type="time" pattern="h:mm:ss a" /></td>
                                         <td class="center-text"  id="lastDownloadDiv${batch.id}"><fmt:formatDate value="${batch.lastDownloaded}" type="date" pattern="M/dd/yyyy" /><br /><fmt:formatDate value="${batch.lastDownloaded}" type="time" pattern="h:mm:ss a" /></td>
                                         <td class="actions-col" style="width:100px;">
-                                             <a href="javascript:void(0);" rel="${batch.id}" rel1="${batch.outputFIleName}" rel2="${batch.orgId}" class="downloadFile" title="Download">
+                                            <a href="javascript:void(0);" rel="${batch.id}" rel1="${batch.outputFIleName}" rel2="${batch.orgId}" class="downloadFile" title="Download">
                                                 <span class="glyphicon glyphicon-edit"></span>
                                                 Download	
                                             </a>
@@ -81,15 +71,6 @@
                         </c:choose>    
                     </tbody>
                 </table>
-                <c:if test="${totalPages > 0}">            
-                    <ul class="pagination pull-right" role="navigation" aria-labelledby="Paging">
-                        <c:if test="${currentPage > 1}"><li><a href="javascript:void(0);" rel="${currentPage-1}" class="changePage">&laquo;</a></li></c:if>
-                        <c:forEach var="i" begin="1" end="${totalPages}">
-                        <li><a href="javascript:void(0);" rel="${i}" class="changePage">${i}</a></li>
-                        </c:forEach>
-                        <c:if test="${currentPage < totalPages}"><li><a href="javascript:void(0);" rel="${currentPage+1}" class="changePage">&raquo;</a></li></c:if>
-                    </ul>
-                </c:if>
             </div>
         </div>
     </div>
