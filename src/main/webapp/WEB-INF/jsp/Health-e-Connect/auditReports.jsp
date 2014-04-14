@@ -61,7 +61,6 @@
                             <th scope="col" class="center-text">Status</th>
                             <th scope="col" class="center-text">Date Uploaded</th>
                             <th scope="col" class="center-text">View Audit Report</th>
-                            <th scope="col"></th>
                         </tr>
                     </thead>
                     <tbody>
