@@ -95,7 +95,7 @@
                         <div class="col-md-12">
                             <section class="panel panel-default">
                                 <div class="panel-heading">
-                                    <div class="pull-right" style="margin-top: -5px">${transactionIn.transactionInId}
+                                    <div class="pull-right" style="margin-top: -5px">
                                         <c:if test="${transactionIn.transactionStatus == 14 && batch.statusId == 5 && canEdit}">
                                         	<c:set var="idList" value="${idList},${transactionIn.transactionInId}"/>
                                             <a href="javascript:void(0);" id="reject" rel="${transactionIn.transactionInId}" rel2="${batch.id}" class="btn btn-primary btn-xs rejectMessage">Reject</a>
