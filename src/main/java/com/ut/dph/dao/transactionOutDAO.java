@@ -26,7 +26,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface transactionOutDAO {
     
-    List<batchDownloads> getInboxBatches(int userId, int orgId, String searchTerm, Date fromDate, Date toDate, int page, int maxResults) throws Exception;
+    List<batchDownloads> getInboxBatches(int userId, int orgId, Date fromDate, Date toDate) throws Exception;
     
     batchDownloads getBatchDetails(int batchId) throws Exception;
     

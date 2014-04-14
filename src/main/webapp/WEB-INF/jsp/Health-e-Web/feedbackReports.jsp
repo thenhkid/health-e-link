@@ -27,7 +27,7 @@
                 <input type="hidden" id="configId" name="configId" value="" />
             </form>
             <div class="form-container scrollable">
-                <table class="table table-striped table-hover table-default">
+                <table class="table table-striped table-hover table-default" <c:if test="${not empty transactions}">id="dataTable"</c:if>>
                     <thead>
                         <tr>
                             <th scope="col">Message Type</th>

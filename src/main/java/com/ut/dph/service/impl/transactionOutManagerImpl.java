@@ -101,8 +101,8 @@ public class transactionOutManagerImpl implements transactionOutManager {
 
     @Override
     @Transactional
-    public List<batchDownloads> getInboxBatches(int userId, int orgId, String searchTerm, Date fromDate, Date toDate, int page, int maxResults) throws Exception {
-        return transactionOutDAO.getInboxBatches(userId, orgId, searchTerm, fromDate, toDate, page, maxResults);
+    public List<batchDownloads> getInboxBatches(int userId, int orgId, Date fromDate, Date toDate) throws Exception {
+        return transactionOutDAO.getInboxBatches(userId, orgId, fromDate, toDate);
     }
 
     @Override

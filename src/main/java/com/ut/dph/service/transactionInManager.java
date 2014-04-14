@@ -62,11 +62,11 @@ public interface transactionInManager {
     
     void submitTransactionTranslatedInRecords(int transactionId, int transactionRecordId, int configId) throws Exception;
     
-    List<batchUploads> getpendingBatches(int userId, int orgId, String searchTerm, Date fromDate, Date toDate, int page, int maxResults) throws Exception;
+    List<batchUploads> getpendingBatches(int userId, int orgId, Date fromDate, Date toDate) throws Exception;
     
     List<transactionIn> getBatchTransactions(int batchId, int userId) throws Exception;
     
-    List<batchUploads> getsentBatches(int userId, int orgId, String searchTerm, Date fromDate, Date toDate, int page, int maxResults) throws Exception;
+    List<batchUploads> getsentBatches(int userId, int orgId, Date fromDate, Date toDate) throws Exception;
     
     batchUploads getBatchDetails(int batchId) throws Exception;
     
