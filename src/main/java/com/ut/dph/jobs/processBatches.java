@@ -28,9 +28,7 @@ public class processBatches implements Job {
         
         try {
             SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
-            System.out.println(new java.util.Date() + " start of process batch");
-            transactionInManager.processBatches();
-            System.out.println(new java.util.Date() + " end of process batch");
+            transactionInManager.processBatches();           
         } catch (Exception ex) {
             try {
                 throw new Exception("Error occurred trying to process batch files from schedule task",ex);

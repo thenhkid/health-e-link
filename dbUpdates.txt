@@ -460,4 +460,11 @@ ALTER TABLE `universaltranslator`.`userActivity`
 CHANGE COLUMN `transactionInIds` `transactionInIds` TEXT NULL DEFAULT NULL ,
 CHANGE COLUMN `transactionTargetIds` `transactionTargetIds` TEXT NULL DEFAULT NULL ;
 
+/** grace 04142014 0600PM **/
+ALTER TABLE `universaltranslator`.`message_localCodes` 
+CHANGE COLUMN `localCode` `localCode` VARCHAR(255) NULL DEFAULT NULL ;
+
+ALTER TABLE `universaltranslator`.`message_procedures` 
+CHANGE COLUMN `comments` `comments` VARCHAR(200) NULL DEFAULT NULL ;
+
 

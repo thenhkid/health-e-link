@@ -389,7 +389,7 @@ public class transactionInManagerImpl implements transactionInManager {
             }
             return sysErrorCount;
         } catch (Exception e) {
-            System.out.println("clearMessageTables " + e.getStackTrace());
+            System.err.println("clearMessageTables " + e.getStackTrace());
             return 1;
 
         }
@@ -1115,7 +1115,6 @@ public class transactionInManagerImpl implements transactionInManager {
         Pattern pattern3 = Pattern.compile(month + "-" + day + "-" + year + time);
         // check dates
         //month needs to have leading 0
-        System.out.print(date.indexOf("-"));
         if (date.indexOf("-") == 1) {
             date = "0" + date;
         }
@@ -1924,7 +1923,7 @@ public class transactionInManagerImpl implements transactionInManager {
             nexthour.set(Calendar.MILLISECOND, 0);
             nexthour.add(Calendar.HOUR_OF_DAY, 1);
 
-            System.out.println("This Hour: " + thishour.getTime() + " Next Hour: " + nexthour.getTime());
+            //System.out.println("This Hour: " + thishour.getTime() + " Next Hour: " + nexthour.getTime());
 
             Integer batchesThisHour = transactionInDAO.getAllUploadedBatches(thishour.getTime(), nexthour.getTime()).size();
 
@@ -1942,7 +1941,7 @@ public class transactionInManagerImpl implements transactionInManager {
             starttomorrow.set(Calendar.MILLISECOND, 0);
             starttomorrow.add(Calendar.DAY_OF_MONTH, 1);
 
-            System.out.println("Today: " + starttoday.getTime() + " Tomorrow: " + starttomorrow.getTime());
+            //System.out.println("Today: " + starttoday.getTime() + " Tomorrow: " + starttomorrow.getTime());
 
             Integer batchesToday = transactionInDAO.getAllUploadedBatches(starttoday.getTime(), starttomorrow.getTime()).size();
 
@@ -1962,7 +1961,7 @@ public class transactionInManagerImpl implements transactionInManager {
             nextweek.set(Calendar.DAY_OF_WEEK, thisweek.getFirstDayOfWeek());
             nextweek.add(Calendar.WEEK_OF_YEAR, 1);
 
-            System.out.println("This Week: " + thisweek.getTime() + " Next Week: " + nextweek.getTime());
+            //System.out.println("This Week: " + thisweek.getTime() + " Next Week: " + nextweek.getTime());
 
             Integer batchesThisWeek = transactionInDAO.getAllUploadedBatches(thisweek.getTime(), nextweek.getTime()).size();
 

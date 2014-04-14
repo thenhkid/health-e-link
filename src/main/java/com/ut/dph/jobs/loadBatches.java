@@ -30,9 +30,7 @@ public class loadBatches implements Job {
         
         try {
             SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
-            System.out.println(new java.util.Date() + " start of load batches");
-            transactionInManager.loadBatches();
-            System.out.println(new java.util.Date() + " end of load batch");
+            transactionInManager.loadBatches();          
         } catch (Exception ex) {
             try {
                 throw new Exception("Error occurred trying to load batch files from schedule task",ex);
