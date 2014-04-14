@@ -450,3 +450,8 @@ INSERT INTO `universalTranslator`.`lu_ProcessStatus` (`category`, `displayCode`,
 /** grace 04092014 **/
 ALTER TABLE `universaltranslator`.`userActivity` 
 CHANGE COLUMN `batchIds` `batchId` INT NULL DEFAULT NULL ;
+
+/** grace 04142014 **/
+ALTER TABLE `universaltranslator`.`transactioninerrors` 
+ADD INDEX `transInId` (`transactionInId` ASC);
+
