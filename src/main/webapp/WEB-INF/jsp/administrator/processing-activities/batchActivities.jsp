@@ -24,6 +24,11 @@
             <div class="panel-body">
                 
                 <div class="form-container scrollable">
+                <c:if test="${fn:length(userActivities) > 100}">
+                 	 <div class="form-group">
+                   		There were a total of ${fn:length(userActivities)} user activities found.  The last 100 activities are displayed.
+               		 </div>
+                 </c:if>
                     <table class="table table-striped table-hover table-default" <c:if test="${not empty userActivities}">id="dataTable"</c:if>>
                         <thead>
                             <tr>
@@ -34,9 +39,9 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <c:choose>
-                                <c:when test="${not empty userActivities}">
-                                    <c:forEach var="ua" items="${userActivities}">
+                        <c:choose>
+                        <c:when test="${not empty userActivities}">     
+                                 <c:forEach var="ua" items="${userActivities}" end="99">
                                         <tr>
                                             <td scope="row">${ua.userFirstName} ${ua.userLastName}<br/>
                                             ${ua.orgName}
@@ -47,7 +52,7 @@
                                             <td>
                                             	<c:choose>
                                             	<c:when test="${fn:length(ua.transactionInIds) > 10}">
-                                            	<c:forEach items="${ua.transactionInIds}" end="10" var="transactionInId">
+                                            	<c:forEach items="${ua.transactionInIds}" end="9" var="transactionInId">
 	                                            	<a href="#messageDetailsModal" data-toggle="modal" rel="${transactionInId}" rel2="0" class="viewLink">
 	                                                	${transactionInId}
 	                                              	</a>
@@ -64,27 +69,11 @@
                                             	</c:choose>
                                             </td>
                                            <td>
-                                            
-                                               <fmt:formatDate value="${batchDetails.dateSubmitted}" type="date" pattern="M/dd/yyyy" />&nbsp;&nbsp;<fmt:formatDate value="${ua.dateCreated}" type="time" pattern="h:mm:ss a" />
+                                            	<fmt:formatDate value="${batchDetails.dateSubmitted}" type="date" pattern="M/dd/yyyy" />&nbsp;&nbsp;<fmt:formatDate value="${ua.dateCreated}" type="time" pattern="h:mm:ss a" />
                                             </td>                                         
                                       </tr>
-                                   </c:forEach>     
-                                 </c:when>  
-                                 <c:when test="${not empty toomany}">
-                                    <tr>
-                                        <td colspan="7">
-                                            There were a total of ${size} user activities found, please enter a parameter to narrow down the results.
-                                            <br />
-                                        </td>
-                                    </tr>
-                                 </c:when>
-                                 <c:when test="${not empty stilltoomany}">
-                                    <tr>
-                                        <td colspan="7">T
-                                           Your search produced ${size} results, please narrow down further.
-                                        </td>
-                                    </tr>
-                                 </c:when>   
+                                  </c:forEach>
+                                  </c:when>
                                  <c:otherwise>
                                     <tr><td colspan="7" class="center-text">There are currently no user activities for this batch.</td></tr>
                                 </c:otherwise>
