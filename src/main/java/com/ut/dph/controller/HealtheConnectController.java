@@ -1067,6 +1067,7 @@ public class HealtheConnectController {
             boolean hasPermission = false;
             String redirectPage = "auditReports?searchTerm=" + batchInfo.getutBatchName();
             String systemMessage = "";
+            String batchOptionSubmitted = "";
 
             if (batchInfo != null) {
                 List<configuration> configurations = configurationManager.getActiveConfigurationsByUserId(userInfo.getId(), 1);
@@ -1084,6 +1085,7 @@ public class HealtheConnectController {
                  * make sure user has the appropriate permission to this batch *
                  */
                 if (batchOption.equalsIgnoreCase("resetBatch")) { // canCancel
+                	batchOptionSubmitted = "Reset Batch";
                     redirectPage = "upload?searchTerm=" + batchInfo.getutBatchName();
                     //check to make sure we can clear batch and then delete info and reset
                     if (allowBatchClear && userInfo.getcancelAuthority()) {
@@ -1106,6 +1108,7 @@ public class HealtheConnectController {
                     }
 
                 } else if (batchOption.equalsIgnoreCase("cancelBatch")) {
+                	batchOptionSubmitted = "Cancel Batch";
                     //check authority
                     if (allowBatchClear && userInfo.getcancelAuthority()) {
                         transactionInManager.updateBatchStatus(batchId, 4, "startDateTime");
@@ -1119,6 +1122,7 @@ public class HealtheConnectController {
                         hasPermission = false;
                     }
                 } else if (batchOption.equalsIgnoreCase("releaseBatch")) {
+                	batchOptionSubmitted = "Release Batch";
                 	boolean canReleaseBatch = false;
                 	if (batchInfo.getstatusId() == 5 && userInfo.getdeliverAuthority()) { // do the check that doesn't require a hit to db first
 	   	        		 if (batchInfo.getConfigId() != 0) {
@@ -1142,6 +1146,7 @@ public class HealtheConnectController {
                         hasPermission = false;
                     }
                 } else if (batchOption.equalsIgnoreCase("rejectMessages")) {
+                	batchOptionSubmitted = "Reject Messages";
                     if (batchInfo.getstatusId() == 5 && userInfo.geteditAuthority()) {
                         if (idList.size() > 0) {
                             for (Integer transactionInId : idList) {
@@ -1156,6 +1161,7 @@ public class HealtheConnectController {
                     }
 
                 } else if (batchOption.equalsIgnoreCase("rejectMessage")) {
+                	batchOptionSubmitted = "Reject Message";
                     if (batchInfo.getstatusId() == 5 && userInfo.geteditAuthority()) {
                         if (idList.size() > 0) {
                             for (Integer transactionInId : idList) {
@@ -1177,7 +1183,7 @@ public class HealtheConnectController {
             ua.setUserId(userInfo.getId());
             ua.setAccessMethod(request.getMethod());
             ua.setPageAccess("/batchOptions");
-            ua.setActivity("Batch Options -" + batchOption);
+            ua.setActivity("Batch Options -" + batchOptionSubmitted);
             ua.setBatchId(batchInfo.getId());
             if (idList.size() > 0) {
             	ua.setTransactionInIds(idList.toString());
@@ -1433,7 +1439,7 @@ public class HealtheConnectController {
                      ua.setUserId(userInfo.getId());
                      ua.setAccessMethod(request.getMethod());
                      ua.setPageAccess("/releaseBatches");
-                     ua.setActivity("Release batch");
+                     ua.setActivity("Release Batch");
                      ua.setBatchId(batchId);
                      if (!canReleaseBatch) {
                          ua.setActivityDesc("without permission" + forInsert);

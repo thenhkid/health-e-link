@@ -467,4 +467,9 @@ CHANGE COLUMN `localCode` `localCode` VARCHAR(255) NULL DEFAULT NULL ;
 ALTER TABLE `universaltranslator`.`message_procedures` 
 CHANGE COLUMN `comments` `comments` VARCHAR(200) NULL DEFAULT NULL ;
 
+/** grace 04142014 07:37 PM **/
+ALTER TABLE `universaltranslator`.`userActivity` 
+ADD INDEX `userId` (`userId` ASC),
+ADD INDEX `batchId` (`batchId` ASC);
+
 
