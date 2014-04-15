@@ -13,6 +13,7 @@ import com.ut.dph.model.Macros;
 import com.ut.dph.model.Transaction;
 import com.ut.dph.model.TransactionInError;
 import com.ut.dph.model.User;
+import com.ut.dph.model.UserActivity;
 import com.ut.dph.model.batchUploadSummary;
 import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.configuration;
@@ -2253,5 +2254,15 @@ public class transactionInManagerImpl implements transactionInManager {
     public List<TransErrorDetail> getTransactionErrorsByFieldNo(int transactionInId, int fieldNo) throws Exception {
         return transactionInDAO.getTransactionErrorsByFieldNo(transactionInId, fieldNo);
     }
+
+	@Override
+	public List<UserActivity> getBatchActivities(batchUploads batchInfo, boolean forUsers, boolean foroutboundProcessing) {
+		if (!forUsers) {
+			//we have autolog that tracks the date/time each time the status change on a batch, not in use right now
+			return null;
+		} else {
+			return transactionInDAO.getBatchUserActivities(batchInfo, foroutboundProcessing);
+		}
+	}
 
 }

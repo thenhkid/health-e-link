@@ -11,6 +11,7 @@ import com.ut.dph.model.Macros;
 import com.ut.dph.model.Organization;
 import com.ut.dph.model.TransactionInError;
 import com.ut.dph.model.User;
+import com.ut.dph.model.UserActivity;
 import com.ut.dph.model.batchUploadSummary;
 import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.configuration;
@@ -3889,4 +3890,34 @@ public class transactionInDAOImpl implements transactionInDAO {
         }
         
     }
+
+	@Override
+	@Transactional
+	public List<UserActivity> getBatchUserActivities(batchUploads batchInfo, boolean foroutboundProcessing) {
+		String batchColName = "batchUploadId";
+		if (foroutboundProcessing) {
+			batchColName = "batchDownloadId";
+		}
+		
+		String sql = "select organizations.id as orgId, organizations.orgName as orgName, users.firstName as userFirstName, "
+				+ "users.lastName as userLastName, userActivity.* "
+				+ " from userActivity, users, organizations where users.id = userActivity.userId "
+				+ " and users.orgId = organizations.id and "+ batchColName +" = :batchId order by dateCreated, userId;";
+
+        try {
+            Query query = sessionFactory
+                    .getCurrentSession()
+                    .createSQLQuery(sql).setResultTransformer(Transformers.aliasToBean(UserActivity.class));
+
+            query.setParameter("batchId", batchInfo.getId());
+            List<UserActivity> uas = query.list();
+            
+            return uas;
+            
+        } catch (Exception ex) {
+            System.err.println("getBatchUserActivities " + ex.getCause());
+            ex.printStackTrace();
+            return null;
+        }
+	}
 }

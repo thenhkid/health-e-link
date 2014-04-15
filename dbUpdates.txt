@@ -472,4 +472,8 @@ ALTER TABLE `universaltranslator`.`userActivity`
 ADD INDEX `userId` (`userId` ASC),
 ADD INDEX `batchId` (`batchId` ASC);
 
+/** grace 04142014 10:28PM **/
+ALTER TABLE `universaltranslator`.`userActivity` 
+CHANGE COLUMN `batchId` `batchUploadId` INT(11) NULL DEFAULT NULL ,
+ADD COLUMN `batchDownloadId` INT NULL AFTER `transactionInIds`;
 

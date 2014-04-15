@@ -16,6 +16,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+
 import org.springframework.format.annotation.DateTimeFormat;
 
 /**
@@ -25,7 +27,20 @@ import org.springframework.format.annotation.DateTimeFormat;
 @Entity
 @Table(name = "userActivity")
 public class UserActivity {
+	
+	@Transient
+    String userFirstName = null;
+	
+	@Transient
+    String userLastName = null;
 
+	@Transient
+    Integer orgId = null;
+	
+	@Transient
+    String orgName = null;
+
+	
 	@Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID", nullable = false)
@@ -34,8 +49,11 @@ public class UserActivity {
     @Column(name = "userId", nullable = false)
     private int userId = 0;
 	
-	@Column(name = "batchId", nullable = true)
-    private Integer batchId = 0;
+	@Column(name = "batchUploadId", nullable = true)
+    private Integer batchUploadId = 0;
+	
+	@Column(name = "batchDownloadId", nullable = true)
+    private Integer batchDownloadId = 0;
 	
 	@NoHtml
 	@Column(name = "accessMethod", nullable = true)
@@ -138,14 +156,52 @@ public class UserActivity {
 		this.dateCreated = dateCreated;
 	}
 
-	public Integer getBatchId() {
-		return batchId;
+	public Integer getBatchUploadId() {
+		return batchUploadId;
 	}
 
-	public void setBatchId(Integer batchId) {
-		this.batchId = batchId;
+	public void setBatchUploadId(Integer batchUploadId) {
+		this.batchUploadId = batchUploadId;
 	}
 
-	
-    
+	public Integer getBatchDownloadId() {
+		return batchDownloadId;
+	}
+
+	public void setBatchDownloadId(Integer batchDownloadId) {
+		this.batchDownloadId = batchDownloadId;
+	}
+
+	public String getUserFirstName() {
+		return userFirstName;
+	}
+
+	public void setUserFirstName(String userFirstName) {
+		this.userFirstName = userFirstName;
+	}
+
+	public String getUserLastName() {
+		return userLastName;
+	}
+
+	public void setUserLastName(String userLastName) {
+		this.userLastName = userLastName;
+	}
+
+	public Integer getOrgId() {
+		return orgId;
+	}
+
+	public void setOrgId(Integer orgId) {
+		this.orgId = orgId;
+	}
+
+	public String getOrgName() {
+		return orgName;
+	}
+
+	public void setOrgName(String orgName) {
+		this.orgName = orgName;
+	}
+ 
 }

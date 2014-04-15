@@ -6,6 +6,7 @@
 
 package com.ut.dph.service;
 
+import com.ut.dph.model.UserActivity;
 import com.ut.dph.model.CrosswalkData;
 import com.ut.dph.model.Macros;
 import com.ut.dph.model.Transaction;
@@ -345,5 +346,7 @@ public interface transactionInManager {
     List<TransErrorDetail> getTransactionErrorsByFieldNo(int transactionInId, int fieldNo) throws Exception;
     
     List <TransErrorDetailDisplay> populateErrorList(batchUploads batchInfo);
+    
+    List<UserActivity> getBatchActivities(batchUploads batchInfo, boolean forUsers, boolean foroutboundProcessing);
     
 }

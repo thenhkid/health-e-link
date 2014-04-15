@@ -9,6 +9,7 @@ package com.ut.dph.controller;
 import com.ut.dph.model.Organization;
 import com.ut.dph.model.Transaction;
 import com.ut.dph.model.User;
+import com.ut.dph.model.UserActivity;
 import com.ut.dph.model.batchDownloads;
 import com.ut.dph.model.batchUploadSummary;
 import com.ut.dph.model.batchUploads;
@@ -34,6 +35,7 @@ import com.ut.dph.service.sysAdminManager;
 import com.ut.dph.service.transactionInManager;
 import com.ut.dph.service.transactionOutManager;
 import com.ut.dph.service.userManager;
+
 import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -45,9 +47,11 @@ import java.util.ListIterator;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -1366,4 +1370,47 @@ public class adminProcessingActivity {
         
         return true;
     }
+    
+    
+    /**
+     * The '/inbound/batchActivities/{batchName}' GET request will retrieve a list of user activities that are associated to the clicked batch 
+     *
+     * @param batchName	The name of the batch to retrieve transactions for
+     * @return          The list of inbound batch user activities
+     *
+     * @Objects	(1) An object containing all the found user activities
+     *
+     * @throws Exception
+     */
+    @RequestMapping(value = "/inbound/batchActivities/{batchName}", method = RequestMethod.GET)
+    public ModelAndView listBatchActivities(@PathVariable String batchName) throws Exception {
+  
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/processing-activity/batchActivities");
+        
+        /* Get the details of the batch */
+        batchUploads batchDetails = transactionInManager.getBatchDetailsByBatchName(batchName);
+        
+        if(batchDetails != null) {
+            
+            Organization orgDetails = organizationmanager.getOrganizationById(batchDetails.getOrgId());
+            batchDetails.setorgName(orgDetails.getOrgName());
+        
+            mav.addObject("batchDetails", batchDetails);
+
+            try {
+                /* Get all the user activities for the batch */
+                List<UserActivity> uas = transactionInManager.getBatchActivities(batchDetails, true, false);
+                mav.addObject("userActivities", uas);
+
+            }
+            catch (Exception e) {
+                throw new Exception("(Admin) Error occurred in getting batch activities for an inbound batch. batchId: "+ batchDetails.getId()+" ERROR: "+e.getMessage(),e);
+            }
+        }
+        
+        return mav;
+    }
+    
+    
 }

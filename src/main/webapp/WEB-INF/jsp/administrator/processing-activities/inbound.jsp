@@ -80,10 +80,17 @@
                                             </td>
                                             <td class="center-text"><fmt:formatDate value="${batch.dateSubmitted}" type="date" pattern="M/dd/yyyy" /><br /><fmt:formatDate value="${batch.dateSubmitted}" type="time" pattern="h:mm:ss a" /></td>
                                             <td class="actions-col">
-                                                <a href="javascript:void(0);" class="btn btn-link viewAuditReport" title="View Audit Report" role="button">
-                                                    <span class="glyphicon glyphicon-edit"></span>
-                                                    View Audit Report
-                                                </a>
+                                            	<c:if test="${batch.transportMethodId != 2}">
+	                                                <a href="<c:url value='/administrator/processing-activity/inbound/batchActivities/${batch.utBatchName}'/>" class="btn btn-link viewBatchActivities" title="View Batch Activities" role="button">
+	                                                    <span class="glyphicon glyphicon-edit"></span>
+	                                                    View Batch Activities
+	                                                </a>
+	                                                <br/>
+	                                                <a href="javascript:void(0);" class="btn btn-link viewAuditReport" title="View Audit Report" role="button">
+	                                                    <span class="glyphicon glyphicon-edit"></span>
+	                                                    View Audit Report
+	                                                </a>
+            									</c:if>
                                                 <br />
                                                 <a href="<c:url value='/administrator/processing-activity/inbound/batch/${batch.utBatchName}' />" class="btn btn-link viewTransactions" title="View Batch Transactions" role="button">
                                                     <span class="glyphicon glyphicon-edit"></span>

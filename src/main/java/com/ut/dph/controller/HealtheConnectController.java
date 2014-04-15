@@ -724,7 +724,7 @@ public class HealtheConnectController {
             ua.setAccessMethod(request.getMethod());
             ua.setPageAccess("/auditReport");
             ua.setActivity("Audit Report Request");
-            ua.setBatchId(batchInfo.getId());
+            ua.setBatchUploadId(batchInfo.getId());
             if (!hasPermission) {
                 ua.setActivityDesc("without permission");
             }
@@ -905,7 +905,7 @@ public class HealtheConnectController {
                 ua.setActivity("ERG View");
                 ua.setTransactionInIds(String.valueOf(transactionId));
                 if (batchInfo != null) {
-                    ua.setBatchId(batchInfo.getId());
+                    ua.setBatchUploadId(batchInfo.getId());
                 }
                 if (!hasPermission) {
                     ua.setActivityDesc("without permission");
@@ -1184,7 +1184,7 @@ public class HealtheConnectController {
             ua.setAccessMethod(request.getMethod());
             ua.setPageAccess("/batchOptions");
             ua.setActivity("Batch Options -" + batchOptionSubmitted);
-            ua.setBatchId(batchInfo.getId());
+            ua.setBatchUploadId(batchInfo.getId());
             if (idList.size() > 0) {
             	ua.setTransactionInIds(idList.toString());
             }
@@ -1440,7 +1440,7 @@ public class HealtheConnectController {
                      ua.setAccessMethod(request.getMethod());
                      ua.setPageAccess("/releaseBatches");
                      ua.setActivity("Release Batch");
-                     ua.setBatchId(batchId);
+                     ua.setBatchUploadId(batchId);
                      if (!canReleaseBatch) {
                          ua.setActivityDesc("without permission" + forInsert);
                      }
@@ -1503,7 +1503,7 @@ public class HealtheConnectController {
             ua.setAccessMethod(request.getMethod());
             ua.setPageAccess("/rejectMessage");
             ua.setActivity("Reject Message");
-            ua.setBatchId(batchId);
+            ua.setBatchUploadId(batchId);
             ua.setTransactionInIds(transactionId.toString());
             if (!hasPermission) {
                 ua.setActivityDesc("without permission");
