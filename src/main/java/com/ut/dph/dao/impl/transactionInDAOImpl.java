@@ -3902,7 +3902,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 		String sql = "select organizations.id as orgId, organizations.orgName as orgName, users.firstName as userFirstName, "
 				+ "users.lastName as userLastName, userActivity.* "
 				+ " from userActivity, users, organizations where users.id = userActivity.userId "
-				+ " and users.orgId = organizations.id and "+ batchColName +" = :batchId order by dateCreated, userId;";
+				+ " and users.orgId = organizations.id and "+ batchColName +" = :batchId order by dateCreated desc, userId;";
 
         try {
             Query query = sessionFactory

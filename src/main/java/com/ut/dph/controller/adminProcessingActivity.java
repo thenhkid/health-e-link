@@ -906,7 +906,9 @@ public class adminProcessingActivity {
             if(Type == 1) {
                 
                  transactionIn transactionInfo = transactionInManager.getTransactionDetails(transactionId);
-                 
+                 if (transactionInfo == null)  { // this will be null if batch is reset - the same transactions will not be available 
+                	 return mav;
+                 }
                  /* Get the configuration details */
                 configuration configDetails = configurationManager.getConfigurationById(transactionInfo.getconfigId());
                 
@@ -972,6 +974,9 @@ public class adminProcessingActivity {
                 
                 transactionTarget transactionInfo = transactionOutManager.getTransactionDetails(transactionId);
                 
+                if (transactionInfo == null)  { // this will be null if batch is reset - the same transactions will not be available 
+               	 return mav;
+                }
                 /* Get the configuration details */
                 configuration configDetails = configurationManager.getConfigurationById(transactionInfo.getconfigId());
                 

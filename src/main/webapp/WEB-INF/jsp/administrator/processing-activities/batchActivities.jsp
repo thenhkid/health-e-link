@@ -28,11 +28,9 @@
                         <thead>
                             <tr>
                                 <th scope="col">User Name</th>
-                  				<th scope="col">Transaction(s) accessed</th>
                   				<th scope="col">User Activity</th>
-                  				<th scope="col">Additional Information</th>
-                                <th scope="col">Date / Time</th>
-                            	<th scope="col"></th>
+                  				<th scope="col">Transaction(s) Accessed</th>
+                  				<th scope="col">Date / Time</th>                            	
                             </tr>
                         </thead>
                         <tbody>
@@ -44,20 +42,28 @@
                                             ${ua.orgName}
                                             </td>
                                             <td>
-                                                ${ua.activity}
+                                                ${ua.activity}<c:if test="${fn:length(ua.activityDesc) > 0}">- ${ua.activityDesc}</c:if>
                                             </td>
                                             <td>
-                                            ${ua.activityDesc}
+                                            	<c:choose>
+                                            	<c:when test="${fn:length(ua.transactionInIds) > 10}">
+                                            	<c:forEach items="${ua.transactionInIds}" end="10" var="transactionInId">
+	                                            	<a href="#messageDetailsModal" data-toggle="modal" rel="${transactionInId}" rel2="0" class="viewLink">
+	                                                	${transactionInId}
+	                                              	</a>
+                                            	<br/>
+                                            	</c:forEach>
+                                            	<a href="#messageDetailsModal" data-toggle="modal" rel="${ua.id}" class="viewMore">more ...</a>
+                                            	</c:when>
+                                            	<c:otherwise>
+	                                            	<c:forEach var="transactionInId" items="${ua.transactionInIds}">
+		                                            	<a href="#messageDetailsModal" data-toggle="modal" rel="${transactionInId}" rel2="0" class="viewLink">${transactionInId}</a>
+		                                            	<br/>
+	                                            	</c:forEach>
+                                            	</c:otherwise>
+                                            	</c:choose>
                                             </td>
-                                            <td>
-                                           <%-- 
-                                            <c:forEach var="transactionInId" items="ua.transactionInIds" varStatus="counter">
-                                            	<a href="javascript:'alert(\" I open a window\");'">${ua.transactionInIds.[counter]}</a>
-                                           	</c:forEach>
-                                           	--%>
-                                              ${ua.transactionInIds}
-                                            </td> 
-                                            <td>
+                                           <td>
                                             
                                                <fmt:formatDate value="${batchDetails.dateSubmitted}" type="date" pattern="M/dd/yyyy" />&nbsp;&nbsp;<fmt:formatDate value="${ua.dateCreated}" type="time" pattern="h:mm:ss a" />
                                             </td>                                         
