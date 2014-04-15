@@ -1183,7 +1183,7 @@ public class HealtheConnectController {
             ua.setUserId(userInfo.getId());
             ua.setAccessMethod(request.getMethod());
             ua.setPageAccess("/batchOptions");
-            ua.setActivity("Batch Options -" + batchOptionSubmitted);
+            ua.setActivity("Batch Options - " + batchOptionSubmitted);
             ua.setBatchUploadId(batchInfo.getId());
             if (idList.size() > 0) {
             	ua.setTransactionInIds(idList.toString().replace("]", "").replace("[", ""));

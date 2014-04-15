@@ -1,14 +1,13 @@
 package com.ut.dph.dao.impl;
 
 import java.util.List;
-
 import org.hibernate.Query;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.Transformers;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-
 import com.ut.dph.dao.userDAO;
 import com.ut.dph.model.User;
 import com.ut.dph.model.UserActivity;
@@ -287,4 +286,21 @@ public class userDAOImpl implements userDAO {
     		ex.printStackTrace();
     	}
     }
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public UserActivity getUAById(Integer uaId) {
+		try {
+			Query query = sessionFactory.getCurrentSession().createSQLQuery("select * from userActivity where id = :uaId").setResultTransformer(Transformers.aliasToBean(UserActivity.class));
+	        query.setParameter("uaId", uaId);
+	        List <UserActivity> uaList = query.list();
+            if (uaList.size() > 0) {
+            	return uaList.get(0);
+            }
+    	} catch (Exception ex) {
+    		System.err.println("getUAById " + ex.getCause());
+    		ex.printStackTrace();
+    	}
+		return null;
+	}
 }

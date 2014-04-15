@@ -1418,4 +1418,41 @@ public class adminProcessingActivity {
     }
     
     
+    /**
+     * The '/ViewUATransactionList' function will return the list of transaction ids for a batch activity that was 
+     * too long to display
+     * The results will be displayed in the overlay.
+     *
+     * @Param	uaId   This will hold the id of the user activity
+     * @Param	type   1 = inbound 2 = outbound
+     *
+     * @Return	This function will return the transactionList for that user activity.
+     */
+    @RequestMapping(value = "/ViewUATransactionList", method = RequestMethod.GET)
+    public ModelAndView viewUATransactionList(@RequestParam(value = "uaId", required = true) Integer uaId,
+    		@RequestParam(value = "Type", required = true) Integer type) 
+    		throws Exception {
+   
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/processing-activities/transactionList");
+
+        /* Get the details of the selected status */ 
+        UserActivity userActivity = usermanager.getUAById(uaId);
+        
+        
+        /* Get the details of the batch */
+        batchUploads batchDetails = new batchUploads();
+        if (type==1) {
+        	batchDetails = transactionInManager.getBatchDetails(userActivity.getBatchUploadId());
+        } else {
+        	batchDetails = transactionInManager.getBatchDetails(userActivity.getBatchDownloadId());
+        }
+        
+        mav.addObject("userActivity", userActivity);
+        mav.addObject("batchDetails", batchDetails);
+        	
+        return mav;
+    }
+
+    
 }

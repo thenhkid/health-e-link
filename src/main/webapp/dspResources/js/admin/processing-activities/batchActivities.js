@@ -39,5 +39,19 @@ require(['./main'], function () {
             
         });
         
+ $(document).on('click', '.viewMore', function() {
+            var uaId = $(this).attr('rel');
+            
+            $.ajax({
+                url: '../../ViewUATransactionList',
+                data: {'Type': 1, 'uaId': uaId},
+                type: "GET",
+                success: function(data) {
+                    $("#messageDetailsModal").html(data);
+                }
+            });
+            
+        });
+        
     });
 });

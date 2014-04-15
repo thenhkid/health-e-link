@@ -98,4 +98,10 @@ public class userManagerImpl implements userManager {
     public void insertUserLog (UserActivity userActivity) {
         userDAO.insertUserLog(userActivity);
     }
+
+	@Override
+	@Transactional
+	public UserActivity getUAById(Integer uaId) {
+		return userDAO.getUAById(uaId);
+	}
 }
