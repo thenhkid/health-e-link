@@ -11,10 +11,10 @@ ALTER TABLE `universaltranslator`.`transactionouterrors`
 CHANGE COLUMN `configurationFormFieldsId` `fieldNo` INT(11) NULL DEFAULT NULL ;
 
 
-drop procedure insertValidationErrors;
+drop procedure `universaltranslator`.`insertValidationErrors`;
 
 DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `insertValidationErrors`(in vtType int, in fieldNo int,
+CREATE DEFINER=`root`@`localhost` PROCEDURE `universaltranslator`.`insertValidationErrors`(in vtType int, in fieldNo int,
 in batchUploadId int, in configId int)
 BEGIN
 
@@ -49,10 +49,10 @@ EXECUTE stmt;
 DELIMITER ;
 
 
-drop procedure stripPhoneChars;
+drop procedure `universalTranslator`.`stripPhoneChars`;
 
 DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `stripPhoneChars`(in vtType int, in fieldNo int,
+CREATE DEFINER=`root`@`localhost` PROCEDURE `universalTranslator`.`stripPhoneChars`(in vtType int, in fieldNo int,
 in batchUploadId int, in configId int)
 BEGIN
 	DECLARE varToReplace varchar(100) DEFAULT '.';
@@ -168,7 +168,7 @@ INSERT INTO `universaltranslator`.`lu_insuranceCoverage` (`id`,`displayText`) VA
 INSERT INTO `universaltranslator`.`lu_insuranceCoverage` (`id`,`displayText`) VALUES (3,'Uninsured');
 INSERT INTO `universaltranslator`.`lu_insuranceCoverage` (`id`,`displayText`) VALUES (4,'Unknown / Not Reported');
 
-CREATE TABLE `message_localCodes` (
+CREATE TABLE `universalTranslator`.`message_localCodes` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `transactionInId` int(11) NOT NULL,
   `sourceId` varchar(45) DEFAULT NULL,
@@ -194,7 +194,7 @@ ADD COLUMN `SiteId` INT NULL AFTER `transactionInId`;
 INSERT INTO `universaltranslator`.`macro_names` (`ID`, `Category`, `Macro_Name`, `Macro_Short_Name`, `Formula`, `FieldA_Question`, `FieldB_Question`, `Con2_Question`) VALUES ('70', 'String manipulation', 'Set field to null', 'field=null', 'setFieldToNull', 'Please enter in field number to set null, leave blank if src', 'Please enter in field to match, if appicable', 'Please enter in value to match, if applicable');
   
 DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `setFieldToNull`(in configId int, 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `universalTranslator`.`setFieldToNull`(in configId int, 
 in batchId int, in srcField varchar(10),
 in fieldA varchar(10), in fieldB varchar(10), in con1 varchar(10), 
 in con2 varchar(10), in macroId int, in foroutboundProcessing boolean, in passClear int)
@@ -287,7 +287,7 @@ INSERT INTO `universaltranslator`.`lu_noContraceptiveReasons` (`id`, `displaytex
 
 /** grace 03212014 06:21PM **/
 DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `addCharToString`(in configId int, 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `universalTranslator`.`addCharToString`(in configId int, 
 in batchId int, in srcField varchar(10),
 in fieldA varchar(10), in fieldB varchar(10), in con1 varchar(10), 
 in con2 varchar(10), in macroId int, in foroutboundProcessing boolean, in passClear int)
@@ -327,10 +327,10 @@ UPDATE `universaltranslator`.`macro_names` SET `Macro_Short_Name`='addCharToStri
 /** grace 03212014 11:22PM **/
 UPDATE `universaltranslator`.`lu_ErrorCodes` SET `description`='Source Configuration does not have valid connections set up' WHERE `id`='10';
 
-drop procedure addCharToString;
+drop procedure `universalTranslator`.`addCharToString`;
 
 DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `addCharToString`(in configId int, 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `universalTranslator`.`addCharToString`(in configId int, 
 in batchId int, in srcField varchar(10),
 in fieldA varchar(10), in fieldB varchar(10), in con1 varchar(10), 
 in con2 varchar(10), in macroId int, in foroutboundProcessing boolean, in passClear int)
@@ -364,9 +364,9 @@ end proc_main$$
 DELIMITER ;
 
 /** grace 03232014 05:57 AM **/
-drop PROCEDURE setSqlForConfig;
+drop PROCEDURE `universalTranslator`.`setSqlForConfig`;
 DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `setSqlForConfig`(in inConfigId int, in batchUploadId int)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `universalTranslator`.`setSqlForConfig`(in inConfigId int, in batchUploadId int)
 proc_main:begin
 drop TEMPORARY TABLE if exists temp1;
 CREATE TEMPORARY TABLE temp1
@@ -399,10 +399,10 @@ CHANGE COLUMN `moreThanOneRace` `moreThanOneRace` INT NULL DEFAULT NULL;
  
   
 /** Grace 03272014 02:47PM **/
-drop procedure setSqlForConfig;
+drop procedure `universalTranslator`.`setSqlForConfig`;
 
 DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `setSqlForConfig`(in inConfigId int, in batchUploadId int)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `universalTranslator`.`setSqlForConfig`(in inConfigId int, in batchUploadId int)
 proc_main:begin
 drop TEMPORARY TABLE if exists temp1;
 CREATE TEMPORARY TABLE temp1
@@ -428,7 +428,7 @@ DELIMITER ;
 INSERT INTO `universaltranslator`.`lu_ErrorCodes` (`displayText`, `description`) VALUES ('Submitter is not a valid sender', 'User is not a valid sender');
 
 /** 04042014 Grace 11:16AM **/
-CREATE TABLE `userActivity` (
+CREATE TABLE `universalTranslator`.`userActivity` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `userId` int(11) NOT NULL,
   `accessMethod` varchar(10) DEFAULT NULL,
