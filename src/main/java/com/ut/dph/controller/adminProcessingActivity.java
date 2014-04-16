@@ -40,6 +40,7 @@ import com.ut.dph.service.userManager;
 import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -1471,6 +1472,8 @@ public class adminProcessingActivity {
   
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/processing-activity/auditReport");
+        boolean canCancel  = false;
+        boolean canReset  = false;
         
         /* Get the details of the batch */
         batchUploads batchDetails = transactionInManager.getBatchDetailsByBatchName(batchName);
@@ -1479,9 +1482,35 @@ public class adminProcessingActivity {
             
             Organization orgDetails = organizationmanager.getOrganizationById(batchDetails.getOrgId());
             batchDetails.setorgName(orgDetails.getOrgName());
+            
             lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batchDetails.getstatusId());
             batchDetails.setstatusValue(processStatus.getDisplayCode());
 
+            List<Integer> cancelStatusList = Arrays.asList(21, 22, 23, 1, 8);
+            if (!cancelStatusList.contains(batchDetails.getstatusId())) {
+                canCancel = true;
+               if (batchDetails.getstatusId() != 2) {
+                canReset = true;
+               }
+            }
+            /**
+             * we need to check sbp (4) status - if server is restarted and somehow the file hangs in SBP, we want to give them option to reset
+             * if sbp start time is about two hours, that should be sufficient indication that a file is stuck
+             */
+            
+            if (batchDetails.getstatusId() == 4) {
+            	Date d1 = batchDetails.getstartDateTime();
+        		Date d2 = new Date();
+        		//in milliseconds
+    			long diff = d2.getTime() - d1.getTime();
+    			
+    			long diffHours = diff / (60 * 60 * 1000) % 24;
+    			System.out.println(diffHours);
+    			if (diffHours < 2) {
+    				canReset = false;
+    			}
+            }
+            
             if (batchDetails.getConfigId() != 0) {
             	batchDetails.setConfigName(configurationManager.getMessageTypeNameByConfigId(batchDetails.getConfigId()));
             } else {
@@ -1501,6 +1530,10 @@ public class adminProcessingActivity {
         } else {
         	mav.addObject("doesNotExist", true);
         }
+        
+        
+        mav.addObject("canCancel", canCancel);
+        mav.addObject("canReset", canReset);
         
         return mav;
     }
