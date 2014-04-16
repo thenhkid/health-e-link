@@ -1475,6 +1475,7 @@ public class adminProcessingActivity {
         mav.setViewName("/administrator/processing-activity/auditReport");
         boolean canCancel  = false;
         boolean canReset  = false;
+        boolean canEdit = false;
         
         /* Get the details of the batch */
         batchUploads batchDetails = transactionInManager.getBatchDetailsByBatchName(batchName);
@@ -1494,6 +1495,11 @@ public class adminProcessingActivity {
                 canReset = true;
                }
             }
+            
+            if (batchDetails.getstatusId() == 5 && transactionInManager.getRecordCounts(batchDetails.getId(), Arrays.asList(14), false, true) > 0) {
+                canEdit = true;
+            }
+            
             /**
              * we need to check sbp (4) status - if server is restarted and somehow the file hangs in SBP, we want to give them option to reset
              * if sbp start time is about two hours, that should be sufficient indication that a file is stuck
@@ -1535,6 +1541,7 @@ public class adminProcessingActivity {
         
         mav.addObject("canCancel", canCancel);
         mav.addObject("canReset", canReset);
+        mav.addObject("canEdit", canEdit);
         
         return mav;
     }

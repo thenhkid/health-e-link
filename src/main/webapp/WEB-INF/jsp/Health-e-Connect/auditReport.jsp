@@ -78,7 +78,7 @@
                         <div class="col-md-12">
                             	<div class="pull-left">
 	                                <c:if test="${canEdit == true}">
-	                                    <input type="button" id="reject" class="btn btn-primary btn-xs rejectMessages" value="Reject All Transactions" />
+	                                    <input type="button" id="rejectAll" class="btn btn-primary btn-xs rejectMessages" value="Reject All Errors" />
 	                                </c:if>   
 	                                <c:if test="${canSend == true}">
                                         <input type="button" id="release" class="btn btn-primary btn-xs releaseBatch" value="Release" />
@@ -96,6 +96,7 @@
                             <section class="panel panel-default">
                                 <div class="panel-heading">
                                     <div class="pull-right" style="margin-top: -5px">
+                                    	Status:<a href="#statusModal" data-toggle="modal" class="btn btn-link viewStatus" rel="${transactionIn.transactionStatus}" title="View this Status">${transactionIn.transactionStatusValue}&nbsp;<span class="badge badge-help" data-placement="top" title="" data-original-title="">?</span></a>
                                         <c:if test="${transactionIn.transactionStatus == 14 && batch.statusId == 5 && canEdit}">
                                         	<c:set var="idList" value="${idList},${transactionIn.transactionInId}"/>
                                             <a href="javascript:void(0);" id="reject" rel="${transactionIn.transactionInId}" rel2="${batch.id}" class="btn btn-primary btn-xs rejectMessage">Reject</a>
@@ -145,7 +146,7 @@
                         <div class="col-md-12">
                             	<div class="pull-left">
 	                                <c:if test="${canEdit == true}">
-	                                    <input type="button" id="reject" class="btn btn-primary btn-xs rejectMessages" value="Reject All Transactions" />
+	                                    <input type="button" id="reject" class="btn btn-primary btn-xs rejectMessages" value="Reject All Errors" />
 	                                </c:if>   
 	                                <c:if test="${canSend == true}">
                                         <input type="button" id="release" class="btn btn-primary btn-xs releaseBatch" value="Release" />
