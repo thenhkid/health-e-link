@@ -50,14 +50,15 @@
                                                 ${ua.activity}<c:if test="${fn:length(ua.activityDesc) > 0}">- ${ua.activityDesc}</c:if>
                                             </td>
                                             <td>
+                                            	<c:set var="tInIdList" value="${fn:split(ua.transactionInIds, ',')}"/>
                                             	<c:choose>
-                                            	<c:when test="${fn:length(ua.transactionInIds) > 10}">
-                                            	<c:forEach items="${ua.transactionInIds}" end="9" var="transactionInId">
-	                                            	<a href="#messageDetailsModal" data-toggle="modal" rel="${transactionInId}" rel2="0" class="viewLink">
-	                                                	${transactionInId}
-	                                              	</a>
-                                            	<br/>
-                                            	</c:forEach>
+                                            	<c:when test="${fn:length(tInIdList) > 10}">
+	                                            	<c:forEach items="${ua.transactionInIds}" end="9" var="transactionInId">
+		                                            	<a href="#messageDetailsModal" data-toggle="modal" rel="${transactionInId}" rel2="0" class="viewLink">
+		                                                	${transactionInId}
+		                                              	</a>
+	                                            	<br/>
+	                                            	</c:forEach>
                                             	<a href="#messageDetailsModal" data-toggle="modal" rel="${ua.id}" class="viewMore">more ...</a>
                                             	</c:when>
                                             	<c:otherwise>
