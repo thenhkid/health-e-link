@@ -3711,7 +3711,7 @@ public class transactionInDAOImpl implements transactionInDAO {
         		+ "from transactionInErrors, lu_errorCodes, transactionIn , lu_processstatus "
         		+ "where lu_processstatus.id = transactionIn.statusId and "
         		+ "errorId = lu_errorCodes.id and transactionInErrors.transactionInId = transactionIn.Id "
-        		+ "and transactionInErrors.configId = :configId and batchuploadid = :batchId order by errorCode, transactionInId;";
+        		+ "and transactionInErrors.configId = :configId and batchuploadid = :batchId order by transactionInId, errorCode;";
 
         try {
             Query query = sessionFactory

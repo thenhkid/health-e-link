@@ -86,7 +86,7 @@
 	                                                    View Batch Activities
 	                                                </a>
 	                                                <br/>
-	                                                <a href="javascript:void(0);" class="btn btn-link viewAuditReport" title="View Audit Report" role="button">
+	                                                <a href="<c:url value='/administrator/processing-activity/inbound/auditReport/${batch.utBatchName}' />" class="btn btn-link viewAuditReport" title="View Audit Report" role="button">
 	                                                    <span class="glyphicon glyphicon-edit"></span>
 	                                                    View Audit Report
 	                                                </a>

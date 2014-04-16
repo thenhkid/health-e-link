@@ -677,18 +677,11 @@ public class HealtheConnectController {
                  */
                 Organization org = organizationmanager.getOrganizationById(batchInfo.getOrgId());
                 mav.addObject("org", org);
-
-                /**
-                 * grab error info - need to filter this by error type *
-                 
-                List<ConfigErrorInfo> confErrorList = new LinkedList<ConfigErrorInfo>();
-                confErrorList = transactionInManager.populateErrorList(batchInfo);
-                mav.addObject("confErrorList", confErrorList);
-                */
+                
+                //grab error info
                 List<TransErrorDetailDisplay> errorList = new LinkedList<TransErrorDetailDisplay>();
                 errorList = transactionInManager.populateErrorList(batchInfo);
                 mav.addObject("errorList", errorList);
-
             }
 
             /**
@@ -1108,7 +1101,7 @@ public class HealtheConnectController {
                     }
 
                 } else if (batchOption.equalsIgnoreCase("cancelBatch")) {
-                	batchOptionSubmitted = "Cancel Batch";
+                	batchOptionSubmitted = "Cancelled Batch";
                     //check authority
                     if (allowBatchClear && userInfo.getcancelAuthority()) {
                         transactionInManager.updateBatchStatus(batchId, 4, "startDateTime");
@@ -1122,7 +1115,7 @@ public class HealtheConnectController {
                         hasPermission = false;
                     }
                 } else if (batchOption.equalsIgnoreCase("releaseBatch")) {
-                	batchOptionSubmitted = "Release Batch";
+                	batchOptionSubmitted = "Released Batch";
                 	boolean canReleaseBatch = false;
                 	if (batchInfo.getstatusId() == 5 && userInfo.getdeliverAuthority()) { // do the check that doesn't require a hit to db first
 	   	        		 if (batchInfo.getConfigId() != 0) {
@@ -1146,7 +1139,7 @@ public class HealtheConnectController {
                         hasPermission = false;
                     }
                 } else if (batchOption.equalsIgnoreCase("rejectMessages")) {
-                	batchOptionSubmitted = "Reject Messages";
+                	batchOptionSubmitted = "Rejected Messages";
                     if (batchInfo.getstatusId() == 5 && userInfo.geteditAuthority()) {
                         if (idList.size() > 0) {
                             for (Integer transactionInId : idList) {
@@ -1161,7 +1154,7 @@ public class HealtheConnectController {
                     }
 
                 } else if (batchOption.equalsIgnoreCase("rejectMessage")) {
-                	batchOptionSubmitted = "Reject Message";
+                	batchOptionSubmitted = "Rejected Message";
                     if (batchInfo.getstatusId() == 5 && userInfo.geteditAuthority()) {
                         if (idList.size() > 0) {
                             for (Integer transactionInId : idList) {
@@ -1439,7 +1432,7 @@ public class HealtheConnectController {
                      ua.setUserId(userInfo.getId());
                      ua.setAccessMethod(request.getMethod());
                      ua.setPageAccess("/releaseBatches");
-                     ua.setActivity("Release Batch");
+                     ua.setActivity("Released Batch");
                      ua.setBatchUploadId(batchId);
                      if (!canReleaseBatch) {
                          ua.setActivityDesc("without permission" + forInsert);
@@ -1502,7 +1495,7 @@ public class HealtheConnectController {
             ua.setUserId(userInfo.getId());
             ua.setAccessMethod(request.getMethod());
             ua.setPageAccess("/rejectMessage");
-            ua.setActivity("Reject Message");
+            ua.setActivity("Rejected Message");
             ua.setBatchUploadId(batchId);
             ua.setTransactionInIds(String.valueOf(transactionId));
             if (!hasPermission) {

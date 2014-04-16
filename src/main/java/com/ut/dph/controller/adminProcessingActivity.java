@@ -17,6 +17,7 @@ import com.ut.dph.model.configuration;
 import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.configurationMessageSpecs;
 import com.ut.dph.model.configurationTransport;
+import com.ut.dph.model.custom.TransErrorDetailDisplay;
 import com.ut.dph.model.custom.searchParameters;
 import com.ut.dph.model.fieldSelectOptions;
 import com.ut.dph.model.lutables.lu_ProcessStatus;
@@ -42,6 +43,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.TimeZone;
@@ -1454,5 +1456,51 @@ public class adminProcessingActivity {
         return mav;
     }
 
+    /**
+     * The '/inbound/auditReport/{batchName}' GET request will retrieve the audit report that is associated to the clicked batch 
+     *
+     * @param batchName	The name of the batch to retrieve transactions for
+     * @return          The audit report for the batch
+     *
+     * @Objects	(1) An object containing all the errored transactions
+     *
+     * @throws Exception
+     */
+    @RequestMapping(value = "/inbound/auditReport/{batchName}", method = RequestMethod.GET)
+    public ModelAndView viewAuditReport(@PathVariable String batchName) throws Exception {
+  
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/processing-activity/auditReport");
+        
+        /* Get the details of the batch */
+        batchUploads batchDetails = transactionInManager.getBatchDetailsByBatchName(batchName);
+        
+        if(batchDetails != null) {
+            
+            Organization orgDetails = organizationmanager.getOrganizationById(batchDetails.getOrgId());
+            batchDetails.setorgName(orgDetails.getOrgName());
+            lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batchDetails.getstatusId());
+            batchDetails.setstatusValue(processStatus.getDisplayCode());
+
+            if (batchDetails.getConfigId() != 0) {
+            	batchDetails.setConfigName(configurationManager.getMessageTypeNameByConfigId(batchDetails.getConfigId()));
+            } else {
+            	batchDetails.setConfigName("Multiple Message Types");
+            }
+            mav.addObject("batchDetails", batchDetails);
+
+            try {
+            	List<TransErrorDetailDisplay> errorList = new LinkedList<TransErrorDetailDisplay>();
+                errorList = transactionInManager.populateErrorList(batchDetails);
+                mav.addObject("errorList", errorList);
+            }
+            catch (Exception e) {
+                throw new Exception("(Admin) Error occurred in getting the audit report for an inbound batch. batchId: "+ batchDetails.getId()+" ERROR: "+e.getMessage(),e);
+            }
+        }
+        
+        return mav;
+    }
     
+   
 }
