@@ -1566,7 +1566,8 @@ public class transactionInDAOImpl implements transactionInDAO {
                 + "(select " + batchUploadId + ", " + cff.getconfigId() + ", transactionInId, " + cff.getFieldNo()
                 + ", 1 from transactionTranslatedIn where configId = :configId "
                 + " and (F" + cff.getFieldNo()
-                + " is  null  or length(trim(F" + cff.getFieldNo() + ")) = 0)"
+                + " is  null  or length(trim(F" + cff.getFieldNo() + ")) = 0"
+                + " or length(REPLACE(REPLACE(F" + cff.getFieldNo() + ", '\n', ''), '\r', '')) = 0)"
                 + "and transactionInId in (select id from transactionIn where batchId = :batchUploadId"
                 + " and configId = :configId and statusId not in (:transRELId)));";
         Query insertData = sessionFactory.getCurrentSession().createSQLQuery(sql)
