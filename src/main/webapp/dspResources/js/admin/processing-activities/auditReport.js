@@ -39,18 +39,58 @@ require(['./main'], function () {
             
         });
         
- $(document).on('click', '.viewMore', function() {
-            var uaId = $(this).attr('rel');
+      //This function will process the batch
+        $(document).on('click', '.processBatch', function() {
             
-            $.ajax({
-                url: '../../ViewUATransactionList',
-                data: {'Type': 1, 'uaId': uaId},
-                type: "GET",
-                success: function(data) {
-                    $("#messageDetailsModal").html(data);
-                }
-            });
+            var confirmed = confirm("Are you sure you want to process the batch now?");
+
+             if (confirmed) {
+            	 $.ajax({
+                  url: '../../inboundBatchOptions',
+                  data:{'batchOption': $(this).attr('rel'), 'batchId': $(this).attr('rel2')},
+                  type: "POST",
+                  success: function(data) {
+                	  location.reload();
+                  }
+                });
+             }
+           
+        });
+        
+      //This function will cancel the batch
+        $(document).on('click', '.cancelBatch', function() {
             
+            var confirmed = confirm("Are you sure you want to set this batch to 'Do Not Process'?");
+
+             if (confirmed) {
+            	 $.ajax({
+                  url: '../../inboundBatchOptions',
+                  data:{'batchOption': $(this).attr('rel'), 'batchId': $(this).attr('rel2')},
+                  type: "POST",
+                  success: function(data) {
+                	  location.reload();
+                  }
+                });
+             }
+           
+        });
+
+      //This function will reset the batch
+        $(document).on('click', '.resetBatch', function() {
+            
+            var confirmed = confirm("Are you sure you want to reset this batch?");
+
+             if (confirmed) {
+            	 $.ajax({
+                  url: '../../inboundBatchOptions',
+                  data:{'batchOption': $(this).attr('rel'), 'batchId': $(this).attr('rel2')},
+                  type: "POST",
+                  success: function(data) {
+                	  location.reload();
+                  }
+                });
+             }
+           
         });
         
     });

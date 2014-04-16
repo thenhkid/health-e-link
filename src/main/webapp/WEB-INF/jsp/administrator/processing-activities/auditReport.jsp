@@ -24,24 +24,27 @@
     </div>
     <div class="col-md-12">
               <div class="form-container scrollable">
+              <c:if test="${empty doesNotExist}">
+              	<div class="row" style="overflow:hidden;margin-left:0px;margin-right:0px;margin-top:10px; margin-bottom:20px;">
+	  				 	<div class="pull-left">
+	  				 		<c:if test="${batchDetails.statusId == 2}">
+	  				 			<input type="button" id="processBatch" class="btn btn-primary btn-xs processBatch" rel="processBatch" rel2="${batchDetails.id}" value="Load Batch" />
+	  				 		</c:if>
+	  				 		<c:if test="${batchDetails.statusId == 3}">
+	  				 			<input type="button" id="processBatch" class="btn btn-primary btn-xs processBatch" rel="processBatch" rel2="${batchDetails.id}" value="Process Batch" />
+	  				 		</c:if>
+	  				 		<c:if test="${canCancel}">
+	                       		<input type="button" id="cancel" class="btn btn-primary btn-xs cancelBatch" rel="cancel"  rel2="${batchDetails.id}"value="Do Not Process" />
+	                       	</c:if>
+	                        <c:if test="${canReset}">
+	                          	<input type="button" id="reset" class="btn btn-primary btn-xs resetBatch" rel="reset"  rel2="${batchDetails.id}" value="Reset" />
+		       				</c:if>
+		       			</div>
+	                </div>	
+             	</c:if>
+              
   				<c:choose>
   				<c:when test="${fn:length(errorList) > 0}">
-  				
-  				 <div class="row" style="overflow:hidden;margin-left:0px;margin-right:0px;margin-top:10px; margin-bottom:20px;">
-  				 	<div class="pull-left">
-  				 		<c:if test="${batchDetails.statusId == 2 || batchDetails.statusId == 3}">
-  				 			<input type="button" id="processBatch" class="btn btn-primary btn-xs processBatch" value="Process Now" />
-  				 		</c:if>
-  				 		<c:if test="${canCancel}">
-                       		<input type="button" id="cancel" class="btn btn-primary btn-xs cancelBatch" value="Do Not Process" />
-                       	</c:if>
-                        <c:if test="${canReset}">
-                          	<input type="button" id="reset" class="btn btn-primary btn-xs resetBatch" value="Reset" />
-	       				</c:if>
-	       				
-	       			</div>
-                </div>
-                
   				<c:set var="transactionCounter" value="1"/>
   				<c:forEach var="transactionIn" items="${errorList}">
                         <div>
@@ -107,7 +110,7 @@
   				<c:otherwise>
   					<section class="panel panel-default">
                                 <div class="panel-heading">
-  						<strong>An audit report is not available for this batch.</strong>
+  						<strong>There are currently no errors for this batch.</strong>
   					</div>
   					</section>
   				</c:otherwise>

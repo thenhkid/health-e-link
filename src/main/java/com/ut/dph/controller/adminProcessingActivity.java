@@ -58,6 +58,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -1538,5 +1539,59 @@ public class adminProcessingActivity {
         return mav;
     }
     
-   
+    /**
+     * The 'inboundBatchOptions' function will process the batch according to the option submitted by admin
+     */
+    
+    @RequestMapping(value = "/inboundBatchOptions", method = RequestMethod.POST)
+    public @ResponseBody boolean inboundBatchOptions(HttpSession session, 
+    		@RequestParam(value = "batchId", required = true) Integer batchId, Authentication authentication,
+    		@RequestParam(value = "batchOption", required = true) String batchOption) throws Exception {
+        
+    	String strBatchOption = "";
+    	User userInfo = usermanager.getUserByUserName(authentication.getName());
+    	batchUploads batchDetails = transactionInManager.getBatchDetails(batchId);
+    	
+    	if (userInfo != null && batchDetails != null) {
+	    	if (batchOption.equalsIgnoreCase("processBatch")) {
+	    		if (batchDetails.getstatusId() == 2) {
+	    			strBatchOption = "Loaded Batch";
+	    			transactionInManager.loadBatch(batchId);
+	    		} else if (batchDetails.getstatusId() == 3)  {
+	    			strBatchOption = "Processed Batch";
+	    			transactionInManager.processBatch(batchId);
+	    		}
+	    	} else if (batchOption.equalsIgnoreCase("cancel")) {
+	    		strBatchOption = "Cancelled Batch";
+	    		transactionInManager.updateBatchStatus(batchId, 4, "startDateTime");
+                transactionInManager.updateTransactionStatus(batchId, 0, 0, 34);
+                transactionInManager.updateTransactionTargetStatus(batchId, 0, 0, 34);
+                transactionInManager.updateBatchStatus(batchId, 21, "endDateTime");       	
+	    	} else if (batchOption.equalsIgnoreCase("reset")){
+	    		strBatchOption = "Reset Batch";
+	    		//1. Check
+	    		boolean allowBatchClear = transactionInManager.allowBatchClear(batchId);
+	    		if (allowBatchClear) {
+		    		transactionInManager.updateBatchStatus(batchId, 4, "");
+	                //2. clear
+	                boolean cleared = transactionInManager.clearBatch(batchId);
+	                if (cleared) {
+	                    transactionInManager.updateBatchStatus(batchId, 2, "startOver");
+	                }
+	    		}
+	    	}
+    	
+    	}
+    	
+    	//log user activity
+    	UserActivity ua = new UserActivity();
+        ua.setUserId(userInfo.getId());
+        ua.setAccessMethod("POST");
+        ua.setPageAccess("/inboundBatchOptions");
+        ua.setActivity("Admin - " + strBatchOption);
+        ua.setBatchUploadId(batchId);
+        usermanager.insertUserLog(ua);
+        return true;
+    }
+    
 }
