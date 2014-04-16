@@ -93,5 +93,57 @@ require(['./main'], function () {
            
         });
         
+        //This function will reject all errors
+        $(document).on('click', '.rejectMessages', function() {
+            
+            var confirmed = confirm("Are you sure you want to reject all transactions with errors?");
+
+             if (confirmed) {
+            	 $('input[name="batchOption"]').val("rejectMessages"); 
+            	 $('#massReject').submit();
+             }
+           
+        });
+        
+        //This function will release the batch
+        $(document).on('click', '.releaseBatch', function() {
+            
+            var confirmed = confirm("Are you sure you want to release this batch?");
+
+             if (confirmed) {
+            	 $.ajax({
+                  url: '../../inboundBatchOptions',
+                  data:{'batchOption': $(this).attr('rel'), 'batchId': $(this).attr('rel2')},
+                  type: "POST",
+                  success: function(data) {
+                	  location.reload();
+                  }
+                });
+             }    
+        });
+        
+      //This function will release the batch
+        $(document).on('click', '.rejectMessage', function() {
+            
+            var confirmed = confirm("Are you sure you want to reject this transaction?");
+
+             if (confirmed) {
+            	 $.ajax({
+                  url: '../../inboundBatchOptions',
+                  data:{'batchOption': $(this).attr('rel'), 'batchId': $(this).attr('rel2'), 'tId': $(this).attr('rel3')},
+                  type: "POST",
+                  success: function(data) {
+                	  location.reload();
+                  }
+                });
+             }    
+        });
+        
+        //this function will submit the transactionInId to the ERG form for edit
+        $(document).on('click', '.fixErrors', function() {
+        	$('input[name="transactionInId"]').val($(this).attr('rel'));
+        	$('#editTransaction').submit();
+        });
+        
     });
 });

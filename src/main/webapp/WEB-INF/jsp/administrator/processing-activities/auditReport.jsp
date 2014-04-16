@@ -27,9 +27,14 @@
               <c:if test="${empty doesNotExist}">
               	<div class="row" style="overflow:hidden;margin-left:0px;margin-right:0px;margin-top:10px; margin-bottom:20px;">
 	  				 	<div class="pull-left">
-	  				 	
+	  				 		<c:if test="${canSend == true}">
+                                  <input type="button" id="release" class="btn btn-primary btn-xs releaseBatch" rel="releaseBatch" rel2="${batchDetails.id}"  value="Release" />
+                            </c:if>
 	  				 		<c:if test="${canEdit}">
-	  				 			<input type="button" id="rejectMessages" class="btn btn-primary btn-xs rejectMessages" rel="processBatch" rel2="${batchDetails.id}" value="Reject All Errors" />
+	  				 			<input type="button" id="rejectMessages" class="btn btn-primary btn-xs rejectMessages" value="Reject All Errors" />
+	  				 		</c:if>
+	  				 		<c:if test="${batchDetails.statusId == 2}">
+	  				 			<input type="button" id="processBatch" class="btn btn-primary btn-xs processBatch" rel="processBatch" rel2="${batchDetails.id}" value="Load Batch" />
 	  				 		</c:if>
 	  				 		<c:if test="${batchDetails.statusId == 3}">
 	  				 			<input type="button" id="processBatch" class="btn btn-primary btn-xs processBatch" rel="processBatch" rel2="${batchDetails.id}" value="Process Batch" />
@@ -61,7 +66,7 @@
 	                                    &nbsp;&nbsp;
 	                                    <c:if test="${transactionIn.transactionStatus == 14 && batchDetails.statusId == 5}">
                                         	<c:set var="idList" value="${idList},${transactionIn.transactionInId}"/>
-                                            <a href="javascript:void(0);" id="reject" rel="${transactionIn.transactionInId}" rel2="${batchDetails.id}" class="btn btn-primary btn-xs rejectMessage">Reject</a>
+                                            <a href="javascript:void(0);" id="reject" rel="rejectMessage" rel3="${transactionIn.transactionInId}" rel2="${batchDetails.id}" class="btn btn-primary btn-xs rejectMessage">Reject</a>
                                             <a href="javascript:void(0);" id="fixErrors"  rel="${transactionIn.transactionInId}" class="btn btn-primary btn-xs fixErrors">Fix Errors</a>
                                         </c:if>
                                     </div>
@@ -105,6 +110,31 @@
                         </div> 
                         <c:set var="transactionCounter" value="${transactionCounter + 1}"/>
                     </c:forEach>
+                     <c:if test="${transactionCounter > 20}">
+              	<div class="row" style="overflow:hidden;margin-left:0px;margin-right:0px;margin-top:10px; margin-bottom:20px;">
+	  				 	<div class="pull-left">
+	  				 		<c:if test="${canSend == true}">
+                                  <input type="button" id="releaseBottom" class="btn btn-primary btn-xs releaseBatch" rel="releaseBatch" rel2="${batchDetails.id}"  value="Release" />
+                            </c:if>
+	  				 		<c:if test="${canEdit}">
+	  				 			<input type="button" id="rejectMessagesBottom" class="btn btn-primary btn-xs rejectMessages" value="Reject All Errors" />
+	  				 		</c:if>
+	  				 		<c:if test="${batchDetails.statusId == 2}">
+	  				 			<input type="button" id="processBatchBottom" class="btn btn-primary btn-xs processBatch" rel="processBatch" rel2="${batchDetails.id}" value="Load Batch" />
+	  				 		</c:if>
+	  				 		<c:if test="${batchDetails.statusId == 3}">
+	  				 			<input type="button" id="processBatchBottom" class="btn btn-primary btn-xs processBatch" rel="processBatch" rel2="${batchDetails.id}" value="Process Batch" />
+	  				 		</c:if>
+	  				 		<c:if test="${canCancel}">
+	                       		<input type="button" id="cancelBottom" class="btn btn-primary btn-xs cancelBatch" rel="cancel"  rel2="${batchDetails.id}"value="Do Not Process" />
+	                       	</c:if>
+	                        <c:if test="${canReset}">
+	                          	<input type="button" id="resetBottom" class="btn btn-primary btn-xs resetBatch" rel="reset"  rel2="${batchDetails.id}" value="Reset" />
+		       				</c:if>
+		       			</div>
+	                </div>	
+             	</c:if>
+                    
   				</c:when>
   				<c:when test="${not empty doesNotExist}">
   					<section class="panel panel-default">
@@ -126,10 +156,13 @@
     </div>
 </div>
 
-<form action="batchOptions" id="batchOptions" method="post">
+<form action="../../rejectMessages" id="massReject" method="post">
     <input type="hidden" id="idList" name="idList" value="${fn:substring(idList,1,fn:length(idList))}" />
     <input type="hidden" name="batchId" id="batchId" value="${batchDetails.id}"/>
-    <input type="hidden" name="batchOption" id="batchOption" value=""/>
+</form>
+
+<form action="../../editTransaction" id="editTransaction" method="post">
+    <input type="hidden" id="transactionInId" name="transactionInId" value="" />
 </form>
 
 <div class="modal fade" id="statusModal" role="dialog" tabindex="-1" aria-labeledby="Status Details" aria-hidden="true" aria-describedby="Status Details"></div>

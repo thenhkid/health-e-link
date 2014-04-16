@@ -66,6 +66,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.view.RedirectView;
 
 /**
  *
@@ -1476,6 +1478,7 @@ public class adminProcessingActivity {
         boolean canCancel  = false;
         boolean canReset  = false;
         boolean canEdit = false;
+        boolean canSend = false;
         
         /* Get the details of the batch */
         batchUploads batchDetails = transactionInManager.getBatchDetailsByBatchName(batchName);
@@ -1494,6 +1497,13 @@ public class adminProcessingActivity {
                if (batchDetails.getstatusId() != 2) {
                 canReset = true;
                }
+            }
+            
+            if (batchDetails.getstatusId() == 5) {
+                // now we check so we don't have to make a db hit if batch status is not 5 
+                if (transactionInManager.getRecordCounts(batchDetails.getId(), Arrays.asList(11, 12, 13, 16), false, false) == 0) {
+                    canSend = true;
+                }
             }
             
             if (batchDetails.getstatusId() == 5 && transactionInManager.getRecordCounts(batchDetails.getId(), Arrays.asList(14), false, true) > 0) {
@@ -1538,10 +1548,10 @@ public class adminProcessingActivity {
         	mav.addObject("doesNotExist", true);
         }
         
-        
         mav.addObject("canCancel", canCancel);
         mav.addObject("canReset", canReset);
         mav.addObject("canEdit", canEdit);
+        mav.addObject("canSend", canSend);
         
         return mav;
     }
@@ -1551,7 +1561,7 @@ public class adminProcessingActivity {
      */
     
     @RequestMapping(value = "/inboundBatchOptions", method = RequestMethod.POST)
-    public @ResponseBody boolean inboundBatchOptions(HttpSession session, 
+    public @ResponseBody boolean inboundBatchOptions(HttpSession session, @RequestParam(value = "tId", required = false) Integer transactionInId,
     		@RequestParam(value = "batchId", required = true) Integer batchId, Authentication authentication,
     		@RequestParam(value = "batchOption", required = true) String batchOption) throws Exception {
         
@@ -1586,8 +1596,23 @@ public class adminProcessingActivity {
 	                    transactionInManager.updateBatchStatus(batchId, 2, "startOver");
 	                }
 	    		}
+	    	} else if (batchOption.equalsIgnoreCase("releaseBatch")) {
+	    		strBatchOption = "Released Batch";
+            	if (batchDetails.getstatusId() == 5) {   	        
+                    transactionInManager.updateBatchStatus(batchId, 4, "startDateTime");
+                    //check once again to make sure all transactions are in final status
+                    if (transactionInManager.getRecordCounts(batchId, Arrays.asList(11, 12, 13, 16), false, false) == 0) {
+                        transactionInManager.updateBatchStatus(batchId, 6, "endDateTime");
+                    } else {
+                        transactionInManager.updateBatchStatus(batchId, 5, "endDateTime");  
+                    }      	
+            	}
+	    	} else if (batchOption.equalsIgnoreCase("rejectMessage")) {
+	    		strBatchOption = "Rejected Transaction";
+            	if (batchDetails.getstatusId() == 5) {   	        
+            		transactionInManager.updateTranStatusByTInId(transactionInId, 13);     	
+            	}
 	    	}
-    	
     	}
     	
     	//log user activity
@@ -1597,8 +1622,88 @@ public class adminProcessingActivity {
         ua.setPageAccess("/inboundBatchOptions");
         ua.setActivity("Admin - " + strBatchOption);
         ua.setBatchUploadId(batchId);
+        if (transactionInId != null) {
+        	ua.setTransactionInIds(transactionInId.toString());
+        }
         usermanager.insertUserLog(ua);
         return true;
     }
+    
+    
+    /**
+     * The '/rejectMessages POST request will loop through idList, and reject transactions
+     *
+     * @param request - idList with transactionIds to be rejected
+     * @param request - batchId with batch Id
+     * @param response 
+     * @return	we redirect back to the audit report
+     * @throws Exception
+     */
+    @RequestMapping(value = "/rejectMessages", method = RequestMethod.POST)
+    public ModelAndView massRejectTransactions(@RequestParam(value = "idList", required = false) List<Integer> idList,
+    		@RequestParam(value = "batchId", required = false) Integer batchId, Authentication authentication,
+            RedirectAttributes redirectAttr, HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
+
+    	try {
+    		
+    		User userInfo = usermanager.getUserByUserName(authentication.getName());
+    		batchUploads batchInfo = transactionInManager.getBatchDetails(batchId);
+    		if (userInfo != null && batchInfo != null) {
+    			if (batchInfo.getstatusId() == 5) {
+		            if (idList.size() > 0) {
+		                for (Integer transactionInId : idList) {
+		                    transactionInManager.updateTranStatusByTInId(transactionInId, 13);
+		                }
+		            }   
+	        	}
+    		}
+	    	//log user activity
+	         UserActivity ua = new UserActivity();
+	         ua.setUserId(userInfo.getId());
+	         ua.setAccessMethod(request.getMethod());
+	         ua.setPageAccess("/rejectMessages");
+	         ua.setActivity("Admin Mass Rejected Messages");
+	         ua.setBatchUploadId(batchId);
+	         if (idList.size() > 0) {
+	            	ua.setTransactionInIds(idList.toString().replace("]", "").replace("[", ""));
+	            }
+	         usermanager.insertUserLog(ua);
+         
+	         ModelAndView mav = new ModelAndView(new RedirectView("inbound/auditReport/"+ batchInfo.getutBatchName()));
+	         return mav;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception("Admin Error at mass rejected messages.", e);
+        }
+
+    }
+
+    /**
+     * The '/editTransaction POST will bring up the ERG form for user to fix
+     *
+     * @param request - transactionInId
+     * @param response 
+     * @return	we redirect back to the audit report
+     * @throws Exception
+     */
+    @RequestMapping(value = "/editTransaction", method = RequestMethod.POST)
+    public ModelAndView editTransaction(
+    		@RequestParam(value = "transactionInId", required = false) Integer transactionInId,
+            RedirectAttributes redirectAttr, HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
+
+    	try {
+    		
+    		//populate form here
+    		ModelAndView mav = new ModelAndView("");
+	         return mav;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception("Admin Error at editing transaction. TransactionInId = " + transactionInId, e);
+        }
+
+    }
+
     
 }
