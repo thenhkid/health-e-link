@@ -26,23 +26,31 @@
               <div class="form-container scrollable">
   				<c:choose>
   				<c:when test="${fn:length(errorList) > 0}">
+  				 <div class="row" style="overflow:hidden;margin-top:10px; margin-bottom:20px;">
+                      <div class="col-md-12">
+                           <div class="pull-left">
+		                        <input type="button" id="cancel" class="btn btn-primary btn-xs cancelBatch" value="Do Not Process" />
+                                <input type="button" id="reset" class="btn btn-primary btn-xs resetBatch" value="Reset" />
+	       					</div>
+                      </div>
+                </div>
   				<c:set var="transactionCounter" value="1"/>
   				<c:forEach var="transactionIn" items="${errorList}">
-                        <div class="col-md-12">
-                            <section class="panel panel-default">
+                        <div>
+                           <section class="panel panel-default">
                                 <div class="panel-heading">
-                                    <div class="pull-right" style="margin-top: -5px">
-                                        <c:if test="${transactionIn.transactionStatus == 14 && batch.statusId == 5 && canEdit}">
-                                        	<c:set var="idList" value="${idList},${transactionIn.transactionInId}"/>
-                                            <a href="javascript:void(0);" id="reject" rel="${transactionIn.transactionInId}" rel2="${batch.id}" class="btn btn-primary btn-xs rejectMessage">Reject</a>
-                                            <a href="javascript:void(0);" id="fixErrors"  rel="${transactionIn.transactionInId}" class="btn btn-primary btn-xs fixErrors">Fix Errors</a>
-                                        </c:if>
+                                	<%-- don't think admin should be able to reject / fix messages, should show them status as some 
+                                	transaction are invalid, some are pass, some are errored, some might be rejected --%>
+                                    <div class="pull-right" style="margin-top: -5px">Status:
+                                        <a href="#statusModal" data-toggle="modal" class="btn btn-link viewStatus" rel="${transactionIn.transactionStatus}" title="View this Status">${transactionIn.transactionStatusValue}</a>
                                     </div>
-                                    <h3 class="panel-title">Transaction ${transactionCounter} - ${transactionIn.transactionInId}</h3>
+                                    <h3 class="panel-title">Transaction ${transactionCounter}</h3>
                                 </div>
                                 <div class="panel-body">
                                     <div class="form-container scrollable">
-                                        <div>
+                                    	<!-- work out what buttons to show gsc 04152014 -->
+                                    	
+                                    <div>
                                             <table class="table table-striped table-hover table-default">
                                                 <thead>
                                                     <tr>
@@ -77,8 +85,19 @@
                         <c:set var="transactionCounter" value="${transactionCounter + 1}"/>
                     </c:forEach>
   				</c:when>
+  				<c:when test="${not empty doesNotExist}">
+  					<section class="panel panel-default">
+                                <div class="panel-heading">
+  						<strong>This batch does not exist.</strong>
+  					</div>
+  					</section>
+  				</c:when>
   				<c:otherwise>
-  					This batch does not have any errors or the audit report it not ready.
+  					<section class="panel panel-default">
+                                <div class="panel-heading">
+  						<strong>An audit report is not available for this batch.</strong>
+  					</div>
+  					</section>
   				</c:otherwise>
   				</c:choose>
                 </div>

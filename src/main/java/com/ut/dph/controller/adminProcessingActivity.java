@@ -1497,6 +1497,9 @@ public class adminProcessingActivity {
             catch (Exception e) {
                 throw new Exception("(Admin) Error occurred in getting the audit report for an inbound batch. batchId: "+ batchDetails.getId()+" ERROR: "+e.getMessage(),e);
             }
+        
+        } else {
+        	mav.addObject("doesNotExist", true);
         }
         
         return mav;
