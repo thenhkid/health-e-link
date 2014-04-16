@@ -26,14 +26,22 @@
               <div class="form-container scrollable">
   				<c:choose>
   				<c:when test="${fn:length(errorList) > 0}">
-  				 <div class="row" style="overflow:hidden;margin-top:10px; margin-bottom:20px;">
-                      <div class="col-md-12">
-                           <div class="pull-left">
-		                        <input type="button" id="cancel" class="btn btn-primary btn-xs cancelBatch" value="Do Not Process" />
-                                <input type="button" id="reset" class="btn btn-primary btn-xs resetBatch" value="Reset" />
-	       					</div>
-                      </div>
+  				
+  				 <div class="row" style="overflow:hidden;margin-left:0px;margin-right:0px;margin-top:10px; margin-bottom:20px;">
+  				 	<div class="pull-left">
+  				 		<c:if test="${batchDetails.statusId == 2 || batchDetails.statusId == 3}">
+  				 			<input type="button" id="processBatch" class="btn btn-primary btn-xs processBatch" value="Process Now" />
+  				 		</c:if>
+  				 		<c:if test="${canCancel}">
+                       		<input type="button" id="cancel" class="btn btn-primary btn-xs cancelBatch" value="Do Not Process" />
+                       	</c:if>
+                        <c:if test="${canReset}">
+                          	<input type="button" id="reset" class="btn btn-primary btn-xs resetBatch" value="Reset" />
+	       				</c:if>
+	       				
+	       			</div>
                 </div>
+                
   				<c:set var="transactionCounter" value="1"/>
   				<c:forEach var="transactionIn" items="${errorList}">
                         <div>
@@ -43,6 +51,10 @@
                                 	transaction are invalid, some are pass, some are errored, some might be rejected --%>
                                     <div class="pull-right" style="margin-top: -5px">Status:
                                         <a href="#statusModal" data-toggle="modal" class="btn btn-link viewStatus" rel="${transactionIn.transactionStatus}" title="View this Status">${transactionIn.transactionStatusValue}</a>
+                                        <a href="#messageDetailsModal" data-toggle="modal" rel="${transactionIn.transactionInId}" rel2="0" class="viewLink">
+	                                     <span class="glyphicon glyphicon-edit"></span>
+	                                     View
+	                                    </a>
                                     </div>
                                     <h3 class="panel-title">Transaction ${transactionCounter}</h3>
                                 </div>
@@ -104,5 +116,6 @@
 
     </div>
 </div>
+
 <div class="modal fade" id="statusModal" role="dialog" tabindex="-1" aria-labeledby="Status Details" aria-hidden="true" aria-describedby="Status Details"></div>
 <div class="modal fade" id="messageDetailsModal" role="dialog" tabindex="-1" aria-labeledby="Message Details" aria-hidden="true" aria-describedby="Message Details"></div>
