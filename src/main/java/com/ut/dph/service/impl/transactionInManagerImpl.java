@@ -672,8 +672,10 @@ public class transactionInManagerImpl implements transactionInManager {
                     if (handlingDetails.get(0).geterrorHandling() == 4) {
                         //update to pass - 16
                         updateTransactionStatus(batchUploadId, 0, 14, 16);
-                        //target should still be pending output
+                        //auto release, records 
                         updateTransactionTargetStatus(batchUploadId, 0, 14, 19);
+                        updateTransactionTargetStatus(batchUploadId, 0, 16, 19);
+                        
                     }
                     if (handlingDetails.get(0).geterrorHandling() == 2) {
                         //reject errors
@@ -708,7 +710,7 @@ public class transactionInManagerImpl implements transactionInManager {
                     batchStausId = 5;
                     // pass
                     updateTransactionStatus(batchUploadId, 0, 14, 16);
-                    updateTransactionTargetStatus(batchUploadId, 0, 14, 19);
+                    updateTransactionTargetStatus(batchUploadId, 0, 14, 16);
                 } //end of checking auto/error handling
 
                 updateRecordCounts(batchUploadId, new ArrayList<Integer>(), false, "totalRecordCount");
