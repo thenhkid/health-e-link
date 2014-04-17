@@ -12,11 +12,15 @@
 <div class="main clearfix" role="main">
     <div class="row-fluid">
         <div class="col-md-12">
+            <div id="translationMsgDiv"  class="alert alert-danger" style="display:none;">
+                <strong>Error!</strong> 
+                An error has occurred in one of the below fields!
+            </div>
             <section class="panel panel-default">
                 <div class="panel-body">
                     <dt>
                     <dt>Batch Summary:</dt>
-                    <dd><strong>Batch ID:</strong> <a href="inbound/auditReport/${batchDetails.utBatchName}">${batchDetails.utBatchName}</a></dd>
+                    <dd><strong>Batch ID:</strong> <a href="inbound/auditReport/${batchDetails.utBatchName}" id="batchLink" rel="${batchDetails.utBatchName}">${batchDetails.utBatchName}</a></dd>
                     <dd><strong>Source Organization:</strong> ${batchDetails.orgName}</dd>
                     <dd><strong>Date Submitted:</strong> <fmt:formatDate value="${batchDetails.dateSubmitted}" type="date" pattern="M/dd/yyyy" />&nbsp;&nbsp;<fmt:formatDate value="${batchDetails.dateSubmitted}" type="time" pattern="h:mm:ss a" /></dd>
                     <dd><strong>Total Transactions:</strong> ${batchDetails.totalRecordCount}</dd>
@@ -29,11 +33,7 @@
     </div>
     <div class="col-md-12">
         <div class="form-container scrollable">
-            
-            <form action="auditReport" id="viewBatchAuditReport" method="post">
-                <input type="hidden" id="auditbatchId" name="batchId" value="${transaction.batchId}" />
-            </form> 
-            <form:form id="messageForm" action="/Health-e-Connect/editMessage" modelAttribute="transaction" role="form" class="form" method="post">
+              <form:form id="messageForm" action="editMessage" modelAttribute="transaction" role="form" class="form" method="post">
                 <form:hidden path="transactionId"  />
                 <form:hidden path="batchId"  />
                 <form:hidden path="configId" />
@@ -240,13 +240,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
-               
-                <div class="form-group">
-                    <div id="translationMsgDiv"  class="alert alert-danger" style="display:none;">
-                        <strong>An error has occurred in one of the above fields!</strong>
-                    </div>
-                    <input type="button" id="send" class="btn btn-primary btn-action-sm submitMessage" value="Save Changes"/>
                 </div>
            </form:form>
         </div>

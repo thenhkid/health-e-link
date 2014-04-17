@@ -60,6 +60,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -1795,6 +1796,133 @@ public class adminProcessingActivity {
             throw new Exception("Error occurred displaying upload ERG form.", e);
         }
 
+    }
+    
+    /**
+     * The '/editMessage' POST request will submit the changes to the passed in transaction. The
+     * transaction will be updated to a status of 10 (Pending Release) and the error records will be cleared
+     * 
+     * @param transactionDetails The object to hold the transaction fields
+     * 
+     */
+    @RequestMapping(value = "/editMessage", method = RequestMethod.POST)
+    public @ResponseBody Integer submitTransactionChanges(@ModelAttribute(value = "transactionDetails") Transaction transactionDetails,HttpServletRequest request, HttpServletResponse response, Authentication authentication, HttpSession session) throws Exception {
+        
+       
+        /* Update the transactionInRecords */
+        List<transactionRecords> sourceOrgFields = transactionDetails.getsourceOrgFields();
+        List<transactionRecords> sourceProviderFields = transactionDetails.getsourceProviderFields();
+        List<transactionRecords> targetOrgFields = transactionDetails.gettargetOrgFields();
+        List<transactionRecords> targetProviderFields = transactionDetails.gettargetProviderFields();
+        List<transactionRecords> patientFields = transactionDetails.getpatientFields();
+        List<transactionRecords> detailFields = transactionDetails.getdetailFields(); 
+        
+        transactionInRecords records = transactionInManager.getTransactionRecords(transactionDetails.gettransactionId());
+        
+        String colName;
+        for(transactionRecords field : sourceOrgFields) {
+            colName = new StringBuilder().append("f").append(field.getfieldNo()).toString();
+            try {
+                BeanUtils.setProperty(records, colName, field.getfieldValue());
+            } catch (IllegalAccessException ex) {
+                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InvocationTargetException ex) {
+                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        
+        for(transactionRecords field : sourceProviderFields) {
+            colName = new StringBuilder().append("f").append(field.getfieldNo()).toString();
+            try {
+                BeanUtils.setProperty(records, colName, field.getfieldValue());
+            } catch (IllegalAccessException ex) {
+                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InvocationTargetException ex) {
+                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+        for(transactionRecords field : targetOrgFields) {
+            colName = new StringBuilder().append("f").append(field.getfieldNo()).toString();
+            try {
+                BeanUtils.setProperty(records, colName, field.getfieldValue());
+            } catch (IllegalAccessException ex) {
+                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InvocationTargetException ex) {
+                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+        for(transactionRecords field : targetProviderFields) {
+            colName = new StringBuilder().append("f").append(field.getfieldNo()).toString();
+            try {
+                BeanUtils.setProperty(records, colName, field.getfieldValue());
+            } catch (IllegalAccessException ex) {
+                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InvocationTargetException ex) {
+                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+        for(transactionRecords field : patientFields) {
+            colName = new StringBuilder().append("f").append(field.getfieldNo()).toString();
+            try {
+                BeanUtils.setProperty(records, colName, field.getfieldValue());
+            } catch (IllegalAccessException ex) {
+                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InvocationTargetException ex) {
+                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+        for(transactionRecords field : detailFields) {
+            colName = new StringBuilder().append("f").append(field.getfieldNo()).toString();
+            try {
+                BeanUtils.setProperty(records, colName, field.getfieldValue());
+            } catch (IllegalAccessException ex) {
+                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InvocationTargetException ex) {
+                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        
+        try {
+            records.setId(records.getId());
+            transactionInManager.submitTransactionInRecordsUpdates(records);
+
+            /* Update the transactionTranslatedIn records  */
+            transactionInManager.submitTransactionTranslatedInRecords(transactionDetails.gettransactionId(), records.getId(), transactionDetails.getconfigId());
+
+            /* Remove the transaction errors */
+            transactionInManager.deleteTransactionInErrorsByTransactionId(transactionDetails.gettransactionId());
+
+            /* Update the transaction status to 10 (PR Released) */
+            transactionInManager.updateTransactionStatus(0, transactionDetails.gettransactionId(), 14, 10);
+
+            /** update status so it will re-process **/
+            transactionInManager.updateBatchStatus(transactionDetails.getbatchId(), 3, "startDateTime");
+
+            /** re-process batch **/
+            transactionInManager.processBatch(transactionDetails.getbatchId(), true);
+
+            /** add logging **/
+            UserActivity ua = new UserActivity();
+            User userInfo = usermanager.getUserByUserName(authentication.getName());
+            ua.setUserId(userInfo.getId());
+            ua.setAccessMethod(request.getMethod());
+            ua.setPageAccess("/editMessage");
+            ua.setActivity("Modified Transaction with Error(s)");
+            ua.setTransactionInIds(String.valueOf(transactionDetails.gettransactionId()));
+            ua.setBatchUploadId(transactionDetails.getbatchId());
+            usermanager.insertUserLog(ua);
+        }
+       catch (Exception e) {
+            throw new Exception("Error saving the transaction: error", e);
+        }
+        
+        
+        return 1;
+        
     }
 
 }
