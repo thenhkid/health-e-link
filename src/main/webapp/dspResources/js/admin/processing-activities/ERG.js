@@ -48,8 +48,11 @@ require(['./main'], function() {
                     dataType: "json",
                     success: function(data) {
                        window.location.href = 'inbound/auditReport/'+batchName; 
+                    },
+                    error: function(xhr) {
+                        console.log(xhr.responseText);
                     }
-                });
+                }); 
                 
                 
             }

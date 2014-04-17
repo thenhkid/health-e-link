@@ -1804,7 +1804,7 @@ public class adminProcessingActivity {
      * 
      */
     @RequestMapping(value = "/editMessage", method = RequestMethod.POST)
-    public @ResponseBody Integer submitTransactionChanges(@ModelAttribute(value = "transactionDetails") Transaction transactionDetails,HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
+    public @ResponseBody Integer submitTransactionChanges(@ModelAttribute(value = "transactionDetails") Transaction transactionDetails,HttpServletRequest request, HttpServletResponse response, Authentication authentication, HttpSession session) throws Exception {
         
        
         /* Update the transactionInRecords */
@@ -1884,34 +1884,40 @@ public class adminProcessingActivity {
             }
         }
         
-        records.setId(records.getId());
-        transactionInManager.submitTransactionInRecordsUpdates(records);
+        try {
+            records.setId(records.getId());
+            transactionInManager.submitTransactionInRecordsUpdates(records);
+
+            /* Update the transactionTranslatedIn records  */
+            transactionInManager.submitTransactionTranslatedInRecords(transactionDetails.gettransactionId(), records.getId(), transactionDetails.getconfigId());
+
+            /* Remove the transaction errors */
+            transactionInManager.deleteTransactionInErrorsByTransactionId(transactionDetails.gettransactionId());
+
+            /* Update the transaction status to 10 (PR Released) */
+            transactionInManager.updateTransactionStatus(0, transactionDetails.gettransactionId(), 14, 10);
+
+            /** update status so it will re-process **/
+            transactionInManager.updateBatchStatus(transactionDetails.getbatchId(), 3, "startDateTime");
+
+            /** re-process batch **/
+            transactionInManager.processBatch(transactionDetails.getbatchId(), true);
+
+            /** add logging **/
+            UserActivity ua = new UserActivity();
+            User userInfo = usermanager.getUserByUserName(authentication.getName());
+            ua.setUserId(userInfo.getId());
+            ua.setAccessMethod(request.getMethod());
+            ua.setPageAccess("/editMessage");
+            ua.setActivity("Modified Transaction with Error(s)");
+            ua.setTransactionInIds(String.valueOf(transactionDetails.gettransactionId()));
+            ua.setBatchUploadId(transactionDetails.getbatchId());
+            usermanager.insertUserLog(ua);
+        }
+       catch (Exception e) {
+            throw new Exception("Error saving the transaction: error", e);
+        }
         
-        /* Update the transactionTranslatedIn records  */
-        transactionInManager.submitTransactionTranslatedInRecords(transactionDetails.gettransactionId(), records.getId(), transactionDetails.getconfigId());
-        
-        /* Remove the transaction errors */
-        transactionInManager.deleteTransactionInErrorsByTransactionId(transactionDetails.gettransactionId());
-       
-        /* Update the transaction status to 10 (PR Released) */
-        transactionInManager.updateTransactionStatus(0, transactionDetails.gettransactionId(), 14, 10);
-        
-        /** update status so it will re-process **/
-        transactionInManager.updateBatchStatus(transactionDetails.getbatchId(), 3, "startDateTime");
-        
-        /** re-process batch **/
-        transactionInManager.processBatch(transactionDetails.getbatchId(), true);
-        
-        /** add logging **/
-        UserActivity ua = new UserActivity();
-        User userInfo = (User) session.getAttribute("userDetails");
-        ua.setUserId(userInfo.getId());
-        ua.setAccessMethod(request.getMethod());
-        ua.setPageAccess("/editMessage");
-        ua.setActivity("Modified Transaction with Error(s)");
-        ua.setTransactionInIds(String.valueOf(transactionDetails.gettransactionId()));
-        ua.setBatchUploadId(transactionDetails.getbatchId());
-        usermanager.insertUserLog(ua);
         
         return 1;
         
