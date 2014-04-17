@@ -40,7 +40,7 @@
 	  				 			<input type="button" id="processBatch" class="btn btn-primary btn-xs processBatch" rel="processBatch" rel2="${batchDetails.id}" value="Process Batch" />
 	  				 		</c:if>
 	  				 		<c:if test="${canCancel}">
-	                       		<input type="button" id="cancel" class="btn btn-primary btn-xs cancelBatch" rel="cancel"  rel2="${batchDetails.id}"value="Do Not Process" />
+	                       		<input type="button" id="cancel" class="btn btn-primary btn-xs cancelBatch" rel="cancel"  rel2="${batchDetails.id}" value="Cancel" />
 	                       	</c:if>
 	                        <c:if test="${canReset}">
 	                          	<input type="button" id="reset" class="btn btn-primary btn-xs resetBatch" rel="reset"  rel2="${batchDetails.id}" value="Reset" />
@@ -126,7 +126,7 @@
 	  				 			<input type="button" id="processBatchBottom" class="btn btn-primary btn-xs processBatch" rel="processBatch" rel2="${batchDetails.id}" value="Process Batch" />
 	  				 		</c:if>
 	  				 		<c:if test="${canCancel}">
-	                       		<input type="button" id="cancelBottom" class="btn btn-primary btn-xs cancelBatch" rel="cancel"  rel2="${batchDetails.id}"value="Do Not Process" />
+	                       		<input type="button" id="cancelBottom" class="btn btn-primary btn-xs cancelBatch" rel="cancel"  rel2="${batchDetails.id}"value="Cancel" />
 	                       	</c:if>
 	                        <c:if test="${canReset}">
 	                          	<input type="button" id="resetBottom" class="btn btn-primary btn-xs resetBatch" rel="reset"  rel2="${batchDetails.id}" value="Reset" />
