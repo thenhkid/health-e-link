@@ -1451,12 +1451,14 @@ public class adminProcessingActivity {
             lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batchDetails.getstatusId());
             batchDetails.setstatusValue(processStatus.getDisplayCode());
 
-            List<Integer> cancelStatusList = Arrays.asList(22, 23, 1, 8); //DNP (21) is not a final status for admin
+            List<Integer> cancelStatusList = Arrays.asList(21, 22, 23, 1, 8); 
             if (!cancelStatusList.contains(batchDetails.getstatusId())) {
-                canCancel = true;
-                if (batchDetails.getstatusId() != 2) {
-                    canReset = true;
-                }
+                canCancel = true;    
+            }
+            
+            List<Integer> resetStatusList = Arrays.asList(2, 22, 23, 1, 8); //DNP (21) is not a final status for admin
+            if (!resetStatusList.contains(batchDetails.getstatusId())) {
+                canReset = true;
             }
 
             if (batchDetails.getstatusId() == 5) {
