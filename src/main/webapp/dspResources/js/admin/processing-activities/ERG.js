@@ -38,14 +38,16 @@ require(['./main'], function() {
                
                  var formData = $("#messageForm").serialize();
                  
+                 var batchName = $('#batchLink').attr('rel');
+                 
                  $.ajax({
-                    url: '/Health-e-Connect/editMessage',
+                    url: 'editMessage',
                     data: formData,
                     type: "POST",
                     async: false,
                     dataType: "json",
                     success: function(data) {
-                       $('#viewBatchAuditReport').submit();
+                       window.location.href = 'inbound/auditReport/'+batchName; 
                     }
                 });
                 
