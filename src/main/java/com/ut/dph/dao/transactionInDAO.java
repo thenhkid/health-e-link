@@ -94,7 +94,7 @@ public interface transactionInDAO {
     
     void removeAttachmentById(int attachmentId) throws Exception;
     
-    List <Integer> getConfigIdsForBatch (int batchUploadId, boolean getAll);
+    List <Integer> getConfigIdsForBatch (int batchUploadId, boolean getAll, Integer transactionInId);
     
     List <ConfigForInsert> setConfigForInsert(int configId, int batchUploadId);
     
@@ -162,7 +162,7 @@ public interface transactionInDAO {
    
     void flagMacroErrors (Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing);
 
-    void resetTransactionTranslatedIn (Integer batchId, boolean resetAll);
+    void resetTransactionTranslatedIn (Integer batchId, boolean resetAll, Integer transactionInId);
     
     Integer executeMacro (Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing, Macros macro);
     

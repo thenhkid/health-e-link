@@ -356,7 +356,12 @@ public class transactionInManagerImpl implements transactionInManager {
 
     @Override
     public List<Integer> getConfigIdsForBatch(int batchUploadId, boolean getAll) {
-        return transactionInDAO.getConfigIdsForBatch(batchUploadId, getAll);
+    	return transactionInDAO.getConfigIdsForBatch(batchUploadId, getAll, 0);
+    }
+    
+    @Override
+    public List<Integer> getConfigIdsForBatch(int batchUploadId, boolean getAll, Integer transactionInId) {
+        return transactionInDAO.getConfigIdsForBatch(batchUploadId, getAll, transactionInId);
     }
 
     @Override
@@ -541,11 +546,11 @@ public class transactionInManagerImpl implements transactionInManager {
      */
     /** needed to add boolean, made new method **/
     public boolean processBatch(int batchUploadId) throws Exception {
-    	return processBatch(batchUploadId, false);
+    	return processBatch(batchUploadId, false, 0);
     }
     
     @Override
-    public boolean processBatch(int batchUploadId, boolean doNotClearErrors) throws Exception {
+    public boolean processBatch(int batchUploadId, boolean doNotClearErrors, Integer transactionInId) throws Exception {
 
         Integer batchStausId = 29;
         List<Integer> errorStatusIds = Arrays.asList(11, 13, 14, 16);
@@ -563,13 +568,15 @@ public class transactionInManagerImpl implements transactionInManager {
              * we should only process the ones that are not REL status, to be safe, we copy over data from transactionInRecords*
              */
            
-            	resetTransactionTranslatedIn(batchUploadId, false);
+            	resetTransactionTranslatedIn(batchUploadId, false, transactionInId);
            
             //clear transactionInError table for batch
             	if (!doNotClearErrors) {
             		systemErrorCount = systemErrorCount + clearTransactionInErrors(batchUploadId, true);
             	}
-            List<Integer> configIds = getConfigIdsForBatch(batchUploadId, false);
+            	
+            List<Integer> configIds = getConfigIdsForBatch(batchUploadId, false, transactionInId);
+            
             for (Integer configId : configIds) {
 				//we need to run all checks before insert regardless *
 
@@ -1368,7 +1375,12 @@ public class transactionInManagerImpl implements transactionInManager {
 
     @Override
     public void resetTransactionTranslatedIn(Integer batchId, boolean resetAll) {
-        transactionInDAO.resetTransactionTranslatedIn(batchId, resetAll);
+        resetTransactionTranslatedIn(batchId, resetAll, 0);
+    }
+    
+    @Override
+    public void resetTransactionTranslatedIn(Integer batchId, boolean resetAll, Integer transactionInId) {
+        transactionInDAO.resetTransactionTranslatedIn(batchId, resetAll, transactionInId);
     }
 
     @Override

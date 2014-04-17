@@ -1012,7 +1012,7 @@ public class HealtheConnectController {
         transactionInManager.updateBatchStatus(transactionDetails.getbatchId(), 3, "startDateTime");
         
         /** re-process batch **/
-        transactionInManager.processBatch(transactionDetails.getbatchId(), true);
+        transactionInManager.processBatch(transactionDetails.getbatchId(), true, transactionDetails.gettransactionId());
         
         /** add logging **/
         UserActivity ua = new UserActivity();

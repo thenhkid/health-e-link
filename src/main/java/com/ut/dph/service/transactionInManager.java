@@ -109,6 +109,8 @@ public interface transactionInManager {
     
     List <Integer> getConfigIdsForBatch (int batchUploadId, boolean getAll);
     
+    List <Integer> getConfigIdsForBatch (int batchUploadId, boolean getAll, Integer transactionInId);
+    
     List <Integer> getTransWithMultiValues (ConfigForInsert config);
 
     Integer clearMessageTables(int batchId);
@@ -123,7 +125,7 @@ public interface transactionInManager {
     
     List<batchUploads> getuploadedBatches(int userId, int orgId, Date fromDate, Date toDate, List <Integer> excludedStatusIds) throws Exception;
     
-    boolean processBatch(int batchUploadId, boolean doNotClearErrors) throws Exception;
+    boolean processBatch(int batchUploadId, boolean doNotClearErrors, Integer transactionInId) throws Exception;
     
     boolean processBatch(int batchUploadId) throws Exception;
     
@@ -220,6 +222,8 @@ public interface transactionInManager {
     Integer getRecordCounts (Integer batchId, List <Integer> statusIds, boolean foroutboundProcessing, boolean inStatusIds);
     
     void resetTransactionTranslatedIn(Integer batchId, boolean resetAll);
+    
+    void resetTransactionTranslatedIn(Integer batchId, boolean resetAll, Integer transactionInId);
     
     Integer copyTransactionInStatusToTarget(Integer batchId);
     

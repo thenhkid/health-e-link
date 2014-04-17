@@ -938,10 +938,18 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Override
     @Transactional
     @SuppressWarnings("unchecked")
-    public List<Integer> getConfigIdsForBatch(int batchUploadId, boolean getAll) {
-
+    public List<Integer> getConfigIdsForBatch(int batchUploadId, boolean getAll, Integer transactionInId) {
+    	
+    	Integer id = batchUploadId;
         String sql = "select distinct configId from transactionTranslatedIn "
-                + " where transactionInId in (select id from transactionIn where batchId = :id ";
+                + " where transactionInId in (select id from transactionIn where ";
+        
+        if (transactionInId == 0) {
+        	sql = sql + "batchId = :id ";
+        } else {
+        	sql = sql + "id = :id ";
+        	id = transactionInId;
+        }
 
         if (!getAll) {
             sql = sql + " and statusId not in (:transRELId)";
@@ -949,7 +957,7 @@ public class transactionInDAOImpl implements transactionInDAO {
         sql = sql + ");";
 
         Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
-        query.setParameter("id", batchUploadId);
+        query.setParameter("id", id);
         if (!getAll) {
             query.setParameterList("transRELId", transRELId);
         }
@@ -1968,8 +1976,8 @@ public class transactionInDAOImpl implements transactionInDAO {
                     + ", 4,  " + cdt.getMacroId() + " from transactionTranslatedIn where "
                     + "configId = :configId "
                     + " and forcw = 'MACRO_ERROR'"
-                    + "and transactionInId in (select id from transactionIn "
-                    + "where batchId = :batchId"
+                    + " and transactionInId in (select id from transactionIn "
+                    + " where batchId = :batchId"
                     + " and configId = :configId and statusId not in ( :transRELId ));";
 
         } else {
@@ -1996,7 +2004,7 @@ public class transactionInDAOImpl implements transactionInDAO {
     }
 
     /**
-     * this method will repalce transactionTranslatedIn data with data from transactionInRecords
+     * this method will replace transactionTranslatedIn data with data from transactionInRecords
      *
      * @param batchId - the batch to reset
      * @param resetAll - if true, we reset all records. If false, we skip the REL records
@@ -2004,10 +2012,18 @@ public class transactionInDAOImpl implements transactionInDAO {
      */
     @Override
     @Transactional
-    public void resetTransactionTranslatedIn(Integer batchId, boolean resetAll) {
-        String sql = "UPDATE transactionTranslatedIn INNER JOIN transactionInRecords ON "
-                + " (transactionTranslatedIn.transactionInId = transactionInRecords.transactionInId) and transactionTranslatedIn.transactionInId "
-                + " in (select id from transactionIn where batchId = :batchId ";
+    public void resetTransactionTranslatedIn(Integer batchId, boolean resetAll, Integer transactionInId) {
+        
+    	Integer id = batchId;
+    	String sql = "UPDATE transactionTranslatedIn INNER JOIN transactionInRecords ON "
+                + " (transactionTranslatedIn.transactionInId = transactionInRecords.transactionInId) and transactionTranslatedIn.transactionInId ";
+        if (transactionInId == 0) {
+        	sql = sql + " in (select id from transactionIn where batchId = :id ";
+        } else  {
+        	sql = sql + " in (select id from transactionIn where id = :id ";
+        	id = transactionInId;
+        }
+        
         if (!resetAll) {
             sql = sql + " and statusId not in ( :transRELId )";
         }
@@ -2259,8 +2275,10 @@ public class transactionInDAOImpl implements transactionInDAO {
                 + "transactiontranslatedIn.F254 = transactionInRecords.F254,"
                 + "transactiontranslatedIn.F255 = transactionInRecords.F255";
 
-        Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
-                .setParameter("batchId", batchId);
+        Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql);
+        
+        updateData.setParameter("id", id);
+        
         if (!resetAll) {
             updateData.setParameterList("transRELId", transRELId);
         }
