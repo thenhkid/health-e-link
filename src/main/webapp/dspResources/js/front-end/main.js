@@ -10,7 +10,7 @@ require.config({
         'fixed-header': '../fixed-header',
         'moment': '../vendor/moment',
         'daterangepicker': '../vendor/daterangepicker',
-        'dataTables': '../vendor/jquery.dataTables'
+        'dataTables': '../vendor/jquery.dataTables.min'
     },
     shim: {
         'bootstrap': ['jquery'],
