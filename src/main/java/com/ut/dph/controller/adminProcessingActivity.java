@@ -9,6 +9,7 @@ package com.ut.dph.controller;
 import com.ut.dph.model.Organization;
 import com.ut.dph.model.Transaction;
 import com.ut.dph.model.User;
+import com.ut.dph.model.UserActivity;
 import com.ut.dph.model.batchDownloads;
 import com.ut.dph.model.batchUploadSummary;
 import com.ut.dph.model.batchUploads;
@@ -16,6 +17,7 @@ import com.ut.dph.model.configuration;
 import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.configurationMessageSpecs;
 import com.ut.dph.model.configurationTransport;
+import com.ut.dph.model.custom.TransErrorDetailDisplay;
 import com.ut.dph.model.custom.searchParameters;
 import com.ut.dph.model.fieldSelectOptions;
 import com.ut.dph.model.lutables.lu_ProcessStatus;
@@ -34,23 +36,29 @@ import com.ut.dph.service.sysAdminManager;
 import com.ut.dph.service.transactionInManager;
 import com.ut.dph.service.transactionOutManager;
 import com.ut.dph.service.userManager;
+
 import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -58,6 +66,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.view.RedirectView;
 
 /**
  *
@@ -902,7 +912,9 @@ public class adminProcessingActivity {
             if(Type == 1) {
                 
                  transactionIn transactionInfo = transactionInManager.getTransactionDetails(transactionId);
-                 
+                 if (transactionInfo == null)  { // this will be null if batch is reset - the same transactions will not be available 
+                	 return mav;
+                 }
                  /* Get the configuration details */
                 configuration configDetails = configurationManager.getConfigurationById(transactionInfo.getconfigId());
                 
@@ -968,6 +980,9 @@ public class adminProcessingActivity {
                 
                 transactionTarget transactionInfo = transactionOutManager.getTransactionDetails(transactionId);
                 
+                if (transactionInfo == null)  { // this will be null if batch is reset - the same transactions will not be available 
+               	 return mav;
+                }
                 /* Get the configuration details */
                 configuration configDetails = configurationManager.getConfigurationById(transactionInfo.getconfigId());
                 
@@ -1366,4 +1381,329 @@ public class adminProcessingActivity {
         
         return true;
     }
+    
+    
+    /**
+     * The '/inbound/batchActivities/{batchName}' GET request will retrieve a list of user activities that are associated to the clicked batch 
+     *
+     * @param batchName	The name of the batch to retrieve transactions for
+     * @return          The list of inbound batch user activities
+     *
+     * @Objects	(1) An object containing all the found user activities
+     *
+     * @throws Exception
+     */
+    @RequestMapping(value = "/inbound/batchActivities/{batchName}", method = RequestMethod.GET)
+    public ModelAndView listBatchActivities(@PathVariable String batchName) throws Exception {
+  
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/processing-activity/batchActivities");
+        
+        /* Get the details of the batch */
+        batchUploads batchDetails = transactionInManager.getBatchDetailsByBatchName(batchName);
+        
+        if(batchDetails != null) {
+            
+            Organization orgDetails = organizationmanager.getOrganizationById(batchDetails.getOrgId());
+            batchDetails.setorgName(orgDetails.getOrgName());
+        
+            mav.addObject("batchDetails", batchDetails);
+
+            try {
+                /* Get all the user activities for the batch */
+                List<UserActivity> uas = transactionInManager.getBatchActivities(batchDetails, true, false);
+                mav.addObject("userActivities", uas);
+
+            }
+            catch (Exception e) {
+                throw new Exception("(Admin) Error occurred in getting batch activities for an inbound batch. batchId: "+ batchDetails.getId()+" ERROR: "+e.getMessage(),e);
+            }
+        }
+        
+        return mav;
+    }
+    
+    
+    /**
+     * The '/ViewUATransactionList' function will return the list of transaction ids for a batch activity that was 
+     * too long to display
+     * The results will be displayed in the overlay.
+     *
+     * @Param	uaId   This will hold the id of the user activity
+     * @Param	type   1 = inbound 2 = outbound
+     *
+     * @Return	This function will return the transactionList for that user activity.
+     */
+    @RequestMapping(value = "/ViewUATransactionList", method = RequestMethod.GET)
+    public ModelAndView viewUATransactionList(@RequestParam(value = "uaId", required = true) Integer uaId,
+    		@RequestParam(value = "Type", required = true) Integer type) 
+    		throws Exception {
+   
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/processing-activities/transactionList");
+
+        /* Get the details of the selected status */ 
+        UserActivity userActivity = usermanager.getUAById(uaId);
+        
+        
+        /* Get the details of the batch */
+        batchUploads batchDetails = new batchUploads();
+        if (type==1) {
+        	batchDetails = transactionInManager.getBatchDetails(userActivity.getBatchUploadId());
+        } else {
+        	batchDetails = transactionInManager.getBatchDetails(userActivity.getBatchDownloadId());
+        }
+        
+        mav.addObject("userActivity", userActivity);
+        mav.addObject("batchDetails", batchDetails);
+        	
+        return mav;
+    }
+
+    /**
+     * The '/inbound/auditReport/{batchName}' GET request will retrieve the audit report that is associated to the clicked batch 
+     *
+     * @param batchName	The name of the batch to retrieve transactions for
+     * @return          The audit report for the batch
+     *
+     * @Objects	(1) An object containing all the errored transactions
+     *
+     * @throws Exception
+     */
+    @RequestMapping(value = "/inbound/auditReport/{batchName}", method = RequestMethod.GET)
+    public ModelAndView viewAuditReport(@PathVariable String batchName) throws Exception {
+  
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/processing-activity/auditReport");
+        boolean canCancel  = false;
+        boolean canReset  = false;
+        boolean canEdit = false;
+        boolean canSend = false;
+        
+        /* Get the details of the batch */
+        batchUploads batchDetails = transactionInManager.getBatchDetailsByBatchName(batchName);
+        
+        if(batchDetails != null) {
+            
+            Organization orgDetails = organizationmanager.getOrganizationById(batchDetails.getOrgId());
+            batchDetails.setorgName(orgDetails.getOrgName());
+            
+            lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batchDetails.getstatusId());
+            batchDetails.setstatusValue(processStatus.getDisplayCode());
+
+            List<Integer> cancelStatusList = Arrays.asList(21, 22, 23, 1, 8);
+            if (!cancelStatusList.contains(batchDetails.getstatusId())) {
+                canCancel = true;
+               if (batchDetails.getstatusId() != 2) {
+                canReset = true;
+               }
+            }
+            
+            if (batchDetails.getstatusId() == 5) {
+                // now we check so we don't have to make a db hit if batch status is not 5 
+                if (transactionInManager.getRecordCounts(batchDetails.getId(), Arrays.asList(11, 12, 13, 16), false, false) == 0) {
+                    canSend = true;
+                }
+            }
+            
+            if (batchDetails.getstatusId() == 5 && transactionInManager.getRecordCounts(batchDetails.getId(), Arrays.asList(14), false, true) > 0) {
+                canEdit = true;
+            }
+            
+            /**
+             * we need to check sbp (4) status - if server is restarted and somehow the file hangs in SBP, we want to give them option to reset
+             * if sbp start time is about two hours, that should be sufficient indication that a file is stuck
+             */
+            
+            if (batchDetails.getstatusId() == 4) {
+            	Date d1 = batchDetails.getstartDateTime();
+        		Date d2 = new Date();
+        		//in milliseconds
+    			long diff = d2.getTime() - d1.getTime();
+    			
+    			long diffHours = diff / (60 * 60 * 1000) % 24;
+    			System.out.println(diffHours);
+    			if (diffHours < 2) {
+    				canReset = false;
+    			}
+            }
+            
+            if (batchDetails.getConfigId() != 0) {
+            	batchDetails.setConfigName(configurationManager.getMessageTypeNameByConfigId(batchDetails.getConfigId()));
+            } else {
+            	batchDetails.setConfigName("Multiple Message Types");
+            }
+            mav.addObject("batchDetails", batchDetails);
+
+            try {
+            	List<TransErrorDetailDisplay> errorList = new LinkedList<TransErrorDetailDisplay>();
+                errorList = transactionInManager.populateErrorList(batchDetails);
+                mav.addObject("errorList", errorList);
+            }
+            catch (Exception e) {
+                throw new Exception("(Admin) Error occurred in getting the audit report for an inbound batch. batchId: "+ batchDetails.getId()+" ERROR: "+e.getMessage(),e);
+            }
+        
+        } else {
+        	mav.addObject("doesNotExist", true);
+        }
+        
+        mav.addObject("canCancel", canCancel);
+        mav.addObject("canReset", canReset);
+        mav.addObject("canEdit", canEdit);
+        mav.addObject("canSend", canSend);
+        
+        return mav;
+    }
+    
+    /**
+     * The 'inboundBatchOptions' function will process the batch according to the option submitted by admin
+     */
+    
+    @RequestMapping(value = "/inboundBatchOptions", method = RequestMethod.POST)
+    public @ResponseBody boolean inboundBatchOptions(HttpSession session, @RequestParam(value = "tId", required = false) Integer transactionInId,
+    		@RequestParam(value = "batchId", required = true) Integer batchId, Authentication authentication,
+    		@RequestParam(value = "batchOption", required = true) String batchOption) throws Exception {
+        
+    	String strBatchOption = "";
+    	User userInfo = usermanager.getUserByUserName(authentication.getName());
+    	batchUploads batchDetails = transactionInManager.getBatchDetails(batchId);
+    	
+    	if (userInfo != null && batchDetails != null) {
+	    	if (batchOption.equalsIgnoreCase("processBatch")) {
+	    		if (batchDetails.getstatusId() == 2) {
+	    			strBatchOption = "Loaded Batch";
+	    			transactionInManager.loadBatch(batchId);
+	    		} else if (batchDetails.getstatusId() == 3)  {
+	    			strBatchOption = "Processed Batch";
+	    			transactionInManager.processBatch(batchId);
+	    		}
+	    	} else if (batchOption.equalsIgnoreCase("cancel")) {
+	    		strBatchOption = "Cancelled Batch";
+	    		transactionInManager.updateBatchStatus(batchId, 4, "startDateTime");
+                transactionInManager.updateTransactionStatus(batchId, 0, 0, 34);
+                transactionInManager.updateTransactionTargetStatus(batchId, 0, 0, 34);
+                transactionInManager.updateBatchStatus(batchId, 21, "endDateTime");       	
+	    	} else if (batchOption.equalsIgnoreCase("reset")){
+	    		strBatchOption = "Reset Batch";
+	    		//1. Check
+	    		boolean allowBatchClear = transactionInManager.allowBatchClear(batchId);
+	    		if (allowBatchClear) {
+		    		transactionInManager.updateBatchStatus(batchId, 4, "");
+	                //2. clear
+	                boolean cleared = transactionInManager.clearBatch(batchId);
+	                if (cleared) {
+	                    transactionInManager.updateBatchStatus(batchId, 2, "startOver");
+	                }
+	    		}
+	    	} else if (batchOption.equalsIgnoreCase("releaseBatch")) {
+	    		strBatchOption = "Released Batch";
+            	if (batchDetails.getstatusId() == 5) {   	        
+                    transactionInManager.updateBatchStatus(batchId, 4, "startDateTime");
+                    //check once again to make sure all transactions are in final status
+                    if (transactionInManager.getRecordCounts(batchId, Arrays.asList(11, 12, 13, 16), false, false) == 0) {
+                        transactionInManager.updateBatchStatus(batchId, 6, "endDateTime");
+                    } else {
+                        transactionInManager.updateBatchStatus(batchId, 5, "endDateTime");  
+                    }      	
+            	}
+	    	} else if (batchOption.equalsIgnoreCase("rejectMessage")) {
+	    		strBatchOption = "Rejected Transaction";
+            	if (batchDetails.getstatusId() == 5) {   	        
+            		transactionInManager.updateTranStatusByTInId(transactionInId, 13);     	
+            	}
+	    	}
+    	}
+    	
+    	//log user activity
+    	UserActivity ua = new UserActivity();
+        ua.setUserId(userInfo.getId());
+        ua.setAccessMethod("POST");
+        ua.setPageAccess("/inboundBatchOptions");
+        ua.setActivity("Admin - " + strBatchOption);
+        ua.setBatchUploadId(batchId);
+        if (transactionInId != null) {
+        	ua.setTransactionInIds(transactionInId.toString());
+        }
+        usermanager.insertUserLog(ua);
+        return true;
+    }
+    
+    
+    /**
+     * The '/rejectMessages POST request will loop through idList, and reject transactions
+     *
+     * @param request - idList with transactionIds to be rejected
+     * @param request - batchId with batch Id
+     * @param response 
+     * @return	we redirect back to the audit report
+     * @throws Exception
+     */
+    @RequestMapping(value = "/rejectMessages", method = RequestMethod.POST)
+    public ModelAndView massRejectTransactions(@RequestParam(value = "idList", required = false) List<Integer> idList,
+    		@RequestParam(value = "batchId", required = false) Integer batchId, Authentication authentication,
+            RedirectAttributes redirectAttr, HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
+
+    	try {
+    		
+    		User userInfo = usermanager.getUserByUserName(authentication.getName());
+    		batchUploads batchInfo = transactionInManager.getBatchDetails(batchId);
+    		if (userInfo != null && batchInfo != null) {
+    			if (batchInfo.getstatusId() == 5) {
+		            if (idList.size() > 0) {
+		                for (Integer transactionInId : idList) {
+		                    transactionInManager.updateTranStatusByTInId(transactionInId, 13);
+		                }
+		            }   
+	        	}
+    		}
+	    	//log user activity
+	         UserActivity ua = new UserActivity();
+	         ua.setUserId(userInfo.getId());
+	         ua.setAccessMethod(request.getMethod());
+	         ua.setPageAccess("/rejectMessages");
+	         ua.setActivity("Admin Mass Rejected Messages");
+	         ua.setBatchUploadId(batchId);
+	         if (idList.size() > 0) {
+	            	ua.setTransactionInIds(idList.toString().replace("]", "").replace("[", ""));
+	            }
+	         usermanager.insertUserLog(ua);
+         
+	         ModelAndView mav = new ModelAndView(new RedirectView("inbound/auditReport/"+ batchInfo.getutBatchName()));
+	         return mav;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception("Admin Error at mass rejected messages.", e);
+        }
+
+    }
+
+    /**
+     * The '/editTransaction POST will bring up the ERG form for user to fix
+     *
+     * @param request - transactionInId
+     * @param response 
+     * @return	we redirect back to the audit report
+     * @throws Exception
+     */
+    @RequestMapping(value = "/editTransaction", method = RequestMethod.POST)
+    public ModelAndView editTransaction(
+    		@RequestParam(value = "transactionInId", required = false) Integer transactionInId,
+            RedirectAttributes redirectAttr, HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
+
+    	try {
+    		
+    		//populate form here
+    		ModelAndView mav = new ModelAndView("");
+	         return mav;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new Exception("Admin Error at editing transaction. TransactionInId = " + transactionInId, e);
+        }
+
+    }
+
+    
 }

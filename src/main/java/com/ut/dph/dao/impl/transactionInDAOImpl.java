@@ -11,6 +11,7 @@ import com.ut.dph.model.Macros;
 import com.ut.dph.model.Organization;
 import com.ut.dph.model.TransactionInError;
 import com.ut.dph.model.User;
+import com.ut.dph.model.UserActivity;
 import com.ut.dph.model.batchUploadSummary;
 import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.configuration;
@@ -1565,7 +1566,8 @@ public class transactionInDAOImpl implements transactionInDAO {
                 + "(select " + batchUploadId + ", " + cff.getconfigId() + ", transactionInId, " + cff.getFieldNo()
                 + ", 1 from transactionTranslatedIn where configId = :configId "
                 + " and (F" + cff.getFieldNo()
-                + " is  null  or length(trim(F" + cff.getFieldNo() + ")) = 0)"
+                + " is  null  or length(trim(F" + cff.getFieldNo() + ")) = 0"
+                + " or length(REPLACE(REPLACE(F" + cff.getFieldNo() + ", '\n', ''), '\r', '')) = 0)"
                 + "and transactionInId in (select id from transactionIn where batchId = :batchUploadId"
                 + " and configId = :configId and statusId not in (:transRELId)));";
         Query insertData = sessionFactory.getCurrentSession().createSQLQuery(sql)
@@ -1850,12 +1852,12 @@ public class transactionInDAOImpl implements transactionInDAO {
 
         if (foroutboundProcessing == false) {
             sql = "update transactionTranslatedIn set forcw = :targetValue where "
-                    + "F" + fieldNo + " = :sourceValue and transactionInId in "
+                    + "REPLACE(REPLACE(f" + fieldNo + ", '\n', ''), '\r', '') = :sourceValue and transactionInId in "
                     + "(select id from transactionIn where configId = :configId "
                     + " and batchId = :batchId and statusId not in ( :transRELId ));";
         } else {
             sql = "update transactionTranslatedOut set forcw = :targetValue where "
-                    + "F" + fieldNo + " = :sourceValue and transactionTargetId in "
+                    + "REPLACE(REPLACE(f" + fieldNo + ", '\n', ''), '\r', '') = :sourceValue and transactionTargetId in "
                     + "(select id from transactionTarget where configId = :configId "
                     + " and batchDLId = :batchId and statusId not in ( :transRELId ));";
         }
@@ -3710,7 +3712,7 @@ public class transactionInDAOImpl implements transactionInDAO {
         		+ "from transactionInErrors, lu_errorCodes, transactionIn , lu_processstatus "
         		+ "where lu_processstatus.id = transactionIn.statusId and "
         		+ "errorId = lu_errorCodes.id and transactionInErrors.transactionInId = transactionIn.Id "
-        		+ "and transactionInErrors.configId = :configId and batchuploadid = :batchId order by errorCode, transactionInId;";
+        		+ "and transactionInErrors.configId = :configId and batchuploadid = :batchId order by transactionInId, errorCode, transactionInErrors.id;";
 
         try {
             Query query = sessionFactory
@@ -3889,4 +3891,34 @@ public class transactionInDAOImpl implements transactionInDAO {
         }
         
     }
+
+	@Override
+	@Transactional
+	public List<UserActivity> getBatchUserActivities(batchUploads batchInfo, boolean foroutboundProcessing) {
+		String batchColName = "batchUploadId";
+		if (foroutboundProcessing) {
+			batchColName = "batchDownloadId";
+		}
+		
+		String sql = "select organizations.id as orgId, organizations.orgName as orgName, users.firstName as userFirstName, "
+				+ "users.lastName as userLastName, userActivity.* "
+				+ " from userActivity, users, organizations where users.id = userActivity.userId "
+				+ " and users.orgId = organizations.id and "+ batchColName +" = :batchId order by dateCreated desc, userId;";
+
+        try {
+            Query query = sessionFactory
+                    .getCurrentSession()
+                    .createSQLQuery(sql).setResultTransformer(Transformers.aliasToBean(UserActivity.class));
+
+            query.setParameter("batchId", batchInfo.getId());
+            List<UserActivity> uas = query.list();
+            
+            return uas;
+            
+        } catch (Exception ex) {
+            System.err.println("getBatchUserActivities " + ex.getCause());
+            ex.printStackTrace();
+            return null;
+        }
+	}
 }

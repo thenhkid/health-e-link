@@ -10,6 +10,7 @@ import com.ut.dph.model.CrosswalkData;
 import com.ut.dph.model.Macros;
 import com.ut.dph.model.TransactionInError;
 import com.ut.dph.model.User;
+import com.ut.dph.model.UserActivity;
 import com.ut.dph.model.batchUploadSummary;
 import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.configurationConnection;
@@ -284,4 +285,7 @@ public interface transactionInDAO {
     void updateTranStatusByTInId (Integer transactionInId, Integer statusId) throws Exception;
     
     List<TransErrorDetail> getTransactionErrorsByFieldNo(int transactionInId, int fieldNo) throws Exception;
+    
+    List<UserActivity> getBatchUserActivities(batchUploads batchInfo, boolean foroutboundProcessing);
+    
 }

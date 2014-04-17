@@ -421,7 +421,27 @@
         <put-attribute name="jscript" value="/dspResources/js/admin/processing-activities/pendingTransactions.js" />
     </definition>
     
+    <definition name="/administrator/processing-activity/batchActivities" extends="base.definition.admin">
+        <put-attribute name="page-id" value="processing-inbound" />
+        <put-attribute name="page-section" value="section-processing" />
+        <put-attribute name="title" value="Administrator - Processing Activities" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=activity" />
+        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/processing-activities/actionBar.jsp?page=inbound" />
+        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/processing-activities/menu.jsp?page=inbound" />
+        <put-attribute name="body" value="/WEB-INF/jsp/administrator/processing-activities/batchActivities.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/admin/processing-activities/batchActivities.js" />
+    </definition>
     
+    <definition name="/administrator/processing-activity/auditReport" extends="base.definition.admin">
+        <put-attribute name="page-id" value="processing-inbound" />
+        <put-attribute name="page-section" value="section-processing" />
+        <put-attribute name="title" value="Administrator - Processing Activities" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=activity" />
+        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/processing-activities/actionBar.jsp?page=inbound" />
+        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/processing-activities/menu.jsp?page=inbound" />
+        <put-attribute name="body" value="/WEB-INF/jsp/administrator/processing-activities/auditReport.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/admin/processing-activities/auditReport.js" />
+    </definition>
 
 
     <!--  end sysadmin definitions -->

@@ -13,6 +13,7 @@ import com.ut.dph.model.Macros;
 import com.ut.dph.model.Transaction;
 import com.ut.dph.model.TransactionInError;
 import com.ut.dph.model.User;
+import com.ut.dph.model.UserActivity;
 import com.ut.dph.model.batchUploadSummary;
 import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.configuration;
@@ -389,7 +390,7 @@ public class transactionInManagerImpl implements transactionInManager {
             }
             return sysErrorCount;
         } catch (Exception e) {
-            System.out.println("clearMessageTables " + e.getStackTrace());
+            System.err.println("clearMessageTables " + e.getStackTrace());
             return 1;
 
         }
@@ -671,8 +672,10 @@ public class transactionInManagerImpl implements transactionInManager {
                     if (handlingDetails.get(0).geterrorHandling() == 4) {
                         //update to pass - 16
                         updateTransactionStatus(batchUploadId, 0, 14, 16);
-                        //target should still be pending output
+                        //auto release, records 
                         updateTransactionTargetStatus(batchUploadId, 0, 14, 19);
+                        updateTransactionTargetStatus(batchUploadId, 0, 16, 19);
+                        
                     }
                     if (handlingDetails.get(0).geterrorHandling() == 2) {
                         //reject errors
@@ -707,7 +710,7 @@ public class transactionInManagerImpl implements transactionInManager {
                     batchStausId = 5;
                     // pass
                     updateTransactionStatus(batchUploadId, 0, 14, 16);
-                    updateTransactionTargetStatus(batchUploadId, 0, 14, 19);
+                    updateTransactionTargetStatus(batchUploadId, 0, 14, 16);
                 } //end of checking auto/error handling
 
                 updateRecordCounts(batchUploadId, new ArrayList<Integer>(), false, "totalRecordCount");
@@ -1115,7 +1118,6 @@ public class transactionInManagerImpl implements transactionInManager {
         Pattern pattern3 = Pattern.compile(month + "-" + day + "-" + year + time);
         // check dates
         //month needs to have leading 0
-        System.out.print(date.indexOf("-"));
         if (date.indexOf("-") == 1) {
             date = "0" + date;
         }
@@ -1924,7 +1926,7 @@ public class transactionInManagerImpl implements transactionInManager {
             nexthour.set(Calendar.MILLISECOND, 0);
             nexthour.add(Calendar.HOUR_OF_DAY, 1);
 
-            System.out.println("This Hour: " + thishour.getTime() + " Next Hour: " + nexthour.getTime());
+            //System.out.println("This Hour: " + thishour.getTime() + " Next Hour: " + nexthour.getTime());
 
             Integer batchesThisHour = transactionInDAO.getAllUploadedBatches(thishour.getTime(), nexthour.getTime()).size();
 
@@ -1942,7 +1944,7 @@ public class transactionInManagerImpl implements transactionInManager {
             starttomorrow.set(Calendar.MILLISECOND, 0);
             starttomorrow.add(Calendar.DAY_OF_MONTH, 1);
 
-            System.out.println("Today: " + starttoday.getTime() + " Tomorrow: " + starttomorrow.getTime());
+            //System.out.println("Today: " + starttoday.getTime() + " Tomorrow: " + starttomorrow.getTime());
 
             Integer batchesToday = transactionInDAO.getAllUploadedBatches(starttoday.getTime(), starttomorrow.getTime()).size();
 
@@ -1962,7 +1964,7 @@ public class transactionInManagerImpl implements transactionInManager {
             nextweek.set(Calendar.DAY_OF_WEEK, thisweek.getFirstDayOfWeek());
             nextweek.add(Calendar.WEEK_OF_YEAR, 1);
 
-            System.out.println("This Week: " + thisweek.getTime() + " Next Week: " + nextweek.getTime());
+            //System.out.println("This Week: " + thisweek.getTime() + " Next Week: " + nextweek.getTime());
 
             Integer batchesThisWeek = transactionInDAO.getAllUploadedBatches(thisweek.getTime(), nextweek.getTime()).size();
 
@@ -2254,5 +2256,15 @@ public class transactionInManagerImpl implements transactionInManager {
     public List<TransErrorDetail> getTransactionErrorsByFieldNo(int transactionInId, int fieldNo) throws Exception {
         return transactionInDAO.getTransactionErrorsByFieldNo(transactionInId, fieldNo);
     }
+
+	@Override
+	public List<UserActivity> getBatchActivities(batchUploads batchInfo, boolean forUsers, boolean foroutboundProcessing) {
+		if (!forUsers) {
+			//we have autolog that tracks the date/time each time the status change on a batch, not in use right now
+			return null;
+		} else {
+			return transactionInDAO.getBatchUserActivities(batchInfo, foroutboundProcessing);
+		}
+	}
 
 }

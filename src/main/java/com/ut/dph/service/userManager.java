@@ -34,5 +34,7 @@ public interface userManager {
   User getUserByResetCode(String resetCode);
   
   void insertUserLog (UserActivity userActivity);
+  
+  UserActivity getUAById (Integer uaId);
 }
 

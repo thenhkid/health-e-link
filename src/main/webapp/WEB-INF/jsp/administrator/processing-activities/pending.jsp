@@ -35,6 +35,9 @@
     <div class="col-md-12">
          <section class="panel panel-default">
             <div class="panel-body">
+                 <form id="showMessageTypes" action="/administrator/processing-activity/pending/messageTypes" method="post">
+                    <input type="hidden" name="orgId" id="orgId" value="0" />  
+                </form>
                 <div class="form-container scrollable">
                     <table class="table table-striped table-hover table-default" <c:if test="${not empty transactions}">id="dataTable"</c:if>>
                         <thead>

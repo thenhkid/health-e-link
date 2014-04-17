@@ -19,6 +19,11 @@
             <div class="container main-container" role="main">
                 <div class="row">
                     <div class="col-md-12 page-content">
+                    <c:choose>
+                    <c:when test="${empty transactionDetails}">
+                    	This transaction is no longer available.
+                    </c:when>
+                    <c:otherwise>
                         <div class="form-section row">
                              <div class="col-md-6" style="width:450px;">
                                 <h4 class="form-section-heading">Originating Organization: </h4>
@@ -123,7 +128,8 @@
                                 </div>
                             </c:forEach>
                         </div>
-
+						</c:otherwise>
+						</c:choose>
 
                     </div>
 

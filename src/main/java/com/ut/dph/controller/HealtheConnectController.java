@@ -677,18 +677,11 @@ public class HealtheConnectController {
                  */
                 Organization org = organizationmanager.getOrganizationById(batchInfo.getOrgId());
                 mav.addObject("org", org);
-
-                /**
-                 * grab error info - need to filter this by error type *
-                 
-                List<ConfigErrorInfo> confErrorList = new LinkedList<ConfigErrorInfo>();
-                confErrorList = transactionInManager.populateErrorList(batchInfo);
-                mav.addObject("confErrorList", confErrorList);
-                */
+                
+                //grab error info
                 List<TransErrorDetailDisplay> errorList = new LinkedList<TransErrorDetailDisplay>();
                 errorList = transactionInManager.populateErrorList(batchInfo);
                 mav.addObject("errorList", errorList);
-
             }
 
             /**
@@ -724,7 +717,7 @@ public class HealtheConnectController {
             ua.setAccessMethod(request.getMethod());
             ua.setPageAccess("/auditReport");
             ua.setActivity("Audit Report Request");
-            ua.setBatchId(batchInfo.getId());
+            ua.setBatchUploadId(batchInfo.getId());
             if (!hasPermission) {
                 ua.setActivityDesc("without permission");
             }
@@ -765,10 +758,9 @@ public class HealtheConnectController {
             boolean hasPermission = false;
             boolean canEdit = false;
             boolean hasConfigurations = false;
-
-            /**
-             * check for permission*
-             */
+            ModelAndView mav = new ModelAndView();
+          
+            //check for permission
             User userInfo = (User) session.getAttribute("userDetails");
             batchUploads batchInfo = transactionInManager.getBatchDetailsByTInId(transactionId);
             if (batchInfo != null) {
@@ -780,12 +772,6 @@ public class HealtheConnectController {
 
                 hasPermission = transactionInManager.hasPermissionForBatch(batchInfo, userInfo, hasConfigurations);
 
-                /**
-                 * get transaction details *
-                 */
-                /**
-                 * for button to save/release*
-                 */
                 if (batchInfo.getstatusId() == 5 && userInfo.geteditAuthority()) {
                     canEdit = true;
                 }
@@ -793,9 +779,7 @@ public class HealtheConnectController {
 
             /* If user has edit athoritity then show the edit page, otherwise redirect back to the auditReport */
             if (canEdit == true) {
-
-                ModelAndView mav = new ModelAndView();
-                mav.setViewName("/Health-e-Connect/ERG");
+            	mav.setViewName("/Health-e-Connect/ERG");
                 mav.addObject("canEdit", canEdit);
                 mav.addObject("hasConfigurations", hasConfigurations);
                 mav.addObject("hasPermission", hasPermission);
@@ -895,30 +879,28 @@ public class HealtheConnectController {
                     throw new Exception("Error occurred in viewing the sent batch details. transactionId: " + transactionId, e);
                 }
 
-                /**
-                 * log user activity *
-                 */
-                UserActivity ua = new UserActivity();
-                ua.setUserId(userInfo.getId());
-                ua.setAccessMethod(request.getMethod());
-                ua.setPageAccess("/Health-e-Connect/ERG");
-                ua.setActivity("ERG View");
-                ua.setTransactionInIds(String.valueOf(transactionId));
-                if (batchInfo != null) {
-                    ua.setBatchId(batchInfo.getId());
-                }
-                if (!hasPermission) {
-                    ua.setActivityDesc("without permission");
-                }
-                usermanager.insertUserLog(ua);
-
-                return mav;
-
+                
             } else {
-                ModelAndView mav = new ModelAndView(new RedirectView("/Health-e-Connect/upload"));
-                return mav;
+                mav = new ModelAndView(new RedirectView("/Health-e-Connect/upload"));
+                
             }
+            
+            /**
+             * log user activity *
+             */
+            UserActivity ua = new UserActivity();
+            ua.setUserId(userInfo.getId());
+            ua.setAccessMethod(request.getMethod());
+            ua.setPageAccess("/edit");
+            ua.setActivity("Viewed Transaction with Error(s)");
+            ua.setTransactionInIds(String.valueOf(transactionId));
+            ua.setBatchUploadId(batchInfo.getId());
+            if (!hasPermission) {
+                ua.setActivityDesc("without permission");
+            }
+            usermanager.insertUserLog(ua);
 
+            return mav;
         } catch (Exception e) {
             e.printStackTrace();
             throw new Exception("Error occurred displaying upload ERG form.", e);
@@ -1032,6 +1014,17 @@ public class HealtheConnectController {
         /** re-process batch **/
         transactionInManager.processBatch(transactionDetails.getbatchId(), true);
         
+        /** add logging **/
+        UserActivity ua = new UserActivity();
+        User userInfo = (User) session.getAttribute("userDetails");
+        ua.setUserId(userInfo.getId());
+        ua.setAccessMethod(request.getMethod());
+        ua.setPageAccess("/editMessage");
+        ua.setActivity("Modified Transaction with Error(s)");
+        ua.setTransactionInIds(String.valueOf(transactionDetails.gettransactionId()));
+        ua.setBatchUploadId(transactionDetails.getbatchId());
+        usermanager.insertUserLog(ua);
+        
         return 1;
         
     }
@@ -1067,6 +1060,7 @@ public class HealtheConnectController {
             boolean hasPermission = false;
             String redirectPage = "auditReports?searchTerm=" + batchInfo.getutBatchName();
             String systemMessage = "";
+            String batchOptionSubmitted = "";
 
             if (batchInfo != null) {
                 List<configuration> configurations = configurationManager.getActiveConfigurationsByUserId(userInfo.getId(), 1);
@@ -1084,6 +1078,7 @@ public class HealtheConnectController {
                  * make sure user has the appropriate permission to this batch *
                  */
                 if (batchOption.equalsIgnoreCase("resetBatch")) { // canCancel
+                	batchOptionSubmitted = "Reset Batch";
                     redirectPage = "upload?searchTerm=" + batchInfo.getutBatchName();
                     //check to make sure we can clear batch and then delete info and reset
                     if (allowBatchClear && userInfo.getcancelAuthority()) {
@@ -1106,6 +1101,7 @@ public class HealtheConnectController {
                     }
 
                 } else if (batchOption.equalsIgnoreCase("cancelBatch")) {
+                	batchOptionSubmitted = "Cancelled Batch";
                     //check authority
                     if (allowBatchClear && userInfo.getcancelAuthority()) {
                         transactionInManager.updateBatchStatus(batchId, 4, "startDateTime");
@@ -1119,6 +1115,7 @@ public class HealtheConnectController {
                         hasPermission = false;
                     }
                 } else if (batchOption.equalsIgnoreCase("releaseBatch")) {
+                	batchOptionSubmitted = "Released Batch";
                 	boolean canReleaseBatch = false;
                 	if (batchInfo.getstatusId() == 5 && userInfo.getdeliverAuthority()) { // do the check that doesn't require a hit to db first
 	   	        		 if (batchInfo.getConfigId() != 0) {
@@ -1142,6 +1139,7 @@ public class HealtheConnectController {
                         hasPermission = false;
                     }
                 } else if (batchOption.equalsIgnoreCase("rejectMessages")) {
+                	batchOptionSubmitted = "Rejected Messages";
                     if (batchInfo.getstatusId() == 5 && userInfo.geteditAuthority()) {
                         if (idList.size() > 0) {
                             for (Integer transactionInId : idList) {
@@ -1156,6 +1154,7 @@ public class HealtheConnectController {
                     }
 
                 } else if (batchOption.equalsIgnoreCase("rejectMessage")) {
+                	batchOptionSubmitted = "Rejected Message";
                     if (batchInfo.getstatusId() == 5 && userInfo.geteditAuthority()) {
                         if (idList.size() > 0) {
                             for (Integer transactionInId : idList) {
@@ -1177,10 +1176,10 @@ public class HealtheConnectController {
             ua.setUserId(userInfo.getId());
             ua.setAccessMethod(request.getMethod());
             ua.setPageAccess("/batchOptions");
-            ua.setActivity("Batch Options -" + batchOption);
-            ua.setBatchId(batchInfo.getId());
+            ua.setActivity("Batch Options - " + batchOptionSubmitted);
+            ua.setBatchUploadId(batchInfo.getId());
             if (idList.size() > 0) {
-            	ua.setTransactionInIds(idList.toString());
+            	ua.setTransactionInIds(idList.toString().replace("]", "").replace("[", ""));
             }
             if (!hasPermission) {
                 ua.setActivityDesc("without permission" + systemMessage);
@@ -1433,8 +1432,8 @@ public class HealtheConnectController {
                      ua.setUserId(userInfo.getId());
                      ua.setAccessMethod(request.getMethod());
                      ua.setPageAccess("/releaseBatches");
-                     ua.setActivity("Release batch");
-                     ua.setBatchId(batchId);
+                     ua.setActivity("Released Batch");
+                     ua.setBatchUploadId(batchId);
                      if (!canReleaseBatch) {
                          ua.setActivityDesc("without permission" + forInsert);
                      }
@@ -1496,9 +1495,9 @@ public class HealtheConnectController {
             ua.setUserId(userInfo.getId());
             ua.setAccessMethod(request.getMethod());
             ua.setPageAccess("/rejectMessage");
-            ua.setActivity("Reject Message");
-            ua.setBatchId(batchId);
-            ua.setTransactionInIds(transactionId.toString());
+            ua.setActivity("Rejected Message");
+            ua.setBatchUploadId(batchId);
+            ua.setTransactionInIds(String.valueOf(transactionId));
             if (!hasPermission) {
                 ua.setActivityDesc("without permission");
             }

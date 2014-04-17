@@ -7,6 +7,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
+<%@page buffer="1024kb" autoFlush="true" %>
 
 <c:set var="transactionCounter" value="1"/>
 <c:set var="newTransId" value="0"/>
@@ -77,7 +78,7 @@
                         <div class="col-md-12">
                             	<div class="pull-left">
 	                                <c:if test="${canEdit == true}">
-	                                    <input type="button" id="reject" class="btn btn-primary btn-xs rejectMessages" value="Reject All Transactions" />
+	                                    <input type="button" id="rejectAll" class="btn btn-primary btn-xs rejectMessages" value="Reject All Errors" />
 	                                </c:if>   
 	                                <c:if test="${canSend == true}">
                                         <input type="button" id="release" class="btn btn-primary btn-xs releaseBatch" value="Release" />
@@ -95,6 +96,7 @@
                             <section class="panel panel-default">
                                 <div class="panel-heading">
                                     <div class="pull-right" style="margin-top: -5px">
+                                    	Status:<a href="#statusModal" data-toggle="modal" class="btn btn-link viewStatus" rel="${transactionIn.transactionStatus}" title="View this Status">${transactionIn.transactionStatusValue}&nbsp;<span class="badge badge-help" data-placement="top" title="" data-original-title="">?</span></a>
                                         <c:if test="${transactionIn.transactionStatus == 14 && batch.statusId == 5 && canEdit}">
                                         	<c:set var="idList" value="${idList},${transactionIn.transactionInId}"/>
                                             <a href="javascript:void(0);" id="reject" rel="${transactionIn.transactionInId}" rel2="${batch.id}" class="btn btn-primary btn-xs rejectMessage">Reject</a>
@@ -121,7 +123,7 @@
                                                 <tbody>
                                                     <c:forEach var="error" items="${transactionIn.tedList}">
                                                         <tr>
-                                                            <td scope="col">${error.errorDisplayText}<c:if test="${not empty error.errorInfo}">${error.errorInfo}</c:if></td>
+                                                            <td scope="col">${error.errorDisplayText}<c:if test="${not empty error.errorInfo}">-${error.errorInfo}</c:if></td>
                                                             <td scope="col">${error.rptField1Value}</td>
                                                             <td scope="col">${error.rptField2Value}</td>
                                                             <td scope="col">${error.rptField3Value}</td>
@@ -139,11 +141,12 @@
                         </div> 
                         <c:set var="transactionCounter" value="${transactionCounter + 1}"/>
                     </c:forEach>
-                                       <div class="row" style="overflow:hidden;margin-top:10px; margin-bottom:20px;">
+                      <c:if test="${fn:length(errorList) > 20}">
+                      <div class="row" style="overflow:hidden;margin-top:10px; margin-bottom:20px;">
                         <div class="col-md-12">
                             	<div class="pull-left">
 	                                <c:if test="${canEdit == true}">
-	                                    <input type="button" id="reject" class="btn btn-primary btn-xs rejectMessages" value="Reject All Transactions" />
+	                                    <input type="button" id="reject" class="btn btn-primary btn-xs rejectMessages" value="Reject All Errors" />
 	                                </c:if>   
 	                                <c:if test="${canSend == true}">
                                         <input type="button" id="release" class="btn btn-primary btn-xs releaseBatch" value="Release" />
@@ -155,6 +158,7 @@
                                 </div>
                         </div>
                     </div>
+                    </c:if>
                 </c:when>
                 <c:otherwise>
                     You do not have permission to view this audit report.  Your request has been logged.
