@@ -1451,7 +1451,7 @@ public class adminProcessingActivity {
             lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batchDetails.getstatusId());
             batchDetails.setstatusValue(processStatus.getDisplayCode());
 
-            List<Integer> cancelStatusList = Arrays.asList(21, 22, 23, 1, 8);
+            List<Integer> cancelStatusList = Arrays.asList(22, 23, 1, 8); //DNP (21) is not a final status for admin
             if (!cancelStatusList.contains(batchDetails.getstatusId())) {
                 canCancel = true;
                 if (batchDetails.getstatusId() != 2) {
@@ -1471,19 +1471,21 @@ public class adminProcessingActivity {
             }
 
             /**
-             * we need to check sbp (4) status - if server is restarted and somehow the file hangs in SBP, we want to give them option to reset if sbp start time is about two hours, that should be sufficient indication that a file is stuck
+             * we need to check sbp (4) status - if server is restarted and somehow the file hangs in SBP, we want to give them option to reset
+             * if sbp start time is about two hours, that should be sufficient indication that a file is stuck
              */
-            if (batchDetails.getstatusId() == 4) {
-                Date d1 = batchDetails.getstartDateTime();
-                Date d2 = new Date();
-                //in milliseconds
-                long diff = d2.getTime() - d1.getTime();
-
-                long diffHours = diff / (60 * 60 * 1000) % 24;
-                System.out.println(diffHours);
-                if (diffHours < 2) {
-                    canReset = false;
-                }
+            
+            if (batchDetails.getstatusId() == 4 || batchDetails.getstatusId() == 25) {
+            	Date d1 = batchDetails.getstartDateTime();
+        		Date d2 = new Date();
+        		//in milliseconds
+    			long diff = d2.getTime() - d1.getTime();
+    			
+    			long diffHours = diff / (60 * 60 * 1000) % 24;
+    			System.out.println(diffHours);
+    			if (diffHours < 2) {
+    				canReset = false;
+    			}
             }
 
             if (batchDetails.getConfigId() != 0) {

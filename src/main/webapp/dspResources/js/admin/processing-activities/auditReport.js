@@ -60,7 +60,7 @@ require(['./main'], function () {
       //This function will cancel the batch
         $(document).on('click', '.cancelBatch', function() {
             
-            var confirmed = confirm("Are you sure you want to set this batch to 'Do Not Process'?");
+            var confirmed = confirm("Are you sure you want to set this batch to 'Cancel'?");
 
              if (confirmed) {
             	 $.ajax({

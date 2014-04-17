@@ -1077,7 +1077,8 @@ public class HealtheConnectController {
                 /**
                  * make sure user has the appropriate permission to this batch *
                  */
-                if (batchOption.equalsIgnoreCase("resetBatch")) { // canCancel
+                if (batchOption.equalsIgnoreCase("resetBatch")) { // canReset
+                	/**
                 	batchOptionSubmitted = "Reset Batch";
                     redirectPage = "upload?searchTerm=" + batchInfo.getutBatchName();
                     //check to make sure we can clear batch and then delete info and reset
@@ -1099,7 +1100,7 @@ public class HealtheConnectController {
                         hasPermission = false;
 
                     }
-
+					**/
                 } else if (batchOption.equalsIgnoreCase("cancelBatch")) {
                 	batchOptionSubmitted = "Cancelled Batch";
                     //check authority

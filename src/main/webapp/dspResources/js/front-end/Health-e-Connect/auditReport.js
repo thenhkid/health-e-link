@@ -31,13 +31,6 @@ require(['./main'], function () {
         	$('#batchOptions').submit();
         });    
         
-        //click this will reset batch
-        $('.resetBatch').click(function() {
-        	$('input[name="batchOption"]').val("resetBatch");
-        	$('#batchOptions').submit();
-        });  
-        
-        
         //this function will submit the transactionInId to the ERG form for edit
         $(document).on('click', '.fixErrors', function() {
         	$('input[name="transactionInId"]').val($(this).attr('rel'));
