@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package com.ut.dph.model;
 
 import com.ut.dph.validator.NoHtml;
@@ -27,181 +26,179 @@ import org.springframework.format.annotation.DateTimeFormat;
 @Entity
 @Table(name = "userActivity")
 public class UserActivity {
-	
-	@Transient
+
+    @Transient
     String userFirstName = null;
-	
-	@Transient
+
+    @Transient
     String userLastName = null;
 
-	@Transient
+    @Transient
     Integer orgId = null;
-	
-	@Transient
+
+    @Transient
     String orgName = null;
 
-	
-	@Id
+    @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID", nullable = false)
     private int id;
-    
+
     @Column(name = "userId", nullable = false)
     private int userId = 0;
-	
-	@Column(name = "batchUploadId", nullable = true)
+
+    @Column(name = "batchUploadId", nullable = true)
     private Integer batchUploadId = 0;
-	
-	@Column(name = "batchDownloadId", nullable = true)
+
+    @Column(name = "batchDownloadId", nullable = true)
     private Integer batchDownloadId = 0;
-	
-	@NoHtml
-	@Column(name = "accessMethod", nullable = true)
+
+    @NoHtml
+    @Column(name = "accessMethod", nullable = true)
     private String accessMethod;
-	
-	@NoHtml
-	@Column(name = "pageAccess", nullable = true)
+
+    @NoHtml
+    @Column(name = "pageAccess", nullable = true)
     private String pageAccess;
 
-    
-	@NoHtml
-	@Column(name = "transactionInIds", nullable = true)
+    @NoHtml
+    @Column(name = "transactionInIds", nullable = true)
     private String transactionInIds;
-    
+
     @NoHtml
     @Column(name = "transactionTargetIds", nullable = true)
     private String transactionTargetIds;
-    
+
     @NoHtml
     @Column(name = "activity", nullable = true)
     private String activity;
-    
+
     @NoHtml
     @Column(name = "activityDesc", nullable = true)
     private String activityDesc;
-    
+
     @DateTimeFormat(pattern = "dd/MM/yyyy hh:mm:ss")
     @Column(name = "DATECREATED", nullable = false)
     private Date dateCreated = new Date();
 
-	public int getId() {
-		return id;
-	}
+    public int getId() {
+        return id;
+    }
 
-	public void setId(int id) {
-		this.id = id;
-	}
+    public void setId(int id) {
+        this.id = id;
+    }
 
-	public int getUserId() {
-		return userId;
-	}
+    public int getUserId() {
+        return userId;
+    }
 
-	public void setUserId(int userId) {
-		this.userId = userId;
-	}
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
 
-	public String getAccessMethod() {
-		return accessMethod;
-	}
+    public String getAccessMethod() {
+        return accessMethod;
+    }
 
-	public void setAccessMethod(String accessMethod) {
-		this.accessMethod = accessMethod;
-	}
+    public void setAccessMethod(String accessMethod) {
+        this.accessMethod = accessMethod;
+    }
 
-	public String getPageAccess() {
-		return pageAccess;
-	}
+    public String getPageAccess() {
+        return pageAccess;
+    }
 
-	public void setPageAccess(String pageAccess) {
-		this.pageAccess = pageAccess;
-	}
+    public void setPageAccess(String pageAccess) {
+        this.pageAccess = pageAccess;
+    }
 
-	public String getTransactionInIds() {
-		return transactionInIds;
-	}
+    public String getTransactionInIds() {
+        return transactionInIds;
+    }
 
-	public void setTransactionInIds(String transactionInIds) {
-		this.transactionInIds = transactionInIds;
-	}
+    public void setTransactionInIds(String transactionInIds) {
+        this.transactionInIds = transactionInIds;
+    }
 
-	public String getTransactionTargetIds() {
-		return transactionTargetIds;
-	}
+    public String getTransactionTargetIds() {
+        return transactionTargetIds;
+    }
 
-	public void setTransactionTargetIds(String transactionTargetIds) {
-		this.transactionTargetIds = transactionTargetIds;
-	}
+    public void setTransactionTargetIds(String transactionTargetIds) {
+        this.transactionTargetIds = transactionTargetIds;
+    }
 
-	public String getActivity() {
-		return activity;
-	}
+    public String getActivity() {
+        return activity;
+    }
 
-	public void setActivity(String activity) {
-		this.activity = activity;
-	}
+    public void setActivity(String activity) {
+        this.activity = activity;
+    }
 
-	public String getActivityDesc() {
-		return activityDesc;
-	}
+    public String getActivityDesc() {
+        return activityDesc;
+    }
 
-	public void setActivityDesc(String activityDesc) {
-		this.activityDesc = activityDesc;
-	}
+    public void setActivityDesc(String activityDesc) {
+        this.activityDesc = activityDesc;
+    }
 
-	public Date getDateCreated() {
-		return dateCreated;
-	}
+    public Date getDateCreated() {
+        return dateCreated;
+    }
 
-	public void setDateCreated(Date dateCreated) {
-		this.dateCreated = dateCreated;
-	}
+    public void setDateCreated(Date dateCreated) {
+        this.dateCreated = dateCreated;
+    }
 
-	public Integer getBatchUploadId() {
-		return batchUploadId;
-	}
+    public Integer getBatchUploadId() {
+        return batchUploadId;
+    }
 
-	public void setBatchUploadId(Integer batchUploadId) {
-		this.batchUploadId = batchUploadId;
-	}
+    public void setBatchUploadId(Integer batchUploadId) {
+        this.batchUploadId = batchUploadId;
+    }
 
-	public Integer getBatchDownloadId() {
-		return batchDownloadId;
-	}
+    public Integer getBatchDownloadId() {
+        return batchDownloadId;
+    }
 
-	public void setBatchDownloadId(Integer batchDownloadId) {
-		this.batchDownloadId = batchDownloadId;
-	}
+    public void setBatchDownloadId(Integer batchDownloadId) {
+        this.batchDownloadId = batchDownloadId;
+    }
 
-	public String getUserFirstName() {
-		return userFirstName;
-	}
+    public String getUserFirstName() {
+        return userFirstName;
+    }
 
-	public void setUserFirstName(String userFirstName) {
-		this.userFirstName = userFirstName;
-	}
+    public void setUserFirstName(String userFirstName) {
+        this.userFirstName = userFirstName;
+    }
 
-	public String getUserLastName() {
-		return userLastName;
-	}
+    public String getUserLastName() {
+        return userLastName;
+    }
 
-	public void setUserLastName(String userLastName) {
-		this.userLastName = userLastName;
-	}
+    public void setUserLastName(String userLastName) {
+        this.userLastName = userLastName;
+    }
 
-	public Integer getOrgId() {
-		return orgId;
-	}
+    public Integer getOrgId() {
+        return orgId;
+    }
 
-	public void setOrgId(Integer orgId) {
-		this.orgId = orgId;
-	}
+    public void setOrgId(Integer orgId) {
+        this.orgId = orgId;
+    }
 
-	public String getOrgName() {
-		return orgName;
-	}
+    public String getOrgName() {
+        return orgName;
+    }
 
-	public void setOrgName(String orgName) {
-		this.orgName = orgName;
-	}
- 
+    public void setOrgName(String orgName) {
+        this.orgName = orgName;
+    }
+
 }
