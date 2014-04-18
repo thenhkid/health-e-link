@@ -1,0 +1,123 @@
+/** grace 04182014 12:21PM **/
+ALTER TABLE `universaltranslator`.`transactionin` 
+ADD INDEX `idAndStatusId` (`id` ASC, `statusId` ASC);
+
+drop PROCEDURE `universaltranslator`.`insertValidationErrors`;
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `universaltranslator`.`insertValidationErrors`(in vtType int, in fieldNo int,
+in batchUploadId int, in configId int, in transactionId int)
+BEGIN
+
+DECLARE regEx varchar(100) DEFAULT '';
+
+CASE vtType
+	WHEN 2 THEN set regEx = '^[A-Z0-9._%-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$';
+    WHEN 3 THEN 
+		BEGIN 
+			CALL `universalTranslator`.`stripPhoneChars`(vtType, fieldNo, batchUploadId, configId, transactionId);
+			set regEx ='^[0-9]{7,11}$';
+		END;
+	WHEN 5 THEN set regEx = '^-?[0-9]+[.]?[0-9]*$|^-?[.][0-9]+$';
+    ELSE
+        BEGIN
+        END;
+	END 
+	CASE;
+
+IF (transactionId = 0) THEN
+set @stmt = concat(
+'insert into transactionInerrors (batchUploadId, transactionInId, fieldNo, errorid, configId,
+validationTypeId) SELECT ', batchUploadId, ', transactionInId, ',fieldNo,',2, ',configId, ',' , vtType,'  
+ FROM transactionTranslatedIn WHERE F' ,fieldNo, ' not REGEXP  "', regEx, '" and F',fieldNo, ' is not null 
+and length(F', fieldNO, ') != 0
+and length(trim(F', fieldNO, ')) != 0
+and length(REPLACE(REPLACE(F', fieldNO,' , "\n", ""), "\r", "") != 0) and configId = ', configId, ' and transactionInId 
+in (select id from transactionIn where batchId = ', batchUploadId,' and configId = ', configId,' and statusId not in (11,12,13,16));'
+);
+
+BEGIN -- true
+		PREPARE stmt from @stmt;
+		EXECUTE stmt;
+END; 
+END IF;
+
+IF (transactionId != 0) THEN
+
+set @stmt= concat(
+'insert into transactionInerrors (batchUploadId, transactionInId, fieldNo, errorid, configId, 
+validationTypeId) SELECT ', batchUploadId, ', transactionInId, ',fieldNo,',2, ', configId, ',', vtType,'  
+ FROM transactionTranslatedIn WHERE F' ,fieldNo, ' not REGEXP  "', regEx, '" and F',fieldNo, ' is not null 
+and length(F', fieldNO, ') != 0
+and length(trim(F', fieldNO, ')) != 0
+and length(REPLACE(REPLACE(F', fieldNO,', "\n", ""), "\r", "") != 0) and configId = ', configId, ' and transactionInId 
+in (select id from transactionIn where id = ', transactionId, ');'
+);
+
+BEGIN -- true
+		PREPARE stmt from @stmt;
+		EXECUTE stmt;
+
+
+END; 
+END IF;
+
+
+END$$
+DELIMITER ;
+
+drop PROCEDURE `universaltranslator`.`stripPhoneChars`;
+
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `universaltranslator`.`stripPhoneChars`(in vtType int, in fieldNo int,
+in batchUploadId int, in configId int, in transactionId int)
+BEGIN
+	DECLARE varToReplace varchar(100) DEFAULT '.';
+	DECLARE part1 varchar(255) DEFAULT '.';
+	DECLARE part2 varchar(25) DEFAULT '.';
+	
+	if (transactionId = 0) then
+	BEGIN
+		set part1 = concat("update transactiontranslatedIn JOIN (SELECT id from transactionIn WHERE configId = ",
+	  configId,"  and batchId = ", batchUploadId, " and statusId not in (11,12,13,16)) as ti ON transactiontranslatedIn.transactionInId = ti.id SET transactiontranslatedIn.F"
+	  , fieldNo, " = replace(F", fieldNo, ", '");
+	END;
+	END if;
+
+	if (transactionId != 0) then
+	BEGIN
+	  set part1 = concat("update transactiontranslatedIn JOIN (SELECT id from transactionIn WHERE id = ",
+	  transactionId, ") as ti ON transactiontranslatedIn.transactionInId = ti.id SET transactiontranslatedIn.F"
+	  , fieldNo, " = replace(F", fieldNo, ", '");
+	END;
+	END if;
+
+	
+	set part2 = "', '');";
+	set @stmt = concat(part1, varToReplace, part2);
+  	PREPARE stmt from @stmt;
+	EXECUTE stmt;
+
+	set varToReplace = '-';
+	set @stmt = concat(part1, varToReplace, part2);
+	PREPARE stmt from @stmt;
+	EXECUTE stmt;
+
+	set varToReplace = ')';
+	set @stmt = concat(part1, varToReplace, part2);
+	PREPARE stmt from @stmt;
+	EXECUTE stmt;
+
+	set varToReplace = '(';
+	set @stmt = concat(part1, varToReplace, part2);
+	PREPARE stmt from @stmt;
+	EXECUTE stmt;
+
+	set varToReplace = ' ';
+	set @stmt = concat(part1, varToReplace, part2);
+	PREPARE stmt from @stmt;
+	EXECUTE stmt;
+
+ END$$
+DELIMITER ;

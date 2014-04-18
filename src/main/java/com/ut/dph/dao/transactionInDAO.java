@@ -110,7 +110,7 @@ public interface transactionInDAO {
     
     List<Integer> getBlankTransIds(ConfigForInsert config);
     
-    Integer genericValidation(configurationFormFields cff, Integer validationTypeId, Integer batchUploadId, String regEx);
+    Integer genericValidation(configurationFormFields cff, Integer validationTypeId, Integer batchUploadId, String regEx, Integer transactionId);
     
     Integer countSubString(ConfigForInsert config, Integer transId);
     
@@ -140,7 +140,7 @@ public interface transactionInDAO {
     
     Integer deleteTransactionInErrorsByTransactionId(Integer transactionInId);
     
-    void updateStatusForErrorTrans(Integer batchId, Integer statusId, boolean foroutboundProcessing);
+    void updateStatusForErrorTrans(Integer batchId, Integer statusId, boolean foroutboundProcessing, Integer transactionId);
     
     void updateBlanksToNull(configurationFormFields cff, Integer batchUploadId);
     

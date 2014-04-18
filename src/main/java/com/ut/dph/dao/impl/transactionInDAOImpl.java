@@ -1653,54 +1653,63 @@ public class transactionInDAOImpl implements transactionInDAO {
 
     @Override
     @Transactional
-    public void updateStatusForErrorTrans(Integer batchId, Integer statusId, boolean foroutboundProcessing) {
-
-        String sql;
-
-        if (foroutboundProcessing == false) {
-            sql = "update transactionIn set statusId = :statusId where"
-                    + " id in (select distinct transactionInId"
-                    + " from transactionInErrors where batchUploadId = :batchId)"
-                    + " and statusId not in (:transRELId); ";
-        } else {
-            sql = "update transactionTarget set statusId = :statusId where"
-                    + " id in (select distinct transactionTargetId"
-                    + " from transactionOutErrors where batchDownLoadId = :batchId)"
-                    + " and statusId not in (:transRELId); ";
-
-        }
-
-        Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
-                .setParameter("batchId", batchId)
-                .setParameter("statusId", statusId)
-                .setParameterList("transRELId", transRELId);
-
-        try {
-            updateData.executeUpdate();
+    public void updateStatusForErrorTrans(Integer batchId, Integer statusId, boolean foroutboundProcessing, Integer transactionId) {
+    	try {
+	        String sql;
+	        Integer id = batchId;
+	        
+	        if (foroutboundProcessing == false) {
+	            sql = "update transactionIn set statusId = :statusId where"
+	                    + " id in (select distinct transactionInId from transactionInErrors where ";
+	            		if (transactionId == 0) {
+	            			sql = sql  + " batchUploadId = :id) and statusId not in (:transRELId); ";
+	            		} else {
+	            			sql = sql  + " transactionInId = :id);";
+	            		}
+	        } else {
+	            sql = "update transactionTarget set statusId = :statusId where"
+	                    + " id  in (select distinct transactionTargetId from transactionOutErrors where ";
+	            if (transactionId == 0) {
+	            	sql = sql  + " batchDownLoadId = :id) and statusId not in (:transRELId); ";
+        		} else {
+        			sql = sql  + " transactionInId = :id);";
+        		}
+	        }
+	
+	        Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+	                .setParameter("id", id)
+	                .setParameter("statusId", statusId);
+	        if (transactionId == 0) {
+	        		updateData.setParameterList("transRELId", transRELId);
+	        }
+	        updateData.executeUpdate();
 
         } catch (Exception ex) {
             System.err.println("updateStatusForErrorTrans " + ex.getCause());
+            ex.printStackTrace();
         }
     }
 
     @Override
     @Transactional
     public Integer genericValidation(configurationFormFields cff,
-            Integer validationTypeId, Integer batchUploadId, String regEx) {
-
-        String sql = "call insertValidationErrors(:vtType, :fieldNo, :batchUploadId, :configId)";
+            Integer validationTypeId, Integer batchUploadId, String regEx, Integer transactionId) {
+    	
+    	String sql = "call insertValidationErrors(:vtType, :fieldNo, :batchUploadId, :configId, :transactionId)";
 
         Query insertError = sessionFactory.getCurrentSession().createSQLQuery(sql);
         insertError.setParameter("vtType", cff.getValidationType());
         insertError.setParameter("fieldNo", cff.getFieldNo());
         insertError.setParameter("batchUploadId", batchUploadId);
         insertError.setParameter("configId", cff.getconfigId());
+        insertError.setParameter("transactionId", transactionId);
 
         try {
             insertError.executeUpdate();
             return 0;
         } catch (Exception ex) {
             System.err.println("genericValidation " + ex.getCause());
+            ex.printStackTrace();
             insertProcessingError(processingSysErrorId, cff.getconfigId(), batchUploadId, cff.getId(),
                     null, null, validationTypeId, false, false, ("-" + ex.getCause().toString()));
             return 1; //we return error count of 1 when error

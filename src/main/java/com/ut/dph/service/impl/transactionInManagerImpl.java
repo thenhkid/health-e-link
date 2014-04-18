@@ -550,7 +550,7 @@ public class transactionInManagerImpl implements transactionInManager {
     }
     
     @Override
-    public boolean processBatch(int batchUploadId, boolean doNotClearErrors, Integer transactionInId) throws Exception {
+    public boolean processBatch(int batchUploadId, boolean doNotClearErrors, Integer transactionId) throws Exception {
 
         Integer batchStausId = 29;
         List<Integer> errorStatusIds = Arrays.asList(11, 13, 14, 16);
@@ -568,14 +568,14 @@ public class transactionInManagerImpl implements transactionInManager {
              * we should only process the ones that are not REL status, to be safe, we copy over data from transactionInRecords*
              */
            
-            	resetTransactionTranslatedIn(batchUploadId, false, transactionInId);
+            	resetTransactionTranslatedIn(batchUploadId, false, transactionId);
            
             //clear transactionInError table for batch
             	if (!doNotClearErrors) {
             		systemErrorCount = systemErrorCount + clearTransactionInErrors(batchUploadId, true);
             	}
             	
-            List<Integer> configIds = getConfigIdsForBatch(batchUploadId, false, transactionInId);
+            List<Integer> configIds = getConfigIdsForBatch(batchUploadId, false, transactionId);
             
             for (Integer configId : configIds) {
 				//we need to run all checks before insert regardless *
@@ -584,14 +584,15 @@ public class transactionInManagerImpl implements transactionInManager {
                 List<configurationFormFields> reqFields = getRequiredFieldsForConfig(configId);
 
                 for (configurationFormFields cff : reqFields) {
-                    systemErrorCount = systemErrorCount + insertFailedRequiredFields(cff, batchUploadId, transactionInId);
+                    systemErrorCount = systemErrorCount + insertFailedRequiredFields(cff, batchUploadId, transactionId);
                 }
                 // update status of the failed records to ERR - 14
-                updateStatusForErrorTrans(batchUploadId, 14, false);
+                updateStatusForErrorTrans(batchUploadId, 14, false, transactionId);
+                
                 //run validation
-                systemErrorCount = systemErrorCount + runValidations(batchUploadId, configId);
+                systemErrorCount = systemErrorCount + runValidations(batchUploadId, configId, transactionId);
                 // update status of the failed records to ERR - 14
-                updateStatusForErrorTrans(batchUploadId, 14, false);
+                updateStatusForErrorTrans(batchUploadId, 14, false, transactionId);
 
                 // 1. grab the configurationDataTranslations and run cw/macros
                 List<configurationDataTranslations> dataTranslations = configurationManager
@@ -946,12 +947,12 @@ public class transactionInManagerImpl implements transactionInManager {
      */
     @Override
     public void updateStatusForErrorTrans(Integer batchId,
-            Integer statusId, boolean foroutboundProcessing) {
-        transactionInDAO.updateStatusForErrorTrans(batchId, statusId, foroutboundProcessing);
+            Integer statusId, boolean foroutboundProcessing, Integer transactionId) {
+        transactionInDAO.updateStatusForErrorTrans(batchId, statusId, foroutboundProcessing, transactionId);
     }
 
     @Override
-    public Integer runValidations(Integer batchUploadId, Integer configId) {
+    public Integer runValidations(Integer batchUploadId, Integer configId, Integer transactionId) {
         Integer errorCount = 0;
         //1. we get validation types
         //2. we skip 1 as that is not necessary
@@ -975,11 +976,11 @@ public class transactionInManagerImpl implements transactionInManager {
                     break; // no validation
                 //email calling SQL to validation and insert - one statement
                 case 2:
-                    errorCount = errorCount + genericValidation(cff, validationTypeId, batchUploadId, regEx);
+                    errorCount = errorCount + genericValidation(cff, validationTypeId, batchUploadId, regEx, transactionId);
                     break;
                 //phone  calling SP to validation and insert - one statement 
                 case 3:
-                    errorCount = errorCount + genericValidation(cff, validationTypeId, batchUploadId, regEx);
+                    errorCount = errorCount + genericValidation(cff, validationTypeId, batchUploadId, regEx, transactionId);
                     break;
                 // need to loop through each record / each field
                 case 4:
@@ -987,7 +988,7 @@ public class transactionInManagerImpl implements transactionInManager {
                     break;
                 //numeric   calling SQL to validation and insert - one statement      
                 case 5:
-                    errorCount = errorCount + genericValidation(cff, validationTypeId, batchUploadId, regEx);
+                    errorCount = errorCount + genericValidation(cff, validationTypeId, batchUploadId, regEx, transactionId);
                     break;
                 //url - need to rethink as regExp is not validating correctly
                 case 6:
@@ -995,7 +996,7 @@ public class transactionInManagerImpl implements transactionInManager {
                     break;
                 //anything new we hope to only have to modify sp
                 default:
-                    errorCount = errorCount + genericValidation(cff, validationTypeId, batchUploadId, regEx);
+                    errorCount = errorCount + genericValidation(cff, validationTypeId, batchUploadId, regEx, transactionId);
                     break;
             }
 
@@ -1005,8 +1006,8 @@ public class transactionInManagerImpl implements transactionInManager {
 
     @Override
     public Integer genericValidation(configurationFormFields cff,
-            Integer validationTypeId, Integer batchUploadId, String regEx) {
-        return transactionInDAO.genericValidation(cff, validationTypeId, batchUploadId, regEx);
+            Integer validationTypeId, Integer batchUploadId, String regEx, Integer transactionId) {
+        return transactionInDAO.genericValidation(cff, validationTypeId, batchUploadId, regEx, transactionId);
     }
 
     @Override
@@ -1260,7 +1261,7 @@ public class transactionInManagerImpl implements transactionInManager {
             flagCWErrors(configId, batchId, cdt, foroutboundProcessing);
 
             //flag as error in transactionIn or transactionOut table
-            updateStatusForErrorTrans(batchId, 14, foroutboundProcessing);
+            updateStatusForErrorTrans(batchId, 14, foroutboundProcessing, 0);
 
             //we replace original F[FieldNo] column with data in forcw
             updateFieldNoWithCWData(configId, batchId, cdt.getFieldNo(), cdt.getPassClear(), foroutboundProcessing);

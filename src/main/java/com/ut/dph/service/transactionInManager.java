@@ -125,7 +125,7 @@ public interface transactionInManager {
     
     List<batchUploads> getuploadedBatches(int userId, int orgId, Date fromDate, Date toDate, List <Integer> excludedStatusIds) throws Exception;
     
-    boolean processBatch(int batchUploadId, boolean doNotClearErrors, Integer transactionInId) throws Exception;
+    boolean processBatch(int batchUploadId, boolean doNotClearErrors, Integer transactionId) throws Exception;
     
     boolean processBatch(int batchUploadId) throws Exception;
     
@@ -163,11 +163,11 @@ public interface transactionInManager {
     
     Integer deleteTransactionInErrorsByTransactionId(Integer transactionInId);
     
-    void updateStatusForErrorTrans(Integer batchId, Integer statusId, boolean foroutboundProcessing);
+    void updateStatusForErrorTrans(Integer batchId, Integer statusId, boolean foroutboundProcessing, Integer transactionId);
     
-    Integer runValidations(Integer batchUploadId, Integer configId);
+    Integer runValidations(Integer batchUploadId, Integer configId, Integer transactionId);
     
-    Integer genericValidation(configurationFormFields cff, Integer validationTypeId, Integer batchUploadId, String regEx);
+    Integer genericValidation(configurationFormFields cff, Integer validationTypeId, Integer batchUploadId, String regEx, Integer transactionId);
     
     Integer urlValidation(configurationFormFields cff, Integer validationTypeId, Integer batchUploadId);
     
