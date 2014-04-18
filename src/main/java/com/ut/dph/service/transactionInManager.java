@@ -157,7 +157,7 @@ public interface transactionInManager {
     
     List <configurationFormFields> getRequiredFieldsForConfig (Integer configId);
     
-    Integer insertFailedRequiredFields(configurationFormFields cff, Integer batchUploadId);
+    Integer insertFailedRequiredFields(configurationFormFields cff, Integer batchUploadId, Integer transactionInId);
     
     Integer clearTransactionInErrors(Integer batchUploadId, boolean leaveFinalStatus);
     

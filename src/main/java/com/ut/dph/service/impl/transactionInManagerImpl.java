@@ -584,7 +584,7 @@ public class transactionInManagerImpl implements transactionInManager {
                 List<configurationFormFields> reqFields = getRequiredFieldsForConfig(configId);
 
                 for (configurationFormFields cff : reqFields) {
-                    systemErrorCount = systemErrorCount + insertFailedRequiredFields(cff, batchUploadId);
+                    systemErrorCount = systemErrorCount + insertFailedRequiredFields(cff, batchUploadId, transactionInId);
                 }
                 // update status of the failed records to ERR - 14
                 updateStatusForErrorTrans(batchUploadId, 14, false);
@@ -926,8 +926,8 @@ public class transactionInManagerImpl implements transactionInManager {
     }
 
     @Override
-    public Integer insertFailedRequiredFields(configurationFormFields cff, Integer batchUploadId) {
-        return transactionInDAO.insertFailedRequiredFields(cff, batchUploadId);
+    public Integer insertFailedRequiredFields(configurationFormFields cff, Integer batchUploadId, Integer transactionInId) {
+        return transactionInDAO.insertFailedRequiredFields(cff, batchUploadId, transactionInId);
     }
 
     @Override

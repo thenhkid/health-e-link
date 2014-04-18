@@ -929,41 +929,48 @@ public class transactionInDAOImpl implements transactionInDAO {
     /**
      * The 'getConfigIdsForBatch' function will return a list of configurations for a batch
      *
-     * @param batchUploadId The id of the attachment to be removed
-     *
-     * @table transactionTranslatedIn
-     *
+     * @param batchUploadId The id of batch
+     * @param getAll - get configs for the entire batch or just the ones not in final status
+     * @transactionInId - just get the configId for the transaction
+     * 
      * @return This function will return a list of configIds (Integer)
      */
     @Override
     @Transactional
     @SuppressWarnings("unchecked")
     public List<Integer> getConfigIdsForBatch(int batchUploadId, boolean getAll, Integer transactionInId) {
-    	
-    	Integer id = batchUploadId;
-        String sql = "select distinct configId from transactionTranslatedIn "
-                + " where transactionInId in (select id from transactionIn where ";
-        
-        if (transactionInId == 0) {
-        	sql = sql + "batchId = :id ";
-        } else {
-        	sql = sql + "id = :id ";
-        	id = transactionInId;
-        }
-
-        if (!getAll) {
-            sql = sql + " and statusId not in (:transRELId)";
-        }
-        sql = sql + ");";
-
-        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
-        query.setParameter("id", id);
-        if (!getAll) {
-            query.setParameterList("transRELId", transRELId);
-        }
-        List<Integer> configIds = query.list();
-
-        return configIds;
+    	try {
+	    	Integer id = batchUploadId;
+	        String sql = "select distinct configId from transactionTranslatedIn "
+	                + " where   ";
+	        
+	        if (transactionInId == 0) {
+	        	sql = sql + " transactionInId in (select id from transactionIn where batchId = :id ";
+	        } else {
+	        	sql = sql + "( transactionInId = :id ";
+	        	id = transactionInId;
+	        	//we don't care about statusId if only one transaction
+	        	getAll = true;
+	        }
+	
+	        if (!getAll) {
+	            sql = sql + " and statusId not in (:transRELId)";
+	        }
+	        
+	        sql = sql + ");";
+	        
+	        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+	        query.setParameter("id", id);
+	        if (!getAll) {
+	            query.setParameterList("transRELId", transRELId);
+	        }
+	        List<Integer> configIds = query.list();
+	        return configIds;
+    	} catch (Exception ex) {
+    		ex.printStackTrace();
+    		System.err.println("clearMessageTableForBatch " + ex.getCause());
+    		return null;
+    	}
     }
 
     @Override
@@ -1569,26 +1576,33 @@ public class transactionInDAOImpl implements transactionInDAO {
      */
     @Override
     @Transactional
-    public Integer insertFailedRequiredFields(configurationFormFields cff, Integer batchUploadId) {
-        String sql = "insert into transactionInerrors (batchUploadId, configId, transactionInId, fieldNo, errorid)"
-                + "(select " + batchUploadId + ", " + cff.getconfigId() + ", transactionInId, " + cff.getFieldNo()
+    public Integer insertFailedRequiredFields(configurationFormFields cff, Integer batchUploadId, Integer transactionInId) {
+    	try {
+	    	Integer id = batchUploadId;
+	    	String sql = "insert into transactionInerrors (batchUploadId, configId, transactionInId, fieldNo, errorid)"
+	                + "select " + batchUploadId + ", " + cff.getconfigId() + ", transactionInId, " + cff.getFieldNo()
                 + ", 1 from transactionTranslatedIn where configId = :configId "
                 + " and (F" + cff.getFieldNo()
                 + " is  null  or length(trim(F" + cff.getFieldNo() + ")) = 0"
                 + " or length(REPLACE(REPLACE(F" + cff.getFieldNo() + ", '\n', ''), '\r', '')) = 0)"
-                + "and transactionInId in (select id from transactionIn where batchId = :batchUploadId"
-                + " and configId = :configId and statusId not in (:transRELId)));";
-        Query insertData = sessionFactory.getCurrentSession().createSQLQuery(sql)
-                .setParameter("batchUploadId", batchUploadId)
-                .setParameter("configId", cff.getconfigId())
-                .setParameterList("transRELId", transRELId);
-
-        try {
+                + "and transactionInId ";
+               	if (transactionInId == 0) {
+               		sql = sql+ " in (select id from transactionIn where batchId = :id and configId = :configId and statusId not in (:transRELId));";
+               	} else {
+               		sql = sql+ " = :id";
+               		id = transactionInId;
+               	}
+                
+               	Query insertData = sessionFactory.getCurrentSession().createSQLQuery(sql).setParameter("id", id);
+               	insertData.setParameter("configId", cff.getconfigId());
+                if (transactionInId == 0) {
+                	insertData.setParameterList("transRELId", transRELId);
+                }
             insertData.executeUpdate();
             return 0;
         } catch (Exception ex) {
             System.err.println("insertFailedRequiredFields " + ex.getCause());
-
+            ex.printStackTrace();
             return 1;
         }
 
@@ -2016,12 +2030,14 @@ public class transactionInDAOImpl implements transactionInDAO {
         
     	Integer id = batchId;
     	String sql = "UPDATE transactionTranslatedIn INNER JOIN transactionInRecords ON "
-                + " (transactionTranslatedIn.transactionInId = transactionInRecords.transactionInId) and transactionTranslatedIn.transactionInId ";
+                + " (transactionTranslatedIn.transactionInId = transactionInRecords.transactionInId) "
+                + " and  ";
         if (transactionInId == 0) {
-        	sql = sql + " in (select id from transactionIn where batchId = :id ";
+        	sql = sql + "transactionTranslatedIn.transactionInId in (select id from transactionIn where batchId = :id ";
         } else  {
-        	sql = sql + " in (select id from transactionIn where id = :id ";
+        	sql = sql + " (transactionTranslatedIn.transactionInId = :id ";
         	id = transactionInId;
+        	resetAll = true;
         }
         
         if (!resetAll) {

@@ -134,7 +134,7 @@ public interface transactionInDAO {
 
     Integer clearTransactionIn(Integer batchUploadId);
      
-    Integer insertFailedRequiredFields(configurationFormFields cff, Integer batchUploadId);
+    Integer insertFailedRequiredFields(configurationFormFields cff, Integer batchUploadId, Integer transactionInId);
     
     Integer clearTransactionInErrors(Integer batchUploadId, boolean leaveFinalStatusIds);
     
