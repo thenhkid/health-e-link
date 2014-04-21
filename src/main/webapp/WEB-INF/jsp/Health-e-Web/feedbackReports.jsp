@@ -34,7 +34,7 @@
                             <th scope="col">Patient Information</th>
                             <th scope="col">Sent To</th>
                             <th scope="col">Sent By</th>
-                            <th scope="col" class="center-text">Status</th>
+                            <th scope="col" class="center-text">System Status</th>
                             <th scope="col" class="center-text">Date Submitted</th>
                             <th scope="col"></th>
                         </tr>

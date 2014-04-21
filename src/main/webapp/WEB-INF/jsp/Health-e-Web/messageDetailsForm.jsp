@@ -39,7 +39,7 @@
                                 <dd><strong>Date Submitted:</strong> <fmt:formatDate value="${transaction.dateSubmitted}" type="both" dateStyle="long" timeStyle="long" /></dd>
                                 <dd><strong>Batch ID:</strong> ${transaction.batchName}</dd>
                                 <dd><strong>Transaction Type:</strong> <c:choose><c:when test="${transaction.sourceType == 1}">Originating Message</c:when><c:otherwise>Feedback Report</c:otherwise></c:choose></dd>
-                                <dd><strong>Status:</strong> <a href="#statusModal" data-toggle="modal" class="btn btn-link viewStatus" rel="${transaction.statusId}" title="View this Status">${transaction.statusValue}&nbsp;<span class="badge badge-help" data-placement="top" title="" data-original-title="">?</span></a></dd>
+                                <dd><strong>System Status:</strong> <a href="#statusModal" data-toggle="modal" class="btn btn-link viewStatus" rel="${transaction.statusId}" title="View this Status">${transaction.statusValue}&nbsp;<span class="badge badge-help" data-placement="top" title="" data-original-title="">?</span></a></dd>
                             </dl>
                         </div>
                         <div class="col-md-6"></div>

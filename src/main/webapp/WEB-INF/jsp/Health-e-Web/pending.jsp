@@ -59,7 +59,7 @@
                             <c:if test="${userDetails.deliverAuthority == true}"><th scope="col" class="center-text">Send?</th></c:if>
                             <th scope="col">Batch Name</th>
                             <th scope="col" class="center-text">Total Transactions</th>
-                            <th scope="col" class="center-text">Status</th>
+                            <th scope="col" class="center-text">System Status</th>
                             <th scope="col" class="center-text">Submitted By</th>
                             <th scope="col" class="center-text">Date Submitted</th>
                             <th scope="col"></th>

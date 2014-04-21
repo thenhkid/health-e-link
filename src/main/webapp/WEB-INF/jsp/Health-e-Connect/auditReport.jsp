@@ -38,7 +38,7 @@
                                     <strong>Batch Name:</strong> ${batch.utBatchName}
                                 </dd>
                                 <dd>
-                                    <strong>Status:</strong> 
+                                    <strong>System Status:</strong> 
                                     <a href="#statusModal" data-toggle="modal" class="btn btn-link viewStatus" rel="${batch.statusId}" title="View this Status">
                                         ${batch.statusValue}&nbsp;<span class="badge badge-help" data-placement="top" title="" data-original-title="">?</span>
                                     </a>

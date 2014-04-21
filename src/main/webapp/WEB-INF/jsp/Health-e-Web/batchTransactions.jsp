@@ -48,7 +48,7 @@
                             <c:if test="${fromPage == 'inbox'}"><th scope="col">Referral ID</th></c:if>
                             <th scope="col">Patient Information</th>
                             <c:if test="${fromPage != 'inbox'}"><th scope="col">Sent To</th></c:if>
-                            <th scope="col" class="center-text">Status</th>
+                            <th scope="col" class="center-text">System Status</th>
                             <th scope="col" class="center-text">Date Submitted</th>
                             <th scope="col"></th>
                         </tr>
