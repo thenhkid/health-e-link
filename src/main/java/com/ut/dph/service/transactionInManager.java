@@ -193,19 +193,19 @@ public interface transactionInManager {
 	
     boolean isValidURL(String url);
     
-    Integer processCrosswalk (Integer configId, Integer batchId, configurationDataTranslations translation, boolean foroutboundProcessing);
+    Integer processCrosswalk (Integer configId, Integer batchId, configurationDataTranslations translation, boolean foroutboundProcessing, Integer transactionId);
     
     Integer processMacro (Integer configId, Integer batchId, configurationDataTranslations translation, boolean foroutboundProcessing);
     
-    void nullForCWCol(Integer configId, Integer batchId, boolean foroutboundProcessing);
+    void nullForCWCol(Integer configId, Integer batchId, boolean foroutboundProcessing, Integer transactionId);
     
-    void executeCWData(Integer configId, Integer batchId, Integer fieldNo, CrosswalkData cwd, boolean foroutboundProcessing, Integer fieldId);
+    void executeCWData(Integer configId, Integer batchId, Integer fieldNo, CrosswalkData cwd, boolean foroutboundProcessing, Integer fieldId, Integer transactionId);
 
-    void updateFieldNoWithCWData (Integer configId, Integer batchId, Integer fieldNo, Integer passClear, boolean foroutboundProcessing);
+    void updateFieldNoWithCWData (Integer configId, Integer batchId, Integer fieldNo, Integer passClear, boolean foroutboundProcessing, Integer transactionId);
     
     Integer executeMacro (Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing, Macros macro);
     
-    void flagCWErrors (Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing);
+    void flagCWErrors (Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing, Integer transactionId);
     
     void flagMacroErrors (Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing);
     

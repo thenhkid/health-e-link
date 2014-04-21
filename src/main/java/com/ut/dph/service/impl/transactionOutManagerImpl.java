@@ -239,7 +239,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
         for (configurationDataTranslations cdt : dataTranslations) {
             if (cdt.getCrosswalkId() != 0) {
                 try {
-                    errorCount = errorCount + transactionInManager.processCrosswalk(configId, batchId, cdt, true);
+                    errorCount = errorCount + transactionInManager.processCrosswalk(configId, batchId, cdt, true, 0);
                 } catch (Exception e) {
                     //throw new Exception("Error occurred processing crosswalks. crosswalkId: "+cdt.getCrosswalkId()+" configId: "+configId,e);
                     e.printStackTrace();
