@@ -169,7 +169,7 @@ public interface transactionInManager {
     
     Integer genericValidation(configurationFormFields cff, Integer validationTypeId, Integer batchUploadId, String regEx, Integer transactionId);
     
-    Integer urlValidation(configurationFormFields cff, Integer validationTypeId, Integer batchUploadId);
+    Integer urlValidation(configurationFormFields cff, Integer validationTypeId, Integer batchUploadId, Integer transactionId);
     
     Integer dateValidation(configurationFormFields cff, Integer validationTypeId, Integer batchUploadId, Integer transactionId);
     

@@ -992,7 +992,7 @@ public class transactionInManagerImpl implements transactionInManager {
                     break;
                 //url - need to rethink as regExp is not validating correctly
                 case 6:
-                    errorCount = errorCount + urlValidation(cff, validationTypeId, batchUploadId);
+                    errorCount = errorCount + urlValidation(cff, validationTypeId, batchUploadId, transactionId);
                     break;
                 //anything new we hope to only have to modify sp
                 default:
@@ -1012,10 +1012,16 @@ public class transactionInManagerImpl implements transactionInManager {
 
     @Override
     public Integer urlValidation(configurationFormFields cff,
-            Integer validationTypeId, Integer batchUploadId) {
+            Integer validationTypeId, Integer batchUploadId, Integer transactionId) {
         try {
             //1. we grab all transactionInIds for messages that are not length of 0 and not null 
-            List<transactionRecords> trs = getFieldColAndValues(batchUploadId, cff);
+        	List<transactionRecords> trs = null;
+            //1. we grab all transactionInIds for messages that are not length of 0 and not null 
+            if (transactionId == 0) {
+            	trs = getFieldColAndValues(batchUploadId, cff);
+            } else  {
+            	trs = getFieldColAndValueByTransactionId(cff, transactionId);
+            }
             //2. we look at each column and check each value to make sure it is a valid url
             for (transactionRecords tr : trs) {
                 //System.out.println(tr.getfieldValue());
