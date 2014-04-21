@@ -121,3 +121,8 @@ BEGIN
 
  END$$
 DELIMITER ;
+
+
+/** Chad 4-21-14 @ 1 PM **/
+ALTER TABLE `universaltranslator`.`transactionin` 
+ADD COLUMN `messageStatus` INT NULL DEFAULT '1' COMMENT '1 = Open\n2 = Closed' AFTER `loadTableId`;
