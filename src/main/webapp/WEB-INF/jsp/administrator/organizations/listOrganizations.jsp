@@ -20,7 +20,7 @@
             <div class="panel-body">
                 
                 <div class="form-container scrollable"><br />
-                    <table class="table table-striped table-hover table-default" id="dataTable">
+                    <table class="table table-striped table-hover table-default" <c:if test="${not empty organizationList}">id="dataTable"</c:if>>
                         <thead>
                             <tr>
                                 <th scope="col">Organization Name ${result}</th>

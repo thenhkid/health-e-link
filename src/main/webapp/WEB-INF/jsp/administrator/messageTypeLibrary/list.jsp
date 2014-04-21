@@ -21,7 +21,7 @@
             <div class="panel-body">
                 
                 <div class="form-container scrollable"><br />
-                    <table class="table table-striped table-hover table-default" id="dataTable">
+                    <table class="table table-striped table-hover table-default" <c:if test="${not empty messageTypesList}">id="dataTable"</c:if>>
                         <thead>
                             <tr>
                                 <th scope="col">Message Type Name</th>

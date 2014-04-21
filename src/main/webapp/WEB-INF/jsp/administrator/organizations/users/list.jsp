@@ -33,7 +33,7 @@
                 
 
                 <div class="form-container scrollable">
-                    <br /><table class="table table-striped table-hover table-default" id="dataTable">
+                    <br /><table class="table table-striped table-hover table-default" <c:if test="${not empty userList}">id="dataTable"</c:if>>
                         <thead>
                             <tr>
                                 <th scope="col">Name</th>
