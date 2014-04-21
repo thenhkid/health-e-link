@@ -984,7 +984,7 @@ public class transactionInManagerImpl implements transactionInManager {
                     break;
                 // need to loop through each record / each field
                 case 4:
-                    errorCount = errorCount + dateValidation(cff, validationTypeId, batchUploadId);
+                    errorCount = errorCount + dateValidation(cff, validationTypeId, batchUploadId, transactionId);
                     break;
                 //numeric   calling SQL to validation and insert - one statement      
                 case 5:
@@ -1042,11 +1042,15 @@ public class transactionInManagerImpl implements transactionInManager {
 
     @Override
     public Integer dateValidation(configurationFormFields cff,
-            Integer validationTypeId, Integer batchUploadId) {
+            Integer validationTypeId, Integer batchUploadId, Integer transactionId) {
         try {
+        	List<transactionRecords> trs = null;
             //1. we grab all transactionInIds for messages that are not length of 0 and not null 
-            List<transactionRecords> trs = getFieldColAndValues(batchUploadId, cff);
-
+            if (transactionId == 0) {
+            	trs = getFieldColAndValues(batchUploadId, cff);
+            } else  {
+            	trs = getFieldColAndValueByTransactionId(cff, transactionId);
+            }
             //2. we look at each column and check each value by trying to convert it to a date
             for (transactionRecords tr : trs) {
                 if (tr.getfieldValue() != null) {
@@ -2278,6 +2282,12 @@ public class transactionInManagerImpl implements transactionInManager {
 		} else {
 			return transactionInDAO.getBatchUserActivities(batchInfo, foroutboundProcessing);
 		}
+	}
+
+	@Override
+	public List<transactionRecords> getFieldColAndValueByTransactionId(configurationFormFields cff,
+			Integer transactionId) {
+		     return transactionInDAO.getFieldColAndValueByTransactionId(cff, transactionId);
 	}
 
 }

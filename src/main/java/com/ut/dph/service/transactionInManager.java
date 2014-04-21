@@ -171,7 +171,7 @@ public interface transactionInManager {
     
     Integer urlValidation(configurationFormFields cff, Integer validationTypeId, Integer batchUploadId);
     
-    Integer dateValidation(configurationFormFields cff, Integer validationTypeId, Integer batchUploadId);
+    Integer dateValidation(configurationFormFields cff, Integer validationTypeId, Integer batchUploadId, Integer transactionId);
     
     void updateBlanksToNull(configurationFormFields cff, Integer batchUploadId);
     
@@ -352,5 +352,6 @@ public interface transactionInManager {
     List <TransErrorDetailDisplay> populateErrorList(batchUploads batchInfo);
     
     List<UserActivity> getBatchActivities(batchUploads batchInfo, boolean forUsers, boolean foroutboundProcessing);
-    
+ 
+    List <transactionRecords> getFieldColAndValueByTransactionId (configurationFormFields cff, Integer transactionId);
 }

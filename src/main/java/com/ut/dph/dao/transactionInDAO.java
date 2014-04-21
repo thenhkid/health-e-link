@@ -288,4 +288,6 @@ public interface transactionInDAO {
     
     List<UserActivity> getBatchUserActivities(batchUploads batchInfo, boolean foroutboundProcessing);
     
+    List <transactionRecords> getFieldColAndValueByTransactionId (configurationFormFields cff, Integer transactionId);
+   
 }

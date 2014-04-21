@@ -3964,4 +3964,34 @@ public class transactionInDAOImpl implements transactionInDAO {
             return null;
         }
 	}
+	
+	@Override
+    @Transactional
+    @SuppressWarnings("unchecked")
+    public List<transactionRecords> getFieldColAndValueByTransactionId(configurationFormFields cff, Integer transactionId) {
+        try {
+    	String sql = ("select transactionInId as transactionId, F" + cff.getFieldNo()
+                + "  as fieldValue, " + cff.getFieldNo() + " as fieldNo from transactiontranslatedIn "
+                + " where configId = :configId "
+                + " and F" + cff.getFieldNo() + " is not null "
+                + " and transactionInId = :id");
+
+        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                .addScalar("transactionId", StandardBasicTypes.INTEGER)
+                .addScalar("fieldValue", StandardBasicTypes.STRING)
+                .addScalar("fieldNo", StandardBasicTypes.INTEGER)
+                .setResultTransformer(Transformers.aliasToBean(transactionRecords.class))
+                .setParameter("configId", cff.getconfigId())
+                .setParameter("id", transactionId);
+
+        List<transactionRecords> trs = query.list();
+
+        return trs;
+        } catch (Exception ex) {
+        	System.err.println("getFieldColAndValueByTransactionId " + ex.getCause());
+        	ex.printStackTrace();
+        	return null;
+        }
+    }
+	
 }
