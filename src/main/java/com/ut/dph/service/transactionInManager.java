@@ -195,7 +195,7 @@ public interface transactionInManager {
     
     Integer processCrosswalk (Integer configId, Integer batchId, configurationDataTranslations translation, boolean foroutboundProcessing, Integer transactionId);
     
-    Integer processMacro (Integer configId, Integer batchId, configurationDataTranslations translation, boolean foroutboundProcessing);
+    Integer processMacro (Integer configId, Integer batchId, configurationDataTranslations translation, boolean foroutboundProcessing, Integer transactionId);
     
     void nullForCWCol(Integer configId, Integer batchId, boolean foroutboundProcessing, Integer transactionId);
     
@@ -203,11 +203,11 @@ public interface transactionInManager {
 
     void updateFieldNoWithCWData (Integer configId, Integer batchId, Integer fieldNo, Integer passClear, boolean foroutboundProcessing, Integer transactionId);
     
-    Integer executeMacro (Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing, Macros macro);
+    Integer executeMacro (Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing, Macros macro, Integer transactionId);
     
     void flagCWErrors (Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing, Integer transactionId);
     
-    void flagMacroErrors (Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing);
+    void flagMacroErrors (Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing, Integer transactionId);
     
     List<configurationTransport> getHandlingDetailsByBatch(int batchId);
     

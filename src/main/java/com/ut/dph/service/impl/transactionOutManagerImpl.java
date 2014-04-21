@@ -247,7 +247,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                 }
             } else if (cdt.getMacroId() != 0) {
                 try {
-                    errorCount = errorCount + transactionInManager.processMacro(configId, batchId, cdt, true);
+                    errorCount = errorCount + transactionInManager.processMacro(configId, batchId, cdt, true, 0);
                 } catch (Exception e) {
                     //throw new Exception("Error occurred processing macro. macroId: "+ cdt.getMacroId() + " configId: "+configId,e);
                     e.printStackTrace();

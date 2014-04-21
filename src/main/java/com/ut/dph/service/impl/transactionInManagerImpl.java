@@ -601,7 +601,7 @@ public class transactionInManagerImpl implements transactionInManager {
                     if (cdt.getCrosswalkId() != 0) {
                         systemErrorCount = systemErrorCount + processCrosswalk(configId, batchUploadId, cdt, false, transactionId);
                     } else if (cdt.getMacroId() != 0) {
-                        systemErrorCount = systemErrorCount + processMacro(configId, batchUploadId, cdt, false);
+                        systemErrorCount = systemErrorCount + processMacro(configId, batchUploadId, cdt, false, transactionId);
                     }
                 }
                 /**
@@ -1288,17 +1288,17 @@ public class transactionInManagerImpl implements transactionInManager {
 
     @Override
     public Integer processMacro(Integer configId, Integer batchId, configurationDataTranslations cdt,
-            boolean foroutboundProcessing) {
+            boolean foroutboundProcessing, Integer transactionId) {
         // we clear forCW column for before we begin any translation
-        nullForCWCol(configId, batchId, foroutboundProcessing, 0);
+        nullForCWCol(configId, batchId, foroutboundProcessing, transactionId);
         try {
             Macros macro = configurationManager.getMacroById(cdt.getMacroId());
             int sysError = 0;
             try {
                 // we expect the target field back so we can figure out clear pass option
-                sysError = sysError + executeMacro(configId, batchId, cdt, foroutboundProcessing, macro);
+                sysError = sysError + executeMacro(configId, batchId, cdt, foroutboundProcessing, macro, transactionId);
                 // insert macro errors
-                flagMacroErrors(configId, batchId, cdt, foroutboundProcessing);
+                flagMacroErrors(configId, batchId, cdt, foroutboundProcessing, transactionId);
                 return sysError;
             } catch (Exception e) {
                 e.printStackTrace();
@@ -1334,14 +1334,14 @@ public class transactionInManagerImpl implements transactionInManager {
 
     @Override
     public void flagMacroErrors(Integer configId, Integer batchId,
-            configurationDataTranslations cdt, boolean foroutboundProcessing) {
-        transactionInDAO.flagMacroErrors(configId, batchId, cdt, foroutboundProcessing);
+            configurationDataTranslations cdt, boolean foroutboundProcessing, Integer transactionId) {
+        transactionInDAO.flagMacroErrors(configId, batchId, cdt, foroutboundProcessing, transactionId);
     }
 
     @Override
     public Integer executeMacro(Integer configId, Integer batchId,
-            configurationDataTranslations cdt, boolean foroutboundProcessing, Macros macro) {
-        return transactionInDAO.executeMacro(configId, batchId, cdt, foroutboundProcessing, macro);
+            configurationDataTranslations cdt, boolean foroutboundProcessing, Macros macro, Integer transactionId) {
+        return transactionInDAO.executeMacro(configId, batchId, cdt, foroutboundProcessing, macro, transactionId);
 
     }
 
@@ -1666,6 +1666,7 @@ public class transactionInManagerImpl implements transactionInManager {
                     // at this point we will only have invalid records
                     if (getRecordCounts(batchId, errorStatusIds, false) > 0) {
                         updateBatchStatus(batchId, 7, "endDateTime");
+                        updateRecordCounts(batchId, errorStatusIds, false, "errorRecordCount");
                         //update loaded to rejected
                         updateTransactionStatus(batchId, 0, 9, 13);
                         return false;
@@ -1673,6 +1674,8 @@ public class transactionInManagerImpl implements transactionInManager {
                 }
             }
 
+            updateRecordCounts(batchId, errorStatusIds, false, "errorRecordCount");
+            updateRecordCounts(batchId, new ArrayList<Integer>(), false, "totalRecordCount");
             //at the end of loaded, we update to PR
             updateTransactionStatus(batchId, 0, 9, 10);
             updateTransactionTargetStatus(batchId, 0, 9, 10);
