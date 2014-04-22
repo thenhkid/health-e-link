@@ -482,3 +482,60 @@ select '';
 end proc_main$$
 DELIMITER ;
 
+
+/** Chad 4-22-14 @ 3:48 pm **/
+USE `universalTranslator`;
+DROP procedure IF EXISTS `closeOutReferral`;
+
+DELIMITER $$
+USE `universalTranslator`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `closeOutReferral`(in configId int, 
+in batchId int, in srcField varchar(10),
+in fieldA varchar(10), in fieldB varchar(10), in con1 varchar(10), 
+in con2 varchar(10), in macroId int, in foroutboundProcessing boolean, in passClear int, in transactionId int)
+proc_main:begin
+
+call setInboundOutBoundTables (foroutboundProcessing);
+select @translatedTable, @transactionTable, @batchTable, @batchIdType , @errorTable
+into @translatedTable, @transactionTable, @batchTable, @batchIdType , @errorTable;
+
+-- Need to get the value of the srcField to see what the referral status is set to
+begin
+
+set @stmt = concat("select ", " ", srcField, " INTO @referralStatus from ", @translatedTable, " where transactionInId = ", transactionId);
+
+PREPARE stmt1 FROM @stmt;
+EXECUTE stmt1;
+DEALLOCATE PREPARE stmt1;
+
+if(@referralStatus = 2) then
+
+	BEGIN 
+		set @stmt = concat("select transactionInId INTO @transactionInId from transactionTarget where id = (select transactionTargetId from transactionIn where id = ", transactionId, " )");
+		
+		PREPARE stmt from @stmt;
+		EXECUTE stmt;
+		DEALLOCATE PREPARE stmt;
+
+		set @stmt = concat("update transactionIn set messageStatus = 2 where id = ", @transactionInId);
+		PREPARE stmt from @stmt;
+		EXECUTE stmt;
+
+	END;
+
+END if;
+
+
+END;
+
+
+END$$
+
+DELIMITER ;
+
+
+
+
+
+
+
