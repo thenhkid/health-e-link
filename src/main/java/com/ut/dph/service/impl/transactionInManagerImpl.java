@@ -570,7 +570,7 @@ public class transactionInManagerImpl implements transactionInManager {
            
             	resetTransactionTranslatedIn(batchUploadId, false, transactionId);
            
-            //clear transactionInError table for batch
+            	//clear transactionInError table for batch, if do not clear errors is true, we skip this.
             	if (!doNotClearErrors) {
             		systemErrorCount = systemErrorCount + clearTransactionInErrors(batchUploadId, true);
             	}
