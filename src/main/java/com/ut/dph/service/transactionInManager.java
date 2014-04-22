@@ -225,7 +225,7 @@ public interface transactionInManager {
     
     void resetTransactionTranslatedIn(Integer batchId, boolean resetAll, Integer transactionInId);
     
-    Integer copyTransactionInStatusToTarget(Integer batchId);
+    Integer copyTransactionInStatusToTarget(Integer batchId, Integer transactionId);
     
     Integer insertLoadData(Integer batchId, String delimChar, String fileWithPath, String loadTableName, boolean containsHeaderRow);
    

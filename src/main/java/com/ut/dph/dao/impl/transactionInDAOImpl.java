@@ -2622,12 +2622,19 @@ public class transactionInDAOImpl implements transactionInDAO {
 
     @Override
     @Transactional
-    public Integer copyTransactionInStatusToTarget(Integer batchId) {
+    public Integer copyTransactionInStatusToTarget(Integer batchId, Integer transactionId) {
         try {
-            String sql = ("UPDATE transactionTarget INNER JOIN transactionIn  ON  transactionIn.id = transactionTarget.transactionInId "
-                    + " and transactionTarget.batchUploadId = :batchId set transactionTarget.statusId = transactionIn.statusId;");
+        	Integer id = batchId;
+        	String sql = ("UPDATE transactionTarget INNER JOIN transactionIn  ON  transactionIn.id = transactionTarget.transactionInId ");
+        	if (transactionId == 0)	{
+        		sql = sql +  " and transactionTarget.batchUploadId = :id ";
+        	} else {
+        		sql = sql +  " and transactionTarget.transactionInId = :id ";
+        	}
+        			sql = sql + (" set transactionTarget.statusId = transactionIn.statusId;");
+            
             Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
-                    .setParameter("batchId", batchId);
+                    .setParameter("id", id);
             query.executeUpdate();
             return 0;
         } catch (Exception ex) {

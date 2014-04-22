@@ -178,7 +178,7 @@ public interface transactionInDAO {
     
     Integer getRecordCounts (Integer batchId, List <Integer> statusIds, boolean foroutboundProcessing, boolean inStatusIds);
     
-    Integer copyTransactionInStatusToTarget(Integer batchId);
+    Integer copyTransactionInStatusToTarget(Integer batchId, Integer transactionId);
     
     Integer insertLoadData (Integer batchId, String delimChar, String fileWithPath, String tableName, boolean containsHeaderRow);
     

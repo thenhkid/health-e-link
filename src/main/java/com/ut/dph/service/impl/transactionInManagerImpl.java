@@ -613,9 +613,9 @@ public class transactionInManagerImpl implements transactionInManager {
                 }
             } //end of configs
 
-            updateTransactionStatus(batchUploadId, 0, 10, 12);
+            updateTransactionStatus(batchUploadId, transactionId, 10, 12);
             //transactionIn and transactionTarget status should be the same 
-            copyTransactionInStatusToTarget(batchUploadId);
+            copyTransactionInStatusToTarget(batchUploadId, transactionId);
 
             /**
              * batches gets process again when user hits release button, maybe have separate method call for those that are just going from pending release to release, have to think about scenario when upload file is huge *
@@ -679,27 +679,27 @@ public class transactionInManagerImpl implements transactionInManager {
                     // all went well
                     if (handlingDetails.get(0).geterrorHandling() == 4) {
                         //update to pass - 16
-                        updateTransactionStatus(batchUploadId, 0, 14, 16);
+                        updateTransactionStatus(batchUploadId, transactionId, 14, 16);
                         //auto release, records 
-                        updateTransactionTargetStatus(batchUploadId, 0, 14, 19);
-                        updateTransactionTargetStatus(batchUploadId, 0, 16, 19);
+                        updateTransactionTargetStatus(batchUploadId, transactionId, 14, 19);
+                        updateTransactionTargetStatus(batchUploadId, transactionId, 16, 19);
                         
                     }
                     if (handlingDetails.get(0).geterrorHandling() == 2) {
                         //reject errors
-                        updateTransactionStatus(batchUploadId, 0, 14, 13);
-                        copyTransactionInStatusToTarget(batchUploadId);
+                        updateTransactionStatus(batchUploadId, transactionId, 14, 13);
+                        copyTransactionInStatusToTarget(batchUploadId, transactionId);
                     }
-                    updateTransactionStatus(batchUploadId, 0, 12, 19);
-                    updateTransactionTargetStatus(batchUploadId, 0, 12, 19);
+                    updateTransactionStatus(batchUploadId, transactionId, 12, 19);
+                    updateTransactionTargetStatus(batchUploadId, transactionId, 12, 19);
                     batchStausId = 24;
 
                 } else if (handlingDetails.get(0).getautoRelease() && handlingDetails.get(0).geterrorHandling() == 3) {
                     //auto-release, 3 = Reject submission on error 
                     batchStausId = 7;
                     //updating entire batch to reject since error transactionIds are in error tables
-                    updateTransactionTargetStatus(batchUploadId, 0, 14, 13);
-                    updateTransactionStatus(batchUploadId, 0, 14, 13);
+                    updateTransactionTargetStatus(batchUploadId, transactionId, 14, 13);
+                    updateTransactionStatus(batchUploadId, transactionId, 14, 13);
 
                 } else if (!handlingDetails.get(0).getautoRelease() && handlingDetails.get(0).geterrorHandling() == 1) { //manual release
                     //transaction will be set to saved, batch will be set to RP
@@ -708,17 +708,17 @@ public class transactionInManagerImpl implements transactionInManager {
                 } else if (!handlingDetails.get(0).getautoRelease() && handlingDetails.get(0).geterrorHandling() == 2) {
                     //reject records
                     batchStausId = 5;
-                    updateTransactionStatus(batchUploadId, 0, 14, 13);
-                    updateTransactionTargetStatus(batchUploadId, 0, 14, 13);
+                    updateTransactionStatus(batchUploadId, transactionId, 14, 13);
+                    updateTransactionTargetStatus(batchUploadId, transactionId, 14, 13);
                 } else if (!handlingDetails.get(0).getautoRelease() && handlingDetails.get(0).geterrorHandling() == 3) {
                     batchStausId = 7;
-                    updateTransactionStatus(batchUploadId, 0, 14, 13);
-                    updateTransactionTargetStatus(batchUploadId, 0, 14, 13);
+                    updateTransactionStatus(batchUploadId, transactionId, 14, 13);
+                    updateTransactionTargetStatus(batchUploadId, transactionId, 14, 13);
                 } else if (!handlingDetails.get(0).getautoRelease() && handlingDetails.get(0).geterrorHandling() == 4) {
                     batchStausId = 5;
                     // pass
-                    updateTransactionStatus(batchUploadId, 0, 14, 16);
-                    updateTransactionTargetStatus(batchUploadId, 0, 14, 16);
+                    updateTransactionStatus(batchUploadId, transactionId, 14, 16);
+                    updateTransactionTargetStatus(batchUploadId, transactionId, 14, 16);
                 } //end of checking auto/error handling
 
                 updateRecordCounts(batchUploadId, new ArrayList<Integer>(), false, "totalRecordCount");
@@ -1397,8 +1397,8 @@ public class transactionInManagerImpl implements transactionInManager {
     }
 
     @Override
-    public Integer copyTransactionInStatusToTarget(Integer batchId) {
-        return transactionInDAO.copyTransactionInStatusToTarget(batchId);
+    public Integer copyTransactionInStatusToTarget(Integer batchId, Integer transactionId) {
+        return transactionInDAO.copyTransactionInStatusToTarget(batchId, transactionId);
     }
 
     @Override
