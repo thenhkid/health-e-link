@@ -482,3 +482,51 @@ select '';
 end proc_main$$
 DELIMITER ;
 
+/** Grace 04222014 3:49PM **/
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `universaltranslator`.`replacechars`(in configId int, 
+in batchId int, in srcField varchar(10),
+in fieldA varchar(10), in fieldB varchar(10), in con1 varchar(10), 
+in con2 varchar(10), in macroId int, in foroutboundProcessing boolean, in passClear int, in transactionId int)
+proc_main:begin
+
+-- this SP matches FieldA with Con1 and then updates fieldB with Con2
+-- this sets out table
+call setInboundOutBoundTables (foroutboundProcessing);
+select @translatedTable, @transactionTable, @batchTable, @batchIdType , @errorTable
+into @translatedTable, @transactionTable, @batchTable, @batchIdType , @errorTable;
+
+call getFinalStatusIds;
+select @finalStatusIds into @finalStatusIds;
+
+
+-- build our sql
+if (transactionId = 0) then
+	set @stmt = concat("update ",@translatedTable, " set ",fieldA," = replace(",fieldA,", '",con1,"','",con2,"') where ",@transactionTable,"Id in (select id from ",@transactionTable,
+				" where configId = ",configId," and ", @batchIdType," = ",batchId," and statusId not in (",@finalStatusIds ,"));");
+	END if;
+
+
+if (transactionId != 0) then
+	set @stmt = concat("update ",@translatedTable, " set ",fieldA," = replace(",fieldA,", '",con1,"','",con2,"') where ",
+	@transactionTable,"Id = ", transactionId,";");
+	END if;
+
+PREPARE stmt from @stmt;
+EXECUTE stmt;-- execute
+
+-- we check pass /clear
+if (passClear = 2) THEN
+BEGIN
+-- accessible
+END;
+END IF;
+
+
+-- the only error for this is if SP bombs, no need to write in insert error logs
+select '';
+end proc_main$$
+DELIMITER ;
+
+
+INSERT INTO `universaltranslator`.`macro_names` (`id`,`Category`, `Macro_Name`, `Macro_Short_Name`, `Formula`, `Con1_Question`, `Con2_Question`) VALUES (72, 'String manipulation', 'Replace chars', 'replaceChars', 'replaceChars', 'Please enter character(s) that you would like to replace', 'Please enter new character(s).');
