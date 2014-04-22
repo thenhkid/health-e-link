@@ -2460,8 +2460,8 @@ public class transactionInDAOImpl implements transactionInDAO {
             query.setParameter("passClear", cdt.getPassClear());
             query.setParameter("transactionId", transactionId);
             
-
             query.list();
+            
             return 0;
         } catch (Exception ex) {
             //insert system error

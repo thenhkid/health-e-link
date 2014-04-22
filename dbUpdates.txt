@@ -484,11 +484,11 @@ DELIMITER ;
 
 /** Chad 4-22-14 @ 3:48 pm **/
 USE `universalTranslator`;
-DROP procedure IF EXISTS `universaltranslator`.`closeOutReferral`;
+DROP procedure IF EXISTS `closeOutReferral`;
 
 DELIMITER $$
 USE `universalTranslator`$$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `universaltranslator`.`closeOutReferral`(in configId int, 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `closeOutReferral`(in configId int, 
 in batchId int, in srcField varchar(10),
 in fieldA varchar(10), in fieldB varchar(10), in con1 varchar(10), 
 in con2 varchar(10), in macroId int, in foroutboundProcessing boolean, in passClear int, in transactionId int)
@@ -527,10 +527,14 @@ END if;
 
 END;
 
+-- see if we want to return something
+select '';
 
-END$$
+END proc_main$$
 
 DELIMITER ;
+
+
 
 /** Grace 04222014 3:49PM **/
 DELIMITER $$

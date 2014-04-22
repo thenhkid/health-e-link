@@ -475,6 +475,7 @@ public class HealtheWebController {
             }
             else {
                 transaction.setsourceType(configDetails.getsourceType());
+                transaction.setmessageStatus(originalTransactionInfo.getmessageStatus());
             }
             transaction.setinternalStatusId(transactionInfo.getinternalStatusId());
 

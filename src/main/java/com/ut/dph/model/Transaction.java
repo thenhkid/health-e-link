@@ -53,6 +53,8 @@ public class Transaction {
    private List<transactionRecords> patientFields = null;
    private List<transactionRecords> detailFields = null;
    
+   private int messageStatus = 1;
+   
    
    public int getorgId() {
        return orgId;
@@ -341,5 +343,13 @@ public class Transaction {
    public void setreportableFieldHeading4(String reportableFieldHeading4) {
        this.reportableFieldHeading4 = reportableFieldHeading4;
    }
+   
+   public int getmessageStatus() {
+        return messageStatus;
+    }
+    
+    public void setmessageStatus(int messageStatus) {
+        this.messageStatus = messageStatus;
+    }
 
 }
