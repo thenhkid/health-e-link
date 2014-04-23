@@ -45,6 +45,9 @@ require(['./main'], function () {
             var confirmed = confirm("Are you sure you want to process the batch now?");
 
              if (confirmed) {
+            	 // hide buttons
+            	 $("#actionRowBottom").hide();
+            	 $("#actionRowTop").hide();
             	 $.ajax({
                   url: '../../inboundBatchOptions',
                   data:{'batchOption': $(this).attr('rel'), 'batchId': $(this).attr('rel2')},
@@ -63,6 +66,8 @@ require(['./main'], function () {
             var confirmed = confirm("Are you sure you want to set this batch to 'Cancel'?");
 
              if (confirmed) {
+            	 $("#actionRowBottom").hide();
+            	 $("#actionRowTop").hide();
             	 $.ajax({
                   url: '../../inboundBatchOptions',
                   data:{'batchOption': $(this).attr('rel'), 'batchId': $(this).attr('rel2')},
@@ -81,6 +86,8 @@ require(['./main'], function () {
             var confirmed = confirm("Are you sure you want to reset this batch?");
 
              if (confirmed) {
+            	 $("#actionRowBottom").hide();
+            	 $("#actionRowTop").hide();
             	 $.ajax({
                   url: '../../inboundBatchOptions',
                   data:{'batchOption': $(this).attr('rel'), 'batchId': $(this).attr('rel2')},
@@ -99,6 +106,8 @@ require(['./main'], function () {
             var confirmed = confirm("Are you sure you want to reject all transactions with errors?");
 
              if (confirmed) {
+            	 $("#actionRowBottom").hide();
+            	 $("#actionRowTop").hide();
             	 $('input[name="batchOption"]').val("rejectMessages"); 
             	 $('#massReject').submit();
              }
@@ -111,6 +120,8 @@ require(['./main'], function () {
             var confirmed = confirm("Are you sure you want to release this batch?");
 
              if (confirmed) {
+            	 $("#actionRowBottom").hide();
+            	 $("#actionRowTop").hide();
             	 $.ajax({
                   url: '../../inboundBatchOptions',
                   data:{'batchOption': $(this).attr('rel'), 'batchId': $(this).attr('rel2')},

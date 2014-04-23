@@ -25,7 +25,7 @@
     <div class="col-md-12">
               <div class="form-container scrollable">
               <c:if test="${empty doesNotExist}">
-              	<div class="row" style="overflow:hidden;margin-left:0px;margin-right:0px;margin-top:10px; margin-bottom:20px;">
+              	<div class="row" style="overflow:hidden;margin-left:0px;margin-right:0px;margin-top:10px; margin-bottom:20px;" id="actionRowTop">
 	  				 	<div class="pull-left">
 	  				 		<c:if test="${canSend == true}">
                                   <input type="button" id="release" class="btn btn-primary btn-xs releaseBatch" rel="releaseBatch" rel2="${batchDetails.id}"  value="Release" />
@@ -39,7 +39,7 @@
 	  				 		<c:if test="${batchDetails.statusId == 3}">
 	  				 			<input type="button" id="processBatch" class="btn btn-primary btn-xs processBatch" rel="processBatch" rel2="${batchDetails.id}" value="Process Batch" />
 	  				 		</c:if>
-	  				 		<c:if test="${canCancel}">
+	  				 		<c:if test="${canCancel && batchDetails.statusId != 4}">
 	                       		<input type="button" id="cancel" class="btn btn-primary btn-xs cancelBatch" rel="cancel"  rel2="${batchDetails.id}" value="Cancel" />
 	                       	</c:if>
 	                        <c:if test="${canReset}">
@@ -110,9 +110,9 @@
                         </div> 
                         <c:set var="transactionCounter" value="${transactionCounter + 1}"/>
                     </c:forEach>
-                     <c:if test="${transactionCounter > 20}">
-              	<div class="row" style="overflow:hidden;margin-left:0px;margin-right:0px;margin-top:10px; margin-bottom:20px;">
-	  				 	<div class="pull-left">
+                <div class="row" style="overflow:hidden;margin-left:0px;margin-right:0px;margin-top:10px; margin-bottom:20px;" id="actionRowBottom">
+	  				<c:if test="${transactionCounter > 20}">
+              		 	<div class="pull-left">
 	  				 		<c:if test="${canSend == true}">
                                   <input type="button" id="releaseBottom" class="btn btn-primary btn-xs releaseBatch" rel="releaseBatch" rel2="${batchDetails.id}"  value="Release" />
                             </c:if>
@@ -125,16 +125,15 @@
 	  				 		<c:if test="${batchDetails.statusId == 3}">
 	  				 			<input type="button" id="processBatchBottom" class="btn btn-primary btn-xs processBatch" rel="processBatch" rel2="${batchDetails.id}" value="Process Batch" />
 	  				 		</c:if>
-	  				 		<c:if test="${canCancel}">
+	  				 		<c:if test="${canCancel && batchDetails.statusId != 4}">
 	                       		<input type="button" id="cancelBottom" class="btn btn-primary btn-xs cancelBatch" rel="cancel"  rel2="${batchDetails.id}"value="Cancel" />
 	                       	</c:if>
 	                        <c:if test="${canReset}">
 	                          	<input type="button" id="resetBottom" class="btn btn-primary btn-xs resetBatch" rel="reset"  rel2="${batchDetails.id}" value="Reset" />
 		       				</c:if>
-		       			</div>
-	                </div>	
+		       			</div>	
              	</c:if>
-                    
+               </div>     
   				</c:when>
   				<c:when test="${not empty doesNotExist}">
   					<section class="panel panel-default">

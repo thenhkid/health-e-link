@@ -795,6 +795,8 @@ public class transactionInManagerImpl implements transactionInManager {
                 } else {
                     toBatchStatusId = 2;
                     sysError = clearTransactionTables(batchUploadId, false);
+                    updateRecordCounts(batchUploadId, new ArrayList<Integer>(), false, "errorRecordCount");
+                    updateRecordCounts(batchUploadId, new ArrayList<Integer>(), false, "totalRecordCount");
                 }
             }
         }
