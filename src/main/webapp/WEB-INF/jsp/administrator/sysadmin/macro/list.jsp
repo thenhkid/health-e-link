@@ -7,7 +7,11 @@
 <div class="main clearfix" role="main" rel="dataForTable">
     <div class="col-md-12">
         <div class="alert alert-success">
-            <c:choose><c:when test="${param.msg == 'updated'}">The macro has been successfully updated!</c:when><c:when test="${param.msg == 'created'}">The macro has been successfully added!</c:when></c:choose>
+            <c:choose><c:when test="${param.msg == 'updated'}">The macro has been successfully updated!</c:when>
+            <c:when test="${param.msg == 'created'}">The macro has been successfully added!</c:when>
+            <c:when test="${param.msg == 'deleted'}">The macro has been successfully deleted!</c:when>
+            <c:when test="${param.msg == 'notDeleted'}">The macro was not deleted.  Please try again.</c:when>
+            </c:choose>
                 </div>
                 <section class="panel panel-default">
                     <div class="panel-heading">

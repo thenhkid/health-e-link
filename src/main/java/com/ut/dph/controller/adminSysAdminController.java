@@ -110,7 +110,7 @@ public class adminSysAdminController {
         //This variable will be used to display the message on the details form
         redirectAttr.addFlashAttribute("savedStatus", returnMessage);
 
-        ModelAndView mav = new ModelAndView(new RedirectView("../macros"));
+        ModelAndView mav = new ModelAndView(new RedirectView("../macros?msg=" + returnMessage));
         return mav;
     }
 
