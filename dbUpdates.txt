@@ -2,7 +2,8 @@
 ALTER TABLE `universaltranslator`.`transactionin` 
 ADD INDEX `idAndStatusId` (`id` ASC, `statusId` ASC);
 
-drop PROCEDURE `universaltranslator`.`insertValidationErrors`;
+USE `universalTranslator`;
+DROP procedure IF EXISTS `insertValidationErrors`;
 
 DELIMITER $$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `universaltranslator`.`insertValidationErrors`(in vtType int, in fieldNo int,
@@ -66,7 +67,7 @@ END IF;
 END$$
 DELIMITER ;
 
-drop PROCEDURE `universaltranslator`.`stripPhoneChars`;
+drop PROCEDURE IF EXISTS `universaltranslator`.`stripPhoneChars`;
 
 
 DELIMITER $$
@@ -132,13 +133,7 @@ ADD COLUMN `messageStatus` INT NULL DEFAULT '1' COMMENT '1 = Open (Default)\n2 =
 
 
 /** grace 04.21.2014 5:02PM **/
-drop procedure `universaltranslator`.`addCharToString`;
-drop procedure `universaltranslator`.`MatchFAUpdateSF`;
-drop procedure `universaltranslator`.`MatchFieldAUpdateFieldB`;
-drop procedure `universaltranslator`.`mmddyyyytoyyyymmdd`;
-drop procedure `universaltranslator`.`setFieldToNull`;
-drop procedure `universaltranslator`.`yyyymmddTommddyyyy`;
-
+drop procedure IF EXISTS `universaltranslator`.`addCharToString`;
 
 DELIMITER $$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `universaltranslator`.`addCharToString`(in configId int, 
@@ -184,6 +179,7 @@ end proc_main$$
 DELIMITER ;
 
 
+drop procedure IF EXISTS `universaltranslator`.`MatchFAUpdateSF`;
 
 DELIMITER $$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `universaltranslator`.`MatchFAUpdateSF`(in configId int, 
@@ -250,6 +246,10 @@ END IF;
 select '';
 end proc_main$$
 DELIMITER ;
+
+
+drop procedure IF EXISTS  `universaltranslator`.`MatchFieldAUpdateFieldB`;
+
 DELIMITER $$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `universaltranslator`.`MatchFieldAUpdateFieldB`(in configId int, 
 in batchId int, in srcField varchar(10),
@@ -317,6 +317,7 @@ end proc_main$$
 DELIMITER ;
 
 
+drop procedure IF EXISTS `universaltranslator`.`mmddyyyytoyyyymmdd`;
 DELIMITER $$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `universaltranslator`.`mmddyyyytoyyyymmdd`(in configId int, 
 in batchId int, in srcField varchar(10),
@@ -376,6 +377,7 @@ select '';
 end proc_main$$
 DELIMITER ;
 
+drop procedure IF EXISTS  `universaltranslator`.`setFieldToNull`;
 
 DELIMITER $$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `universaltranslator`.`setFieldToNull`(in configId int, 
@@ -425,6 +427,7 @@ select '';
 end proc_main$$
 DELIMITER ;
 
+drop procedure IF EXISTS `universaltranslator`.`yyyymmddTommddyyyy`;
 DELIMITER $$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `universaltranslator`.`yyyymmddTommddyyyy`(in configId int, 
 in batchId int, in srcField varchar(10),
@@ -537,6 +540,8 @@ DELIMITER ;
 
 
 /** Grace 04222014 3:49PM **/
+drop procedure IF EXISTS `universaltranslator`.`replacechars`;
+
 DELIMITER $$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `universaltranslator`.`replacechars`(in configId int, 
 in batchId int, in srcField varchar(10),
@@ -615,6 +620,9 @@ ADD CONSTRAINT `secondContraFK`
 
   
 /** grace 04222014 06:49PM **/
+USE `universalTranslator`;
+DROP procedure IF EXISTS `trimField`;
+
 DELIMITER $$
 CREATE DEFINER=`root`@`localhost` PROCEDURE `universaltranslator`.`trimField`(in configId int, 
 in batchId int, in srcField varchar(10),
