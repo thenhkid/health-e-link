@@ -106,7 +106,8 @@ public class HealtheConnectController {
      * The private maxResults variable will hold the number of results to show per list page.
      */
     private static int maxResults = 20;
-
+    
+    private int featureId = 4;
     /**
      * this list holds the status that we do not want the audit reports to show *
      */
@@ -159,9 +160,10 @@ public class HealtheConnectController {
              */
             UserActivity ua = new UserActivity();
             ua.setUserId(userInfo.getId());
+            ua.setFeatureId(featureId);
             ua.setAccessMethod(request.getMethod());
-            ua.setPageAccess("/upload");
-            ua.setActivity("View Uploads Page");
+            ua.setPageAccess("/upload"); // include mapping in case we want to send them back to page in the future
+            ua.setActivity("Viewed Uploads Page");
             usermanager.insertUserLog(ua);
         } catch (Exception e) {
             throw new Exception("Error occurred viewing the uploaded batches. userId: " + userInfo.getId(), e);
@@ -206,6 +208,19 @@ public class HealtheConnectController {
         mav.addObject("configurations", configMessageTypes);
         mav.addObject("allowmultipleMessageTypes", allowmultipleMessageTypes);
 
+        try {
+	        //log user activity
+	        UserActivity ua = new UserActivity();
+	        ua.setUserId(userInfo.getId());
+	        ua.setFeatureId(featureId);
+	        ua.setAccessMethod("GET");
+	        ua.setPageAccess("/fileUploadForm"); 
+	        ua.setActivity("Viewed Upload New File Form");
+	        usermanager.insertUserLog(ua);
+	    } catch (Exception ex) {
+	    	System.err.println("fileUploadForm = error logging user" + ex.getCause());
+	    	ex.printStackTrace();
+        }
         return mav;
     }
 
@@ -340,6 +355,21 @@ public class HealtheConnectController {
                 redirectAttr.addFlashAttribute("errorCodes", errorCodes);
             }
 
+            try {
+    	        //log user activity
+    	        UserActivity ua = new UserActivity();
+    	        ua.setUserId(userInfo.getId());
+    	        ua.setFeatureId(featureId);
+    	        ua.setAccessMethod("POST");
+    	        ua.setPageAccess("/submitFileUpload"); 
+    	        ua.setActivity("Uploaded a new file");
+    	        ua.setBatchUploadId(batchId);
+    	        usermanager.insertUserLog(ua);
+    	    } catch (Exception ex) {
+    	    	System.err.println("submitFileUpload = error logging user" + ex.getCause());
+    	    	ex.printStackTrace();
+            }
+            
             ModelAndView mav = new ModelAndView(new RedirectView("upload"));
             return mav;
 
@@ -390,6 +420,20 @@ public class HealtheConnectController {
 
             mav.addObject("downloadableBatches", downloadableBatches);
 
+            try {
+    	        //log user activity
+    	        UserActivity ua = new UserActivity();
+    	        ua.setUserId(userInfo.getId());
+    	        ua.setFeatureId(featureId);
+    	        ua.setAccessMethod(request.getMethod());
+    	        ua.setPageAccess("/download"); 
+    	        ua.setActivity("Viewed Downloads");
+    	        usermanager.insertUserLog(ua);
+    	    } catch (Exception ex) {
+    	    	System.err.println("viewDownloads = error logging user" + ex.getCause());
+    	    	ex.printStackTrace();
+            }
+            
             return mav;
         } catch (Exception e) {
             throw new Exception("Error occurred trying to view the download screen. userId: " + userInfo.getId(), e);
@@ -436,6 +480,21 @@ public class HealtheConnectController {
             }
             mav.addObject("downloadableBatches", downloadableBatches);
 
+            try {
+    	        //log user activity
+    	        UserActivity ua = new UserActivity();
+    	        ua.setUserId(userInfo.getId());
+    	        ua.setFeatureId(featureId);
+    	        ua.setAccessMethod(request.getMethod());
+    	        ua.setPageAccess("/download"); 
+    	        ua.setActivity("View Downloads");
+    	        ua.setActivityDesc("Searched for downloads files from " + fromDate + " - " + toDate );
+    	        usermanager.insertUserLog(ua);
+    	    } catch (Exception ex) {
+    	    	System.err.println("findDownloads = error logging user" + ex.getCause());
+    	    	ex.printStackTrace();
+            }
+            
             return mav;
         } catch (Exception e) {
             throw new Exception("Error occurred searching downloadable batches.", e);
@@ -452,7 +511,7 @@ public class HealtheConnectController {
      */
     @RequestMapping(value = "/downloadBatch.do", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody
-    Integer downloadBatch(@RequestParam(value = "batchId", required = false) Integer batchId) throws Exception {
+    Integer downloadBatch(@RequestParam(value = "batchId", required = false) Integer batchId, HttpSession session) throws Exception {
 
         try {
             transactionOutManager.updateTargetBatchStatus(batchId, 22, "");
@@ -474,6 +533,22 @@ public class HealtheConnectController {
             /* Update the last Downloaded field */
             transactionOutManager.updateLastDownloaded(batchId);
 
+            User userInfo = (User) session.getAttribute("userDetails");
+            try {
+    	        //log user activity
+    	        UserActivity ua = new UserActivity();
+    	        ua.setUserId(userInfo.getId());
+    	        ua.setFeatureId(featureId);
+    	        ua.setAccessMethod("POST");
+    	        ua.setPageAccess("/downloadBatch.do"); 
+    	        ua.setActivity("Downloaded Batch");
+    	        ua.setBatchDownloadId(batchId);
+    	        usermanager.insertUserLog(ua);
+    	    } catch (Exception ex) {
+    	    	System.err.println("downloadBatch = error logging user" + ex.getCause());
+    	    	ex.printStackTrace();
+            }
+            
             return 1;
         } catch (Exception e) {
             throw new Exception("Error occurred downloading the file. batchId: " + batchId, e);
@@ -545,10 +620,13 @@ public class HealtheConnectController {
              */
             UserActivity ua = new UserActivity();
             ua.setUserId(userInfo.getId());
+            ua.setFeatureId(featureId);
             ua.setAccessMethod(request.getMethod());
             ua.setPageAccess("/auditReports");
             ua.setActivity("View Audit Reports Page");
+            ua.setActivityDesc("Default Dates " + fromDate + " - " + toDate );
             usermanager.insertUserLog(ua);
+            
         } catch (Exception e) {
             throw new Exception("Error occurred viewing the audit reports. userId: " + userInfo.getId(), e);
         }
@@ -575,9 +653,11 @@ public class HealtheConnectController {
          */
         UserActivity ua = new UserActivity();
         ua.setUserId(userInfo.getId());
+        ua.setFeatureId(featureId);
         ua.setAccessMethod(request.getMethod());
         ua.setPageAccess("/auditReports");
         ua.setActivity("Audit Reports Page");
+        ua.setActivityDesc("Searched for Dates " + fromDate + " - " + toDate );
         usermanager.insertUserLog(ua);
 
         ModelAndView mav = new ModelAndView();
@@ -699,7 +779,8 @@ public class HealtheConnectController {
             }
             // check to see if it can be cancelled - 
             boolean canCancel = false;
-            List<Integer> cancelStatusList = Arrays.asList(21, 22, 23, 1, 8);
+            //we do not let users cancel SBP
+            List<Integer> cancelStatusList = Arrays.asList(21, 22, 23, 1, 8, 4, 25);
             if (userInfo.getcancelAuthority() && !cancelStatusList.contains(batchInfo.getstatusId())) {
                 canCancel = true;
             }
@@ -714,6 +795,7 @@ public class HealtheConnectController {
              */
             UserActivity ua = new UserActivity();
             ua.setUserId(userInfo.getId());
+            ua.setFeatureId(featureId);
             ua.setAccessMethod(request.getMethod());
             ua.setPageAccess("/auditReport");
             ua.setActivity("Audit Report Request");
@@ -890,6 +972,7 @@ public class HealtheConnectController {
              */
             UserActivity ua = new UserActivity();
             ua.setUserId(userInfo.getId());
+            ua.setFeatureId(featureId);
             ua.setAccessMethod(request.getMethod());
             ua.setPageAccess("/edit");
             ua.setActivity("Viewed Transaction with Error(s)");
@@ -1018,6 +1101,7 @@ public class HealtheConnectController {
         UserActivity ua = new UserActivity();
         User userInfo = (User) session.getAttribute("userDetails");
         ua.setUserId(userInfo.getId());
+        ua.setFeatureId(featureId);
         ua.setAccessMethod(request.getMethod());
         ua.setPageAccess("/editMessage");
         ua.setActivity("Modified Transaction with Error(s)");
@@ -1031,11 +1115,11 @@ public class HealtheConnectController {
 
     /**
      * The '/batchOptions POST request will perform option for batch as selected by the user .
-     * Four options - 
+     * Three options - 
      * rejectMessages - canEdit - need to POST form and refresh audit report 
      * releaseBatch - canSend resetBatch 
      * cancelBatch - canEdit - need to POST form and refresh audit report - reject one transaction
-     * resetBatch - canCancel
+     * we do not allow users to reset batches
      * @param request
      * @param response
      * @return	we redirect all back to /auditReports except for resetBatch. resetBatch sends user back to 
@@ -1077,31 +1161,7 @@ public class HealtheConnectController {
                 /**
                  * make sure user has the appropriate permission to this batch *
                  */
-                if (batchOption.equalsIgnoreCase("resetBatch")) { // canReset
-                	/**
-                	batchOptionSubmitted = "Reset Batch";
-                    redirectPage = "upload?searchTerm=" + batchInfo.getutBatchName();
-                    //check to make sure we can clear batch and then delete info and reset
-                    if (allowBatchClear && userInfo.getcancelAuthority()) {
-    				//reset batch takes batch back to statusId of 2
-                        //1. set batch process to 4
-                        transactionInManager.updateBatchStatus(batchId, 4, "");
-                        //2. clear
-                        boolean cleared = transactionInManager.clearBatch(batchId);
-                        if (cleared) {
-                            transactionInManager.updateBatchStatus(batchId, 2, "startOver");
-                            systemMessage = "Batch is reset.";
-                        } else {
-                            transactionInManager.updateBatchStatus(batchId, 29, "endDateTime");
-                            systemMessage = "An error occurred while resetting batch.  Please review logs.";
-                        }
-                    } else {
-                        systemMessage = "You do not have permission to reset a batch.";
-                        hasPermission = false;
-
-                    }
-					**/
-                } else if (batchOption.equalsIgnoreCase("cancelBatch")) {
+                if (batchOption.equalsIgnoreCase("cancelBatch")) {
                 	batchOptionSubmitted = "Cancelled Batch";
                     //check authority
                     if (allowBatchClear && userInfo.getcancelAuthority()) {
@@ -1175,6 +1235,7 @@ public class HealtheConnectController {
             //log user activity
             UserActivity ua = new UserActivity();
             ua.setUserId(userInfo.getId());
+            ua.setFeatureId(featureId);
             ua.setAccessMethod(request.getMethod());
             ua.setPageAccess("/batchOptions");
             ua.setActivity("Batch Options - " + batchOptionSubmitted);
@@ -1431,6 +1492,7 @@ public class HealtheConnectController {
              		//log user activity
                      UserActivity ua = new UserActivity();
                      ua.setUserId(userInfo.getId());
+                     ua.setFeatureId(featureId);
                      ua.setAccessMethod(request.getMethod());
                      ua.setPageAccess("/releaseBatches");
                      ua.setActivity("Released Batch");
@@ -1494,9 +1556,9 @@ public class HealtheConnectController {
           //log user activity
             UserActivity ua = new UserActivity();
             ua.setUserId(userInfo.getId());
+            ua.setFeatureId(featureId);
             ua.setAccessMethod(request.getMethod());
-            ua.setPageAccess("/rejectMessage");
-            ua.setActivity("Rejected Message");
+            ua.setActivity("Rejected Message");         
             ua.setBatchUploadId(batchId);
             ua.setTransactionInIds(String.valueOf(transactionId));
             if (!hasPermission) {

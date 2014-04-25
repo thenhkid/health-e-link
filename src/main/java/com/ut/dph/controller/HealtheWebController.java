@@ -10,6 +10,7 @@ import com.ut.dph.model.Organization;
 import com.ut.dph.model.Provider;
 import com.ut.dph.model.Transaction;
 import com.ut.dph.model.User;
+import com.ut.dph.model.UserActivity;
 import com.ut.dph.model.batchDownloadSummary;
 import com.ut.dph.model.batchDownloads;
 import com.ut.dph.model.batchUploadSummary;
@@ -39,6 +40,7 @@ import com.ut.dph.service.sysAdminManager;
 import com.ut.dph.service.transactionInManager;
 import com.ut.dph.service.transactionOutManager;
 import com.ut.dph.service.userManager;
+
 import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -50,9 +52,11 @@ import java.util.List;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -102,6 +106,8 @@ public class HealtheWebController {
     
     @Autowired
     private providerManager providermanager;
+   
+    private int featureId = 3;
     
     private int inboxTotal = 0;
     private int pendingTotal = 0;
@@ -207,7 +213,24 @@ public class HealtheWebController {
 
             /* Set the header totals */
             setTotals(session);
-
+            
+            //we log here 
+            try {
+    	        //log user activity
+    	        UserActivity ua = new UserActivity();
+    	        ua.setUserId(userInfo.getId());
+    	        ua.setFeatureId(featureId);
+    	        ua.setAccessMethod("GET");
+    	        ua.setPageAccess("/inbox"); 
+    	        ua.setActivity("Viewed Inbox");
+    	        ua.setActivityDesc("Inbox - " + fromDate + " - " + toDate );
+    	        usermanager.insertUserLog(ua);
+    	    } catch (Exception ex) {
+    	    	System.err.println("viewinbox = error logging user" + ex.getCause());
+    	    	ex.printStackTrace();
+            }
+            
+            
             mav.addObject("pendingTotal", pendingTotal);
             mav.addObject("inboxTotal", inboxTotal);
 
@@ -286,6 +309,22 @@ public class HealtheWebController {
 
             /* Set the header totals */
             setTotals(session);
+            
+          //we log here 
+            try {
+    	        //log user activity
+    	        UserActivity ua = new UserActivity();
+    	        ua.setUserId(userInfo.getId());
+    	        ua.setFeatureId(featureId);
+    	        ua.setAccessMethod("POST");
+    	        ua.setPageAccess("/inbox"); 
+    	        ua.setActivity("Viewed Inbox");
+    	        ua.setActivityDesc("Searched Dates " + fromDate + " - " + toDate );
+    	        usermanager.insertUserLog(ua);
+    	    } catch (Exception ex) {
+    	    	System.err.println("findInboxBatches = error logging user" + ex.getCause());
+    	    	ex.printStackTrace();
+            }
 
             mav.addObject("pendingTotal", pendingTotal);
             mav.addObject("inboxTotal", inboxTotal);
@@ -403,6 +442,22 @@ public class HealtheWebController {
 
             /* Set the header totals */
             setTotals(session);
+            
+          //we log here 
+            try {
+    	        //log user activity
+    	        UserActivity ua = new UserActivity();
+    	        ua.setUserId(userInfo.getId());
+    	        ua.setFeatureId(featureId);
+    	        ua.setAccessMethod("POST");
+    	        ua.setPageAccess("/inbox/batch/Transactions"); 
+    	        ua.setActivity("Viewed Transactions for Inbox Batch");
+    	        ua.setBatchDownloadId(batchId);
+    	        usermanager.insertUserLog(ua);
+    	    } catch (Exception ex) {
+    	    	System.err.println("showInboxBatchTransactions = error logging user" + ex.getCause());
+    	    	ex.printStackTrace();
+            }
 
             mav.addObject("pendingTotal", pendingTotal);
             mav.addObject("inboxTotal", inboxTotal); 
@@ -585,6 +640,24 @@ public class HealtheWebController {
             /* Set the header totals */
             setTotals(session);
 
+          //we log here 
+            try {
+    	        //log user activity
+    	        UserActivity ua = new UserActivity();
+    	        ua.setUserId(userInfo.getId());
+    	        ua.setFeatureId(featureId);
+    	        ua.setAccessMethod("POST");
+    	        ua.setPageAccess("/inbox/messageDetails"); 
+    	        ua.setActivity("Viewed Transaction Details");
+    	        ua.setTransactionTargetIds(transactionId.toString());
+    	        ua.setBatchDownloadId(batchInfo.getId());
+    	        usermanager.insertUserLog(ua);
+    	    } catch (Exception ex) {
+    	    	System.err.println("showInboxMessageDetails = error logging user" + ex.getCause());
+    	    	ex.printStackTrace();
+            }
+            
+            
             mav.addObject("pendingTotal", pendingTotal);
             mav.addObject("inboxTotal", inboxTotal);
             mav.addObject("fromPage", "inbox");
@@ -593,8 +666,6 @@ public class HealtheWebController {
         catch (Exception e) {
             throw new Exception("An error occurred in returning the details of the message, id: "+ transactionId, e);
         }
-        
-        
         
         return mav;
     }
@@ -644,6 +715,22 @@ public class HealtheWebController {
 
             mav.addObject("pendingTotal", pendingTotal);
             mav.addObject("inboxTotal", inboxTotal);
+            
+          //we log here 
+            try {
+    	        //log user activity
+    	        UserActivity ua = new UserActivity();
+    	        ua.setUserId(userInfo.getId());
+    	        ua.setFeatureId(featureId);
+    	        ua.setAccessMethod(request.getMethod());
+    	        ua.setPageAccess("/create"); 
+    	        ua.setActivity("Viewed Create Message Form");
+    	        usermanager.insertUserLog(ua);
+    	    } catch (Exception ex) {
+    	    	System.err.println("createNewMesage = error logging user" + ex.getCause());
+    	    	ex.printStackTrace();
+            }
+                        
         }
         catch (Exception e) {
             throw new Exception("An error occurred in returning a list of message types for user " + userInfo.getId(), e);
@@ -797,11 +884,31 @@ public class HealtheWebController {
                 List<transactionRecords> detailFields = setInboxFormFields(detailFormFields, null, configId, false, transactionDetails.gettransactionInId());
                 transaction.setdetailFields(detailFields);
 
+              //we log here 
+                try {
+        	        //log user activity
+        	        UserActivity ua = new UserActivity();
+        	        ua.setUserId(userInfo.getId());
+        	        ua.setFeatureId(featureId);
+        	        ua.setAccessMethod("POST");
+        	        ua.setPageAccess("/feedbackReport/details"); 
+        	        ua.setBatchUploadId(transactionDetails.getbatchUploadId());
+        	        ua.setBatchUploadId(transactionDetails.getbatchUploadId());
+        	        ua.setTransactionInIds(String.valueOf(transactionDetails.gettransactionInId()));
+        	        ua.setActivity("Selected Create Feedback Report");       	    
+        	        ua.setTransactionTargetIds(String.valueOf(transactionId));
+        	        usermanager.insertUserLog(ua);
+        	    } catch (Exception ex) {
+        	    	System.err.println("createNewMesage = error logging user" + ex.getCause());
+        	    	ex.printStackTrace();
+                }
             
             }
             catch (Exception e) {
                 throw new Exception ("Error retrieving feedback detail fields for configuration id: "+ configId, e);
             }
+            
+            
             
             
             
@@ -1022,10 +1129,27 @@ public class HealtheWebController {
 
             mav.addObject("pendingTotal", pendingTotal);
             mav.addObject("inboxTotal", inboxTotal);
+            
+          //we log here 
+            try {
+    	        //log user activity
+    	        UserActivity ua = new UserActivity();
+    	        ua.setUserId(userInfo.getId());
+    	        ua.setFeatureId(featureId);
+    	        ua.setAccessMethod("POST");
+    	        ua.setPageAccess("/" + pathVariable + "/details"); 
+    	        ua.setActivity("Showed Message Details");
+    	        usermanager.insertUserLog(ua);
+    	    } catch (Exception ex) {
+    	    	System.err.println("showMessageDetailsForm = error logging user" + ex.getCause());
+    	    	ex.printStackTrace();
+            }
         }
         catch (Exception e) {
             throw new Exception("Error occurred in getting the details for the new message form for config "+configId, e);
         }
+        
+      
         
         
         return mav;
@@ -1423,7 +1547,7 @@ public class HealtheWebController {
             method to handle all the processing and saving to the final messages_ tables. This method
             will return true if successfully received and false otherwise.
             */
-            boolean transactionSentToProcess = transactionInManager.processBatch(batchId);
+            boolean transactionSentToProcess = transactionInManager.processBatch(batchId, false, 0);
             
             
             /*
@@ -2132,7 +2256,7 @@ public class HealtheWebController {
                     transactionInManager.updateBatchStatus(batchId, 6, "");
 
                     /* Process the batch */
-                    boolean transactionSentToProcess = transactionInManager.processBatch(batchId);
+                    boolean transactionSentToProcess = transactionInManager.processBatch(batchId, false, 0);
 
                 }
             }

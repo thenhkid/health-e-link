@@ -57,6 +57,9 @@ public class UserActivity {
     @Column(name = "accessMethod", nullable = true)
     private String accessMethod;
 
+    @Column(name = "featureId", nullable = false)
+    private int featureId = 0;
+    
     @NoHtml
     @Column(name = "pageAccess", nullable = true)
     private String pageAccess;
@@ -200,5 +203,15 @@ public class UserActivity {
     public void setOrgName(String orgName) {
         this.orgName = orgName;
     }
+
+	public int getFeatureId() {
+		return featureId;
+	}
+
+	public void setFeatureId(int featureId) {
+		this.featureId = featureId;
+	}
+    
+    
 
 }

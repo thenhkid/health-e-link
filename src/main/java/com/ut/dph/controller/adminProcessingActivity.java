@@ -1476,7 +1476,7 @@ public class adminProcessingActivity {
             /**
              * we need to check sbp (4), tbc (25) status - if server is restarted and somehow the file hangs in SBP, we want to give them option to reset
              * if sbp/tbc start time is about two hours, that should be sufficient indication that a file is stuck
-             * we don't want to reset in the middle of the process
+             * we don't want to reset or cancel in the middle of the processing
              */
             
             if (batchDetails.getstatusId() == 4 || batchDetails.getstatusId() == 25) {
@@ -1489,6 +1489,7 @@ public class adminProcessingActivity {
     			System.out.println(diffHours);
     			if (diffHours < 2) {
     				canReset = false;
+    				canCancel = false;
     			}
             }
 
@@ -1539,7 +1540,7 @@ public class adminProcessingActivity {
                     transactionInManager.loadBatch(batchId);
                 } else if (batchDetails.getstatusId() == 3) {
                     strBatchOption = "Processed Batch";
-                    transactionInManager.processBatch(batchId);
+                    transactionInManager.processBatch(batchId, false, 0);
                 }
             } else if (batchOption.equalsIgnoreCase("cancel")) {
                 strBatchOption = "Cancelled Batch";

@@ -775,4 +775,8 @@ END proc_main$$
 DELIMITER ;
 
 
+/** grace 04242014 9:58PM **/
+ALTER TABLE `universaltranslator`.`userActivity` 
+ADD COLUMN `featureId` INT NULL AFTER `userId`;
+
 
