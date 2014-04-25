@@ -29,7 +29,7 @@
                     
         <div class="col-md-12">
             
-            <form:form id="transportDetails" commandName="transportDetails" modelAttribute="transportDetails" method="post" role="form">
+            <form:form id="transportDetails" commandName="transportDetails" modelAttribute="transportDetails" method="post" role="form" enctype="multipart/form-data">
             
                 <c:if test="${(transportDetails.id == 0 && fn:length(availConfigurations) > 1) || transportDetails.copiedTransportId > 0}">
                     <section class="panel panel-default">
@@ -244,7 +244,7 @@
                                         </div>
                                         <div id="protocol${ftpDetails.method}Div" class="form-group">
                                             <label class="control-label" for="protocol${ftpDetails.method}">Protocol *</label>
-                                            <select name="FTPFields[${field.index}].protocol" id="protocol${ftpDetails.method}" class="form-control ftpProtocol">
+                                            <select name="FTPFields[${field.index}].protocol" id="protocol${ftpDetails.method}" rel="${ftpDetails.method}" class="form-control ftpProtocol">
                                                 <option value="">- Select -</option>
                                                 <option value="FTP" <c:if test="${ftpDetails.protocol == 'FTP'}">selected</c:if>>FTP</option>
                                                 <option value="FTPS" <c:if test="${ftpDetails.protocol == 'FTPS'}">selected</c:if>>FTPS</option>
@@ -253,7 +253,7 @@
                                             <span id="protocol${ftpDetails.method}Msg" class="control-label"></span>
                                         </div>
                                         <div id="ip${ftpDetails.method}Div" class="form-group">
-                                            <label class="control-label" for="ip${ftpDetails.method}">IP Address *</label>
+                                            <label class="control-label" for="ip${ftpDetails.method}">Host *</label>
                                             <input name="FTPFields[${field.index}].ip" id="ip${ftpDetails.method}" class="form-control" type="text" maxLength="45" value="${ftpDetails.ip}"  />
                                             <span id="ip${ftpDetails.method}Msg" class="control-label"></span>
                                         </div>
@@ -276,6 +276,11 @@
                                             <label class="control-label" for="port${ftpDetails.method}">Port *</label>
                                             <input name="FTPFields[${field.index}].port" id="port${ftpDetails.method}" class="form-control" type="text" maxLength="45" value="${ftpDetails.port}"  />
                                              <span id="port${ftpDetails.method}Msg" class="control-label"></span>
+                                        </div>
+                                             <div id="certificationfileDiv${ftpDetails.method}" class="form-group ${status.error ? 'has-error' : '' }" <c:if test="${ftpDetails.protocol != 'SFTP'}">style="display:none" </c:if>>
+                                            <label class="control-label" for="certification">Certification File </label>
+                                            <input type="file" id="file${ftpDetails.method}" name="FTPFields[${field.index}].file" lass="form-control"  />
+                                            <span id="certificationfileMsg" class="control-label"></span>
                                         </div>
                                         <div class="pull-right">
                                             <a href="javascript:void(0);" class="btn btn-primary btn-xs testFTP<c:choose><c:when test="${ftpDetails.method == 1}">Get</c:when><c:otherwise>Push</c:otherwise></c:choose>"  title="Test FTP Connection">Test FTP Connection</a>

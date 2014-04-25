@@ -175,6 +175,30 @@ require(['./main'], function () {
             });
         });
         
+        $(document).on('change','.ftpProtocol', function() {
+           
+            if($(this).val() == "SFTP") {
+                $('#certificationfileDiv'+$(this).attr('rel')).show();
+                if($(this).attr('rel') == 1) {
+                    $('.testFTPGet').hide(); 
+                }
+                else {
+                    $('.testFTPPush').hide();
+                }
+            }
+            else {
+               $('#certificationfileDiv'+$(this).attr('rel')).hide(); 
+               $('#file'+$(this).attr('rel')).val(""); 
+               if($(this).attr('rel') == 1) {
+                    $('.testFTPGet').show();
+                }
+                else {
+                    $('.testFTPPush').show();
+                }
+            }
+            
+        });
+        
     });
 });
 
@@ -239,7 +263,7 @@ function checkFormFields() {
        if(selMethodId === "3") {
         var IPReg = /^(\d\d?)|(1\d\d)|(0\d\d)|(2[0-4]\d)|(2[0-5])\.(\d\d?)|(1\d\d)|(0\d\d)|(2[0-4]\d)|(2[0-5])\.(\d\d?)|(1\d\d)|(0\d\d)|(2[0-4]\d)|(2[0-5])$/;
         
-            //Check FTP Get Fields
+        //Check FTP Get Fields
         var getFieldsEntered = 0;
 
         if($('#ip1').val() !== "" || $('#username1').val() !== "" || $('#password1').val() !== "" || $('#directory1').val() !== "") {
@@ -265,12 +289,25 @@ function checkFormFields() {
                 $('#username1Msg').html('The username is a required field.');
                 hasErrors = 1;
             }
-            if($('#password1').val() === "") {
-                $('#password1Div').addClass("has-error");
-                $('#password1Msg').addClass("has-error");
-                $('#password1Msg').html('The password is a required field.');
-                hasErrors = 1;
+            
+            if($('#protocol1').val() === "SFTP") {
+                if($('#password1').val() === "" && $('#file1').val() === "") {
+                    $('#password1Div').addClass("has-error");
+                    $('#password1Msg').addClass("has-error");
+                    $('#password1Msg').html('The password or certification is a required field.');
+                    hasErrors = 1;
+                }
             }
+            else {
+                if($('#password1').val() === "") {
+                    $('#password1Div').addClass("has-error");
+                    $('#password1Msg').addClass("has-error");
+                    $('#password1Msg').html('The password is a required field.');
+                    hasErrors = 1;
+                }
+            }
+            
+            
             if($('#directory1').val() === "") {
                 $('#directory1Div').addClass("has-error");
                 $('#directory1Msg').addClass("has-error");
@@ -305,11 +342,21 @@ function checkFormFields() {
                 $('#username2Msg').html('The username is a required field.');
                 hasErrors = 1;
             }
-            if($('#password2').val() === "") {
-                $('#password2Div').addClass("has-error");
-                $('#password2Msg').addClass("has-error");
-                $('#password2Msg').html('The password is a required field.');
-                hasErrors = 1;
+            if($('#protocol2').val() === "SFTP") {
+                if($('#password2').val() === "" && $('#file2').val() === "") {
+                    $('#password2Div').addClass("has-error");
+                    $('#password2Msg').addClass("has-error");
+                    $('#password2Msg').html('The password or certification is a required field.');
+                    hasErrors = 1;
+                }
+            }
+            else {
+                if($('#password2').val() === "") {
+                    $('#password2Div').addClass("has-error");
+                    $('#password2Msg').addClass("has-error");
+                    $('#password2Msg').html('The password is a required field.');
+                    hasErrors = 1;
+                }
             }
             if($('#directory2').val() === "") {
                 $('#directory2Div').addClass("has-error");

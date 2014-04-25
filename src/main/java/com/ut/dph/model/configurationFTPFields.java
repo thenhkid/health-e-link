@@ -7,10 +7,15 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 @Entity
 @Table(name = "REL_TRANSPORTFTPDETAILS")
 public class configurationFTPFields {
+    
+    @Transient
+    private CommonsMultipartFile file;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -44,6 +49,9 @@ public class configurationFTPFields {
     @NoHtml
     @Column(name = "PROTOCOL", nullable = true)
     private String protocol = "FTP";
+    
+    @Column(name = "CERTIFICATION", nullable = true)
+    private String certification = null;
 
     public int getId() {
         return id;
@@ -115,6 +123,22 @@ public class configurationFTPFields {
     
     public void setprotocol(String protocol) {
         this.protocol = protocol;
+    }
+    
+    public String getcertification() {
+        return certification;
+    }
+    
+    public void setcertification(String certification) {
+        this.certification = certification;
+    }
+    
+    public CommonsMultipartFile getfile() {
+        return file;
+    }
+
+    public void setfile(CommonsMultipartFile file) {
+        this.file = file;
     }
 
 }

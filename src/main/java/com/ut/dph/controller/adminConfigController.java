@@ -593,7 +593,8 @@ public class adminConfigController {
         if(transportDetails.gettransportMethodId() == 3 && !transportDetails.getFTPFields().isEmpty()) {
             for(configurationFTPFields ftpFields : transportDetails.getFTPFields()) {
                 ftpFields.settransportId(transportId);
-                configurationTransportManager.saveTransportFTP(ftpFields);
+                
+                configurationTransportManager.saveTransportFTP(configurationDetails.getorgId(), ftpFields);
             }
         }
         

@@ -36,7 +36,7 @@ public interface configurationTransportManager {
     
     configurationFTPFields getTransportFTPDetailsPull(int transportDetailId) throws Exception;
     
-    void saveTransportFTP(configurationFTPFields FTPFields);
+    void saveTransportFTP(int orgId, configurationFTPFields FTPFields);
     
     String getTransportMethodById(int Id);
     
