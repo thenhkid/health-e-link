@@ -122,6 +122,7 @@ public class fileSystem {
                     new File(winDirectoryPath + orgName + "\\templates").mkdirs();
                     new File(winDirectoryPath + orgName + "\\brochures").mkdirs();
                     new File(winDirectoryPath + orgName + "\\attachments").mkdirs();
+                    new File(winDirectoryPath + orgName + "\\certificates").mkdirs();
                 }
             } //Mac
             else if (os.indexOf("mac") >= 0) {
@@ -135,6 +136,7 @@ public class fileSystem {
                     new File(macDirectoryPath + orgName + "/templates").mkdirs();
                     new File(macDirectoryPath + orgName + "/brochures").mkdirs();
                     new File(macDirectoryPath + orgName + "/attachments").mkdirs();
+                    new File(macDirectoryPath + orgName + "/certificates").mkdirs();
                 }
             } //Unix or Linux or Solarix
             else if (os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0 || os.indexOf("aix") >= 0 || os.indexOf("sunos") >= 0) {
@@ -148,6 +150,7 @@ public class fileSystem {
                     new File(unixDirectoryPath + orgName + "/templates").mkdirs();
                     new File(unixDirectoryPath + orgName + "/brochures").mkdirs();
                     new File(unixDirectoryPath + orgName + "/attachments").mkdirs();
+                    new File(unixDirectoryPath + orgName + "/certificates").mkdirs();
                 }
             } else {
                 System.out.println("Your OS is not support!!");

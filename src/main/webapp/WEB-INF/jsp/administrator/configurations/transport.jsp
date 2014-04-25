@@ -244,10 +244,11 @@
                                         </div>
                                         <div id="protocol${ftpDetails.method}Div" class="form-group">
                                             <label class="control-label" for="protocol${ftpDetails.method}">Protocol *</label>
-                                            <select name="FTPFields[${field.index}].protocol" id="protocol${ftpDetails.method}" class="form-control">
+                                            <select name="FTPFields[${field.index}].protocol" id="protocol${ftpDetails.method}" class="form-control ftpProtocol">
                                                 <option value="">- Select -</option>
                                                 <option value="FTP" <c:if test="${ftpDetails.protocol == 'FTP'}">selected</c:if>>FTP</option>
                                                 <option value="FTPS" <c:if test="${ftpDetails.protocol == 'FTPS'}">selected</c:if>>FTPS</option>
+                                                <option value="SFTP" <c:if test="${ftpDetails.protocol == 'SFTP'}">selected</c:if>>SFTP</option>
                                            </select>
                                             <span id="protocol${ftpDetails.method}Msg" class="control-label"></span>
                                         </div>
