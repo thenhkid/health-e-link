@@ -795,4 +795,9 @@ DELIMITER ;
 ALTER TABLE `universaltranslator`.`userActivity` 
 ADD COLUMN `featureId` INT NULL AFTER `userId`;
 
+/** Chad 04252014 2:47 PM **/
+ALTER TABLE `universalTranslator`.`rel_TransportFTPDetails` 
+ADD COLUMN `certification` VARCHAR(255) NULL AFTER `protocol`;
+
+
 
