@@ -43,6 +43,17 @@
             </property>
         </bean>
     </beans>
+    	
+    	<!-- by default we don't log queries, we will log for dev machines -->
+        <beans profile="localLog">
+        <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+            <property name="locations">
+                <list>
+                    <value>classpath:localLog.database.properties</value>
+                </list>
+            </property>
+        </bean>
+    </beans>
     
     <beans profile="orion-dev">
         <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
