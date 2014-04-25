@@ -99,8 +99,6 @@ public interface transactionInManager {
     
     void removeAttachmentById(int attachmentId) throws Exception;
     
-    boolean processTransactions(int batchUploadId);
-    
     boolean insertSingleToMessageTables(ConfigForInsert configForInsert);
     
     boolean insertMultiValToMessageTables(ConfigForInsert config, Integer subStringCounter, Integer transId);
@@ -126,8 +124,6 @@ public interface transactionInManager {
     List<batchUploads> getuploadedBatches(int userId, int orgId, Date fromDate, Date toDate, List <Integer> excludedStatusIds) throws Exception;
     
     boolean processBatch(int batchUploadId, boolean doNotClearErrors, Integer transactionId) throws Exception;
-    
-    boolean processBatch(int batchUploadId) throws Exception;
     
     void processBatches();
     

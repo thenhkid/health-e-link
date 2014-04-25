@@ -337,17 +337,6 @@ public class transactionInManagerImpl implements transactionInManager {
 
     }
 
-    /**
-     * 1.27.14 not in use
-     *
-     * Last Step - insert all transactions with RP (10) status and batch status of SRP (5) for a batch
-     *
-     */
-    @Override
-    public boolean processTransactions(int batchUploadId) {
-        return true;
-    }
-
     @Override
     public List<ConfigForInsert> setConfigForInsert(int configId, int batchUploadId) {
         // we call sp and set the parameters here
@@ -378,13 +367,21 @@ public class transactionInManagerImpl implements transactionInManager {
     }
 
     /**
-     * this method takes in the transId, the insert fields, the insert tables*
+     * this method takes in the transId, the delimited fields, loops them and insert them into the message
+     * table by string pairs.  UT delimiter is ^^^^^ 
      */
     @Override
     public boolean insertMultiValToMessageTables(ConfigForInsert config, Integer subStringCounter, Integer transId) {
         return transactionInDAO.insertMultiValToMessageTables(config, subStringCounter, transId);
     }
 
+    /**
+     * The 'clearMessageTables' function will loop through all each message table and remove any rows matching transactionInIds belonging to a batch.
+     *
+     * @param batchId of the batch to be cleared.
+     * 
+     * It will return 0 as in no errors.
+     */
     @Override
     public Integer clearMessageTables(int batchId) {
         List<String> mts = transactionInDAO.getMessageTables();
@@ -520,14 +517,36 @@ public class transactionInManagerImpl implements transactionInManager {
         return transactionInDAO.countSubString(config, transId);
     }
 
+
     /**
-     * orginal method only excludes 1, need the ability to exclude different statusIds *
+     * The 'getuploadedBatches' function calls  
+     * getuploadedBatches(int userId, int orgId, Date fromDate, Date toDate, List<Integer> excludedStatusIds)
+     * 
+     * It defaults excludedStatusIds to 1 as that is how the original fn is written. We wrote new method to 
+     * pass in 1 as excludedStatusIds so we don't have to go back and modify every single method.
+     * @param userId 
+     * @param orgId
+     * @param fromDate
+     * @param todate
+     * 
+     * It will return a list of batchUploads.
      */
+    
     @Override
     public List<batchUploads> getuploadedBatches(int userId, int orgId, Date fromDate, Date toDate) throws Exception {
         return getuploadedBatches(userId, orgId, fromDate, toDate, Arrays.asList(1));
     }
 
+    /**
+     * The 'getuploadedBatches' function gets a list of batchUploads according to parameters being queried. 
+     * @param userId 
+     * @param orgId
+     * @param fromDate
+     * @param todate
+     * @param excludedStatusIds - statusIds for batches to exclude
+     * 
+     * It will return a list of batchUploads.
+     */
     @Override
     public List<batchUploads> getuploadedBatches(int userId, int orgId, Date fromDate, Date toDate, List<Integer> excludedStatusIds) throws Exception {
         return transactionInDAO.getuploadedBatches(userId, orgId, fromDate, toDate, excludedStatusIds);
@@ -535,19 +554,16 @@ public class transactionInManagerImpl implements transactionInManager {
 
     
     /**
-     * We will take a batch and then from its status etc we will decide if we want to process transactions or not. This allow the admin to run just one batch
-     *
+     * We will take a batch and then from its status etc we will decide 
+     * if we want to process transactions or not. This method allowa admin to run just one batch
      * This assumes batches SR - 6, Trans status REL We still run through entire process but these records should pass... (check to make sure it aligns with file upload) just be applying Macros / CW and inserting into our message tables
-     */
-    /**
-     * This assumes batch being passed in is SSA or SR 1. We set it to SBP, start date time
+	 * This method will only process a batch that is RP or SSL
+     * 
+     * We added to this method as if a batch is being call from fixErrors (ERG Form), we do not clear errors in transactionInErrors table.
+     * We default the flag to false as when it is call from old methods, we
      *
      * *
      */
-    /** needed to add boolean, made new method **/
-    public boolean processBatch(int batchUploadId) throws Exception {
-    	return processBatch(batchUploadId, false, 0);
-    }
     
     @Override
     public boolean processBatch(int batchUploadId, boolean doNotClearErrors, Integer transactionId) throws Exception {
@@ -746,7 +762,7 @@ public class transactionInManagerImpl implements transactionInManager {
                 //we loop and process
                 for (batchUploads batch : batches) {
                     try {
-                        processBatch(batch.getId());
+                        processBatch(batch.getId(), false, 0);
                     } catch (Exception ex) {
                         setBatchToError(batch.getId(), ("Errored at processBatches  " + ex.getCause()));
                         ex.printStackTrace();
