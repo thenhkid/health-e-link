@@ -6,7 +6,8 @@ USE `universalTranslator`;
 DROP procedure IF EXISTS `insertValidationErrors`;
 
 DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `universaltranslator`.`insertValidationErrors`(in vtType int, in fieldNo int,
+USE `universalTranslator`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `insertValidationErrors`(in vtType int, in fieldNo int,
 in batchUploadId int, in configId int, in transactionId int)
 BEGIN
 
@@ -16,7 +17,7 @@ CASE vtType
 	WHEN 2 THEN set regEx = '^[A-Z0-9._%-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$';
     WHEN 3 THEN 
 		BEGIN 
-			CALL `universalTranslator`.`stripPhoneChars`(vtType, fieldNo, batchUploadId, configId, transactionId);
+			CALL `stripPhoneChars`(vtType, fieldNo, batchUploadId, configId, transactionId);
 			set regEx ='^[0-9]{7,11}$';
 		END;
 	WHEN 5 THEN set regEx = '^-?[0-9]+[.]?[0-9]*$|^-?[.][0-9]+$';
@@ -67,11 +68,13 @@ END IF;
 END$$
 DELIMITER ;
 
-drop PROCEDURE IF EXISTS `universaltranslator`.`stripPhoneChars`;
+USE `universalTranslator`;
+drop PROCEDURE IF EXISTS `stripPhoneChars`;
 
 
 DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `universaltranslator`.`stripPhoneChars`(in vtType int, in fieldNo int,
+USE `universalTranslator`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `stripPhoneChars`(in vtType int, in fieldNo int,
 in batchUploadId int, in configId int, in transactionId int)
 BEGIN
 	DECLARE varToReplace varchar(100) DEFAULT '.';
@@ -133,10 +136,13 @@ ADD COLUMN `messageStatus` INT NULL DEFAULT '1' COMMENT '1 = Open (Default)\n2 =
 
 
 /** grace 04.21.2014 5:02PM **/
-drop procedure IF EXISTS `universaltranslator`.`addCharToString`;
+
+USE `universalTranslator`;
+drop procedure IF EXISTS `addCharToString`;
 
 DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `universaltranslator`.`addCharToString`(in configId int, 
+USE `universalTranslator`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `addCharToString`(in configId int, 
 in batchId int, in srcField varchar(10),
 in fieldA varchar(10), in fieldB varchar(10), in con1 varchar(10), 
 in con2 varchar(10), in macroId int, in foroutboundProcessing boolean, in passClear int, in transactionId int)
@@ -178,11 +184,12 @@ select '';
 end proc_main$$
 DELIMITER ;
 
-
-drop procedure IF EXISTS `universaltranslator`.`MatchFAUpdateSF`;
+USE `universalTranslator`;
+drop procedure IF EXISTS `MatchFAUpdateSF`;
 
 DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `universaltranslator`.`MatchFAUpdateSF`(in configId int, 
+USE `universalTranslator`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `MatchFAUpdateSF`(in configId int, 
 in batchId int, in srcField varchar(10),
 in fieldA varchar(10), in fieldB varchar(10), in con1 varchar(10), 
 in con2 varchar(10), in macroId int, in foroutboundProcessing boolean, in passClear int, in transactionId int)
@@ -247,11 +254,12 @@ select '';
 end proc_main$$
 DELIMITER ;
 
-
-drop procedure IF EXISTS  `universaltranslator`.`MatchFieldAUpdateFieldB`;
+USE `universalTranslator`;
+drop procedure IF EXISTS  `MatchFieldAUpdateFieldB`;
 
 DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `universaltranslator`.`MatchFieldAUpdateFieldB`(in configId int, 
+USE `universalTranslator`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `MatchFieldAUpdateFieldB`(in configId int, 
 in batchId int, in srcField varchar(10),
 in fieldA varchar(10), in fieldB varchar(10), in con1 varchar(10), 
 in con2 varchar(10), in macroId int, in foroutboundProcessing boolean, in passClear int, in transactionId int)
@@ -316,10 +324,11 @@ select '';
 end proc_main$$
 DELIMITER ;
 
-
-drop procedure IF EXISTS `universaltranslator`.`mmddyyyytoyyyymmdd`;
+USE `universalTranslator`;
+drop procedure IF EXISTS `mmddyyyytoyyyymmdd`;
 DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `universaltranslator`.`mmddyyyytoyyyymmdd`(in configId int, 
+USE `universalTranslator`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `mmddyyyytoyyyymmdd`(in configId int, 
 in batchId int, in srcField varchar(10),
 in fieldA varchar(10), in fieldB varchar(10), in con1 varchar(10), 
 in con2 varchar(10), in macroId int, in foroutboundProcessing boolean, in passClear int, in transactionId int)
@@ -377,10 +386,12 @@ select '';
 end proc_main$$
 DELIMITER ;
 
-drop procedure IF EXISTS  `universaltranslator`.`setFieldToNull`;
+USE `universalTranslator`;
+drop procedure IF EXISTS  `setFieldToNull`;
 
 DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `universaltranslator`.`setFieldToNull`(in configId int, 
+USE `universalTranslator`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `setFieldToNull`(in configId int, 
 in batchId int, in srcField varchar(10),
 in fieldA varchar(10), in fieldB varchar(10), in con1 varchar(10), 
 in con2 varchar(10), in macroId int, in foroutboundProcessing boolean, in passClear int, in transactionId int)
@@ -427,9 +438,11 @@ select '';
 end proc_main$$
 DELIMITER ;
 
-drop procedure IF EXISTS `universaltranslator`.`yyyymmddTommddyyyy`;
+USE `universalTranslator`;
+drop procedure IF EXISTS `yyyymmddTommddyyyy`;
 DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `universaltranslator`.`yyyymmddTommddyyyy`(in configId int, 
+USE `universalTranslator`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `yyyymmddTommddyyyy`(in configId int, 
 in batchId int, in srcField varchar(10),
 in fieldA varchar(10), in fieldB varchar(10), in con1 varchar(10), 
 in con2 varchar(10), in macroId int, in foroutboundProcessing boolean, in passClear int, in transactionId int)
@@ -540,10 +553,12 @@ DELIMITER ;
 
 
 /** Grace 04222014 3:49PM **/
-drop procedure IF EXISTS `universaltranslator`.`replacechars`;
+use `universaltranslator`;
+drop procedure IF EXISTS `replacechars`;
 
 DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `universaltranslator`.`replacechars`(in configId int, 
+USE `universalTranslator`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `replacechars`(in configId int, 
 in batchId int, in srcField varchar(10),
 in fieldA varchar(10), in fieldB varchar(10), in con1 varchar(10), 
 in con2 varchar(10), in macroId int, in foroutboundProcessing boolean, in passClear int, in transactionId int)
@@ -624,7 +639,8 @@ USE `universalTranslator`;
 DROP procedure IF EXISTS `trimField`;
 
 DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `universaltranslator`.`trimField`(in configId int, 
+USE `universalTranslator`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `trimField`(in configId int, 
 in batchId int, in srcField varchar(10),
 in fieldA varchar(10), in fieldB varchar(10), in con1 varchar(10), 
 in con2 varchar(10), in macroId int, in foroutboundProcessing boolean, in passClear int, in transactionId int)
