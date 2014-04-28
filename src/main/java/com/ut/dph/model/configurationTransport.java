@@ -20,6 +20,9 @@ public class configurationTransport {
 
     @Transient
     private List<configurationFTPFields> FTPfields = null;
+    
+    @Transient
+    private List<configurationEMedAppFields> eMedAppFields = null;
 
     @Transient
     private String delimChar = null;
@@ -234,7 +237,7 @@ public class configurationTransport {
         this.delimChar = delimChar;
     }
 
-    public boolean isContainsHeaderRow() {
+    public boolean getContainsHeaderRow() {
         return containsHeaderRow;
     }
 
@@ -249,4 +252,13 @@ public class configurationTransport {
     public void setfileExt(String fileExt) {
         this.fileExt = fileExt;
     }
+    
+    public List<configurationEMedAppFields> geteMedAppFields() {
+        return eMedAppFields;
+    }
+
+    public void seteMedAppFields(List<configurationEMedAppFields> eMedAppFields) {
+        this.eMedAppFields = eMedAppFields;
+    }
+    
 }

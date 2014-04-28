@@ -7,7 +7,7 @@ require(['./main'], function () {
     
         var selMethodId = $('#transportMethod').val() 
         //Show file/download/FTP fields
-        if(selMethodId === "1" || selMethodId === "3") {
+        if(selMethodId === "1" || selMethodId === "3" || selMethodId === "5") {
             $('#upload-downloadDiv').show();
         }
 
@@ -17,6 +17,10 @@ require(['./main'], function () {
 
         if(selMethodId !== "2" && selMethodId !== "") {
             $('.assocMessageTypes').hide();
+        }
+        
+        if(selMethodId === "5") {
+            $('#additionalEmedAppsDiv').show();
         }
         
         //Fade out the updated/created message after being displayed.
@@ -31,20 +35,34 @@ require(['./main'], function () {
            $('.methodDiv').hide();
 
            //Show file/download/FTP fields
-           if(methodId === "1" || methodId === "3") {
+           if(methodId === "1" || methodId === "3" || methodId === "5") {
                $('#upload-downloadDiv').show();
            }
 
            if(methodId === "3") {
                $('#additionalFTPDiv').show();
            }
-
+           
+           if(methodId === "5") {
+               $('#additionalEmedAppsDiv').show();
+               var fileLocation = $('#fileLocation').val();
+               if($('#configType').val() == 1) {
+                   var newFileLocation = fileLocation.replace('output files/', 'emedapps/inputfiles');
+               }
+               else {
+                   var newFileLocation = fileLocation.replace('output files/', 'emedapps/outputfiles');
+               }
+               
+               $('#fileLocation').val(newFileLocation);
+           }
+ 
            if(methodId !== "2" && methodId !== "") {
                 $('.assocMessageTypes').hide();
             }
             else {
                 $('.assocMessageTypes').hide();
             }
+            
 
         });
 

@@ -803,6 +803,8 @@ ADD COLUMN `certification` VARCHAR(255) NULL AFTER `protocol`;
 ALTER TABLE `universalTranslator`.`ref_transportMethods` 
 ADD COLUMN `active` BIT NOT NULL DEFAULT false AFTER `transportMethod`;
 
+INSERT INTO `universalTranslator`.`ref_transportMethods` (`transportMethod`, `active`) VALUES ('E-MedApps', 1);
+
 CREATE TABLE `universalTranslator`.`eMedAppTransportDetails` (
   `id` INT NOT NULL,
   `transportId` INT NOT NULL,
@@ -813,5 +815,7 @@ CREATE TABLE `universalTranslator`.`eMedAppTransportDetails` (
   PRIMARY KEY (`id`),
   UNIQUE INDEX `id_UNIQUE` (`id` ASC));
 
+ALTER TABLE `universalTranslator`.`eMedAppTransportDetails` 
+CHANGE COLUMN `id` `id` INT(11) NOT NULL AUTO_INCREMENT ;
 
 

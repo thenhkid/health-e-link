@@ -10,6 +10,7 @@ import com.ut.dph.model.configurationMessageSpecs;
 import com.ut.dph.model.configurationTransport;
 import com.ut.dph.dao.configurationTransportDAO;
 import com.ut.dph.model.Organization;
+import com.ut.dph.model.configurationEMedAppFields;
 import com.ut.dph.model.configurationFTPFields;
 import com.ut.dph.model.configurationTransportMessageTypes;
 import com.ut.dph.reference.fileSystem;
@@ -135,15 +136,8 @@ public class configurationTransportManagerImpl implements configurationTransport
 
                 newFile = new File(dir.getDir() + fileName);
                 
-                if (newFile.exists()) {
-                    int i = 1;
-                    while (newFile.exists()) {
-                        int iDot = fileName.lastIndexOf(".");
-                        newFile = new File(dir.getDir() + fileName.substring(0, iDot) + "_(" + ++i + ")" + fileName.substring(iDot));
-                    }
-                    fileName = newFile.getName();
-                } else {
-                    newFile.createNewFile();
+                if (!newFile.exists()) {
+                   newFile.createNewFile();
                 }
 
                 outputStream = new FileOutputStream(newFile);
@@ -227,5 +221,68 @@ public class configurationTransportManagerImpl implements configurationTransport
     public List<configurationMessageSpecs> getConfigurationMessageSpecsForOrgTransport(Integer orgId, Integer transportMethodId, boolean getZeroMessageTypeCol) {
         return configurationTransportDAO.getConfigurationMessageSpecsForOrgTransport(orgId, transportMethodId, getZeroMessageTypeCol);
     }
+    
+    @Override
+    @Transactional
+    public List<configurationEMedAppFields> getTransportEMedAppDetails(int transportDetailId) throws Exception {
+        return configurationTransportDAO.getTransportEMedAppDetails(transportDetailId);
+    }
+    
+    @Override
+    @Transactional
+    public void saveTransportEMedApps(int orgId, configurationEMedAppFields eMedAppFields) {
+        
+        //Need to get the cleanURL of the organization for the brochure
+        Organization orgDetails = organizationManager.getOrganizationById(orgId);
+            
+        /* Make sure EMed app folders exists */
+        fileSystem eMedAppDir = new fileSystem();
+        eMedAppDir.createOrgDirectory(orgDetails.getcleanURL(), "emedapps");
+        eMedAppDir.createOrgDirectory(orgDetails.getcleanURL(), "emedapps/inputfiles");
+        eMedAppDir.createOrgDirectory(orgDetails.getcleanURL(), "emedapps/outputfiles");
+        
+        /* Need to upload the certificate if uploaded */
+        if (eMedAppFields.getfile() != null && eMedAppFields.getfile().getSize() > 0) {
+            
+            MultipartFile file = eMedAppFields.getfile();
+            String fileName = file.getOriginalFilename();
 
+            InputStream inputStream = null;
+            OutputStream outputStream = null;
+
+            try {
+                inputStream = file.getInputStream();
+                File newFile = null;
+
+                //Set the directory to save the brochures to
+                fileSystem dir = new fileSystem();
+                dir.setDir(orgDetails.getcleanURL(), "certificates");
+
+                newFile = new File(dir.getDir() + fileName);
+                
+                if (!newFile.exists()) {
+                    newFile.createNewFile();
+                }
+
+                outputStream = new FileOutputStream(newFile);
+                int read = 0;
+                byte[] bytes = new byte[1024];
+
+                while ((read = inputStream.read(bytes)) != -1) {
+                    outputStream.write(bytes, 0, read);
+                }
+                outputStream.close();
+
+                //Set the filename to the original file name
+                eMedAppFields.setcertification(dir.getDir() + fileName);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+        configurationTransportDAO.saveTransportEMedApps(eMedAppFields);
+    }
+    
 }

@@ -1,5 +1,6 @@
 package com.ut.dph.dao;
 
+import com.ut.dph.model.configurationEMedAppFields;
 import com.ut.dph.model.configurationFTPFields;
 
 import java.util.List;
@@ -62,5 +63,8 @@ public interface configurationTransportDAO {
     
     List <configurationMessageSpecs> getConfigurationMessageSpecsForOrgTransport(Integer orgId, Integer transportMethodId, boolean getZeroMessageTypeCol);
     
+    List<configurationEMedAppFields> getTransportEMedAppDetails(int transportDetailId) throws Exception;
+    
+    void saveTransportEMedApps(configurationEMedAppFields eMedAppFields);
     
 }
