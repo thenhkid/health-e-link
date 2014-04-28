@@ -99,7 +99,7 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
     @SuppressWarnings("rawtypes")
     @Transactional
     public List getTransportMethods() {
-        Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT id, transportMethod FROM ref_transportMethods order by transportMethod asc");
+        Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT id, transportMethod FROM ref_transportMethods where active = 1 order by transportMethod asc");
 
         return query.list();
     }

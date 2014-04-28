@@ -799,5 +799,19 @@ ADD COLUMN `featureId` INT NULL AFTER `userId`;
 ALTER TABLE `universalTranslator`.`rel_TransportFTPDetails` 
 ADD COLUMN `certification` VARCHAR(255) NULL AFTER `protocol`;
 
+/** Chad 04282014 1:07 PM **/
+ALTER TABLE `universalTranslator`.`ref_transportMethods` 
+ADD COLUMN `active` BIT NOT NULL DEFAULT false AFTER `transportMethod`;
+
+CREATE TABLE `universalTranslator`.`eMedAppTransportDetails` (
+  `id` INT NOT NULL,
+  `transportId` INT NOT NULL,
+  `fileLocation` VARCHAR(255) NULL,
+  `host` VARCHAR(45) NOT NULL,
+  `user` VARCHAR(45) NOT NULL,
+  `certification` VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `id_UNIQUE` (`id` ASC));
+
 
 
