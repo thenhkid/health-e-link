@@ -138,17 +138,12 @@ require(['./main'], function () {
         //Test the FTP Push Connection
         $(document).on('click', '.testFTPPush', function() {
             
-            var protocol = $('#protocol2').val();
-            var ip = $('#ip2').val();
-            var username = $('#username2').val();
-            var password = $('#password2').val();
-            var directory = $('#directory2').val();
-            var port = $('#port2').val();
+            var ftpSettingsId = $('#id').val();
             
             $.ajax({
                 url: 'testFTPConnection.do',
                 type: "GET",
-                data: {'protocol': protocol, 'ip': ip, 'username': username, 'password': password, 'directory': directory, 'port': port},
+                 data: {'method': 2, 'id': ftpSettingsId},
                 success: function(data) {
                      alert(data);
                 }
@@ -158,17 +153,13 @@ require(['./main'], function () {
         //Test the FTP Get Connection
         $(document).on('click', '.testFTPGet', function() {
           
-            var protocol = $('#protocol1').val();
-            var ip = $('#ip1').val();
-            var username = $('#username1').val();
-            var password = $('#password1').val();
-            var directory = $('#directory1').val();
-            var port = $('#port1').val();
+            var ftpSettingsId = $('#id').val();
+            var configId = $('#configId').val();
             
             $.ajax({
                 url: 'testFTPConnection.do',
                 type: "GET",
-                data: {'protocol': protocol, 'ip': ip, 'username': username, 'password': password, 'directory': directory, 'port': port},
+                data: {'method': 1, 'id': ftpSettingsId, 'configId': configId},
                 success: function(data) {
                      alert(data);
                 }
@@ -291,7 +282,7 @@ function checkFormFields() {
             }
             
             if($('#protocol1').val() === "SFTP") {
-                if($('#password1').val() === "" && $('#file1').val() === "") {
+                if($('#password1').val() === "" && $('#file1').val() === "" && $('#certification1').val() === "") {
                     $('#password1Div').addClass("has-error");
                     $('#password1Msg').addClass("has-error");
                     $('#password1Msg').html('The password or certification is a required field.');
@@ -343,7 +334,7 @@ function checkFormFields() {
                 hasErrors = 1;
             }
             if($('#protocol2').val() === "SFTP") {
-                if($('#password2').val() === "" && $('#file2').val() === "") {
+                if($('#password2').val() === "" && $('#file2').val() === "" && $('#certification2').val() === "") {
                     $('#password2Div').addClass("has-error");
                     $('#password2Msg').addClass("has-error");
                     $('#password2Msg').html('The password or certification is a required field.');

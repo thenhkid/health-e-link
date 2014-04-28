@@ -60,5 +60,4 @@ public interface configurationTransportManager {
     
     List <configurationMessageSpecs> getConfigurationMessageSpecsForOrgTransport(Integer orgId, Integer transportMethodId, boolean getZeroMessageTypeCol);
     
-    
 }

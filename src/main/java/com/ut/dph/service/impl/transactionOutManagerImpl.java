@@ -5,6 +5,9 @@
  */
 package com.ut.dph.service.impl;
 
+import com.jcraft.jsch.ChannelSftp;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.Session;
 import com.ut.dph.dao.messageTypeDAO;
 import com.ut.dph.dao.transactionOutDAO;
 import com.ut.dph.model.HL7Details;
@@ -1253,65 +1256,140 @@ public class transactionOutManagerImpl implements transactionOutManager {
 
             /* Get the FTP Details */
             configurationFTPFields ftpDetails = configurationTransportManager.getTransportFTPDetailsPush(transportDetails.getId());
+            
+            if("SFTP".equals(ftpDetails.getprotocol())) {
+                
+                JSch jsch = new JSch();
+                Session session = null;
+                ChannelSftp channel = null;
+                FileInputStream localFileStream = null;
 
-            FTPClient ftp;
+                String user = ftpDetails.getusername();
+                int port = ftpDetails.getport();
+                String host = ftpDetails.getip();
+                
+                Organization orgDetails = organizationManager.getOrganizationById(configurationManager.getConfigurationById(transportDetails.getconfigId()).getorgId());
+                
+                if(ftpDetails.getcertification() != null && !"".equals(ftpDetails.getcertification())) {
+                    
+                    File newFile = null;
+                    
+                    fileSystem dir = new fileSystem();
+                    dir.setDir(orgDetails.getcleanURL(), "certificates");
 
-            if ("FTP".equals(ftpDetails.getprotocol())) {
-                ftp = new FTPClient();
-            } else {
-                FTPSClient ftps;
-                ftps = new FTPSClient(true);
+                    jsch.addIdentity(new File(dir.getDir() + ftpDetails.getcertification()).getAbsolutePath());
+                    session = jsch.getSession(user, host , port);
+                }
+                else if(ftpDetails.getpassword() != null && !"".equals(ftpDetails.getpassword())) {
+                    session = jsch.getSession(user, host , port);
+                    session.setPassword(ftpDetails.getpassword());
+                }
+                
+                session.setConfig("StrictHostKeyChecking", "no");
+                session.setTimeout(2000);
+                
+                session.connect();
+ 
+                channel = (ChannelSftp)session.openChannel("sftp");
+                
+                channel.connect();
+                    
+                if(ftpDetails.getdirectory() != null && !"".equals(ftpDetails.getdirectory())) {
+                   channel.cd(ftpDetails.getdirectory());
+                   
+                   String fileName = null;
 
-                ftp = ftps;
-                ftps.setTrustManager(null);
+                   int findExt = batchFTPFileInfo.getoutputFIleName().lastIndexOf(".");
+
+                   if (findExt >= 0) {
+                       fileName = batchFTPFileInfo.getoutputFIleName();
+                   } else {
+                       fileName = new StringBuilder().append(batchFTPFileInfo.getoutputFIleName()).append(".").append(transportDetails.getfileExt()).toString();
+                   }
+                   
+                   //Set the directory to save the brochures to
+                   fileSystem dir = new fileSystem();
+
+                   String filelocation = transportDetails.getfileLocation();
+                   filelocation = filelocation.replace("/bowlink/", "");
+                   dir.setDirByName(filelocation);
+
+                   File file = new File(dir.getDir() + fileName);
+                   
+                   if(file.exists()) {
+                       FileInputStream fileInput = new FileInputStream(file);
+                   
+                       channel.put(fileInput, fileName);
+                   }
+                   
+                }
+                
+                channel.disconnect();
+                session.disconnect();
+                
             }
+            else {
+               FTPClient ftp;
 
-            ftp.addProtocolCommandListener(new PrintCommandListener(new PrintWriter(System.out)));
-            ftp.setDefaultTimeout(3000);
-            ftp.setConnectTimeout(3000);
-
-            if (ftpDetails.getport() > 0) {
-                ftp.connect(ftpDetails.getip(), ftpDetails.getport());
-            } else {
-                ftp.connect(ftpDetails.getip());
-            }
-
-            int reply = ftp.getReplyCode();
-
-            if (!FTPReply.isPositiveCompletion(reply)) {
-                ftp.disconnect();
-            } else {
-                ftp.login(ftpDetails.getusername(), ftpDetails.getpassword());
-
-                ftp.enterLocalPassiveMode();
-
-                String fileName = null;
-
-                int findExt = batchFTPFileInfo.getoutputFIleName().lastIndexOf(".");
-
-                if (findExt >= 0) {
-                    fileName = batchFTPFileInfo.getoutputFIleName();
+                if ("FTP".equals(ftpDetails.getprotocol())) {
+                    ftp = new FTPClient();
                 } else {
-                    fileName = new StringBuilder().append(batchFTPFileInfo.getoutputFIleName()).append(".").append(transportDetails.getfileExt()).toString();
+                    FTPSClient ftps;
+                    ftps = new FTPSClient(true);
+
+                    ftp = ftps;
+                    ftps.setTrustManager(null);
                 }
 
-                //Set the directory to save the brochures to
-                fileSystem dir = new fileSystem();
+                ftp.addProtocolCommandListener(new PrintCommandListener(new PrintWriter(System.out)));
+                ftp.setDefaultTimeout(3000);
+                ftp.setConnectTimeout(3000);
 
-                String filelocation = transportDetails.getfileLocation();
-                filelocation = filelocation.replace("/bowlink/", "");
-                dir.setDirByName(filelocation);
+                if (ftpDetails.getport() > 0) {
+                    ftp.connect(ftpDetails.getip(), ftpDetails.getport());
+                } else {
+                    ftp.connect(ftpDetails.getip());
+                }
 
-                File file = new File(dir.getDir() + fileName);
+                int reply = ftp.getReplyCode();
 
-                FileInputStream fileInput = new FileInputStream(file);
+                if (!FTPReply.isPositiveCompletion(reply)) {
+                    ftp.disconnect();
+                } else {
+                    ftp.login(ftpDetails.getusername(), ftpDetails.getpassword());
 
-                ftp.changeWorkingDirectory(ftpDetails.getdirectory());
-                ftp.storeFile(fileName, fileInput);
-                ftp.logout();
-                ftp.disconnect();
+                    ftp.enterLocalPassiveMode();
 
+                    String fileName = null;
+
+                    int findExt = batchFTPFileInfo.getoutputFIleName().lastIndexOf(".");
+
+                    if (findExt >= 0) {
+                        fileName = batchFTPFileInfo.getoutputFIleName();
+                    } else {
+                        fileName = new StringBuilder().append(batchFTPFileInfo.getoutputFIleName()).append(".").append(transportDetails.getfileExt()).toString();
+                    }
+
+                    //Set the directory to save the brochures to
+                    fileSystem dir = new fileSystem();
+
+                    String filelocation = transportDetails.getfileLocation();
+                    filelocation = filelocation.replace("/bowlink/", "");
+                    dir.setDirByName(filelocation);
+
+                    File file = new File(dir.getDir() + fileName);
+
+                    FileInputStream fileInput = new FileInputStream(file);
+
+                    ftp.changeWorkingDirectory(ftpDetails.getdirectory());
+                    ftp.storeFile(fileName, fileInput);
+                    ftp.logout();
+                    ftp.disconnect();
+
+                } 
             }
+
+            
 
         } catch (Exception e) {
             throw new Exception("Error occurred trying to FTP a batch target. batchId: " + batchId, e);

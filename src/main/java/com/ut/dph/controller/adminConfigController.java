@@ -1,5 +1,8 @@
 package com.ut.dph.controller;
 
+import com.jcraft.jsch.ChannelSftp;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
@@ -45,8 +48,12 @@ import com.ut.dph.model.messageType;
 import com.ut.dph.service.messageTypeManager;
 import com.ut.dph.model.configurationTransport;
 import com.ut.dph.model.configurationTransportMessageTypes;
+import com.ut.dph.reference.fileSystem;
 import com.ut.dph.service.configurationTransportManager;
 import com.ut.dph.service.userManager;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import org.apache.commons.net.PrintCommandListener;
 import org.apache.commons.net.ftp.FTPClient;
@@ -1841,61 +1848,144 @@ public class adminConfigController {
      * The 'testFTPConnection.do' method will test the FTP connection paramenters.
      */
     @RequestMapping(value = "/testFTPConnection.do", method = RequestMethod.GET)
-    public @ResponseBody String testFTPPushConnection(@RequestParam String protocol, @RequestParam String ip, @RequestParam String username, @RequestParam String password, @RequestParam String directory, @RequestParam Integer port) {
+    public @ResponseBody String testFTPConnection(@RequestParam int method, @RequestParam int id, @RequestParam int configId) throws Exception {
+        
+        Organization orgDetails = organizationmanager.getOrganizationById(configurationmanager.getConfigurationById(configId).getorgId());
+        
+        /* get the FTP Details */
+        configurationFTPFields ftpDetails;
+        if(method == 1) {
+            ftpDetails = configurationTransportManager.getTransportFTPDetailsPull(id);
+        }
+        else {
+           ftpDetails = configurationTransportManager.getTransportFTPDetailsPush(id); 
+        }
         
         String connectionResponse = null;
         
-        try {
-        
-            FTPClient ftp;
+        /* SFTP */
+        if("SFTP".equals(ftpDetails.getprotocol())) {
+            
+            JSch jsch = new JSch();
+            Session session = null;
+            ChannelSftp channel = null;
+            FileInputStream localFileStream = null;
+            
+            String user = ftpDetails.getusername();
+            int port = ftpDetails.getport();
+            String host = ftpDetails.getip();
+            
+            try {
+                if(ftpDetails.getcertification() != null && !"".equals(ftpDetails.getcertification())) {
+                    
+                    File newFile = null;
+                    
+                    fileSystem dir = new fileSystem();
+                    dir.setDir(orgDetails.getcleanURL(), "certificates");
 
-            if("FTP".equals(protocol)) {
-                ftp = new FTPClient();
-            }
-            else {
-                FTPSClient ftps;
-                ftps = new FTPSClient(true);
-
-                ftp = ftps;
-                ftps.setTrustManager(null);
+                    jsch.addIdentity(new File(dir.getDir() + ftpDetails.getcertification()).getAbsolutePath());
+                    session = jsch.getSession(user, host , port);
+                }
+                else if(ftpDetails.getpassword() != null && !"".equals(ftpDetails.getpassword())) {
+                    session = jsch.getSession(user, host , port);
+                    session.setPassword(ftpDetails.getpassword());
+                }
+                
+                session.setConfig("StrictHostKeyChecking", "no");
+                session.setTimeout(2000);
+                
+                session.connect();
+ 
+                channel = (ChannelSftp)session.openChannel("sftp");
+                
+                try {
+                    channel.connect();
+                    
+                    if(ftpDetails.getdirectory() != null && !"".equals(ftpDetails.getdirectory())) {
+                        try {
+                            channel.cd(ftpDetails.getdirectory());
+                            connectionResponse = "Connected to the Directory " + ftpDetails.getdirectory();
+                        }
+                        catch (Exception e) {
+                            connectionResponse = "The Directory " + ftpDetails.getdirectory() + " was not found";
+                        }
+                    }
+                    else {
+                        connectionResponse = "connected";
+                    }
+                    
+                    channel.disconnect();
+                    session.disconnect();
+                }
+                catch (Exception e) {
+                    connectionResponse = "Connecton not valid";
+                    channel.disconnect();
+                    session.disconnect();
+                }
                 
             }
-
-            ftp.addProtocolCommandListener(new PrintCommandListener(new PrintWriter(System.out)));
-            ftp.setDefaultTimeout(3000);
-            ftp.setConnectTimeout(2000);
+            catch (Exception e) {
+                connectionResponse = "Connecton not valid";
+                session.disconnect();
+            }
             
-            if(port > 0) {
-                ftp.connect(ip,port);
-            }
-            else {
-                ftp.connect(ip);
-            }
-
-
-            int reply = ftp.getReplyCode();
-            if(!FTPReply.isPositiveCompletion(reply)) {
-                 connectionResponse = ftp.getReplyString();
-                 ftp.disconnect();
-            }
-            else {
-                 ftp.login(username, password);
-                 ftp.enterLocalPassiveMode();
-                 
-                 if(!"".equals(directory)) {
-                     ftp.changeWorkingDirectory(directory);
-                 }
-                 
-                 connectionResponse = ftp.getReplyString();
-                 
-                 ftp.logout();
-                 ftp.disconnect();
-
-            } 
         }
-        catch(Exception e) {
-            connectionResponse = "Connecton not valid";
+        /* FTP OR FTPS */
+        else {
+            try {
+        
+                FTPClient ftp;
+
+                if("FTP".equals(ftpDetails.getprotocol())) {
+                    ftp = new FTPClient();
+                }
+                else {
+                    FTPSClient ftps;
+                    ftps = new FTPSClient(true);
+
+                    ftp = ftps;
+                    ftps.setTrustManager(null);
+
+                }
+
+                ftp.addProtocolCommandListener(new PrintCommandListener(new PrintWriter(System.out)));
+                ftp.setDefaultTimeout(3000);
+                ftp.setConnectTimeout(2000);
+
+                if(ftpDetails.getport() > 0) {
+                    ftp.connect(ftpDetails.getip(),ftpDetails.getport());
+                }
+                else {
+                    ftp.connect(ftpDetails.getip());
+                }
+
+
+                int reply = ftp.getReplyCode();
+                if(!FTPReply.isPositiveCompletion(reply)) {
+                     connectionResponse = ftp.getReplyString();
+                     ftp.disconnect();
+                }
+                else {
+                     ftp.login(ftpDetails.getusername(), ftpDetails.getpassword());
+                     ftp.enterLocalPassiveMode();
+
+                     if(!"".equals(ftpDetails.getdirectory())) {
+                         ftp.changeWorkingDirectory(ftpDetails.getdirectory());
+                     }
+
+                     connectionResponse = ftp.getReplyString();
+
+                     ftp.logout();
+                     ftp.disconnect();
+
+                } 
+            }
+            catch(Exception e) {
+                connectionResponse = "Connecton not valid";
+            }
+        
         }
+        
         
         return connectionResponse;
         
