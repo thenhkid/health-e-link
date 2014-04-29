@@ -35,7 +35,7 @@
     <div class="col-md-12">
          <section class="panel panel-default">
             <div class="panel-body">
-                 <form id="showMessageTypes" action="/administrator/processing-activity/pending/messageTypes" method="post">
+                <form id="showMessageTypes" action="/administrator/processing-activity/pending/messageTypes" method="post">
                     <input type="hidden" name="orgId" id="orgId" value="0" />  
                 </form>
                 <div class="form-container scrollable">

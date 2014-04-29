@@ -66,6 +66,7 @@ import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
 import org.apache.commons.net.ftp.FTPSClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.codec.Base64;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -808,8 +809,8 @@ public class transactionOutManagerImpl implements transactionOutManager {
                 }
 
             } 
-            /* File Download || FTP */ 
-            else if (transportDetails.gettransportMethodId() == 1 || transportDetails.gettransportMethodId() == 3) {
+            /* File Download || FTP || EMed-Apps */ 
+            else if (transportDetails.gettransportMethodId() == 1 || transportDetails.gettransportMethodId() == 3  || transportDetails.gettransportMethodId() == 5) {
 
                 boolean createNewFile = true;
                 
@@ -879,12 +880,18 @@ public class transactionOutManagerImpl implements transactionOutManager {
 
                 /* Generate the file */
                 try {
-                    generateTargetFile(createNewFile, transaction.getId(), batchId, transportDetails);
+                    boolean encryptMessage = false;
+                    
+                    if(transportDetails.gettransportMethodId() == 5) {
+                        encryptMessage = true;
+                    }
+                    generateTargetFile(createNewFile, transaction.getId(), batchId, transportDetails, encryptMessage);
                 } catch (Exception e) {
                     throw new Exception("Error occurred trying to generate the batch file. batchId: " + batchId, e);
                 }
 
             }
+            
 
             /* Update the status of the transaction to PP (Pending Pickup) (ID = 18) */
             transactionInManager.updateTransactionStatus(transaction.getbatchUploadId(), transaction.gettransactionInId(), 0, 18);
@@ -989,10 +996,11 @@ public class transactionOutManagerImpl implements transactionOutManager {
         return batchId;
     }
 
+    
     /**
      * The 'generateTargetFile' function will generate the actual file in the correct organizations outpufiles folder.
      */
-    public void generateTargetFile(boolean createNewFile, int transactionTargetId, int batchId, configurationTransport transportDetails) throws Exception {
+    public void generateTargetFile(boolean createNewFile, int transactionTargetId, int batchId, configurationTransport transportDetails, boolean encrypt) throws Exception {
 
         String fileName = null;
 
@@ -1086,10 +1094,11 @@ public class transactionOutManagerImpl implements transactionOutManager {
                     List<HL7Segments> hl7Segments = configurationManager.getHL7Segments(hl7Details.getId());
 
                     if (!hl7Segments.isEmpty()) {
+                        
+                        StringBuilder hl7recordRow = new StringBuilder();
 
                         for (HL7Segments segment : hl7Segments) {
-                            StringBuilder hl7recordRow = new StringBuilder();
-
+                            
                             hl7recordRow.append(segment.getsegmentName()).append(hl7Details.getfieldSeparator());
 
                             /* Get the segment elements */
@@ -1126,7 +1135,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                                 }
 
                                             }
-                                            hl7recordRow.append(hl7Details.getfieldSeparator());
+                                            
 
                                         } else {
                                             hl7recordRow.append("");
@@ -1144,14 +1153,22 @@ public class transactionOutManagerImpl implements transactionOutManager {
 
                             hl7recordRow.append(System.getProperty("line.separator"));
 
-                            if (!"".equals(hl7recordRow.toString())) {
-                                try {
-                                    fw.write(hl7recordRow.toString());
-                                } catch (IOException ex) {
-                                    throw new IOException(ex);
+                        }
+                        
+                        if (!"".equals(hl7recordRow.toString())) {
+                            try {
+                                if(encrypt == true) {
+                                    System.out.println(hl7recordRow.toString());
+                                    byte[] encoded = Base64.encode(hl7recordRow.toString().getBytes());
+                                    fw.write(new String(encoded));
                                 }
-                            }
+                                else {
+                                    fw.write(hl7recordRow.toString());
+                                }
 
+                            } catch (IOException ex) {
+                                throw new IOException(ex);
+                            }
                         }
 
                         fw.close();
@@ -1190,7 +1207,14 @@ public class transactionOutManagerImpl implements transactionOutManager {
 
                 if (recordRow != null) {
                     try {
-                        fw.write(recordRow);
+                         if(encrypt == true) {
+                            byte[] encoded = Base64.encode(recordRow.getBytes());
+                            fw.write(new String(encoded));
+                        }
+                        else {
+                           fw.write(recordRow);  
+                        }
+                        
                         fw.close();
                     } catch (IOException ex) {
                         throw new IOException(ex);

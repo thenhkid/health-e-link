@@ -29,9 +29,11 @@
             <form:hidden path="configId" /> 
             <section class="panel panel-default">
                 <div class="panel-heading">
+                    <c:if test="${HL7Details.id > 0}">
                     <div class="pull-right">
                         <a href="#newSegmentModal" data-toggle="modal" class="btn btn-primary btn-xs btn-action" id="addNewSegment" title="Add new segment">Add New Segment</a>
                     </div>
+                    </c:if>
                     <h3 class="panel-title"><strong>HL7 Details</strong></h3>
                  </div>
                  <div class="panel-body">
@@ -76,11 +78,11 @@
                         </div>
                         <h3 class="panel-title">
                             <a data-toggle="collapse" href="#collapse-${segments.id}">
-                                <strong>Segment ${segments.displayPos} (${segments.segmentName})</strong>
+                               <strong>Segment ${segments.displayPos} (${segments.segmentName})</strong>
                             </a>
                         </h3>
                      </div>
-                     <div id="collapse-${segments.id}" class="panel-collapse collapse">       
+                     <div id="collapse-${segments.id}" class="panel-collapse ${segment.index+1 != HL7Details.HL7Segments.size() ? 'collapse' : ''}">       
                         <div class="panel-body">
                            <div id="segmentName_${segment.index}" class="form-group ${status.error ? 'has-error' : '' }">
                                <label class="control-label" for="segmentName">Segment Name *</label>

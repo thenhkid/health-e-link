@@ -47,10 +47,10 @@ require(['./main'], function () {
                $('#additionalEmedAppsDiv').show();
                var fileLocation = $('#fileLocation').val();
                if($('#configType').val() == 1) {
-                   var newFileLocation = fileLocation.replace('output files/', 'emedapps/inputfiles');
+                   var newFileLocation = fileLocation.replace('output files/', 'emedapps/inputfiles/');
                }
                else {
-                   var newFileLocation = fileLocation.replace('output files/', 'emedapps/outputfiles');
+                   var newFileLocation = fileLocation.replace('output files/', 'emedapps/outputfiles/');
                }
                
                $('#fileLocation').val(newFileLocation);

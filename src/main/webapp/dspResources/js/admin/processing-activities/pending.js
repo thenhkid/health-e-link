@@ -27,8 +27,7 @@ require(['./main'], function () {
                   data:{'orgId': $(this).attr('rel'), 'messageTypeId': 0},
                   type: "POST",
                   success: function(data) {
-                     $('#searchForm').attr('action','/administrator/processing-activity/pending?msg=processed');
-                     $('#searchForm').submit();
+                     window.location.href= '/administrator/processing-activity/pending?msg=processed';
                   }
                 });
              }
@@ -47,8 +46,7 @@ require(['./main'], function () {
                   data:{'orgId': $(this).attr('rel'), 'messageTypeId': 0},
                   type: "POST",
                   success: function(data) {
-                     $('#searchForm').attr('action','/administrator/processing-activity/pending?msg=notprocessed');
-                     $('#searchForm').submit();
+                     window.location.href= '/administrator/processing-activity/pending?msg=notprocessed';
                   }
               });
             
