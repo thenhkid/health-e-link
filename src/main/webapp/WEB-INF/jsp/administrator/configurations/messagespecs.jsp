@@ -51,7 +51,7 @@
                                 <spring:bind path="file">
                                     <div id="templateFileDiv" class="form-group ${status.error ? 'has-error' : '' }">
                                         <label class="control-label" for="file"><c:if test="${not empty messageSpecs.templateFile}">New</c:if> File *</label>
-                                        <form:input path="file" id="file" type="file"  />
+                                        <form:input path="file" id="file" type="file" class="form-control"  />
                                         <span id="templateFileMsg" class="control-label"></span>
                                     </div>
                                 </spring:bind>

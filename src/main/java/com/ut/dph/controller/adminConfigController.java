@@ -1,4 +1,4 @@
-package com.ut.dph.controller;
+ package com.ut.dph.controller;
 
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
@@ -54,7 +54,6 @@ import com.ut.dph.service.configurationTransportManager;
 import com.ut.dph.service.userManager;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.InputStream;
 import java.io.PrintWriter;
 import org.apache.commons.net.PrintCommandListener;
 import org.apache.commons.net.ftp.FTPClient;
@@ -801,7 +800,7 @@ public class adminConfigController {
         configurationTransport transportDetails = configurationTransportManager.getTransportDetails(configId);
         
         /** Save/Update the configuration message specs */
-        configurationmanager.updateMessageSpecs(messageSpecs, transportDetails.getId());
+        configurationmanager.updateMessageSpecs(messageSpecs, transportDetails.getId(), transportDetails.getfileType());
         
         redirectAttr.addFlashAttribute("savedStatus", "updated");
 

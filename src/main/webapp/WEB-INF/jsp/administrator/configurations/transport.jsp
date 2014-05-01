@@ -82,6 +82,24 @@
                                     </c:if>
                                 </div>
                             </spring:bind>
+                             <c:if test="${configurationDetails.type == 1}">    
+                                <spring:bind path="autoRelease">
+                                    <div class="form-group">
+                                        <label class="control-label" for="autoRelease">Release Records *</label>
+                                        <div>
+                                            <label class="radio-inline">
+                                                <form:radiobutton id="autoRelease" path="autoRelease" value="1" disabled="${transportDetails.copiedTransportId > 0 ? 'true' : 'false'}" /> Automatically 
+                                            </label>
+                                            <label class="radio-inline">
+                                                <form:radiobutton id="autoRelease" path="autoRelease" value="0" disabled="${transportDetails.copiedTransportId > 0 ? 'true' : 'false'}" /> Manually
+                                            </label>
+                                        </div>
+                                        <c:if test="${transportDetails.copiedTransportId > 0}">
+                                            <form:hidden path="autoRelease" />
+                                        </c:if>    
+                                    </div>
+                                </spring:bind>  
+                            </c:if>
                             <div id="upload-downloadDiv" class="methodDiv" style="display:none">
                                 <spring:bind path="clearRecords">
                                     <div class="form-group">
@@ -283,7 +301,7 @@
                                                     <input type="text" disabled value="${ftpDetails.certification}" class="form-control" />
                                                 <input type="hidden" id="certification${ftpDetails.method}" name="FTPFields[${field.index}].certification" value="${ftpDetails.certification}" />
                                             </div>
-                                            <div id="certificationfileDiv${ftpDetails.method}" class="form-group ${status.error ? 'has-error' : '' }">
+                                            <div id="certificationfileDiv${ftpDetails.method}" class="form-group ${status.error ? 'has-error' : '' }" style="display:none;">
                                                 <label class="control-label" for="certification"><c:if test="${ftpDetails.certification != null}">New </c:if>Certification File </label>
                                                 <input type="file" id="file${ftpDetails.method}" name="FTPFields[${field.index}].file" class="form-control"  />
                                                 <span id="certificationfileMsg" class="control-label"></span>
@@ -330,25 +348,7 @@
                                     </c:forEach>
                                 </div>
                             </div>     
-                                
-                            <c:if test="${configurationDetails.type == 1}">    
-                                <spring:bind path="autoRelease">
-                                    <div class="form-group">
-                                        <label class="control-label" for="autoRelease">Release Records *</label>
-                                        <div>
-                                            <label class="radio-inline">
-                                                <form:radiobutton id="autoRelease" path="autoRelease" value="1" disabled="${transportDetails.copiedTransportId > 0 ? 'true' : 'false'}" /> Automatically 
-                                            </label>
-                                            <label class="radio-inline">
-                                                <form:radiobutton id="autoRelease" path="autoRelease" value="0" disabled="${transportDetails.copiedTransportId > 0 ? 'true' : 'false'}" /> Manually
-                                            </label>
-                                        </div>
-                                        <c:if test="${transportDetails.copiedTransportId > 0}">
-                                            <form:hidden path="autoRelease" />
-                                        </c:if>    
-                                    </div>
-                                </spring:bind>  
-                            </c:if>
+                            
                         </div>
                     </div>
                 </section>

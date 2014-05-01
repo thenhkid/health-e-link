@@ -919,8 +919,12 @@ public class configurationDAOImpl implements configurationDAO {
      */
     @Override
     @Transactional
-    public void saveHL7Segment(HL7Segments newSegment) {
-        sessionFactory.getCurrentSession().save(newSegment);
+    public int saveHL7Segment(HL7Segments newSegment) {
+        Integer lastId;
+
+        lastId = (Integer) sessionFactory.getCurrentSession().save(newSegment);
+        
+        return lastId;
     }
     
     /**
@@ -930,8 +934,12 @@ public class configurationDAOImpl implements configurationDAO {
      */
     @Override
     @Transactional
-    public void saveHL7Element(HL7Elements newElement) {
-        sessionFactory.getCurrentSession().save(newElement);
+    public int saveHL7Element(HL7Elements newElement) {
+        Integer lastId;
+
+        lastId = (Integer) sessionFactory.getCurrentSession().save(newElement);
+        
+        return lastId;
     }
     
     /**

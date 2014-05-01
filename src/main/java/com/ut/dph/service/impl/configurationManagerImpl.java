@@ -24,13 +24,19 @@ import com.ut.dph.model.configurationMessageSpecs;
 import com.ut.dph.model.configurationSchedules;
 import com.ut.dph.reference.fileSystem;
 import com.ut.dph.service.configurationManager;
+import java.io.BufferedReader;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -272,7 +278,7 @@ public class configurationManagerImpl implements configurationManager {
 
     @Override
     @Transactional
-    public void updateMessageSpecs(configurationMessageSpecs messageSpecs, int transportDetailId) {
+    public void updateMessageSpecs(configurationMessageSpecs messageSpecs, int transportDetailId, int fileType) {
 
         boolean processFile = false;
         String fileName = null;
@@ -284,7 +290,13 @@ public class configurationManagerImpl implements configurationManager {
         //If a file is uploaded
         if (file != null && !file.isEmpty()) {
             processFile = true;
-            clearFields = 1;
+            
+            if(fileType == 4) {
+                clearFields = 0;
+            }
+            else {
+                clearFields = 1;
+            }
 
             fileName = file.getOriginalFilename();
 
@@ -338,7 +350,13 @@ public class configurationManagerImpl implements configurationManager {
 
         if (processFile == true) {
             try {
-              loadExcelContents(messageSpecs.getconfigId(), transportDetailId, fileName, dir);  
+              /* If file type == 4 (HL7) */
+              if(fileType == 4) {
+                 loadHL7Sample(messageSpecs.getconfigId(), transportDetailId, fileName, dir);
+              }
+              else {
+                 loadExcelContents(messageSpecs.getconfigId(), transportDetailId, fileName, dir);  
+              }
             }
             catch (Exception e1) {
                 e1.printStackTrace();
@@ -347,14 +365,124 @@ public class configurationManagerImpl implements configurationManager {
         }
 
     }
+    
+    
+    /**
+     * The 'loadHL7Sample' will take the contents of the uploaded HL7 Sample Text file and populate the corresponding configuration form fields table. This function will split 
+     * up the contents into the appropriate segments.
+     * 
+     * @param id        value of the latest added configuration
+     * @param fileName	file name of the uploaded excel file.
+     * @param dir	the directory of the uploaded file
+     */
+    public void loadHL7Sample(int id, int transportDetailId, String fileName, fileSystem dir) throws Exception {
+        
+        /* Create the HL7 Details */
+        HL7Details hl7Details = new HL7Details();
+        hl7Details.setconfigId(id);
+        hl7Details.setfieldSeparator("|");
+        hl7Details.setcomponentSeparator("^");
+        
+        configurationDAO.updateHL7Details(hl7Details);
+        
+        int hl7Id = configurationDAO.getHL7Details(id).getId();
+        
+        /* Loop through uploaded file to create HL7 segments and elements */
+        FileInputStream fileInput = null;
+        try {
+            File file = new File(dir.getDir() + fileName);
+            fileInput = new FileInputStream(file);
+            
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        
+        BufferedReader br = new BufferedReader(new InputStreamReader(fileInput));
+        
+        try {
+            String line;
+            int counter = 1;
+            try {
+                while ((line = br.readLine()) != null) {
+                    
+                    HL7Segments hl7Segments = new HL7Segments();
+                    hl7Segments.sethl7Id(hl7Id);
+                    hl7Segments.setdisplayPos(counter);
+                   
+                    String[] lineItemsArray = line.split("\\|",-1);
+                    
+                    System.out.println(lineItemsArray[0]);
+                    hl7Segments.setsegmentName(lineItemsArray[0]);
+                    /* Save the segment */
+                    int segmentId = configurationDAO.saveHL7Segment(hl7Segments);
+                    
+                     for(int i = 1; i < lineItemsArray.length; i++) {
+                        
+                        HL7Elements hl7Element = new HL7Elements();
+                        hl7Element.sethl7Id(hl7Id);
+                        hl7Element.setsegmentId(segmentId);
+                        hl7Element.setelementName("Element "+i);
+                        hl7Element.setdefaultValue("");
+                        hl7Element.setdisplayPos(i); 
+                        int elementId = configurationDAO.saveHL7Element(hl7Element);
+                        
+                        if(lineItemsArray[i].contains("^")) {
+                            
+                            String[] componentArray = lineItemsArray[i].split("\\^",-1);
+                            
+                            for(int c = 0; c < componentArray.length; c++) {
+                                HL7ElementComponents component = new HL7ElementComponents();
+                                component.setelementId(elementId);
+                                component.setdisplayPos(c+1);
+                                component.setfieldDescriptor("");
+                                component.setfieldValue("");
+                                
+                                configurationDAO.saveHL7Component(component);
+                            }
+                            
+                        }
+                        else {
+                            
+                            HL7ElementComponents component = new HL7ElementComponents();
+                            component.setelementId(elementId);
+                            component.setdisplayPos(1);
+                            if(lineItemsArray[i].contains(":")) {
+                                String[] descArray = lineItemsArray[i].split("\\:",-1);
+                                component.setfieldDescriptor(descArray[0]+":");
+                            }
+                            else {
+                               component.setfieldDescriptor(""); 
+                            }
+                            component.setfieldValue("");
+                            
+                            configurationDAO.saveHL7Component(component);
+                        }
+                        
+                    }
+                    
+                    counter++;
+                    
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(fileSystem.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } finally {
+            try {
+                br.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        
+    }
 
     /**
      * The 'loadExcelContents' will take the contents of the uploaded excel template file and populate the corresponding configuration form fields table. This function will split 
      * up the contents into the appropriate buckets. Buckets (1 - 4) will be separated by spacer rows with in the excel file.
      *
-     * @param id id: value of the latest added configuration
-     * @param fileName	fileName: file name of the uploaded excel file.
-     * @param cleanURL	cleanURL: the cleanURL of the selected organization
+     * @param id        value of the latest added configuration
+     * @param fileName	file name of the uploaded excel file.
+     * @param dir	the directory of the uploaded file
      *
      */
     public void loadExcelContents(int id, int transportDetailId, String fileName, fileSystem dir) throws Exception {
@@ -508,13 +636,13 @@ public class configurationManagerImpl implements configurationManager {
     }
     
     @Override
-    public void saveHL7Segment(HL7Segments newSegment) {
-        configurationDAO.saveHL7Segment(newSegment);
+    public int saveHL7Segment(HL7Segments newSegment) {
+        return configurationDAO.saveHL7Segment(newSegment);
     }
     
     @Override
-    public void saveHL7Element(HL7Elements newElement) {
-        configurationDAO.saveHL7Element(newElement);
+    public int saveHL7Element(HL7Elements newElement) {
+        return configurationDAO.saveHL7Element(newElement);
     }
     
     @Override
