@@ -548,5 +548,5 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
     public void saveTransportEMedApps(configurationEMedAppFields eMedAppFields) {
         sessionFactory.getCurrentSession().saveOrUpdate(eMedAppFields);
     }
-
+    
 }

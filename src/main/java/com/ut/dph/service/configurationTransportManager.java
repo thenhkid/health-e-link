@@ -65,4 +65,5 @@ public interface configurationTransportManager {
     
     void saveTransportEMedApps(int orgId, configurationEMedAppFields eMedAppFields);
     
+    
 }

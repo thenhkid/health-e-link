@@ -345,9 +345,9 @@ public class transactionInManagerImpl implements transactionInManager {
 
     @Override
     public List<Integer> getConfigIdsForBatch(int batchUploadId, boolean getAll) {
-    	return transactionInDAO.getConfigIdsForBatch(batchUploadId, getAll, 0);
+        return transactionInDAO.getConfigIdsForBatch(batchUploadId, getAll, 0);
     }
-    
+
     @Override
     public List<Integer> getConfigIdsForBatch(int batchUploadId, boolean getAll, Integer transactionInId) {
         return transactionInDAO.getConfigIdsForBatch(batchUploadId, getAll, transactionInId);
@@ -367,8 +367,7 @@ public class transactionInManagerImpl implements transactionInManager {
     }
 
     /**
-     * this method takes in the transId, the delimited fields, loops them and insert them into the message
-     * table by string pairs.  UT delimiter is ^^^^^ 
+     * this method takes in the transId, the delimited fields, loops them and insert them into the message table by string pairs. UT delimiter is ^^^^^
      */
     @Override
     public boolean insertMultiValToMessageTables(ConfigForInsert config, Integer subStringCounter, Integer transId) {
@@ -379,7 +378,7 @@ public class transactionInManagerImpl implements transactionInManager {
      * The 'clearMessageTables' function will loop through all each message table and remove any rows matching transactionInIds belonging to a batch.
      *
      * @param batchId of the batch to be cleared.
-     * 
+     *
      * It will return 0 as in no errors.
      */
     @Override
@@ -517,34 +516,32 @@ public class transactionInManagerImpl implements transactionInManager {
         return transactionInDAO.countSubString(config, transId);
     }
 
-
     /**
-     * The 'getuploadedBatches' function calls  
-     * getuploadedBatches(int userId, int orgId, Date fromDate, Date toDate, List<Integer> excludedStatusIds)
-     * 
-     * It defaults excludedStatusIds to 1 as that is how the original fn is written. We wrote new method to 
-     * pass in 1 as excludedStatusIds so we don't have to go back and modify every single method.
-     * @param userId 
+     * The 'getuploadedBatches' function calls getuploadedBatches(int userId, int orgId, Date fromDate, Date toDate, List<Integer> excludedStatusIds)
+     *
+     * It defaults excludedStatusIds to 1 as that is how the original fn is written. We wrote new method to pass in 1 as excludedStatusIds so we don't have to go back and modify every single method.
+     *
+     * @param userId
      * @param orgId
      * @param fromDate
      * @param todate
-     * 
+     *
      * It will return a list of batchUploads.
      */
-    
     @Override
     public List<batchUploads> getuploadedBatches(int userId, int orgId, Date fromDate, Date toDate) throws Exception {
         return getuploadedBatches(userId, orgId, fromDate, toDate, Arrays.asList(1));
     }
 
     /**
-     * The 'getuploadedBatches' function gets a list of batchUploads according to parameters being queried. 
-     * @param userId 
+     * The 'getuploadedBatches' function gets a list of batchUploads according to parameters being queried.
+     *
+     * @param userId
      * @param orgId
      * @param fromDate
      * @param todate
      * @param excludedStatusIds - statusIds for batches to exclude
-     * 
+     *
      * It will return a list of batchUploads.
      */
     @Override
@@ -552,19 +549,13 @@ public class transactionInManagerImpl implements transactionInManager {
         return transactionInDAO.getuploadedBatches(userId, orgId, fromDate, toDate, excludedStatusIds);
     }
 
-    
     /**
-     * We will take a batch and then from its status etc we will decide 
-     * if we want to process transactions or not. This method allowa admin to run just one batch
-     * This assumes batches SR - 6, Trans status REL We still run through entire process but these records should pass... (check to make sure it aligns with file upload) just be applying Macros / CW and inserting into our message tables
-	 * This method will only process a batch that is RP or SSL
-     * 
-     * We added to this method as if a batch is being call from fixErrors (ERG Form), we do not clear errors in transactionInErrors table.
-     * We default the flag to false as when it is call from old methods, we
+     * We will take a batch and then from its status etc we will decide if we want to process transactions or not. This method allowa admin to run just one batch This assumes batches SR - 6, Trans status REL We still run through entire process but these records should pass... (check to make sure it aligns with file upload) just be applying Macros / CW and inserting into our message tables This method will only process a batch that is RP or SSL
+     *
+     * We added to this method as if a batch is being call from fixErrors (ERG Form), we do not clear errors in transactionInErrors table. We default the flag to false as when it is call from old methods, we
      *
      * *
      */
-    
     @Override
     public boolean processBatch(int batchUploadId, boolean doNotClearErrors, Integer transactionId) throws Exception {
 
@@ -583,16 +574,15 @@ public class transactionInManagerImpl implements transactionInManager {
             /**
              * we should only process the ones that are not REL status, to be safe, we copy over data from transactionInRecords*
              */
-           
-            	resetTransactionTranslatedIn(batchUploadId, false, transactionId);
-           
-            	//clear transactionInError table for batch, if do not clear errors is true, we skip this.
-            	if (!doNotClearErrors) {
-            		systemErrorCount = systemErrorCount + clearTransactionInErrors(batchUploadId, true);
-            	}
-            	
+            resetTransactionTranslatedIn(batchUploadId, false, transactionId);
+
+            //clear transactionInError table for batch, if do not clear errors is true, we skip this.
+            if (!doNotClearErrors) {
+                systemErrorCount = systemErrorCount + clearTransactionInErrors(batchUploadId, true);
+            }
+
             List<Integer> configIds = getConfigIdsForBatch(batchUploadId, false, transactionId);
-            
+
             for (Integer configId : configIds) {
 				//we need to run all checks before insert regardless *
 
@@ -604,7 +594,7 @@ public class transactionInManagerImpl implements transactionInManager {
                 }
                 // update status of the failed records to ERR - 14
                 updateStatusForErrorTrans(batchUploadId, 14, false, transactionId);
-                
+
                 //run validation
                 systemErrorCount = systemErrorCount + runValidations(batchUploadId, configId, transactionId);
                 // update status of the failed records to ERR - 14
@@ -699,7 +689,7 @@ public class transactionInManagerImpl implements transactionInManager {
                         //auto release, records 
                         updateTransactionTargetStatus(batchUploadId, transactionId, 14, 19);
                         updateTransactionTargetStatus(batchUploadId, transactionId, 16, 19);
-                        
+
                     }
                     if (handlingDetails.get(0).geterrorHandling() == 2) {
                         //reject errors
@@ -953,7 +943,7 @@ public class transactionInManagerImpl implements transactionInManager {
     public Integer clearTransactionInErrors(Integer batchUploadId, boolean leaveFinalStatusIds) {
         return transactionInDAO.clearTransactionInErrors(batchUploadId, leaveFinalStatusIds);
     }
-    
+
     @Override
     public Integer deleteTransactionInErrorsByTransactionId(Integer transactionInId) {
         return transactionInDAO.deleteTransactionInErrorsByTransactionId(transactionInId);
@@ -1033,12 +1023,12 @@ public class transactionInManagerImpl implements transactionInManager {
             Integer validationTypeId, Integer batchUploadId, Integer transactionId) {
         try {
             //1. we grab all transactionInIds for messages that are not length of 0 and not null 
-        	List<transactionRecords> trs = null;
+            List<transactionRecords> trs = null;
             //1. we grab all transactionInIds for messages that are not length of 0 and not null 
             if (transactionId == 0) {
-            	trs = getFieldColAndValues(batchUploadId, cff);
-            } else  {
-            	trs = getFieldColAndValueByTransactionId(cff, transactionId);
+                trs = getFieldColAndValues(batchUploadId, cff);
+            } else {
+                trs = getFieldColAndValueByTransactionId(cff, transactionId);
             }
             //2. we look at each column and check each value to make sure it is a valid url
             for (transactionRecords tr : trs) {
@@ -1068,12 +1058,12 @@ public class transactionInManagerImpl implements transactionInManager {
     public Integer dateValidation(configurationFormFields cff,
             Integer validationTypeId, Integer batchUploadId, Integer transactionId) {
         try {
-        	List<transactionRecords> trs = null;
+            List<transactionRecords> trs = null;
             //1. we grab all transactionInIds for messages that are not length of 0 and not null 
             if (transactionId == 0) {
-            	trs = getFieldColAndValues(batchUploadId, cff);
-            } else  {
-            	trs = getFieldColAndValueByTransactionId(cff, transactionId);
+                trs = getFieldColAndValues(batchUploadId, cff);
+            } else {
+                trs = getFieldColAndValueByTransactionId(cff, transactionId);
             }
             //2. we look at each column and check each value by trying to convert it to a date
             for (transactionRecords tr : trs) {
@@ -1301,8 +1291,6 @@ public class transactionInManagerImpl implements transactionInManager {
         }
 
     }
-    
-
 
     @Override
     public Integer processMacro(Integer configId, Integer batchId, configurationDataTranslations cdt,
@@ -1408,7 +1396,7 @@ public class transactionInManagerImpl implements transactionInManager {
     public void resetTransactionTranslatedIn(Integer batchId, boolean resetAll) {
         resetTransactionTranslatedIn(batchId, resetAll, 0);
     }
-    
+
     @Override
     public void resetTransactionTranslatedIn(Integer batchId, boolean resetAll, Integer transactionInId) {
         transactionInDAO.resetTransactionTranslatedIn(batchId, resetAll, transactionInId);
@@ -1973,7 +1961,6 @@ public class transactionInManagerImpl implements transactionInManager {
             nexthour.add(Calendar.HOUR_OF_DAY, 1);
 
             //System.out.println("This Hour: " + thishour.getTime() + " Next Hour: " + nexthour.getTime());
-
             Integer batchesThisHour = transactionInDAO.getAllUploadedBatches(thishour.getTime(), nexthour.getTime()).size();
 
             /* Get batches submitted today */
@@ -1991,7 +1978,6 @@ public class transactionInManagerImpl implements transactionInManager {
             starttomorrow.add(Calendar.DAY_OF_MONTH, 1);
 
             //System.out.println("Today: " + starttoday.getTime() + " Tomorrow: " + starttomorrow.getTime());
-
             Integer batchesToday = transactionInDAO.getAllUploadedBatches(starttoday.getTime(), starttomorrow.getTime()).size();
 
             /* Get batches submitted this week */
@@ -2011,7 +1997,6 @@ public class transactionInManagerImpl implements transactionInManager {
             nextweek.add(Calendar.WEEK_OF_YEAR, 1);
 
             //System.out.println("This Week: " + thisweek.getTime() + " Next Week: " + nextweek.getTime());
-
             Integer batchesThisWeek = transactionInDAO.getAllUploadedBatches(thisweek.getTime(), nextweek.getTime()).size();
 
             systemSummary.setBatchesPastHour(batchesThisHour);
@@ -2037,20 +2022,19 @@ public class transactionInManagerImpl implements transactionInManager {
         return transactionInDAO.getErrorList(batchId);
     }
 
-    
     //TODO need to write this better
     @Override
     public List<TransErrorDetailDisplay> populateErrorList(batchUploads batchInfo) {
-    	//we want to group by transaction
-        List<TransErrorDetail> masterTedList = new ArrayList <TransErrorDetail>();
-        List<TransErrorDetailDisplay> tedDisplayList = new ArrayList <TransErrorDetailDisplay>();
+        //we want to group by transaction
+        List<TransErrorDetail> masterTedList = new ArrayList<TransErrorDetail>();
+        List<TransErrorDetailDisplay> tedDisplayList = new ArrayList<TransErrorDetailDisplay>();
         try {
             ConfigErrorInfo configErrorInfo = new ConfigErrorInfo();
             configErrorInfo.setBatchId(batchInfo.getId());
-            
-            List<TransErrorDetail> tedList = getTransErrorDetailsForNoRptFields(batchInfo.getId(), Arrays.asList(5,7,8,10));
+
+            List<TransErrorDetail> tedList = getTransErrorDetailsForNoRptFields(batchInfo.getId(), Arrays.asList(5, 7, 8, 10));
             if (tedList.size() > 0) {
-            	masterTedList.addAll(tedList);
+                masterTedList.addAll(tedList);
             }
             /**
              * now get invalid configIds, errorId 6 - these are tied to transaction but not reportable fields since we don't know what configId it is. we don't know column that holds the field either since it didn't match with any for org, we display the first 4 columns
@@ -2059,7 +2043,7 @@ public class transactionInManagerImpl implements transactionInManager {
             configErrorInfo.setBatchId(batchInfo.getId());
             tedList = getTransErrorDetailsForInvConfig(batchInfo.getId());
             if (tedList.size() > 0) {
-            	masterTedList.addAll(tedList);
+                masterTedList.addAll(tedList);
             }
             //now get the rest by configId
             List<ConfigErrorInfo> confErrorListByConfig = getErrorConfigForBatch(batchInfo.getId());
@@ -2069,7 +2053,7 @@ public class transactionInManagerImpl implements transactionInManager {
                 //add error details
                 String sqlStmt = "";
                 if (configErrorInfo.getRptField1() != 0) {
-                    sqlStmt = sqlStmt + "F" + configErrorInfo.getRptField1() + " as rptField1Value, ";                    
+                    sqlStmt = sqlStmt + "F" + configErrorInfo.getRptField1() + " as rptField1Value, ";
                 } else {
                     sqlStmt = sqlStmt + "'' as rptField1Value, ";
                 }
@@ -2088,61 +2072,62 @@ public class transactionInManagerImpl implements transactionInManager {
                 } else {
                     sqlStmt = sqlStmt + "'' as rptField4Value ";
                 }
-                
+
                 tedList = getTransErrorDetails(batchInfo, configErrorInfo, sqlStmt);
                 if (tedList.size() > 0) {
-                	masterTedList.addAll(tedList);
+                    masterTedList.addAll(tedList);
                 }
-              }
-            
-            
-            /** custom group by - need to check if it is faster to just hit the db **/
+            }
+
+            /**
+             * custom group by - need to check if it is faster to just hit the db *
+             */
             if (masterTedList.size() > 0) {
-            	Integer transactionInId = -1;
+                Integer transactionInId = -1;
                 TransErrorDetailDisplay tedd = new TransErrorDetailDisplay();
                 List<TransErrorDetail> transErrorDetailList = new ArrayList<TransErrorDetail>();
                 Integer counter = 0;
-                
-            	/** we need to group them by transactionInId **/
-            	for (TransErrorDetail ted : masterTedList) {
-            		counter++;
-            		if (!ted.getTransactionInId().equals(transactionInId)) {
-            			if (transactionInId != -1) {
-            				tedd.setTedList(transErrorDetailList);
-            				transErrorDetailList = new ArrayList<TransErrorDetail>();
-            				tedDisplayList.add(tedd);
-            			}
-            			
-            			transactionInId = ted.getTransactionInId();
-            			tedd = new TransErrorDetailDisplay();
-            			tedd.setTransactionInId(transactionInId);
-            			tedd.setTransactionStatus(ted.getTransactionStatus());
-            			tedd.setRptField1Label(ted.getRptField1Label());
-            			tedd.setRptField2Label(ted.getRptField2Label());
-            			tedd.setRptField3Label(ted.getRptField3Label());
-            			tedd.setRptField4Label(ted.getRptField4Label());
-            			tedd.setTransactionStatusValue(ted.getTransactionStatusValue());
-            		} 
-            		transErrorDetailList.add(ted);
-            		if (counter == masterTedList.size()) {
-            			tedd.setTedList(transErrorDetailList);
-            			transErrorDetailList = new ArrayList<TransErrorDetail>();
-            			tedDisplayList.add(tedd);
-            			
-            		} 	
-            	}
-              }
-            
+
+                /**
+                 * we need to group them by transactionInId *
+                 */
+                for (TransErrorDetail ted : masterTedList) {
+                    counter++;
+                    if (!ted.getTransactionInId().equals(transactionInId)) {
+                        if (transactionInId != -1) {
+                            tedd.setTedList(transErrorDetailList);
+                            transErrorDetailList = new ArrayList<TransErrorDetail>();
+                            tedDisplayList.add(tedd);
+                        }
+
+                        transactionInId = ted.getTransactionInId();
+                        tedd = new TransErrorDetailDisplay();
+                        tedd.setTransactionInId(transactionInId);
+                        tedd.setTransactionStatus(ted.getTransactionStatus());
+                        tedd.setRptField1Label(ted.getRptField1Label());
+                        tedd.setRptField2Label(ted.getRptField2Label());
+                        tedd.setRptField3Label(ted.getRptField3Label());
+                        tedd.setRptField4Label(ted.getRptField4Label());
+                        tedd.setTransactionStatusValue(ted.getTransactionStatusValue());
+                    }
+                    transErrorDetailList.add(ted);
+                    if (counter == masterTedList.size()) {
+                        tedd.setTedList(transErrorDetailList);
+                        transErrorDetailList = new ArrayList<TransErrorDetail>();
+                        tedDisplayList.add(tedd);
+
+                    }
+                }
+            }
 
         } catch (Exception ex) {
             ex.printStackTrace();
             System.err.println("populateErrorList " + ex.getCause());
         }
-        
+
         return tedDisplayList;
     }
-    
-    
+
     @Override
     public List<TransErrorDetail> getTransErrorDetailsForNoRptFields(Integer batchId, List<Integer> errorCodes) {
         return transactionInDAO.getTransErrorDetailsForNoRptFields(batchId, errorCodes);
@@ -2172,7 +2157,7 @@ public class transactionInManagerImpl implements transactionInManager {
 
     @Override
     public List<TransErrorDetail> getTransErrorDetails(batchUploads batchInfo, ConfigErrorInfo configErrorInfo, String sqlStmt) {
-    	List<TransErrorDetail> transErrorDetails;
+        List<TransErrorDetail> transErrorDetails;
         try {
             transErrorDetails = transactionInDAO.getTransErrorDetails(batchInfo, configErrorInfo);
 
@@ -2283,7 +2268,7 @@ public class transactionInManagerImpl implements transactionInManager {
                 lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
                 batch.setstatusValue(processStatus.getDisplayCode());
                 if (batch.getstatusId() == 5) {
-                	batch.setTransTotalNotFinal(getRecordCounts(batch.getId(), finalStatusIds, false, false));                    
+                    batch.setTransTotalNotFinal(getRecordCounts(batch.getId(), finalStatusIds, false, false));
                 }
 
                 User userDetails = usermanager.getUserById(batch.getuserId());
@@ -2297,26 +2282,26 @@ public class transactionInManagerImpl implements transactionInManager {
         }
         return uploadedBatches;
     }
-    
+
     @Override
     public List<TransErrorDetail> getTransactionErrorsByFieldNo(int transactionInId, int fieldNo) throws Exception {
         return transactionInDAO.getTransactionErrorsByFieldNo(transactionInId, fieldNo);
     }
 
-	@Override
-	public List<UserActivity> getBatchActivities(batchUploads batchInfo, boolean forUsers, boolean foroutboundProcessing) {
-		if (!forUsers) {
-			//we have autolog that tracks the date/time each time the status change on a batch, not in use right now
-			return null;
-		} else {
-			return transactionInDAO.getBatchUserActivities(batchInfo, foroutboundProcessing);
-		}
-	}
+    @Override
+    public List<UserActivity> getBatchActivities(batchUploads batchInfo, boolean forUsers, boolean foroutboundProcessing) {
+        if (!forUsers) {
+            //we have autolog that tracks the date/time each time the status change on a batch, not in use right now
+            return null;
+        } else {
+            return transactionInDAO.getBatchUserActivities(batchInfo, foroutboundProcessing);
+        }
+    }
 
-	@Override
-	public List<transactionRecords> getFieldColAndValueByTransactionId(configurationFormFields cff,
-			Integer transactionId) {
-		     return transactionInDAO.getFieldColAndValueByTransactionId(cff, transactionId);
-	}
-
+    @Override
+    public List<transactionRecords> getFieldColAndValueByTransactionId(configurationFormFields cff,
+            Integer transactionId) {
+        return transactionInDAO.getFieldColAndValueByTransactionId(cff, transactionId);
+    }
+    
 }

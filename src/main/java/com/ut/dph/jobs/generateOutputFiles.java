@@ -25,7 +25,6 @@ public class generateOutputFiles implements Job {
     
     @Override
     public void execute(JobExecutionContext context)  throws JobExecutionException {
-        
         try {
             SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
         

@@ -6,7 +6,6 @@
 
 package com.ut.dph.jobs;
 
-
 import com.ut.dph.service.transactionOutManager;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -22,13 +21,11 @@ import org.springframework.web.context.support.SpringBeanAutowiringSupport;
  */
 public class processOutputRecords implements Job {
     
-      
     @Autowired
     private transactionOutManager transactionOutManager;
     
     @Override
     public void execute(JobExecutionContext context)  throws JobExecutionException {
-        
         try {
             SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
             

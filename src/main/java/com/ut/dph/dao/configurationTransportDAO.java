@@ -67,4 +67,5 @@ public interface configurationTransportDAO {
     
     void saveTransportEMedApps(configurationEMedAppFields eMedAppFields);
     
+    
 }

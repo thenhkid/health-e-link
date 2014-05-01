@@ -350,4 +350,5 @@ public interface transactionInManager {
     List<UserActivity> getBatchActivities(batchUploads batchInfo, boolean forUsers, boolean foroutboundProcessing);
  
     List <transactionRecords> getFieldColAndValueByTransactionId (configurationFormFields cff, Integer transactionId);
+    
 }
