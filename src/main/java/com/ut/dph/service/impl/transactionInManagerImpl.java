@@ -37,6 +37,7 @@ import com.ut.dph.model.systemSummary;
 import com.ut.dph.reference.fileSystem;
 import com.ut.dph.service.configurationManager;
 import com.ut.dph.service.configurationTransportManager;
+import com.ut.dph.service.hl7toTxt;
 import com.ut.dph.service.messageTypeManager;
 import com.ut.dph.service.organizationManager;
 import com.ut.dph.service.sysAdminManager;
@@ -104,6 +105,9 @@ public class transactionInManagerImpl implements transactionInManager {
 
     @Autowired
     private userManager usermanager;
+    
+    @Autowired
+    private hl7toTxt hl7toTxt;
 
     private int processingSysErrorId = 5;
 
@@ -1526,13 +1530,37 @@ public class transactionInManagerImpl implements transactionInManager {
 
             fileSystem dir = new fileSystem();
             dir.setDirByName("/");
-            String fileWithPath = dir.getDir() + batch.getFileLocation() + batch.getoriginalFileName();
-            fileWithPath = fileWithPath.replace("bowlink///", "");
-
+            
+            
             //2. we load data with my sql
+            
+            /* 
+                if the original file name is a HL7 file (".hr") then we are going to translate it to
+                a pip-delimited text file.
+            */
+            String fileWithPath = null;
+            String actualFileName = null;
+            if(batch.getoriginalFileName().endsWith(".hr")) {
+                String newfilename = hl7toTxt.TranslateHl7toTxt(batch.getFileLocation(), batch.getoriginalFileName());
+                
+                fileWithPath = dir.getDir() + batch.getFileLocation() + newfilename;
+                fileWithPath = fileWithPath.replace("bowlink///", "");
+                actualFileName = newfilename;
+            }
+            else {
+                fileWithPath = dir.getDir() + batch.getFileLocation() + batch.getoriginalFileName();
+                fileWithPath = fileWithPath.replace("bowlink///", "");
+                actualFileName = batch.getoriginalFileName();
+            }
+            System.out.println(actualFileName);
             //get delimiter, get fileWithPath etc
-            if (batch.getoriginalFileName().endsWith(".txt") || batch.getoriginalFileName().endsWith(".csv")) {
+            if (actualFileName.endsWith(".txt") || actualFileName.endsWith(".csv")) {
+                System.out.println("IN");
+                System.out.println(batch.getId());
+                System.out.println(batch.getDelimChar());
+                 System.out.println(fileWithPath);
                 sysError = sysError + insertLoadData(batch.getId(), batch.getDelimChar(), fileWithPath, loadTableName, batch.isContainsHeaderRow());
+                System.out.println(sysError);
 
             }
 
