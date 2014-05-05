@@ -12,7 +12,6 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
 
 import com.ut.dph.dao.configurationTransportDAO;
-import com.ut.dph.model.configurationEMedAppFields;
 import com.ut.dph.model.configurationFTPFields;
 import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.configurationMessageSpecs;
@@ -517,36 +516,6 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
 
             return null;
         }
-    }
-    
-    /**
-    * The 'getTransportEMedAppDetails' function will return the eMed-App information for the 
-    * passed in transportDetailId.
-    * 
-    * @param transportDetailsId     the id of the selected transport method
-    * 
-    * @return This function will return a list of eMed-App Details
-    */
-    @Override
-    @Transactional
-    public List<configurationEMedAppFields> getTransportEMedAppDetails(int transportDetailId) throws Exception {
-        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configurationEMedAppFields.class)
-                .add(Restrictions.eq("transportId", transportDetailId));
-
-        return criteria.list();
-    }
-    
-    /**
-     * The 'saveTransportEMedApps' function will save the transport EMed-Apps information into the DB.
-     *
-     * @param eMedAppFields The EMed-Apps form fields
-     *
-     * @return this function will not return anything.
-     */
-    @Override
-    @Transactional
-    public void saveTransportEMedApps(configurationEMedAppFields eMedAppFields) {
-        sessionFactory.getCurrentSession().saveOrUpdate(eMedAppFields);
     }
     
 }

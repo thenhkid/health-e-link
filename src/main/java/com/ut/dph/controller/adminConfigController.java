@@ -40,7 +40,6 @@ import com.ut.dph.model.User;
 import com.ut.dph.model.configurationConnection;
 import com.ut.dph.model.configurationConnectionReceivers;
 import com.ut.dph.model.configurationConnectionSenders;
-import com.ut.dph.model.configurationEMedAppFields;
 import com.ut.dph.model.configurationFTPFields;
 import com.ut.dph.model.configurationMessageSpecs;
 import com.ut.dph.model.configurationSchedules;
@@ -484,21 +483,6 @@ public class adminConfigController {
             transportDetails.setFTPFields(ftpFields);
         }
         
-        /* Need to get any eMed App Fields */
-        List<configurationEMedAppFields> eMedAppFields = configurationTransportManager.getTransportEMedAppDetails(transportDetails.getId());
-        
-        if(eMedAppFields.isEmpty()) {
-            List<configurationEMedAppFields> emptyEMedAppFields = new ArrayList<configurationEMedAppFields>();
-            configurationEMedAppFields eMedAppField = new configurationEMedAppFields();
-            emptyEMedAppFields.add(eMedAppField);
-            
-            transportDetails.seteMedAppFields(emptyEMedAppFields);
-            
-        }
-        else {
-            transportDetails.seteMedAppFields(eMedAppFields);
-        }
-        
         
         //Need to get a list of all configurations for the current organization
         List<configuration> configurations = configurationmanager.getConfigurationsByOrgId(configurationDetails.getorgId(),"");
@@ -620,20 +604,6 @@ public class adminConfigController {
                 configurationTransportManager.saveTransportFTP(configurationDetails.getorgId(), ftpFields);
             }
         }
-        
-        /** 
-         * Need to set up the EMed-Apps information if
-         * any has been entered
-         */
-        if(transportDetails.gettransportMethodId() == 5 && !transportDetails.geteMedAppFields().isEmpty()) {
-            for(configurationEMedAppFields eMedAppFields : transportDetails.geteMedAppFields()) {
-                eMedAppFields.settransportId(transportId);
-                eMedAppFields.setfileLocation(transportDetails.getfileLocation());
-                
-                configurationTransportManager.saveTransportEMedApps(configurationDetails.getorgId(), eMedAppFields);
-            }
-        }
-        
         
         /**
          * Need to set the associated messages types

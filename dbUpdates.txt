@@ -818,4 +818,9 @@ CREATE TABLE `universalTranslator`.`eMedAppTransportDetails` (
 ALTER TABLE `universalTranslator`.`eMedAppTransportDetails` 
 CHANGE COLUMN `id` `id` INT(11) NOT NULL AUTO_INCREMENT ;
 
+/* Chad 05052014 */
+DROP TABLE `universalTranslator`.`eMedAppTransportDetails`;
+
+DELETE FROM `universalTranslator`.`ref_transportMethods` WHERE `id`='5';
+
 

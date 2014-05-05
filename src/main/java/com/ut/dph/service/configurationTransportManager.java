@@ -1,6 +1,5 @@
 package com.ut.dph.service;
 
-import com.ut.dph.model.configurationEMedAppFields;
 import com.ut.dph.model.configurationFTPFields;
 
 import java.util.List;
@@ -60,10 +59,5 @@ public interface configurationTransportManager {
     configurationFormFields getCFFByFieldNo(int configId, int fieldNo) throws Exception;
     
     List <configurationMessageSpecs> getConfigurationMessageSpecsForOrgTransport(Integer orgId, Integer transportMethodId, boolean getZeroMessageTypeCol);
-    
-    List<configurationEMedAppFields> getTransportEMedAppDetails(int transportDetailId) throws Exception;
-    
-    void saveTransportEMedApps(int orgId, configurationEMedAppFields eMedAppFields);
-    
     
 }

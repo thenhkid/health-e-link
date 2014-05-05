@@ -315,40 +315,7 @@
                                     </c:forEach>
                                 </div>
                             </div>
-                                
-                           <div id="additionalEmedAppsDiv" class="methodDiv" style="display:none">
-                                <div class="row">
-                                    <c:forEach items="${transportDetails.eMedAppFields}" var="emedAppFields" varStatus="eMedfield">
-                                        <div class="form-group col-md-6">
-                                            <div class="form-group">
-                                               <label for="status">E-MedApps Details</label>
-                                               <input name="eMedAppFields[${eMedfield.index}].id" class="form-control" type="hidden" value="${emedAppFields.id}"  />
-                                            </div>
-                                            <div id="eMedHostDiv" class="form-group">
-                                                <label class="control-label" for="eMedHost">Host *</label>
-                                                <input name="eMedAppFields[${eMedfield.index}].host" id="eMedHost" class="form-control" type="text" maxLength="45" value="${emedAppFields.host}"  />
-                                                <span id="eMedHostMsg" class="control-label"></span>
-                                            </div>
-                                            <div id="userDiv" class="form-group">
-                                                <label class="control-label" for="user">User *</label>
-                                                <input name="eMedAppFields[${eMedfield.index}].user" id="user" class="form-control" type="text" maxLength="45" value="${emedAppFields.user}"  />
-                                                <span id="userMsg" class="control-label"></span>
-                                            </div>
-                                            <div class="form-group" <c:if test="${emedAppFields.certification == null || emedAppFields.certification == ''}">style="display:none" </c:if>>
-                                                <label class="control-label">Existing Certifciation:</label>
-                                                <input type="text" disabled value="${emedAppFields.certification}" class="form-control" />
-                                                <input type="hidden" id="certification" name="eMedAppFields[${eMedfield.index}].certification" value="${emedAppFields.certification}" />
-                                            </div>
-                                            <div id="eMedcertificationfileDiv" class="form-group ${status.error ? 'has-error' : '' }">
-                                                <label class="control-label" for="certification"><c:if test="${emedAppFields.certification != null}">New </c:if>Certification File </label>
-                                                <input type="file" id="emedAppfile" name="eMedAppFields[${eMedfield.index}].file" class="form-control"  />
-                                                <span id="eMedcertificationfileMsg" class="control-label"></span>
-                                            </div>
-                                        </div>
-                                    </c:forEach>
-                                </div>
-                            </div>     
-                            
+                           
                         </div>
                     </div>
                 </section>

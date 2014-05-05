@@ -19,10 +19,6 @@ require(['./main'], function () {
             $('.assocMessageTypes').hide();
         }
         
-        if(selMethodId === "5") {
-            $('#additionalEmedAppsDiv').show();
-        }
-        
         //Fade out the updated/created message after being displayed.
         if ($('.alert').length > 0) {
             $('.alert').delay(2000).fadeOut(1000);
@@ -42,20 +38,7 @@ require(['./main'], function () {
            if(methodId === "3") {
                $('#additionalFTPDiv').show();
            }
-           
-           if(methodId === "5") {
-               $('#additionalEmedAppsDiv').show();
-               var fileLocation = $('#fileLocation').val();
-               if($('#configType').val() == 1) {
-                   var newFileLocation = fileLocation.replace('output files/', 'emedapps/inputfiles/');
-               }
-               else {
-                   var newFileLocation = fileLocation.replace('output files/', 'emedapps/outputfiles/');
-               }
-               
-               $('#fileLocation').val(newFileLocation);
-           }
- 
+          
            if(methodId !== "2" && methodId !== "") {
                 $('.assocMessageTypes').hide();
             }

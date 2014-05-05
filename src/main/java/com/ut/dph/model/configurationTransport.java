@@ -22,9 +22,6 @@ public class configurationTransport {
     private List<configurationFTPFields> FTPfields = null;
     
     @Transient
-    private List<configurationEMedAppFields> eMedAppFields = null;
-
-    @Transient
     private String delimChar = null;
 
     @Transient
@@ -251,14 +248,6 @@ public class configurationTransport {
     
     public void setfileExt(String fileExt) {
         this.fileExt = fileExt;
-    }
-    
-    public List<configurationEMedAppFields> geteMedAppFields() {
-        return eMedAppFields;
-    }
-
-    public void seteMedAppFields(List<configurationEMedAppFields> eMedAppFields) {
-        this.eMedAppFields = eMedAppFields;
     }
     
 }
