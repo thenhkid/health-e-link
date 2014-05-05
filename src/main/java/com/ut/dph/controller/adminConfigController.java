@@ -333,7 +333,7 @@ public class adminConfigController {
                 }
             }
             
-            if(transportDetails.getfileType() == 4) {
+            if(transportDetails.getfileType() == 4 && configurationDetails.getType() == 2) {
                 HL7 = true;
             }
             else {

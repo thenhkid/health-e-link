@@ -68,7 +68,7 @@
                                                         <input type="hidden" name="fields[${field.index}].useField" value="${mappings.useField}" />
                                                         <input type="hidden" name="fields[${field.index}].required" value="${mappings.required}" />
                                                         <input type="hidden" name="fields[${field.index}].bucketDspPos" value="${mappings.bucketDspPos}" />
-                                                        <input type="hidden" name="fields[${field.index}].validationType" value="${mappings.validationType}" />
+                                                        <input type="hidden" id="validationType_${field.index}" name="fields[${field.index}].validationType" value="${mappings.validationType}" />
                                                         <input type="hidden" id="saveToTableName_${field.index}" name="fields[${field.index}].saveToTableName" value="${mappings.saveToTableName}" />
                                                         <input type="hidden" id="saveToTableCol_${field.index}" name="fields[${field.index}].saveToTableCol" value="${mappings.saveToTableCol}" />
                                                         <input type="hidden" name="fields[${field.index}].autoPopulateTableName" value="${mappings.autoPopulateTableName}" />
@@ -126,6 +126,7 @@
                                                     ${tField.fieldDesc}
                                                     <input type="hidden" id="tableName_${tField.id}" value="${tField.saveToTableName}" />
                                                     <input type="hidden" id="tableCol_${tField.id}" value="${tField.saveToTableCol}" />
+                                                    <input type="hidden" id="validationType_${tField.id}" value="${tField.validationType}" />
                                                 </td>
                                                 <td class="center-text">
                                                     <input type="checkbox" disabled="disabled" <c:if test="${tField.required == true}">checked</c:if>  />

@@ -823,4 +823,20 @@ DROP TABLE `universalTranslator`.`eMedAppTransportDetails`;
 
 DELETE FROM `universalTranslator`.`ref_transportMethods` WHERE `id`='5';
 
+/* Chad 05052014 @ 3:25 PM */
+CREATE TABLE `universalTranslator`.`message_misc` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `transactionInId` INT NOT NULL,
+  `field1` VARCHAR(45) NULL,
+  `field2` VARCHAR(45) NULL,
+  `field3` VARCHAR(45) NULL,
+  `field4` VARCHAR(45) NULL,
+  `field5` VARCHAR(45) NULL,
+  `field6` VARCHAR(45) NULL,
+  `field7` VARCHAR(45) NULL,
+  `field8` VARCHAR(45) NULL,
+  `field9` VARCHAR(45) NULL,
+  `field10` VARCHAR(45) NULL,
+  PRIMARY KEY (`id`));
+
 

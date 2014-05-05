@@ -145,9 +145,11 @@ require(['./main'], function () {
            var indexVal = $(this).attr('rel');
            var tableName = $('#tableName_'+$(this).val()).val();
            var tableCol = $('#tableCol_'+$(this).val()).val();
+           var valType = $('#validationType_'+$(this).val()).val();
            
            $('#saveToTableName_'+indexVal).val(tableName);
            $('#saveToTableCol_'+indexVal).val(tableCol);
+           $('#validationType_'+indexVal).val(valType);
             
             
         });
