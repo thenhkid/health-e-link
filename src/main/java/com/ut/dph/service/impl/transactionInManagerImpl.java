@@ -476,6 +476,10 @@ public class transactionInManagerImpl implements transactionInManager {
             String ext = FilenameUtils.getExtension(dir.getDir() + fileName);
 
             String fileType = (String) configurationManager.getFileTypesById(transportDetails.getfileType());
+            
+            if("hl7".equals(fileType)) {
+                fileType = "hr";
+            }
 
             if (ext == null ? fileType != null : !ext.equals(fileType)) {
                 batchFileResults.put("wrongFileType", "3");
