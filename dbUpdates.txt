@@ -839,9 +839,18 @@ CREATE TABLE `universalTranslator`.`message_misc` (
   `field10` VARCHAR(45) NULL,
   PRIMARY KEY (`id`));
 
-/** grace 05062014 12:24AM **/
-ALTER TABLE `universaltranslator`.`macro_names` 
-ADD COLUMN `populateFieldA` BIT NULL DEFAULT 0 AFTER `Con2_Question`;
+/* Chad 05052014 @ 9:46 PM */
+ALTER TABLE `universalTranslator`.`message_misc` 
+CHANGE COLUMN `field1` `field1` VARCHAR(255) NULL DEFAULT NULL ,
+CHANGE COLUMN `field2` `field2` VARCHAR(255) NULL DEFAULT NULL ,
+CHANGE COLUMN `field3` `field3` VARCHAR(255) NULL DEFAULT NULL ,
+CHANGE COLUMN `field4` `field4` VARCHAR(255) NULL DEFAULT NULL ,
+CHANGE COLUMN `field5` `field5` VARCHAR(255) NULL DEFAULT NULL ,
+CHANGE COLUMN `field6` `field6` VARCHAR(255) NULL DEFAULT NULL ,
+CHANGE COLUMN `field7` `field7` VARCHAR(255) NULL DEFAULT NULL ,
+CHANGE COLUMN `field8` `field8` VARCHAR(255) NULL DEFAULT NULL ,
+CHANGE COLUMN `field9` `field9` VARCHAR(255) NULL DEFAULT NULL ,
+CHANGE COLUMN `field10` `field10` VARCHAR(255) NULL DEFAULT NULL ;
 
 /** grace 05052014 9:53PM **/
 UPDATE `universaltranslator`.`macro_names` SET `populateFieldA`=1 WHERE `ID`='68';

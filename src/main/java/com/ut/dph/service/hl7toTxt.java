@@ -6,9 +6,6 @@
 
 package com.ut.dph.service;
 
-import com.ut.dph.model.HL7ElementComponents;
-import com.ut.dph.model.HL7Elements;
-import com.ut.dph.model.HL7Segments;
 import com.ut.dph.reference.fileSystem;
 import java.io.BufferedReader;
 import java.io.File;
@@ -17,8 +14,6 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.springframework.stereotype.Service;
 
 /**
@@ -99,7 +94,12 @@ public class hl7toTxt {
             else {
                 recordRow = new StringBuilder().append(recordRow).append("|").toString();
             }
-            recordRow = new StringBuilder().append(recordRow).append(line.replace("^","|")).toString();
+            if(!"MSH".equals(lineItemsArray[0])) {
+                recordRow = new StringBuilder().append(recordRow).append(line.replace("^","|")).toString();
+            }
+            else {
+                recordRow = new StringBuilder().append(recordRow).append(line).toString();  
+            }
             
         }
         fw.write(recordRow);  
