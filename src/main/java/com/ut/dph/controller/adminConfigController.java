@@ -1044,7 +1044,6 @@ public class adminConfigController {
         
         //Loop through the list of translations
         for (configurationDataTranslations translation : translations) {
-            System.out.println(translation.getconfigId());
             configurationmanager.saveDataTranslations(translation);
         }
 

@@ -1158,7 +1158,6 @@ public class transactionOutManagerImpl implements transactionOutManager {
                         if (!"".equals(hl7recordRow.toString())) {
                             try {
                                 if(encrypt == true) {
-                                    System.out.println(hl7recordRow.toString());
                                     byte[] encoded = Base64.encode(hl7recordRow.toString().getBytes());
                                     fw.write(new String(encoded));
                                 }

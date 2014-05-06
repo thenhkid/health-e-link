@@ -549,6 +549,10 @@ public class HealtheWebController {
                 List<transactionRecords> fromFields;
                 if(!senderInfoFormFields.isEmpty()) {
                     fromFields = setInboxFormFields(senderInfoFormFields, records, transactionInfo.getconfigId(), true, 0);
+                    
+                    if("".equals(fromFields.get(0).getFieldValue()) || fromFields.get(0).getFieldValue() == null) {
+                        fromFields = setOrgDetails(transactionOutManager.getDownloadSummaryDetails(transactionInfo.getId()).getsourceOrgId());
+                    }
                 }
                 else {
                     fromFields = setOrgDetails(transactionOutManager.getDownloadSummaryDetails(transactionInfo.getId()).getsourceOrgId());

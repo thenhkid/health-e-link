@@ -1085,27 +1085,26 @@ public class adminProcessingActivity {
             field.setfieldLabel(formfield.getFieldLabel());
             field.setreadOnly(readOnly);
             field.setfieldValue(null);
-            
-            if(transactionId > 0) {
+
+            if (transactionId > 0) {
                 /* Get the error for each field */
                 try {
-                     List<TransErrorDetail> fieldErrors = transactionInManager.getTransactionErrorsByFieldNo(transactionId, formfield.getFieldNo());
+                    List<TransErrorDetail> fieldErrors = transactionInManager.getTransactionErrorsByFieldNo(transactionId, formfield.getFieldNo());
 
-                     if(fieldErrors.size() > 0) {
-                         StringBuilder errorDetails = new StringBuilder();
+                    if (fieldErrors.size() > 0) {
+                        StringBuilder errorDetails = new StringBuilder();
 
-                         for(TransErrorDetail error : fieldErrors) {
-                               errorDetails.append(error.getErrorDisplayText());
-                               if(!"".equals(error.getErrorInfo()) && error.getErrorInfo() != null) {
-                                   errorDetails.append(" - ").append(error.getErrorInfo());
-                               }
-                               errorDetails.append("<br />");
-                         }
-                         field.setErrorDesc(errorDetails.toString());
-                     }
-                }
-                catch(Exception e) {
-                     throw new Exception("Error at batch options.", e);
+                        for (TransErrorDetail error : fieldErrors) {
+                            errorDetails.append(error.getErrorDisplayText());
+                            if (!"".equals(error.getErrorInfo()) && error.getErrorInfo() != null) {
+                                errorDetails.append(" - ").append(error.getErrorInfo());
+                            }
+                            errorDetails.append("<br />");
+                        }
+                        field.setErrorDesc(errorDetails.toString());
+                    }
+                } catch (Exception e) {
+                    throw new Exception("Error at batch options.", e);
                 }
             }
 
@@ -1452,11 +1451,11 @@ public class adminProcessingActivity {
             lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batchDetails.getstatusId());
             batchDetails.setstatusValue(processStatus.getDisplayCode());
 
-            List<Integer> cancelStatusList = Arrays.asList(21, 22, 23, 1, 8); 
+            List<Integer> cancelStatusList = Arrays.asList(21, 22, 23, 1, 8);
             if (!cancelStatusList.contains(batchDetails.getstatusId())) {
-                canCancel = true;    
+                canCancel = true;
             }
-            
+
             List<Integer> resetStatusList = Arrays.asList(2, 22, 23, 1, 8); //DNP (21) is not a final status for admin
             if (!resetStatusList.contains(batchDetails.getstatusId())) {
                 canReset = true;
@@ -1474,23 +1473,19 @@ public class adminProcessingActivity {
             }
 
             /**
-             * we need to check sbp (4), tbc (25) status - if server is restarted and somehow the file hangs in SBP, we want to give them option to reset
-             * if sbp/tbc start time is about two hours, that should be sufficient indication that a file is stuck
-             * we don't want to reset or cancel in the middle of the processing
+             * we need to check sbp (4), tbc (25) status - if server is restarted and somehow the file hangs in SBP, we want to give them option to reset if sbp/tbc start time is about two hours, that should be sufficient indication that a file is stuck we don't want to reset or cancel in the middle of the processing
              */
-            
             if (batchDetails.getstatusId() == 4 || batchDetails.getstatusId() == 25) {
-            	Date d1 = batchDetails.getstartDateTime();
-        		Date d2 = new Date();
-        		//in milliseconds
-    			long diff = d2.getTime() - d1.getTime();
-    			
-    			long diffHours = diff / (60 * 60 * 1000) % 24;
-    			System.out.println(diffHours);
-    			if (diffHours < 2) {
-    				canReset = false;
-    				canCancel = false;
-    			}
+                Date d1 = batchDetails.getstartDateTime();
+                Date d2 = new Date();
+                //in milliseconds
+                long diff = d2.getTime() - d1.getTime();
+
+                long diffHours = diff / (60 * 60 * 1000) % 24;
+                if (diffHours < 2) {
+                    canReset = false;
+                    canCancel = false;
+                }
             }
 
             if (batchDetails.getConfigId() != 0) {
@@ -1656,12 +1651,11 @@ public class adminProcessingActivity {
 
         try {
             ModelAndView mav = new ModelAndView();
-            
+
             User userInfo = usermanager.getUserByUserName(authentication.getName());
-          
+
             batchUploads batchDetails = transactionInManager.getBatchDetailsByTInId(transactionInId);
-            
-            
+
             if (batchDetails != null) {
 
                 Organization orgDetails = organizationmanager.getOrganizationById(batchDetails.getOrgId());
@@ -1670,20 +1664,18 @@ public class adminProcessingActivity {
                 lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batchDetails.getstatusId());
                 batchDetails.setstatusValue(processStatus.getDisplayCode());
 
-
                 if (batchDetails.getConfigId() != 0) {
                     batchDetails.setConfigName(configurationManager.getMessageTypeNameByConfigId(batchDetails.getConfigId()));
                 } else {
                     batchDetails.setConfigName("Multiple Message Types");
                 }
                 mav.addObject("batchDetails", batchDetails);
-            
+
             }
-            
-            
+
             /* If user has edit athoritity then show the edit page, otherwise redirect back to the auditReport */
             mav.setViewName("/administrator/processing-activity/ERG");
-               
+
             try {
                 transactionIn transactionInfo = transactionInManager.getTransactionDetails(transactionInId);
 
@@ -1770,7 +1762,6 @@ public class adminProcessingActivity {
                 List<transactionRecords> detailFields = setOutboundFormFields(detailFormFields, records, transactionInfo.getconfigId(), transactionInId, false, 0);
                 transaction.setdetailFields(detailFields);
 
-
                 mav.addObject("transaction", transaction);
 
                 mav.addObject("transactionInId", transactionInId);
@@ -1798,41 +1789,29 @@ public class adminProcessingActivity {
         }
 
     }
-    
+
     /**
-     * The '/editMessage' POST request will submit the changes to the passed in transaction. The
-     * transaction will be updated to a status of 10 (Pending Release) and the error records will be cleared
-     * 
+     * The '/editMessage' POST request will submit the changes to the passed in transaction. The transaction will be updated to a status of 10 (Pending Release) and the error records will be cleared
+     *
      * @param transactionDetails The object to hold the transaction fields
-     * 
+     *
      */
     @RequestMapping(value = "/editMessage", method = RequestMethod.POST)
-    public @ResponseBody Integer submitTransactionChanges(@ModelAttribute(value = "transactionDetails") Transaction transactionDetails,HttpServletRequest request, HttpServletResponse response, Authentication authentication, HttpSession session) throws Exception {
-        
-       
+    public @ResponseBody
+    Integer submitTransactionChanges(@ModelAttribute(value = "transactionDetails") Transaction transactionDetails, HttpServletRequest request, HttpServletResponse response, Authentication authentication, HttpSession session) throws Exception {
+
         /* Update the transactionInRecords */
         List<transactionRecords> sourceOrgFields = transactionDetails.getsourceOrgFields();
         List<transactionRecords> sourceProviderFields = transactionDetails.getsourceProviderFields();
         List<transactionRecords> targetOrgFields = transactionDetails.gettargetOrgFields();
         List<transactionRecords> targetProviderFields = transactionDetails.gettargetProviderFields();
         List<transactionRecords> patientFields = transactionDetails.getpatientFields();
-        List<transactionRecords> detailFields = transactionDetails.getdetailFields(); 
-        
+        List<transactionRecords> detailFields = transactionDetails.getdetailFields();
+
         transactionInRecords records = transactionInManager.getTransactionRecords(transactionDetails.gettransactionId());
-        
+
         String colName;
-        for(transactionRecords field : sourceOrgFields) {
-            colName = new StringBuilder().append("f").append(field.getfieldNo()).toString();
-            try {
-                BeanUtils.setProperty(records, colName, field.getfieldValue());
-            } catch (IllegalAccessException ex) {
-                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (InvocationTargetException ex) {
-                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-        
-        for(transactionRecords field : sourceProviderFields) {
+        for (transactionRecords field : sourceOrgFields) {
             colName = new StringBuilder().append("f").append(field.getfieldNo()).toString();
             try {
                 BeanUtils.setProperty(records, colName, field.getfieldValue());
@@ -1843,7 +1822,7 @@ public class adminProcessingActivity {
             }
         }
 
-        for(transactionRecords field : targetOrgFields) {
+        for (transactionRecords field : sourceProviderFields) {
             colName = new StringBuilder().append("f").append(field.getfieldNo()).toString();
             try {
                 BeanUtils.setProperty(records, colName, field.getfieldValue());
@@ -1854,7 +1833,7 @@ public class adminProcessingActivity {
             }
         }
 
-        for(transactionRecords field : targetProviderFields) {
+        for (transactionRecords field : targetOrgFields) {
             colName = new StringBuilder().append("f").append(field.getfieldNo()).toString();
             try {
                 BeanUtils.setProperty(records, colName, field.getfieldValue());
@@ -1865,7 +1844,7 @@ public class adminProcessingActivity {
             }
         }
 
-        for(transactionRecords field : patientFields) {
+        for (transactionRecords field : targetProviderFields) {
             colName = new StringBuilder().append("f").append(field.getfieldNo()).toString();
             try {
                 BeanUtils.setProperty(records, colName, field.getfieldValue());
@@ -1876,7 +1855,7 @@ public class adminProcessingActivity {
             }
         }
 
-        for(transactionRecords field : detailFields) {
+        for (transactionRecords field : patientFields) {
             colName = new StringBuilder().append("f").append(field.getfieldNo()).toString();
             try {
                 BeanUtils.setProperty(records, colName, field.getfieldValue());
@@ -1886,7 +1865,18 @@ public class adminProcessingActivity {
                 Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        
+
+        for (transactionRecords field : detailFields) {
+            colName = new StringBuilder().append("f").append(field.getfieldNo()).toString();
+            try {
+                BeanUtils.setProperty(records, colName, field.getfieldValue());
+            } catch (IllegalAccessException ex) {
+                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (InvocationTargetException ex) {
+                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
         try {
             records.setId(records.getId());
             transactionInManager.submitTransactionInRecordsUpdates(records);
@@ -1900,13 +1890,19 @@ public class adminProcessingActivity {
             /* Update the transaction status to 10 (PR Released) */
             transactionInManager.updateTransactionStatus(0, transactionDetails.gettransactionId(), 14, 10);
 
-            /** update status so it will re-process **/
+            /**
+             * update status so it will re-process *
+             */
             transactionInManager.updateBatchStatus(transactionDetails.getbatchId(), 3, "startDateTime");
 
-            /** re-process batch **/
+            /**
+             * re-process batch *
+             */
             transactionInManager.processBatch(transactionDetails.getbatchId(), true, transactionDetails.gettransactionId());
 
-            /** add logging **/
+            /**
+             * add logging *
+             */
             UserActivity ua = new UserActivity();
             User userInfo = usermanager.getUserByUserName(authentication.getName());
             ua.setUserId(userInfo.getId());
@@ -1916,14 +1912,12 @@ public class adminProcessingActivity {
             ua.setTransactionInIds(String.valueOf(transactionDetails.gettransactionId()));
             ua.setBatchUploadId(transactionDetails.getbatchId());
             usermanager.insertUserLog(ua);
-        }
-       catch (Exception e) {
+        } catch (Exception e) {
             throw new Exception("Error saving the transaction: error", e);
         }
-        
-        
+
         return 1;
-        
+
     }
 
 }

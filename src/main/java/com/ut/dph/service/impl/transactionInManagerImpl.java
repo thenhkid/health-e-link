@@ -1556,16 +1556,10 @@ public class transactionInManagerImpl implements transactionInManager {
                 fileWithPath = fileWithPath.replace("bowlink///", "");
                 actualFileName = batch.getoriginalFileName();
             }
-            System.out.println(actualFileName);
+           
             //get delimiter, get fileWithPath etc
             if (actualFileName.endsWith(".txt") || actualFileName.endsWith(".csv")) {
-                System.out.println("IN");
-                System.out.println(batch.getId());
-                System.out.println(batch.getDelimChar());
-                 System.out.println(fileWithPath);
-                sysError = sysError + insertLoadData(batch.getId(), batch.getDelimChar(), fileWithPath, loadTableName, batch.isContainsHeaderRow());
-                System.out.println(sysError);
-
+              sysError = sysError + insertLoadData(batch.getId(), batch.getDelimChar(), fileWithPath, loadTableName, batch.isContainsHeaderRow());
             }
 
             //3. we update batchId, loadRecordId
