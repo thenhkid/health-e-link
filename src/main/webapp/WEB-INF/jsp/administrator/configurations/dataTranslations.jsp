@@ -74,7 +74,7 @@
                                             </c:when>
                                         </c:choose>
                                     </c:if>
-                                    <option value="${fields[fStatus.index].id}">${fields[fStatus.index].fieldLabel} </option>
+                                    <option value="${fields[fStatus.index].id}">${fields[fStatus.index].fieldLabel} - ${fields[fStatus.index].fieldNo} </option>
                                 </c:forEach>
                             </select>
                             <span id="fieldMsg" class="control-label"></span>
