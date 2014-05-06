@@ -839,4 +839,11 @@ CREATE TABLE `universalTranslator`.`message_misc` (
   `field10` VARCHAR(45) NULL,
   PRIMARY KEY (`id`));
 
+/** grace 05062014 12:24AM **/
+ALTER TABLE `universaltranslator`.`macro_names` 
+ADD COLUMN `populateFieldA` BIT NULL DEFAULT 0 AFTER `Con2_Question`;
 
+/** grace 05052014 9:53PM **/
+UPDATE `universaltranslator`.`macro_names` SET `populateFieldA`=1 WHERE `ID`='68';
+UPDATE `universaltranslator`.`macro_names` SET `populateFieldA`=1 WHERE `ID`='69';
+UPDATE `universaltranslator`.`macro_names` SET `populateFieldA`=1 WHERE `ID`='70';

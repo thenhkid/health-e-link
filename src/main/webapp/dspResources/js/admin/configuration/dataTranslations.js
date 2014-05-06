@@ -11,10 +11,10 @@ require(['./main'], function () {
         if ($('.alert').length > 0) {
             $('.alert').delay(2000).fadeOut(1000);
         }
-
+        
         //Function that will check the selected macro and determine if a module
         //should be launched to ask questions.
-        $('#macro').change(function() {
+        $('#macro').change(function() {        	
             var selMacro = $(this).val();
             var list = $('#macroLookUpList').val();
 
@@ -350,3 +350,11 @@ function removeVariableFromURL(url_string, variable_name) {
     return URL;
 }
 
+
+function populateFieldA() {
+	if ($( "#field option:selected").val() != '') {
+    	var idForOption = "o" + $( "#field option:selected").val();
+    	var fieldAVal = $("#" + idForOption).attr('rel');
+    	$('#fieldAQuestion').val(fieldAVal);
+	}
+}

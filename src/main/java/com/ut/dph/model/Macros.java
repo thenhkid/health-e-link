@@ -40,9 +40,10 @@ public class Macros {
     @Column(name = "DATE_DISPLAY", nullable = true)
     private String dateDisplay;
 
+    @NotEmpty
     @NoHtml
-    @Column(name = "FORMULA", nullable = true)
-    private String formula = null;
+    @Column(name = "FORMULA", nullable = false)
+    private String formula;
 
     @NoHtml
     @Column(name = "INVALID_WHEN", nullable = true)
@@ -63,8 +64,19 @@ public class Macros {
     @NoHtml
     @Column(name = "CON2_QUESTION", nullable = true)
     private String con2Question = null;
+    
+    @Column(name = "populateFieldA", nullable = true)
+    private boolean populateFieldA = true;
 
-    public int getId() {
+	public boolean isPopulateFieldA() {
+		return populateFieldA;
+	}
+
+	public void setPopulateFieldA(boolean populateFieldA) {
+		this.populateFieldA = populateFieldA;
+	}
+
+	public int getId() {
         return id;
     }
 

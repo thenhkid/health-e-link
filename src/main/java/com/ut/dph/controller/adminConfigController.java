@@ -1017,6 +1017,7 @@ public class adminConfigController {
         mav.addObject("fieldB_Question", macroDetails.getfieldBQuestion());
         mav.addObject("Con1_Question", macroDetails.getcon1Question());
         mav.addObject("Con2_Question", macroDetails.getcon2Question());
+        mav.addObject("populateFieldA", macroDetails.isPopulateFieldA());
         
         return mav;
     }

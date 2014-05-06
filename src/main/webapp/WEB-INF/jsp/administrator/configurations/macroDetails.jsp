@@ -20,6 +20,11 @@
                     <input type="text" id="fieldAQuestion" class="form-control" type="text" maxLength="255" />
                     <span id="fieldAMsg" class="control-label"></span>
                 </div>
+             <c:if test="${populateFieldA}">
+             	<script>
+             		populateFieldA();
+             	</script>
+             </c:if>
             </c:if>
             <c:if test="${not empty fieldB_Question}">
                 <div id="fieldBDiv" class="form-group ${status.error ? 'has-error' : '' }">

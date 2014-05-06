@@ -36,11 +36,22 @@
                         </spring:bind>
                         <spring:bind path="formula">
                             <div class="form-group ${status.error ? 'has-error' : '' }">
-                                <label class="control-label" for="formula">Stored Procedure Name</label>
+                                <label class="control-label" for="formula">Stored Procedure Name*</label>
                                 <form:input path="formula" id="formula" class="form-control" type="text" maxLength="255" />
                                 <form:errors path="formula" cssClass="control-label" element="label" />
                             </div>
-                        </spring:bind>                       
+                        </spring:bind> 
+                       <div class="form-group">
+                        <label for="status">Pre-Populate Field A with Source Field No.</label>
+                        <div>
+                            <label class="radio-inline">
+                                <form:radiobutton id="populateFieldA" path="populateFieldA" value="true" /> Yes
+                            </label>
+                            <label class="radio-inline">
+                                <form:radiobutton id="populateFieldA" path="populateFieldA" value="false" /> No
+                            </label>
+                        </div>         
+                        <br/>          
                         <spring:bind path="fieldAQuestion">
                             <div class="form-group ${status.error ? 'has-error' : '' }">
                                 <label class="control-label" for="fieldAQuestion">Field A Question</label>
