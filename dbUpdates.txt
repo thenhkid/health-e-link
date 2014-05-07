@@ -852,6 +852,11 @@ CHANGE COLUMN `field8` `field8` VARCHAR(255) NULL DEFAULT NULL ,
 CHANGE COLUMN `field9` `field9` VARCHAR(255) NULL DEFAULT NULL ,
 CHANGE COLUMN `field10` `field10` VARCHAR(255) NULL DEFAULT NULL ;
 
+/** grace 05052014 3:58PM **/
+ALTER TABLE `universaltranslator`.`macro_names` 
+ADD COLUMN `populateFieldA` BIT NULL AFTER `Con2_Question`;
+
+
 /** grace 05052014 9:53PM **/
 UPDATE `universaltranslator`.`macro_names` SET `populateFieldA`=1 WHERE `ID`='68';
 UPDATE `universaltranslator`.`macro_names` SET `populateFieldA`=1 WHERE `ID`='69';
