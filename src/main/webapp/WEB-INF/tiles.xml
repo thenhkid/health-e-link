@@ -561,6 +561,24 @@
         <put-attribute name="otherscript" value="/dspResources/js/front-end/ajaxupload.js" />
     </definition>
     
+    <definition name="/Health-e-Web/history" extends="base.definition.frontEnd">
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Health-e-Web&amp;page=history" />
+        <put-attribute name="body" value="/WEB-INF/jsp/Health-e-Web/historySearch.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/front-end/Health-e-Web/historySearch.js" />
+    </definition>
+    
+    <definition name="/Health-e-Web/historySummary" extends="base.definition.frontEnd">
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Health-e-Web&amp;page=history" />
+        <put-attribute name="body" value="/WEB-INF/jsp/Health-e-Web/historySummary.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/front-end/Health-e-Web/historySummary.js" />
+    </definition>
+    
+    <definition name="/Health-e-Web/historyDetails" extends="base.definition.frontEnd">
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Health-e-Web&amp;page=history" />
+        <put-attribute name="body" value="/WEB-INF/jsp/Health-e-Web/historyDetails.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/front-end/Health-e-Web/historyDetails.js" />
+    </definition>
+    
     <!-- Health-e-Connect (Exchange) Pages -->
     <!-- Upload -->
     <definition name="/Health-e-Connect/upload" extends="base.definition.frontEnd">

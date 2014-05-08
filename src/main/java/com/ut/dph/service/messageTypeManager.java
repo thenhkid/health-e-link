@@ -81,6 +81,6 @@ public interface messageTypeManager {
 	
 	List <validationType> getValidationTypes1 ();
 	
-
+        List<messageType> getAssociatedMessageTypes(int orgId);
 
 }

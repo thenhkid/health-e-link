@@ -99,7 +99,7 @@ public class messageTypeManagerImpl implements messageTypeManager {
         //Submit the new message type to the database
         lastId = (Integer) messageTypeDAO.createMessageType(messageType);
 
-		//Call the function that will load the content of the message type excel file
+        //Call the function that will load the content of the message type excel file
         //into the messageTypeFormFields table
         loadExcelContents(lastId, fileName);
 
@@ -112,7 +112,7 @@ public class messageTypeManagerImpl implements messageTypeManager {
         //Update the selected message type
         messageTypeDAO.updateMessageType(messageType);
     }
-    
+
     @Override
     @Transactional
     public void saveMessageTypeFields(messageTypeFormFields formField) {
@@ -124,7 +124,7 @@ public class messageTypeManagerImpl implements messageTypeManager {
     public List<messageType> getMessageTypes() {
         return messageTypeDAO.getMessageTypes();
     }
-    
+
     @Override
     @Transactional
     public List<messageType> getAvailableMessageTypes(int orgId) {
@@ -203,14 +203,14 @@ public class messageTypeManagerImpl implements messageTypeManager {
     public List getInformationTables() {
         return messageTypeDAO.getInformationTables();
     }
-    
+
     @SuppressWarnings("rawtypes")
     @Override
     @Transactional
     public List getAllTables() {
         return messageTypeDAO.getAllTables();
     }
-    
+
     @SuppressWarnings("rawtypes")
     @Override
     @Transactional
@@ -224,14 +224,14 @@ public class messageTypeManagerImpl implements messageTypeManager {
     public List getValidationTypes() {
         return messageTypeDAO.getValidationTypes();
     }
-    
+
     @SuppressWarnings("rawtypes")
     @Override
     @Transactional
     public String getValidationById(int id) {
         return messageTypeDAO.getValidationById(id);
     }
-    
+
     @SuppressWarnings("rawtypes")
     @Override
     @Transactional
@@ -326,7 +326,7 @@ public class messageTypeManagerImpl implements messageTypeManager {
         //Need to get the actual delimiter character
         String delimChar = (String) messageTypeDAO.getDelimiterChar(crosswalkDetails.getFileDelimiter());
 
-	//Check to make sure the file contains the selected delimiter
+        //Check to make sure the file contains the selected delimiter
         //Set the directory that holds the crosswalk files
         int delimCount = (Integer) dir.checkFileDelimiter(dir, fileName, delimChar);
 
@@ -334,7 +334,7 @@ public class messageTypeManagerImpl implements messageTypeManager {
             //Submit the new message type to the database
             lastId = (Integer) messageTypeDAO.createCrosswalk(crosswalkDetails);
 
-			//Call the function that will load the content of the crosswalk text file
+            //Call the function that will load the content of the crosswalk text file
             //into the rel_crosswalkData table
             loadCrosswalkContents(lastId, fileName, delimChar, cleanURL);
 
@@ -463,14 +463,14 @@ public class messageTypeManagerImpl implements messageTypeManager {
             //Set the initial value of the field number (0);
             Integer fieldNo = 0;
 
-			//Set the initial value of the display position for the field
+            //Set the initial value of the display position for the field
             //within each bucket (0);
             Integer dspPos = 0;
 
             //Set the directory that will hold the message type library excel files
             fileSystem dir = new fileSystem();
             dir.setMessageTypeDir("libraryFiles");
-            
+
             //Create Workbook instance holding reference to .xlsx file
             OPCPackage pkg = null;
             XSSFWorkbook workbook = null;
@@ -478,17 +478,17 @@ public class messageTypeManagerImpl implements messageTypeManager {
             FileInputStream file = new FileInputStream(new File(dir.getDir() + fileName));
 
             try {
-               pkg = OPCPackage.open(new File(dir.getDir() + fileName));
-               
-               workbook = new XSSFWorkbook(pkg);
-               
+                pkg = OPCPackage.open(new File(dir.getDir() + fileName));
+
+                workbook = new XSSFWorkbook(pkg);
+
             } catch (Exception e1) {
                 e1.printStackTrace();
             }
 
             //Get first/desired sheet from the workbook
             Sheet sheet = workbook.getSheetAt(0);
-            
+
             //Iterate through each rows one by one
             Iterator<Row> rowIterator = sheet.iterator();
 
@@ -558,12 +558,17 @@ public class messageTypeManagerImpl implements messageTypeManager {
 
     }
 
-    
     // this does the same thing as getValidationTypes except putting result in an object
     //TODO need to combine and test and replace getValidationTypes
     @Override
-	public List<validationType> getValidationTypes1() {
-		return messageTypeDAO.getValidationTypes1();
-	}
+    public List<validationType> getValidationTypes1() {
+        return messageTypeDAO.getValidationTypes1();
+    }
+    
+    @Override
+    @Transactional
+    public List<messageType> getAssociatedMessageTypes(int orgId) {
+        return messageTypeDAO.getAssociatedMessageTypes(orgId);
+    }
 
 }

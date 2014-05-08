@@ -22,6 +22,7 @@ import com.ut.dph.model.configurationTransport;
 import com.ut.dph.model.custom.searchParameters;
 import com.ut.dph.model.fieldSelectOptions;
 import com.ut.dph.model.lutables.lu_ProcessStatus;
+import com.ut.dph.model.messageType;
 import com.ut.dph.model.providerAddress;
 import com.ut.dph.model.providerIdNum;
 import com.ut.dph.model.transactionAttachment;
@@ -2823,5 +2824,174 @@ public class HealtheWebController {
         return fields;
         
     } 
+    
+    
+    /**
+     * The '/history' GET request will serve up the Health-e-Web (ERG) page that will list allow the 
+     * logged in user to search their referral and feedback history.
+     *
+     * @param request
+     * @param response
+     * * @param searchTerm The term to search pending messages
+     * @return	the health-e-web inbox message list view
+     * @throws Exception
+     */
+    @RequestMapping(value = "/history", method = RequestMethod.GET)
+    public ModelAndView viewHistory(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
+       
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/Health-e-Web/history");
+        
+        Date fromDate = getMonthDate("START");
+        Date toDate = getMonthDate("END");
+        
+        /* Need to get all the message types set up for the user */
+        User userInfo = (User)session.getAttribute("userDetails");
+        
+        /* Get associated organizations */
+        List<Organization> associatedOrgs = organizationmanager.getAssociatedOrgs(userInfo.getOrgId());
+        
+        mav.addObject("associatedOrgs", associatedOrgs);
+        
+        /* Get associated message types */
+        List<messageType> assocMessageTypes = messagetypemanager.getAssociatedMessageTypes(userInfo.getOrgId());
+        
+        mav.addObject("assocMessageTypes", assocMessageTypes);
+        
+        
+        //we log here 
+        try {
+            //log user activity
+            UserActivity ua = new UserActivity();
+            ua.setUserId(userInfo.getId());
+            ua.setFeatureId(featureId);
+            ua.setAccessMethod("GET");
+            ua.setPageAccess("/history"); 
+            ua.setActivity("Viewed History Tab");
+            ua.setActivityDesc("History - " + fromDate + " - " + toDate );
+            usermanager.insertUserLog(ua);
+        } catch (Exception ex) {
+            System.err.println("viewHistory = error logging user" + ex.getCause());
+            ex.printStackTrace();
+        }
+        
+        mav.addObject("pendingTotal", pendingTotal);
+        mav.addObject("inboxTotal", inboxTotal); 
+        mav.addObject("fromDate", fromDate);
+        mav.addObject("toDate", toDate);
+        
+        return mav;
+  
+    }
+    
+    /**
+     * The '/history' POST request will serve up the Health-e-Web (ERG) page that will list allow the 
+     * logged in user to search their referral and feedback history.
+     *
+     * @param request
+     * @param response
+     * * @param searchTerm The term to search pending messages
+     * @return	the health-e-web inbox message list view
+     * @throws Exception
+     */
+    @RequestMapping(value = "/history", method = RequestMethod.POST)
+    public ModelAndView historyResults(HttpSession session, @RequestParam Date fromDate, @RequestParam Date toDate, @RequestParam Integer type, @RequestParam Integer sentTo,
+    @RequestParam Integer messageType, @RequestParam Integer receivedFrom, @RequestParam Integer status, @RequestParam Integer systemStatus, @RequestParam Integer reportType,
+    @RequestParam String batchName, @RequestParam String utBatchName, @RequestParam String lastName, @RequestParam String patientId, @RequestParam String firstName, @RequestParam String providerId) throws Exception {
+       
+        ModelAndView mav = new ModelAndView();
+        
+        if(reportType == 1) {
+            mav.setViewName("/Health-e-Web/historySummary");
+        }
+        else {
+            mav.setViewName("/Health-e-Web/historyDetails");
+        }
+        
+        /* Need to get all the message types set up for the user */
+        User userInfo = (User)session.getAttribute("userDetails");
+        
+        /* Add search Paramaters */
+        mav.addObject("fromDate", fromDate);
+        mav.addObject("toDate", toDate);
+        
+        if(type == 0) {
+           mav.addObject("type", "Both (Referrals & Reports)"); 
+        }
+        else if(type == 1) {
+           mav.addObject("type", "Referrals Only");
+        }
+        else {
+           mav.addObject("type", "Reports Only"); 
+        }
+        
+        if(sentTo == 0) {
+           mav.addObject("sentTo", "All Affiliated Organizations"); 
+        }
+        else {
+           Organization orgDetails = organizationmanager.getOrganizationById(sentTo);
+           mav.addObject("sentTo", orgDetails.getOrgName());
+        }
+        
+        if(messageType == 0) {
+           mav.addObject("messageType", "All Message Types"); 
+        }
+        else {
+           messageType msgTypeDetails = messagetypemanager.getMessageTypeById(messageType);
+           mav.addObject("messageType", msgTypeDetails.getName());
+        }
+        
+        if(receivedFrom == 0) {
+           mav.addObject("receivedFrom", "All Affiliated Organizations"); 
+        }
+        else {
+           Organization orgDetails = organizationmanager.getOrganizationById(receivedFrom);
+           mav.addObject("receivedFrom", orgDetails.getOrgName());
+        }
+        
+        if(status == 0) {
+           mav.addObject("status", "Both (Opened & Closed)"); 
+        }
+        else if(type == 1) {
+           mav.addObject("status", "Opened Only");
+        }
+        else {
+           mav.addObject("status", "Closed Only"); 
+        }
+        
+        mav.addObject("systemStatus", "All System Statuses");
+        
+        /* Add additional search options */
+        mav.addObject("batchName", batchName);
+        mav.addObject("utBatchName", utBatchName);
+        mav.addObject("lastName", lastName);
+        mav.addObject("patientId", patientId);
+        mav.addObject("firstName", firstName);
+        mav.addObject("providerId", providerId);
+        
+        
+        
+        //we log here 
+        try {
+            //log user activity
+            UserActivity ua = new UserActivity();
+            ua.setUserId(userInfo.getId());
+            ua.setFeatureId(featureId);
+            ua.setAccessMethod("POST");
+            ua.setPageAccess("/history"); 
+            ua.setActivity("History Search");
+            ua.setActivityDesc("History Search - " + fromDate + " - " + toDate );
+            usermanager.insertUserLog(ua);
+        } catch (Exception ex) {
+            System.err.println("viewHistory = error logging user" + ex.getCause());
+            ex.printStackTrace();
+        }
+        
+        mav.addObject("pendingTotal", pendingTotal);
+        mav.addObject("inboxTotal", inboxTotal); 
+        
+        return mav;
+        
+    }
     
 }

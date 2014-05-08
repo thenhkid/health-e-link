@@ -140,6 +140,25 @@ public class messageTypeDAOImpl implements messageTypeDAO {
 
         return query.list();
     }
+    
+    /**
+     * The 'getAssociatedMessageTypes' function will return the list of message types in the system that have been set up for the passed in orgId.
+     *
+     * @Table	messageTypes
+     *
+     * @Param	orgId	This will hold the id of the selected organization
+     *
+     * @Return	This function will return a list of message type objects
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<messageType> getAssociatedMessageTypes(int orgId) {
+
+        Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT id, name FROM messageTypes where status = 1 and id in (select messageTypeId from configurations where orgId = :orgId)");
+        query.setParameter("orgId", orgId);
+
+        return query.list();
+    }
 
     /**
      * The 'getLatestMessageTypes' function will return the list of the latest message types in the system.
