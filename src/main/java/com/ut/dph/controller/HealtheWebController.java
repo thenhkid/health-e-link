@@ -2977,6 +2977,8 @@ public class HealtheWebController {
         
         for(configuration config : configs) {
             
+            
+            
             if(messageType == 0 || (messageType > 0 && messageType == config.getMessageTypeId())) {
             
                 /* Source config type */
