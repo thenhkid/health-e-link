@@ -21,6 +21,7 @@ import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.configurationTransport;
 import com.ut.dph.model.custom.searchParameters;
 import com.ut.dph.model.fieldSelectOptions;
+import com.ut.dph.model.historyResults;
 import com.ut.dph.model.lutables.lu_ProcessStatus;
 import com.ut.dph.model.messageType;
 import com.ut.dph.model.providerAddress;
@@ -2969,7 +2970,72 @@ public class HealtheWebController {
         mav.addObject("firstName", firstName);
         mav.addObject("providerId", providerId);
         
+        /* Get all connections for the logged in organization */
+        List<configuration> configs = configurationManager.getActiveConfigurationsByOrgId(userInfo.getOrgId());
         
+        List<historyResults> results = new ArrayList<historyResults>();
+        
+        for(configuration config : configs) {
+            
+            if(messageType == 0 || (messageType > 0 && messageType == config.getMessageTypeId())) {
+            
+                /* Source config type */
+                if(config.getType() == 1) {
+
+                    List<configurationConnection> connections = configurationManager.getConnectionsByConfiguration(config.getId());
+
+                    if(connections.size() > 0) {
+
+                        for(configurationConnection connection : connections) {
+
+                            if(sentTo == 0 || (sentTo > 0 && sentTo == configurationManager.getConfigurationById(connection.gettargetConfigId()).getorgId())) {
+                                String orgName = organizationmanager.getOrganizationById(configurationManager.getConfigurationById(connection.gettargetConfigId()).getorgId()).getOrgName();
+                                String messageTypeName = messagetypemanager.getMessageTypeById(config.getMessageTypeId()).getName();
+                                
+                                historyResults result = new historyResults();
+                                result.setorgName(orgName);
+                                result.setmessageType(messageTypeName);
+
+                                results.add(result);
+                            }
+
+                            
+
+                        }
+
+                    }
+
+                }
+                /* Target config Type */
+                else if(config.getType() == 2) {
+
+                    List<configurationConnection> connections = configurationManager.getConnectionsByTargetConfiguration(config.getId());
+
+                    if(connections.size() > 0) {
+
+                        for(configurationConnection connection : connections) {
+                            
+                            if(receivedFrom == 0 || (receivedFrom > 0 && sentTo == configurationManager.getConfigurationById(connection.getsourceConfigId()).getorgId())) {
+                                String orgName = organizationmanager.getOrganizationById(configurationManager.getConfigurationById(connection.getsourceConfigId()).getorgId()).getOrgName();
+                                String messageTypeName = messagetypemanager.getMessageTypeById(config.getMessageTypeId()).getName();
+                                
+                                historyResults result = new historyResults();
+                                result.setorgName(orgName);
+                                result.setmessageType(messageTypeName);
+
+                                results.add(result);
+                            }
+
+                        }
+
+
+                    }
+
+                }
+            }
+        }
+        
+        mav.addObject("historyResults", results);
         
         //we log here 
         try {

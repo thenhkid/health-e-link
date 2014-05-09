@@ -26,10 +26,10 @@
             </div>
         </div> 
     </div>
-                
+
     <div class="row"> 
         <div class="col-md-12 page-content">
-               
+
             <div class="col-md-12 form-section">
                 <section class="panel panel-default panel-collapse">
                     <div class="panel-heading">
@@ -151,16 +151,35 @@
                 </section>            
 
 
-                <section class="panel panel-default panel-collapse">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Summary View</h3>
-                    </div>
-                    <div class="panel-body">
-
-                    </div>                   
-                </section>
+                <div class="form-container scrollable">
+                    <table class="table table-striped table-hover table-default" <c:if test="${not empty historyResults}">id="dataTable"</c:if>>
+                            <thead>
+                                <tr>
+                                    <th scope="col">Affiliated Organization</th>
+                                    <th scope="col">Message Type</th>
+                                    <th scope="col"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            <c:choose>
+                                <c:when test="${not empty historyResults}">
+                                    <c:forEach var="result" items="${historyResults}">
+                                        <tr>
+                                            <td scope="row">${result.orgName}</td>
+                                            <td>
+                                                ${result.messageType}
+                                            </td>
+                                            <td>
+                                                ${result.msg}
+                                            </td>
+                                        </tr>
+                                    </c:forEach>
+                                </c:when>
+                            </c:choose>                  
+                        </tbody>
+                    </table>
+                </div> 
             </div>
-
         </div>
     </div>
 </div>
