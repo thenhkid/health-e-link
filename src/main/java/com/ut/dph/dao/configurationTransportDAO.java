@@ -4,6 +4,7 @@ import com.ut.dph.model.configurationFTPFields;
 
 import java.util.List;
 
+import com.ut.dph.model.User;
 import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.configurationMessageSpecs;
 import com.ut.dph.model.configurationTransport;
@@ -62,4 +63,9 @@ public interface configurationTransportDAO {
     
     List <configurationMessageSpecs> getConfigurationMessageSpecsForOrgTransport(Integer orgId, Integer transportMethodId, boolean getZeroMessageTypeCol);
    
+    List <configurationTransport> getTransportsByMethodId (boolean notInJob, Integer status, Integer transportMethodId);
+    
+    List <User> getUserIdFromConnForTransport (Integer configurationTransportId);
+    
+    List<User> getOrgUserIdForTransport (Integer configurationTransportId);
 }

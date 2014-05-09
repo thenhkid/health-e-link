@@ -9,6 +9,7 @@ import com.ut.dph.dao.transactionInDAO;
 import com.ut.dph.model.CrosswalkData;
 import com.ut.dph.model.Macros;
 import com.ut.dph.model.Organization;
+import com.ut.dph.model.SFTPJobRunLog;
 import com.ut.dph.model.TransactionInError;
 import com.ut.dph.model.User;
 import com.ut.dph.model.UserActivity;
@@ -4114,5 +4115,30 @@ public class transactionInDAOImpl implements transactionInDAO {
         	return null;
         }
     }
-	
+
+	@Override
+	@Transactional
+	public Integer insertSFTPRun(SFTPJobRunLog sftpJob) {
+		try {
+			 Integer lastId = (Integer) sessionFactory.getCurrentSession().save(sftpJob);
+			return lastId;
+		} catch (Exception ex) {
+			System.err.println("insertSFTPRun " + ex.getCause());
+        	ex.printStackTrace();
+			return null;
+		}
+	}
+
+	@Override
+	@Transactional
+	public void updateSFTPRun(SFTPJobRunLog sftpJob) {
+		try {
+			sessionFactory.getCurrentSession().update(sftpJob);	
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			System.err.println("updateSFTPRun " + ex.getCause());
+		}
+	}
+
+		
 }

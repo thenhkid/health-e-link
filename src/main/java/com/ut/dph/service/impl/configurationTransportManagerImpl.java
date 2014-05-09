@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ut.dph.model.User;
 import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.configurationMessageSpecs;
 import com.ut.dph.model.configurationTransport;
@@ -220,5 +221,20 @@ public class configurationTransportManagerImpl implements configurationTransport
     public List<configurationMessageSpecs> getConfigurationMessageSpecsForOrgTransport(Integer orgId, Integer transportMethodId, boolean getZeroMessageTypeCol) {
         return configurationTransportDAO.getConfigurationMessageSpecsForOrgTransport(orgId, transportMethodId, getZeroMessageTypeCol);
     }
+    
+    @Override
+    public List <configurationTransport> getTransportsByMethodId (boolean notInJob, Integer status, Integer transportMethodId) {
+        return configurationTransportDAO.getTransportsByMethodId(notInJob, status, transportMethodId);
+    }
+
+	@Override
+	public List<User> getUserIdFromConnForTransport(Integer configurationTransportId) {
+		return configurationTransportDAO.getUserIdFromConnForTransport(configurationTransportId);
+	}
+
+	@Override
+	public List<User> getOrgUserIdForTransport(Integer configurationTransportId) {
+		return configurationTransportDAO.getOrgUserIdForTransport(configurationTransportId);
+	}
   
 }

@@ -861,3 +861,21 @@ ADD COLUMN `populateFieldA` BIT NULL AFTER `Con2_Question`;
 UPDATE `universaltranslator`.`macro_names` SET `populateFieldA`=1 WHERE `ID`='68';
 UPDATE `universaltranslator`.`macro_names` SET `populateFieldA`=1 WHERE `ID`='69';
 UPDATE `universaltranslator`.`macro_names` SET `populateFieldA`=1 WHERE `ID`='70';
+
+/** grace 05092014 01:57 AM **/
+use universaltranslator;
+
+CREATE TABLE `SFTPJobRunLog` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `transportId` int(11) NOT NULL,
+  `statusId` int(11) NOT NULL COMMENT '1 for started\n2 for done',
+  `startDateTime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `endDateTime` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+INSERT INTO `universaltranslator`.`lu_ErrorCodes` (`displayText`, `description`) VALUES ('Invalid File Size', 'File size is invalid');
+INSERT INTO `universaltranslator`.`lu_ErrorCodes` (`displayText`, `description`) VALUES ('Invalid File Extension', 'Invalid File Extension');
+
+

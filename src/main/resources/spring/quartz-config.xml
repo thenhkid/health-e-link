@@ -78,5 +78,23 @@
         </trigger>
     </schedule>
     
+    <schedule>
+        <job>
+            <name>MoveSFTPFiles</name>
+            <group>processGroup</group>
+            <description>This process will run every [N] mins starting at [N] mins of the hour to check if any SFTP files will need to be moved and logged</description>
+            <job-class>com.ut.dph.jobs.MoveSFTPFiles</job-class>
+        </job>
+ 
+        <trigger>
+            <cron>
+                <name>moveSFTPTrigger</name>
+                <job-name>MoveSFTPFiles</job-name>
+                <job-group>processGroup</job-group>
+                <cron-expression>0 0/1 * * * ?</cron-expression>
+            </cron>
+        </trigger>
+    </schedule>
+    
     
 </job-scheduling-data>

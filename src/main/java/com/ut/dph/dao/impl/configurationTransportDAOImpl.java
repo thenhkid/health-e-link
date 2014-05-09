@@ -1,5 +1,6 @@
 package com.ut.dph.dao.impl;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.hibernate.Criteria;
@@ -12,6 +13,7 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
 
 import com.ut.dph.dao.configurationTransportDAO;
+import com.ut.dph.model.User;
 import com.ut.dph.model.configurationFTPFields;
 import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.configurationMessageSpecs;
@@ -517,5 +519,94 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
             return null;
         }
     }
+
+    /** param status - 1 - get active, 2 get inactive, 3 get all **/
+    @Override
+    @Transactional
+    @SuppressWarnings("unchecked")
+	public List<configurationTransport> getTransportsByMethodId(boolean notInJob, Integer status, 
+			Integer transportMethodId) {
+		
+		try {
+			 	String sql = ("select  * from configurationtransportdetails where transportmethodid = :transportMethodId "
+	            		+ " and configId in (select id from configurations where status in (:statusIds))");
+	            if (notInJob) {
+	            	sql = sql + (" and id not in (select transportId from SFTPJobRunLog where statusId = 1) ");
+	            }
+			 	
+	            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
+	                    Transformers.aliasToBean(configurationTransport.class));
+	          
+	            if (status == 3) {
+	            	query.setParameterList("statusIds",Arrays.asList(0,1));	            	
+	            } else if (status == 2) {
+	            	query.setParameterList("statusIds",Arrays.asList(0));
+	            } else {
+	            	query.setParameterList("statusIds",Arrays.asList(1));
+	            }
+	            
+	            query.setParameter("transportMethodId", transportMethodId);
+
+	            List<configurationTransport> configurationTransport = query.list();
+
+	            return configurationTransport;
+
+	        } catch (Exception ex) {
+	            System.err.println("getTransportsByMethodId  " + ex.getCause());
+	            ex.printStackTrace();
+	            return null;
+	        }
+	}
+
+	@Override
+	@Transactional
+    @SuppressWarnings("unchecked")
+	public List <User> getUserIdFromConnForTransport(Integer configurationTransportId) {
+		try {
+		 	String sql = ("select * from users where id in (select userId from configurationconnectionsenders where connectionId in "
+		 			+ " (select id from configurationconnections "
+		 			+ " where sourceConfigId in (select configId from configurationtransportdetails "
+		 			+ " where id = :configurationTransportId))) order by userType;");
+            
+		 	
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
+                    Transformers.aliasToBean(User.class));;
+            query.setParameter("configurationTransportId", configurationTransportId);
+
+            List<User> users = query.list();
+
+            return users;
+
+        } catch (Exception ex) {
+            System.err.println("getUserIdFromConnForTransport  " + ex.getCause());
+            ex.printStackTrace();
+            return null;
+        }
+	}
+
+	@Override
+	@Transactional
+    @SuppressWarnings("unchecked")
+	public List<User> getOrgUserIdForTransport(Integer configurationTransportId) {
+		try {
+		 	String sql = ("select * from users where orgId in (select orgId from configurations where id "
+		 			+ " in (select configId from configurationtransportdetails where id = :configurationTransportId)) "
+		 			+ " and status = 1 order by userType;");
+            
+		 	
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
+                    Transformers.aliasToBean(User.class));;
+            query.setParameter("configurationTransportId", configurationTransportId);
+
+            List<User> users = query.list();
+
+            return users;
+
+        } catch (Exception ex) {
+            System.err.println("getOrgUserIdForTransport  " + ex.getCause());
+            ex.printStackTrace();
+            return null;
+        }
+	}
     
 }

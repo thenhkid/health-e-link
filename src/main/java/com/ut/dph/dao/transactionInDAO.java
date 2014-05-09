@@ -8,6 +8,7 @@ package com.ut.dph.dao;
 
 import com.ut.dph.model.CrosswalkData;
 import com.ut.dph.model.Macros;
+import com.ut.dph.model.SFTPJobRunLog;
 import com.ut.dph.model.TransactionInError;
 import com.ut.dph.model.User;
 import com.ut.dph.model.UserActivity;
@@ -290,4 +291,7 @@ public interface transactionInDAO {
     
     List <transactionRecords> getFieldColAndValueByTransactionId (configurationFormFields cff, Integer transactionId);
    
+    Integer insertSFTPRun(SFTPJobRunLog sftpJob);
+    
+    void updateSFTPRun(SFTPJobRunLog sftpJob) throws Exception;
 }

@@ -6,6 +6,7 @@
 
 package com.ut.dph.service;
 
+import com.ut.dph.model.SFTPJobRunLog;
 import com.ut.dph.model.UserActivity;
 import com.ut.dph.model.CrosswalkData;
 import com.ut.dph.model.Macros;
@@ -350,5 +351,12 @@ public interface transactionInManager {
     List<UserActivity> getBatchActivities(batchUploads batchInfo, boolean forUsers, boolean foroutboundProcessing);
  
     List <transactionRecords> getFieldColAndValueByTransactionId (configurationFormFields cff, Integer transactionId);
+
+    Integer moveSFTPFilesByTrasport (configurationTransport transportDetails, User userForTransport);
     
+    Integer moveSFTPFiles ();
+    
+    Integer insertSFTPRun(SFTPJobRunLog sftpJob);
+    
+    void updateSFTPRun(SFTPJobRunLog sftpJob) throws Exception;
 }
