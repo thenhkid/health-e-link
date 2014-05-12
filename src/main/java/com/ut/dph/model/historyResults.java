@@ -12,10 +12,19 @@ package com.ut.dph.model;
  */
 public class historyResults {
     
+    private int orgId;
     private String orgName = null;
+    private int messageTypeId;
     private String messageType = null;
     private String msg = null;
     
+    public int getorgId() {
+        return orgId;
+    }
+    
+    public void setorgId(int orgId) {
+        this.orgId = orgId;
+    }
     
     public String getorgName() {
         return orgName;
@@ -23,6 +32,14 @@ public class historyResults {
     
     public void setorgName(String orgName) {
         this.orgName = orgName;
+    }
+    
+    public int getmessageTypeId() {
+        return messageTypeId;
+    }
+    
+    public void setmessageTypeId(int messageTypeId) {
+        this.messageTypeId = messageTypeId;
     }
     
     public String getmessageType() {

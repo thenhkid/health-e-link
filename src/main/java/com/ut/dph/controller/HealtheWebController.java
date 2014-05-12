@@ -2901,12 +2901,13 @@ public class HealtheWebController {
     @RequestParam String batchName, @RequestParam String utBatchName, @RequestParam String lastName, @RequestParam String patientId, @RequestParam String firstName, @RequestParam String providerId) throws Exception {
        
         ModelAndView mav = new ModelAndView();
+        mav.setViewName("/Health-e-Web/historySummary");
         
         if(reportType == 1) {
-            mav.setViewName("/Health-e-Web/historySummary");
+            mav.addObject("showDetails", false);
         }
         else {
-            mav.setViewName("/Health-e-Web/historyDetails");
+            mav.addObject("showDetails", true);
         }
         
         /* Need to get all the message types set up for the user */
@@ -3000,33 +3001,44 @@ public class HealtheWebController {
                                     String messageTypeName = messagetypemanager.getMessageTypeById(config.getMessageTypeId()).getName();
 
                                     historyResults result = new historyResults();
+                                    result.setorgId(configurationManager.getConfigurationById(connection.gettargetConfigId()).getorgId());
                                     result.setorgName(orgName);
+                                    result.setmessageTypeId(config.getMessageTypeId());
                                     result.setmessageType(messageTypeName);
                                     
                                     List<batchUploads> batches = transactionInManager.getsentBatchesHistory(userInfo.getId(), config.getorgId(), configurationManager.getConfigurationById(connection.gettargetConfigId()).getorgId(), config.getMessageTypeId(), fromDate, toDate);
 
-                                    for(batchUploads batch : batches) {
-                                        
-                                        /* get transactions */
-                                        List<transactionIn> transactions = transactionInManager.getBatchTransactions(batch.getId(), 0);
-                                        
-                                        for(transactionIn transaction : transactions) {
-                                            
-                                            if(status == 0 || (status == transaction.getmessageStatus())) {
-                                                if(config.getsourceType() == 1) {
-                                            
-                                                    result.setmsg("Total Referrals Sent: "+ batches.size());
+                                    if(batches.size() > 0) {
+                                        for(batchUploads batch : batches) {
 
-                                                    totalReferralsRec+=1;
+                                            /* get transactions */
+                                            List<transactionIn> transactions = transactionInManager.getBatchTransactions(batch.getId(), 0);
+
+                                            for(transactionIn transaction : transactions) {
+
+                                                if(status == 0 || (status == transaction.getmessageStatus())) {
+                                                    if(config.getsourceType() == 1) {
+
+                                                        result.setmsg("Total Referrals Sent: "+ batches.size());
+
+                                                        totalReferralsSent+=1;
+                                                    }
+                                                    else {
+                                                        result.setmsg("Total Feedback Reports Sent: "+ batches.size());
+                                                        totalFBSent+=1;
+                                                    }
                                                 }
-                                                else {
-                                                    result.setmsg("Total Feedback Reports Sent: "+ batches.size());
-                                                    totalFBRec+=1;
-                                                }
+
                                             }
-                                            
                                         }
-                                        
+                                    }
+                                    else {
+                                        if(config.getsourceType() == 1) {
+                                            result.setmsg("Total Referrals Sent: 0");
+                                        }
+                                        else {
+                                            result.setmsg("Total Feedback Reports Sent: 0");
+                                        }
                                     }
                                     
                                     results.add(result);
@@ -3052,7 +3064,9 @@ public class HealtheWebController {
                                     String messageTypeName = messagetypemanager.getMessageTypeById(config.getMessageTypeId()).getName();
 
                                     historyResults result = new historyResults();
+                                    result.setorgId(configurationManager.getConfigurationById(connection.getsourceConfigId()).getorgId());
                                     result.setorgName(orgName);
+                                    result.setmessageTypeId(config.getMessageTypeId());
                                     result.setmessageType(messageTypeName);
 
                                     /* Find Received Referrals / Feedback Reports */

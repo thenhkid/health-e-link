@@ -14,7 +14,7 @@
             <ol class="breadcrumb">
                 <li><a href="<c:url value='/profile'/>">My Account</a></li>
                 <li class="active"><a href="<c:url value='/Health-e-Web/history'/>">History</a></li>
-                <li class="active">History Summary</li>
+                <li class="active">History Search Results</li>
             </ol>
         </div>
     </div>
@@ -158,6 +158,7 @@
                                     <th scope="col">Affiliated Organization</th>
                                     <th scope="col">Message Type</th>
                                     <th scope="col"></th>
+                                    <c:if test="${showDetails == true}"><th scope="col"></th></c:if>
                                 </tr>
                             </thead>
                             <tbody>
@@ -172,6 +173,11 @@
                                             <td>
                                                 ${result.msg}
                                             </td>
+                                            <c:if test="${showDetails == true}">
+                                                <td>
+                                                    <a href="javascript:void(0);" class="viewDetals" rel="${result.orgId}" rel2="${result.messageTypeId}">View Details</a>
+                                                </td>
+                                            </c:if>
                                         </tr>
                                     </c:forEach>
                                 </c:when>
