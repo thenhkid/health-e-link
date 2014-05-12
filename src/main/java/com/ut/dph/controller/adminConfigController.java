@@ -466,15 +466,18 @@ public class adminConfigController {
         List<configurationFTPFields> ftpFields = configurationTransportManager.getTransportFTPDetails(transportDetails.getId());
         
         if(ftpFields.isEmpty()) {
+        	
+        	
             List<configurationFTPFields> emptyFTPFields = new ArrayList<configurationFTPFields>();
             configurationFTPFields pushFTPFields = new configurationFTPFields();
             pushFTPFields.setmethod(1);
-            
-            emptyFTPFields.add(pushFTPFields);
+            pushFTPFields.setdirectory("/UT/"+orgDetails.getcleanURL()+"/input files/");
             
             configurationFTPFields getFTPFields = new configurationFTPFields();
             getFTPFields.setmethod(2);
+            getFTPFields.setdirectory("/UT/"+orgDetails.getcleanURL()+"/output files/"); 
             
+            emptyFTPFields.add(pushFTPFields);
             emptyFTPFields.add(getFTPFields);
             
             transportDetails.setFTPFields(emptyFTPFields);
