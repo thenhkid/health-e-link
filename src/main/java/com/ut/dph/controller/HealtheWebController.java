@@ -2953,7 +2953,7 @@ public class HealtheWebController {
         if(status == 0) {
            mav.addObject("status", "Both (Opened & Closed)"); 
         }
-        else if(type == 1) {
+        else if(status == 1) {
            mav.addObject("status", "Opened Only");
         }
         else {
@@ -3007,15 +3007,26 @@ public class HealtheWebController {
 
                                     for(batchUploads batch : batches) {
                                         
-                                        if(config.getsourceType() == 1) {
-                                            result.setmsg("Total Referrals Sent: "+ batches.size());
+                                        /* get transactions */
+                                        List<transactionIn> transactions = transactionInManager.getBatchTransactions(batch.getId(), 0);
+                                        
+                                        for(transactionIn transaction : transactions) {
+                                            
+                                            if(status == 0 || (status == transaction.getmessageStatus())) {
+                                                if(config.getsourceType() == 1) {
+                                            
+                                                    result.setmsg("Total Referrals Sent: "+ batches.size());
 
-                                            totalReferralsRec+=1;
+                                                    totalReferralsRec+=1;
+                                                }
+                                                else {
+                                                    result.setmsg("Total Feedback Reports Sent: "+ batches.size());
+                                                    totalFBRec+=1;
+                                                }
+                                            }
+                                            
                                         }
-                                        else {
-                                            result.setmsg("Total Feedback Reports Sent: "+ batches.size());
-                                            totalFBRec+=1;
-                                        }
+                                        
                                     }
                                     
                                     results.add(result);
@@ -3034,8 +3045,9 @@ public class HealtheWebController {
                         if(connections.size() > 0) {
 
                             for(configurationConnection connection : connections) {
+                                int total = 0;
 
-                                if(receivedFrom == 0 || (receivedFrom > 0 && sentTo == configurationManager.getConfigurationById(connection.getsourceConfigId()).getorgId())) {
+                                if(receivedFrom == 0 || (receivedFrom > 0 && receivedFrom == configurationManager.getConfigurationById(connection.getsourceConfigId()).getorgId())) {
                                     String orgName = organizationmanager.getOrganizationById(configurationManager.getConfigurationById(connection.getsourceConfigId()).getorgId()).getOrgName();
                                     String messageTypeName = messagetypemanager.getMessageTypeById(config.getMessageTypeId()).getName();
 
@@ -3044,16 +3056,27 @@ public class HealtheWebController {
                                     result.setmessageType(messageTypeName);
 
                                     /* Find Received Referrals / Feedback Reports */
-                                    int totalReceived = transactionOutManager.getInboxBatchesHistory(userInfo.getId(), config.getorgId(), configurationManager.getConfigurationById(connection.getsourceConfigId()).getorgId(), config.getMessageTypeId(), fromDate, toDate).size();
+                                    List<batchDownloads> batches = transactionOutManager.getInboxBatchesHistory(userInfo.getId(), config.getorgId(), configurationManager.getConfigurationById(connection.getsourceConfigId()).getorgId(), config.getMessageTypeId(), fromDate, toDate);
 
-                                    if(config.getsourceType() == 1) {
-                                        result.setmsg("Total Referrals Received: "+ totalReceived);
-                                        
-                                        totalReferralsRec+=totalReceived;
+                                    
+                                    if(!"".equals(batchName) || !"".equals(firstName) || !"".equals(lastName) || !"".equals(utBatchName) || !"".equals(patientId) || !"".equals(providerId)) {
+                                        String searchTerm = new StringBuilder().append(batchName).append("|").append(firstName).append("|").append(lastName).append("|").append(utBatchName).append("|").append(patientId).append("|").append(providerId).toString();
+                                        List<Integer> totalMatches = transactionOutManager.findInboxBatches(batches, searchTerm);
+                                        total = totalMatches.size();
                                     }
                                     else {
-                                        result.setmsg("Total Feedback Reports Received: "+ totalReceived);
-                                        totalFBRec+=totalReceived;
+                                        total = batches.size();
+                                    }
+                                    
+                                    
+                                    if(config.getsourceType() == 1) {
+                                        result.setmsg("Total Referrals Received: "+ total);
+                                        
+                                        totalReferralsRec+=total;
+                                    }
+                                    else {
+                                        result.setmsg("Total Feedback Reports Received: "+ total);
+                                        totalFBRec+=total;
                                     }
 
                                     results.add(result);

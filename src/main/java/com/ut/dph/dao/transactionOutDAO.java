@@ -121,4 +121,6 @@ public interface transactionOutDAO {
     
     List<batchDownloads> getInboxBatchesHistory(int userId, int orgId, int fromOrgId, int messageTypeId, Date fromDate, Date toDate) throws Exception;
     
+    List<Integer> findInboxBatches(List<batchDownloads> batches, String searchTerm) throws Exception;
+    
 }

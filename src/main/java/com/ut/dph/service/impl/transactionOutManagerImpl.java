@@ -1693,4 +1693,9 @@ public class transactionOutManagerImpl implements transactionOutManager {
     public List<batchDownloads> getInboxBatchesHistory(int userId, int orgId, int fromOrgId, int messageTypeId, Date fromDate, Date toDate) throws Exception {
         return transactionOutDAO.getInboxBatchesHistory(userId, orgId, fromOrgId, messageTypeId, fromDate, toDate);
     }
+    
+    @Override
+    public List<Integer> findInboxBatches(List<batchDownloads> batches, String searchTerm) throws Exception {
+        return transactionOutDAO.findInboxBatches(batches, searchTerm);
+    }
 }

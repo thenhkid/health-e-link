@@ -17,6 +17,7 @@ import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.configurationSchedules;
 import com.ut.dph.model.configurationTransport;
 import com.ut.dph.model.lutables.lu_ProcessStatus;
+import com.ut.dph.model.messagePatients;
 import com.ut.dph.model.messageType;
 import com.ut.dph.model.targetOutputRunLogs;
 import com.ut.dph.model.transactionIn;
@@ -321,109 +322,79 @@ public class transactionOutDAOImpl implements transactionOutDAO {
      *
      * @return This function will return a list of batches that match the search term.
      */
+    @Override
+    @Transactional
     public List<Integer> findInboxBatches(List<batchDownloads> batches, String searchTerm) throws Exception {
-
+        
+        String[] terms = searchTerm.split("\\|",-1);
+        String batchName = terms[0];
+        String firstName = terms[1];
+        String lastName = terms[2];
+        String utBatchName = terms[3];
+        String patientId = terms[4];
+        String providerId = terms[5];
+        
         List<Integer> batchIdList = new ArrayList<Integer>();
-
-        searchTerm = searchTerm.toLowerCase();
-        searchTerm = searchTerm.replace(".", "\\.");
 
         for (batchDownloads batch : batches) {
 
             lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
             batch.setstatusValue(processStatus.getDisplayCode());
 
-            User userDetails = usermanager.getUserById(batch.getuserId());
-            String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
-            batch.setusersName(usersName);
-
-            /* Search the submitted by */
-            if (batch.getusersName().toLowerCase().matches(".*" + searchTerm + ".*")) {
-                if (!batchIdList.contains(batch.getId())) {
-                    batchIdList.add(batch.getId());
-                }
-            }
-
             /* Search the batch name */
-            if (batch.getutBatchName().toLowerCase().matches(".*" + searchTerm + ".*")) {
+            if (!"".equals(utBatchName) && batch.getutBatchName().toLowerCase().matches(".*" + utBatchName + ".*")) {
+                if (!batchIdList.contains(batch.getId())) {
+                    batchIdList.add(batch.getId());
+                }
+            }
+            
+            /* Search the file name */
+            if (!"".equals(batchName) && batch.getoutputFIleName().toLowerCase().matches(".*" + batchName + ".*")) {
                 if (!batchIdList.contains(batch.getId())) {
                     batchIdList.add(batch.getId());
                 }
             }
 
-            /* Search the batch date */
-            String dateAsString = new SimpleDateFormat("MM/dd/yyyy").format(batch.getdateCreated());
 
-            if (dateAsString.matches(".*" + searchTerm + ".*")) {
-                if (!batchIdList.contains(batch.getId())) {
-                    batchIdList.add(batch.getId());
-                }
-            }
-
-            /* Search the status */
+            /* Search the status 
             if (batch.getstatusValue().toLowerCase().matches(".*" + searchTerm + ".*")) {
                 if (!batchIdList.contains(batch.getId())) {
                     batchIdList.add(batch.getId());
                 }
-            }
+            }*/
 
             /* Search message types included in the batch */
             Criteria transactionQuery = sessionFactory.getCurrentSession().createCriteria(transactionTarget.class);
-            transactionQuery.add(Restrictions.eq("batchUploadId", batch.getId()));
-            List<transactionIn> transactions = transactionQuery.list();
+            transactionQuery.add(Restrictions.eq("batchDLId", batch.getId()));
+            List<transactionTarget> transactions = transactionQuery.list();
+            
+            if (!transactions.isEmpty() && (!"".equals(firstName) || !"".equals(lastName) || !"".equals(patientId))) {
 
-            if (!transactions.isEmpty()) {
+                /* Loop through the transactions to match patient information */
+                for (transactionTarget transaction : transactions) {
 
-                /* Loop through the transactions to get the config details */
-                for (transactionIn transaction : transactions) {
-
-                    Criteria configQuery = sessionFactory.getCurrentSession().createCriteria(configuration.class);
-                    configQuery.add(Restrictions.eq("id", transaction.getconfigId()));
-                    List<configuration> configs = configQuery.list();
-
-                    if (!configs.isEmpty()) {
-
-                        /* Loop through the configurations to get the config details */
-                        for (configuration config : configs) {
-
-                            messageType messageTypeDetails = (messageType) sessionFactory.getCurrentSession().get(messageType.class, config.getMessageTypeId());
-
-                            /* Search the status */
-                            if (messageTypeDetails.getName().toLowerCase().matches(".*" + searchTerm + ".*")) {
-                                if (!batchIdList.contains(batch.getId())) {
-                                    batchIdList.add(batch.getId());
-                                }
-                            }
-                        }
+                   
+                    Criteria patientQuery = sessionFactory.getCurrentSession().createCriteria(messagePatients.class);
+                    patientQuery.add(Restrictions.eq("transactionInId", transaction.gettransactionInId()));
+                    
+                    if(!"".equals(firstName)) {
+                        patientQuery.add(Restrictions.like("firstName",firstName));
                     }
-
+                    if(!"".equals(lastName)) {
+                        patientQuery.add(Restrictions.like("lastName",lastName));
+                    }
+                    if(!"".equals(patientId)) {
+                        patientQuery.add(Restrictions.like("sourcePatientId",patientId));
+                    }
+                    
+                    if(patientQuery.list().size() > 0) {
+                        batchIdList.add(batch.getId());
+                    }
+                    
                 }
 
             }
 
-            /* Search source data */
-            Criteria sourceQuery = sessionFactory.getCurrentSession().createCriteria(batchDownloadSummary.class);
-            sourceQuery.add(Restrictions.eq("batchId", batch.getId()));
-            List<batchDownloadSummary> sources = sourceQuery.list();
-
-            if (!sources.isEmpty()) {
-
-                for (batchDownloadSummary source : sources) {
-                    Organization orgDetails = (Organization) sessionFactory.getCurrentSession().get(Organization.class, source.getsourceOrgId());
-
-
-                    /* Search the source organization name */
-                    if (orgDetails.getOrgName().toLowerCase().matches(".*" + searchTerm + ".*")) {
-                        if (!batchIdList.contains(batch.getId())) {
-                            batchIdList.add(batch.getId());
-                        }
-                    }
-                }
-            }
-        }
-
-        if (batchIdList.isEmpty()) {
-            batchIdList.add(0);
         }
 
         return batchIdList;
