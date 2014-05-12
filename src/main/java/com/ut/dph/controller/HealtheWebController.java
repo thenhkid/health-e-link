@@ -2918,48 +2918,53 @@ public class HealtheWebController {
         mav.addObject("toDate", toDate);
         
         if(type == 0) {
-           mav.addObject("type", "Both (Referrals & Reports)"); 
+           mav.addObject("typeText", "Both (Referrals & Reports)"); 
         }
         else if(type == 1) {
-           mav.addObject("type", "Referrals Only");
+           mav.addObject("typeText", "Referrals Only");
         }
         else {
-           mav.addObject("type", "Reports Only"); 
+           mav.addObject("typeText", "Reports Only"); 
         }
+        mav.addObject("type", type);
         
         if(sentTo == 0) {
-           mav.addObject("sentTo", "All Affiliated Organizations"); 
+           mav.addObject("sentToText", "All Affiliated Organizations"); 
         }
         else {
            Organization orgDetails = organizationmanager.getOrganizationById(sentTo);
-           mav.addObject("sentTo", orgDetails.getOrgName());
+           mav.addObject("sentToText", orgDetails.getOrgName());
         }
+        mav.addObject("sentTo", sentTo);
         
         if(messageType == 0) {
-           mav.addObject("messageType", "All Message Types"); 
+           mav.addObject("messageTypeText", "All Message Types"); 
         }
         else {
            messageType msgTypeDetails = messagetypemanager.getMessageTypeById(messageType);
-           mav.addObject("messageType", msgTypeDetails.getName());
+           mav.addObject("messageTypeText", msgTypeDetails.getName());
         }
+        mav.addObject("messageType", messageType);
         
         if(receivedFrom == 0) {
-           mav.addObject("receivedFrom", "All Affiliated Organizations"); 
+           mav.addObject("receivedFromText", "All Affiliated Organizations"); 
         }
         else {
            Organization orgDetails = organizationmanager.getOrganizationById(receivedFrom);
-           mav.addObject("receivedFrom", orgDetails.getOrgName());
+           mav.addObject("receivedFromText", orgDetails.getOrgName());
         }
+        mav.addObject("receivedFrom", receivedFrom);
         
         if(status == 0) {
-           mav.addObject("status", "Both (Opened & Closed)"); 
+           mav.addObject("statusText", "Both (Opened & Closed)"); 
         }
         else if(status == 1) {
-           mav.addObject("status", "Opened Only");
+           mav.addObject("statusText", "Opened Only");
         }
         else {
-           mav.addObject("status", "Closed Only"); 
+           mav.addObject("statusText", "Closed Only"); 
         }
+        mav.addObject("status", status);
         
         mav.addObject("systemStatus", "All System Statuses");
         

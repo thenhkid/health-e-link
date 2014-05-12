@@ -28,6 +28,24 @@
     </div>
 
     <div class="row"> 
+        <form action="history/details" id="viewHistoryDetails" method="post">
+            <input type="hidden" id="selorgId" name="selorgId" value="" />
+            <input type="hidden" id="selmessageTypeId" name="selmessageTypeId" value="" />
+            <input type="hidden" name="fromDate" value="${fromDate}" />
+            <input type="hidden" name="toDate" value="${toDate}" />
+            <input type="hidden" name="type" value="${type}" />
+            <input type="hidden" name="sentTo" value="${sentTo}" />
+            <input type="hidden" name="messageType" value="${messageType}" />
+            <input type="hidden" name="receivedFrom" value="${receivedFrom}" />
+            <input type="hidden" name="status" value="${status}" />
+            <input type="hidden" name="systemStatus" value="${systemStatus}" />
+            <input type="hidden" name="batchName" value="${batchName}" />
+            <input type="hidden" name="utBatchName" value="${utBatchName}" />
+            <input type="hidden" name="lastName" value="${lastName}" />
+            <input type="hidden" name="firstName" value="${firstName}" />
+            <input type="hidden" name="patientId" value="${patientId}" />
+            <input type="hidden" name="providerId" value="${providerId}" />
+        </form>   
         <div class="col-md-12 page-content">
 
             <div class="col-md-12 form-section">
@@ -50,31 +68,31 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="control-label" for="type">Type</label>
-                                        <div class="control-label">${type}</div>
+                                        <div class="control-label">${typeText}</div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="control-label" for="sentTo">Sent To</label>
-                                        <div>${sentTo}</div>
+                                        <div>${sentToText}</div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="control-label" for="messageType"> Message Type</label>
-                                        <div>${messageType}</div>
+                                        <div>${messageTypeText}</div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="control-label" for="receivedFrom">Received From</label>
-                                        <div>${receivedFrom}</div>
+                                        <div>${receivedFromText}</div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="control-label" for="status"> Referral Status</label>
-                                        <div>${status}</div>
+                                        <div>${statusText}</div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
