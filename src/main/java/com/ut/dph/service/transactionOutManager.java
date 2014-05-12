@@ -113,4 +113,6 @@ public interface transactionOutManager {
     boolean searchPendingTransactions(Transaction tran, String searchTerm) throws Exception;
     
     void doNotProcessTransaction(int transactionId) throws Exception;
+    
+    List<batchDownloads> getInboxBatchesHistory(int userId, int orgId, int fromOrgId, int messageTypeId, Date fromDate, Date toDate) throws Exception;
 }

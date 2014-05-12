@@ -2970,6 +2970,11 @@ public class HealtheWebController {
         mav.addObject("firstName", firstName);
         mav.addObject("providerId", providerId);
         
+        int totalReferralsRec = 0;
+        int totalFBRec = 0;
+        int totalReferralsSent = 0;
+        int totalFBSent = 0;
+        
         /* Get all connections for the logged in organization */
         List<configuration> configs = configurationManager.getActiveConfigurationsByOrgId(userInfo.getOrgId());
         
@@ -2977,66 +2982,95 @@ public class HealtheWebController {
         
         for(configuration config : configs) {
             
+            if(type == 0 || (type == 1 && config.getsourceType() == 1) || (type == 2 && config.getsourceType() == 2)) {
             
-            
-            if(messageType == 0 || (messageType > 0 && messageType == config.getMessageTypeId())) {
-            
-                /* Source config type */
-                if(config.getType() == 1) {
+                if(messageType == 0 || (messageType > 0 && messageType == config.getMessageTypeId())) {
 
-                    List<configurationConnection> connections = configurationManager.getConnectionsByConfiguration(config.getId());
+                    /* Source config type */
+                    if(config.getType() == 1) {
 
-                    if(connections.size() > 0) {
+                        List<configurationConnection> connections = configurationManager.getConnectionsByConfiguration(config.getId());
 
-                        for(configurationConnection connection : connections) {
+                        if(connections.size() > 0) {
 
-                            if(sentTo == 0 || (sentTo > 0 && sentTo == configurationManager.getConfigurationById(connection.gettargetConfigId()).getorgId())) {
-                                String orgName = organizationmanager.getOrganizationById(configurationManager.getConfigurationById(connection.gettargetConfigId()).getorgId()).getOrgName();
-                                String messageTypeName = messagetypemanager.getMessageTypeById(config.getMessageTypeId()).getName();
-                                
-                                historyResults result = new historyResults();
-                                result.setorgName(orgName);
-                                result.setmessageType(messageTypeName);
+                            for(configurationConnection connection : connections) {
 
-                                results.add(result);
-                            }
+                                if(sentTo == 0 || (sentTo > 0 && sentTo == configurationManager.getConfigurationById(connection.gettargetConfigId()).getorgId())) {
+                                    String orgName = organizationmanager.getOrganizationById(configurationManager.getConfigurationById(connection.gettargetConfigId()).getorgId()).getOrgName();
+                                    String messageTypeName = messagetypemanager.getMessageTypeById(config.getMessageTypeId()).getName();
 
-                            
+                                    historyResults result = new historyResults();
+                                    result.setorgName(orgName);
+                                    result.setmessageType(messageTypeName);
+                                    
+                                    List<batchUploads> batches = transactionInManager.getsentBatchesHistory(userInfo.getId(), config.getorgId(), configurationManager.getConfigurationById(connection.gettargetConfigId()).getorgId(), config.getMessageTypeId(), fromDate, toDate);
 
-                        }
+                                    for(batchUploads batch : batches) {
+                                        
+                                        if(config.getsourceType() == 1) {
+                                            result.setmsg("Total Referrals Sent: "+ batches.size());
 
-                    }
+                                            totalReferralsRec+=1;
+                                        }
+                                        else {
+                                            result.setmsg("Total Feedback Reports Sent: "+ batches.size());
+                                            totalFBRec+=1;
+                                        }
+                                    }
+                                    
+                                    results.add(result);
+                                }
 
-                }
-                /* Target config Type */
-                else if(config.getType() == 2) {
-
-                    List<configurationConnection> connections = configurationManager.getConnectionsByTargetConfiguration(config.getId());
-
-                    if(connections.size() > 0) {
-
-                        for(configurationConnection connection : connections) {
-                            
-                            if(receivedFrom == 0 || (receivedFrom > 0 && sentTo == configurationManager.getConfigurationById(connection.getsourceConfigId()).getorgId())) {
-                                String orgName = organizationmanager.getOrganizationById(configurationManager.getConfigurationById(connection.getsourceConfigId()).getorgId()).getOrgName();
-                                String messageTypeName = messagetypemanager.getMessageTypeById(config.getMessageTypeId()).getName();
-                                
-                                historyResults result = new historyResults();
-                                result.setorgName(orgName);
-                                result.setmessageType(messageTypeName);
-
-                                results.add(result);
                             }
 
                         }
 
+                    }
+                    /* Target config Type */
+                    else if(config.getType() == 2) {
+
+                        List<configurationConnection> connections = configurationManager.getConnectionsByTargetConfiguration(config.getId());
+
+                        if(connections.size() > 0) {
+
+                            for(configurationConnection connection : connections) {
+
+                                if(receivedFrom == 0 || (receivedFrom > 0 && sentTo == configurationManager.getConfigurationById(connection.getsourceConfigId()).getorgId())) {
+                                    String orgName = organizationmanager.getOrganizationById(configurationManager.getConfigurationById(connection.getsourceConfigId()).getorgId()).getOrgName();
+                                    String messageTypeName = messagetypemanager.getMessageTypeById(config.getMessageTypeId()).getName();
+
+                                    historyResults result = new historyResults();
+                                    result.setorgName(orgName);
+                                    result.setmessageType(messageTypeName);
+
+                                    /* Find Received Referrals / Feedback Reports */
+                                    int totalReceived = transactionOutManager.getInboxBatchesHistory(userInfo.getId(), config.getorgId(), configurationManager.getConfigurationById(connection.getsourceConfigId()).getorgId(), config.getMessageTypeId(), fromDate, toDate).size();
+
+                                    if(config.getsourceType() == 1) {
+                                        result.setmsg("Total Referrals Received: "+ totalReceived);
+                                        
+                                        totalReferralsRec+=totalReceived;
+                                    }
+                                    else {
+                                        result.setmsg("Total Feedback Reports Received: "+ totalReceived);
+                                        totalFBRec+=totalReceived;
+                                    }
+
+                                    results.add(result);
+                                }
+
+                            }
+
+                        }
 
                     }
-
                 }
             }
         }
-        
+        mav.addObject("totalReferralsRec", totalReferralsRec);
+        mav.addObject("totalFBRec", totalFBRec);
+        mav.addObject("totalReferralsSent", totalReferralsSent);
+        mav.addObject("totalFBSent", totalFBSent);
         mav.addObject("historyResults", results);
         
         //we log here 
