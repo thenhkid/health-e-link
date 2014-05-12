@@ -916,3 +916,15 @@ CREATE TABLE `universalTranslator`.`message_Encounters` (
     REFERENCES `universalTranslator`.`transactionin` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION);
+ 
+/** grace 05122014 12:22PM **/
+ALTER TABLE `universaltranslator`.`SFTPJobRunLog` 
+CHANGE COLUMN `transportId` `transportId` INT(11) NULL ,
+ADD COLUMN `folderPath` VARCHAR(75) NULL AFTER `endDateTime`;
+
+ALTER TABLE `universaltranslator`.`SFTPJobRunLog` 
+ADD COLUMN `method` INT NULL AFTER `folderPath`;
+
+/** grace 05122014 02:41PM **/
+update macro_names set populateFieldA = false where populateFieldA is null;
+
