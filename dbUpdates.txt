@@ -879,3 +879,40 @@ INSERT INTO `universaltranslator`.`lu_ErrorCodes` (`displayText`, `description`)
 INSERT INTO `universaltranslator`.`lu_ErrorCodes` (`displayText`, `description`) VALUES ('Invalid File Extension', 'Invalid File Extension');
 
 
+/** Chad 05122014 @ 10:33 AM **/
+ALTER TABLE `universalTranslator`.`message_Patients` 
+ADD COLUMN `race` VARCHAR(45) NULL AFTER `dateCreated`;
+
+ALTER TABLE `universalTranslator`.`message_visitinfo` 
+ADD COLUMN `bmi` FLOAT NULL DEFAULT NULL AFTER `messageStatus`;
+
+ALTER TABLE `universalTranslator`.`message_misc` 
+CHANGE COLUMN `field1` `field1` VARCHAR(500) NULL DEFAULT NULL ,
+CHANGE COLUMN `field2` `field2` VARCHAR(500) NULL DEFAULT NULL ,
+CHANGE COLUMN `field3` `field3` VARCHAR(500) NULL DEFAULT NULL ,
+CHANGE COLUMN `field4` `field4` VARCHAR(500) NULL DEFAULT NULL ,
+CHANGE COLUMN `field5` `field5` VARCHAR(500) NULL DEFAULT NULL ,
+CHANGE COLUMN `field6` `field6` VARCHAR(500) NULL DEFAULT NULL ,
+CHANGE COLUMN `field7` `field7` VARCHAR(500) NULL DEFAULT NULL ,
+CHANGE COLUMN `field8` `field8` VARCHAR(500) NULL DEFAULT NULL ,
+CHANGE COLUMN `field9` `field9` VARCHAR(500) NULL DEFAULT NULL ,
+CHANGE COLUMN `field10` `field10` VARCHAR(500) NULL DEFAULT NULL ;
+
+ALTER TABLE `universalTranslator`.`message_Allergies` 
+ADD COLUMN `substance` VARCHAR(255) NULL DEFAULT NULL AFTER `reactionsSymptoms`;
+
+CREATE TABLE `universalTranslator`.`message_Encounters` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `transactionInId` INT NOT NULL,
+  `encounter` VARCHAR(255) NULL DEFAULT NULL,
+  `performer` VARCHAR(45) NULL DEFAULT NULL,
+  `encounterDate` VARCHAR(45) NULL DEFAULT NULL,
+  `status` VARCHAR(45) NULL DEFAULT NULL,
+  `dateCreated` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  INDEX `enct_tranId_idx` (`transactionInId` ASC),
+  CONSTRAINT `enc_tranId`
+    FOREIGN KEY (`transactionInId`)
+    REFERENCES `universalTranslator`.`transactionin` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
