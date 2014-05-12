@@ -129,22 +129,22 @@
                     <div class="panel-body" style="background-color:#f1f1f1">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <h3 class="panel-title">Total Referrals Sent: 15</h3>
+                                <h3 class="panel-title">Total Referrals Sent: ${totalReferralsSent}</h3>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <h3 class="panel-title">Total Feedback Reports Sent: 15</h3>
+                                <h3 class="panel-title">Total Feedback Reports Sent: ${totalFBSent}</h3>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <h3 class="panel-title">Total Referrals Received: 15</h3>
+                                <h3 class="panel-title">Total Referrals Received: ${totalReferralsRec}</h3>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                <h3 class="panel-title">Total Feedback Reports Received: 15</h3>
+                                <h3 class="panel-title">Total Feedback Reports Received: ${totalFBRec}</h3>
                             </div>
                         </div>
                     </div>

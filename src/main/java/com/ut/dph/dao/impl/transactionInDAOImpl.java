@@ -613,7 +613,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 
         return findTransactions.list();
     }
-
+    
     /**
      * The 'getsentBatches' function will return a list of sent batches for the organization passed in.
      *
@@ -624,6 +624,33 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Override
     @Transactional
     public List<batchUploads> getsentBatches(int userId, int orgId, Date fromDate, Date toDate) throws Exception {
+        
+        return findsentBatches(userId, orgId, 0, 0, fromDate, toDate);
+    }
+    
+    /**
+     * The 'getsentBatchesHistory' function will return a list of sent batches for the organization passed in.
+     *
+     * @param orgId The organization Id to find pending transactions for.
+     *
+     * @return The function will return a list of sent transactions
+     */
+    @Override
+    @Transactional
+    public List<batchUploads> getsentBatchesHistory(int userId, int orgId, int toOrgId, int messageTypeId, Date fromDate, Date toDate) throws Exception {
+        
+        return findsentBatches(userId, orgId, toOrgId, messageTypeId, fromDate, toDate);
+    }
+
+    /**
+     * The 'findsentBatches' function will return a list of sent batches for the organization passed in.
+     *
+     * @param orgId The organization Id to find pending transactions for.
+     *
+     * @return The function will return a list of sent transactions
+     */
+    @Transactional
+    public List<batchUploads> findsentBatches(int userId, int orgId, int toOrgId, int messageTypeId, Date fromDate, Date toDate) throws Exception {
 
         /* Get a list of connections the user has access to */
         Criteria connections = sessionFactory.getCurrentSession().createCriteria(configurationConnectionSenders.class);
@@ -651,15 +678,29 @@ public class transactionInDAOImpl implements transactionInDAO {
                 configuration configDetails = (configuration) sourceconfigurationQuery.uniqueResult();
 
                 /* Add the message type to the message type list */
-                messageTypeList.add(configDetails.getMessageTypeId());
-
+                if(messageTypeId == 0) {
+                    messageTypeList.add(configDetails.getMessageTypeId());
+                }
+                else {
+                    if(messageTypeId == configDetails.getMessageTypeId()) {
+                        messageTypeList.add(configDetails.getMessageTypeId());
+                    }
+                }
+                
                 /* Get the list of target orgs */
                 Criteria targetconfigurationQuery = sessionFactory.getCurrentSession().createCriteria(configuration.class);
                 targetconfigurationQuery.add(Restrictions.eq("id", connectionInfo.gettargetConfigId()));
                 configuration targetconfigDetails = (configuration) targetconfigurationQuery.uniqueResult();
 
                 /* Add the target org to the target organization list */
-                targetOrgList.add(targetconfigDetails.getorgId());
+                if(toOrgId == 0) {
+                    targetOrgList.add(targetconfigDetails.getorgId());
+                }
+                else {
+                    if(toOrgId == targetconfigDetails.getorgId()) {
+                        targetOrgList.add(targetconfigDetails.getorgId());
+                    }
+                }
             }
         }
 

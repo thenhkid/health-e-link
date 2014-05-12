@@ -359,4 +359,6 @@ public interface transactionInManager {
     Integer insertSFTPRun(SFTPJobRunLog sftpJob);
     
     void updateSFTPRun(SFTPJobRunLog sftpJob) throws Exception;
+    
+    List<batchUploads> getsentBatchesHistory(int userId, int orgId, int toOrgId, int messageTypeId, Date fromDate, Date toDate) throws Exception;
 }

@@ -1687,4 +1687,10 @@ public class transactionOutManagerImpl implements transactionOutManager {
     public void doNotProcessTransaction(int transactionId) throws Exception {
         transactionOutDAO.doNotProcessTransaction(transactionId);
     }
+    
+    @Override
+    @Transactional
+    public List<batchDownloads> getInboxBatchesHistory(int userId, int orgId, int fromOrgId, int messageTypeId, Date fromDate, Date toDate) throws Exception {
+        return transactionOutDAO.getInboxBatchesHistory(userId, orgId, fromOrgId, messageTypeId, fromDate, toDate);
+    }
 }

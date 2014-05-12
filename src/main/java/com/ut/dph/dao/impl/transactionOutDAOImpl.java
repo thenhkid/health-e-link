@@ -137,7 +137,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
         return batchId;
 
     }
-
+    
     /**
      * The 'getInboxBatches' will return a list of received batches for the logged in user.
      *
@@ -150,6 +150,39 @@ public class transactionOutDAOImpl implements transactionOutDAO {
     @Transactional
     @SuppressWarnings("UnusedAssignment")
     public List<batchDownloads> getInboxBatches(int userId, int orgId, Date fromDate, Date toDate) throws Exception {
+        
+        return findInboxBatches(userId, orgId, 0, 0, fromDate, toDate);
+        
+    } 
+    
+   /**
+     * The 'getInboxBatchesHistory' will return a list of received batches for the logged in user.
+     *
+     * @param userId The id of the logged in user trying to view received batches
+     * @param orgId The id of the organization the user belongs to
+     *
+     * @return The function will return a list of received batches
+     */
+    @Override
+    @Transactional
+    @SuppressWarnings("UnusedAssignment")
+    public List<batchDownloads> getInboxBatchesHistory(int userId, int orgId, int fromOrgId, int messageTypeId, Date fromDate, Date toDate) throws Exception {
+        
+        return findInboxBatches(userId, orgId, fromOrgId, messageTypeId, fromDate, toDate);
+        
+    }  
+
+    /**
+     * The 'findInboxBatches' will return a list of received batches for the logged in user.
+     *
+     * @param userId The id of the logged in user trying to view received batches
+     * @param orgId The id of the organization the user belongs to
+     *
+     * @return The function will return a list of received batches
+     */
+    @Transactional
+    @SuppressWarnings("UnusedAssignment")
+    public List<batchDownloads> findInboxBatches(int userId, int orgId, int fromOrgId, int messageTypeId, Date fromDate, Date toDate) throws Exception {
         int firstResult = 0;
 
         /* Get a list of connections the user has access to */
@@ -178,7 +211,15 @@ public class transactionOutDAOImpl implements transactionOutDAO {
                 configuration configDetails = (configuration) targetconfigurationQuery.uniqueResult();
 
                 /* Add the message type to the message type list */
-                messageTypeList.add(configDetails.getMessageTypeId());
+                if(messageTypeId == 0) {
+                    messageTypeList.add(configDetails.getMessageTypeId());
+                }
+                else {
+                    if(messageTypeId == configDetails.getMessageTypeId()) {
+                        messageTypeList.add(configDetails.getMessageTypeId());
+                    }
+                }
+                
 
                 /* Get the list of source orgs */
                 Criteria sourceconfigurationQuery = sessionFactory.getCurrentSession().createCriteria(configuration.class);
@@ -186,7 +227,14 @@ public class transactionOutDAOImpl implements transactionOutDAO {
                 configuration sourceconfigDetails = (configuration) sourceconfigurationQuery.uniqueResult();
 
                 /* Add the target org to the target organization list */
-                sourceOrgList.add(sourceconfigDetails.getorgId());
+                if(fromOrgId == 0) {
+                    sourceOrgList.add(sourceconfigDetails.getorgId());
+                }
+                else {
+                    if(fromOrgId == sourceconfigDetails.getorgId()) {
+                        sourceOrgList.add(sourceconfigDetails.getorgId());
+                    }
+                }
             }
         }
 
