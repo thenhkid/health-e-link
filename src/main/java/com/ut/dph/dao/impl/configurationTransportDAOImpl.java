@@ -21,6 +21,7 @@ import com.ut.dph.model.configurationTransport;
 import com.ut.dph.model.configurationTransportMessageTypes;
 
 import java.util.Iterator;
+
 import org.springframework.stereotype.Repository;
 
 @Repository
@@ -570,7 +571,7 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
             
 		 	
             Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
-                    Transformers.aliasToBean(User.class));;
+                    Transformers.aliasToBean(User.class));
             query.setParameter("configurationTransportId", configurationTransportId);
 
             List<User> users = query.list();
@@ -595,7 +596,7 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
             
 		 	
             Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
-                    Transformers.aliasToBean(User.class));;
+                    Transformers.aliasToBean(User.class));
             query.setParameter("configurationTransportId", configurationTransportId);
 
             List<User> users = query.list();
@@ -674,6 +675,28 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
 			System.err.println("getTransportDetailsByTransportId " + ex.getCause());
             ex.printStackTrace();
             return null;
+		}
+	}
+
+	@Override
+	@Transactional
+	public Integer getOrgIdForFTPPath(configurationFTPFields ftpInfo)
+			throws Exception {
+		try {
+			String sql = ("select distinct orgId from configurations where id in (select configId from configurationTransportDetails where id in (select transportId from"
+					+ " rel_TransportFTPDetails where method = :method and directory = :directory));;");
+	        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+	        query.setParameter("method", ftpInfo.getmethod());
+	        query.setParameter("directory", ftpInfo.getdirectory());
+	
+	        Integer orgId  = (Integer) query.list().get(0);
+	
+	        return orgId;
+
+		} catch (Exception ex) {
+	        System.err.println("getOrgIdForFTPPath  " + ex.getCause());
+	        ex.printStackTrace();
+	        return null;
 		}
 	}
 	

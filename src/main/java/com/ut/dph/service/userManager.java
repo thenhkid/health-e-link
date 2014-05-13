@@ -35,6 +35,8 @@ public interface userManager {
   
   void insertUserLog (UserActivity userActivity);
   
+  List<User> getUserByTypeByOrganization(int orgId);
+  
   UserActivity getUAById (Integer uaId);
 }
 

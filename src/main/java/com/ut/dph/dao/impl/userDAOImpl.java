@@ -303,4 +303,19 @@ public class userDAOImpl implements userDAO {
     	}
 		return null;
 	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<User> getUserByTypeByOrganization(int orgId) {
+		try {
+			Query query = sessionFactory.getCurrentSession().createQuery("from User where orgId = :orgId and status = 1 order by userType");
+			query.setParameter("orgId", orgId);
+			List<User> users = query.list();
+			return users;
+		} catch (Exception ex) {
+			System.err.println("getUserByTypeByOrganization " + ex.getCause());
+    		ex.printStackTrace();
+			return null;
+		}
+	}
 }

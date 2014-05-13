@@ -18,7 +18,6 @@ public interface userDAO {
 
     User getUserById(int userId);
 
-    
     List<User> getUsersByOrganization(int orgId);
 
     User getUserByUserName(String username);
@@ -40,4 +39,6 @@ public interface userDAO {
     void insertUserLog (UserActivity userActivity);
     
     UserActivity getUAById (Integer uaId);
+    
+    List<User> getUserByTypeByOrganization(int orgId);
 }

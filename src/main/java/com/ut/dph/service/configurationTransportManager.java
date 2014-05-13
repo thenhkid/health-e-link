@@ -72,4 +72,6 @@ public interface configurationTransportManager {
     List<configurationTransport>  getTransportListForFileExt(String fileExt, Integer transportMethodId);
     
     configurationTransport getTransportDetailsByTransportId(Integer transportId);
+    
+    Integer getOrgIdForFTPPath (configurationFTPFields ftpInfo) throws Exception;
 }

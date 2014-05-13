@@ -10,6 +10,7 @@ import com.ut.dph.dao.transactionInDAO;
 import com.ut.dph.dao.transactionOutDAO;
 import com.ut.dph.model.CrosswalkData;
 import com.ut.dph.model.Macros;
+import com.ut.dph.model.Organization;
 import com.ut.dph.model.SFTPJobRunLog;
 import com.ut.dph.model.Transaction;
 import com.ut.dph.model.TransactionInError;
@@ -2524,7 +2525,6 @@ public class transactionInManagerImpl implements transactionInManager {
 					f.mkdirs();
 				}
 				
-				ftpInfo.setdirectory(f.getAbsolutePath());
 				sysErrors = sysErrors + moveSFTPFilesByPath(ftpInfo);
 				
 				if (sysErrors == 0) {
@@ -2549,10 +2549,14 @@ public class transactionInManagerImpl implements transactionInManager {
 		Integer sysErrors = 0;
 		
 		try {
-		//we look up org for this path	
+		//we look up org for this path
+		Integer orgId = configurationtransportmanager.getOrgIdForFTPPath(ftpInfo);
 			
-		//loop files and handle
-		File folder = new File(ftpInfo.getdirectory());
+		
+		fileSystem fileSystem = new fileSystem();
+		String inPath = fileSystem.setPath(ftpInfo.getdirectory());
+        File folder = new File(inPath);
+			
 		//list files
 		//we only list visible files
 		File[] listOfFiles = folder.listFiles((FileFilter) HiddenFileFilter.VISIBLE); 
@@ -2566,21 +2570,48 @@ public class transactionInManagerImpl implements transactionInManager {
 			 
 			 //figure out how many transports are using fileExt method
 			 List<configurationTransport> transportList = configurationtransportmanager.getTransportListForFileExt(fileExt, 3);
-			 System.out.println(transportList.size());
 			 
-			//figure out if this 
+			 //figure out if this 
 			 List<configurationTransport> transports =  configurationtransportmanager.getConfigTransportForFileExt(fileExt, 3);
-			 System.out.println(transports.size());
+			
 			 
+			 batchUploads batchInfo = new batchUploads();
+			 batchInfo.setOrgId(orgId);
+			 batchInfo.settransportMethodId(3);
 			 
+			 DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmssS");
+             Date date = new Date();
+             String batchName = new StringBuilder().append("UT_3_").append(orgId).append(dateFormat.format(date)).toString();
+             System.out.println(batchName);
+             
+             String outPath = "";
+             Integer batchId = 0;
+             String newFileName = "";
+
 			 if (transportList.size() == 0) {
 				 //no transport is using this method - we find the mgr user and reject this file
+				 batchInfo.setuserId(usermanager.getUserByTypeByOrganization(orgId).get(0).getId());
+				 //since this file is not associated with config, we put in main folder for org
+				 Organization orgDetails = organizationmanager.getOrganizationById(orgId);
+				 String defPath = "/bowlink/"+orgDetails.getcleanURL()+"/input files/";
+				 outPath = fileSystem.setPath(defPath);
+				 batchInfo.setstatusId(4);
+                 batchInfo.setConfigId(0);
+                 batchInfo.setutBatchName(batchName);
+                 newFileName = newFileName(outPath, fileName);
+                 batchInfo.setoriginalFileName(newFileName);
+                 batchInfo.setFileLocation(defPath);
+                 batchInfo.setstartDateTime(date);
+                 batchId = (Integer) submitBatchUpload(batchInfo);
+				 //insert error
+                 updateBatchStatus(batchId, 7, "endDateTime");
+                 insertProcessingError(13, 0, batchId, null, null, null, null, false, false, "");
 				 
 			 } else if (transportList.size() == 1) {
 				//only transport details
 				 configurationTransport  ct = configurationtransportmanager.getTransportDetailsByTransportId(ftpInfo.gettransportId());
 				 configuration conf = configurationManager.getConfigurationById(ct.getconfigId());
-				 batchUploads batchInfo = new batchUploads();
+				
 				 batchInfo.setConfigId(conf.getId());
 				 batchInfo.setContainsHeaderRow(transports.get(0).getContainsHeaderRow());
 				 batchInfo.setDelimChar(ct.getDelimChar());
@@ -2599,6 +2630,12 @@ public class transactionInManagerImpl implements transactionInManager {
 				 //we have to read file see if it contains header row and what delimiter it is using
 			 }
 			 
+			 File newFile = new File(outPath + newFileName);
+
+             // now we move file
+             Path source = file.toPath();
+             Path target = newFile.toPath();
+             Files.move(source, target);
 			 
 			 
 			 
@@ -2617,4 +2654,25 @@ public class transactionInManagerImpl implements transactionInManager {
 	public List<configurationFTPFields> getFTPInfoForJob(Integer method) {
 		return transactionInDAO.getFTPInfoForJob(method);
 	}
+	
+	@Override
+	public String newFileName (String path, String fileName){
+		try {
+			File newFile = new File(path + fileName);
+	        if (newFile.exists()) {
+	            int i = 1;
+	            while (newFile.exists()) {
+	                int iDot = fileName.lastIndexOf(".");
+	                newFile = new File(path + fileName.substring(0, iDot) + "_(" + ++i + ")" + fileName.substring(iDot));
+	            }
+	            fileName = newFile.getName();
+	        }
+	        return fileName;
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			System.err.println("newBatchName " + ex.getCause());
+			return null;
+		}
+	}
+	
 }

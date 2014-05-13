@@ -368,5 +368,7 @@ public interface transactionInManager {
     Integer moveSFTPFilesByPath(configurationFTPFields inputPaths);
     
     List <configurationFTPFields> getFTPInfoForJob (Integer method);
+    
+    String newFileName (String path, String fileName);
 
 }

@@ -251,4 +251,10 @@ public class configurationTransportManagerImpl implements configurationTransport
 	public configurationTransport getTransportDetailsByTransportId(Integer transportId) {
 		return configurationTransportDAO.getTransportDetailsByTransportId(transportId);
 	}
+
+	@Override
+	public Integer getOrgIdForFTPPath(configurationFTPFields ftpInfo)
+			throws Exception {
+		return configurationTransportDAO.getOrgIdForFTPPath(ftpInfo);
+	}
 }

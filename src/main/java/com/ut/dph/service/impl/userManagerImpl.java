@@ -104,4 +104,11 @@ public class userManagerImpl implements userManager {
 	public UserActivity getUAById(Integer uaId) {
 		return userDAO.getUAById(uaId);
 	}
+	
+	@Override
+	@Transactional
+	public List<User> getUserByTypeByOrganization(int orgId){
+		return userDAO.getUserByTypeByOrganization(orgId);
+	}
+
 }
