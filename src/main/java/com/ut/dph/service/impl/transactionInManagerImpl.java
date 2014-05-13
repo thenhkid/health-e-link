@@ -2635,30 +2635,6 @@ public class transactionInManagerImpl implements transactionInManager {
                  batchId = (Integer) submitBatchUpload(batchInfo);
 				 statusId = 2;
 				 
-			 } else if  (transportList.size() > 1 && transports.size() == 1) {
-				 // multiple config but one delimiter & one containsHeaderRow
-				 configurationTransport  ct = configurationtransportmanager.getTransportDetailsByTransportId(ftpInfo.gettransportId());
-				 batchInfo.setConfigId(0);
-				 batchInfo.setContainsHeaderRow(transports.get(0).getContainsHeaderRow());
-				 batchInfo.setDelimChar(transports.get(0).getDelimChar());
-				 batchInfo.setFileLocation(ct.getfileLocation());
-				 outPath = fileSystem.setPath(ct.getfileLocation());
-				 batchInfo.setOrgId(orgId);
-				 batchInfo.setutBatchName(batchName);
-				 newFileName = newFileName(outPath, fileName);
-                 batchInfo.setoriginalFileName(newFileName);
-                 batchInfo.setstartDateTime(date);
-                 //find user 
-                 List<User> users = configurationtransportmanager.getUserIdFromConnForTransport(ct.getId());
-                 if (users.size() == 0) {
-                     users = configurationtransportmanager.getOrgUserIdForTransport(ct.getId());
-                 }
-                 batchInfo.setuserId(users.get(0).getId());
-                 batchId = (Integer) submitBatchUpload(batchInfo);
-				 statusId = 2;
-				 
-				 
-				 
 			 } else if  (transportList.size() > 1 && transports.size() >1)  {
 				 //we have to read file see if it contains header row and what delimiter it is using
 			 }
