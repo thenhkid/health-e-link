@@ -1551,5 +1551,28 @@ public class transactionOutDAOImpl implements transactionOutDAO {
         return transactions.list();
 
     }
+    
+    /**
+     * The 'getBatchesBySentOrg' will search the batchDownloadSummary table for batches sent by the
+     * passed in orgId to the passed in orgId for the passed in messagetypeId
+     * 
+     * @param srcOrgId      The orgId who sent the batch
+     * @param tgtOrgId      The orgId for the user who is logged in
+     * @param messageTypeId The id of the message Type that was selected
+     * 
+     * @return This function will return a list of batches found matching the criteria passed in.
+     */
+    @Override
+    @Transactional
+    public List<batchDownloadSummary> getBatchesBySentOrg(int srcorgId, int tgtOrgId, int messageTypeId) throws Exception {
+        
+        Criteria batchSummaries = sessionFactory.getCurrentSession().createCriteria(batchDownloadSummary.class);
+        batchSummaries.add(Restrictions.eq("sourceOrgId", srcorgId));
+        batchSummaries.add(Restrictions.eq("targetOrgId", tgtOrgId));
+        batchSummaries.add(Restrictions.eq("messageTypeId", messageTypeId));
+        
+        return batchSummaries.list();
+    
+    }
 
 }

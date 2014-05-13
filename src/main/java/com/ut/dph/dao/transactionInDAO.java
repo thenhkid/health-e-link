@@ -29,6 +29,7 @@ import com.ut.dph.model.transactionTarget;
 import com.ut.dph.model.custom.ConfigErrorInfo;
 import com.ut.dph.model.custom.ConfigForInsert;
 import com.ut.dph.model.custom.TransErrorDetail;
+import com.ut.dph.model.messagePatients;
 
 import java.util.Date;
 import java.util.List;
@@ -299,4 +300,8 @@ public interface transactionInDAO {
     List<batchUploads> getsentBatchesHistory(int userId, int orgId, int toOrgId, int messageTypeId, Date fromDate, Date toDate) throws Exception;
     
     List <configurationFTPFields> getFTPInfoForJob (Integer method);
+    
+    List<batchUploadSummary> getBatchesToSentOrg(int srcorgId, int tgtOrgId, int messageTypeId) throws Exception;
+    
+    messagePatients getPatientTransactionDetails(int transactionInId);
 }

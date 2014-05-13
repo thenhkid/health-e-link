@@ -17,6 +17,7 @@ public class historyResults {
     private int messageTypeId;
     private String messageType = null;
     private String msg = null;
+    private int type;
     
     public int getorgId() {
         return orgId;
@@ -56,6 +57,14 @@ public class historyResults {
     
     public void setmsg(String msg) {
         this.msg = msg;
+    }
+    
+    public int gettype() {
+        return type;
+    }
+    
+    public void settype(int type) {
+        this.type = type;
     }
     
 }

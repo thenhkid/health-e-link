@@ -33,6 +33,7 @@ import com.ut.dph.model.custom.ConfigErrorInfo;
 import com.ut.dph.model.custom.ConfigForInsert;
 import com.ut.dph.model.custom.TransErrorDetail;
 import com.ut.dph.model.lutables.lu_ProcessStatus;
+import com.ut.dph.model.messagePatients;
 import com.ut.dph.model.messageType;
 import com.ut.dph.service.sysAdminManager;
 import com.ut.dph.service.userManager;
@@ -614,7 +615,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 
         return findTransactions.list();
     }
-    
+
     /**
      * The 'getsentBatches' function will return a list of sent batches for the organization passed in.
      *
@@ -625,10 +626,10 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Override
     @Transactional
     public List<batchUploads> getsentBatches(int userId, int orgId, Date fromDate, Date toDate) throws Exception {
-        
+
         return findsentBatches(userId, orgId, 0, 0, fromDate, toDate);
     }
-    
+
     /**
      * The 'getsentBatchesHistory' function will return a list of sent batches for the organization passed in.
      *
@@ -639,7 +640,7 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Override
     @Transactional
     public List<batchUploads> getsentBatchesHistory(int userId, int orgId, int toOrgId, int messageTypeId, Date fromDate, Date toDate) throws Exception {
-        
+
         return findsentBatches(userId, orgId, toOrgId, messageTypeId, fromDate, toDate);
     }
 
@@ -679,26 +680,24 @@ public class transactionInDAOImpl implements transactionInDAO {
                 configuration configDetails = (configuration) sourceconfigurationQuery.uniqueResult();
 
                 /* Add the message type to the message type list */
-                if(messageTypeId == 0) {
+                if (messageTypeId == 0) {
                     messageTypeList.add(configDetails.getMessageTypeId());
-                }
-                else {
-                    if(messageTypeId == configDetails.getMessageTypeId()) {
+                } else {
+                    if (messageTypeId == configDetails.getMessageTypeId()) {
                         messageTypeList.add(configDetails.getMessageTypeId());
                     }
                 }
-                
+
                 /* Get the list of target orgs */
                 Criteria targetconfigurationQuery = sessionFactory.getCurrentSession().createCriteria(configuration.class);
                 targetconfigurationQuery.add(Restrictions.eq("id", connectionInfo.gettargetConfigId()));
                 configuration targetconfigDetails = (configuration) targetconfigurationQuery.uniqueResult();
 
                 /* Add the target org to the target organization list */
-                if(toOrgId == 0) {
+                if (toOrgId == 0) {
                     targetOrgList.add(targetconfigDetails.getorgId());
-                }
-                else {
-                    if(toOrgId == targetconfigDetails.getorgId()) {
+                } else {
+                    if (toOrgId == targetconfigDetails.getorgId()) {
                         targetOrgList.add(targetconfigDetails.getorgId());
                     }
                 }
@@ -975,45 +974,45 @@ public class transactionInDAOImpl implements transactionInDAO {
      * @param batchUploadId The id of batch
      * @param getAll - get configs for the entire batch or just the ones not in final status
      * @transactionInId - just get the configId for the transaction
-     * 
+     *
      * @return This function will return a list of configIds (Integer)
      */
     @Override
     @Transactional
     @SuppressWarnings("unchecked")
     public List<Integer> getConfigIdsForBatch(int batchUploadId, boolean getAll, Integer transactionInId) {
-    	try {
-	    	Integer id = batchUploadId;
-	        String sql = "select distinct configId from transactionTranslatedIn "
-	                + " where   ";
-	        
-	        if (transactionInId == 0) {
-	        	sql = sql + " transactionInId in (select id from transactionIn where batchId = :id ";
-	        } else {
-	        	sql = sql + "( transactionInId = :id ";
-	        	id = transactionInId;
-	        	//we don't care about statusId if only one transaction
-	        	getAll = true;
-	        }
-	
-	        if (!getAll) {
-	            sql = sql + " and statusId not in (:transRELId)";
-	        }
-	        
-	        sql = sql + ");";
-	        
-	        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
-	        query.setParameter("id", id);
-	        if (!getAll) {
-	            query.setParameterList("transRELId", transRELId);
-	        }
-	        List<Integer> configIds = query.list();
-	        return configIds;
-    	} catch (Exception ex) {
-    		ex.printStackTrace();
-    		System.err.println("clearMessageTableForBatch " + ex.getCause());
-    		return null;
-    	}
+        try {
+            Integer id = batchUploadId;
+            String sql = "select distinct configId from transactionTranslatedIn "
+                    + " where   ";
+
+            if (transactionInId == 0) {
+                sql = sql + " transactionInId in (select id from transactionIn where batchId = :id ";
+            } else {
+                sql = sql + "( transactionInId = :id ";
+                id = transactionInId;
+                //we don't care about statusId if only one transaction
+                getAll = true;
+            }
+
+            if (!getAll) {
+                sql = sql + " and statusId not in (:transRELId)";
+            }
+
+            sql = sql + ");";
+
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+            query.setParameter("id", id);
+            if (!getAll) {
+                query.setParameterList("transRELId", transRELId);
+            }
+            List<Integer> configIds = query.list();
+            return configIds;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.err.println("clearMessageTableForBatch " + ex.getCause());
+            return null;
+        }
     }
 
     @Override
@@ -1297,7 +1296,7 @@ public class transactionInDAOImpl implements transactionInDAO {
         }
 
         findBatches.addOrder(Order.desc("dateSubmitted"));
-        
+
         return findBatches.list();
     }
 
@@ -1620,27 +1619,27 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Override
     @Transactional
     public Integer insertFailedRequiredFields(configurationFormFields cff, Integer batchUploadId, Integer transactionInId) {
-    	try {
-	    	Integer id = batchUploadId;
-	    	String sql = "insert into transactionInerrors (batchUploadId, configId, transactionInId, fieldNo, errorid)"
-	                + "select " + batchUploadId + ", " + cff.getconfigId() + ", transactionInId, " + cff.getFieldNo()
-                + ", 1 from transactionTranslatedIn where configId = :configId "
-                + " and (F" + cff.getFieldNo()
-                + " is  null  or length(trim(F" + cff.getFieldNo() + ")) = 0"
-                + " or length(REPLACE(REPLACE(F" + cff.getFieldNo() + ", '\n', ''), '\r', '')) = 0)"
-                + "and transactionInId ";
-               	if (transactionInId == 0) {
-               		sql = sql+ " in (select id from transactionIn where batchId = :id and configId = :configId and statusId not in (:transRELId));";
-               	} else {
-               		sql = sql+ " = :id";
-               		id = transactionInId;
-               	}
-                
-               	Query insertData = sessionFactory.getCurrentSession().createSQLQuery(sql).setParameter("id", id);
-               	insertData.setParameter("configId", cff.getconfigId());
-                if (transactionInId == 0) {
-                	insertData.setParameterList("transRELId", transRELId);
-                }
+        try {
+            Integer id = batchUploadId;
+            String sql = "insert into transactionInerrors (batchUploadId, configId, transactionInId, fieldNo, errorid)"
+                    + "select " + batchUploadId + ", " + cff.getconfigId() + ", transactionInId, " + cff.getFieldNo()
+                    + ", 1 from transactionTranslatedIn where configId = :configId "
+                    + " and (F" + cff.getFieldNo()
+                    + " is  null  or length(trim(F" + cff.getFieldNo() + ")) = 0"
+                    + " or length(REPLACE(REPLACE(F" + cff.getFieldNo() + ", '\n', ''), '\r', '')) = 0)"
+                    + "and transactionInId ";
+            if (transactionInId == 0) {
+                sql = sql + " in (select id from transactionIn where batchId = :id and configId = :configId and statusId not in (:transRELId));";
+            } else {
+                sql = sql + " = :id";
+                id = transactionInId;
+            }
+
+            Query insertData = sessionFactory.getCurrentSession().createSQLQuery(sql).setParameter("id", id);
+            insertData.setParameter("configId", cff.getconfigId());
+            if (transactionInId == 0) {
+                insertData.setParameterList("transRELId", transRELId);
+            }
             insertData.executeUpdate();
             return 0;
         } catch (Exception ex) {
@@ -1676,7 +1675,7 @@ public class transactionInDAOImpl implements transactionInDAO {
             return 1;
         }
     }
-    
+
     @Override
     @Transactional
     public Integer deleteTransactionInErrorsByTransactionId(Integer transactionInId) {
@@ -1685,7 +1684,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 
             Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
                     .setParameter("transactionInId", transactionInId);
-            
+
             deleteData.executeUpdate();
             return 0;
         } catch (Exception ex) {
@@ -1697,35 +1696,35 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Override
     @Transactional
     public void updateStatusForErrorTrans(Integer batchId, Integer statusId, boolean foroutboundProcessing, Integer transactionId) {
-    	try {
-	        String sql;
-	        Integer id = batchId;
-	        
-	        if (foroutboundProcessing == false) {
-	            sql = "update transactionIn set statusId = :statusId where"
-	                    + " id in (select distinct transactionInId from transactionInErrors where ";
-	            		if (transactionId == 0) {
-	            			sql = sql  + " batchUploadId = :id) and statusId not in (:transRELId); ";
-	            		} else {
-	            			sql = sql  + " transactionInId = :id);";
-	            		}
-	        } else {
-	            sql = "update transactionTarget set statusId = :statusId where"
-	                    + " id  in (select distinct transactionTargetId from transactionOutErrors where ";
-	            if (transactionId == 0) {
-	            	sql = sql  + " batchDownLoadId = :id) and statusId not in (:transRELId); ";
-        		} else {
-        			sql = sql  + " transactionInId = :id);";
-        		}
-	        }
-	
-	        Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
-	                .setParameter("id", id)
-	                .setParameter("statusId", statusId);
-	        if (transactionId == 0) {
-	        		updateData.setParameterList("transRELId", transRELId);
-	        }
-	        updateData.executeUpdate();
+        try {
+            String sql;
+            Integer id = batchId;
+
+            if (foroutboundProcessing == false) {
+                sql = "update transactionIn set statusId = :statusId where"
+                        + " id in (select distinct transactionInId from transactionInErrors where ";
+                if (transactionId == 0) {
+                    sql = sql + " batchUploadId = :id) and statusId not in (:transRELId); ";
+                } else {
+                    sql = sql + " transactionInId = :id);";
+                }
+            } else {
+                sql = "update transactionTarget set statusId = :statusId where"
+                        + " id  in (select distinct transactionTargetId from transactionOutErrors where ";
+                if (transactionId == 0) {
+                    sql = sql + " batchDownLoadId = :id) and statusId not in (:transRELId); ";
+                } else {
+                    sql = sql + " transactionInId = :id);";
+                }
+            }
+
+            Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                    .setParameter("id", id)
+                    .setParameter("statusId", statusId);
+            if (transactionId == 0) {
+                updateData.setParameterList("transRELId", transRELId);
+            }
+            updateData.executeUpdate();
 
         } catch (Exception ex) {
             System.err.println("updateStatusForErrorTrans " + ex.getCause());
@@ -1737,8 +1736,8 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Transactional
     public Integer genericValidation(configurationFormFields cff,
             Integer validationTypeId, Integer batchUploadId, String regEx, Integer transactionId) {
-    	
-    	String sql = "call insertValidationErrors(:vtType, :fieldNo, :batchUploadId, :configId, :transactionId)";
+
+        String sql = "call insertValidationErrors(:vtType, :fieldNo, :batchUploadId, :configId, :transactionId)";
 
         Query insertError = sessionFactory.getCurrentSession().createSQLQuery(sql);
         insertError.setParameter("vtType", cff.getValidationType());
@@ -1884,48 +1883,48 @@ public class transactionInDAOImpl implements transactionInDAO {
     public void nullForCWCol(Integer configId, Integer batchId, boolean foroutboundProcessing, Integer transactionId) {
 
         String sql;
-        Integer id = batchId; 
+        Integer id = batchId;
 
-        if (foroutboundProcessing == false) { 
-        
+        if (foroutboundProcessing == false) {
+
             sql = "update transactionTranslatedIn set forcw = null where "
                     + " transactionInId ";
             if (transactionId == 0) {
-            	sql = sql + "in (select id from transactionIn where ";
-	            if (configId != 0) {
-	                sql = sql + " configId = :configId and ";
-	            }
-	            sql = sql + " batchId = :id and statusId not in ( :transRELId ));";
+                sql = sql + "in (select id from transactionIn where ";
+                if (configId != 0) {
+                    sql = sql + " configId = :configId and ";
+                }
+                sql = sql + " batchId = :id and statusId not in ( :transRELId ));";
             } else {
-            	sql = sql + " = :id";
-            	id = transactionId;
+                sql = sql + " = :id";
+                id = transactionId;
             }
         } else {
-            
-        	sql = "update transactionTranslatedOut set forcw = null where "
+
+            sql = "update transactionTranslatedOut set forcw = null where "
                     + "transactionTargetId ";
-            
-        	if (transactionId == 0) {
-	            sql = sql + " in (select id from transactionTarget where ";
-	            
-	            if (configId != 0) {
-	                sql = sql + "configId = :configId and ";
-	            }
-	            sql = sql + " batchDLId = :id and statusId not in ( :transRELId ));";
-        	} else {
-        		sql = sql + " = :id";
-            	id = transactionId;
-        	}
+
+            if (transactionId == 0) {
+                sql = sql + " in (select id from transactionTarget where ";
+
+                if (configId != 0) {
+                    sql = sql + "configId = :configId and ";
+                }
+                sql = sql + " batchDLId = :id and statusId not in ( :transRELId ));";
+            } else {
+                sql = sql + " = :id";
+                id = transactionId;
+            }
         }
 
         Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
                 .setParameter("id", id);
-        
-        if (transactionId == 0) {     
-	        updateData.setParameterList("transRELId", transRELId);
-	        if (configId != 0) {
-	            updateData.setParameter("configId", configId);
-	        }
+
+        if (transactionId == 0) {
+            updateData.setParameterList("transRELId", transRELId);
+            if (configId != 0) {
+                updateData.setParameter("configId", configId);
+            }
         }
         try {
             updateData.executeUpdate();
@@ -1947,20 +1946,20 @@ public class transactionInDAOImpl implements transactionInDAO {
             sql = "update transactionTranslatedIn set forcw = :targetValue where "
                     + "REPLACE(REPLACE(f" + fieldNo + ", '\n', ''), '\r', '') = :sourceValue and transactionInId ";
             if (transactionId == 0) {
-            sql = sql +	"in (select id from transactionIn where configId = :configId "
-                    + " and batchId = :id and statusId not in ( :transRELId ));";
-            } else  {
-            	sql = sql + " = :id";
-            	id = transactionId;
+                sql = sql + "in (select id from transactionIn where configId = :configId "
+                        + " and batchId = :id and statusId not in ( :transRELId ));";
+            } else {
+                sql = sql + " = :id";
+                id = transactionId;
             }
         } else {
             sql = "update transactionTranslatedOut set forcw = :targetValue where "
                     + "REPLACE(REPLACE(f" + fieldNo + ", '\n', ''), '\r', '') = :sourceValue and transactionTargetId ";
             if (transactionId == 0) {
-            	sql = sql   + " in (select id from transactionTarget where configId = :configId and batchDLId = :id and statusId not in ( :transRELId ));";
+                sql = sql + " in (select id from transactionTarget where configId = :configId and batchDLId = :id and statusId not in ( :transRELId ));";
             } else {
-            	sql = sql + " = :id";
-            	id = transactionId;
+                sql = sql + " = :id";
+                id = transactionId;
             }
         }
 
@@ -1969,8 +1968,8 @@ public class transactionInDAOImpl implements transactionInDAO {
                 .setParameter("sourceValue", cwd.getSourceValue())
                 .setParameter("id", id);
         if (transactionId == 0) {
-        		updateData.setParameter("configId", configId);
-                updateData.setParameterList("transRELId", transRELId);
+            updateData.setParameter("configId", configId);
+            updateData.setParameterList("transRELId", transRELId);
         }
         try {
             updateData.executeUpdate();
@@ -1987,65 +1986,64 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Override
     @Transactional
     public void updateFieldNoWithCWData(Integer configId, Integer batchId, Integer fieldNo, Integer passClear, boolean foroutboundProcessing, Integer transactionId) {
-    	try {
-	        String sql;
-	        Integer id = batchId;
-	
-	        if (foroutboundProcessing == false) {
-	        	if (transactionId == 0) {
-	        	sql = "update transactionTranslatedIn "
-	                    + " JOIN (SELECT id from transactionIn WHERE configId = :configId"
-	                    + " and batchId = :id and statusId not in ( :transRELId )"
-	                    + ") as ti ON transactionTranslatedIn.transactionInId = ti.id "
-	                    + " SET transactionTranslatedIn.F" + fieldNo + " = forcw ";
-	        	if (passClear == 1) {
-	                // 1 is pass, we leave original values in fieldNo alone
-	                sql = sql + "where forcw is not null;";
-	            }
-	        	} else {
-	        		sql = "update transactionTranslatedIn SET transactionTranslatedIn.F" + fieldNo + " = forcw "
-	        			+ " where transactionInId = :id";
-	        		id = transactionId;
-	        		if (passClear == 1) {
-	                    // 1 is pass, we leave original values in fieldNo alone
-	                    sql = sql + " and  forcw is not null;";
-	                }
-	        	}
-	        
-	        } else {
-	        	if (transactionId == 0) {
-	        		sql = "update transactionTranslatedOut "
-	                        + " JOIN (SELECT id from transactionTarget WHERE configId = :configId"
-	                        + " and batchDLId = :id and statusId not in ( :transRELId )) as ti ON transactionTranslatedOut.transactionTargetId = ti.id "
-	                        + " SET transactionTranslatedOut.F" + fieldNo + " = forcw ";
-	        		if (passClear == 1) {
-	                    // 1 is pass, we leave original values in fieldNo alone
-	                    sql = sql + "where forcw is not null;";
-	                }
-	            	} else {
-	            		sql = "update transactionTranslatedOut "
-	            				+ " SET transactionTranslatedOut.F" + fieldNo + " = forcw "
-	            				+ " where transactionTargetId = :id";
-	            		if (passClear == 1) {
-	                        // 1 is pass, we leave original values in fieldNo alone
-	                        sql = sql + " and  forcw is not null;";
-	                    }
-	            		id = transactionId;
-	            	}
-	        }
-	
-	        
-	        Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
-	                .setParameter("id", id);
-	        if (transactionId == 0) {
-	        		updateData.setParameter("configId", configId);
-	                updateData.setParameterList("transRELId", transRELId);
-	        }
-	             updateData.executeUpdate();
-	        } catch (Exception ex) {
-	            System.err.println("updateFieldNoWithCWData " + ex.getCause());
-	            ex.printStackTrace();
-	        }
+        try {
+            String sql;
+            Integer id = batchId;
+
+            if (foroutboundProcessing == false) {
+                if (transactionId == 0) {
+                    sql = "update transactionTranslatedIn "
+                            + " JOIN (SELECT id from transactionIn WHERE configId = :configId"
+                            + " and batchId = :id and statusId not in ( :transRELId )"
+                            + ") as ti ON transactionTranslatedIn.transactionInId = ti.id "
+                            + " SET transactionTranslatedIn.F" + fieldNo + " = forcw ";
+                    if (passClear == 1) {
+                        // 1 is pass, we leave original values in fieldNo alone
+                        sql = sql + "where forcw is not null;";
+                    }
+                } else {
+                    sql = "update transactionTranslatedIn SET transactionTranslatedIn.F" + fieldNo + " = forcw "
+                            + " where transactionInId = :id";
+                    id = transactionId;
+                    if (passClear == 1) {
+                        // 1 is pass, we leave original values in fieldNo alone
+                        sql = sql + " and  forcw is not null;";
+                    }
+                }
+
+            } else {
+                if (transactionId == 0) {
+                    sql = "update transactionTranslatedOut "
+                            + " JOIN (SELECT id from transactionTarget WHERE configId = :configId"
+                            + " and batchDLId = :id and statusId not in ( :transRELId )) as ti ON transactionTranslatedOut.transactionTargetId = ti.id "
+                            + " SET transactionTranslatedOut.F" + fieldNo + " = forcw ";
+                    if (passClear == 1) {
+                        // 1 is pass, we leave original values in fieldNo alone
+                        sql = sql + "where forcw is not null;";
+                    }
+                } else {
+                    sql = "update transactionTranslatedOut "
+                            + " SET transactionTranslatedOut.F" + fieldNo + " = forcw "
+                            + " where transactionTargetId = :id";
+                    if (passClear == 1) {
+                        // 1 is pass, we leave original values in fieldNo alone
+                        sql = sql + " and  forcw is not null;";
+                    }
+                    id = transactionId;
+                }
+            }
+
+            Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                    .setParameter("id", id);
+            if (transactionId == 0) {
+                updateData.setParameter("configId", configId);
+                updateData.setParameterList("transRELId", transRELId);
+            }
+            updateData.executeUpdate();
+        } catch (Exception ex) {
+            System.err.println("updateFieldNoWithCWData " + ex.getCause());
+            ex.printStackTrace();
+        }
     }
 
     @Override
@@ -2057,18 +2055,18 @@ public class transactionInDAOImpl implements transactionInDAO {
 
         if (foroutboundProcessing == false) {
             if (transactionId == 0) {
-        	sql = "insert into transactionInerrors (batchUploadId, configId, "
-                    + "transactionInId, fieldNo, errorid, cwId)"
-                    + " select " + batchId + ", " + configId + ",transactionInId, " + cdt.getFieldNo()
-                    + ", 3,  " + cdt.getCrosswalkId() + " from transactionTranslatedIn where "
-                    + "configId = :configId "
-                    + " and (F" + cdt.getFieldNo()
-                    + " is not null and length(F" + cdt.getFieldNo() + ") != 0  and forcw is null)"
-                    + "and transactionInId in (select id from transactionIn "
-                    + "where batchId = :id"
-                    + " and configId = :configId and statusId not in ( :transRELId ));";
+                sql = "insert into transactionInerrors (batchUploadId, configId, "
+                        + "transactionInId, fieldNo, errorid, cwId)"
+                        + " select " + batchId + ", " + configId + ",transactionInId, " + cdt.getFieldNo()
+                        + ", 3,  " + cdt.getCrosswalkId() + " from transactionTranslatedIn where "
+                        + "configId = :configId "
+                        + " and (F" + cdt.getFieldNo()
+                        + " is not null and length(F" + cdt.getFieldNo() + ") != 0  and forcw is null)"
+                        + "and transactionInId in (select id from transactionIn "
+                        + "where batchId = :id"
+                        + " and configId = :configId and statusId not in ( :transRELId ));";
             } else {
-            	sql = "insert into transactionInerrors (batchUploadId, configId, "
+                sql = "insert into transactionInerrors (batchUploadId, configId, "
                         + "transactionInId, fieldNo, errorid, cwId)"
                         + " select " + batchId + ", " + configId + ",transactionInId, " + cdt.getFieldNo()
                         + ", 3,  " + cdt.getCrosswalkId() + " from transactionTranslatedIn where "
@@ -2076,22 +2074,22 @@ public class transactionInDAOImpl implements transactionInDAO {
                         + " and (F" + cdt.getFieldNo()
                         + " is not null and length(F" + cdt.getFieldNo() + ") != 0  and forcw is null)"
                         + " and transactionInId = :id";
-            	id = transactionId;
+                id = transactionId;
             }
         } else {
-        	if (transactionId == 0) {
-            sql = "insert into transactionOutErrors (batchDownloadId, configId, "
-                    + "transactionTargetId, fieldNo, errorid, cwId)"
-                    + " select " + batchId + ", " + configId + ",  transactionTargetId, " + cdt.getFieldNo()
-                    + ", 3,  " + cdt.getCrosswalkId() + " from transactionTranslatedOut where "
-                    + " configId = :configId "
-                    + " and (F" + cdt.getFieldNo()
-                    + " is not null and length(F" + cdt.getFieldNo() + ") != 0 and forcw is null)"
-                    + " and transactionTargetId in (select id from transactionTarget "
-                    + " where batchDLId = :id"
-                    + " and configId = :configId and statusId not in ( :transRELId ));";
-        	} else {
-        		sql = "insert into transactionOutErrors (batchDownloadId, configId, "
+            if (transactionId == 0) {
+                sql = "insert into transactionOutErrors (batchDownloadId, configId, "
+                        + "transactionTargetId, fieldNo, errorid, cwId)"
+                        + " select " + batchId + ", " + configId + ",  transactionTargetId, " + cdt.getFieldNo()
+                        + ", 3,  " + cdt.getCrosswalkId() + " from transactionTranslatedOut where "
+                        + " configId = :configId "
+                        + " and (F" + cdt.getFieldNo()
+                        + " is not null and length(F" + cdt.getFieldNo() + ") != 0 and forcw is null)"
+                        + " and transactionTargetId in (select id from transactionTarget "
+                        + " where batchDLId = :id"
+                        + " and configId = :configId and statusId not in ( :transRELId ));";
+            } else {
+                sql = "insert into transactionOutErrors (batchDownloadId, configId, "
                         + "transactionTargetId, fieldNo, errorid, cwId)"
                         + " select " + batchId + ", " + configId + ",  transactionTargetId, " + cdt.getFieldNo()
                         + ", 3,  " + cdt.getCrosswalkId() + " from transactionTranslatedOut where "
@@ -2099,16 +2097,16 @@ public class transactionInDAOImpl implements transactionInDAO {
                         + " and (F" + cdt.getFieldNo()
                         + " is not null and length(F" + cdt.getFieldNo() + ") != 0 and forcw is null)"
                         + " and transactionTargetId = :id";
-        		id = transactionId;
-        	}
+                id = transactionId;
+            }
         }
 
         Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
                 .setParameter("id", id)
                 .setParameter("configId", configId);
-	        if (transactionId == 0) {
-	        	updateData.setParameterList("transRELId", transRELId);
-	        }
+        if (transactionId == 0) {
+            updateData.setParameterList("transRELId", transRELId);
+        }
         try {
             updateData.executeUpdate();
         } catch (Exception ex) {
@@ -2120,64 +2118,64 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Override
     @Transactional
     public void flagMacroErrors(Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing, Integer transactionId) {
-    	try {
-	        String sql;
-	        Integer id = batchId;
-	        if (foroutboundProcessing == false) {
-	            if (transactionId == 0) {
-	        	sql = "insert into transactionInerrors (batchUploadId, configId, "
-	                    + "transactionInId, fieldNo, errorid, macroId)"
-	                    + " select " + batchId + ", " + configId + ", transactionInId, " + cdt.getFieldNo()
-	                    + ", 4,  " + cdt.getMacroId() + " from transactionTranslatedIn where "
-	                    + "configId = :configId "
-	                    + " and forcw = 'MACRO_ERROR'"
-	                    + " and transactionInId in (select id from transactionIn "
-	                    + " where batchId = :id"
-	                    + " and configId = :configId and statusId not in ( :transRELId ));";
-	            } else {
-	            	sql = "insert into transactionInerrors (batchUploadId, configId, "
-	                        + "transactionInId, fieldNo, errorid, macroId)"
-	                        + " (select " + batchId + ", " + configId + ", transactionInId, " + cdt.getFieldNo()
-	                        + ", 4,  " + cdt.getMacroId() + " from transactionTranslatedIn where "
-	                        + "configId = :configId "
-	                        + " and forcw = 'MACRO_ERROR'"
-	                        + " and transactionInId = :id);";
-	            	id = transactionId;
-	            }
-	        } else {
-	            if (transactionId == 0) {
-	            	sql = "insert into transactionOutErrors (batchDownloadId, configId, "
-	                    + "transactionTargetId, fieldNo, errorid, macroId)"
-	                    + " select " + batchId + ", " + configId + ",transactionTargetId, " + cdt.getFieldNo()
-	                    + ", 4,  " + cdt.getMacroId() + " from transactionTranslatedOut where "
-	                    + "configId = :configId "
-	                    + " and forcw = 'MACRO_ERROR'"
-	                    + " and transactionTargetId in (select id from transactionTarget "
-	                    + "where batchDLId = :id"
-	                    + " and configId = :configId  and statusId not in ( :transRELId ));";
-	            } else {
-	            	sql = "insert into transactionOutErrors (batchDownloadId, configId, "
-		                    + "transactionTargetId, fieldNo, errorid, macroId)"
-		                    + "( select " + batchId + ", " + configId + ",transactionTargetId, " + cdt.getFieldNo()
-		                    + ", 4,  " + cdt.getMacroId() + " from transactionTranslatedOut where "
-		                    + "configId = :configId "
-		                    + " and forcw = 'MACRO_ERROR'"
-		                    + " and transactionTargetId = :id);";
-	            	id = transactionId;
-	            }
-	        }
-	
-	        Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
-	                .setParameter("id", id)
-	                .setParameter("configId", configId);
-	        if (transactionId == 0) {
-	        	updateData.setParameterList("transRELId", transRELId);
-	        }
-	            updateData.executeUpdate();
-	     } catch (Exception ex) {
-	            System.err.println("flagMacroErrors " + ex.getCause());
-	            ex.printStackTrace();
-	     }
+        try {
+            String sql;
+            Integer id = batchId;
+            if (foroutboundProcessing == false) {
+                if (transactionId == 0) {
+                    sql = "insert into transactionInerrors (batchUploadId, configId, "
+                            + "transactionInId, fieldNo, errorid, macroId)"
+                            + " select " + batchId + ", " + configId + ", transactionInId, " + cdt.getFieldNo()
+                            + ", 4,  " + cdt.getMacroId() + " from transactionTranslatedIn where "
+                            + "configId = :configId "
+                            + " and forcw = 'MACRO_ERROR'"
+                            + " and transactionInId in (select id from transactionIn "
+                            + " where batchId = :id"
+                            + " and configId = :configId and statusId not in ( :transRELId ));";
+                } else {
+                    sql = "insert into transactionInerrors (batchUploadId, configId, "
+                            + "transactionInId, fieldNo, errorid, macroId)"
+                            + " (select " + batchId + ", " + configId + ", transactionInId, " + cdt.getFieldNo()
+                            + ", 4,  " + cdt.getMacroId() + " from transactionTranslatedIn where "
+                            + "configId = :configId "
+                            + " and forcw = 'MACRO_ERROR'"
+                            + " and transactionInId = :id);";
+                    id = transactionId;
+                }
+            } else {
+                if (transactionId == 0) {
+                    sql = "insert into transactionOutErrors (batchDownloadId, configId, "
+                            + "transactionTargetId, fieldNo, errorid, macroId)"
+                            + " select " + batchId + ", " + configId + ",transactionTargetId, " + cdt.getFieldNo()
+                            + ", 4,  " + cdt.getMacroId() + " from transactionTranslatedOut where "
+                            + "configId = :configId "
+                            + " and forcw = 'MACRO_ERROR'"
+                            + " and transactionTargetId in (select id from transactionTarget "
+                            + "where batchDLId = :id"
+                            + " and configId = :configId  and statusId not in ( :transRELId ));";
+                } else {
+                    sql = "insert into transactionOutErrors (batchDownloadId, configId, "
+                            + "transactionTargetId, fieldNo, errorid, macroId)"
+                            + "( select " + batchId + ", " + configId + ",transactionTargetId, " + cdt.getFieldNo()
+                            + ", 4,  " + cdt.getMacroId() + " from transactionTranslatedOut where "
+                            + "configId = :configId "
+                            + " and forcw = 'MACRO_ERROR'"
+                            + " and transactionTargetId = :id);";
+                    id = transactionId;
+                }
+            }
+
+            Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                    .setParameter("id", id)
+                    .setParameter("configId", configId);
+            if (transactionId == 0) {
+                updateData.setParameterList("transRELId", transRELId);
+            }
+            updateData.executeUpdate();
+        } catch (Exception ex) {
+            System.err.println("flagMacroErrors " + ex.getCause());
+            ex.printStackTrace();
+        }
     }
 
     /**
@@ -2190,19 +2188,19 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Override
     @Transactional
     public void resetTransactionTranslatedIn(Integer batchId, boolean resetAll, Integer transactionInId) {
-        
-    	Integer id = batchId;
-    	String sql = "UPDATE transactionTranslatedIn INNER JOIN transactionInRecords ON "
+
+        Integer id = batchId;
+        String sql = "UPDATE transactionTranslatedIn INNER JOIN transactionInRecords ON "
                 + " (transactionTranslatedIn.transactionInId = transactionInRecords.transactionInId) "
                 + " and  ";
         if (transactionInId == 0) {
-        	sql = sql + "transactionTranslatedIn.transactionInId in (select id from transactionIn where batchId = :id ";
-        } else  {
-        	sql = sql + " (transactionTranslatedIn.transactionInId = :id ";
-        	id = transactionInId;
-        	resetAll = true;
+            sql = sql + "transactionTranslatedIn.transactionInId in (select id from transactionIn where batchId = :id ";
+        } else {
+            sql = sql + " (transactionTranslatedIn.transactionInId = :id ";
+            id = transactionInId;
+            resetAll = true;
         }
-        
+
         if (!resetAll) {
             sql = sql + " and statusId not in ( :transRELId )";
         }
@@ -2455,9 +2453,9 @@ public class transactionInDAOImpl implements transactionInDAO {
                 + "transactiontranslatedIn.F255 = transactionInRecords.F255";
 
         Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql);
-        
+
         updateData.setParameter("id", id);
-        
+
         if (!resetAll) {
             updateData.setParameterList("transRELId", transRELId);
         }
@@ -2502,9 +2500,9 @@ public class transactionInDAOImpl implements transactionInDAO {
             query.setParameter("foroutboundProcessing", foroutboundProcessing);
             query.setParameter("passClear", cdt.getPassClear());
             query.setParameter("transactionId", transactionId);
-            
+
             query.list();
-            
+
             return 0;
         } catch (Exception ex) {
             //insert system error
@@ -2667,15 +2665,15 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Transactional
     public Integer copyTransactionInStatusToTarget(Integer batchId, Integer transactionId) {
         try {
-        	Integer id = batchId;
-        	String sql = ("UPDATE transactionTarget INNER JOIN transactionIn  ON  transactionIn.id = transactionTarget.transactionInId ");
-        	if (transactionId == 0)	{
-        		sql = sql +  " and transactionTarget.batchUploadId = :id ";
-        	} else {
-        		sql = sql +  " and transactionTarget.transactionInId = :id ";
-        	}
-        			sql = sql + (" set transactionTarget.statusId = transactionIn.statusId;");
-            
+            Integer id = batchId;
+            String sql = ("UPDATE transactionTarget INNER JOIN transactionIn  ON  transactionIn.id = transactionTarget.transactionInId ");
+            if (transactionId == 0) {
+                sql = sql + " and transactionTarget.batchUploadId = :id ";
+            } else {
+                sql = sql + " and transactionTarget.transactionInId = :id ";
+            }
+            sql = sql + (" set transactionTarget.statusId = transactionIn.statusId;");
+
             Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
                     .setParameter("id", id);
             query.executeUpdate();
@@ -3763,7 +3761,7 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Override
     public ConfigErrorInfo setConfigErrorInfo(Integer batchId, Integer errorCode, ConfigErrorInfo configErrorInfo) {
 
-		//depending on errorCode 
+        //depending on errorCode 
         return configErrorInfo;
     }
 
@@ -3773,15 +3771,15 @@ public class transactionInDAOImpl implements transactionInDAO {
     public List<TransErrorDetail> getTransErrorDetailsForNoRptFields(Integer batchId, List<Integer> errorCodes) {
         try {
             String sql = "select "
-            		+ "'N/A' as transactionStatusValue, 'N/A' as errorFieldLabel, "
-            		+ " transactionInErrors.id, errorId as errorCode, displayText as errorDisplayText, stackTrace as errorData  "
+                    + "'N/A' as transactionStatusValue, 'N/A' as errorFieldLabel, "
+                    + " transactionInErrors.id, errorId as errorCode, displayText as errorDisplayText, stackTrace as errorData  "
                     + " from transactionInErrors, lu_errorCodes where  transactionInErrors.errorId = lu_errorCodes.id "
                     + " and transactionInErrors.errorId  in ( :errorCodes ) and batchuploadid = :batchId order by errorId, id;";
 
             Query query = sessionFactory.getCurrentSession()
                     .createSQLQuery(sql)
                     .setResultTransformer(Transformers.aliasToBean(TransErrorDetail.class));
-            
+
             query.setParameter("batchId", batchId);
             query.setParameterList("errorCodes", errorCodes);
             return query.list();
@@ -3819,16 +3817,16 @@ public class transactionInDAOImpl implements transactionInDAO {
     public List<TransErrorDetail> getTransErrorDetailsForInvConfig(Integer batchId) {
         try {
             String sql = "select transactionIn.statusId as transactionStatus, lu_processstatus.displayCode as transactionStatusValue, "
-            		+ " transactionIn.id as transactionInId, 'N/A' as errorFieldLabel, 'N/A' as errorData,"
-            		+ " F1 as rptField1Value, F2 as rptField2Value, F3 as rptField3Value, F4 as rptField4Value,"
-            		+ " 'Field 1' as rptField1Label, 'Field 2' as rptField2Label, 'Field 3' as rptField3Label, 'Field 4' as rptField4Label,"
-            		+ " errorId as errorCode, lu_errorcodes.displayText as errorDisplayText "
-            		+ " from transactionInErrors, transactionInRecords, lu_errorcodes, transactionIn, lu_processstatus "
-            		+ " where batchuploadId = :batchId and errorId = :errorId and lu_errorcodes.id = transactionInErrors.errorId"
-            		+ " and transactionIn.id = transactionInRecords.transactionInId "
-            		+ " and transactionIn.statusId = lu_processstatus.id "
-            		+ " and transactionInErrors.transactionInId = transactionInRecords.transactionInId  "
-            		+ " order  by transactionInRecords.transactionInId;";
+                    + " transactionIn.id as transactionInId, 'N/A' as errorFieldLabel, 'N/A' as errorData,"
+                    + " F1 as rptField1Value, F2 as rptField2Value, F3 as rptField3Value, F4 as rptField4Value,"
+                    + " 'Field 1' as rptField1Label, 'Field 2' as rptField2Label, 'Field 3' as rptField3Label, 'Field 4' as rptField4Label,"
+                    + " errorId as errorCode, lu_errorcodes.displayText as errorDisplayText "
+                    + " from transactionInErrors, transactionInRecords, lu_errorcodes, transactionIn, lu_processstatus "
+                    + " where batchuploadId = :batchId and errorId = :errorId and lu_errorcodes.id = transactionInErrors.errorId"
+                    + " and transactionIn.id = transactionInRecords.transactionInId "
+                    + " and transactionIn.statusId = lu_processstatus.id "
+                    + " and transactionInErrors.transactionInId = transactionInRecords.transactionInId  "
+                    + " order  by transactionInRecords.transactionInId;";
             Query query = sessionFactory
                     .getCurrentSession()
                     .createSQLQuery(sql).setResultTransformer(Transformers.aliasToBean(TransErrorDetail.class));
@@ -3913,13 +3911,13 @@ public class transactionInDAOImpl implements transactionInDAO {
     public List<TransErrorDetail> getTransErrorDetails(batchUploads batchInfo, ConfigErrorInfo configErrorInfo) {
 
         String sql = "select transactionInErrors.id, transactionInErrors.configId, transactionInId, errorId as errorCode, lu_errorCodes.displayText as errorDisplayText, "
-        		+ "fieldNo as errorFieldNo, cwId, macroId, validationTypeId , "
-        		+ "transactionIn.statusId as transactionStatus, "
-        		+ "lu_processstatus.displayCode as transactionStatusValue "
-        		+ "from transactionInErrors, lu_errorCodes, transactionIn , lu_processstatus "
-        		+ "where lu_processstatus.id = transactionIn.statusId and "
-        		+ "errorId = lu_errorCodes.id and transactionInErrors.transactionInId = transactionIn.Id "
-        		+ "and transactionInErrors.configId = :configId and batchuploadid = :batchId order by transactionInId, errorCode, transactionInErrors.id;";
+                + "fieldNo as errorFieldNo, cwId, macroId, validationTypeId , "
+                + "transactionIn.statusId as transactionStatus, "
+                + "lu_processstatus.displayCode as transactionStatusValue "
+                + "from transactionInErrors, lu_errorCodes, transactionIn , lu_processstatus "
+                + "where lu_processstatus.id = transactionIn.statusId and "
+                + "errorId = lu_errorCodes.id and transactionInErrors.transactionInId = transactionIn.Id "
+                + "and transactionInErrors.configId = :configId and batchuploadid = :batchId order by transactionInId, errorCode, transactionInErrors.id;";
 
         try {
             Query query = sessionFactory
@@ -4070,12 +4068,12 @@ public class transactionInDAOImpl implements transactionInDAO {
         }
 
     }
-    
+
     @Override
     @Transactional
     public List<TransErrorDetail> getTransactionErrorsByFieldNo(int transactionInId, int fieldNo) throws Exception {
-        
-         String sql = "select err.displayText as errorDisplayText, v.validationType as errorInfo "
+
+        String sql = "select err.displayText as errorDisplayText, v.validationType as errorInfo "
                 + "from transactionInErrors inner join lu_errorCodes err on err.id = transactionInErrors.errorId "
                 + "left outer join ref_validationTypes v on v.id = transactionInErrors.validationTypeId "
                 + "where transactionInErrors.transactionInId = :transactionInId and transactionInErrors.fieldNo = :fieldNo ";
@@ -4090,27 +4088,27 @@ public class transactionInDAOImpl implements transactionInDAO {
 
             List<TransErrorDetail> teds = query.list();
             return teds;
-            
+
         } catch (Exception ex) {
             System.err.println("getTransErrorDetails " + ex.getCause());
             ex.printStackTrace();
             return null;
         }
-        
+
     }
 
-	@Override
-	@Transactional
-	public List<UserActivity> getBatchUserActivities(batchUploads batchInfo, boolean foroutboundProcessing) {
-		String batchColName = "batchUploadId";
-		if (foroutboundProcessing) {
-			batchColName = "batchDownloadId";
-		}
-		
-		String sql = "select organizations.id as orgId, organizations.orgName as orgName, users.firstName as userFirstName, "
-				+ "users.lastName as userLastName, userActivity.* "
-				+ " from userActivity, users, organizations where users.id = userActivity.userId "
-				+ " and users.orgId = organizations.id and "+ batchColName +" = :batchId order by dateCreated desc, userId;";
+    @Override
+    @Transactional
+    public List<UserActivity> getBatchUserActivities(batchUploads batchInfo, boolean foroutboundProcessing) {
+        String batchColName = "batchUploadId";
+        if (foroutboundProcessing) {
+            batchColName = "batchDownloadId";
+        }
+
+        String sql = "select organizations.id as orgId, organizations.orgName as orgName, users.firstName as userFirstName, "
+                + "users.lastName as userLastName, userActivity.* "
+                + " from userActivity, users, organizations where users.id = userActivity.userId "
+                + " and users.orgId = organizations.id and " + batchColName + " = :batchId order by dateCreated desc, userId;";
 
         try {
             Query query = sessionFactory
@@ -4119,93 +4117,132 @@ public class transactionInDAOImpl implements transactionInDAO {
 
             query.setParameter("batchId", batchInfo.getId());
             List<UserActivity> uas = query.list();
-            
+
             return uas;
-            
+
         } catch (Exception ex) {
             System.err.println("getBatchUserActivities " + ex.getCause());
             ex.printStackTrace();
             return null;
         }
-	}
-	
-	@Override
+    }
+
+    @Override
     @Transactional
     @SuppressWarnings("unchecked")
     public List<transactionRecords> getFieldColAndValueByTransactionId(configurationFormFields cff, Integer transactionId) {
         try {
-	    	String sql = ("select transactionInId as transactionId, F" + cff.getFieldNo()
-	                + "  as fieldValue, " + cff.getFieldNo() + " as fieldNo from transactiontranslatedIn "
-	                + " where configId = :configId "
-	                + " and F" + cff.getFieldNo() + " is not null "
-	                + " and transactionInId = :id");
-	
-	        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
-	                .addScalar("transactionId", StandardBasicTypes.INTEGER)
-	                .addScalar("fieldValue", StandardBasicTypes.STRING)
-	                .addScalar("fieldNo", StandardBasicTypes.INTEGER)
-	                .setResultTransformer(Transformers.aliasToBean(transactionRecords.class))
-	                .setParameter("configId", cff.getconfigId())
-	                .setParameter("id", transactionId);
-	
-	        List<transactionRecords> trs = query.list();
-	
-	        return trs;
-	        } catch (Exception ex) {
-        	System.err.println("getFieldColAndValueByTransactionId " + ex.getCause());
-        	ex.printStackTrace();
-        	return null;
+            String sql = ("select transactionInId as transactionId, F" + cff.getFieldNo()
+                    + "  as fieldValue, " + cff.getFieldNo() + " as fieldNo from transactiontranslatedIn "
+                    + " where configId = :configId "
+                    + " and F" + cff.getFieldNo() + " is not null "
+                    + " and transactionInId = :id");
+
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                    .addScalar("transactionId", StandardBasicTypes.INTEGER)
+                    .addScalar("fieldValue", StandardBasicTypes.STRING)
+                    .addScalar("fieldNo", StandardBasicTypes.INTEGER)
+                    .setResultTransformer(Transformers.aliasToBean(transactionRecords.class))
+                    .setParameter("configId", cff.getconfigId())
+                    .setParameter("id", transactionId);
+
+            List<transactionRecords> trs = query.list();
+
+            return trs;
+        } catch (Exception ex) {
+            System.err.println("getFieldColAndValueByTransactionId " + ex.getCause());
+            ex.printStackTrace();
+            return null;
         }
     }
 
-	@Override
-	@Transactional
-	public Integer insertSFTPRun(SFTPJobRunLog sftpJob) {
-		try {
-			 Integer lastId = (Integer) sessionFactory.getCurrentSession().save(sftpJob);
-			return lastId;
-		} catch (Exception ex) {
-			System.err.println("insertSFTPRun " + ex.getCause());
-        	ex.printStackTrace();
-			return null;
-		}
-	}
-
-	@Override
-	@Transactional
-	public void updateSFTPRun(SFTPJobRunLog sftpJob) {
-		try {
-			sessionFactory.getCurrentSession().update(sftpJob);	
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			System.err.println("updateSFTPRun " + ex.getCause());
-		}
-	}
-
-	@Override
-	@Transactional
-	public List<configurationFTPFields> getFTPInfoForJob(Integer method) {
-		try {
-	    	String sql = ("select rel_TransportFTPDetails.id, directory, ip, username, password, method, port, protocol, certification, transportId "
-	    			+ " from configurationTransportDetails, rel_TransportFTPDetails "
-	    			+ " where method = :method and configurationTransportDetails.id = rel_TransportFTPDetails.transportId "
-	    			+ " and configId in (select id from configurations where status = 1) and "
-	    			+ " directory not in (select folderPath from sftpjobrunlog where statusId = 1 and method = :method)"
-	    			+ " group by directory order by configId;");
-	
-	        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
-	                .setResultTransformer(Transformers.aliasToBean(configurationFTPFields.class))
-	                .setParameter("method", method);
-	
-	        List<configurationFTPFields> ftpPaths = query.list();
-	
-	        return ftpPaths;
-	        } catch (Exception ex) {
-        	System.err.println("getFTPInfoForJob " + ex.getCause());
-        	ex.printStackTrace();
-        	return null;
+    @Override
+    @Transactional
+    public Integer insertSFTPRun(SFTPJobRunLog sftpJob) {
+        try {
+            Integer lastId = (Integer) sessionFactory.getCurrentSession().save(sftpJob);
+            return lastId;
+        } catch (Exception ex) {
+            System.err.println("insertSFTPRun " + ex.getCause());
+            ex.printStackTrace();
+            return null;
         }
-	}
+    }
 
-		
+    @Override
+    @Transactional
+    public void updateSFTPRun(SFTPJobRunLog sftpJob) {
+        try {
+            sessionFactory.getCurrentSession().update(sftpJob);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.err.println("updateSFTPRun " + ex.getCause());
+        }
+    }
+
+    @Override
+    @Transactional
+    public List<configurationFTPFields> getFTPInfoForJob(Integer method) {
+        try {
+            String sql = ("select rel_TransportFTPDetails.id, directory, ip, username, password, method, port, protocol, certification, transportId "
+                    + " from configurationTransportDetails, rel_TransportFTPDetails "
+                    + " where method = :method and configurationTransportDetails.id = rel_TransportFTPDetails.transportId "
+                    + " and configId in (select id from configurations where status = 1) and "
+                    + " directory not in (select folderPath from sftpjobrunlog where statusId = 1 and method = :method)"
+                    + " group by directory order by configId;");
+
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                    .setResultTransformer(Transformers.aliasToBean(configurationFTPFields.class))
+                    .setParameter("method", method);
+
+            List<configurationFTPFields> ftpPaths = query.list();
+
+            return ftpPaths;
+        } catch (Exception ex) {
+            System.err.println("getFTPInfoForJob " + ex.getCause());
+            ex.printStackTrace();
+            return null;
+        }
+    }
+    
+    /**
+     * The 'getBatchesToSentOrg' will search the batchUploadSummary table for batches sent by the
+     * passed in orgId to the passed in orgId for the passed in messagetypeId
+     * 
+     * @param srcOrgId      The orgId who sent the batch
+     * @param tgtOrgId      The orgId for the user who is logged in
+     * @param messageTypeId The id of the message Type that was selected
+     * 
+     * @return This function will return a list of batches found matching the criteria passed in.
+     */
+    @Override
+    @Transactional
+    public List<batchUploadSummary> getBatchesToSentOrg(int srcorgId, int tgtOrgId, int messageTypeId) throws Exception {
+        
+        Criteria batchSummaries = sessionFactory.getCurrentSession().createCriteria(batchUploadSummary.class);
+        batchSummaries.add(Restrictions.eq("sourceOrgId", srcorgId));
+        batchSummaries.add(Restrictions.eq("targetOrgId", tgtOrgId));
+        batchSummaries.add(Restrictions.eq("messageTypeId", messageTypeId));
+        
+        return batchSummaries.list();
+    
+    }
+    
+    /**
+     * The 'getPatientTransactionDetails' function will return the submitted patient data
+     * for the passed in transactionId.
+     * 
+     * @param transactionInId   The id of the transaction to retrieve the patient details
+     */
+    @Override
+    @Transactional
+    public messagePatients getPatientTransactionDetails(int transactionInId) {
+        
+        Criteria patientDetails = sessionFactory.getCurrentSession().createCriteria(messagePatients.class);
+        patientDetails.add(Restrictions.eq("transactionInId", transactionInId));
+        
+        return (messagePatients) patientDetails.uniqueResult();
+        
+    }
+
 }

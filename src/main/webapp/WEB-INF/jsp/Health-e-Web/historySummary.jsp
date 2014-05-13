@@ -36,7 +36,6 @@
             <input type="hidden" name="type" value="${type}" />
             <input type="hidden" name="sentTo" value="${sentTo}" />
             <input type="hidden" name="messageType" value="${messageType}" />
-            <input type="hidden" name="receivedFrom" value="${receivedFrom}" />
             <input type="hidden" name="status" value="${status}" />
             <input type="hidden" name="systemStatus" value="${systemStatus}" />
             <input type="hidden" name="batchName" value="${batchName}" />
@@ -73,7 +72,7 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label class="control-label" for="sentTo">Sent To</label>
+                                        <label class="control-label" for="sentTo">Affiliated Organization</label>
                                         <div>${sentToText}</div>
                                     </div>
                                 </div>
@@ -85,12 +84,6 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label class="control-label" for="receivedFrom">Received From</label>
-                                        <div>${receivedFromText}</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
                                         <label class="control-label" for="status"> Referral Status</label>
                                         <div>${statusText}</div>
                                     </div>
@@ -98,7 +91,7 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="control-label" for="systemStatus">System Status</label>
-                                        <div>${systemStatus}</div>
+                                        <div>${systemStatusText}</div>
                                     </div>
                                 </div> 
                                 <div class="col-md-6">
@@ -174,6 +167,7 @@
                             <thead>
                                 <tr>
                                     <th scope="col">Affiliated Organization</th>
+                                    <th scope="col">Type</th>
                                     <th scope="col">Message Type</th>
                                     <th scope="col"></th>
                                     <c:if test="${showDetails == true}"><th scope="col"></th></c:if>
@@ -185,6 +179,9 @@
                                     <c:forEach var="result" items="${historyResults}">
                                         <tr>
                                             <td scope="row">${result.orgName}</td>
+                                            <td>
+                                              <c:choose><c:when test="${result.type == 1}">Referral</c:when><c:otherwise>Feedback Report</c:otherwise></c:choose>
+                                            </td>
                                             <td>
                                                 ${result.messageType}
                                             </td>

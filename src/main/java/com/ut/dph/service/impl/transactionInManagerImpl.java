@@ -36,6 +36,7 @@ import com.ut.dph.model.custom.ConfigForInsert;
 import com.ut.dph.model.custom.TransErrorDetail;
 import com.ut.dph.model.custom.TransErrorDetailDisplay;
 import com.ut.dph.model.lutables.lu_ProcessStatus;
+import com.ut.dph.model.messagePatients;
 import com.ut.dph.model.systemSummary;
 import com.ut.dph.reference.fileSystem;
 import com.ut.dph.service.configurationManager;
@@ -2063,7 +2064,7 @@ public class transactionInManagerImpl implements transactionInManager {
             ConfigErrorInfo configErrorInfo = new ConfigErrorInfo();
             configErrorInfo.setBatchId(batchInfo.getId());
 
-            List<TransErrorDetail> tedList = getTransErrorDetailsForNoRptFields(batchInfo.getId(), Arrays.asList(5, 7, 8, 10, 11, 12, 13, 14,15, 16));
+            List<TransErrorDetail> tedList = getTransErrorDetailsForNoRptFields(batchInfo.getId(), Arrays.asList(5, 7, 8, 10, 11, 12, 13));
             if (tedList.size() > 0) {
                 masterTedList.addAll(tedList);
             }
@@ -2336,6 +2337,147 @@ public class transactionInManagerImpl implements transactionInManager {
     }
 
     @Override
+    public Integer moveSFTPFilesByTrasport(configurationTransport transportDetails, User userInfo) {
+        try {
+            //1 set our paths
+            //from file
+            //get home directory
+            fileSystem fileSystem = new fileSystem();
+            String inPath = transportDetails.getFTPFields().get(0).getdirectory();
+            inPath = fileSystem.setPath(inPath);
+
+            String outPath = transportDetails.getfileLocation();
+            outPath = fileSystem.setPath(outPath);
+
+            //list files
+            File folder = new File(inPath);
+            //we only list visible files
+            File[] listOfFiles = folder.listFiles((FileFilter) HiddenFileFilter.VISIBLE);
+
+            //loop files 
+            for (File file : listOfFiles) {
+                //added milliseconds because file copying is too fast
+                DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmssS");
+                Date date = new Date();
+                String batchName = new StringBuilder().append("UT_3_").append(transportDetails.getId()).append(userInfo.getOrgId()).append(transportDetails.getmessageTypes().get(0)).append(dateFormat.format(date)).toString();
+                System.out.println(batchName);
+                //move file and get name of file
+                String fileName = file.getName();
+                File newFile = new File(outPath + fileName);
+                if (newFile.exists()) {
+                    int i = 1;
+                    while (newFile.exists()) {
+                        int iDot = fileName.lastIndexOf(".");
+                        newFile = new File(outPath + fileName.substring(0, iDot) + "_(" + ++i + ")" + fileName.substring(iDot));
+                    }
+                    fileName = newFile.getName();
+                }
+
+                // now we move file
+                Path source = file.toPath();
+                Path target = newFile.toPath();
+                Files.move(source, target);
+
+                //set batch Info
+                batchUploads batchInfo = new batchUploads();
+                batchInfo.setConfigId(transportDetails.getconfigId());
+                batchInfo.setuserId(userInfo.getId());
+                batchInfo.setOrgId(userInfo.getOrgId());
+                batchInfo.setuserId(userInfo.getId());
+                batchInfo.setutBatchName(batchName);
+                batchInfo.settransportMethodId(3);
+                batchInfo.setoriginalFileName(fileName);
+                batchInfo.setFileLocation(transportDetails.getfileLocation());
+                batchInfo.setContainsHeaderRow(transportDetails.getContainsHeaderRow());
+                batchInfo.setstatusId(4);
+                batchInfo.setstartDateTime(date);
+                batchInfo.setDelimChar(transportDetails.getDelimChar());
+                Integer batchId = (Integer) submitBatchUpload(batchInfo);
+
+                //now check file size & extension
+                if ((Files.size(target) / (1024L * 1024L)) > transportDetails.getmaxFileSize()) {
+                    updateBatchStatus(batchId, 7, "endDateTime");
+                    insertProcessingError(12, transportDetails.getconfigId(), batchId, null, null, null, null, false, false, "");
+                } else if (!fileName.substring(fileName.lastIndexOf(".")).equalsIgnoreCase("." + transportDetails.getfileExt())) {
+                    updateBatchStatus(batchId, 7, "endDateTime");
+                    insertProcessingError(13, transportDetails.getconfigId(), batchId, null, null, null, null, false, false, "");
+                } else {
+                    updateBatchStatus(batchId, 2, "endDateTime");
+                }
+            }
+
+            return 0;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.err.println("moveSFTPFilesByTrasport " + ex.getCause());
+            return 1;
+        }
+
+    }
+
+    /**
+     * The sftp move files job will get all active configurations, loop through and move file to the appropriate folder.
+     *
+     * This method is the outer loops that will get all the active SFTP configurations. *
+     */
+    @Override
+    public Integer moveSFTPFiles() {
+        try {
+            Integer sysErrors = 0;
+            //1. get active sftp configurations, get the ones that are notInJob because another sftp job run could be happening
+            /**
+             * param status - 1 - get active, 2 get inactive, 3 get all *
+             */
+            List<configurationTransport> transports = configurationtransportmanager.getTransportsByMethodId(true, 1, 3);
+            //2. loop configs
+            for (configurationTransport transportDetails : transports) {
+                //we flag the sftp table that this job is being started so in case we copy big file or something goes wrong it won't keep processing this sftp config
+                SFTPJobRunLog sftpJob = new SFTPJobRunLog();
+                sftpJob.setTransportId(transportDetails.getId());
+                sftpJob.setStatusId(1);
+                Integer lastId = insertSFTPRun(sftpJob);
+                sftpJob.setId(lastId);
+
+                //get messageType
+                configuration configuration = configurationManager.getConfigurationById(transportDetails.getconfigId());
+                List<Integer> messageTypeIds = new ArrayList<Integer>();
+                messageTypeIds.add(configuration.getMessageTypeId());
+                transportDetails.setmessageTypes(messageTypeIds);
+                configurationMessageSpecs messageSpecs = configurationManager.getMessageSpecs(transportDetails.getconfigId());
+                transportDetails.setContainsHeaderRow(messageSpecs.getcontainsHeaderRow());
+                transportDetails.setDelimChar((String) messageTypeDAO.getDelimiterChar(transportDetails.getfileDelimiter()));
+                //we need to add FTP  details 
+                List<configurationFTPFields> ftpFieldsList = new ArrayList<configurationFTPFields>();
+                ftpFieldsList.add(configurationtransportmanager.getTransportFTPDetailsPull(transportDetails.getId()));
+                transportDetails.setFTPFields(ftpFieldsList);
+
+                // get user to set batchUpload to
+                //we assign it to user in connection list, if multiple users are found, we assign it to mgr user
+                List<User> users = configurationtransportmanager.getUserIdFromConnForTransport(transportDetails.getId());
+                if (users.size() == 0) {
+                    users = configurationtransportmanager.getOrgUserIdForTransport(transportDetails.getId());
+                }
+
+                User userForTransport = users.get(0);
+
+                //move files
+                sysErrors = sysErrors + moveSFTPFilesByTrasport(transportDetails, userForTransport);
+                if (sysErrors == 0) {
+                    sftpJob.setStatusId(2);
+                    sftpJob.setEndDateTime(new Date());
+                    updateSFTPRun(sftpJob);
+                }
+            }
+            return 0;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.err.println("moveSFTPFiles " + ex.getCause());
+            return 1;
+        }
+
+    }
+
+    @Override
     public Integer insertSFTPRun(SFTPJobRunLog sftpJob) {
         return transactionInDAO.insertSFTPRun(sftpJob);
     }
@@ -2344,65 +2486,61 @@ public class transactionInManagerImpl implements transactionInManager {
     public void updateSFTPRun(SFTPJobRunLog sftpJob) throws Exception {
         transactionInDAO.updateSFTPRun(sftpJob);
     }
-    
+
     @Override
     public List<batchUploads> getsentBatchesHistory(int userId, int orgId, int toOrgId, int messageTypeId, Date fromDate, Date toDate) throws Exception {
         return transactionInDAO.getsentBatchesHistory(userId, orgId, toOrgId, messageTypeId, fromDate, toDate);
     }
 
-	/**
-	 * The sftp move files will grab all unique active SFTP pull paths and check folders for file.
-	 * It will check path to see how many configurations it is associated with. 
-	 * It will also get the delimiter, check if there is a headerRow, how the file is being release.
-	 * **/
-	@Override
-	public Integer moveSFTPFilesJob() {
-		Integer sysErrors = 0;
-		
-		
-		try {
-			//1 . get distinct ftp paths
-			List <configurationFTPFields> inputPaths = getFTPInfoForJob(1);
-			
-			
-			//loop ftp paths and check
-			for (configurationFTPFields ftpInfo : inputPaths) {
-				//we insert job so if anything goes wrong or the scheduler overlaps, we won't be checking the same folder over and over
-				SFTPJobRunLog sftpJob = new SFTPJobRunLog();
-				sftpJob.setStatusId(1);
-				sftpJob.setFolderPath(ftpInfo.getdirectory());
-				sftpJob.setMethod(1);
-				Integer lastId = insertSFTPRun(sftpJob);
-				sftpJob.setId(lastId);
-				
-				// check if directory exists, if not create
-				fileSystem fileSystem = new fileSystem();
-				String inPath = fileSystem.setPath(ftpInfo.getdirectory());
-	            File f = new File(inPath);
-				if (!f.exists()) {
-					f.mkdirs();
-				}
-				
-				sysErrors = sysErrors + moveSFTPFilesByPath(ftpInfo);
-				
-				if (sysErrors == 0) {
+    /**
+     * The sftp move files will grab all unique active SFTP pull paths and check folders for file. It will check path to see how many configurations it is associated with. It will also get the delimiter, check if there is a headerRow, how the file is being release.
+	 * *
+     */
+    @Override
+    public Integer moveSFTPFilesJob() {
+        Integer sysErrors = 0;
+
+        try {
+            //1 . get distinct ftp paths
+            List<configurationFTPFields> inputPaths = getFTPInfoForJob(1);
+
+            //loop ftp paths and check
+            for (configurationFTPFields ftpInfo : inputPaths) {
+                //we insert job so if anything goes wrong or the scheduler overlaps, we won't be checking the same folder over and over
+                SFTPJobRunLog sftpJob = new SFTPJobRunLog();
+                sftpJob.setStatusId(1);
+                sftpJob.setFolderPath(ftpInfo.getdirectory());
+                sftpJob.setMethod(1);
+                Integer lastId = insertSFTPRun(sftpJob);
+                sftpJob.setId(lastId);
+
+                // check if directory exists, if not create
+                fileSystem fileSystem = new fileSystem();
+                String inPath = fileSystem.setPath(ftpInfo.getdirectory());
+                File f = new File(inPath);
+                if (!f.exists()) {
+                    f.mkdirs();
+                }
+
+                sysErrors = sysErrors + moveSFTPFilesByPath(ftpInfo);
+
+                if (sysErrors == 0) {
                     sftpJob.setStatusId(2);
                     sftpJob.setEndDateTime(new Date());
                     updateSFTPRun(sftpJob);
                 }
-			}
-			
+            }
+
 			// if there are no errors, we release the folder path
-			
-		} catch (Exception ex) {
-			ex.printStackTrace();
-	        System.err.println("moveSFTPFilesJob " + ex.getCause());
-	        return 1;
-	   }
-		return sysErrors;
-	}
-		
-	@Override
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.err.println("moveSFTPFilesJob " + ex.getCause());
+            return 1;
+        }
+        return sysErrors;
+    }
+
+@Override
 	public Integer moveSFTPFilesByPath(configurationFTPFields ftpInfo) {
 		Integer sysErrors = 0;
 		
@@ -2591,31 +2729,40 @@ public class transactionInManagerImpl implements transactionInManager {
 		}
 		return sysErrors;
 	}
+    @Override
+    public List<configurationFTPFields> getFTPInfoForJob(Integer method) {
+        return transactionInDAO.getFTPInfoForJob(method);
+    }
 
-	/** 1 for org push to UT, 2 for UT push to org **/
-	@Override
-	public List<configurationFTPFields> getFTPInfoForJob(Integer method) {
-		return transactionInDAO.getFTPInfoForJob(method);
-	}
-	
-	@Override
-	public String newFileName (String path, String fileName){
-		try {
-			File newFile = new File(path + fileName);
-	        if (newFile.exists()) {
-	            int i = 1;
-	            while (newFile.exists()) {
-	                int iDot = fileName.lastIndexOf(".");
-	                newFile = new File(path + fileName.substring(0, iDot) + "_(" + ++i + ")" + fileName.substring(iDot));
-	            }
-	            fileName = newFile.getName();
-	        }
-	        return fileName;
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			System.err.println("newFileName " + ex.getCause());
-			return null;
-		}
-	}
-	
+    @Override
+    public String newFileName(String path, String fileName) {
+        try {
+            File newFile = new File(path + fileName);
+            if (newFile.exists()) {
+                int i = 1;
+                while (newFile.exists()) {
+                    int iDot = fileName.lastIndexOf(".");
+                    newFile = new File(path + fileName.substring(0, iDot) + "_(" + ++i + ")" + fileName.substring(iDot));
+                }
+                fileName = newFile.getName();
+            }
+            return fileName;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.err.println("newBatchName " + ex.getCause());
+            return null;
+        }
+    }
+    
+    @Override
+    public List<batchUploadSummary> getBatchesToSentOrg(int srcorgId, int tgtOrgId, int messageTypeId) throws Exception {
+        return transactionInDAO.getBatchesToSentOrg(srcorgId, tgtOrgId, messageTypeId);
+    }
+    
+    
+    @Override
+    public messagePatients getPatientTransactionDetails(int transactionInId) {
+        return transactionInDAO.getPatientTransactionDetails(transactionInId);
+    }
+
 }
