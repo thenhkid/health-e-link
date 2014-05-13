@@ -257,4 +257,9 @@ public class configurationTransportManagerImpl implements configurationTransport
 			throws Exception {
 		return configurationTransportDAO.getOrgIdForFTPPath(ftpInfo);
 	}
+
+	@Override
+	public Integer getMinMaxFileSize(String fileExt, Integer transportMethodId) {
+		return configurationTransportDAO.getMinMaxFileSize(fileExt, transportMethodId);
+	}
 }

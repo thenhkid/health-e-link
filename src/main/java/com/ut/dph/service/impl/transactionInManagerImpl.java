@@ -2590,6 +2590,7 @@ public class transactionInManagerImpl implements transactionInManager {
              String newFileName = "";
              Integer statusId = 4;
              Integer configId = 0;
+             Integer fileSize = 0;
              
 			 if (transportList.size() == 0) {
 				 //no transport is using this method - we find the mgr user and reject this file
@@ -2609,10 +2610,11 @@ public class transactionInManagerImpl implements transactionInManager {
                  insertProcessingError(13, 0, batchId, null, null, null, null, false, false, "");
 				 statusId = 7;
 			 } else if (transports.size() == 1) {
-				//only 1 config
 				 configurationTransport  ct = configurationtransportmanager.getTransportDetailsByTransportId(ftpInfo.gettransportId());
+				 fileSize = ct.getmaxFileSize();
 				 if (transportList.size() > 1) {
 					 configId =0;
+					 fileSize = configurationtransportmanager.getMinMaxFileSize(fileExt, 3);
 				 } else {
 					 configId = ct.getconfigId();
 				 }
@@ -2632,11 +2634,14 @@ public class transactionInManagerImpl implements transactionInManager {
                      users = configurationtransportmanager.getOrgUserIdForTransport(ct.getId());
                  }
                  batchInfo.setuserId(users.get(0).getId());
-                 batchId = (Integer) submitBatchUpload(batchInfo);
+                 batchId = (Integer) submitBatchUpload(batchInfo);                
 				 statusId = 2;
 				 
 			 } else if  (transportList.size() > 1 && transports.size() >1)  {
 				 //we have to read file see if it contains header row and what delimiter it is using
+				 
+				 
+				 
 			 }
 			 
 			 File newFile = new File(outPath + newFileName);
@@ -2645,11 +2650,19 @@ public class transactionInManagerImpl implements transactionInManager {
              Path source = file.toPath();
              Path target = newFile.toPath();
              Files.move(source, target);
-			 
-			 
-             updateBatchStatus(batchId,statusId, "endDateTime");
              
-			 
+             if (statusId == 2) {
+            	 /** check file size
+            	  * if configId is 0 we go with the smallest file size
+            	  ***/
+                 if ((Files.size(target) / (1024L * 1024L)) > fileSize) {
+                     statusId = 7;
+                     insertProcessingError(12, configId, batchId, null, null, null, null, false, false, "");
+                 }
+             }
+             
+			 updateBatchStatus(batchId,statusId, "endDateTime");
+         	 
 		 }
 		} catch (Exception ex) {
 			ex.printStackTrace();

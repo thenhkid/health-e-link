@@ -685,7 +685,7 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
 			throws Exception {
 		try {
 			String sql = ("select distinct orgId from configurations where id in (select configId from configurationTransportDetails where id in (select transportId from"
-					+ " rel_TransportFTPDetails where method = :method and directory = :directory));;");
+					+ " rel_TransportFTPDetails where method = :method and directory = :directory));");
 	        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
 	        query.setParameter("method", ftpInfo.getmethod());
 	        query.setParameter("directory", ftpInfo.getdirectory());
@@ -696,6 +696,26 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
 
 		} catch (Exception ex) {
 	        System.err.println("getOrgIdForFTPPath  " + ex.getCause());
+	        ex.printStackTrace();
+	        return null;
+		}
+	}
+
+	@Override
+	@Transactional
+	public Integer getMinMaxFileSize(String fileExt, Integer transportMethodId) {
+		try {
+			String sql = ("select min(maxFileSize) as filesize from configurationTransportDetails "
+					+ " where transportmethodid = :transportMethodId and fileext = :fileExt");
+	        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+	        query.setParameter("fileExt", fileExt);
+	        query.setParameter("transportMethodId", transportMethodId);
+	
+	        Integer fileSize  = (Integer) query.list().get(0);
+	
+	        return fileSize;
+
+		} catch (Exception ex) {
 	        ex.printStackTrace();
 	        return null;
 		}

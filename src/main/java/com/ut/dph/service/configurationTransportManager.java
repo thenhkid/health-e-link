@@ -74,4 +74,6 @@ public interface configurationTransportManager {
     configurationTransport getTransportDetailsByTransportId(Integer transportId);
     
     Integer getOrgIdForFTPPath (configurationFTPFields ftpInfo) throws Exception;
+    
+    Integer getMinMaxFileSize(String fileExt, Integer transportMethodId);
 }
