@@ -48,7 +48,7 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label class="control-label" for="sentTo">Sent To</label>
+                                        <label class="control-label" for="sentTo">Affiliated Organizations</label>
                                         <select name="sentTo" class="form-control">
                                             <option value="0">- All Affiliated Organizations -</option>
                                             <c:forEach var="org" items="${associatedOrgs}">
@@ -64,17 +64,6 @@
                                             <option value="0">- All Message Types -</option>
                                             <c:forEach var="msgType" items="${assocMessageTypes}">
                                                 <option value="${msgType[0]}">${msgType[1]}</option>
-                                            </c:forEach>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label class="control-label" for="receivedFrom">Received From</label>
-                                        <select name="receivedFrom" class="form-control">
-                                            <option value="0">- All Affiliated Organizations -</option>
-                                            <c:forEach var="org" items="${associatedOrgs}">
-                                                <option value="${org.id}">${org.orgName}</option>
                                             </c:forEach>
                                         </select>
                                     </div>

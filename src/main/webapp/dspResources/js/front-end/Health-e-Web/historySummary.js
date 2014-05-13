@@ -13,6 +13,10 @@ require(['./main'], function() {
             
             $('#viewHistoryDetails').submit();
          });
+         
+         $('.print').click(function() {
+            window.print();
+         });
 
     });
 });

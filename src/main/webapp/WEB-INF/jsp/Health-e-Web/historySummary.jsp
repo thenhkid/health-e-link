@@ -36,7 +36,6 @@
             <input type="hidden" name="type" value="${type}" />
             <input type="hidden" name="sentTo" value="${sentTo}" />
             <input type="hidden" name="messageType" value="${messageType}" />
-            <input type="hidden" name="receivedFrom" value="${receivedFrom}" />
             <input type="hidden" name="status" value="${status}" />
             <input type="hidden" name="systemStatus" value="${systemStatus}" />
             <input type="hidden" name="batchName" value="${batchName}" />
@@ -73,7 +72,7 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label class="control-label" for="sentTo">Sent To</label>
+                                        <label class="control-label" for="sentTo">Affiliated Organization</label>
                                         <div>${sentToText}</div>
                                     </div>
                                 </div>
@@ -81,12 +80,6 @@
                                     <div class="form-group">
                                         <label class="control-label" for="messageType"> Message Type</label>
                                         <div>${messageTypeText}</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label class="control-label" for="receivedFrom">Received From</label>
-                                        <div>${receivedFromText}</div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">

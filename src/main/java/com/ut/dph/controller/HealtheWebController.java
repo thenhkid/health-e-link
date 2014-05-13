@@ -2899,7 +2899,7 @@ public class HealtheWebController {
      */
     @RequestMapping(value = "/history", method = RequestMethod.POST)
     public ModelAndView historyResults(HttpSession session, @RequestParam Date fromDate, @RequestParam Date toDate, @RequestParam Integer type, @RequestParam Integer sentTo,
-    @RequestParam Integer messageType, @RequestParam Integer receivedFrom, @RequestParam Integer status, @RequestParam Integer systemStatus, @RequestParam Integer reportType,
+    @RequestParam Integer messageType, @RequestParam Integer status, @RequestParam Integer systemStatus, @RequestParam Integer reportType,
     @RequestParam String batchName, @RequestParam String utBatchName, @RequestParam String lastName, @RequestParam String patientId, @RequestParam String firstName, @RequestParam String providerId) throws Exception {
        
         ModelAndView mav = new ModelAndView();
@@ -2947,15 +2947,6 @@ public class HealtheWebController {
            mav.addObject("messageTypeText", msgTypeDetails.getName());
         }
         mav.addObject("messageType", messageType);
-        
-        if(receivedFrom == 0) {
-           mav.addObject("receivedFromText", "All Affiliated Organizations"); 
-        }
-        else {
-           Organization orgDetails = organizationmanager.getOrganizationById(receivedFrom);
-           mav.addObject("receivedFromText", orgDetails.getOrgName());
-        }
-        mav.addObject("receivedFrom", receivedFrom);
         
         if(status == 0) {
            mav.addObject("statusText", "Both (Opened & Closed)"); 
@@ -3068,7 +3059,7 @@ public class HealtheWebController {
                             for(configurationConnection connection : connections) {
                                 int total = 0;
 
-                                if(receivedFrom == 0 || (receivedFrom > 0 && receivedFrom == configurationManager.getConfigurationById(connection.getsourceConfigId()).getorgId())) {
+                                if(sentTo == 0 || (sentTo > 0 && sentTo == configurationManager.getConfigurationById(connection.getsourceConfigId()).getorgId())) {
                                     String orgName = organizationmanager.getOrganizationById(configurationManager.getConfigurationById(connection.getsourceConfigId()).getorgId()).getOrgName();
                                     String messageTypeName = messagetypemanager.getMessageTypeById(config.getMessageTypeId()).getName();
 
@@ -3155,7 +3146,7 @@ public class HealtheWebController {
      */
     @RequestMapping(value = "/history/details", method = RequestMethod.POST)
     public ModelAndView historyDetails(HttpSession session, @RequestParam Integer selorgId, @RequestParam Integer selmessageTypeId, @RequestParam Date fromDate, @RequestParam Date toDate, @RequestParam Integer type, @RequestParam Integer sentTo,
-    @RequestParam Integer messageType, @RequestParam Integer receivedFrom, @RequestParam Integer status, @RequestParam Integer systemStatus, @RequestParam String batchName, @RequestParam String utBatchName, 
+    @RequestParam Integer messageType, @RequestParam Integer status, @RequestParam Integer systemStatus, @RequestParam String batchName, @RequestParam String utBatchName, 
     @RequestParam String lastName, @RequestParam String patientId, @RequestParam String firstName, @RequestParam String providerId) throws Exception {
        
         ModelAndView mav = new ModelAndView();
@@ -3201,16 +3192,7 @@ public class HealtheWebController {
            mav.addObject("messageTypeText", msgTypeDetails.getName());
         }
         mav.addObject("messageType", messageType);
-        
-        if(receivedFrom == 0) {
-           mav.addObject("receivedFromText", "All Affiliated Organizations"); 
-        }
-        else {
-           Organization orgDetails = organizationmanager.getOrganizationById(receivedFrom);
-           mav.addObject("receivedFromText", orgDetails.getOrgName());
-        }
-        mav.addObject("receivedFrom", receivedFrom);
-        
+       
         if(status == 0) {
            mav.addObject("statusText", "Both (Opened & Closed)"); 
         }
@@ -3251,6 +3233,7 @@ public class HealtheWebController {
             List<transactionTarget> trans = transactionOutManager.getTransactionsByBatchDLId(batchDetails.getId());
             
             for(transactionTarget tarTrans : trans) {
+                boolean addTrans = true;
                 historyDetails details = new historyDetails();
                 details.setBatchName(batchDetails.getutBatchName());
                 details.setDateCreated(batchDetails.getdateCreated());
@@ -3273,7 +3256,40 @@ public class HealtheWebController {
                 details.setpatientName(patientInfo.getFirstName()+ " " + patientInfo.getLastName());
                 details.setPatientId(patientInfo.getSourcePatientId());
                 
-                transactions.add(details);
+                if(!"".equals(lastName) && !patientInfo.getLastName().equals(lastName)) {
+                    addTrans = false;
+                }
+                
+                if(!"".equals(firstName) && !patientInfo.getFirstName().equals(firstName)) {
+                    addTrans = false;
+                }
+                
+                if(!"".equals(patientId) && !patientInfo.getSourcePatientId().equals(patientId)) {
+                    addTrans = false;
+                }
+                
+                if(!"".equals(utBatchName) && !batchDetails.getutBatchName().equals(utBatchName)) {
+                    addTrans = false;
+                }
+                
+                if(type > 0 && type != configDetails.getsourceType()) {
+                    addTrans = false;
+                }
+                
+                if(messageType > 0 && messageType != configDetails.getMessageTypeId()) {
+                    addTrans = false;
+                }
+                
+                if(batchDetails.getdateCreated().before(fromDate) || batchDetails.getdateCreated().after(toDate)) {
+                    addTrans = false;
+                }
+                
+                
+                if(addTrans == true) {
+                    transactions.add(details);
+                }
+                
+                
             }
             
         }
@@ -3292,6 +3308,8 @@ public class HealtheWebController {
             List<transactionIn> trans = transactionInManager.getBatchTransactions(batchDetails.getId(), 0);
             
             for(transactionIn transaction : trans) {
+                boolean addTrans = true;
+                
                 historyDetails details = new historyDetails();
                 details.setBatchName(batchDetails.getutBatchName());
                 details.setDateCreated(batchDetails.getdateSubmitted());
@@ -3313,7 +3331,37 @@ public class HealtheWebController {
                 details.setpatientName(patientInfo.getFirstName()+ " " + patientInfo.getLastName());
                 details.setPatientId(patientInfo.getSourcePatientId());
                 
-                transactions.add(details);
+                if(!"".equals(lastName) && !patientInfo.getLastName().equals(lastName)) {
+                    addTrans = false;
+                }
+                
+                if(!"".equals(firstName) && !patientInfo.getFirstName().equals(firstName)) {
+                    addTrans = false;
+                }
+                
+                if(!"".equals(patientId) && !patientInfo.getSourcePatientId().equals(patientId)) {
+                    addTrans = false;
+                }
+                
+                if(!"".equals(utBatchName) && !batchDetails.getutBatchName().equals(utBatchName)) {
+                    addTrans = false;
+                }
+                
+                if(type > 0 && type != configDetails.getsourceType()) {
+                    addTrans = false;
+                }
+                
+                if(messageType > 0 && messageType != configDetails.getMessageTypeId()) {
+                    addTrans = false;
+                }
+                
+                if(batchDetails.getdateSubmitted().before(fromDate) || batchDetails.getdateSubmitted().after(toDate)) {
+                    addTrans = false;
+                }
+                
+                if(addTrans == true) {
+                    transactions.add(details);
+                }
             }
             
         }

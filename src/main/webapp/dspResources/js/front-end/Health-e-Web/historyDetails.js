@@ -10,6 +10,11 @@ require(['./main'], function() {
          $('.returnResults').click(function() {
            $('#viewHistoryResults').submit();
          });
+         
+         
+         $('.print').click(function() {
+            window.print();
+         });
 
     });
 });

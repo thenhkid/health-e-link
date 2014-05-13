@@ -47,8 +47,8 @@
         </form>   
         <div class="col-md-12 page-content">
 
-            <div class="col-md-12 form-section">
-                <section class="panel panel-default panel-collapse">
+            <div class="col-md-12 form-section" >
+                <section id="searchCriteriaSection" class="panel panel-default panel-collapse">
                     <div class="panel-heading">
                         <h3 class="panel-title">
                             Selected Criteria
@@ -72,7 +72,7 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label class="control-label" for="sentTo">Sent To</label>
+                                        <label class="control-label" for="sentTo">Affiliated Organization</label>
                                         <div>${sentToText}</div>
                                     </div>
                                 </div>
@@ -84,12 +84,6 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label class="control-label" for="receivedFrom">Received From</label>
-                                        <div>${receivedFromText}</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
                                         <label class="control-label" for="status"> Referral Status</label>
                                         <div>${statusText}</div>
                                     </div>
@@ -97,7 +91,7 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="control-label" for="systemStatus">System Status</label>
-                                        <div>${systemStatus}</div>
+                                        <div>${systemStatusText}</div>
                                     </div>
                                 </div> 
                                 <div class="col-md-6">
