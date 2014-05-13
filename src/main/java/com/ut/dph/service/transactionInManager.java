@@ -360,7 +360,7 @@ public interface transactionInManager {
     
     List<batchUploads> getsentBatchesHistory(int userId, int orgId, int toOrgId, int messageTypeId, Date fromDate, Date toDate) throws Exception;
 
-    Integer moveSFTPFilesJob ();
+    Integer moveSFTPFiles();
     
     Integer moveSFTPFilesByPath(configurationFTPFields inputPaths);
     

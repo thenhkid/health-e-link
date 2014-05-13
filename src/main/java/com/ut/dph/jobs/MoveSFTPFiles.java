@@ -30,7 +30,7 @@ public class MoveSFTPFiles implements Job {
         
         try {
             SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
-            transactionInManager.moveSFTPFilesJob();          
+            transactionInManager.moveSFTPFiles();          
         } catch (Exception ex) {
             try {
                 throw new Exception("Error occurred trying to move SFTP files from schedule task",ex);

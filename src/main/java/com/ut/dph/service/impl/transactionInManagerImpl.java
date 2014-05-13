@@ -2357,7 +2357,7 @@ public class transactionInManagerImpl implements transactionInManager {
 	 * *
      */
     @Override
-    public Integer moveSFTPFilesJob() {
+    public Integer moveSFTPFiles() {
         Integer sysErrors = 0;
 
         try {
