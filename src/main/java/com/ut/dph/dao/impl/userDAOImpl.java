@@ -318,4 +318,53 @@ public class userDAOImpl implements userDAO {
 			return null;
 		}
 	}
+	
+	
+	@Override
+	@SuppressWarnings("unchecked")
+	public List <User> getSendersForConfig (List <Integer> configIds) {
+		try {
+		 	String sql = ("select * from users where id in (select userId from configurationconnectionsenders where connectionId in "
+		 			+ " (select id from configurationconnections "
+		 			+ " where sourceConfigId in ( :configId))) order by userType;");
+            
+		 	
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
+                    Transformers.aliasToBean(User.class));
+            query.setParameterList("configId", configIds);
+
+            List<User> users = query.list();
+
+            return users;
+
+        } catch (Exception ex) {
+            System.err.println("getSendersForConfig  " + ex.getCause());
+            ex.printStackTrace();
+            return null;
+        }
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<User> getOrgUsersForConfig(List <Integer> configIds) {
+		try {
+		 	String sql = ("select * from users where orgId in (select orgId from configurations where id "
+		 			+ " in ( :configId ) "
+		 			+ " and status = 1) order by userType;");
+            
+		 	
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
+                    Transformers.aliasToBean(User.class));
+            query.setParameterList("configId", configIds);
+
+            List<User> users = query.list();
+
+            return users;
+
+        } catch (Exception ex) {
+            System.err.println("getOrgUsersForConfig  " + ex.getCause());
+            ex.printStackTrace();
+            return null;
+        }
+	}
 }

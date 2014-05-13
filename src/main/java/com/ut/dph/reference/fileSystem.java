@@ -301,4 +301,45 @@ public class fileSystem {
         return path;
     }
 
+    
+    public Integer checkFileDelimiter(File file, String delim) {
+
+        int delimCount = 0;
+
+        FileInputStream fileInput = null;
+        try {
+            fileInput = new FileInputStream(file);
+            
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        
+        
+        BufferedReader br = new BufferedReader(new InputStreamReader(fileInput));
+        
+        try {
+            String line;
+            try {
+                while ((line = br.readLine()) != null) {
+                    if (delim == "t") {
+                        delimCount = line.split("\t", -1).length - 1;
+                    } else {
+                        delimCount = line.split("\\" + delim, -1).length - 1;
+                    }
+                    break;
+                }
+            } catch (IOException ex) {
+                Logger.getLogger(fileSystem.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } finally {
+            try {
+                br.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return delimCount;
+    }
+    
 }

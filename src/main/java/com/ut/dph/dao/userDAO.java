@@ -41,4 +41,9 @@ public interface userDAO {
     UserActivity getUAById (Integer uaId);
     
     List<User> getUserByTypeByOrganization(int orgId);
+    
+    List <User> getSendersForConfig (List <Integer> configIds);
+    
+    List<User> getOrgUsersForConfig(List <Integer> configIds);
+
 }

@@ -111,4 +111,16 @@ public class userManagerImpl implements userManager {
 		return userDAO.getUserByTypeByOrganization(orgId);
 	}
 
+	@Override
+	@Transactional
+	public List<User> getSendersForConfig(List <Integer> configIds) {
+		return userDAO.getSendersForConfig(configIds);
+	}
+
+	@Override
+	@Transactional
+	public List<User> getOrgUsersForConfig(List <Integer> configIds) {
+		return userDAO.getOrgUsersForConfig(configIds);
+	}
+
 }

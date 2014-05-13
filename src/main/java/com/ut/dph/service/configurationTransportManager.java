@@ -61,12 +61,6 @@ public interface configurationTransportManager {
     
     List <configurationMessageSpecs> getConfigurationMessageSpecsForOrgTransport(Integer orgId, Integer transportMethodId, boolean getZeroMessageTypeCol);
     
-    List <configurationTransport> getTransportsByMethodId (boolean notInJob, Integer status, Integer transportMethodId);
-    
-    List <User> getUserIdFromConnForTransport (Integer configurationTransportId);
-    
-    List<User> getOrgUserIdForTransport (Integer configurationTransportId);
-    
     List<configurationTransport> getConfigTransportForFileExt(String fileExt, Integer transportMethodId);
     
     List<configurationTransport>  getTransportListForFileExt(String fileExt, Integer transportMethodId);
@@ -76,4 +70,9 @@ public interface configurationTransportManager {
     Integer getOrgIdForFTPPath (configurationFTPFields ftpInfo) throws Exception;
     
     Integer getMinMaxFileSize(String fileExt, Integer transportMethodId);
+    
+    List <configurationTransport> getCountContainsHeaderRow(String fileExt, Integer transportMethodId);
+    
+    List <Integer> getConfigCount(String fileExt, Integer transportMethodId, Integer fileDelimiter);
+    
 }

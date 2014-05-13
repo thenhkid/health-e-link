@@ -4,8 +4,6 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.ut.dph.model.User;
 import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.configurationMessageSpecs;
 import com.ut.dph.model.configurationTransport;
@@ -222,21 +220,6 @@ public class configurationTransportManagerImpl implements configurationTransport
         return configurationTransportDAO.getConfigurationMessageSpecsForOrgTransport(orgId, transportMethodId, getZeroMessageTypeCol);
     }
     
-    @Override
-    public List <configurationTransport> getTransportsByMethodId (boolean notInJob, Integer status, Integer transportMethodId) {
-        return configurationTransportDAO.getTransportsByMethodId(notInJob, status, transportMethodId);
-    }
-
-	@Override
-	public List<User> getUserIdFromConnForTransport(Integer configurationTransportId) {
-		return configurationTransportDAO.getUserIdFromConnForTransport(configurationTransportId);
-	}
-
-	@Override
-	public List<User> getOrgUserIdForTransport(Integer configurationTransportId) {
-		return configurationTransportDAO.getOrgUserIdForTransport(configurationTransportId);
-	}
-  
 	@Override
 	public List<configurationTransport> getConfigTransportForFileExt(String fileExt, Integer transportMethodId) {
 		return configurationTransportDAO.getConfigTransportForFileExt(fileExt, transportMethodId);
@@ -261,5 +244,16 @@ public class configurationTransportManagerImpl implements configurationTransport
 	@Override
 	public Integer getMinMaxFileSize(String fileExt, Integer transportMethodId) {
 		return configurationTransportDAO.getMinMaxFileSize(fileExt, transportMethodId);
+	}
+
+	@Override
+	public List <configurationTransport>  getCountContainsHeaderRow(String fileExt, Integer transportMethodId) {
+		return configurationTransportDAO.getCountContainsHeaderRow(fileExt, transportMethodId);
+	}
+
+	@Override
+	public List<Integer> getConfigCount(String fileExt,	Integer transportMethodId, Integer fileDelimiter) {
+		return configurationTransportDAO.getConfigCount(fileExt, transportMethodId, fileDelimiter);
+
 	}
 }

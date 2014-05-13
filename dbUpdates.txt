@@ -1,2 +1,8 @@
 /** grace 05132014 05:41AM **/
 INSERT INTO `universaltranslator`.`lu_ErrorCodes` (`displayText`, `description`) VALUES ('Invalid Set Up', 'File with same extension, delimiter should be set up either contain headers or do not contain headers.');
+
+/** grace 05132014 04:23PM **/
+INSERT INTO `universaltranslator`.`lu_ErrorCodes` (`displayText`) VALUES ('Invalid Delimiter');
+UPDATE `universaltranslator`.`lu_ErrorCodes` SET `description`='Delimiter is valid for this type of file' WHERE `id`='15';
+
+

@@ -38,5 +38,9 @@ public interface userManager {
   List<User> getUserByTypeByOrganization(int orgId);
   
   UserActivity getUAById (Integer uaId);
+  
+  List <User> getSendersForConfig (List <Integer> configId);
+  
+  List<User> getOrgUsersForConfig(List <Integer> configId);
 }
 

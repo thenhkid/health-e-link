@@ -521,102 +521,13 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
         }
     }
 
-    /** param status - 1 - get active, 2 get inactive, 3 get all **/
-    @Override
-    @Transactional
-    @SuppressWarnings("unchecked")
-	public List<configurationTransport> getTransportsByMethodId(boolean notInJob, Integer status, 
-			Integer transportMethodId) {
-		
-		try {
-			 	String sql = ("select  * from configurationtransportdetails where transportmethodid = :transportMethodId "
-	            		+ " and configId in (select id from configurations where status in (:statusIds))");
-	            if (notInJob) {
-	            	sql = sql + (" and id not in (select transportId from SFTPJobRunLog where statusId = 1) ");
-	            }
-			 	
-	            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
-	                    Transformers.aliasToBean(configurationTransport.class));
-	          
-	            if (status == 3) {
-	            	query.setParameterList("statusIds",Arrays.asList(0,1));	            	
-	            } else if (status == 2) {
-	            	query.setParameterList("statusIds",Arrays.asList(0));
-	            } else {
-	            	query.setParameterList("statusIds",Arrays.asList(1));
-	            }
-	            
-	            query.setParameter("transportMethodId", transportMethodId);
-
-	            List<configurationTransport> configurationTransport = query.list();
-
-	            return configurationTransport;
-
-	        } catch (Exception ex) {
-	            System.err.println("getTransportsByMethodId  " + ex.getCause());
-	            ex.printStackTrace();
-	            return null;
-	        }
-	}
-
-	@Override
-	@Transactional
-    @SuppressWarnings("unchecked")
-	public List <User> getUserIdFromConnForTransport(Integer configurationTransportId) {
-		try {
-		 	String sql = ("select * from users where id in (select userId from configurationconnectionsenders where connectionId in "
-		 			+ " (select id from configurationconnections "
-		 			+ " where sourceConfigId in (select configId from configurationtransportdetails "
-		 			+ " where id = :configurationTransportId))) order by userType;");
-            
-		 	
-            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
-                    Transformers.aliasToBean(User.class));
-            query.setParameter("configurationTransportId", configurationTransportId);
-
-            List<User> users = query.list();
-
-            return users;
-
-        } catch (Exception ex) {
-            System.err.println("getUserIdFromConnForTransport  " + ex.getCause());
-            ex.printStackTrace();
-            return null;
-        }
-	}
-
-	@Override
-	@Transactional
-    @SuppressWarnings("unchecked")
-	public List<User> getOrgUserIdForTransport(Integer configurationTransportId) {
-		try {
-		 	String sql = ("select * from users where orgId in (select orgId from configurations where id "
-		 			+ " in (select configId from configurationtransportdetails where id = :configurationTransportId)) "
-		 			+ " and status = 1 order by userType;");
-            
-		 	
-            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
-                    Transformers.aliasToBean(User.class));
-            query.setParameter("configurationTransportId", configurationTransportId);
-
-            List<User> users = query.list();
-
-            return users;
-
-        } catch (Exception ex) {
-            System.err.println("getOrgUserIdForTransport  " + ex.getCause());
-            ex.printStackTrace();
-            return null;
-        }
-	}
-
 	@Override
     @Transactional
     @SuppressWarnings("unchecked")
     public List<configurationTransport> getConfigTransportForFileExt(String fileExt, Integer transportMethodId) {
         try {
 
-            String sql = ("select distinct delimChar, containsHeaderRow from configurationTransportDetails, ref_delimiters , configurationMessageSpecs "
+            String sql = ("select distinct delimChar, containsHeaderRow , fileDelimiter, fileLocation from configurationTransportDetails, ref_delimiters , configurationMessageSpecs "
             		+ " where ref_delimiters.id = configurationTransportDetails.fileDelimiter "
             		+ " and configurationMessageSpecs.configId = configurationTransportDetails.configId"
             		+ " and fileext = :fileExt and transportmethodId = :transportMethodId");
@@ -716,6 +627,57 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
 	        return fileSize;
 
 		} catch (Exception ex) {
+			 System.err.println("getMinMaxFileSize  " + ex.getCause());
+	        ex.printStackTrace();
+	        return null;
+		}
+	}
+	
+	@Override
+	@Transactional
+	@SuppressWarnings("unchecked")
+	public List <configurationTransport>  getCountContainsHeaderRow(String fileExt, Integer transportMethodId) {
+		try {
+			String sql = ("select distinct containsHeaderRow from configurationTransportDetails, ref_delimiters , configurationMessageSpecs "
+            		+ " where ref_delimiters.id = configurationTransportDetails.fileDelimiter "
+            		+ " and configurationMessageSpecs.configId = configurationTransportDetails.configId"
+            		+ " and fileext = :fileExt and transportmethodId = :transportMethodId");
+			Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
+                    Transformers.aliasToBean(configurationTransport.class));
+	        query.setParameter("fileExt", fileExt);
+	        query.setParameter("transportMethodId", transportMethodId);
+	
+	        List <configurationTransport>  headerRows  = query.list();
+	
+	        return headerRows;
+
+		} catch (Exception ex) {
+			System.err.println("getCountContainsHeaderRow  " + ex.getCause());
+	        ex.printStackTrace();
+	        return null;
+		}
+	}
+
+	
+	@Override
+	@Transactional
+	@SuppressWarnings("unchecked")
+	public List<Integer> getConfigCount(String fileExt, Integer transportMethodId, Integer fileDelimiter) {
+		try {
+			String sql = (" select configId from configurationTransportDetails "
+					+ " where transportmethodid = :transportMethodId and fileext = :fileExt "
+					+ " and filedelimiter = :fileDelimiter");
+			Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+	        query.setParameter("fileExt", fileExt);
+	        query.setParameter("transportMethodId", transportMethodId);
+	        query.setParameter("fileDelimiter", fileDelimiter);
+	        
+	        List <Integer> configs  = query.list();
+	
+	        return configs;
+
+		} catch (Exception ex) {
+			System.err.println("getConfigCount  " + ex.getCause());
 	        ex.printStackTrace();
 	        return null;
 		}
