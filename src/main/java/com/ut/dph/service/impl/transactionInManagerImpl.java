@@ -2578,6 +2578,7 @@ public class transactionInManagerImpl implements transactionInManager {
 			 batchUploads batchInfo = new batchUploads();
 			 batchInfo.setOrgId(orgId);
 			 batchInfo.settransportMethodId(3);
+			 batchInfo.setstatusId(4);
 			 
 			 DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmssS");
              Date date = new Date();
@@ -2587,7 +2588,9 @@ public class transactionInManagerImpl implements transactionInManager {
              String outPath = "";
              Integer batchId = 0;
              String newFileName = "";
-
+             Integer statusId = 4;
+             Integer configId = 0;
+             
 			 if (transportList.size() == 0) {
 				 //no transport is using this method - we find the mgr user and reject this file
 				 batchInfo.setuserId(usermanager.getUserByTypeByOrganization(orgId).get(0).getId());
@@ -2595,7 +2598,6 @@ public class transactionInManagerImpl implements transactionInManager {
 				 Organization orgDetails = organizationmanager.getOrganizationById(orgId);
 				 String defPath = "/bowlink/"+orgDetails.getcleanURL()+"/input files/";
 				 outPath = fileSystem.setPath(defPath);
-				 batchInfo.setstatusId(4);
                  batchInfo.setConfigId(0);
                  batchInfo.setutBatchName(batchName);
                  newFileName = newFileName(outPath, fileName);
@@ -2604,27 +2606,58 @@ public class transactionInManagerImpl implements transactionInManager {
                  batchInfo.setstartDateTime(date);
                  batchId = (Integer) submitBatchUpload(batchInfo);
 				 //insert error
-                 updateBatchStatus(batchId, 7, "endDateTime");
                  insertProcessingError(13, 0, batchId, null, null, null, null, false, false, "");
-				 
-			 } else if (transportList.size() == 1) {
-				//only transport details
+				 statusId = 7;
+			 } else if (transports.size() == 1) {
+				//only 1 config
 				 configurationTransport  ct = configurationtransportmanager.getTransportDetailsByTransportId(ftpInfo.gettransportId());
-				 configuration conf = configurationManager.getConfigurationById(ct.getconfigId());
-				
-				 batchInfo.setConfigId(conf.getId());
+				 if (transportList.size() > 1) {
+					 configId =0;
+				 } else {
+					 configId = ct.getconfigId();
+				 }
+				 batchInfo.setConfigId(configId);
 				 batchInfo.setContainsHeaderRow(transports.get(0).getContainsHeaderRow());
-				 batchInfo.setDelimChar(ct.getDelimChar());
+				 batchInfo.setDelimChar(transports.get(0).getDelimChar());
 				 batchInfo.setFileLocation(ct.getfileLocation());
-				 batchInfo.setOrgId(conf.getorgId());
-				 
-				//figure out config id and find users
-				 
-				 //if multiple senders assign mgr
+				 outPath = fileSystem.setPath(ct.getfileLocation());
+				 batchInfo.setOrgId(orgId);
+				 batchInfo.setutBatchName(batchName);
+				 newFileName = newFileName(outPath, fileName);
+                 batchInfo.setoriginalFileName(newFileName);
+                 batchInfo.setstartDateTime(date);
+                 //find user 
+                 List<User> users = configurationtransportmanager.getUserIdFromConnForTransport(ct.getId());
+                 if (users.size() == 0) {
+                     users = configurationtransportmanager.getOrgUserIdForTransport(ct.getId());
+                 }
+                 batchInfo.setuserId(users.get(0).getId());
+                 batchId = (Integer) submitBatchUpload(batchInfo);
+				 statusId = 2;
 				 
 			 } else if  (transportList.size() > 1 && transports.size() == 1) {
 				 // multiple config but one delimiter & one containsHeaderRow
-				 Integer configId = 0;
+				 configurationTransport  ct = configurationtransportmanager.getTransportDetailsByTransportId(ftpInfo.gettransportId());
+				 batchInfo.setConfigId(0);
+				 batchInfo.setContainsHeaderRow(transports.get(0).getContainsHeaderRow());
+				 batchInfo.setDelimChar(transports.get(0).getDelimChar());
+				 batchInfo.setFileLocation(ct.getfileLocation());
+				 outPath = fileSystem.setPath(ct.getfileLocation());
+				 batchInfo.setOrgId(orgId);
+				 batchInfo.setutBatchName(batchName);
+				 newFileName = newFileName(outPath, fileName);
+                 batchInfo.setoriginalFileName(newFileName);
+                 batchInfo.setstartDateTime(date);
+                 //find user 
+                 List<User> users = configurationtransportmanager.getUserIdFromConnForTransport(ct.getId());
+                 if (users.size() == 0) {
+                     users = configurationtransportmanager.getOrgUserIdForTransport(ct.getId());
+                 }
+                 batchInfo.setuserId(users.get(0).getId());
+                 batchId = (Integer) submitBatchUpload(batchInfo);
+				 statusId = 2;
+				 
+				 
 				 
 			 } else if  (transportList.size() > 1 && transports.size() >1)  {
 				 //we have to read file see if it contains header row and what delimiter it is using
@@ -2638,7 +2671,8 @@ public class transactionInManagerImpl implements transactionInManager {
              Files.move(source, target);
 			 
 			 
-			 
+             updateBatchStatus(batchId,statusId, "endDateTime");
+             
 			 
 		 }
 		} catch (Exception ex) {

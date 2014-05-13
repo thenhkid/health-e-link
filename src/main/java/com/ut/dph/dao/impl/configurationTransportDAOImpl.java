@@ -666,6 +666,7 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
 
     
 	@Override
+	@Transactional
 	public configurationTransport getTransportDetailsByTransportId(Integer transportId) {
 		try  {
 			 Query query = sessionFactory.getCurrentSession().createQuery("from configurationTransport where id = :id");
