@@ -2491,4 +2491,130 @@ public class transactionInManagerImpl implements transactionInManager {
         return transactionInDAO.getsentBatchesHistory(userId, orgId, toOrgId, messageTypeId, fromDate, toDate);
     }
 
+	/**
+	 * The sftp move files will grab all unique active SFTP pull paths and check folders for file.
+	 * It will check path to see how many configurations it is associated with. 
+	 * It will also get the delimiter, check if there is a headerRow, how the file is being release.
+	 * **/
+	@Override
+	public Integer moveSFTPFilesJob() {
+		Integer sysErrors = 0;
+		
+		
+		try {
+			//1 . get distinct ftp paths
+			List <configurationFTPFields> inputPaths = getFTPInfoForJob(1);
+			
+			
+			//loop ftp paths and check
+			for (configurationFTPFields ftpInfo : inputPaths) {
+				//we insert job so if anything goes wrong or the scheduler overlaps, we won't be checking the same folder over and over
+				SFTPJobRunLog sftpJob = new SFTPJobRunLog();
+				sftpJob.setStatusId(1);
+				sftpJob.setFolderPath(ftpInfo.getdirectory());
+				sftpJob.setMethod(1);
+				Integer lastId = insertSFTPRun(sftpJob);
+				sftpJob.setId(lastId);
+				
+				// check if directory exists, if not create
+				fileSystem fileSystem = new fileSystem();
+				String inPath = fileSystem.setPath(ftpInfo.getdirectory());
+	            File f = new File(inPath);
+				if (!f.exists()) {
+					f.mkdirs();
+				}
+				
+				ftpInfo.setdirectory(f.getAbsolutePath());
+				sysErrors = sysErrors + moveSFTPFilesByPath(ftpInfo);
+				
+				if (sysErrors == 0) {
+                    sftpJob.setStatusId(2);
+                    sftpJob.setEndDateTime(new Date());
+                    updateSFTPRun(sftpJob);
+                }
+			}
+			
+			// if there are no errors, we release the folder path
+			
+		} catch (Exception ex) {
+			ex.printStackTrace();
+	        System.err.println("moveSFTPFilesJob " + ex.getCause());
+	        return 1;
+	   }
+		return sysErrors;
+	}
+		
+	@Override
+	public Integer moveSFTPFilesByPath(configurationFTPFields ftpInfo) {
+		Integer sysErrors = 0;
+		
+		try {
+		//we look up org for this path	
+			
+		//loop files and handle
+		File folder = new File(ftpInfo.getdirectory());
+		//list files
+		//we only list visible files
+		File[] listOfFiles = folder.listFiles((FileFilter) HiddenFileFilter.VISIBLE); 
+		
+		//too many variables that could come into play regarding file types, will check files with one method
+		//loop files 
+		 for (File file : listOfFiles) {
+			 // first get file extension
+			 String fileName = file.getName();
+			 String fileExt = fileName.substring(fileName.lastIndexOf(".")+1);
+			 
+			 //figure out how many transports are using fileExt method
+			 List<configurationTransport> transportList = configurationtransportmanager.getTransportListForFileExt(fileExt, 3);
+			 System.out.println(transportList.size());
+			 
+			//figure out if this 
+			 List<configurationTransport> transports =  configurationtransportmanager.getConfigTransportForFileExt(fileExt, 3);
+			 System.out.println(transports.size());
+			 
+			 
+			 if (transportList.size() == 0) {
+				 //no transport is using this method - we find the mgr user and reject this file
+				 
+			 } else if (transportList.size() == 1) {
+				//only transport details
+				 configurationTransport  ct = configurationtransportmanager.getTransportDetailsByTransportId(ftpInfo.gettransportId());
+				 configuration conf = configurationManager.getConfigurationById(ct.getconfigId());
+				 batchUploads batchInfo = new batchUploads();
+				 batchInfo.setConfigId(conf.getId());
+				 batchInfo.setContainsHeaderRow(transports.get(0).getContainsHeaderRow());
+				 batchInfo.setDelimChar(ct.getDelimChar());
+				 batchInfo.setFileLocation(ct.getfileLocation());
+				 batchInfo.setOrgId(conf.getorgId());
+				 
+				//figure out config id and find users
+				 
+				 //if multiple senders assign mgr
+				 
+			 } else if  (transportList.size() > 1 && transports.size() == 1) {
+				 // multiple config but one delimiter & one containsHeaderRow
+				 Integer configId = 0;
+				 
+			 } else if  (transportList.size() > 1 && transports.size() >1)  {
+				 //we have to read file see if it contains header row and what delimiter it is using
+			 }
+			 
+			 
+			 
+			 
+			 
+		 }
+		} catch (Exception ex) {
+			ex.printStackTrace();
+	        System.err.println("moveSFTPFilesByPath " + ex.getCause());
+	        return 1;
+		}
+		return sysErrors;
+	}
+
+	/** 1 for org push to UT, 2 for UT push to org **/
+	@Override
+	public List<configurationFTPFields> getFTPInfoForJob(Integer method) {
+		return transactionInDAO.getFTPInfoForJob(method);
+	}
 }

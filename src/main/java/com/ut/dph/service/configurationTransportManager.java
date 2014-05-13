@@ -66,4 +66,10 @@ public interface configurationTransportManager {
     List <User> getUserIdFromConnForTransport (Integer configurationTransportId);
     
     List<User> getOrgUserIdForTransport (Integer configurationTransportId);
+    
+    List<configurationTransport> getConfigTransportForFileExt(String fileExt, Integer transportMethodId);
+    
+    List<configurationTransport>  getTransportListForFileExt(String fileExt, Integer transportMethodId);
+    
+    configurationTransport getTransportDetailsByTransportId(Integer transportId);
 }

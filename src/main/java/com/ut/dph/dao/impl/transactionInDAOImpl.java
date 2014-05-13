@@ -19,6 +19,7 @@ import com.ut.dph.model.configuration;
 import com.ut.dph.model.configurationConnection;
 import com.ut.dph.model.configurationConnectionSenders;
 import com.ut.dph.model.configurationDataTranslations;
+import com.ut.dph.model.configurationFTPFields;
 import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.configurationMessageSpecs;
 import com.ut.dph.model.configurationTransport;
@@ -4133,24 +4134,24 @@ public class transactionInDAOImpl implements transactionInDAO {
     @SuppressWarnings("unchecked")
     public List<transactionRecords> getFieldColAndValueByTransactionId(configurationFormFields cff, Integer transactionId) {
         try {
-    	String sql = ("select transactionInId as transactionId, F" + cff.getFieldNo()
-                + "  as fieldValue, " + cff.getFieldNo() + " as fieldNo from transactiontranslatedIn "
-                + " where configId = :configId "
-                + " and F" + cff.getFieldNo() + " is not null "
-                + " and transactionInId = :id");
-
-        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
-                .addScalar("transactionId", StandardBasicTypes.INTEGER)
-                .addScalar("fieldValue", StandardBasicTypes.STRING)
-                .addScalar("fieldNo", StandardBasicTypes.INTEGER)
-                .setResultTransformer(Transformers.aliasToBean(transactionRecords.class))
-                .setParameter("configId", cff.getconfigId())
-                .setParameter("id", transactionId);
-
-        List<transactionRecords> trs = query.list();
-
-        return trs;
-        } catch (Exception ex) {
+	    	String sql = ("select transactionInId as transactionId, F" + cff.getFieldNo()
+	                + "  as fieldValue, " + cff.getFieldNo() + " as fieldNo from transactiontranslatedIn "
+	                + " where configId = :configId "
+	                + " and F" + cff.getFieldNo() + " is not null "
+	                + " and transactionInId = :id");
+	
+	        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
+	                .addScalar("transactionId", StandardBasicTypes.INTEGER)
+	                .addScalar("fieldValue", StandardBasicTypes.STRING)
+	                .addScalar("fieldNo", StandardBasicTypes.INTEGER)
+	                .setResultTransformer(Transformers.aliasToBean(transactionRecords.class))
+	                .setParameter("configId", cff.getconfigId())
+	                .setParameter("id", transactionId);
+	
+	        List<transactionRecords> trs = query.list();
+	
+	        return trs;
+	        } catch (Exception ex) {
         	System.err.println("getFieldColAndValueByTransactionId " + ex.getCause());
         	ex.printStackTrace();
         	return null;
@@ -4179,6 +4180,31 @@ public class transactionInDAOImpl implements transactionInDAO {
 			ex.printStackTrace();
 			System.err.println("updateSFTPRun " + ex.getCause());
 		}
+	}
+
+	@Override
+	@Transactional
+	public List<configurationFTPFields> getFTPInfoForJob(Integer method) {
+		try {
+	    	String sql = ("select rel_TransportFTPDetails.id, directory, ip, username, password, method, port, protocol, certification, transportId "
+	    			+ " from configurationTransportDetails, rel_TransportFTPDetails "
+	    			+ " where method = :method and configurationTransportDetails.id = rel_TransportFTPDetails.transportId "
+	    			+ " and configId in (select id from configurations where status = 1) and "
+	    			+ " directory not in (select folderPath from sftpjobrunlog where statusId = 1 and method = :method)"
+	    			+ " group by directory order by configId;");
+	
+	        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
+	                .setResultTransformer(Transformers.aliasToBean(configurationFTPFields.class))
+	                .setParameter("method", method);
+	
+	        List<configurationFTPFields> ftpPaths = query.list();
+	
+	        return ftpPaths;
+	        } catch (Exception ex) {
+        	System.err.println("getFTPInfoForJob " + ex.getCause());
+        	ex.printStackTrace();
+        	return null;
+        }
 	}
 
 		

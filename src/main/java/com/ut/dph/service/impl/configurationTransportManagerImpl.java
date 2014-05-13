@@ -237,4 +237,18 @@ public class configurationTransportManagerImpl implements configurationTransport
 		return configurationTransportDAO.getOrgUserIdForTransport(configurationTransportId);
 	}
   
+	@Override
+	public List<configurationTransport> getConfigTransportForFileExt(String fileExt, Integer transportMethodId) {
+		return configurationTransportDAO.getConfigTransportForFileExt(fileExt, transportMethodId);
+	}
+	
+	@Override
+	public List<configurationTransport> getTransportListForFileExt(String fileExt, Integer transportMethodId) {
+		return configurationTransportDAO.getTransportListForFileExt(fileExt, transportMethodId);
+	}
+
+	@Override
+	public configurationTransport getTransportDetailsByTransportId(Integer transportId) {
+		return configurationTransportDAO.getTransportDetailsByTransportId(transportId);
+	}
 }

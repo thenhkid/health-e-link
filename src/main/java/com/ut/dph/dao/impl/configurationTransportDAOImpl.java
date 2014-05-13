@@ -608,5 +608,73 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
             return null;
         }
 	}
+
+	@Override
+    @Transactional
+    @SuppressWarnings("unchecked")
+    public List<configurationTransport> getConfigTransportForFileExt(String fileExt, Integer transportMethodId) {
+        try {
+
+            String sql = ("select distinct delimChar, containsHeaderRow from configurationTransportDetails, ref_delimiters , configurationMessageSpecs "
+            		+ " where ref_delimiters.id = configurationTransportDetails.fileDelimiter "
+            		+ " and configurationMessageSpecs.configId = configurationTransportDetails.configId"
+            		+ " and fileext = :fileExt and transportmethodId = :transportMethodId");
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
+                    Transformers.aliasToBean(configurationTransport.class));
+            query.setParameter("fileExt", fileExt);
+            query.setParameter("transportMethodId", transportMethodId);
+            
+            List<configurationTransport> configurationTransports = query.list();
+
+            return configurationTransports;
+
+        } catch (Exception ex) {
+            System.err.println("getConfigTransportForConfigIds " + ex.getCause());
+            ex.printStackTrace();
+
+            return null;
+        }
+    }
+
     
+    @Override
+    @Transactional
+    @SuppressWarnings("unchecked")
+    public List <configurationTransport> getTransportListForFileExt(String fileExt, Integer transportMethodId) {
+        try {
+
+            String sql = ("select * "
+            		+ " from configurationTransportDetails "
+            		+ " where fileext = :fileExt and transportmethodId = :transportMethodId");
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
+                    Transformers.aliasToBean(configurationTransport.class));
+            query.setParameter("fileExt", fileExt);
+            query.setParameter("transportMethodId", transportMethodId);
+            
+            
+			List <configurationTransport>  transportList =  query.list();
+
+            return transportList;
+
+        } catch (Exception ex) {
+            System.err.println("getTransportListForFileExt " + ex.getCause());
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    
+	@Override
+	public configurationTransport getTransportDetailsByTransportId(Integer transportId) {
+		try  {
+			 Query query = sessionFactory.getCurrentSession().createQuery("from configurationTransport where id = :id");
+		     query.setParameter("id", transportId);
+		     return (configurationTransport) query.uniqueResult();
+		} catch (Exception ex) {
+			System.err.println("getTransportDetailsByTransportId " + ex.getCause());
+            ex.printStackTrace();
+            return null;
+		}
+	}
+	
 }

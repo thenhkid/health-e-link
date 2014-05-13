@@ -8,7 +8,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+
 import org.springframework.format.annotation.DateTimeFormat;
+
+import com.ut.dph.validator.NoHtml;
 
 @Entity
 @Table(name = "SFTPJobRunLog")
@@ -20,11 +23,18 @@ public class SFTPJobRunLog {
     @Column(name = "ID", nullable = false)
     private int id;
 
-    @Column(name = "transportId", nullable = false)
+    @Column(name = "transportId", nullable = true)
     private int transportId;
 
     @Column(name = "statusId", nullable = false)
     private int statusId;
+    
+    @Column(name = "method", nullable = false)
+    private int method;   
+    
+    @NoHtml
+    @Column(name = "folderPath", nullable = true)
+    private String folderPath;
 
     @DateTimeFormat(pattern = "dd/MM/yyyy hh:mm:ss")
     @Column(name = "startDateTime", nullable = true)
@@ -74,5 +84,20 @@ public class SFTPJobRunLog {
 		this.endDateTime = endDateTime;
 	}
 
+	public int getMethod() {
+		return method;
+	}
 
+	public void setMethod(int method) {
+		this.method = method;
+	}
+
+	public String getFolderPath() {
+		return folderPath;
+	}
+
+	public void setFolderPath(String folderPath) {
+		this.folderPath = folderPath;
+	}
+	
 }

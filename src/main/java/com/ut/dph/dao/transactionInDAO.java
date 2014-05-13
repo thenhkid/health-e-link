@@ -16,6 +16,7 @@ import com.ut.dph.model.batchUploadSummary;
 import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.configurationConnection;
 import com.ut.dph.model.configurationDataTranslations;
+import com.ut.dph.model.configurationFTPFields;
 import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.configurationMessageSpecs;
 import com.ut.dph.model.configurationTransport;
@@ -296,4 +297,6 @@ public interface transactionInDAO {
     void updateSFTPRun(SFTPJobRunLog sftpJob) throws Exception;
     
     List<batchUploads> getsentBatchesHistory(int userId, int orgId, int toOrgId, int messageTypeId, Date fromDate, Date toDate) throws Exception;
+    
+    List <configurationFTPFields> getFTPInfoForJob (Integer method);
 }
