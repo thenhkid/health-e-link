@@ -4,4 +4,12 @@
  * and open the template in the editor.
  */
 
+require(['./main'], function() {
+    require(['jquery'], function($) {
 
+         $('.returnResults').click(function() {
+           $('#viewHistoryResults').submit();
+         });
+
+    });
+});

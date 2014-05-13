@@ -21,8 +21,10 @@ import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.configurationTransport;
 import com.ut.dph.model.custom.searchParameters;
 import com.ut.dph.model.fieldSelectOptions;
+import com.ut.dph.model.historyDetails;
 import com.ut.dph.model.historyResults;
 import com.ut.dph.model.lutables.lu_ProcessStatus;
+import com.ut.dph.model.messagePatients;
 import com.ut.dph.model.messageType;
 import com.ut.dph.model.providerAddress;
 import com.ut.dph.model.providerIdNum;
@@ -2966,7 +2968,8 @@ public class HealtheWebController {
         }
         mav.addObject("status", status);
         
-        mav.addObject("systemStatus", "All System Statuses");
+        mav.addObject("systemStatusText", "All System Statuses");
+        mav.addObject("systemStatus", 0);
         
         /* Add additional search options */
         mav.addObject("batchName", batchName);
@@ -3010,6 +3013,7 @@ public class HealtheWebController {
                                     result.setorgName(orgName);
                                     result.setmessageTypeId(config.getMessageTypeId());
                                     result.setmessageType(messageTypeName);
+                                    result.settype(config.getsourceType());
                                     
                                     List<batchUploads> batches = transactionInManager.getsentBatchesHistory(userInfo.getId(), config.getorgId(), configurationManager.getConfigurationById(connection.gettargetConfigId()).getorgId(), config.getMessageTypeId(), fromDate, toDate);
 
@@ -3073,6 +3077,7 @@ public class HealtheWebController {
                                     result.setorgName(orgName);
                                     result.setmessageTypeId(config.getMessageTypeId());
                                     result.setmessageType(messageTypeName);
+                                    result.settype(config.getsourceType());
 
                                     /* Find Received Referrals / Feedback Reports */
                                     List<batchDownloads> batches = transactionOutManager.getInboxBatchesHistory(userInfo.getId(), config.getorgId(), configurationManager.getConfigurationById(connection.getsourceConfigId()).getorgId(), config.getMessageTypeId(), fromDate, toDate);
@@ -3136,6 +3141,187 @@ public class HealtheWebController {
         
         return mav;
         
+    }
+    
+     /**
+     * The '/history/ddetails' POST request will serve up the Health-e-Web (ERG) page that will list allow the 
+     * logged in user to search their referral and feedback history.
+     *
+     * @param request
+     * @param response
+     * * @param searchTerm The term to search pending messages
+     * @return	the health-e-web inbox message list view
+     * @throws Exception
+     */
+    @RequestMapping(value = "/history/details", method = RequestMethod.POST)
+    public ModelAndView historyDetails(HttpSession session, @RequestParam Integer selorgId, @RequestParam Integer selmessageTypeId, @RequestParam Date fromDate, @RequestParam Date toDate, @RequestParam Integer type, @RequestParam Integer sentTo,
+    @RequestParam Integer messageType, @RequestParam Integer receivedFrom, @RequestParam Integer status, @RequestParam Integer systemStatus, @RequestParam String batchName, @RequestParam String utBatchName, 
+    @RequestParam String lastName, @RequestParam String patientId, @RequestParam String firstName, @RequestParam String providerId) throws Exception {
+       
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/Health-e-Web/historyDetails");
+        
+        /* Get selected org name */
+        Organization selorgDetails = organizationmanager.getOrganizationById(selorgId);
+        mav.addObject("orgName", selorgDetails.getOrgName());
+        
+        /* Get Message Type Name */
+        messageType messageTypeDetails = messagetypemanager.getMessageTypeById(selmessageTypeId);
+        mav.addObject("messageTypeName", messageTypeDetails.getName());
+        
+        /* Add search Paramaters */
+        mav.addObject("fromDate", fromDate);
+        mav.addObject("toDate", toDate);
+        
+        if(type == 0) {
+           mav.addObject("typeText", "Both (Referrals & Reports)"); 
+        }
+        else if(type == 1) {
+           mav.addObject("typeText", "Referrals Only");
+        }
+        else {
+           mav.addObject("typeText", "Reports Only"); 
+        }
+        mav.addObject("type", type);
+        
+        if(sentTo == 0) {
+           mav.addObject("sentToText", "All Affiliated Organizations"); 
+        }
+        else {
+           Organization orgDetails = organizationmanager.getOrganizationById(sentTo);
+           mav.addObject("sentToText", orgDetails.getOrgName());
+        }
+        mav.addObject("sentTo", sentTo);
+        
+        if(messageType == 0) {
+           mav.addObject("messageTypeText", "All Message Types"); 
+        }
+        else {
+           messageType msgTypeDetails = messagetypemanager.getMessageTypeById(messageType);
+           mav.addObject("messageTypeText", msgTypeDetails.getName());
+        }
+        mav.addObject("messageType", messageType);
+        
+        if(receivedFrom == 0) {
+           mav.addObject("receivedFromText", "All Affiliated Organizations"); 
+        }
+        else {
+           Organization orgDetails = organizationmanager.getOrganizationById(receivedFrom);
+           mav.addObject("receivedFromText", orgDetails.getOrgName());
+        }
+        mav.addObject("receivedFrom", receivedFrom);
+        
+        if(status == 0) {
+           mav.addObject("statusText", "Both (Opened & Closed)"); 
+        }
+        else if(status == 1) {
+           mav.addObject("statusText", "Opened Only");
+        }
+        else {
+           mav.addObject("statusText", "Closed Only"); 
+        }
+        mav.addObject("status", status);
+        
+        mav.addObject("systemStatusText", "All System Statuses");
+        mav.addObject("systemStatus", 0);
+        
+        /* Add additional search options */
+        mav.addObject("batchName", batchName);
+        mav.addObject("utBatchName", utBatchName);
+        mav.addObject("lastName", lastName);
+        mav.addObject("patientId", patientId);
+        mav.addObject("firstName", firstName);
+        mav.addObject("providerId", providerId);
+        
+        /* Need to get all the message types set up for the user */
+        User userInfo = (User)session.getAttribute("userDetails");
+        
+        List<historyDetails> transactions = new ArrayList<historyDetails>();
+        
+        /* Get received transactions */
+        List<batchDownloadSummary> recievedBatches = transactionOutManager.getBatchesBySentOrg(selorgId, userInfo.getOrgId(), selmessageTypeId);
+        
+        for(batchDownloadSummary batches : recievedBatches) {
+            
+            batchDownloads batchDetails = transactionOutManager.getBatchDetails(batches.getbatchId());
+            
+            configuration configDetails = configurationManager.getConfigurationById(batches.gettargetConfigId());
+            
+            /* Get transactions */
+            List<transactionTarget> trans = transactionOutManager.getTransactionsByBatchDLId(batchDetails.getId());
+            
+            for(transactionTarget tarTrans : trans) {
+                historyDetails details = new historyDetails();
+                details.setBatchName(batchDetails.getutBatchName());
+                details.setDateCreated(batchDetails.getdateCreated());
+                details.setBatchId(batchDetails.getId());
+                
+                if(configDetails.getsourceType() == 1) {
+                    details.setType("Referral");
+                }
+                else {
+                    details.setType("Feedback Report");
+                }
+                details.setTransactionId(tarTrans.getId());
+                
+                lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batchDetails.getstatusId());
+                details.setStatus(processStatus.getDisplayCode());
+                
+                /* Get the patient data */
+                messagePatients patientInfo = transactionInManager.getPatientTransactionDetails(tarTrans.gettransactionInId());
+                
+                details.setpatientName(patientInfo.getFirstName()+ " " + patientInfo.getLastName());
+                details.setPatientId(patientInfo.getSourcePatientId());
+                
+                transactions.add(details);
+            }
+            
+        }
+        
+        
+        /* Get Sent transactions */
+        List<batchUploadSummary> sentBatches = transactionInManager.getBatchesToSentOrg(userInfo.getOrgId(), selorgId, selmessageTypeId);
+        
+        for(batchUploadSummary batch : sentBatches) {
+            
+            batchUploads batchDetails = transactionInManager.getBatchDetails(batch.getbatchId());
+            
+            configuration configDetails = configurationManager.getConfigurationById(batch.getsourceConfigId());
+            
+            /* Get transactions */
+            List<transactionIn> trans = transactionInManager.getBatchTransactions(batchDetails.getId(), 0);
+            
+            for(transactionIn transaction : trans) {
+                historyDetails details = new historyDetails();
+                details.setBatchName(batchDetails.getutBatchName());
+                details.setDateCreated(batchDetails.getdateSubmitted());
+                details.setBatchId(batchDetails.getId());
+                if(configDetails.getsourceType() == 1) {
+                    details.setType("Referral");
+                }
+                else {
+                    details.setType("Feedback Report");
+                }
+                details.setTransactionId(transaction.getId());
+                
+                lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batchDetails.getstatusId());
+                details.setStatus(processStatus.getDisplayCode());
+                
+                /* Get the patient data */
+                messagePatients patientInfo = transactionInManager.getPatientTransactionDetails(transaction.getId());
+                
+                details.setpatientName(patientInfo.getFirstName()+ " " + patientInfo.getLastName());
+                details.setPatientId(patientInfo.getSourcePatientId());
+                
+                transactions.add(details);
+            }
+            
+        }
+        
+        mav.addObject("transactions", transactions);
+        
+        return mav;
+   
     }
     
 }

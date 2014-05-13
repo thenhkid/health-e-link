@@ -31,6 +31,7 @@ import com.ut.dph.model.custom.ConfigErrorInfo;
 import com.ut.dph.model.custom.ConfigForInsert;
 import com.ut.dph.model.custom.TransErrorDetail;
 import com.ut.dph.model.custom.TransErrorDetailDisplay;
+import com.ut.dph.model.messagePatients;
 import com.ut.dph.model.systemSummary;
 
 import java.util.Date;
@@ -370,5 +371,9 @@ public interface transactionInManager {
     List <configurationFTPFields> getFTPInfoForJob (Integer method);
     
     String newFileName (String path, String fileName);
+    
+    List<batchUploadSummary> getBatchesToSentOrg(int srcorgId, int tgtOrgId, int messageTypeId) throws Exception;
+    
+    messagePatients getPatientTransactionDetails(int transactionInId);
 
 }

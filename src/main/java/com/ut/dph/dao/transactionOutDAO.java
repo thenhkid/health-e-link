@@ -123,4 +123,6 @@ public interface transactionOutDAO {
     
     List<Integer> findInboxBatches(List<batchDownloads> batches, String searchTerm) throws Exception;
     
+    List<batchDownloadSummary> getBatchesBySentOrg(int srcorgId, int tgtOrgId, int messageTypeId) throws Exception;
+    
 }

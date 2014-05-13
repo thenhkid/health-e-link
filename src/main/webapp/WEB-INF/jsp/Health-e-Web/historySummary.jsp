@@ -98,7 +98,7 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="control-label" for="systemStatus">System Status</label>
-                                        <div>${systemStatus}</div>
+                                        <div>${systemStatusText}</div>
                                     </div>
                                 </div> 
                                 <div class="col-md-6">
@@ -174,6 +174,7 @@
                             <thead>
                                 <tr>
                                     <th scope="col">Affiliated Organization</th>
+                                    <th scope="col">Type</th>
                                     <th scope="col">Message Type</th>
                                     <th scope="col"></th>
                                     <c:if test="${showDetails == true}"><th scope="col"></th></c:if>
@@ -185,6 +186,9 @@
                                     <c:forEach var="result" items="${historyResults}">
                                         <tr>
                                             <td scope="row">${result.orgName}</td>
+                                            <td>
+                                              <c:choose><c:when test="${result.type == 1}">Referral</c:when><c:otherwise>Feedback Report</c:otherwise></c:choose>
+                                            </td>
                                             <td>
                                                 ${result.messageType}
                                             </td>
