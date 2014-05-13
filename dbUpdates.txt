@@ -1,0 +1,2 @@
+/** grace 05132014 05:41AM **/
+INSERT INTO `universaltranslator`.`lu_ErrorCodes` (`displayText`, `description`) VALUES ('Invalid Set Up', 'File with same extension, delimiter should be set up either contain headers or do not contain headers.');
