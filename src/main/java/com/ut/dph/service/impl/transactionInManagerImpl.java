@@ -2409,7 +2409,9 @@ public class transactionInManagerImpl implements transactionInManager {
 		try {
 		
 		fileSystem fileSystem = new fileSystem();
-		File folder = new File(inPath);
+		String fileInPath = fileSystem.setPath(inPath);
+		File folder = new File(fileInPath);
+		
 			
 		//list files
 		//we only list visible files
