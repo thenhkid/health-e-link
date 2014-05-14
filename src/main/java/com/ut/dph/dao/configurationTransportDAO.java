@@ -76,4 +76,6 @@ public interface configurationTransportDAO {
     
     List <Integer> getConfigCount(String fileExt, Integer transportMethodId, Integer fileDelimiter);
     
+    List<configurationTransport> getDistinctDelimCharForFileExt(String fileExt, Integer transportMethodId);
+    
 }

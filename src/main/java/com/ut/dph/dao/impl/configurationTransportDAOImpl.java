@@ -682,5 +682,33 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
 	        return null;
 		}
 	}
+
+	@Override
+	@Transactional
+	@SuppressWarnings("unchecked")
+	public List<configurationTransport> getDistinctDelimCharForFileExt(String fileExt, Integer transportMethodId) {
+		 try {
+
+	            String sql = ("select distinct delimChar, fileDelimiter "
+	                    + " from configurationTransportDetails, ref_delimiters  "
+	                    + " where ref_delimiters.id = configurationTransportDetails.fileDelimiter "
+	                    + " and transportMethodId = :transportMethodId "
+	                    + " and configurationTransportDetails.fileExt = :fileExt");
+	            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
+	                    Transformers.aliasToBean(configurationTransport.class));
+	            query.setParameter("transportMethodId", transportMethodId);
+	            query.setParameter("fileExt", fileExt);
+	            
+	            List<configurationTransport> configurationTransports = query.list();
+
+	            return configurationTransports;
+
+	        } catch (Exception ex) {
+	            System.err.println("getDistinctDelimCharForFileExt " + ex.getCause());
+	            ex.printStackTrace();
+
+	            return null;
+	        }
+	}
 	
 }

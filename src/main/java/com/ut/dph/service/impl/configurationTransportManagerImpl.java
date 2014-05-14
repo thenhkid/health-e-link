@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.configurationMessageSpecs;
 import com.ut.dph.model.configurationTransport;
@@ -14,6 +15,7 @@ import com.ut.dph.model.configurationTransportMessageTypes;
 import com.ut.dph.reference.fileSystem;
 import com.ut.dph.service.configurationTransportManager;
 import com.ut.dph.service.organizationManager;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -255,5 +257,11 @@ public class configurationTransportManagerImpl implements configurationTransport
 	public List<Integer> getConfigCount(String fileExt,	Integer transportMethodId, Integer fileDelimiter) {
 		return configurationTransportDAO.getConfigCount(fileExt, transportMethodId, fileDelimiter);
 
+	}
+
+	@Override
+	public List<configurationTransport> getDistinctDelimCharForFileExt(
+			String fileExt, Integer transportMethodId) {
+		return configurationTransportDAO.getDistinctDelimCharForFileExt(fileExt, transportMethodId);
 	}
 }

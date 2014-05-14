@@ -2382,7 +2382,7 @@ public class transactionInManagerImpl implements transactionInManager {
                     f.mkdirs();
                 }
 
-                sysErrors = sysErrors + moveSFTPFilesByPath(ftpInfo);
+                sysErrors = sysErrors + moveFilesByPath(ftpInfo, 3);
 
                 if (sysErrors == 0) {
                     sftpJob.setStatusId(2);
@@ -2400,8 +2400,8 @@ public class transactionInManagerImpl implements transactionInManager {
         return sysErrors;
     }
 
-@Override
-	public Integer moveSFTPFilesByPath(configurationFTPFields ftpInfo) {
+    @Override
+	public Integer moveFilesByPath(configurationFTPFields ftpInfo, Integer transportMethodId) {
 		Integer sysErrors = 0;
 		
 		try {
@@ -2425,20 +2425,18 @@ public class transactionInManagerImpl implements transactionInManager {
 			 String fileExt = fileName.substring(fileName.lastIndexOf(".")+1);
 			 
 			 //figure out how many transports are using fileExt method
-			 List<configurationTransport> transportList = configurationtransportmanager.getTransportListForFileExt(fileExt, 3);
+			 List<configurationTransport> transportList = configurationtransportmanager.getTransportListForFileExt(fileExt, transportMethodId);
 			 
-			 //figure out if this 
-			 List<configurationTransport> transports =  configurationtransportmanager.getConfigTransportForFileExt(fileExt, 3);
+			 //figure out if files has distinct delimiters
+			 List<configurationTransport> transports =  configurationtransportmanager.getConfigTransportForFileExt(fileExt, transportMethodId);
 			
-			 
-			 
 			 DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmssS");
              Date date = new Date();
-             String batchName = new StringBuilder().append("UT_3_").append(orgId).append(dateFormat.format(date)).toString();
+             String batchName = new StringBuilder().append("UT_").append(transportMethodId).append("_").append(orgId).append(dateFormat.format(date)).toString();
              
              batchUploads batchInfo = new batchUploads();
 			 batchInfo.setOrgId(orgId);
-			 batchInfo.settransportMethodId(3);
+			 batchInfo.settransportMethodId(transportMethodId);
 			 batchInfo.setstatusId(4);
 			 batchInfo.setstartDateTime(date);
 			 batchInfo.setutBatchName(batchName);
@@ -2470,7 +2468,7 @@ public class transactionInManagerImpl implements transactionInManager {
 				 fileSize = ct.getmaxFileSize();
 				 if (transportList.size() > 1) {
 					 configId =0;
-					 fileSize = configurationtransportmanager.getMinMaxFileSize(fileExt, 3);
+					 fileSize = configurationtransportmanager.getMinMaxFileSize(fileExt, transportMethodId);
 				 } else {
 					 configId = ct.getconfigId();
 				 }
@@ -2494,13 +2492,15 @@ public class transactionInManagerImpl implements transactionInManager {
 				 statusId = 2;
 				 
 			 } else if  (transportList.size() > 1 && transports.size() >1)  {
-				 //we have to read file see if it contains header row and what delimiter it is using
-				 //we loop though our delimiters for this type of file
+				 //we loop though our delimiters for this type of fileExt
 				 String delimiter = "";
 				 Integer fileDelimiter = 0;
 				 String fileLocation = "";
 				 Integer userId = 0;
-				 for (configurationTransport ctdelim: transports) {
+				 //get distinct delimiters
+				 List <configurationTransport>  delimList = configurationtransportmanager.getDistinctDelimCharForFileExt(fileExt, transportMethodId);
+					
+				 for (configurationTransport ctdelim: delimList) {
 					 fileSystem dir = new fileSystem();
 					 int delimCount = (Integer) dir.checkFileDelimiter(file, ctdelim.getDelimChar());
 			         if (delimCount > 3) {
@@ -2529,13 +2529,13 @@ public class transactionInManagerImpl implements transactionInManager {
 					 
 				 } else if (statusId == 2) {
 					 //we check to see if there is multi header row, if so, we reject because we don't know what header rows value to look for
-					 List <configurationTransport>  containsHeaderRowCount = configurationtransportmanager.getCountContainsHeaderRow(fileExt, 3);
+					 List <configurationTransport>  containsHeaderRowCount = configurationtransportmanager.getCountContainsHeaderRow(fileExt, transportMethodId);
 					 if (containsHeaderRowCount.size() != 1) {
 						 batchInfo.setuserId(usermanager.getUserByTypeByOrganization(orgId).get(0).getId());
 						 statusId = 7;
 						 insertProcessingError(14, 0, batchId, null, null, null, null, false, false, "");
 					 } else {
-						 List <Integer> totalConfigs = configurationtransportmanager.getConfigCount(fileExt, 3, fileDelimiter);
+						 List <Integer> totalConfigs = configurationtransportmanager.getConfigCount(fileExt, transportMethodId, fileDelimiter);
 						 
 						 //set how many configs we have
 						 if (totalConfigs.size() > 1) {
@@ -2543,6 +2543,11 @@ public class transactionInManagerImpl implements transactionInManager {
 						 } else {
 							 configId = totalConfigs.get(0);
 						 } 
+						 
+						 //get path
+						 fileLocation = configurationtransportmanager.getTransportDetails(totalConfigs.get(0)).getfileLocation();
+						 
+						 
 						 List<User> users = usermanager.getSendersForConfig(totalConfigs);
 		                 if (users.size() == 0) {
 		                     users = usermanager.getOrgUsersForConfig(totalConfigs);
@@ -2589,6 +2594,8 @@ public class transactionInManagerImpl implements transactionInManager {
 		}
 		return sysErrors;
 	}
+
+	/** this method grabs all distinct ftp path that need to be check for files **/
     @Override
     public List<configurationFTPFields> getFTPInfoForJob(Integer method) {
         return transactionInDAO.getFTPInfoForJob(method);
