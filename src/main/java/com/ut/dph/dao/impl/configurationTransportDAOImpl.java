@@ -375,7 +375,7 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
      */
     public void copyExistingTransportMethod(int configTransportId, int configId) {
 
-        Query query = sessionFactory.getCurrentSession().createSQLQuery("INSERT INTO configurationTransportDetails (configId, transportMethodId, fileType, fileDelimiter, status, targetFileName, appendDateTime, maxFileSize, clearRecords, fileLocation, autoRelease, errorHandling, mergeBatches, copiedTransportId) select :configId, transportMethodId, fileType, fileDelimiter, status, targetFileName, appendDateTime, maxFileSize, clearRecords, fileLocation, autoRelease, errorHandling, mergeBatches, :configTransportId FROM configurationTransportDetails where id = :configTransportId");
+        Query query = sessionFactory.getCurrentSession().createSQLQuery("INSERT INTO configurationTransportDetails (configId, transportMethodId, fileType, fileDelimiter, status, targetFileName, appendDateTime, maxFileSize, clearRecords, fileLocation, autoRelease, errorHandling, mergeBatches, copiedTransportId, fileExt) select :configId, transportMethodId, fileType, fileDelimiter, status, targetFileName, appendDateTime, maxFileSize, clearRecords, fileLocation, autoRelease, errorHandling, mergeBatches, :configTransportId, fileExt FROM configurationTransportDetails where id = :configTransportId");
         query.setParameter("configId", configId);
         query.setParameter("configTransportId", configTransportId);
 
