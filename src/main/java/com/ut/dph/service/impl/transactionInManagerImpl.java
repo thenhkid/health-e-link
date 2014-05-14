@@ -2381,8 +2381,10 @@ public class transactionInManagerImpl implements transactionInManager {
                 if (!f.exists()) {
                     f.mkdirs();
                 }
-
-                sysErrors = sysErrors + moveFilesByPath(ftpInfo, 3);
+              //we look up org for this path
+        		Integer orgId = configurationtransportmanager.getOrgIdForFTPPath(ftpInfo);
+        		
+                sysErrors = sysErrors + moveFilesByPath(ftpInfo.getdirectory(), 3, orgId, ftpInfo.gettransportId());
 
                 if (sysErrors == 0) {
                     sftpJob.setStatusId(2);
@@ -2401,17 +2403,13 @@ public class transactionInManagerImpl implements transactionInManager {
     }
 
     @Override
-	public Integer moveFilesByPath(configurationFTPFields ftpInfo, Integer transportMethodId) {
+	public Integer moveFilesByPath(String inPath, Integer transportMethodId, Integer orgId, Integer transportId) {
 		Integer sysErrors = 0;
 		
 		try {
-		//we look up org for this path
-		Integer orgId = configurationtransportmanager.getOrgIdForFTPPath(ftpInfo);
-			
 		
 		fileSystem fileSystem = new fileSystem();
-		String inPath = fileSystem.setPath(ftpInfo.getdirectory());
-        File folder = new File(inPath);
+		File folder = new File(inPath);
 			
 		//list files
 		//we only list visible files
@@ -2464,7 +2462,7 @@ public class transactionInManagerImpl implements transactionInManager {
                  insertProcessingError(13, 0, batchId, null, null, null, null, false, false, "");
 				 statusId = 7;
 			 } else if (transports.size() == 1) {
-				 configurationTransport  ct = configurationtransportmanager.getTransportDetailsByTransportId(ftpInfo.gettransportId());
+				 configurationTransport  ct = configurationtransportmanager.getTransportDetailsByTransportId(transportId);
 				 fileSize = ct.getmaxFileSize();
 				 if (transportList.size() > 1) {
 					 configId =0;
@@ -2546,8 +2544,6 @@ public class transactionInManagerImpl implements transactionInManager {
 						 
 						 //get path
 						 fileLocation = configurationtransportmanager.getTransportDetails(totalConfigs.get(0)).getfileLocation();
-						 
-						 
 						 List<User> users = usermanager.getSendersForConfig(totalConfigs);
 		                 if (users.size() == 0) {
 		                     users = usermanager.getOrgUsersForConfig(totalConfigs);
@@ -2589,7 +2585,7 @@ public class transactionInManagerImpl implements transactionInManager {
 		 }
 		} catch (Exception ex) {
 			ex.printStackTrace();
-	        System.err.println("moveSFTPFilesByPath " + ex.getCause());
+	        System.err.println("moveFilesByPath " + ex.getCause());
 	        return 1;
 		}
 		return sysErrors;
