@@ -2461,7 +2461,7 @@ public class transactionInManagerImpl implements transactionInManager {
                  batchInfo.setFileLocation(defPath);
                  batchId = (Integer) submitBatchUpload(batchInfo);
 				 //insert error
-                 insertProcessingError(13, 0, batchId, null, null, null, null, false, false, "");
+                 insertProcessingError(13, 0, batchId, null, null, null, null, false, false, fileName);
 				 statusId = 7;
 			 } else if (transports.size() == 1) {
 				 configurationTransport  ct = configurationtransportmanager.getTransportDetailsByTransportId(transportId);
@@ -2533,7 +2533,7 @@ public class transactionInManagerImpl implements transactionInManager {
 					 if (containsHeaderRowCount.size() != 1) {
 						 batchInfo.setuserId(usermanager.getUserByTypeByOrganization(orgId).get(0).getId());
 						 statusId = 7;
-						 insertProcessingError(14, 0, batchId, null, null, null, null, false, false, "");
+						 insertProcessingError(14, 0, batchId, null, null, null, null, false, false, (containsHeaderRowCount.size() + " different set up were found for this file extension. (" + fileExt +")"));
 					 } else {
 						 List <Integer> totalConfigs = configurationtransportmanager.getConfigCount(fileExt, transportMethodId, fileDelimiter);
 						 
@@ -2576,15 +2576,17 @@ public class transactionInManagerImpl implements transactionInManager {
             	 /** check file size
             	  * if configId is 0 we go with the smallest file size
             	  ***/
-                 if ((Files.size(target) / (1024L * 1024L)) > fileSize) {
+            	 long maxFileSize =  fileSize * 1000000;
+            	 if (Files.size(target) > maxFileSize) {
                      statusId = 7;
-                     insertProcessingError(12, configId, batchId, null, null, null, null, false, false, "");
+                     insertProcessingError(12, configId, batchId, null, null, null, null, false, false, ("Input file is " + String.valueOf(Files.size(target)/1000.) + " kb"));
                  }
              }
              
 			 updateBatchStatus(batchId,statusId, "endDateTime");
          	 
 		 }
+		 
 		} catch (Exception ex) {
 			ex.printStackTrace();
 	        System.err.println("moveFilesByPath " + ex.getCause());
