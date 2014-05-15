@@ -6,8 +6,6 @@
 package com.ut.dph.dao.impl;
 
 import com.ut.dph.dao.transactionOutDAO;
-import com.ut.dph.model.Organization;
-import com.ut.dph.model.User;
 import com.ut.dph.model.batchDownloadSummary;
 import com.ut.dph.model.batchDownloads;
 import com.ut.dph.model.configuration;
@@ -18,7 +16,6 @@ import com.ut.dph.model.configurationSchedules;
 import com.ut.dph.model.configurationTransport;
 import com.ut.dph.model.lutables.lu_ProcessStatus;
 import com.ut.dph.model.messagePatients;
-import com.ut.dph.model.messageType;
 import com.ut.dph.model.targetOutputRunLogs;
 import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionOutNotes;
@@ -26,8 +23,6 @@ import com.ut.dph.model.transactionOutRecords;
 import com.ut.dph.model.transactionTarget;
 import com.ut.dph.service.sysAdminManager;
 import com.ut.dph.service.userManager;
-
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;

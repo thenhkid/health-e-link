@@ -34,6 +34,7 @@
         <quartz.version>2.2.1</quartz.version>
         <commons-validator.version>1.4.0</commons-validator.version>
         <tomcat-jdbc.version>7.0.47</tomcat-jdbc.version>
+        <sax.version>2.0.1</sax.version>
     </properties>
   
  
@@ -281,11 +282,17 @@
             <version>0.1.51</version>
         </dependency>
         
-         <dependency>
+        <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
             <version>20041127.091804</version>
-         </dependency>
+        </dependency>
+         
+        <dependency>
+            <groupId>sax</groupId>
+            <artifactId>sax</artifactId>
+            <version>${sax.version}</version>
+        </dependency>
     
     </dependencies>
     <build>

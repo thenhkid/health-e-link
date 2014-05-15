@@ -18,3 +18,9 @@ CREATE TABLE `rel_TransportRhapsodyDetails` (
 
 INSERT INTO `universaltranslator`.`ref_transportMethods` (`id`,`transportMethod`, `active`) VALUES (5, 'Rhapsody', 1);
 
+/* Chad 05152014 3:53 PM */
+ALTER TABLE `universalTranslator`.`configurationTransportDetails` 
+ADD COLUMN `CCDJarTemplate` VARCHAR(45) NULL DEFAULT NULL AFTER `fileExt`;
+
+UPDATE `universalTranslator`.`ref_fileTypes` SET `fileType`='xml (CCD)' WHERE `id`='9';
+

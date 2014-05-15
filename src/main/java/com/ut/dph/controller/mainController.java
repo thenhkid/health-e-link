@@ -32,13 +32,13 @@ import org.springframework.web.servlet.view.RedirectView;
  */
 @Controller
 public class mainController {
-    
+
     @Autowired
     private userManager usermanager;
-    
+
     @Autowired
     private emailMessageManager emailMessageManager;
-    
+
     /**
      * The '/login' request will serve up the login page.
      *
@@ -49,10 +49,11 @@ public class mainController {
      */
     @RequestMapping(value = "/login", method = RequestMethod.GET)
     public ModelAndView login(HttpServletRequest request, HttpServletResponse response) throws Exception {
-        
+
+
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/login");
-        
+
         return mav;
 
     }
@@ -84,7 +85,7 @@ public class mainController {
      * @throws Exception
      */
     @RequestMapping(value = "/logout", method = RequestMethod.GET)
-    public ModelAndView logout(HttpServletRequest request,  HttpServletResponse response) throws Exception {
+    public ModelAndView logout(HttpServletRequest request, HttpServletResponse response) throws Exception {
         return new ModelAndView("/login");
     }
 
@@ -97,50 +98,50 @@ public class mainController {
      * @throws Exception
      */
     @RequestMapping(value = "/", method = RequestMethod.GET)
-    public ModelAndView welcome(HttpServletRequest request,  HttpServletResponse response, RedirectAttributes redirectAttr) throws Exception {
-        
+    public ModelAndView welcome(HttpServletRequest request, HttpServletResponse response, RedirectAttributes redirectAttr) throws Exception {
+
         ModelAndView mav = new ModelAndView(new RedirectView("/login"));
         return mav;
-        
+
         /*return new ModelAndView("/home");*/
     }
-    
+
     /**
      * The '/product-suite' request will display the product suite information page.
      */
-    @RequestMapping(value="/product-suite", method = RequestMethod.GET)
+    @RequestMapping(value = "/product-suite", method = RequestMethod.GET)
     public ModelAndView productSuite() throws Exception {
-        
+
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/productSuite");
-        mav.addObject("pageTitle","Product Suite");
+        mav.addObject("pageTitle", "Product Suite");
         return mav;
     }
-    
+
     /**
      * The '/about' GET request will display the about page.
      */
-    @RequestMapping(value="/about", method = RequestMethod.GET)
+    @RequestMapping(value = "/about", method = RequestMethod.GET)
     public ModelAndView aboutPage() throws Exception {
-        
+
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/about");
-        mav.addObject("pageTitle","About Us");
+        mav.addObject("pageTitle", "About Us");
         return mav;
     }
-    
+
     /**
      * The '/contact' GEt request will display the contact page.
      */
-    @RequestMapping(value="/contact", method = RequestMethod.GET)
+    @RequestMapping(value = "/contact", method = RequestMethod.GET)
     public ModelAndView contactPage() throws Exception {
-        
+
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/contact");
-        mav.addObject("pageTitle","Contact Us");
+        mav.addObject("pageTitle", "Contact Us");
         return mav;
     }
-    
+
     /**
      * The '/forgotPassword' GET request will be used to display the forget password form (In a modal)
      *
@@ -154,45 +155,43 @@ public class mainController {
 
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/forgotPassword");
-       
 
         return mav;
     }
-    
+
     /**
-     * The '/forgotPassword.do' POST request will be used to find the account information for the user
-     * and send an email.
+     * The '/forgotPassword.do' POST request will be used to find the account information for the user and send an email.
      *
      *
      */
     @RequestMapping(value = "/forgotPassword.do", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody Integer findPassword(@RequestParam String identifier) throws Exception {
-        
+    public @ResponseBody
+    Integer findPassword(@RequestParam String identifier) throws Exception {
+
         Integer userId = usermanager.getUserByIdentifier(identifier);
-        
-        if(userId == null) {
+
+        if (userId == null) {
             return 0;
-        }
-        else {
-            
+        } else {
+
             return userId;
         }
 
     }
-    
+
     /**
      * The '/sendPassword.do' POST request will be used to send the reset email to the user.
      *
-     * @param userId    The id of the return user.
+     * @param userId The id of the return user.
      */
     @RequestMapping(value = "/sendPassword.do", method = RequestMethod.POST)
     public void sendPassword(@RequestParam Integer userId) throws Exception {
-        
+
         String randomCode = generateRandomCode();
-        
+
         User userDetails = usermanager.getUserById(userId);
         userDetails.setresetCode(randomCode);
-        
+
         //Return the sections for the clicked user
         List<userAccess> userSections = usermanager.getuserSections(userId);
         List<Integer> userSectionList = new ArrayList<Integer>();
@@ -202,9 +201,9 @@ public class mainController {
         }
 
         userDetails.setsectionList(userSectionList);
-        
+
         usermanager.updateUser(userDetails);
-        
+
         /* Sent Reset Email */
         mailMessage messageDetails = new mailMessage();
 
@@ -213,9 +212,9 @@ public class mainController {
 
         StringBuilder sb = new StringBuilder();
 
-        sb.append("Dear "+userDetails.getFirstName()+",<br />");
+        sb.append("Dear " + userDetails.getFirstName() + ",<br />");
         sb.append("You have recently asked to reset your Universal Translator password.<br /><br />");
-        sb.append("<a href='http://localhost:8085/resetPassword?b="+randomCode+"'>Click here to reset your password.</a>");
+        sb.append("<a href='http://localhost:8085/resetPassword?b=" + randomCode + "'>Click here to reset your password.</a>");
 
         messageDetails.setmessageBody(sb.toString());
         messageDetails.setfromEmailAddress("dphuniversaltranslator@gmail.com");
@@ -223,7 +222,7 @@ public class mainController {
         emailMessageManager.sendEmail(messageDetails);
 
     }
-    
+
     /**
      * The '/resetPassword' GET request will be used to display the reset password form
      *
@@ -238,11 +237,10 @@ public class mainController {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/resetPassword");
         mav.addObject("resetCode", resetCode);
-       
 
         return mav;
     }
-    
+
     /**
      * The '/resetPassword' POST request will be used to display update the users password
      *
@@ -252,16 +250,15 @@ public class mainController {
      */
     @RequestMapping(value = "/resetPassword", method = RequestMethod.POST)
     public ModelAndView resetPassword(@RequestParam String resetCode, @RequestParam String newPassword, HttpSession session, RedirectAttributes redirectAttr) throws Exception {
-        
+
         User userDetails = usermanager.getUserByResetCode(resetCode);
-        
-        if(userDetails == null) {
+
+        if (userDetails == null) {
             redirectAttr.addFlashAttribute("msg", "notfound");
 
             ModelAndView mav = new ModelAndView(new RedirectView("/login"));
             return mav;
-        }
-        else {
+        } else {
             userDetails.setresetCode(null);
             userDetails.setPassword(newPassword);
 
@@ -282,38 +279,35 @@ public class mainController {
             ModelAndView mav = new ModelAndView(new RedirectView("/login"));
             return mav;
         }
-        
+
     }
-    
-    
+
     /**
-     * The 'generateRandomCode' function will be used to generate a random access code to reset
-     * a users password. The function will call itself until it gets a unique code.
-     * 
-     * @return This function returns a randomcode as a string 
+     * The 'generateRandomCode' function will be used to generate a random access code to reset a users password. The function will call itself until it gets a unique code.
+     *
+     * @return This function returns a randomcode as a string
      */
     public String generateRandomCode() {
-        
+
         StringBuilder code = new StringBuilder();
 
         /* Generate a random 6 digit number for a confirmation code */
-        for(int i=1;i<=7;i++) {
+        for (int i = 1; i <= 7; i++) {
             Random rand = new Random();
             int r = rand.nextInt(8) + 1;
             code.append(r);
         }
-        
+
         /* Check to make sure there is not reset code already generated */
         User usedCode = usermanager.getUserByResetCode(code.toString());
-        
-        if(usedCode == null) {
+
+        if (usedCode == null) {
             return code.toString();
-        }
-        else {
-            
+        } else {
+
             return generateRandomCode();
-            
+
         }
-        
+
     }
 }

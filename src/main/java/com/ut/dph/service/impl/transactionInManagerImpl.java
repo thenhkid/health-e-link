@@ -39,6 +39,7 @@ import com.ut.dph.model.lutables.lu_ProcessStatus;
 import com.ut.dph.model.messagePatients;
 import com.ut.dph.model.systemSummary;
 import com.ut.dph.reference.fileSystem;
+import com.ut.dph.service.CCDtoTxt;
 import com.ut.dph.service.configurationManager;
 import com.ut.dph.service.configurationTransportManager;
 import com.ut.dph.service.hl7toTxt;
@@ -117,6 +118,9 @@ public class transactionInManagerImpl implements transactionInManager {
 
     @Autowired
     private hl7toTxt hl7toTxt;
+    
+    @Autowired
+    private CCDtoTxt ccdtotxt;
 
     private int processingSysErrorId = 5;
 
@@ -1545,14 +1549,27 @@ public class transactionInManagerImpl implements transactionInManager {
             dir.setDirByName("/");
 
             //2. we load data with my sql
-            /* 
-             if the original file name is a HL7 file (".hr") then we are going to translate it to
-             a pip-delimited text file.
-             */
             String fileWithPath = null;
             String actualFileName = null;
-            if (batch.getoriginalFileName().endsWith(".hr")) {
-                String newfilename = hl7toTxt.TranslateHl7toTxt(batch.getFileLocation(), batch.getoriginalFileName());
+            String newfilename = null;
+            
+            /*
+                If batch is set up for CCD input then we need to translate it
+                to a pipe-delimited text file.
+            */
+             if (batch.getoriginalFileName().endsWith(".xml")) {
+                newfilename = ccdtotxt.TranslateCCDtoTxt(batch.getFileLocation(), batch.getoriginalFileName(), batch.getOrgId(), batch.getConfigId());
+                
+                fileWithPath = dir.getDir() + batch.getFileLocation() + newfilename;
+                fileWithPath = fileWithPath.replace("bowlink///", "");
+                actualFileName = newfilename;
+             }
+            /* 
+             if the original file name is a HL7 file (".hr") then we are going to translate it to
+             a pipe-delimited text file.
+             */
+            else if (batch.getoriginalFileName().endsWith(".hr")) {
+                newfilename = hl7toTxt.TranslateHl7toTxt(batch.getFileLocation(), batch.getoriginalFileName());
 
                 fileWithPath = dir.getDir() + batch.getFileLocation() + newfilename;
                 fileWithPath = fileWithPath.replace("bowlink///", "");

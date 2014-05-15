@@ -81,6 +81,9 @@ public class configurationTransport {
     @NoHtml
     @Column(name = "FILEEXT", nullable = false)
     private String fileExt = null;
+    
+    @Column(name = "CCDJarTemplate", nullable = true)
+    private String CCDJarTemplate = null;
 
     public int getId() {
         return id;
@@ -249,5 +252,15 @@ public class configurationTransport {
     public void setfileExt(String fileExt) {
         this.fileExt = fileExt;
     }
+
+    public String getCCDJarTemplate() {
+        return CCDJarTemplate;
+    }
+
+    public void setCCDJarTemplate(String CCDJarTemplate) {
+        this.CCDJarTemplate = CCDJarTemplate;
+    }
+    
+    
     
 }
