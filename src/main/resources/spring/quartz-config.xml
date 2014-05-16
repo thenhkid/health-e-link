@@ -77,7 +77,7 @@
             </cron>
         </trigger>
     </schedule>
-    
+    <!--
     <schedule>
         <job>
             <name>MoveSFTPFiles</name>
@@ -95,6 +95,6 @@
             </cron>
         </trigger>
     </schedule>
-    
+    -->
     
 </job-scheduling-data>

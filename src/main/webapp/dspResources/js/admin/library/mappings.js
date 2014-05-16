@@ -1,10 +1,10 @@
 
-require(['./main'], function () {
+require(['./main'], function() {
     require(['jquery'], function($) {
-        
-        
+
+
         $("input:text,form").attr("autocomplete", "off");
-        
+
         //Fade out the updated/created message after being displayed.
         if ($('.alert').length > 0) {
             $('.alert').delay(2000).fadeOut(1000);
@@ -49,20 +49,65 @@ require(['./main'], function () {
         });
 
         //Loop through all selected table names to populate the columns
+        var currTableName = "";
+        var currTableCols = [];
+
         $('.tableName').each(function() {
             var row = $(this).attr('rel');
             var tableName = $(this).val();
             if (tableName !== "") {
-                populateTableColumns(tableName, row);
+
+                if ((currTableName == "" || tableName != currTableName)) {
+                    currTableName = tableName;
+
+                    currTableCols = populateTableColumns(tableName);
+                }
+
+                var colVal = $('#tableCols' + row).attr('rel2');
+
+                var html = '<option value="">- Select - </option>';
+                var len = currTableCols.length;
+                for (var i = 0; i < len; i++) {
+                    if (colVal == currTableCols[i]) {
+                        html += '<option value="' + currTableCols[i] + '" selected>' + currTableCols[i] + '</option>';
+                    }
+                    else {
+                        html += '<option value="' + currTableCols[i] + '">' + currTableCols[i] + '</option>';
+                    }
+                }
+                $('#tableCols' + row).html(html);
             }
         });
+
+        var currAutoTableName = "";
+        var currAutoTableCols = [];
 
         //Loop through all selected table names to populate the columns
         $('.autoPopulatetableName').each(function() {
             var row = $(this).attr('rel');
             var tableName = $(this).val();
             if (tableName !== "") {
-                populateAutoTableColumns(tableName, row);
+
+                if ((currAutoTableName == "" || tableName != currAutoTableName)) {
+                    currAutoTableName = tableName;
+
+                    currAutoTableCols = populateAutoTableColumns(tableName);
+                }
+
+                var colVal = $('#autoPopulatetableCols' + row).attr('rel2');
+
+                var html = '<option value="">- Select - </option>';
+                var len = currAutoTableCols.length;
+                for (var i = 0; i < len; i++) {
+                    if (colVal == currAutoTableCols[i]) {
+                        html += '<option value="' + currAutoTableCols[i] + '" selected>' + currAutoTableCols[i] + '</option>';
+                    }
+                    else {
+                        html += '<option value="' + currAutoTableCols[i] + '">' + currAutoTableCols[i] + '</option>';
+                    }
+                }
+                $('#autoPopulatetableCols' + row).html(html);
+
             }
         });
 
@@ -70,14 +115,45 @@ require(['./main'], function () {
         $(document).on('change', '.tableName', function() {
             var row = $(this).attr('rel');
             var tableName = $(this).val();
-            populateTableColumns(tableName, row);
+            currTableCols = populateTableColumns(tableName);
+
+            var colVal = $('#tableCols' + row).attr('rel2');
+
+            var html = '<option value="">- Select - </option>';
+            var len = currTableCols.length;
+            for (var i = 0; i < len; i++) {
+                if (colVal == currTableCols[i]) {
+                    html += '<option value="' + currTableCols[i] + '" selected>' + currTableCols[i] + '</option>';
+                }
+                else {
+                    html += '<option value="' + currTableCols[i] + '">' + currTableCols[i] + '</option>';
+                }
+            }
+            $('#tableCols' + row).html(html);
+
         });
 
         //Need to populate the auto populate table columns or the selected table
         $(document).on('change', '.autoPopulatetableName', function() {
             var row = $(this).attr('rel');
             var tableName = $(this).val();
-            populateAutoTableColumns(tableName, row);
+            currAutoTableCols = populateAutoTableColumns(tableName);
+
+            var colVal = $('#autoPopulatetableCols' + row).attr('rel2');
+
+            var html = '<option value="">- Select - </option>';
+            var len = currAutoTableCols.length;
+            for (var i = 0; i < len; i++) {
+                if (colVal == currAutoTableCols[i]) {
+                    html += '<option value="' + currAutoTableCols[i] + '" selected>' + currAutoTableCols[i] + '</option>';
+                }
+                else {
+                    html += '<option value="' + currAutoTableCols[i] + '">' + currAutoTableCols[i] + '</option>';
+                }
+            }
+            $('#autoPopulatetableCols' + row).html(html);
+
+
         });
 
         //This function will save the messgae type field mappings
@@ -87,7 +163,7 @@ require(['./main'], function () {
             var errorsFound = 0;
             var row = 0;
 
-             $('#mappingErrorMsgDiv').hide();
+            $('#mappingErrorMsgDiv').hide();
 
             //Check field labels
             $('.fieldLabel').each(function() {
@@ -129,24 +205,24 @@ require(['./main'], function () {
                     errorsFound = 1;
                 }
             });
-            
+
 
             if (errorsFound == 0) {
-                
+
                 /*$('body').overlay({
-                    glyphicon : 'floppy-disk',
-                    message : 'Saving...'
-                });*/
-                
-               var formData = $("#fieldMappings").serialize();
-                
+                 glyphicon : 'floppy-disk',
+                 message : 'Saving...'
+                 });*/
+
+                var formData = $("#fieldMappings").serialize();
+
                 $.ajax({
                     url: 'mappings',
                     data: formData,
                     type: "POST",
                     async: false,
                     success: function(data) {
-                        if(data == 1) {
+                        if (data == 1) {
                             $('.mappingsUpdated').show();
                             $('.alert').delay(2000).fadeOut(1000);
                         }
@@ -154,16 +230,16 @@ require(['./main'], function () {
                 });
                 event.preventDefault();
                 return false;
-               //$('#fieldMappings').submit();
-                
+                //$('#fieldMappings').submit();
+
             }
             else {
                 $('#mappingErrorMsgDiv').show();
             }
 
         });
-       
-        
+
+
     });
 });
 
@@ -171,49 +247,43 @@ require(['./main'], function () {
 //This functin will be used to populate the tableCols drop down.
 //function takes in the name of the selected table name and the
 //row it is working with.
-function populateTableColumns(tableName, row) {
-    $.getJSON('getTableCols.do', {
-        tableName: tableName, ajax: true
-    }, function(data) {
-        //get value of preselected col
-        var colVal = $('#tableCols' + row).attr('rel2');
+function populateTableColumns(tableName) {
 
-        var html = '<option value="">- Select - </option>';
-        var len = data.length;
-        for (var i = 0; i < len; i++) {
-            if (colVal == data[i]) {
-                html += '<option value="' + data[i] + '" selected>' + data[i] + '</option>';
-            }
-            else {
-                html += '<option value="' + data[i] + '">' + data[i] + '</option>';
-            }
+    var result = [];
+
+    $.ajax({
+        async: false,
+        url: 'getTableCols.do',
+        data: {'tableName': tableName},
+        dataType: 'json',
+        success: function(data) {
+            result = data;
         }
-        $('#tableCols' + row).html(html);
     });
+
+    return result;
 }
 
-//This functin will be used to populate the autoPopulatetableCols drop down.
+//This function will be used to populate the autoPopulatetableCols drop down.
 //function takes in the name of the selected table name and the
 //row it is working with.
-function populateAutoTableColumns(tableName, row) {
-    $.getJSON('getTableCols.do', {
-        tableName: tableName, ajax: true
-    }, function(data) {
-        //get value of preselected col
-        var colVal = $('#autoPopulatetableCols' + row).attr('rel2');
 
-        var html = '<option value="">- Select - </option>';
-        var len = data.length;
-        for (var i = 0; i < len; i++) {
-            if (colVal == data[i]) {
-                html += '<option value="' + data[i] + '" selected>' + data[i] + '</option>';
-            }
-            else {
-                html += '<option value="' + data[i] + '">' + data[i] + '</option>';
-            }
+
+function populateAutoTableColumns(tableName) {
+
+    var result = [];
+
+    $.ajax({
+        async: false,
+        url: 'getTableCols.do',
+        data: {'tableName': tableName},
+        dataType: 'json',
+        success: function(data) {
+            result = data;
         }
-        $('#autoPopulatetableCols' + row).html(html);
     });
+
+    return result;
 }
 
 

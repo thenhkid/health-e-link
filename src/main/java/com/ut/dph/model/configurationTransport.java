@@ -10,6 +10,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 @Entity
 @Table(name = "CONFIGURATIONTRANSPORTDETAILS")
@@ -29,6 +30,9 @@ public class configurationTransport {
 
     @Transient
     private List<Integer> messageTypes = null;
+    
+    @Transient
+    private CommonsMultipartFile file = null;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -45,7 +49,7 @@ public class configurationTransport {
     private int fileType = 1;
 
     @Column(name = "FILEDELIMITER", nullable = true)
-    private int fileDelimiter = 0;
+    private int fileDelimiter = 2;
 
     @Column(name = "STATUS", nullable = false)
     private boolean status = true;
@@ -261,6 +265,12 @@ public class configurationTransport {
         this.CCDJarTemplate = CCDJarTemplate;
     }
     
-    
+    public CommonsMultipartFile getFile() {
+        return file;
+    }
+
+    public void setFile(CommonsMultipartFile file) {
+        this.file = file;
+    }
     
 }

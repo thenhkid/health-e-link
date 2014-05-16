@@ -15,11 +15,13 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 /**
  *
  * @author chadmccue
  */
+@Service
 public class CCDtoTxt {
 
     @Autowired

@@ -467,7 +467,6 @@ public class adminConfigController {
         
         if(ftpFields.isEmpty()) {
         	
-        	
             List<configurationFTPFields> emptyFTPFields = new ArrayList<configurationFTPFields>();
             configurationFTPFields pushFTPFields = new configurationFTPFields();
             pushFTPFields.setmethod(1);
@@ -561,9 +560,6 @@ public class adminConfigController {
         
         Integer currTransportId = transportDetails.getId();
         
-        /* submit the updates */
-        Integer transportId = (Integer) configurationTransportManager.updateTransportDetails(transportDetails);
-        
         /**
          * if transport method = ERG (2) then set up the online form
          * OR
@@ -571,6 +567,10 @@ public class adminConfigController {
          * to fix errors via ERG set up the online form
          */
         configuration configurationDetails = configurationmanager.getConfigurationById(configId);
+        
+        /* submit the updates */
+        Integer transportId = (Integer) configurationTransportManager.updateTransportDetails(transportDetails, configurationDetails.getorgId());
+        
         
         if(currTransportId == 0) {
             configurationTransportManager.setupOnlineForm(transportId, configId, configurationDetails.getMessageTypeId());

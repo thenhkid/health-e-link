@@ -3,8 +3,6 @@ package com.ut.dph.service;
 import com.ut.dph.model.configurationFTPFields;
 
 import java.util.List;
-
-import com.ut.dph.model.User;
 import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.configurationMessageSpecs;
 import com.ut.dph.model.configurationTransport;
@@ -16,7 +14,7 @@ public interface configurationTransportManager {
 
     configurationTransport getTransportDetailsByTransportMethod(int configId, int transportMethod);
 
-    Integer updateTransportDetails(configurationTransport transportDetails);
+    Integer updateTransportDetails(configurationTransport transportDetails, int orgId);
 
     List<configurationFormFields> getConfigurationFields(int configId, int transportDetailId);
     
