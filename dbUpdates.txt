@@ -6,7 +6,7 @@ INSERT INTO `universaltranslator`.`lu_ErrorCodes` (`displayText`) VALUES ('Inval
 UPDATE `universaltranslator`.`lu_ErrorCodes` SET `description`='Delimiter is valid for this type of file' WHERE `id`='15';
 
 /** grace 05142014 11:47 AM **/
-CREATE TABLE `rel_TransportRhapsodyDetails` (
+CREATE TABLE `universalTranslator`.`rel_TransportRhapsodyDetails` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `transportId` int(11) NOT NULL,
   `directory` varchar(255) DEFAULT NULL,
