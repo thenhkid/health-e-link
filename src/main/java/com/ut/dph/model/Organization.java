@@ -13,11 +13,16 @@ import javax.persistence.Table;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import com.ut.dph.validator.Phone;
+import javax.persistence.Transient;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 @Entity
 @Table(name = "ORGANIZATIONS")
 public class Organization {
+    
+    @Transient
+    private CommonsMultipartFile file = null;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -75,6 +80,9 @@ public class Organization {
     @NoHtml
     @Column(name = "CLEANURL", nullable = false)
     private String cleanURL;
+    
+    @Column(name = "CCDJarTemplate", nullable = true)
+    private String CCDJarTemplate = null;
 
     public int getId() {
         return id;
@@ -178,6 +186,22 @@ public class Organization {
 
     public void setcleanURL(String cleanURL) {
         this.cleanURL = cleanURL;
+    }
+    
+    public String getCCDJarTemplate() {
+        return CCDJarTemplate;
+    }
+
+    public void setCCDJarTemplate(String CCDJarTemplate) {
+        this.CCDJarTemplate = CCDJarTemplate;
+    }
+    
+    public CommonsMultipartFile getFile() {
+        return file;
+    }
+
+    public void setFile(CommonsMultipartFile file) {
+        this.file = file;
     }
 
 }

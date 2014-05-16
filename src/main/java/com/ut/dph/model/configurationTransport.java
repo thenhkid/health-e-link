@@ -31,9 +31,6 @@ public class configurationTransport {
     @Transient
     private List<Integer> messageTypes = null;
     
-    @Transient
-    private CommonsMultipartFile file = null;
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID", nullable = false)
@@ -86,9 +83,6 @@ public class configurationTransport {
     @Column(name = "FILEEXT", nullable = false)
     private String fileExt = null;
     
-    @Column(name = "CCDJarTemplate", nullable = true)
-    private String CCDJarTemplate = null;
-
     public int getId() {
         return id;
     }
@@ -257,20 +251,4 @@ public class configurationTransport {
         this.fileExt = fileExt;
     }
 
-    public String getCCDJarTemplate() {
-        return CCDJarTemplate;
-    }
-
-    public void setCCDJarTemplate(String CCDJarTemplate) {
-        this.CCDJarTemplate = CCDJarTemplate;
-    }
-    
-    public CommonsMultipartFile getFile() {
-        return file;
-    }
-
-    public void setFile(CommonsMultipartFile file) {
-        this.file = file;
-    }
-    
 }

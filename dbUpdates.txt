@@ -29,5 +29,12 @@ ALTER TABLE `universaltranslator`.`batchuploads`
 ADD COLUMN `originalFolder` VARCHAR(255) NULL AFTER `configId`;
 INSERT INTO `universaltranslator`.`lu_ProcessStatus` (`id`,`category`, `displayCode`, `displayText`) VALUES (35, 'batch', 'FR', 'File Reset');
 
+/** Chad 05162014 @ 10:42 PM **/
+ALTER TABLE `universalTranslator`.`configurationTransportDetails` 
+DROP COLUMN `CCDJarTemplate`;
+
+ALTER TABLE `universalTranslator`.`organizations` 
+ADD COLUMN `CCDJarTemplate` VARCHAR(45) NULL DEFAULT NULL AFTER `cleanURL`;
+
 
 

@@ -13,6 +13,12 @@ import com.ut.dph.service.organizationManager;
 import com.ut.dph.model.User;
 import com.ut.dph.model.Brochure;
 import com.ut.dph.reference.fileSystem;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class organizationManagerImpl implements organizationManager {
@@ -39,13 +45,62 @@ public class organizationManagerImpl implements organizationManager {
     @Override
     @Transactional
     public void updateOrganization(Organization organization) {
-        organizationDAO.updateOrganization(organization);
-
+       
 	//Need to make sure all folders are created for
         //the organization
         fileSystem dir = new fileSystem();
-
+        
         dir.creatOrgDirectories(organization.getcleanURL());
+        
+        MultipartFile file = organization.getFile();
+        //If a file is uploaded
+        if (file != null && !file.isEmpty()) {
+        
+            String fileName = file.getOriginalFilename();
+            
+            InputStream inputStream = null;
+            OutputStream outputStream = null;
+            
+            try {
+                inputStream = file.getInputStream();
+                File newFile = null;
+
+                //Set the directory to save the uploaded message type template to
+                fileSystem orgdir = new fileSystem();
+
+                orgdir.setDir(organization.getcleanURL(), "templates");
+
+                newFile = new File(orgdir.getDir() + fileName);
+
+                if (newFile.exists()) {
+                    int i = 1;
+                    while (newFile.exists()) {
+                        int iDot = fileName.lastIndexOf(".");
+                        newFile = new File(orgdir.getDir() + fileName.substring(0, iDot) + "_(" + ++i + ")" + fileName.substring(iDot));
+                    }
+                    fileName = newFile.getName();
+                } else {
+                    newFile.createNewFile();
+                }
+                outputStream = new FileOutputStream(newFile);
+                int read = 0;
+                byte[] bytes = new byte[1024];
+
+                while ((read = inputStream.read(bytes)) != -1) {
+                    outputStream.write(bytes, 0, read);
+                }
+                outputStream.close();
+
+                //Set the filename to the file name
+                organization.setCCDJarTemplate(fileName);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            
+        }
+        
+        organizationDAO.updateOrganization(organization);
     }
 
     @Override

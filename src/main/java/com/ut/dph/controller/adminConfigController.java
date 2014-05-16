@@ -569,7 +569,7 @@ public class adminConfigController {
         configuration configurationDetails = configurationmanager.getConfigurationById(configId);
         
         /* submit the updates */
-        Integer transportId = (Integer) configurationTransportManager.updateTransportDetails(transportDetails, configurationDetails.getorgId());
+        Integer transportId = (Integer) configurationTransportManager.updateTransportDetails(transportDetails);
         
         
         if(currTransportId == 0) {

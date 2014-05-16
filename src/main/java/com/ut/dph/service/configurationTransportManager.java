@@ -14,7 +14,7 @@ public interface configurationTransportManager {
 
     configurationTransport getTransportDetailsByTransportMethod(int configId, int transportMethod);
 
-    Integer updateTransportDetails(configurationTransport transportDetails, int orgId);
+    Integer updateTransportDetails(configurationTransport transportDetails);
 
     List<configurationFormFields> getConfigurationFields(int configId, int transportDetailId);
     

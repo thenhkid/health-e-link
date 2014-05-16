@@ -10,10 +10,10 @@
             <div class="alert alert-success" role="alert">
                 <strong>Success!</strong> 
                 <c:choose><c:when test="${savedStatus == 'updated'}">The organization has been successfully updated!</c:when><c:otherwise>The organization has been successfully created!</c:otherwise></c:choose>
-            </div>
+                    </div>
         </c:if>
 
-        <form:form commandName="organization"  method="post" role="form">
+        <form:form commandName="organization"  method="post" role="form" enctype="multipart/form-data">
             <input type="hidden" id="action" name="action" value="save" />
             <form:hidden path="id" id="orgId" />
             <form:hidden path="cleanURL" id="cleanURL" />
@@ -62,7 +62,7 @@
                                 <form:errors path="address" cssClass="control-label" element="label" />
                             </div>
                         </spring:bind>
-                         <spring:bind path="address2">
+                        <spring:bind path="address2">
                             <div class="form-group ${status.error ? 'has-error' : '' }">
                                 <label class="control-label" for="address2">Address 2</label>
                                 <form:input path="address2" id="address2" class="form-control" type="text" maxLength="45" />
@@ -107,6 +107,21 @@
                                 <form:errors path="fax" cssClass="control-label" element="label" />
                             </div>
                         </spring:bind>
+                        <c:if test="${not empty organization.CCDJarTemplate}">
+                            <div class="form-group">
+                                <label class="control-label" for="CCDJarTemplate">Current XML/CCD Parse Script</label>
+                                <input type="text" disabled id="CCDJarTemplate" class="form-control" value="${organization.CCDJarTemplate}" />
+                                <form:hidden id="CCDJarTemplate" path="CCDJarTemplate" />
+                            </div>
+                        </c:if>
+                        <spring:bind path="file">
+                            <div id="CCDJarTemplateDiv" class="form-group ${status.error ? 'has-error' : '' }">
+                                <label class="control-label" for="file">XML/CCD Parse Script (JAR file)</label>
+                                <form:input path="file" id="file" class="form-control" type="file" />
+                                <form:errors path="file" cssClass="control-label" element="label" />
+                                <span id="CCDJarTemplateMsg" class="control-label"></span>
+                            </div>
+                        </spring:bind>        
                     </div>
                 </div>
             </section>

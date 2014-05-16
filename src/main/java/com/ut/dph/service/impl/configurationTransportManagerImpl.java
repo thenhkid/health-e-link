@@ -54,60 +54,10 @@ public class configurationTransportManagerImpl implements configurationTransport
 
     @Override
     @Transactional
-    public Integer updateTransportDetails(configurationTransport transportDetails, int orgId) {
+    public Integer updateTransportDetails(configurationTransport transportDetails) {
 
         int transportDetailId;
         
-        MultipartFile file = transportDetails.getFile();
-        //If a file is uploaded
-        if (file != null && !file.isEmpty()) {
-        
-            String fileName = file.getOriginalFilename();
-            
-            InputStream inputStream = null;
-            OutputStream outputStream = null;
-            
-            try {
-                inputStream = file.getInputStream();
-                File newFile = null;
-
-                //Set the directory to save the uploaded message type template to
-                fileSystem dir = new fileSystem();
-                Organization orgDetails = organizationManager.getOrganizationById(orgId);
-
-                dir.setDir(orgDetails.getcleanURL(), "templates");
-
-                newFile = new File(dir.getDir() + fileName);
-
-                if (newFile.exists()) {
-                    int i = 1;
-                    while (newFile.exists()) {
-                        int iDot = fileName.lastIndexOf(".");
-                        newFile = new File(dir.getDir() + fileName.substring(0, iDot) + "_(" + ++i + ")" + fileName.substring(iDot));
-                    }
-                    fileName = newFile.getName();
-                } else {
-                    newFile.createNewFile();
-                }
-                outputStream = new FileOutputStream(newFile);
-                int read = 0;
-                byte[] bytes = new byte[1024];
-
-                while ((read = inputStream.read(bytes)) != -1) {
-                    outputStream.write(bytes, 0, read);
-                }
-                outputStream.close();
-
-                //Set the filename to the file name
-                transportDetails.setCCDJarTemplate(fileName);
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            
-            
-        }
-
         transportDetailId = (Integer) configurationTransportDAO.updateTransportDetails(transportDetails);
 
         return transportDetailId;

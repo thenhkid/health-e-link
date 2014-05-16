@@ -30,17 +30,14 @@ public class CCDtoTxt {
     @Autowired
     private configurationTransportManager configurationTransportManager;
 
-    public String TranslateCCDtoTxt(String fileLocation, String ccdFileName, int orgId, int configId) throws Exception {
+    public String TranslateCCDtoTxt(String fileLocation, String ccdFileName, int orgId) throws Exception {
 
         Organization orgDetails = organiationmanager.getOrganizationById(orgId);
         fileSystem dir = new fileSystem();
 
         dir.setDir(orgDetails.getcleanURL(), "templates");
         
-        /* Need to get the XML (CCD) JAR template name */
-        configurationTransport transportDetails = configurationTransportManager.getTransportDetails(configId);
-
-        String templatefileName = transportDetails.getCCDJarTemplate();
+        String templatefileName = orgDetails.getCCDJarTemplate();
 
         URLClassLoader loader = new URLClassLoader(new URL[]{new URL("file://" + dir.getDir() + templatefileName)});
 

@@ -19,12 +19,6 @@ require(['./main'], function () {
             $('.assocMessageTypes').hide();
         }
         
-        var selfileType = $('#fileType').val();
-        if(selfileType == 9) {
-            $('#fileDelimiterDiv').hide();
-            $('#CCDJarTemplateDiv').show();
-        }
-        
         //Fade out the updated/created message after being displayed.
         if ($('.alert').length > 0) {
             $('.alert').delay(2000).fadeOut(1000);
@@ -137,9 +131,6 @@ require(['./main'], function () {
            }
            else if(fileType == 9) {
               $('#fileExt').val('xml'); 
-              //Hide the File Delimiter field
-              $('#fileDelimiterDiv').hide();
-              $('#CCDJarTemplateDiv').show();
            }
            else if(fileType == 10) {
               $('#fileExt').val('doc'); 
@@ -374,42 +365,6 @@ function checkFormFields() {
             hasErrors = 1;
         }
      
-       }
-       
-       //Check that the XML Parse file is uploaded and a jar file
-       var fileType = $('#fileType').val();
-       if(fileType == 9) {
-           
-           if($('#file').val() == "" && $('#id').val() == 0) {
-               $('#CCDJarTemplateDiv').addClass("has-error");
-               $('#CCDJarTemplateMsg').addClass("has-error");
-               $('#CCDJarTemplateMsg').html('The XML/CCD Parsing Script is a required field.');
-               hasErrors = 1;
-           }
-           
-           if($('#file').val() != "") {
-               
-               var filename = $('#file').val();
-               var extension = filename.replace(/^.*\./, '');
-               
-               if (extension == filename) {
-                    extension = '';
-                } else {
-                    // if there is an extension, we convert to lower case
-                    // (N.B. this conversion will not effect the value of the extension
-                    // on the file upload.)
-                    extension = extension.toLowerCase();
-                }
-                
-                if(extension != "jar") {
-                    $('#CCDJarTemplateDiv').addClass("has-error");
-                    $('#CCDJarTemplateMsg').addClass("has-error");
-                    $('#CCDJarTemplateMsg').html('The XML/CCD Parsing Script must be a jar file.');
-                    hasErrors = 1;
-                }
-               
-           }
-           
        }
        
        

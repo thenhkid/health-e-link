@@ -178,21 +178,6 @@
                                         </c:if>
                                     </div>
                                 </spring:bind>
-                                <c:if test="${not empty transportDetails.CCDJarTemplate}">
-                                    <div class="form-group">
-                                        <label class="control-label" for="templateFile">Current XML/CCD Parse Script</label>
-                                        <input type="text" disabled class="form-control" value="${transportDetails.CCDJarTemplate}" />
-                                        <form:hidden id="CCDJarTemplate" path="CCDJarTemplate" />
-                                    </div>
-                                </c:if>
-                                <spring:bind path="file">
-                                    <div id="CCDJarTemplateDiv" class="form-group ${status.error ? 'has-error' : '' }" style="display:none;">
-                                        <label class="control-label" for="file">XML/CCD Parse Script (JAR file) *</label>
-                                        <form:input path="file" id="file" class="form-control" type="file" disabled="${transportDetails.copiedTransportId > 0 ? 'true' : 'false'}" />
-                                        <form:errors path="file" cssClass="control-label" element="label" />
-                                        <span id="CCDJarTemplateMsg" class="control-label"></span>
-                                    </div>
-                                </spring:bind>
                                 <%-- Target File Download options only --%>
                                 <c:if test="${configurationDetails.type == 2}">
                                     <spring:bind path="targetFileName">

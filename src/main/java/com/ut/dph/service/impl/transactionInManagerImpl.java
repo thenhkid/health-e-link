@@ -1558,7 +1558,7 @@ public class transactionInManagerImpl implements transactionInManager {
                 to a pipe-delimited text file.
             */
              if (batch.getoriginalFileName().endsWith(".xml")) {
-                newfilename = ccdtotxt.TranslateCCDtoTxt(batch.getFileLocation(), batch.getoriginalFileName(), batch.getOrgId(), batch.getConfigId());
+                newfilename = ccdtotxt.TranslateCCDtoTxt(batch.getFileLocation(), batch.getoriginalFileName(), batch.getOrgId());
                 
                 fileWithPath = dir.getDir() + batch.getFileLocation() + newfilename;
                 fileWithPath = fileWithPath.replace("bowlink///", "");
