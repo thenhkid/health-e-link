@@ -24,3 +24,10 @@ ADD COLUMN `CCDJarTemplate` VARCHAR(45) NULL DEFAULT NULL AFTER `fileExt`;
 
 UPDATE `universalTranslator`.`ref_fileTypes` SET `fileType`='xml (CCD)' WHERE `id`='9';
 
+/** grace 05152014 11:34PM **/
+ALTER TABLE `universaltranslator`.`batchuploads` 
+ADD COLUMN `originalFolder` VARCHAR(255) NULL AFTER `configId`;
+INSERT INTO `universaltranslator`.`lu_ProcessStatus` (`id`,`category`, `displayCode`, `displayText`) VALUES (35, 'batch', 'FR', 'File Reset');
+
+
+

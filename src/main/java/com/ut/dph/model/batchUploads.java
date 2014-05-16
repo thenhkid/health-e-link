@@ -105,6 +105,10 @@ public class batchUploads {
 
     @Column(name = "fileLocation", nullable = true)
     private String fileLocation;
+    
+    @NoHtml
+    @Column(name = "originalFolder", nullable = false)
+    private String originalFolder;
 
     public boolean isContainsHeaderRow() {
         return containsHeaderRow;
@@ -308,6 +312,14 @@ public class batchUploads {
 
 	public void setTransTotalNotFinal(Integer transTotalNotFinal) {
 		this.transTotalNotFinal = transTotalNotFinal;
+	}
+
+	public String getOriginalFolder() {
+		return originalFolder;
+	}
+
+	public void setOriginalFolder(String originalFolder) {
+		this.originalFolder = originalFolder;
 	}
 
 }

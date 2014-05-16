@@ -28,6 +28,7 @@ import com.ut.dph.model.transactionInRecords;
 import com.ut.dph.model.transactionOutRecords;
 import com.ut.dph.model.transactionRecords;
 import com.ut.dph.model.transactionTarget;
+import com.ut.dph.reference.fileSystem;
 import com.ut.dph.service.configurationManager;
 import com.ut.dph.service.configurationTransportManager;
 import com.ut.dph.service.messageTypeManager;
@@ -37,7 +38,10 @@ import com.ut.dph.service.transactionInManager;
 import com.ut.dph.service.transactionOutManager;
 import com.ut.dph.service.userManager;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1451,14 +1455,14 @@ public class adminProcessingActivity {
             lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batchDetails.getstatusId());
             batchDetails.setstatusValue(processStatus.getDisplayCode());
 
-            List<Integer> cancelStatusList = Arrays.asList(21, 22, 23, 1, 8);
+            List<Integer> cancelStatusList = Arrays.asList(21, 22, 23, 1, 8, 35);
             if (!cancelStatusList.contains(batchDetails.getstatusId())) {
                 canCancel = true;
             }
 
-            List<Integer> resetStatusList = Arrays.asList(2, 22, 23, 1, 8); //DNP (21) is not a final status for admin
+            List<Integer> resetStatusList = Arrays.asList(2, 22, 23, 1, 8, 35); //DNP (21) is not a final status for admin
             if (!resetStatusList.contains(batchDetails.getstatusId())) {
-                canReset = true;
+            	canReset = true;
             }
 
             if (batchDetails.getstatusId() == 5) {
@@ -1548,12 +1552,39 @@ public class adminProcessingActivity {
                 //1. Check
                 boolean allowBatchClear = transactionInManager.allowBatchClear(batchId);
                 if (allowBatchClear) {
-                    transactionInManager.updateBatchStatus(batchId, 4, "");
-                    //2. clear
-                    boolean cleared = transactionInManager.clearBatch(batchId);
-                    if (cleared) {
-                        transactionInManager.updateBatchStatus(batchId, 2, "startOver");
-                    }
+                    //if ftp or rhapsody, we flag as DNP and move file back to input folder
+                	if (batchDetails.gettransportMethodId() == 5 || batchDetails.gettransportMethodId() == 3) {
+                		strBatchOption = "Reset Batch  - FTP/Rhapsody Reset";
+                        
+                        //move file back to original folder
+                        fileSystem fileSystem = new fileSystem();
+                		String fileFromPath = fileSystem.setPath(batchDetails.getFileLocation());
+                		File oldFile = new File(fileFromPath + batchDetails.getoriginalFileName());
+                		
+                		String fileToPath = fileSystem.setPath(batchDetails.getOriginalFolder());
+                		String fileExt = batchDetails.getoriginalFileName().substring(batchDetails.getoriginalFileName().lastIndexOf("."));
+                		//we name it ut batch name when move so we know
+                		String newFileName = transactionInManager.newFileName(fileToPath, (batchDetails.getutBatchName() + fileExt));
+                		File newFile = new File(fileToPath + newFileName);
+                		
+                		// now we copy file
+                        Path source = oldFile.toPath();
+                        Path target = newFile.toPath();
+                        Files.copy(source, target);
+                		
+                        transactionInManager.updateBatchStatus(batchId, 4, "startDateTime");
+                        transactionInManager.updateTransactionStatus(batchId, 0, 0, 34);
+                        transactionInManager.updateTransactionTargetStatus(batchId, 0, 0, 34);
+                        transactionInManager.updateBatchStatus(batchId, 35, "endDateTime");
+                        
+                	} else {
+                		transactionInManager.updateBatchStatus(batchId, 4, "");
+                		//2. clear
+	                    boolean cleared = transactionInManager.clearBatch(batchId);
+	                    if (cleared) {
+	                        transactionInManager.updateBatchStatus(batchId, 2, "startOver");
+	                    }
+                	}
                 }
             } else if (batchOption.equalsIgnoreCase("releaseBatch")) {
                 strBatchOption = "Released Batch";

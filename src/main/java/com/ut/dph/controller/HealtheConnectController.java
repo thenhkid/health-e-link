@@ -778,7 +778,7 @@ public class HealtheConnectController {
             // check to see if it can be cancelled - 
             boolean canCancel = false;
             //we do not let users cancel SBP
-            List<Integer> cancelStatusList = Arrays.asList(21, 22, 23, 1, 8, 4, 25);
+            List<Integer> cancelStatusList = Arrays.asList(21, 22, 23, 1, 8, 4, 25, 35);
             if (userInfo.getcancelAuthority() && !cancelStatusList.contains(batchInfo.getstatusId())) {
                 canCancel = true;
             }
