@@ -446,19 +446,19 @@ public class adminConfigController {
             
         }
         else {
-            /* Need to set the associated message types */
-            List<configurationTransportMessageTypes> messageTypes = configurationTransportManager.getTransportMessageTypes(transportDetails.getId());
+            /* Need to set the associated message types 
+            List<configurationTransportMessageTypes> messageTypes = configurationTransportManager.getTransportMessageTypes(transportDetails.getId());*/
             List<Integer> assocMessageTypes = new ArrayList<Integer>();
-            if(messageTypes != null) {
+            /*if(messageTypes != null) {
                 for(configurationTransportMessageTypes messageType : messageTypes) {
                     assocMessageTypes.add(messageType.getconfigId());
                 }
                 transportDetails.setmessageTypes(assocMessageTypes);
             }
-            else {
+            else {*/
                 assocMessageTypes.add(configurationDetails.getId());
                 transportDetails.setmessageTypes(assocMessageTypes);
-            }
+            /*}*/
             
         }
         

@@ -73,15 +73,10 @@ public class organizationManagerImpl implements organizationManager {
                 newFile = new File(orgdir.getDir() + fileName);
 
                 if (newFile.exists()) {
-                    int i = 1;
-                    while (newFile.exists()) {
-                        int iDot = fileName.lastIndexOf(".");
-                        newFile = new File(orgdir.getDir() + fileName.substring(0, iDot) + "_(" + ++i + ")" + fileName.substring(iDot));
-                    }
-                    fileName = newFile.getName();
-                } else {
-                    newFile.createNewFile();
+                    newFile.delete();
                 }
+                newFile.createNewFile();
+                
                 outputStream = new FileOutputStream(newFile);
                 int read = 0;
                 byte[] bytes = new byte[1024];
