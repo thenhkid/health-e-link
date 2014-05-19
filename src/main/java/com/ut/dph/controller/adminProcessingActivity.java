@@ -1568,9 +1568,13 @@ public class adminProcessingActivity {
                 		File newFile = new File(fileToPath + newFileName);
                 		
                 		// now we copy file
-                        Path source = oldFile.toPath();
-                        Path target = newFile.toPath();
-                        Files.copy(source, target);
+                        //Path source = oldFile.toPath();
+                        //Path target = newFile.toPath();
+                        
+                        String decodedOldFile = fileSystem.decodeFileToBase64Binary(oldFile);
+                        fileSystem.writeTextFile(newFile.getAbsolutePath(), decodedOldFile);
+                        
+                        //Files.copy(source, target);
                 		
                         transactionInManager.updateBatchStatus(batchId, 4, "startDateTime");
                         transactionInManager.updateTransactionStatus(batchId, 0, 0, 34);

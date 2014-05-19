@@ -1,10 +1,16 @@
 package com.ut.dph.reference;
-
 import java.io.BufferedReader;
+
+import org.apache.commons.codec.binary.Base64;
+
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -342,4 +348,92 @@ public class fileSystem {
         return delimCount;
     }
     
+    public String encodeFileToBase64Binary(File file) throws IOException {
+ 
+		byte[] bytes = loadFile(file);
+		byte[] encoded = Base64.encodeBase64(bytes);
+		String encodedString = new String(encoded);
+ 
+		return encodedString;
+	}
+    
+    
+    public String decodeFileToBase64Binary(File file) throws IOException {
+    	 
+		byte[] bytes = loadFile(file);
+		byte[] decoded = Base64.decodeBase64(bytes);
+		String decodedString = new String(decoded);
+ 
+		return decodedString;
+	}
+    
+    @SuppressWarnings("resource")
+	public static byte[] loadFile(File file) throws IOException {
+	    InputStream is = new FileInputStream(file);
+ 
+	    long length = file.length();
+	    byte[] bytes = new byte[(int)length];
+	    
+	    int offset = 0;
+	    int numRead = 0;
+	    while (offset < bytes.length
+	           && (numRead=is.read(bytes, offset, bytes.length-offset)) >= 0) {
+	        offset += numRead;
+	    }
+ 
+	    if (offset < bytes.length) {
+	        throw new IOException("Could not completely read file "+file.getName());
+	    }
+ 
+	    is.close();
+	    return bytes;
+	}
+    
+    public String readTextFile(String fileName) {
+        String returnValue = "";
+        FileReader file = null;
+        String line = "";
+        try {
+          file = new FileReader(fileName);
+          BufferedReader reader = new BufferedReader(file);
+          while ((line = reader.readLine()) != null) {
+            returnValue += line + "\n";
+          }
+        } catch (FileNotFoundException e) {
+          throw new RuntimeException("File not found");
+        } catch (IOException e) {
+          throw new RuntimeException("IO Error occured");
+        } finally {
+          if (file != null) {
+            try {
+              file.close();
+            } catch (IOException e) {
+              e.printStackTrace();
+            }
+          }
+        }
+        return returnValue;
+      }
+
+      @SuppressWarnings("resource")
+      public void writeTextFile(String fileName, String s) {
+        FileWriter output = null;
+        try {
+          output = new FileWriter(fileName);          
+		BufferedWriter writer = new BufferedWriter(output);
+          writer.write(s);
+        } catch (IOException e) {
+          e.printStackTrace();
+        } finally {
+          if (output != null) {
+            try {
+              output.close();
+            } catch (IOException e) {
+              e.printStackTrace();
+            }
+          }
+        }
+
+      }
+  
 }

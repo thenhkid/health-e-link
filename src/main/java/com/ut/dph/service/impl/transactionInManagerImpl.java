@@ -1582,7 +1582,24 @@ public class transactionInManagerImpl implements transactionInManager {
 
             //get delimiter, get fileWithPath etc
             if (actualFileName.endsWith(".txt") || actualFileName.endsWith(".csv")) {
-                sysError = sysError + insertLoadData(batch.getId(), batch.getDelimChar(), fileWithPath, loadTableName, batch.isContainsHeaderRow());
+            	//need to decode file
+            	File encodedFile = new File (fileWithPath);
+            	fileSystem fileSystem = new fileSystem();
+            	String decodedOldFile = fileSystem.decodeFileToBase64Binary(encodedFile);
+            	String fileForPath = dir.getDir() + batch.getFileLocation();
+            	fileForPath = fileForPath.replace("bowlink///", "");
+            	String newFileWithPath = fileForPath + batch.getutBatchName() + ".txt";
+            	File newFile = new File(newFileWithPath);
+            	if (newFile.exists()) {
+            		newFile.delete();
+            	}
+            	try {
+            		fileSystem.writeTextFile(newFileWithPath, decodedOldFile);
+            	} catch (Exception ex) {
+            		ex.printStackTrace();
+            	}
+            	sysError = sysError + insertLoadData(batch.getId(), batch.getDelimChar(), newFileWithPath, loadTableName, batch.isContainsHeaderRow());
+            	newFile.delete();
             }
 
             //3. we update batchId, loadRecordId
@@ -2449,7 +2466,7 @@ public class transactionInManagerImpl implements transactionInManager {
 			
 			 DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmssS");
              Date date = new Date();
-             String batchName = new StringBuilder().append("UT_").append(transportMethodId).append("_").append(orgId).append(dateFormat.format(date)).toString();
+             String batchName = new StringBuilder().append(transportMethodId).append(orgId).append(dateFormat.format(date)).toString();
              
              batchUploads batchInfo = new batchUploads();
 			 batchInfo.setOrgId(orgId);
@@ -2457,7 +2474,8 @@ public class transactionInManagerImpl implements transactionInManager {
 			 batchInfo.setstatusId(4);
 			 batchInfo.setstartDateTime(date);
 			 batchInfo.setutBatchName(batchName);
-			 
+             batchInfo.setOriginalFolder(inPath);
+             
 			 String outPath = "";
              Integer batchId = 0;
              String newFileName = "";
@@ -2497,6 +2515,7 @@ public class transactionInManagerImpl implements transactionInManager {
 				 batchInfo.setOrgId(orgId);
 				 newFileName = newFileName(outPath, fileName);
                  batchInfo.setoriginalFileName(newFileName);
+
                  
                  //find user 
                  List<User> users = usermanager.getSendersForConfig(Arrays.asList(ct.getconfigId()));
@@ -2563,6 +2582,7 @@ public class transactionInManagerImpl implements transactionInManager {
 						 
 						 //get path
 						 fileLocation = configurationtransportmanager.getTransportDetails(totalConfigs.get(0)).getfileLocation();
+						 fileSize = configurationtransportmanager.getTransportDetails(totalConfigs.get(0)).getmaxFileSize();
 						 List<User> users = usermanager.getSendersForConfig(totalConfigs);
 		                 if (users.size() == 0) {
 		                     users = usermanager.getOrgUsersForConfig(totalConfigs);
@@ -2575,7 +2595,7 @@ public class transactionInManagerImpl implements transactionInManager {
 						 outPath = fileSystem.setPath(fileLocation);
 						 batchInfo.setOrgId(orgId);
 						 newFileName = newFileName(outPath, fileName);
-		                 batchInfo.setoriginalFileName(newFileName);            
+		                 batchInfo.setoriginalFileName(newFileName);  		                
 		                 batchInfo.setuserId(userId);
 		                 batchId = (Integer) submitBatchUpload(batchInfo);
 					 }
@@ -2587,7 +2607,11 @@ public class transactionInManagerImpl implements transactionInManager {
 			 // now we move file
              Path source = file.toPath();
              Path target = newFile.toPath();
-             Files.move(source, target);
+             String encodedOldFile = fileSystem.encodeFileToBase64Binary(file);
+             fileSystem.writeTextFile(newFile.getAbsolutePath(), encodedOldFile);
+             
+             Files.delete(source);
+             
              
              if (statusId == 2) {
             	 /** check file size
