@@ -14,6 +14,10 @@ require(['./main'], function () {
         if(selMethodId === "3") {
             $('#additionalFTPDiv').show();
         }
+        
+        if(selMethodId === "5") {
+            $('#rhapsodyDiv').show();
+        }
 
         if(selMethodId !== "2" && selMethodId !== "") {
             $('.assocMessageTypes').hide();
@@ -39,6 +43,10 @@ require(['./main'], function () {
                $('#additionalFTPDiv').show();
            }
           
+           if(selMethodId === "5") {
+               $('#rhapsodyDiv').show();
+           }
+           
            if(methodId !== "2" && methodId !== "") {
                 $('.assocMessageTypes').hide();
             }
@@ -375,6 +383,31 @@ function checkFormFields() {
      
        }
        
+       
+       if(selMethodId === "5") {
+    		//Check rhapsody get Fields
+    	          if($('#rDirectory1').val() === "") {
+    	                $('#rDirectory1Div').addClass("has-error");
+    	                $('#rDirectory1Msg').addClass("has-error");
+    	                $('#rDirectory1Msg').html('The directory is a required field.');
+    	                hasErrors = 1;
+    	            }
+
+    	        //Check rhapsody push Fields
+    	           
+    	            if($('#rDirectory2').val() === "") {
+    	                $('#rDirectory2Div').addClass("has-error");
+    	                $('#rDirectory2Msg').addClass("has-error");
+    	                $('#rDirectory2Msg').html('The directory is a required field.');
+    	                hasErrors = 1;
+    	            }
+
+    	        if(hasErrors == 1) {
+    	            $('#rhapsodyDanger').show();
+    	            hasErrors = 1;
+    	        }
+    	     
+    	       }
        
     }
     

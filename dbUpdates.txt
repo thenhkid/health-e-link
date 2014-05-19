@@ -58,5 +58,10 @@ ADD CONSTRAINT `fkEncoding`
   ON UPDATE NO ACTION;
 
 
+/** grace 05192014 02:49PM **/
+ALTER TABLE `universaltranslator`.`rel_TransportRhapsodyDetails` 
+ADD COLUMN `method` INT NULL COMMENT '1 = Push\n2 = Get' AFTER `directory`;
+
+
 
 

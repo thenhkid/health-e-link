@@ -7,16 +7,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.persistence.Transient;
-import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 @Entity
-@Table(name = "REL_TRANSPORTFTPDETAILS")
+@Table(name = "rel_TransportRhapsodyDetails")
 public class configurationRhapsodyFields {
     
-    @Transient
-    private CommonsMultipartFile file;
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID", nullable = false)
@@ -29,14 +24,10 @@ public class configurationRhapsodyFields {
     @Column(name = "DIRECTORY", nullable = true)
     private String directory = null;
 
-	public CommonsMultipartFile getFile() {
-		return file;
-	}
 
-	public void setFile(CommonsMultipartFile file) {
-		this.file = file;
-	}
-
+    @Column(name = "Method", nullable = true)
+    private int method = 0;
+    
 	public int getId() {
 		return id;
 	}
@@ -61,4 +52,11 @@ public class configurationRhapsodyFields {
 		this.directory = directory;
 	}
 
+	public int getMethod() {
+		return method;
+	}
+
+	public void setMethod(int method) {
+		this.method = method;
+	}
 }

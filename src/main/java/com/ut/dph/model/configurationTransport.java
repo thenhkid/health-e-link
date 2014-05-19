@@ -22,6 +22,9 @@ public class configurationTransport {
     private List<configurationFTPFields> FTPfields = null;
     
     @Transient
+    private List<configurationRhapsodyFields> rhapsodyFields = null;
+    
+    @Transient
     private String delimChar = null;
 
     @Transient
@@ -259,6 +262,14 @@ public class configurationTransport {
 
 	public void setEncodingId(int encodingId) {
 		this.encodingId = encodingId;
+	}
+
+	public List<configurationRhapsodyFields> getRhapsodyFields() {
+		return rhapsodyFields;
+	}
+
+	public void setRhapsodyFields(List<configurationRhapsodyFields> rhapsodyFields) {
+		this.rhapsodyFields = rhapsodyFields;
 	}
 
 }

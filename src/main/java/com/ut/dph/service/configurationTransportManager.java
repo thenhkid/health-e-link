@@ -5,6 +5,7 @@ import com.ut.dph.model.configurationFTPFields;
 import java.util.List;
 import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.configurationMessageSpecs;
+import com.ut.dph.model.configurationRhapsodyFields;
 import com.ut.dph.model.configurationTransport;
 import com.ut.dph.model.configurationTransportMessageTypes;
 
@@ -74,5 +75,13 @@ public interface configurationTransportManager {
     List <Integer> getConfigCount(String fileExt, Integer transportMethodId, Integer fileDelimiter);
     
     List<configurationTransport> getDistinctDelimCharForFileExt(String fileExt, Integer transportMethodId);
+    
+    void saveTransportRhapsody(configurationRhapsodyFields rhapsodyFields);
+    
+    List<configurationRhapsodyFields> getTransRhapsodyDetails(int transportDetailId) throws Exception;
+    
+    configurationRhapsodyFields getTransRhapsodyDetailsPush(int transportDetailId) throws Exception;
+    
+    configurationRhapsodyFields getTransRhapsodyDetailsPull(int transportDetailId) throws Exception;
     
 }

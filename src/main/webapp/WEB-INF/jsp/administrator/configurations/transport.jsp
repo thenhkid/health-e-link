@@ -331,6 +331,28 @@
                                 </div>
                             </div>
                            
+                           <div id="rhapsodyDiv" class="methodDiv" style="display:none">
+                                <div id="rhapsodyDanger" class="alert alert-danger" style="display:none;">
+                                    Please fill out both paths.
+                                </div> 
+                                <div class="row">
+                                    <c:forEach items="${transportDetails.rhapsodyFields}" var="rhapsodyFields" varStatus="field">
+                                        <div class="form-group col-md-6">
+                                            <div class="form-group">
+                                                <label for="status">Rhapsody <c:choose><c:when test="${rhapsodyFields.method == 1}">Get</c:when><c:otherwise>Push</c:otherwise></c:choose> Details</label>
+                                                <input name="rhapsodyFields[${field.index}].method" class="form-control" type="hidden" value="${rhapsodyFields.method}"  />
+                                                <input name="rhapsodyFields[${field.index}].id" id="id${rhapsodyFields.method}" class="form-control" type="hidden" value="${rhapsodyFields.id}"  />
+                                            </div>
+                                        	<div id="rDirectory${rhapsodyFields.method}Div" class="form-group">
+                                                <label class="control-label" for="directory${rhapsodyFields.method}">Directory *</label>
+                                                <input name="rhapsodyFields[${field.index}].directory" id="directory${rhapsodyFields.method}" class="form-control" type="text" maxLength="255" value="${rhapsodyFields.directory}"  />
+                                                <span id="rDirectory${rhapsodyFields.method}Msg" class="control-label"></span>
+                                            </div>                                 
+                                        </div>
+                                    </c:forEach>
+                                </div>
+                            </div>
+                           
                         </div>
                     </div>
                 </section>

@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.configurationMessageSpecs;
+import com.ut.dph.model.configurationRhapsodyFields;
 import com.ut.dph.model.configurationTransport;
 import com.ut.dph.dao.configurationTransportDAO;
 import com.ut.dph.model.Organization;
@@ -264,4 +265,28 @@ public class configurationTransportManagerImpl implements configurationTransport
 			String fileExt, Integer transportMethodId) {
 		return configurationTransportDAO.getDistinctDelimCharForFileExt(fileExt, transportMethodId);
 	}
+
+	@Override
+	public void saveTransportRhapsody(configurationRhapsodyFields rhapsodyFields) {
+		configurationTransportDAO.saveTransportRhapsody(rhapsodyFields);	
+	}
+	
+
+    @Override
+    @Transactional
+    public List<configurationRhapsodyFields> getTransRhapsodyDetails(int transportDetailId) throws Exception {
+        return configurationTransportDAO.getTransRhapsodyDetails(transportDetailId);
+    }
+
+    @Override
+    @Transactional
+    public configurationRhapsodyFields getTransRhapsodyDetailsPush(int transportDetailId) throws Exception {
+        return configurationTransportDAO.getTransRhapsodyDetailsPush(transportDetailId);
+    }
+
+    @Override
+    @Transactional
+    public configurationRhapsodyFields getTransRhapsodyDetailsPull(int transportDetailId) throws Exception {
+        return configurationTransportDAO.getTransRhapsodyDetailsPull(transportDetailId);
+    }
 }

@@ -13,10 +13,10 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
 
 import com.ut.dph.dao.configurationTransportDAO;
-import com.ut.dph.model.User;
 import com.ut.dph.model.configurationFTPFields;
 import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.configurationMessageSpecs;
+import com.ut.dph.model.configurationRhapsodyFields;
 import com.ut.dph.model.configurationTransport;
 import com.ut.dph.model.configurationTransportMessageTypes;
 
@@ -710,5 +710,76 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
 	            return null;
 	        }
 	}
+	
+    /**
+     * The 'saveTransportRhapsody' function will save the transport Rhapsody information into the DB.
+     *
+     * @param rhapsodyFields The rhapsody form fields
+     *
+     * @return this function will not return anything.
+     */
+    @Override
+    @Transactional
+    public void saveTransportRhapsody(configurationRhapsodyFields rhapsodyFields) {
+    	try {
+    		sessionFactory.getCurrentSession().saveOrUpdate(rhapsodyFields);
+    	} catch (Exception ex) {
+    		ex.printStackTrace();
+    		System.err.println("saveTransportFTP " + ex.getCause());
+    	}
+    }
+
+    /**
+     * The 'getTransRhapsodyDetails' function will return the Rhapsody information for the passed in transportDetailId.
+     *
+     * @param transportDetailsId the id of the selected transport method
+     *
+     * @return This function will return a list of Rhapsody details
+     */
+    @Override
+    @Transactional
+    public List<configurationRhapsodyFields> getTransRhapsodyDetails(int transportDetailId) throws Exception {
+        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configurationRhapsodyFields.class)
+                .add(Restrictions.eq("transportId", transportDetailId));
+
+        return criteria.list();
+    }
+
+    /**
+     * The 'getTransRhapsodyDetailsPush' function will return the PUSH Rhapsody details for the passed in transportDetailsId.
+     *
+     * @param transportDetailsId The id of the selected transport method
+     *
+     * @return This function will return the PUSH Rhapsody details
+     */
+    @Override
+    @Transactional
+    public configurationRhapsodyFields getTransRhapsodyDetailsPush(int transportDetailId) throws Exception {
+        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configurationRhapsodyFields.class)
+                .add(Restrictions.eq("transportId", transportDetailId))
+                .add(Restrictions.eq("method", 2));
+
+        return (configurationRhapsodyFields) criteria.uniqueResult();
+
+    }
+
+    /**
+     * The 'configurationRhapsodyFields' function will return the PULL Rhapsody details for the passed in transportDetailsId.
+     *
+     * @param transportDetailsId The id of the selected transport method
+     *
+     * @return This function will return the PULL Rhapsody details
+     */
+    @Override
+    @Transactional
+    public configurationRhapsodyFields getTransRhapsodyDetailsPull(int transportDetailId) throws Exception {
+        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configurationRhapsodyFields.class)
+                .add(Restrictions.eq("transportId", transportDetailId))
+                .add(Restrictions.eq("method", 1));
+
+        return (configurationRhapsodyFields) criteria.uniqueResult();
+
+    }    
+    
 	
 }

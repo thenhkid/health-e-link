@@ -33,6 +33,7 @@ import com.ut.dph.model.Macros;
 import com.ut.dph.model.configuration;
 import com.ut.dph.model.configurationDataTranslations;
 import com.ut.dph.model.configurationFormFields;
+import com.ut.dph.model.configurationRhapsodyFields;
 import com.ut.dph.model.messageTypeFormFields;
 import com.ut.dph.service.configurationManager;
 import com.ut.dph.model.Organization;
@@ -485,6 +486,30 @@ public class adminConfigController {
             transportDetails.setFTPFields(ftpFields);
         }
         
+        //get rhaposody fields
+        List<configurationRhapsodyFields> rhapsodyFields = configurationTransportManager.getTransRhapsodyDetails(transportDetails.getId());
+        
+        
+        if(rhapsodyFields.isEmpty()) {
+        	
+            List<configurationRhapsodyFields> emptyRhapsodyFields = new ArrayList<configurationRhapsodyFields>();
+            configurationRhapsodyFields pushRFields = new configurationRhapsodyFields();
+            pushRFields.setMethod(1);
+            pushRFields.setDirectory("/UT/"+orgDetails.getcleanURL()+"/input/");
+            
+            configurationRhapsodyFields getRFields = new configurationRhapsodyFields();
+            getRFields.setMethod(2);
+            getRFields.setDirectory("/UT/"+orgDetails.getcleanURL()+"/output/"); 
+            
+            emptyRhapsodyFields.add(pushRFields);
+            emptyRhapsodyFields.add(getRFields);
+            
+            transportDetails.setRhapsodyFields(emptyRhapsodyFields);
+        }
+        else {
+            transportDetails.setRhapsodyFields(rhapsodyFields);
+        }
+        
         
         //Need to get a list of all configurations for the current organization
         List<configuration> configurations = configurationmanager.getConfigurationsByOrgId(configurationDetails.getorgId(),"");
@@ -609,6 +634,14 @@ public class adminConfigController {
                 ftpFields.settransportId(transportId);
                 
                 configurationTransportManager.saveTransportFTP(configurationDetails.getorgId(), ftpFields);
+            }
+        }
+        
+        /** need to get rhapsody info if any has been entered **/
+        if(transportDetails.gettransportMethodId() == 5 && !transportDetails.getRhapsodyFields().isEmpty()) {
+            for(configurationRhapsodyFields rhapsodyFields : transportDetails.getRhapsodyFields()) {
+            	rhapsodyFields.setTransportId(transportId);
+                configurationTransportManager.saveTransportRhapsody(rhapsodyFields);
             }
         }
         
