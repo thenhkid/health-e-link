@@ -123,4 +123,7 @@ public interface configurationDAO {
   
   String getMessageTypeNameByConfigId (Integer configId);
   
+  @SuppressWarnings("rawtypes")
+  List getEncodings();
+  
 }

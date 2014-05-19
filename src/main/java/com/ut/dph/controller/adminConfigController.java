@@ -531,6 +531,10 @@ public class adminConfigController {
         //Get the list of available file types
         List fileTypes = configurationmanager.getFileTypes();
         mav.addObject("fileTypes", fileTypes);
+        
+        //Get the list of available encodings
+        List encodings = configurationmanager.getEncodings();
+        mav.addObject("encodings", encodings);
 
         return mav;
     }

@@ -216,7 +216,7 @@ function checkFormFields() {
        hasErrors = 1;
     }
     
-    if (selMethodId === "1" || selMethodId === "3") {
+    if (selMethodId === "1" || selMethodId === "3" || selMethodId === "5") {
        
        //Make sure the file size is numeric and greate than 0
        if($('#maxFileSize').val() <= 0 || !$.isNumeric($('#maxFileSize').val())) {
@@ -239,6 +239,14 @@ function checkFormFields() {
            $('#fileExtDiv').addClass("has-error");
            $('#fileExtMsg').addClass("has-error");
            $('#fileExtMsg').html('The file extension is a required field.');
+           hasErrors = 1;
+       }
+       
+       //make sure encoding is selected
+       if($('#encodingId').val() === "") {
+           $('#encodingDiv').addClass("has-error");
+           $('#encodingMsg').addClass("has-error");
+           $('#encodingMsg').html('Encoding is a required field.');
            hasErrors = 1;
        }
        else {

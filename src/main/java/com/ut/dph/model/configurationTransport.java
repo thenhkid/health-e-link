@@ -10,7 +10,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 @Entity
 @Table(name = "CONFIGURATIONTRANSPORTDETAILS")
@@ -82,6 +81,9 @@ public class configurationTransport {
     @NoHtml
     @Column(name = "FILEEXT", nullable = false)
     private String fileExt = null;
+    
+    @Column(name = "encodingId", nullable = false)
+    private int encodingId;
     
     public int getId() {
         return id;
@@ -250,5 +252,13 @@ public class configurationTransport {
     public void setfileExt(String fileExt) {
         this.fileExt = fileExt;
     }
+
+	public int getEncodingId() {
+		return encodingId;
+	}
+
+	public void setEncodingId(int encodingId) {
+		this.encodingId = encodingId;
+	}
 
 }

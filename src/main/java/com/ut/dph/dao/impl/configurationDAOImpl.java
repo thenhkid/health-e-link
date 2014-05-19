@@ -970,5 +970,23 @@ public class configurationDAOImpl implements configurationDAO {
             return null;
         }
 	}
+	
+	/**
+     * The 'getEncodings' function will return a list of available encodings
+     *
+     */
+    @SuppressWarnings("rawtypes")
+    @Override
+    @Transactional
+    public List getEncodings() {
+    	try {
+    		Query query = sessionFactory.getCurrentSession().createSQLQuery("select id, encoding from ref_encoding order by id asc");
+    		return query.list();
+    	} catch (Exception ex) {
+    		ex.printStackTrace();
+    		System.err.println("getEncodings - " + ex.getCause());
+    		return null;
+    	}
+    }
     
 }

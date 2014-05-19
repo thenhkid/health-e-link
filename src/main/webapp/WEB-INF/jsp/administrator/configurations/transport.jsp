@@ -178,6 +178,21 @@
                                         </c:if>
                                     </div>
                                 </spring:bind>
+                                <spring:bind path="encodingId">
+                                    <div id="encodingDiv" class="form-group ${status.error ? 'has-error' : '' }">
+                                        <label class="control-label" for="encodingId">Encoding *</label>
+                                        <form:select path="encodingId" id="encodingId" class="form-control" disabled="${transportDetails.copiedTransportId > 0 ? 'true' : 'false'}">
+                                            <option value="">- Select -</option>
+                                            <c:forEach items="${encodings}" varStatus="fStatus">
+                                                    <option value="${encodings[fStatus.index][0]}" <c:if test="${transportDetails.encodingId == encodings[fStatus.index][0]}">selected</c:if>>${encodings[fStatus.index][1]}</option>                                                
+                                            </c:forEach>
+                                        </form:select>
+                                        <span id="encodingMsg" class="control-label"></span>
+                                        <c:if test="${transportDetails.copiedTransportId > 0}">
+                                            <form:hidden path="encodingId" />
+                                        </c:if>
+                                    </div>
+                                </spring:bind>
                                 <%-- Target File Download options only --%>
                                 <c:if test="${configurationDetails.type == 2}">
                                     <spring:bind path="targetFileName">

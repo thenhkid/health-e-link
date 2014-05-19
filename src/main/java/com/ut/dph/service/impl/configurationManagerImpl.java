@@ -528,4 +528,11 @@ public class configurationManagerImpl implements configurationManager {
 	public String getMessageTypeNameByConfigId(Integer configId) {
 		return configurationDAO.getMessageTypeNameByConfigId(configId);		
 	}
+	
+	@SuppressWarnings("rawtypes")
+    @Override
+    @Transactional
+    public List getEncodings() {
+        return configurationDAO.getEncodings();
+    }
 }
