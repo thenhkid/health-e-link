@@ -6,7 +6,6 @@
 package com.ut.dph.service;
 
 import com.ut.dph.model.Organization;
-import com.ut.dph.model.configurationTransport;
 import com.ut.dph.reference.fileSystem;
 import java.io.File;
 import java.io.FileWriter;
@@ -38,7 +37,7 @@ public class CCDtoTxt {
         dir.setDir(orgDetails.getcleanURL(), "templates");
         
         String templatefileName = orgDetails.getCCDJarTemplate();
-
+        
         URLClassLoader loader = new URLClassLoader(new URL[]{new URL("file://" + dir.getDir() + templatefileName)});
 
         // Remove the .class extension
@@ -53,7 +52,7 @@ public class CCDtoTxt {
         fileLocation = fileLocation.replace("/bowlink/", "");
         dir.setDirByName(fileLocation);
         File ccdFile = new File(dir.getDir() + ccdFileName);
-
+        
         /* Create the txt file that will hold the CCD fields */
         String newfileName = new StringBuilder().append(ccdFile.getName().substring(0, ccdFile.getName().lastIndexOf("."))).append(".").append("txt").toString();
 
