@@ -84,4 +84,5 @@ public interface configurationTransportManager {
     
     configurationRhapsodyFields getTransRhapsodyDetailsPull(int transportDetailId) throws Exception;
     
+    List <configurationTransport>  getTransportEncoding(String fileExt, Integer transportMethodId);
 }

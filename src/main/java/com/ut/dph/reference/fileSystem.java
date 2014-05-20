@@ -415,25 +415,14 @@ public class fileSystem {
         return returnValue;
       }
 
-      @SuppressWarnings("resource")
-      public void writeTextFile(String fileName, String s) {
-        FileWriter output = null;
-        try {
-          output = new FileWriter(fileName);          
-		BufferedWriter writer = new BufferedWriter(output);
-          writer.write(s);
-        } catch (IOException e) {
-          e.printStackTrace();
-        } finally {
-          if (output != null) {
-            try {
-              output.close();
-            } catch (IOException e) {
-              e.printStackTrace();
-            }
-          }
-        }
-
-      }
-  
+      public void writeFile(String strFileName, String strFile) {
+    	  try (BufferedWriter out = new BufferedWriter(new FileWriter(strFileName))) {
+             out.write(strFile);
+             out.flush();
+          } catch (IOException ex) {
+        	 System.err.println(ex.getMessage());
+             ex.printStackTrace();
+          }         
+       }
+      
 }

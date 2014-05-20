@@ -62,6 +62,20 @@ ADD CONSTRAINT `fkEncoding`
 ALTER TABLE `universaltranslator`.`rel_TransportRhapsodyDetails` 
 ADD COLUMN `method` INT NULL COMMENT '1 = Push\n2 = Get' AFTER `directory`;
 
+/** grace 05202104 0809AM **/
+ALTER TABLE `universaltranslator`.`SFTPJobRunLog` 
+RENAME TO  `universaltranslator`.`moveFilesLog` ;
+
+ALTER TABLE `universaltranslator`.`moveFilesLog` 
+ADD COLUMN `transportMethodId` INT NOT NULL AFTER `id`;
+
+INSERT INTO `universaltranslator`.`lu_ErrorCodes` (`id`, `displayText`, `description`) VALUES ('16', 'Cannot Determine Encoding Type for File', 'Multiple encodings found for file');
+UPDATE `universaltranslator`.`lu_ErrorCodes` SET `description`='Delimiter is invalid for this type of file' WHERE `id`='15';
+
+/** 05202014 Grace 12:08PM **/
+ALTER TABLE `universaltranslator`.`batchuploads` 
+ADD COLUMN `encodingId` INT NULL COMMENT 'the encoding file came in' AFTER `originalFolder`;
+
 
 
 

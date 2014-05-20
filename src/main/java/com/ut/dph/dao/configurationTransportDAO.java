@@ -87,4 +87,5 @@ public interface configurationTransportDAO {
     
     configurationRhapsodyFields getTransRhapsodyDetailsPull(int transportDetailId) throws Exception;
     
+    List <configurationTransport>  getTransportEncoding(String fileExt, Integer transportMethodId);
 }

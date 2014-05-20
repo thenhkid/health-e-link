@@ -109,6 +109,9 @@ public class batchUploads {
     @NoHtml
     @Column(name = "originalFolder", nullable = false)
     private String originalFolder;
+    
+    @Column(name = "encodingId", nullable = true)
+    private Integer encodingId = 1;
 
     public boolean isContainsHeaderRow() {
         return containsHeaderRow;
@@ -320,6 +323,14 @@ public class batchUploads {
 
 	public void setOriginalFolder(String originalFolder) {
 		this.originalFolder = originalFolder;
+	}
+
+	public Integer getEncodingId() {
+		return encodingId;
+	}
+
+	public void setEncodingId(Integer encodingId) {
+		this.encodingId = encodingId;
 	}
 
 }

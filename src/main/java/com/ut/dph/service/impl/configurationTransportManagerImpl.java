@@ -289,4 +289,9 @@ public class configurationTransportManagerImpl implements configurationTransport
     public configurationRhapsodyFields getTransRhapsodyDetailsPull(int transportDetailId) throws Exception {
         return configurationTransportDAO.getTransRhapsodyDetailsPull(transportDetailId);
     }
+    
+	@Override
+	public List <configurationTransport>  getTransportEncoding(String fileExt, Integer transportMethodId) {
+		return configurationTransportDAO.getTransportEncoding(fileExt, transportMethodId);
+	}
 }

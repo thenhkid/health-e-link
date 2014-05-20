@@ -9,7 +9,7 @@ import com.ut.dph.dao.transactionInDAO;
 import com.ut.dph.model.CrosswalkData;
 import com.ut.dph.model.Macros;
 import com.ut.dph.model.Organization;
-import com.ut.dph.model.SFTPJobRunLog;
+import com.ut.dph.model.MoveFilesLog;
 import com.ut.dph.model.TransactionInError;
 import com.ut.dph.model.User;
 import com.ut.dph.model.UserActivity;
@@ -4158,7 +4158,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 
     @Override
     @Transactional
-    public Integer insertSFTPRun(SFTPJobRunLog sftpJob) {
+    public Integer insertSFTPRun(MoveFilesLog sftpJob) {
         try {
             Integer lastId = (Integer) sessionFactory.getCurrentSession().save(sftpJob);
             return lastId;
@@ -4171,7 +4171,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 
     @Override
     @Transactional
-    public void updateSFTPRun(SFTPJobRunLog sftpJob) {
+    public void updateSFTPRun(MoveFilesLog sftpJob) {
         try {
             sessionFactory.getCurrentSession().update(sftpJob);
         } catch (Exception ex) {
@@ -4188,7 +4188,7 @@ public class transactionInDAOImpl implements transactionInDAO {
                     + " from configurationTransportDetails, rel_TransportFTPDetails "
                     + " where method = :method and configurationTransportDetails.id = rel_TransportFTPDetails.transportId "
                     + " and configId in (select id from configurations where status = 1) and "
-                    + " directory not in (select folderPath from sftpjobrunlog where statusId = 1 and method = :method)"
+                    + " directory not in (select folderPath from moveFilesLog where statusId = 1 and method = :method)"
                     + " group by directory order by configId;");
 
             Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
@@ -4244,5 +4244,5 @@ public class transactionInDAOImpl implements transactionInDAO {
         return (messagePatients) patientDetails.uniqueResult();
         
     }
-
+    
 }

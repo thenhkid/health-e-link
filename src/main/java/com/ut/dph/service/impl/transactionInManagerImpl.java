@@ -11,7 +11,7 @@ import com.ut.dph.dao.transactionOutDAO;
 import com.ut.dph.model.CrosswalkData;
 import com.ut.dph.model.Macros;
 import com.ut.dph.model.Organization;
-import com.ut.dph.model.SFTPJobRunLog;
+import com.ut.dph.model.MoveFilesLog;
 import com.ut.dph.model.Transaction;
 import com.ut.dph.model.TransactionInError;
 import com.ut.dph.model.User;
@@ -1597,7 +1597,7 @@ public class transactionInManagerImpl implements transactionInManager {
 	            	if (newFile.exists()) {
 	            		newFile.delete();
 	            	}
-	            	fileSystem.writeTextFile(newFileWithPath, decodedOldFile);
+	            	fileSystem.writeFile(newFileWithPath, decodedOldFile);
             	
             	}
             	sysError = sysError + insertLoadData(batch.getId(), batch.getDelimChar(), newFileWithPath, loadTableName, batch.isContainsHeaderRow());
@@ -2376,12 +2376,12 @@ public class transactionInManagerImpl implements transactionInManager {
 
 
     @Override
-    public Integer insertSFTPRun(SFTPJobRunLog sftpJob) {
+    public Integer insertSFTPRun(MoveFilesLog sftpJob) {
         return transactionInDAO.insertSFTPRun(sftpJob);
     }
 
     @Override
-    public void updateSFTPRun(SFTPJobRunLog sftpJob) throws Exception {
+    public void updateSFTPRun(MoveFilesLog sftpJob) throws Exception {
         transactionInDAO.updateSFTPRun(sftpJob);
     }
 
@@ -2405,9 +2405,10 @@ public class transactionInManagerImpl implements transactionInManager {
             //loop ftp paths and check
             for (configurationFTPFields ftpInfo : inputPaths) {
                 //we insert job so if anything goes wrong or the scheduler overlaps, we won't be checking the same folder over and over
-                SFTPJobRunLog sftpJob = new SFTPJobRunLog();
+                MoveFilesLog sftpJob = new MoveFilesLog();
                 sftpJob.setStatusId(1);
                 sftpJob.setFolderPath(ftpInfo.getdirectory());
+                sftpJob.setTransportMethodId(3);
                 sftpJob.setMethod(1);
                 Integer lastId = insertSFTPRun(sftpJob);
                 sftpJob.setId(lastId);
@@ -2486,6 +2487,8 @@ public class transactionInManagerImpl implements transactionInManager {
              Integer statusId = 4;
              Integer configId = 0;
              Integer fileSize = 0;
+             Integer encodingId = 1;
+             Integer errorId = 0;
              
 			 if (transportList.size() == 0) {
 				 //no transport is using this method - we find the mgr user and reject this file
@@ -2498,11 +2501,13 @@ public class transactionInManagerImpl implements transactionInManager {
                  newFileName = newFileName(outPath, fileName);
                  batchInfo.setoriginalFileName(newFileName);
                  batchInfo.setFileLocation(defPath);
+                 batchInfo.setEncodingId(encodingId);
                  batchId = (Integer) submitBatchUpload(batchInfo);
 				 //insert error
-                 insertProcessingError(13, 0, batchId, null, null, null, null, false, false, fileName);
-				 statusId = 7;
+                 errorId = 13;
+                 statusId = 7;
 			 } else if (transports.size() == 1) {
+				 encodingId = transports.get(0).getEncodingId();
 				 configurationTransport  ct = configurationtransportmanager.getTransportDetailsByTransportId(transportId);
 				 fileSize = ct.getmaxFileSize();
 				 if (transportList.size() > 1) {
@@ -2519,7 +2524,7 @@ public class transactionInManagerImpl implements transactionInManager {
 				 batchInfo.setOrgId(orgId);
 				 newFileName = newFileName(outPath, fileName);
                  batchInfo.setoriginalFileName(newFileName);
-
+                 batchInfo.setEncodingId(encodingId);
                  
                  //find user 
                  List<User> users = usermanager.getSendersForConfig(Arrays.asList(ct.getconfigId()));
@@ -2539,17 +2544,25 @@ public class transactionInManagerImpl implements transactionInManager {
 				 Integer userId = 0;
 				 //get distinct delimiters
 				 List <configurationTransport>  delimList = configurationtransportmanager.getDistinctDelimCharForFileExt(fileExt, transportMethodId);
-					
-				 for (configurationTransport ctdelim: delimList) {
-					 fileSystem dir = new fileSystem();
-					 int delimCount = (Integer) dir.checkFileDelimiter(file, ctdelim.getDelimChar());
-			         if (delimCount > 3) {
-			        	 	   delimiter = ctdelim.getDelimChar();
-			        	 	   fileDelimiter = ctdelim.getfileDelimiter();
-				               statusId = 2;
-				               fileLocation = ctdelim.getfileLocation();
-				               break;
-				     }	 
+				 List <configurationTransport>  encodings = configurationtransportmanager.getTransportEncoding(fileExt, transportMethodId);
+				 //we reject file is multiple encodings/delimiters are found for extension type as we won't know how to decode it and read delimiter
+				 if (encodings.size() != 1) {
+					 batchInfo.setuserId(usermanager.getUserByTypeByOrganization(orgId).get(0).getId());
+					 statusId = 7;
+					 errorId = 16;
+				 } else {
+					 	 encodingId = encodings.get(0).getEncodingId();
+						 for (configurationTransport ctdelim: delimList) {
+							 fileSystem dir = new fileSystem();
+							 int delimCount = (Integer) dir.checkFileDelimiter(file, ctdelim.getDelimChar());
+					         if (delimCount > 3) {
+				        	 	   delimiter = ctdelim.getDelimChar();
+				        	 	   fileDelimiter = ctdelim.getfileDelimiter();
+					               statusId = 2;
+					               fileLocation = ctdelim.getfileLocation();
+					               break;
+					     }	 
+					 }
 				 }
 				 if (statusId !=2) {
 					 //no vaild delimiter detected
@@ -2565,15 +2578,17 @@ public class transactionInManagerImpl implements transactionInManager {
 	                 batchInfo.setoriginalFileName(newFileName);            
 	                 batchInfo.setuserId(userId);
 	                 batchId = (Integer) submitBatchUpload(batchInfo);
-	                 insertProcessingError(15, 0, batchId, null, null, null, null, false, false, "");
-					 
+	                 batchInfo.setEncodingId(encodingId);
+	                 errorId = 15;
 				 } else if (statusId == 2) {
+					 encodingId = encodings.get(0).getEncodingId();
 					 //we check to see if there is multi header row, if so, we reject because we don't know what header rows value to look for
 					 List <configurationTransport>  containsHeaderRowCount = configurationtransportmanager.getCountContainsHeaderRow(fileExt, transportMethodId);
+					 
 					 if (containsHeaderRowCount.size() != 1) {
 						 batchInfo.setuserId(usermanager.getUserByTypeByOrganization(orgId).get(0).getId());
 						 statusId = 7;
-						 insertProcessingError(14, 0, batchId, null, null, null, null, false, false, (containsHeaderRowCount.size() + " different set up were found for this file extension. (" + fileExt +")"));
+						 errorId = 14;
 					 } else {
 						 List <Integer> totalConfigs = configurationtransportmanager.getConfigCount(fileExt, transportMethodId, fileDelimiter);
 						 
@@ -2601,21 +2616,26 @@ public class transactionInManagerImpl implements transactionInManager {
 						 newFileName = newFileName(outPath, fileName);
 		                 batchInfo.setoriginalFileName(newFileName);  		                
 		                 batchInfo.setuserId(userId);
+		                 batchInfo.setEncodingId(encodingId);
 		                 batchId = (Integer) submitBatchUpload(batchInfo);
 					 }
 				 } 
 				  
 			 }
 			 
+			 
 			 File newFile = new File(outPath + newFileName);
 			 // now we move file
              Path source = file.toPath();
              Path target = newFile.toPath();
-             String encodedOldFile = fileSystem.encodeFileToBase64Binary(file);
-             fileSystem.writeTextFile(newFile.getAbsolutePath(), encodedOldFile);
-             
-             Files.delete(source);
-             
+             /** we check encoding here **/
+             if (encodingId < 2) { //file is not encoded
+	             String encodedOldFile = fileSystem.encodeFileToBase64Binary(file);
+	             fileSystem.writeFile(newFile.getAbsolutePath(), encodedOldFile);
+	             Files.delete(source);
+             } else {
+            	 Files.move(source, target);
+             }
              
              if (statusId == 2) {
             	 /** check file size
@@ -2624,9 +2644,13 @@ public class transactionInManagerImpl implements transactionInManager {
             	 long maxFileSize =  fileSize * 1000000;
             	 if (Files.size(target) > maxFileSize) {
                      statusId = 7;
-                     insertProcessingError(12, configId, batchId, null, null, null, null, false, false, ("Input file is " + String.valueOf(Files.size(target)/1000.) + " kb"));
+                     errorId = 12;
                  }
              }
+             
+             if (statusId != 2) {
+				 insertProcessingError(errorId, 0, batchId, null, null, null, null, false, false, "");
+			 }
              
 			 updateBatchStatus(batchId,statusId, "endDateTime");
          	 

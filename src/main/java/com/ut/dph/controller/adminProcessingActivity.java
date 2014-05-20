@@ -1572,7 +1572,7 @@ public class adminProcessingActivity {
                         //Path target = newFile.toPath();
                         
                         String decodedOldFile = fileSystem.decodeFileToBase64Binary(oldFile);
-                        fileSystem.writeTextFile(newFile.getAbsolutePath(), decodedOldFile);
+                        fileSystem.writeFile(newFile.getAbsolutePath(), decodedOldFile);
                         
                         //Files.copy(source, target);
                 		
