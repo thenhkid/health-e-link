@@ -527,7 +527,7 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
     public List<configurationTransport> getConfigTransportForFileExt(String fileExt, Integer transportMethodId) {
         try {
 
-            String sql = ("select distinct delimChar, containsHeaderRow , fileDelimiter, fileLocation from configurationTransportDetails, ref_delimiters , configurationMessageSpecs "
+            String sql = ("select distinct delimChar, containsHeaderRow , fileDelimiter, fileLocation, encodingId from configurationTransportDetails, ref_delimiters , configurationMessageSpecs "
             		+ " where ref_delimiters.id = configurationTransportDetails.fileDelimiter "
             		+ " and configurationMessageSpecs.configId = configurationTransportDetails.configId"
             		+ " and fileext = :fileExt and transportmethodId = :transportMethodId");
@@ -781,5 +781,27 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
 
     }    
     
+    @Override
+	@Transactional
+	@SuppressWarnings("unchecked")
+	public List <configurationTransport>  getTransportEncoding(String fileExt, Integer transportMethodId) {
+		try {
+			String sql = ("select distinct encodingId from configurationTransportDetails "
+            		+ " where fileext = :fileExt and transportmethodId = :transportMethodId");
+			Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
+                    Transformers.aliasToBean(configurationTransport.class));
+	        query.setParameter("fileExt", fileExt);
+	        query.setParameter("transportMethodId", transportMethodId);
+	
+	        List <configurationTransport>  encodingIds  = query.list();
+	
+	        return encodingIds;
+
+		} catch (Exception ex) {
+			System.err.println("getTransportEncoding  " + ex.getCause());
+	        ex.printStackTrace();
+	        return null;
+		}
+	}
 	
 }

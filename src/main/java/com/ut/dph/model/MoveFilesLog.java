@@ -14,14 +14,17 @@ import org.springframework.format.annotation.DateTimeFormat;
 import com.ut.dph.validator.NoHtml;
 
 @Entity
-@Table(name = "SFTPJobRunLog")
-public class SFTPJobRunLog {
+@Table(name = "moveFilesLog")
+public class MoveFilesLog {
 
     
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID", nullable = false)
     private int id;
+    
+    @Column(name = "transportMethodId", nullable = true)
+    private int transportMethodId;
 
     @Column(name = "transportId", nullable = true)
     private int transportId;
@@ -98,6 +101,14 @@ public class SFTPJobRunLog {
 
 	public void setFolderPath(String folderPath) {
 		this.folderPath = folderPath;
+	}
+
+	public int getTransportMethodId() {
+		return transportMethodId;
+	}
+
+	public void setTransportMethodId(int transportMethodId) {
+		this.transportMethodId = transportMethodId;
 	}
 	
 }

@@ -6,7 +6,7 @@
 
 package com.ut.dph.service;
 
-import com.ut.dph.model.SFTPJobRunLog;
+import com.ut.dph.model.MoveFilesLog;
 import com.ut.dph.model.UserActivity;
 import com.ut.dph.model.CrosswalkData;
 import com.ut.dph.model.Macros;
@@ -354,9 +354,9 @@ public interface transactionInManager {
  
     List <transactionRecords> getFieldColAndValueByTransactionId (configurationFormFields cff, Integer transactionId);
 
-    Integer insertSFTPRun(SFTPJobRunLog sftpJob);
+    Integer insertSFTPRun(MoveFilesLog sftpJob);
     
-    void updateSFTPRun(SFTPJobRunLog sftpJob) throws Exception;
+    void updateSFTPRun(MoveFilesLog sftpJob) throws Exception;
     
     List<batchUploads> getsentBatchesHistory(int userId, int orgId, int toOrgId, int messageTypeId, Date fromDate, Date toDate) throws Exception;
 
