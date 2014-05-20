@@ -22,6 +22,8 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
+import com.ut.dph.service.CCDtoTxt;
+
 /**
  * The mainController class will handle all URL requests that fall outside of specific user or admin controllers
  *
@@ -38,6 +40,20 @@ public class mainController {
 
     @Autowired
     private emailMessageManager emailMessageManager;
+    
+    @Autowired
+    private CCDtoTxt ccdtotxt;
+    @RequestMapping(value= "/ccdtest", method = RequestMethod.GET)
+    public void ccdtest(HttpServletRequest request) throws Exception {
+        
+        String filelocation = "/bowlink/HarborHealth/input files/";
+        String ccdFileName = "harborhealth.xml";
+        
+        int orgId = 5;
+        
+       ccdtotxt.TranslateCCDtoTxt(filelocation, ccdFileName, orgId);
+        
+    }
 
     /**
      * The '/login' request will serve up the login page.
@@ -185,8 +201,8 @@ public class mainController {
      * @param userId The id of the return user.
      */
     @RequestMapping(value = "/sendPassword.do", method = RequestMethod.POST)
-    public void sendPassword(@RequestParam Integer userId) throws Exception {
-
+    public void sendPassword(@RequestParam Integer userId, HttpServletRequest request) throws Exception {
+        
         String randomCode = generateRandomCode();
 
         User userDetails = usermanager.getUserById(userId);
@@ -209,12 +225,14 @@ public class mainController {
 
         messageDetails.settoEmailAddress(userDetails.getEmail());
         messageDetails.setmessageSubject("Universal Translator Reset Password");
-
+        
+        String resetURL = request.getRequestURL().toString().replace("sendPassword.do", "resetPassword?b=");
+        
         StringBuilder sb = new StringBuilder();
 
         sb.append("Dear " + userDetails.getFirstName() + ",<br />");
         sb.append("You have recently asked to reset your Universal Translator password.<br /><br />");
-        sb.append("<a href='http://localhost:8085/resetPassword?b=" + randomCode + "'>Click here to reset your password.</a>");
+        sb.append("<a href='" + resetURL + randomCode + "'>Click here to reset your password.</a>");
 
         messageDetails.setmessageBody(sb.toString());
         messageDetails.setfromEmailAddress("dphuniversaltranslator@gmail.com");
