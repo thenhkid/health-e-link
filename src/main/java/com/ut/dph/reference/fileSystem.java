@@ -416,8 +416,7 @@ public class fileSystem {
       }
 
       public void writeFile(String strFileName, String strFile) {
-    	  try {
-             BufferedWriter out = new BufferedWriter(new FileWriter(strFileName));
+    	  try (BufferedWriter out = new BufferedWriter(new FileWriter(strFileName))) {
              out.write(strFile);
              out.flush();
           } catch (IOException ex) {
