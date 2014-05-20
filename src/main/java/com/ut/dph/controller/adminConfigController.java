@@ -471,11 +471,11 @@ public class adminConfigController {
             List<configurationFTPFields> emptyFTPFields = new ArrayList<configurationFTPFields>();
             configurationFTPFields pushFTPFields = new configurationFTPFields();
             pushFTPFields.setmethod(1);
-            pushFTPFields.setdirectory("/UT/"+orgDetails.getcleanURL()+"/input/");
+            pushFTPFields.setdirectory("/UTSFTP/"+orgDetails.getcleanURL()+"/input/");
             
             configurationFTPFields getFTPFields = new configurationFTPFields();
             getFTPFields.setmethod(2);
-            getFTPFields.setdirectory("/UT/"+orgDetails.getcleanURL()+"/output/"); 
+            getFTPFields.setdirectory("/UTSFTP/"+orgDetails.getcleanURL()+"/output/"); 
             
             emptyFTPFields.add(pushFTPFields);
             emptyFTPFields.add(getFTPFields);
