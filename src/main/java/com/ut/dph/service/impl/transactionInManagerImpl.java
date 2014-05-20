@@ -1581,12 +1581,11 @@ public class transactionInManagerImpl implements transactionInManager {
                 actualFileName = batch.getoriginalFileName();
             }
 
-            //get delimiter, get fileWithPath etc
-            if (actualFileName.endsWith(".txt") || actualFileName.endsWith(".csv")) {
-            	String newFileWithPath = fileWithPath;
-            	File newFile = new File(newFileWithPath);
-            	//need to decode file, so far for UT files only
-            	if(batch.gettransportMethodId() == 3) {
+             /** need to handle encode / decode here
+             String newFileWithPath = fileWithPath;
+         	File newFile = new File(newFileWithPath);
+         	//need to decode file, so far for UT files only
+         	if(batch.gettransportMethodId() == 3) {
 	            	File encodedFile = new File (fileWithPath);
 	            	fileSystem fileSystem = new fileSystem();
 	            	String decodedOldFile = fileSystem.decodeFileToBase64Binary(encodedFile);
@@ -1598,12 +1597,12 @@ public class transactionInManagerImpl implements transactionInManager {
 	            		newFile.delete();
 	            	}
 	            	fileSystem.writeFile(newFileWithPath, decodedOldFile);
-            	
-            	}
-            	sysError = sysError + insertLoadData(batch.getId(), batch.getDelimChar(), newFileWithPath, loadTableName, batch.isContainsHeaderRow());
-            	if(batch.gettransportMethodId() == 3) {
-            		newFile.delete();
-            	}
+         	
+         	}
+             **/
+            //at this point, hl7 and hr are in unencoded plain text
+            if (actualFileName.endsWith(".txt") || actualFileName.endsWith(".csv")) {
+            	sysError = sysError + insertLoadData(batch.getId(), batch.getDelimChar(), fileWithPath, loadTableName, batch.isContainsHeaderRow());
             }
 
             //3. we update batchId, loadRecordId
