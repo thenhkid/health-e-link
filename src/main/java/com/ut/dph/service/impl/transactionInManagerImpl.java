@@ -606,7 +606,18 @@ public class transactionInManagerImpl implements transactionInManager {
 
             for (Integer configId : configIds) {
 				//we need to run all checks before insert regardless *
-
+            	/** we are reordering cw/macro, req and validate **/
+            	// 1. grab the configurationDataTranslations and run cw/macros
+                List<configurationDataTranslations> dataTranslations = configurationManager
+                        .getDataTranslationsWithFieldNo(configId);
+                for (configurationDataTranslations cdt : dataTranslations) {
+                    if (cdt.getCrosswalkId() != 0) {
+                        systemErrorCount = systemErrorCount + processCrosswalk(configId, batchUploadId, cdt, false, transactionId);
+                    } else if (cdt.getMacroId() != 0) {
+                        systemErrorCount = systemErrorCount + processMacro(configId, batchUploadId, cdt, false, transactionId);
+                    }
+                }
+                
                 //check R/O
                 List<configurationFormFields> reqFields = getRequiredFieldsForConfig(configId);
 
@@ -621,16 +632,6 @@ public class transactionInManagerImpl implements transactionInManager {
                 // update status of the failed records to ERR - 14
                 updateStatusForErrorTrans(batchUploadId, 14, false, transactionId);
 
-                // 1. grab the configurationDataTranslations and run cw/macros
-                List<configurationDataTranslations> dataTranslations = configurationManager
-                        .getDataTranslationsWithFieldNo(configId);
-                for (configurationDataTranslations cdt : dataTranslations) {
-                    if (cdt.getCrosswalkId() != 0) {
-                        systemErrorCount = systemErrorCount + processCrosswalk(configId, batchUploadId, cdt, false, transactionId);
-                    } else if (cdt.getMacroId() != 0) {
-                        systemErrorCount = systemErrorCount + processMacro(configId, batchUploadId, cdt, false, transactionId);
-                    }
-                }
                 /**
                  * if there are errors, those are system errors, they will be logged we get errorId 5 and email to admin, update batch to 29 *
                  */
@@ -1582,24 +1583,27 @@ public class transactionInManagerImpl implements transactionInManager {
 
             //get delimiter, get fileWithPath etc
             if (actualFileName.endsWith(".txt") || actualFileName.endsWith(".csv")) {
-            	//need to decode file
-            	File encodedFile = new File (fileWithPath);
-            	fileSystem fileSystem = new fileSystem();
-            	String decodedOldFile = fileSystem.decodeFileToBase64Binary(encodedFile);
-            	String fileForPath = dir.getDir() + batch.getFileLocation();
-            	fileForPath = fileForPath.replace("bowlink///", "");
-            	String newFileWithPath = fileForPath + batch.getutBatchName() + ".txt";
+            	String newFileWithPath = fileWithPath;
             	File newFile = new File(newFileWithPath);
-            	if (newFile.exists()) {
-            		newFile.delete();
-            	}
-            	try {
-            		fileSystem.writeTextFile(newFileWithPath, decodedOldFile);
-            	} catch (Exception ex) {
-            		ex.printStackTrace();
+            	//need to decode file, so far for UT files only
+            	if(batch.gettransportMethodId() == 3) {
+	            	File encodedFile = new File (fileWithPath);
+	            	fileSystem fileSystem = new fileSystem();
+	            	String decodedOldFile = fileSystem.decodeFileToBase64Binary(encodedFile);
+	            	String fileForPath = dir.getDir() + batch.getFileLocation();
+	            	fileForPath = fileForPath.replace("bowlink///", "");
+	            	newFileWithPath = fileForPath + batch.getutBatchName() + ".txt";
+	            	newFile = new File(newFileWithPath);
+	            	if (newFile.exists()) {
+	            		newFile.delete();
+	            	}
+	            	fileSystem.writeTextFile(newFileWithPath, decodedOldFile);
+            	
             	}
             	sysError = sysError + insertLoadData(batch.getId(), batch.getDelimChar(), newFileWithPath, loadTableName, batch.isContainsHeaderRow());
-            	newFile.delete();
+            	if(batch.gettransportMethodId() == 3) {
+            		newFile.delete();
+            	}
             }
 
             //3. we update batchId, loadRecordId
