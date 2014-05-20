@@ -606,7 +606,7 @@ public class transactionInManagerImpl implements transactionInManager {
 
             for (Integer configId : configIds) {
 				//we need to run all checks before insert regardless *
-            	/** we are reordering cw/macro, req and validate **/
+            	/** we are reordering 1. cw/macro, 2. required and 3. validate **/
             	// 1. grab the configurationDataTranslations and run cw/macros
                 List<configurationDataTranslations> dataTranslations = configurationManager
                         .getDataTranslationsWithFieldNo(configId);
