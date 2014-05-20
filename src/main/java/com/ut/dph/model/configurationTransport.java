@@ -86,7 +86,7 @@ public class configurationTransport {
     private String fileExt = null;
     
     @Column(name = "encodingId", nullable = false)
-    private int encodingId;
+    private int encodingId = 1;
     
     public int getId() {
         return id;

@@ -1109,7 +1109,13 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                 for (HL7Elements element : hl7Elements) {
 
                                     if (!"".equals(element.getdefaultValue())) {
-                                        hl7recordRow.append(element.getdefaultValue());
+                                        if("~currDate~".equals(element.getdefaultValue())) {
+                                            hl7recordRow.append(batchDetails.getdateCreated());
+                                        }
+                                        else {
+                                            hl7recordRow.append(element.getdefaultValue());
+                                        }
+                                        
                                     } else {
 
                                         /* Get the element components */
