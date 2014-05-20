@@ -1036,7 +1036,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
         /* Create the empty file in the correct location */
         if (createNewFile == true || !newFile.exists()) {
             try {
-
+               
                 if (newFile.exists()) {
                     int i = 1;
                     while (newFile.exists()) {

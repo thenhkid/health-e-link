@@ -870,8 +870,19 @@ public class transactionOutDAOImpl implements transactionOutDAO {
             String dataSQL;
             for (configurationFormFields formField : formFields) {
                 if (!formField.getsaveToTableName().equalsIgnoreCase("")) {
+                    
+                    int rowNum;
+                    int idot = formField.getFieldDesc().lastIndexOf(".");
+                    
+                    if(idot > 0) {
+                        rowNum = Integer.parseInt(formField.getFieldDesc().substring(idot))-1;
+                    }
+                    else {
+                        rowNum = 0;
+                    }
+                    
                     dataSQL = "SELECT " + formField.getsaveToTableCol() + " from " + formField.getsaveToTableName()
-                            + " WHERE transactionInId = :transactionInId";
+                            + " WHERE transactionInId = :transactionInId LIMIT " + rowNum + ",1"; //LIMIT 0,1
 
                     Query getData = sessionFactory.getCurrentSession().createSQLQuery(dataSQL)
                             .setParameter("transactionInId", transactionInId);
