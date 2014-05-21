@@ -165,12 +165,12 @@ end proc_main$$
 DELIMITER ;
 
 
-=======
+
 /** 05212014 Chad 3:47 PM **/
 ALTER TABLE `universalTranslator`.`message_Encounters` 
 DROP COLUMN `status`,
 DROP COLUMN `encounterDate`,
 CHANGE COLUMN `encounter` `ICD9Code` VARCHAR(45) NULL DEFAULT NULL ,
 CHANGE COLUMN `performer` `description` VARCHAR(500) NULL DEFAULT NULL ;
->>>>>>> a2376038e0734799422c0c9da9791a90092226af
+
 
