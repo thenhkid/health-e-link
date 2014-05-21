@@ -84,3 +84,10 @@ ADD COLUMN `CategoryId` INT NULL DEFAULT 1 COMMENT '1 - data manipulation\n2 - p
 ALTER TABLE `universaltranslator`.`macro_names` 
 DROP COLUMN `Category`;
 
+/** 05212014 Chad 3:47 PM **/
+ALTER TABLE `universalTranslator`.`message_Encounters` 
+DROP COLUMN `status`,
+DROP COLUMN `encounterDate`,
+CHANGE COLUMN `encounter` `ICD9Code` VARCHAR(45) NULL DEFAULT NULL ,
+CHANGE COLUMN `performer` `description` VARCHAR(500) NULL DEFAULT NULL ;
+
