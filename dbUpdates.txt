@@ -84,9 +84,9 @@ ADD COLUMN `CategoryId` INT NULL DEFAULT 1 COMMENT '1 - data manipulation\n2 - p
 ALTER TABLE `universaltranslator`.`macro_names` 
 DROP COLUMN `Category`;
 
-<<<<<<< HEAD
 
-/** 05212014 4:28 PM **/
+
+/** 05212014 Grace 4:28 PM **/
 
 use universalTranslator;
 drop procedure if exists getConfigToFromFieldNo;
