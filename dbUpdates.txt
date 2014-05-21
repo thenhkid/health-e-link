@@ -84,3 +84,84 @@ ADD COLUMN `CategoryId` INT NULL DEFAULT 1 COMMENT '1 - data manipulation\n2 - p
 ALTER TABLE `universaltranslator`.`macro_names` 
 DROP COLUMN `Category`;
 
+
+/** 05212014 4:28 PM **/
+
+use universalTranslator;
+drop procedure if exists getConfigToFromFieldNo;
+DELIMITER $$
+ 
+CREATE PROCEDURE getConfigToFromFieldNo (in cInId int, in cOutId int)
+
+proc_main:begin
+
+drop TEMPORARY TABLE if exists fieldAndNos;
+
+CREATE TEMPORARY TABLE fieldAndNos as (select id, cOutId as configIdOut, cInId as configIdIn, 
+fieldNo as fieldNoIn, fieldNo as fieldNoOut, saveToTableName, saveToTableCol from configurationFormFields where configId = cOutId order by fieldNoOut);
+
+update fieldAndNos set fieldNoIn = 0;
+
+BEGIN
+ 
+    DECLARE v_finished INTEGER DEFAULT 0;
+	DECLARE v_saveToTableName varchar(100) DEFAULT "";
+	DECLARE v_saveToTableCol varchar(100) DEFAULT "";
+	DECLARE v_fieldNoIn int DEFAULT 0;
+	DECLARE v_fieldNoOut int DEFAULT 0;
+	DECLARE v_newFieldNo int DEFAULT 0;
+	DECLARE v_id int default 0;
+
+ 
+    -- declare cursor for employee email
+    DEClARE fieldNo_cursor CURSOR FOR 
+        SELECT id, fieldNoIn, fieldNoOut, saveToTableName, saveToTableCol from fieldAndNos order by fieldNoOut;
+
+    -- declare NOT FOUND handler
+    DECLARE CONTINUE HANDLER 
+        FOR NOT FOUND SET v_finished = 1;
+	
+    OPEN fieldNo_cursor;
+	
+	get_fieldNo: LOOP
+		
+		
+        
+		FETCH fieldNo_cursor INTO v_id, v_fieldNoIn, v_fieldNoOut, v_saveToTableName, v_saveToTableCol;
+ 
+        IF v_finished = 1 THEN 
+            LEAVE get_fieldNo;
+        END IF;
+	
+	
+        -- find fieldNo and update
+	if  (v_id > 1) then
+		set v_newFieldNo = 0;
+		
+		select count(fieldNo) into v_newFieldNo from configurationFormFields where configId = cInId 
+		and saveToTableName = v_saveToTableName and saveToTableCol = v_saveToTableCol order by fieldNo limit 1;
+		
+		if (v_newFieldNo > 0) then
+			select fieldNo into v_newFieldNo from configurationFormFields where configId = cInId 
+			and saveToTableName = v_saveToTableName and saveToTableCol = v_saveToTableCol order by fieldNo limit 1;
+			update fieldAndNos set fieldNoIn = v_newFieldNo where id = v_id;
+		end if; 
+		
+		
+		
+	end if;
+	
+    END LOOP get_fieldNo;
+ 
+    CLOSE fieldNo_cursor;
+
+	
+END;
+
+select * from fieldAndNos order by fieldNoOut;
+end proc_main$$
+ 
+DELIMITER ;
+
+
+
