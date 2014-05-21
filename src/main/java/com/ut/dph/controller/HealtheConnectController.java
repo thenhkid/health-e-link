@@ -281,7 +281,8 @@ public class HealtheConnectController {
             /* Create the batch name (OrgId+MessageTypeId+Date/Time) */
             DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
             Date date = new Date();
-            String batchName = new StringBuilder().append(userInfo.getOrgId()).append(configDetails.getMessageTypeId()).append(dateFormat.format(date)).toString();
+            //adding transport method id to UT batch name
+            String batchName = new StringBuilder().append("1").append(userInfo.getOrgId()).append(configDetails.getMessageTypeId()).append(dateFormat.format(date)).toString();
 
             /* Submit a new batch */
             batchUploads batchUpload = new batchUploads();
@@ -294,6 +295,7 @@ public class HealtheConnectController {
             batchUpload.setFileLocation(transportDetails.getfileLocation());
             batchUpload.setContainsHeaderRow(messageSpecs.getcontainsHeaderRow());
             batchUpload.setDelimChar(delimChar);
+            batchUpload.setEncodingId(transportDetails.getEncodingId());
 
             if (multipleMessageTypes == true) {
                 batchUpload.setConfigId(0);

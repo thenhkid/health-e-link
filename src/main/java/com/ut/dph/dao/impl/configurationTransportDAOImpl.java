@@ -423,7 +423,7 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
         try {
 
             String sql = ("select distinct delimChar, errorHandling, autoRelease, fileLocation, fileType, containsHeaderRow, "
-                    + " transportMethodId from configurationTransportDetails, ref_delimiters , configurationMessageSpecs "
+                    + " transportMethodId, encodingId from configurationTransportDetails, ref_delimiters , configurationMessageSpecs "
                     + " where ref_delimiters.id = configurationTransportDetails.fileDelimiter "
                     + " and configurationMessageSpecs.configId = configurationTransportDetails.configId "
                     + " and transportMethodId = :transportMethodId and configurationTransportDetails.configId in "
