@@ -77,5 +77,10 @@ ALTER TABLE `universaltranslator`.`batchuploads`
 ADD COLUMN `encodingId` INT NULL COMMENT 'the encoding file came in' AFTER `originalFolder`;
 
 
+/** 05212014 Grace 11:28 AM**/
+ALTER TABLE `universaltranslator`.`macro_names` 
+ADD COLUMN `CategoryId` INT NULL DEFAULT 1 COMMENT '1 - data manipulation\n2 - processing' AFTER `ID`;
 
+ALTER TABLE `universaltranslator`.`macro_names` 
+DROP COLUMN `Category`;
 

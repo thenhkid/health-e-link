@@ -13,13 +13,14 @@
                 <form:hidden path="id" id="id" />
                 
                 <div class="form-container">
-                          <spring:bind path="category">
-                            <div class="form-group ${status.error ? 'has-error' : '' }">
-                                <label class="control-label" for="category">Category</label>
-                                <form:input path="category" id="category" class="form-control" type="text" maxLength="50" />
-                                <form:errors path="category" cssClass="control-label" element="label" />
+                          <div class="form-group ${status.error ? 'has-error' : '' }">
+                                <label class="control-label" for="categoryId">Category</label>
+                                <form:select class="form-control" id="categoryId" path="categoryId">
+                                	<option value="1" <c:if test="${macroDetails.categoryId == 1}">selected</c:if>>Data Manipulation</option>
+                               		<option value="2" <c:if test="${macroDetails.categoryId == 2}">selected</c:if>>Processing</option> 
+                            	</form:select>
+                                <form:errors path="categoryId" cssClass="control-label" element="label" />
                             </div>
-                        </spring:bind>
                          <spring:bind path="macroShortName">
                             <div class="form-group ${status.error ? 'has-error' : '' }">
                                 <label class="control-label" for="macroShortName">Macro Short Name*</label>
@@ -51,7 +52,8 @@
                                 <form:radiobutton id="populateFieldA" path="populateFieldA" value="false" /> No
                             </label>
                         </div>         
-                        <br/>          
+                        <br/> 
+                        </div>         
                         <spring:bind path="fieldAQuestion">
                             <div class="form-group ${status.error ? 'has-error' : '' }">
                                 <label class="control-label" for="fieldAQuestion">Field A Question</label>

@@ -19,10 +19,6 @@ public class Macros {
     @Column(name = "ID", nullable = false)
     private int id;
 
-    @NoHtml
-    @Column(name = "CATEGORY", nullable = false)
-    private String category;
-
     @NotEmpty
     @NoHtml
     @Column(name = "MACRO_NAME", nullable = false)
@@ -68,6 +64,10 @@ public class Macros {
     @Column(name = "populateFieldA", nullable = true)
     private boolean populateFieldA = true;
 
+    @Column(name = "CategoryId", nullable = true)
+    private int categoryId;
+
+    
 	public boolean isPopulateFieldA() {
 		return populateFieldA;
 	}
@@ -164,14 +164,6 @@ public class Macros {
         this.con2Question = con2Question;
     }
 
-	public String getCategory() {
-		return category;
-	}
-
-	public void setCategory(String category) {
-		this.category = category;
-	}
-
 	public String getMacroName() {
 		return macroName;
 	}
@@ -250,6 +242,14 @@ public class Macros {
 
 	public void setCon2Question(String con2Question) {
 		this.con2Question = con2Question;
+	}
+
+	public int getCategoryId() {
+		return categoryId;
+	}
+
+	public void setCategoryId(int categoryId) {
+		this.categoryId = categoryId;
 	} 
 
 }

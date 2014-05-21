@@ -45,7 +45,10 @@
                                 <c:when test="${not empty macroList}">
                                     <c:forEach var="macro" items="${macroList}">
                                         <tr id="dataRow">
-                                            <td>${macro.category}</td>
+                                            <td>
+                                            	<c:if test="${macro.categoryId == 1}">Data Manipulation</c:if>
+                                           		<c:if test="${macro.categoryId == 2}">Processing</c:if>
+                                            </td>
                                             <td scope="row"><a href="#macroModal" data-toggle="modal" rel="${macro.id}" class="macroEdit" title="Edit this macro">${macro.macroShortName}</a>
                                             </td>
                                             <td>
