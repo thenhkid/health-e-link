@@ -1,0 +1,18 @@
+
+Chad
+    - Add configuration screens to allow the user to select pre and post processing macros
+    - Continue working on the Harbor Health templates and CCD parsing script
+    - Add Grace SP to check the transactionTranslatedIn field if source config is set to pass through and no value is found in the assigned message table
+    - Sit with Mike to review Waynes QA feedback and fix any found issues
+    - Work with Mike to figure out the HL7 feedback report structure for Harbor Health to integrate back into NextGen EMR
+
+Grace
+    - Work with Wayne on setting up the Family Planning template and configurations
+    - Look into sendMail for linux
+    - Create the SP to return the transactionIn field
+    - Continue work with encoding and decoding
+    - Continue work with moving files from UT folder to our Bowlink folders (Referrals)
+    - Continue work with moving files from our Bowlink folders to the UT folder (Feedback Reports)
+
+
+Open
