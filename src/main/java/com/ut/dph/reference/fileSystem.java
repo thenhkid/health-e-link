@@ -350,7 +350,7 @@ public class fileSystem {
     
     public String encodeFileToBase64Binary(File file) throws IOException {
  
-		byte[] bytes = loadFile(file);
+		byte[] bytes = fileToBytes(file);
 		byte[] encoded = Base64.encodeBase64(bytes);
 		String encodedString = new String(encoded);
  
@@ -360,7 +360,7 @@ public class fileSystem {
     
     public String decodeFileToBase64Binary(File file) throws IOException {
     	 
-		byte[] bytes = loadFile(file);
+		byte[] bytes = fileToBytes(file);
 		byte[] decoded = Base64.decodeBase64(bytes);
 		String decodedString = new String(decoded);
  
@@ -368,7 +368,7 @@ public class fileSystem {
 	}
     
     @SuppressWarnings("resource")
-	public static byte[] loadFile(File file) throws IOException {
+	public static byte[] fileToBytes(File file) throws IOException {
 	    InputStream is = new FileInputStream(file);
  
 	    long length = file.length();

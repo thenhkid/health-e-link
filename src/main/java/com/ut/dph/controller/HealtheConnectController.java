@@ -218,7 +218,7 @@ public class HealtheConnectController {
 	        ua.setActivity("Viewed Upload New File Form");
 	        usermanager.insertUserLog(ua);
 	    } catch (Exception ex) {
-	    	System.err.println("fileUploadForm = error logging user" + ex.getCause());
+	    	System.err.println("fileUploadForm = error logging user " + ex.getCause());
 	    	ex.printStackTrace();
         }
         return mav;
@@ -274,12 +274,36 @@ public class HealtheConnectController {
         }
 
         try {
+        	
             /* Upload the file */
-            Map<String, String> batchResults = transactionInManager.uploadBatchFile(configId, uploadedFile);
-
+            Map<String, String> batchResults =  null;
+            
+            /* check file to see if we need to encode */
+            if (transportDetails.getEncodingId() == 1) {
+            	// user is submitting the file without encoding
+            	batchResults = transactionInManager.uploadBatchFile(configId, uploadedFile);
+            	/* we encode and delete old file */
+            	//a. we get file path from transport details, new file name is batchResults.get("fileName")
+            	
+            	//b. we set source / target
+            	
+            	//c. we encode and write
+            	/**
+            	 * java.nio.file.Files.move(Path source, Path target, CopyOption... options) 
+            	 * with CopyOptions "REPLACE_EXISTING" and "ATOMIC_MOVE".
+            	 * **/
+            	
+            	
+            } else  {
+            	// we handle encoding files here
+            	batchResults = transactionInManager.uploadEncodedBatchFile(transportDetails, uploadedFile);
+            }
+            
+            
+            
             /* Need to add the file to the batchUploads table */
-            /* Create the batch name (OrgId+MessageTypeId+Date/Time) */
-            DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+            /* Create the batch name (TransportMethodId+OrgId+MessageTypeId+Date/Time/Seconds) */
+            DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmssS");
             Date date = new Date();
             //adding transport method id to UT batch name
             String batchName = new StringBuilder().append("1").append(userInfo.getOrgId()).append(configDetails.getMessageTypeId()).append(dateFormat.format(date)).toString();
@@ -368,7 +392,7 @@ public class HealtheConnectController {
     	        ua.setBatchUploadId(batchId);
     	        usermanager.insertUserLog(ua);
     	    } catch (Exception ex) {
-    	    	System.err.println("submitFileUpload = error logging user" + ex.getCause());
+    	    	System.err.println("submitFileUpload = error logging user " + ex.getCause());
     	    	ex.printStackTrace();
             }
             
@@ -432,7 +456,7 @@ public class HealtheConnectController {
     	        ua.setActivity("Viewed Downloads");
     	        usermanager.insertUserLog(ua);
     	    } catch (Exception ex) {
-    	    	System.err.println("viewDownloads = error logging user" + ex.getCause());
+    	    	System.err.println("viewDownloads = error logging user " + ex.getCause());
     	    	ex.printStackTrace();
             }
             
@@ -491,7 +515,7 @@ public class HealtheConnectController {
     	        ua.setActivityDesc("Searched for downloads files from " + fromDate + " - " + toDate );
     	        usermanager.insertUserLog(ua);
     	    } catch (Exception ex) {
-    	    	System.err.println("findDownloads = error logging user" + ex.getCause());
+    	    	System.err.println("findDownloads = error logging user " + ex.getCause());
     	    	ex.printStackTrace();
             }
             
@@ -545,7 +569,7 @@ public class HealtheConnectController {
     	        ua.setBatchDownloadId(batchId);
     	        usermanager.insertUserLog(ua);
     	    } catch (Exception ex) {
-    	    	System.err.println("downloadBatch = error logging user" + ex.getCause());
+    	    	System.err.println("downloadBatch = error logging user " + ex.getCause());
     	    	ex.printStackTrace();
             }
             

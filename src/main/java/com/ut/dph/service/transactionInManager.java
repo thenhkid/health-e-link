@@ -371,5 +371,8 @@ public interface transactionInManager {
     List<batchUploadSummary> getBatchesToSentOrg(int srcorgId, int tgtOrgId, int messageTypeId) throws Exception;
     
     messagePatients getPatientTransactionDetails(int transactionInId);
-
+    
+    Map<String,String> uploadEncodedBatchFile(configurationTransport transportDetails, MultipartFile fileUpload) throws Exception;
+    
+    void moveToLoadFilesFolder (String oldFilePath, String newFilePath) throws Exception;
 }

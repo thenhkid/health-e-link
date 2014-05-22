@@ -230,7 +230,7 @@ public class HealtheWebController {
     	        ua.setActivityDesc("Inbox - " + fromDate + " - " + toDate );
     	        usermanager.insertUserLog(ua);
     	    } catch (Exception ex) {
-    	    	System.err.println("viewinbox = error logging user" + ex.getCause());
+    	    	System.err.println("viewinbox = error logging user " + ex.getCause());
     	    	ex.printStackTrace();
             }
             
@@ -326,7 +326,7 @@ public class HealtheWebController {
     	        ua.setActivityDesc("Searched Dates " + fromDate + " - " + toDate );
     	        usermanager.insertUserLog(ua);
     	    } catch (Exception ex) {
-    	    	System.err.println("findInboxBatches = error logging user" + ex.getCause());
+    	    	System.err.println("findInboxBatches = error logging user " + ex.getCause());
     	    	ex.printStackTrace();
             }
 
@@ -459,7 +459,7 @@ public class HealtheWebController {
     	        ua.setBatchDownloadId(batchId);
     	        usermanager.insertUserLog(ua);
     	    } catch (Exception ex) {
-    	    	System.err.println("showInboxBatchTransactions = error logging user" + ex.getCause());
+    	    	System.err.println("showInboxBatchTransactions = error logging user " + ex.getCause());
     	    	ex.printStackTrace();
             }
 
@@ -661,7 +661,7 @@ public class HealtheWebController {
     	        ua.setBatchDownloadId(batchInfo.getId());
     	        usermanager.insertUserLog(ua);
     	    } catch (Exception ex) {
-    	    	System.err.println("showInboxMessageDetails = error logging user" + ex.getCause());
+    	    	System.err.println("showInboxMessageDetails = error logging user " + ex.getCause());
     	    	ex.printStackTrace();
             }
             
@@ -735,7 +735,7 @@ public class HealtheWebController {
     	        ua.setActivity("Viewed Create Message Form");
     	        usermanager.insertUserLog(ua);
     	    } catch (Exception ex) {
-    	    	System.err.println("createNewMesage = error logging user" + ex.getCause());
+    	    	System.err.println("createNewMesage = error logging user " + ex.getCause());
     	    	ex.printStackTrace();
             }
                         
@@ -907,7 +907,7 @@ public class HealtheWebController {
         	        ua.setTransactionTargetIds(String.valueOf(transactionId));
         	        usermanager.insertUserLog(ua);
         	    } catch (Exception ex) {
-        	    	System.err.println("createNewMesage = error logging user" + ex.getCause());
+        	    	System.err.println("createNewMesage = error logging user " + ex.getCause());
         	    	ex.printStackTrace();
                 }
             
@@ -1149,7 +1149,7 @@ public class HealtheWebController {
     	        ua.setActivity("Showed Message Details");
     	        usermanager.insertUserLog(ua);
     	    } catch (Exception ex) {
-    	    	System.err.println("showMessageDetailsForm = error logging user" + ex.getCause());
+    	    	System.err.println("showMessageDetailsForm = error logging user " + ex.getCause());
     	    	ex.printStackTrace();
             }
         }
@@ -1187,10 +1187,10 @@ public class HealtheWebController {
         if(currBatchId == 0) {
             
             try {
-                /* Create the batch name (OrgId+MessageTypeId+Date/Time) */
-                DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+            	/* Create the batch name (TransportMethodId+OrgId+MessageTypeId+Date/Time/Seconds) */
+                DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmssS");
                 Date date = new Date();
-                String batchName = new StringBuilder().append(transactionDetails.getorgId()).append(transactionDetails.getmessageTypeId()).append(dateFormat.format(date)).toString();
+                String batchName = new StringBuilder().append("2").append(transactionDetails.getorgId()).append(transactionDetails.getmessageTypeId()).append(dateFormat.format(date)).toString();
 
                 /* Submit a new batch */
                 batchUploads batchUpload = new batchUploads();
@@ -2874,7 +2874,7 @@ public class HealtheWebController {
             ua.setActivityDesc("History - " + fromDate + " - " + toDate );
             usermanager.insertUserLog(ua);
         } catch (Exception ex) {
-            System.err.println("viewHistory = error logging user" + ex.getCause());
+            System.err.println("viewHistory = error logging user " + ex.getCause());
             ex.printStackTrace();
         }
         
@@ -3123,7 +3123,7 @@ public class HealtheWebController {
             ua.setActivityDesc("History Search - " + fromDate + " - " + toDate );
             usermanager.insertUserLog(ua);
         } catch (Exception ex) {
-            System.err.println("viewHistory = error logging user" + ex.getCause());
+            System.err.println("viewHistory = error logging user " + ex.getCause());
             ex.printStackTrace();
         }
         
