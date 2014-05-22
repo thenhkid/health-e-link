@@ -35,6 +35,12 @@
                     </c:when> 
                     <c:when test="${param['page'] == 'HL7'}">
                         <a href="javascript:void(0);" title="HL7 Customization" class="unstyled-link">Configuration - HL7 Customization</a>
+                    </c:when>  
+                    <c:when test="${param['page'] == 'preprocessing'}">
+                        <a href="javascript:void(0);" title="Configuration Pre-Processing Macros" class="unstyled-link">Configuration - Pre-Processing Macros</a>
+                    </c:when>   
+                    <c:when test="${param['page'] == 'postprocessing'}">
+                        <a href="javascript:void(0);" title="Configuration Post-Processing Macros" class="unstyled-link">Configuration - Post-Processing Macros</a>
                     </c:when>   
                 </c:choose>
             </h1>
@@ -43,19 +49,19 @@
             <c:choose>
                 <c:when test="${param['page'] == 'listConfigs'}">
                     <li><a href="create" title="Create New Configuration" role="button"><span class="glyphicon icon-stacked glyphicon glyphicon-plus"></span>Create New</a></li>
-                </c:when>
-                <c:when test="${param['page'] == 'connections'}">
-                <li><a href="#connectionsModal" id="createNewConnection" data-toggle="modal" role="button" title="Create Configuration Connection"><span class="glyphicon icon-stacked glyphicon glyphicon-plus"></span>Create New</a></li>
-                </c:when>  
-                <c:otherwise>
+                    </c:when>
+                    <c:when test="${param['page'] == 'connections'}">
+                    <li><a href="#connectionsModal" id="createNewConnection" data-toggle="modal" role="button" title="Create Configuration Connection"><span class="glyphicon icon-stacked glyphicon glyphicon-plus"></span>Create New</a></li>
+                    </c:when>  
+                    <c:otherwise>
                     <li><a href="javascript:void(0);" id="saveDetails" title="Save this Configuration initial setup" role="button"><span class="glyphicon glyphicon-ok icon-stacked"></span> Save </a></li>
-                    <c:if test="${configurationDetails.type == 2 && (param['page'] == 'translations' && mappings != 2) || (param['page'] != 'translations' && param['page'] != 'schedule' && param['page'] != 'HL7') }">
-                      <li><a href="javascript:void(0);" id="next" title="Save and Proceed to the Next Step"><span class="glyphicon glyphicon-forward icon-stacked" role="button"></span>Next Step</a></li>
-                    </c:if>
-                    <%--<c:if test="${not empty id}"><li><a href="#confirmationOrgDelete" data-toggle="modal" rel="${id}" title="Delete this Configuration"><span class="glyphicon glyphicon-remove icon-stacked"></span>Delete</a></li></c:if>--%>
+                        <c:if test="${param['page'] != 'postprocessing'}">
+                        <li><a href="javascript:void(0);" id="next" title="Save and Proceed to the Next Step"><span class="glyphicon glyphicon-forward icon-stacked" role="button"></span>Next Step</a></li>
+                        </c:if>
+                        <%--<c:if test="${not empty id}"><li><a href="#confirmationOrgDelete" data-toggle="modal" rel="${id}" title="Delete this Configuration"><span class="glyphicon glyphicon-remove icon-stacked"></span>Delete</a></li></c:if>--%>
                     <li><a href="<c:url value='/administrator/configurations/list' />" title="Cancel" role="button"><span class="glyphicon icon-stacked custom-icon icon-cancel"></span>Cancel</a></li>
-               </c:otherwise>
-           </c:choose>
+                    </c:otherwise>
+                </c:choose>
         </ul>
     </div>
 </nav>

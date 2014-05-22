@@ -4,14 +4,14 @@
              xsi:schemaLocation="http://www.springframework.org/schema/beans
     http://www.springframework.org/schema/beans/spring-beans.xsd
     http://www.springframework.org/schema/security
-    http://www.springframework.org/schema/security/spring-security-3.1.xsd">
+    http://www.springframework.org/schema/security/spring-security-3.2.xsd">
 
     <http pattern="/css/**" security="none"/>
     <http pattern="/javascript/**" security="none" />
     <http pattern="/login*" security="none"/>
     <http pattern="/" security="none"/>
 
-    <http auto-config="true" use-expressions="true">
+    <http auto-config="true" use-expressions="true" disable-url-rewriting="false" >
         <intercept-url access="hasRole('ROLE_ADMIN')" pattern="/administrator/**"></intercept-url>
         <intercept-url access="hasRole('ROLE_USER')" pattern="/profile/**"></intercept-url>
         <intercept-url access="hasRole('ROLE_USER')" pattern="/Health-e-Web/**"></intercept-url>
@@ -22,15 +22,22 @@
         <logout invalidate-session="true" delete-cookies="JSESSIONID" logout-success-url="/login" logout-url="/logout"></logout>
         <form-login authentication-success-handler-ref="authenticationSuccessRedirecthandler" authentication-failure-url="/loginfailed" login-page="/login"></form-login>
         <session-management invalid-session-url="/login"></session-management>
+        <headers>
+            <cache-control />
+            <content-type-options />
+            <hsts />
+            <frame-options />
+            <xss-protection />
+        </headers>
     </http>
 
     <authentication-manager>
         <authentication-provider>
             <jdbc-user-service data-source-ref="dataSource"
  
-                            users-by-username-query="select username,password,status from users where username=?" 
+                               users-by-username-query="select username,password,status from users where username=?" 
  
-                            authorities-by-username-query="select u.username, r.role as authority from users u inner join userRoles r on u.roleId = r.id where u.status = 1 and u.username =?  " 
+                               authorities-by-username-query="select u.username, r.role as authority from users u inner join userRoles r on u.roleId = r.id where u.status = 1 and u.username =?  " 
  
             />
         </authentication-provider>

@@ -2030,5 +2030,105 @@ public class adminConfigController {
         
     }
     
+    /**
+     * The '/preprocessing' GET request will display the configuration preprocessing page 
+     */
+    @RequestMapping(value = "/preprocessing", method = RequestMethod.GET)
+    public ModelAndView getPreProcessing() throws Exception {
+      
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/configurations/preprocessing");
+        mav.addObject("id", configId);
+        mav.addObject("mappings", mappings);
+        mav.addObject("HL7", HL7);
+        
+        //Get the completed steps for the selected configuration;
+        configuration configurationDetails = configurationmanager.getConfigurationById(configId);
+        
+        //Get the transport details by configid and selected transport method
+        configurationTransport transportDetails = configurationTransportManager.getTransportDetails(configId);
+        
+        configurationDetails.setOrgName(organizationmanager.getOrganizationById(configurationDetails.getorgId()).getOrgName());
+        configurationDetails.setMessageTypeName(messagetypemanager.getMessageTypeById(configurationDetails.getMessageTypeId()).getName());
+        configurationDetails.settransportMethod(configurationTransportManager.getTransportMethodById(transportDetails.gettransportMethodId()));
+        
+        //pass the configuration detail object back to the page.
+        mav.addObject("configurationDetails", configurationDetails);
+
+        //Get the transport fields
+        List<configurationFormFields> fields = configurationTransportManager.getConfigurationFields(configId, transportDetails.getId());
+        transportDetails.setFields(fields);
+
+        mav.addObject("fields", fields);
+
+        //Return a list of available macros
+        List<Macros> macros = configurationmanager.getMacros();
+        mav.addObject("macros", macros);
+        
+        //Loop through list of macros to mark the ones that need
+        //fields filled in
+        List<Integer> macroLookUpList = new ArrayList<Integer>();
+        for(Macros macro : macros) {
+            if(macro.getfieldAQuestion() != null || macro.getfieldBQuestion() != null || macro.getcon1Question() != null || macro.getcon2Question() != null) {
+                macroLookUpList.add(macro.getId());
+            }
+        }
+        mav.addObject("macroLookUpList", macroLookUpList);
+        
+        //Set the variable to hold the number of completed steps for this configuration;
+        mav.addObject("stepsCompleted", stepsCompleted);
+
+        return mav;
+    }
     
+    /**
+     * The '/postprocessing' GET request will display the configuration post processing page 
+     */
+    @RequestMapping(value = "/postprocessing", method = RequestMethod.GET)
+    public ModelAndView getPostProcessing() throws Exception {
+      
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/configurations/postprocessing");
+        mav.addObject("id", configId);
+        mav.addObject("mappings", mappings);
+        mav.addObject("HL7", HL7);
+        
+        //Get the completed steps for the selected configuration;
+        configuration configurationDetails = configurationmanager.getConfigurationById(configId);
+        
+        //Get the transport details by configid and selected transport method
+        configurationTransport transportDetails = configurationTransportManager.getTransportDetails(configId);
+        
+        configurationDetails.setOrgName(organizationmanager.getOrganizationById(configurationDetails.getorgId()).getOrgName());
+        configurationDetails.setMessageTypeName(messagetypemanager.getMessageTypeById(configurationDetails.getMessageTypeId()).getName());
+        configurationDetails.settransportMethod(configurationTransportManager.getTransportMethodById(transportDetails.gettransportMethodId()));
+        
+        //pass the configuration detail object back to the page.
+        mav.addObject("configurationDetails", configurationDetails);
+
+        //Get the transport fields
+        List<configurationFormFields> fields = configurationTransportManager.getConfigurationFields(configId, transportDetails.getId());
+        transportDetails.setFields(fields);
+
+        mav.addObject("fields", fields);
+
+        //Return a list of available macros
+        List<Macros> macros = configurationmanager.getMacros();
+        mav.addObject("macros", macros);
+        
+        //Loop through list of macros to mark the ones that need
+        //fields filled in
+        List<Integer> macroLookUpList = new ArrayList<Integer>();
+        for(Macros macro : macros) {
+            if(macro.getfieldAQuestion() != null || macro.getfieldBQuestion() != null || macro.getcon1Question() != null || macro.getcon2Question() != null) {
+                macroLookUpList.add(macro.getId());
+            }
+        }
+        mav.addObject("macroLookUpList", macroLookUpList);
+        
+        //Set the variable to hold the number of completed steps for this configuration;
+        mav.addObject("stepsCompleted", stepsCompleted);
+
+        return mav;
+    }
 }

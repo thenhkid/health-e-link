@@ -136,13 +136,13 @@
                     <spring:bind path="password">
                         <div id="passwordDiv" class="form-group ${status.error ? 'has-error' : '' }">
                             <label class="control-label" for="password">Password *</label>
-                            <form:input path="password" id="password" class="form-control" type="password" maxLength="15"  />
+                            <form:input path="password" id="password" class="form-control" type="password" maxLength="15" autocomplete="off"  />
                             <form:errors path="password" cssClass="control-label" element="label" />
                         </div>
                     </spring:bind>
                     <div id="confirmPasswordDiv" class="form-group">
                         <label class="control-label" for="confirmPassword">Confirm Password *</label>
-                        <input id="confirmPassword" name="confirmpassword" class="form-control" maxLength="15"  type="password" value=${userdetails.getPassword()} />
+                        <input id="confirmPassword" name="confirmpassword" class="form-control" maxLength="15" autocomplete="off" type="password" value=${userdetails.getPassword()} />
                         <span id="confimPasswordMsg" class="control-label"></span>
                     </div>
                     <div class="form-group">
