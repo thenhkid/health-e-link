@@ -173,4 +173,52 @@ DROP COLUMN `encounterDate`,
 CHANGE COLUMN `encounter` `ICD9Code` VARCHAR(45) NULL DEFAULT NULL ,
 CHANGE COLUMN `performer` `description` VARCHAR(500) NULL DEFAULT NULL ;
 
+/** 05222014 Chad @ 12:03 PM **/
+CREATE TABLE `universalTranslator`.`configurationPreProcessing` (
+  `id` INT UNSIGNED NOT NULL,
+  `configId` INT NOT NULL,
+  `macroId` INT NOT NULL,
+  `fieldA` VARCHAR(45) NULL,
+  `fieldB` VARCHAR(45) NULL,
+  `constant1` VARCHAR(45) NULL,
+  `constant2` VARCHAR(45) NULL,
+  `processOrder` INT NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `cppConfigId_idx` (`configId` ASC),
+  INDEX `ccpMacroId_idx` (`macroId` ASC),
+  CONSTRAINT `cppConfigId`
+    FOREIGN KEY (`configId`)
+    REFERENCES `universalTranslator`.`configurations` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `ccpMacroId`
+    FOREIGN KEY (`macroId`)
+    REFERENCES `universalTranslator`.`macro_names` (`ID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+CREATE TABLE `universalTranslator`.`configurationPostProcessing` (
+  `id` INT UNSIGNED NOT NULL,
+  `configId` INT NOT NULL,
+  `macroId` INT NOT NULL,
+  `fieldA` VARCHAR(45) NULL,
+  `fieldB` VARCHAR(45) NULL,
+  `constant1` VARCHAR(45) NULL,
+  `constant2` VARCHAR(45) NULL,
+  `processOrder` INT NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `cpstpConfigId_idx` (`configId` ASC),
+  INDEX `cpstpMacroId_idx` (`macroId` ASC),
+  CONSTRAINT `cpstpConfigId`
+    FOREIGN KEY (`configId`)
+    REFERENCES `universalTranslator`.`configurations` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `cpstpMacroId`
+    FOREIGN KEY (`macroId`)
+    REFERENCES `universalTranslator`.`macro_names` (`ID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION);
+
+
 
