@@ -10,9 +10,12 @@ Grace
     - Work with Wayne on setting up the Family Planning template and configurations
     - Look into sendMail for linux
     - Create the SP to return the transactionIn field
+    	 - SP returns configIdOut,configIdIn,fieldNoIn,fieldNoOut,fieldColumn,saveToTableName,saveToTableCol
+    	 - sample usage - CALL `universaltranslator`.`getConfigToFromFieldNo`(configIdIn, configIdOut);
+    	   if a field has no match, fieldNoIn will be zero, we need to decide on action as output field should always be grabbing value from an input field
     - Continue work with encoding and decoding
     - Continue work with moving files from UT folder to our Bowlink folders (Referrals)
     - Continue work with moving files from our Bowlink folders to the UT folder (Feedback Reports)
-
+	- Review and add additional user logging where needed
 
 Open
