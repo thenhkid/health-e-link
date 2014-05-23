@@ -28,13 +28,13 @@ public class hl7toTxt {
         FileInputStream fileInput = null;
         
         fileSystem dir = new fileSystem();
-        fileLocation = fileLocation.replace("/bowlink/", "");
+        fileLocation = fileLocation.replace("/Applications/bowlink/", "");
         dir.setDirByName(fileLocation);
         
         File origfile = null;
         
         try {
-            origfile = new File(dir.getDir() + fileName);
+            origfile = new File(dir.getDir() + fileName+".hr");
             fileInput = new FileInputStream(origfile);
             
         } catch (FileNotFoundException e) {

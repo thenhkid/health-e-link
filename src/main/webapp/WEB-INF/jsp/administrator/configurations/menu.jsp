@@ -18,8 +18,8 @@
             <c:if test="${HL7 == true}">
                 <li role="menuitem" ${param['page'] == 'HL7' ? 'class="active"' : ''} ${id > 0 and stepsCompleted >= 5 ? '' : 'class="disabled"'}><a href="${param['page'] != 'HL7' and id > 0 and stepsCompleted >= 5 ? 'HL7' : 'javascript:void(0);'}" title="HL7 Customization">HL7 Customization</a></li>
             </c:if>
-            <li role="menuitem" ${param['page'] == 'preProcessing' ? 'class="active"' : ''} ${id > 0 and stepsCompleted >= 5 ? '' : 'class="disabled"'}><a href="${param['page'] != 'preProcessing' and id > 0 and stepsCompleted >= 4 ? 'postProcessing' : 'javascript:void(0);'}" title="Pre-Processing Macros">Pre-Processing Macros</a></li>
-            <li role="menuitem" ${param['page'] == 'postProcessing' ? 'class="active"' : ''} ${id > 0 and stepsCompleted >= 5 ? '' : 'class="disabled"'}><a href="${param['page'] != 'postProcessing' and id > 0 and stepsCompleted >= 4 ? 'postProcessing' : 'javascript:void(0);'}" title="Post-Processing Macros">Post-Processing Macros</a></li>
+            <li role="menuitem" ${param['page'] == 'preprocessing' ? 'class="active"' : ''} ${id > 0 and stepsCompleted >= 5 ? '' : 'class="disabled"'}><a href="${param['page'] != 'preprocessing' and id > 0 and stepsCompleted >= 4 ? 'postProcessing' : 'javascript:void(0);'}" title="Pre-Process Macros">Pre-Process Macros</a></li>
+            <li role="menuitem" ${param['page'] == 'postprocessing' ? 'class="active"' : ''} ${id > 0 and stepsCompleted >= 5 ? '' : 'class="disabled"'}><a href="${param['page'] != 'postprocessing' and id > 0 and stepsCompleted >= 4 ? 'postProcessing' : 'javascript:void(0);'}" title="Post-Process Macros">Post-Process Macros</a></li>
         </ul>
     </nav>
 </aside>

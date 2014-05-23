@@ -82,7 +82,7 @@ require(['./main'], function () {
             });
         });
 
-        //The function that will be called when the "Save" button
+        //The function that will be called when the "Next Step" button
         //is clicked
         $('#next').click(function() {
              
@@ -94,11 +94,11 @@ require(['./main'], function () {
                 type: "POST",
                 success: function(data) {
                     if(configType == 1) {
-                        window.location.href = "translations?msg=updated";
+                        window.location.href = "preprocessing?msg=updated";
                     }
                     else {
                        if(mappings == 2) {
-                           window.location.href = "translations?msg=updated";
+                           window.location.href = "preprocessing?msg=updated";
                        } 
                        else {
                          window.location.href = "scheduling?msg=updated";   

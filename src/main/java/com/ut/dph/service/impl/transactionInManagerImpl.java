@@ -497,8 +497,8 @@ public class transactionInManagerImpl implements transactionInManager {
             if ("hl7".equals(fileType)) {
                 fileType = "hr";
             }
-
-            if (ext == null ? fileType != null : !ext.equals(fileType)) {
+           
+            if (ext == null ? fileType != null : !ext.equals(transportDetails.getfileExt())) {
                 batchFileResults.put("wrongFileType", "3");
             }
 
@@ -518,7 +518,7 @@ public class transactionInManagerImpl implements transactionInManager {
             //Set the directory that holds the crosswalk files
             int delimCount = (Integer) dir.checkFileDelimiter(dir, fileName, delimChar);
 
-            if (delimCount < 3) {
+            if (delimCount < 3 && !"xml".equals(transportDetails.getfileExt())) {
                 batchFileResults.put("wrongDelim", "4");
             }
 
@@ -1576,13 +1576,14 @@ public class transactionInManagerImpl implements transactionInManager {
             }
             
             if (!strDecode.equalsIgnoreCase("")) {
-	            	//we write and decode file
+	            //we write and decode file
 	            filemanager.writeFile((decodedFilePath + decodedFileName + decodedFileExt) , strDecode);
 	            actualFileName = (decodedFilePath + decodedFileName + decodedFileExt);
 	            /*
 	                If batch is set up for CCD input then we need to translate it
 	                to a pipe-delimited text file.
 	            */
+                   
 	            if (batch.getoriginalFileName().endsWith(".xml")) {
 	                newfilename = ccdtotxt.TranslateCCDtoTxt(decodedFilePath, decodedFileName, batch.getOrgId());
 	                actualFileName = newfilename;

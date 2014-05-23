@@ -37,10 +37,10 @@
                         <a href="javascript:void(0);" title="HL7 Customization" class="unstyled-link">Configuration - HL7 Customization</a>
                     </c:when>  
                     <c:when test="${param['page'] == 'preprocessing'}">
-                        <a href="javascript:void(0);" title="Configuration Pre-Processing Macros" class="unstyled-link">Configuration - Pre-Processing Macros</a>
+                        <a href="javascript:void(0);" title="Configuration Pre-Processing Macros" class="unstyled-link">Configuration - Pre-Process Macros</a>
                     </c:when>   
                     <c:when test="${param['page'] == 'postprocessing'}">
-                        <a href="javascript:void(0);" title="Configuration Post-Processing Macros" class="unstyled-link">Configuration - Post-Processing Macros</a>
+                        <a href="javascript:void(0);" title="Configuration Post-Processing Macros" class="unstyled-link">Configuration - Post-Process Macros</a>
                     </c:when>   
                 </c:choose>
             </h1>

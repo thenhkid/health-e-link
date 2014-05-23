@@ -49,10 +49,11 @@ public class CCDtoTxt {
         Method myMethod = cls.getMethod("CCDtoTxt", new Class[]{File.class});
 
         /* Get the uploaded CCD File */
-        fileLocation = fileLocation.replace("/bowlink/", "");
+        fileLocation = fileLocation.replace("/Applications/bowlink/", "");
         dir.setDirByName(fileLocation);
-        File ccdFile = new File(dir.getDir() + ccdFileName);
         
+        File ccdFile = new File(dir.getDir() + ccdFileName + ".xml");
+        System.out.println("File Exists:" + ccdFile.exists());
         /* Create the txt file that will hold the CCD fields */
         String newfileName = new StringBuilder().append(ccdFile.getName().substring(0, ccdFile.getName().lastIndexOf("."))).append(".").append("txt").toString();
 
