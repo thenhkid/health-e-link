@@ -4,6 +4,7 @@
  * and open the template in the editor.
  */
 package com.ut.dph.service.impl;
+
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import com.ut.dph.dao.messageTypeDAO;
 import com.ut.dph.dao.transactionInDAO;
@@ -18,7 +19,6 @@ import com.ut.dph.model.User;
 import com.ut.dph.model.UserActivity;
 import com.ut.dph.model.batchUploadSummary;
 import com.ut.dph.model.batchUploads;
-import com.ut.dph.model.configuration;
 import com.ut.dph.model.configurationConnection;
 import com.ut.dph.model.configurationDataTranslations;
 import com.ut.dph.model.configurationFTPFields;
@@ -42,6 +42,7 @@ import com.ut.dph.reference.fileSystem;
 import com.ut.dph.service.CCDtoTxt;
 import com.ut.dph.service.configurationManager;
 import com.ut.dph.service.configurationTransportManager;
+import com.ut.dph.service.fileManager;
 import com.ut.dph.service.hl7toTxt;
 import com.ut.dph.service.messageTypeManager;
 import com.ut.dph.service.organizationManager;
@@ -115,6 +116,10 @@ public class transactionInManagerImpl implements transactionInManager {
 
     @Autowired
     private userManager usermanager;
+    
+    @Autowired
+    private fileManager filemanager;
+
 
     @Autowired
     private hl7toTxt hl7toTxt;
@@ -426,8 +431,7 @@ public class transactionInManagerImpl implements transactionInManager {
     @Override
     public Map<String, String> uploadBatchFile(int configId, MultipartFile fileUpload) throws Exception {
     	
-    	configuration configDetails = configurationManager.getConfigurationById(configId);
-        configurationTransport transportDetails = configurationtransportmanager.getTransportDetails(configId);
+    	configurationTransport transportDetails = configurationtransportmanager.getTransportDetails(configId);
 
         MultipartFile file = fileUpload;
         String fileName = file.getOriginalFilename();
@@ -1550,187 +1554,162 @@ public class transactionInManagerImpl implements transactionInManager {
             dir.setDirByName("/");
 
             //2. we load data with my sql
-            String fileWithPath = null;
             String actualFileName = null;
             String newfilename = null;
             
-            /*
-                If batch is set up for CCD input then we need to translate it
-                to a pipe-delimited text file.
-            */
-            
             /** decoded files will always be in loadFiles folder with UTBatchName **/
-            
-             if (batch.getoriginalFileName().endsWith(".xml")) {
-                newfilename = ccdtotxt.TranslateCCDtoTxt(batch.getFileLocation(), batch.getoriginalFileName(), batch.getOrgId());
-                String oldFilePath = dir.getDir() + batch.getFileLocation() + newfilename;
-                oldFilePath = oldFilePath.replace("bowlink///", "");
-                actualFileName = newfilename;
-                fileWithPath = (dir.setPath(processFolderPath) + batch.getutBatchName() + ".txt");
-                moveToLoadFilesFolder(oldFilePath, fileWithPath);
-                
-            /* 
-             if the original file name is a HL7 file (".hr") then we are going to translate it to
-             a pipe-delimited text file.
-             */
-             } else if (batch.getoriginalFileName().endsWith(".hr")) {
-                newfilename = hl7toTxt.TranslateHl7toTxt(batch.getFileLocation(), batch.getoriginalFileName());
-
-                String oldFilePath = dir.getDir() + batch.getFileLocation() + newfilename;
-                oldFilePath = oldFilePath.replace("bowlink///", "");
-                actualFileName = newfilename;
-                fileWithPath = (dir.setPath(processFolderPath) + batch.getutBatchName() + ".txt");
-                moveToLoadFilesFolder(oldFilePath, fileWithPath);
-                
-            } else {
-            	/** assuming all files are Base64 encrypted until this section, where we look up
-            	 * decoding algorithm and decode **/
-            	String oldFilePath = dir.getDir() + batch.getFileLocation();
-            	oldFilePath = oldFilePath.replace("bowlink///", "");
-            	oldFilePath = oldFilePath + batch.getoriginalFileName();
-                actualFileName = batch.getoriginalFileName();
-                fileWithPath = oldFilePath;
-                // fileWithPath = (dir.setPath(processFolderPath) + batch.getutBatchName() + );
-                //newfilename = decodedFile(fileWithPath);
-                //decoded file need to be fileWithPath
-                
-                
-            }
-             
-             /** need to handle encode / decode here
-             String newFileWithPath = fileWithPath;
-         	File newFile = new File(newFileWithPath);
-         	//need to decode file, so far for UT files only
-         	if(batch.gettransportMethodId() == 3) {
-	            	File encodedFile = new File (fileWithPath);
-	            	fileSystem fileSystem = new fileSystem();
-	            	String decodedOldFile = fileSystem.decodeFileToBase64Binary(encodedFile);
-	            	String fileForPath = dir.getDir() + batch.getFileLocation();
-	            	fileForPath = fileForPath.replace("bowlink///", "");
-	            	newFileWithPath = fileForPath + batch.getutBatchName() + ".txt";
-	            	newFile = new File(newFileWithPath);
-	            	if (newFile.exists()) {
-	            		newFile.delete();
-	            	}
-	            	fileSystem.writeFile(newFileWithPath, decodedOldFile);
-         	
-         	}
-             **/
-            //at this point, hl7 and hr are in unencoded plain text
-            if (actualFileName.endsWith(".txt") || actualFileName.endsWith(".csv")) {
-            	sysError = sysError + insertLoadData(batch.getId(), batch.getDelimChar(), fileWithPath, loadTableName, batch.isContainsHeaderRow());
+            // all files are Base64 encoded at this point
+            String encodedFilePath = dir.setPath(batch.getFileLocation());
+            String encodedFileName = batch.getoriginalFileName();
+            File encodedFile = new File (encodedFilePath + encodedFileName);
+            String decodedFilePath = dir.setPath(processFolderPath);
+            String decodedFileName = batch.getutBatchName();
+            String decodedFileExt = batch.getoriginalFileName().substring(batch.getoriginalFileName().lastIndexOf("."));
+            String strDecode = "";
+            try {
+            	strDecode = filemanager.decodeFileToBase64Binary(encodedFile);
+            } catch (Exception ex) {
+            	ex.printStackTrace();
+            	strDecode = "";
+            	sysErrors = 1;
+            	processingSysErrorId = 17;
             }
             
-            //we delete the loadFile here as it is not encrypted
-            /**
-            File decodedFile = new File(fileWithPath);
-            decodedFile.delete();
-			**/
-            //3. we update batchId, loadRecordId
-            sysError = sysError + updateLoadTable(loadTableName, batch.getId());
-
-            // 4. we insert into transactionIn - status of invalid (11), batchId, loadRecordId
-            sysError = sysError + loadTransactionIn(loadTableName, batch.getId());
-
-            //5. we insert into transactionInRecords - we select transactionIn batchId, transactionInId
-            sysError = sysError + loadTransactionInRecords(batch.getId());
-
-            //6. we match loadRecordId and update transactionInRecords's F1-F255 data
-            sysError = sysError + loadTransactionInRecordsData(loadTableName);
-
-            //7. we delete loadTable
-            sysError = sysError + dropLoadTable(loadTableName);
-
-            //8. we see how if the file only has one upload type so we don't need to parse every line
-            // if we only have one, we update the entire table 
-            if (batch.getConfigId() != null && batch.getConfigId() != 0) {
-                // we update entire transactionIN with configId
-                sysError = sysError + updateConfigIdForBatch(batch.getId(), batch.getConfigId());
-            } else {
-                //1. we get all configs for user - user might not have permission to submit but someone else in org does
-
-                List<configurationMessageSpecs> configurationMessageSpecs = configurationtransportmanager.getConfigurationMessageSpecsForOrgTransport(batch.getOrgId(), batch.gettransportMethodId(), false);
-                //2. we get all rows for batch
-                List<transactionInRecords> tInRecords = getTransactionInRecordsForBatch(batch.getId());
-                if (tInRecords == null || tInRecords.size() == 0) {
-                    updateBatchStatus(batchId, 7, "endDateTime");
-                    insertProcessingError(7, null, batchId, null, null, null, null,
-                            false, false, "No valid transactions were found for batch.");
-                    return false;
-                }
-                if (configurationMessageSpecs == null || configurationMessageSpecs.size() == 0) {
-                    insertProcessingError(6, null, batchId, null, null, null, null,
-                            false, false, "No valid configurations were found for loading batch.");
-                    // update all transactions to invalid
-                    updateBatchStatus(batchId, 7, "endDateTime");
-                    updateTransactionStatus(batchId, 0, 0, 11);
-                    return false;
-                }
-
-                //3 loop through each config and mass update by config
-                for (configurationMessageSpecs cms : configurationMessageSpecs) {
-                    //we update by config
-                    if (updateConfigIdForCMS(batchId, cms) != 0) {
-                        sysError++;
-                        insertProcessingError(processingSysErrorId, null, batch.getId(), null, null, null, null,
-                                false, false, "System error while checking configuration");
-                        //system error - break
-                        break;
-                    }
-                }
-
-                // now we looped through config, we flag the invalid records.
-                sysError = flagInvalidConfig(batchId);
-                //we also need to flag and error the ones that a user is not supposed to upload for
-                sysError = flagNoPermissionConfig(batch);
-            }
-
-            //we populate transactionTranslatedIn
-            sysError = sysError + loadTransactionTranslatedIn(batchId);
-
-            //update data in transactionTranslatedIn
-            resetTransactionTranslatedIn(batchId, true);
-
-            //load targets - we need to loadTarget only if field for target is blank, otherwise we load what user sent
-            List<configurationConnection> batchTargetList = getBatchTargets(batchId, true);
-            int sourceConfigId = 0;
-            if (batchTargetList.size() <= 0) {
-                insertProcessingError(10, null, batchId, null, null, null, null, false, false, "No valid connections were found for loading batch.");
-                updateTransactionStatus(batchId, 0, 0, 13);
-                updateRecordCounts(batchId, new ArrayList<Integer>(), false, "errorRecordCount");
-                updateRecordCounts(batchId, new ArrayList<Integer>(), false, "totalRecordCount");
-                updateBatchStatus(batchId, 7, "endDateTime");
-                return false;
-            } else {
-                for (configurationConnection bt : batchTargetList) {
-                    /* populate batchUploadSummary need batchId, transactionInId,  configId, 
-                     * sourceOrgId, messageTypeId - in configurations - missing targetOrgId, 
-                     * if targetOrgCol has value, we populate - cms's target col could be 0, if spec has no target column,
-                     * we insert all connections
-                     * if targetOrgCol has value, we make sure value is value
-                     */
-                    sysErrors = sysErrors + insertBatchUploadSummary(batch, bt);
-                    if (sourceConfigId != bt.getsourceConfigId()) {
-                        if (bt.getTargetOrgCol() != 0) {
-                            sysErrors = sysErrors + rejectInvalidTargetOrg(batchId, bt);
-                        }
-                        sourceConfigId = bt.getsourceConfigId();
-                    }
-                }
-                sysErrors = sysErrors + setStatusForErrorCode(batchId, 11, 9, false);
-
-                //reject transactions with config that do not connections
-                sysErrors = sysErrors + rejectNoConnections(batch);
-                sysErrors = sysErrors + setStatusForErrorCode(batchId, 11, 10, false);
-
-                sysErrors = sysErrors + insertBatchTargets(batchId);
-
-                //handle duplicates, need to insert again and let it be its own row
-                sysErrors = sysErrors + newEntryForMultiTargets(batchId);
-
-                //we reset transactionTranslatedIn
-                resetTransactionTranslatedIn(batchId, true);
-
+            if (!strDecode.equalsIgnoreCase("")) {
+	            	//we write and decode file
+	            filemanager.writeFile((decodedFilePath + decodedFileName + decodedFileExt) , strDecode);
+	            actualFileName = (decodedFilePath + decodedFileName + decodedFileExt);
+	            /*
+	                If batch is set up for CCD input then we need to translate it
+	                to a pipe-delimited text file.
+	            */
+	            if (batch.getoriginalFileName().endsWith(".xml")) {
+	                newfilename = ccdtotxt.TranslateCCDtoTxt(decodedFilePath, decodedFileName, batch.getOrgId());
+	                actualFileName = newfilename;
+	            /* 
+	             if the original file name is a HL7 file (".hr") then we are going to translate it to
+	             a pipe-delimited text file.
+	             */
+	             } else if (batch.getoriginalFileName().endsWith(".hr")) {
+	                newfilename = hl7toTxt.TranslateHl7toTxt(decodedFilePath, decodedFileName); 
+	                actualFileName = newfilename;
+	            }  
+	                
+	            //at this point, hl7 and hr are in unencoded plain text
+	            if (actualFileName.endsWith(".txt") || actualFileName.endsWith(".csv")) {
+	            	sysError = sysError + insertLoadData(batch.getId(), batch.getDelimChar(), actualFileName, loadTableName, batch.isContainsHeaderRow());
+	            	//we delete the loadFile here as it is not encrypted
+	                //File actualFile = new File(actualFileName);
+	            	//actualFile.delete();
+	            }
+	            
+	            
+	            //3. we update batchId, loadRecordId
+	            sysError = sysError + updateLoadTable(loadTableName, batch.getId());
+	
+	            // 4. we insert into transactionIn - status of invalid (11), batchId, loadRecordId
+	            sysError = sysError + loadTransactionIn(loadTableName, batch.getId());
+	
+	            //5. we insert into transactionInRecords - we select transactionIn batchId, transactionInId
+	            sysError = sysError + loadTransactionInRecords(batch.getId());
+	
+	            //6. we match loadRecordId and update transactionInRecords's F1-F255 data
+	            sysError = sysError + loadTransactionInRecordsData(loadTableName);
+	
+	            //7. we delete loadTable
+	            sysError = sysError + dropLoadTable(loadTableName);
+	
+	            //8. we see how if the file only has one upload type so we don't need to parse every line
+	            // if we only have one, we update the entire table 
+	            if (batch.getConfigId() != null && batch.getConfigId() != 0) {
+	                // we update entire transactionIN with configId
+	                sysError = sysError + updateConfigIdForBatch(batch.getId(), batch.getConfigId());
+	            } else {
+	                //1. we get all configs for user - user might not have permission to submit but someone else in org does
+	
+	                List<configurationMessageSpecs> configurationMessageSpecs = configurationtransportmanager.getConfigurationMessageSpecsForOrgTransport(batch.getOrgId(), batch.gettransportMethodId(), false);
+	                //2. we get all rows for batch
+	                List<transactionInRecords> tInRecords = getTransactionInRecordsForBatch(batch.getId());
+	                if (tInRecords == null || tInRecords.size() == 0) {
+	                    updateBatchStatus(batchId, 7, "endDateTime");
+	                    insertProcessingError(7, null, batchId, null, null, null, null,
+	                            false, false, "No valid transactions were found for batch.");
+	                    return false;
+	                }
+	                if (configurationMessageSpecs == null || configurationMessageSpecs.size() == 0) {
+	                    insertProcessingError(6, null, batchId, null, null, null, null,
+	                            false, false, "No valid configurations were found for loading batch.");
+	                    // update all transactions to invalid
+	                    updateBatchStatus(batchId, 7, "endDateTime");
+	                    updateTransactionStatus(batchId, 0, 0, 11);
+	                    return false;
+	                }
+	
+	                //3 loop through each config and mass update by config
+	                for (configurationMessageSpecs cms : configurationMessageSpecs) {
+	                    //we update by config
+	                    if (updateConfigIdForCMS(batchId, cms) != 0) {
+	                        sysError++;
+	                        insertProcessingError(processingSysErrorId, null, batch.getId(), null, null, null, null,
+	                                false, false, "System error while checking configuration");
+	                        //system error - break
+	                        break;
+	                    }
+	                }
+	
+	                // now we looped through config, we flag the invalid records.
+	                sysError = flagInvalidConfig(batchId);
+	                //we also need to flag and error the ones that a user is not supposed to upload for
+	                sysError = flagNoPermissionConfig(batch);
+	            }
+	
+	            //we populate transactionTranslatedIn
+	            sysError = sysError + loadTransactionTranslatedIn(batchId);
+	
+	            //update data in transactionTranslatedIn
+	            resetTransactionTranslatedIn(batchId, true);
+	
+	            //load targets - we need to loadTarget only if field for target is blank, otherwise we load what user sent
+	            List<configurationConnection> batchTargetList = getBatchTargets(batchId, true);
+	            int sourceConfigId = 0;
+	            if (batchTargetList.size() <= 0) {
+	                insertProcessingError(10, null, batchId, null, null, null, null, false, false, "No valid connections were found for loading batch.");
+	                updateTransactionStatus(batchId, 0, 0, 13);
+	                updateRecordCounts(batchId, new ArrayList<Integer>(), false, "errorRecordCount");
+	                updateRecordCounts(batchId, new ArrayList<Integer>(), false, "totalRecordCount");
+	                updateBatchStatus(batchId, 7, "endDateTime");
+	                return false;
+	            } else {
+	                for (configurationConnection bt : batchTargetList) {
+	                    /* populate batchUploadSummary need batchId, transactionInId,  configId, 
+	                     * sourceOrgId, messageTypeId - in configurations - missing targetOrgId, 
+	                     * if targetOrgCol has value, we populate - cms's target col could be 0, if spec has no target column,
+	                     * we insert all connections
+	                     * if targetOrgCol has value, we make sure value is value
+	                     */
+	                    sysErrors = sysErrors + insertBatchUploadSummary(batch, bt);
+	                    if (sourceConfigId != bt.getsourceConfigId()) {
+	                        if (bt.getTargetOrgCol() != 0) {
+	                            sysErrors = sysErrors + rejectInvalidTargetOrg(batchId, bt);
+	                        }
+	                        sourceConfigId = bt.getsourceConfigId();
+	                    }
+	                }
+	                sysErrors = sysErrors + setStatusForErrorCode(batchId, 11, 9, false);
+	
+	                //reject transactions with config that do not connections
+	                sysErrors = sysErrors + rejectNoConnections(batch);
+	                sysErrors = sysErrors + setStatusForErrorCode(batchId, 11, 10, false);
+	
+	                sysErrors = sysErrors + insertBatchTargets(batchId);
+	
+	                //handle duplicates, need to insert again and let it be its own row
+	                sysErrors = sysErrors + newEntryForMultiTargets(batchId);
+	
+	                //we reset transactionTranslatedIn
+	                resetTransactionTranslatedIn(batchId, true);
+	
+	            }
             }
             if (sysErrors > 0) {
                 insertProcessingError(processingSysErrorId, null, batchId, null, null, null, null, false, false, errorMessage);
@@ -1778,7 +1757,7 @@ public class transactionInManagerImpl implements transactionInManager {
             batchStatusId = 3;
 
         } catch (Exception ex) {
-            insertProcessingError(processingSysErrorId, null, batchId, null, null, null, null, false, false, ("loadBatch error " + ex.getCause()));
+            insertProcessingError(processingSysErrorId, null, batchId, null, null, null, null, false, false, ("loadBatch error " + ex.getLocalizedMessage()));
             batchStatusId = 29;
         }
 
@@ -2651,8 +2630,8 @@ public class transactionInManagerImpl implements transactionInManager {
              Path target = newFile.toPath();
              /** we check encoding here **/
              if (encodingId < 2) { //file is not encoded
-	             String encodedOldFile = fileSystem.encodeFileToBase64Binary(file);
-	             fileSystem.writeFile(newFile.getAbsolutePath(), encodedOldFile);
+	             String encodedOldFile = filemanager.encodeFileToBase64Binary(file);
+	             filemanager.writeFile(newFile.getAbsolutePath(), encodedOldFile);
 	             Files.delete(source);
              } else {
             	 Files.move(source, target);

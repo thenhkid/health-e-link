@@ -427,7 +427,7 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
                     + " where ref_delimiters.id = configurationTransportDetails.fileDelimiter "
                     + " and configurationMessageSpecs.configId = configurationTransportDetails.configId "
                     + " and transportMethodId = :transportMethodId and configurationTransportDetails.configId in "
-                    + "(select id from configurations where orgId = :orgId);");
+                    + "(select id from configurations where orgId = :orgId and type = 1);");
             Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
                     Transformers.aliasToBean(configurationTransport.class));
             query.setParameter("orgId", orgId);
@@ -530,7 +530,8 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
             String sql = ("select distinct delimChar, containsHeaderRow , fileDelimiter, fileLocation, encodingId from configurationTransportDetails, ref_delimiters , configurationMessageSpecs "
             		+ " where ref_delimiters.id = configurationTransportDetails.fileDelimiter "
             		+ " and configurationMessageSpecs.configId = configurationTransportDetails.configId"
-            		+ " and fileext = :fileExt and transportmethodId = :transportMethodId");
+            		+ " and fileext = :fileExt and transportmethodId = :transportMethodId"
+            		+ " and configurationTransportDetails.configId in (select id from configurations where type = 1)");
             Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
                     Transformers.aliasToBean(configurationTransport.class));
             query.setParameter("fileExt", fileExt);
@@ -641,7 +642,8 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
 			String sql = ("select distinct containsHeaderRow from configurationTransportDetails, ref_delimiters , configurationMessageSpecs "
             		+ " where ref_delimiters.id = configurationTransportDetails.fileDelimiter "
             		+ " and configurationMessageSpecs.configId = configurationTransportDetails.configId"
-            		+ " and fileext = :fileExt and transportmethodId = :transportMethodId");
+            		+ " and fileext = :fileExt and transportmethodId = :transportMethodId"
+            		+ " and configurationTransportDetails.configId in (select id from configurations where type = 1)");
 			Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
                     Transformers.aliasToBean(configurationTransport.class));
 	        query.setParameter("fileExt", fileExt);
@@ -693,7 +695,8 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
 	                    + " from configurationTransportDetails, ref_delimiters  "
 	                    + " where ref_delimiters.id = configurationTransportDetails.fileDelimiter "
 	                    + " and transportMethodId = :transportMethodId "
-	                    + " and configurationTransportDetails.fileExt = :fileExt");
+	                    + " and configurationTransportDetails.fileExt = :fileExt"
+	                    + " and configurationTransportDetails.configId in (select id from configurations where type = 1)");
 	            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
 	                    Transformers.aliasToBean(configurationTransport.class));
 	            query.setParameter("transportMethodId", transportMethodId);
@@ -787,7 +790,8 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
 	public List <configurationTransport>  getTransportEncoding(String fileExt, Integer transportMethodId) {
 		try {
 			String sql = ("select distinct encodingId from configurationTransportDetails "
-            		+ " where fileext = :fileExt and transportmethodId = :transportMethodId");
+            		+ " where fileext = :fileExt and transportmethodId = :transportMethodId"
+            		+ " and configurationTransportDetails.configId in (select id from configurations where type = 1)");
 			Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
                     Transformers.aliasToBean(configurationTransport.class));
 	        query.setParameter("fileExt", fileExt);

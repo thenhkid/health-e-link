@@ -31,17 +31,15 @@ import com.ut.dph.model.transactionTarget;
 import com.ut.dph.reference.fileSystem;
 import com.ut.dph.service.configurationManager;
 import com.ut.dph.service.configurationTransportManager;
+import com.ut.dph.service.fileManager;
 import com.ut.dph.service.messageTypeManager;
 import com.ut.dph.service.organizationManager;
 import com.ut.dph.service.sysAdminManager;
 import com.ut.dph.service.transactionInManager;
 import com.ut.dph.service.transactionOutManager;
 import com.ut.dph.service.userManager;
-
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -106,6 +104,9 @@ public class adminProcessingActivity {
     @Autowired
     private userManager usermanager;
 
+    @Autowired
+    private fileManager filemanager;
+    
     /**
      * The private maxResults variable will hold the number of results to show per list page.
      */
@@ -1571,8 +1572,8 @@ public class adminProcessingActivity {
                         //Path source = oldFile.toPath();
                         //Path target = newFile.toPath();
                         
-                        String decodedOldFile = fileSystem.decodeFileToBase64Binary(oldFile);
-                        fileSystem.writeFile(newFile.getAbsolutePath(), decodedOldFile);
+                        String decodedOldFile = filemanager.decodeFileToBase64Binary(oldFile);
+                        filemanager.writeFile(newFile.getAbsolutePath(), decodedOldFile);
                         
                         //Files.copy(source, target);
                 		

@@ -220,5 +220,7 @@ CREATE TABLE `universalTranslator`.`configurationPostProcessing` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION);
 
+/** grace 05222014 10:49PM **/
+INSERT INTO `universaltranslator`.`lu_errorcodes` (`id`, `displayText`, `description`, `isCustom`, `status`) VALUES ('17', 'File Did Not Decode Correctly', 'System was not able to decode file', 0, 1);
 
 

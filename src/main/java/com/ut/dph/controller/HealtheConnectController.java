@@ -24,16 +24,21 @@ import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionInRecords;
 import com.ut.dph.model.transactionRecords;
 import com.ut.dph.model.transactionTarget;
+import com.ut.dph.reference.fileSystem;
 import com.ut.dph.service.configurationManager;
 import com.ut.dph.service.configurationTransportManager;
+import com.ut.dph.service.fileManager;
 import com.ut.dph.service.messageTypeManager;
 import com.ut.dph.service.organizationManager;
 import com.ut.dph.service.sysAdminManager;
 import com.ut.dph.service.transactionInManager;
 import com.ut.dph.service.transactionOutManager;
 import com.ut.dph.service.userManager;
-
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -48,11 +53,9 @@ import java.util.Map;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -102,6 +105,8 @@ public class HealtheConnectController {
     @Autowired
     private messageTypeDAO messageTypeDAO;
 
+    @Autowired
+    private fileManager filemanager;
     /**
      * The private maxResults variable will hold the number of results to show per list page.
      */
@@ -116,6 +121,7 @@ public class HealtheConnectController {
     //final status Ids
     private List<Integer> finalStatusIds = Arrays.asList(11, 12, 13, 16);
 
+    private String archivePath = "/bowlink/archives/";
     /**
      * The '/upload' request will serve up the Health-e-Connect upload page.
      *
@@ -235,9 +241,8 @@ public class HealtheConnectController {
 
         /* Get the organization details for the source (Sender) organization */
         User userInfo = (User) session.getAttribute("userDetails");
-        Organization sendingOrgDetails = organizationmanager.getOrganizationById(userInfo.getOrgId());
-
-        configuration configDetails = null;
+       
+       configuration configDetails = null;
         configurationTransport transportDetails = null;
         configurationMessageSpecs messageSpecs = null;
         String delimChar = null;
@@ -252,7 +257,7 @@ public class HealtheConnectController {
             /* Need to get list of available configurations for the user */
             List<configuration> configurations = configurationManager.getActiveConfigurationsByUserId(userInfo.getId(), 1);
 
-            /* Pull the first configujration in the list */
+            /* Pull the first configuration in the list */
             configId = configurations.get(0).getId();
 
             /* Need to get the details of the configuration */
@@ -275,39 +280,50 @@ public class HealtheConnectController {
 
         try {
         	
-            /* Upload the file */
-            Map<String, String> batchResults =  null;
-            
-            /* check file to see if we need to encode */
-            if (transportDetails.getEncodingId() == 1) {
-            	// user is submitting the file without encoding
-            	batchResults = transactionInManager.uploadBatchFile(configId, uploadedFile);
-            	/* we encode and delete old file */
-            	//a. we get file path from transport details, new file name is batchResults.get("fileName")
-            	
-            	//b. we set source / target
-            	
-            	//c. we encode and write
-            	/**
-            	 * java.nio.file.Files.move(Path source, Path target, CopyOption... options) 
-            	 * with CopyOptions "REPLACE_EXISTING" and "ATOMIC_MOVE".
-            	 * **/
-            	
-            	
-            } else  {
-            	// we handle encoding files here
-            	batchResults = transactionInManager.uploadEncodedBatchFile(transportDetails, uploadedFile);
-            }
-            
-            
-            
-            /* Need to add the file to the batchUploads table */
+        	/* Need to add the file to the batchUploads table */
             /* Create the batch name (TransportMethodId+OrgId+MessageTypeId+Date/Time/Seconds) */
             DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmssS");
             Date date = new Date();
             //adding transport method id to UT batch name
             String batchName = new StringBuilder().append("1").append(userInfo.getOrgId()).append(configDetails.getMessageTypeId()).append(dateFormat.format(date)).toString();
 
+            
+            /* Upload the file */
+            Map<String, String> batchResults =  null;
+            
+            fileSystem dir = new fileSystem();
+            dir.setDirByName("/");
+            
+            /* check file to see if we need to encode */
+            if (transportDetails.getEncodingId() == 1) {
+            	// user is submitting the file without encoding
+            	batchResults = transactionInManager.uploadBatchFile(configId, uploadedFile);            	 
+            } else  {
+            	// we handle encoded files here
+            	batchResults = transactionInManager.uploadEncodedBatchFile(transportDetails, uploadedFile);
+            	// no need to move file as it is already encoded and in the correct folder
+            	//we always archive a copy of what they uploaded
+            }
+            
+            //we handle the file here
+            String oldFilePath = dir.getDir() + transportDetails.getfileLocation();;
+            oldFilePath = oldFilePath.replace("bowlink///", "");
+            File oldFile = new File(oldFilePath + batchResults.get("fileName"));
+            Path source = oldFile.toPath();
+        	
+            //we set archive path
+            File archiveFile = new File(dir.setPath(archivePath) + batchName + batchResults.get("fileName").substring(batchResults.get("fileName").lastIndexOf(".")));
+            Path archive = archiveFile.toPath();
+            
+            if (transportDetails.getEncodingId() == 1) {
+            	String strEncodedFile = filemanager.encodeFileToBase64Binary(oldFile);
+            	Files.move(source, archive, REPLACE_EXISTING);
+            	 //we replace file with encoded
+                filemanager.writeFile(oldFile.getAbsolutePath(), strEncodedFile);
+            } else { // already encoded
+            	Files.copy(source, archive);
+            }
+            
             /* Submit a new batch */
             batchUploads batchUpload = new batchUploads();
             batchUpload.setOrgId(userInfo.getOrgId());
