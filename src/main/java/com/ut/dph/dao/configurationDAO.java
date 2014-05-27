@@ -49,7 +49,7 @@ public interface configurationDAO {
   
   List<configurationDataTranslations> getDataTranslations(int configId);
   
-  List<configurationDataTranslations> getDataTranslationsWithFieldNo(int configId);
+  List<configurationDataTranslations> getDataTranslationsWithFieldNo(int configId, int categoryId);
   
   String getFieldName(int fieldId);
   

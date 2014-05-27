@@ -458,8 +458,8 @@ public class configurationManagerImpl implements configurationManager {
 
     @Override
     public List<configurationDataTranslations> getDataTranslationsWithFieldNo(
-            int configId) {
-        return configurationDAO.getDataTranslationsWithFieldNo(configId);
+            int configId, int categoryId) {
+        return configurationDAO.getDataTranslationsWithFieldNo(configId, categoryId);
     }
 
     @Override

@@ -757,16 +757,16 @@ public class configurationDAOImpl implements configurationDAO {
     @Transactional
     @SuppressWarnings("unchecked")
     public List<configurationDataTranslations> getDataTranslationsWithFieldNo(
-            int configId) {
+            int configId, int categoryId) {
         Query query = sessionFactory
                 .getCurrentSession()
                 .createSQLQuery(
                         "select configurationDataTranslations.*, fieldNo from configurationDataTranslations, configurationFormFields"
                         + " where configurationDataTranslations.fieldId = configurationFormFields.id "
-                        + " and configurationDataTranslations.configId = :configId order by processorder asc;")
+                        + " and configurationDataTranslations.configId = :configId and categoryId = :categoryId order by processorder asc;")
                 .setResultTransformer(
                         Transformers.aliasToBean(configurationDataTranslations.class))
-                .setParameter("configId", configId);
+                .setParameter("categoryId", categoryId).setParameter("configId", configId);
 
         List<configurationDataTranslations> cdtList = query.list();
 

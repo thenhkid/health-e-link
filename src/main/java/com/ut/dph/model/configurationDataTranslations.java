@@ -64,6 +64,9 @@ public class configurationDataTranslations {
 
     @Column(name = "PROCESSORDER", nullable = false)
     private int processOrder;
+    
+    @Column(name = "CategoryId", nullable = false)
+    private int categoryId;
 
     public int getId() {
         return id;
@@ -184,5 +187,13 @@ public class configurationDataTranslations {
     public void setFieldNo(int fieldNo) {
         this.fieldNo = fieldNo;
     }
+
+	public int getCategoryId() {
+		return categoryId;
+	}
+
+	public void setCategoryId(int categoryId) {
+		this.categoryId = categoryId;
+	}
 
 }
