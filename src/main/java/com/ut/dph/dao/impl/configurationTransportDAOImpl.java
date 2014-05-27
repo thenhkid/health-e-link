@@ -807,5 +807,27 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
 	        return null;
 		}
 	}
+
+	@Override
+	@Transactional
+	public Integer getOrgIdForRhapsodyPath(
+			configurationRhapsodyFields rhapsodyInfo) throws Exception {
+		try {
+			String sql = ("select distinct orgId from configurations where id in (select configId from configurationTransportDetails where id in (select transportId from"
+					+ " rel_TransportRhapsodyDetails where method = :method and directory = :directory));");
+	        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+	        query.setParameter("method", rhapsodyInfo.getMethod());
+	        query.setParameter("directory", rhapsodyInfo.getDirectory());
+	
+	        Integer orgId  = (Integer) query.list().get(0);
+	
+	        return orgId;
+
+		} catch (Exception ex) {
+	        System.err.println("getOrgIdForRhapsodyPath  " + ex.getCause());
+	        ex.printStackTrace();
+	        return null;
+		}
+	}
 	
 }

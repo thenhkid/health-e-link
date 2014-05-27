@@ -5,7 +5,6 @@
  */
 package com.ut.dph.service.impl;
 
-import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import com.ut.dph.dao.messageTypeDAO;
 import com.ut.dph.dao.transactionInDAO;
 import com.ut.dph.dao.transactionOutDAO;
@@ -24,6 +23,7 @@ import com.ut.dph.model.configurationDataTranslations;
 import com.ut.dph.model.configurationFTPFields;
 import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.configurationMessageSpecs;
+import com.ut.dph.model.configurationRhapsodyFields;
 import com.ut.dph.model.configurationTransport;
 import com.ut.dph.model.fieldSelectOptions;
 import com.ut.dph.model.transactionAttachment;
@@ -131,7 +131,9 @@ public class transactionInManagerImpl implements transactionInManager {
 
     //final status Ids
     private List<Integer> finalStatusIds = Arrays.asList(11, 12, 13, 16);
-
+    
+    private String archivePath = "/bowlink/archives/";
+    
     @Override
     @Transactional
     public String getFieldValue(String tableName, String tableCol, String idCol, int idValue) {
@@ -419,117 +421,7 @@ public class transactionInManagerImpl implements transactionInManager {
         }
     }
 
-    /**
-     * The 'uploadBatchFile' function will take in the file and orgName and upload the file to the appropriate file on the file system. The function will run the file through various validations. If a single validation fails the batch will be put in a error validation status and the file will be removed from the system. The user will receive an error message on the screen letting them know which validations have failed and be asked to upload a new file.
-     *
-     * The following validations will be taken place. - File is not empty - Proper file type (as determined in the configuration set up) - Proper delimiter (as determined in the configuration set up) - Does not exceed file size (as determined in the configuration set up)
-     *
-     * @param configId The configuration Id to get some validation parameters
-     * @param fileUpload The file to be uploaded
-     *
-     */
-    @Override
-    public Map<String, String> uploadBatchFile(int configId, MultipartFile fileUpload) throws Exception {
-    	
-    	configurationTransport transportDetails = configurationtransportmanager.getTransportDetails(configId);
-
-        MultipartFile file = fileUpload;
-        String fileName = file.getOriginalFilename();
-
-        long fileSize = file.getSize();
-        long fileSizeMB = (fileSize / (1024L * 1024L));
-
-        /* 
-         1 = File is empty
-         2 = Too large
-         3 = Wrong file type
-         4 = Wrong delimiter
-         */
-        Map<String, String> batchFileResults = new HashMap<String, String>();
-
-        /* Make sure the file is not empty : ERROR CODE 1 */
-        if (fileSize == 0) {
-            batchFileResults.put("emptyFile", "1");
-        }
-
-        /* Make sure file is the correct size : ERROR CODE 2 */
-        double maxFileSize = (double) transportDetails.getmaxFileSize();
-
-        if (fileSizeMB > maxFileSize) {
-            batchFileResults.put("wrongSize", "2");
-        }
-
-        InputStream inputStream;
-        OutputStream outputStream;
-
-        try {
-            inputStream = file.getInputStream();
-            File newFile = null;
-
-            //Set the directory to save the brochures to
-            fileSystem dir = new fileSystem();
-
-            String filelocation = transportDetails.getfileLocation();
-            filelocation = filelocation.replace("/bowlink/", "");
-            dir.setDirByName(filelocation);
-
-            newFile = new File(dir.getDir() + fileName);
-
-            if (newFile.exists()) {
-                int i = 1;
-                while (newFile.exists()) {
-                    int iDot = fileName.lastIndexOf(".");
-                    newFile = new File(dir.getDir() + fileName.substring(0, iDot) + "_(" + ++i + ")" + fileName.substring(iDot));
-                }
-                fileName = newFile.getName();
-                newFile.createNewFile();
-            } else {
-                newFile.createNewFile();
-            }
-
-            batchFileResults.put("fileName", fileName);
-
-            /* Make sure file is the correct file type : ERROR CODE 3 */
-            String ext = FilenameUtils.getExtension(dir.getDir() + fileName);
-
-            String fileType = (String) configurationManager.getFileTypesById(transportDetails.getfileType());
-
-            if ("hl7".equals(fileType)) {
-                fileType = "hr";
-            }
-           
-            if (ext == null ? fileType != null : !ext.equals(transportDetails.getfileExt())) {
-                batchFileResults.put("wrongFileType", "3");
-            }
-
-            outputStream = new FileOutputStream(newFile);
-            int read = 0;
-            byte[] bytes = new byte[1024];
-
-            while ((read = inputStream.read(bytes)) != -1) {
-                outputStream.write(bytes, 0, read);
-            }
-            outputStream.close();
-
-            /* Make sure the file has the correct delimiter : ERROR CODE 5 */
-            String delimChar = (String) messageTypeDAO.getDelimiterChar(transportDetails.getfileDelimiter());
-
-            //Check to make sure the file contains the selected delimiter
-            //Set the directory that holds the crosswalk files
-            int delimCount = (Integer) dir.checkFileDelimiter(dir, fileName, delimChar);
-
-            if (delimCount < 3 && !"xml".equals(transportDetails.getfileExt())) {
-                batchFileResults.put("wrongDelim", "4");
-            }
-
-            //Save the attachment
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return batchFileResults;
-
-    }
+    
 
     @Override
     public List<Integer> getBlankTransIds(ConfigForInsert config) {
@@ -1565,7 +1457,7 @@ public class transactionInManagerImpl implements transactionInManager {
             String decodedFilePath = dir.setPath(processFolderPath);
             String decodedFileName = batch.getutBatchName();
             String decodedFileExt = batch.getoriginalFileName().substring(batch.getoriginalFileName().lastIndexOf("."));
-            String strDecode = "";
+            String strDecode = "";           
             try {
             	strDecode = filemanager.decodeFileToBase64Binary(encodedFile);
             } catch (Exception ex) {
@@ -1576,24 +1468,23 @@ public class transactionInManagerImpl implements transactionInManager {
             }
             
             if (!strDecode.equalsIgnoreCase("")) {
-	            //we write and decode file
+	            	//we write and decode file
 	            filemanager.writeFile((decodedFilePath + decodedFileName + decodedFileExt) , strDecode);
 	            actualFileName = (decodedFilePath + decodedFileName + decodedFileExt);
 	            /*
 	                If batch is set up for CCD input then we need to translate it
 	                to a pipe-delimited text file.
 	            */
-                   
 	            if (batch.getoriginalFileName().endsWith(".xml")) {
 	                newfilename = ccdtotxt.TranslateCCDtoTxt(decodedFilePath, decodedFileName, batch.getOrgId());
-	                actualFileName = (decodedFilePath + newfilename);
+	                actualFileName = newfilename;
 	            /* 
 	             if the original file name is a HL7 file (".hr") then we are going to translate it to
 	             a pipe-delimited text file.
 	             */
 	             } else if (batch.getoriginalFileName().endsWith(".hr")) {
 	                newfilename = hl7toTxt.TranslateHl7toTxt(decodedFilePath, decodedFileName); 
-	                actualFileName = (decodedFilePath + newfilename);
+	                actualFileName = newfilename;
 	            }  
 	                
 	            //at this point, hl7 and hr are in unencoded plain text
@@ -2625,10 +2516,16 @@ public class transactionInManagerImpl implements transactionInManager {
 			 }
 			 
 			 
+			 //we encoded user's file if it is not
 			 File newFile = new File(outPath + newFileName);
 			 // now we move file
              Path source = file.toPath();
              Path target = newFile.toPath();
+             
+             File archiveFile = new File(fileSystem.setPath(archivePath) + batchName + newFileName.substring(newFileName.lastIndexOf(".")));
+             Path archive = archiveFile.toPath();
+             //we keep original file in archive folder
+             Files.copy(source, archive);
              /** we check encoding here **/
              if (encodingId < 2) { //file is not encoded
 	             String encodedOldFile = filemanager.encodeFileToBase64Binary(file);
@@ -2702,9 +2599,61 @@ public class transactionInManagerImpl implements transactionInManager {
         return transactionInDAO.getPatientTransactionDetails(transactionInId);
     }
     
-    
-    /**
-     * The 'uploadEncodedBatchFile' function will take in the file and orgName and upload the file to the appropriate file on the file system. The function will run the file through various validations. If a single validation fails the batch will be put in a error validation status and the file will be removed from the system. The user will receive an error message on the screen letting them know which validations have failed and be asked to upload a new file.
+    @Override
+	public String copyUplaodedPath(configurationTransport transportDetails, MultipartFile fileUpload) {
+	    	
+			//save the file as is to input folder
+			MultipartFile file = fileUpload;
+	        String fileName = file.getOriginalFilename();
+
+	        InputStream inputStream;
+	        OutputStream outputStream;
+
+	        try {
+	            inputStream = file.getInputStream();
+	            File newFile = null;
+
+	            //Set the directory to save the brochures to
+	            fileSystem dir = new fileSystem();
+
+	            String filelocation = transportDetails.getfileLocation();
+	            filelocation = filelocation.replace("/bowlink/", "");
+	            dir.setDirByName(filelocation);
+
+	            newFile = new File(dir.getDir() + fileName);
+
+	            if (newFile.exists()) {
+	                int i = 1;
+	                while (newFile.exists()) {
+	                    int iDot = fileName.lastIndexOf(".");
+	                    newFile = new File(dir.getDir() + fileName.substring(0, iDot) + "_(" + ++i + ")" + fileName.substring(iDot));
+	                }
+	                fileName = newFile.getName();
+	                newFile.createNewFile();
+	            } else {
+	                newFile.createNewFile();
+	            }
+
+	            //Save the attachment
+	            outputStream = new FileOutputStream(newFile);
+	            int read = 0;
+	            byte[] bytes = new byte[1024];
+
+	            while ((read = inputStream.read(bytes)) != -1) {
+	                outputStream.write(bytes, 0, read);
+	            }
+	            outputStream.close();
+
+	           return fileName;	          
+	        } catch (IOException e) {
+	        	System.err.println("copyUplaodedPath " + e.getCause());
+	            e.printStackTrace();
+	            return null;
+	        }
+		}
+	
+	/**
+     * The 'chkUploadBatchFile' function will take in the file and orgName and upload the file to the appropriate file on the file system. The function will run the file through various validations. If a single validation fails the batch will be put in a error validation status and the file will be removed from the system. The user will receive an error message on the screen letting them know which validations have failed and be asked to upload a new file.
      *
      * The following validations will be taken place. - File is not empty - Proper file type (as determined in the configuration set up) - Proper delimiter (as determined in the configuration set up) - Does not exceed file size (as determined in the configuration set up)
      *
@@ -2713,125 +2662,124 @@ public class transactionInManagerImpl implements transactionInManager {
      *
      */
     @Override
-    public Map<String, String> uploadEncodedBatchFile(configurationTransport transportDetails, MultipartFile fileUpload) throws Exception {
+    public Map<String, String> chkUploadBatchFile(configurationTransport transportDetails, File uploadedFile) throws Exception {
     	
-    	//1. decode file
+    	Map<String, String> batchFileResults = new HashMap<String, String>();
     	
-    	//2. check delimiters etc
-    	
-    	//3. save input file to input folder
-    	
-        MultipartFile file = fileUpload;
-        String fileName = file.getOriginalFilename();
+    	try {
+	    	long fileSize = uploadedFile.length();
+	        long fileSizeMB = (fileSize / (1024L * 1024L));
+	
+	        /* 
+	         1 = File is empty
+	         2 = Too large
+	         3 = Wrong file type
+	         4 = Wrong delimiter
+	         */
+	       
+	        /* Make sure the file is not empty : ERROR CODE 1 */
+	        if (fileSize == 0) {
+	            batchFileResults.put("emptyFile", "1");
+	        }
+	
+	        /* Make sure file is the correct size : ERROR CODE 2 */
+	        double maxFileSize = (double) transportDetails.getmaxFileSize();
 
-        long fileSize = file.getSize();
-        long fileSizeMB = (fileSize / (1024L * 1024L));
-
-        /* 
-         1 = File is empty
-         2 = Too large
-         3 = Wrong file type
-         4 = Wrong delimiter
-         */
-        Map<String, String> batchFileResults = new HashMap<String, String>();
-
-        /* Make sure the file is not empty : ERROR CODE 1 */
-        if (fileSize == 0) {
-            batchFileResults.put("emptyFile", "1");
-        }
-
-        /* Make sure file is the correct size : ERROR CODE 2 */
-        double maxFileSize = (double) transportDetails.getmaxFileSize();
-
-        if (fileSizeMB > maxFileSize) {
-            batchFileResults.put("wrongSize", "2");
-        }
-
-        InputStream inputStream;
-        OutputStream outputStream;
-
-        try {
-            inputStream = file.getInputStream();
-            File newFile = null;
-
-            //Set the directory to save the brochures to
-            fileSystem dir = new fileSystem();
-
-            String filelocation = transportDetails.getfileLocation();
-            filelocation = filelocation.replace("/bowlink/", "");
-            dir.setDirByName(filelocation);
-
-            newFile = new File(dir.getDir() + fileName);
-
-            if (newFile.exists()) {
-                int i = 1;
-                while (newFile.exists()) {
-                    int iDot = fileName.lastIndexOf(".");
-                    newFile = new File(dir.getDir() + fileName.substring(0, iDot) + "_(" + ++i + ")" + fileName.substring(iDot));
-                }
-                fileName = newFile.getName();
-                newFile.createNewFile();
-            } else {
-                newFile.createNewFile();
-            }
-
-            batchFileResults.put("fileName", fileName);
-
-            /* Make sure file is the correct file type : ERROR CODE 3 */
-            String ext = FilenameUtils.getExtension(dir.getDir() + fileName);
-
-            String fileType = (String) configurationManager.getFileTypesById(transportDetails.getfileType());
-
-            if ("hl7".equals(fileType)) {
-                fileType = "hr";
-            }
-
-            if (ext == null ? fileType != null : !ext.equals(fileType)) {
-                batchFileResults.put("wrongFileType", "3");
-            }
-
-            outputStream = new FileOutputStream(newFile);
-            int read = 0;
-            byte[] bytes = new byte[1024];
-
-            while ((read = inputStream.read(bytes)) != -1) {
-                outputStream.write(bytes, 0, read);
-            }
-            outputStream.close();
-
-            /* Make sure the file has the correct delimiter : ERROR CODE 5 */
-            String delimChar = (String) messageTypeDAO.getDelimiterChar(transportDetails.getfileDelimiter());
-
-            //Check to make sure the file contains the selected delimiter
-            //Set the directory that holds the crosswalk files
-            int delimCount = (Integer) dir.checkFileDelimiter(dir, fileName, delimChar);
-
-            if (delimCount < 3) {
-                batchFileResults.put("wrongDelim", "4");
-            }
-
-            //Save the attachment
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+	        if (fileSizeMB > maxFileSize) {
+	            batchFileResults.put("wrongSize", "2");
+	        }
+	
+	        	String fileName = uploadedFile.getName();
+	        
+	
+	            batchFileResults.put("fileName", fileName);
+	
+	            /* Make sure file is the correct file type : ERROR CODE 3 */
+	            String ext = FilenameUtils.getExtension(uploadedFile.getAbsolutePath());
+	
+	            String fileType = (String) configurationManager.getFileTypesById(transportDetails.getfileType());
+	
+	            if ("hl7".equals(fileType)) {
+	                fileType = "hr";
+	            }
+	
+	            if (ext == null ? fileType != null : !ext.equals(transportDetails.getfileExt())) {
+	                batchFileResults.put("wrongFileType", "3");
+	            }
+	
+	            fileSystem dir = new fileSystem();
+	            	            
+	            /* Make sure the file has the correct delimiter : ERROR CODE 5 */
+	            String delimChar = (String) messageTypeDAO.getDelimiterChar(transportDetails.getfileDelimiter());
+	
+	            //Check to make sure the file contains the selected delimiter
+	            //Set the directory that holds the crosswalk files
+	            int delimCount = (Integer) dir.checkFileDelimiter(uploadedFile, delimChar);
+	
+	            if (delimCount < 3 && !"xml".equals(transportDetails.getfileExt())) {
+	                batchFileResults.put("wrongDelim", "4");
+	            }
+	
+	            //Save the attachment
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
 
         return batchFileResults;
 
     }
 
 	@Override
-	public void moveToLoadFilesFolder(String oldFilePath, String newFilePath)
-			throws Exception {
-		try {
-			File oldFile = new File(oldFilePath);
-            File processFile = new File(newFilePath);
-    		Path source = oldFile.toPath();
-            Path target = processFile.toPath();
-            Files.move(source, target, REPLACE_EXISTING);
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			System.err.println("moveToLoadFilesFolder " + ex.getCause());
-		}
+	public Integer moveRhapsodyFiles() {
+		Integer sysErrors = 0;
+
+        try {
+            //1 . get distinct ftp paths
+            List<configurationRhapsodyFields> inputPaths = getRhapsodyInfoForJob(1);
+
+            //loop ftp paths and check
+            for (configurationRhapsodyFields rhapsodyInfo : inputPaths) {
+                //we insert job so if anything goes wrong or the scheduler overlaps, we won't be checking the same folder over and over
+                MoveFilesLog moveJob = new MoveFilesLog();
+                moveJob.setStatusId(1);
+                moveJob.setFolderPath(rhapsodyInfo.getDirectory());
+                moveJob.setTransportMethodId(5);
+                moveJob.setMethod(1);
+                Integer lastId = insertSFTPRun(moveJob);
+                moveJob.setId(lastId);
+
+                // check if directory exists, if not create
+                fileSystem fileSystem = new fileSystem();
+                String inPath = fileSystem.setPath(rhapsodyInfo.getDirectory());
+                File f = new File(inPath);
+                if (!f.exists()) {
+                    f.mkdirs();
+                }
+              //we look up org for this path
+        		Integer orgId = configurationtransportmanager.getOrgIdForRhapsodyPath(rhapsodyInfo);
+        		
+                sysErrors = sysErrors + moveFilesByPath(rhapsodyInfo.getDirectory(), 5, orgId, rhapsodyInfo.getTransportId());
+
+                if (sysErrors == 0) {
+                	moveJob.setStatusId(2);
+                	moveJob.setEndDateTime(new Date());
+                    updateSFTPRun(moveJob);
+                }
+            }
+
+			// if there are no errors, we release the folder path
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.err.println("moveRhapsodyFiles " + ex.getCause());
+            return 1;
+        }
+        return sysErrors;
 	}
 
+	/** this method grabs all distinct ftp path that need to be check for files **/
+    @Override
+    public List<configurationRhapsodyFields> getRhapsodyInfoForJob(Integer method) {
+        return transactionInDAO.getRhapsodyInfoForJob(method);
+    }
+	
 }

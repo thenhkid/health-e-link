@@ -19,6 +19,7 @@ import com.ut.dph.model.configurationDataTranslations;
 import com.ut.dph.model.configurationFTPFields;
 import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.configurationMessageSpecs;
+import com.ut.dph.model.configurationRhapsodyFields;
 import com.ut.dph.model.configurationTransport;
 import com.ut.dph.model.fieldSelectOptions;
 import com.ut.dph.model.transactionAttachment;
@@ -304,4 +305,6 @@ public interface transactionInDAO {
     List<batchUploadSummary> getBatchesToSentOrg(int srcorgId, int tgtOrgId, int messageTypeId) throws Exception;
     
     messagePatients getPatientTransactionDetails(int transactionInId);
+    
+    List <configurationRhapsodyFields> getRhapsodyInfoForJob (Integer method);
 }

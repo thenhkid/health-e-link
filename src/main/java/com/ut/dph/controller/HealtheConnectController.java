@@ -122,6 +122,9 @@ public class HealtheConnectController {
     private List<Integer> finalStatusIds = Arrays.asList(11, 12, 13, 16);
 
     private String archivePath = "/bowlink/archives/";
+    
+    private String processPath = "/bowlink/loadFiles/";
+ 
     /**
      * The '/upload' request will serve up the Health-e-Connect upload page.
      *
@@ -294,23 +297,31 @@ public class HealtheConnectController {
             fileSystem dir = new fileSystem();
             dir.setDirByName("/");
             
-            /* check file to see if we need to encode */
-            if (transportDetails.getEncodingId() == 1) {
-            	// user is submitting the file without encoding
-            	batchResults = transactionInManager.uploadBatchFile(configId, uploadedFile);            	 
-            } else  {
-            	// we handle encoded files here
-            	batchResults = transactionInManager.uploadEncodedBatchFile(transportDetails, uploadedFile);
-            	// no need to move file as it is already encoded and in the correct folder
-            	//we always archive a copy of what they uploaded
-            }
-            
-            //we handle the file here
-            String oldFilePath = dir.getDir() + transportDetails.getfileLocation();;
+            //need to write the file first, we will write it to our process folder
+            String uploadedFileName = transactionInManager.copyUplaodedPath(transportDetails, uploadedFile);
+            String oldFilePath = dir.getDir() + transportDetails.getfileLocation();
             oldFilePath = oldFilePath.replace("bowlink///", "");
-            File oldFile = new File(oldFilePath + batchResults.get("fileName"));
+            File oldFile = new File(oldFilePath + uploadedFileName);
             Path source = oldFile.toPath();
         	
+            String processFilePath = dir.setPath(processPath);
+            String strProcessFile =  processFilePath + uploadedFileName;
+            File processFile = new File(strProcessFile);
+            
+            //right now we only support id 2, Base64
+            if (transportDetails.getEncodingId() == 2) {
+            	String strDecode = filemanager.decodeFileToBase64Binary(oldFile);
+            	filemanager.writeFile((processFilePath+ uploadedFileName), strDecode);  	
+            } else {
+            	processFile = oldFile;
+            }
+            //we decode file and pass it into uploadedFile
+            batchResults = transactionInManager.chkUploadBatchFile(transportDetails, processFile); 
+            //we delete the temp file here
+            if (transportDetails.getEncodingId() == 2) {
+            	processFile.delete();
+            }
+            
             //we set archive path
             File archiveFile = new File(dir.setPath(archivePath) + batchName + batchResults.get("fileName").substring(batchResults.get("fileName").lastIndexOf(".")));
             Path archive = archiveFile.toPath();

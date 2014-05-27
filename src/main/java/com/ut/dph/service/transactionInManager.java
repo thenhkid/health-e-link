@@ -20,6 +20,7 @@ import com.ut.dph.model.configurationDataTranslations;
 import com.ut.dph.model.configurationFTPFields;
 import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.configurationMessageSpecs;
+import com.ut.dph.model.configurationRhapsodyFields;
 import com.ut.dph.model.configurationTransport;
 import com.ut.dph.model.fieldSelectOptions;
 import com.ut.dph.model.transactionAttachment;
@@ -34,6 +35,7 @@ import com.ut.dph.model.custom.TransErrorDetailDisplay;
 import com.ut.dph.model.messagePatients;
 import com.ut.dph.model.systemSummary;
 
+import java.io.File;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -115,8 +117,6 @@ public interface transactionInManager {
     List <Integer> getTransWithMultiValues (ConfigForInsert config);
 
     Integer clearMessageTables(int batchId);
-    
-     Map<String,String> uploadBatchFile(int configId, MultipartFile fileUpload) throws Exception;
     
     List <Integer> getBlankTransIds (ConfigForInsert config);
     
@@ -372,7 +372,12 @@ public interface transactionInManager {
     
     messagePatients getPatientTransactionDetails(int transactionInId);
     
-    Map<String,String> uploadEncodedBatchFile(configurationTransport transportDetails, MultipartFile fileUpload) throws Exception;
+    String copyUplaodedPath(configurationTransport transportDetails,MultipartFile fileUpload);
+	
+	Map<String, String> chkUploadBatchFile(configurationTransport transportDetails, File uploadedFile) throws Exception;
+	
+	Integer moveRhapsodyFiles();
+	
+    List <configurationRhapsodyFields> getRhapsodyInfoForJob (Integer method);
     
-    void moveToLoadFilesFolder (String oldFilePath, String newFilePath) throws Exception;
 }

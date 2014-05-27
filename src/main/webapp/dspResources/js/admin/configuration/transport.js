@@ -16,7 +16,7 @@ require(['./main'], function () {
         }
         
         if(selMethodId === "5") {
-            $('#rhapsodyDiv').show();
+        	$('#rhapsodyDiv').show();
         }
 
         if(selMethodId !== "2" && selMethodId !== "") {
@@ -43,8 +43,8 @@ require(['./main'], function () {
                $('#additionalFTPDiv').show();
            }
           
-           if(selMethodId === "5") {
-               $('#rhapsodyDiv').show();
+           if(methodId === "5") {
+        	   $('#rhapsodyDiv').show();
            }
            
            if(methodId !== "2" && methodId !== "") {

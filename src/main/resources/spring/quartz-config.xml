@@ -95,6 +95,24 @@
             </cron>
         </trigger>
     </schedule>
-   
+
+    <schedule>
+        <job>
+            <name>MoveRhapsodyFiles</name>
+            <group>processGroup</group>
+            <description>This process will run every 10 mins starting at 8 mins of the hour to check if any Rhapsody file will need to be moved and logged</description>
+            <job-class>com.ut.dph.jobs.MoveRhapsodyFiles</job-class>
+        </job>
+ 
+        <trigger>
+            <cron>
+                <name>moveRhapTrigger</name>
+                <job-name>MoveRhapsodyFiles</job-name>
+                <job-group>processGroup</job-group>
+                <cron-expression>0 8/10 * * * ?</cron-expression>
+            </cron>
+        </trigger>
+    </schedule>
+    
     
 </job-scheduling-data>

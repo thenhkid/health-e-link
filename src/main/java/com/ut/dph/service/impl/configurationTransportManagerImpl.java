@@ -294,4 +294,10 @@ public class configurationTransportManagerImpl implements configurationTransport
 	public List <configurationTransport>  getTransportEncoding(String fileExt, Integer transportMethodId) {
 		return configurationTransportDAO.getTransportEncoding(fileExt, transportMethodId);
 	}
+
+	@Override
+	public Integer getOrgIdForRhapsodyPath(
+			configurationRhapsodyFields rhapsodyInfo) throws Exception {
+		return configurationTransportDAO.getOrgIdForRhapsodyPath(rhapsodyInfo);
+	}
 }

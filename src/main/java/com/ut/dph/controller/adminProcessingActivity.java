@@ -38,8 +38,12 @@ import com.ut.dph.service.sysAdminManager;
 import com.ut.dph.service.transactionInManager;
 import com.ut.dph.service.transactionOutManager;
 import com.ut.dph.service.userManager;
+
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -111,6 +115,8 @@ public class adminProcessingActivity {
      * The private maxResults variable will hold the number of results to show per list page.
      */
     private static int maxResults = 10;
+    
+    private String archivePath = "/bowlink/archives/";
 
     /**
      * The '/inbound' GET request will serve up the existing list of generated referrals and feedback reports
@@ -1555,38 +1561,50 @@ public class adminProcessingActivity {
                 if (allowBatchClear) {
                     //if ftp or rhapsody, we flag as DNP and move file back to input folder
                 	if (batchDetails.gettransportMethodId() == 5 || batchDetails.gettransportMethodId() == 3) {
-                		strBatchOption = "Reset Batch  - FTP/Rhapsody Reset";
-                        
-                        //move file back to original folder
-                        fileSystem fileSystem = new fileSystem();
-                		String fileFromPath = fileSystem.setPath(batchDetails.getFileLocation());
-                		File oldFile = new File(fileFromPath + batchDetails.getoriginalFileName());
+                		transactionInManager.updateBatchStatus(batchId, 4, "startDateTime");
                 		
-                		String fileToPath = fileSystem.setPath(batchDetails.getOriginalFolder());
-                		String fileExt = batchDetails.getoriginalFileName().substring(batchDetails.getoriginalFileName().lastIndexOf("."));
+                		strBatchOption = "Reset Batch  - FTP/Rhapsody Reset";
+                        String fileExt = batchDetails.getoriginalFileName().substring(batchDetails.getoriginalFileName().lastIndexOf("."));
+                		fileSystem fileSystem = new fileSystem();
+                        
+                		File archiveFile = new File(fileSystem.setPath(archivePath) + batchDetails.getutBatchName() + fileExt);
+                        String fileToPath = fileSystem.setPath(batchDetails.getOriginalFolder());
                 		//we name it ut batch name when move so we know
                 		String newFileName = transactionInManager.newFileName(fileToPath, (batchDetails.getutBatchName() + fileExt));
                 		File newFile = new File(fileToPath + newFileName);
-                		
-                		// now we copy file
-                        //Path source = oldFile.toPath();
-                        //Path target = newFile.toPath();
-                        
-                        String decodedOldFile = filemanager.decodeFileToBase64Binary(oldFile);
-                        filemanager.writeFile(newFile.getAbsolutePath(), decodedOldFile);
-                        
-                        //Files.copy(source, target);
-                		
-                        transactionInManager.updateBatchStatus(batchId, 4, "startDateTime");
+                		Path source = archiveFile.toPath();
+                		Path target = newFile.toPath();
+                		Files.copy(source, target);
+                		                
                         transactionInManager.updateTransactionStatus(batchId, 0, 0, 34);
                         transactionInManager.updateTransactionTargetStatus(batchId, 0, 0, 34);
                         transactionInManager.updateBatchStatus(batchId, 35, "endDateTime");
                         
                 	} else {
+                		
                 		transactionInManager.updateBatchStatus(batchId, 4, "");
                 		//2. clear
 	                    boolean cleared = transactionInManager.clearBatch(batchId);
-	                    if (cleared) {
+	                    
+	                    //copy archive file back to original folder
+                        fileSystem dir = new fileSystem();
+                        
+                        // we need to move unencoded file back from archive folder and replace current file
+                        //we set archive path
+                        try {
+                        	
+	                        File archiveFile = new File(dir.setPath(archivePath) + batchDetails.getutBatchName() + batchDetails.getoriginalFileName().substring(batchDetails.getoriginalFileName().lastIndexOf(".")));
+	                        Path archive = archiveFile.toPath();
+	                        File toFile = new File(dir.setPath(batchDetails.getFileLocation()) + batchDetails.getoriginalFileName());
+	                       	Path toPath = toFile.toPath();
+	                       	Files.copy(archive, toPath, StandardCopyOption.REPLACE_EXISTING);
+	                       	cleared = true;
+                       	} catch (Exception ex) {
+	                       	ex.printStackTrace();
+                       		cleared = false;
+                       	}
+          
+                        if (cleared) {
 	                        transactionInManager.updateBatchStatus(batchId, 2, "startOver");
 	                    }
                 	}
