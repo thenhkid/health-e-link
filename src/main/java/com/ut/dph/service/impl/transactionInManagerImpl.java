@@ -1552,7 +1552,7 @@ public class transactionInManagerImpl implements transactionInManager {
 	
 	            //update data in transactionTranslatedIn
 	            resetTransactionTranslatedIn(batchId, true);
-	            
+      
 	            //now that we have our config, we will apply pre-processing cw and macros to manipulate our data
 	            //1. find all configs for batch, loop and process
 	            int transactionId = 0;
