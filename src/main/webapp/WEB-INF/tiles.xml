@@ -365,6 +365,42 @@
         <put-attribute name="jscript" value="/dspResources/js/admin/sysadmin/logos/details.js" />
     </definition>
     
+    <!--  this page let user modify front end admin HL7 Specs -->    
+    <definition name="/administrator/sysadmin/hl7" extends="base.definition.admin">
+        <put-attribute name="page-id" value="sysadmin-hl7" />
+        <put-attribute name="page-section" value="section-sysadmin" />
+        <put-attribute name="title" value="Administrator - Manage HL7 Version" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=sysadmin" />
+        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/sysadmin/actionBar.jsp?page=hl7List" />
+        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/sysadmin/menu.jsp?page=hl7List" />
+        <put-attribute name="body" value="/WEB-INF/jsp/administrator/sysadmin/hl7/list.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/admin/sysadmin/hl7/list.js" />
+    </definition>
+    
+    <!--  this page let user create new HL7 Version -->    
+    <definition name="/administrator/sysadmin/hl7/create" extends="base.definition.admin">
+        <put-attribute name="page-id" value="sysadmin-hl7" />
+        <put-attribute name="page-section" value="section-sysadmin" />
+        <put-attribute name="title" value="Administrator - Create New HL7 Version" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=sysadmin" />
+        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/sysadmin/actionBar.jsp?page=hl7Details" />
+        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/sysadmin/menu.jsp?page=hl7List" />
+        <put-attribute name="body" value="/WEB-INF/jsp/administrator/sysadmin/hl7/details.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/admin/sysadmin/hl7/details.js" />
+    </definition>
+    
+    <!--  this page let user create new HL7 Version -->    
+    <definition name="/administrator/sysadmin/hl7/details" extends="base.definition.admin">
+        <put-attribute name="page-id" value="sysadmin-hl7" />
+        <put-attribute name="page-section" value="section-sysadmin" />
+        <put-attribute name="title" value="Administrator - Create HL7 Details" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=sysadmin" />
+        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/sysadmin/actionBar.jsp?page=hl7Details" />
+        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/sysadmin/menu.jsp?page=hl7List" />
+        <put-attribute name="body" value="/WEB-INF/jsp/administrator/sysadmin/hl7/details.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/admin/sysadmin/hl7/details.js" />
+    </definition>
+    
     
     <definition name="/administrator/processing-activity/inbound" extends="base.definition.admin">
         <put-attribute name="page-id" value="processing-inbound" />

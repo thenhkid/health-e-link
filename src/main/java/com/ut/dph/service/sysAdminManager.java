@@ -19,6 +19,9 @@ import com.ut.dph.model.lutables.lu_Procedures;
 import com.ut.dph.model.lutables.lu_ProcessStatus;
 import com.ut.dph.model.lutables.lu_Tests;
 import com.ut.dph.model.Macros;
+import com.ut.dph.model.mainHL7Details;
+import com.ut.dph.model.mainHL7Elements;
+import com.ut.dph.model.mainHL7Segments;
 
 /**
  * 1. sysAdminManager should handle the adding, deleting and modifying lu_ table items 2. It should
@@ -144,4 +147,24 @@ public interface sysAdminManager {
     String getFrontEndLogoPath();
 
     String getBackEndLogoPath();
+    
+    List<mainHL7Details> getHL7List() throws Exception;
+    
+    mainHL7Details getHL7Details(int hl7Id) throws Exception;
+    
+    List<mainHL7Segments> getHL7Segments(int hl7Id);
+  
+    List<mainHL7Elements> getHL7Elements(int hl7Id, int segmentId);
+    
+    int createHL7(mainHL7Details details);
+
+    void updateHL7Details(mainHL7Details details);
+
+    void updateHL7Segments(mainHL7Segments segment);
+
+    void updateHL7Elements(mainHL7Elements element);
+
+    int saveHL7Segment(mainHL7Segments newSegment);
+
+    int saveHL7Element(mainHL7Elements newElement);
 }

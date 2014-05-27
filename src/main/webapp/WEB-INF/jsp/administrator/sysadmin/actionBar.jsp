@@ -15,7 +15,13 @@
                     </c:when>
                     <c:when test="${param['page'] == 'logos'}">
                         <a href="javascript:void(0);" title="Logos" class="unstyled-link">Manage Logos</a>
-                    </c:when>   
+                    </c:when> 
+                    <c:when test="${param['page'] == 'hl7List'}">
+                        <a href="javascript:void(0);" title="HL7 Versions" class="unstyled-link">Manage HL7 Versions</a>
+                    </c:when> 
+                    <c:when test="${param['page'] == 'hl7Details'}">
+                        <a href="javascript:void(0);" title="Create new HL7 Version" class="unstyled-link">Create new HL7 Version</a>
+                    </c:when>     
                 </c:choose>
             </h1>
         </div>
@@ -24,7 +30,13 @@
                 <c:when test="${param['page'] == 'logos'}">
                     <li><a href="javascript:void(0);" id="saveDetails" title="Save logo(s)"><span class="glyphicon glyphicon-ok icon-stacked"></span> Save </a></li>
                     <li><a href="<c:url value='/administrator/sysadmin/' />" title="Cancel"><span class="glyphicon icon-stacked custom-icon icon-cancel"></span>Cancel</a></li>
-                    </c:when>              
+                    </c:when>    
+                    <c:when test="${param['page'] == 'hl7List'}">
+                    <li><a href="<c:url value='/administrator/sysadmin/hl7/create' />" title="Create New HL7 Version" role="button"><span class="glyphicon icon-stacked glyphicon glyphicon-plus"></span>Create New</a></li>
+                    </c:when>
+                    <c:when test="${param['page'] == 'hl7Details'}">
+                    <li><a href="javascript:void(0);" id="saveDetails" title="Save this Configuration initial setup" role="button"><span class="glyphicon glyphicon-ok icon-stacked"></span> Save </a></li>
+                    </c:when>
                 </c:choose>
 
         </ul>

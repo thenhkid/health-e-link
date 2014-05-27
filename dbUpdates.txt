@@ -224,3 +224,36 @@ CREATE TABLE `universalTranslator`.`configurationPostProcessing` (
 INSERT INTO `universaltranslator`.`lu_errorcodes` (`id`, `displayText`, `description`, `isCustom`, `status`) VALUES ('17', 'File Did Not Decode Correctly', 'System was not able to decode file', 0, 1);
 
 
+/** Chad 05272014 @ 9:33 AM **/
+CREATE TABLE `HL7Specs` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `Name` varchar(45) NOT NULL,
+  `fieldSeparator` varchar(1) NOT NULL DEFAULT '|',
+  `componentSeparator` varchar(1) NOT NULL DEFAULT '^',
+  `EscapeChar` varchar(45) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=latin1;
+
+CREATE TABLE `HL7Segments` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `hl7Id` int(11) NOT NULL,
+  `segmentName` varchar(3) NOT NULL,
+  `displayPos` int(11) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id`),
+  KEY `mainsegHL7Idfk_idx` (`hl7Id`),
+  CONSTRAINT `mainsegHL7Idfk` FOREIGN KEY (`hl7Id`) REFERENCES `HL7Specs` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
+
+CREATE TABLE `HL7Elements` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `hl7Id` int(11) NOT NULL,
+  `segmentId` int(11) NOT NULL,
+  `elementName` varchar(255) NOT NULL,
+  `displayPos` int(11) NOT NULL DEFAULT '1',
+  `defaultValue` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `mainelemHLyIdfk_idx` (`hl7Id`),
+  KEY `mainelemSegIdfk_idx` (`segmentId`),
+  CONSTRAINT `mainelemHLyIdfk` FOREIGN KEY (`hl7Id`) REFERENCES `HL7Specs` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `mainelemSegIdfk` FOREIGN KEY (`segmentId`) REFERENCES `HL7Segments` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=131 DEFAULT CHARSET=latin1;

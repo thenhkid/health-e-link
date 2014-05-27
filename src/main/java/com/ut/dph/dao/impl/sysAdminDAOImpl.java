@@ -29,6 +29,12 @@ import com.ut.dph.model.lutables.lu_Medications;
 import com.ut.dph.model.lutables.lu_Procedures;
 import com.ut.dph.model.lutables.lu_ProcessStatus;
 import com.ut.dph.model.lutables.lu_Tests;
+import com.ut.dph.model.mainHL7Details;
+import com.ut.dph.model.mainHL7Elements;
+import com.ut.dph.model.mainHL7Segments;
+import org.hibernate.Criteria;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 
 /**
  * @see com.ut.dph.dao.sysAdminDAO
@@ -718,5 +724,159 @@ public class sysAdminDAOImpl implements sysAdminDAO {
             System.err.println("update LogoInfo failed." + ex);
         }
     }
+    
+    /**
+     * The 'getHL7List' function will return the list of saved hl7 standard versions.
+     */
+    @Override
+    @Transactional
+    public List<mainHL7Details> getHL7List() throws Exception {
+        
+       Query query = sessionFactory.getCurrentSession().createQuery("from mainHL7Details order by id desc");
+
+        List<mainHL7Details> HL7List = query.list();
+        return HL7List;
+    }
+    
+    /**
+     * The 'getHL7Details' function will the HL7 details for the passed in hl7 version.
+     *
+     * @Table HL7Specs
+     *
+     * @param	hl7Id    This will hold the id to find
+     *
+     * @return	This function will return a HL7Details object
+     */
+    @Override
+    @Transactional
+    @SuppressWarnings("unchecked")
+    public mainHL7Details getHL7Details(int hl7Id) {
+        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(mainHL7Details.class);
+        criteria.add(Restrictions.eq("id", hl7Id));
+        
+        if(criteria.uniqueResult() == null) {
+            return null;
+        }
+        else {
+            return (mainHL7Details) criteria.uniqueResult();
+        }
+
+    }
+    
+    /**
+     * The 'getHL7Segments' function will return the list of segments for a specific HL7 Message.
+     * 
+     * @Table configurationHL7Segments
+     * 
+     * @return This function will return a list of HL7Segment objects
+     */
+    @Override
+    @Transactional
+    public List<mainHL7Segments> getHL7Segments(int hl7Id) {
+        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(mainHL7Segments.class);
+        criteria.add(Restrictions.eq("hl7Id", hl7Id));
+        criteria.addOrder(Order.asc("displayPos"));
+        
+        return criteria.list();
+    }
+    
+    /**
+     * The 'getHL7Elements' function will return the list of elements for a specific HL7 Message segment.
+     * 
+     * @Table configurationHL7Elements
+     * 
+     * @return This function will return a list of HL7Elements objects
+     */
+    @Override
+    @Transactional
+    public List<mainHL7Elements> getHL7Elements(int hl7Id, int segmentId) {
+        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(mainHL7Elements.class);
+        criteria.add(Restrictions.eq("hl7Id", hl7Id));
+        criteria.add(Restrictions.eq("segmentId", segmentId));
+        criteria.addOrder(Order.asc("displayPos"));
+        
+        return criteria.list();
+    }
+   
+    /**
+     * the 'updateHL7Details' funciton will update/save the details of the HL7 message
+     * 
+     * @param details The Hl7 details object
+     */
+    @Override
+    @Transactional
+    public void updateHL7Details(mainHL7Details details) {
+        sessionFactory.getCurrentSession().saveOrUpdate(details);
+    }
+    
+    
+    /**
+     * The 'updateHL7Segments' function will update the segment passed to the function.
+     * 
+     * @param segment The segment object to update
+     */
+    @Override
+    @Transactional
+    public void updateHL7Segments(mainHL7Segments segment) {
+        sessionFactory.getCurrentSession().update(segment);
+    }
+    
+    /**
+     * The 'updateHL7Elements' function will update the segment element
+     * passed to the function.
+     * 
+     * @param element  The segment element object to update.
+     */
+    @Override
+    @Transactional
+    public void updateHL7Elements(mainHL7Elements element) {
+         sessionFactory.getCurrentSession().update(element);
+    }
+    
+    /**
+     * The 'createHL7' function will save the new HL7 Segment
+     * 
+     * @param HL7Details The object holding the new HL7 Object
+     */
+    @Override
+    @Transactional
+    public int createHL7(mainHL7Details HL7Details) {
+        Integer lastId;
+
+        lastId = (Integer) sessionFactory.getCurrentSession().save(HL7Details);
+        
+        return lastId;
+    }
+    
+    /**
+     * The 'saveHL7Segment' function will save the new HL7 Segment
+     * 
+     * @param newSegment The object holding the new HL7 Object
+     */
+    @Override
+    @Transactional
+    public int saveHL7Segment(mainHL7Segments newSegment) {
+        Integer lastId;
+
+        lastId = (Integer) sessionFactory.getCurrentSession().save(newSegment);
+        
+        return lastId;
+    }
+    
+    /**
+     * The 'saveHL7Element' function will save the new HL7 Segment Element
+     * 
+     * @param newElement The object holding the new HL7 Element Object
+     */
+    @Override
+    @Transactional
+    public int saveHL7Element(mainHL7Elements newElement) {
+        Integer lastId;
+
+        lastId = (Integer) sessionFactory.getCurrentSession().save(newElement);
+        
+        return lastId;
+    }
+    
 
 }
