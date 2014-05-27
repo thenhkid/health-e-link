@@ -3457,6 +3457,7 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Override
     @Transactional
     public Integer insertBatchUploadSumByOrg(batchUploads batchUpload, configurationConnection bt) {
+       
         try {
             String sql = ("insert into batchuploadsummary (batchId, transactionInId, "
                     + " sourceOrgId, targetOrgId, messageTypeId, sourceConfigId, targetConfigId) "

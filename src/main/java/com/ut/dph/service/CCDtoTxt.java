@@ -53,7 +53,7 @@ public class CCDtoTxt {
         dir.setDirByName(fileLocation);
         
         File ccdFile = new File(dir.getDir() + ccdFileName + ".xml");
-        System.out.println("File Exists:" + ccdFile.exists());
+        
         /* Create the txt file that will hold the CCD fields */
         String newfileName = new StringBuilder().append(ccdFile.getName().substring(0, ccdFile.getName().lastIndexOf("."))).append(".").append("txt").toString();
 
