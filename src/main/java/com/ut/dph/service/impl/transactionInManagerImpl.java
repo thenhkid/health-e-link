@@ -23,6 +23,7 @@ import com.ut.dph.model.configurationDataTranslations;
 import com.ut.dph.model.configurationFTPFields;
 import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.configurationMessageSpecs;
+import com.ut.dph.model.configurationRhapsodyFields;
 import com.ut.dph.model.configurationTransport;
 import com.ut.dph.model.fieldSelectOptions;
 import com.ut.dph.model.transactionAttachment;
@@ -130,7 +131,9 @@ public class transactionInManagerImpl implements transactionInManager {
 
     //final status Ids
     private List<Integer> finalStatusIds = Arrays.asList(11, 12, 13, 16);
-
+    
+    private String archivePath = "/bowlink/archives/";
+    
     @Override
     @Transactional
     public String getFieldValue(String tableName, String tableCol, String idCol, int idValue) {
@@ -2513,10 +2516,16 @@ public class transactionInManagerImpl implements transactionInManager {
 			 }
 			 
 			 
+			 //we encoded user's file if it is not
 			 File newFile = new File(outPath + newFileName);
 			 // now we move file
              Path source = file.toPath();
              Path target = newFile.toPath();
+             
+             File archiveFile = new File(fileSystem.setPath(archivePath) + batchName + newFileName.substring(newFileName.lastIndexOf(".")));
+             Path archive = archiveFile.toPath();
+             //we keep original file in archive folder
+             Files.copy(source, archive);
              /** we check encoding here **/
              if (encodingId < 2) { //file is not encoded
 	             String encodedOldFile = filemanager.encodeFileToBase64Binary(file);
@@ -2720,4 +2729,57 @@ public class transactionInManagerImpl implements transactionInManager {
 
     }
 
+	@Override
+	public Integer moveRhapsodyFiles() {
+		Integer sysErrors = 0;
+
+        try {
+            //1 . get distinct ftp paths
+            List<configurationRhapsodyFields> inputPaths = getRhapsodyInfoForJob(1);
+
+            //loop ftp paths and check
+            for (configurationRhapsodyFields rhapsodyInfo : inputPaths) {
+                //we insert job so if anything goes wrong or the scheduler overlaps, we won't be checking the same folder over and over
+                MoveFilesLog moveJob = new MoveFilesLog();
+                moveJob.setStatusId(1);
+                moveJob.setFolderPath(rhapsodyInfo.getDirectory());
+                moveJob.setTransportMethodId(5);
+                moveJob.setMethod(1);
+                Integer lastId = insertSFTPRun(moveJob);
+                moveJob.setId(lastId);
+
+                // check if directory exists, if not create
+                fileSystem fileSystem = new fileSystem();
+                String inPath = fileSystem.setPath(rhapsodyInfo.getDirectory());
+                File f = new File(inPath);
+                if (!f.exists()) {
+                    f.mkdirs();
+                }
+              //we look up org for this path
+        		Integer orgId = configurationtransportmanager.getOrgIdForRhapsodyPath(rhapsodyInfo);
+        		
+                sysErrors = sysErrors + moveFilesByPath(rhapsodyInfo.getDirectory(), 5, orgId, rhapsodyInfo.getTransportId());
+
+                if (sysErrors == 0) {
+                	moveJob.setStatusId(2);
+                	moveJob.setEndDateTime(new Date());
+                    updateSFTPRun(moveJob);
+                }
+            }
+
+			// if there are no errors, we release the folder path
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.err.println("moveRhapsodyFiles " + ex.getCause());
+            return 1;
+        }
+        return sysErrors;
+	}
+
+	/** this method grabs all distinct ftp path that need to be check for files **/
+    @Override
+    public List<configurationRhapsodyFields> getRhapsodyInfoForJob(Integer method) {
+        return transactionInDAO.getRhapsodyInfoForJob(method);
+    }
+	
 }

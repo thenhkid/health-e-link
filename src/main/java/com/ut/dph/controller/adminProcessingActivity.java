@@ -1561,29 +1561,21 @@ public class adminProcessingActivity {
                 if (allowBatchClear) {
                     //if ftp or rhapsody, we flag as DNP and move file back to input folder
                 	if (batchDetails.gettransportMethodId() == 5 || batchDetails.gettransportMethodId() == 3) {
-                		strBatchOption = "Reset Batch  - FTP/Rhapsody Reset";
-                        
-                        //move file back to original folder
-                        fileSystem fileSystem = new fileSystem();
-                		String fileFromPath = fileSystem.setPath(batchDetails.getFileLocation());
-                		File oldFile = new File(fileFromPath + batchDetails.getoriginalFileName());
+                		transactionInManager.updateBatchStatus(batchId, 4, "startDateTime");
                 		
-                		String fileToPath = fileSystem.setPath(batchDetails.getOriginalFolder());
-                		String fileExt = batchDetails.getoriginalFileName().substring(batchDetails.getoriginalFileName().lastIndexOf("."));
+                		strBatchOption = "Reset Batch  - FTP/Rhapsody Reset";
+                        String fileExt = batchDetails.getoriginalFileName().substring(batchDetails.getoriginalFileName().lastIndexOf("."));
+                		fileSystem fileSystem = new fileSystem();
+                        
+                		File archiveFile = new File(fileSystem.setPath(archivePath) + batchDetails.getutBatchName() + fileExt);
+                        String fileToPath = fileSystem.setPath(batchDetails.getOriginalFolder());
                 		//we name it ut batch name when move so we know
                 		String newFileName = transactionInManager.newFileName(fileToPath, (batchDetails.getutBatchName() + fileExt));
                 		File newFile = new File(fileToPath + newFileName);
-                		
-                		// now we copy file
-                        //Path source = oldFile.toPath();
-                        //Path target = newFile.toPath();
-                        
-                        String decodedOldFile = filemanager.decodeFileToBase64Binary(oldFile);
-                        filemanager.writeFile(newFile.getAbsolutePath(), decodedOldFile);
-                        
-                        //Files.copy(source, target);
-                		
-                        transactionInManager.updateBatchStatus(batchId, 4, "startDateTime");
+                		Path source = archiveFile.toPath();
+                		Path target = newFile.toPath();
+                		Files.copy(source, target);
+                		                
                         transactionInManager.updateTransactionStatus(batchId, 0, 0, 34);
                         transactionInManager.updateTransactionTargetStatus(batchId, 0, 0, 34);
                         transactionInManager.updateBatchStatus(batchId, 35, "endDateTime");

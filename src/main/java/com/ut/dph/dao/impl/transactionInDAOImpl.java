@@ -22,6 +22,7 @@ import com.ut.dph.model.configurationDataTranslations;
 import com.ut.dph.model.configurationFTPFields;
 import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.configurationMessageSpecs;
+import com.ut.dph.model.configurationRhapsodyFields;
 import com.ut.dph.model.configurationTransport;
 import com.ut.dph.model.fieldSelectOptions;
 import com.ut.dph.model.transactionAttachment;
@@ -4244,5 +4245,33 @@ public class transactionInDAOImpl implements transactionInDAO {
         return (messagePatients) patientDetails.uniqueResult();
         
     }
+
+	@Override
+	@Transactional
+	@SuppressWarnings("unchecked")
+	public List<configurationRhapsodyFields> getRhapsodyInfoForJob(
+			Integer method) {
+		try {
+            String sql = ("select rel_TransportRhapsodyDetails.id, directory, method, transportId "
+            		+ " from configurationTransportDetails, rel_TransportRhapsodyDetails "
+            		+ " where method = :method and configurationTransportDetails.id = rel_TransportRhapsodyDetails.transportId "
+            		+ " and configId in (select id from configurations where status = 1) and  "
+            		+ " directory not in (select folderPath from moveFilesLog where statusId = 1 and method = :method) "
+            		+ " group by directory order by configId;");
+
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                    .setResultTransformer(Transformers.aliasToBean(configurationRhapsodyFields.class))
+                    .setParameter("method", method);
+
+            
+			List<configurationRhapsodyFields> directories = query.list();
+
+            return directories;
+        } catch (Exception ex) {
+            System.err.println("getRhapsodyInfoForJob " + ex.getCause());
+            ex.printStackTrace();
+            return null;
+        }
+	}
     
 }

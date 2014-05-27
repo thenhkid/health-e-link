@@ -20,6 +20,7 @@ import com.ut.dph.model.configurationDataTranslations;
 import com.ut.dph.model.configurationFTPFields;
 import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.configurationMessageSpecs;
+import com.ut.dph.model.configurationRhapsodyFields;
 import com.ut.dph.model.configurationTransport;
 import com.ut.dph.model.fieldSelectOptions;
 import com.ut.dph.model.transactionAttachment;
@@ -375,5 +376,8 @@ public interface transactionInManager {
 	
 	Map<String, String> chkUploadBatchFile(configurationTransport transportDetails, File uploadedFile) throws Exception;
 	
+	Integer moveRhapsodyFiles();
 	
+    List <configurationRhapsodyFields> getRhapsodyInfoForJob (Integer method);
+    
 }
