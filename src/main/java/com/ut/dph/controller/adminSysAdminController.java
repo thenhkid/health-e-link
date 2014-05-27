@@ -74,8 +74,10 @@ public class adminSysAdminController {
          */
         int totalLookUpTables = sysAdminManager.findTotalLookUpTable();
         Long totalMacroRows = sysAdminManager.findTotalMacroRows();
+        Long totalHL7Entries = sysAdminManager.findtotalHL7Entries();
         mav.addObject("totalLookUpTables", totalLookUpTables);
         mav.addObject("totalMacroRows", totalMacroRows);
+        mav.addObject("totalHL7Entries", totalHL7Entries);
 
         return mav;
     }

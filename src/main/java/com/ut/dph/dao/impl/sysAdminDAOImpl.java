@@ -350,6 +350,14 @@ public class sysAdminDAOImpl implements sysAdminDAO {
         Long totalMacros = (Long) query.uniqueResult();
         return totalMacros;
     }
+    
+    @Override
+    @Transactional
+    public Long findtotalHL7Entries() {
+        Query query = sessionFactory.getCurrentSession().createQuery("select count(id) as totalHL7 from mainHL7Details");
+        Long totalHL7Entries = (Long) query.uniqueResult();
+        return totalHL7Entries;
+    }
 
     /**
      * this method deletes the macro in the table*

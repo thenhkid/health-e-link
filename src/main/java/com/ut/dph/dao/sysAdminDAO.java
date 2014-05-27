@@ -47,6 +47,8 @@ public interface sysAdminDAO {
     List<Macros> getMarcoList(String searchTerm);
 
     Long findTotalMacroRows();
+    
+    Long findtotalHL7Entries();
 
     boolean deleteMacro(int id);
 

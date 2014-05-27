@@ -57,6 +57,8 @@ public interface sysAdminManager {
     List<Macros> getMarcoList(String searchTerm);
 
     Long findTotalMacroRows();
+    
+    Long findtotalHL7Entries();
 
     String addWildCardSearch(String searchTerm);
 

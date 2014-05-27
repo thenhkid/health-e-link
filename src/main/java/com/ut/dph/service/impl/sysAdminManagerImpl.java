@@ -112,7 +112,12 @@ public class sysAdminManagerImpl implements sysAdminManager {
     public Long findTotalMacroRows() {
         return sysAdminDAO.findTotalMacroRows();
     }
-
+    
+    @Override
+    public Long findtotalHL7Entries() {
+        return sysAdminDAO.findtotalHL7Entries();
+    }
+    
     @Override
     public String addWildCardSearch(String searchTerm) {
 
