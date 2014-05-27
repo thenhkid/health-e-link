@@ -38,8 +38,12 @@ import com.ut.dph.service.sysAdminManager;
 import com.ut.dph.service.transactionInManager;
 import com.ut.dph.service.transactionOutManager;
 import com.ut.dph.service.userManager;
+
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -111,6 +115,8 @@ public class adminProcessingActivity {
      * The private maxResults variable will hold the number of results to show per list page.
      */
     private static int maxResults = 10;
+    
+    private String archivePath = "/bowlink/archives/";
 
     /**
      * The '/inbound' GET request will serve up the existing list of generated referrals and feedback reports
@@ -1583,10 +1589,30 @@ public class adminProcessingActivity {
                         transactionInManager.updateBatchStatus(batchId, 35, "endDateTime");
                         
                 	} else {
+                		
                 		transactionInManager.updateBatchStatus(batchId, 4, "");
                 		//2. clear
 	                    boolean cleared = transactionInManager.clearBatch(batchId);
-	                    if (cleared) {
+	                    
+	                    //copy archive file back to original folder
+                        fileSystem dir = new fileSystem();
+                        
+                        // we need to move unencoded file back from archive folder and replace current file
+                        //we set archive path
+                        try {
+                        	
+	                        File archiveFile = new File(dir.setPath(archivePath) + batchDetails.getutBatchName() + batchDetails.getoriginalFileName().substring(batchDetails.getoriginalFileName().lastIndexOf(".")));
+	                        Path archive = archiveFile.toPath();
+	                        File toFile = new File(dir.setPath(batchDetails.getFileLocation()) + batchDetails.getoriginalFileName());
+	                       	Path toPath = toFile.toPath();
+	                       	Files.copy(archive, toPath, StandardCopyOption.REPLACE_EXISTING);
+	                       	cleared = true;
+                       	} catch (Exception ex) {
+	                       	ex.printStackTrace();
+                       		cleared = false;
+                       	}
+          
+                        if (cleared) {
 	                        transactionInManager.updateBatchStatus(batchId, 2, "startOver");
 	                    }
                 	}
