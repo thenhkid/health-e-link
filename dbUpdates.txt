@@ -224,6 +224,10 @@ CREATE TABLE `universalTranslator`.`configurationPostProcessing` (
 INSERT INTO `universaltranslator`.`lu_errorcodes` (`id`, `displayText`, `description`, `isCustom`, `status`) VALUES ('17', 'File Did Not Decode Correctly', 'System was not able to decode file', 0, 1);
 
 
+/** grace 05272014 **/
+ALTER TABLE `universaltranslator`.`configurationdatatranslations` 
+ADD COLUMN `categoryId` INT NULL DEFAULT 3 COMMENT '1. pre-processing\n2. post processing\n3. while processing' AFTER `processOrder`;
+
 /** Chad 05272014 @ 9:33 AM **/
 CREATE TABLE `HL7Specs` (
   `id` int(11) NOT NULL AUTO_INCREMENT,

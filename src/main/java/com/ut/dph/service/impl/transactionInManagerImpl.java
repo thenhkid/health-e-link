@@ -505,7 +505,7 @@ public class transactionInManagerImpl implements transactionInManager {
             	/** we are reordering 1. cw/macro, 2. required and 3. validate **/
             	// 1. grab the configurationDataTranslations and run cw/macros
                 List<configurationDataTranslations> dataTranslations = configurationManager
-                        .getDataTranslationsWithFieldNo(configId);
+                        .getDataTranslationsWithFieldNo(configId, 3); //while processing
                 for (configurationDataTranslations cdt : dataTranslations) {
                     if (cdt.getCrosswalkId() != 0) {
                         systemErrorCount = systemErrorCount + processCrosswalk(configId, batchUploadId, cdt, false, transactionId);
