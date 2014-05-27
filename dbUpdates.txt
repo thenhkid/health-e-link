@@ -224,6 +224,53 @@ CREATE TABLE `universalTranslator`.`configurationPostProcessing` (
 INSERT INTO `universaltranslator`.`lu_errorcodes` (`id`, `displayText`, `description`, `isCustom`, `status`) VALUES ('17', 'File Did Not Decode Correctly', 'System was not able to decode file', 0, 1);
 
 
-/** grace 05272014 **/
+/** grace 05272014 AM**/
 ALTER TABLE `universaltranslator`.`configurationdatatranslations` 
 ADD COLUMN `categoryId` INT NULL DEFAULT 3 COMMENT '1. pre-processing\n2. post processing\n3. while processing' AFTER `processOrder`;
+
+/** grace 05272014 1:27 PM **/
+use universalTranslator;
+drop procedure if exists processFieldListAsSingleValues;
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `processFieldListAsSingleValues`(in configId int, 
+in batchId int, in srcField varchar(10),
+in fieldA varchar(10), in fieldB varchar(10), in con1 varchar(10), 
+in con2 varchar(10), in macroId int, in foroutboundProcessing boolean, in passClear int, in transactionId int)
+proc_main:begin
+-- this sets out table
+call setInboundOutBoundTables (foroutboundProcessing);
+select @translatedTable, @transactionTable, @batchTable, @batchIdType , @errorTable
+into @translatedTable, @transactionTable, @batchTable, @batchIdType , @errorTable;
+
+call getFinalStatusIds;
+select @finalStatusIds into @finalStatusIds;
+
+
+-- build our sql
+if (transactionId = 0) then
+	set @stmt = concat("update ",@translatedTable, " set ",fieldA," = replace(",fieldA,", '",con1,"','^^^^^') where ",@transactionTable,"Id in (select id from ",@transactionTable,
+				" where configId = ",configId," and ", @batchIdType," = ",batchId," and statusId not in (",@finalStatusIds ,"));");
+	END if;
+
+
+if (transactionId != 0) then
+	set @stmt = concat("update ",@translatedTable, " set ",fieldA," = replace(",fieldA,", '",con1,"','^^^^^') where ",
+	@transactionTable,"Id = ", transactionId,";");
+	END if;
+
+PREPARE stmt from @stmt;
+EXECUTE stmt;-- execute
+
+-- we check pass /clear
+if (passClear = 2) THEN
+BEGIN
+-- accessible
+END;
+END IF;
+
+
+-- the only error for this is if SP bombs, no need to write in insert error logs
+select '';
+end proc_main$$
+DELIMITER ;

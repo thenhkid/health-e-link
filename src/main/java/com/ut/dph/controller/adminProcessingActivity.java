@@ -5,6 +5,8 @@
  */
 package com.ut.dph.controller;
 
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+
 import com.ut.dph.model.Organization;
 import com.ut.dph.model.Transaction;
 import com.ut.dph.model.User;
@@ -1597,9 +1599,19 @@ public class adminProcessingActivity {
 	                        Path archive = archiveFile.toPath();
 	                        File toFile = new File(dir.setPath(batchDetails.getFileLocation()) + batchDetails.getoriginalFileName());
 	                       	Path toPath = toFile.toPath();
-	                       	Files.copy(archive, toPath, StandardCopyOption.REPLACE_EXISTING);
+	                       	//need to encode file first
+	                       	if (batchDetails.getEncodingId() == 1) {
+	                        	String strEncodedFile = filemanager.encodeFileToBase64Binary(archiveFile);
+	                        	toFile.delete();
+	                        	 //we replace file with encoded
+	                            filemanager.writeFile(toFile.getAbsolutePath(), strEncodedFile);
+	                        } else { // already encoded
+	                        	Files.copy(archive, toPath, StandardCopyOption.REPLACE_EXISTING);
+	                        }
+	                       	
 	                       	cleared = true;
-                       	} catch (Exception ex) {
+	                       	
+                        } catch (Exception ex) {
 	                       	ex.printStackTrace();
                        		cleared = false;
                        	}

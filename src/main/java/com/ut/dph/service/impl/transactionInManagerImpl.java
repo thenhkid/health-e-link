@@ -487,12 +487,7 @@ public class transactionInManagerImpl implements transactionInManager {
         if ((batch.getstatusId() == 3 || batch.getstatusId() == 6)) {
             // set batch to SBP - 4*
             updateBatchStatus(batchUploadId, 4, "startDateTime");
-
-            /**
-             * we should only process the ones that are not REL status, to be safe, we copy over data from transactionInRecords*
-             */
-            resetTransactionTranslatedIn(batchUploadId, false, transactionId);
-
+      
             //clear transactionInError table for batch, if do not clear errors is true, we skip this.
             if (!doNotClearErrors) {
                 systemErrorCount = systemErrorCount + clearTransactionInErrors(batchUploadId, true);
@@ -1187,11 +1182,8 @@ public class transactionInManagerImpl implements transactionInManager {
             //we null forcw column, we translate and insert there, we then replace
             nullForCWCol(configId, batchId, foroutboundProcessing, transactionId);
             for (CrosswalkData cwd : cdList) {
-                executeCWData(configId, batchId, cdt.getFieldNo(), cwd, foroutboundProcessing, cdt.getFieldId(), transactionId);
+                executeSingleValueCWData(configId, batchId, cdt.getFieldNo(), cwd, foroutboundProcessing, cdt.getFieldId(), transactionId);
             }
-
-            //we replace original F[FieldNo] column with data in forcw
-            updateFieldNoWithCWData(configId, batchId, cdt.getFieldNo(), cdt.getPassClear(), foroutboundProcessing, transactionId);
 
             //flag errors, anything row that is not null in F[FieldNo] but null in forCW
             flagCWErrors(configId, batchId, cdt, foroutboundProcessing, transactionId);
@@ -1241,8 +1233,8 @@ public class transactionInManagerImpl implements transactionInManager {
     }
 
     @Override
-    public void executeCWData(Integer configId, Integer batchId, Integer fieldNo, CrosswalkData cwd, boolean foroutboundProcessing, Integer fieldId, Integer transactionId) {
-        transactionInDAO.executeCWData(configId, batchId, fieldNo, cwd, foroutboundProcessing, fieldId, transactionId);
+    public void executeSingleValueCWData(Integer configId, Integer batchId, Integer fieldNo, CrosswalkData cwd, boolean foroutboundProcessing, Integer fieldId, Integer transactionId) {
+        transactionInDAO.executeSingleValueCWData(configId, batchId, fieldNo, cwd, foroutboundProcessing, fieldId, transactionId);
     }
 
     @Override
@@ -1560,7 +1552,26 @@ public class transactionInManagerImpl implements transactionInManager {
 	
 	            //update data in transactionTranslatedIn
 	            resetTransactionTranslatedIn(batchId, true);
-	
+	            
+	            //now that we have our config, we will apply pre-processing cw and macros to manipulate our data
+	            //1. find all configs for batch, loop and process
+	            int transactionId = 0;
+                List<Integer> configIds = getConfigIdsForBatch(batchId, false, transactionId);
+                for (Integer configId : configIds) {
+					//we need to run all checks before insert regardless *
+	            	/** we are reordering 1. cw/macro, 2. required and 3. validate **/
+	            	// 1. grab the configurationDataTranslations and run cw/macros
+	            	List<configurationDataTranslations> dataTranslations = configurationManager
+	                        .getDataTranslationsWithFieldNo(configId, 1); //pre processing
+	                for (configurationDataTranslations cdt : dataTranslations) {
+	                    if (cdt.getCrosswalkId() != 0) {
+	                    	sysError = sysError + processCrosswalk(configId, batchId, cdt, false, transactionId);
+	                    } else if (cdt.getMacroId() != 0) {
+	                    	sysError = sysError + processMacro(configId, batchId, cdt, false, transactionId);
+	                    }
+	                }
+	            
+                }
 	            //load targets - we need to loadTarget only if field for target is blank, otherwise we load what user sent
 	            List<configurationConnection> batchTargetList = getBatchTargets(batchId, true);
 	            int sourceConfigId = 0;
@@ -1597,9 +1608,6 @@ public class transactionInManagerImpl implements transactionInManager {
 	
 	                //handle duplicates, need to insert again and let it be its own row
 	                sysErrors = sysErrors + newEntryForMultiTargets(batchId);
-	
-	                //we reset transactionTranslatedIn
-	                resetTransactionTranslatedIn(batchId, true);
 	
 	            }
             }

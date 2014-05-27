@@ -1937,7 +1937,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 
     @Override
     @Transactional
-    public void executeCWData(Integer configId, Integer batchId, Integer fieldNo,
+    public void executeSingleValueCWData(Integer configId, Integer batchId, Integer fieldNo,
             CrosswalkData cwd, boolean foroutboundProcessing, Integer fieldId, Integer transactionId) {
 
         String sql;
@@ -1975,11 +1975,11 @@ public class transactionInDAOImpl implements transactionInDAO {
         try {
             updateData.executeUpdate();
         } catch (Exception ex) {
-            System.err.println("executeCWData " + ex.getCause());
+            System.err.println("executeSingleValueCWData " + ex.getCause());
             ex.printStackTrace();
             insertProcessingError(processingSysErrorId, configId, batchId, fieldId,
                     null, cwd.getCrosswalkId(), null,
-                    false, foroutboundProcessing, ("executeCWData " + ex.getCause().toString()));
+                    false, foroutboundProcessing, ("executeSingleValueCWData " + ex.getCause().toString()));
         }
 
     }

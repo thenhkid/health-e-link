@@ -66,8 +66,8 @@ public class configurationDataTranslations {
     private int processOrder;
     
     @Column(name = "CategoryId", nullable = false)
-    private int categoryId;
-
+    private int categoryId = 3; // while processing
+    
     public int getId() {
         return id;
     }
