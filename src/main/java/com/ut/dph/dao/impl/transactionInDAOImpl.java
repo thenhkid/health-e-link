@@ -3112,7 +3112,8 @@ public class transactionInDAOImpl implements transactionInDAO {
     public Integer insertBatchTargets(Integer batchId) {
         try {
             String sql = ("insert into transactiontarget (batchUploadId, transactionInId, configId, statusId)"
-                    + " select batchId, transactionInId, targetconfigId, 9 from batchUploadSummary where batchId = :batchId");
+                    + " select batchUploadSummary.batchId, transactionInId, targetconfigId, statusId from batchUploadSummary, transactionIn "
+                    + " where transactionIn.id = batchUploadSummary.transactionInId and  batchUploadSummary.batchId = :batchId");
             Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
             query.setParameter("batchId", batchId);
             query.executeUpdate();
@@ -3593,7 +3594,7 @@ public class transactionInDAOImpl implements transactionInDAO {
     public Integer insertTransactionInByTargetId(batchUploadSummary bus) {
         try {
             String sql = ("insert into transactionIn (batchId, configId, statusId, transactionTargetId, loadTableId) "
-                    + " select batchUploadId,sourceConfigId, 9,  transactionTarget.id, transactionTarget.transactionInId "
+                    + " select batchUploadId,sourceConfigId, statusId,  transactionTarget.id, transactionTarget.transactionInId "
                     + " from transactionTarget, batchUploadSummary where "
                     + " batchId = :batchId and transactionTarget.transactionInId = batchUploadSummary.transactionInId "
                     + " and batchUploadSummary.targetConfigId = transactionTarget.configId and transactionTarget.id  = :targetId");
@@ -4272,6 +4273,25 @@ public class transactionInDAOImpl implements transactionInDAO {
             System.err.println("getRhapsodyInfoForJob " + ex.getCause());
             ex.printStackTrace();
             return null;
+        }
+	}
+
+	@Override
+	@Transactional
+	public Integer insertTransactionInError(Integer newTInId, Integer oldTInId) {
+		try {
+            String sql = ("INSERT INTO transactioninerrors(batchUploadId, configId, transactionInId, fieldNo, required, errorId, cwId, macroId, validationTypeId, stackTrace) "
+            		+ "select batchUploadId, configId, "+ newTInId +", fieldNo, required, errorId, cwId, macroId, validationTypeId, stackTrace from transactioninerrors where transactionInId = :oldTInId");
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+            query.setParameter("oldTInId",oldTInId);
+            query.executeUpdate();
+
+            return 0;
+
+        } catch (Exception ex) {
+            System.err.println("insertTransactionInError " + ex.getCause());
+            ex.printStackTrace();
+            return 1;
         }
 	}
     

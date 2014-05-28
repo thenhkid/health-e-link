@@ -307,4 +307,6 @@ public interface transactionInDAO {
     messagePatients getPatientTransactionDetails(int transactionInId);
     
     List <configurationRhapsodyFields> getRhapsodyInfoForJob (Integer method);
+    
+    Integer insertTransactionInError(Integer newTInId, Integer oldTInId);
 }
