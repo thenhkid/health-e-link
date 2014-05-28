@@ -1232,13 +1232,13 @@ public class transactionInManagerImpl implements transactionInManager {
             for (CrosswalkData cwd : cdList) {
                 executeSingleValueCWData(configId, batchId, cdt.getFieldNo(), cwd, foroutboundProcessing, cdt.getFieldId(), transactionId);
             }
+            if (cdt.getPassClear() == 1) {
+            	//flag errors, anything row that is not null in F[FieldNo] but null in forCW
+            	flagCWErrors(configId, batchId, cdt, foroutboundProcessing, transactionId);
+            	//flag as error in transactionIn or transactionOut table
+                updateStatusForErrorTrans(batchId, 14, foroutboundProcessing, transactionId);
 
-            //flag errors, anything row that is not null in F[FieldNo] but null in forCW
-            flagCWErrors(configId, batchId, cdt, foroutboundProcessing, transactionId);
-
-            //flag as error in transactionIn or transactionOut table
-            updateStatusForErrorTrans(batchId, 14, foroutboundProcessing, transactionId);
-
+            } 
             //we replace original F[FieldNo] column with data in forcw
             updateFieldNoWithCWData(configId, batchId, cdt.getFieldNo(), cdt.getPassClear(), foroutboundProcessing, transactionId);
 
@@ -2028,7 +2028,7 @@ public class transactionInManagerImpl implements transactionInManager {
             //now get the rest by configId
             List<ConfigErrorInfo> confErrorListByConfig = getErrorConfigForBatch(batchInfo.getId());
             for (ConfigErrorInfo cei : confErrorListByConfig) {
-                configErrorInfo.setBatchId(batchInfo.getId());
+            	cei.setBatchId(batchInfo.getId());
                 configErrorInfo = getHeaderForConfigErrorInfo(batchInfo.getId(), cei);
                 //add error details
                 String sqlStmt = "";
