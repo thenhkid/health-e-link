@@ -372,3 +372,29 @@ INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`
 INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('58', 'Injection Contraception', 'Injection Contraception');
 
 /** grace 05282014 12:34 AM   -  All ABOVE UPDATES are on DEV and TEST **/
+
+/** grace 05282014 12:20 PM **/
+ALTER TABLE `universaltranslator`.`message_visitinfo` 
+ADD COLUMN `subRecipientId` INT NULL AFTER `bmi`;
+
+ALTER TABLE `universaltranslator`.`message_races` 
+ADD COLUMN `refusedToState` INT NULL AFTER `moreThanOneRace`;
+
+ALTER TABLE `universaltranslator`.`message_visitinfo` 
+ADD COLUMN `incomeUnit` VARCHAR(45) NULL AFTER `wklyIncome`;
+
+ALTER TABLE `universaltranslator`.`message_visitinfo` 
+ADD COLUMN `weightUnitReported` VARCHAR(45) NULL AFTER `weight`,
+ADD COLUMN `heightUnitReported` VARCHAR(45) NULL AFTER `height`;
+
+ALTER TABLE `universaltranslator`.`message_Patients` 
+ADD COLUMN `initialNoContraceptiveId` INT NULL AFTER `initialContraceptiveId`;
+
+ALTER TABLE `universaltranslator`.`message_visitinfo` 
+ADD COLUMN `pregIntentions` VARCHAR(45) NULL AFTER `subRecipientId`;
+
+ALTER TABLE `universaltranslator`.`message_visitinfo` 
+ADD COLUMN `pregHistory` INT NULL AFTER `pregIntentions`;
+
+
+

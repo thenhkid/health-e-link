@@ -339,7 +339,7 @@ public class messageTypeDAOImpl implements messageTypeDAO {
     @SuppressWarnings("rawtypes")
     @Transactional
     public List getTableColumns(String tableName) {
-        Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'universalTranslator' AND TABLE_NAME = :tableName")
+        Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'universalTranslator' AND TABLE_NAME = :tableName and COLUMN_NAME not in ('id', 'dateCreated', 'transactionInId') order by COLUMN_NAME")
                 .setParameter("tableName", tableName);
 
         return query.list();
