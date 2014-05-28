@@ -17,10 +17,10 @@
                         <a href="javascript:void(0);" title="Logos" class="unstyled-link">Manage Logos</a>
                     </c:when> 
                     <c:when test="${param['page'] == 'hl7List'}">
-                        <a href="javascript:void(0);" title="HL7 Versions" class="unstyled-link">Manage HL7 Versions</a>
+                        <a href="javascript:void(0);" title="HL7 Specs" class="unstyled-link">Manage HL7 Specs</a>
                     </c:when> 
                     <c:when test="${param['page'] == 'hl7Details'}">
-                        <a href="javascript:void(0);" title="Create new HL7 Version" class="unstyled-link">Create new HL7 Version</a>
+                        <a href="javascript:void(0);" title="Create new HL7 Spec" class="unstyled-link">Create new HL7 Spec</a>
                     </c:when>     
                 </c:choose>
             </h1>

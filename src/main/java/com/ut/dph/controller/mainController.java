@@ -22,7 +22,6 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
-import com.ut.dph.service.CCDtoTxt;
 
 /**
  * The mainController class will handle all URL requests that fall outside of specific user or admin controllers
@@ -41,20 +40,6 @@ public class mainController {
     @Autowired
     private emailMessageManager emailMessageManager;
     
-    @Autowired
-    private CCDtoTxt ccdtotxt;
-    @RequestMapping(value= "/ccdtest", method = RequestMethod.GET)
-    public void ccdtest(HttpServletRequest request) throws Exception {
-        
-        String filelocation = "/bowlink/HarborHealth/input files/";
-        String ccdFileName = "harborhealth.xml";
-        
-        int orgId = 5;
-        
-       ccdtotxt.TranslateCCDtoTxt(filelocation, ccdFileName, orgId);
-        
-    }
-
     /**
      * The '/login' request will serve up the login page.
      *
@@ -114,11 +99,20 @@ public class mainController {
      * @throws Exception
      */
     @RequestMapping(value = "/", method = RequestMethod.GET)
-    public ModelAndView welcome(HttpServletRequest request, HttpServletResponse response, RedirectAttributes redirectAttr) throws Exception {
-
-        ModelAndView mav = new ModelAndView(new RedirectView("/login"));
-        return mav;
-
+    public ModelAndView welcome(HttpServletRequest request, HttpServletResponse response, RedirectAttributes redirectAttr, HttpSession session) throws Exception {
+        
+        /** If the user is logged in and clicks to go home send to the account home page, otherwise the login page**/
+        User userInfo = (User)session.getAttribute("userDetails");
+        
+        if(userInfo == null) {
+           ModelAndView mav = new ModelAndView(new RedirectView("/login"));
+            return mav; 
+        }
+        else {
+            ModelAndView mav = new ModelAndView(new RedirectView("/profile"));
+            return mav;
+        }
+        
         /*return new ModelAndView("/home");*/
     }
 

@@ -9,8 +9,8 @@
             <div class="alert alert-success">
                 <strong>Success!</strong> 
                 <c:choose>
-                    <c:when test="${savedStatus == 'updated'}">The HL7 Standard has been successfully updated!</c:when>
-                    <c:when test="${savedStatus == 'created'}">The HL7 Standard has been successfully added!</c:when>
+                    <c:when test="${savedStatus == 'updated'}">The HL7 Spec has been successfully updated!</c:when>
+                    <c:when test="${savedStatus == 'created'}">The HL7 Spec has been successfully added!</c:when>
                 </c:choose>
             </div>
         </c:if>
@@ -22,7 +22,7 @@
                     <table class="table table-striped table-hover table-default" <c:if test="${not empty hl7Versions}">id="dataTable"</c:if>>
                         <thead>
                             <tr>
-                                <th scope="col">HL7 Version</th>
+                                <th scope="col">HL7 Spec Name</th>
                                 <th scope="col"></th>
                             </tr>
                         </thead>

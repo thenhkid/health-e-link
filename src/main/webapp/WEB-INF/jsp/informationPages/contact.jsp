@@ -88,13 +88,12 @@
                     </div>
                     <div class="form-group">
                         <label for="email">Email *</label>
-                        <input id="fname" name="email" class="form-control half" type="text" />
-                        <a href="" title="">Privacy Policy</a>
+                        <input id="email" name="email" class="form-control half" type="text" />
                     </div>
                     
                     <div class="form-group">
-                        <label for="email">Comments</label>
-                        <textarea class="form-control"></textarea>
+                        <label for="comments">Comments</label>
+                        <textarea id="comments" class="form-control"></textarea>
                     </div>
                     <div class="form-group">
                         <input type="submit" class="btn btn-primary" value="Send"/>
