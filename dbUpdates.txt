@@ -309,3 +309,65 @@ CREATE TABLE `HL7Elements` (
   CONSTRAINT `mainelemHLyIdfk` FOREIGN KEY (`hl7Id`) REFERENCES `HL7Specs` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `mainelemSegIdfk` FOREIGN KEY (`segmentId`) REFERENCES `HL7Segments` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=131 DEFAULT CHARSET=latin1;
+
+
+/** grace 05282014 11:49PM **/
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('1', 'Pelvic Exam', 'Pelvic Exam');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('2', 'Breast Exam', 'Breast Exam');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('3', 'Implant Insert', 'Implant Insert');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('4', 'Implant Removal', 'Implant Removal');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('5', 'Implant Replacement', 'Implant Replacement');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('6', 'HPV', 'HPV');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('7', 'Other', 'Other');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('8', 'Emergency Contraception', 'Emergency Contraception');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('9', 'CBE Referral', 'CBE Referral');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('10', 'Wart Treatment', 'Wart Treatment');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('11', 'Vasectomy', 'Vasectomy');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('12', 'Wart Treatment', 'Wart Treatment');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('13', 'Diaphragm / Cap Fitting', 'Diaphragm / Cap Fitting');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('14', 'Colposcopy', 'Colposcopy');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('15', 'Colposcopy w/ Biopsy', 'Colposcopy w/ Biopsy');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('16', 'Colposcopy w/ Leep', 'Colposcopy w/ Leep');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('17', 'Cryo Cautery', 'Cryo Cautery');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('18', 'Colposcopy w/ Leep', 'Colposcopy w/ Leep');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('19', 'IUD Insertion', 'IUD Insertion');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('20', 'IUD Removal', 'IUD Removal');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('21', 'Tubal Ligation', 'Tubal Ligation');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('22', 'HIV Test - Standard', 'HIV Test - Standard');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('23', 'HIV Test - Standard Result Provided', 'HIV Test - Standard Result Provided');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('24', 'Pregnancy Test', 'Pregnancy Test');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('25', 'Cholesterol', 'Cholesterol');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('26', 'Anemia Screening', 'Anemia Screening');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('27', 'RPR', 'RPR');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('28', 'HIV Test - Rapid', 'HIV Test - Rapid');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('29', 'HEP C Test', 'HEP C Test');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('30', 'Wet Prep  / Mount', 'Wet Prep  / Mount');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('31', 'Chlamydia Test', 'Chlamydia Test');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('32', 'GC', 'GC');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('33', 'Pap Smear', 'Pap Smear');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('34', 'Pap Smear', 'Pap Smear');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('35', 'Pap Smear', 'Pap Smear');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('36', 'Pap Smear', 'Pap Smear');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('37', 'Injection contraception', 'Injection contraception');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('38', 'Limited/ Minor', 'Limited/ Minor');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('39', 'Low to Moderate', 'Low to Moderate');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('40', 'Moderate', 'Moderate');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('41', 'Moderate to High', 'Moderate to High');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('42', 'High Complexity', 'High Complexity');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('43', 'Brief', 'Brief');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('44', 'Minor Complexity', 'Minor Complexity');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('45', 'Low Complexity', 'Low Complexity');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('46', 'Moderate to High', 'Moderate to High');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('47', 'High Complexity', 'High Complexity');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('48', 'Age 12- 17 Years', 'Age 12- 17 Years');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('49', 'Age 18-39 Years', 'Age 18-39 Years');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('50', 'Age 40-64 Years', 'Age 40-64 Years');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('51', 'Age 65+ Years', 'Age 65+ Years');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('52', 'Age 12- 17 Years', 'Age 12- 17 Years');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('53', 'Age 18-39 Years', 'Age 18-39 Years');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('54', 'Age 40-64 Years', 'Age 40-64 Years');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('55', 'Age 65+ Years', 'Age 65+ Years');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('56', 'Short', 'Short');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('57', 'Long', 'Long');
+INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('58', 'Injection Contraception', 'Injection Contraception');
+
