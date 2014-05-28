@@ -83,7 +83,7 @@
                                                             <select name="fields[${field.index}].messageTypeFieldId" id="matchingField_${mappings.fieldNo}" rel="${field.index}" class="formField matchingField">
                                                             <option value="0">-</option>
                                                             <c:forEach var="tField" items="${templateFields}">
-                                                                <option value="${tField.id}" <c:if test="${mappings.messageTypeFieldId == tField.id}">selected</c:if>>${tField.fieldNo} - ${tField.fieldLabel}</option>
+                                                                <option value="${tField.id}" <c:if test="${mappings.messageTypeFieldId == tField.id}">selected</c:if>>${tField.fieldLabel} - ${tField.fieldNo}</option>
                                                             </c:forEach>
                                                         </select>
                                                     </td>
