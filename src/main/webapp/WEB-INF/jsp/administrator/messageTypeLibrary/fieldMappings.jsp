@@ -62,7 +62,7 @@
                             <table class="table table-striped table-hover bucketTable_${i}">
                                 <thead>
                                     <tr>
-                                        <th scope="col" style="width:100px; min-width:120px">Display POS</th>
+                                        <th scope="col" style="width:150px; min-width:150px">Display POS</th>
                                         <th scope="col" style="width:150px; min-width:150px;">Field Name</th>
                                         <th scope="col" style="width:150px; min-width:150px;">Field Label *</th>
                                         <th scope="col" style="width:150px; min-width:150px;">Field Validation </th>
