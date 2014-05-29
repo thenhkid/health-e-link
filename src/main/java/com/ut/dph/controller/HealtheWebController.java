@@ -1304,6 +1304,16 @@ public class HealtheWebController {
 
                 transactionId = (Integer) transactionInManager.submitTransactionIn(transactionIn);
 
+                /* Need to populate the batchUploadSummary table */
+                batchUploadSummary summary = new batchUploadSummary();
+                summary.setbatchId(batchId);
+                summary.settransactionInId(transactionId);
+                summary.setsourceOrgId(transactionDetails.getorgId());
+                summary.settargetOrgId(transactionDetails.gettargetOrgId());
+                summary.setmessageTypeId(transactionDetails.getmessageTypeId());
+                summary.setsourceConfigId(transactionDetails.getconfigId());
+
+                transactionInManager.submitBatchUploadSummary(summary);  
             }
             catch (Exception e) {
                 throw new Exception("Error occurred in creating the new transaction for batch "+batchId,e);
@@ -1545,7 +1555,7 @@ public class HealtheWebController {
             method to handle all the processing and saving to the final messages_ tables. This method
             will return true if successfully received and false otherwise.
             */
-            boolean transactionSentToProcess = transactionInManager.processBatch(batchId, false, transactionId);
+            boolean transactionSentToProcess = transactionInManager.processBatch(batchId, false, 0);
             
             
             /*
