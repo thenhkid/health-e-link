@@ -4295,4 +4295,24 @@ public class transactionInDAOImpl implements transactionInDAO {
         }
 	}
     
+	@Override
+	@Transactional
+	public boolean insertTargets(Integer batchId) {
+		boolean insertTargets = false;
+		try {
+            String sql = ("select count(id)  as ids from transactionTarget where transactionInId in (select id from transactionIn where batchId = :batchId);");
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+            query.setParameter("batchId",batchId);
+            query.list();
+
+            if (query.list().size() == 0) {
+            	insertTargets = true;
+            } 
+
+        } catch (Exception ex) {
+            System.err.println("insertTargets " + ex.getCause());
+            ex.printStackTrace();
+        }
+		return insertTargets;
+	}
 }

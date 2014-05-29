@@ -382,4 +382,6 @@ public interface transactionInManager {
     
     Integer insertTransactionInError(Integer newTInId, Integer oldTInId);
     
+    boolean insertTargets (Integer batchId);
+    
 }

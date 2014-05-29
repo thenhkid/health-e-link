@@ -523,49 +523,51 @@ public class transactionInManagerImpl implements transactionInManager {
                 // update status of the failed records to ERR - 14
                 updateStatusForErrorTrans(batchUploadId, 14, false, transactionId);
 
-                /** moving targets to here **/
-                //load our targets here
-              //load targets - we need to loadTarget only if field for target is blank, otherwise we load what user sent
-	            Integer batchId = batchUploadId;
-	            List<configurationConnection> batchTargetList = getBatchTargets(batchId, true);
-	            int sourceConfigId = 0;
-	            if (batchTargetList.size() <= 0) {
-	                insertProcessingError(10, null, batchId, null, null, null, null, false, false, "No valid connections were found for loading batch.");
-	                updateTransactionStatus(batchId, 0, 0, 13);
-	                updateRecordCounts(batchId, new ArrayList<Integer>(), false, "errorRecordCount");
-	                updateRecordCounts(batchId, new ArrayList<Integer>(), false, "totalRecordCount");
-	                updateBatchStatus(batchId, 7, "endDateTime");
-	                return false;
-	            } else {
-	                for (configurationConnection bt : batchTargetList) {
-	                    /* populate batchUploadSummary need batchId, transactionInId,  configId, 
-	                     * sourceOrgId, messageTypeId - in configurations - missing targetOrgId, 
-	                     * if targetOrgCol has value, we populate - cms's target col could be 0, if spec has no target column,
-	                     * we insert all connections
-	                     * if targetOrgCol has value, we make sure value is valid
-	                     */
-	                	systemErrorCount = systemErrorCount + insertBatchUploadSummary(batch, bt);
-	                    if (sourceConfigId != bt.getsourceConfigId()) {
-	                        if (bt.getTargetOrgCol() != 0) {
-	                        	systemErrorCount = systemErrorCount + rejectInvalidTargetOrg(batchId, bt);
-	                        }
-	                        sourceConfigId = bt.getsourceConfigId();
-	                    }
-	                }
-	                systemErrorCount = systemErrorCount + setStatusForErrorCode(batchId, 11, 9, false);
-	
-	                //reject transactions with config that do not connections
-	                systemErrorCount = systemErrorCount + rejectNoConnections(batch);
-	                systemErrorCount = systemErrorCount + setStatusForErrorCode(batchId, 11, 10, false);
-	
-	                systemErrorCount = systemErrorCount + insertBatchTargets(batchId);
-	
-	                //handle duplicates, need to insert again and let it be its own row
-	                systemErrorCount = systemErrorCount + newEntryForMultiTargets(batchId);
-	
-	            }
-                
-                
+               
+                /** targets should only be inserted if it hasn't gone through this loop already **/
+                if (insertTargets(batchUploadId)) {
+	                //load our targets here
+	                //load targets - we need to loadTarget only if field for target is blank, otherwise we load what user sent
+		            Integer batchId = batchUploadId;
+		            List<configurationConnection> batchTargetList = getBatchTargets(batchId, true);
+		            int sourceConfigId = 0;
+		            if (batchTargetList.size() <= 0) {
+		                insertProcessingError(10, null, batchId, null, null, null, null, false, false, "No valid connections were found for loading batch.");
+		                updateTransactionStatus(batchId, 0, 0, 13);
+		                updateRecordCounts(batchId, new ArrayList<Integer>(), false, "errorRecordCount");
+		                updateRecordCounts(batchId, new ArrayList<Integer>(), false, "totalRecordCount");
+		                updateBatchStatus(batchId, 7, "endDateTime");
+		                return false;
+		            } else {
+		                for (configurationConnection bt : batchTargetList) {
+		                    /* populate batchUploadSummary need batchId, transactionInId,  configId, 
+		                     * sourceOrgId, messageTypeId - in configurations - missing targetOrgId, 
+		                     * if targetOrgCol has value, we populate - cms's target col could be 0, if spec has no target column,
+		                     * we insert all connections
+		                     * if targetOrgCol has value, we make sure value is valid
+		                     */
+		                	systemErrorCount = systemErrorCount + insertBatchUploadSummary(batch, bt);
+		                    if (sourceConfigId != bt.getsourceConfigId()) {
+		                        if (bt.getTargetOrgCol() != 0) {
+		                        	systemErrorCount = systemErrorCount + rejectInvalidTargetOrg(batchId, bt);
+		                        }
+		                        sourceConfigId = bt.getsourceConfigId();
+		                    }
+		                }
+		                systemErrorCount = systemErrorCount + setStatusForErrorCode(batchId, 11, 9, false);
+		
+		                //reject transactions with config that do not connections
+		                systemErrorCount = systemErrorCount + rejectNoConnections(batch);
+		                systemErrorCount = systemErrorCount + setStatusForErrorCode(batchId, 11, 10, false);
+		
+		                systemErrorCount = systemErrorCount + insertBatchTargets(batchId);
+		
+		                //handle duplicates, need to insert again and let it be its own row
+		                systemErrorCount = systemErrorCount + newEntryForMultiTargets(batchId);
+		
+		            }
+                }
+                /** end of inserting target **/
                 
                 
                 
@@ -2805,5 +2807,10 @@ public class transactionInManagerImpl implements transactionInManager {
 	@Override
 	public Integer insertTransactionInError(Integer newTInId, Integer oldTInId) {
 		return transactionInDAO.insertTransactionInError(newTInId, oldTInId);
+	}
+	
+	@Override
+	public boolean insertTargets (Integer batchId) {
+		return transactionInDAO.insertTargets(batchId);
 	}
 }
