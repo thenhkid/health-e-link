@@ -329,10 +329,10 @@
                     <div id="translationMsgDiv"  class="alert alert-danger" style="display:none;">
                         <strong>An error has occurred in one of the above fields!</strong>
                     </div>
-                    <input type="button" id="save" class="btn btn-primary btn-action-sm submitMessage" value="Save ${transaction.sourceType == 1 && pageHeader == 'create' ? 'Referral' : 'Feedback Report'}"/>
+                    <input type="button" id="save" class="btn btn-primary btn-action-sm submitMessage" value="Save ${transaction.sourceType == 1 && (pageHeader == 'create' || pageHeader == 'pending') ? 'Referral' : 'Feedback Report'}"/>
                     <c:choose>
                         <c:when test="${transaction.autoRelease == true}">
-                            <input type="button" id="send" class="btn btn-primary btn-action-sm submitMessage" value="Send ${transaction.sourceType == 1 && pageHeader == 'create' ? 'Referral' : 'Feedback Report'}"/>
+                            <input type="button" id="send" class="btn btn-primary btn-action-sm submitMessage" value="Send ${transaction.sourceType == 1 && (pageHeader == 'create' || pageHeader == 'pending') ? 'Referral' : 'Feedback Report'}"/>
                         </c:when>
                         <c:otherwise>
                             <input type="button" id="release" class="btn btn-primary btn-action-sm submitMessage" value="Release"/>
