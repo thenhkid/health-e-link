@@ -371,8 +371,6 @@ INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`
 INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('57', 'Long', 'Long');
 INSERT INTO `universaltranslator`.`lu_tests` (`id`, `displayText`, `description`) VALUES ('58', 'Injection Contraception', 'Injection Contraception');
 
-/** grace 05282014 12:34 AM   -  All ABOVE UPDATES are on DEV and TEST **/
-
 /** grace 05282014 12:20 PM **/
 ALTER TABLE `universaltranslator`.`message_visitinfo` 
 ADD COLUMN `subRecipientId` INT NULL AFTER `bmi`;
@@ -397,6 +395,7 @@ ALTER TABLE `universaltranslator`.`message_visitinfo`
 ADD COLUMN `pregHistory` INT NULL AFTER `pregIntentions`;
 
 
+/** grace 05282014 09:54PM   -  All ABOVE UPDATES are on DEV and TEST **/
 /** Chad 05292014 @ 11:35 PM **/
 UPDATE `universalTranslator`.`lu_Races` SET `displayText`='American Indian/Alaskan Native' WHERE `id`='3';
 UPDATE `universalTranslator`.`lu_Races` SET `displayText`='Black or African American' WHERE `id`='2';

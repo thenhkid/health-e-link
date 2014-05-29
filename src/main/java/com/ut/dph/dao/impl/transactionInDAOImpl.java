@@ -1945,7 +1945,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 
         if (foroutboundProcessing == false) {
             sql = "update transactionTranslatedIn set forcw = :targetValue where "
-                    + "REPLACE(REPLACE(f" + fieldNo + ", '\n', ''), '\r', '') = :sourceValue and transactionInId ";
+                    + "REPLACE(REPLACE(trim(f" + fieldNo + "), '\n', ''), '\r', '') = :sourceValue and transactionInId ";
             if (transactionId == 0) {
                 sql = sql + "in (select id from transactionIn where configId = :configId "
                         + " and batchId = :id and statusId not in ( :transRELId ));";
@@ -1955,7 +1955,7 @@ public class transactionInDAOImpl implements transactionInDAO {
             }
         } else {
             sql = "update transactionTranslatedOut set forcw = :targetValue where "
-                    + "REPLACE(REPLACE(f" + fieldNo + ", '\n', ''), '\r', '') = :sourceValue and transactionTargetId ";
+                    + "REPLACE(REPLACE(trim(f" + fieldNo + "), '\n', ''), '\r', '') = :sourceValue and transactionTargetId ";
             if (transactionId == 0) {
                 sql = sql + " in (select id from transactionTarget where configId = :configId and batchDLId = :id and statusId not in ( :transRELId ));";
             } else {
