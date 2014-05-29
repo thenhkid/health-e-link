@@ -410,4 +410,5 @@ UPDATE `universalTranslator`.`lu_Hispanics` SET `displayText`='Not Hispanic or L
 UPDATE `universalTranslator`.`lu_Hispanics` SET `displayText`='Unknown or Refused to Report' WHERE `id`='3';
 
 
-
+/** grace 05292014 3:23PM **/
+update organizations set orgName = 'Universal Transaltor' where id = 1;
