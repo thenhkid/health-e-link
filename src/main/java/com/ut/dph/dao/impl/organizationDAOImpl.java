@@ -169,7 +169,7 @@ public class organizationDAOImpl implements organizationDAO {
     @Override
     @SuppressWarnings("unchecked")
     public List<Organization> getAllActiveOrganizations() {
-        Query query = sessionFactory.getCurrentSession().createQuery("from Organization where cleanURL is not '' and status = 1 order by orgName desc");
+        Query query = sessionFactory.getCurrentSession().createQuery("from Organization where cleanURL is not '' and status = 1 order by orgName asc");
 
         List<Organization> organizationList = query.list();
         return organizationList;
