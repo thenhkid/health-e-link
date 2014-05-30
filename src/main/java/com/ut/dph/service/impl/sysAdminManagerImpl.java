@@ -88,10 +88,6 @@ public class sysAdminManagerImpl implements sysAdminManager {
         return sysAdminDAO.getTableData(id, utTableName);
     }
 
-    @Override
-    public Integer createTableData(TableData tableData, String utTableName) {
-        return sysAdminDAO.createTableData(tableData, utTableName);
-    }
 
     @Override
     public boolean updateTableData(TableData tableData, String utTableName) {

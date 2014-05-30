@@ -48,8 +48,6 @@ public interface sysAdminManager {
 
     TableData getTableData(Integer id, String utTableName);
 
-    Integer createTableData(TableData tableData, String utTableName);
-
     void createTableDataHibernate(TableData tableData, String utTableName);
 
     boolean updateTableData(TableData tableData, String utTableName);
