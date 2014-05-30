@@ -73,7 +73,7 @@
                 <name>10on15MinsTrigger</name>
                 <job-name>ProcessBatches</job-name>
                 <job-group>processGroup</job-group>
-                <cron-expression>0 3/10 * * * ?</cron-expression>
+                <cron-expression>0 3/2 * * * ?</cron-expression>
             </cron>
         </trigger>
     </schedule>
