@@ -224,59 +224,7 @@ public class sysAdminDAOImpl implements sysAdminDAO {
 
     }
 
-    /**
-     * need table name to be dynamic but java complies and hibernate will not allow dynamic table name. Need to accurately return the id generated and select (max) or sql = 'inserted display text' is not a good idea. For inserts that are dynamic, we will use old fashion JDBC sql
-     *
-     *
-     */
-    @Override
-    public Integer createTableData(TableData tableData, String utTableName) {
-        Integer tableDataId = 0;
-
-        Connection conn = null;
-        PreparedStatement pst = null;
-        ResultSet rs = null;
-
-        try {
-            conn = udao.getConnection();
-            String sql = "insert into " + utTableName
-                    + " (displayText, description, isCustom, status) "
-                    + "values (?, ?,?, ?)";
-
-            pst
-                    = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            pst.setString(1, tableData.getDisplayText());
-            pst.setString(2, tableData.getDescription());
-            pst.setBoolean(3, tableData.isCustom());
-            pst.setBoolean(4, tableData.isStatus());
-
-            pst.executeUpdate();
-            rs = pst.getGeneratedKeys();
-            if (rs.next()) {
-                tableDataId = rs.getInt(1);
-            }
-
-        } catch (Exception ex) {
-            System.err.println("insert table data failed." + ex);
-        } finally {
-            try {
-                if (rs != null) {
-                    rs.close();
-                }
-                if (pst != null) {
-                    pst.close();
-                }
-                if (conn != null) {
-                    conn.close();
-                }
-            } catch (SQLException e) {
-                System.out.println("Error: createData: - close connection: " + e);
-            }
-        }
-
-        return tableDataId;
-    }
-
+    
     @Override
     @Transactional
     public boolean updateTableData(TableData tableData, String utTableName) {
