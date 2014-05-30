@@ -14,7 +14,17 @@
         <property name="username" value="${jdbc.user}" />
         <property name="password" value="${jdbc.password}" />
         <property name="logAbandoned" value="${jdbc.logAbandoned}" />
-    </bean>
+        <property name="removeAbandoned" value="${jdbc.removeAbandoned}" />
+        <property name="initialSize" value="${jdbc.initialSize}" />
+        <property name="maxActive" value="${jdbc.maxActive}" />
+        <property name="maxIdle" value="${jdbc.maxIdle}" />
+        <property name="minIdle" value="${jdbc.minIdle}" />
+        <property name="timeBetweenEvictionRunsMillis" value="${jdbc.timeBetweenEvictionRunsMillis}" />
+        <property name="validationQuery" value="${jdbc.validationQuery}" />
+        <property name="validationInterval" value="${jdbc.validationInterval}" />
+        <property name="testOnBorrow" value="${jdbc.testOnBorrow}" />
+        <property name="removeAbandonedTimeout" value="${jdbc.removeAbandonedTimeout}" />
+ </bean>
     
     <bean id="sessionFactory" class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
         <property name="dataSource" ref="dataSource"></property>
@@ -22,7 +32,7 @@
             <props>
                 <prop 
                     key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>
-                <prop key="hibernate.show_sql">${hibernate.show_sql}</prop>
+                <prop key="hibernate.show_sql">${jdbc.hibernate.show_sql}</prop>
             </props>
         </property>
         <property name="packagesToScan" value="com.ut.dph.model, com.ut.dph.model.custom, com.ut.dph.model.lutables" />
