@@ -872,9 +872,10 @@ public class transactionOutDAOImpl implements transactionOutDAO {
                 if (!formField.getsaveToTableName().equalsIgnoreCase("")) {
                     
                     int rowNum;
-                    int idot = formField.getFieldDesc().indexOf(".")+1;
+                    int idot = formField.getFieldDesc().indexOf(".");
                     
                     if(idot > 0) {
+                        idot+=1;
                         rowNum = Integer.parseInt(formField.getFieldDesc().substring(idot))-1;
                     }
                     else {
