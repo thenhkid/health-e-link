@@ -311,6 +311,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                         //throw new Exception("Error occurred trying to process output transaction. transactionId: "+transaction.getId(),e);
                         processed = false;
                     }
+                    
 
                     if (!processed) {
                         //we update and log

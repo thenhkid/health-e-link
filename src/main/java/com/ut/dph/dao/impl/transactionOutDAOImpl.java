@@ -872,7 +872,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
                 if (!formField.getsaveToTableName().equalsIgnoreCase("")) {
                     
                     int rowNum;
-                    int idot = formField.getFieldDesc().lastIndexOf(".");
+                    int idot = formField.getFieldDesc().indexOf(".")+1;
                     
                     if(idot > 0) {
                         rowNum = Integer.parseInt(formField.getFieldDesc().substring(idot))-1;
@@ -883,7 +883,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
                     
                     dataSQL = "SELECT " + formField.getsaveToTableCol() + " from " + formField.getsaveToTableName()
                             + " WHERE transactionInId = :transactionInId LIMIT " + rowNum + ",1"; //LIMIT 0,1
-
+                    
                     Query getData = sessionFactory.getCurrentSession().createSQLQuery(dataSQL)
                             .setParameter("transactionInId", transactionInId);
 
