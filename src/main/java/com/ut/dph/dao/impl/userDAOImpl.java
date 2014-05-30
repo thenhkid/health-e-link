@@ -209,7 +209,7 @@ public class userDAOImpl implements userDAO {
     @Override
     @SuppressWarnings("unchecked")
     public List<User> getOrganizationContact(int orgId, int mainContact) {
-        Query query = sessionFactory.getCurrentSession().createQuery("from User where orgId = :orgId and mainContact = :mainContact and sendEmailAlert = 1");
+        Query query = sessionFactory.getCurrentSession().createQuery("from User where orgId = :orgId and mainContact = :mainContact");
         query.setParameter("orgId", orgId);
         query.setParameter("mainContact", mainContact);
         
