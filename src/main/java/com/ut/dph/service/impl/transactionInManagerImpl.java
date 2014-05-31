@@ -2813,9 +2813,5 @@ public class transactionInManagerImpl implements transactionInManager {
 	public Integer insertTransactionInError(Integer newTInId, Integer oldTInId) {
 		return transactionInDAO.insertTransactionInError(newTInId, oldTInId);
 	}
-	
-	@Override
-	public boolean insertTargets (Integer batchId) {
-		return transactionInDAO.insertTargets(batchId);
-	}
+
 }
