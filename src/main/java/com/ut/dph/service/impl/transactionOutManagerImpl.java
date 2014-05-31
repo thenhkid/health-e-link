@@ -1195,6 +1195,15 @@ public class transactionOutManagerImpl implements transactionOutManager {
                         if ("null".equals(fieldValue)) {
                             fieldValue = "";
                         }
+                        else if (fieldValue.isEmpty()) {
+                            fieldValue = "";
+                        }
+                        else if (fieldValue == null) {
+                            fieldValue = "";
+                        }
+                        else if (fieldValue.length() == 0) {
+                            fieldValue = "";
+                        }
 
                         if (i == maxFieldNo) {
                             recordRow = new StringBuilder().append(recordRow).append(fieldValue).append(System.getProperty("line.separator")).toString();

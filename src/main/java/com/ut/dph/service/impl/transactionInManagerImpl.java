@@ -1524,14 +1524,14 @@ public class transactionInManagerImpl implements transactionInManager {
 	            */
 	            if (batch.getoriginalFileName().endsWith(".xml")) {
 	                newfilename = ccdtotxt.TranslateCCDtoTxt(decodedFilePath, decodedFileName, batch.getOrgId());
-	                actualFileName = newfilename;
+	                actualFileName = (decodedFilePath + newfilename);
 	            /* 
 	             if the original file name is a HL7 file (".hr") then we are going to translate it to
 	             a pipe-delimited text file.
 	             */
 	             } else if (batch.getoriginalFileName().endsWith(".hr")) {
 	                newfilename = hl7toTxt.TranslateHl7toTxt(decodedFilePath, decodedFileName); 
-	                actualFileName = newfilename;
+	                actualFileName = (decodedFilePath + newfilename);
 	            }  
 	                
 	            //at this point, hl7 and hr are in unencoded plain text
