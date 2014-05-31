@@ -484,6 +484,11 @@ public class transactionInManagerImpl implements transactionInManager {
         Integer systemErrorCount = 0;
         // Check to make sure the file is valid for processing, valid file is a batch with SSL (3) or SR (6)*
 
+        boolean insertTargets = false;
+        // we should only insert for batches that are just loaded
+        if (batch.getstatusId() == 3) {
+        	insertTargets = true;
+        }
         if ((batch.getstatusId() == 3 || batch.getstatusId() == 6)) {
             // set batch to SBP - 4*
             updateBatchStatus(batchUploadId, 4, "startDateTime");
@@ -525,7 +530,7 @@ public class transactionInManagerImpl implements transactionInManager {
 
                
                 /** targets should only be inserted if it hasn't gone through this loop already **/
-                if (insertTargets(batchUploadId)) {
+                if (insertTargets) {
 	                //load our targets here
 	                //load targets - we need to loadTarget only if field for target is blank, otherwise we load what user sent
 		            Integer batchId = batchUploadId;
