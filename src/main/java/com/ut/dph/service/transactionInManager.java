@@ -381,7 +381,5 @@ public interface transactionInManager {
     List <configurationRhapsodyFields> getRhapsodyInfoForJob (Integer method);
     
     Integer insertTransactionInError(Integer newTInId, Integer oldTInId);
-    
-    boolean insertTargets (Integer batchId);
-    
+
 }
