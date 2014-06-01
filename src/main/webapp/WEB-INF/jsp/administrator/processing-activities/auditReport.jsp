@@ -142,6 +142,13 @@
   					</div>
   					</section>
   				</c:when>
+  				<c:when test="${not empty toomany}">
+  					<section class="panel panel-default">
+                                <div class="panel-heading">
+  						<strong>Audit report cannot be viewed as there are over 1000 errors for this batch.</strong>
+  					</div>
+  					</section>
+  				</c:when>
   				<c:otherwise>
   					<section class="panel panel-default">
                                 <div class="panel-heading">

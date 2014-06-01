@@ -1505,15 +1505,17 @@ public class adminProcessingActivity {
                 batchDetails.setConfigName("Multiple Message Types");
             }
             mav.addObject("batchDetails", batchDetails);
-
-            try {
-                List<TransErrorDetailDisplay> errorList = new LinkedList<TransErrorDetailDisplay>();
-                errorList = transactionInManager.populateErrorList(batchDetails);
-                mav.addObject("errorList", errorList);
-            } catch (Exception e) {
-                throw new Exception("(Admin) Error occurred in getting the audit report for an inbound batch. batchId: " + batchDetails.getId() + " ERROR: " + e.getMessage(), e);
+            if (batchDetails.geterrorRecordCount() <= 1000) {
+	            try {
+	                List<TransErrorDetailDisplay> errorList = new LinkedList<TransErrorDetailDisplay>();
+	                errorList = transactionInManager.populateErrorList(batchDetails);
+	                mav.addObject("errorList", errorList);
+	            } catch (Exception e) {
+	                throw new Exception("(Admin) Error occurred in getting the audit report for an inbound batch. batchId: " + batchDetails.getId() + " ERROR: " + e.getMessage(), e);
+	            }
+            } else {
+            	 mav.addObject("toomany", true);
             }
-
         } else {
             mav.addObject("doesNotExist", true);
         }

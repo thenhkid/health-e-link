@@ -47,7 +47,7 @@ public class fileDownloadController {
                 dir.setDir(cleanURL, foldername);
             }
             else {
-                dir.setDirByName(foldername);
+                dir.setDirByName(foldername + "/");
             }
             
             String mimeType = context.getMimeType(dir.getDir() + filename);

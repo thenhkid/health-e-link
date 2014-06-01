@@ -2,6 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="s" uri="http://www.springframework.org/tags" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
 <div class="main clearfix" role="main">
     <div class="row-fluid">
@@ -62,9 +63,11 @@
                                             </td>
                                             <td>
                                                 ${batch.utBatchName}
-                                                <c:if test="${batch.transportMethodId == 1}">
-                                                    <br />
-                                                    <a href="/FileDownload/downloadFile.do?filename=${batch.originalFileName}&foldername=input files&orgId=${batch.orgId}" title="View Original File">
+                                                <c:if test="${batch.transportMethodId == 1 ||batch.transportMethodId == 3 || batch.transportMethodId == 5}">
+                                                <c:set var="text" value="${fn:split(batch.originalFileName,'.')}" />
+                                                <c:set var="ext" value="${text[fn:length(text)-1]}" />
+                                                	<br />
+                                                    <a href="/FileDownload/downloadFile.do?filename=${batch.utBatchName}.${ext}&foldername=archives" title="View Original File">
                                                         ${batch.originalFileName}
                                                     </a>
                                                 </c:if>
