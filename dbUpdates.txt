@@ -469,3 +469,92 @@ DELIMITER ;
 INSERT INTO `universaltranslator`.`macro_names` (`CategoryId`, `Macro_Name`, `Macro_Short_Name`, `Formula`, `FieldA_Question`, `Con1_Question`, `Con2_Question`, `populateFieldA`) VALUES ('1', 'Concat fields into delimited list', 'concatFieldToList', 'concatFieldToList', 'Please enter field to store list', 'Pleaes enter delimiter', 'Please enter field number in a comma delimited list', 1);
 
 /** all above updates are applied on DPH  grace 05302014 12:53AM **/
+
+/** grace 06012014 04:56 AM **/
+use universalTranslator;
+
+drop procedure if exists stripCharAtPos;
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `stripCharAtPos`(in configId int, 
+in batchId int, in srcField varchar(10), in fieldA varchar(10), in fieldB varchar(10), in con1 varchar(10), 
+in con2 varchar(10), in macroId int, in foroutboundProcessing boolean, in passClear int, in transactionId int)
+
+proc_main:begin
+-- sample usage CALL `universaltranslator`.`stripCharAtPos`(34, 12, 'F3', 'F255', 'F', '4', '', 9875, false, 2, 0);
+
+-- this sets out table
+call setInboundOutBoundTables (foroutboundProcessing);
+select @translatedTable, @transactionTable, @batchTable, @batchIdType , @errorTable
+into @translatedTable, @transactionTable, @batchTable, @batchIdType , @errorTable;
+
+call getFinalStatusIds;
+select @finalStatusIds into @finalStatusIds;
+
+-- fieldA - field to update, fieldA already has false
+-- fieldB - field to read value from
+-- conA  field position
+-- conB field to match, leave blank if just dropping
+
+set @readField = fieldA;
+set @strCompare = '';
+
+select fieldB;
+if (fieldB != 'F') then
+	begin 
+		set @readField = fieldB;
+end;
+end if; 
+
+if (length(trim(con2)) != 0) then
+	begin 
+		set @strCompare = concat(" and substring(", @readField, ",", con1, ", 1) = '", con2, "'");
+	end;
+end if; 
+
+-- build our sql
+if (transactionId = 0) then
+begin
+
+select @readField;
+
+set @stmt = concat("update ",@translatedTable, " set ",fieldA," = concat(substring(", @readField,", 1, (", con1, "-1)), 
+substring(", @readField, ", (", con1, " + 1),length(", @readField,")- ", con1,")) where length(", @readField,") >= " ,con1 , 
+@strCompare, "  and ",@transactionTable,"Id in (select id from ",@transactionTable,
+" where configId = ",configId," and ", @batchIdType," = ",batchId," and statusId not in (",@finalStatusIds ,"));");
+
+end;
+END if;
+
+
+if (transactionId != 0) then
+
+	set @stmt = concat("update ",@translatedTable, " set ",fieldA," = concat(substring(", @readField,", 1, (", con1, "-1)), 
+	substring(", @readField, ", (", con1, " + 1),length(", @readField,")- ", con1,")) where length(", @readField,") >= " ,con1 , 
+	@strCompare, "  and ",@transactionTable,"Id =", transactionId,";");
+END if;
+
+-- insert into formula (formula) values (@stmt);
+
+ PREPARE stmt from @stmt;
+ EXECUTE stmt;-- execute
+
+-- we check pass /clear
+if (passClear = 2) THEN
+BEGIN
+-- accessible
+END;
+END IF;
+
+
+-- the only error for this is if SP bombs, no need to write in insert error logs
+select '';
+end proc_main$$
+DELIMITER ;
+
+INSERT INTO `universaltranslator`.`Macro_Names` (`Macro_Name`, `Macro_Short_Name`, `Formula`, `FieldA_Question`, `FieldB_Question`, `Con1_Question`, `Con2_Question`, `populateFieldA`) VALUES ('Strip character at specific position of field, can update another column and have option match', 'stripCharAtPos', 'stripCharAtPos', 'Please enter field to update', 'Please enter field to strip value from', 'Please enter position of character to drop', 'Please enter character to drop (optional)', 1);
+
+
+/** all above updates are applied on DPH  grace 06012014 05:09AM **/
+
+
