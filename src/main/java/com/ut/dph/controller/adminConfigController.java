@@ -954,7 +954,7 @@ public class adminConfigController {
                 if (formfield.getmessageTypeFieldId() == 0) {
                     formfield.setUseField(false);
                 } else {
-                    formfield.setUseField(true);
+                    formfield.setUseField(formfield.getUseField());
                 }
                 
                 //Update each field
