@@ -82,6 +82,7 @@ import org.apache.commons.io.filefilter.HiddenFileFilter;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -2843,26 +2844,32 @@ public class transactionInManagerImpl implements transactionInManager {
 			//1. we get list of ids for field
 			for (IdAndFieldValue idAndValue : idAndValues) {
 				Integer invalidCount = 0;
+				Integer blankListLength = 0;
 				List <String> values = new ArrayList<String>();
+				
 				List<String> fieldValues = Arrays.asList(idAndValue.getFieldValue().split("\\^\\^\\^\\^\\^",-1));
 				//we loop through value and compare to cw
 				for (String fieldValue : fieldValues) {
+					//sometimes user need to pass blank list, should not be count as an error
 					if(cwMap.containsKey(fieldValue.trim())){
-						values.add(cwMap.get(fieldValue.trim()));
+						values.add(cwMap.get(fieldValue.trim()));						
 					} else {
 						//we pass value
 						if (cdt.getPassClear() == 1) {
 							values.add(fieldValue.trim());	
 							invalidCount = invalidCount + 1;
+							if (fieldValue.trim().length() != 0) {
+								blankListLength = blankListLength + 1;
+							}
 						}
 					}
 				}
-				//4. we update field value values.toString().replace("]", "").replace("[", "")
-				String newValue =  values.toString().replace("]", "").replace("[", "");
+				
+				String newValue = StringUtils.collectionToDelimitedString(values, "^^^^^");
 				error = updateFieldValue (newValue, cdt.getFieldNo(), idAndValue.getTransactionId(),foroutboundProcessing);
 				
 				//we insert error if no valid values were replaced
-				if (invalidCount > 0) {
+				if (invalidCount > 0 && blankListLength > 0) {
 					insertProcessingError(3, cdt.getconfigId(), batchId, cdt.getFieldNo(), null, cdt.getCrosswalkId(), null, false, foroutboundProcessing, "", idAndValue.getTransactionId());
 				}
 			}
