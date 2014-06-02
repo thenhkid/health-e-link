@@ -26,7 +26,7 @@
             <cache-control />
             <content-type-options />
             <hsts />
-            <frame-options />
+            <frame-options policy="SAMEORIGIN" />
             <xss-protection />
         </headers>
     </http>
@@ -44,7 +44,5 @@
     </authentication-manager>
      
     <beans:bean class="com.ut.dph.security.CustomAuthenticationHandler" id="authenticationSuccessRedirecthandler"></beans:bean>
-    
-    
-
+   
 </beans:beans>
