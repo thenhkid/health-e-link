@@ -180,6 +180,59 @@ public class HealtheConnectController {
 
         return mav;
     }
+    
+    /**
+     * The '/upload' POST request will serve up the Health-e-Connect upload page.
+     *
+     * @param request
+     * @param response
+     * @return	the health-e-Connect upload view
+     * @throws Exception
+     */
+    @RequestMapping(value = "/upload", method = RequestMethod.POST)
+    public ModelAndView findUploadForm(@RequestParam Date fromDate, @RequestParam Date toDate, HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
+
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/Health-e-Connect/upload");
+
+        mav.addObject("fromDate", fromDate);
+        mav.addObject("toDate", toDate);
+
+        /* Need to get a list of uploaded files */
+        User userInfo = (User) session.getAttribute("userDetails");
+
+        try {
+            List<batchUploads> uploadedBatches = transactionInManager.getuploadedBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate);
+
+            if (!uploadedBatches.isEmpty()) {
+                uploadedBatches = transactionInManager.populateBatchInfo(uploadedBatches, userInfo);
+            }
+
+            List<configuration> configurations = configurationManager.getActiveConfigurationsByUserId(userInfo.getId(), 1);
+            boolean hasConfigurations = false;
+            if (configurations.size() >= 1) {
+                hasConfigurations = true;
+            }
+
+            mav.addObject("hasConfigurations", hasConfigurations);
+            mav.addObject("uploadedBatches", uploadedBatches);
+           
+            /**
+             * log user activity *
+             */
+            UserActivity ua = new UserActivity();
+            ua.setUserId(userInfo.getId());
+            ua.setFeatureId(featureId);
+            ua.setAccessMethod(request.getMethod());
+            ua.setPageAccess("/upload"); // include mapping in case we want to send them back to page in the future
+            ua.setActivity("Viewed Uploads Page");
+            usermanager.insertUserLog(ua);
+        } catch (Exception e) {
+            throw new Exception("Error occurred viewing the uploaded batches. userId: " + userInfo.getId(), e);
+        }
+
+        return mav;
+    }
 
 
     /**
