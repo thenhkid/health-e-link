@@ -2848,7 +2848,7 @@ public class transactionInManagerImpl implements transactionInManager {
 				//we loop through value and compare to cw
 				for (String fieldValue : fieldValues) {
 					if(cwMap.containsKey(fieldValue.trim())){
-						values.add(cwMap.get(fieldValue));
+						values.add(cwMap.get(fieldValue.trim()));
 					} else {
 						//we pass value
 						if (cdt.getPassClear() == 1) {
