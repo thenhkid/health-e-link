@@ -33,6 +33,7 @@ import com.ut.dph.model.transactionRecords;
 import com.ut.dph.model.transactionTarget;
 import com.ut.dph.model.custom.ConfigErrorInfo;
 import com.ut.dph.model.custom.ConfigForInsert;
+import com.ut.dph.model.custom.IdAndFieldValue;
 import com.ut.dph.model.custom.TransErrorDetail;
 import com.ut.dph.model.custom.TransErrorDetailDisplay;
 import com.ut.dph.model.lutables.lu_ProcessStatus;
@@ -1016,7 +1017,7 @@ public class transactionInManagerImpl implements transactionInManager {
             return 0;
         } catch (Exception ex) {
             ex.printStackTrace();
-            insertProcessingError(processingSysErrorId, cff.getconfigId(), batchUploadId, cff.getId(), null, null, validationTypeId, false, false, (ex.getClass() + " " + ex.getCause()));
+            insertProcessingError(processingSysErrorId, cff.getconfigId(), batchUploadId, cff.getFieldNo(), null, null, validationTypeId, false, false, (ex.getClass() + " " + ex.getCause()));
             return 1;
         }
 
@@ -1065,7 +1066,7 @@ public class transactionInManagerImpl implements transactionInManager {
             return 0;
         } catch (Exception ex) {
             ex.printStackTrace();
-            insertProcessingError(processingSysErrorId, cff.getconfigId(), batchUploadId, cff.getId(), null, null, validationTypeId, false, false, (ex.getClass() + " " + ex.getCause()));
+            insertProcessingError(processingSysErrorId, cff.getconfigId(), batchUploadId, cff.getFieldNo(), null, null, validationTypeId, false, false, (ex.getClass() + " " + ex.getCause()));
             return 1;
         }
 
@@ -1232,24 +1233,31 @@ public class transactionInManagerImpl implements transactionInManager {
     public Integer processCrosswalk(Integer configId, Integer batchId,
             configurationDataTranslations cdt, boolean foroutboundProcessing, Integer transactionId) {
         try {
-            // 1. we get the info for that cw (fieldNo, sourceVal, targetVal rel_crosswalkData)
+            Integer errors = 0;
+        	// 1. we get the info for that cw (fieldNo, sourceVal, targetVal rel_crosswalkData)
             List<CrosswalkData> cdList = configurationManager.getCrosswalkData(cdt.getCrosswalkId());
             //we null forcw column, we translate and insert there, we then replace
             nullForCWCol(configId, batchId, foroutboundProcessing, transactionId);
-            for (CrosswalkData cwd : cdList) {
-                executeSingleValueCWData(configId, batchId, cdt.getFieldNo(), cwd, foroutboundProcessing, cdt.getFieldId(), transactionId);
-            }
-            if (cdt.getPassClear() == 1) {
-            	//flag errors, anything row that is not null in F[FieldNo] but null in forCW
-            	flagCWErrors(configId, batchId, cdt, foroutboundProcessing, transactionId);
-            	//flag as error in transactionIn or transactionOut table
-                updateStatusForErrorTrans(batchId, 14, foroutboundProcessing, transactionId);
-
-            } 
-            //we replace original F[FieldNo] column with data in forcw
-            updateFieldNoWithCWData(configId, batchId, cdt.getFieldNo(), cdt.getPassClear(), foroutboundProcessing, transactionId);
-
-            return 0;
+            //we check to see if field value contains a list defined by UT delimiter
+            List <Integer> cwMultiList = checkCWFieldForList(configId, batchId, cdt, foroutboundProcessing, transactionId);
+            if (cwMultiList.size() > 0){
+            	// we loop through each field value in the list and apply cw
+            	errors = processMultiValueCWData(configId, batchId, cdt, cdList, foroutboundProcessing, transactionId);
+             } else  {
+	            for (CrosswalkData cwd : cdList) {
+	                executeSingleValueCWData(configId, batchId, cdt.getFieldNo(), cwd, foroutboundProcessing, cdt.getFieldId(), transactionId);
+	            }
+	            if (cdt.getPassClear() == 1) {
+	            	//flag errors, anything row that is not null in F[FieldNo] but null in forCW
+	            	flagCWErrors(configId, batchId, cdt, foroutboundProcessing, transactionId);
+	            	//flag as error in transactionIn or transactionOut table
+	                updateStatusForErrorTrans(batchId, 14, foroutboundProcessing, transactionId);
+	
+	            } 
+	            //we replace original F[FieldNo] column with data in forcw
+	            updateFieldNoWithCWData(configId, batchId, cdt.getFieldNo(), cdt.getPassClear(), foroutboundProcessing, transactionId);
+	            }
+            return errors;
         } catch (Exception e) {
             e.printStackTrace();
             return 1;
@@ -1326,18 +1334,18 @@ public class transactionInManagerImpl implements transactionInManager {
     }
 
     @Override
-    public void insertProcessingError(Integer errorId, Integer configId, Integer batchId, Integer fieldId,
+    public void insertProcessingError(Integer errorId, Integer configId, Integer batchId, Integer fieldNo,
             Integer macroId, Integer cwId, Integer validationTypeId, boolean required,
             boolean foroutboundProcessing, String errorCause) {
-        insertProcessingError(errorId, configId, batchId, fieldId, macroId, cwId, validationTypeId, required, foroutboundProcessing, errorCause, null);
+        insertProcessingError(errorId, configId, batchId, fieldNo, macroId, cwId, validationTypeId, required, foroutboundProcessing, errorCause, null);
 
     }
 
     @Override
-    public void insertProcessingError(Integer errorId, Integer configId, Integer batchId, Integer fieldId,
+    public void insertProcessingError(Integer errorId, Integer configId, Integer batchId, Integer fieldNo,
             Integer macroId, Integer cwId, Integer validationTypeId, boolean required,
             boolean foroutboundProcessing, String errorCause, Integer transactionId) {
-        transactionInDAO.insertProcessingError(errorId, configId, batchId, fieldId, macroId, cwId, validationTypeId, required, foroutboundProcessing, errorCause, transactionId);
+        transactionInDAO.insertProcessingError(errorId, configId, batchId, fieldNo, macroId, cwId, validationTypeId, required, foroutboundProcessing, errorCause, transactionId);
 
     }
 
@@ -2812,6 +2820,74 @@ public class transactionInManagerImpl implements transactionInManager {
 	@Override
 	public Integer insertTransactionInError(Integer newTInId, Integer oldTInId) {
 		return transactionInDAO.insertTransactionInError(newTInId, oldTInId);
+	}
+
+	@Override
+	public List<Integer> checkCWFieldForList(Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing, Integer transactionId) {
+		return transactionInDAO.checkCWFieldForList(configId, batchId, cdt, foroutboundProcessing, transactionId);
+	}
+
+	@Override
+	public Integer processMultiValueCWData(Integer configId, Integer batchId,
+			configurationDataTranslations cdt, List<CrosswalkData> cwdList,
+			boolean foroutboundProcessing, Integer transactionId) {
+		try {
+			Integer error = 0;
+			List <IdAndFieldValue>  idAndValues =  getIdAndValuesForConfigField(configId, batchId, cdt, foroutboundProcessing, transactionId);
+			//we turn cwdList into a map
+			Map<String, String> cwMap = new HashMap<String, String>();
+			for (CrosswalkData cw : cwdList) {
+				cwMap.put(cw.getSourceValue(),cw.getTargetValue());
+			}
+			
+			//1. we get list of ids for field
+			for (IdAndFieldValue idAndValue : idAndValues) {
+				Integer invalidCount = 0;
+				List <String> values = new ArrayList<String>();
+				List<String> fieldValues = Arrays.asList(idAndValue.getFieldValue().split("\\^\\^\\^\\^\\^",-1));
+				//we loop through value and compare to cw
+				for (String fieldValue : fieldValues) {
+					if(cwMap.containsKey(fieldValue.trim())){
+						values.add(cwMap.get(fieldValue));
+					} else {
+						//we pass value
+						if (cdt.getPassClear() == 1) {
+							values.add(fieldValue.trim());	
+							invalidCount = invalidCount + 1;
+						}
+					}
+				}
+				//4. we update field value values.toString().replace("]", "").replace("[", "")
+				String newValue =  values.toString().replace("]", "").replace("[", "");
+				error = updateFieldValue (newValue, cdt.getFieldNo(), idAndValue.getTransactionId(),foroutboundProcessing);
+				
+				//we insert error if no valid values were replaced
+				if (invalidCount > 0) {
+					insertProcessingError(3, cdt.getconfigId(), batchId, cdt.getFieldNo(), null, cdt.getCrosswalkId(), null, false, foroutboundProcessing, "", idAndValue.getTransactionId());
+				}
+			}
+			
+			return error;
+		} catch (Exception ex) {
+			ex.printStackTrace();
+            System.err.println("processMultiValueCWData " + ex.getCause());
+            return 1;
+			
+		}
+		
+		
+	}
+
+	@Override
+	public List <IdAndFieldValue> getIdAndValuesForConfigField(Integer configId,
+			Integer batchId, configurationDataTranslations cdt,
+			boolean foroutboundProcessing, Integer transactionId) {
+		return transactionInDAO.getIdAndValuesForConfigField(configId, batchId, cdt, foroutboundProcessing, transactionId);
+	}
+	
+	@Override
+	public Integer updateFieldValue (String fieldValue, Integer fieldNo, Integer transactionId,boolean foroutboundProcessing){
+		return transactionInDAO.updateFieldValue(fieldValue, fieldNo, transactionId, foroutboundProcessing);
 	}
 
 }

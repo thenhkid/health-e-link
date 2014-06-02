@@ -30,6 +30,7 @@ import com.ut.dph.model.transactionRecords;
 import com.ut.dph.model.transactionTarget;
 import com.ut.dph.model.custom.ConfigErrorInfo;
 import com.ut.dph.model.custom.ConfigForInsert;
+import com.ut.dph.model.custom.IdAndFieldValue;
 import com.ut.dph.model.custom.TransErrorDetail;
 import com.ut.dph.model.custom.TransErrorDetailDisplay;
 import com.ut.dph.model.messagePatients;
@@ -210,9 +211,9 @@ public interface transactionInManager {
     
     List<configurationTransport> getHandlingDetailsByBatch(int batchId);
     
-    void insertProcessingError(Integer errorId, Integer configId, Integer batchId, Integer fieldId, Integer macroId, Integer cwId, Integer validationTypeId, boolean required, boolean foroutboundProcessing, String errorCause);
+    void insertProcessingError(Integer errorId, Integer configId, Integer batchId, Integer fieldNo, Integer macroId, Integer cwId, Integer validationTypeId, boolean required, boolean foroutboundProcessing, String errorCause);
     
-    void insertProcessingError(Integer errorId, Integer configId, Integer batchId, Integer fieldId, Integer macroId, Integer cwId, Integer validationTypeId, boolean required, boolean foroutboundProcessing, String errorCause, Integer transactionId);
+    void insertProcessingError(Integer errorId, Integer configId, Integer batchId, Integer fieldNo, Integer macroId, Integer cwId, Integer validationTypeId, boolean required, boolean foroutboundProcessing, String errorCause, Integer transactionId);
     
     void updateRecordCounts (Integer batchId, List <Integer> statusIds, boolean foroutboundProcessing, String colNameToUpdate);
     
@@ -381,5 +382,15 @@ public interface transactionInManager {
     List <configurationRhapsodyFields> getRhapsodyInfoForJob (Integer method);
     
     Integer insertTransactionInError(Integer newTInId, Integer oldTInId);
+    
+    List <Integer> checkCWFieldForList(Integer configId, Integer batchId,
+            configurationDataTranslations cdt, boolean foroutboundProcessing, Integer transactionId);
+    
+    Integer processMultiValueCWData(Integer configId, Integer batchId, configurationDataTranslations cdt, List<CrosswalkData> cdList, boolean foroutboundProcessing, Integer transactionId);
 
+    List <IdAndFieldValue>  getIdAndValuesForConfigField(Integer configId, Integer batchId,
+            configurationDataTranslations cdt, boolean foroutboundProcessing, Integer transactionId);
+    
+    Integer updateFieldValue (String fieldValue, Integer fieldNo, Integer transactionId,boolean foroutboundProcessing);
+    
 }

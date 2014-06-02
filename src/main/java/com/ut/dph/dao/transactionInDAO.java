@@ -29,11 +29,13 @@ import com.ut.dph.model.transactionRecords;
 import com.ut.dph.model.transactionTarget;
 import com.ut.dph.model.custom.ConfigErrorInfo;
 import com.ut.dph.model.custom.ConfigForInsert;
+import com.ut.dph.model.custom.IdAndFieldValue;
 import com.ut.dph.model.custom.TransErrorDetail;
 import com.ut.dph.model.messagePatients;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Repository;
 
@@ -309,5 +311,12 @@ public interface transactionInDAO {
     List <configurationRhapsodyFields> getRhapsodyInfoForJob (Integer method);
     
     Integer insertTransactionInError(Integer newTInId, Integer oldTInId);
-   
+    
+    List <Integer> checkCWFieldForList(Integer configId, Integer batchId,
+            configurationDataTranslations cdt, boolean foroutboundProcessing, Integer transactionId);
+    
+    List <IdAndFieldValue> getIdAndValuesForConfigField(Integer configId, Integer batchId,
+            configurationDataTranslations cdt, boolean foroutboundProcessing, Integer transactionId);
+    
+    Integer updateFieldValue (String fieldValue, Integer fieldNo, Integer transactionId,boolean foroutboundProcessing);
 }

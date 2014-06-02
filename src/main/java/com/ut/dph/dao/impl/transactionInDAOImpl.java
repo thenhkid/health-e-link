@@ -32,6 +32,7 @@ import com.ut.dph.model.transactionRecords;
 import com.ut.dph.model.transactionTarget;
 import com.ut.dph.model.custom.ConfigErrorInfo;
 import com.ut.dph.model.custom.ConfigForInsert;
+import com.ut.dph.model.custom.IdAndFieldValue;
 import com.ut.dph.model.custom.TransErrorDetail;
 import com.ut.dph.model.lutables.lu_ProcessStatus;
 import com.ut.dph.model.messagePatients;
@@ -45,6 +46,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -1753,7 +1755,7 @@ public class transactionInDAOImpl implements transactionInDAO {
         } catch (Exception ex) {
             System.err.println("genericValidation " + ex.getCause());
             ex.printStackTrace();
-            insertProcessingError(processingSysErrorId, cff.getconfigId(), batchUploadId, cff.getId(),
+            insertProcessingError(processingSysErrorId, cff.getconfigId(), batchUploadId, cff.getFieldNo(),
                     null, null, validationTypeId, false, false, ("-" + ex.getCause().toString()));
             return 1; //we return error count of 1 when error
         }
@@ -1977,7 +1979,7 @@ public class transactionInDAOImpl implements transactionInDAO {
         } catch (Exception ex) {
             System.err.println("executeSingleValueCWData " + ex.getCause());
             ex.printStackTrace();
-            insertProcessingError(processingSysErrorId, configId, batchId, fieldId,
+            insertProcessingError(processingSysErrorId, configId, batchId, fieldNo,
                     null, cwd.getCrosswalkId(), null,
                     false, foroutboundProcessing, ("executeSingleValueCWData " + ex.getCause().toString()));
         }
@@ -2507,7 +2509,7 @@ public class transactionInDAOImpl implements transactionInDAO {
             return 0;
         } catch (Exception ex) {
             //insert system error
-            insertProcessingError(processingSysErrorId, configId, batchId, cdt.getFieldId(),
+            insertProcessingError(processingSysErrorId, configId, batchId, cdt.getFieldNo(),
                     cdt.getMacroId(), null, null,
                     false, foroutboundProcessing, ("executeMacro " + ex.getCause().toString()), transactionId);
             System.err.println("executeMacro " + ex.getCause());
@@ -4293,6 +4295,147 @@ public class transactionInDAOImpl implements transactionInDAO {
             ex.printStackTrace();
             return 1;
         }
+	}
+
+	@Override
+	@Transactional
+	@SuppressWarnings("unchecked")
+	public List<Integer> checkCWFieldForList(Integer configId, Integer batchId,
+			configurationDataTranslations cdt, boolean foroutboundProcessing,
+			Integer transactionId) {
+		try {
+			String sql = "";
+			Integer id = batchId;
+			//we look for field values with UT delimiter
+			if (! foroutboundProcessing) {
+		           sql = "select transactionInId from transactionTranslatedIn where  F" + cdt.getFieldNo();
+		           sql = sql + " like '%^^^^^%' and " 
+		                    + " transactionInId ";
+		            if (transactionId == 0) {
+		                sql = sql + "in (select id from transactionIn where ";
+		                if (configId != 0) {
+		                    sql = sql + " configId = :configId and ";
+		                }
+		                sql = sql + " batchId = :id and statusId not in ( :transRELId ));";
+		            } else {
+		                sql = sql + " = :id";
+		                id = transactionId;
+		            }
+		        } else {
+
+		        	sql = "select transactionTargetId from transactionTranslatedOut where  F" + cdt.getFieldNo();
+			           sql = sql + " like '%^^^^^%' and " 
+			                    + " transactionTargetId ";
+			            if (transactionId == 0) {
+			                sql = sql + "in (select id from transactionTarget where ";
+			                if (configId != 0) {
+			                    sql = sql + " configId = :configId and ";
+			                }
+			                sql = sql + " batchDownloadId = :id and statusId not in ( :transRELId ));";
+			            } else {
+			                sql = sql + " = :id";
+			                id = transactionId;
+			            }
+		        }
+	        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+	        query.setParameter("configId", configId);
+	        query.setParameter("id", id);
+	        query.setParameter("transRELId",transRELId);
+	        
+			List<Integer> transId = query.list();
+
+	        return transId;
+			
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			System.err.println("checkCWFieldForList " + ex.getCause());
+			return null;
+		}
+
+	}
+
+	@Override
+	@Transactional
+	@SuppressWarnings("unchecked")
+	public List <IdAndFieldValue> getIdAndValuesForConfigField(Integer configId,
+			Integer batchId, configurationDataTranslations cdt,
+			boolean foroutboundProcessing, Integer transactionId) {
+		try {
+			String sql = "";
+			Integer id = batchId;
+			if (! foroutboundProcessing) {
+		           sql = "select transactionInId as transactionId, F" + cdt.getFieldNo() + " as fieldValue from transactionTranslatedIn "
+		           		+ "where  length(trim(F" + cdt.getFieldNo() + ")) != 0"
+                    + " and length(REPLACE(REPLACE(F" + cdt.getFieldNo() + ", '\n', ''), '\r', '')) != 0"
+                    		+ " and transactionInId ";
+		            if (transactionId == 0) {
+		                sql = sql + "in (select id from transactionIn where ";
+		                if (configId != 0) {
+		                    sql = sql + " configId = :configId and ";
+		                }
+		                sql = sql + " batchId = :id and statusId not in ( :transRELId ));";
+		            } else {
+		                sql = sql + " = :id";
+		                id = transactionId;
+		            }
+		        } else {
+
+		        	sql = "select transactionTargetId as transactionId, F" + cdt.getFieldNo() + " as fieldValue from transactionTranslatedOut "
+		        			+ " where length(trim(F" + cdt.getFieldNo() + ")) != 0"
+                    + " and length(REPLACE(REPLACE(F" + cdt.getFieldNo() + ", '\n', ''), '\r', '')) != 0"
+                    		+ " and transactionTargetId ";
+			            if (transactionId == 0) {
+			                sql = sql + "in (select id from transactionTarget where ";
+			                if (configId != 0) {
+			                    sql = sql + " configId = :configId and ";
+			                }
+			                sql = sql + " batchDownloadId = :id and statusId not in ( :transRELId ));";
+			            } else {
+			                sql = sql + " = :id";
+			                id = transactionId;
+			            }
+		        }
+	        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
+	        .setResultTransformer(
+                    Transformers.aliasToBean(IdAndFieldValue.class))
+            .setParameter("configId", configId)
+            .setParameter("id", id).setParameter("transRELId", transRELId);
+			
+	        List<IdAndFieldValue> valueList = query.list();
+
+	        return valueList;
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			System.err.println("getIdAndValuesForConfigField " + ex.getCause());
+			return null;
+		}
+	}
+
+	@Override
+	@Transactional
+	public Integer updateFieldValue(String fieldValue, Integer fieldNo,
+			Integer transactionId, boolean foroutboundProcessing) {
+		try {
+			String sql = "";
+			
+			if (!foroutboundProcessing ) {
+				sql = "update transactionTranslatedIn set F" + fieldNo + " = :fieldValue where transactionInId = :id";
+			} else {
+				sql = "update transactionTranslatedIn set F" + fieldNo + " = :fieldValue where transactionTargetId = :id";
+			}
+	        
+	        Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+	                .setParameter("fieldValue", fieldValue)
+	                .setParameter("id", transactionId);
+	        
+	        updateData.executeUpdate();
+	        
+	        return 0;
+		} catch (Exception ex) {
+			System.err.println("updateFieldValue " + ex.getCause());
+			ex.printStackTrace();
+			return 1;
+		}
 	}
     
 }
