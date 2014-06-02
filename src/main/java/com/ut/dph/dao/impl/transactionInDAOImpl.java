@@ -4331,7 +4331,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 			                if (configId != 0) {
 			                    sql = sql + " configId = :configId and ";
 			                }
-			                sql = sql + " batchDownloadId = :id and statusId not in ( :transRELId ));";
+			                sql = sql + " batchDLId = :id and statusId not in ( :transRELId ));";
 			            } else {
 			                sql = sql + " = :id";
 			                id = transactionId;
@@ -4389,7 +4389,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 			                if (configId != 0) {
 			                    sql = sql + " configId = :configId and ";
 			                }
-			                sql = sql + " batchDownloadId = :id and statusId not in ( :transRELId ));";
+			                sql = sql + " batchDLId = :id and statusId not in ( :transRELId ));";
 			            } else {
 			                sql = sql + " = :id";
 			                id = transactionId;

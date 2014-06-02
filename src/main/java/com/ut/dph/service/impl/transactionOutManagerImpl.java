@@ -414,7 +414,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                                 String toName = null;
                                                 mailMessage msg = new mailMessage();
                                                 ArrayList<String> ccAddressArray = new ArrayList<String>();
-                                                msg.setfromEmailAddress(fromPrimaryContact.get(0).getEmail());
+                                                msg.setfromEmailAddress("dphuniversaltranslator@gmail.com");
 
                                                 if (toPrimaryContact.size() > 0) {
                                                     toName = toPrimaryContact.get(0).getFirstName() + " " + toPrimaryContact.get(0).getLastName();
