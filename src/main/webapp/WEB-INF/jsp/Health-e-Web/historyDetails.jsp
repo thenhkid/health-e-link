@@ -162,7 +162,7 @@
                                     <th scope="col" class="center-text">Patient Id</th>
                                     <th scope="col" class="center-text">Status</th>
                                     <th scope="col" class="center-text">Date Sent</th>
-                                    <th scope="col"></th>
+                                    <%--<th scope="col"></th>--%>
                                 </tr>
                             </thead>
                             <tbody>
@@ -184,9 +184,9 @@
                                                 ${trans.status}
                                             </td>
                                             <td class="center-text"><fmt:formatDate value="${trans.dateCreated}" type="date" pattern="M/dd/yyyy" /><br /><fmt:formatDate value="${trans.dateCreated}" type="time" pattern="h:mm:ss a" /></td>
-                                            <td>
+                                            <%--<td>
                                                 <a href="javascript:void(0);" class="viewDetals" >View</a>
-                                            </td>
+                                            </td>--%>
                                         </tr>
                                     </c:forEach>
                                 </c:when>

@@ -154,9 +154,9 @@ public class messageTypeDAOImpl implements messageTypeDAO {
     @SuppressWarnings("unchecked")
     public List<messageType> getAssociatedMessageTypes(int orgId) {
 
-        Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT id, name FROM messageTypes where status = 1 and id in (select messageTypeId from configurations where orgId = :orgId)");
+        Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT id, name FROM messageTypes where status = 1 and id in (select messageTypeId from configurations where orgId = :orgId) order by name asc");
         query.setParameter("orgId", orgId);
-
+        
         return query.list();
     }
 

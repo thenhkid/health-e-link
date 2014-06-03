@@ -322,32 +322,30 @@ public class transactionOutDAOImpl implements transactionOutDAO {
     public List<Integer> findInboxBatches(List<batchDownloads> batches, String searchTerm) throws Exception {
         
         String[] terms = searchTerm.split("\\|",-1);
-        String batchName = terms[0];
-        String firstName = terms[1];
-        String lastName = terms[2];
-        String utBatchName = terms[3];
-        String patientId = terms[4];
-        String providerId = terms[5];
+        String status = terms[0];
+        String batchName = terms[1];
+        String firstName = terms[2];
+        String lastName = terms[3];
+        String utBatchName = terms[4];
+        String patientId = terms[5];
+        String providerId = terms[6];
         
         List<Integer> batchIdList = new ArrayList<Integer>();
 
         for (batchDownloads batch : batches) {
+            boolean addBatch = true;
 
             lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
             batch.setstatusValue(processStatus.getDisplayCode());
 
             /* Search the batch name */
-            if (!"".equals(utBatchName) && batch.getutBatchName().toLowerCase().matches(".*" + utBatchName + ".*")) {
-                if (!batchIdList.contains(batch.getId())) {
-                    batchIdList.add(batch.getId());
-                }
+            if (!"".equals(utBatchName) && !batch.getutBatchName().toLowerCase().matches(".*" + utBatchName + ".*")) {
+               addBatch = false;
             }
             
             /* Search the file name */
-            if (!"".equals(batchName) && batch.getoutputFIleName().toLowerCase().matches(".*" + batchName + ".*")) {
-                if (!batchIdList.contains(batch.getId())) {
-                    batchIdList.add(batch.getId());
-                }
+            if (!"".equals(batchName) && !batch.getoutputFIleName().toLowerCase().matches(".*" + batchName + ".*")) {
+                addBatch = false;
             }
 
 
@@ -363,12 +361,21 @@ public class transactionOutDAOImpl implements transactionOutDAO {
             transactionQuery.add(Restrictions.eq("batchDLId", batch.getId()));
             List<transactionTarget> transactions = transactionQuery.list();
             
-            if (!transactions.isEmpty() && (!"".equals(firstName) || !"".equals(lastName) || !"".equals(patientId))) {
+            if (!transactions.isEmpty() && (!"0".equals(status) || !"".equals(firstName) || !"".equals(lastName) || !"".equals(patientId))) {
 
                 /* Loop through the transactions to match patient information */
                 for (transactionTarget transaction : transactions) {
-
+                    
+                    /* Get a the transaction in entry */
+                    Criteria transactionIn = sessionFactory.getCurrentSession().createCriteria(transactionIn.class);
+                    transactionIn.add(Restrictions.eq("id", transaction.gettransactionInId()));
+                    
+                    transactionIn transactionInDetails = (transactionIn) transactionIn.uniqueResult();
                    
+                    if(!"0".equals(status) && !status.equals(String.valueOf(transactionInDetails.getmessageStatus()))) {
+                        addBatch = false;
+                    }
+                    
                     Criteria patientQuery = sessionFactory.getCurrentSession().createCriteria(messagePatients.class);
                     patientQuery.add(Restrictions.eq("transactionInId", transaction.gettransactionInId()));
                     
@@ -382,12 +389,19 @@ public class transactionOutDAOImpl implements transactionOutDAO {
                         patientQuery.add(Restrictions.like("sourcePatientId",patientId));
                     }
                     
-                    if(patientQuery.list().size() > 0) {
-                        batchIdList.add(batch.getId());
+                    if(patientQuery.list().isEmpty()) {
+                        addBatch = false;
                     }
                     
                 }
 
+            }
+            
+            /* Transaction in for status */
+            
+            
+            if(addBatch == true && !batchIdList.contains(batch.getId())) {
+                 batchIdList.add(batch.getId());
             }
 
         }

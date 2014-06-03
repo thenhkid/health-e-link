@@ -19,6 +19,7 @@ import com.ut.dph.model.configurationConnection;
 import com.ut.dph.reference.fileSystem;
 import com.ut.dph.service.brochureManager;
 import java.util.ArrayList;
+import org.hibernate.criterion.Order;
 import org.hibernate.exception.SQLGrammarException;
 
 
@@ -480,6 +481,7 @@ public class organizationDAOImpl implements organizationDAO {
         orgs.add(Restrictions.eq("status",true));
         orgs.add(Restrictions.eq("publicOrg", true));
         orgs.add(Restrictions.in("id", targetOrgIds));
+        orgs.addOrder(Order.asc("orgName"));
         
         return orgs.list();
         

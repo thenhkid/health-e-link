@@ -19,24 +19,30 @@
             <form id="searchHistoryForm" action="/Health-e-Web/history" role="form" class="form" method="post">
                 <input type="hidden" name="fromDate" id="fromDate" rel="<fmt:formatDate value="${fromDate}" type="date" pattern="MM/dd/yyyy" />" rel2="<fmt:formatDate value="${userDetails.dateOrgWasCreated}" type="date" pattern="MM/dd/yyyy" />" value="${fromDate}" />
                 <input type="hidden" name="toDate" id="toDate" rel="<fmt:formatDate value="${toDate}" type="date" pattern="MM/dd/yyyy" />" value="${toDate}" />
-                               
-                 <div class="col-md-12 form-section">
+
+                <div class="col-md-12">
+                    <div class="date-range-picker-trigger form-control daterange pull-left" style="width:265px; margin-left: 10px;">
+                        <i class="glyphicon glyphicon-calendar"></i>
+                        <span class="date-label"  rel="" rel2=""><fmt:formatDate value="${fromDate}" type="date" pattern="MMM dd, yyyy" /> - <fmt:formatDate value="${toDate}" type="date" pattern="MMM dd, yyyy" /></span> <b class="caret"></b>
+                    </div>
+                    <div class="form-group pull-right">
+                        <select name="reportType" class="form-control">
+                            <option value="1">Summary Report</option>
+                            <option value="2">Detailed Report</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="col-md-12 form-section pull-left">
+
                     <section class="panel panel-default">
                         <div class="panel-heading">
                             <h3 class="panel-title">History Search Criteria</h3>
                         </div>
                         <div class="panel-body">
                             <div class="form-container scrollable">
-                                <div class="col-md-12">
-                                    <div class="form-group">
-                                        <label class="control-label" for="fromDate">Date Range</label>
-                                        <div class="date-range-picker-trigger form-control daterange" style="width:265px; margin-left: 10px;">
-                                            <i class="glyphicon glyphicon-calendar"></i>
-                                            <span class="date-label"  rel="" rel2=""><fmt:formatDate value="${fromDate}" type="date" pattern="MMM dd, yyyy" /> - <fmt:formatDate value="${toDate}" type="date" pattern="MMM dd, yyyy" /></span> <b class="caret"></b>
-                                        </div>
-                                   </div>
-                                </div>
-                               <div class="col-md-6">
+
+                                <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="control-label" for="type">Type</label>
                                         <select name="type" class="form-control">
@@ -86,22 +92,13 @@
                                             <option value=""></option>
                                         </select>
                                     </div>
-                                </div>  
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label class="control-label" for="reportType">Report Type</label>
-                                        <select name="reportType" class="form-control">
-                                            <option value="1">Summary Report</option>
-                                            <option value="2">Detailed Report</option>
-                                        </select>
-                                    </div>
-                                </div>        
+                                </div>     
                             </div>
                         </div>
                     </section>
-                   <input type="button" id="search1" class="btn btn-primary btn-action-sm search" value="Search"/>   
-                   <span style="padding-left:10px;" id="showOther"><a href="javascript:void(0);" class="showOtherCriteria">Show additional Search Criteria</a></span>
-                   <section class="panel panel-default" id="additionalCriteria" style="margin-top: 20px; display:none;">
+                    <input type="button" id="search1" class="btn btn-primary btn-action-sm search" value="Search"/>   
+                    <span style="padding-left:10px;" id="showOther"><a href="javascript:void(0);" class="showOtherCriteria">Show additional Search Criteria</a></span>
+                    <section class="panel panel-default" id="additionalCriteria" style="margin-top: 20px; display:none;">
                         <div class="panel-heading">
                             <h3 class="panel-title">Additional Search Criteria</h3>
                         </div>
