@@ -11,6 +11,8 @@ import javax.persistence.Table;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
+import com.ut.dph.validator.NoHtml;
+
 @Entity
 @Table(name="lu_Tests")
 public class lu_Tests {
@@ -53,6 +55,12 @@ public class lu_Tests {
 	
 	@Column(name="codeVersion", nullable = true)
 	private String codeVersion;
+	
+	@NotEmpty
+	@NoHtml
+	@Column(name="category", nullable = true)
+	private String category;  
+
 
 	public int getId() {
 		return id;
@@ -148,6 +156,14 @@ public class lu_Tests {
 
 	public void setCodeVersion(String codeVersion) {
 		this.codeVersion = codeVersion;
+	}
+
+	public String getCategory() {
+		return category;
+	}
+
+	public void setCategory(String category) {
+		this.category = category;
 	}
 
 	
