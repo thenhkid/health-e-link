@@ -190,7 +190,9 @@
                                             </td>
                                             <c:if test="${showDetails == true}">
                                                 <td>
-                                                    <a href="javascript:void(0);" class="viewDetals" rel="${result.orgId}" rel2="${result.messageTypeId}">View Details</a>
+                                                    <c:if test="${result.showDetails == true}">
+                                                        <a href="javascript:void(0);" class="viewDetals" rel="${result.orgId}" rel2="${result.messageTypeId}">View Details</a>
+                                                    </c:if>
                                                 </td>
                                             </c:if>
                                         </tr>

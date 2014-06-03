@@ -2886,6 +2886,7 @@ public class HealtheWebController {
                                                 }
 
                                             }
+                                            result.setshowDetails(true);
                                         }
                                     } else {
                                         if (config.getsourceType() == 1) {
@@ -2902,7 +2903,9 @@ public class HealtheWebController {
 
                         }
 
-                    } /* Target config Type */ else if (config.getType() == 2) {
+                    } 
+                    /* Target config Type */ 
+                    else if (config.getType() == 2) {
 
                         List<configurationConnection> connections = configurationManager.getConnectionsByTargetConfiguration(config.getId());
 
@@ -2925,8 +2928,8 @@ public class HealtheWebController {
                                     /* Find Received Referrals / Feedback Reports */
                                     List<batchDownloads> batches = transactionOutManager.getInboxBatchesHistory(userInfo.getId(), config.getorgId(), configurationManager.getConfigurationById(connection.getsourceConfigId()).getorgId(), config.getMessageTypeId(), fromDate, toDate);
 
-                                    if (!"".equals(batchName) || !"".equals(firstName) || !"".equals(lastName) || !"".equals(utBatchName) || !"".equals(patientId) || !"".equals(providerId)) {
-                                        String searchTerm = new StringBuilder().append(batchName).append("|").append(firstName).append("|").append(lastName).append("|").append(utBatchName).append("|").append(patientId).append("|").append(providerId).toString();
+                                    if (status != 0 || !"".equals(batchName) || !"".equals(firstName) || !"".equals(lastName) || !"".equals(utBatchName) || !"".equals(patientId) || !"".equals(providerId)) {
+                                        String searchTerm = new StringBuilder().append(status).append("|").append(batchName).append("|").append(firstName).append("|").append(lastName).append("|").append(utBatchName).append("|").append(patientId).append("|").append(providerId).toString();
                                         List<Integer> totalMatches = transactionOutManager.findInboxBatches(batches, searchTerm);
                                         total = totalMatches.size();
                                     } else {
@@ -2941,8 +2944,13 @@ public class HealtheWebController {
                                         result.setmsg("Total Feedback Reports Received: " + total);
                                         totalFBRec += total;
                                     }
+                                    
+                                    if(total > 0) {
+                                       result.setshowDetails(true);
+                                    }
 
                                     results.add(result);
+                                    
                                 }
 
                             }

@@ -18,6 +18,7 @@ public class historyResults {
     private String messageType = null;
     private String msg = null;
     private int type;
+    boolean showDetails = false;
     
     public int getorgId() {
         return orgId;
@@ -65,6 +66,14 @@ public class historyResults {
     
     public void settype(int type) {
         this.type = type;
+    }
+    
+    public boolean getshowDetails() {
+        return showDetails;
+    }
+    
+    public void setshowDetails(boolean showDetails) {
+        this.showDetails = showDetails;
     }
     
 }
