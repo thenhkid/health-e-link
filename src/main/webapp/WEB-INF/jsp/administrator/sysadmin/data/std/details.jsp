@@ -37,6 +37,20 @@
                                 </label>
                             </div>
                         </div>
+                         <c:if test='${objectType=="lu_Tests"}'>
+	                         <spring:bind path="category">
+	                            <div class="form-group ${status.error ? 'has-error' : '' }">
+	                                <label class="control-label" for="category">Category *</label>
+	                                <form:select id="category" path="category" cssClass="form-control half">
+	                                    <option value="" label=" - Select - " ></option>
+	                                    <form:options items="${categoryList}"/>
+	                                </form:select>
+	                                <form:errors path="category" cssClass="control-label" element="label" />
+	                            </div>
+	                        </spring:bind>
+                         </c:if>
+                        
+                        
                         <c:if test='${objectType=="lu_ProcessStatus"}'>
                          <spring:bind path="category">
                             <div class="form-group ${status.error ? 'has-error' : '' }">

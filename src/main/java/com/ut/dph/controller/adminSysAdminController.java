@@ -9,6 +9,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.ut.dph.reference.TestCategoryList;
 import com.ut.dph.reference.USStateList;
 import com.ut.dph.reference.ProcessCategoryList;
 import com.ut.dph.service.configurationManager;
@@ -1233,6 +1234,10 @@ public class adminSysAdminController {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/sysadmin/data/std/details");
 
+        //Get a list of process status categories
+        TestCategoryList categoryList = new TestCategoryList();
+        mav.addObject("categoryList", categoryList.getCategories());
+        
         //create the object
         lu_Tests lu = new lu_Tests();
         lu.setId(0);
@@ -1251,6 +1256,11 @@ public class adminSysAdminController {
 
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/sysadmin/data/std/details");
+        
+        //Get a list of process status categories
+        TestCategoryList categoryList = new TestCategoryList();
+        mav.addObject("categoryList", categoryList.getCategories());
+        
         mav.addObject("objectType", "lu_Tests");
         mav.addObject("formId", "tabledataform");
         // check for error
@@ -1274,7 +1284,11 @@ public class adminSysAdminController {
 
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/sysadmin/data/std/details");
-
+       
+        //Get a list of process status categories
+        TestCategoryList categoryList = new TestCategoryList();
+        mav.addObject("categoryList", categoryList.getCategories());
+        
         lu_Tests lu = sysAdminManager.getTestById(i);
         mav.addObject("tableDataDetails", lu);
 
@@ -1292,6 +1306,11 @@ public class adminSysAdminController {
 
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/sysadmin/data/std/details");
+        
+        //Get a list of process status categories
+        TestCategoryList categoryList = new TestCategoryList();
+        mav.addObject("categoryList", categoryList.getCategories());
+        
         mav.addObject("objectType", "lu_Tests");
         mav.addObject("formId", "tabledataform");
         /**
