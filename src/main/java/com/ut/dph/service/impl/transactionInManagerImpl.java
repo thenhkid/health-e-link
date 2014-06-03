@@ -1616,10 +1616,13 @@ public class transactionInManagerImpl implements transactionInManager {
 	
 	            //update data in transactionTranslatedIn
 	            resetTransactionTranslatedIn(batchId, true);
-      
+	            int transactionId = 0;
+	            // we trim all values
+	            trimFieldValues (batchId, false, transactionId, true);
+
 	            //now that we have our config, we will apply pre-processing cw and macros to manipulate our data
 	            //1. find all configs for batch, loop and process
-	            int transactionId = 0;
+	            
                 List<Integer> configIds = getConfigIdsForBatch(batchId, false, transactionId);
                 for (Integer configId : configIds) {
 					//we need to run all checks before insert regardless *
@@ -2895,6 +2898,11 @@ public class transactionInManagerImpl implements transactionInManager {
 	@Override
 	public Integer updateFieldValue (String fieldValue, Integer fieldNo, Integer transactionId,boolean foroutboundProcessing){
 		return transactionInDAO.updateFieldValue(fieldValue, fieldNo, transactionId, foroutboundProcessing);
+	}
+
+	@Override
+	public void trimFieldValues(Integer batchId, boolean foroutboundProcessing, Integer transactionId, boolean trimAll) {
+			transactionInDAO.trimFieldValues(batchId, foroutboundProcessing, transactionId, trimAll);
 	}
 
 }

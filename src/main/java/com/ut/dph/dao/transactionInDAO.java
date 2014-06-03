@@ -319,4 +319,6 @@ public interface transactionInDAO {
             configurationDataTranslations cdt, boolean foroutboundProcessing, Integer transactionId);
     
     Integer updateFieldValue (String fieldValue, Integer fieldNo, Integer transactionId,boolean foroutboundProcessing);
+   
+    void trimFieldValues (Integer batchId, boolean foroutboundProcessing, Integer transactionId, boolean trimAll);
 }

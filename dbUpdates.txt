@@ -791,3 +791,8 @@ END IF;
 END$$
 DELIMITER ;
 
+
+/** grace 01:28PM 06032014 **/
+INSERT INTO `lu_noContraceptiveReasons` (`id`,`displayText`,`description`,`isCustom`,`status`,`dateCreated`) VALUES (5,'Unknown','','0','1','2014-06-03 13:24:55');
+INSERT INTO `universaltranslator`.`lu_payertypes` (`id`, `displayText`) VALUES ('18', 'Unknown');
+
