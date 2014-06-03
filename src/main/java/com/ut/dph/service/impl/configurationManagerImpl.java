@@ -510,6 +510,11 @@ public class configurationManagerImpl implements configurationManager {
     }
     
     @Override
+    public int saveHL7Details(HL7Details details) {
+        return configurationDAO.saveHL7Details(details);
+    }
+    
+    @Override
     public int saveHL7Segment(HL7Segments newSegment) {
         return configurationDAO.saveHL7Segment(newSegment);
     }

@@ -99,7 +99,7 @@ require(['./main'], function () {
                 indexVal = $(this).attr('rel2');
                 
                 $('#matchingField_' + fieldNo + ' > option').each(function() {
-                    if ($(this).text().indexOf(fieldNo+" - ") != -1) {
+                    if ($(this).text().indexOf(" - " +fieldNo) != -1) {
                         $('#matchingField_' + fieldNo).val($(this).val());
                         return false;
                     }

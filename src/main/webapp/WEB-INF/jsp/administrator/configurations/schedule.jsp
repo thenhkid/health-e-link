@@ -80,6 +80,7 @@
                         <form:hidden path="configId" value="${scheduleDetails.configId}" />
                         <form:hidden path="id" value="${scheduleDetails.id}" />
                         <form:hidden path="type" id="type" />
+                        <input type="hidden" id="action" name="action" value="save" />
                         <div class="form-group specFormFields" id="processingTypeDiv" style="display:none">
                             <label for="status">Type of Processing</label>
                             <div>

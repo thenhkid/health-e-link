@@ -872,7 +872,8 @@ public class configurationDAOImpl implements configurationDAO {
     @Override
     @Transactional
     public void updateHL7Details(HL7Details details) {
-        sessionFactory.getCurrentSession().saveOrUpdate(details);
+       sessionFactory.getCurrentSession().update(details);
+        
     }
 
     /**
@@ -906,6 +907,21 @@ public class configurationDAOImpl implements configurationDAO {
     @Transactional
     public void updateHL7ElementComponent(HL7ElementComponents component) {
         sessionFactory.getCurrentSession().update(component);
+    }
+    
+    /**
+     * The 'saveHL7Details' function will save the new HL7 Segment
+     *
+     * @param newSegment The object holding the new HL7 Object
+     */
+    @Override
+    @Transactional
+    public int saveHL7Details(HL7Details details) {
+        Integer lastId;
+
+        lastId = (Integer) sessionFactory.getCurrentSession().save(details);
+
+        return lastId;
     }
 
     /**

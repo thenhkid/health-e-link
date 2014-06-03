@@ -1,10 +1,10 @@
 
 
-require(['./main'], function () {
+require(['./main'], function() {
     require(['jquery'], function($) {
-        
+
         $("input:text,form").attr("autocomplete", "off");
-         
+
         //Fade out the updated/created message after being displayed.
         if ($('.alert').length > 0) {
             $('.alert').delay(2000).fadeOut(1000);
@@ -19,17 +19,17 @@ require(['./main'], function () {
             }
 
         });
-        
+
         $('#addNewSegment').click(function(event) {
-           var hl7Id = $('#hl7Id').val();
-           var lastSegPos = $('.segmentPos:last').val();
-           var nextPos = 1;
-           
-           if(lastSegPos > 0) {
-               nextPos = eval(eval(lastSegPos*1)+1);
-           }
-           
-           $.ajax({
+            var hl7Id = $('#hl7Id').val();
+            var lastSegPos = $('.segmentPos:last').val();
+            var nextPos = 1;
+
+            if (lastSegPos > 0) {
+                nextPos = eval(eval(lastSegPos * 1) + 1);
+            }
+
+            $.ajax({
                 url: 'newHL7Segment',
                 type: "GET",
                 data: {'hl7Id': hl7Id, 'nextPos': nextPos},
@@ -37,9 +37,9 @@ require(['./main'], function () {
                     $("#newSegmentModal").html(data);
                 }
             });
-           
-        }); 
-        
+
+        });
+
         //Function to submit the new HL7 Segment
         $(document).on('click', '#submitSegmentButton', function(event) {
             var errorFound = 0;
@@ -56,30 +56,30 @@ require(['./main'], function () {
                 $('#segmentNameMsg').html('The segment name is a required field.');
                 errorFound = 1;
             }
-            
-            
+
+
             if (errorFound == 1) {
                 event.preventDefault();
                 return false;
             }
 
-            $('#hl7SegmentForm').attr('action','saveHL7Segment');
+            $('#hl7SegmentForm').attr('action', 'saveHL7Segment');
             $('#hl7SegmentForm').submit();
 
         });
-        
+
         //Function to show the new segment element modal
         $('.addNewElement').click(function() {
             var hl7Id = $(this).attr("rel");
             var segmentId = $(this).attr("rel2");
-            
-            var lastDspPos = $('.displayPos_'+segmentId+':last').val();
+
+            var lastDspPos = $('.displayPos_' + segmentId + ':last').val();
             var nextPos = 1;
 
-            if(lastDspPos > 0) {
-                nextPos = eval(eval(lastDspPos*1)+1);
+            if (lastDspPos > 0) {
+                nextPos = eval(eval(lastDspPos * 1) + 1);
             }
-            
+
             $.ajax({
                 url: 'newHL7Element',
                 type: "GET",
@@ -88,9 +88,9 @@ require(['./main'], function () {
                     $("#newSegmentElement").html(data);
                 }
             });
-            
+
         });
-        
+
         //Function to submit the new HL7 Segment Element
         $(document).on('click', '#submitElementButton', function(event) {
             var errorFound = 0;
@@ -107,30 +107,30 @@ require(['./main'], function () {
                 $('#elementNameMsg').html('The element name is a required field.');
                 errorFound = 1;
             }
-            
-            
+
+
             if (errorFound == 1) {
                 event.preventDefault();
                 return false;
             }
 
-            $('#hl7ElementForm').attr('action','saveHL7Element');
+            $('#hl7ElementForm').attr('action', 'saveHL7Element');
             $('#hl7ElementForm').submit();
 
         });
-        
-        
+
+
         //Function to show the new element component modal
         $('.addNewComponent').click(function() {
             var elementId = $(this).attr("rel");
-            
-            var lastDspPos = $('.displayPos_'+elementId+':last').val();
+
+            var lastDspPos = $('.displayPos_' + elementId + ':last').val();
             var nextPos = 1;
 
-            if(lastDspPos > 0) {
-                nextPos = eval(eval(lastDspPos*1)+1);
+            if (lastDspPos > 0) {
+                nextPos = eval(eval(lastDspPos * 1) + 1);
             }
-            
+
             $.ajax({
                 url: 'newHL7Component',
                 type: "GET",
@@ -139,9 +139,9 @@ require(['./main'], function () {
                     $("#newSegmentElement").html(data);
                 }
             });
-            
+
         });
-        
+
         //Function to submit the new HL7 Element Component
         $(document).on('click', '#submitComponentButton', function(event) {
             var errorFound = 0;
@@ -158,20 +158,51 @@ require(['./main'], function () {
                 $('#fieldValueMsg').html('The field value is a required field.');
                 errorFound = 1;
             }
-            
-            
+
+
             if (errorFound == 1) {
                 event.preventDefault();
                 return false;
             }
 
-            $('#hl7ComponentForm').attr('action','saveHL7Component');
+            $('#hl7ComponentForm').attr('action', 'saveHL7Component');
             $('#hl7ComponentForm').submit();
 
         });
-        
+
+        //Function to select an HL7 Spec
+        $('#HL7Spec').change(function() {
+
+            if ($('#HL7Spec option:selected').val() == "") {
+                $('#HL7SpecDiv').addClass("has-error");
+                $('#HL7SpecMsg').addClass("has-error");
+                $('#HL7SpecMsg').html('An HL7 Spec is required.');
+            }
+            else {
+                var confirmed = confirm("Are you sure you want to choose the HL7 Spec: " + $('#HL7Spec option:selected').text());
+
+                if (confirmed) {
+                    $('body').overlay({
+                        glyphicon: 'floppy-disk',
+                        message: 'Loading...'
+                    });
+                    
+                    $.ajax({
+                        url: 'loadHL7Spec',
+                        type: "POST",
+                        data: {'configId': $(this).attr('rel'), 'hl7SpecId': $('#HL7Spec option:selected').val()},
+                        success: function(data) {
+                            $('body').overlay('hide');
+                            window.location.href = 'HL7';
+                        }
+                    });
+                    
+                }
+            }
+        });
+
     });
-    
+
 });
 
 function checkform() {

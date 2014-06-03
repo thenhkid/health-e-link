@@ -48,6 +48,12 @@ require(['./main'], function () {
             $('#schedulingSpecs').submit();
         });
         
+        
+        $('#next').click(function() {
+            $('#action').val("next");
+            $('#schedulingSpecs').submit();
+        });
+        
     });
 })
 

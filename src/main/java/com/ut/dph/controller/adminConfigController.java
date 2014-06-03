@@ -49,8 +49,12 @@ import com.ut.dph.model.messageType;
 import com.ut.dph.service.messageTypeManager;
 import com.ut.dph.model.configurationTransport;
 import com.ut.dph.model.configurationTransportMessageTypes;
+import com.ut.dph.model.mainHL7Details;
+import com.ut.dph.model.mainHL7Elements;
+import com.ut.dph.model.mainHL7Segments;
 import com.ut.dph.reference.fileSystem;
 import com.ut.dph.service.configurationTransportManager;
+import com.ut.dph.service.sysAdminManager;
 import com.ut.dph.service.userManager;
 import java.io.File;
 import java.io.FileInputStream;
@@ -79,6 +83,9 @@ public class adminConfigController {
 
     @Autowired
     private configurationTransportManager configurationTransportManager;
+    
+    @Autowired
+    private sysAdminManager sysAdminManager;
 
     /**
      * The private variable configId will hold the configurationId when viewing a configuration this will be used when on a configuration subsections like Field Mappings, Data Translations, etc. We will use this private variable so we don't have to go fetch the id
@@ -1561,7 +1568,7 @@ public class adminConfigController {
      * @return This method will redirect the user back to the scheduling form page.
      */
     @RequestMapping(value = "/scheduling", method = RequestMethod.POST)
-    public ModelAndView submitConfigurationSchedules(@ModelAttribute(value = "scheduleDetails") configurationSchedules scheduleDetails, RedirectAttributes redirectAttr) throws Exception {
+    public ModelAndView submitConfigurationSchedules(@ModelAttribute(value = "scheduleDetails") configurationSchedules scheduleDetails, RedirectAttributes redirectAttr, @RequestParam String action) throws Exception {
        
        //Set default values based on what schedule type is selected
        //This will help in case the user was switching around selecting
@@ -1606,10 +1613,20 @@ public class adminConfigController {
         }
        
        redirectAttr.addFlashAttribute("savedStatus", "updated");
+       
+       if("save".equals(action)) {
+            ModelAndView mav = new ModelAndView(new RedirectView("scheduling"));
+            return mav;
+       }
+       else if(HL7 == true) {
+            ModelAndView mav = new ModelAndView(new RedirectView("HL7"));
+            return mav;
+       }
+       else {
+            ModelAndView mav = new ModelAndView(new RedirectView("preProcessing"));
+            return mav;
+       }
 
-       ModelAndView mav = new ModelAndView(new RedirectView("scheduling"));
-       return mav;
-    
     }
     
     /**
@@ -1645,9 +1662,9 @@ public class adminConfigController {
         
         /* If null then create an empty HL7 Detail object */
         if(hl7Details == null) {
-            HL7Details hl7DetailsEmpty = new HL7Details();
-            hl7DetailsEmpty.setconfigId(configId);
-            mav.addObject("HL7Details", hl7DetailsEmpty);
+            /* Get a list of available HL7 Sepcs */
+            List<mainHL7Details> HL7Specs = sysAdminManager.getHL7List();
+            mav.addObject("HL7Specs", HL7Specs);
         }
         else {
             HL7Id = hl7Details.getId();
@@ -1686,6 +1703,59 @@ public class adminConfigController {
         mav.addObject("fields", fields);
         
         return mav;
+    }
+    
+    /**
+     * The '/loadHL7Spec' will load the configuration HL7 specs from one that was chosen from the list of standard
+     * hl7 specs.
+     * 
+     * @param configId  The id of the configuration to attach the HL7 spec to
+     * @param hl7SpecId The id of the selected hl7 standard spec
+     * 
+     * @return This function will return a 1 back to the calling jquery call.
+     */
+    @RequestMapping(value = "/loadHL7Spec", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody Integer loadHL7Spec(@RequestParam int configId, @RequestParam int hl7SpecId) throws Exception {
+        
+        mainHL7Details hl7Specs = sysAdminManager.getHL7Details(hl7SpecId);
+        
+        HL7Details newHL7 = new HL7Details();
+        newHL7.setconfigId(configId);
+        newHL7.setfieldSeparator(hl7Specs.getfieldSeparator());
+        newHL7.setcomponentSeparator(hl7Specs.getcomponentSeparator());
+        newHL7.setEscapeChar(hl7Specs.getEscapeChar());
+        
+        int hl7Id = configurationmanager.saveHL7Details(newHL7);
+        
+        List<mainHL7Segments> segments = sysAdminManager.getHL7Segments(hl7SpecId);
+        
+        for (mainHL7Segments segment : segments) {
+            
+            HL7Segments newHL7Segment = new HL7Segments();
+            newHL7Segment.sethl7Id(hl7Id);
+            newHL7Segment.setsegmentName(segment.getsegmentName());
+            newHL7Segment.setdisplayPos(segment.getdisplayPos());
+            
+            int segmentId = configurationmanager.saveHL7Segment(newHL7Segment);
+            
+            List<mainHL7Elements> elements = sysAdminManager.getHL7Elements(hl7SpecId, segment.getId());
+            
+            for (mainHL7Elements element : elements) {
+                
+                HL7Elements newHL7Element = new HL7Elements();
+                newHL7Element.sethl7Id(hl7Id);
+                newHL7Element.setsegmentId(segmentId);
+                newHL7Element.setelementName(element.getelementName());
+                newHL7Element.setdefaultValue(element.getdefaultValue());
+                newHL7Element.setdisplayPos(element.getdisplayPos());
+                
+                configurationmanager.saveHL7Element(newHL7Element);
+            }
+            
+        }
+        
+        return 1;
+        
     }
     
     

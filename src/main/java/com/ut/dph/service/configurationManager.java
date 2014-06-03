@@ -113,6 +113,8 @@ public interface configurationManager {
   
   void updateHL7ElementComponent(HL7ElementComponents component);
   
+  int saveHL7Details(HL7Details details);
+  
   int saveHL7Segment(HL7Segments newSegment);
   
   int saveHL7Element(HL7Elements newElement);
