@@ -1203,13 +1203,13 @@ public class transactionOutManagerImpl implements transactionOutManager {
                         try {
                             String fieldValue = BeanUtils.getProperty(records, colName);
 
-                            if ("null".equals(fieldValue)) {
+                            if (fieldValue == null) {
+                                fieldValue = "";
+                            }
+                            else if ("null".equals(fieldValue)) {
                                 fieldValue = "";
                             }
                             else if (fieldValue.isEmpty()) {
-                                fieldValue = "";
-                            }
-                            else if (fieldValue == null) {
                                 fieldValue = "";
                             }
                             else if (fieldValue.length() == 0) {
