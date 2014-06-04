@@ -802,3 +802,5 @@ UPDATE `universaltranslator`.`lu_processstatus` SET `displayCode`='SSL', `displa
 UPDATE `universaltranslator`.`lu_processstatus` SET `displayCode`='SSR', `displayText`='Source Submission Reloaded' WHERE `id`='3';
 
 
+/** the above update are deployed to test and dev 06032014 11:48PM **/
+
