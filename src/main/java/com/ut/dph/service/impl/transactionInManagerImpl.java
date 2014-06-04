@@ -488,10 +488,10 @@ public class transactionInManagerImpl implements transactionInManager {
 
         boolean insertTargets = false;
         // we should only insert for batches that are just loaded
-        if (batch.getstatusId() == 3) {
+        if (batch.getstatusId() == 36) {
         	insertTargets = true;
         }
-        if ((batch.getstatusId() == 3 || batch.getstatusId() == 6)) {
+        if ((batch.getstatusId() == 3 || batch.getstatusId() == 6 || batch.getstatusId() == 36)) {
             // set batch to SBP - 4*
             updateBatchStatus(batchUploadId, 4, "startDateTime");
       
@@ -717,7 +717,7 @@ public class transactionInManagerImpl implements transactionInManager {
         //0. grab all batches with SSL (3) - Loaded or ready for Release SR (6)
         //1. get all batches with SSA
         try {
-            List<batchUploads> batches = getBatchesByStatusIds(Arrays.asList(3, 6));
+            List<batchUploads> batches = getBatchesByStatusIds(Arrays.asList(3, 6, 36));
             if (batches != null && batches.size() != 0) {
                 //we loop and process
                 for (batchUploads batch : batches) {
@@ -1683,7 +1683,7 @@ public class transactionInManagerImpl implements transactionInManager {
             //at the end of loaded, we update to PR
             updateTransactionStatus(batchId, 0, 9, 10);
             updateTransactionTargetStatus(batchId, 0, 9, 10);
-            batchStatusId = 3;
+            batchStatusId = 36; //loaded without targets
 
         } catch (Exception ex) {
             insertProcessingError(processingSysErrorId, null, batchId, null, null, null, null, false, false, ("loadBatch error " + ex.getLocalizedMessage()));

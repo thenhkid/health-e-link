@@ -1546,7 +1546,7 @@ public class adminProcessingActivity {
                 if (batchDetails.getstatusId() == 2) {
                     strBatchOption = "Loaded Batch";
                     transactionInManager.loadBatch(batchId);
-                } else if (batchDetails.getstatusId() == 3) {
+                } else if (batchDetails.getstatusId() == 3 || batchDetails.getstatusId() == 36) {
                     strBatchOption = "Processed Batch";
                     transactionInManager.processBatch(batchId, false, 0);
                 }

@@ -796,3 +796,9 @@ DELIMITER ;
 INSERT INTO `lu_noContraceptiveReasons` (`id`,`displayText`,`description`,`isCustom`,`status`,`dateCreated`) VALUES (5,'Unknown','','0','1','2014-06-03 13:24:55');
 INSERT INTO `universaltranslator`.`lu_payertypes` (`id`, `displayText`) VALUES ('18', 'Unknown');
 
+/** grace 06032014 10:44PM **/
+INSERT INTO `universaltranslator`.`lu_processstatus` (`id`, `category`, `displayCode`) VALUES ('36', 'batch', 'LWT');
+UPDATE `universaltranslator`.`lu_processstatus` SET `displayCode`='SSL', `displayText`='Source Submission Reloaded' WHERE `id`='36';
+UPDATE `universaltranslator`.`lu_processstatus` SET `displayCode`='SSR', `displayText`='Source Submission Reloaded' WHERE `id`='3';
+
+

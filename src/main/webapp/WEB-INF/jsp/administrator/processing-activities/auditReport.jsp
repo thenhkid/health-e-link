@@ -36,7 +36,7 @@
 	  				 		<c:if test="${batchDetails.statusId == 2}">
 	  				 			<input type="button" id="processBatch" class="btn btn-primary btn-xs processBatch" rel="processBatch" rel2="${batchDetails.id}" value="Load Batch" />
 	  				 		</c:if>
-	  				 		<c:if test="${batchDetails.statusId == 3}">
+	  				 		<c:if test="${batchDetails.statusId == 3 || batchDetails.statusId == 36}">
 	  				 			<input type="button" id="processBatch" class="btn btn-primary btn-xs processBatch" rel="processBatch" rel2="${batchDetails.id}" value="Process Batch" />
 	  				 		</c:if>
 	  				 		<c:if test="${canCancel && batchDetails.statusId != 4}">
@@ -122,7 +122,7 @@
 	  				 		<c:if test="${batchDetails.statusId == 2}">
 	  				 			<input type="button" id="processBatchBottom" class="btn btn-primary btn-xs processBatch" rel="processBatch" rel2="${batchDetails.id}" value="Load Batch" />
 	  				 		</c:if>
-	  				 		<c:if test="${batchDetails.statusId == 3}">
+	  				 		<c:if test="${batchDetails.statusId == 3 || batchDetails.statusId == 36}">
 	  				 			<input type="button" id="processBatchBottom" class="btn btn-primary btn-xs processBatch" rel="processBatch" rel2="${batchDetails.id}" value="Process Batch" />
 	  				 		</c:if>
 	  				 		<c:if test="${canCancel && batchDetails.statusId != 4}">

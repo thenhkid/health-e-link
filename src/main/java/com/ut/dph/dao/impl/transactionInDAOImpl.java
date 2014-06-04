@@ -4338,9 +4338,12 @@ public class transactionInDAOImpl implements transactionInDAO {
 			            }
 		        }
 	        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
-	        query.setParameter("configId", configId);
+	        if (transactionId == 0) {
+	        	query.setParameter("configId", configId);
+	        	query.setParameter("transRELId",transRELId);
+	        }
 	        query.setParameter("id", id);
-	        query.setParameter("transRELId",transRELId);
+	        
 	        
 			List<Integer> transId = query.list();
 
