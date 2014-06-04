@@ -50,3 +50,6 @@ Wishlist / down the road -
 6. a macro that will insert placeholder for value pairs
 7. one that will handle list of values and apply a cw
 8. and one that will tell you to continue or not based on if it finds a value
+9. Ability to create a subset of the standard internal standards per organization. These would show on the top of the page on the message details
+10.Would family planning ever use ERG for data entry or review? If so need ability to modify entry/details form to remove what fields do not apply.
+11. Does it make sense to split the admin configuration into two (Referrals & Other), where other wouldnt rely on the 6 buckets for the templates
