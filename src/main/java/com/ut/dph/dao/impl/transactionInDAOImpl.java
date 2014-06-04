@@ -4424,7 +4424,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 			if (!foroutboundProcessing ) {
 				sql = "update transactionTranslatedIn set F" + fieldNo + " = :fieldValue where transactionInId = :id";
 			} else {
-				sql = "update transactionTranslatedIn set F" + fieldNo + " = :fieldValue where transactionTargetId = :id";
+				sql = "update transactionTranslatedOut set F" + fieldNo + " = :fieldValue where transactionTargetId = :id";
 			}
 	        
 	        Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
