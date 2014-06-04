@@ -292,7 +292,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
 
                 for (transactionTarget transaction : pendingTransactions) {
 
-                    boolean processed = false;
+                	boolean processed = false;
                     String errorMessage = "Error occurred trying to process output transaction. transactionId: " + transaction.getId();
 
                     try {
@@ -888,7 +888,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                     }
                     generateTargetFile(createNewFile, transaction.getId(), batchId, transportDetails, encryptMessage);
                 } catch (Exception e) {
-                    throw new Exception("Error occurred trying to generate the batch file. batchId: " + batchId, e);
+                	throw new Exception("Error occurred trying to generate the batch file. batchId: " + batchId, e);
                 }
 
             }
@@ -1188,17 +1188,14 @@ public class transactionOutManagerImpl implements transactionOutManager {
                 for (int i = 1; i <= maxFieldNo; i++) {
 
                     String colName = new StringBuilder().append("f").append(i).toString();
-
                     try {
                         String fieldValue = BeanUtils.getProperty(records, colName);
-
-                        if ("null".equals(fieldValue)) {
+                        
+                        if (fieldValue == null) {
                             fieldValue = "";
-                        }
-                        else if (fieldValue.isEmpty()) {
+                        }else  if ("null".equals(fieldValue)) {
                             fieldValue = "";
-                        }
-                        else if (fieldValue == null) {
+                        } else if (fieldValue.isEmpty()){
                             fieldValue = "";
                         }
                         else if (fieldValue.length() == 0) {
