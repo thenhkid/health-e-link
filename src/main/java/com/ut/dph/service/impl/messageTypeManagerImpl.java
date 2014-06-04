@@ -509,6 +509,10 @@ public class messageTypeManagerImpl implements messageTypeManager {
                     Iterator<Cell> cellIterator = row.cellIterator();
                     boolean required = false;
                     String fieldDesc = "";
+                    String saveToTable = "";
+                    String saveToCol = "";
+                    String popTable = "";
+                    String popCol = "";
 
                     //Increase the field number by 1
                     fieldNo++;
@@ -518,9 +522,10 @@ public class messageTypeManagerImpl implements messageTypeManager {
 
                     while (cellIterator.hasNext()) {
                         Cell cell = cellIterator.next();
-
-                        //Check the cell type and format accordingly
+                        
+                        /*
                         switch (cell.getCellType()) {
+                            
                             case Cell.CELL_TYPE_BOOLEAN:
                                 required = cell.getBooleanCellValue();
                                 break;
@@ -529,18 +534,44 @@ public class messageTypeManagerImpl implements messageTypeManager {
                                 fieldDesc = cell.getStringCellValue();
                                 break;
                         }
+                        */
+
+                        //Check the cell type and format accordingly
+                        if(cell.getColumnIndex() == 0) {
+                            fieldDesc = cell.getStringCellValue();
+                        }
+                        else if(cell.getColumnIndex() == 1) {
+                             required = cell.getBooleanCellValue();
+                        }
+                        else if(cell.getColumnIndex() == 2) {
+                             saveToTable = cell.getStringCellValue();
+                        }
+                        else if(cell.getColumnIndex() == 3) {
+                             saveToCol = cell.getStringCellValue();
+                        }
+                        else if(cell.getColumnIndex() == 4) {
+                             popTable = cell.getStringCellValue();
+                        }
+                        else if(cell.getColumnIndex() == 5) {
+                             popCol = cell.getStringCellValue();
+                        }
+                        
                     }
 
                     //Need to insert all the fields into the message type Form Fields table
-                    Query query = sessionFactory.getCurrentSession().createSQLQuery("INSERT INTO messageTypeFormFields (messageTypeId, fieldNo, fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos)"
-                            + "VALUES (:messageTypeId, :fieldNo, :fieldDesc, :fieldLabel, 0, :required, :bucketNo, :bucketDspPos)")
+                    Query query = sessionFactory.getCurrentSession().createSQLQuery("INSERT INTO messageTypeFormFields (messageTypeId, fieldNo, fieldDesc, fieldLabel, validationType, required, saveToTableName, saveToTableCol, bucketNo, bucketDspPos, autoPopulateTableName, autoPopulateTableCol)"
+                            + "VALUES (:messageTypeId, :fieldNo, :fieldDesc, :fieldLabel, 0, :required, :saveToTableName, :saveToTableCol, :bucketNo, :bucketDspPos, :autoPopulateTableName, :autoPopulateTableCol)")
                             .setParameter("messageTypeId", id)
                             .setParameter("fieldNo", fieldNo)
                             .setParameter("fieldDesc", fieldDesc)
                             .setParameter("fieldLabel", fieldDesc)
                             .setParameter("required", required)
+                            .setParameter("saveToTableName", saveToTable)
+                            .setParameter("saveToTableCol", saveToCol)
                             .setParameter("bucketNo", bucketVal)
-                            .setParameter("bucketDspPos", dspPos);
+                            .setParameter("bucketDspPos", dspPos)
+                            .setParameter("autoPopulateTableName", popTable)
+                            .setParameter("autoPopulateTableCol", popCol);
 
                     query.executeUpdate();
 

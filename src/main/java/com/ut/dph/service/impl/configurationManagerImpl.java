@@ -419,7 +419,7 @@ public class configurationManagerImpl implements configurationManager {
                         Cell cell = cellIterator.next();
 
                         //Check the cell type and format accordingly
-                        switch (cell.getCellType()) {
+                        /*switch (cell.getCellType()) {
                             case Cell.CELL_TYPE_BOOLEAN:
                                 required = cell.getBooleanCellValue();
                                 break;
@@ -427,6 +427,14 @@ public class configurationManagerImpl implements configurationManager {
                             case Cell.CELL_TYPE_STRING:
                                 fieldDesc = cell.getStringCellValue();
                                 break;
+                        }*/
+                        
+                         //Check the cell type and format accordingly
+                        if(cell.getColumnIndex() == 0) {
+                            fieldDesc = cell.getStringCellValue();
+                        }
+                        else if(cell.getColumnIndex() == 1) {
+                             required = cell.getBooleanCellValue();
                         }
                     }
 

@@ -25,6 +25,7 @@ import com.ut.dph.model.configurationConnection;
 import com.ut.dph.model.configurationConnectionReceivers;
 import com.ut.dph.model.configurationDataTranslations;
 import com.ut.dph.model.configurationFTPFields;
+import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.configurationSchedules;
 import com.ut.dph.model.configurationTransport;
 import com.ut.dph.service.emailMessageManager;
@@ -292,7 +293,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
 
                 for (transactionTarget transaction : pendingTransactions) {
 
-                    boolean processed = false;
+                	boolean processed = false;
                     String errorMessage = "Error occurred trying to process output transaction. transactionId: " + transaction.getId();
 
                     try {
@@ -888,7 +889,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                     }
                     generateTargetFile(createNewFile, transaction.getId(), batchId, transportDetails, encryptMessage);
                 } catch (Exception e) {
-                    throw new Exception("Error occurred trying to generate the batch file. batchId: " + batchId, e);
+                	throw new Exception("Error occurred trying to generate the batch file. batchId: " + batchId, e);
                 }
 
             }
@@ -1067,7 +1068,11 @@ public class transactionOutManagerImpl implements transactionOutManager {
         String recordRow = "";
         
         transactionOutRecords records = transactionOutDAO.getTransactionRecords(transactionTargetId);
-
+        
+        /* Get the target fields */
+        //NEW
+        List<configurationFormFields> formFields = configurationTransportManager.getConfigurationFields(transportDetails.getconfigId(), transportDetails.getId());
+       
         /* Need to get the max field number */
         int maxFieldNo = transactionOutDAO.getMaxFieldNo(transportDetails.getconfigId());
         
@@ -1185,38 +1190,48 @@ public class transactionOutManagerImpl implements transactionOutManager {
 
             } else {
                
-                for (int i = 1; i <= maxFieldNo; i++) {
+               // for (int i = 1; i <= maxFieldNo; i++) {
+               //NEW
+               for(configurationFormFields field : formFields) {
 
-                    String colName = new StringBuilder().append("f").append(i).toString();
+                    //String colName = new StringBuilder().append("f").append(i).toString();
+                    //NEW
+                    if(field.getUseField() == true) {
+                        //NEW
+                        String colName = new StringBuilder().append("f").append(field.getFieldNo()).toString();
 
-                    try {
-                        String fieldValue = BeanUtils.getProperty(records, colName);
+                        try {
+                            String fieldValue = BeanUtils.getProperty(records, colName);
 
-                        if ("null".equals(fieldValue)) {
-                            fieldValue = "";
-                        }
-                        else if (fieldValue.isEmpty()) {
-                            fieldValue = "";
-                        }
-                        else if (fieldValue == null) {
-                            fieldValue = "";
-                        }
-                        else if (fieldValue.length() == 0) {
-                            fieldValue = "";
-                        }
+                            if ("null".equals(fieldValue)) {
+                                fieldValue = "";
+                            }
+                            else if (fieldValue.isEmpty()) {
+                                fieldValue = "";
+                            }
+                            else if (fieldValue == null) {
+                                fieldValue = "";
+                            }
+                            else if (fieldValue.length() == 0) {
+                                fieldValue = "";
+                            }
 
-                        if (i == maxFieldNo) {
-                            recordRow = new StringBuilder().append(recordRow).append(fieldValue).append(System.getProperty("line.separator")).toString();
-                        } else {
-                            recordRow = new StringBuilder().append(recordRow).append(fieldValue).append(delimChar).toString();
-                        }
+                            //if (i == maxFieldNo) {
+                            //New
+                            if(field.getFieldNo() == maxFieldNo) {
+                                recordRow = new StringBuilder().append(recordRow).append(fieldValue).append(System.getProperty("line.separator")).toString();
+                            } else {
+                                recordRow = new StringBuilder().append(recordRow).append(fieldValue).append(delimChar).toString();
+                            }
 
-                    } catch (IllegalAccessException ex) {
-                        Logger.getLogger(transactionOutManagerImpl.class.getName()).log(Level.SEVERE, null, ex);
-                    } catch (InvocationTargetException ex) {
-                        Logger.getLogger(transactionOutManagerImpl.class.getName()).log(Level.SEVERE, null, ex);
-                    } catch (NoSuchMethodException ex) {
-                        Logger.getLogger(transactionOutManagerImpl.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (IllegalAccessException ex) {
+                            Logger.getLogger(transactionOutManagerImpl.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (InvocationTargetException ex) {
+                            Logger.getLogger(transactionOutManagerImpl.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (NoSuchMethodException ex) {
+                            Logger.getLogger(transactionOutManagerImpl.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    //NEW
                     }
                 }
 
