@@ -73,7 +73,7 @@ public class configurationTransport {
     private boolean autoRelease = true;
 
     @Column(name = "ERRORHANDLING", nullable = false)
-    private int errorHandling = 1;
+    private int errorHandling = 2;
 
     @Column(name = "MERGEBATCHES", nullable = false)
     private boolean mergeBatches = true;
