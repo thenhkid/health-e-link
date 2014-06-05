@@ -3,8 +3,7 @@ Chad
     - Add configuration screens to allow the user to select pre and post processing macros
     - Continue working on the Harbor Health templates and CCD parsing script
     - Add Grace SP to check the transactionTranslatedIn field if source config is set to pass through and no value is found in the assigned message table
-    - Sit with Mike to review Waynes QA feedback and fix any found issues
-    - Work with Mike to figure out the HL7 feedback report structure for Harbor Health to integrate back into NextGen EMR
+
 
 Grace
     - Work with Wayne on setting up the Family Planning template and configurations
@@ -38,15 +37,15 @@ Open
 
 
 Wishlist / down the road -
-1. Be able to delete cws
-2. Need to think about how to modify upload files that doesn't fit the 6 bucket model - Reg1 files starts at F1
-3. While adding data translation if one adds a crosswalk, all existing translation will be lost due to the fact that user didn't save.  Maybe prompt user?
-4. Partial Save when setting up a Message Type? SaveToTableName, SaveToTableCol
-5. macro to strip leading zeros
-6. a macro that will insert placeholder for value pairs
-7. and one that will tell you to continue or not based on if it finds a value
-8. Ability to create a subset of the standard internal standards per organization. These would show on the top of the page on the message details
-9.Would family planning ever use ERG for data entry or review? If so need ability to modify entry/details form to remove what fields do not apply.
+1.  Be able to delete cws
+2.  Need to think about how to modify upload files that doesn't fit the 6 bucket model - Reg1 files starts at F1
+3.  While adding data translation if one adds a crosswalk, all existing translation will be lost due to the fact that user didn't save.  Maybe prompt user?
+4.  Partial Save when setting up a Message Type? SaveToTableName, SaveToTableCol
+5.  macro to strip leading zeros
+6.  a macro that will insert placeholder for value pairs
+7.  and one that will tell you to continue or not based on if it finds a value
+8.  Ability to create a subset of the standard internal standards per organization. These would show on the top of the page on the message details
+9.  Would family planning ever use ERG for data entry or review? If so need ability to modify entry/details form to remove what fields do not apply.
 10. Does it make sense to split the admin configuration into two (Referrals & Other), where other wouldnt rely on the 6 buckets for the templates
 11. prompt user when the same reportable fields are selected or give user better error message when reportable fields selected for display are the same	
-12. Be able to import save to table / columns in the template also.
+12. ** DONE (CHAD ON 6/4/14) ** Be able to import save to table / columns in the template also.
