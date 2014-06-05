@@ -25,16 +25,12 @@ Grace
 	- Review and add additional user logging where needed
 		 - not done 6.2
 	- Load test Dev/Test with BadBoy software
-	- Wish List - prompt user when the same reportable fields are selected or give user better error message when reportable fields selected for display are the same	
+	- Review Status List - make it more user friendly
 
 Macros needed
-Concat Fields - done
-CW for handling list - done, handled with Java Codes instead
 How to handle numbers cw matching better - for example, reg1 sometimes submit with 001, 00004 and it really should read as 1 and 4.  Need to see how to handle isNum in mySQL
-Handle field pairs - macro is not needed, users can use concat fields to generate field pairs
-Outbound Macro - returns continue or not - look in field and delete records matching value for given config
-	- will discuss with Chad on Wed 6.4
-
+ - need strip specific leading / ending character
+#1. Post Processing macro that will delete configurations that should not be targets
 	
 
 Open
@@ -43,13 +39,14 @@ Open
 
 Wishlist / down the road -
 1. Be able to delete cws
-2. Need to think about how to modify uplaod files that doesn't fit the 6 bucket model - Reg1 files starts at F1
+2. Need to think about how to modify upload files that doesn't fit the 6 bucket model - Reg1 files starts at F1
 3. While adding data translation if one adds a crosswalk, all existing translation will be lost due to the fact that user didn't save.  Maybe prompt user?
 4. Partial Save when setting up a Message Type? SaveToTableName, SaveToTableCol
 5. macro to strip leading zeros
 6. a macro that will insert placeholder for value pairs
-7. one that will handle list of values and apply a cw
-8. and one that will tell you to continue or not based on if it finds a value
-9. Ability to create a subset of the standard internal standards per organization. These would show on the top of the page on the message details
-10.Would family planning ever use ERG for data entry or review? If so need ability to modify entry/details form to remove what fields do not apply.
-11. Does it make sense to split the admin configuration into two (Referrals & Other), where other wouldnt rely on the 6 buckets for the templates
+7. and one that will tell you to continue or not based on if it finds a value
+8. Ability to create a subset of the standard internal standards per organization. These would show on the top of the page on the message details
+9.Would family planning ever use ERG for data entry or review? If so need ability to modify entry/details form to remove what fields do not apply.
+10. Does it make sense to split the admin configuration into two (Referrals & Other), where other wouldnt rely on the 6 buckets for the templates
+11. prompt user when the same reportable fields are selected or give user better error message when reportable fields selected for display are the same	
+12. Be able to import save to table / columns in the template also.
