@@ -334,6 +334,18 @@ public class adminProcessingActivity {
                     User userDetails = usermanager.getUserById(batch.getuserId());
                     String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
                     batch.setusersName(usersName);
+                    
+                    /* Get from batch information */
+                    List<transactionTarget> transactionTargets = transactionOutManager.getTransactionsByBatchDLId(batch.getId());
+                    
+                    for(transactionTarget transactiontarget : transactionTargets) {
+                        batchUploads batchUploadDetails = transactionInManager.getBatchDetails(transactiontarget.getbatchUploadId());
+                        
+                        batch.setFromBatchName(batchUploadDetails.getutBatchName());
+                        batch.setFromBatchFile(batchUploadDetails.getoriginalFileName());
+                        batch.setFromOrgId(batchUploadDetails.getOrgId());
+                        
+                    }
 
                 }
             }

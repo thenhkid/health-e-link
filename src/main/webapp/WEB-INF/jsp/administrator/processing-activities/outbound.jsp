@@ -43,6 +43,7 @@
                             <tr>
                                 <th scope="col">Organization</th>
                                 <th scope="col">Batch ID</th>
+                                <th scope="col">Generated From Batch</th>
                                 <th scope="col" class="center-text">Transport Method</th>
                                 <th scope="col" class="center-text">Status</th>
                                 <th scope="col" class="center-text"># of Transactions</th>
@@ -65,6 +66,15 @@
                                                     <br />
                                                     <a href="/FileDownload/downloadFile.do?filename=${batch.outputFIleName}&foldername=output files&orgId=${batch.orgId}" title="View Original File">
                                                         ${batch.outputFIleName}
+                                                    </a>
+                                                </c:if>
+                                            </td>
+                                            <td>
+                                                ${batch.fromBatchName}
+                                                <c:if test="${not empty batch.fromBatchFile}">
+                                                    <br />
+                                                    <a href="/FileDownload/downloadFile.do?filename=${batch.fromBatchFile}&foldername=input files&orgId=${batch.fromOrgId}" title="View Uploaded Source File">
+                                                        ${batch.fromBatchFile}
                                                     </a>
                                                 </c:if>
                                             </td>

@@ -39,6 +39,15 @@ public class batchDownloads {
     
     @Transient
     private String transportMethod;
+    
+    @Transient
+    private String fromBatchName;
+    
+    @Transient
+    private String fromBatchFile;
+    
+    @Transient
+    private int fromOrgId;
 
     
     @Id
@@ -257,4 +266,29 @@ public class batchDownloads {
     public void settransportMethod(String transportMethod) {
         this.transportMethod = transportMethod;
     }
+
+    public String getFromBatchName() {
+        return fromBatchName;
+    }
+
+    public void setFromBatchName(String fromBatchName) {
+        this.fromBatchName = fromBatchName;
+    }
+
+    public String getFromBatchFile() {
+        return fromBatchFile;
+    }
+
+    public void setFromBatchFile(String fromBatchFile) {
+        this.fromBatchFile = fromBatchFile;
+    }
+
+    public int getFromOrgId() {
+        return fromOrgId;
+    }
+
+    public void setFromOrgId(int fromOrgId) {
+        this.fromOrgId = fromOrgId;
+    }
+    
 }

@@ -115,7 +115,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
     public batchDownloads getBatchDetails(int batchId) throws Exception {
         return transactionOutDAO.getBatchDetails(batchId);
     }
-    
+
     @Override
     @Transactional
     public batchDownloads getBatchDetailsByBatchName(String batchName) throws Exception {
@@ -293,7 +293,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
 
                 for (transactionTarget transaction : pendingTransactions) {
 
-                	boolean processed = false;
+                    boolean processed = false;
                     String errorMessage = "Error occurred trying to process output transaction. transactionId: " + transaction.getId();
 
                     try {
@@ -312,7 +312,6 @@ public class transactionOutManagerImpl implements transactionOutManager {
                         //throw new Exception("Error occurred trying to process output transaction. transactionId: "+transaction.getId(),e);
                         processed = false;
                     }
-                    
 
                     if (!processed) {
                         //we update and log
@@ -399,7 +398,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
 
                                     if (batchId > 0) {
                                         /* Send the email to primary contact */
-                                    	try {
+                                        try {
                                             /* Get the batch Details */
                                             batchDownloads batchDLInfo = transactionOutDAO.getBatchDetails(batchId);
 
@@ -468,9 +467,9 @@ public class transactionOutManagerImpl implements transactionOutManager {
 
                                                 /* Send the email */
                                                 try {
-                                                	emailMessageManager.sendEmail(msg);
-                                                } catch(Exception ex) {
-                                                	ex.printStackTrace();
+                                                    emailMessageManager.sendEmail(msg);
+                                                } catch (Exception ex) {
+                                                    ex.printStackTrace();
                                                 }
                                             }
                                         } catch (Exception e) {
@@ -583,9 +582,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                             }
 
                         }
-                    } 
-                    /* WEEKLY SCHEDULE */ 
-                    else if (schedule.gettype() == 3) {
+                    } /* WEEKLY SCHEDULE */ else if (schedule.gettype() == 3) {
                         long diffInWeeks = 0;
 
                         if (logs.size() > 0) {
@@ -600,9 +597,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
 
                         }
 
-                    } 
-                    /* MONTHLY SCHEDULE */ 
-                    else if (schedule.gettype() == 4) {
+                    } /* MONTHLY SCHEDULE */ else if (schedule.gettype() == 4) {
 
                         long diffInDays = 0;
 
@@ -742,9 +737,9 @@ public class transactionOutManagerImpl implements transactionOutManager {
 
                                 /* Send the email */
                                 try {
-                                	emailMessageManager.sendEmail(msg);
+                                    emailMessageManager.sendEmail(msg);
                                 } catch (Exception ex) {
-                                	ex.printStackTrace();
+                                    ex.printStackTrace();
                                 }
                             }
                         } catch (Exception e) {
@@ -761,20 +756,19 @@ public class transactionOutManagerImpl implements transactionOutManager {
         }
 
     }
-    
+
     /**
-     * The 'processManualTransaction' function will start the processing of a transaction 
-     * that is set to manual.
-     * 
+     * The 'processManualTransaction' function will start the processing of a transaction that is set to manual.
+     *
      * @param transaction The transaction object that needs to be translated.
-     * 
+     *
      * @return This function returns the created batchId.
      */
     @Override
     public int processManualTransaction(transactionTarget transaction) throws Exception {
         return beginOutputProcess(transaction);
     }
-    
+
     /**
      * The 'beginOutputProcess' function will start the process to creating the target download transaction
      *
@@ -810,12 +804,10 @@ public class transactionOutManagerImpl implements transactionOutManager {
                     throw new Exception("Error occurred trying to generate a batch. transactionId: " + transaction.getId(), e);
                 }
 
-            } 
-            /* File Download || FTP || EMed-Apps */ 
-            else if (transportDetails.gettransportMethodId() == 1 || transportDetails.gettransportMethodId() == 3  || transportDetails.gettransportMethodId() == 5) {
+            } /* File Download || FTP || EMed-Apps */ else if (transportDetails.gettransportMethodId() == 1 || transportDetails.gettransportMethodId() == 3 || transportDetails.gettransportMethodId() == 5) {
 
                 boolean createNewFile = true;
-                
+
                 /* 
                  If the merge batches option is not checked create the batch right away
                  */
@@ -883,17 +875,17 @@ public class transactionOutManagerImpl implements transactionOutManager {
                 /* Generate the file */
                 try {
                     boolean encryptMessage = false;
-                    
-                    if(transportDetails.gettransportMethodId() == 5) {
+
+                    if (transportDetails.gettransportMethodId() == 5) {
                         encryptMessage = true;
                     }
                     generateTargetFile(createNewFile, transaction.getId(), batchId, transportDetails, encryptMessage);
                 } catch (Exception e) {
-                	throw new Exception("Error occurred trying to generate the batch file. batchId: " + batchId, e);
+                    throw new Exception("Error occurred trying to generate the batch file. batchId: " + batchId, e);
                 }
 
             }
-            
+
 
             /* Update the status of the transaction to PP (Pending Pickup) (ID = 18) */
             transactionInManager.updateTransactionStatus(transaction.getbatchUploadId(), transaction.gettransactionInId(), 0, 18);
@@ -998,7 +990,6 @@ public class transactionOutManagerImpl implements transactionOutManager {
         return batchId;
     }
 
-    
     /**
      * The 'generateTargetFile' function will generate the actual file in the correct organizations outpufiles folder.
      */
@@ -1038,7 +1029,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
         /* Create the empty file in the correct location */
         if (createNewFile == true || !newFile.exists()) {
             try {
-               
+
                 if (newFile.exists()) {
                     int i = 1;
                     while (newFile.exists()) {
@@ -1058,7 +1049,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
             transactionOutDAO.updateBatchOutputFileName(batchDetails.getId(), fileName);
 
         }
-        
+
         /* Read in the file */
         FileInputStream fileInput = null;
         File file = new File(dir.getDir() + fileName);
@@ -1066,19 +1057,19 @@ public class transactionOutManagerImpl implements transactionOutManager {
 
         /* Need to get the records for the transaction */
         String recordRow = "";
-        
+
         transactionOutRecords records = transactionOutDAO.getTransactionRecords(transactionTargetId);
-        
+
         /* Get the target fields */
         //NEW
         List<configurationFormFields> formFields = configurationTransportManager.getConfigurationFields(transportDetails.getconfigId(), transportDetails.getId());
-       
+
         /* Need to get the max field number */
         int maxFieldNo = transactionOutDAO.getMaxFieldNo(transportDetails.getconfigId());
-        
+
         /* Need to get the correct delimiter for the output file */
         String delimChar = (String) messageTypeDAO.getDelimiterChar(transportDetails.getfileDelimiter());
-         
+
         if (records != null) {
             FileWriter fw = null;
 
@@ -1100,11 +1091,11 @@ public class transactionOutManagerImpl implements transactionOutManager {
                     List<HL7Segments> hl7Segments = configurationManager.getHL7Segments(hl7Details.getId());
 
                     if (!hl7Segments.isEmpty()) {
-                        
+
                         StringBuilder hl7recordRow = new StringBuilder();
 
                         for (HL7Segments segment : hl7Segments) {
-                            
+
                             hl7recordRow.append(segment.getsegmentName()).append(hl7Details.getfieldSeparator());
 
                             /* Get the segment elements */
@@ -1115,13 +1106,12 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                 for (HL7Elements element : hl7Elements) {
 
                                     if (!"".equals(element.getdefaultValue())) {
-                                        if("~currDate~".equals(element.getdefaultValue())) {
+                                        if ("~currDate~".equals(element.getdefaultValue())) {
                                             hl7recordRow.append(batchDetails.getdateCreated());
-                                        }
-                                        else {
+                                        } else {
                                             hl7recordRow.append(element.getdefaultValue());
                                         }
-                                        
+
                                     } else {
 
                                         /* Get the element components */
@@ -1135,6 +1125,16 @@ public class transactionOutManagerImpl implements transactionOutManager {
 
                                                 String fieldValue = BeanUtils.getProperty(records, colName);
 
+                                                if (fieldValue == null) {
+                                                    fieldValue = "";
+                                                } else if ("null".equals(fieldValue)) {
+                                                    fieldValue = "";
+                                                } else if (fieldValue.isEmpty()) {
+                                                    fieldValue = "";
+                                                } else if (fieldValue.length() == 0) {
+                                                    fieldValue = "";
+                                                }
+
                                                 if (!"".equals(component.getfieldDescriptor()) && component.getfieldDescriptor() != null) {
                                                     hl7recordRow.append(component.getfieldDescriptor()).append(fieldValue);
                                                 } else {
@@ -1147,7 +1147,6 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                                 }
 
                                             }
-                                            
 
                                         } else {
                                             hl7recordRow.append("");
@@ -1155,7 +1154,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
 
                                     }
 
-                                    if (elementCounter <= hl7Elements.size()) {
+                                    if (elementCounter < hl7Elements.size()) {
                                         hl7recordRow.append(hl7Details.getfieldSeparator());
                                         elementCounter += 1;
                                     }
@@ -1166,14 +1165,13 @@ public class transactionOutManagerImpl implements transactionOutManager {
                             hl7recordRow.append(System.getProperty("line.separator"));
 
                         }
-                        
+
                         if (!"".equals(hl7recordRow.toString())) {
                             try {
-                                if(encrypt == true) {
+                                if (encrypt == true) {
                                     byte[] encoded = Base64.encode(hl7recordRow.toString().getBytes());
                                     fw.write(new String(encoded));
-                                }
-                                else {
+                                } else {
                                     fw.write(hl7recordRow.toString());
                                 }
 
@@ -1189,14 +1187,14 @@ public class transactionOutManagerImpl implements transactionOutManager {
                 }
 
             } else {
-               
+
                // for (int i = 1; i <= maxFieldNo; i++) {
-               //NEW
-               for(configurationFormFields field : formFields) {
+                //NEW
+                for (configurationFormFields field : formFields) {
 
                     //String colName = new StringBuilder().append("f").append(i).toString();
                     //NEW
-                    if(field.getUseField() == true) {
+                    if (field.getUseField() == true) {
                         //NEW
                         String colName = new StringBuilder().append("f").append(field.getFieldNo()).toString();
 
@@ -1205,20 +1203,17 @@ public class transactionOutManagerImpl implements transactionOutManager {
 
                             if (fieldValue == null) {
                                 fieldValue = "";
-                            }
-                            else if ("null".equals(fieldValue)) {
+                            } else if ("null".equals(fieldValue)) {
                                 fieldValue = "";
-                            }
-                            else if (fieldValue.isEmpty()) {
+                            } else if (fieldValue.isEmpty()) {
                                 fieldValue = "";
-                            }
-                            else if (fieldValue.length() == 0) {
+                            } else if (fieldValue.length() == 0) {
                                 fieldValue = "";
                             }
 
                             //if (i == maxFieldNo) {
                             //New
-                            if(field.getFieldNo() == maxFieldNo) {
+                            if (field.getFieldNo() == maxFieldNo) {
                                 recordRow = new StringBuilder().append(recordRow).append(fieldValue).append(System.getProperty("line.separator")).toString();
                             } else {
                                 recordRow = new StringBuilder().append(recordRow).append(fieldValue).append(delimChar).toString();
@@ -1231,20 +1226,19 @@ public class transactionOutManagerImpl implements transactionOutManager {
                         } catch (NoSuchMethodException ex) {
                             Logger.getLogger(transactionOutManagerImpl.class.getName()).log(Level.SEVERE, null, ex);
                         }
-                    //NEW
+                        //NEW
                     }
                 }
 
                 if (recordRow != null) {
                     try {
-                         if(encrypt == true) {
+                        if (encrypt == true) {
                             byte[] encoded = Base64.encode(recordRow.getBytes());
                             fw.write(new String(encoded));
+                        } else {
+                            fw.write(recordRow);
                         }
-                        else {
-                           fw.write(recordRow);  
-                        }
-                        
+
                         fw.close();
                     } catch (IOException ex) {
                         throw new IOException(ex);
@@ -1310,9 +1304,9 @@ public class transactionOutManagerImpl implements transactionOutManager {
 
             /* Get the FTP Details */
             configurationFTPFields ftpDetails = configurationTransportManager.getTransportFTPDetailsPush(transportDetails.getId());
-            
-            if("SFTP".equals(ftpDetails.getprotocol())) {
-                
+
+            if ("SFTP".equals(ftpDetails.getprotocol())) {
+
                 JSch jsch = new JSch();
                 Session session = null;
                 ChannelSftp channel = null;
@@ -1321,69 +1315,67 @@ public class transactionOutManagerImpl implements transactionOutManager {
                 String user = ftpDetails.getusername();
                 int port = ftpDetails.getport();
                 String host = ftpDetails.getip();
-                
+
                 Organization orgDetails = organizationManager.getOrganizationById(configurationManager.getConfigurationById(transportDetails.getconfigId()).getorgId());
-                
-                if(ftpDetails.getcertification() != null && !"".equals(ftpDetails.getcertification())) {
-                    
+
+                if (ftpDetails.getcertification() != null && !"".equals(ftpDetails.getcertification())) {
+
                     File newFile = null;
-                    
+
                     fileSystem dir = new fileSystem();
                     dir.setDir(orgDetails.getcleanURL(), "certificates");
 
                     jsch.addIdentity(new File(dir.getDir() + ftpDetails.getcertification()).getAbsolutePath());
-                    session = jsch.getSession(user, host , port);
-                }
-                else if(ftpDetails.getpassword() != null && !"".equals(ftpDetails.getpassword())) {
-                    session = jsch.getSession(user, host , port);
+                    session = jsch.getSession(user, host, port);
+                } else if (ftpDetails.getpassword() != null && !"".equals(ftpDetails.getpassword())) {
+                    session = jsch.getSession(user, host, port);
                     session.setPassword(ftpDetails.getpassword());
                 }
-                
+
                 session.setConfig("StrictHostKeyChecking", "no");
                 session.setTimeout(2000);
-                
+
                 session.connect();
- 
-                channel = (ChannelSftp)session.openChannel("sftp");
-                
+
+                channel = (ChannelSftp) session.openChannel("sftp");
+
                 channel.connect();
-                    
-                if(ftpDetails.getdirectory() != null && !"".equals(ftpDetails.getdirectory())) {
-                   channel.cd(ftpDetails.getdirectory());
-                   
-                   String fileName = null;
 
-                   int findExt = batchFTPFileInfo.getoutputFIleName().lastIndexOf(".");
+                if (ftpDetails.getdirectory() != null && !"".equals(ftpDetails.getdirectory())) {
+                    channel.cd(ftpDetails.getdirectory());
 
-                   if (findExt >= 0) {
-                       fileName = batchFTPFileInfo.getoutputFIleName();
-                   } else {
-                       fileName = new StringBuilder().append(batchFTPFileInfo.getoutputFIleName()).append(".").append(transportDetails.getfileExt()).toString();
-                   }
-                   
-                   //Set the directory to save the brochures to
-                   fileSystem dir = new fileSystem();
+                    String fileName = null;
 
-                   String filelocation = transportDetails.getfileLocation();
-                   filelocation = filelocation.replace("/bowlink/", "");
-                   dir.setDirByName(filelocation);
+                    int findExt = batchFTPFileInfo.getoutputFIleName().lastIndexOf(".");
 
-                   File file = new File(dir.getDir() + fileName);
-                   
-                   if(file.exists()) {
-                       FileInputStream fileInput = new FileInputStream(file);
-                   
-                       channel.put(fileInput, fileName);
-                   }
-                   
+                    if (findExt >= 0) {
+                        fileName = batchFTPFileInfo.getoutputFIleName();
+                    } else {
+                        fileName = new StringBuilder().append(batchFTPFileInfo.getoutputFIleName()).append(".").append(transportDetails.getfileExt()).toString();
+                    }
+
+                    //Set the directory to save the brochures to
+                    fileSystem dir = new fileSystem();
+
+                    String filelocation = transportDetails.getfileLocation();
+                    filelocation = filelocation.replace("/bowlink/", "");
+                    dir.setDirByName(filelocation);
+
+                    File file = new File(dir.getDir() + fileName);
+
+                    if (file.exists()) {
+                        FileInputStream fileInput = new FileInputStream(file);
+
+                        channel.put(fileInput, fileName);
+                    }
+
                 }
-                
+
                 channel.disconnect();
                 session.disconnect();
-                
-            }
-            else {
-               FTPClient ftp;
+
+            } else {
+                FTPClient ftp;
 
                 if ("FTP".equals(ftpDetails.getprotocol())) {
                     ftp = new FTPClient();
@@ -1440,10 +1432,8 @@ public class transactionOutManagerImpl implements transactionOutManager {
                     ftp.logout();
                     ftp.disconnect();
 
-                } 
+                }
             }
-
-            
 
         } catch (Exception e) {
             throw new Exception("Error occurred trying to FTP a batch target. batchId: " + batchId, e);
@@ -1486,18 +1476,17 @@ public class transactionOutManagerImpl implements transactionOutManager {
             return 1;
         }
     }
-    
+
     @Override
     @Transactional
     public batchDownloadSummary getDownloadSummaryDetails(int transactionTargetId) {
         return transactionOutDAO.getDownloadSummaryDetails(transactionTargetId);
     }
-    
+
     /**
-     * The 'generateSystemOutboundSummary' function will return the summary object for
-     * outbound system batches
-     * 
-     * @return This function will return a systemSummary object 
+     * The 'generateSystemOutboundSummary' function will return the summary object for outbound system batches
+     *
+     * @return This function will return a systemSummary object
      */
     @Override
     public systemSummary generateSystemOutboundSummary() {
@@ -1566,12 +1555,11 @@ public class transactionOutManagerImpl implements transactionOutManager {
         return systemSummary;
 
     }
-    
+
     /**
-     * The 'generateSystemWaitingSummary' function will return the summary object for
-     * waiting to be processed system transactions
-     * 
-     * @return This function will return a systemSummary object 
+     * The 'generateSystemWaitingSummary' function will return the summary object for waiting to be processed system transactions
+     *
+     * @return This function will return a systemSummary object
      */
     @Override
     public systemSummary generateSystemWaitingSummary() {
@@ -1592,29 +1580,28 @@ public class transactionOutManagerImpl implements transactionOutManager {
         return systemSummary;
 
     }
-    
+
     @Override
     @Transactional
-    public List <batchDownloads> getAllBatches(Date fromDate, Date toDate) throws Exception {
+    public List<batchDownloads> getAllBatches(Date fromDate, Date toDate) throws Exception {
         return transactionOutDAO.getAllBatches(fromDate, toDate);
     }
-    
+
     @Override
     public boolean searchTransactions(Transaction transaction, String searchTerm) throws Exception {
 
         boolean matchFound = false;
-        
+
         String lcaseSearchTerm = searchTerm.toLowerCase();
 
         if (transaction.getmessageTypeName() != null && transaction.getmessageTypeName().toLowerCase().matches(".*" + lcaseSearchTerm + ".*")) {
             matchFound = true;
         }
 
-
         if (transaction.getstatusValue() != null && transaction.getstatusValue().toLowerCase().matches(".*" + lcaseSearchTerm + ".*")) {
             matchFound = true;
         }
-        
+
         if (transaction.getsourceOrgFields().size() > 0) {
 
             for (int i = 0; i < transaction.getsourceOrgFields().size(); i++) {
@@ -1623,7 +1610,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                 }
             }
         }
-        
+
         if (transaction.gettargetOrgFields().size() > 0) {
 
             for (int i = 0; i < transaction.gettargetOrgFields().size(); i++) {
@@ -1636,20 +1623,19 @@ public class transactionOutManagerImpl implements transactionOutManager {
         return matchFound;
 
     }
-    
-    
+
     @Override
     @Transactional
     public List getTransactionsToProcess() throws Exception {
         return transactionOutDAO.getTransactionsToProcess();
     }
-    
+
     @Override
     @Transactional
     public List getTransactionsToProcessByMessageType(int orgId) throws Exception {
         return transactionOutDAO.getTransactionsToProcessByMessageType(orgId);
     }
-    
+
     @Override
     @Transactional
     public List getAllransactionsToProcessByMessageType(int orgId, int messageTypeId) throws Exception {
@@ -1661,31 +1647,31 @@ public class transactionOutManagerImpl implements transactionOutManager {
     public List<transactionTarget> getPendingDeliveryTransactions(int orgId, int messageType, Date fromDate, Date toDate) throws Exception {
         return transactionOutDAO.getPendingDeliveryTransactions(orgId, messageType, fromDate, toDate);
     }
-    
+
     @Override
     public boolean searchTransactionsByMessageType(pendingDeliveryTargets transaction, String searchTerm) throws Exception {
         boolean matchFound = false;
-        
+
         String lcaseSearchTerm = searchTerm.toLowerCase();
-        
+
         if (transaction.getMessageType() != null && transaction.getMessageType().toLowerCase().matches(".*" + lcaseSearchTerm + ".*")) {
             matchFound = true;
         }
-        
+
         if (transaction.getOrgDetails().toLowerCase().matches(".*" + lcaseSearchTerm + ".*")) {
             matchFound = true;
         }
-        
+
         return matchFound;
     }
-    
+
     @Override
     public boolean searchPendingTransactions(Transaction transaction, String searchTerm) throws Exception {
-        
+
         boolean matchFound = false;
-        
+
         String lcaseSearchTerm = searchTerm.toLowerCase();
-        
+
         if (transaction.getbatchName() != null && transaction.getbatchName().toLowerCase().matches(".*" + lcaseSearchTerm + ".*")) {
             matchFound = true;
         }
@@ -1698,7 +1684,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                 }
             }
         }
-        
+
         if (transaction.getpatientFields().size() > 0) {
 
             for (int i = 0; i < transaction.getpatientFields().size(); i++) {
@@ -1707,29 +1693,28 @@ public class transactionOutManagerImpl implements transactionOutManager {
                 }
             }
         }
-        
+
         return matchFound;
-        
-        
+
     }
-    
+
     @Override
     @Transactional
     public void doNotProcessTransaction(int transactionId) throws Exception {
         transactionOutDAO.doNotProcessTransaction(transactionId);
     }
-    
+
     @Override
     @Transactional
     public List<batchDownloads> getInboxBatchesHistory(int userId, int orgId, int fromOrgId, int messageTypeId, Date fromDate, Date toDate) throws Exception {
         return transactionOutDAO.getInboxBatchesHistory(userId, orgId, fromOrgId, messageTypeId, fromDate, toDate);
     }
-    
+
     @Override
     public List<Integer> findInboxBatches(List<batchDownloads> batches, String searchTerm) throws Exception {
         return transactionOutDAO.findInboxBatches(batches, searchTerm);
     }
-    
+
     @Override
     public List<batchDownloadSummary> getBatchesBySentOrg(int srcorgId, int tgtOrgId, int messageTypeId) throws Exception {
         return transactionOutDAO.getBatchesBySentOrg(srcorgId, tgtOrgId, messageTypeId);
