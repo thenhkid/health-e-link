@@ -1405,3 +1405,5 @@ END IF;
 select '';
 end proc_main$$
 DELIMITER ;
+
+/** the above updates are applied 01:30AM 06052014 Grace **/
