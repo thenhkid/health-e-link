@@ -47,5 +47,5 @@ Wishlist / down the road -
 8.  Ability to create a subset of the standard internal standards per organization. These would show on the top of the page on the message details
 9.  Would family planning ever use ERG for data entry or review? If so need ability to modify entry/details form to remove what fields do not apply.
 10. Does it make sense to split the admin configuration into two (Referrals & Other), where other wouldnt rely on the 6 buckets for the templates
-11. prompt user when the same reportable fields are selected or give user better error message when reportable fields selected for display are the same	
+11. ** DONE (CHAD ON 6/4/14) ** prompt user when the same reportable fields are selected or give user better error message when reportable fields selected for display are the same	
 12. ** DONE (CHAD ON 6/4/14) ** Be able to import save to table / columns in the template also.

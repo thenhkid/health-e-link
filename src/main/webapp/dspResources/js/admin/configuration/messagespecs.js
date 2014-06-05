@@ -58,6 +58,26 @@ function checkFormFields() {
         hasErrors = 1;
     }
     
+    /* Check to make sure there are different selected fields */
+    if(hasErrors == 0 && rptField1 > 0 && (rptField1 == rptField2 || rptField1 == rptField3 || rptField1 == rptField4)) {
+        $('.rtpField').addClass("has-error");
+        $('#rptFieldMsg').addClass("has-error");
+        $('#rptFieldMsg').html('All reportable fields must be different.<br />');
+        hasErrors = 1;
+    }
+    if(hasErrors == 0 && rptField2 > 0 && (rptField2 == rptField3 || rptField2 == rptField4)) {
+        $('.rtpField').addClass("has-error");
+        $('#rptFieldMsg').addClass("has-error");
+        $('#rptFieldMsg').html('All reportable fields must be different.<br />');
+        hasErrors = 1;
+    }
+    if(hasErrors == 0 && rptField3 > 0 && (rptField3 == rptField4)) {
+        $('.rtpField').addClass("has-error");
+        $('#rptFieldMsg').addClass("has-error");
+        $('#rptFieldMsg').html('All reportable fields must be different.<br />');
+        hasErrors = 1;
+    }
+    
     return hasErrors;
 }
 

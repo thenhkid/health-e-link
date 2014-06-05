@@ -1107,7 +1107,9 @@ public class transactionOutManagerImpl implements transactionOutManager {
 
                                     if (!"".equals(element.getdefaultValue())) {
                                         if ("~currDate~".equals(element.getdefaultValue())) {
-                                            hl7recordRow.append(batchDetails.getdateCreated());
+                                            SimpleDateFormat date_format = new SimpleDateFormat("yyyyMMdd");
+                                            String date = date_format.format(batchDetails.getdateCreated());
+                                            hl7recordRow.append(date);
                                         } else {
                                             hl7recordRow.append(element.getdefaultValue());
                                         }
