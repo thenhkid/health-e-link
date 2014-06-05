@@ -239,7 +239,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
         Integer errorCount = 0;
 
         /* Need to get the configured data translations */
-        List<configurationDataTranslations> dataTranslations = configurationManager.getDataTranslationsWithFieldNo(configId, 3);
+        List<configurationDataTranslations> dataTranslations = configurationManager.getDataTranslationsWithFieldNo(configId, 1);
 
         for (configurationDataTranslations cdt : dataTranslations) {
             if (cdt.getCrosswalkId() != 0) {

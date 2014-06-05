@@ -868,7 +868,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
         if (!formFields.isEmpty()) {
 
             String sql;
-            sql = "insert into transactionTranslatedOut (transactionTargetId, configId, ";
+            sql = "insert into transactionTranslatedOut (transactionTargetId, configId,";
             for (configurationFormFields formField : formFields) {
                 if (!formField.getsaveToTableName().equalsIgnoreCase("")) {
                     sql += "f" + formField.getFieldNo() + ",";
@@ -879,7 +879,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
 
             sql += ") ";
 
-            sql += "VALUES( :transactionTargetId, :configId, ";
+            sql += "VALUES( :transactionTargetId, :configId,";
 
             String dataSQL;
             for (configurationFormFields formField : formFields) {

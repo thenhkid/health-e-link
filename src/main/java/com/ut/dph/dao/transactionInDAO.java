@@ -258,7 +258,7 @@ public interface transactionInDAO {
     
     Integer copyTransactionInRecord(Integer newTInId, Integer oldTInId);
     
-    Integer insertTransactionTranslated(Integer newTInId, batchUploadSummary bus);
+    Integer insertTransactionTranslated(Integer oldInId ,Integer newInId, batchUploadSummary bus);
     
     List <batchUploads> getAllUploadedBatches(Date fromDate, Date toDate) throws Exception;
     

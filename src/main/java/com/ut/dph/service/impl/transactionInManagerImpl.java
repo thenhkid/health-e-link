@@ -507,7 +507,7 @@ public class transactionInManagerImpl implements transactionInManager {
             	/** we are reordering 1. cw/macro, 2. required and 3. validate **/
             	// 1. grab the configurationDataTranslations and run cw/macros
                 List<configurationDataTranslations> dataTranslations = configurationManager
-                        .getDataTranslationsWithFieldNo(configId, 3); //while processing
+                        .getDataTranslationsWithFieldNo(configId,1); //while processing
                 for (configurationDataTranslations cdt : dataTranslations) {
                     if (cdt.getCrosswalkId() != 0) {
                         systemErrorCount = systemErrorCount + processCrosswalk(configId, batchUploadId, cdt, false, transactionId);
@@ -576,9 +576,16 @@ public class transactionInManagerImpl implements transactionInManager {
                 }
                 /** end of inserting target **/
                 
-                
-                
-                
+                /** we apply post processing rules here - categoryId 3 **/
+                //1. we loop it by config
+                for (Integer postConfigId : configIds) {
+                	System.out.println(postConfigId);
+                	List<configurationDataTranslations> postDataTranslations = configurationManager
+                            .getDataTranslationsWithFieldNo(configId,3); //while processing
+                    for (configurationDataTranslations cdt : postDataTranslations) {
+                        systemErrorCount = systemErrorCount + processMacro(postConfigId, batchUploadId, cdt, false, transactionId);                       
+                    }
+                }
                 
                 /**
                  * if there are errors, those are system errors, they will be logged we get errorId 5 and email to admin, update batch to 29 *
@@ -1629,7 +1636,7 @@ public class transactionInManagerImpl implements transactionInManager {
 	            	/** we are reordering 1. cw/macro, 2. required and 3. validate **/
 	            	// 1. grab the configurationDataTranslations and run cw/macros
 	            	List<configurationDataTranslations> dataTranslations = configurationManager
-	                        .getDataTranslationsWithFieldNo(configId, 1); //pre processing
+	                        .getDataTranslationsWithFieldNo(configId, 2); //pre processing
 	                for (configurationDataTranslations cdt : dataTranslations) {
 	                    if (cdt.getCrosswalkId() != 0) {
 	                    	sysError = sysError + processCrosswalk(configId, batchId, cdt, false, transactionId);
@@ -1835,7 +1842,7 @@ public class transactionInManagerImpl implements transactionInManager {
                     sysError = sysError + updateTINIDForBatchUploadSummary(bus, newTInId);
                     //we insert new entry into transactionInRecords and transactionTranslated In
                     sysError = sysError + copyTransactionInRecord(newTInId, bus.gettransactionInId());
-                    sysError = sysError + insertTransactionTranslated(newTInId, bus);
+                    sysError = sysError + insertTransactionTranslated(bus.gettransactionInId(), newTInId, bus);
                     sysError = sysError + insertTransactionInError(newTInId, bus.gettransactionInId());
                     //dup errors
                 }
@@ -1886,9 +1893,8 @@ public class transactionInManagerImpl implements transactionInManager {
     }
 
     @Override
-    public Integer insertTransactionTranslated(Integer newTInId,
-            batchUploadSummary bus) {
-        return transactionInDAO.insertTransactionTranslated(newTInId, bus);
+    public Integer insertTransactionTranslated(Integer oldInId ,Integer newInId, batchUploadSummary bus) {
+        return transactionInDAO.insertTransactionTranslated(oldInId, newInId, bus);
     }
 
     @Override
