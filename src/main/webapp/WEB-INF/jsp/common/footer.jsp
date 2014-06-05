@@ -18,7 +18,7 @@
             <span class="adr"><span class="post-office-box">250 Washington Street</span>,
                 <span class="region">Boston, MA</span>
                 <span class="postal-code">02108</span></span> |
-            Phone: <span class="tel">(617) 624-6030</span> |
+            Phone: <span class="tel">(617) 994-9869</span> |
         </p>
         <p>
             Copyright <fmt:formatDate value="${date}" pattern="yyyy" /> Massachusetts Department of Public Health All rights reserved</p>
