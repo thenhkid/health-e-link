@@ -1,0 +1,7 @@
+/** grace 06052014 10:02 **/
+
+update configurationDataTranslations set categoryId = 1;
+
+ALTER TABLE `universaltranslator`.`configurationdatatranslations` 
+CHANGE COLUMN `categoryId` `categoryId` INT(11) NULL DEFAULT 1 COMMENT '2 pre - processing\n3 - post processing\n1 -  while- processing\n' ;
+
