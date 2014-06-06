@@ -292,6 +292,10 @@ public class transactionOutManagerImpl implements transactionOutManager {
             if (!pendingTransactions.isEmpty()) {
 
                 for (transactionTarget transaction : pendingTransactions) {
+                    
+                    /* Update the status to TCP (Transaction Creating Processing) ID = 37 */
+                    transactionInManager.updateTransactionTargetStatus(0, transaction.getId(), 0, 37);
+                    
 
                     boolean processed = false;
                     String errorMessage = "Error occurred trying to process output transaction. transactionId: " + transaction.getId();

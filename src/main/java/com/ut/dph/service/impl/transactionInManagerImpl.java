@@ -579,7 +579,6 @@ public class transactionInManagerImpl implements transactionInManager {
                 /** we apply post processing rules here - categoryId 3 **/
                 //1. we loop it by config
                 for (Integer postConfigId : configIds) {
-                	System.out.println(postConfigId);
                 	List<configurationDataTranslations> postDataTranslations = configurationManager
                             .getDataTranslationsWithFieldNo(configId,3); //while processing
                     for (configurationDataTranslations cdt : postDataTranslations) {

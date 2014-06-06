@@ -53,8 +53,8 @@
                                 <tbody>
                                     <c:forEach var="i" begin="1" end="6">
                                         <tr>
-                                            <td colspan="4"><strong><c:choose><c:when test="${i==1}"> (Sender Organization Information)</c:when><c:when test="${i==2}"> (Sender Provider Information)</c:when><c:when test="${i==3}">(Recipient Organization Information)</c:when><c:when test="${i==4}">(Recipient Provider Information)</c:when><c:when test="${i==5}"> (Patient Information)</c:when><c:when test="${i==6}"> (Details)</c:when></c:choose></strong></td>
-                                                </tr>
+                                            <td colspan="5"><strong><c:choose><c:when test="${i==1}"> (Sender Organization Information)</c:when><c:when test="${i==2}"> (Sender Provider Information)</c:when><c:when test="${i==3}">(Recipient Organization Information)</c:when><c:when test="${i==4}">(Recipient Provider Information)</c:when><c:when test="${i==5}"> (Patient Information)</c:when><c:when test="${i==6}"> (Details)</c:when></c:choose></strong></td>
+                                        </tr>
                                         <c:forEach items="${transportDetails.fields}" var="mappings" varStatus="field">
                                             <c:if test="${mappings.bucketNo == i}">
                                                 <tr class="uFieldRow" rel="${mappings.fieldNo}" rel2="${field.index}">

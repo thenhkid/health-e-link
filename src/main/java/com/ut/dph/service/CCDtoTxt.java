@@ -58,7 +58,7 @@ public class CCDtoTxt {
         String newfileName = new StringBuilder().append(ccdFile.getName().substring(0, ccdFile.getName().lastIndexOf("."))).append(".").append("txt").toString();
 
         File newFile = new File(dir.getDir() + newfileName);
-
+        
         if (newFile.exists()) {
             try {
 
