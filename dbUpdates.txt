@@ -130,3 +130,24 @@ UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayCode`='STPE', `displ
 
 INSERT INTO `universaltranslator`.`lu_ProcessStatus` (`id`, `category`, `displayCode`, `displayText`, `description`) VALUES ('37', 'transaction', 'TCP', 'Transaction Creation Processing', 'This is when a transaction is picked up by the scheduler and the translation is happening');
 
+
+/** Grace 06062014 11:04PM **/
+UPDATE `universaltranslator`.`macro_names` SET `Con1_Question`='Please enter value to match', `Con2_Question`='' WHERE `ID`='77';
+
+
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `description`='This is when a transaction is loaded into our system in its raw format waiting to be process. It is sorted into F1, F2, F3 ... etc.' WHERE `id`='9';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayCode`='TRP', `displayText`='Transaction Release Pending', `description`='This is an interim status we set the transaction to after it has been fixed in the ERG.  It will get pick up by the sceduler and all cw/macros/validations will be applied.' WHERE `id`='10';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayCode`='TI', `displayText`='Trasaction Invalid', `description`='This is when a transaction is submitted without a valid configuration.  It is a final status.' WHERE `id`='11';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayCode`='TREL', `displayText`='Transaction Released', `description`='This is when a transaction is processed. It is a Final Status' WHERE `id`='12';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayCode`='TRJ', `displayText`='Transaction Rejected', `description`='This is when a transaction is rejected by user or set to reject as part of processing rules.  this is a final status.' WHERE `id`='13';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayCode`='TE', `displayText`='Transaction Errored', `description`='This is when a transaction contains error that can be fixed in the ERG.' WHERE `id`='14';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayCode`='TS', `displayText`='Transaction Saved', `description`='This is when an user created a message and save it half way so he/she can return later to fix' WHERE `id`='15';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayCode`='TP', `displayText`='Transaction Passed', `description`='This is when a transaction contains errors but set to pass as part of the processing rules.  This is a final status.' WHERE `id`='16';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayCode`='TC', `displayText`='Transaciton Closed', `description`='This is when user closes the transaction.  It is for ERG.  When a transcaction is closed, users will not be able to create feedback reports.' WHERE `id`='17';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayCode`='TPP', `displayText`='Transaciton Pending Pickup', `description`='This is a target status. The transaction output is created and is waiting for use to view / download by file.' WHERE `id`='18';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayCode`='TPO', `displayText`='Transaciton  Pending Output', `description`='This is a target stauts.  The transaction is ready for output generation.' WHERE `id`='19';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayCode`='TREC', `displayText`='Transaction Received', `description`='This is a target status.  The user has downloaded or viewed the transaction. ' WHERE `id`='20';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayText`='Transaction Canceled', `description`='The is an ERG status. User goes online and hit the cancel button to stop all further activities for this transaction.' WHERE `id`='31';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayCode`='TPE', `displayText`='Transaction Processing Error', `description`='This is when this transaciton errored due to some unforeseen error.  We flag this record and over on with batch.' WHERE `id`='33';
+DELETE FROM `universaltranslator`.`lu_ProcessStatus` WHERE `id`='34';
+
