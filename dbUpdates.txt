@@ -107,3 +107,26 @@ select @returnText;
 
 end proc_main$$
 DELIMITER ;
+
+
+
+/** grace 10:44AM 06062014 **/
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `description`='The file has failed either size, delimiter, type or is blank.' WHERE `id`='1';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `description`='The file is uploaded and has met size, type, delimiter requirement.  It will be loaded into the database and translated.' WHERE `id`='2';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `description`='This is when a user fixes transactions on ERG and resubmits them for process.' WHERE `id`='3';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `description`='This is the intrim status that locks the file.  It is flagged so the scheudler won\'t pick it up for process.' WHERE `id`='4';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `description`='This is when a file is processed but pending review' WHERE `id`='5';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `description`='This is when the batch has all final status.  It will be picked up by the scheudler and insert into UT db.' WHERE `id`='6';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `description`='This is when the entire batch is rejected after processing.  This status happens when every record in the batch fails or when the user selects fail batch when there are errored records' WHERE `id`='7';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `description`='This is when a user enter in an ERG and decides to return and complete it later.' WHERE `id`='8';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `description`='?? I am not sure what the difference between this and cancel (SCN - Cancelled) is. But this flags the batch to not be process. ' WHERE `id`='21';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `description`='This is when a batch is delivered and at least one record (but not all) is viewed by an end user' WHERE `id`='22';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `description`='This is when an entire batch has been delivered and viewed by user.' WHERE `id`='23';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `description`='This is when a batch are all in final status and inserted into the UT db.' WHERE `id`='24';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayCode`='STP', `displayText`='Submission Target Being Process', `description`='This is an interim status for when a submission target is being generated' WHERE `id`='25';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayText`='Submission Target Created', `description`='This is when a submission target is created but before it is delivered to users' WHERE `id`='28';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `description`='This is when an unexpected error happened during processing.  This usually will require code fixing or cw/macro update.  It means the cw, macro or something went wrong.' WHERE `id`='29';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayCode`='STPE', `displayText`='Submission Target Processing Errored' WHERE `id`='30';
+
+INSERT INTO `universaltranslator`.`lu_ProcessStatus` (`id`, `category`, `displayCode`, `displayText`, `description`) VALUES ('37', 'transaction', 'TCP', 'Transaction Creation Processing', 'This is when a transaction is picked up by the scheduler and the translation is happening');
+
