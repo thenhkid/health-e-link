@@ -1554,8 +1554,8 @@ public class transactionInManagerImpl implements transactionInManager {
 	            if (actualFileName.endsWith(".txt") || actualFileName.endsWith(".csv")) {
 	            	sysError = sysError + insertLoadData(batch.getId(), batch.getDelimChar(), actualFileName, loadTableName, batch.isContainsHeaderRow());
 	            	//we delete the loadFile here as it is not encrypted
-	                File actualFile = new File(actualFileName);
-	            	actualFile.delete();
+	                // File actualFile = new File(actualFileName);
+	            	// actualFile.delete();
 	            }
 	            
 	            
