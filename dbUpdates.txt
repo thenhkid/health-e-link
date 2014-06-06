@@ -5,3 +5,105 @@ update configurationDataTranslations set categoryId = 1;
 ALTER TABLE `universaltranslator`.`configurationdatatranslations` 
 CHANGE COLUMN `categoryId` `categoryId` INT(11) NULL DEFAULT 1 COMMENT '2 pre - processing\n3 - post processing\n1 -  while- processing\n' ;
 
+
+/** grace 06052014 11:03PM **/
+INSERT INTO `universaltranslator`.`macro_names` (`ID`, `CategoryId`, `Macro_Name`, `Macro_Short_Name`, `Formula`, `FieldA_Question`, `Con1_Question`, `Con2_Question`) VALUES ('77', '2', 'Remove Transaction and Targets', 'removeTransactionTargets', 'removeTransactionTargets', 'Please enter field to check', 'Please enter transport method', 'Please enter org ids if there are multiple organizations (optional).  Leave blank to delete all target associated with batch.');
+UPDATE `universaltranslator`.`macro_names` SET `populateFieldA`=0 WHERE `ID`='77';
+
+ALTER TABLE `universaltranslator`.`macro_names` 
+CHANGE COLUMN `populateFieldA` `populateFieldA` BIT(1) NULL DEFAULT 1 ;
+
+
+
+use universaltranslator;
+
+drop procedure if exists removeTransactionTargets;
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `removeTransactionTargets`(in configId int, 
+in batchId int, in srcField varchar(10),
+in fieldA varchar(10), in fieldB varchar(10), in con1 varchar(255), 
+in con2 varchar(255), in macroId int, in foroutboundProcessing boolean, in passClear int, in transactionId int)
+
+proc_main:begin
+
+/**
+fieldA - field to look for value
+fieldB - not in use
+con1 - value to match
+con2 - target organizations to apply rule to
+**/
+
+-- 1. quering target transactionInIds from batchSummary
+start transaction;
+
+set @stmt1 = 
+concat("select group_concat(transactionInId order by transactionInId, ',') into @listOfIds
+ from batchUploadSummary where sourceConfigId = ", configId,  " and targetConfigId in 
+(select configId from configurationTransportDetails where transportMethodid 
+in (select id from ref_transportmethods where transportMethod = '", con1,"') 
+and configId in (select id from configurations where status = 1 ");
+
+set @stmt2 = '';
+
+if (con2 != '') then
+BEGIN
+set @stmt2 = concat(" and orgId in (", con2, ")");
+END;
+end if;
+
+set @stmt = concat(@stmt1, @stmt2, ") and batchId = ", batchId,");");
+
+PREPARE stmt from @stmt;
+EXECUTE stmt;-- execute
+
+
+if (@listOfIds is not null) then
+BEGIN
+-- we have data, we delete from these tables
+-- start our transaction here
+
+set @del1 = concat("delete from transactionInErrors where transactionInId in (", @listOfIds, ");");
+set @del2 = concat("delete from transactionInRecords where transactionInId in (", @listOfIds, ");");
+set @del3 = concat("delete from transactionTranslatedIn where transactionInId in (", @listOfIds, ");");
+set @del4 = concat("delete from transactionTarget where transactionInId in (", @listOfIds, ");");
+set @del5 = concat("delete from batchUploadSummary where transactionInId in (", @listOfIds, ");");
+set @del6 = concat("delete from transactionIn where id in (", @listOfIds, ");");
+
+
+
+PREPARE delStmt from @del1;
+EXECUTE delStmt;-- execute
+
+PREPARE delStmt from @del2;
+EXECUTE delStmt;-- execute
+
+PREPARE delStmt from @del3;
+EXECUTE delStmt;-- execute
+
+PREPARE delStmt from @del4;
+EXECUTE delStmt;-- execute
+
+PREPARE delStmt from @del5;
+EXECUTE delStmt;-- execute
+
+PREPARE delStmt from @del6;
+EXECUTE delStmt;-- execute
+
+END;
+end if;
+
+EXECUTE stmt;-- execute
+
+set @returnText = 'failed';
+if (@listOfIds is not null) then
+rollback;
+else
+set @returnText ='success';
+COMMIT;
+end if;
+
+select @returnText;
+
+end proc_main$$
+DELIMITER ;
