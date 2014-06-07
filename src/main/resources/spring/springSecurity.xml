@@ -8,8 +8,7 @@
 
     <http pattern="/css/**" security="none"/>
     <http pattern="/javascript/**" security="none" />
-    <http pattern="/login*" security="none"/>
-    <http pattern="/" security="none"/>
+    
 
     <http auto-config="true" use-expressions="true" disable-url-rewriting="false" >
         <intercept-url access="hasRole('ROLE_ADMIN')" pattern="/administrator/**"></intercept-url>
@@ -30,6 +29,8 @@
             <xss-protection />
         </headers>
     </http>
+    
+    
 
     <authentication-manager>
         <authentication-provider>

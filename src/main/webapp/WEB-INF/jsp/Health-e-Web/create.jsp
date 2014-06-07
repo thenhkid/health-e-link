@@ -4,6 +4,7 @@
     Author     : chadmccue
 --%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 
 <div class="container main-container" role="main">
     <div class="row">
@@ -13,11 +14,11 @@
                 <li><a href="#">eRG</a></li>
                 <li class="active">Available Message Types</li>
             </ol>
-            <form action="create/details" id="createMessageForm" method="post">
+            <form:form action="create/details" id="createMessageForm" method="post">
                 <input type="hidden" id="configId" name="configId" value="" />
                 <input type="hidden" id="targetOrg" name="targetOrg" value="" />
                 <input type="hidden" id="targetConfig" name="targetConfig" value="" />
-            </form>
+            </form:form>
             <div class="form-container scrollable">
                 <table class="table table-striped table-hover table-default">
                     <thead>

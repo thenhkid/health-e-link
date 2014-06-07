@@ -39,10 +39,10 @@
 
             </div>          
               
-            <form action="batch/transactions" id="viewBatchTransactions" method="post">
+            <form:form action="batch/transactions" id="viewBatchTransactions" method="post">
                 <input type="hidden" id="batchId" name="batchId" value="" />
                 <input type="hidden" name="fromPage" value="sent" />
-            </form>    
+            </form:form>    
             <div class="form-container scrollable">
                 <div class="date-range-picker-trigger form-control pull-right daterange" style="width:265px; margin-left: 10px;">
                     <i class="glyphicon glyphicon-calendar"></i>

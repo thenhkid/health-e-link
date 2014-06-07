@@ -5,6 +5,7 @@
 --%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <c:set var="urgencyVal" value="Not Reported" />
 <div class="container main-container" role="main">
     <div class="row">
@@ -18,14 +19,14 @@
                 <li class="active">Feedback Reports</li>
             </ol>
 
-            <form action="" id="viewOriginalTransactionDetails" method="post">
+            <form:form action="" id="viewOriginalTransactionDetails" method="post">
                 <input type="hidden" id="originalTransactionId" name="transactionId" value="" />
-            </form>    
-            <form action="" id="viewTransactionDetails" method="post">
+            </form:form>    
+            <form:form action="" id="viewTransactionDetails" method="post">
                 <input type="hidden" id="transactionId" name="transactionId" value="" />
                 <input type="hidden" id="fromPage" name="fromPage" value="${fromPage}" />
                 <input type="hidden" id="configId" name="configId" value="" />
-            </form>
+            </form:form>
             <div class="form-container scrollable">
                 <table class="table table-striped table-hover table-default" <c:if test="${not empty transactions}">id="dataTable"</c:if>>
                     <thead>

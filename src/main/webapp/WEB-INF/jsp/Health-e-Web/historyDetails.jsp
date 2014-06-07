@@ -28,7 +28,7 @@
     </div>
 
     <div class="row"> 
-        <form action="/Health-e-Web/history" id="viewHistoryResults" method="post">
+        <form:form action="/Health-e-Web/history" id="viewHistoryResults" method="post">
             <input type="hidden" name="fromDate" value="${fromDate}" />
             <input type="hidden" name="toDate" value="${toDate}" />
             <input type="hidden" name="type" value="${type}" />
@@ -44,7 +44,7 @@
             <input type="hidden" name="patientId" value="${patientId}" />
             <input type="hidden" name="providerId" value="${providerId}" />
             <input type="hidden" name="reportType" value="2" />
-        </form>   
+        </form:form>   
         <div class="col-md-12 page-content">
 
             <div class="col-md-12 form-section" >

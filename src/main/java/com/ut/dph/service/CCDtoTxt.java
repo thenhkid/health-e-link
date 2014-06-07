@@ -87,7 +87,7 @@ public class CCDtoTxt {
 
         /* END */
         String fileRecords = (String) myMethod.invoke(CCDObj, new Object[]{ccdFile});
-
+        
         fw.write(fileRecords);
 
         fw.close();

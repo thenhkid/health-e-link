@@ -28,7 +28,7 @@
     </div>
 
     <div class="row"> 
-        <form action="history/details" id="viewHistoryDetails" method="post">
+        <form:form action="history/details" id="viewHistoryDetails" method="post">
             <input type="hidden" id="selorgId" name="selorgId" value="" />
             <input type="hidden" id="selmessageTypeId" name="selmessageTypeId" value="" />
             <input type="hidden" name="fromDate" value="${fromDate}" />
@@ -44,7 +44,7 @@
             <input type="hidden" name="firstName" value="${firstName}" />
             <input type="hidden" name="patientId" value="${patientId}" />
             <input type="hidden" name="providerId" value="${providerId}" />
-        </form>   
+        </form:form>   
         <div class="col-md-12 page-content">
 
             <div class="col-md-12 form-section">

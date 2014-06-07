@@ -49,8 +49,8 @@ public class mainController {
      * @throws Exception
      */
     @RequestMapping(value = "/login", method = RequestMethod.GET)
-    public ModelAndView login(HttpServletRequest request, HttpServletResponse response) throws Exception {
-
+    public ModelAndView login() throws Exception {
+        
 
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/login");

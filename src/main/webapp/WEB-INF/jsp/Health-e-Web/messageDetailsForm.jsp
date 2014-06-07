@@ -66,9 +66,9 @@
                 </c:otherwise>
             </c:choose>
                     
-            <form action="/Health-e-Web/inbox/messageDetails" id="viewOriginalTransaction" method="post">
+            <form:form action="/Health-e-Web/inbox/messageDetails" id="viewOriginalTransaction" method="post">
                 <input type="hidden" id="originalTransactionId" name="transactionId" value="" />
-            </form> 
+            </form:form> 
             <form:form id="messageForm" action="/Health-e-Web/submitMessage" modelAttribute="transaction" role="form" class="form" method="post">
                 <input type="hidden" id="action" name="action" value="save" />
                 <form:hidden path="orgId" />
