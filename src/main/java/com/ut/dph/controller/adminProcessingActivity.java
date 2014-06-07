@@ -1565,8 +1565,8 @@ public class adminProcessingActivity {
             } else if (batchOption.equalsIgnoreCase("cancel")) {
                 strBatchOption = "Cancelled Batch";
                 transactionInManager.updateBatchStatus(batchId, 4, "startDateTime");
-                transactionInManager.updateTransactionStatus(batchId, 0, 0, 34);
-                transactionInManager.updateTransactionTargetStatus(batchId, 0, 0, 34);
+                transactionInManager.updateTransactionStatus(batchId, 0, 0, 31);
+                transactionInManager.updateTransactionTargetStatus(batchId, 0, 0, 31);
                 transactionInManager.updateBatchStatus(batchId, 21, "endDateTime");
             } else if (batchOption.equalsIgnoreCase("reset")) {
                 strBatchOption = "Reset Batch";
