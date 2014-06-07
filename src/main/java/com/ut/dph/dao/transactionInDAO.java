@@ -321,4 +321,6 @@ public interface transactionInDAO {
     Integer updateFieldValue (String fieldValue, Integer fieldNo, Integer transactionId,boolean foroutboundProcessing);
    
     void trimFieldValues (Integer batchId, boolean foroutboundProcessing, Integer transactionId, boolean trimAll);
+    
+    void updateTransactionTargetListStatus(List<transactionTarget> transactions, Integer statusId);
 }

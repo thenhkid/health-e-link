@@ -1488,7 +1488,39 @@ public class transactionInDAOImpl implements transactionInDAO {
         }
 
     }
-
+    
+    /**
+     * The 'updateTransactionTargetListStatus' function will update a list of transactionTarget entries when the 
+     * output process begins.
+     * 
+     * @param transactions The list of transaction Target entries to be updates
+     * @param statusId The new status .
+     */
+    @Override
+    @Transactional
+    public void updateTransactionTargetListStatus(List<transactionTarget> transactions, Integer statusId) {
+        
+         ArrayList<Integer> transactionIdArray = new ArrayList<Integer>();
+         
+         for(transactionTarget target : transactions) {
+             transactionIdArray.add(target.getId());
+         }
+        
+         String sql = "update transactiontarget set statusId = :toStatusId, statusTime = CURRENT_TIMESTAMP where id in (:transactionIdList)";
+         
+         Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                 .setParameter("toStatusId", statusId)
+                 .setParameterList("transactionIdList", transactionIdArray);
+        
+        try {
+            updateData.executeUpdate();
+        } catch (Exception ex) {
+            System.err.println("updateTransactionTargetListStatus " + ex.getCause());
+        }
+    }
+    
+    
+    
     /**
      * The 'updateTransactionTargetStatus' function will update the transactionTarget entries when the created batch has been sent.
      *
