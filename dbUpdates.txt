@@ -151,3 +151,172 @@ UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayText`='Transaction C
 UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayCode`='TPE', `displayText`='Transaction Processing Error', `description`='This is when this transaciton errored due to some unforeseen error.  We flag this record and over on with batch.' WHERE `id`='33';
 DELETE FROM `universaltranslator`.`lu_ProcessStatus` WHERE `id`='34';
 
+/** grace 10:36PM 06062014 **/
+
+use universaltranslator;
+
+drop procedure if exists removeTransactionTargets;
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `removeTransactionTargets`(in configId int, 
+in batchId int, in srcField varchar(10),
+in fieldA varchar(10), in fieldB varchar(10), in con1 varchar(255), 
+in con2 varchar(255), in macroId int, in foroutboundProcessing boolean, in passClear int, in transactionId int)
+
+proc_main:begin
+
+/**
+fieldA - field to look for value
+fieldB - not in use
+con1 - value to match
+
+
+This is a pre-processing target for outbound that removes the target entirely from all tables
+This is a per transaction macro
+transaction will fail if in transactionId  is not a valid int and java codes will handle our transaction
+
+**/
+
+/** the id we get will be a transactionTargetId - we need to find the transactionInId since we need to clear
+all tables as if the transaction never happended
+**/
+set @tInId = 0;
+set @tOutId = 0;
+set @batchInId = 0;
+set @getTInId = concat("select transactionInId, id, batchUploadId into @tInId, @tOutId, @batchInId from transactionTarget where id = "
+, transactionId ," and id in (select transactionTargetId from transactionTranslatedOut where "
+,fieldA," = '",con1, "' and transactionTargetId = ", transactionId,");");
+
+
+prepare stmt from @getTInId;
+execute stmt;
+
+set @processStatus = 'continue';
+if (@tInId > 0) then
+begin
+
+call deleteTransaction (@tInId, @tOutId);
+-- we need to update the original batch count
+
+set @batchCount = 0;
+set @batchInfoSql = concat("select count(*) into @batchCount from transactionIN where batchId = ",@batchInId);
+
+prepare stmt from @batchInfoSql;
+execute stmt;
+
+-- now we update counts
+
+set @batchInfoSql1 = concat("update batchUploads set totalrecordcount =  ", @batchCount, " where id = ",
+@batchInId);
+
+prepare stmt from @batchInfoSql1;
+execute stmt;
+
+set @processStatus = 'stop';
+end;
+end if;
+
+select @processStatus;
+
+end proc_main$$
+DELIMITER ;
+
+
+use universaltranslator;  
+
+drop procedure if exists deleteTransaction;  
+
+
+DELIMITER $$ 
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `deleteTransaction`(in tInId int, in tOutId int)  
+proc_main:begin  
+set @stmt1 = concat("delete from message_Allergies where transactionInId = ", tInId , ";"); 
+set @stmt2 = concat("delete from message_BestTimeToCall where transactionInId = ", tInId , ";"); 
+set @stmt3 = concat("delete from message_Encounters where transactionInId = ", tInId , ";"); 
+set @stmt4 = concat("delete from message_Exercises where transactionInId = ", tInId , ";"); 
+set @stmt5 = concat("delete from message_FamMemMedicalConditions where transactionInId = ", tInId , ";"); 
+set @stmt6 = concat("delete from message_FamilyMembers where transactionInId = ", tInId , ";"); 
+set @stmt7 = concat("delete from message_FromOrg where transactionInId = ", tInId , ";"); 
+set @stmt8 = concat("delete from message_FromProvider where transactionInId = ", tInId , ";"); 
+set @stmt9 = concat("delete from message_GeneralHealths where transactionInId = ", tInId , ";"); 
+set @stmt10 = concat("delete from message_HealthcareTeams where transactionInId = ", tInId , ";"); 
+set @stmt11 = concat("delete from message_Immunizations where transactionInId = ", tInId , ";"); 
+set @stmt12 = concat("delete from message_localcodes where transactionInId = ", tInId , ";"); 
+set @stmt13 = concat("delete from message_MedicalConditions where transactionInId = ", tInId , ";"); 
+set @stmt14 = concat("delete from message_Medications where transactionInId = ", tInId , ";"); 
+set @stmt15 = concat("delete from message_Misc where transactionInId = ", tInId , ";"); 
+set @stmt16 = concat("delete from message_PatientAddresses where transactionInId = ", tInId , ";"); 
+set @stmt17 = concat("delete from message_Patients where transactionInId = ", tInId , ";"); 
+set @stmt18 = concat("delete from message_patientIds where transactionInId = ", tInId , ";"); 
+set @stmt19 = concat("delete from message_Payers where transactionInId = ", tInId , ";"); 
+set @stmt20 = concat("delete from message_Procedures where transactionInId = ", tInId , ";"); 
+set @stmt21 = concat("delete from message_SocialHistories where transactionInId = ", tInId , ";"); 
+set @stmt22 = concat("delete from message_TestResults where transactionInId = ", tInId , ";"); 
+set @stmt23 = concat("delete from message_ToOrg where transactionInId = ", tInId , ";"); 
+set @stmt24 = concat("delete from message_ToProvider where transactionInId = ", tInId , ";"); 
+set @stmt25 = concat("delete from message_VisitInfo where transactionInId = ", tInId , ";"); 
+set @stmt26 = concat("delete from message_races where transactionInId = ", tInId , ";"); 
+set @stmt27 = concat("delete from transactionOutNotes where transactionTargetId = ", @tOutId , ";");  
+set @stmt28 = concat("delete from transactionTranslatedOut where transactionTargetId = ", @tOutId , ";");  
+set @stmt29 = concat("delete from transactionOutErrors where transactionTargetId = ", @tOutId , ";");  
+set @stmt30 = concat("delete from transactionOutRecords where transactionTargetId = ", @tOutId , ";");  
+set @stmt31 = concat("delete from batchDownloadSummary where transactionTargetId = ", @tOutId , ";");  
+set @stmt32 = concat("delete from transactionTarget where id = ", @tOutId , ";");        
+set @stmt33 = concat("delete from transactionInErrors where transactionInId = ", @tInId , ";");  
+set @stmt34 = concat("delete from transactionInRecords where transactionInId = ", @tInId , ";");  
+set @stmt35 = concat("delete from transactionTranslatedIn where transactionInId = ", @tInId , ";");  
+set @stmt36 = concat("delete from batchUploadSummary where transactionInId = ", @tInId , ";");  
+set @stmt37 = concat("delete from transactionIn where id = ", @tInId , ";");     
+prepare stmt from @stmt1; execute stmt;  
+prepare stmt from @stmt2; execute stmt;  
+prepare stmt from @stmt3; execute stmt;  
+prepare stmt from @stmt4; execute stmt;  
+prepare stmt from @stmt5; execute stmt;  
+prepare stmt from @stmt6; execute stmt;  
+prepare stmt from @stmt7; execute stmt;  
+prepare stmt from @stmt8; execute stmt;  
+prepare stmt from @stmt9; execute stmt;  
+prepare stmt from @stmt10; execute stmt;  
+prepare stmt from @stmt11; execute stmt;  
+prepare stmt from @stmt12; execute stmt;  
+prepare stmt from @stmt13; execute stmt;  
+prepare stmt from @stmt14; execute stmt;  
+prepare stmt from @stmt15; execute stmt;  
+prepare stmt from @stmt16; execute stmt;  
+prepare stmt from @stmt17; execute stmt;  
+prepare stmt from @stmt18; execute stmt;  
+prepare stmt from @stmt19; execute stmt;  
+prepare stmt from @stmt20; execute stmt;
+prepare stmt from @stmt21; execute stmt;  
+prepare stmt from @stmt22; execute stmt;  
+prepare stmt from @stmt23; execute stmt;  
+prepare stmt from @stmt24; execute stmt;  
+prepare stmt from @stmt25; execute stmt;  
+prepare stmt from @stmt26; execute stmt;  
+prepare stmt from @stmt27; execute stmt;  
+prepare stmt from @stmt28; execute stmt; 
+prepare stmt from @stmt29; execute stmt;  
+prepare stmt from @stmt30; execute stmt;  
+prepare stmt from @stmt31; execute stmt;  
+prepare stmt from @stmt32; execute stmt;  
+prepare stmt from @stmt33; execute stmt;  
+prepare stmt from @stmt34; execute stmt;  
+prepare stmt from @stmt35; execute stmt;  
+prepare stmt from @stmt36; execute stmt;  
+prepare stmt from @stmt37; execute stmt;  
+
+end proc_main$$ 
+DELIMITER ; 
+
+UPDATE `universaltranslator`.`macro_names` SET `populateFieldA`=1 WHERE `ID`='77';
+UPDATE `universaltranslator`.`macro_names` SET `populateFieldA`=1 WHERE `ID`='76';
+UPDATE `universaltranslator`.`macro_names` SET `populateFieldA`=1 WHERE `ID`='74';
+UPDATE `universaltranslator`.`macro_names` SET `populateFieldA`=1 WHERE `ID`='75';
+UPDATE `universaltranslator`.`macro_names` SET `populateFieldA`=1 WHERE `ID`='68';
+UPDATE `universaltranslator`.`macro_names` SET `populateFieldA`=1 WHERE `ID`='69';
+UPDATE `universaltranslator`.`macro_names` SET `populateFieldA`=1 WHERE `ID`='70';
+UPDATE `universaltranslator`.`macro_names` SET `populateFieldA`=1 WHERE `ID`='71';
+UPDATE `universaltranslator`.`macro_names` SET `populateFieldA`=1 WHERE `ID`='72';
+UPDATE `universaltranslator`.`macro_names` SET `populateFieldA`=1 WHERE `ID`='73';
+

@@ -151,7 +151,7 @@
                                         <input type="button" id="release" class="btn btn-primary btn-xs releaseBatch" value="Release" />
                                     </c:if>
                                     <c:if test="${canCancel == true}">
-                                        <input type="button" id="cancel" class="btn btn-primary btn-xs cancelBatch" value="Do Not Process" />
+                                        <input type="button" id="cancel" class="btn btn-primary btn-xs cancelBatch" value="Cancel" />
                                         <input type="button" id="reset" class="btn btn-primary btn-xs resetBatch" value="Reset" />
                                     </c:if>
                                 </div>

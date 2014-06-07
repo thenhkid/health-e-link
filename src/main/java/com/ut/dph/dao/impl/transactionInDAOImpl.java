@@ -2504,8 +2504,15 @@ public class transactionInDAOImpl implements transactionInDAO {
             query.setParameter("passClear", cdt.getPassClear());
             query.setParameter("transactionId", transactionId);
 
-            query.list();
-
+            List <String> macroResults = query.list();
+            /** we return '' with data manipulation macros and we return continue or stop with macros**/
+            if (macroResults.get(0).equalsIgnoreCase("")) {
+            	return 0;
+            } else if (macroResults.get(0).equalsIgnoreCase("continue")) {
+            	return 0;
+            } else if (macroResults.get(0).equalsIgnoreCase("stop")) {
+            	return 1;
+            }
             return 0;
         } catch (Exception ex) {
             //insert system error
@@ -4369,7 +4376,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 			Integer id = batchId;
 			if (! foroutboundProcessing) {
 		           sql = "select transactionInId as transactionId, F" + cdt.getFieldNo() + " as fieldValue from transactionTranslatedIn "
-		           		+ "where  length(trim(F" + cdt.getFieldNo() + ")) != 0"
+		           		+ "where  configId = :configId and length(trim(F" + cdt.getFieldNo() + ")) != 0"
                     + " and length(REPLACE(REPLACE(F" + cdt.getFieldNo() + ", '\n', ''), '\r', '')) != 0"
                     		+ " and transactionInId ";
 		            if (transactionId == 0) {
@@ -4385,7 +4392,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 		        } else {
 
 		        	sql = "select transactionTargetId as transactionId, F" + cdt.getFieldNo() + " as fieldValue from transactionTranslatedOut "
-		        			+ " where length(trim(F" + cdt.getFieldNo() + ")) != 0"
+		        			+ " where configId = :configId and length(trim(F" + cdt.getFieldNo() + ")) != 0"
                     + " and length(REPLACE(REPLACE(F" + cdt.getFieldNo() + ", '\n', ''), '\r', '')) != 0"
                     		+ " and transactionTargetId ";
 			            if (transactionId == 0) {
@@ -4403,8 +4410,10 @@ public class transactionInDAOImpl implements transactionInDAO {
 	        .setResultTransformer(
                     Transformers.aliasToBean(IdAndFieldValue.class))
             .setParameter("configId", configId)
-            .setParameter("id", id).setParameter("transRELId", transRELId);
-			
+            .setParameter("id", id);
+            if (transactionId == 0) {
+            	query.setParameter("transRELId", transRELId);
+            }
 	        List<IdAndFieldValue> valueList = query.list();
 
 	        return valueList;

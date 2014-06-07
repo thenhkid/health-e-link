@@ -572,7 +572,13 @@ public class transactionOutDAOImpl implements transactionOutDAO {
     @Override
     @Transactional
     public transactionTarget getTransactionDetails(int transactionId) throws Exception {
-        return (transactionTarget) sessionFactory.getCurrentSession().get(transactionTarget.class, transactionId);
+    	try {
+    		return (transactionTarget) sessionFactory.getCurrentSession().get(transactionTarget.class, transactionId);
+    	} catch (Exception ex) {
+    		ex.printStackTrace();
+    		System.err.println("errored at getTransactionDetails " + ex.getMessage());
+    		return null;
+    	}
     }
 
     /**
