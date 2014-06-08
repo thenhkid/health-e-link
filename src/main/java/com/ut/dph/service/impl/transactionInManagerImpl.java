@@ -49,7 +49,7 @@ import com.ut.dph.service.messageTypeManager;
 import com.ut.dph.service.organizationManager;
 import com.ut.dph.service.sysAdminManager;
 import com.ut.dph.service.userManager;
-
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -1558,9 +1558,13 @@ public class transactionInManagerImpl implements transactionInManager {
                 //at this point, hl7 and hr are in unencoded plain text
                 if (actualFileName.endsWith(".txt") || actualFileName.endsWith(".csv")) {
                     sysError = sysError + insertLoadData(batch.getId(), batch.getDelimChar(), actualFileName, loadTableName, batch.isContainsHeaderRow());
-	            	//we delete the loadFile here as it is not encrypted
-                    // File actualFile = new File(actualFileName);
-                    // actualFile.delete();
+	            	File actualFile = new File(actualFileName);
+                    //we are archiving it
+                    File archiveFile = new File(dir.setPath(archivePath) + batch.getutBatchName() + "_dec" +actualFileName.substring(actualFileName.lastIndexOf(".")));
+                    Path archive = archiveFile.toPath();
+                    Path actual = actualFile.toPath();
+                    //we keep original file in archive folder
+                    Files.move(actual, archive, REPLACE_EXISTING);
                 }
 
                 //3. we update batchId, loadRecordId
