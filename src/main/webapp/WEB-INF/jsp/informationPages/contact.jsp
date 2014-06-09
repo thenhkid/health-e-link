@@ -44,25 +44,25 @@
                     </div>
                     <div class="form-group">
                         <label for="company">Company / Organization *</label>
-                        <input id="fname" name="company" class="form-control" type="text" />
+                        <input id="company" name="company" class="form-control" type="text" />
                     </div>
                     <div class="form-group">
                         <label for="address">Address *</label>
-                        <input id="fname" name="address" class="form-control" type="text" />
+                        <input id="address" name="address" class="form-control" type="text" />
                     </div>
                     <div class="form-group">
                         <div class="row">
                             <div class="col-xs-3">
                                 <label for="city">City</label>
-                                <input id="fname" name="city" class="form-control" type="text" />
+                                <input id="city" name="city" class="form-control" type="text" />
                             </div>
                             <div class="col-xs-2">
                                 <label for="state">State </label>
-                                <input id="fname" name="state" class="form-control" type="text" />
+                                <input id="state" name="state" class="form-control" type="text" />
                             </div>
                             <div class="col-xs-2">
-                                <label for="state">Zip</label>
-                                <input id="fname" name="state" class="form-control" type="text" />
+                                <label for="zip">Zip</label>
+                                <input id="zip" name="zip" class="form-control" type="text" />
                             </div>
                         </div>
                     </div>

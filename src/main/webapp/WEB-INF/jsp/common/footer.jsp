@@ -6,9 +6,9 @@
     <div class="container">
         <nav>
             <ul class="nav-inline">
-                <li><a href="<c:url value='/'/>" title="">Home</a></li>
-                <li><a href="<c:url value='/about'/>" title="">About</a></li>
-                <li><a href="<c:url value='/contact'/>" title="">Contact</a></li>
+                <li><a href="<c:url value='/'/>" title="Home">Home</a></li>
+                <li><a href="<c:url value='/about'/>" title="About">About</a></li>
+                <li><a href="<c:url value='/contact'/>" title="Contact">Contact</a></li>
                 <c:if test="${not empty pageContext.request.userPrincipal.name}"><li><a href="<c:url value='/profile'/>" title="My Account">My Account</a></li></c:if>
             </ul>
         </nav>

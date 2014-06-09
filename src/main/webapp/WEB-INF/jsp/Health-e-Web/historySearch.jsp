@@ -26,7 +26,7 @@
                         <span class="date-label"  rel="" rel2=""><fmt:formatDate value="${fromDate}" type="date" pattern="MMM dd, yyyy" /> - <fmt:formatDate value="${toDate}" type="date" pattern="MMM dd, yyyy" /></span> <b class="caret"></b>
                     </div>
                     <div class="form-group pull-right">
-                        <select name="reportType" class="form-control">
+                        <select id="reportType" name="reportType" class="form-control">
                             <option value="1">Summary Report</option>
                             <option value="2">Detailed Report</option>
                         </select>
@@ -45,7 +45,7 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="control-label" for="type">Type</label>
-                                        <select name="type" class="form-control">
+                                        <select id="type" name="type" class="form-control">
                                             <option value="0">Both (Referrals & Feedback Reports)</option>
                                             <option value="1">Referrals Only</option>
                                             <option value="2">Feedback Reports Only</option>
@@ -55,7 +55,7 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="control-label" for="sentTo">Affiliated Organizations</label>
-                                        <select name="sentTo" class="form-control">
+                                        <select id="sentTo" name="sentTo" class="form-control">
                                             <option value="0">- All Affiliated Organizations -</option>
                                             <c:forEach var="org" items="${associatedOrgs}">
                                                 <option value="${org.id}">${org.orgName}</option>
@@ -66,7 +66,7 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="control-label" for="messageType"> Message Type</label>
-                                        <select name="messageType" class="form-control">
+                                        <select id="messageType" name="messageType" class="form-control">
                                             <option value="0">- All Message Types -</option>
                                             <c:forEach var="msgType" items="${assocMessageTypes}">
                                                 <option value="${msgType[0]}">${msgType[1]}</option>
@@ -77,7 +77,7 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="control-label" for="status"> Referral Status</label>
-                                        <select name="status" class="form-control">
+                                        <select id="status" name="status" class="form-control">
                                             <option value="0">Both (Open & Closed)</option>
                                             <option value="1">Opened Referrals Only</option>
                                             <option value="2">Closed Referrals Only</option>
@@ -87,7 +87,7 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="control-label" for="systemStatus">System Status</label>
-                                        <select name="systemStatus" class="form-control">
+                                        <select id="systemStatus" name="systemStatus" class="form-control">
                                             <option value="0">- All System Statuses -</option>
                                             <option value=""></option>
                                         </select>
@@ -107,37 +107,37 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="control-label" for="batchName">Batch Name</label>
-                                        <input type="text" class="form-control" name="batchName" />
+                                        <input id="batchName" type="text" class="form-control" name="batchName" />
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="control-label" for="utBatchName">System Referral Id</label>
-                                        <input type="text" class="form-control" name="utBatchName" />
+                                        <input id="utBatchName" type="text" class="form-control" name="utBatchName" />
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="control-label" for="lastName">Patient Last Name</label>
-                                        <input type="text" class="form-control" name="lastName" />
+                                        <input id="lastName" type="text" class="form-control" name="lastName" />
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="control-label" for="patientId">Patient Id</label>
-                                        <input type="text" class="form-control" name="patientId" />
+                                        <input id="patientId" type="text" class="form-control" name="patientId" />
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="control-label" for="firstName">Patient First Name</label>
-                                        <input type="text" class="form-control" name="firstName" />
+                                        <input id="firstName" type="text" class="form-control" name="firstName" />
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label class="control-label" for="providerId">Provider Id</label>
-                                        <input type="text" class="form-control" name="providerId" />
+                                        <input id="providerId" type="text" class="form-control" name="providerId" />
                                     </div>
                                 </div>       
                             </div>
