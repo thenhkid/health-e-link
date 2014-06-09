@@ -17,18 +17,20 @@ require(['./main'], function () {
         $('#macro').change(function() {        	
             var selMacro = $(this).val();
             var list = $('#macroLookUpList').val();
-
-            if (list.indexOf(selMacro) !== -1) {
-                $.ajax({
-                    url: 'getMacroDetails.do',
-                    type: "GET",
-                    data: {'macroId': selMacro},
-                    success: function(data) {
-                        $('#macroModal').html(data);
-                        $('#macroModal').modal('toggle');
-                        $('#macroModal').modal('show');
-                    }
-                });
+            
+            if(selMacro > 0) {
+                if (list.indexOf(selMacro) !== -1) {
+                    $.ajax({
+                        url: 'getMacroDetails.do',
+                        type: "GET",
+                        data: {'macroId': selMacro},
+                        success: function(data) {
+                            $('#macroModal').html(data);
+                            $('#macroModal').modal('toggle');
+                            $('#macroModal').modal('show');
+                        }
+                    });
+                }
             }
         });
 
@@ -76,6 +78,7 @@ require(['./main'], function () {
            $.ajax({
                 url: 'translations',
                 type: "POST",
+                data: {'categoryId': 1},
                 success: function(data) {
                     window.location.href = "translations?msg=updated";
                 }
@@ -92,6 +95,7 @@ require(['./main'], function () {
              $.ajax({
                 url: 'translations',
                 type: "POST",
+                data: {'categoryId': 1},
                 success: function(data) {
                     if(configType == 1) {
                         window.location.href = "preprocessing?msg=updated";
@@ -242,7 +246,9 @@ require(['./main'], function () {
                     type: "GET",
                     data: {'f': selectedField, 'fText': selectedFieldText, 'cw': selectedCW, 'CWText': selectedCWText, 'macroId': selectedMacro
                         , 'macroName': selectedMacroText, 'fieldA': $('#fieldA').val(), 'fieldB': $('#fieldB').val(), 'constant1': $('#constant1').val(), 'constant2': $('#constant2').val()
-                        , 'passClear': $('.passclear:checked').val()},
+                        , 'passClear': $('.passclear:checked').val()
+                        , 'categoryId': 1
+                    },
                     success: function(data) {
                         $('#translationMsgDiv').show();
                         $("#existingTranslations").html(data);
@@ -319,7 +325,7 @@ function populateExistingTranslations(reload) {
     $.ajax({
         url: 'getTranslations.do',
         type: "GET",
-        data: {'reload': reload},
+        data: {'reload': reload, 'categoryId': 1},
         success: function(data) {
             $("#existingTranslations").html(data);
         }

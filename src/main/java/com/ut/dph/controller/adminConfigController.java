@@ -1074,7 +1074,7 @@ public class adminConfigController {
      *
      */
     @RequestMapping(value = "/translations", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody Integer submitDataTranslations() throws Exception {
+    public @ResponseBody Integer submitDataTranslations(@RequestParam(value = "categoryId", required = true) Integer categoryId) throws Exception {
 
         /**
          * Need to update the configuration completed step
@@ -1087,7 +1087,7 @@ public class adminConfigController {
 
 	//Delete all the data translations before creating
         //This will help with the jquery removing translations
-        configurationmanager.deleteDataTranslations(configId);
+        configurationmanager.deleteDataTranslations(configId, categoryId);
         
         //Loop through the list of translations
         for (configurationDataTranslations translation : translations) {
@@ -1103,7 +1103,7 @@ public class adminConfigController {
      * @Return list of translations
      */
     @RequestMapping(value = "/getTranslations.do", method = RequestMethod.GET)
-    public @ResponseBody ModelAndView getTranslations(@RequestParam(value = "reload", required = true) boolean reload) throws Exception {
+    public @ResponseBody ModelAndView getTranslations(@RequestParam(value = "reload", required = true) boolean reload, @RequestParam(value = "categoryId", required = true) Integer categoryId) throws Exception {
 
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/configurations/existingTranslations");
@@ -1112,7 +1112,7 @@ public class adminConfigController {
         //We only want to retrieve the saved ones on initial load
         if (reload == false) {
             //Need to get a list of existing translations
-            List<configurationDataTranslations> existingTranslations = configurationmanager.getDataTranslations(configId);
+            List<configurationDataTranslations> existingTranslations = configurationmanager.getDataTranslationsWithFieldNo(configId, categoryId);
             
             String fieldName;
             String crosswalkName;
@@ -1163,7 +1163,8 @@ public class adminConfigController {
             @RequestParam(value = "CWText", required = true) String cwText, @RequestParam(value = "macroId", required = true) Integer macroId, 
             @RequestParam(value = "macroName", required = true) String macroName, @RequestParam(value = "fieldA", required = false) String fieldA, 
             @RequestParam(value = "fieldB") String fieldB, @RequestParam(value = "constant1") String constant1,
-            @RequestParam(value = "constant2", required = false) String constant2, @RequestParam(value = "passClear") Integer passClear
+            @RequestParam(value = "constant2", required = false) String constant2, @RequestParam(value = "passClear") Integer passClear,
+            @RequestParam(value = "categoryId", required = true) Integer categoryId
     ) throws Exception {
 
         int processOrder = translations.size() + 1;
@@ -1191,6 +1192,7 @@ public class adminConfigController {
         translation.setConstant2(constant2);
         translation.setProcessOrder(processOrder);
         translation.setPassClear(passClear);
+        translation.setCategoryId(categoryId);
 
         translations.add(translation);
 
@@ -2105,6 +2107,9 @@ public class adminConfigController {
      */
     @RequestMapping(value = "/preprocessing", method = RequestMethod.GET)
     public ModelAndView getPreProcessing() throws Exception {
+        
+        //Set the data translations array to get ready to hold data
+        translations = new CopyOnWriteArrayList<configurationDataTranslations>();
       
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/configurations/preprocessing");
@@ -2132,7 +2137,7 @@ public class adminConfigController {
         mav.addObject("fields", fields);
 
         //Return a list of available macros
-        List<Macros> macros = configurationmanager.getMacros();
+        List<Macros> macros = configurationmanager.getMacrosByCategory(2);
         mav.addObject("macros", macros);
         
         //Loop through list of macros to mark the ones that need
@@ -2151,11 +2156,15 @@ public class adminConfigController {
         return mav;
     }
     
+    
     /**
      * The '/postprocessing' GET request will display the configuration post processing page 
      */
     @RequestMapping(value = "/postprocessing", method = RequestMethod.GET)
     public ModelAndView getPostProcessing() throws Exception {
+        
+        //Set the data translations array to get ready to hold data
+        translations = new CopyOnWriteArrayList<configurationDataTranslations>();
       
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/administrator/configurations/postprocessing");
@@ -2183,7 +2192,7 @@ public class adminConfigController {
         mav.addObject("fields", fields);
 
         //Return a list of available macros
-        List<Macros> macros = configurationmanager.getMacros();
+        List<Macros> macros = configurationmanager.getMacrosByCategory(3);
         mav.addObject("macros", macros);
         
         //Loop through list of macros to mark the ones that need
@@ -2201,4 +2210,6 @@ public class adminConfigController {
 
         return mav;
     }
+    
+    
 }

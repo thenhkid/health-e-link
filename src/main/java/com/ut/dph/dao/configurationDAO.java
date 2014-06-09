@@ -46,18 +46,20 @@ public interface configurationDAO {
   List getFileTypes();
   
   String getFileTypesById(int id);
-  
+ 
   List<configurationDataTranslations> getDataTranslations(int configId);
   
   List<configurationDataTranslations> getDataTranslationsWithFieldNo(int configId, int categoryId);
   
   String getFieldName(int fieldId);
   
-  void deleteDataTranslations(int configId);
+  void deleteDataTranslations(int configId, int categoryId);
   
   void saveDataTranslations(configurationDataTranslations translations);
-  
+
   List<Macros> getMacros();
+  
+  List<Macros> getMacrosByCategory(int categoryId);
   
   Macros getMacroById(int macroId);
   

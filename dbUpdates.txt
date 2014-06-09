@@ -320,3 +320,6 @@ UPDATE `universaltranslator`.`macro_names` SET `populateFieldA`=1 WHERE `ID`='71
 UPDATE `universaltranslator`.`macro_names` SET `populateFieldA`=1 WHERE `ID`='72';
 UPDATE `universaltranslator`.`macro_names` SET `populateFieldA`=1 WHERE `ID`='73';
 
+
+/** Chad 6/9/14 @ 11:01 AM **/
+DROP TABLE `universaltranslator`.`configurationpostprocessing`, `universaltranslator`.`configurationpreprocessing`;

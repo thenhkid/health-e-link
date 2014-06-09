@@ -144,10 +144,12 @@ public class configurationManagerImpl implements configurationManager {
         return configurationDAO.getFieldName(fieldId);
     }
 
+    
+
     @Override
     @Transactional
-    public void deleteDataTranslations(int configId) {
-        configurationDAO.deleteDataTranslations(configId);
+    public void deleteDataTranslations(int configId, int categoryId) {
+        configurationDAO.deleteDataTranslations(configId, categoryId);
     }
 
     @Override
@@ -161,6 +163,12 @@ public class configurationManagerImpl implements configurationManager {
     public List<Macros> getMacros() {
         return configurationDAO.getMacros();
     }
+    
+    @Override
+    @Transactional
+    public List<Macros> getMacrosByCategory(int categoryId) {
+        return configurationDAO.getMacrosByCategory(categoryId);
+    }
 
     @Override
     @Transactional
@@ -173,7 +181,7 @@ public class configurationManagerImpl implements configurationManager {
     public List<configurationConnection> getAllConnections() {
         return configurationDAO.getAllConnections();
     }
-    
+
     @Override
     @Transactional
     public List<configurationConnection> getLatestConnections(int maxResults) {
@@ -284,9 +292,9 @@ public class configurationManagerImpl implements configurationManager {
         //If a file is uploaded
         if (file != null && !file.isEmpty()) {
             processFile = true;
-            
+
             clearFields = 1;
-           
+
             fileName = file.getOriginalFilename();
 
             InputStream inputStream = null;
@@ -334,33 +342,30 @@ public class configurationManagerImpl implements configurationManager {
                 e.printStackTrace();
             }
         }
-        
+
         configurationDAO.updateMessageSpecs(messageSpecs, transportDetailId, clearFields);
 
         if (processFile == true) {
             try {
-              loadExcelContents(messageSpecs.getconfigId(), transportDetailId, fileName, dir);  
-            }
-            catch (Exception e1) {
+                loadExcelContents(messageSpecs.getconfigId(), transportDetailId, fileName, dir);
+            } catch (Exception e1) {
                 e1.printStackTrace();
             }
-            
+
         }
 
     }
-    
 
     /**
-     * The 'loadExcelContents' will take the contents of the uploaded excel template file and populate the corresponding configuration form fields table. This function will split 
-     * up the contents into the appropriate buckets. Buckets (1 - 4) will be separated by spacer rows with in the excel file.
+     * The 'loadExcelContents' will take the contents of the uploaded excel template file and populate the corresponding configuration form fields table. This function will split up the contents into the appropriate buckets. Buckets (1 - 4) will be separated by spacer rows with in the excel file.
      *
-     * @param id        value of the latest added configuration
+     * @param id value of the latest added configuration
      * @param fileName	file name of the uploaded excel file.
      * @param dir	the directory of the uploaded file
      *
      */
     public void loadExcelContents(int id, int transportDetailId, String fileName, fileSystem dir) throws Exception {
-        
+
         try {
             //Set the initial value of the buckets (1);
             Integer bucketVal = new Integer(1);
@@ -371,16 +376,16 @@ public class configurationManagerImpl implements configurationManager {
             //Set the initial value of the display position for the field
             //within each bucket (0);
             Integer dspPos = new Integer(0);
-            
+
             //Create Workbook instance holding reference to .xlsx file
             OPCPackage pkg = null;
             XSSFWorkbook workbook = null;
-            
+
             try {
-               pkg = OPCPackage.open(new File(dir.getDir() + fileName));
-               
-               workbook = new XSSFWorkbook(pkg);
-               
+                pkg = OPCPackage.open(new File(dir.getDir() + fileName));
+
+                workbook = new XSSFWorkbook(pkg);
+
             } catch (Exception e1) {
                 e1.printStackTrace();
             }
@@ -390,7 +395,7 @@ public class configurationManagerImpl implements configurationManager {
 
             //Iterate through each rows one by one
             Iterator<Row> rowIterator = sheet.iterator();
-            
+
             while (rowIterator.hasNext()) {
                 Row row = rowIterator.next();
 
@@ -420,21 +425,19 @@ public class configurationManagerImpl implements configurationManager {
 
                         //Check the cell type and format accordingly
                         /*switch (cell.getCellType()) {
-                            case Cell.CELL_TYPE_BOOLEAN:
-                                required = cell.getBooleanCellValue();
-                                break;
+                         case Cell.CELL_TYPE_BOOLEAN:
+                         required = cell.getBooleanCellValue();
+                         break;
 
-                            case Cell.CELL_TYPE_STRING:
-                                fieldDesc = cell.getStringCellValue();
-                                break;
-                        }*/
-                        
-                         //Check the cell type and format accordingly
-                        if(cell.getColumnIndex() == 0) {
+                         case Cell.CELL_TYPE_STRING:
+                         fieldDesc = cell.getStringCellValue();
+                         break;
+                         }*/
+                        //Check the cell type and format accordingly
+                        if (cell.getColumnIndex() == 0) {
                             fieldDesc = cell.getStringCellValue();
-                        }
-                        else if(cell.getColumnIndex() == 1) {
-                             required = cell.getBooleanCellValue();
+                        } else if (cell.getColumnIndex() == 1) {
+                            required = cell.getBooleanCellValue();
                         }
                     }
 
@@ -474,29 +477,28 @@ public class configurationManagerImpl implements configurationManager {
     public List<CrosswalkData> getCrosswalkData(int cwId) {
         return configurationDAO.getCrosswalkData(cwId);
     }
-    
-    
+
     @Override
     public HL7Details getHL7Details(int configId) {
         return configurationDAO.getHL7Details(configId);
     }
-    
+
     @Override
     public List<HL7Segments> getHL7Segments(int hl7Id) {
         return configurationDAO.getHL7Segments(hl7Id);
     }
-    
+
     @Override
     @Transactional
     public List<HL7Elements> getHL7Elements(int hl7Id, int segmentId) {
         return configurationDAO.getHL7Elements(hl7Id, segmentId);
     }
-    
+
     @Override
     public List<HL7ElementComponents> getHL7ElementComponents(int elementId) {
         return configurationDAO.getHL7ElementComponents(elementId);
     }
-    
+
     @Override
     public void updateHL7Details(HL7Details details) {
         configurationDAO.updateHL7Details(details);
@@ -506,43 +508,43 @@ public class configurationManagerImpl implements configurationManager {
     public void updateHL7Segments(HL7Segments segment) {
         configurationDAO.updateHL7Segments(segment);
     }
-    
+
     @Override
     public void updateHL7Elements(HL7Elements element) {
         configurationDAO.updateHL7Elements(element);
     }
-    
+
     @Override
     public void updateHL7ElementComponent(HL7ElementComponents component) {
         configurationDAO.updateHL7ElementComponent(component);
     }
-    
+
     @Override
     public int saveHL7Details(HL7Details details) {
         return configurationDAO.saveHL7Details(details);
     }
-    
+
     @Override
     public int saveHL7Segment(HL7Segments newSegment) {
         return configurationDAO.saveHL7Segment(newSegment);
     }
-    
+
     @Override
     public int saveHL7Element(HL7Elements newElement) {
         return configurationDAO.saveHL7Element(newElement);
     }
-    
+
     @Override
     public void saveHL7Component(HL7ElementComponents newcomponent) {
         configurationDAO.saveHL7Component(newcomponent);
     }
 
-	@Override
-	public String getMessageTypeNameByConfigId(Integer configId) {
-		return configurationDAO.getMessageTypeNameByConfigId(configId);		
-	}
-	
-	@SuppressWarnings("rawtypes")
+    @Override
+    public String getMessageTypeNameByConfigId(Integer configId) {
+        return configurationDAO.getMessageTypeNameByConfigId(configId);
+    }
+
+    @SuppressWarnings("rawtypes")
     @Override
     @Transactional
     public List getEncodings() {

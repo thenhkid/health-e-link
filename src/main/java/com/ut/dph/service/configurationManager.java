@@ -51,9 +51,11 @@ public interface configurationManager {
     
   String getFieldName(int fieldId);
   
-  void deleteDataTranslations(int configId);
+  void deleteDataTranslations(int configId, int categoryId);
   
   void saveDataTranslations(configurationDataTranslations translations);
+
+  List<Macros> getMacrosByCategory(int categoryId);
   
   List<Macros> getMacros();
   

@@ -21,7 +21,6 @@ import com.ut.dph.model.HL7ElementComponents;
 import com.ut.dph.model.HL7Elements;
 import com.ut.dph.model.HL7Segments;
 import com.ut.dph.model.Macros;
-import com.ut.dph.model.Organization;
 import com.ut.dph.model.configuration;
 import com.ut.dph.model.configurationConnection;
 import com.ut.dph.model.configurationConnectionReceivers;
@@ -334,19 +333,21 @@ public class configurationDAOImpl implements configurationDAO {
 
         return fieldName;
     }
-
+    
     /**
      * The 'deleteDataTranslations' function will remove all data translations for the passed in configuration / transport method.
      *
      * @param	configId	The id of the configuration to remove associated translations
+     * @param   categoryId      The id of the category
      * @param	transportMethod	The transport method for the configuration
      *
      */
     @Override
     @Transactional
-    public void deleteDataTranslations(int configId) {
-        Query deleteTranslations = sessionFactory.getCurrentSession().createQuery("delete from configurationDataTranslations where configId = :configId");
+    public void deleteDataTranslations(int configId, int categoryId) {
+        Query deleteTranslations = sessionFactory.getCurrentSession().createQuery("delete from configurationDataTranslations where configId = :configId and categoryId = :categoryId");
         deleteTranslations.setParameter("configId", configId);
+        deleteTranslations.setParameter("categoryId", categoryId);
         deleteTranslations.executeUpdate();
     }
 
@@ -361,6 +362,22 @@ public class configurationDAOImpl implements configurationDAO {
     public void saveDataTranslations(configurationDataTranslations translations) {
         sessionFactory.getCurrentSession().save(translations);
     }
+    
+    /**
+     * The 'getMacrosByCategory' function will return a list of available Pre and Post macros.
+     *
+     * @return list of macros
+     */
+    @Override
+    @Transactional
+    public List<Macros> getMacrosByCategory(int categoryId) {
+        Query query = sessionFactory.getCurrentSession().createQuery("from Macros where categoryId = :categoryId order by macro_short_name asc");
+        query.setParameter("categoryId", categoryId);
+        
+        List<Macros> macros = query.list();
+        
+        return macros;
+    }
 
     /**
      * The 'getMacros' function will return a list of available system macros.
@@ -371,7 +388,7 @@ public class configurationDAOImpl implements configurationDAO {
     @Override
     @Transactional
     public List<Macros> getMacros() {
-        Query query = sessionFactory.getCurrentSession().createQuery("from Macros order by macro_short_name asc");
+        Query query = sessionFactory.getCurrentSession().createQuery("from Macros where categoryId = 1 order by macro_short_name asc");
         return query.list();
     }
 
@@ -752,7 +769,7 @@ public class configurationDAOImpl implements configurationDAO {
         return criteria.list();
 
     }
-
+   
     @Override
     @Transactional
     @SuppressWarnings("unchecked")
