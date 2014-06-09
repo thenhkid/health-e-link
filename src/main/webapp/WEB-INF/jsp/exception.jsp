@@ -29,17 +29,7 @@
         <div class="col-md-9 col-md-offset-0 col-sm-8 col-sm-offset-1 page-content">
             <h2>Oops, An error has occurred.</h2>
             <p>
-                Lorem ipsum <em>emphasised text</em> dolor sit amet, <strong>strong text</strong> 
-                consectetur adipisicing elit, <abbr title="">abbreviated text</abbr> sed do eiusmod tempor 
-                incididunt ut labore et dolore magna aliqua. Ut 
-                <q>quoted text</q> enim ad minim veniam, quis nostrud exercitation <a href="/">link text</a> 
-                ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute 
-                <ins>inserted text</ins> irure dolor in reprehenderit in voluptate velit esse cillum 
-                dolore eu fugiat nulla pariatur. Excepteur sint occaecat <code>code text</code> cupidatat 
-                non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-            </p>
-            <p>
-                ${messageBody}
+                There was an error trying to process your request. The site administrators have been contacted.
             </p>
         </div>
     </div>
