@@ -47,6 +47,7 @@
                     <span class="date-label"  rel="" rel2=""><fmt:formatDate value="${fromDate}" type="date" pattern="MMM dd, yyyy" /> - <fmt:formatDate value="${toDate}" type="date" pattern="MMM dd, yyyy" /></span> <b class="caret"></b>
                 </div>
                 <table class="table table-striped table-hover table-default" <c:if test="${not empty inboxBatches}">id="dataTable"</c:if>>
+                    <caption style="display:none">Inbox</caption>
                     <thead>
                         <tr>
                             <th scope="col">Batch Name</th>

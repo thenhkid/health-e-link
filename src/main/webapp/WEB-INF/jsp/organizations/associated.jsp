@@ -38,6 +38,7 @@
 --%>
             <div class="form-container scrollable">
                 <table class="table table-striped table-hover table-default">
+                    <caption style="display:none">Associated Organizations</caption>
                     <thead>
                         <tr>
                             <th scope="col">Organization</th>

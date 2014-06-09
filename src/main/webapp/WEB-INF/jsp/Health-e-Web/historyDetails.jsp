@@ -154,6 +154,7 @@
 
                 <div class="form-container scrollable">
                     <table class="table table-striped table-hover table-default" <c:if test="${not empty historyResults}">id="dataTable"</c:if>>
+                        <caption style="display:none">History Results</caption>
                             <thead>
                                 <tr>
                                     <th scope="col">Type</th>

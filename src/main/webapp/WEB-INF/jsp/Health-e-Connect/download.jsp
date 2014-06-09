@@ -32,6 +32,7 @@
                     <span class="date-label"  rel="" rel2=""><fmt:formatDate value="${fromDate}" type="date" pattern="MMM dd, yyyy" /> - <fmt:formatDate value="${toDate}" type="date" pattern="MMM dd, yyyy" /></span> <b class="caret"></b>
                 </div>
                 <table class="table table-striped table-hover table-default" <c:if test="${not empty downloadableBatches}">id="dataTable"</c:if>>
+                    <caption style="display:none">Downloaded Files</caption>
                     <thead>
                         <tr>
                             <th scope="col">Batch Name</th>

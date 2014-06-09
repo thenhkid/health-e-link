@@ -152,6 +152,7 @@
                                     <span class="glyphicon glyphicon-plus"></span>
                                 </a>
                                 <table class="table table-striped table-hover responsive">
+                                    <caption style="display:none">Provider Addresses</caption>
                                     <thead>
                                         <tr>
                                             <th scope="col">Address Info</th>
@@ -213,6 +214,7 @@
                                     <span class="glyphicon glyphicon-plus"></span>
                                 </a>    
                                 <table class="table table-striped table-hover responsive">
+                                    <caption style="display:none">Provider Ids</caption>
                                     <thead>
                                         <tr>
                                             <th scope="col">ID Number</th>

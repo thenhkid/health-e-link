@@ -3,6 +3,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <table class="table table-striped table-hover responsive">
+    <caption style="display:none">Notes</caption>
     <thead>
         <tr>
             <th scope="col">Date Created</th>

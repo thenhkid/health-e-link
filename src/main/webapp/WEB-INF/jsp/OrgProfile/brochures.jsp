@@ -35,6 +35,7 @@
             
             <div class="form-container scrollable">
                 <table class="table table-striped table-hover table-default">
+                    <caption style="display:none">Organization Brochures</caption>
                     <thead>
                         <tr>
                             <th scope="col">Brochure Title</th>

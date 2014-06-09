@@ -29,6 +29,7 @@
             </form:form>
             <div class="form-container scrollable">
                 <table class="table table-striped table-hover table-default" <c:if test="${not empty transactions}">id="dataTable"</c:if>>
+                    <caption style="display:none">Feedback Reports</caption>
                     <thead>
                         <tr>
                             <th scope="col">Message Type</th>

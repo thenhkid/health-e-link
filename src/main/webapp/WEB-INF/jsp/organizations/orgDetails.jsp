@@ -90,6 +90,7 @@
                     </div>
                     <div class="panel-body">
                         <table class="table table-striped table-hover table-default">
+                            <caption style="display:none">Organization Primary Contacts</caption>
                             <thead>
                                 <tr>
                                     <th scope="col">Name</th>
@@ -121,6 +122,7 @@
                         </div>
                         <div class="panel-body">
                             <table class="table table-striped table-hover table-default">
+                                <caption style="display:none">Organization Secondary Contacts</caption>
                                 <thead>
                                     <tr>
                                         <th scope="col">Name</th>
