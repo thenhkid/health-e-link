@@ -1253,6 +1253,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
      * The 'getScheduledConfigurations' function will return a list of configurations that have a Daily, Weekly or Monthly schedule setting
      */
     @Override
+    @Transactional
     public List<configurationSchedules> getScheduledConfigurations() {
 
         Query query = sessionFactory.getCurrentSession().createQuery("from configurationSchedules where type = 2 or type = 3 or type = 4");
@@ -1292,6 +1293,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
      * @param log The output run log to save.
      */
     @Override
+    @Transactional
     public void saveOutputRunLog(targetOutputRunLogs log) throws Exception {
         sessionFactory.getCurrentSession().save(log);
     }
@@ -1304,6 +1306,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
      * @return This function will return the latest log
      */
     @Override
+    @Transactional
     public List<targetOutputRunLogs> getLatestRunLog(int configId) throws Exception {
 
         Criteria latestLogQuery = sessionFactory.getCurrentSession().createCriteria(targetOutputRunLogs.class);
@@ -1322,6 +1325,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
      * @return This function will return a list of transaction targets.
      */
     @Override
+    @Transactional
     public List<transactionTarget> getTransactionsByBatchDLId(int batchDLId) {
 
         Criteria targets = sessionFactory.getCurrentSession().createCriteria(transactionTarget.class);
@@ -1338,6 +1342,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
      * @return This function will not return anything.
      */
     @Override
+    @Transactional
     public void cancelMessageTransaction(int transactionId, int transactionInId) {
 
         /* Update the transactionTarget status */

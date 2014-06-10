@@ -29,7 +29,7 @@ public class processOutputRecords implements Job {
         try {
             SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
             
-            transactionOutManager.processOutputRecords(0);
+            transactionOutManager.selectOutputRecordsForProcess(0);
         } catch (Exception ex) {
             try {
                 throw new Exception("Error occurred trying to process output records from schedule task",ex);

@@ -279,24 +279,9 @@ public class transactionOutManagerImpl implements transactionOutManager {
     public void processOutputRecords(int transactionTargetId) throws Exception {
 
         try {
-            /* 
-             Need to find all transactionTarget records that are ready to be processed
-             statusId (19 - Pending Output)
-             */
-            List<transactionTarget> pendingTransactions = transactionOutDAO.getpendingOutPutTransactions(transactionTargetId);
-
-            /* 
-             If pending transactions are found need to loop through and start the processing
-             of the outbound records.
-             */
-            if (!pendingTransactions.isEmpty()) {
-                
-                /* Update all the found transactions to the status of TCP (Transaction Creating Processing) ID = 37 */
-                transactionInManager.updateTransactionTargetListStatus(pendingTransactions, 37);
-
-                for (transactionTarget transaction : pendingTransactions) {
-                    
-                    boolean processed = false;
+        	transactionTarget transaction = getTransactionDetails(transactionTargetId);
+            if (transaction != null) {
+                	boolean processed = false;
                     String errorMessage = "Error occurred trying to process output transaction. transactionId: " + transaction.getId();
 
                     try {
@@ -505,8 +490,6 @@ public class transactionOutManagerImpl implements transactionOutManager {
 
                     }
                 }
-            }
-
         } catch (Exception e) {
             throw new Exception("Error trying to process output records", e);
         }
@@ -1742,4 +1725,25 @@ public class transactionOutManagerImpl implements transactionOutManager {
         return transactionOutDAO.getBatchesBySentOrg(srcorgId, tgtOrgId, messageTypeId);
     }
 
+    @Override
+	public void selectOutputRecordsForProcess(Integer transactionTargetId) throws Exception {
+		try {
+			//we get all the transactions that we want to process, we lock them
+  			List<transactionTarget> pendingTransactions = transactionOutDAO.getpendingOutPutTransactions(transactionTargetId);
+	       
+  			if (pendingTransactions.size() > 0) {
+        	  for (transactionTarget transaction : pendingTransactions)  {
+        		  //we recheck in case another scheduler picked it up
+        		  if (getTransactionDetails(transaction.getId()).getstatusId() == 19) {
+        			  transactionInManager.updateTransactionTargetStatus(0,transaction.getId(), 19, 37);
+        			  //we process it
+        			  processOutputRecords(transaction.getId());
+        		  }
+        	  	}
+        	 }
+		}catch (Exception ex) {
+			ex.printStackTrace();
+			throw new Exception("Error at selectOutputRecordsForProcess");
+		}
+	}
 }

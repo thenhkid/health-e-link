@@ -76,7 +76,7 @@ public class scheduledTaskController {
         }
         
         try {
-            transactionOutManager.processOutputRecords(transactionTargetId);
+            transactionOutManager.selectOutputRecordsForProcess(transactionTargetId);
         }
         catch (Exception e) {
             throw new Exception("Error occurred trying to process output records. transactionTargetId: " + transactionTargetId,e);
