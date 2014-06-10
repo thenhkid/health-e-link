@@ -1909,7 +1909,13 @@ public class transactionInManagerImpl implements transactionInManager {
     @Override
     @Transactional
     public List<batchUploads> getAllUploadedBatches(Date fromDate, Date toDate) throws Exception {
-        return transactionInDAO.getAllUploadedBatches(fromDate, toDate);
+    	return transactionInDAO.getAllUploadedBatches(fromDate, toDate, 0);
+    }
+    
+    @Override
+    @Transactional
+    public List<batchUploads> getAllUploadedBatches(Date fromDate, Date toDate, Integer fetchSize) throws Exception {
+        return transactionInDAO.getAllUploadedBatches(fromDate, toDate, fetchSize);
     }
 
     @Override

@@ -165,7 +165,13 @@ public class adminProcessingActivity {
         /* Get all inbound transactions */
         try {
             /* Need to get a list of all uploaded batches */
-            List<batchUploads> uploadedBatches = transactionInManager.getAllUploadedBatches(fromDate, toDate);
+        	List<batchUploads> uploadedBatchesCount = transactionInManager.getAllUploadedBatches(fromDate, toDate, 0);
+        	Integer fetchCount = 0;
+        	if (uploadedBatchesCount.size() > 200) {
+        		fetchCount  = 200;
+        		mav.addObject("tooMany", true);
+        	}
+            List<batchUploads> uploadedBatches = transactionInManager.getAllUploadedBatches(fromDate, toDate, fetchCount);
 
             List<Integer> statusIds = new ArrayList();
 
@@ -189,7 +195,8 @@ public class adminProcessingActivity {
             }
 
             mav.addObject("batches", uploadedBatches);
-
+           
+            
         } catch (Exception e) {
             throw new Exception("Error occurred viewing the all uploaded batches.", e);
         }

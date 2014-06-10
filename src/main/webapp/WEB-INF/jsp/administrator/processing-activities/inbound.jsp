@@ -34,7 +34,13 @@
                         </form:form>
                     </div>
                 </div>
-
+                <c:if test="${not empty toomany}">
+                                    <div>
+                                    <b>There are over 200 batches found.  The first 200 results are displayed.  Please refine your search.</b>
+                                    <br/><br/>
+                                    </div>
+                 </c:if>
+				
                 <div class="form-container scrollable">
                      <div class="date-range-picker-trigger form-control pull-right daterange" style="width:245px; margin-left: 10px;">
                         <i class="glyphicon glyphicon-calendar"></i>

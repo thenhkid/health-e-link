@@ -1273,6 +1273,13 @@ public class transactionInDAOImpl implements transactionInDAO {
         return findBatches.list();
 
     }
+    
+    @Override
+    @Transactional
+    public List<batchUploads> getAllUploadedBatches(Date fromDate, Date toDate) throws Exception {
+    		return getAllUploadedBatches(fromDate, toDate, 0);
+    }
+
 
     /**
      * The 'getAllUploadedBatches' function will return a list of batches for the admin in the processing activities section.
@@ -1284,7 +1291,7 @@ public class transactionInDAOImpl implements transactionInDAO {
      */
     @Override
     @Transactional
-    public List<batchUploads> getAllUploadedBatches(Date fromDate, Date toDate) throws Exception {
+    public List<batchUploads> getAllUploadedBatches(Date fromDate, Date toDate, Integer fetchSize) throws Exception {
 
         int firstResult = 0;
 
@@ -1299,7 +1306,10 @@ public class transactionInDAOImpl implements transactionInDAO {
         }
 
         findBatches.addOrder(Order.desc("dateSubmitted"));
-
+        
+        if (fetchSize > 0) {
+        	findBatches.setMaxResults(fetchSize);
+        }
         return findBatches.list();
     }
 

@@ -262,6 +262,8 @@ public interface transactionInDAO {
     
     List <batchUploads> getAllUploadedBatches(Date fromDate, Date toDate) throws Exception;
     
+    List <batchUploads> getAllUploadedBatches(Date fromDate, Date toDate, Integer fetchSize) throws Exception;
+    
     boolean checkPermissionForBatch (User userInfo, batchUploads batchInfo);
     
     List <TransactionInError> getErrorList (Integer batchId);

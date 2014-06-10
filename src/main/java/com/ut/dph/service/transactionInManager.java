@@ -312,6 +312,8 @@ public interface transactionInManager {
 
     List<batchUploads> getAllUploadedBatches(Date fromDate, Date toDate) throws Exception;
 
+    List<batchUploads> getAllUploadedBatches(Date fromDate, Date toDate, Integer fetchSize) throws Exception;
+
     boolean searchTransactions(Transaction transaction, String searchTerm) throws Exception;
 
     systemSummary generateSystemInboundSummary();

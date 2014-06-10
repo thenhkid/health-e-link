@@ -323,3 +323,6 @@ UPDATE `universaltranslator`.`macro_names` SET `populateFieldA`=1 WHERE `ID`='73
 
 /** Chad 6/9/14 @ 11:01 AM **/
 DROP TABLE `universaltranslator`.`configurationpostprocessing`, `universaltranslator`.`configurationpreprocessing`;
+
+
+/** all above updates are applied to dev and test DPH grace 06092014 10:36PM **/
