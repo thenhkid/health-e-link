@@ -187,6 +187,10 @@
                                                                             </c:forEach>
                                                                     </select>
                                                                 </div>
+                                                                <div class="form-group col-md-6">
+                                                                    <label class="control-label" for="fieldAppendText">Append Text</label>
+                                                                    <input type="text" id="fieldAppendText" name="HL7Segments[${segment.index}].HL7Elements[${element.index}].elementComponents[${component.index}].fieldAppendText" value="${elementComponents.fieldAppendText}" maxLength="255" class="form-control fieldLabel" />
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </c:forEach>

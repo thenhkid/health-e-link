@@ -20,6 +20,12 @@
                             <form:input path="fieldDescriptor" id="newelementName" class="form-control" type="text" maxLength="255" />
                         </div>
                     </spring:bind>
+                    <spring:bind path="fieldDescriptor">
+                        <div id="fieldAppendDiv" class="form-group ${status.error ? 'has-error' : '' }">
+                            <label class="control-label" for="fieldAppendText">Append Text</label>
+                            <form:input path="fieldAppendText" id="fieldAppendText" class="form-control" type="text" maxLength="255" />
+                        </div>
+                    </spring:bind>
                     <spring:bind path="fieldValue">
                         <div id="fieldValueDiv" class="form-group ${status.error ? 'has-error' : '' }">
                             <label class="control-label" for="fieldValue">Field Value *</label>

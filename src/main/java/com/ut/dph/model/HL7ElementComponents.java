@@ -35,6 +35,10 @@ public class HL7ElementComponents {
     private String fieldDescriptor = "";
     
     @NoHtml
+    @Column(name = "fieldAppendText", nullable = true)
+    private String fieldAppendText = "";
+    
+    @NoHtml
     @Column(name = "fieldValue", nullable = true)
     private String fieldValue = "";
     
@@ -65,7 +69,15 @@ public class HL7ElementComponents {
     public void setfieldDescriptor(String fieldDescriptor) {
         this.fieldDescriptor = fieldDescriptor;
     }
-    
+
+    public String getFieldAppendText() {
+        return fieldAppendText;
+    }
+
+    public void setFieldAppendText(String fieldAppendText) {
+        this.fieldAppendText = fieldAppendText;
+    }
+   
     public String getfieldValue() {
         return fieldValue;
     }

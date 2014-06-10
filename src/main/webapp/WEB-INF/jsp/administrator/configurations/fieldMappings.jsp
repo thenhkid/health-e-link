@@ -66,7 +66,6 @@
                                                         <input type="hidden" name="fields[${field.index}].bucketNo" value="${mappings.bucketNo}" />
                                                         <input type="hidden" name="fields[${field.index}].fieldDesc" value="${mappings.fieldDesc}" />
                                                         <input type="hidden" name="fields[${field.index}].fieldLabel" value="${mappings.fieldLabel}" />
-                                                        <input type="hidden" name="fields[${field.index}].required" value="${mappings.required}" />
                                                         <input type="hidden" name="fields[${field.index}].bucketDspPos" value="${mappings.bucketDspPos}" />
                                                         <input type="hidden" id="validationType_${field.index}" name="fields[${field.index}].validationType" value="${mappings.validationType}" />
                                                         <input type="hidden" id="saveToTableName_${field.index}" name="fields[${field.index}].saveToTableName" value="${mappings.saveToTableName}" />
@@ -77,7 +76,7 @@
                                                     </td>
                                                     <td>${mappings.fieldDesc}</td>
                                                     <td class="center-text">
-                                                        <input type="checkbox" disabled="disabled" <c:if test="${mappings.required == true}">checked</c:if>  />
+                                                        <input type="checkbox" name="fields[${field.index}].required"  <c:if test="${mappings.required == true}">checked</c:if>  />
                                                     </td>
                                                     <td class="center-text">
                                                         <input type="checkbox" name="fields[${field.index}].useField" <c:if test="${mappings.useField == true}">checked</c:if> />

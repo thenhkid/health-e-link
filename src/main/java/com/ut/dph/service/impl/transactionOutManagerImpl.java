@@ -1099,12 +1099,13 @@ public class transactionOutManagerImpl implements transactionOutManager {
 
                         for (HL7Segments segment : hl7Segments) {
 
-                            hl7recordRow.append(segment.getsegmentName()).append(hl7Details.getfieldSeparator());
-
                             /* Get the segment elements */
                             List<HL7Elements> hl7Elements = configurationManager.getHL7Elements(hl7Details.getId(), segment.getId());
 
                             if (!hl7Elements.isEmpty()) {
+                                
+                                hl7recordRow.append(segment.getsegmentName()).append(hl7Details.getfieldSeparator());
+                                
                                 int elementCounter = 1;
                                 for (HL7Elements element : hl7Elements) {
 
@@ -1144,6 +1145,10 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                                     hl7recordRow.append(component.getfieldDescriptor()).append(fieldValue);
                                                 } else {
                                                     hl7recordRow.append(fieldValue);
+                                                }
+                                                
+                                                if (!"".equals(component.getFieldAppendText()) && component.getFieldAppendText() != null) {
+                                                    hl7recordRow.append(" ").append(component.getFieldAppendText());
                                                 }
 
                                                 if (counter < hl7Components.size()) {

@@ -500,3 +500,8 @@ INSERT INTO `universaltranslator`.`Macro_Names` (`ID`, `CategoryId`, `Macro_Name
 UPDATE `universaltranslator`.`Macro_Names` SET `Macro_Name`='Stripleading characters', `Macro_Short_Name`='StripLeading' WHERE `ID`='80';
 
 
+/** Chad 6/10/14 @ 2:45 PM **/
+ALTER TABLE `universaltranslator`.`configurationhl7elementvalues` 
+ADD COLUMN `fieldAppendText` VARCHAR(255) NULL DEFAULT NULL AFTER `fieldDescriptor`;
+
+DELETE FROM `universaltranslator`.`lu_internalmessagestatus` WHERE `id`='9';
