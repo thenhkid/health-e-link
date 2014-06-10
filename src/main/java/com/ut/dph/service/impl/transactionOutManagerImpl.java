@@ -279,217 +279,217 @@ public class transactionOutManagerImpl implements transactionOutManager {
     public void processOutputRecords(int transactionTargetId) throws Exception {
 
         try {
-        	transactionTarget transaction = getTransactionDetails(transactionTargetId);
+            transactionTarget transaction = getTransactionDetails(transactionTargetId);
             if (transaction != null) {
-                	boolean processed = false;
-                    String errorMessage = "Error occurred trying to process output transaction. transactionId: " + transaction.getId();
+                boolean processed = false;
+                String errorMessage = "Error occurred trying to process output transaction. transactionId: " + transaction.getId();
 
-                    try {
-                        if (clearOutTables(transaction.getId()) > 0) {
-                            processed = false;
-                        }
-                    } catch (Exception ex) {
-                        processed = false;
-                        ex.printStackTrace();
-                    }
-
-                    /* Process the output (transactionTargetId, targetConfigId, transactionInId) */
-                    try {
-                        processed = transactionOutDAO.processOutPutTransactions(transaction.getId(), transaction.getconfigId(), transaction.gettransactionInId());
-                    } catch (Exception e) {
-                        //throw new Exception("Error occurred trying to process output transaction. transactionId: "+transaction.getId(),e);
+                try {
+                    if (clearOutTables(transaction.getId()) > 0) {
                         processed = false;
                     }
+                } catch (Exception ex) {
+                    processed = false;
+                    ex.printStackTrace();
+                }
 
-                    if (!processed) {
-                        //we update and log
-                        transactionInManager.updateTransactionTargetStatus(0, transaction.getId(), 0, 33);
-                        transactionInManager.insertProcessingError(processingSysErrorId, null, 0, null, null, null, null, false, true, errorMessage, transaction.getId());
-                    }
+                /* Process the output (transactionTargetId, targetConfigId, transactionInId) */
+                try {
+                    processed = transactionOutDAO.processOutPutTransactions(transaction.getId(), transaction.getconfigId(), transaction.gettransactionInId());
+                } catch (Exception e) {
+                    //throw new Exception("Error occurred trying to process output transaction. transactionId: "+transaction.getId(),e);
+                    processed = false;
+                }
 
-                    Integer processingErrors;
-                    /**
-                     * pre-process should occur here, we get config and grab all macros associated, pre processing macro is category 2  *
-                     */
-                    try {
-                        processingErrors = translateTargetRecords(transaction.getId(), transaction.getconfigId(), transaction.getbatchDLId(), 2);
-                    } catch (Exception e) {
+                if (!processed) {
+                    //we update and log
+                    transactionInManager.updateTransactionTargetStatus(0, transaction.getId(), 0, 33);
+                    transactionInManager.insertProcessingError(processingSysErrorId, null, 0, null, null, null, null, false, true, errorMessage, transaction.getId());
+                }
+
+                Integer processingErrors;
+                /**
+                 * pre-process should occur here, we get config and grab all macros associated, pre processing macro is category 2 *
+                 */
+                try {
+                    processingErrors = translateTargetRecords(transaction.getId(), transaction.getconfigId(), transaction.getbatchDLId(), 2);
+                } catch (Exception e) {
 	                            // throw new Exception("Error occurred trying to translate target records. transactionId: "+ transaction.getId(),e);
+                    //we log
+                    e.printStackTrace();
+                    processingErrors = 1;
+                }
+                if (processingErrors > 0) {
+                    //we stop processing because one of the macros returned STOP
+                    processed = false;
+                }
+
+                /* If processed == true update the status of the batch and transaction */
+                if (processed == true) {
+
+                    /* Need to start the transaction translations */
+                    try {
+                        processingErrors = translateTargetRecords(transaction.getId(), transaction.getconfigId(), transaction.getbatchDLId(), 1);
+                    } catch (Exception e) {
+		                            // throw new Exception("Error occurred trying to translate target records. transactionId: "+ transaction.getId(),e);
                         //we log
                         e.printStackTrace();
                         processingErrors = 1;
                     }
-                    if (processingErrors > 0) {
-                        //we stop processing because one of the macros returned STOP
-                        processed = false;
+
+                    if (processingErrors != 0) {
+                        transactionInManager.updateTransactionTargetStatus(0, transaction.getId(), 0, 33);
+                        transactionInManager.insertProcessingError(processingSysErrorId, null, 0, null, null, null, null, false, true, "error applying macros and crosswalks", transaction.getId());
                     }
 
-                    /* If processed == true update the status of the batch and transaction */
-                    if (processed == true) {
+                    /* Once all the processing has completed with no errors need to copy records to the transactionOutRecords to make available to view */
+                    if (processingErrors == 0) { // no errors
 
-                        /* Need to start the transaction translations */
                         try {
-                            processingErrors = translateTargetRecords(transaction.getId(), transaction.getconfigId(), transaction.getbatchDLId(), 1);
+                            transactionOutDAO.moveTranslatedRecords(transaction.getId());
                         } catch (Exception e) {
-		                            // throw new Exception("Error occurred trying to translate target records. transactionId: "+ transaction.getId(),e);
-                            //we log
-                            e.printStackTrace();
-                            processingErrors = 1;
+                            throw new Exception("Error occurred moving translated records. transactionId: " + transaction.getId(), e);
                         }
 
-                        if (processingErrors != 0) {
-                            transactionInManager.updateTransactionTargetStatus(0, transaction.getId(), 0, 33);
-                            transactionInManager.insertProcessingError(processingSysErrorId, null, 0, null, null, null, null, false, true, "error applying macros and crosswalks", transaction.getId());
+                        try {
+                            /* Update the status of the transaction to L (Loaded) (ID = 9) */
+                            transactionInManager.updateTransactionStatus(transaction.getbatchUploadId(), transaction.gettransactionInId(), 0, 9);
+                        } catch (Exception e) {
+                            throw new Exception("Error updating the transactionIn status. transactionId: " + transaction.getbatchUploadId(), e);
                         }
 
-                        /* Once all the processing has completed with no errors need to copy records to the transactionOutRecords to make available to view */
-                        if (processingErrors == 0) { // no errors
+                        try {
+                            /* Update the status of the transaction target to L (Loaded) (ID = 9) */
+                            transactionInManager.updateTransactionTargetStatus(0, transaction.getId(), 0, 9);
+                        } catch (Exception e) {
+                            throw new Exception("Error updating the transactionTarget status. transactionId: " + transaction.getId(), e);
+                        }
+
+                        /* If configuration is set to auto process the process right away */
+                        configurationSchedules scheduleDetails = configurationManager.getScheduleDetails(transaction.getconfigId());
+
+                        /* If no schedule is found or automatic */
+                        if (scheduleDetails == null || scheduleDetails.gettype() == 5) {
 
                             try {
-                                transactionOutDAO.moveTranslatedRecords(transaction.getId());
-                            } catch (Exception e) {
-                                throw new Exception("Error occurred moving translated records. transactionId: " + transaction.getId(), e);
-                            }
+                                int batchId = beginOutputProcess(transaction);
 
-                            try {
-                                /* Update the status of the transaction to L (Loaded) (ID = 9) */
-                                transactionInManager.updateTransactionStatus(transaction.getbatchUploadId(), transaction.gettransactionInId(), 0, 9);
-                            } catch (Exception e) {
-                                throw new Exception("Error updating the transactionIn status. transactionId: " + transaction.getbatchUploadId(), e);
-                            }
-
-                            try {
-                                /* Update the status of the transaction target to L (Loaded) (ID = 9) */
-                                transactionInManager.updateTransactionTargetStatus(0, transaction.getId(), 0, 9);
-                            } catch (Exception e) {
-                                throw new Exception("Error updating the transactionTarget status. transactionId: " + transaction.getId(), e);
-                            }
-
-                            /* If configuration is set to auto process the process right away */
-                            configurationSchedules scheduleDetails = configurationManager.getScheduleDetails(transaction.getconfigId());
-
-                            /* If no schedule is found or automatic */
-                            if (scheduleDetails == null || scheduleDetails.gettype() == 5) {
-
+                                /* Log the last run time */
                                 try {
-                                    int batchId = beginOutputProcess(transaction);
+                                    targetOutputRunLogs log = new targetOutputRunLogs();
+                                    log.setconfigId(transaction.getconfigId());
 
-                                    /* Log the last run time */
-                                    try {
-                                        targetOutputRunLogs log = new targetOutputRunLogs();
-                                        log.setconfigId(transaction.getconfigId());
-
-                                        transactionOutDAO.saveOutputRunLog(log);
-                                    } catch (Exception e) {
-                                        throw new Exception("Error occurred trying to save the run log. configId: " + transaction.getconfigId(), e);
-                                    }
-
-                                    /* 
-                                     Need to check the transport method for the configuration, if set to file download
-                                     or set to FTP.
-                                     */
-                                    configurationTransport transportDetails = configurationTransportManager.getTransportDetails(transaction.getconfigId());
-
-                                    /* if File Download update the status to Submission Delivery Completed ID = 23 status. This will only
-                                     apply to scheduled and not continous settings. */
-                                    if (transportDetails.gettransportMethodId() == 1) {
-                                        transactionOutDAO.updateBatchStatus(batchId, 23);
-                                        transactionInManager.updateBatchStatus(transaction.getbatchUploadId(), 23, "");
-                                    } /* If FTP Call the FTP Method */ else if (transportDetails.gettransportMethodId() == 3) {
-                                        FTPTargetFile(batchId, transportDetails);
-                                    }
-
-                                    if (batchId > 0) {
-                                        /* Send the email to primary contact */
-                                        try {
-                                            /* Get the batch Details */
-                                            batchDownloads batchDLInfo = transactionOutDAO.getBatchDetails(batchId);
-
-                                            /* Get the from user */
-                                            Organization fromOrg = organizationManager.getOrganizationById(configurationManager.getConfigurationById(transactionInManager.getTransactionDetails(transaction.gettransactionInId()).getconfigId()).getorgId());
-                                            List<User> fromPrimaryContact = userManager.getOrganizationContact(fromOrg.getId(), 1);
-
-                                            /* get the to user details */
-                                            List<User> toPrimaryContact = userManager.getOrganizationContact(configurationManager.getConfigurationById(transaction.getconfigId()).getorgId(), 1);
-                                            List<User> toSecondaryContact = userManager.getOrganizationContact(configurationManager.getConfigurationById(transaction.getconfigId()).getorgId(), 2);
-
-                                            if (fromPrimaryContact.size() > 0 && (toPrimaryContact.size() > 0 || toSecondaryContact.size() > 0)) {
-                                                String toName = null;
-                                                mailMessage msg = new mailMessage();
-                                                ArrayList<String> ccAddressArray = new ArrayList<String>();
-                                                msg.setfromEmailAddress("dphuniversaltranslator@gmail.com");
-
-                                                if (toPrimaryContact.size() > 0) {
-                                                    toName = toPrimaryContact.get(0).getFirstName() + " " + toPrimaryContact.get(0).getLastName();
-                                                    msg.settoEmailAddress(toPrimaryContact.get(0).getEmail());
-
-                                                    if (toPrimaryContact.size() > 1) {
-                                                        for (int i = 1; i < toPrimaryContact.size(); i++) {
-                                                            ccAddressArray.add(toPrimaryContact.get(i).getEmail());
-                                                        }
-                                                    }
-
-                                                    if (toSecondaryContact.size() > 0) {
-                                                        for (int i = 0; i < toSecondaryContact.size(); i++) {
-                                                            ccAddressArray.add(toSecondaryContact.get(i).getEmail());
-                                                        }
-                                                    }
-                                                } else {
-                                                    toName = toSecondaryContact.get(0).getFirstName() + " " + toSecondaryContact.get(0).getLastName();
-                                                    msg.settoEmailAddress(toSecondaryContact.get(0).getEmail());
-
-                                                    if (toSecondaryContact.size() > 1) {
-                                                        for (int i = 1; i < toSecondaryContact.size(); i++) {
-                                                            ccAddressArray.add(toSecondaryContact.get(i).getEmail());
-                                                        }
-                                                    }
-                                                }
-
-                                                if (ccAddressArray.size() > 0) {
-                                                    String[] ccAddressList = new String[ccAddressArray.size()];
-                                                    ccAddressList = ccAddressArray.toArray(ccAddressList);
-                                                    msg.setccEmailAddress(ccAddressList);
-                                                }
-
-                                                msg.setmessageSubject("You have received a new message from the Universal Translator");
-
-                                                /* Build the body of the email */
-                                                StringBuilder sb = new StringBuilder();
-                                                sb.append("Dear " + toName + ", You have recieved a new message from the Universal Translator. ");
-                                                sb.append(System.getProperty("line.separator"));
-                                                sb.append(System.getProperty("line.separator"));
-                                                sb.append("BatchId: " + batchDLInfo.getutBatchName());
-                                                if (batchDLInfo.getoutputFIleName() != null && !"".equals(batchDLInfo.getoutputFIleName())) {
-                                                    sb.append(System.getProperty("line.separator"));
-                                                    sb.append("File Name: " + batchDLInfo.getoutputFIleName());
-                                                }
-                                                sb.append(System.getProperty("line.separator"));
-                                                sb.append("From Organization: " + fromOrg.getOrgName());
-
-                                                msg.setmessageBody(sb.toString());
-
-                                                /* Send the email */
-                                                try {
-                                                    emailMessageManager.sendEmail(msg);
-                                                } catch (Exception ex) {
-                                                    System.err.println("mail exception");
-                                                    //ex.printStackTrace();
-                                                }
-                                            }
-                                        } catch (Exception e) {
-                                            throw new Exception("Error occurred trying to send the alert email for batchId: " + batchId, e);
-                                        }
-
-                                    }
+                                    transactionOutDAO.saveOutputRunLog(log);
                                 } catch (Exception e) {
-                                    throw new Exception("Error occurred trying to auto process the output file.", e);
+                                    throw new Exception("Error occurred trying to save the run log. configId: " + transaction.getconfigId(), e);
                                 }
 
-                            }
-                        }
+                                /* 
+                                 Need to check the transport method for the configuration, if set to file download
+                                 or set to FTP.
+                                 */
+                                configurationTransport transportDetails = configurationTransportManager.getTransportDetails(transaction.getconfigId());
 
+                                /* if File Download update the status to Submission Delivery Completed ID = 23 status. This will only
+                                 apply to scheduled and not continous settings. */
+                                if (transportDetails.gettransportMethodId() == 1) {
+                                    transactionOutDAO.updateBatchStatus(batchId, 23);
+                                    transactionInManager.updateBatchStatus(transaction.getbatchUploadId(), 23, "");
+                                } /* If FTP Call the FTP Method */ else if (transportDetails.gettransportMethodId() == 3) {
+                                    FTPTargetFile(batchId, transportDetails);
+                                }
+
+                                if (batchId > 0) {
+                                    /* Send the email to primary contact */
+                                    try {
+                                        /* Get the batch Details */
+                                        batchDownloads batchDLInfo = transactionOutDAO.getBatchDetails(batchId);
+
+                                        /* Get the from user */
+                                        Organization fromOrg = organizationManager.getOrganizationById(configurationManager.getConfigurationById(transactionInManager.getTransactionDetails(transaction.gettransactionInId()).getconfigId()).getorgId());
+                                        List<User> fromPrimaryContact = userManager.getOrganizationContact(fromOrg.getId(), 1);
+
+                                        /* get the to user details */
+                                        List<User> toPrimaryContact = userManager.getOrganizationContact(configurationManager.getConfigurationById(transaction.getconfigId()).getorgId(), 1);
+                                        List<User> toSecondaryContact = userManager.getOrganizationContact(configurationManager.getConfigurationById(transaction.getconfigId()).getorgId(), 2);
+
+                                        if (fromPrimaryContact.size() > 0 && (toPrimaryContact.size() > 0 || toSecondaryContact.size() > 0)) {
+                                            String toName = null;
+                                            mailMessage msg = new mailMessage();
+                                            ArrayList<String> ccAddressArray = new ArrayList<String>();
+                                            msg.setfromEmailAddress("dphuniversaltranslator@gmail.com");
+
+                                            if (toPrimaryContact.size() > 0) {
+                                                toName = toPrimaryContact.get(0).getFirstName() + " " + toPrimaryContact.get(0).getLastName();
+                                                msg.settoEmailAddress(toPrimaryContact.get(0).getEmail());
+
+                                                if (toPrimaryContact.size() > 1) {
+                                                    for (int i = 1; i < toPrimaryContact.size(); i++) {
+                                                        ccAddressArray.add(toPrimaryContact.get(i).getEmail());
+                                                    }
+                                                }
+
+                                                if (toSecondaryContact.size() > 0) {
+                                                    for (int i = 0; i < toSecondaryContact.size(); i++) {
+                                                        ccAddressArray.add(toSecondaryContact.get(i).getEmail());
+                                                    }
+                                                }
+                                            } else {
+                                                toName = toSecondaryContact.get(0).getFirstName() + " " + toSecondaryContact.get(0).getLastName();
+                                                msg.settoEmailAddress(toSecondaryContact.get(0).getEmail());
+
+                                                if (toSecondaryContact.size() > 1) {
+                                                    for (int i = 1; i < toSecondaryContact.size(); i++) {
+                                                        ccAddressArray.add(toSecondaryContact.get(i).getEmail());
+                                                    }
+                                                }
+                                            }
+
+                                            if (ccAddressArray.size() > 0) {
+                                                String[] ccAddressList = new String[ccAddressArray.size()];
+                                                ccAddressList = ccAddressArray.toArray(ccAddressList);
+                                                msg.setccEmailAddress(ccAddressList);
+                                            }
+
+                                            msg.setmessageSubject("You have received a new message from the Universal Translator");
+
+                                            /* Build the body of the email */
+                                            StringBuilder sb = new StringBuilder();
+                                            sb.append("Dear " + toName + ", You have recieved a new message from the Universal Translator. ");
+                                            sb.append(System.getProperty("line.separator"));
+                                            sb.append(System.getProperty("line.separator"));
+                                            sb.append("BatchId: " + batchDLInfo.getutBatchName());
+                                            if (batchDLInfo.getoutputFIleName() != null && !"".equals(batchDLInfo.getoutputFIleName())) {
+                                                sb.append(System.getProperty("line.separator"));
+                                                sb.append("File Name: " + batchDLInfo.getoutputFIleName());
+                                            }
+                                            sb.append(System.getProperty("line.separator"));
+                                            sb.append("From Organization: " + fromOrg.getOrgName());
+
+                                            msg.setmessageBody(sb.toString());
+
+                                            /* Send the email */
+                                            try {
+                                                emailMessageManager.sendEmail(msg);
+                                            } catch (Exception ex) {
+                                                System.err.println("mail exception");
+                                                //ex.printStackTrace();
+                                            }
+                                        }
+                                    } catch (Exception e) {
+                                        throw new Exception("Error occurred trying to send the alert email for batchId: " + batchId, e);
+                                    }
+
+                                }
+                            } catch (Exception e) {
+                                throw new Exception("Error occurred trying to auto process the output file.", e);
+                            }
+
+                        }
                     }
+
                 }
+            }
         } catch (Exception e) {
             throw new Exception("Error trying to process output records", e);
         }
@@ -1103,9 +1103,9 @@ public class transactionOutManagerImpl implements transactionOutManager {
                             List<HL7Elements> hl7Elements = configurationManager.getHL7Elements(hl7Details.getId(), segment.getId());
 
                             if (!hl7Elements.isEmpty()) {
-                                
+
                                 hl7recordRow.append(segment.getsegmentName()).append(hl7Details.getfieldSeparator());
-                                
+
                                 int elementCounter = 1;
                                 for (HL7Elements element : hl7Elements) {
 
@@ -1146,7 +1146,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                                 } else {
                                                     hl7recordRow.append(fieldValue);
                                                 }
-                                                
+
                                                 if (!"".equals(component.getFieldAppendText()) && component.getFieldAppendText() != null) {
                                                     hl7recordRow.append(" ").append(component.getFieldAppendText());
                                                 }
@@ -1731,24 +1731,24 @@ public class transactionOutManagerImpl implements transactionOutManager {
     }
 
     @Override
-	public void selectOutputRecordsForProcess(Integer transactionTargetId) throws Exception {
-		try {
-			//we get all the transactions that we want to process, we lock them
-  			List<transactionTarget> pendingTransactions = transactionOutDAO.getpendingOutPutTransactions(transactionTargetId);
-	       
-  			if (pendingTransactions.size() > 0) {
-        	  for (transactionTarget transaction : pendingTransactions)  {
-        		  //we recheck in case another scheduler picked it up
-        		  if (getTransactionDetails(transaction.getId()).getstatusId() == 19) {
-        			  transactionInManager.updateTransactionTargetStatus(0,transaction.getId(), 19, 37);
-        			  //we process it
-        			  processOutputRecords(transaction.getId());
-        		  }
-        	  	}
-        	 }
-		}catch (Exception ex) {
-			ex.printStackTrace();
-			throw new Exception("Error at selectOutputRecordsForProcess");
-		}
-	}
+    public void selectOutputRecordsForProcess(Integer transactionTargetId) throws Exception {
+        try {
+            //we get all the transactions that we want to process, we lock them
+            List<transactionTarget> pendingTransactions = transactionOutDAO.getpendingOutPutTransactions(transactionTargetId);
+
+            if (pendingTransactions.size() > 0) {
+                for (transactionTarget transaction : pendingTransactions) {
+                    //we recheck in case another scheduler picked it up
+                    if (getTransactionDetails(transaction.getId()).getstatusId() == 19) {
+                        transactionInManager.updateTransactionTargetStatus(0, transaction.getId(), 19, 37);
+                        //we process it
+                        processOutputRecords(transaction.getId());
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            throw new Exception("Error at selectOutputRecordsForProcess");
+        }
+    }
 }
