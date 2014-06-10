@@ -499,6 +499,9 @@ DELIMITER ;
 INSERT INTO `universaltranslator`.`Macro_Names` (`ID`, `CategoryId`, `Macro_Name`, `Macro_Short_Name`, `Formula`, `FieldA_Question`, `Con1_Question`, `populateFieldA`) VALUES ('81', '1', 'Strip Trailing', 'Strip trailing character', 'stripTrailingChars', 'Please enter field to strip trailing character(s) from', 'Please enter character(s) to remove', 1);
 UPDATE `universaltranslator`.`Macro_Names` SET `Macro_Name`='Stripleading characters', `Macro_Short_Name`='StripLeading' WHERE `ID`='80';
 
+/** grace 06102014 11:41 AM **/
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayCode`='SFR', `description`='This is when resets a SFTP or Rhapsody file.  The original file is copied back to input folder and a new batch number is reassigned.' WHERE `id`='35';
+
 
 /** Chad 6/10/14 @ 2:45 PM **/
 ALTER TABLE `universaltranslator`.`configurationhl7elementvalues` 
