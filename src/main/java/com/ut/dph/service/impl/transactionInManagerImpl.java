@@ -2052,7 +2052,7 @@ public class transactionInManagerImpl implements transactionInManager {
             ConfigErrorInfo configErrorInfo = new ConfigErrorInfo();
             configErrorInfo.setBatchId(batchInfo.getId());
 
-            List<TransErrorDetail> tedList = getTransErrorDetailsForNoRptFields(batchInfo.getId(), Arrays.asList(5, 7, 8, 10, 11, 12, 13));
+            List<TransErrorDetail> tedList = getTransErrorDetailsForNoRptFields(batchInfo.getId(), Arrays.asList(5, 7, 8, 10, 11, 12, 13, 14,15,16,17,18,19,20));
             if (tedList.size() > 0) {
                 masterTedList.addAll(tedList);
             }
@@ -2363,7 +2363,7 @@ public class transactionInManagerImpl implements transactionInManager {
 
                 // check if directory exists, if not create
                 fileSystem fileSystem = new fileSystem();
-                String inPath = fileSystem.setPath(ftpInfo.getdirectory());
+                String inPath = fileSystem.setPathFromRoot(ftpInfo.getdirectory());
                 File f = new File(inPath);
                 if (!f.exists()) {
                     f.mkdirs();
@@ -2396,7 +2396,7 @@ public class transactionInManagerImpl implements transactionInManager {
         try {
 
             fileSystem fileSystem = new fileSystem();
-            String fileInPath = fileSystem.setPath(inPath);
+            String fileInPath = fileSystem.setPathFromRoot(inPath);
             File folder = new File(fileInPath);
 
 		//list files
@@ -2512,7 +2512,24 @@ public class transactionInManagerImpl implements transactionInManager {
                             }
                         }
                     }
-                    if (statusId != 2) {
+                    // we don't have an error yet
+                    
+                    
+                    if (errorId > 0) {
+                    	// some error detected from previous checks
+                        userId = usermanager.getUserByTypeByOrganization(orgId).get(0).getId();
+                        Organization orgDetails = organizationmanager.getOrganizationById(orgId);
+                        String defPath = "/bowlink/" + orgDetails.getcleanURL() + "/input files/";
+                        outPath = fileSystem.setPath(defPath);
+                        batchInfo.setConfigId(configId);
+                        batchInfo.setFileLocation(defPath);
+                        batchInfo.setOrgId(orgId);
+                        newFileName = newFileName(outPath, fileName);
+                        batchInfo.setoriginalFileName(newFileName);
+                        batchInfo.setuserId(userId);
+                        batchId = (Integer) submitBatchUpload(batchInfo);
+                        batchInfo.setEncodingId(encodingId);
+                    }else if (statusId != 2) {
                         //no vaild delimiter detected
                         statusId = 7;
                         userId = usermanager.getUserByTypeByOrganization(orgId).get(0).getId();
@@ -2807,7 +2824,8 @@ public class transactionInManagerImpl implements transactionInManager {
 
                 // check if directory exists, if not create
                 fileSystem fileSystem = new fileSystem();
-                String inPath = fileSystem.setPath(rhapsodyInfo.getDirectory());
+                //paths are from root instead of /home
+                String inPath = fileSystem.setPathFromRoot(rhapsodyInfo.getDirectory());
                 File f = new File(inPath);
                 if (!f.exists()) {
                     f.mkdirs();

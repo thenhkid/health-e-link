@@ -1597,7 +1597,7 @@ public class adminProcessingActivity {
                 		fileSystem fileSystem = new fileSystem();
                         
                 		File archiveFile = new File(fileSystem.setPath(archivePath) + batchDetails.getutBatchName() + fileExt);
-                        String fileToPath = fileSystem.setPath(batchDetails.getOriginalFolder());
+                        String fileToPath = fileSystem.setPathFromRoot(batchDetails.getOriginalFolder());
                 		//we name it ut batch name when move so we know
                 		String newFileName = transactionInManager.newFileName(fileToPath, (batchDetails.getutBatchName() + fileExt));
                 		File newFile = new File(fileToPath + newFileName);
