@@ -36,7 +36,7 @@
                 </div>
                 <c:if test="${not empty toomany}">
                                     <div>
-                                    <b>There are over 200 batches found.  The first 200 results are displayed.  Please refine your date search.</b>
+                                    <b>There are over 200 batches found.  The first 200 results are displayed.  Please refine your results using the date search box.</b>
                                     <br/><br/>
                                     </div>
                  </c:if>
