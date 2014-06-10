@@ -169,7 +169,7 @@ public class adminProcessingActivity {
         	Integer fetchCount = 0;
         	if (uploadedBatchesCount.size() > 200) {
         		fetchCount  = 200;
-        		mav.addObject("tooMany", true);
+        		mav.addObject("toomany", true);
         	}
             List<batchUploads> uploadedBatches = transactionInManager.getAllUploadedBatches(fromDate, toDate, fetchCount);
 
