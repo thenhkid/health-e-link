@@ -326,3 +326,59 @@ DROP TABLE `universaltranslator`.`configurationpostprocessing`, `universaltransl
 
 
 /** all above updates are applied to dev and test DPH grace 06092014 10:36PM **/
+
+/** grace 06102014 2:54 AM **/
+use universalTranslator;
+
+drop procedure if exists appendPrependString;
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `appendPrependString`(in configId int, 
+in batchId int, in srcField varchar(10),
+in fieldA varchar(10), in fieldB varchar(10), in con1 varchar(255), 
+in con2 varchar(255), in macroId int, in foroutboundProcessing boolean, in passClear int, in transactionId int)
+proc_main:begin
+
+call setInboundOutBoundTables (foroutboundProcessing);
+select @translatedTable, @transactionTable, @batchTable, @batchIdType , @errorTable
+into @translatedTable, @transactionTable, @batchTable, @batchIdType , @errorTable;
+
+call getFinalStatusIds;
+select @finalStatusIds into @finalStatusIds;
+
+/** 
+fieldA - which field would you like to append and / or prepend?
+con1 - what string would you like to prepend?
+con2 - what string would you like to append?
+**/
+-- we build sql here 
+
+
+
+if (transactionId = 0) then
+set @stmt = concat("update ", @translatedTable," set ",fieldA,
+" = concat('", con1, "', ", fieldA, ", '", con2,"') where ", @transactionTable ,"Id in (select id from ",@transactionTable,
+" where configId = ",configId," and ", @batchIdType," = ",batchId," and statusId not in (",@finalStatusIds,"));");
+END if;
+
+if (transactionId != 0) then
+set @stmt = concat("update ", @translatedTable," set ",fieldA,
+" = concat('", con1, "', ", fieldA, ", '", con2,"') where ", @transactionTable ,"Id = ",transactionId, ";");
+END if;
+
+PREPARE stmt from @stmt;
+EXECUTE stmt;-- execute
+
+-- we check pass /clear
+if (passClear = 2) THEN
+BEGIN
+-- not sure how to pass clear this
+END;
+END IF;
+-- see if we want to return something
+select '';
+
+end proc_main$$
+DELIMITER ;
+
+INSERT INTO `universaltranslator`.`Macro_Names` (`ID`, `Macro_Name`, `Macro_Short_Name`, `Formula`, `FieldA_Question`, `Con1_Question`, `Con2_Question`, `populateFieldA`) VALUES ('79', 'Prepend and/or Append Strings', 'Prepend Append String', 'appendPrependString', 'Please enter field that append and/or prepend to', 'Please enter value you would like to prepend', 'Please enter value you would like to append', 1);
