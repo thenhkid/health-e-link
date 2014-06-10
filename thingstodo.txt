@@ -24,12 +24,12 @@ Grace
 	- Review and add additional user logging where needed
 		 - not done 6.2
 	- Load test Dev/Test with BadBoy software
-	- Review Status List - make it more user friendly
+	- Review Status List - make it more user friendly - waiting for MS feedback (6/10/14)
 
 Macros needed
 How to handle numbers cw matching better - for example, reg1 sometimes submit with 001, 00004 and it really should read as 1 and 4.  Need to see how to handle isNum in mySQL
- - need strip specific leading / ending character
-#1. Post Processing macro that will delete configurations that should not be targets
+ - need strip specific leading / ending character ** DONE (Grace ON 6/10/14) ** 
+#1.** DONE (Grace ON 6/8/14) ** Post Processing macro that will delete configurations that should not be targets
 	
 
 Open

@@ -382,3 +382,121 @@ end proc_main$$
 DELIMITER ;
 
 INSERT INTO `universaltranslator`.`Macro_Names` (`ID`, `Macro_Name`, `Macro_Short_Name`, `Formula`, `FieldA_Question`, `Con1_Question`, `Con2_Question`, `populateFieldA`) VALUES ('79', 'Prepend and/or Append Strings', 'Prepend Append String', 'appendPrependString', 'Please enter field that append and/or prepend to', 'Please enter value you would like to prepend', 'Please enter value you would like to append', 1);
+
+/** grace 06102014 03:10 AM **/
+
+use universalTranslator;
+
+drop procedure if exists stripLeadingChars;
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `stripLeadingChars`(in configId int, 
+in batchId int, in srcField varchar(10),
+in fieldA varchar(10), in fieldB varchar(10), in con1 varchar(255), 
+in con2 varchar(255), in macroId int, in foroutboundProcessing boolean, in passClear int, in transactionId int)
+proc_main:begin
+
+call setInboundOutBoundTables (foroutboundProcessing);
+select @translatedTable, @transactionTable, @batchTable, @batchIdType , @errorTable
+into @translatedTable, @transactionTable, @batchTable, @batchIdType , @errorTable;
+
+call getFinalStatusIds;
+select @finalStatusIds into @finalStatusIds;
+
+/** 
+fieldA - which field would you like to trim  leading characters from?
+con1 - what string would you like to trim?
+
+**/
+-- we build sql here 
+
+
+
+if (transactionId = 0) then
+set @stmt = concat("update ", @translatedTable," set ",fieldA,
+" = TRIM(LEADING '",con1,"' FROM ",fieldA,") where ", @transactionTable ,"Id in (select id from ",@transactionTable,
+" where configId = ",configId," and ", @batchIdType," = ",batchId," and statusId not in (",@finalStatusIds,"));");
+END if;
+
+if (transactionId != 0) then
+set @stmt = concat("update ", @translatedTable," set ",fieldA,
+" = TRIM(LEADING '",con1,"' FROM ",fieldA,") where ", @transactionTable ,"Id = ",transactionId, ";");
+END if;
+
+PREPARE stmt from @stmt;
+EXECUTE stmt;-- execute
+
+-- we check pass /clear
+if (passClear = 2) THEN
+BEGIN
+-- not sure how to pass clear this
+END;
+END IF;
+-- see if we want to return something
+select '';
+
+end proc_main$$
+DELIMITER ;
+
+INSERT INTO `universaltranslator`.`Macro_Names` (`ID`, `CategoryId`, `Macro_Name`, `Macro_Short_Name`, `Formula`, `FieldA_Question`, `Con1_Question`, `populateFieldA`) VALUES ('80', '1', 'String leading characters', 'StringLeading', 'stripLeadingChars', 'Please enter field to strip leading characters from', 'Please enter leading characters', 1);
+
+
+/*** separator ***/
+
+use universalTranslator;
+
+drop procedure if exists stripTrailingChars;
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `stripTrailingChars`(in configId int, 
+in batchId int, in srcField varchar(10),
+in fieldA varchar(10), in fieldB varchar(10), in con1 varchar(255), 
+in con2 varchar(255), in macroId int, in foroutboundProcessing boolean, in passClear int, in transactionId int)
+proc_main:begin
+
+call setInboundOutBoundTables (foroutboundProcessing);
+select @translatedTable, @transactionTable, @batchTable, @batchIdType , @errorTable
+into @translatedTable, @transactionTable, @batchTable, @batchIdType , @errorTable;
+
+call getFinalStatusIds;
+select @finalStatusIds into @finalStatusIds;
+
+/** 
+fieldA - which field would you like to trim  leading characters from?
+con1 - what string would you like to trim?
+
+**/
+-- we build sql here 
+
+
+
+if (transactionId = 0) then
+set @stmt = concat("update ", @translatedTable," set ",fieldA,
+" = TRIM(TRAILING '",con1,"' FROM ",fieldA,") where ", @transactionTable ,"Id in (select id from ",@transactionTable,
+" where configId = ",configId," and ", @batchIdType," = ",batchId," and statusId not in (",@finalStatusIds,"));");
+END if;
+
+if (transactionId != 0) then
+set @stmt = concat("update ", @translatedTable," set ",fieldA,
+" = TRIM(TRAILING '",con1,"' FROM ",fieldA,") where ", @transactionTable ,"Id = ",transactionId, ";");
+END if;
+
+PREPARE stmt from @stmt;
+EXECUTE stmt;-- execute
+
+-- we check pass /clear
+if (passClear = 2) THEN
+BEGIN
+-- not sure how to pass clear this
+END;
+END IF;
+-- see if we want to return something
+select '';
+
+end proc_main$$
+DELIMITER ;
+
+INSERT INTO `universaltranslator`.`Macro_Names` (`ID`, `CategoryId`, `Macro_Name`, `Macro_Short_Name`, `Formula`, `FieldA_Question`, `Con1_Question`, `populateFieldA`) VALUES ('81', '1', 'Strip Trailing', 'Strip trailing character', 'stripTrailingChars', 'Please enter field to strip trailing character(s) from', 'Please enter character(s) to remove', 1);
+UPDATE `universaltranslator`.`Macro_Names` SET `Macro_Name`='Stripleading characters', `Macro_Short_Name`='StripLeading' WHERE `ID`='80';
+
+
