@@ -353,7 +353,7 @@ public class HealtheConnectController {
             //need to write the file first, we will write it to our process folder
             String uploadedFileName = transactionInManager.copyUplaodedPath(transportDetails, uploadedFile);
             String oldFilePath = dir.getDir() + transportDetails.getfileLocation();
-            oldFilePath = oldFilePath.replace("bowlink///", "");
+            oldFilePath = oldFilePath.replace("bowlink///", "").replace("bowlink/","");
             File oldFile = new File(oldFilePath + uploadedFileName);
             Path source = oldFile.toPath();
         	

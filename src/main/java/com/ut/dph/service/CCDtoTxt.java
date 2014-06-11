@@ -49,7 +49,7 @@ public class CCDtoTxt {
         Method myMethod = cls.getMethod("CCDtoTxt", new Class[]{File.class});
 
         /* Get the uploaded CCD File */
-        fileLocation = fileLocation.replace("/Applications/bowlink/", "");
+        fileLocation = fileLocation.replace("/Applications/bowlink/", "").replace("/home/bowlink/","").replace("/bowlink/", "");
         dir.setDirByName(fileLocation);
         
         File ccdFile = new File(dir.getDir() + ccdFileName + ".xml");

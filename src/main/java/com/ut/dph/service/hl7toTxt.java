@@ -28,7 +28,7 @@ public class hl7toTxt {
         FileInputStream fileInput = null;
         
         fileSystem dir = new fileSystem();
-        fileLocation = fileLocation.replace("/Applications/bowlink/", "");
+        fileLocation = fileLocation.replace("/Applications/bowlink/", "").replace("/home/bowlink/","").replace("/bowlink/", "");
         dir.setDirByName(fileLocation);
         
         File origfile = null;
