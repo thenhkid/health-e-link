@@ -24,14 +24,14 @@ import org.springframework.stereotype.Service;
 public class CCDtoTxt {
 
     @Autowired
-    private organizationManager organiationmanager;
+    private organizationManager organizationmanager;
     
     @Autowired
     private configurationTransportManager configurationTransportManager;
 
     public String TranslateCCDtoTxt(String fileLocation, String ccdFileName, int orgId) throws Exception {
 
-        Organization orgDetails = organiationmanager.getOrganizationById(orgId);
+        Organization orgDetails = organizationmanager.getOrganizationById(orgId);
         fileSystem dir = new fileSystem();
 
         dir.setDir(orgDetails.getcleanURL(), "templates");
