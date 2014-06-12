@@ -521,22 +521,22 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
         }
     }
 
-	@Override
+    @Override
     @Transactional
     @SuppressWarnings("unchecked")
     public List<configurationTransport> getConfigTransportForFileExt(String fileExt, Integer transportMethodId) {
         try {
 
             String sql = ("select distinct delimChar, containsHeaderRow , fileDelimiter, fileLocation, encodingId from configurationTransportDetails, ref_delimiters , configurationMessageSpecs "
-            		+ " where ref_delimiters.id = configurationTransportDetails.fileDelimiter "
-            		+ " and configurationMessageSpecs.configId = configurationTransportDetails.configId"
-            		+ " and fileext = :fileExt and transportmethodId = :transportMethodId"
-            		+ " and configurationTransportDetails.configId in (select id from configurations where type = 1)");
+                    + " where ref_delimiters.id = configurationTransportDetails.fileDelimiter "
+                    + " and configurationMessageSpecs.configId = configurationTransportDetails.configId"
+                    + " and fileext = :fileExt and transportmethodId = :transportMethodId"
+                    + " and configurationTransportDetails.configId in (select id from configurations where type = 1)");
             Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
                     Transformers.aliasToBean(configurationTransport.class));
             query.setParameter("fileExt", fileExt);
             query.setParameter("transportMethodId", transportMethodId);
-            
+
             List<configurationTransport> configurationTransports = query.list();
 
             return configurationTransports;
@@ -549,23 +549,21 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
         }
     }
 
-    
     @Override
     @Transactional
     @SuppressWarnings("unchecked")
-    public List <configurationTransport> getTransportListForFileExt(String fileExt, Integer transportMethodId) {
+    public List<configurationTransport> getTransportListForFileExt(String fileExt, Integer transportMethodId) {
         try {
 
             String sql = ("select * "
-            		+ " from configurationTransportDetails "
-            		+ " where fileext = :fileExt and transportmethodId = :transportMethodId");
+                    + " from configurationTransportDetails "
+                    + " where fileext = :fileExt and transportmethodId = :transportMethodId");
             Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
                     Transformers.aliasToBean(configurationTransport.class));
             query.setParameter("fileExt", fileExt);
             query.setParameter("transportMethodId", transportMethodId);
-            
-            
-			List <configurationTransport>  transportList =  query.list();
+
+            List<configurationTransport> transportList = query.list();
 
             return transportList;
 
@@ -576,144 +574,142 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
         }
     }
 
-    
-	@Override
-	@Transactional
-	public configurationTransport getTransportDetailsByTransportId(Integer transportId) {
-		try  {
-			 Query query = sessionFactory.getCurrentSession().createQuery("from configurationTransport where id = :id");
-		     query.setParameter("id", transportId);
-		     return (configurationTransport) query.uniqueResult();
-		} catch (Exception ex) {
-			System.err.println("getTransportDetailsByTransportId " + ex.getCause());
+    @Override
+    @Transactional
+    public configurationTransport getTransportDetailsByTransportId(Integer transportId) {
+        try {
+            Query query = sessionFactory.getCurrentSession().createQuery("from configurationTransport where id = :id");
+            query.setParameter("id", transportId);
+            return (configurationTransport) query.uniqueResult();
+        } catch (Exception ex) {
+            System.err.println("getTransportDetailsByTransportId " + ex.getCause());
             ex.printStackTrace();
             return null;
-		}
-	}
+        }
+    }
 
-	@Override
-	@Transactional
-	public Integer getOrgIdForFTPPath(configurationFTPFields ftpInfo)
-			throws Exception {
-		try {
-			String sql = ("select distinct orgId from configurations where id in (select configId from configurationTransportDetails where id in (select transportId from"
-					+ " rel_TransportFTPDetails where method = :method and directory = :directory));");
-	        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
-	        query.setParameter("method", ftpInfo.getmethod());
-	        query.setParameter("directory", ftpInfo.getdirectory());
-	
-	        Integer orgId  = (Integer) query.list().get(0);
-	
-	        return orgId;
+    @Override
+    @Transactional
+    public Integer getOrgIdForFTPPath(configurationFTPFields ftpInfo)
+            throws Exception {
+        try {
+            String sql = ("select distinct orgId from configurations where id in (select configId from configurationTransportDetails where id in (select transportId from"
+                    + " rel_TransportFTPDetails where method = :method and directory = :directory));");
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+            query.setParameter("method", ftpInfo.getmethod());
+            query.setParameter("directory", ftpInfo.getdirectory());
 
-		} catch (Exception ex) {
-	        System.err.println("getOrgIdForFTPPath  " + ex.getCause());
-	        ex.printStackTrace();
-	        return null;
-		}
-	}
+            Integer orgId = (Integer) query.list().get(0);
 
-	@Override
-	@Transactional
-	public Integer getMinMaxFileSize(String fileExt, Integer transportMethodId) {
-		try {
-			String sql = ("select min(maxFileSize) as filesize from configurationTransportDetails "
-					+ " where transportmethodid = :transportMethodId and fileext = :fileExt");
-	        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
-	        query.setParameter("fileExt", fileExt);
-	        query.setParameter("transportMethodId", transportMethodId);
-	
-	        Integer fileSize  = (Integer) query.list().get(0);
-	
-	        return fileSize;
+            return orgId;
 
-		} catch (Exception ex) {
-			 System.err.println("getMinMaxFileSize  " + ex.getCause());
-	        ex.printStackTrace();
-	        return null;
-		}
-	}
-	
-	@Override
-	@Transactional
-	@SuppressWarnings("unchecked")
-	public List <configurationTransport>  getCountContainsHeaderRow(String fileExt, Integer transportMethodId) {
-		try {
-			String sql = ("select distinct containsHeaderRow from configurationTransportDetails, ref_delimiters , configurationMessageSpecs "
-            		+ " where ref_delimiters.id = configurationTransportDetails.fileDelimiter "
-            		+ " and configurationMessageSpecs.configId = configurationTransportDetails.configId"
-            		+ " and fileext = :fileExt and transportmethodId = :transportMethodId"
-            		+ " and configurationTransportDetails.configId in (select id from configurations where type = 1)");
-			Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
+        } catch (Exception ex) {
+            System.err.println("getOrgIdForFTPPath  " + ex.getCause());
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    @Transactional
+    public Integer getMinMaxFileSize(String fileExt, Integer transportMethodId) {
+        try {
+            String sql = ("select min(maxFileSize) as filesize from configurationTransportDetails "
+                    + " where transportmethodid = :transportMethodId and fileext = :fileExt");
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+            query.setParameter("fileExt", fileExt);
+            query.setParameter("transportMethodId", transportMethodId);
+
+            Integer fileSize = (Integer) query.list().get(0);
+
+            return fileSize;
+
+        } catch (Exception ex) {
+            System.err.println("getMinMaxFileSize  " + ex.getCause());
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    @Transactional
+    @SuppressWarnings("unchecked")
+    public List<configurationTransport> getCountContainsHeaderRow(String fileExt, Integer transportMethodId) {
+        try {
+            String sql = ("select distinct containsHeaderRow from configurationTransportDetails, ref_delimiters , configurationMessageSpecs "
+                    + " where ref_delimiters.id = configurationTransportDetails.fileDelimiter "
+                    + " and configurationMessageSpecs.configId = configurationTransportDetails.configId"
+                    + " and fileext = :fileExt and transportmethodId = :transportMethodId"
+                    + " and configurationTransportDetails.configId in (select id from configurations where type = 1)");
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
                     Transformers.aliasToBean(configurationTransport.class));
-	        query.setParameter("fileExt", fileExt);
-	        query.setParameter("transportMethodId", transportMethodId);
-	
-	        List <configurationTransport>  headerRows  = query.list();
-	
-	        return headerRows;
+            query.setParameter("fileExt", fileExt);
+            query.setParameter("transportMethodId", transportMethodId);
 
-		} catch (Exception ex) {
-			System.err.println("getCountContainsHeaderRow  " + ex.getCause());
-	        ex.printStackTrace();
-	        return null;
-		}
-	}
+            List<configurationTransport> headerRows = query.list();
 
-	
-	@Override
-	@Transactional
-	@SuppressWarnings("unchecked")
-	public List<Integer> getConfigCount(String fileExt, Integer transportMethodId, Integer fileDelimiter) {
-		try {
-			String sql = (" select configId from configurationTransportDetails "
-					+ " where transportmethodid = :transportMethodId and fileext = :fileExt "
-					+ " and filedelimiter = :fileDelimiter");
-			Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
-	        query.setParameter("fileExt", fileExt);
-	        query.setParameter("transportMethodId", transportMethodId);
-	        query.setParameter("fileDelimiter", fileDelimiter);
-	        
-	        List <Integer> configs  = query.list();
-	
-	        return configs;
+            return headerRows;
 
-		} catch (Exception ex) {
-			System.err.println("getConfigCount  " + ex.getCause());
-	        ex.printStackTrace();
-	        return null;
-		}
-	}
+        } catch (Exception ex) {
+            System.err.println("getCountContainsHeaderRow  " + ex.getCause());
+            ex.printStackTrace();
+            return null;
+        }
+    }
 
-	@Override
-	@Transactional
-	@SuppressWarnings("unchecked")
-	public List<configurationTransport> getDistinctDelimCharForFileExt(String fileExt, Integer transportMethodId) {
-		 try {
+    @Override
+    @Transactional
+    @SuppressWarnings("unchecked")
+    public List<Integer> getConfigCount(String fileExt, Integer transportMethodId, Integer fileDelimiter) {
+        try {
+            String sql = (" select configId from configurationTransportDetails "
+                    + " where transportmethodid = :transportMethodId and fileext = :fileExt "
+                    + " and filedelimiter = :fileDelimiter");
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+            query.setParameter("fileExt", fileExt);
+            query.setParameter("transportMethodId", transportMethodId);
+            query.setParameter("fileDelimiter", fileDelimiter);
 
-	            String sql = ("select distinct delimChar, fileDelimiter "
-	                    + " from configurationTransportDetails, ref_delimiters  "
-	                    + " where ref_delimiters.id = configurationTransportDetails.fileDelimiter "
-	                    + " and transportMethodId = :transportMethodId "
-	                    + " and configurationTransportDetails.fileExt = :fileExt"
-	                    + " and configurationTransportDetails.configId in (select id from configurations where type = 1)");
-	            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
-	                    Transformers.aliasToBean(configurationTransport.class));
-	            query.setParameter("transportMethodId", transportMethodId);
-	            query.setParameter("fileExt", fileExt);
-	            
-	            List<configurationTransport> configurationTransports = query.list();
+            List<Integer> configs = query.list();
 
-	            return configurationTransports;
+            return configs;
 
-	        } catch (Exception ex) {
-	            System.err.println("getDistinctDelimCharForFileExt " + ex.getCause());
-	            ex.printStackTrace();
+        } catch (Exception ex) {
+            System.err.println("getConfigCount  " + ex.getCause());
+            ex.printStackTrace();
+            return null;
+        }
+    }
 
-	            return null;
-	        }
-	}
-	
+    @Override
+    @Transactional
+    @SuppressWarnings("unchecked")
+    public List<configurationTransport> getDistinctDelimCharForFileExt(String fileExt, Integer transportMethodId) {
+        try {
+
+            String sql = ("select distinct delimChar, fileDelimiter "
+                    + " from configurationTransportDetails, ref_delimiters  "
+                    + " where ref_delimiters.id = configurationTransportDetails.fileDelimiter "
+                    + " and transportMethodId = :transportMethodId "
+                    + " and configurationTransportDetails.fileExt = :fileExt"
+                    + " and configurationTransportDetails.configId in (select id from configurations where type = 1)");
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
+                    Transformers.aliasToBean(configurationTransport.class));
+            query.setParameter("transportMethodId", transportMethodId);
+            query.setParameter("fileExt", fileExt);
+
+            List<configurationTransport> configurationTransports = query.list();
+
+            return configurationTransports;
+
+        } catch (Exception ex) {
+            System.err.println("getDistinctDelimCharForFileExt " + ex.getCause());
+            ex.printStackTrace();
+
+            return null;
+        }
+    }
+
     /**
      * The 'saveTransportRhapsody' function will save the transport Rhapsody information into the DB.
      *
@@ -724,12 +720,12 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
     @Override
     @Transactional
     public void saveTransportRhapsody(configurationRhapsodyFields rhapsodyFields) {
-    	try {
-    		sessionFactory.getCurrentSession().saveOrUpdate(rhapsodyFields);
-    	} catch (Exception ex) {
-    		ex.printStackTrace();
-    		System.err.println("saveTransportFTP " + ex.getCause());
-    	}
+        try {
+            sessionFactory.getCurrentSession().saveOrUpdate(rhapsodyFields);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.err.println("saveTransportFTP " + ex.getCause());
+        }
     }
 
     /**
@@ -782,52 +778,52 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
 
         return (configurationRhapsodyFields) criteria.uniqueResult();
 
-    }    
-    
+    }
+
     @Override
-	@Transactional
-	@SuppressWarnings("unchecked")
-	public List <configurationTransport>  getTransportEncoding(String fileExt, Integer transportMethodId) {
-		try {
-			String sql = ("select distinct encodingId from configurationTransportDetails "
-            		+ " where fileext = :fileExt and transportmethodId = :transportMethodId"
-            		+ " and configurationTransportDetails.configId in (select id from configurations where type = 1)");
-			Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
+    @Transactional
+    @SuppressWarnings("unchecked")
+    public List<configurationTransport> getTransportEncoding(String fileExt, Integer transportMethodId) {
+        try {
+            String sql = ("select distinct encodingId from configurationTransportDetails "
+                    + " where fileext = :fileExt and transportmethodId = :transportMethodId"
+                    + " and configurationTransportDetails.configId in (select id from configurations where type = 1)");
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
                     Transformers.aliasToBean(configurationTransport.class));
-	        query.setParameter("fileExt", fileExt);
-	        query.setParameter("transportMethodId", transportMethodId);
-	
-	        List <configurationTransport>  encodingIds  = query.list();
-	
-	        return encodingIds;
+            query.setParameter("fileExt", fileExt);
+            query.setParameter("transportMethodId", transportMethodId);
 
-		} catch (Exception ex) {
-			System.err.println("getTransportEncoding  " + ex.getCause());
-	        ex.printStackTrace();
-	        return null;
-		}
-	}
+            List<configurationTransport> encodingIds = query.list();
 
-	@Override
-	@Transactional
-	public Integer getOrgIdForRhapsodyPath(
-			configurationRhapsodyFields rhapsodyInfo) throws Exception {
-		try {
-			String sql = ("select distinct orgId from configurations where id in (select configId from configurationTransportDetails where id in (select transportId from"
-					+ " rel_TransportRhapsodyDetails where method = :method and directory = :directory));");
-	        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
-	        query.setParameter("method", rhapsodyInfo.getMethod());
-	        query.setParameter("directory", rhapsodyInfo.getDirectory());
-	
-	        Integer orgId  = (Integer) query.list().get(0);
-	
-	        return orgId;
+            return encodingIds;
 
-		} catch (Exception ex) {
-	        System.err.println("getOrgIdForRhapsodyPath  " + ex.getCause());
-	        ex.printStackTrace();
-	        return null;
-		}
-	}
-	
+        } catch (Exception ex) {
+            System.err.println("getTransportEncoding  " + ex.getCause());
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    @Transactional
+    public Integer getOrgIdForRhapsodyPath(
+            configurationRhapsodyFields rhapsodyInfo) throws Exception {
+        try {
+            String sql = ("select distinct orgId from configurations where id in (select configId from configurationTransportDetails where id in (select transportId from"
+                    + " rel_TransportRhapsodyDetails where method = :method and directory = :directory));");
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+            query.setParameter("method", rhapsodyInfo.getMethod());
+            query.setParameter("directory", rhapsodyInfo.getDirectory());
+
+            Integer orgId = (Integer) query.list().get(0);
+
+            return orgId;
+
+        } catch (Exception ex) {
+            System.err.println("getOrgIdForRhapsodyPath  " + ex.getCause());
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
 }

@@ -116,7 +116,7 @@
                         <c:if test="${userDetails.createAuthority == true}">
                             <ul class="nav navbar-nav navbar-right navbar-actions">
                                 <li ${param['page'] == 'create' && pageHeader != 'feedback' ? 'class="active"' : ''}>
-                                    <a href="<c:url value='/Health-e-Web/create'/>" title="Create a new message" >Create New Message</a>
+                                    <a href="<c:url value='/Health-e-Web/create'/>" title="Create New Referral" >Create New Referral</a>
                                     <span class="indicator-active arrow-up"></span>
                                 </li>
                             </ul>

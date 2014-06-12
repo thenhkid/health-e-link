@@ -4846,7 +4846,7 @@ public class transactionInDAOImpl implements transactionInDAO {
             String newBatchSQL = ("INSERT INTO transactionin "
                     + " (batchId, configId, statusId, transactionTargetId, loadTableId, messageStatus) "
                     + " select  :newbatchId, configId, statusId, transactionTargetId, loadTableId, messageStatus"
-                    + " from batchuploads  where batchId = :batchId");
+                    + " from transactionin  where batchId = :batchId");
             Query query = sessionFactory.getCurrentSession().createSQLQuery(newBatchSQL);
             query.setParameter("batchId", batchId);
             query.setParameter("newbatchId", newbatchId);
@@ -4883,7 +4883,7 @@ public class transactionInDAOImpl implements transactionInDAO {
             newTarget.setbatchUploadId(newbatchId);
             newTarget.settransactionInId(newtransactionInId);
             newTarget.setconfigId(tgtConfigId);
-            newTarget.setinternalStatusId(12);
+            newTarget.setstatusId(12);
             newTarget.setinternalStatusId(0);
             
             submitTransactionTarget(newTarget);
@@ -4891,13 +4891,23 @@ public class transactionInDAOImpl implements transactionInDAO {
             /* Insert Batch Summary */
             String newBatchSummarySQL = ("INSERT INTO batchuploadsummary "
                     + " (batchId, transactionInId, sourceOrgId, targetOrgId, messageTypeId, sourceConfigId, targetConfigId) "
-                    + " select  :newbatchId, :transactionInId, configId, sourceOrgId, targetOrgId, messageTypeId, sourceConfigId, targetConfigId"
+                    + " select  :newbatchId, :transactionInId, sourceOrgId, targetOrgId, messageTypeId, sourceConfigId, targetConfigId"
                     + " from batchuploadsummary  where batchId = :batchId");
             Query batchsummaryquery = sessionFactory.getCurrentSession().createSQLQuery(newBatchSummarySQL);
             batchsummaryquery.setParameter("transactionInId", newtransactionInId);
             batchsummaryquery.setParameter("newbatchId", newbatchId);
             batchsummaryquery.setParameter("batchId", batchId);
             batchsummaryquery.executeUpdate();
+            
+            /* Insert Attachments */
+            String attachmentSQL = ("INSERT INTO transactionattachments "
+                    + " (transactionInId, fileName, fileLocation, title) "
+                    + " select  :newtransactionInId, fileName, fileLocation, title"
+                    + " from transactionattachments  where transactionInId = :transactionId");
+            Query attachmentquery = sessionFactory.getCurrentSession().createSQLQuery(attachmentSQL);
+            attachmentquery.setParameter("newtransactionInId", newtransactionInId);
+            attachmentquery.setParameter("transactionId", transactionId);
+            attachmentquery.executeUpdate();
 
             return newbatchId;
 

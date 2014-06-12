@@ -1142,7 +1142,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                                 }
 
                                                 if (!"".equals(component.getfieldDescriptor()) && component.getfieldDescriptor() != null) {
-                                                    hl7recordRow.append(component.getfieldDescriptor()).append(fieldValue);
+                                                    hl7recordRow.append(component.getfieldDescriptor()).append(" ").append(fieldValue);
                                                 } else {
                                                     hl7recordRow.append(fieldValue);
                                                 }
@@ -1170,9 +1170,9 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                     }
 
                                 }
+                                
+                                hl7recordRow.append(System.getProperty("line.separator"));
                             }
-
-                            hl7recordRow.append(System.getProperty("line.separator"));
 
                         }
 

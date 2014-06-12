@@ -1203,6 +1203,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
 
         Criteria findBatches = sessionFactory.getCurrentSession().createCriteria(batchDownloads.class);
         findBatches.add(Restrictions.in("id", batchIdList));
+        findBatches.add(Restrictions.eq("transportMethodId",1));
         findBatches.add(Restrictions.or(
                 Restrictions.eq("statusId", 22),
                 Restrictions.eq("statusId", 23),
