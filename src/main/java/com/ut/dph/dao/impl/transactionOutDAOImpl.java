@@ -259,6 +259,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
 
         Criteria findBatches = sessionFactory.getCurrentSession().createCriteria(batchDownloads.class);
         findBatches.add(Restrictions.in("id", batchIdList));
+        findBatches.add(Restrictions.eq("transportMethodId", 2));
         findBatches.add(Restrictions.and(
                 Restrictions.ne("statusId", 29), /* Submission Processed Errored */
                 Restrictions.ne("statusId", 30), /* Target Creation Errored */
