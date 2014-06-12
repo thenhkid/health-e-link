@@ -12,6 +12,7 @@ import com.ut.dph.model.User;
 import com.ut.dph.model.UserActivity;
 import com.ut.dph.model.batchDownloadSummary;
 import com.ut.dph.model.batchDownloads;
+import com.ut.dph.model.batchMultipleTargets;
 import com.ut.dph.model.batchUploadSummary;
 import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.configuration;
@@ -765,8 +766,16 @@ public class HealtheWebController {
             Organization receivingOrgDetails = organizationmanager.getOrganizationById(configDetails.getorgId());
 
             /* Find out the target configuration id */
-            Integer targetConnectionId = transactionInManager.getFeedbackReportConnection(configId, origConfigDetails.getorgId());
-            configurationConnection connectionDetails = configurationManager.getConnection(targetConnectionId);
+            System.out.println("ConfigID: "+ configId);
+            System.out.println("orgId: " + origConfigDetails.getorgId());
+            List<Integer> targetConnectionIds = transactionInManager.getFeedbackReportConnection(configId, origConfigDetails.getorgId());
+            
+            List<Integer> targetConfigIds = new ArrayList<Integer>();
+            for(Integer connections : targetConnectionIds) {
+                configurationConnection connectionDetails = configurationManager.getConnection(connections);
+                targetConfigIds.add(connectionDetails.gettargetConfigId());
+            }
+            
 
             /* Get a list of form fields */
             configurationTransport transportDetails = configurationTransportManager.getTransportDetailsByTransportMethod(configId, 2);
@@ -786,7 +795,7 @@ public class HealtheWebController {
             transaction.settargetOrgId(origConfigDetails.getorgId());
             transaction.setconfigId(configId);
             transaction.setautoRelease(transportDetails.getautoRelease());
-            transaction.settargetConfigId(connectionDetails.gettargetConfigId());
+            transaction.settargetConfigId(targetConfigIds);
             transaction.setorginialTransactionId(transactionId);
 
             try {
@@ -987,7 +996,11 @@ public class HealtheWebController {
                 transaction.settransactionTargetId(transactionTarget.getId());
                 transaction.setdateSubmitted(transactionInfo.getdateCreated());
                 transaction.setsourceType(configDetails.getsourceType());
-                transaction.settargetConfigId(transactionTarget.getconfigId());
+                
+                List<Integer> targetConfigId = new ArrayList<Integer>();
+                targetConfigId.add(transactionTarget.getconfigId());
+                transaction.settargetConfigId(targetConfigId);
+                
                 transaction.setorginialTransactionId(transactionInfo.gettransactionTargetId());
 
                 lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(transaction.getstatusId());
@@ -1011,7 +1024,11 @@ public class HealtheWebController {
                 transaction.settargetOrgId(targetOrg);
                 transaction.setconfigId(configId);
                 transaction.setautoRelease(transportDetails.getautoRelease());
-                transaction.settargetConfigId(targetConfig);
+                
+                List<Integer> targetConfigId = new ArrayList<Integer>();
+                targetConfigId.add(targetConfig);
+                transaction.settargetConfigId(targetConfigId);
+                
                 transaction.setsourceType(configDetails.getsourceType());
             }
 
@@ -1146,6 +1163,7 @@ public class HealtheWebController {
         if (currBatchId == 0) {
 
             try {
+                
                 /* Create the batch name (TransportMethodId+OrgId+MessageTypeId+Date/Time/Seconds) */
                 DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmssS");
                 Date date = new Date();
@@ -1408,12 +1426,32 @@ public class HealtheWebController {
 
             /* Need to populate the transaction Target */
             if (currTransactionTargetId == 0) {
-
+                
                 /* Submit a new Transaction Target record */
                 transactionTarget transactiontarget = new transactionTarget();
                 transactiontarget.setbatchUploadId(batchId);
                 transactiontarget.settransactionInId(transactionId);
-                transactiontarget.setconfigId(transactionDetails.gettargetConfigId());
+                
+                if(transactionDetails.gettargetConfigId().size() > 1) {
+                    transactiontarget.setconfigId(transactionDetails.gettargetConfigId().get(0));
+                    
+                    /* If the message is going to multiple targets only save one and store the 
+                    other targets in teh batchMultipleTargets table. The ones that are stored 
+                    here will be sent out when the message is actually sent. A batch will be 
+                    created for each of them. */
+                    for(int i = 1; i < transactionDetails.gettargetConfigId().size(); i++) {
+                        batchMultipleTargets target = new batchMultipleTargets();
+                        target.setBatchId(batchId);
+                        target.setTgtConfigId(transactionDetails.gettargetConfigId().get(i));
+                        
+                        transactionInManager.submitTransactionMultipleTargets(target);
+                    }
+                    
+                }
+                else {
+                    transactiontarget.setconfigId(transactionDetails.gettargetConfigId().get(0));
+                }
+                
 
                 /* 
                  If the "Save" button was pressed set the
@@ -1434,7 +1472,9 @@ public class HealtheWebController {
                 }
 
                 transactionInManager.submitTransactionTarget(transactiontarget);
-            } /* Otherwise update existing batch */ else {
+            } 
+            /* Otherwise update existing batch */ 
+            else {
                 transactionTargetId = currTransactionTargetId;
 
                 transactionTarget transactiontarget = transactionInManager.getTransactionTargetDetails(transactionTargetId);
@@ -1464,13 +1504,36 @@ public class HealtheWebController {
         }
 
         if (action.equals("send")) {
-
+            
+            
             /*
-             Once the "Send" button is pressed we will send the batch off to the processTransactions
-             method to handle all the processing and saving to the final messages_ tables. This method
-             will return true if successfully received and false otherwise.
-             */
-            boolean transactionSentToProcess = transactionInManager.processBatch(batchId, false, 0);
+              Need to check to see if there are multiple targets this message needs to be copied and sent
+             to.
+            */
+            boolean transactionSentToProcess;
+            
+            List<batchMultipleTargets> multipleTargets = transactionInManager.getBatchMultipleTargets(batchId);
+            
+            if(!multipleTargets.isEmpty()) {
+                for(batchMultipleTargets target : multipleTargets) {
+                    
+                    /* Copy all the information from the batch */
+                    int copiedBatchId = transactionInManager.copyBatchDetails(batchId, target.getTgtConfigId(), transactionId);
+                    
+                    transactionSentToProcess = transactionInManager.processBatch(copiedBatchId, false, 0);
+                }
+            }
+            else {
+            
+
+                /*
+                 Once the "Send" button is pressed we will send the batch off to the processTransactions
+                 method to handle all the processing and saving to the final messages_ tables. This method
+                 will return true if successfully received and false otherwise.
+                 */
+                transactionSentToProcess = transactionInManager.processBatch(batchId, false, 0);
+           
+            }
 
             /*
              Send the user to the "Sent" items page
@@ -2903,9 +2966,7 @@ public class HealtheWebController {
 
                         }
 
-                    } 
-                    /* Target config Type */ 
-                    else if (config.getType() == 2) {
+                    } /* Target config Type */ else if (config.getType() == 2) {
 
                         List<configurationConnection> connections = configurationManager.getConnectionsByTargetConfiguration(config.getId());
 
@@ -2944,13 +3005,13 @@ public class HealtheWebController {
                                         result.setmsg("Total Feedback Reports Received: " + total);
                                         totalFBRec += total;
                                     }
-                                    
-                                    if(total > 0) {
-                                       result.setshowDetails(true);
+
+                                    if (total > 0) {
+                                        result.setshowDetails(true);
                                     }
 
                                     results.add(result);
-                                    
+
                                 }
 
                             }

@@ -32,10 +32,10 @@ public class ExceptionControllerAdvice {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/exception");
         
-        mailMessage messageDetails = new mailMessage();
+        /*mailMessage messageDetails = new mailMessage();
         
         messageDetails.settoEmailAddress("dphuniversaltranslator@gmail.com");
-        messageDetails.setmessageSubject("Exception Error");
+        messageDetails.setmessageSubject("Exception Error");*/
         
         StringBuilder sb = new StringBuilder();
         
@@ -58,9 +58,9 @@ public class ExceptionControllerAdvice {
         sb.append(System.getProperty("line.separator"));
         sb.append("Stack Trace: " + Arrays.toString(e.getStackTrace()));
         
-        messageDetails.setmessageBody(sb.toString());
+        /*messageDetails.setmessageBody(sb.toString());
         
-        /* emailMessageManager.sendEmail(messageDetails); */
+        emailMessageManager.sendEmail(messageDetails); */
         mav.addObject("messageBody",sb.toString());
         
         return mav;

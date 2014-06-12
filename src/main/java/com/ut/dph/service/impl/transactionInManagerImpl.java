@@ -16,6 +16,7 @@ import com.ut.dph.model.Transaction;
 import com.ut.dph.model.TransactionInError;
 import com.ut.dph.model.User;
 import com.ut.dph.model.UserActivity;
+import com.ut.dph.model.batchMultipleTargets;
 import com.ut.dph.model.batchUploadSummary;
 import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.configurationConnection;
@@ -1171,7 +1172,7 @@ public class transactionInManagerImpl implements transactionInManager {
 
     @Override
     @Transactional
-    public Integer getFeedbackReportConnection(int configId, int targetorgId) {
+    public List<Integer> getFeedbackReportConnection(int configId, int targetorgId) {
         return transactionInDAO.getFeedbackReportConnection(configId, targetorgId);
     }
 
@@ -2945,6 +2946,21 @@ public class transactionInManagerImpl implements transactionInManager {
     @Override
     public void updateTransactionTargetListStatus(List<transactionTarget> transactions, Integer statusId) {
         transactionInDAO.updateTransactionTargetListStatus(transactions, statusId);
+    }
+    
+    @Override
+    public void submitTransactionMultipleTargets(batchMultipleTargets target) {
+        transactionInDAO.submitTransactionMultipleTargets(target);
+    }
+    
+    @Override
+    public List<batchMultipleTargets> getBatchMultipleTargets(Integer batchId) {
+        return transactionInDAO.getBatchMultipleTargets(batchId);
+    }
+    
+    @Override
+    public Integer copyBatchDetails(Integer batchId, Integer tgtConfigId, Integer transactionId) {
+        return transactionInDAO.copyBatchDetails(batchId, tgtConfigId, transactionId);
     }
 
 }

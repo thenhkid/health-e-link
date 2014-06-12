@@ -508,3 +508,15 @@ ALTER TABLE `universaltranslator`.`configurationhl7elementvalues`
 ADD COLUMN `fieldAppendText` VARCHAR(255) NULL DEFAULT NULL AFTER `fieldDescriptor`;
 
 DELETE FROM `universaltranslator`.`lu_internalmessagestatus` WHERE `id`='9';
+
+
+/** Chad 6-11-14 @ 12:28 AM **/
+CREATE TABLE `universaltranslator`.`batchMultipleTargets` (
+  `id` INT NOT NULL,
+  `batchId` INT NOT NULL,
+  `tgtConfigId` INT NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE INDEX `id_UNIQUE` (`id` ASC));
+
+ALTER TABLE `universaltranslator`.`batchMultipleTargets` 
+CHANGE COLUMN `id` `id` INT(11) NOT NULL AUTO_INCREMENT ;

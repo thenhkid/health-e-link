@@ -13,6 +13,7 @@ import com.ut.dph.model.MoveFilesLog;
 import com.ut.dph.model.TransactionInError;
 import com.ut.dph.model.User;
 import com.ut.dph.model.UserActivity;
+import com.ut.dph.model.batchMultipleTargets;
 import com.ut.dph.model.batchUploadSummary;
 import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.configuration;
@@ -39,6 +40,7 @@ import com.ut.dph.model.messagePatients;
 import com.ut.dph.model.messageType;
 import com.ut.dph.service.sysAdminManager;
 import com.ut.dph.service.userManager;
+import java.text.DateFormat;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -1273,13 +1275,12 @@ public class transactionInDAOImpl implements transactionInDAO {
         return findBatches.list();
 
     }
-    
+
     @Override
     @Transactional
     public List<batchUploads> getAllUploadedBatches(Date fromDate, Date toDate) throws Exception {
-    		return getAllUploadedBatches(fromDate, toDate, 0);
+        return getAllUploadedBatches(fromDate, toDate, 0);
     }
-
 
     /**
      * The 'getAllUploadedBatches' function will return a list of batches for the admin in the processing activities section.
@@ -1306,9 +1307,9 @@ public class transactionInDAOImpl implements transactionInDAO {
         }
 
         findBatches.addOrder(Order.desc("dateSubmitted"));
-        
+
         if (fetchSize > 0) {
-        	findBatches.setMaxResults(fetchSize);
+            findBatches.setMaxResults(fetchSize);
         }
         return findBatches.list();
     }
@@ -1498,39 +1499,36 @@ public class transactionInDAOImpl implements transactionInDAO {
         }
 
     }
-    
+
     /**
-     * The 'updateTransactionTargetListStatus' function will update a list of transactionTarget entries when the 
-     * output process begins.
-     * 
+     * The 'updateTransactionTargetListStatus' function will update a list of transactionTarget entries when the output process begins.
+     *
      * @param transactions The list of transaction Target entries to be updates
      * @param statusId The new status .
      */
     @Override
     @Transactional
     public void updateTransactionTargetListStatus(List<transactionTarget> transactions, Integer statusId) {
-        
-         ArrayList<Integer> transactionIdArray = new ArrayList<Integer>();
-         
-         for(transactionTarget target : transactions) {
-             transactionIdArray.add(target.getId());
-         }
-        
-         String sql = "update transactiontarget set statusId = :toStatusId, statusTime = CURRENT_TIMESTAMP where id in (:transactionIdList)";
-         
-         Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
-                 .setParameter("toStatusId", statusId)
-                 .setParameterList("transactionIdList", transactionIdArray);
-        
+
+        ArrayList<Integer> transactionIdArray = new ArrayList<Integer>();
+
+        for (transactionTarget target : transactions) {
+            transactionIdArray.add(target.getId());
+        }
+
+        String sql = "update transactiontarget set statusId = :toStatusId, statusTime = CURRENT_TIMESTAMP where id in (:transactionIdList)";
+
+        Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                .setParameter("toStatusId", statusId)
+                .setParameterList("transactionIdList", transactionIdArray);
+
         try {
             updateData.executeUpdate();
         } catch (Exception ex) {
             System.err.println("updateTransactionTargetListStatus " + ex.getCause());
         }
     }
-    
-    
-    
+
     /**
      * The 'updateTransactionTargetStatus' function will update the transactionTarget entries when the created batch has been sent.
      *
@@ -1891,17 +1889,19 @@ public class transactionInDAOImpl implements transactionInDAO {
     }
 
     /**
-     *
+     * The 'getFeedbackReportConnection' method will return a list of connections for the clicked feedback report.
      */
     @Override
     @Transactional
-    public Integer getFeedbackReportConnection(int configId, int targetorgId) {
+    public List<Integer> getFeedbackReportConnection(int configId, int targetorgId) {
 
         Criteria configurationConnections = sessionFactory.getCurrentSession().createCriteria(configurationConnection.class);
         configurationConnections.add(Restrictions.eq("sourceConfigId", configId));
+        configurationConnections.addOrder(Order.asc("dateCreated"));
+
         List<configurationConnection> connections = configurationConnections.list();
 
-        Integer connectionId = 0;
+        List<Integer> connectionId = new ArrayList<Integer>();
 
         if (!connections.isEmpty()) {
 
@@ -1912,7 +1912,7 @@ public class transactionInDAOImpl implements transactionInDAO {
                 configuration configDetails = (configuration) configurations.uniqueResult();
 
                 if (configDetails.getorgId() == targetorgId) {
-                    connectionId = connection.getId();
+                    connectionId.add(connection.getId());
                 }
 
             }
@@ -2546,14 +2546,16 @@ public class transactionInDAOImpl implements transactionInDAO {
             query.setParameter("passClear", cdt.getPassClear());
             query.setParameter("transactionId", transactionId);
 
-            List <String> macroResults = query.list();
-            /** we return '' with data manipulation macros and we return continue or stop with macros**/
+            List<String> macroResults = query.list();
+            /**
+             * we return '' with data manipulation macros and we return continue or stop with macros*
+             */
             if (macroResults.get(0).equalsIgnoreCase("")) {
-            	return 0;
+                return 0;
             } else if (macroResults.get(0).equalsIgnoreCase("continue")) {
-            	return 0;
+                return 0;
             } else if (macroResults.get(0).equalsIgnoreCase("stop")) {
-            	return 1;
+                return 1;
             }
             return 0;
         } catch (Exception ex) {
@@ -3510,7 +3512,7 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Override
     @Transactional
     public Integer insertBatchUploadSumByOrg(batchUploads batchUpload, configurationConnection bt) {
-       
+
         try {
             String sql = ("insert into batchuploadsummary (batchId, transactionInId, "
                     + " sourceOrgId, targetOrgId, messageTypeId, sourceConfigId, targetConfigId) "
@@ -3747,12 +3749,12 @@ public class transactionInDAOImpl implements transactionInDAO {
 
     @Override
     @Transactional
-    public Integer insertTransactionTranslated(Integer oldInId ,Integer newInId, batchUploadSummary bus) {
+    public Integer insertTransactionTranslated(Integer oldInId, Integer newInId, batchUploadSummary bus) {
         try {
             String sql = ("INSERT INTO universaltranslator.transactiontranslatedin "
-            		+ " (transactionInId, configId, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16, f17, f18, f19, f20, f21, f22, f23, f24, f25, f26, f27, f28, f29, f30, f31, f32, f33, f34, f35, f36, f37, f38, f39, f40, f41, f42, f43, f44, f45, f46, f47, f48, f49, f50, f51, f52, f53, f54, f55, f56, f57, f58, f59, f60, f61, f62, f63, f64, f65, f66, f67, f68, f69, f70, f71, f72, f73, f74, f75, f76, f77, f78, f79, f80, f81, f82, f83, f84, f85, f86, f87, f88, f89, f90, f91, f92, f93, f94, f95, f96, f97, f98, f99, f100, f101, f102, f103, f104, f105, f106, f107, f108, f109, f110, f111, f112, f113, f114, f115, f116, f117, f118, f119, f120, f121, f122, f123, f124, f125, f126, f127, f128, f129, f130, f131, f132, f133, f134, f135, f136, f137, f138, f139, f140, f141, f142, f143, f144, f145, f146, f147, f148, f149, f150, f151, f152, f153, f154, f155, f156, f157, f158, f159, f160, f161, f162, f163, f164, f165, f166, f167, f168, f169, f170, f171, f172, f173, f174, f175, f176, f177, f178, f179, f180, f181, f182, f183, f184, f185, f186, f187, f188, f189, f190, f191, f192, f193, f194, f195, f196, f197, f198, f199, f200, f201, f202, f203, f204, f205, f206, f207, f208, f209, f210, f211, f212, f213, f214, f215, f216, f217, f218, f219, f220, f221, f222, f223, f224, f225, f226, f227, f228, f229, f230, f231, f232, f233, f234, f235, f236, f237, f238, f239, f240, f241, f242, f243, f244, f245, f246, f247, f248, f249, f250, f251, f252, f253, f254, f255) "
-            		+ " select  "+ newInId +", "+ bus.getsourceConfigId() +", f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16, f17, f18, f19, f20, f21, f22, f23, f24, f25, f26, f27, f28, f29, f30, f31, f32, f33, f34, f35, f36, f37, f38, f39, f40, f41, f42, f43, f44, f45, f46, f47, f48, f49, f50, f51, f52, f53, f54, f55, f56, f57, f58, f59, f60, f61, f62, f63, f64, f65, f66, f67, f68, f69, f70, f71, f72, f73, f74, f75, f76, f77, f78, f79, f80, f81, f82, f83, f84, f85, f86, f87, f88, f89, f90, f91, f92, f93, f94, f95, f96, f97, f98, f99, f100, f101, f102, f103, f104, f105, f106, f107, f108, f109, f110, f111, f112, f113, f114, f115, f116, f117, f118, f119, f120, f121, f122, f123, f124, f125, f126, f127, f128, f129, f130, f131, f132, f133, f134, f135, f136, f137, f138, f139, f140, f141, f142, f143, f144, f145, f146, f147, f148, f149, f150, f151, f152, f153, f154, f155, f156, f157, f158, f159, f160, f161, f162, f163, f164, f165, f166, f167, f168, f169, f170, f171, f172, f173, f174, f175, f176, f177, f178, f179, f180, f181, f182, f183, f184, f185, f186, f187, f188, f189, f190, f191, f192, f193, f194, f195, f196, f197, f198, f199, f200, f201, f202, f203, f204, f205, f206, f207, f208, f209, f210, f211, f212, f213, f214, f215, f216, f217, f218, f219, f220, f221, f222, f223, f224, f225, f226, f227, f228, f229, f230, f231, f232, f233, f234, f235, f236, f237, f238, f239, f240, f241, f242, f243, f244, f245, f246, f247, f248, f249, f250, f251, f252, f253, f254, f255"
-            		+ " from transactiontranslatedin  where transactionInId = :oldInId");
+                    + " (transactionInId, configId, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16, f17, f18, f19, f20, f21, f22, f23, f24, f25, f26, f27, f28, f29, f30, f31, f32, f33, f34, f35, f36, f37, f38, f39, f40, f41, f42, f43, f44, f45, f46, f47, f48, f49, f50, f51, f52, f53, f54, f55, f56, f57, f58, f59, f60, f61, f62, f63, f64, f65, f66, f67, f68, f69, f70, f71, f72, f73, f74, f75, f76, f77, f78, f79, f80, f81, f82, f83, f84, f85, f86, f87, f88, f89, f90, f91, f92, f93, f94, f95, f96, f97, f98, f99, f100, f101, f102, f103, f104, f105, f106, f107, f108, f109, f110, f111, f112, f113, f114, f115, f116, f117, f118, f119, f120, f121, f122, f123, f124, f125, f126, f127, f128, f129, f130, f131, f132, f133, f134, f135, f136, f137, f138, f139, f140, f141, f142, f143, f144, f145, f146, f147, f148, f149, f150, f151, f152, f153, f154, f155, f156, f157, f158, f159, f160, f161, f162, f163, f164, f165, f166, f167, f168, f169, f170, f171, f172, f173, f174, f175, f176, f177, f178, f179, f180, f181, f182, f183, f184, f185, f186, f187, f188, f189, f190, f191, f192, f193, f194, f195, f196, f197, f198, f199, f200, f201, f202, f203, f204, f205, f206, f207, f208, f209, f210, f211, f212, f213, f214, f215, f216, f217, f218, f219, f220, f221, f222, f223, f224, f225, f226, f227, f228, f229, f230, f231, f232, f233, f234, f235, f236, f237, f238, f239, f240, f241, f242, f243, f244, f245, f246, f247, f248, f249, f250, f251, f252, f253, f254, f255) "
+                    + " select  " + newInId + ", " + bus.getsourceConfigId() + ", f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16, f17, f18, f19, f20, f21, f22, f23, f24, f25, f26, f27, f28, f29, f30, f31, f32, f33, f34, f35, f36, f37, f38, f39, f40, f41, f42, f43, f44, f45, f46, f47, f48, f49, f50, f51, f52, f53, f54, f55, f56, f57, f58, f59, f60, f61, f62, f63, f64, f65, f66, f67, f68, f69, f70, f71, f72, f73, f74, f75, f76, f77, f78, f79, f80, f81, f82, f83, f84, f85, f86, f87, f88, f89, f90, f91, f92, f93, f94, f95, f96, f97, f98, f99, f100, f101, f102, f103, f104, f105, f106, f107, f108, f109, f110, f111, f112, f113, f114, f115, f116, f117, f118, f119, f120, f121, f122, f123, f124, f125, f126, f127, f128, f129, f130, f131, f132, f133, f134, f135, f136, f137, f138, f139, f140, f141, f142, f143, f144, f145, f146, f147, f148, f149, f150, f151, f152, f153, f154, f155, f156, f157, f158, f159, f160, f161, f162, f163, f164, f165, f166, f167, f168, f169, f170, f171, f172, f173, f174, f175, f176, f177, f178, f179, f180, f181, f182, f183, f184, f185, f186, f187, f188, f189, f190, f191, f192, f193, f194, f195, f196, f197, f198, f199, f200, f201, f202, f203, f204, f205, f206, f207, f208, f209, f210, f211, f212, f213, f214, f215, f216, f217, f218, f219, f220, f221, f222, f223, f224, f225, f226, f227, f228, f229, f230, f231, f232, f233, f234, f235, f236, f237, f238, f239, f240, f241, f242, f243, f244, f245, f246, f247, f248, f249, f250, f251, f252, f253, f254, f255"
+                    + " from transactiontranslatedin  where transactionInId = :oldInId");
             Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
             query.setParameter("oldInId", oldInId);
             query.executeUpdate();
@@ -3816,7 +3818,7 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Override
     public ConfigErrorInfo setConfigErrorInfo(Integer batchId, Integer errorCode, ConfigErrorInfo configErrorInfo) {
 
-        //depending on errorCode 
+        //depending on errorCode
         return configErrorInfo;
     }
 
@@ -4259,66 +4261,63 @@ public class transactionInDAOImpl implements transactionInDAO {
             return null;
         }
     }
-    
+
     /**
-     * The 'getBatchesToSentOrg' will search the batchUploadSummary table for batches sent by the
-     * passed in orgId to the passed in orgId for the passed in messagetypeId
-     * 
-     * @param srcOrgId      The orgId who sent the batch
-     * @param tgtOrgId      The orgId for the user who is logged in
+     * The 'getBatchesToSentOrg' will search the batchUploadSummary table for batches sent by the passed in orgId to the passed in orgId for the passed in messagetypeId
+     *
+     * @param srcOrgId The orgId who sent the batch
+     * @param tgtOrgId The orgId for the user who is logged in
      * @param messageTypeId The id of the message Type that was selected
-     * 
+     *
      * @return This function will return a list of batches found matching the criteria passed in.
      */
     @Override
     @Transactional
     public List<batchUploadSummary> getBatchesToSentOrg(int srcorgId, int tgtOrgId, int messageTypeId) throws Exception {
-        
+
         Criteria batchSummaries = sessionFactory.getCurrentSession().createCriteria(batchUploadSummary.class);
         batchSummaries.add(Restrictions.eq("sourceOrgId", srcorgId));
         batchSummaries.add(Restrictions.eq("targetOrgId", tgtOrgId));
         batchSummaries.add(Restrictions.eq("messageTypeId", messageTypeId));
-        
+
         return batchSummaries.list();
-    
+
     }
-    
+
     /**
-     * The 'getPatientTransactionDetails' function will return the submitted patient data
-     * for the passed in transactionId.
-     * 
-     * @param transactionInId   The id of the transaction to retrieve the patient details
+     * The 'getPatientTransactionDetails' function will return the submitted patient data for the passed in transactionId.
+     *
+     * @param transactionInId The id of the transaction to retrieve the patient details
      */
     @Override
     @Transactional
     public messagePatients getPatientTransactionDetails(int transactionInId) {
-        
+
         Criteria patientDetails = sessionFactory.getCurrentSession().createCriteria(messagePatients.class);
         patientDetails.add(Restrictions.eq("transactionInId", transactionInId));
-        
+
         return (messagePatients) patientDetails.uniqueResult();
-        
+
     }
 
-	@Override
-	@Transactional
-	@SuppressWarnings("unchecked")
-	public List<configurationRhapsodyFields> getRhapsodyInfoForJob(
-			Integer method) {
-		try {
+    @Override
+    @Transactional
+    @SuppressWarnings("unchecked")
+    public List<configurationRhapsodyFields> getRhapsodyInfoForJob(
+            Integer method) {
+        try {
             String sql = ("select rel_TransportRhapsodyDetails.id, directory, method, transportId "
-            		+ " from configurationTransportDetails, rel_TransportRhapsodyDetails "
-            		+ " where method = :method and configurationTransportDetails.id = rel_TransportRhapsodyDetails.transportId "
-            		+ " and configId in (select id from configurations where status = 1) and  "
-            		+ " directory not in (select folderPath from moveFilesLog where statusId = 1 and method = :method) "
-            		+ " group by directory order by configId;");
+                    + " from configurationTransportDetails, rel_TransportRhapsodyDetails "
+                    + " where method = :method and configurationTransportDetails.id = rel_TransportRhapsodyDetails.transportId "
+                    + " and configId in (select id from configurations where status = 1) and  "
+                    + " directory not in (select folderPath from moveFilesLog where statusId = 1 and method = :method) "
+                    + " group by directory order by configId;");
 
             Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
                     .setResultTransformer(Transformers.aliasToBean(configurationRhapsodyFields.class))
                     .setParameter("method", method);
 
-            
-			List<configurationRhapsodyFields> directories = query.list();
+            List<configurationRhapsodyFields> directories = query.list();
 
             return directories;
         } catch (Exception ex) {
@@ -4326,16 +4325,16 @@ public class transactionInDAOImpl implements transactionInDAO {
             ex.printStackTrace();
             return null;
         }
-	}
+    }
 
-	@Override
-	@Transactional
-	public Integer insertTransactionInError(Integer newTInId, Integer oldTInId) {
-		try {
+    @Override
+    @Transactional
+    public Integer insertTransactionInError(Integer newTInId, Integer oldTInId) {
+        try {
             String sql = ("INSERT INTO transactioninerrors(batchUploadId, configId, transactionInId, fieldNo, required, errorId, cwId, macroId, validationTypeId, stackTrace) "
-            		+ "select batchUploadId, configId, "+ newTInId +", fieldNo, required, errorId, cwId, macroId, validationTypeId, stackTrace from transactioninerrors where transactionInId = :oldTInId");
+                    + "select batchUploadId, configId, " + newTInId + ", fieldNo, required, errorId, cwId, macroId, validationTypeId, stackTrace from transactioninerrors where transactionInId = :oldTInId");
             Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
-            query.setParameter("oldTInId",oldTInId);
+            query.setParameter("oldTInId", oldTInId);
             query.executeUpdate();
 
             return 0;
@@ -4345,438 +4344,436 @@ public class transactionInDAOImpl implements transactionInDAO {
             ex.printStackTrace();
             return 1;
         }
-	}
+    }
 
-	@Override
-	@Transactional
-	@SuppressWarnings("unchecked")
-	public List<Integer> checkCWFieldForList(Integer configId, Integer batchId,
-			configurationDataTranslations cdt, boolean foroutboundProcessing,
-			Integer transactionId) {
-		try {
-			String sql = "";
-			Integer id = batchId;
-			//we look for field values with UT delimiter
-			if (! foroutboundProcessing) {
-		           sql = "select transactionInId from transactionTranslatedIn where  F" + cdt.getFieldNo();
-		           sql = sql + " like '%^^^^^%' and " 
-		                    + " transactionInId ";
-		            if (transactionId == 0) {
-		                sql = sql + "in (select id from transactionIn where ";
-		                if (configId != 0) {
-		                    sql = sql + " configId = :configId and ";
-		                }
-		                sql = sql + " batchId = :id and statusId not in ( :transRELId ));";
-		            } else {
-		                sql = sql + " = :id";
-		                id = transactionId;
-		            }
-		        } else {
+    @Override
+    @Transactional
+    @SuppressWarnings("unchecked")
+    public List<Integer> checkCWFieldForList(Integer configId, Integer batchId,
+            configurationDataTranslations cdt, boolean foroutboundProcessing,
+            Integer transactionId) {
+        try {
+            String sql = "";
+            Integer id = batchId;
+            //we look for field values with UT delimiter
+            if (!foroutboundProcessing) {
+                sql = "select transactionInId from transactionTranslatedIn where  F" + cdt.getFieldNo();
+                sql = sql + " like '%^^^^^%' and "
+                        + " transactionInId ";
+                if (transactionId == 0) {
+                    sql = sql + "in (select id from transactionIn where ";
+                    if (configId != 0) {
+                        sql = sql + " configId = :configId and ";
+                    }
+                    sql = sql + " batchId = :id and statusId not in ( :transRELId ));";
+                } else {
+                    sql = sql + " = :id";
+                    id = transactionId;
+                }
+            } else {
 
-		        	sql = "select transactionTargetId from transactionTranslatedOut where  F" + cdt.getFieldNo();
-			           sql = sql + " like '%^^^^^%' and " 
-			                    + " transactionTargetId ";
-			            if (transactionId == 0) {
-			                sql = sql + "in (select id from transactionTarget where ";
-			                if (configId != 0) {
-			                    sql = sql + " configId = :configId and ";
-			                }
-			                sql = sql + " batchDLId = :id and statusId not in ( :transRELId ));";
-			            } else {
-			                sql = sql + " = :id";
-			                id = transactionId;
-			            }
-		        }
-	        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
-	        if (transactionId == 0) {
-	        	query.setParameter("configId", configId);
-	        	query.setParameter("transRELId",transRELId);
-	        }
-	        query.setParameter("id", id);
-	        
-	        
-			List<Integer> transId = query.list();
-
-	        return transId;
-			
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			System.err.println("checkCWFieldForList " + ex.getCause());
-			return null;
-		}
-
-	}
-
-	@Override
-	@Transactional
-	@SuppressWarnings("unchecked")
-	public List <IdAndFieldValue> getIdAndValuesForConfigField(Integer configId,
-			Integer batchId, configurationDataTranslations cdt,
-			boolean foroutboundProcessing, Integer transactionId) {
-		try {
-			String sql = "";
-			Integer id = batchId;
-			if (! foroutboundProcessing) {
-		           sql = "select transactionInId as transactionId, F" + cdt.getFieldNo() + " as fieldValue from transactionTranslatedIn "
-		           		+ "where  configId = :configId and length(trim(F" + cdt.getFieldNo() + ")) != 0"
-                    + " and length(REPLACE(REPLACE(F" + cdt.getFieldNo() + ", '\n', ''), '\r', '')) != 0"
-                    		+ " and transactionInId ";
-		            if (transactionId == 0) {
-		                sql = sql + "in (select id from transactionIn where ";
-		                if (configId != 0) {
-		                    sql = sql + " configId = :configId and ";
-		                }
-		                sql = sql + " batchId = :id and statusId not in ( :transRELId ));";
-		            } else {
-		                sql = sql + " = :id";
-		                id = transactionId;
-		            }
-		        } else {
-
-		        	sql = "select transactionTargetId as transactionId, F" + cdt.getFieldNo() + " as fieldValue from transactionTranslatedOut "
-		        			+ " where configId = :configId and length(trim(F" + cdt.getFieldNo() + ")) != 0"
-                    + " and length(REPLACE(REPLACE(F" + cdt.getFieldNo() + ", '\n', ''), '\r', '')) != 0"
-                    		+ " and transactionTargetId ";
-			            if (transactionId == 0) {
-			                sql = sql + "in (select id from transactionTarget where ";
-			                if (configId != 0) {
-			                    sql = sql + " configId = :configId and ";
-			                }
-			                sql = sql + " batchDLId = :id and statusId not in ( :transRELId ));";
-			            } else {
-			                sql = sql + " = :id";
-			                id = transactionId;
-			            }
-		        }
-	        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
-	        .setResultTransformer(
-                    Transformers.aliasToBean(IdAndFieldValue.class))
-            .setParameter("configId", configId)
-            .setParameter("id", id);
-            if (transactionId == 0) {
-            	query.setParameter("transRELId", transRELId);
+                sql = "select transactionTargetId from transactionTranslatedOut where  F" + cdt.getFieldNo();
+                sql = sql + " like '%^^^^^%' and "
+                        + " transactionTargetId ";
+                if (transactionId == 0) {
+                    sql = sql + "in (select id from transactionTarget where ";
+                    if (configId != 0) {
+                        sql = sql + " configId = :configId and ";
+                    }
+                    sql = sql + " batchDLId = :id and statusId not in ( :transRELId ));";
+                } else {
+                    sql = sql + " = :id";
+                    id = transactionId;
+                }
             }
-	        List<IdAndFieldValue> valueList = query.list();
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+            if (transactionId == 0) {
+                query.setParameter("configId", configId);
+                query.setParameter("transRELId", transRELId);
+            }
+            query.setParameter("id", id);
 
-	        return valueList;
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			System.err.println("getIdAndValuesForConfigField " + ex.getCause());
-			return null;
-		}
-	}
+            List<Integer> transId = query.list();
 
-	@Override
-	@Transactional
-	public Integer updateFieldValue(String fieldValue, Integer fieldNo,
-			Integer transactionId, boolean foroutboundProcessing) {
-		try {
-			String sql = "";
-			
-			if (!foroutboundProcessing ) {
-				sql = "update transactionTranslatedIn set F" + fieldNo + " = :fieldValue where transactionInId = :id";
-			} else {
-				sql = "update transactionTranslatedOut set F" + fieldNo + " = :fieldValue where transactionTargetId = :id";
-			}
-	        
-	        Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
-	                .setParameter("fieldValue", fieldValue)
-	                .setParameter("id", transactionId);
-	        
-	        updateData.executeUpdate();
-	        
-	        return 0;
-		} catch (Exception ex) {
-			System.err.println("updateFieldValue " + ex.getCause());
-			ex.printStackTrace();
-			return 1;
-		}
-	}
+            return transId;
 
-	@Override
-	@Transactional
-	public void trimFieldValues(Integer batchId, boolean foroutboundProcessing, Integer transactionId, boolean trimAll) {
-		Integer id = batchId;
-		String tableName = "transactionTranslatedIn";
-		String statusTable = "transactionIn";
-		String strBatchCol = "batchId";
-		if (foroutboundProcessing) {
-			tableName = "transactionTranslatedOut";
-			statusTable = "transactionTarget";
-			strBatchCol = "batchDLId";
-		}
-		        String sql = "UPDATE " + tableName 
-		        + " SET F1 = trim(F1),"
-		        + " F2 = trim(F2),"
-        		+ " F3 = trim(F3),"
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.err.println("checkCWFieldForList " + ex.getCause());
+            return null;
+        }
+
+    }
+
+    @Override
+    @Transactional
+    @SuppressWarnings("unchecked")
+    public List<IdAndFieldValue> getIdAndValuesForConfigField(Integer configId,
+            Integer batchId, configurationDataTranslations cdt,
+            boolean foroutboundProcessing, Integer transactionId) {
+        try {
+            String sql = "";
+            Integer id = batchId;
+            if (!foroutboundProcessing) {
+                sql = "select transactionInId as transactionId, F" + cdt.getFieldNo() + " as fieldValue from transactionTranslatedIn "
+                        + "where  configId = :configId and length(trim(F" + cdt.getFieldNo() + ")) != 0"
+                        + " and length(REPLACE(REPLACE(F" + cdt.getFieldNo() + ", '\n', ''), '\r', '')) != 0"
+                        + " and transactionInId ";
+                if (transactionId == 0) {
+                    sql = sql + "in (select id from transactionIn where ";
+                    if (configId != 0) {
+                        sql = sql + " configId = :configId and ";
+                    }
+                    sql = sql + " batchId = :id and statusId not in ( :transRELId ));";
+                } else {
+                    sql = sql + " = :id";
+                    id = transactionId;
+                }
+            } else {
+
+                sql = "select transactionTargetId as transactionId, F" + cdt.getFieldNo() + " as fieldValue from transactionTranslatedOut "
+                        + " where configId = :configId and length(trim(F" + cdt.getFieldNo() + ")) != 0"
+                        + " and length(REPLACE(REPLACE(F" + cdt.getFieldNo() + ", '\n', ''), '\r', '')) != 0"
+                        + " and transactionTargetId ";
+                if (transactionId == 0) {
+                    sql = sql + "in (select id from transactionTarget where ";
+                    if (configId != 0) {
+                        sql = sql + " configId = :configId and ";
+                    }
+                    sql = sql + " batchDLId = :id and statusId not in ( :transRELId ));";
+                } else {
+                    sql = sql + " = :id";
+                    id = transactionId;
+                }
+            }
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                    .setResultTransformer(
+                            Transformers.aliasToBean(IdAndFieldValue.class))
+                    .setParameter("configId", configId)
+                    .setParameter("id", id);
+            if (transactionId == 0) {
+                query.setParameter("transRELId", transRELId);
+            }
+            List<IdAndFieldValue> valueList = query.list();
+
+            return valueList;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.err.println("getIdAndValuesForConfigField " + ex.getCause());
+            return null;
+        }
+    }
+
+    @Override
+    @Transactional
+    public Integer updateFieldValue(String fieldValue, Integer fieldNo,
+            Integer transactionId, boolean foroutboundProcessing) {
+        try {
+            String sql = "";
+
+            if (!foroutboundProcessing) {
+                sql = "update transactionTranslatedIn set F" + fieldNo + " = :fieldValue where transactionInId = :id";
+            } else {
+                sql = "update transactionTranslatedOut set F" + fieldNo + " = :fieldValue where transactionTargetId = :id";
+            }
+
+            Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                    .setParameter("fieldValue", fieldValue)
+                    .setParameter("id", transactionId);
+
+            updateData.executeUpdate();
+
+            return 0;
+        } catch (Exception ex) {
+            System.err.println("updateFieldValue " + ex.getCause());
+            ex.printStackTrace();
+            return 1;
+        }
+    }
+
+    @Override
+    @Transactional
+    public void trimFieldValues(Integer batchId, boolean foroutboundProcessing, Integer transactionId, boolean trimAll) {
+        Integer id = batchId;
+        String tableName = "transactionTranslatedIn";
+        String statusTable = "transactionIn";
+        String strBatchCol = "batchId";
+        if (foroutboundProcessing) {
+            tableName = "transactionTranslatedOut";
+            statusTable = "transactionTarget";
+            strBatchCol = "batchDLId";
+        }
+        String sql = "UPDATE " + tableName
+                + " SET F1 = trim(F1),"
+                + " F2 = trim(F2),"
+                + " F3 = trim(F3),"
                 + " F4 = trim(F4),"
-        		+ " F5 = trim(F5),"
+                + " F5 = trim(F5),"
                 + "F6 = trim(F6),"
-        		+ "F7 = trim(F7),"
+                + "F7 = trim(F7),"
                 + "F8 = trim(F8),"
-        		+ "F9 = trim(F9),"
+                + "F9 = trim(F9),"
                 + "F10 = trim(F10),"
-        		+ "F11 = trim(F11),"
-                        + "F12 = trim(F12),"
-        		+ "F13 = trim(F13),"
-                        + "F14 = trim(F14),"
-        		+ "F15 = trim(F15),"
-                        + "F16 = trim(F16),"
-        		+ "F17 = trim(F17),"
-                        + "F18 = trim(F18),"
-                        + "F19 = trim(F19),"
-                        + "F20 = trim(F20),"
-                        + "F21 = trim(F21),"
-                        + "F22 = trim(F22),"
-                        + "F23 = trim(F23),"
-                        + "F24 = trim(F24),"
-                        + "F25 = trim(F25),"
-                        + "F26 = trim(F26),"
-                        + "F27 = trim(F27),"
-                        + "F28 = trim(F28),"
-                        + "F29 = trim(F29),"
-                        + "F30 = trim(F30),"
-                        + "F31 = trim(F31),"
-                        + "F32 = trim(F32),"
-                        + "F33 = trim(F33),"
-                        + "F34 = trim(F34),"
-                        + "F35 = trim(F35),"
-                        + "F36 = trim(F36),"
-                        + "F37 = trim(F37),"
-                        + "F38 = trim(F38),"
-                        + "F39 = trim(F39),"
-                        + "F40 = trim(F40),"
-                        + "F41 = trim(F41),"
-                        + "F42 = trim(F42),"
-                        + "F43 = trim(F43),"
-                        + "F44 = trim(F44),"
-                        + "F45 = trim(F45),"
-                        + "F46 = trim(F46),"
-                        + "F47 = trim(F47),"
-                        + "F48 = trim(F48),"
-                        + "F49 = trim(F49),"
-                        + "F50 = trim(F50),"
-                        + "F51 = trim(F51),"
-                        + "F52 = trim(F52),"
-                        + "F53 = trim(F53),"
-                        + "F54 = trim(F54),"
-                        + "F55 = trim(F55),"
-                        + "F56 = trim(F56),"
-                        + "F57 = trim(F57),"
-                        + "F58 = trim(F58),"
-                        + "F59 = trim(F59),"
-                        + "F60 = trim(F60),"
-                        + "F61 = trim(F61),"
-                        + "F62 = trim(F62),"
-                        + "F63 = trim(F63),"
-                        + "F64 = trim(F64),"
-                        + "F65 = trim(F65),"
-                        + "F66 = trim(F66),"
-                        + "F67 = trim(F67),"
-                        + "F68 = trim(F68),"
-                        + "F69 = trim(F69),"
-                        + "F70 = trim(F70),"
-                        + "F71 = trim(F71),"
-                        + "F72 = trim(F72),"
-                        + "F73 = trim(F73),"
-                        + "F74 = trim(F74),"
-                        + "F75 = trim(F75),"
-                        + "F76 = trim(F76),"
-                        + "F77 = trim(F77),"
-                        + "F78 = trim(F78),"
-                        + "F79 = trim(F79),"
-                        + "F80 = trim(F80),"
-                        + "F81 = trim(F81),"
-                        + "F82 = trim(F82),"
-                        + "F83 = trim(F83),"
-                        + "F84 = trim(F84),"
-                        + "F85 = trim(F85),"
-                        + "F86 = trim(F86),"
-                        + "F87 = trim(F87),"
-                        + "F88 = trim(F88),"
-                        + "F89 = trim(F89),"
-                        + "F90 = trim(F90),"
-                        + "F91 = trim(F91),"
-                        + "F92 = trim(F92),"
-                        + "F93 = trim(F93),"
-                        + "F94 = trim(F94),"
-                        + "F95 = trim(F95),"
-                        + "F96 = trim(F96),"
-                        + "F97 = trim(F97),"
-                        + "F98 = trim(F98),"
-                        + "F99 = trim(F99),"
-                        + "F100 = trim(F100),"
-                        + "F101 = trim(F101),"
-                        + "F102 = trim(F102),"
-                        + "F103 = trim(F103),"
-                        + "F104 = trim(F104),"
-                        + "F105 = trim(F105),"
-                        + "F106 = trim(F106),"
-                        + "F107 = trim(F107),"
-                        + "F108 = trim(F108),"
-                        + "F109 = trim(F109),"
-                        + "F110 = trim(F110),"
-                        + "F111 = trim(F111),"
-                        + "F112 = trim(F112),"
-                        + "F113 = trim(F113),"
-                        + "F114 = trim(F114),"
-                        + "F115 = trim(F115),"
-                        + "F116 = trim(F116),"
-                        + "F117 = trim(F117),"
-                        + "F118 = trim(F118),"
-                        + "F119 = trim(F119),"
-                        + "F120 = trim(F120),"
-                        + "F121 = trim(F121),"
-                        + "F122 = trim(F122),"
-                        + "F123 = trim(F123),"
-                        + "F124 = trim(F124),"
-                        + "F125 = trim(F125),"
-                        + "F126 = trim(F126),"
-                        + "F127 = trim(F127),"
-                        + "F128 = trim(F128),"
-                        + "F129 = trim(F129),"
-                        + "F130 = trim(F130),"
-                        + "F131 = trim(F131),"
-                        + "F132 = trim(F132),"
-                        + "F133 = trim(F133),"
-                        + "F134 = trim(F134),"
-                        + "F135 = trim(F135),"
-                        + "F136 = trim(F136),"
-                        + "F137 = trim(F137),"
-                        + "F138 = trim(F138),"
-                        + "F139 = trim(F139),"
-                        + "F140 = trim(F140),"
-                        + "F141 = trim(F141),"
-                        + "F142 = trim(F142),"
-                        + "F143 = trim(F143),"
-                        + "F144 = trim(F144),"
-                        + "F145 = trim(F145),"
-                        + "F146 = trim(F146),"
-                        + "F147 = trim(F147),"
-                        + "F148 = trim(F148),"
-                        + "F149 = trim(F149),"
-                        + "F150 = trim(F150),"
-                        + "F151 = trim(F151),"
-                        + "F152 = trim(F152),"
-                        + "F153 = trim(F153),"
-                        + "F154 = trim(F154),"
-                        + "F155 = trim(F155),"
-                        + "F156 = trim(F156),"
-                        + "F157 = trim(F157),"
-                        + "F158 = trim(F158),"
-                        + "F159 = trim(F159),"
-                        + "F160 = trim(F160),"
-                        + "F161 = trim(F161),"
-                        + "F162 = trim(F162),"
-                        + "F163 = trim(F163),"
-                        + "F164 = trim(F164),"
-                        + "F165 = trim(F165),"
-                        + "F166 = trim(F166),"
-                        + "F167 = trim(F167),"
-                        + "F168 = trim(F168),"
-                        + "F169 = trim(F169),"
-                        + "F170 = trim(F170),"
-                        + "F171 = trim(F171),"
-                        + "F172 = trim(F172),"
-                        + "F173 = trim(F173),"
-                        + "F174 = trim(F174),"
-                        + "F175 = trim(F175),"
-                        + "F176 = trim(F176),"
-                        + "F177 = trim(F177),"
-                        + "F178 = trim(F178),"
-                        + "F179 = trim(F179),"
-                        + "F180 = trim(F180),"
-                        + "F181 = trim(F181),"
-                        + "F182 = trim(F182),"
-                        + "F183 = trim(F183),"
-                        + "F184 = trim(F184),"
-                        + "F185 = trim(F185),"
-                        + "F186 = trim(F186),"
-                        + "F187 = trim(F187),"
-                        + "F188 = trim(F188),"
-                        + "F189 = trim(F189),"
-                        + "F190 = trim(F190),"
-                        + "F191 = trim(F191),"
-                        + "F192 = trim(F192),"
-                        + "F193 = trim(F193),"
-                        + "F194 = trim(F194),"
-                        + "F195 = trim(F195),"
-                        + "F196 = trim(F196),"
-                        + "F197 = trim(F197),"
-                        + "F198 = trim(F198),"
-                        + "F199 = trim(F199),"
-                        + "F200 = trim(F200),"
-                        + "F201 = trim(F201),"
-                        + "F202 = trim(F202),"
-                        + "F203 = trim(F203),"
-                        + "F204 = trim(F204),"
-                        + "F205 = trim(F205),"
-                        + "F206 = trim(F206),"
-                        + "F207 = trim(F207),"
-                        + "F208 = trim(F208),"
-                        + "F209 = trim(F209),"
-                        + "F210 = trim(F210),"
-                        + "F211 = trim(F211),"
-                        + "F212 = trim(F212),"
-                        + "F213 = trim(F213),"
-                        + "F214 = trim(F214),"
-                        + "F215 = trim(F215),"
-                        + "F216 = trim(F216),"
-                        + "F217 = trim(F217),"
-                        + "F218 = trim(F218),"
-                        + "F219 = trim(F219),"
-                        + "F220 = trim(F220),"
-                        + "F221 = trim(F221),"
-                        + "F222 = trim(F222),"
-                        + "F223 = trim(F223),"
-                        + "F224 = trim(F224),"
-                        + "F225 = trim(F225),"
-                        + "F226 = trim(F226),"
-                        + "F227 = trim(F227),"
-                        + "F228 = trim(F228),"
-                        + "F229 = trim(F229),"
-                        + "F230 = trim(F230),"
-                        + "F231 = trim(F231),"
-                        + "F232 = trim(F232),"
-                        + "F233 = trim(F233),"
-                        + "F234 = trim(F234),"
-                        + "F235 = trim(F235),"
-                        + "F236 = trim(F236),"
-                        + "F237 = trim(F237),"
-                        + "F238 = trim(F238),"
-                        + "F239 = trim(F239),"
-                        + "F240 = trim(F240),"
-                        + "F241 = trim(F241),"
-                        + "F242 = trim(F242),"
-                        + "F243 = trim(F243),"
-                        + "F244 = trim(F244),"
-                        + "F245 = trim(F245),"
-                        + "F246 = trim(F246),"
-                        + "F247 = trim(F247),"
-                        + "F248 = trim(F248),"
-                        + "F249 = trim(F249),"
-                        + "F250 = trim(F250),"
-                        + "F251 = trim(F251),"
-                        + "F252 = trim(F252),"
-                        + "F253 = trim(F253),"
-                        + "F254 = trim(F254),"
-                        + "F255 = trim(F255)";
-        
+                + "F11 = trim(F11),"
+                + "F12 = trim(F12),"
+                + "F13 = trim(F13),"
+                + "F14 = trim(F14),"
+                + "F15 = trim(F15),"
+                + "F16 = trim(F16),"
+                + "F17 = trim(F17),"
+                + "F18 = trim(F18),"
+                + "F19 = trim(F19),"
+                + "F20 = trim(F20),"
+                + "F21 = trim(F21),"
+                + "F22 = trim(F22),"
+                + "F23 = trim(F23),"
+                + "F24 = trim(F24),"
+                + "F25 = trim(F25),"
+                + "F26 = trim(F26),"
+                + "F27 = trim(F27),"
+                + "F28 = trim(F28),"
+                + "F29 = trim(F29),"
+                + "F30 = trim(F30),"
+                + "F31 = trim(F31),"
+                + "F32 = trim(F32),"
+                + "F33 = trim(F33),"
+                + "F34 = trim(F34),"
+                + "F35 = trim(F35),"
+                + "F36 = trim(F36),"
+                + "F37 = trim(F37),"
+                + "F38 = trim(F38),"
+                + "F39 = trim(F39),"
+                + "F40 = trim(F40),"
+                + "F41 = trim(F41),"
+                + "F42 = trim(F42),"
+                + "F43 = trim(F43),"
+                + "F44 = trim(F44),"
+                + "F45 = trim(F45),"
+                + "F46 = trim(F46),"
+                + "F47 = trim(F47),"
+                + "F48 = trim(F48),"
+                + "F49 = trim(F49),"
+                + "F50 = trim(F50),"
+                + "F51 = trim(F51),"
+                + "F52 = trim(F52),"
+                + "F53 = trim(F53),"
+                + "F54 = trim(F54),"
+                + "F55 = trim(F55),"
+                + "F56 = trim(F56),"
+                + "F57 = trim(F57),"
+                + "F58 = trim(F58),"
+                + "F59 = trim(F59),"
+                + "F60 = trim(F60),"
+                + "F61 = trim(F61),"
+                + "F62 = trim(F62),"
+                + "F63 = trim(F63),"
+                + "F64 = trim(F64),"
+                + "F65 = trim(F65),"
+                + "F66 = trim(F66),"
+                + "F67 = trim(F67),"
+                + "F68 = trim(F68),"
+                + "F69 = trim(F69),"
+                + "F70 = trim(F70),"
+                + "F71 = trim(F71),"
+                + "F72 = trim(F72),"
+                + "F73 = trim(F73),"
+                + "F74 = trim(F74),"
+                + "F75 = trim(F75),"
+                + "F76 = trim(F76),"
+                + "F77 = trim(F77),"
+                + "F78 = trim(F78),"
+                + "F79 = trim(F79),"
+                + "F80 = trim(F80),"
+                + "F81 = trim(F81),"
+                + "F82 = trim(F82),"
+                + "F83 = trim(F83),"
+                + "F84 = trim(F84),"
+                + "F85 = trim(F85),"
+                + "F86 = trim(F86),"
+                + "F87 = trim(F87),"
+                + "F88 = trim(F88),"
+                + "F89 = trim(F89),"
+                + "F90 = trim(F90),"
+                + "F91 = trim(F91),"
+                + "F92 = trim(F92),"
+                + "F93 = trim(F93),"
+                + "F94 = trim(F94),"
+                + "F95 = trim(F95),"
+                + "F96 = trim(F96),"
+                + "F97 = trim(F97),"
+                + "F98 = trim(F98),"
+                + "F99 = trim(F99),"
+                + "F100 = trim(F100),"
+                + "F101 = trim(F101),"
+                + "F102 = trim(F102),"
+                + "F103 = trim(F103),"
+                + "F104 = trim(F104),"
+                + "F105 = trim(F105),"
+                + "F106 = trim(F106),"
+                + "F107 = trim(F107),"
+                + "F108 = trim(F108),"
+                + "F109 = trim(F109),"
+                + "F110 = trim(F110),"
+                + "F111 = trim(F111),"
+                + "F112 = trim(F112),"
+                + "F113 = trim(F113),"
+                + "F114 = trim(F114),"
+                + "F115 = trim(F115),"
+                + "F116 = trim(F116),"
+                + "F117 = trim(F117),"
+                + "F118 = trim(F118),"
+                + "F119 = trim(F119),"
+                + "F120 = trim(F120),"
+                + "F121 = trim(F121),"
+                + "F122 = trim(F122),"
+                + "F123 = trim(F123),"
+                + "F124 = trim(F124),"
+                + "F125 = trim(F125),"
+                + "F126 = trim(F126),"
+                + "F127 = trim(F127),"
+                + "F128 = trim(F128),"
+                + "F129 = trim(F129),"
+                + "F130 = trim(F130),"
+                + "F131 = trim(F131),"
+                + "F132 = trim(F132),"
+                + "F133 = trim(F133),"
+                + "F134 = trim(F134),"
+                + "F135 = trim(F135),"
+                + "F136 = trim(F136),"
+                + "F137 = trim(F137),"
+                + "F138 = trim(F138),"
+                + "F139 = trim(F139),"
+                + "F140 = trim(F140),"
+                + "F141 = trim(F141),"
+                + "F142 = trim(F142),"
+                + "F143 = trim(F143),"
+                + "F144 = trim(F144),"
+                + "F145 = trim(F145),"
+                + "F146 = trim(F146),"
+                + "F147 = trim(F147),"
+                + "F148 = trim(F148),"
+                + "F149 = trim(F149),"
+                + "F150 = trim(F150),"
+                + "F151 = trim(F151),"
+                + "F152 = trim(F152),"
+                + "F153 = trim(F153),"
+                + "F154 = trim(F154),"
+                + "F155 = trim(F155),"
+                + "F156 = trim(F156),"
+                + "F157 = trim(F157),"
+                + "F158 = trim(F158),"
+                + "F159 = trim(F159),"
+                + "F160 = trim(F160),"
+                + "F161 = trim(F161),"
+                + "F162 = trim(F162),"
+                + "F163 = trim(F163),"
+                + "F164 = trim(F164),"
+                + "F165 = trim(F165),"
+                + "F166 = trim(F166),"
+                + "F167 = trim(F167),"
+                + "F168 = trim(F168),"
+                + "F169 = trim(F169),"
+                + "F170 = trim(F170),"
+                + "F171 = trim(F171),"
+                + "F172 = trim(F172),"
+                + "F173 = trim(F173),"
+                + "F174 = trim(F174),"
+                + "F175 = trim(F175),"
+                + "F176 = trim(F176),"
+                + "F177 = trim(F177),"
+                + "F178 = trim(F178),"
+                + "F179 = trim(F179),"
+                + "F180 = trim(F180),"
+                + "F181 = trim(F181),"
+                + "F182 = trim(F182),"
+                + "F183 = trim(F183),"
+                + "F184 = trim(F184),"
+                + "F185 = trim(F185),"
+                + "F186 = trim(F186),"
+                + "F187 = trim(F187),"
+                + "F188 = trim(F188),"
+                + "F189 = trim(F189),"
+                + "F190 = trim(F190),"
+                + "F191 = trim(F191),"
+                + "F192 = trim(F192),"
+                + "F193 = trim(F193),"
+                + "F194 = trim(F194),"
+                + "F195 = trim(F195),"
+                + "F196 = trim(F196),"
+                + "F197 = trim(F197),"
+                + "F198 = trim(F198),"
+                + "F199 = trim(F199),"
+                + "F200 = trim(F200),"
+                + "F201 = trim(F201),"
+                + "F202 = trim(F202),"
+                + "F203 = trim(F203),"
+                + "F204 = trim(F204),"
+                + "F205 = trim(F205),"
+                + "F206 = trim(F206),"
+                + "F207 = trim(F207),"
+                + "F208 = trim(F208),"
+                + "F209 = trim(F209),"
+                + "F210 = trim(F210),"
+                + "F211 = trim(F211),"
+                + "F212 = trim(F212),"
+                + "F213 = trim(F213),"
+                + "F214 = trim(F214),"
+                + "F215 = trim(F215),"
+                + "F216 = trim(F216),"
+                + "F217 = trim(F217),"
+                + "F218 = trim(F218),"
+                + "F219 = trim(F219),"
+                + "F220 = trim(F220),"
+                + "F221 = trim(F221),"
+                + "F222 = trim(F222),"
+                + "F223 = trim(F223),"
+                + "F224 = trim(F224),"
+                + "F225 = trim(F225),"
+                + "F226 = trim(F226),"
+                + "F227 = trim(F227),"
+                + "F228 = trim(F228),"
+                + "F229 = trim(F229),"
+                + "F230 = trim(F230),"
+                + "F231 = trim(F231),"
+                + "F232 = trim(F232),"
+                + "F233 = trim(F233),"
+                + "F234 = trim(F234),"
+                + "F235 = trim(F235),"
+                + "F236 = trim(F236),"
+                + "F237 = trim(F237),"
+                + "F238 = trim(F238),"
+                + "F239 = trim(F239),"
+                + "F240 = trim(F240),"
+                + "F241 = trim(F241),"
+                + "F242 = trim(F242),"
+                + "F243 = trim(F243),"
+                + "F244 = trim(F244),"
+                + "F245 = trim(F245),"
+                + "F246 = trim(F246),"
+                + "F247 = trim(F247),"
+                + "F248 = trim(F248),"
+                + "F249 = trim(F249),"
+                + "F250 = trim(F250),"
+                + "F251 = trim(F251),"
+                + "F252 = trim(F252),"
+                + "F253 = trim(F253),"
+                + "F254 = trim(F254),"
+                + "F255 = trim(F255)";
+
         if (transactionId == 0) {
-            sql = sql + " where " + tableName+ "." + statusTable + "Id in (select id from " + statusTable + " where " + 
-            	  strBatchCol +" = :id ";
+            sql = sql + " where " + tableName + "." + statusTable + "Id in (select id from " + statusTable + " where "
+                    + strBatchCol + " = :id ";
             if (!trimAll) {
                 sql = sql + " and statusId not in ( :transRELId )";
             }
             sql = sql + ")";
-            
+
         } else {
-            sql = sql + " where " + tableName+ "."+ statusTable + "Id = :id ";
+            sql = sql + " where " + tableName + "." + statusTable + "Id = :id ";
             id = transactionId;
             trimAll = true;
         }
 
-         
         Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql);
         updateData.setParameter("id", id);
 
@@ -4789,6 +4786,126 @@ public class transactionInDAOImpl implements transactionInDAO {
         } catch (Exception ex) {
             System.err.println("resetTransactionTranslatedIn " + ex.getCause());
         }
-	}
-    
+    }
+
+    @Override
+    @Transactional
+    public void submitTransactionMultipleTargets(batchMultipleTargets target) {
+        sessionFactory.getCurrentSession().save(target);
+    }
+
+    @Override
+    @Transactional
+    public List<batchMultipleTargets> getBatchMultipleTargets(Integer batchId) {
+
+        /* Get a list of connections the user has access to */
+        Criteria targets = sessionFactory.getCurrentSession().createCriteria(batchMultipleTargets.class);
+        targets.add(Restrictions.eq("batchId", batchId));
+        List<batchMultipleTargets> targetList = targets.list();
+
+        return targetList;
+
+    }
+
+    /**
+     *
+     */
+    @Override
+    @Transactional
+    public Integer copyBatchDetails(Integer batchId, Integer tgtConfigId, Integer transactionId) {
+
+        Integer newbatchId;
+
+        try {
+          
+            batchUploads batchDetails = (batchUploads) sessionFactory.getCurrentSession().get(batchUploads.class, batchId);
+           
+             /* Create the batch name (TransportMethodId+OrgId+MessageTypeId+Date/Time/Seconds) */
+            DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmssS");
+            Date date = new Date();
+            String batchName = new StringBuilder().append("2").append(batchDetails.getOrgId()).append(dateFormat.format(date)).toString();
+
+            batchUploads newBatch = new batchUploads();
+            newBatch.setOrgId(batchDetails.getOrgId());
+            newBatch.setproviderId(batchDetails.getproviderId());
+            newBatch.setuserId(batchDetails.getuserId());
+            newBatch.setutBatchConfName(batchDetails.getutBatchConfName());
+            newBatch.setutBatchName(batchName);
+            newBatch.settransportMethodId(batchDetails.gettransportMethodId());
+            newBatch.setoriginalFileName(batchName);
+            newBatch.setstatusId(batchDetails.getstatusId());
+            newBatch.settotalRecordCount(1);
+            newBatch.setdeleted(false);
+            newBatch.seterrorRecordCount(0);
+            newBatch.setContainsHeaderRow(false);
+            newBatch.setEncodingId(1);
+                    
+            newbatchId = (Integer) submitBatchUpload(newBatch);
+            
+            /* Insert transaction In */
+            String newBatchSQL = ("INSERT INTO transactionin "
+                    + " (batchId, configId, statusId, transactionTargetId, loadTableId, messageStatus) "
+                    + " select  :newbatchId, configId, statusId, transactionTargetId, loadTableId, messageStatus"
+                    + " from batchuploads  where batchId = :batchId");
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(newBatchSQL);
+            query.setParameter("batchId", batchId);
+            query.setParameter("newbatchId", newbatchId);
+            query.executeUpdate();
+            
+            Query maxId = sessionFactory.getCurrentSession().createSQLQuery("SELECT max(id) FROM transactionin where batchId = :batchId");
+            maxId.setParameter("batchId", newbatchId);
+            Integer newtransactionInId = (Integer) maxId.uniqueResult();
+            
+            /* Insert transaction In Records */
+            String inrecordssql = ("INSERT INTO transactioninrecords "
+                    + " (transactionInId, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16, f17, f18, f19, f20, f21, f22, f23, f24, f25, f26, f27, f28, f29, f30, f31, f32, f33, f34, f35, f36, f37, f38, f39, f40, f41, f42, f43, f44, f45, f46, f47, f48, f49, f50, f51, f52, f53, f54, f55, f56, f57, f58, f59, f60, f61, f62, f63, f64, f65, f66, f67, f68, f69, f70, f71, f72, f73, f74, f75, f76, f77, f78, f79, f80, f81, f82, f83, f84, f85, f86, f87, f88, f89, f90, f91, f92, f93, f94, f95, f96, f97, f98, f99, f100, f101, f102, f103, f104, f105, f106, f107, f108, f109, f110, f111, f112, f113, f114, f115, f116, f117, f118, f119, f120, f121, f122, f123, f124, f125, f126, f127, f128, f129, f130, f131, f132, f133, f134, f135, f136, f137, f138, f139, f140, f141, f142, f143, f144, f145, f146, f147, f148, f149, f150, f151, f152, f153, f154, f155, f156, f157, f158, f159, f160, f161, f162, f163, f164, f165, f166, f167, f168, f169, f170, f171, f172, f173, f174, f175, f176, f177, f178, f179, f180, f181, f182, f183, f184, f185, f186, f187, f188, f189, f190, f191, f192, f193, f194, f195, f196, f197, f198, f199, f200, f201, f202, f203, f204, f205, f206, f207, f208, f209, f210, f211, f212, f213, f214, f215, f216, f217, f218, f219, f220, f221, f222, f223, f224, f225, f226, f227, f228, f229, f230, f231, f232, f233, f234, f235, f236, f237, f238, f239, f240, f241, f242, f243, f244, f245, f246, f247, f248, f249, f250, f251, f252, f253, f254, f255) "
+                    + " select  :newtransactionInId, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16, f17, f18, f19, f20, f21, f22, f23, f24, f25, f26, f27, f28, f29, f30, f31, f32, f33, f34, f35, f36, f37, f38, f39, f40, f41, f42, f43, f44, f45, f46, f47, f48, f49, f50, f51, f52, f53, f54, f55, f56, f57, f58, f59, f60, f61, f62, f63, f64, f65, f66, f67, f68, f69, f70, f71, f72, f73, f74, f75, f76, f77, f78, f79, f80, f81, f82, f83, f84, f85, f86, f87, f88, f89, f90, f91, f92, f93, f94, f95, f96, f97, f98, f99, f100, f101, f102, f103, f104, f105, f106, f107, f108, f109, f110, f111, f112, f113, f114, f115, f116, f117, f118, f119, f120, f121, f122, f123, f124, f125, f126, f127, f128, f129, f130, f131, f132, f133, f134, f135, f136, f137, f138, f139, f140, f141, f142, f143, f144, f145, f146, f147, f148, f149, f150, f151, f152, f153, f154, f155, f156, f157, f158, f159, f160, f161, f162, f163, f164, f165, f166, f167, f168, f169, f170, f171, f172, f173, f174, f175, f176, f177, f178, f179, f180, f181, f182, f183, f184, f185, f186, f187, f188, f189, f190, f191, f192, f193, f194, f195, f196, f197, f198, f199, f200, f201, f202, f203, f204, f205, f206, f207, f208, f209, f210, f211, f212, f213, f214, f215, f216, f217, f218, f219, f220, f221, f222, f223, f224, f225, f226, f227, f228, f229, f230, f231, f232, f233, f234, f235, f236, f237, f238, f239, f240, f241, f242, f243, f244, f245, f246, f247, f248, f249, f250, f251, f252, f253, f254, f255"
+                    + " from transactioninrecords  where transactionInId = :transactionId");
+            Query inrecords = sessionFactory.getCurrentSession().createSQLQuery(inrecordssql);
+            inrecords.setParameter("newtransactionInId", newtransactionInId);
+            inrecords.setParameter("transactionId", transactionId);
+            inrecords.executeUpdate();
+            
+            
+            /* Insert transaction In Records Translated */
+            String translatedinrecordssql = ("INSERT INTO transactiontranslatedin "
+                    + " (transactionInId, configId, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16, f17, f18, f19, f20, f21, f22, f23, f24, f25, f26, f27, f28, f29, f30, f31, f32, f33, f34, f35, f36, f37, f38, f39, f40, f41, f42, f43, f44, f45, f46, f47, f48, f49, f50, f51, f52, f53, f54, f55, f56, f57, f58, f59, f60, f61, f62, f63, f64, f65, f66, f67, f68, f69, f70, f71, f72, f73, f74, f75, f76, f77, f78, f79, f80, f81, f82, f83, f84, f85, f86, f87, f88, f89, f90, f91, f92, f93, f94, f95, f96, f97, f98, f99, f100, f101, f102, f103, f104, f105, f106, f107, f108, f109, f110, f111, f112, f113, f114, f115, f116, f117, f118, f119, f120, f121, f122, f123, f124, f125, f126, f127, f128, f129, f130, f131, f132, f133, f134, f135, f136, f137, f138, f139, f140, f141, f142, f143, f144, f145, f146, f147, f148, f149, f150, f151, f152, f153, f154, f155, f156, f157, f158, f159, f160, f161, f162, f163, f164, f165, f166, f167, f168, f169, f170, f171, f172, f173, f174, f175, f176, f177, f178, f179, f180, f181, f182, f183, f184, f185, f186, f187, f188, f189, f190, f191, f192, f193, f194, f195, f196, f197, f198, f199, f200, f201, f202, f203, f204, f205, f206, f207, f208, f209, f210, f211, f212, f213, f214, f215, f216, f217, f218, f219, f220, f221, f222, f223, f224, f225, f226, f227, f228, f229, f230, f231, f232, f233, f234, f235, f236, f237, f238, f239, f240, f241, f242, f243, f244, f245, f246, f247, f248, f249, f250, f251, f252, f253, f254, f255) "
+                    + " select  :newtransactionInId, configId, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16, f17, f18, f19, f20, f21, f22, f23, f24, f25, f26, f27, f28, f29, f30, f31, f32, f33, f34, f35, f36, f37, f38, f39, f40, f41, f42, f43, f44, f45, f46, f47, f48, f49, f50, f51, f52, f53, f54, f55, f56, f57, f58, f59, f60, f61, f62, f63, f64, f65, f66, f67, f68, f69, f70, f71, f72, f73, f74, f75, f76, f77, f78, f79, f80, f81, f82, f83, f84, f85, f86, f87, f88, f89, f90, f91, f92, f93, f94, f95, f96, f97, f98, f99, f100, f101, f102, f103, f104, f105, f106, f107, f108, f109, f110, f111, f112, f113, f114, f115, f116, f117, f118, f119, f120, f121, f122, f123, f124, f125, f126, f127, f128, f129, f130, f131, f132, f133, f134, f135, f136, f137, f138, f139, f140, f141, f142, f143, f144, f145, f146, f147, f148, f149, f150, f151, f152, f153, f154, f155, f156, f157, f158, f159, f160, f161, f162, f163, f164, f165, f166, f167, f168, f169, f170, f171, f172, f173, f174, f175, f176, f177, f178, f179, f180, f181, f182, f183, f184, f185, f186, f187, f188, f189, f190, f191, f192, f193, f194, f195, f196, f197, f198, f199, f200, f201, f202, f203, f204, f205, f206, f207, f208, f209, f210, f211, f212, f213, f214, f215, f216, f217, f218, f219, f220, f221, f222, f223, f224, f225, f226, f227, f228, f229, f230, f231, f232, f233, f234, f235, f236, f237, f238, f239, f240, f241, f242, f243, f244, f245, f246, f247, f248, f249, f250, f251, f252, f253, f254, f255"
+                    + " from transactiontranslatedin  where transactionInId = :transactionId");
+            Query translatedrecords = sessionFactory.getCurrentSession().createSQLQuery(translatedinrecordssql);
+            translatedrecords.setParameter("newtransactionInId", newtransactionInId);
+            translatedrecords.setParameter("transactionId", transactionId);
+            translatedrecords.executeUpdate();
+            
+            /* Insert target */
+            transactionTarget newTarget = new transactionTarget();
+            newTarget.setbatchDLId(0);
+            newTarget.setbatchUploadId(newbatchId);
+            newTarget.settransactionInId(newtransactionInId);
+            newTarget.setconfigId(tgtConfigId);
+            newTarget.setinternalStatusId(12);
+            newTarget.setinternalStatusId(0);
+            
+            submitTransactionTarget(newTarget);
+            
+            /* Insert Batch Summary */
+            String newBatchSummarySQL = ("INSERT INTO batchuploadsummary "
+                    + " (batchId, transactionInId, sourceOrgId, targetOrgId, messageTypeId, sourceConfigId, targetConfigId) "
+                    + " select  :newbatchId, :transactionInId, configId, sourceOrgId, targetOrgId, messageTypeId, sourceConfigId, targetConfigId"
+                    + " from batchuploadsummary  where batchId = :batchId");
+            Query batchsummaryquery = sessionFactory.getCurrentSession().createSQLQuery(newBatchSummarySQL);
+            batchsummaryquery.setParameter("transactionInId", newtransactionInId);
+            batchsummaryquery.setParameter("newbatchId", newbatchId);
+            batchsummaryquery.setParameter("batchId", batchId);
+            batchsummaryquery.executeUpdate();
+
+            return newbatchId;
+
+        } catch (Exception ex) {
+            System.err.println("insertTransactionTranslated " + ex.getCause());
+            ex.printStackTrace();
+            return 1;
+        }
+    }
+
 }

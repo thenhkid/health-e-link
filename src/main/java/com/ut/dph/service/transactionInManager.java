@@ -12,6 +12,7 @@ import com.ut.dph.model.Macros;
 import com.ut.dph.model.Transaction;
 import com.ut.dph.model.TransactionInError;
 import com.ut.dph.model.User;
+import com.ut.dph.model.batchMultipleTargets;
 import com.ut.dph.model.batchUploadSummary;
 import com.ut.dph.model.batchUploads;
 import com.ut.dph.model.configurationConnection;
@@ -182,7 +183,7 @@ public interface transactionInManager {
 
     void insertValidationError(transactionRecords tr, configurationFormFields cff, Integer batchUploadId);
 
-    Integer getFeedbackReportConnection(int configId, int targetorgId);
+    List<Integer> getFeedbackReportConnection(int configId, int targetorgId);
 
     String formatDateForDB(Date date);
 
@@ -397,4 +398,10 @@ public interface transactionInManager {
     void trimFieldValues(Integer batchId, boolean foroutboundProcessing, Integer transactionId, boolean trimAll);
     
     void updateTransactionTargetListStatus(List<transactionTarget> transactions, Integer statusId);
+    
+    void submitTransactionMultipleTargets(batchMultipleTargets target);
+    
+    List<batchMultipleTargets> getBatchMultipleTargets(Integer batchId);
+    
+    Integer copyBatchDetails(Integer batchId, Integer tgtConfigId, Integer transactionId);
 }

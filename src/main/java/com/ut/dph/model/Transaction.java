@@ -26,7 +26,7 @@ public class Transaction {
    private int messageTypeId;
    private int transactionStatusId;
    private int targetOrgId;
-   private int targetConfigId;
+   private List<Integer> targetConfigId;
    private boolean autoRelease = true;
    private Date dateSubmitted = null;
    private String messageTypeName = null;
@@ -144,11 +144,11 @@ public class Transaction {
        this.targetOrgId = targetOrgId;
    }
    
-   public int gettargetConfigId() {
+   public List<Integer> gettargetConfigId() {
        return targetConfigId;
    }
    
-   public void settargetConfigId(int targetConfigId) {
+   public void settargetConfigId(List<Integer> targetConfigId) {
        this.targetConfigId = targetConfigId;
    }
    
