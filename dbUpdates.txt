@@ -535,3 +535,9 @@ ADD COLUMN `notes` TEXT NULL AFTER `method`;
 
 
 /** all above updates are deployed on test and dev  06122014 8:16PM **/
+
+
+/** Chad 6-12-14 @ 11:36 PM **/
+ALTER TABLE `universaltranslator`.`rel_crosswalkdata` 
+CHANGE COLUMN `targetValue` `targetValue` VARCHAR(255) NOT NULL ,
+CHANGE COLUMN `descValue` `descValue` VARCHAR(255) NOT NULL ;
