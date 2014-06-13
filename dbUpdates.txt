@@ -533,10 +533,6 @@ ADD COLUMN `field15` VARCHAR(500) NULL DEFAULT NULL AFTER `field14`;
 ALTER TABLE `universaltranslator`.`moveFilesLog` 
 ADD COLUMN `notes` TEXT NULL AFTER `method`;
 
-
-/** all above updates are deployed on test and dev  06122014 8:16PM **/
-
-
 /** Chad 6-12-14 @ 11:36 PM **/
 ALTER TABLE `universaltranslator`.`rel_crosswalkdata` 
 CHANGE COLUMN `targetValue` `targetValue` VARCHAR(255) NOT NULL ,
@@ -609,3 +605,5 @@ end proc_main$$
 DELIMITER ;
 
 UPDATE `universaltranslator`.`macro_names` SET `Macro_Name`='Match Null or empty value and replace', `Macro_Short_Name`='replaceBlanksWithChars', `Formula`='replaceBlanksWithChars', `FieldB_Question`=NULL, `Con1_Question`='Please enter value that you would like to replace empty with' WHERE `ID`='76';
+
+/** all above updates are deployed on test and dev  06132014 1:43PM **/
