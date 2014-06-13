@@ -532,3 +532,6 @@ ADD COLUMN `field15` VARCHAR(500) NULL DEFAULT NULL AFTER `field14`;
 /** Grace 06-12-2014 7:21 PM **/
 ALTER TABLE `universaltranslator`.`moveFilesLog` 
 ADD COLUMN `notes` TEXT NULL AFTER `method`;
+
+
+/** all above updates are deployed on test and dev  06122014 8:16PM **/
