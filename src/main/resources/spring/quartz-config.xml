@@ -91,7 +91,7 @@
                 <name>moveSFTPTrigger</name>
                 <job-name>MoveSFTPFiles</job-name>
                 <job-group>processGroup</job-group>
-                <cron-expression>0 6/10 * * * ?</cron-expression>
+                <cron-expression>0 0/2 * * * ?</cron-expression>
             </cron>
         </trigger>
     </schedule>
@@ -109,7 +109,7 @@
                 <name>moveRhapTrigger</name>
                 <job-name>MoveRhapsodyFiles</job-name>
                 <job-group>processGroup</job-group>
-                <cron-expression>0 8/10 * * * ?</cron-expression>
+                <cron-expression>0 0/2 * * * ?</cron-expression>
             </cron>
         </trigger>
     </schedule>
