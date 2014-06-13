@@ -404,4 +404,6 @@ public interface transactionInManager {
     List<batchMultipleTargets> getBatchMultipleTargets(Integer batchId);
     
     Integer copyBatchDetails(Integer batchId, Integer tgtConfigId, Integer transactionId);
+    
+    void sendEmailToAdmin(String message, String subject);
 }

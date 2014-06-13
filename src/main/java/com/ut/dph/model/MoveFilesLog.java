@@ -47,6 +47,10 @@ public class MoveFilesLog {
     @Column(name = "endDateTime", nullable = true)
     private Date endDateTime = new Date();
 
+    @NoHtml
+    @Column(name = "notes", nullable = true)
+    private String notes;
+    
 	public int getId() {
 		return id;
 	}
@@ -110,5 +114,14 @@ public class MoveFilesLog {
 	public void setTransportMethodId(int transportMethodId) {
 		this.transportMethodId = transportMethodId;
 	}
+
+	public String getNotes() {
+		return notes;
+	}
+
+	public void setNotes(String notes) {
+		this.notes = notes;
+	}
+	
 	
 }

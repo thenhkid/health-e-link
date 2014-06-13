@@ -27,6 +27,7 @@ import com.ut.dph.model.configurationMessageSpecs;
 import com.ut.dph.model.configurationRhapsodyFields;
 import com.ut.dph.model.configurationTransport;
 import com.ut.dph.model.fieldSelectOptions;
+import com.ut.dph.model.mailMessage;
 import com.ut.dph.model.transactionAttachment;
 import com.ut.dph.model.transactionIn;
 import com.ut.dph.model.transactionInRecords;
@@ -44,13 +45,16 @@ import com.ut.dph.reference.fileSystem;
 import com.ut.dph.service.CCDtoTxt;
 import com.ut.dph.service.configurationManager;
 import com.ut.dph.service.configurationTransportManager;
+import com.ut.dph.service.emailMessageManager;
 import com.ut.dph.service.fileManager;
 import com.ut.dph.service.hl7toTxt;
 import com.ut.dph.service.messageTypeManager;
 import com.ut.dph.service.organizationManager;
 import com.ut.dph.service.sysAdminManager;
 import com.ut.dph.service.userManager;
+
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -128,6 +132,9 @@ public class transactionInManagerImpl implements transactionInManager {
 
     @Autowired
     private CCDtoTxt ccdtotxt;
+    
+    @Autowired
+    private emailMessageManager emailManager;
 
     private int processingSysErrorId = 5;
 
@@ -2367,7 +2374,11 @@ public class transactionInManagerImpl implements transactionInManager {
                 String inPath = fileSystem.setPathFromRoot(ftpInfo.getdirectory());
                 File f = new File(inPath);
                 if (!f.exists()) {
-                    f.mkdirs();
+                	sftpJob.setNotes("Directory " +  ftpInfo.getdirectory()+ " does not exist");
+                	updateSFTPRun(sftpJob);
+                    //need to get out of loop since set up was not done properly
+                	sendEmailToAdmin(ftpInfo.getdirectory() + " does not exist", "SFTP Job Error");
+                	break;
                 }
                 //we look up org for this path
                 Integer orgId = configurationtransportmanager.getOrgIdForFTPPath(ftpInfo);
@@ -2829,7 +2840,11 @@ public class transactionInManagerImpl implements transactionInManager {
                 String inPath = fileSystem.setPathFromRoot(rhapsodyInfo.getDirectory());
                 File f = new File(inPath);
                 if (!f.exists()) {
-                    f.mkdirs();
+                	moveJob.setNotes(("Directory " +  rhapsodyInfo.getDirectory() + " does not exist"));
+                	updateSFTPRun(moveJob);
+                	//need to get out of loop since set up was not done properly
+                	sendEmailToAdmin((rhapsodyInfo.getDirectory() + " does not exist"), "Rhapsody Job Error");
+                	break;
                 }
                 //we look up org for this path
                 Integer orgId = configurationtransportmanager.getOrgIdForRhapsodyPath(rhapsodyInfo);
@@ -2963,4 +2978,20 @@ public class transactionInManagerImpl implements transactionInManager {
         return transactionInDAO.copyBatchDetails(batchId, tgtConfigId, transactionId);
     }
 
+	@Override
+	public void sendEmailToAdmin(String message, String subject) {
+		try {
+			mailMessage mail = new mailMessage();
+			mail.setfromEmailAddress("dphuniversaltranslator@gmail.com");
+			mail.setmessageBody(message);
+			mail.setmessageSubject(subject);
+			mail.settoEmailAddress(usermanager.getUserById(1).getEmail());
+			emailManager.sendEmail(mail);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+            System.err.println("sendEmailToAdmin message for admin was " + message +" " + ex.getCause());
+		}
+	}
+
+    
 }
