@@ -66,7 +66,7 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label class="control-label" for="type">Type</label>
+                                        <label class="control-label" for="type"></label>
                                         <div class="control-label">${typeText}</div>
                                     </div>
                                 </div>
@@ -135,74 +135,103 @@
                     </div>
                 </section>
 
+                <ul class="nav nav-tabs navbar-actions">
+                    <c:if test="${type == 0 || type == 1}"><li ${type == 0 || type == 1 ? 'class="active"' : ''}><a href="#sent" data-toggle="tab" class="btn btn-link">Sent Messages <span class="badge" style="border:1px solid #fff">${sentTotal}</span></a></li></c:if>
+                    <c:if test="${type == 0 || type == 2}"><li ${type == 2 ? 'class="active"' : ''}><a href="#received" data-toggle="tab" class="btn btn-link">Received Messages  <span class="badge" style="border:1px solid #fff">${receivedTotal}</span></a></li></c:if>
+                </ul>       
+                               
+                <div id='content' class="tab-content">
+                    <c:if test="${type == 0 || type == 1}">
+                        <div class="tab-pane active" id="sent">       
+                            <div class="form-container scrollable" style="padding-top:20px;">
+                                <table class="table table-striped table-hover table-default" <c:if test="${not empty sentMessages}">id="dataTable"</c:if>>
+                                        <caption style="display:none">Sent Messages</caption>
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">Affiliated Organization</th>
+                                                <th scope="col">Transport Method</th>
+                                                <th scope="col">Message Type</th>
+                                                <th scope="col" class="center-text">Total Sent</th>
+                                            <c:if test="${showDetails == true}"><th scope="col"></th></c:if>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        <c:choose>
+                                            <c:when test="${not empty sentMessages}">
+                                                <c:forEach var="result" items="${sentMessages}">
+                                                    <tr>
+                                                        <td scope="row">${result.orgName}</td>
+                                                        <td>
+                                                            ${result.transportType}
+                                                        </td>
+                                                        <td>
+                                                            ${result.messageType}
+                                                        </td>
+                                                        <td class="center-text">
+                                                            ${result.totalSent}
+                                                        </td>
+                                                        <c:if test="${showDetails == true}">
+                                                            <td>
+                                                               <a href="javascript:void(0);" class="viewDetals" rel="${result.orgId}" rel2="${result.messageTypeId}">View Details</a>
+                                                            </td>
+                                                        </c:if>
+                                                    </tr>
+                                                </c:forEach>
+                                            </c:when>
+                                        </c:choose>                  
+                                    </tbody>
+                                </table>
+                            </div> 
+                        </div>
+                    </c:if>
+                    <c:if test="${type == 0 || type == 2}">                    
+                        <div class="tab-pane" id="received">       
+                            <div class="form-container scrollable" style="padding-top:20px;">
+                                <table class="table table-striped table-hover table-default" <c:if test="${not empty receivedMessages}">id="dataTable"</c:if>>
+                                        <caption style="display:none">Received Messages</caption>
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">Affiliated Organization</th>
+                                                <th scope="col">Transport Method</th>
+                                                <th scope="col">Message Type</th>
+                                                <th scope="col" class="center-text">Total Received</th>
+                                            <c:if test="${showDetails == true}"><th scope="col"></th></c:if>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        <c:choose>
+                                            <c:when test="${not empty receivedMessages}">
+                                                <c:forEach var="result" items="${receivedMessages}">
+                                                    <tr>
+                                                        <td scope="row">${result.orgName}</td>
+                                                        <td>
+                                                            ${result.transportType}
+                                                        </td>
+                                                        <td>
+                                                            ${result.messageType}
+                                                        </td>
+                                                        <td class="center-text">
+                                                            ${result.totalSent}
+                                                        </td>
+                                                        <c:if test="${showDetails == true}">
+                                                            <td>
+                                                                <c:if test="${result.showDetails == true}">
+                                                                    <a href="javascript:void(0);" class="viewDetals" rel="${result.orgId}" rel2="${result.messageTypeId}">View Details</a>
+                                                                </c:if>
+                                                            </td>
+                                                        </c:if>
+                                                    </tr>
+                                                </c:forEach>
+                                            </c:when>
+                                        </c:choose>                  
+                                    </tbody>
+                                </table>
+                            </div>  
+                        </div>
+                    </div> 
+                </c:if>
 
-                <section class="panel panel-default" >
-                    <div class="panel-body" style="background-color:#f1f1f1">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <h3 class="panel-title">Total Referrals Sent: ${totalReferralsSent}</h3>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <h3 class="panel-title">Total Feedback Reports Sent: ${totalFBSent}</h3>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <h3 class="panel-title">Total Referrals Received: ${totalReferralsRec}</h3>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <h3 class="panel-title">Total Feedback Reports Received: ${totalFBRec}</h3>
-                            </div>
-                        </div>
-                    </div>
-                </section>            
-
-
-                <div class="form-container scrollable">
-                    <table class="table table-striped table-hover table-default" <c:if test="${not empty historyResults}">id="dataTable"</c:if>>
-                        <caption style="display:none">History Results</caption>
-                            <thead>
-                                <tr>
-                                    <th scope="col">Affiliated Organization</th>
-                                    <th scope="col">Type</th>
-                                    <th scope="col">Message Type</th>
-                                    <th scope="col"></th>
-                                    <c:if test="${showDetails == true}"><th scope="col"></th></c:if>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            <c:choose>
-                                <c:when test="${not empty historyResults}">
-                                    <c:forEach var="result" items="${historyResults}">
-                                        <tr>
-                                            <td scope="row">${result.orgName}</td>
-                                            <td>
-                                              <c:choose><c:when test="${result.type == 1}">Referral</c:when><c:otherwise>Feedback Report</c:otherwise></c:choose>
-                                            </td>
-                                            <td>
-                                                ${result.messageType}
-                                            </td>
-                                            <td>
-                                                ${result.msg}
-                                            </td>
-                                            <c:if test="${showDetails == true}">
-                                                <td>
-                                                    <c:if test="${result.showDetails == true}">
-                                                        <a href="javascript:void(0);" class="viewDetals" rel="${result.orgId}" rel2="${result.messageTypeId}">View Details</a>
-                                                    </c:if>
-                                                </td>
-                                            </c:if>
-                                        </tr>
-                                    </c:forEach>
-                                </c:when>
-                            </c:choose>                  
-                        </tbody>
-                    </table>
-                </div> 
+                        
             </div>
         </div>
     </div>

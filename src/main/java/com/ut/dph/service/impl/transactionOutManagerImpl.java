@@ -1810,6 +1810,10 @@ public class transactionOutManagerImpl implements transactionOutManager {
     }
 
 
+    @Override
+    public List<batchDownloadSummary> getuploadBatchesByConfigAndSource(Integer configId, Integer orgId) {
+        return transactionOutDAO.getuploadBatchesByConfigAndSource(configId, orgId);
+    }
 
 
 }

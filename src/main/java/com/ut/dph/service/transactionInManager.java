@@ -406,4 +406,10 @@ public interface transactionInManager {
     Integer copyBatchDetails(Integer batchId, Integer tgtConfigId, Integer transactionId);
     
     void sendEmailToAdmin(String message, String subject);
+    
+    List<batchUploadSummary> getuploadBatchesByConfigAndTarget(Integer configId, Integer orgId);
+    
+    boolean searchBatchForHistory(batchUploads batchDetails, String searchTerm, Date fromDate, Date toDate);
+    
+    
 }

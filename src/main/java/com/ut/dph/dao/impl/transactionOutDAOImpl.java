@@ -1608,5 +1608,28 @@ public class transactionOutDAOImpl implements transactionOutDAO {
         return batchSummaries.list();
     
     }
+    
+    /**
+     * The 'getuploadBatchesByConfigAndSource' method will return the list of uploaded messages for the 
+     * passed in configId and passed in target orgId
+     * 
+     * @param configId  The configuration Id to find uploaded messages
+     * 
+     * @param orgId     The organization Id that the message was sent to
+     * 
+     * @return This method will return a list of uploaded batches
+     */
+    @Override
+    @Transactional
+    public List<batchDownloadSummary> getuploadBatchesByConfigAndSource(Integer configId, Integer orgId) {
+        
+        Criteria batchSummaries = sessionFactory.getCurrentSession().createCriteria(batchDownloadSummary.class);
+        batchSummaries.add(Restrictions.eq("targetConfigId", configId));
+        batchSummaries.add(Restrictions.eq("sourceOrgId", orgId));
+
+        return batchSummaries.list();
+        
+        
+    }
 
 }

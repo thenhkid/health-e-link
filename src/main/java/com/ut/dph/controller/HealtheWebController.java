@@ -766,16 +766,16 @@ public class HealtheWebController {
             Organization receivingOrgDetails = organizationmanager.getOrganizationById(configDetails.getorgId());
 
             /* Find out the target configuration id */
-            System.out.println("ConfigID: "+ configId);
+            System.out.println("ConfigID: " + configId);
             System.out.println("orgId: " + origConfigDetails.getorgId());
             List<Integer> targetConnectionIds = transactionInManager.getFeedbackReportConnection(configId, origConfigDetails.getorgId());
-            
+
             List<Integer> targetConfigIds = new ArrayList<Integer>();
-            for(Integer connections : targetConnectionIds) {
+            for (Integer connections : targetConnectionIds) {
                 configurationConnection connectionDetails = configurationManager.getConnection(connections);
                 targetConfigIds.add(connectionDetails.gettargetConfigId());
             }
-            
+
 
             /* Get a list of form fields */
             configurationTransport transportDetails = configurationTransportManager.getTransportDetailsByTransportMethod(configId, 2);
@@ -996,11 +996,11 @@ public class HealtheWebController {
                 transaction.settransactionTargetId(transactionTarget.getId());
                 transaction.setdateSubmitted(transactionInfo.getdateCreated());
                 transaction.setsourceType(configDetails.getsourceType());
-                
+
                 List<Integer> targetConfigId = new ArrayList<Integer>();
                 targetConfigId.add(transactionTarget.getconfigId());
                 transaction.settargetConfigId(targetConfigId);
-                
+
                 transaction.setorginialTransactionId(transactionInfo.gettransactionTargetId());
 
                 lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(transaction.getstatusId());
@@ -1024,11 +1024,11 @@ public class HealtheWebController {
                 transaction.settargetOrgId(targetOrg);
                 transaction.setconfigId(configId);
                 transaction.setautoRelease(transportDetails.getautoRelease());
-                
+
                 List<Integer> targetConfigId = new ArrayList<Integer>();
                 targetConfigId.add(targetConfig);
                 transaction.settargetConfigId(targetConfigId);
-                
+
                 transaction.setsourceType(configDetails.getsourceType());
             }
 
@@ -1163,7 +1163,7 @@ public class HealtheWebController {
         if (currBatchId == 0) {
 
             try {
-                
+
                 /* Create the batch name (TransportMethodId+OrgId+MessageTypeId+Date/Time/Seconds) */
                 DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmssS");
                 Date date = new Date();
@@ -1426,32 +1426,31 @@ public class HealtheWebController {
 
             /* Need to populate the transaction Target */
             if (currTransactionTargetId == 0) {
-                
+
                 /* Submit a new Transaction Target record */
                 transactionTarget transactiontarget = new transactionTarget();
                 transactiontarget.setbatchUploadId(batchId);
                 transactiontarget.settransactionInId(transactionId);
-                
-                if(transactionDetails.gettargetConfigId().size() > 1) {
+
+                if (transactionDetails.gettargetConfigId().size() > 1) {
                     transactiontarget.setconfigId(transactionDetails.gettargetConfigId().get(0));
-                    
+
                     /* If the message is going to multiple targets only save one and store the 
-                    other targets in teh batchMultipleTargets table. The ones that are stored 
-                    here will be sent out when the message is actually sent. A batch will be 
-                    created for each of them. */
-                    for(int i = 1; i < transactionDetails.gettargetConfigId().size(); i++) {
+                     other targets in teh batchMultipleTargets table. The ones that are stored 
+                     here will be sent out when the message is actually sent. A batch will be 
+                     created for each of them. */
+                    for (int i = 1; i < transactionDetails.gettargetConfigId().size(); i++) {
                         batchMultipleTargets target = new batchMultipleTargets();
                         target.setBatchId(batchId);
                         target.setTgtConfigId(transactionDetails.gettargetConfigId().get(i));
-                        
+
                         transactionInManager.submitTransactionMultipleTargets(target);
                     }
-                    
-                }
-                else {
+
+                } else {
                     transactiontarget.setconfigId(transactionDetails.gettargetConfigId().get(0));
                 }
-                
+
 
                 /* 
                  If the "Save" button was pressed set the
@@ -1472,9 +1471,7 @@ public class HealtheWebController {
                 }
 
                 transactionInManager.submitTransactionTarget(transactiontarget);
-            } 
-            /* Otherwise update existing batch */ 
-            else {
+            } /* Otherwise update existing batch */ else {
                 transactionTargetId = currTransactionTargetId;
 
                 transactionTarget transactiontarget = transactionInManager.getTransactionTargetDetails(transactionTargetId);
@@ -1504,27 +1501,25 @@ public class HealtheWebController {
         }
 
         if (action.equals("send")) {
-            
-            
+
             /*
-              Need to check to see if there are multiple targets this message needs to be copied and sent
+             Need to check to see if there are multiple targets this message needs to be copied and sent
              to.
-            */
+             */
             boolean transactionSentToProcess;
-            
+
             List<batchMultipleTargets> multipleTargets = transactionInManager.getBatchMultipleTargets(batchId);
-            
-            if(!multipleTargets.isEmpty()) {
-                for(batchMultipleTargets target : multipleTargets) {
-                    
+
+            if (!multipleTargets.isEmpty()) {
+                for (batchMultipleTargets target : multipleTargets) {
+
                     /* Copy all the information from the batch */
                     int copiedBatchId = transactionInManager.copyBatchDetails(batchId, target.getTgtConfigId(), transactionId);
-                    
+
                     transactionSentToProcess = transactionInManager.processBatch(copiedBatchId, false, 0);
                 }
-            }
-            else {
-            
+            } else {
+
 
                 /*
                  Once the "Send" button is pressed we will send the batch off to the processTransactions
@@ -1532,7 +1527,7 @@ public class HealtheWebController {
                  will return true if successfully received and false otherwise.
                  */
                 transactionSentToProcess = transactionInManager.processBatch(batchId, false, 0);
-           
+
             }
 
             /*
@@ -2826,6 +2821,223 @@ public class HealtheWebController {
      */
     @RequestMapping(value = "/history", method = RequestMethod.POST)
     public ModelAndView historyResults(HttpSession session, @RequestParam Date fromDate, @RequestParam Date toDate, @RequestParam Integer type, @RequestParam Integer sentTo,
+            @RequestParam Integer messageType, @RequestParam Integer status, @RequestParam Integer systemStatus, @RequestParam Integer reportType,
+            @RequestParam String batchName, @RequestParam String utBatchName, @RequestParam String lastName, @RequestParam String patientId, @RequestParam String firstName, @RequestParam String providerId) throws Exception {
+
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/Health-e-Web/historySummary");
+
+        if (reportType == 1) {
+            mav.addObject("showDetails", false);
+        } else {
+            mav.addObject("showDetails", true);
+        }
+
+        /* Need to get all the message types set up for the user */
+        User userInfo = (User) session.getAttribute("userDetails");
+
+        /* Add search Paramaters */
+        mav.addObject("fromDate", fromDate);
+        mav.addObject("toDate", toDate);
+
+        if (type == 0) {
+            mav.addObject("typeText", "Both (Sent & Received Messages)");
+        } else if (type == 1) {
+            mav.addObject("typeText", "Sent Messaages Only");
+        } else {
+            mav.addObject("typeText", "Recieved Messages Only");
+        }
+        mav.addObject("type", type);
+
+        if (sentTo == 0) {
+            mav.addObject("sentToText", "All Affiliated Organizations");
+        } else {
+            Organization orgDetails = organizationmanager.getOrganizationById(sentTo);
+            mav.addObject("sentToText", orgDetails.getOrgName());
+        }
+        mav.addObject("sentTo", sentTo);
+
+        if (messageType == 0) {
+            mav.addObject("messageTypeText", "All Message Types");
+        } else {
+            messageType msgTypeDetails = messagetypemanager.getMessageTypeById(messageType);
+            mav.addObject("messageTypeText", msgTypeDetails.getName());
+        }
+        mav.addObject("messageType", messageType);
+
+        if (status == 0) {
+            mav.addObject("statusText", "Both (Opened & Closed)");
+        } else if (status == 1) {
+            mav.addObject("statusText", "Opened Only");
+        } else {
+            mav.addObject("statusText", "Closed Only");
+        }
+        mav.addObject("status", status);
+
+        mav.addObject("systemStatusText", "All System Statuses");
+        mav.addObject("systemStatus", 0);
+
+        /* Add additional search options */
+        mav.addObject("batchName", batchName);
+        mav.addObject("utBatchName", utBatchName);
+        mav.addObject("lastName", lastName);
+        mav.addObject("patientId", patientId);
+        mav.addObject("firstName", firstName);
+        mav.addObject("providerId", providerId);
+
+        /* Get all connections for the logged in organization */
+        List<configuration> configs = configurationManager.getActiveConfigurationsByOrgId(userInfo.getOrgId());
+
+        List<historyResults> sentMessages = new ArrayList<historyResults>();
+
+        Integer sentTotal = 0;
+
+        List<historyResults> receivedMessages = new ArrayList<historyResults>();
+
+        Integer receivedTotal = 0;
+
+        String searchTerm = new StringBuilder().append(status).append("|").append(batchName).append("|").append(firstName).append("|").append(lastName).append("|").append(utBatchName).append("|").append(patientId).append("|").append(providerId).toString();
+
+        for (configuration config : configs) {
+
+            /* Get sent messages */
+            List<configurationConnection> sourceConnections = configurationManager.getConnectionsByConfiguration(config.getId());
+
+            if (!sourceConnections.isEmpty()) {
+
+                for (configurationConnection connection : sourceConnections) {
+
+                    historyResults resultEntry = new historyResults();
+
+                    configuration configDetails = configurationManager.getConfigurationById(connection.gettargetConfigId());
+
+                    String tgtOrgName = organizationmanager.getOrganizationById(configDetails.getorgId()).getOrgName();
+
+                    String msgTypeName = configurationManager.getMessageTypeNameByConfigId(connection.gettargetConfigId());
+
+                    String transportType = configurationTransportManager.getTransportMethodById(configurationTransportManager.getTransportDetails(configDetails.getId()).gettransportMethodId());
+
+                    resultEntry.setorgName(tgtOrgName);
+                    resultEntry.setorgId(configDetails.getorgId());
+                    resultEntry.setmessageType(msgTypeName);
+                    resultEntry.setmessageTypeId(configDetails.getMessageTypeId());
+                    resultEntry.setTransportType(transportType);
+
+                    if (sentTo == 0 || sentTo == configDetails.getorgId()) {
+
+                        /* Find the total messages sent for this target and this configuration */
+                        List<batchUploadSummary> sentBatches = transactionInManager.getuploadBatchesByConfigAndTarget(connection.getsourceConfigId(), configDetails.getorgId());
+
+                        int matchedSentBatches = 0;
+
+                        /* Need to filter based on the passed in search Criteria */
+                        for (batchUploadSummary batch : sentBatches) {
+                            boolean matched = true;
+
+                            batchUploads batchDetails = transactionInManager.getBatchDetails(batch.getbatchId());
+
+                            matched = transactionInManager.searchBatchForHistory(batchDetails, searchTerm, fromDate, toDate);
+                            
+                            /* Check the passed in message type */
+                            if (messageType > 0 && !messageType.equals(batch.getmessageTypeId())) {
+                                matched = false;
+                            }
+
+                            if (matched == true) {
+                                matchedSentBatches += 1;
+                            }
+
+                        }
+
+                        resultEntry.setTotalSent(matchedSentBatches);
+
+                        sentMessages.add(resultEntry);
+
+                        sentTotal += matchedSentBatches;
+
+                    }
+
+                }
+
+            }
+
+            /* Get received messages */
+            List<configurationConnection> targetConnections = configurationManager.getConnectionsByTargetConfiguration(config.getId());
+
+            if (!targetConnections.isEmpty()) {
+
+                for (configurationConnection connection : targetConnections) {
+
+                    historyResults resultEntry = new historyResults();
+
+                    configuration configDetails = configurationManager.getConfigurationById(connection.getsourceConfigId());
+
+                    String srcOrgName = organizationmanager.getOrganizationById(configDetails.getorgId()).getOrgName();
+
+                    String msgTypeName = configurationManager.getMessageTypeNameByConfigId(connection.gettargetConfigId());
+
+                    String transportType = configurationTransportManager.getTransportMethodById(configurationTransportManager.getTransportDetails(configDetails.getId()).gettransportMethodId());
+
+                    resultEntry.setorgName(srcOrgName);
+                    resultEntry.setorgId(configDetails.getorgId());
+                    resultEntry.setmessageType(msgTypeName);
+                    resultEntry.setmessageTypeId(configDetails.getMessageTypeId());
+                    resultEntry.setTransportType(transportType);
+
+                    /* Find the total messages received from this source and this configuration */
+                    List<batchDownloadSummary> totalReceived = transactionOutManager.getuploadBatchesByConfigAndSource(connection.gettargetConfigId(), configDetails.getorgId());
+
+                    resultEntry.setTotalSent(totalReceived.size());
+
+                    receivedMessages.add(resultEntry);
+
+                    receivedTotal += totalReceived.size();
+
+                }
+
+            }
+
+        }
+
+        mav.addObject("sentMessages", sentMessages);
+        mav.addObject("sentTotal", sentTotal);
+        mav.addObject("receivedMessages", receivedMessages);
+        mav.addObject("receivedTotal", receivedTotal);
+
+        //we log here 
+        try {
+            //log user activity
+            UserActivity ua = new UserActivity();
+            ua.setUserId(userInfo.getId());
+            ua.setFeatureId(featureId);
+            ua.setAccessMethod("POST");
+            ua.setPageAccess("/history");
+            ua.setActivity("History Search");
+            ua.setActivityDesc("History Search - " + fromDate + " - " + toDate);
+            usermanager.insertUserLog(ua);
+        } catch (Exception ex) {
+            System.err.println("viewHistory = error logging user " + ex.getCause());
+            ex.printStackTrace();
+        }
+
+        mav.addObject("pendingTotal", pendingTotal);
+        mav.addObject("inboxTotal", inboxTotal);
+
+        return mav;
+
+    }
+
+    /**
+     * The '/history' POST request will serve up the Health-e-Web (ERG) page that will list allow the logged in user to search their referral and feedback history.
+     *
+     * @param request
+     * @param response
+     * * @param searchTerm The term to search pending messages
+     * @return	the health-e-web inbox message list view
+     * @throws Exception
+     */
+    @RequestMapping(value = "/history_old", method = RequestMethod.POST)
+    public ModelAndView historyResultsOld(HttpSession session, @RequestParam Date fromDate, @RequestParam Date toDate, @RequestParam Integer type, @RequestParam Integer sentTo,
             @RequestParam Integer messageType, @RequestParam Integer status, @RequestParam Integer systemStatus, @RequestParam Integer reportType,
             @RequestParam String batchName, @RequestParam String utBatchName, @RequestParam String lastName, @RequestParam String patientId, @RequestParam String firstName, @RequestParam String providerId) throws Exception {
 

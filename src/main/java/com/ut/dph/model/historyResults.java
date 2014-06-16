@@ -19,6 +19,8 @@ public class historyResults {
     private String msg = null;
     private int type;
     boolean showDetails = false;
+    private String transportType = null;
+    private Integer totalSent = 0;
     
     public int getorgId() {
         return orgId;
@@ -75,5 +77,23 @@ public class historyResults {
     public void setshowDetails(boolean showDetails) {
         this.showDetails = showDetails;
     }
+
+    public String getTransportType() {
+        return transportType;
+    }
+
+    public void setTransportType(String transportType) {
+        this.transportType = transportType;
+    }
+
+    public Integer getTotalSent() {
+        return totalSent;
+    }
+
+    public void setTotalSent(Integer totalSent) {
+        this.totalSent = totalSent;
+    }
+    
+    
     
 }

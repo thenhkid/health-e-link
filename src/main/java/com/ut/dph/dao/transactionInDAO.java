@@ -332,4 +332,9 @@ public interface transactionInDAO {
     List<batchMultipleTargets> getBatchMultipleTargets(Integer batchId);
     
     Integer copyBatchDetails(Integer batchId, Integer tgtConfigId, Integer transactionId);
+    
+    List<batchUploadSummary> getuploadBatchesByConfigAndTarget(Integer configId, Integer orgId);
+    
+    boolean searchBatchForHistory(batchUploads batchDetails, String searchTerm, Date fromDate, Date toDate);
+    
 }

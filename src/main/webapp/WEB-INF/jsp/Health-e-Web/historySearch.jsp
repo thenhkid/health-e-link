@@ -44,11 +44,11 @@
 
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label class="control-label" for="type">Type</label>
+                                        <label class="control-label" for="type">&nbsp;</label>
                                         <select id="type" name="type" class="form-control">
-                                            <option value="0">Both (Referrals & Feedback Reports)</option>
-                                            <option value="1">Referrals Only</option>
-                                            <option value="2">Feedback Reports Only</option>
+                                            <option value="0">Both (Sent & Received Messages)</option>
+                                            <option value="1">Sent Messages Only</option>
+                                            <option value="2">Received Messages Only</option>
                                         </select>
                                     </div>
                                 </div>

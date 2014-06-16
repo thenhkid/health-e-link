@@ -132,7 +132,7 @@ public class transactionInManagerImpl implements transactionInManager {
 
     @Autowired
     private CCDtoTxt ccdtotxt;
-    
+
     @Autowired
     private emailMessageManager emailManager;
 
@@ -541,7 +541,7 @@ public class transactionInManagerImpl implements transactionInManager {
                  * targets should only be inserted if it hasn't gone through this loop already *
                  */
                 if (insertTargets) {
-	                //load our targets here
+                    //load our targets here
                     //load targets - we need to loadTarget only if field for target is blank, otherwise we load what user sent
                     Integer batchId = batchUploadId;
                     List<configurationConnection> batchTargetList = getBatchTargets(batchId, true);
@@ -1566,9 +1566,9 @@ public class transactionInManagerImpl implements transactionInManager {
                 //at this point, hl7 and hr are in unencoded plain text
                 if (actualFileName.endsWith(".txt") || actualFileName.endsWith(".csv")) {
                     sysError = sysError + insertLoadData(batch.getId(), batch.getDelimChar(), actualFileName, loadTableName, batch.isContainsHeaderRow());
-	            	File actualFile = new File(actualFileName);
+                    File actualFile = new File(actualFileName);
                     //we are archiving it
-                    File archiveFile = new File(dir.setPath(archivePath) + batch.getutBatchName() + "_dec" +actualFileName.substring(actualFileName.lastIndexOf(".")));
+                    File archiveFile = new File(dir.setPath(archivePath) + batch.getutBatchName() + "_dec" + actualFileName.substring(actualFileName.lastIndexOf(".")));
                     Path archive = archiveFile.toPath();
                     Path actual = actualFile.toPath();
                     //we keep original file in archive folder
@@ -1590,13 +1590,13 @@ public class transactionInManagerImpl implements transactionInManager {
                 //7. we delete loadTable
                 sysError = sysError + dropLoadTable(loadTableName);
 
-	            //8. we see how if the file only has one upload type so we don't need to parse every line
+                //8. we see how if the file only has one upload type so we don't need to parse every line
                 // if we only have one, we update the entire table 
                 if (batch.getConfigId() != null && batch.getConfigId() != 0) {
                     // we update entire transactionIN with configId
                     sysError = sysError + updateConfigIdForBatch(batch.getId(), batch.getConfigId());
                 } else {
-	                //1. we get all configs for user - user might not have permission to submit but someone else in org does
+                    //1. we get all configs for user - user might not have permission to submit but someone else in org does
 
                     List<configurationMessageSpecs> configurationMessageSpecs = configurationtransportmanager.getConfigurationMessageSpecsForOrgTransport(batch.getOrgId(), batch.gettransportMethodId(), false);
                     //2. we get all rows for batch
@@ -1617,23 +1617,23 @@ public class transactionInManagerImpl implements transactionInManager {
                     }
                     //if we only have one, else we loop through
                     if (configurationMessageSpecs.size() == 1) {
-                    	sysError = sysError + updateConfigIdForBatch(batch.getId(), configurationMessageSpecs.get(0).getconfigId());
+                        sysError = sysError + updateConfigIdForBatch(batch.getId(), configurationMessageSpecs.get(0).getconfigId());
                     } else {
-                    //3 loop through each config and mass update by config
-	                    for (configurationMessageSpecs cms : configurationMessageSpecs) {
-	                        //we update by config
-	                        if (updateConfigIdForCMS(batchId, cms) != 0) {
-	                            sysError++;
-	                            insertProcessingError(processingSysErrorId, null, batch.getId(), null, null, null, null,
-	                                    false, false, "System error while checking configuration");
-	                            //system error - break
-	                            break;
-	                        }
-	                    }                   
-                    // now we looped through config, we flag the invalid records.
-                    sysError = flagInvalidConfig(batchId);
-                    //we also need to flag and error the ones that a user is not supposed to upload for
-                    sysError = flagNoPermissionConfig(batch);
+                        //3 loop through each config and mass update by config
+                        for (configurationMessageSpecs cms : configurationMessageSpecs) {
+                            //we update by config
+                            if (updateConfigIdForCMS(batchId, cms) != 0) {
+                                sysError++;
+                                insertProcessingError(processingSysErrorId, null, batch.getId(), null, null, null, null,
+                                        false, false, "System error while checking configuration");
+                                //system error - break
+                                break;
+                            }
+                        }
+                        // now we looped through config, we flag the invalid records.
+                        sysError = flagInvalidConfig(batchId);
+                        //we also need to flag and error the ones that a user is not supposed to upload for
+                        sysError = flagNoPermissionConfig(batch);
                     }
                 }
 
@@ -1646,7 +1646,7 @@ public class transactionInManagerImpl implements transactionInManager {
                 // we trim all values
                 trimFieldValues(batchId, false, transactionId, true);
 
-	            //now that we have our config, we will apply pre-processing cw and macros to manipulate our data
+                //now that we have our config, we will apply pre-processing cw and macros to manipulate our data
                 //1. find all configs for batch, loop and process
                 List<Integer> configIds = getConfigIdsForBatch(batchId, false, transactionId);
                 for (Integer configId : configIds) {
@@ -1920,9 +1920,9 @@ public class transactionInManagerImpl implements transactionInManager {
     @Override
     @Transactional
     public List<batchUploads> getAllUploadedBatches(Date fromDate, Date toDate) throws Exception {
-    	return transactionInDAO.getAllUploadedBatches(fromDate, toDate, 0);
+        return transactionInDAO.getAllUploadedBatches(fromDate, toDate, 0);
     }
-    
+
     @Override
     @Transactional
     public List<batchUploads> getAllUploadedBatches(Date fromDate, Date toDate, Integer fetchSize) throws Exception {
@@ -2063,7 +2063,7 @@ public class transactionInManagerImpl implements transactionInManager {
             ConfigErrorInfo configErrorInfo = new ConfigErrorInfo();
             configErrorInfo.setBatchId(batchInfo.getId());
 
-            List<TransErrorDetail> tedList = getTransErrorDetailsForNoRptFields(batchInfo.getId(), Arrays.asList(5, 7, 8, 10, 11, 12, 13, 14,15,16,17,18,19,20));
+            List<TransErrorDetail> tedList = getTransErrorDetailsForNoRptFields(batchInfo.getId(), Arrays.asList(5, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20));
             if (tedList.size() > 0) {
                 masterTedList.addAll(tedList);
             }
@@ -2377,11 +2377,11 @@ public class transactionInManagerImpl implements transactionInManager {
                 String inPath = fileSystem.setPathFromRoot(ftpInfo.getdirectory());
                 File f = new File(inPath);
                 if (!f.exists()) {
-                	sftpJob.setNotes("Directory " +  ftpInfo.getdirectory()+ " does not exist");
-                	updateSFTPRun(sftpJob);
+                    sftpJob.setNotes("Directory " + ftpInfo.getdirectory() + " does not exist");
+                    updateSFTPRun(sftpJob);
                     //need to get out of loop since set up was not done properly
-                	sendEmailToAdmin(ftpInfo.getdirectory() + " does not exist", "SFTP Job Error");
-                	break;
+                    sendEmailToAdmin(ftpInfo.getdirectory() + " does not exist", "SFTP Job Error");
+                    break;
                 }
                 //we look up org for this path
                 Integer orgId = configurationtransportmanager.getOrgIdForFTPPath(ftpInfo);
@@ -2414,11 +2414,11 @@ public class transactionInManagerImpl implements transactionInManager {
             String fileInPath = fileSystem.setPathFromRoot(inPath);
             File folder = new File(fileInPath);
 
-		//list files
+            //list files
             //we only list visible files
             File[] listOfFiles = folder.listFiles((FileFilter) HiddenFileFilter.VISIBLE);
 
-		//too many variables that could come into play regarding file types, will check files with one method
+            //too many variables that could come into play regarding file types, will check files with one method
             //loop files 
             for (File file : listOfFiles) {
                 // first get file extension
@@ -2528,10 +2528,9 @@ public class transactionInManagerImpl implements transactionInManager {
                         }
                     }
                     // we don't have an error yet
-                    
-                    
+
                     if (errorId > 0) {
-                    	// some error detected from previous checks
+                        // some error detected from previous checks
                         userId = usermanager.getUserByTypeByOrganization(orgId).get(0).getId();
                         Organization orgDetails = organizationmanager.getOrganizationById(orgId);
                         String defPath = "/bowlink/" + orgDetails.getcleanURL() + "/input files/";
@@ -2544,7 +2543,7 @@ public class transactionInManagerImpl implements transactionInManager {
                         batchInfo.setuserId(userId);
                         batchId = (Integer) submitBatchUpload(batchInfo);
                         batchInfo.setEncodingId(encodingId);
-                    }else if (statusId != 2) {
+                    } else if (statusId != 2) {
                         //no vaild delimiter detected
                         statusId = 7;
                         userId = usermanager.getUserByTypeByOrganization(orgId).get(0).getId();
@@ -2626,8 +2625,7 @@ public class transactionInManagerImpl implements transactionInManager {
 
                 if (statusId == 2) {
                     /**
-                     * check file size if configId is 0 we go with the smallest file size
-            	  **
+                     * check file size if configId is 0 we go with the smallest file size *
                      */
                     long maxFileSize = fileSize * 1000000;
                     if (Files.size(target) > maxFileSize) {
@@ -2801,7 +2799,7 @@ public class transactionInManagerImpl implements transactionInManager {
             /* Make sure the file has the correct delimiter : ERROR CODE 5 */
             String delimChar = (String) messageTypeDAO.getDelimiterChar(transportDetails.getfileDelimiter());
 
-	            //Check to make sure the file contains the selected delimiter
+            //Check to make sure the file contains the selected delimiter
             //Set the directory that holds the crosswalk files
             int delimCount = (Integer) dir.checkFileDelimiter(uploadedFile, delimChar);
 
@@ -2843,11 +2841,11 @@ public class transactionInManagerImpl implements transactionInManager {
                 String inPath = fileSystem.setPathFromRoot(rhapsodyInfo.getDirectory());
                 File f = new File(inPath);
                 if (!f.exists()) {
-                	moveJob.setNotes(("Directory " +  rhapsodyInfo.getDirectory() + " does not exist"));
-                	updateSFTPRun(moveJob);
-                	//need to get out of loop since set up was not done properly
-                	sendEmailToAdmin((rhapsodyInfo.getDirectory() + " does not exist"), "Rhapsody Job Error");
-                	break;
+                    moveJob.setNotes(("Directory " + rhapsodyInfo.getDirectory() + " does not exist"));
+                    updateSFTPRun(moveJob);
+                    //need to get out of loop since set up was not done properly
+                    sendEmailToAdmin((rhapsodyInfo.getDirectory() + " does not exist"), "Rhapsody Job Error");
+                    break;
                 }
                 //we look up org for this path
                 Integer orgId = configurationtransportmanager.getOrgIdForRhapsodyPath(rhapsodyInfo);
@@ -2960,41 +2958,50 @@ public class transactionInManagerImpl implements transactionInManager {
     public void trimFieldValues(Integer batchId, boolean foroutboundProcessing, Integer transactionId, boolean trimAll) {
         transactionInDAO.trimFieldValues(batchId, foroutboundProcessing, transactionId, trimAll);
     }
-    
+
     @Override
     public void updateTransactionTargetListStatus(List<transactionTarget> transactions, Integer statusId) {
         transactionInDAO.updateTransactionTargetListStatus(transactions, statusId);
     }
-    
+
     @Override
     public void submitTransactionMultipleTargets(batchMultipleTargets target) {
         transactionInDAO.submitTransactionMultipleTargets(target);
     }
-    
+
     @Override
     public List<batchMultipleTargets> getBatchMultipleTargets(Integer batchId) {
         return transactionInDAO.getBatchMultipleTargets(batchId);
     }
-    
+
     @Override
     public Integer copyBatchDetails(Integer batchId, Integer tgtConfigId, Integer transactionId) {
         return transactionInDAO.copyBatchDetails(batchId, tgtConfigId, transactionId);
     }
 
-	@Override
-	public void sendEmailToAdmin(String message, String subject) {
-		try {
-			mailMessage mail = new mailMessage();
-			mail.setfromEmailAddress("dphuniversaltranslator@gmail.com");
-			mail.setmessageBody(message);
-			mail.setmessageSubject(subject);
-			mail.settoEmailAddress(usermanager.getUserById(1).getEmail());
-			emailManager.sendEmail(mail);
-		} catch (Exception ex) {
-			ex.printStackTrace();
-            System.err.println("sendEmailToAdmin message for admin was " + message +" " + ex.getCause());
-		}
-	}
-
+    @Override
+    public void sendEmailToAdmin(String message, String subject) {
+        try {
+            mailMessage mail = new mailMessage();
+            mail.setfromEmailAddress("dphuniversaltranslator@gmail.com");
+            mail.setmessageBody(message);
+            mail.setmessageSubject(subject);
+            mail.settoEmailAddress(usermanager.getUserById(1).getEmail());
+            emailManager.sendEmail(mail);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.err.println("sendEmailToAdmin message for admin was " + message + " " + ex.getCause());
+        }
+    }
     
+    @Override
+    public List<batchUploadSummary> getuploadBatchesByConfigAndTarget(Integer configId, Integer orgId) {
+        return transactionInDAO.getuploadBatchesByConfigAndTarget(configId, orgId);
+    }
+    
+    @Override
+    public boolean searchBatchForHistory(batchUploads batchDetails, String searchTerm, Date fromDate, Date toDate) {
+        return transactionInDAO.searchBatchForHistory(batchDetails, searchTerm, fromDate, toDate);
+    }
+
 }

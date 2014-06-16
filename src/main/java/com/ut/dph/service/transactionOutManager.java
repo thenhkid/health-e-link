@@ -121,4 +121,6 @@ public interface transactionOutManager {
     List<batchDownloadSummary> getBatchesBySentOrg(int srcorgId, int tgtOrgId, int messageTypeId) throws Exception;
     
     void selectOutputRecordsForProcess(Integer transactionTargetId) throws Exception;
+    
+    List<batchDownloadSummary> getuploadBatchesByConfigAndSource(Integer configId, Integer orgId);
 }

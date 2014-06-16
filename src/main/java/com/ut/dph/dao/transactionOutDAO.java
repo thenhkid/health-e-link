@@ -6,7 +6,6 @@
 
 package com.ut.dph.dao;
 
-import com.ut.dph.model.Transaction;
 import com.ut.dph.model.batchDownloadSummary;
 import com.ut.dph.model.batchDownloads;
 import com.ut.dph.model.configurationSchedules;
@@ -124,5 +123,7 @@ public interface transactionOutDAO {
     List<Integer> findInboxBatches(List<batchDownloads> batches, String searchTerm) throws Exception;
     
     List<batchDownloadSummary> getBatchesBySentOrg(int srcorgId, int tgtOrgId, int messageTypeId) throws Exception;
+    
+    List<batchDownloadSummary> getuploadBatchesByConfigAndSource(Integer configId, Integer orgId);
     
 }
