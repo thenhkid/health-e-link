@@ -26,6 +26,7 @@ import com.ut.dph.model.configurationConnectionReceivers;
 import com.ut.dph.model.configurationDataTranslations;
 import com.ut.dph.model.configurationFTPFields;
 import com.ut.dph.model.configurationFormFields;
+import com.ut.dph.model.configurationRhapsodyFields;
 import com.ut.dph.model.configurationSchedules;
 import com.ut.dph.model.configurationTransport;
 import com.ut.dph.service.emailMessageManager;
@@ -390,14 +391,16 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                  */
                                 configurationTransport transportDetails = configurationTransportManager.getTransportDetails(transaction.getconfigId());
 
-                                /* if File Download update the status to Submission Delivery Completed ID = 23 status. This will only
-                                 apply to scheduled and not continous settings. */
+                                /* if File Download update the status to Submission Delivery Completed ID = 23 status. 
+                                 * This will only apply to scheduled and not continuous settings. */
                                 if (transportDetails.gettransportMethodId() == 1) {
                                     transactionOutDAO.updateBatchStatus(batchId, 23);
                                     transactionInManager.updateBatchStatus(transaction.getbatchUploadId(), 23, "");
                                 } /* If FTP Call the FTP Method */ else if (transportDetails.gettransportMethodId() == 3) {
                                     FTPTargetFile(batchId, transportDetails);
-                                }
+                                } /* Rhapsody Method */ else if (transportDetails.gettransportMethodId() == 5) {
+                                	RhapsodyTargetFile(batchId, transportDetails);
+                            }
 
                                 if (batchId > 0) {
                                     /* Send the email to primary contact */
@@ -508,7 +511,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
         
          1. When the beginOutput Process function returns (RETURN BATCH ID???) check to see if the target transport method 
          for the config is set to FTP, if so then call the FTP method to send off the file. Batch would then get a 
-         Submission Delivery Locked ID = 22 status.
+         Submission Delivery Locked ID = 22 status. same goes for rhapsody
          2. For file download transport methods, after the beginOutput Process function returns with the batch Id, the batch
          would then get a Submission Delivery Completed ID = 23 status so we don't keep adding new transactions to already
          created batch files. FOR SCHEDULED PROCESSING ONLY, CONTINUOUS processing will keep adding to the same file until
@@ -665,6 +668,8 @@ public class transactionOutManagerImpl implements transactionOutManager {
 
                         } /* If FTP Call the FTP Method */ else if (transportDetails.gettransportMethodId() == 3) {
                             FTPTargetFile(batchId, transportDetails);
+                        } /* If Rhapsody Method */ else if (transportDetails.gettransportMethodId() == 5) {
+                        	RhapsodyTargetFile(batchId, transportDetails);
                         }
 
                         /* Log the last run time */
@@ -1751,4 +1756,64 @@ public class transactionOutManagerImpl implements transactionOutManager {
             throw new Exception("Error at selectOutputRecordsForProcess");
         }
     }
+
+    /** 
+     * The 'RhapsodyTargetFile' function will get the Rhapsody details and move the file to the
+     * output folder defined in 
+     *
+     * @param batchId The id of the batch to move to Rhapsody folder
+     */
+    private void RhapsodyTargetFile(int batchId, configurationTransport transportDetails)  {
+
+        try {
+
+            /* Update the status of the batch to locked */
+            transactionOutDAO.updateBatchStatus(batchId, 22);
+
+            List<transactionTarget> targets = transactionOutDAO.getTransactionsByBatchDLId(batchId);
+
+            if (!targets.isEmpty()) {
+
+                for (transactionTarget target : targets) {
+
+                    /* Need to update the uploaded batch status */
+                    transactionInManager.updateBatchStatus(target.getbatchUploadId(), 22, "");
+
+                    /* Need to update the uploaded batch transaction status */
+                    transactionInManager.updateTransactionStatus(target.getbatchUploadId(), target.gettransactionInId(), 0, 20);
+
+                    /* Update the downloaded batch transaction status */
+                    transactionOutDAO.updateTargetTransasctionStatus(target.getbatchDLId(), 2);
+
+                }
+
+            }
+
+            /* get the batch details */
+            batchDownloads batchFTPFileInfo = transactionOutDAO.getBatchDetails(batchId);
+
+            /* Get the Rhapsody Details */
+            configurationRhapsodyFields rhapsodyDetails = configurationTransportManager.getTransRhapsodyDetailsPush(transportDetails.getId());
+
+            //see if we need to encode file
+            
+            //copy the file over and update the status to complete
+            
+            
+            //update status
+
+        } catch (Exception e) {
+        	e.printStackTrace();
+            System.err.println("RhapsodyTargetFile - Error occurred trying to FTP a batch target. batchId: " + batchId);
+        }
+
+    }
+
+
+
+
 }
+
+
+
+
