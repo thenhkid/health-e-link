@@ -21,7 +21,6 @@ import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.configurationTransport;
 import com.ut.dph.model.custom.searchParameters;
 import com.ut.dph.model.fieldSelectOptions;
-import com.ut.dph.model.historyDetails;
 import com.ut.dph.model.historyResults;
 import com.ut.dph.model.lutables.lu_ProcessStatus;
 import com.ut.dph.model.messagePatients;
@@ -2907,8 +2906,6 @@ public class HealtheWebController {
 
                 for (configurationConnection connection : sourceConnections) {
 
-                    historyResults resultEntry = new historyResults();
-
                     configuration configDetails = configurationManager.getConfigurationById(connection.gettargetConfigId());
 
                     String tgtOrgName = organizationmanager.getOrganizationById(configDetails.getorgId()).getOrgName();
@@ -2916,13 +2913,18 @@ public class HealtheWebController {
                     String msgTypeName = configurationManager.getMessageTypeNameByConfigId(connection.gettargetConfigId());
 
                     String transportType = configurationTransportManager.getTransportMethodById(configurationTransportManager.getTransportDetails(configDetails.getId()).gettransportMethodId());
-
-                    resultEntry.setorgName(tgtOrgName);
-                    resultEntry.setorgId(configDetails.getorgId());
-                    resultEntry.setmessageType(msgTypeName);
-                    resultEntry.setmessageTypeId(configDetails.getMessageTypeId());
-                    resultEntry.setTransportType(transportType);
-
+                    
+                    historyResults resultEntry = null;
+                    
+                    if(reportType == 1) {
+                        resultEntry = new historyResults();
+                        resultEntry.setorgName(tgtOrgName);
+                        resultEntry.setorgId(configDetails.getorgId());
+                        resultEntry.setmessageType(msgTypeName);
+                        resultEntry.setmessageTypeId(configDetails.getMessageTypeId());
+                        resultEntry.setTransportType(transportType);
+                    }
+                    
                     if (sentTo == 0 || sentTo == configDetails.getorgId()) {
 
                         /* Find the total messages sent for this target and this configuration */
@@ -2933,7 +2935,7 @@ public class HealtheWebController {
                         /* Need to filter based on the passed in search Criteria */
                         for (batchUploadSummary batch : sentBatches) {
                             boolean matched = true;
-
+                            
                             batchUploads batchDetails = transactionInManager.getBatchDetails(batch.getbatchId());
 
                             matched = transactionInManager.searchBatchForHistory(batchDetails, searchTerm, fromDate, toDate);
@@ -2946,12 +2948,42 @@ public class HealtheWebController {
                             if (matched == true) {
                                 matchedSentBatches += 1;
                             }
+                            
+                            if(reportType == 2) {
+                                
+                               if(matched == true) {
+                                   
+                                    List<transactionIn> transactionDetails = transactionInManager.getBatchTransactions(batch.getbatchId(), batchDetails.getuserId());
+                                   
+                                    resultEntry = new historyResults();
+                                    resultEntry.setorgName(tgtOrgName);
+                                    resultEntry.setorgId(configDetails.getorgId());
+                                    resultEntry.setmessageType(msgTypeName);
+                                    resultEntry.setmessageTypeId(configDetails.getMessageTypeId());
+                                    resultEntry.setTransportType(transportType);
+                                    resultEntry.setBatchName(batchDetails.getutBatchName());
+                                    resultEntry.setDateCreated(batchDetails.getdateSubmitted());
+                                    
+                                     /* Get the patient data */
+                                    messagePatients patientInfo = transactionInManager.getPatientTransactionDetails(transactionDetails.get(0).getId());
+
+                                    resultEntry.setpatientName(patientInfo.getFirstName() + " " + patientInfo.getLastName());
+                                    resultEntry.setPatientId(patientInfo.getSourcePatientId());
+                                    
+                                    resultEntry.setTotalSent(1);
+                                    
+                                    sentMessages.add(resultEntry); 
+                               } 
+                                
+                            }
 
                         }
 
-                        resultEntry.setTotalSent(matchedSentBatches);
-
-                        sentMessages.add(resultEntry);
+                        
+                        if(reportType == 1) {
+                            resultEntry.setTotalSent(matchedSentBatches);
+                            sentMessages.add(resultEntry);
+                        }
 
                         sentTotal += matchedSentBatches;
 
@@ -2968,8 +3000,6 @@ public class HealtheWebController {
 
                 for (configurationConnection connection : targetConnections) {
 
-                    historyResults resultEntry = new historyResults();
-
                     configuration configDetails = configurationManager.getConfigurationById(connection.getsourceConfigId());
 
                     String srcOrgName = organizationmanager.getOrganizationById(configDetails.getorgId()).getOrgName();
@@ -2978,21 +3008,79 @@ public class HealtheWebController {
 
                     String transportType = configurationTransportManager.getTransportMethodById(configurationTransportManager.getTransportDetails(configDetails.getId()).gettransportMethodId());
 
-                    resultEntry.setorgName(srcOrgName);
-                    resultEntry.setorgId(configDetails.getorgId());
-                    resultEntry.setmessageType(msgTypeName);
-                    resultEntry.setmessageTypeId(configDetails.getMessageTypeId());
-                    resultEntry.setTransportType(transportType);
+                    historyResults resultEntry = null;
+                    
+                    if(reportType == 1) {
+                        resultEntry = new historyResults();
+                        resultEntry.setorgName(srcOrgName);
+                        resultEntry.setorgId(configDetails.getorgId());
+                        resultEntry.setmessageType(msgTypeName);
+                        resultEntry.setmessageTypeId(configDetails.getMessageTypeId());
+                        resultEntry.setTransportType(transportType);
+                    }
+                    
+                    if (sentTo == 0 || sentTo == configDetails.getorgId()) {
 
-                    /* Find the total messages received from this source and this configuration */
-                    List<batchDownloadSummary> totalReceived = transactionOutManager.getuploadBatchesByConfigAndSource(connection.gettargetConfigId(), configDetails.getorgId());
+                        /* Find the total messages received from this source and this configuration */
+                        List<batchDownloadSummary> receivedBatches = transactionOutManager.getuploadBatchesByConfigAndSource(connection.gettargetConfigId(), configDetails.getorgId());
 
-                    resultEntry.setTotalSent(totalReceived.size());
+                        int matchedReceivedBatches = 0;
 
-                    receivedMessages.add(resultEntry);
+                        /* Need to filter based on the passed in search Criteria */
+                        for (batchDownloadSummary batch : receivedBatches) {
+                            boolean matched = true;
 
-                    receivedTotal += totalReceived.size();
+                            batchDownloads batchDetails = transactionOutManager.getBatchDetails(batch.getbatchId());
 
+                            matched = transactionOutManager.searchBatchForHistory(batchDetails, searchTerm, fromDate, toDate);
+                            
+                            /* Check the passed in message type */
+                            if (messageType > 0 && !messageType.equals(batch.getmessageTypeId())) {
+                                matched = false;
+                            }
+
+                            if (matched == true) {
+                                matchedReceivedBatches += 1;
+                            }
+                            
+                            if(reportType == 2) {
+                                
+                               if(matched == true) {
+                                   
+                                    List<transactionTarget> transactionDetails = transactionOutManager.getTransactionsByBatchDLId(batch.getbatchId());
+                                   
+                                    resultEntry = new historyResults();
+                                    resultEntry.setorgName(srcOrgName);
+                                    resultEntry.setorgId(configDetails.getorgId());
+                                    resultEntry.setmessageType(msgTypeName);
+                                    resultEntry.setmessageTypeId(configDetails.getMessageTypeId());
+                                    resultEntry.setTransportType(transportType);
+                                    resultEntry.setBatchName(batchDetails.getutBatchName());
+                                    resultEntry.setDateCreated(batchDetails.getdateCreated());
+                                    
+                                     /* Get the patient data */
+                                    messagePatients patientInfo = transactionInManager.getPatientTransactionDetails(transactionDetails.get(0).gettransactionInId());
+
+                                    resultEntry.setpatientName(patientInfo.getFirstName() + " " + patientInfo.getLastName());
+                                    resultEntry.setPatientId(patientInfo.getSourcePatientId());
+                                    
+                                    resultEntry.setTotalSent(1);
+                                    
+                                    receivedMessages.add(resultEntry); 
+                               } 
+                                
+                            }
+                        }
+
+                        if(reportType == 1) {
+                            resultEntry.setTotalSent(matchedReceivedBatches);
+                            receivedMessages.add(resultEntry);
+                        }
+
+                        receivedTotal += matchedReceivedBatches;
+
+                    }
+                    
                 }
 
             }
@@ -3027,466 +3115,6 @@ public class HealtheWebController {
 
     }
 
-    /**
-     * The '/history' POST request will serve up the Health-e-Web (ERG) page that will list allow the logged in user to search their referral and feedback history.
-     *
-     * @param request
-     * @param response
-     * * @param searchTerm The term to search pending messages
-     * @return	the health-e-web inbox message list view
-     * @throws Exception
-     */
-    @RequestMapping(value = "/history_old", method = RequestMethod.POST)
-    public ModelAndView historyResultsOld(HttpSession session, @RequestParam Date fromDate, @RequestParam Date toDate, @RequestParam Integer type, @RequestParam Integer sentTo,
-            @RequestParam Integer messageType, @RequestParam Integer status, @RequestParam Integer systemStatus, @RequestParam Integer reportType,
-            @RequestParam String batchName, @RequestParam String utBatchName, @RequestParam String lastName, @RequestParam String patientId, @RequestParam String firstName, @RequestParam String providerId) throws Exception {
 
-        ModelAndView mav = new ModelAndView();
-        mav.setViewName("/Health-e-Web/historySummary");
-
-        if (reportType == 1) {
-            mav.addObject("showDetails", false);
-        } else {
-            mav.addObject("showDetails", true);
-        }
-
-        /* Need to get all the message types set up for the user */
-        User userInfo = (User) session.getAttribute("userDetails");
-
-        /* Add search Paramaters */
-        mav.addObject("fromDate", fromDate);
-        mav.addObject("toDate", toDate);
-
-        if (type == 0) {
-            mav.addObject("typeText", "Both (Referrals & Reports)");
-        } else if (type == 1) {
-            mav.addObject("typeText", "Referrals Only");
-        } else {
-            mav.addObject("typeText", "Reports Only");
-        }
-        mav.addObject("type", type);
-
-        if (sentTo == 0) {
-            mav.addObject("sentToText", "All Affiliated Organizations");
-        } else {
-            Organization orgDetails = organizationmanager.getOrganizationById(sentTo);
-            mav.addObject("sentToText", orgDetails.getOrgName());
-        }
-        mav.addObject("sentTo", sentTo);
-
-        if (messageType == 0) {
-            mav.addObject("messageTypeText", "All Message Types");
-        } else {
-            messageType msgTypeDetails = messagetypemanager.getMessageTypeById(messageType);
-            mav.addObject("messageTypeText", msgTypeDetails.getName());
-        }
-        mav.addObject("messageType", messageType);
-
-        if (status == 0) {
-            mav.addObject("statusText", "Both (Opened & Closed)");
-        } else if (status == 1) {
-            mav.addObject("statusText", "Opened Only");
-        } else {
-            mav.addObject("statusText", "Closed Only");
-        }
-        mav.addObject("status", status);
-
-        mav.addObject("systemStatusText", "All System Statuses");
-        mav.addObject("systemStatus", 0);
-
-        /* Add additional search options */
-        mav.addObject("batchName", batchName);
-        mav.addObject("utBatchName", utBatchName);
-        mav.addObject("lastName", lastName);
-        mav.addObject("patientId", patientId);
-        mav.addObject("firstName", firstName);
-        mav.addObject("providerId", providerId);
-
-        int totalReferralsRec = 0;
-        int totalFBRec = 0;
-        int totalReferralsSent = 0;
-        int totalFBSent = 0;
-
-        /* Get all connections for the logged in organization */
-        List<configuration> configs = configurationManager.getActiveConfigurationsByOrgId(userInfo.getOrgId());
-
-        List<historyResults> results = new ArrayList<historyResults>();
-
-        for (configuration config : configs) {
-
-            if (type == 0 || (type == 1 && config.getsourceType() == 1) || (type == 2 && config.getsourceType() == 2)) {
-
-                if (messageType == 0 || (messageType > 0 && messageType == config.getMessageTypeId())) {
-
-                    /* Source config type */
-                    if (config.getType() == 1) {
-
-                        List<configurationConnection> connections = configurationManager.getConnectionsByConfiguration(config.getId());
-
-                        if (connections.size() > 0) {
-
-                            for (configurationConnection connection : connections) {
-
-                                if (sentTo == 0 || (sentTo > 0 && sentTo == configurationManager.getConfigurationById(connection.gettargetConfigId()).getorgId())) {
-                                    String orgName = organizationmanager.getOrganizationById(configurationManager.getConfigurationById(connection.gettargetConfigId()).getorgId()).getOrgName();
-                                    String messageTypeName = messagetypemanager.getMessageTypeById(config.getMessageTypeId()).getName();
-
-                                    historyResults result = new historyResults();
-                                    result.setorgId(configurationManager.getConfigurationById(connection.gettargetConfigId()).getorgId());
-                                    result.setorgName(orgName);
-                                    result.setmessageTypeId(config.getMessageTypeId());
-                                    result.setmessageType(messageTypeName);
-                                    result.settype(config.getsourceType());
-
-                                    List<batchUploads> batches = transactionInManager.getsentBatchesHistory(userInfo.getId(), config.getorgId(), configurationManager.getConfigurationById(connection.gettargetConfigId()).getorgId(), config.getMessageTypeId(), fromDate, toDate);
-
-                                    if (batches.size() > 0) {
-                                        for (batchUploads batch : batches) {
-
-                                            /* get transactions */
-                                            List<transactionIn> transactions = transactionInManager.getBatchTransactions(batch.getId(), 0);
-
-                                            for (transactionIn transaction : transactions) {
-
-                                                if (status == 0 || (status == transaction.getmessageStatus())) {
-                                                    if (config.getsourceType() == 1) {
-
-                                                        result.setmsg("Total Referrals Sent: " + batches.size());
-
-                                                        totalReferralsSent += 1;
-                                                    } else {
-                                                        result.setmsg("Total Feedback Reports Sent: " + batches.size());
-                                                        totalFBSent += 1;
-                                                    }
-                                                }
-
-                                            }
-                                            result.setshowDetails(true);
-                                        }
-                                    } else {
-                                        if (config.getsourceType() == 1) {
-                                            result.setmsg("Total Referrals Sent: 0");
-                                        } else {
-                                            result.setmsg("Total Feedback Reports Sent: 0");
-                                        }
-                                    }
-
-                                    results.add(result);
-                                }
-
-                            }
-
-                        }
-
-                    } /* Target config Type */ else if (config.getType() == 2) {
-
-                        List<configurationConnection> connections = configurationManager.getConnectionsByTargetConfiguration(config.getId());
-
-                        if (connections.size() > 0) {
-
-                            for (configurationConnection connection : connections) {
-                                int total = 0;
-
-                                if (sentTo == 0 || (sentTo > 0 && sentTo == configurationManager.getConfigurationById(connection.getsourceConfigId()).getorgId())) {
-                                    String orgName = organizationmanager.getOrganizationById(configurationManager.getConfigurationById(connection.getsourceConfigId()).getorgId()).getOrgName();
-                                    String messageTypeName = messagetypemanager.getMessageTypeById(config.getMessageTypeId()).getName();
-
-                                    historyResults result = new historyResults();
-                                    result.setorgId(configurationManager.getConfigurationById(connection.getsourceConfigId()).getorgId());
-                                    result.setorgName(orgName);
-                                    result.setmessageTypeId(config.getMessageTypeId());
-                                    result.setmessageType(messageTypeName);
-                                    result.settype(config.getsourceType());
-
-                                    /* Find Received Referrals / Feedback Reports */
-                                    List<batchDownloads> batches = transactionOutManager.getInboxBatchesHistory(userInfo.getId(), config.getorgId(), configurationManager.getConfigurationById(connection.getsourceConfigId()).getorgId(), config.getMessageTypeId(), fromDate, toDate);
-
-                                    if (status != 0 || !"".equals(batchName) || !"".equals(firstName) || !"".equals(lastName) || !"".equals(utBatchName) || !"".equals(patientId) || !"".equals(providerId)) {
-                                        String searchTerm = new StringBuilder().append(status).append("|").append(batchName).append("|").append(firstName).append("|").append(lastName).append("|").append(utBatchName).append("|").append(patientId).append("|").append(providerId).toString();
-                                        List<Integer> totalMatches = transactionOutManager.findInboxBatches(batches, searchTerm);
-                                        total = totalMatches.size();
-                                    } else {
-                                        total = batches.size();
-                                    }
-
-                                    if (config.getsourceType() == 1) {
-                                        result.setmsg("Total Referrals Received: " + total);
-
-                                        totalReferralsRec += total;
-                                    } else {
-                                        result.setmsg("Total Feedback Reports Received: " + total);
-                                        totalFBRec += total;
-                                    }
-
-                                    if (total > 0) {
-                                        result.setshowDetails(true);
-                                    }
-
-                                    results.add(result);
-
-                                }
-
-                            }
-
-                        }
-
-                    }
-                }
-            }
-        }
-        mav.addObject("totalReferralsRec", totalReferralsRec);
-        mav.addObject("totalFBRec", totalFBRec);
-        mav.addObject("totalReferralsSent", totalReferralsSent);
-        mav.addObject("totalFBSent", totalFBSent);
-        mav.addObject("historyResults", results);
-
-        //we log here 
-        try {
-            //log user activity
-            UserActivity ua = new UserActivity();
-            ua.setUserId(userInfo.getId());
-            ua.setFeatureId(featureId);
-            ua.setAccessMethod("POST");
-            ua.setPageAccess("/history");
-            ua.setActivity("History Search");
-            ua.setActivityDesc("History Search - " + fromDate + " - " + toDate);
-            usermanager.insertUserLog(ua);
-        } catch (Exception ex) {
-            System.err.println("viewHistory = error logging user " + ex.getCause());
-            ex.printStackTrace();
-        }
-
-        mav.addObject("pendingTotal", pendingTotal);
-        mav.addObject("inboxTotal", inboxTotal);
-
-        return mav;
-
-    }
-
-    /**
-     * The '/history/ddetails' POST request will serve up the Health-e-Web (ERG) page that will list allow the logged in user to search their referral and feedback history.
-     *
-     * @param request
-     * @param response
-     * * @param searchTerm The term to search pending messages
-     * @return	the health-e-web inbox message list view
-     * @throws Exception
-     */
-    @RequestMapping(value = "/history/details", method = RequestMethod.POST)
-    public ModelAndView historyDetails(HttpSession session, @RequestParam Integer selorgId, @RequestParam Integer selmessageTypeId, @RequestParam Date fromDate, @RequestParam Date toDate, @RequestParam Integer type, @RequestParam Integer sentTo,
-            @RequestParam Integer messageType, @RequestParam Integer status, @RequestParam Integer systemStatus, @RequestParam String batchName, @RequestParam String utBatchName,
-            @RequestParam String lastName, @RequestParam String patientId, @RequestParam String firstName, @RequestParam String providerId) throws Exception {
-
-        ModelAndView mav = new ModelAndView();
-        mav.setViewName("/Health-e-Web/historyDetails");
-
-        /* Get selected org name */
-        Organization selorgDetails = organizationmanager.getOrganizationById(selorgId);
-        mav.addObject("orgName", selorgDetails.getOrgName());
-
-        /* Get Message Type Name */
-        messageType messageTypeDetails = messagetypemanager.getMessageTypeById(selmessageTypeId);
-        mav.addObject("messageTypeName", messageTypeDetails.getName());
-
-        /* Add search Paramaters */
-        mav.addObject("fromDate", fromDate);
-        mav.addObject("toDate", toDate);
-
-        if (type == 0) {
-            mav.addObject("typeText", "Both (Referrals & Reports)");
-        } else if (type == 1) {
-            mav.addObject("typeText", "Referrals Only");
-        } else {
-            mav.addObject("typeText", "Reports Only");
-        }
-        mav.addObject("type", type);
-
-        if (sentTo == 0) {
-            mav.addObject("sentToText", "All Affiliated Organizations");
-        } else {
-            Organization orgDetails = organizationmanager.getOrganizationById(sentTo);
-            mav.addObject("sentToText", orgDetails.getOrgName());
-        }
-        mav.addObject("sentTo", sentTo);
-
-        if (messageType == 0) {
-            mav.addObject("messageTypeText", "All Message Types");
-        } else {
-            messageType msgTypeDetails = messagetypemanager.getMessageTypeById(messageType);
-            mav.addObject("messageTypeText", msgTypeDetails.getName());
-        }
-        mav.addObject("messageType", messageType);
-
-        if (status == 0) {
-            mav.addObject("statusText", "Both (Opened & Closed)");
-        } else if (status == 1) {
-            mav.addObject("statusText", "Opened Only");
-        } else {
-            mav.addObject("statusText", "Closed Only");
-        }
-        mav.addObject("status", status);
-
-        mav.addObject("systemStatusText", "All System Statuses");
-        mav.addObject("systemStatus", 0);
-
-        /* Add additional search options */
-        mav.addObject("batchName", batchName);
-        mav.addObject("utBatchName", utBatchName);
-        mav.addObject("lastName", lastName);
-        mav.addObject("patientId", patientId);
-        mav.addObject("firstName", firstName);
-        mav.addObject("providerId", providerId);
-
-        /* Need to get all the message types set up for the user */
-        User userInfo = (User) session.getAttribute("userDetails");
-
-        List<historyDetails> transactions = new ArrayList<historyDetails>();
-
-        /* Get received transactions */
-        List<batchDownloadSummary> recievedBatches = transactionOutManager.getBatchesBySentOrg(selorgId, userInfo.getOrgId(), selmessageTypeId);
-
-        for (batchDownloadSummary batches : recievedBatches) {
-
-            batchDownloads batchDetails = transactionOutManager.getBatchDetails(batches.getbatchId());
-
-            configuration configDetails = configurationManager.getConfigurationById(batches.gettargetConfigId());
-
-            /* Get transactions */
-            List<transactionTarget> trans = transactionOutManager.getTransactionsByBatchDLId(batchDetails.getId());
-
-            for (transactionTarget tarTrans : trans) {
-                boolean addTrans = true;
-                historyDetails details = new historyDetails();
-                details.setBatchName(batchDetails.getutBatchName());
-                details.setDateCreated(batchDetails.getdateCreated());
-                details.setBatchId(batchDetails.getId());
-
-                if (configDetails.getsourceType() == 1) {
-                    details.setType("Referral");
-                } else {
-                    details.setType("Feedback Report");
-                }
-                details.setTransactionId(tarTrans.getId());
-
-                lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batchDetails.getstatusId());
-                details.setStatus(processStatus.getDisplayCode());
-
-                /* Get the patient data */
-                messagePatients patientInfo = transactionInManager.getPatientTransactionDetails(tarTrans.gettransactionInId());
-
-                details.setpatientName(patientInfo.getFirstName() + " " + patientInfo.getLastName());
-                details.setPatientId(patientInfo.getSourcePatientId());
-
-                if (!"".equals(lastName) && !patientInfo.getLastName().equals(lastName)) {
-                    addTrans = false;
-                }
-
-                if (!"".equals(firstName) && !patientInfo.getFirstName().equals(firstName)) {
-                    addTrans = false;
-                }
-
-                if (!"".equals(patientId) && !patientInfo.getSourcePatientId().equals(patientId)) {
-                    addTrans = false;
-                }
-
-                if (!"".equals(utBatchName) && !batchDetails.getutBatchName().equals(utBatchName)) {
-                    addTrans = false;
-                }
-
-                if (type > 0 && type != configDetails.getsourceType()) {
-                    addTrans = false;
-                }
-
-                if (messageType > 0 && messageType != configDetails.getMessageTypeId()) {
-                    addTrans = false;
-                }
-
-                if (batchDetails.getdateCreated().before(fromDate) || batchDetails.getdateCreated().after(toDate)) {
-                    addTrans = false;
-                }
-
-                if (addTrans == true) {
-                    transactions.add(details);
-                }
-
-            }
-
-        }
-
-        /* Get Sent transactions */
-        List<batchUploadSummary> sentBatches = transactionInManager.getBatchesToSentOrg(userInfo.getOrgId(), selorgId, selmessageTypeId);
-
-        for (batchUploadSummary batch : sentBatches) {
-
-            batchUploads batchDetails = transactionInManager.getBatchDetails(batch.getbatchId());
-
-            configuration configDetails = configurationManager.getConfigurationById(batch.getsourceConfigId());
-
-            /* Get transactions */
-            List<transactionIn> trans = transactionInManager.getBatchTransactions(batchDetails.getId(), 0);
-
-            for (transactionIn transaction : trans) {
-                boolean addTrans = true;
-
-                historyDetails details = new historyDetails();
-                details.setBatchName(batchDetails.getutBatchName());
-                details.setDateCreated(batchDetails.getdateSubmitted());
-                details.setBatchId(batchDetails.getId());
-                if (configDetails.getsourceType() == 1) {
-                    details.setType("Referral");
-                } else {
-                    details.setType("Feedback Report");
-                }
-                details.setTransactionId(transaction.getId());
-
-                lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batchDetails.getstatusId());
-                details.setStatus(processStatus.getDisplayCode());
-
-                /* Get the patient data */
-                messagePatients patientInfo = transactionInManager.getPatientTransactionDetails(transaction.getId());
-
-                details.setpatientName(patientInfo.getFirstName() + " " + patientInfo.getLastName());
-                details.setPatientId(patientInfo.getSourcePatientId());
-
-                if (!"".equals(lastName) && !patientInfo.getLastName().equals(lastName)) {
-                    addTrans = false;
-                }
-
-                if (!"".equals(firstName) && !patientInfo.getFirstName().equals(firstName)) {
-                    addTrans = false;
-                }
-
-                if (!"".equals(patientId) && !patientInfo.getSourcePatientId().equals(patientId)) {
-                    addTrans = false;
-                }
-
-                if (!"".equals(utBatchName) && !batchDetails.getutBatchName().equals(utBatchName)) {
-                    addTrans = false;
-                }
-
-                if (type > 0 && type != configDetails.getsourceType()) {
-                    addTrans = false;
-                }
-
-                if (messageType > 0 && messageType != configDetails.getMessageTypeId()) {
-                    addTrans = false;
-                }
-
-                if (batchDetails.getdateSubmitted().before(fromDate) || batchDetails.getdateSubmitted().after(toDate)) {
-                    addTrans = false;
-                }
-
-                if (addTrans == true) {
-                    transactions.add(details);
-                }
-            }
-
-        }
-
-        mav.addObject("transactions", transactions);
-
-        return mav;
-
-    }
 
 }

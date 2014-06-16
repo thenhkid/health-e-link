@@ -1726,10 +1726,10 @@ public class transactionOutManagerImpl implements transactionOutManager {
     }
 
     @Override
-    public List<Integer> findInboxBatches(List<batchDownloads> batches, String searchTerm) throws Exception {
-        return transactionOutDAO.findInboxBatches(batches, searchTerm);
+    public boolean searchBatchForHistory(batchDownloads batchDetails, String searchTerm, Date fromDate, Date toDate) {
+        return transactionOutDAO.searchBatchForHistory(batchDetails, searchTerm, fromDate, toDate);
     }
-
+   
     @Override
     public List<batchDownloadSummary> getBatchesBySentOrg(int srcorgId, int tgtOrgId, int messageTypeId) throws Exception {
         return transactionOutDAO.getBatchesBySentOrg(srcorgId, tgtOrgId, messageTypeId);

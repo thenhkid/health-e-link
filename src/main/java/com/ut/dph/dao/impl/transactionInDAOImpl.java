@@ -4938,9 +4938,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 
     }
 
-    /**
-     *
-     */
+    
     @Override
     @Transactional
     public boolean searchBatchForHistory(batchUploads batchDetails, String searchTerm, Date fromDate, Date toDate) {

@@ -120,7 +120,7 @@ public interface transactionOutDAO {
     
     List<batchDownloads> getInboxBatchesHistory(int userId, int orgId, int fromOrgId, int messageTypeId, Date fromDate, Date toDate) throws Exception;
     
-    List<Integer> findInboxBatches(List<batchDownloads> batches, String searchTerm) throws Exception;
+    boolean searchBatchForHistory(batchDownloads batchDetails, String searchTerm, Date fromDate, Date toDate);
     
     List<batchDownloadSummary> getBatchesBySentOrg(int srcorgId, int tgtOrgId, int messageTypeId) throws Exception;
     

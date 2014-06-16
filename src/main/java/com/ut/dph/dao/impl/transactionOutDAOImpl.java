@@ -133,7 +133,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
         return batchId;
 
     }
-    
+
     /**
      * The 'getInboxBatches' will return a list of received batches for the logged in user.
      *
@@ -146,12 +146,12 @@ public class transactionOutDAOImpl implements transactionOutDAO {
     @Transactional
     @SuppressWarnings("UnusedAssignment")
     public List<batchDownloads> getInboxBatches(int userId, int orgId, Date fromDate, Date toDate) throws Exception {
-        
+
         return findInboxBatches(userId, orgId, 0, 0, fromDate, toDate);
-        
-    } 
-    
-   /**
+
+    }
+
+    /**
      * The 'getInboxBatchesHistory' will return a list of received batches for the logged in user.
      *
      * @param userId The id of the logged in user trying to view received batches
@@ -163,10 +163,10 @@ public class transactionOutDAOImpl implements transactionOutDAO {
     @Transactional
     @SuppressWarnings("UnusedAssignment")
     public List<batchDownloads> getInboxBatchesHistory(int userId, int orgId, int fromOrgId, int messageTypeId, Date fromDate, Date toDate) throws Exception {
-        
+
         return findInboxBatches(userId, orgId, fromOrgId, messageTypeId, fromDate, toDate);
-        
-    }  
+
+    }
 
     /**
      * The 'findInboxBatches' will return a list of received batches for the logged in user.
@@ -207,15 +207,14 @@ public class transactionOutDAOImpl implements transactionOutDAO {
                 configuration configDetails = (configuration) targetconfigurationQuery.uniqueResult();
 
                 /* Add the message type to the message type list */
-                if(messageTypeId == 0) {
+                if (messageTypeId == 0) {
                     messageTypeList.add(configDetails.getMessageTypeId());
-                }
-                else {
-                    if(messageTypeId == configDetails.getMessageTypeId()) {
+                } else {
+                    if (messageTypeId == configDetails.getMessageTypeId()) {
                         messageTypeList.add(configDetails.getMessageTypeId());
                     }
                 }
-                
+
 
                 /* Get the list of source orgs */
                 Criteria sourceconfigurationQuery = sessionFactory.getCurrentSession().createCriteria(configuration.class);
@@ -223,11 +222,10 @@ public class transactionOutDAOImpl implements transactionOutDAO {
                 configuration sourceconfigDetails = (configuration) sourceconfigurationQuery.uniqueResult();
 
                 /* Add the target org to the target organization list */
-                if(fromOrgId == 0) {
+                if (fromOrgId == 0) {
                     sourceOrgList.add(sourceconfigDetails.getorgId());
-                }
-                else {
-                    if(fromOrgId == sourceconfigDetails.getorgId()) {
+                } else {
+                    if (fromOrgId == sourceconfigDetails.getorgId()) {
                         sourceOrgList.add(sourceconfigDetails.getorgId());
                     }
                 }
@@ -285,7 +283,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
      *
      * @param fromDate
      * @param toDate
-      * @return This function will return a list of batch uploads
+     * @return This function will return a list of batch uploads
      * @throws Exception
      */
     @Override
@@ -310,19 +308,14 @@ public class transactionOutDAOImpl implements transactionOutDAO {
 
     }
 
-    /**
-     * The 'findInboxBatches' function will take a list of batches and apply the searchTerm to narrow down the results.
-     *
-     * @param batches The object containing the returned batches
-     * @param searchTerm The term to search the batches on
-     *
-     * @return This function will return a list of batches that match the search term.
-     */
+    
     @Override
     @Transactional
-    public List<Integer> findInboxBatches(List<batchDownloads> batches, String searchTerm) throws Exception {
-        
-        String[] terms = searchTerm.split("\\|",-1);
+    public boolean searchBatchForHistory(batchDownloads batchDetails, String searchTerm, Date fromDate, Date toDate) {
+
+        boolean matched = true;
+
+        String[] terms = searchTerm.split("\\|", -1);
         String status = terms[0];
         String batchName = terms[1];
         String firstName = terms[2];
@@ -330,84 +323,62 @@ public class transactionOutDAOImpl implements transactionOutDAO {
         String utBatchName = terms[4];
         String patientId = terms[5];
         String providerId = terms[6];
-        
-        List<Integer> batchIdList = new ArrayList<Integer>();
 
-        for (batchDownloads batch : batches) {
-            boolean addBatch = true;
+        if (!"".equals(batchName) && !batchName.equals(batchDetails.getoutputFIleName())) {
+            matched = false;
+        }
 
-            lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
-            batch.setstatusValue(processStatus.getDisplayCode());
+        if (!"".equals(utBatchName) && !utBatchName.equals(batchDetails.getutBatchName())) {
+            matched = false;
+        }
 
-            /* Search the batch name */
-            if (!"".equals(utBatchName) && !batch.getutBatchName().toLowerCase().matches(".*" + utBatchName + ".*")) {
-               addBatch = false;
+        if (!batchDetails.getdateCreated().after(fromDate)) {
+            matched = false;
+        }
+
+        if (!batchDetails.getdateCreated().before(toDate)) {
+            matched = false;
+        }
+
+
+        /* Search message types included in the batch */
+        Criteria transactionQuery = sessionFactory.getCurrentSession().createCriteria(transactionTarget.class);
+        transactionQuery.add(Restrictions.eq("batchDLId", batchDetails.getId()));
+        List<transactionTarget> transactions = transactionQuery.list();
+
+        /* Loop through the transactions to match patient information */
+        for (transactionTarget transaction : transactions) {
+
+            /* Get a the transaction in entry */
+            Criteria transactionIn = sessionFactory.getCurrentSession().createCriteria(transactionIn.class);
+            transactionIn.add(Restrictions.eq("id", transaction.gettransactionInId()));
+
+            transactionIn transactionInDetails = (transactionIn) transactionIn.uniqueResult();
+
+            if (!"0".equals(status) && !status.equals(String.valueOf(transactionInDetails.getmessageStatus()))) {
+                matched = false;
             }
-            
-            /* Search the file name */
-            if (!"".equals(batchName) && !batch.getoutputFIleName().toLowerCase().matches(".*" + batchName + ".*")) {
-                addBatch = false;
+
+            Criteria patientQuery = sessionFactory.getCurrentSession().createCriteria(messagePatients.class);
+            patientQuery.add(Restrictions.eq("transactionInId", transaction.gettransactionInId()));
+
+            if (!"".equals(firstName)) {
+                patientQuery.add(Restrictions.like("firstName", firstName));
+            }
+            if (!"".equals(lastName)) {
+                patientQuery.add(Restrictions.like("lastName", lastName));
+            }
+            if (!"".equals(patientId)) {
+                patientQuery.add(Restrictions.like("sourcePatientId", patientId));
             }
 
-
-            /* Search the status 
-            if (batch.getstatusValue().toLowerCase().matches(".*" + searchTerm + ".*")) {
-                if (!batchIdList.contains(batch.getId())) {
-                    batchIdList.add(batch.getId());
-                }
-            }*/
-
-            /* Search message types included in the batch */
-            Criteria transactionQuery = sessionFactory.getCurrentSession().createCriteria(transactionTarget.class);
-            transactionQuery.add(Restrictions.eq("batchDLId", batch.getId()));
-            List<transactionTarget> transactions = transactionQuery.list();
-            
-            if (!transactions.isEmpty() && (!"0".equals(status) || !"".equals(firstName) || !"".equals(lastName) || !"".equals(patientId))) {
-
-                /* Loop through the transactions to match patient information */
-                for (transactionTarget transaction : transactions) {
-                    
-                    /* Get a the transaction in entry */
-                    Criteria transactionIn = sessionFactory.getCurrentSession().createCriteria(transactionIn.class);
-                    transactionIn.add(Restrictions.eq("id", transaction.gettransactionInId()));
-                    
-                    transactionIn transactionInDetails = (transactionIn) transactionIn.uniqueResult();
-                   
-                    if(!"0".equals(status) && !status.equals(String.valueOf(transactionInDetails.getmessageStatus()))) {
-                        addBatch = false;
-                    }
-                    
-                    Criteria patientQuery = sessionFactory.getCurrentSession().createCriteria(messagePatients.class);
-                    patientQuery.add(Restrictions.eq("transactionInId", transaction.gettransactionInId()));
-                    
-                    if(!"".equals(firstName)) {
-                        patientQuery.add(Restrictions.like("firstName",firstName));
-                    }
-                    if(!"".equals(lastName)) {
-                        patientQuery.add(Restrictions.like("lastName",lastName));
-                    }
-                    if(!"".equals(patientId)) {
-                        patientQuery.add(Restrictions.like("sourcePatientId",patientId));
-                    }
-                    
-                    if(patientQuery.list().isEmpty()) {
-                        addBatch = false;
-                    }
-                    
-                }
-
-            }
-            
-            /* Transaction in for status */
-            
-            
-            if(addBatch == true && !batchIdList.contains(batch.getId())) {
-                 batchIdList.add(batch.getId());
+            if (patientQuery.list().isEmpty()) {
+                matched = false;
             }
 
         }
 
-        return batchIdList;
+        return matched;
     }
 
     /**
@@ -573,13 +544,13 @@ public class transactionOutDAOImpl implements transactionOutDAO {
     @Override
     @Transactional
     public transactionTarget getTransactionDetails(int transactionId) throws Exception {
-    	try {
-    		return (transactionTarget) sessionFactory.getCurrentSession().get(transactionTarget.class, transactionId);
-    	} catch (Exception ex) {
-    		ex.printStackTrace();
-    		System.err.println("errored at getTransactionDetails " + ex.getMessage());
-    		return null;
-    	}
+        try {
+            return (transactionTarget) sessionFactory.getCurrentSession().get(transactionTarget.class, transactionId);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.err.println("errored at getTransactionDetails " + ex.getMessage());
+            return null;
+        }
     }
 
     /**
@@ -891,21 +862,20 @@ public class transactionOutDAOImpl implements transactionOutDAO {
             String dataSQL;
             for (configurationFormFields formField : formFields) {
                 if (!formField.getsaveToTableName().equalsIgnoreCase("")) {
-                    
+
                     int rowNum;
                     int idot = formField.getFieldDesc().indexOf(".");
-                    
-                    if(idot > 0) {
-                        idot+=1;
-                        rowNum = Integer.parseInt(formField.getFieldDesc().substring(idot))-1;
-                    }
-                    else {
+
+                    if (idot > 0) {
+                        idot += 1;
+                        rowNum = Integer.parseInt(formField.getFieldDesc().substring(idot)) - 1;
+                    } else {
                         rowNum = 0;
                     }
-                    
+
                     dataSQL = "SELECT " + formField.getsaveToTableCol() + " from " + formField.getsaveToTableName()
                             + " WHERE transactionInId = :transactionInId LIMIT " + rowNum + ",1"; //LIMIT 0,1
-                    
+
                     Query getData = sessionFactory.getCurrentSession().createSQLQuery(dataSQL)
                             .setParameter("transactionInId", transactionInId);
 
@@ -1204,7 +1174,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
 
         Criteria findBatches = sessionFactory.getCurrentSession().createCriteria(batchDownloads.class);
         findBatches.add(Restrictions.in("id", batchIdList));
-        findBatches.add(Restrictions.eq("transportMethodId",1));
+        findBatches.add(Restrictions.eq("transportMethodId", 1));
         findBatches.add(Restrictions.or(
                 Restrictions.eq("statusId", 22),
                 Restrictions.eq("statusId", 23),
@@ -1456,16 +1426,15 @@ public class transactionOutDAOImpl implements transactionOutDAO {
                 + "where tt.batchDLId = 0 and tt.statusID = 9\n"
                 + "Group by c.orgId\n"
                 + "Order by total desc";
-        
+
         Query transactions = sessionFactory.getCurrentSession().createSQLQuery(SQL);
-       
+
         return transactions.list();
 
     }
-    
+
     /**
-     * The 'getTransactionsToProcessByMessageType' will return a list of transactions that need to be processed grouped by
-     * message type.
+     * The 'getTransactionsToProcessByMessageType' will return a list of transactions that need to be processed grouped by message type.
      *
      * @return This method will return a list
      */
@@ -1477,49 +1446,48 @@ public class transactionOutDAOImpl implements transactionOutDAO {
 
         String SQL = "SELECT c.orgId, m.name, c.messageTypeId, count(tt.id) as total\n"
                 + "FROM transactionTarget tt inner join configurations c on c.id = tt.configId inner join messagetypes m on m.id = c.messageTypeId\n"
-                + "where tt.batchDLId = 0 and tt.statusID = 9 and c.orgId = "+ orgId + "\n"
+                + "where tt.batchDLId = 0 and tt.statusID = 9 and c.orgId = " + orgId + "\n"
                 + "Group by c.messageTypeId\n"
                 + "Order by total desc";
-        
+
         Query transactions = sessionFactory.getCurrentSession().createSQLQuery(SQL);
-       
+
         return transactions.list();
 
     }
-    
+
     /**
-     * The 'getPendingTransactions' method will return all pending target transactions based on the org and message type
-     * passed in.
-     * 
-     * @param orgId         The id of the organzition to return pending transactions
-     * @param messageType   The id of the message type to return pending transactions
-     * 
+     * The 'getPendingTransactions' method will return all pending target transactions based on the org and message type passed in.
+     *
+     * @param orgId The id of the organzition to return pending transactions
+     * @param messageType The id of the message type to return pending transactions
+     *
      * @return This function will return a list of transactionTargets
      */
     @Override
     @Transactional
     public List<transactionTarget> getPendingDeliveryTransactions(int orgId, int messageType, Date fromDate, Date toDate) throws Exception {
-        
+
         List<Integer> configIds = new ArrayList<Integer>();
-        
+
         Criteria listConfigs = sessionFactory.getCurrentSession().createCriteria(configuration.class);
         listConfigs.add(Restrictions.eq("orgId", orgId));
         listConfigs.add(Restrictions.eq("messageTypeId", messageType));
-        
+
         List<configuration> configs = listConfigs.list();
-        
-        for(configuration config : configs) {
-            
-            if(!configIds.contains(config.getId())) {
+
+        for (configuration config : configs) {
+
+            if (!configIds.contains(config.getId())) {
                 configIds.add(config.getId());
             }
         }
-        
+
         Criteria transactions = sessionFactory.getCurrentSession().createCriteria(transactionTarget.class);
         transactions.add(Restrictions.in("configId", configIds));
         transactions.add(Restrictions.eq("statusId", 9));
         transactions.add(Restrictions.eq("batchDLId", 0));
-        
+
         if (!"".equals(fromDate)) {
             transactions.add(Restrictions.ge("dateCreated", fromDate));
         }
@@ -1527,42 +1495,41 @@ public class transactionOutDAOImpl implements transactionOutDAO {
         if (!"".equals(toDate)) {
             transactions.add(Restrictions.lt("dateCreated", toDate));
         }
-        
-        return transactions.list(); 
+
+        return transactions.list();
     }
-    
+
     @Override
     @Transactional
     public void doNotProcessTransaction(int transactionId) throws Exception {
-        
+
         Criteria transactionDetails = sessionFactory.getCurrentSession().createCriteria(transactionTarget.class);
         transactionDetails.add(Restrictions.eq("id", transactionId));
-        
+
         transactionTarget targetDetails = (transactionTarget) transactionDetails.uniqueResult();
-        
+
         /* Update the transaction Target status to DNP (Do Not Process) */
         targetDetails.setstatusId(34);
         sessionFactory.getCurrentSession().update(targetDetails);
-        
+
         /* Update the transaction in status to DNP (Do Not Process) */
         String sql = "update transactionIn set statusId = 34 where id = :transactionInId";
 
         Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
                 .setParameter("transactionInId", targetDetails.gettransactionInId());
         updateData.executeUpdate();
-        
+
         /* Need to check to see if this is the only transaction for the uploaded batch */
         String updateBatchSQL = "update batchUploads set statusId = 21 where id = :batchId and 0 in (select count(id) as total from transactionIn where batchId = :batchId and statusId != 34)";
-        
+
         Query updateBatchStatus = sessionFactory.getCurrentSession().createSQLQuery(updateBatchSQL);
         updateBatchStatus.setParameter("batchId", targetDetails.getbatchUploadId());
         updateBatchStatus.executeUpdate();
-                
+
     }
-    
+
     /**
-     * The 'getAllransactionsToProcessByMessageType' will return a list of transactions that need to be processed by the passed in
-     * organizationId and message type id.
+     * The 'getAllransactionsToProcessByMessageType' will return a list of transactions that need to be processed by the passed in organizationId and message type id.
      *
      * @return This method will return a list
      */
@@ -1574,62 +1541,59 @@ public class transactionOutDAOImpl implements transactionOutDAO {
 
         String SQL = "SELECT tt.id, c.id as configId\n"
                 + "FROM transactionTarget tt inner join configurations c on c.id = tt.configId \n"
-                + "where tt.batchDLId = 0 and tt.statusID = 9 and c.orgId = "+ orgId;
-        
-        if(messageTypeId > 0) {
+                + "where tt.batchDLId = 0 and tt.statusID = 9 and c.orgId = " + orgId;
+
+        if (messageTypeId > 0) {
             SQL += " and c.messageTypeId = " + messageTypeId;
         }
-        
+
         Query transactions = sessionFactory.getCurrentSession().createSQLQuery(SQL);
-       
+
         return transactions.list();
 
     }
-    
+
     /**
-     * The 'getBatchesBySentOrg' will search the batchDownloadSummary table for batches sent by the
-     * passed in orgId to the passed in orgId for the passed in messagetypeId
-     * 
-     * @param srcOrgId      The orgId who sent the batch
-     * @param tgtOrgId      The orgId for the user who is logged in
+     * The 'getBatchesBySentOrg' will search the batchDownloadSummary table for batches sent by the passed in orgId to the passed in orgId for the passed in messagetypeId
+     *
+     * @param srcOrgId The orgId who sent the batch
+     * @param tgtOrgId The orgId for the user who is logged in
      * @param messageTypeId The id of the message Type that was selected
-     * 
+     *
      * @return This function will return a list of batches found matching the criteria passed in.
      */
     @Override
     @Transactional
     public List<batchDownloadSummary> getBatchesBySentOrg(int srcorgId, int tgtOrgId, int messageTypeId) throws Exception {
-        
+
         Criteria batchSummaries = sessionFactory.getCurrentSession().createCriteria(batchDownloadSummary.class);
         batchSummaries.add(Restrictions.eq("sourceOrgId", srcorgId));
         batchSummaries.add(Restrictions.eq("targetOrgId", tgtOrgId));
         batchSummaries.add(Restrictions.eq("messageTypeId", messageTypeId));
-        
+
         return batchSummaries.list();
-    
+
     }
-    
+
     /**
-     * The 'getuploadBatchesByConfigAndSource' method will return the list of uploaded messages for the 
-     * passed in configId and passed in target orgId
-     * 
-     * @param configId  The configuration Id to find uploaded messages
-     * 
-     * @param orgId     The organization Id that the message was sent to
-     * 
+     * The 'getuploadBatchesByConfigAndSource' method will return the list of uploaded messages for the passed in configId and passed in target orgId
+     *
+     * @param configId The configuration Id to find uploaded messages
+     *
+     * @param orgId The organization Id that the message was sent to
+     *
      * @return This method will return a list of uploaded batches
      */
     @Override
     @Transactional
     public List<batchDownloadSummary> getuploadBatchesByConfigAndSource(Integer configId, Integer orgId) {
-        
+
         Criteria batchSummaries = sessionFactory.getCurrentSession().createCriteria(batchDownloadSummary.class);
         batchSummaries.add(Restrictions.eq("targetConfigId", configId));
         batchSummaries.add(Restrictions.eq("sourceOrgId", orgId));
 
         return batchSummaries.list();
-        
-        
+
     }
 
 }

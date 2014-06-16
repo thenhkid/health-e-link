@@ -6,6 +6,10 @@
 
 package com.ut.dph.model;
 
+import java.util.Date;
+import javax.persistence.Column;
+import org.springframework.format.annotation.DateTimeFormat;
+
 /**
  *
  * @author chadmccue
@@ -21,6 +25,16 @@ public class historyResults {
     boolean showDetails = false;
     private String transportType = null;
     private Integer totalSent = 0;
+    private String patientName = null;
+    private String batchName = null;
+    private String referralId = null;
+    private String status = null;
+    private int transactionId;
+    private String patientId = null;
+    
+    @DateTimeFormat(pattern = "dd/MM/yyyy hh:mm:ss")
+    @Column(name = "DATECREATED", nullable = false)
+    private Date dateCreated = new Date();
     
     public int getorgId() {
         return orgId;
@@ -94,6 +108,60 @@ public class historyResults {
         this.totalSent = totalSent;
     }
     
+    public String getBatchName() {
+        return batchName;
+    }
+
+    public void setBatchName(String batchName) {
+        this.batchName = batchName;
+    }
+
+    public String getReferralId() {
+        return referralId;
+    }
+
+    public void setReferralId(String referralId) {
+        this.referralId = referralId;
+    }
+
+    public String getpatientName() {
+        return patientName;
+    }
+
+    public void setpatientName(String patientName) {
+        this.patientName = patientName;
+    }
+
+    public String getPatientId() {
+        return patientId;
+    }
+
+    public void setPatientId(String patientId) {
+        this.patientId = patientId;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public int getTransactionId() {
+        return transactionId;
+    }
+
+    public void setTransactionId(int transactionId) {
+        this.transactionId = transactionId;
+    }
     
+    public Date getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(Date dateCreated) {
+        this.dateCreated = dateCreated;
+    }
     
 }
