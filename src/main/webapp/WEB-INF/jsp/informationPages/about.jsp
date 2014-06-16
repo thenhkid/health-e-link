@@ -32,7 +32,7 @@
             </aside>
 
             <div class="col-md-9 col-md-offset-0 col-sm-8 col-sm-offset-1 page-content">
-                <h3>About the e-Referral Project</h3>
+                <h2>About the e-Referral Project</h2>
                 <p>
                     The e-Referral project development has been funded as part of Massachusetts CMS State Innovation Model Testing Award. The Massachusetts' SIM Testing Award projects are committed to providing 
                     better population health, better experience, and lower healthcare costs throughout the Commonwealth. The e-Referral Project aims to transform the Massachusetts' health care delivery system by 

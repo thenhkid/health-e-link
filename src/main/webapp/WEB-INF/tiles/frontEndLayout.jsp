@@ -16,6 +16,7 @@
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <meta http-equiv="Content-Language" content="en">
+    <meta http-equiv="Accept-Language" content="en">
     <title><tiles:insertAttribute name="title" /></title>
     <!%-- main css compiled from main.less --%>
     <link rel="stylesheet" href="<%=request.getContextPath()%>/dspResources/css/front-end/main.css?v=2">

@@ -33,10 +33,10 @@
             <div class="col-md-12 form-section">
                 <section class="panel panel-default panel-collapse">
                     <div class="panel-heading">
-                        <h3 class="panel-title">
+                        <h2 class="panel-title">
                             Selected Criteria
                             <a data-toggle="collapse" href="#collapse-criteria"> - Click to Show</a>
-                        </h3>
+                        </h2>
                     </div>
                     <div id="collapse-criteria" class="panel-collapse collapse">    
                         <div class="panel-body">

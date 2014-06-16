@@ -4,6 +4,10 @@
     Author     : chadmccue
 --%>
 
+<head>
+    <meta http-equiv="Content-Language" content="en">
+</head>
+
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
@@ -16,7 +20,7 @@
         <div class="modal-body">
             <form:form id="fileUploadForm" action="submitFileUpload" enctype="multipart/form-data" method="post" role="form">
                 <div id="configIdsDiv" class="form-group ${status.error ? 'has-error' : '' }">
-                    <label for="crosswalkName">Select the message types that will be in the file *</label>
+                    <label for="configIds">Select the message types that will be in the file *</label>
                     <select id="configIds" name="configId" class="form-control half">
                         <option  value="">- Message Types - </option>
                         <c:forEach items="${configurations}" var="config">

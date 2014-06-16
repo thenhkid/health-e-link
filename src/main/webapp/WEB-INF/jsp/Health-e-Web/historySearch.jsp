@@ -26,6 +26,7 @@
                         <span class="date-label"  rel="" rel2=""><fmt:formatDate value="${fromDate}" type="date" pattern="MMM dd, yyyy" /> - <fmt:formatDate value="${toDate}" type="date" pattern="MMM dd, yyyy" /></span> <b class="caret"></b>
                     </div>
                     <div class="form-group pull-right">
+                         <label class="control-label" for="reportType" style="display:none;">Report Type</label>
                         <select id="reportType" name="reportType" class="form-control">
                             <option value="1">Summary Report</option>
                             <option value="2">Detailed Report</option>
@@ -37,7 +38,7 @@
 
                     <section class="panel panel-default">
                         <div class="panel-heading">
-                            <h3 class="panel-title">History Search Criteria</h3>
+                            <h2 class="panel-title">History Search Criteria</h2>
                         </div>
                         <div class="panel-body">
                             <div class="form-container scrollable">
