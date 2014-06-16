@@ -607,3 +607,20 @@ DELIMITER ;
 UPDATE `universaltranslator`.`macro_names` SET `Macro_Name`='Match Null or empty value and replace', `Macro_Short_Name`='replaceBlanksWithChars', `Formula`='replaceBlanksWithChars', `FieldB_Question`=NULL, `Con1_Question`='Please enter value that you would like to replace empty with' WHERE `ID`='76';
 
 /** all above updates are deployed on test and dev  06132014 1:43PM **/
+
+/** Grace 06162014 2:02 PM **/
+INSERT INTO `universaltranslator`.`lu_ProcessStatus` (`id`,`category`, `displayCode`, `displayText`) VALUES ('38','batch', 'SBL', 'Submission Being Loaded');
+INSERT INTO `universaltranslator`.`lu_ProcessStatus` (`id`, `category`, `displayCode`, `displayText`) VALUES ('39','batch', 'SLE', 'Submission Loading Error');
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayText`='Source Submission Resubmitted' WHERE `id`='3';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayCode`='INV' WHERE `id`='11';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayCode`='TTP', `displayText`='Transaction Translation Pending' WHERE `id`='10';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayCode`='TRP', `displayText`='Transaction Release Pending' WHERE `id`='12';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayCode`='REJ' WHERE `id`='13';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayCode`='ERR' WHERE `id`='14';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayCode`='SAV' WHERE `id`='15';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayCode`='PAS' WHERE `id`='16';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayCode`='CLO' WHERE `id`='17';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayCode`='REC' WHERE `id`='20';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayCode`='SSR', `displayText`='Submission Source Received' WHERE `id`='23';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayCode`='SDC', `displayText`='Submission Delivery Completed' WHERE `id`='28';
+
