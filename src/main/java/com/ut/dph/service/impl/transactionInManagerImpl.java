@@ -1615,23 +1615,26 @@ public class transactionInManagerImpl implements transactionInManager {
                         updateTransactionStatus(batchId, 0, 0, 11);
                         return false;
                     }
-
+                    //if we only have one, else we loop through
+                    if (configurationMessageSpecs.size() == 1) {
+                    	sysError = sysError + updateConfigIdForBatch(batch.getId(), batch.getConfigId());
+                    } else {
                     //3 loop through each config and mass update by config
-                    for (configurationMessageSpecs cms : configurationMessageSpecs) {
-                        //we update by config
-                        if (updateConfigIdForCMS(batchId, cms) != 0) {
-                            sysError++;
-                            insertProcessingError(processingSysErrorId, null, batch.getId(), null, null, null, null,
-                                    false, false, "System error while checking configuration");
-                            //system error - break
-                            break;
-                        }
-                    }
-
+	                    for (configurationMessageSpecs cms : configurationMessageSpecs) {
+	                        //we update by config
+	                        if (updateConfigIdForCMS(batchId, cms) != 0) {
+	                            sysError++;
+	                            insertProcessingError(processingSysErrorId, null, batch.getId(), null, null, null, null,
+	                                    false, false, "System error while checking configuration");
+	                            //system error - break
+	                            break;
+	                        }
+	                    }                   
                     // now we looped through config, we flag the invalid records.
                     sysError = flagInvalidConfig(batchId);
                     //we also need to flag and error the ones that a user is not supposed to upload for
                     sysError = flagNoPermissionConfig(batch);
+                    }
                 }
 
                 //we populate transactionTranslatedIn
