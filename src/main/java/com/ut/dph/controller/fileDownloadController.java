@@ -39,7 +39,7 @@ public class fileDownloadController {
         try {
             fileSystem dir = new fileSystem();
             
-            if(orgId != null) {
+            if(orgId != null && orgId > 0) {
 
                 Organization organization = organizationManager.getOrganizationById(orgId);
                 String cleanURL = organization.getcleanURL();
