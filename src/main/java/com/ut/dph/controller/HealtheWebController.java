@@ -2783,6 +2783,11 @@ public class HealtheWebController {
         List<messageType> assocMessageTypes = messagetypemanager.getAssociatedMessageTypes(userInfo.getOrgId());
 
         mav.addObject("assocMessageTypes", assocMessageTypes);
+        
+        /* Get the list of process status */
+        List<lu_ProcessStatus> statusList = sysAdminManager.getAllProcessStatus();
+        
+        mav.addObject("statusList", statusList);
 
         //we log here 
         try {
@@ -2820,7 +2825,7 @@ public class HealtheWebController {
      */
     @RequestMapping(value = "/history", method = RequestMethod.POST)
     public ModelAndView historyResults(HttpSession session, @RequestParam Date fromDate, @RequestParam Date toDate, @RequestParam Integer type, @RequestParam Integer sentTo,
-            @RequestParam Integer messageType, @RequestParam Integer status, @RequestParam Integer systemStatus, @RequestParam Integer reportType,
+            @RequestParam Integer messageType, @RequestParam Integer status, @RequestParam String systemStatus, @RequestParam Integer reportType,
             @RequestParam String batchName, @RequestParam String utBatchName, @RequestParam String lastName, @RequestParam String patientId, @RequestParam String firstName, @RequestParam String providerId) throws Exception {
 
         ModelAndView mav = new ModelAndView();
@@ -2872,9 +2877,23 @@ public class HealtheWebController {
             mav.addObject("statusText", "Closed Only");
         }
         mav.addObject("status", status);
-
-        mav.addObject("systemStatusText", "All System Statuses");
-        mav.addObject("systemStatus", 0);
+        
+        int statusId = 0;
+        String statusCategory = "";
+        if("0".equals(systemStatus)) {
+            mav.addObject("systemStatusText", "All System Statuses");
+        }
+        else {
+            String[] selsystemStatus = systemStatus.split("\\-", -1);
+            statusId = Integer.parseInt(selsystemStatus[0]);
+            statusCategory = selsystemStatus[1];
+            
+            lu_ProcessStatus statusDetails = sysAdminManager.getProcessStatusById(statusId);
+            
+            mav.addObject("systemStatusText", statusDetails.getDisplayText());
+            
+        }
+        mav.addObject("systemStatus", systemStatus);
 
         /* Add additional search options */
         mav.addObject("batchName", batchName);
@@ -2895,7 +2914,7 @@ public class HealtheWebController {
 
         Integer receivedTotal = 0;
 
-        String searchTerm = new StringBuilder().append(status).append("|").append(batchName).append("|").append(firstName).append("|").append(lastName).append("|").append(utBatchName).append("|").append(patientId).append("|").append(providerId).toString();
+        String searchTerm = new StringBuilder().append(statusId).append("-").append(statusCategory).append("|").append(status).append("|").append(batchName).append("|").append(firstName).append("|").append(lastName).append("|").append(utBatchName).append("|").append(patientId).append("|").append(providerId).toString();
 
         for (configuration config : configs) {
 
@@ -2963,6 +2982,9 @@ public class HealtheWebController {
                                     resultEntry.setTransportType(transportType);
                                     resultEntry.setBatchName(batchDetails.getutBatchName());
                                     resultEntry.setDateCreated(batchDetails.getdateSubmitted());
+                                    lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batchDetails.getstatusId());
+                                    resultEntry.setStatus(processStatus.getDisplayCode());
+                                    resultEntry.setStatusId(batchDetails.getstatusId());
                                     
                                      /* Get the patient data */
                                     messagePatients patientInfo = transactionInManager.getPatientTransactionDetails(transactionDetails.get(0).getId());
@@ -3057,6 +3079,9 @@ public class HealtheWebController {
                                     resultEntry.setTransportType(transportType);
                                     resultEntry.setBatchName(batchDetails.getutBatchName());
                                     resultEntry.setDateCreated(batchDetails.getdateCreated());
+                                    lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batchDetails.getstatusId());
+                                    resultEntry.setStatus(processStatus.getDisplayCode());
+                                    resultEntry.setStatusId(batchDetails.getstatusId());
                                     
                                      /* Get the patient data */
                                     messagePatients patientInfo = transactionInManager.getPatientTransactionDetails(transactionDetails.get(0).gettransactionInId());

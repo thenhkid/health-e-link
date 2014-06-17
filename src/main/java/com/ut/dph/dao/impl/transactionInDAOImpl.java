@@ -4946,13 +4946,18 @@ public class transactionInDAOImpl implements transactionInDAO {
         boolean matched = true;
 
         String[] terms = searchTerm.split("\\|", -1);
-        String status = terms[0];
-        String batchName = terms[1];
-        String firstName = terms[2];
-        String lastName = terms[3];
-        String utBatchName = terms[4];
-        String patientId = terms[5];
-        String providerId = terms[6];
+        String[] systemStatus = terms[0].split("\\-", -1);
+        
+        int statusId = Integer.parseInt(systemStatus[0]);
+        String statusCategory = systemStatus[1];
+        
+        String status = terms[1];
+        String batchName = terms[2];
+        String firstName = terms[3];
+        String lastName = terms[4];
+        String utBatchName = terms[5];
+        String patientId = terms[6];
+        String providerId = terms[7];
 
         if (!"".equals(batchName) && !batchName.equals(batchDetails.getoriginalFileName())) {
             matched = false;
@@ -4970,6 +4975,10 @@ public class transactionInDAOImpl implements transactionInDAO {
             matched = false;
         }
         
+        if(!"".equals(statusCategory) && "batch".equals(statusCategory) && statusId != batchDetails.getstatusId()) {
+            matched = false;
+        }
+        
         
         Criteria transactionQuery = sessionFactory.getCurrentSession().createCriteria(transactionIn.class);
         transactionQuery.add(Restrictions.eq("batchId", batchDetails.getId()));
@@ -4978,6 +4987,10 @@ public class transactionInDAOImpl implements transactionInDAO {
         if (transactions.size() > 0) {
 
             for (transactionIn transaction : transactions) {
+                
+                if(!"".equals(statusCategory) && "transaction".equals(statusCategory) && statusId != transaction.getstatusId()) {
+                    matched = false;
+                }
 
                 if(!"0".equals(status) && !status.equals(String.valueOf(transaction.getmessageStatus()))) {
                     matched = false;

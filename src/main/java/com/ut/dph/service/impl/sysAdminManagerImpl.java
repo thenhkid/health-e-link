@@ -545,5 +545,10 @@ public class sysAdminManagerImpl implements sysAdminManager {
     public int saveHL7Element(mainHL7Elements newElement) {
         return sysAdminDAO.saveHL7Element(newElement);
     }
+    
+    @Override
+    public List<lu_ProcessStatus> getAllProcessStatus() throws Exception {
+        return sysAdminDAO.getAllProcessStatus();
+    }
    
 }

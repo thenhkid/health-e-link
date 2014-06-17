@@ -90,7 +90,9 @@
                                         <label class="control-label" for="systemStatus">System Status</label>
                                         <select id="systemStatus" name="systemStatus" class="form-control">
                                             <option value="0">- All System Statuses -</option>
-                                            <option value=""></option>
+                                            <c:forEach var="status" items="${statusList}">
+                                                <option value="${status.id}-${status.category}">${status.displayCode}&nbsp;-&nbsp;${status.displayText}</option>
+                                            </c:forEach>
                                         </select>
                                     </div>
                                 </div>     

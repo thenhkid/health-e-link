@@ -1,10 +1,5 @@
 package com.ut.dph.dao.impl;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.List;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
@@ -832,6 +827,20 @@ public class sysAdminDAOImpl implements sysAdminDAO {
         lastId = (Integer) sessionFactory.getCurrentSession().save(newElement);
         
         return lastId;
+    }
+    
+    @Override
+    @Transactional
+    public List<lu_ProcessStatus> getAllProcessStatus() throws Exception {
+        
+         
+        Criteria statusList = sessionFactory.getCurrentSession().createCriteria(lu_ProcessStatus.class);
+        statusList.add(Restrictions.eq("status",true));
+        statusList.addOrder(Order.asc("category"));
+        statusList.addOrder(Order.asc("displayText"));
+        
+        return statusList.list();
+        
     }
     
 

@@ -14,7 +14,6 @@ import com.ut.dph.model.configurationConnectionReceivers;
 import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.configurationSchedules;
 import com.ut.dph.model.configurationTransport;
-import com.ut.dph.model.lutables.lu_ProcessStatus;
 import com.ut.dph.model.messagePatients;
 import com.ut.dph.model.targetOutputRunLogs;
 import com.ut.dph.model.transactionIn;
@@ -314,15 +313,20 @@ public class transactionOutDAOImpl implements transactionOutDAO {
     public boolean searchBatchForHistory(batchDownloads batchDetails, String searchTerm, Date fromDate, Date toDate) {
 
         boolean matched = true;
-
+        
         String[] terms = searchTerm.split("\\|", -1);
-        String status = terms[0];
-        String batchName = terms[1];
-        String firstName = terms[2];
-        String lastName = terms[3];
-        String utBatchName = terms[4];
-        String patientId = terms[5];
-        String providerId = terms[6];
+        String[] systemStatus = terms[0].split("\\-", -1);
+        
+        int statusId = Integer.parseInt(systemStatus[0]);
+        String statusCategory = systemStatus[1];
+
+        String status = terms[1];
+        String batchName = terms[2];
+        String firstName = terms[3];
+        String lastName = terms[4];
+        String utBatchName = terms[5];
+        String patientId = terms[6];
+        String providerId = terms[7];
 
         if (!"".equals(batchName) && !batchName.equals(batchDetails.getoutputFIleName())) {
             matched = false;
@@ -337,6 +341,10 @@ public class transactionOutDAOImpl implements transactionOutDAO {
         }
 
         if (!batchDetails.getdateCreated().before(toDate)) {
+            matched = false;
+        }
+        
+        if(!"".equals(statusCategory) && "batch".equals(statusCategory) && statusId != batchDetails.getstatusId()) {
             matched = false;
         }
 
@@ -354,6 +362,10 @@ public class transactionOutDAOImpl implements transactionOutDAO {
             transactionIn.add(Restrictions.eq("id", transaction.gettransactionInId()));
 
             transactionIn transactionInDetails = (transactionIn) transactionIn.uniqueResult();
+            
+            if(!"".equals(statusCategory) && "transaction".equals(statusCategory) && statusId != transactionInDetails.getstatusId()) {
+                matched = false;
+            }
 
             if (!"0".equals(status) && !status.equals(String.valueOf(transactionInDetails.getmessageStatus()))) {
                 matched = false;

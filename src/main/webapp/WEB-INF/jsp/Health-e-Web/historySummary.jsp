@@ -142,6 +142,7 @@
                                                     <th scope="col">Affiliated Organization</th>
                                                     <th scope="col">Message Type</th>
                                                     <th scope="col">Batch Name</th>
+                                                    <th scope="col" class="center-text">Status</th>
                                                     <th scope="col">Patient Name</th>
                                                     <th scope="col" class="center-text">Date Sent</th>
                                                     </c:otherwise>    
@@ -178,6 +179,9 @@
                                                                 <td>
                                                                     ${result.batchName}
                                                                 </td>
+                                                                <td class="center-text">
+                                                                    <a href="#statusModal" data-toggle="modal" class="btn btn-link viewStatus" rel="${result.statusId}" title="View this Status">${result.status}&nbsp;<span class="badge badge-help" data-placement="top" title="" data-original-title="">?</span></a>
+                                                                </td>
                                                                 <td>
                                                                     ${result.patientName}
                                                                     <br />
@@ -192,7 +196,7 @@
                                                 </c:choose>
                                             </c:when>
                                             <c:otherwise>
-                                                <tr><td colspan="${showDetails == false ? '4' : '5'}">There were no sent messages found</td></tr>
+                                                <tr><td colspan="${showDetails == false ? '4' : '6'}">There were no sent messages found</td></tr>
                                             </c:otherwise>                    
                                         </c:choose>   
                                     </tbody>
@@ -218,6 +222,7 @@
                                                     <th scope="col">Affiliated Organization</th>
                                                     <th scope="col">Message Type</th>
                                                     <th scope="col">Batch Name</th>
+                                                    <th scope="col" class="center-text">Status</th>
                                                     <th scope="col">Patient Name</th>
                                                     <th scope="col" class="center-text">Date Received</th>
                                                     </c:otherwise>    
@@ -254,6 +259,9 @@
                                                                 <td>
                                                                     ${result.batchName}
                                                                 </td>
+                                                                <td class="center-text">
+                                                                    <a href="#statusModal" data-toggle="modal" class="btn btn-link viewStatus" rel="${result.statusId}" title="View this Status">${result.status}&nbsp;<span class="badge badge-help" data-placement="top" title="" data-original-title="">?</span></a>
+                                                                </td>
                                                                 <td>
                                                                     ${result.patientName}
                                                                     <br />
@@ -283,3 +291,5 @@
         </div>
     </div>
 </div>
+<!-- Status Definition modal -->
+<div class="modal fade" id="statusModal" role="dialog" tabindex="-1" aria-labeledby="Status Details" aria-hidden="true" aria-describedby="Status Details"></div>

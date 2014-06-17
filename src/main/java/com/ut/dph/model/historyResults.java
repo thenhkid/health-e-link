@@ -29,6 +29,7 @@ public class historyResults {
     private String batchName = null;
     private String referralId = null;
     private String status = null;
+    private int statusId = 0;
     private int transactionId;
     private String patientId = null;
     
@@ -163,5 +164,15 @@ public class historyResults {
     public void setDateCreated(Date dateCreated) {
         this.dateCreated = dateCreated;
     }
+
+    public int getStatusId() {
+        return statusId;
+    }
+
+    public void setStatusId(int statusId) {
+        this.statusId = statusId;
+    }
+    
+    
     
 }

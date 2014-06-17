@@ -167,4 +167,6 @@ public interface sysAdminManager {
     int saveHL7Segment(mainHL7Segments newSegment);
 
     int saveHL7Element(mainHL7Elements newElement);
+    
+    List<lu_ProcessStatus> getAllProcessStatus() throws Exception;
 }
