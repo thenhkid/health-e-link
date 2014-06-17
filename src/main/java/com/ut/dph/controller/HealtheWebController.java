@@ -185,7 +185,7 @@ public class HealtheWebController {
                     batch.settotalTransactions(batchTransactions.size());
 
                     lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
-                    batch.setstatusValue(processStatus.getDisplayCode());
+                    batch.setstatusValue(processStatus.getEndUserDisplayCode());
 
                     /* Get the details of the sender */
                     batchDownloadSummary downloadSummaryDetails = transactionOutManager.getDownloadSummaryDetails(batchTransactions.get(0).getId());
@@ -277,7 +277,7 @@ public class HealtheWebController {
                     batch.settotalTransactions(batchTransactions.size());
 
                     lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
-                    batch.setstatusValue(processStatus.getDisplayCode());
+                    batch.setstatusValue(processStatus.getEndUserDisplayCode());
 
                     /* Get the details of the sender */
                     batchDownloadSummary downloadSummaryDetails = transactionOutManager.getDownloadSummaryDetails(batchTransactions.get(0).getId());
@@ -366,7 +366,7 @@ public class HealtheWebController {
                 transactionDetails.setconfigId(transaction.getconfigId());
 
                 lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(transaction.getstatusId());
-                transactionDetails.setstatusValue(processStatus.getDisplayCode());
+                transactionDetails.setstatusValue(processStatus.getEndUserDisplayCode());
 
                 transactionOutRecords records = transactionOutManager.getTransactionRecords(transaction.getId());
 
@@ -519,7 +519,7 @@ public class HealtheWebController {
             transaction.setinternalStatusId(transactionInfo.getinternalStatusId());
 
             lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(transaction.getstatusId());
-            transaction.setstatusValue(processStatus.getDisplayCode());
+            transaction.setstatusValue(processStatus.getEndUserDisplayCode());
 
             /* get the message type name */
             transaction.setmessageTypeName(messagetypemanager.getMessageTypeById(configDetails.getMessageTypeId()).getName());
@@ -1003,7 +1003,7 @@ public class HealtheWebController {
                 transaction.setorginialTransactionId(transactionInfo.gettransactionTargetId());
 
                 lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(transaction.getstatusId());
-                transaction.setstatusValue(processStatus.getDisplayCode());
+                transaction.setstatusValue(processStatus.getEndUserDisplayCode());
 
                 /* get the message type name */
                 transaction.setmessageTypeName(messagetypemanager.getMessageTypeById(configDetails.getMessageTypeId()).getName());
@@ -1592,7 +1592,7 @@ public class HealtheWebController {
                     batch.settotalTransactions(batchTransactions.size());
 
                     lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
-                    batch.setstatusValue(processStatus.getDisplayCode());
+                    batch.setstatusValue(processStatus.getEndUserDisplayCode());
 
                     User userDetails = usermanager.getUserById(batch.getuserId());
                     String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
@@ -1651,7 +1651,7 @@ public class HealtheWebController {
                     batch.settotalTransactions(batchTransactions.size());
 
                     lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
-                    batch.setstatusValue(processStatus.getDisplayCode());
+                    batch.setstatusValue(processStatus.getEndUserDisplayCode());
 
                     User userDetails = usermanager.getUserById(batch.getuserId());
                     String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
@@ -1718,7 +1718,7 @@ public class HealtheWebController {
                     batch.settotalTransactions(batchTransactions.size());
 
                     lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
-                    batch.setstatusValue(processStatus.getDisplayCode());
+                    batch.setstatusValue(processStatus.getEndUserDisplayCode());
 
                     User userDetails = usermanager.getUserById(batch.getuserId());
                     String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
@@ -1777,7 +1777,7 @@ public class HealtheWebController {
                     batch.settotalTransactions(batchTransactions.size());
 
                     lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
-                    batch.setstatusValue(processStatus.getDisplayCode());
+                    batch.setstatusValue(processStatus.getEndUserDisplayCode());
 
                     User userDetails = usermanager.getUserById(batch.getuserId());
                     String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
@@ -1837,7 +1837,7 @@ public class HealtheWebController {
                 transactionDetails.setconfigId(transaction.getconfigId());
 
                 lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(transaction.getstatusId());
-                transactionDetails.setstatusValue(processStatus.getDisplayCode());
+                transactionDetails.setstatusValue(processStatus.getEndUserDisplayCode());
 
                 transactionInRecords records = transactionInManager.getTransactionRecords(transaction.getId());
 
@@ -1964,7 +1964,7 @@ public class HealtheWebController {
             }
 
             lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(transaction.getstatusId());
-            transaction.setstatusValue(processStatus.getDisplayCode());
+            transaction.setstatusValue(processStatus.getEndUserDisplayCode());
 
             /* get the message type name */
             transaction.setmessageTypeName(messagetypemanager.getMessageTypeById(configDetails.getMessageTypeId()).getName());
@@ -2513,7 +2513,7 @@ public class HealtheWebController {
                     transaction.setconfigId(inboxFeedbackReport.getconfigId());
 
                     lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(inboxFeedbackReport.getstatusId());
-                    transaction.setstatusValue(processStatus.getDisplayCode());
+                    transaction.setstatusValue(processStatus.getEndUserDisplayCode());
 
                     transactionOutRecords records = transactionOutManager.getTransactionRecords(inboxFeedbackReport.getId());
 
@@ -2561,7 +2561,7 @@ public class HealtheWebController {
                     transaction.setconfigId(feedbackReport.getconfigId());
 
                     lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(feedbackReport.getstatusId());
-                    transaction.setstatusValue(processStatus.getDisplayCode());
+                    transaction.setstatusValue(processStatus.getEndUserDisplayCode());
 
                     transactionInRecords records = transactionInManager.getTransactionRecords(feedbackReport.getId());
 
