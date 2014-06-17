@@ -73,7 +73,7 @@
                                                 <c:set var="text" value="${fn:split(batch.originalFileName,'.')}" />
                                                 <c:set var="ext" value="${text[fn:length(text)-1]}" />
                                                 	<br />
-                                                    <a href="/FileDownload/downloadFile.do?filename=${batch.utBatchName}.${ext}&foldername=archives" title="View Original File">
+                                                    <a href="/FileDownload/downloadFile.do?filename=${batch.utBatchName}.${ext}&foldername=archivesIn" title="View Original File">
                                                         ${batch.originalFileName}
                                                     </a>
                                                 </c:if>
