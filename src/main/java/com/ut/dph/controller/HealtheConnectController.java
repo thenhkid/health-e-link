@@ -515,7 +515,7 @@ public class HealtheConnectController {
                 for (batchDownloads batch : downloadableBatches) {
 
                     lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
-                    batch.setstatusValue(processStatus.getDisplayCode());
+                    batch.setstatusValue(processStatus.getEndUserDisplayCode());
 
                     User userDetails = usermanager.getUserById(batch.getuserId());
                     String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
@@ -574,7 +574,7 @@ public class HealtheConnectController {
                 for (batchDownloads batch : downloadableBatches) {
 
                     lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
-                    batch.setstatusValue(processStatus.getDisplayCode());
+                    batch.setstatusValue(processStatus.getEndUserDisplayCode());
 
                     User userDetails = usermanager.getUserById(batch.getuserId());
                     String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
@@ -692,7 +692,7 @@ public class HealtheConnectController {
                     batch.settotalTransactions(batchTransactions.size());
 
                     lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
-                    batch.setstatusValue(processStatus.getDisplayCode());
+                    batch.setstatusValue(processStatus.getEndUserDisplayCode());
                     if (batch.getstatusId() == 5) {
                     	Integer transTotalNotFinal = transactionInManager.getRecordCounts(batch.getId(), finalStatusIds, false, false);
                     	batch.setTransTotalNotFinal(transTotalNotFinal); 
@@ -780,7 +780,7 @@ public class HealtheConnectController {
                     batch.settotalTransactions(batchTransactions.size());
 
                     lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
-                    batch.setstatusValue(processStatus.getDisplayCode());
+                    batch.setstatusValue(processStatus.getEndUserDisplayCode());
                     if (batch.getstatusId() == 5) {
                     	Integer transTotalNotFinal = transactionInManager.getRecordCounts(batch.getId(), finalStatusIds, false, false);
                     	batch.setTransTotalNotFinal(transTotalNotFinal); 
@@ -833,7 +833,7 @@ public class HealtheConnectController {
             User userInfo = (User) session.getAttribute("userDetails");
             batchUploads batchInfo = transactionInManager.getBatchDetails(batchId);
             lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batchInfo.getstatusId());
-            batchInfo.setstatusValue(processStatus.getDisplayCode());
+            batchInfo.setstatusValue(processStatus.getEndUserDisplayCode());
 
 
             if (batchInfo.getConfigId() != 0) {
@@ -1008,7 +1008,7 @@ public class HealtheConnectController {
                     }
 
                     lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(transaction.getstatusId());
-                    transaction.setstatusValue(processStatus.getDisplayCode());
+                    transaction.setstatusValue(processStatus.getEndUserDisplayCode());
 
                     /* get the message type name */
                     transaction.setmessageTypeName(messagetypemanager.getMessageTypeById(configDetails.getMessageTypeId()).getName());
