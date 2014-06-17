@@ -624,3 +624,5 @@ UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayCode`='REC' WHERE `i
 UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayCode`='SSR', `displayText`='Submission Source Received' WHERE `id`='23';
 UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayCode`='SDC', `displayText`='Submission Delivery Completed' WHERE `id`='28';
 
+
+/** all above updates are deployed on test and dev  06172014 3:42AM **/
