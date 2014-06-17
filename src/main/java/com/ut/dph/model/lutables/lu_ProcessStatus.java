@@ -11,6 +11,8 @@ import javax.persistence.Table;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
+import com.ut.dph.validator.NoHtml;
+
 @Entity
 @Table(name="lu_ProcessStatus")
 public class lu_ProcessStatus {
@@ -21,17 +23,21 @@ public class lu_ProcessStatus {
 	private int id;
 	
 	@NotEmpty
+	@NoHtml
 	@Column(name="displayText", nullable = false)
 	private String displayText;
 	
 	@NotEmpty
+	@NoHtml
 	@Column(name="displayCode", nullable = false)
 	private String displayCode;
 	
+	@NoHtml
 	@Column(name="description", nullable = true)
 	private String description;
 	
 	@NotEmpty
+	@NoHtml
 	@Column(name="category", nullable = false)
 	private String category;
 	
@@ -43,7 +49,20 @@ public class lu_ProcessStatus {
 	
 	@Column(name="status", nullable = true)
 	private boolean status = true;
-
+	
+	@NoHtml
+	@Column(name="endUserDisplayText", nullable = false)
+	private String endUserDisplayText;
+	
+	@NoHtml
+	@Column(name="endUserDisplayCode", nullable = false)
+	private String endUserDisplayCode;
+	
+	@NoHtml
+	@Column(name="endUserDescription", nullable = true)
+	private String endUserDescription;
+	
+	
 	public int getId() {
 		return id;
 	}
@@ -108,6 +127,28 @@ public class lu_ProcessStatus {
 		this.status = status;
 	}
 
-	
-	
+	public String getEndUserDisplayText() {
+		return endUserDisplayText;
+	}
+
+	public void setEndUserDisplayText(String endUserDisplayText) {
+		this.endUserDisplayText = endUserDisplayText;
+	}
+
+	public String getEndUserDisplayCode() {
+		return endUserDisplayCode;
+	}
+
+	public void setEndUserDisplayCode(String endUserDisplayCode) {
+		this.endUserDisplayCode = endUserDisplayCode;
+	}
+
+	public String getEndUserDescription() {
+		return endUserDescription;
+	}
+
+	public void setEndUserDescription(String endUserDescription) {
+		this.endUserDescription = endUserDescription;
+	}
+
 }
