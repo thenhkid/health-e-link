@@ -11,15 +11,21 @@
          <div class="modal-body">
             <div class="form-container">
                 <div class="form-group">
-                    <label class="control-label" >Status Code</label>
+                    <label class="control-label" >Status Code / End User Status Code</label>
                     <br />
-                    ${statusDetails.displayCode}
+                    ${statusDetails.displayCode} / ${statusDetails.endUserDisplayCode}
                 </div>
+                
                 <div class="form-group">
                     <label class="control-label" >Status Text</label>
                     <br />
                     ${statusDetails.displayText}
-                </div>
+                </div> 
+                 <div class="form-group">
+                    <label class="control-label" >End User Status Text</label>
+                    <br />
+                    ${statusDetails.endUserDisplayText}
+                </div>               
                 <c:if test="${not empty statusDetails.description}">
                     <div class="form-group">
                         <label class="control-label" >Description</label>
