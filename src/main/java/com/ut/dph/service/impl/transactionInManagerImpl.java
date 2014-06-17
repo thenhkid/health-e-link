@@ -1489,13 +1489,13 @@ public class transactionInManagerImpl implements transactionInManager {
 
     @Override
     public boolean loadBatch(Integer batchId) {
-        Integer batchStatusId = 4;
+        Integer batchStatusId = 38;
         List<Integer> errorStatusIds = Arrays.asList(11, 13, 14, 16);
         String processFolderPath = "/bowlink/loadFiles/";
         try {
             //first thing we do is get details, then we set it to  4
             batchUploads batch = getBatchDetails(batchId);
-            // set batch to SBP - 4
+            // set batch to SBL - 38
             updateBatchStatus(batchId, batchStatusId, "startDateTime");
 
             // let's clear all tables first as we are starting over
@@ -1503,8 +1503,8 @@ public class transactionInManagerImpl implements transactionInManager {
             String errorMessage = "Load errors, please contact admin to review logs";
             // loading batch will take it all the way to loaded (9) status for
             if (sysErrors > 0) {
-                insertProcessingError(5, null, batchId, null, null, null, null, false, false, "Error cleaning out transaction tables.  Batch cannot be processed.");
-                updateBatchStatus(batchId, 29, "endDateTime");
+                insertProcessingError(5, null, batchId, null, null, null, null, false, false, "Error cleaning out transaction tables.  Batch cannot be loaded.");
+                updateBatchStatus(batchId, 39, "endDateTime");
                 return false;
             }
 
@@ -1669,7 +1669,7 @@ public class transactionInManagerImpl implements transactionInManager {
             }
             if (sysErrors > 0) {
                 insertProcessingError(processingSysErrorId, null, batchId, null, null, null, null, false, false, errorMessage);
-                updateBatchStatus(batchId, 29, "endDateTime");
+                updateBatchStatus(batchId, 39, "endDateTime");
                 return false;
             }
 
@@ -1688,7 +1688,7 @@ public class transactionInManagerImpl implements transactionInManager {
                 updateRecordCounts(batchId, new ArrayList<Integer>(), false, "totalRecordCount");
                 // do we count pass records as errors?
                 updateRecordCounts(batchId, errorStatusIds, false, "errorRecordCount");
-                updateBatchStatus(batchId, 29, "endDateTime");
+                updateBatchStatus(batchId, 39, "endDateTime");
                 return false;
             }
             if (batchHandling.size() == 1) {
@@ -1714,7 +1714,7 @@ public class transactionInManagerImpl implements transactionInManager {
 
         } catch (Exception ex) {
             insertProcessingError(processingSysErrorId, null, batchId, null, null, null, null, false, false, ("loadBatch error " + ex.getLocalizedMessage()));
-            batchStatusId = 29;
+            batchStatusId = 39;
         }
 
         try {
