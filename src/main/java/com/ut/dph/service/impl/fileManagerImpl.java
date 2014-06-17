@@ -26,7 +26,7 @@ public class fileManagerImpl implements fileManager {
 	 
 			return encodedString;
 	    } catch (Exception ex) {
-			System.err.println("decodeFileToBase64Binary -" + ex.getLocalizedMessage());
+			System.err.println("encodeFileToBase64Binary -" + ex.getLocalizedMessage());
 			ex.printStackTrace();
 			return null;
 		}
