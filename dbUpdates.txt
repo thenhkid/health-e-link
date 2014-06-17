@@ -673,3 +673,6 @@ UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayText`='Submission Fi
 
 /** all above updates are deployed on test and dev  06172014 10:41AM **/
 
+/** grace 06172014 11:32 AM **/
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `description`='Normal condition: This is a target status.  The transaction is ready for output generation.  When a batch is SPC, the targets will be in TPO so that the output scheduler will pick it up and process it.' WHERE `id`='19';
+
