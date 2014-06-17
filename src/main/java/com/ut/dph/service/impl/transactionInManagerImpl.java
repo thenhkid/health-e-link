@@ -1615,8 +1615,8 @@ public class transactionInManagerImpl implements transactionInManager {
                         updateTransactionStatus(batchId, 0, 0, 11);
                         return false;
                     }
-                    //if we only have one, else we loop through
-                    if (configurationMessageSpecs.size() == 1) {
+                    //if we only have one and it is set to 0,we can default, else we loop through
+                    if (configurationMessageSpecs.size() == 1 && configurationMessageSpecs.get(0).getmessageTypeCol() == 0) {
                         sysError = sysError + updateConfigIdForBatch(batch.getId(), configurationMessageSpecs.get(0).getconfigId());
                     } else {
                         //3 loop through each config and mass update by config
