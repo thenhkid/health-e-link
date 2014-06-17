@@ -18,18 +18,18 @@
                 <div class="form-group">
                     <label class="control-label" >Status Code</label>
                     <br />
-                    ${statusDetails.displayCode}
+                    ${statusDetails.endUserDisplayCode}
                 </div>
                 <div class="form-group">
                     <label class="control-label" >Status Text</label>
                     <br />
-                    ${statusDetails.displayText}
+                    ${statusDetails.endUserDisplayText}
                 </div>
                 <c:if test="${not empty statusDetails.description}">
                     <div class="form-group">
                         <label class="control-label" >Description</label>
                         <br />
-                        ${statusDetails.description}
+                        ${statusDetails.endUserDescription}
                     </div>
                 </c:if>
             </div>

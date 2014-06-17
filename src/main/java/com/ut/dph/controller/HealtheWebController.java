@@ -2785,7 +2785,7 @@ public class HealtheWebController {
         mav.addObject("assocMessageTypes", assocMessageTypes);
         
         /* Get the list of process status */
-        List<lu_ProcessStatus> statusList = sysAdminManager.getAllProcessStatus();
+        List<lu_ProcessStatus> statusList = sysAdminManager.getAllHistoryFormProcessStatus();
         
         mav.addObject("statusList", statusList);
 

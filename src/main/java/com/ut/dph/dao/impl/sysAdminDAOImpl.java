@@ -27,6 +27,7 @@ import com.ut.dph.model.lutables.lu_Tests;
 import com.ut.dph.model.mainHL7Details;
 import com.ut.dph.model.mainHL7Elements;
 import com.ut.dph.model.mainHL7Segments;
+import java.util.ArrayList;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
@@ -843,5 +844,18 @@ public class sysAdminDAOImpl implements sysAdminDAO {
         
     }
     
+    @Override
+    @Transactional
+    public List<lu_ProcessStatus> getAllHistoryFormProcessStatus() throws Exception {
+        
+        Criteria statusList = sessionFactory.getCurrentSession().createCriteria(lu_ProcessStatus.class);
+        statusList.add(Restrictions.eq("status",true));
+        statusList.add(Restrictions.in("id", new Integer [] {1,2,3,4,5,6,7,8,14,18,19,20,21,22,23,24,25,28,29,30,31,32,33,35,36,38,38}));
+        statusList.addOrder(Order.asc("category"));
+        statusList.addOrder(Order.asc("displayText"));
+        
+        return statusList.list();
+        
+    }
 
 }

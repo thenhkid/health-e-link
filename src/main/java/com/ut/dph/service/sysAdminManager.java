@@ -169,4 +169,6 @@ public interface sysAdminManager {
     int saveHL7Element(mainHL7Elements newElement);
     
     List<lu_ProcessStatus> getAllProcessStatus() throws Exception;
+    
+    List<lu_ProcessStatus> getAllHistoryFormProcessStatus() throws Exception;
 }
