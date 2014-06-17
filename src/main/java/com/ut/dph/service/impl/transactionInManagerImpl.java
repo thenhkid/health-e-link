@@ -141,7 +141,7 @@ public class transactionInManagerImpl implements transactionInManager {
     //final status Ids
     private List<Integer> finalStatusIds = Arrays.asList(11, 12, 13, 16);
 
-    private String archivePath = "/bowlink/archives/";
+    private String archivePath = "/bowlink/archivesIn/";
 
     @Override
     @Transactional

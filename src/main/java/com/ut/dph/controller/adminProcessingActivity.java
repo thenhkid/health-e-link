@@ -116,7 +116,7 @@ public class adminProcessingActivity {
      */
     private static int maxResults = 10;
     
-    private String archivePath = "/bowlink/archives/";
+    private String archivePath = "/bowlink/archivesIn/";
 
     /**
      * The '/inbound' GET request will serve up the existing list of generated referrals and feedback reports

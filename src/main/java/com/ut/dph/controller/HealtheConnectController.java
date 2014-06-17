@@ -121,7 +121,7 @@ public class HealtheConnectController {
     //final status Ids
     private List<Integer> finalStatusIds = Arrays.asList(11, 12, 13, 16);
 
-    private String archivePath = "/bowlink/archives/";
+    private String archivePath = "/bowlink/archivesIn/";
     
     private String processPath = "/bowlink/loadFiles/";
  
