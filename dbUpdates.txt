@@ -626,3 +626,46 @@ UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayCode`='SDC', `displa
 
 
 /** all above updates are deployed on test and dev  06172014 3:42AM **/
+
+/** grace 06172014 9:47 AM **/
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `description`='Error condition: The submission has failed either size, delimiter or type constraints. Please review submission, correct and resubmit.' WHERE `id`='1';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `description`='Normal condition: The submission has been accepted and will be processed shortly.' WHERE `id`='2';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `description`='Normal condition: Error transactions have been corrected by the user and the submission has been resubmitted for processing.' WHERE `id`='3';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `description`='Normal condition: The submission is currently being processed.' WHERE `id`='4';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `description`='Normal condition: The audit report for the submission must be reviewed by the submitter. After all errors are resolved (if there are any), the submission is released by the user.' WHERE `id`='5';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `description`='Normal condition: A submission has been released for delivery to the destination.' WHERE `id`='6';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `description`='Error condition: One or more errors occurred in the submission and the submission was rejected. Please review the audit report.' WHERE `id`='7';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `description`='Normal condition: A partially completed transaction was saved for later completion by the user using the eReferral Gateway.' WHERE `id`='8';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `description`='Normal condition: The transaction has been successfully loaded for processing.' WHERE `id`='9';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `description`='Normal condition: The transaction is awaiting translation to destination format.' WHERE `id`='10';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `description`='Error condition: A valid configuration could not be found for the transaction. Please contact the help desk.' WHERE `id`='11';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `description`='Normal condition: The transaction has been successfully processed and is pending release by the submitter.' WHERE `id`='12';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `description`='Error condition: The transaction has failed translation or other processing rules. Please review the audit report.' WHERE `id`='13';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `description`='Error condition: The transaction has failed translation or other processing rules but may be corrected in the eReferral Gateway.' WHERE `id`='14';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `description`='Normal condition: A partially completed transaction was saved for later completion by the user using the eReferral Gateway.' WHERE `id`='15';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `description`='Normal condition: The transaction contains errors but the users configuration is set up to allow errors to be accepted.' WHERE `id`='16';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `description`='Normal condition: This is when user closes the transaction in the eRG.  When a transcaction is closed, users can no longer create feedback reports.' WHERE `id`='17';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `description`='Normal condition: The destination transaction is created and is waiting for the user to view or download.' WHERE `id`='18';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `description`='Normal condition: This is a target status.  The transaction is ready for output generation.' WHERE `id`='19';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `description`='Normal condition: The destination user has downloaded or viewed the transaction. ' WHERE `id`='20';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `description`='Normal condition: A submission has been flagged by the user so that it will not be processed.' WHERE `id`='21';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `description`='Normal condition: One or more transactions within a submission have been viewed/received by the destination. Some transactions in the submission have not yet been viewed/received.' WHERE `id`='22';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `description`='Normal condition: All transactions in a submission have been viewed/received by the destination.' WHERE `id`='23';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `description`='Normal condition: submission transactions have been successfully reviewed and validated.' WHERE `id`='24';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayCode`='TBP', `displayText`='Target Being Processed', `description`='Normal condition: Transactions are being created for delivery to the destination.' WHERE `id`='25';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `description`='Normal condition: All transactions for the submission have been delivered to the destination(s). NOTE: Source submission received (SSR) is the status which indicates that the destination has actually RECEIVED the transaciton(s).' WHERE `id`='28';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayText`='Submission Processing Error', `description`='Error condition: An unexpected error occurred during processing. Please contact the help desk.' WHERE `id`='29';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayCode`='TPE', `displayText`='Target Processing Error', `description`='Error condition: An unexpected error occurred during processing. Please contact the help desk.' WHERE `id`='30';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `description`='Normal condition: The is an ERG status. User cancels the transaction via the eRG. No subsequent activity is allowed for the transaction.' WHERE `id`='31';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `description`='Error condition: An unexpected error occurred during processing. Please contact the help desk.' WHERE `id`='33';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayText`='Source Submission Loaded', `description`='Normal condition: The submission has been successfully loaded for processing.' WHERE `id`='36';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayText`='Transaction Creation In Process', `description`='Normal condition: The transaction is being processed.' WHERE `id`='37';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `description`='Normal condition: The transaction is being processed.' WHERE `id`='38';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `description`='Error condition: The submission could not be loaded for processing. Please review the submission, correct and resubmit.' WHERE `id`='39';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayCode`='SRS', `displayText`='Source Re-submitted' WHERE `id`='3';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayCode`='LOA' WHERE `id`='9';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayCode`='CLS' WHERE `id`='17';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayText`='Source Submission Received' WHERE `id`='23';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayText`='Submission File Reset' WHERE `id`='35';
+
+
