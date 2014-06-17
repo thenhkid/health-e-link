@@ -704,4 +704,7 @@ UPDATE `universaltranslator`.`lu_ProcessStatus` SET `enduserdisplayCode`='SBP', 
 UPDATE `universaltranslator`.`lu_ProcessStatus` SET `enduserdisplayCode`='SSA', `enduserdisplayText`='Source Submission Accepted', `enduserdescription`='Normal condition: The submission has been accepted and will be processed shortly.' WHERE `id`='38';
 UPDATE `universaltranslator`.`lu_ProcessStatus` SET `enduserdisplayCode`='SPE', `enduserdisplayText`='Submission processing error', `enduserdescription`='Error condition: An unexpected error occurred during processing. Please review your submission audit report. Please contact the help desk if necessary.' WHERE `id`='39';
 
+/* grace 06172014 2:22 PM **/
 
+update lu_ProcessStatus set enduserdisplayCode = displayCode, enduserdisplaytext = displayText, enduserdescription = description
+where enduserDisplayCode is null;
