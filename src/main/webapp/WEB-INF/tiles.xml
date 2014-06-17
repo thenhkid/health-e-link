@@ -548,6 +548,7 @@
         <put-attribute name="title" value="Universal Translator - Contact Us" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page=contact" />
         <put-attribute name="body" value="/WEB-INF/jsp/informationPages/contact.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/front-end/contact.js" />
     </definition>
 
     <!-- Profile (Account) Pages -->

@@ -27,15 +27,16 @@ public class ExceptionControllerAdvice {
     private emailMessageManager emailMessageManager;
  
     @ExceptionHandler(Exception.class)
-    public ModelAndView exception(HttpSession session, Exception e) {
+    public ModelAndView exception(HttpSession session, Exception e) throws Exception {
         
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/exception");
         
-        /*mailMessage messageDetails = new mailMessage();
+        mailMessage messageDetails = new mailMessage();
         
         messageDetails.settoEmailAddress("dphuniversaltranslator@gmail.com");
-        messageDetails.setmessageSubject("Exception Error");*/
+        messageDetails.setfromEmailAddress("dphuniversaltranslator@gmail.com");
+        messageDetails.setmessageSubject("Exception Error");
         
         StringBuilder sb = new StringBuilder();
         
@@ -51,17 +52,15 @@ public class ExceptionControllerAdvice {
         }
        
         sb.append("Error: "+ e);
-        sb.append(System.getProperty("line.separator"));
-        sb.append(System.getProperty("line.separator"));
+        sb.append("<br /><br />");
         sb.append("Message: " + e.getMessage());
-        sb.append(System.getProperty("line.separator"));
-        sb.append(System.getProperty("line.separator"));
+        sb.append("<br /><br />");
         sb.append("Stack Trace: " + Arrays.toString(e.getStackTrace()));
         
-        /*messageDetails.setmessageBody(sb.toString());
+        messageDetails.setmessageBody(sb.toString());
         
-        emailMessageManager.sendEmail(messageDetails); */
-        mav.addObject("messageBody",sb.toString());
+        emailMessageManager.sendEmail(messageDetails); 
+        /*mav.addObject("messageBody",sb.toString());*/
         
         return mav;
     }

@@ -6,6 +6,7 @@ import com.ut.dph.model.userAccess;
 import com.ut.dph.service.emailMessageManager;
 import com.ut.dph.service.userManager;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import javax.servlet.http.HttpServletRequest;
@@ -149,6 +150,60 @@ public class mainController {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/contact");
         mav.addObject("pageTitle", "Contact Us");
+        return mav;
+    }
+    
+    /**
+     * The '/contact' POST request will display the contact page.
+     */
+    @RequestMapping(value = "/contact", method = RequestMethod.POST)
+    public ModelAndView contactPageSend(@RequestParam String name, @RequestParam String company, @RequestParam String address, @RequestParam String city, 
+            @RequestParam String state, @RequestParam String zip, @RequestParam String phone, @RequestParam String ext, @RequestParam String fax, @RequestParam String email, 
+            @RequestParam String comments) throws Exception {
+        
+       StringBuilder sb = new StringBuilder();
+       
+       mailMessage messageDetails = new mailMessage();
+        
+       messageDetails.settoEmailAddress("e-Referral@state.ma.us");
+       messageDetails.setfromEmailAddress("dphuniversaltranslator@gmail.com");
+       messageDetails.setmessageSubject("e-Referral Contact Form Submission");
+       
+       
+        sb.append("Name: "+ name);
+        sb.append("<br /><br />");
+        sb.append("Company / Organization: " + company);
+        sb.append("<br /><br />");
+        sb.append("Address: " + address);
+        sb.append("<br /><br />");
+        sb.append("City: " + city);
+        sb.append("<br /><br />");
+        sb.append("State: " + state);
+        sb.append("<br /><br />");
+        sb.append("Zip: " + zip);
+        sb.append("<br /><br />");
+        sb.append("Phone: " + phone);
+        sb.append("<br /><br />");
+        sb.append("Ext: " + ext);
+        sb.append("<br /><br />");
+        sb.append("Fax: " + fax);
+        sb.append("<br /><br />");
+        sb.append("Email: " + email);
+        sb.append("<br /><br />");
+        sb.append("Comments: " + comments);
+        sb.append("<br /><br />");
+        
+        messageDetails.setmessageBody(sb.toString());
+        
+        emailMessageManager.sendEmail(messageDetails); 
+
+        ModelAndView mav = new ModelAndView();
+        
+        mav.setViewName("/contact");
+        mav.addObject("pageTitle", "Contact Us");
+        mav.addObject("sent","sent");
+        
+        
         return mav;
     }
 
