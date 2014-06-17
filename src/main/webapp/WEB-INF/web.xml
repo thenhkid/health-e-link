@@ -54,8 +54,6 @@
    
     <filter>
         <filter-name>XSS</filter-name>
-        <display-name>XSS</display-name>
-        <description></description>
         <filter-class>com.ut.dph.filter.CrossScriptingFilter</filter-class>
     </filter>
 
