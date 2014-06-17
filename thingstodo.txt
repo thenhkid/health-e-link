@@ -17,20 +17,21 @@ Grace
     	   if a field has no match, fieldNoIn will be zero, we need to decide on action as output field should always be grabbing value from an input field
     - Continue work with encoding and decoding
     	-- encoding input done
-    	-- need to work on output 6.2    		
+    	-- need to work on output done 6.17 		
     - Continue work with moving files from UT folder to our Bowlink folders (Referrals) - Done 5.2014
     - Continue work with moving files from our Bowlink folders to the UT folder (Feedback Reports)
-		- not done 6.2
+		- done 6.17
 	- Review and add additional user logging where needed
 		 - not done 6.2
 	- Load test Dev/Test with BadBoy software
-	- Review Status List - make it more user friendly - waiting for MS feedback (6/10/14)
-
+	- Review Status List - make it more user friendly - waiting for MS feedback on end user codes for transactions (6/17/14)
+	- Review Reset process - see why can't SDC be resetted
+	
 Macros needed
 How to handle numbers cw matching better - for example, reg1 sometimes submit with 001, 00004 and it really should read as 1 and 4.  Need to see how to handle isNum in mySQL
  - need strip specific leading / ending character ** DONE (Grace ON 6/10/14) ** 
 #1.** DONE (Grace ON 6/8/14) ** Post Processing macro that will delete configurations that should not be targets
-	
+Macro to apply stripping of characters to each value in list (single field)
 
 Open
 
@@ -41,9 +42,9 @@ Wishlist / down the road -
 2.  Need to think about how to modify upload files that doesn't fit the 6 bucket model - Reg1 files starts at F1
 3.  While adding data translation if one adds a crosswalk, all existing translation will be lost due to the fact that user didn't save.  Maybe prompt user?
 4.  Partial Save when setting up a Message Type? SaveToTableName, SaveToTableCol
-5.  macro to strip leading zeros
+5.  ** Done Grace ** macro to strip leading zeros
 6.  a macro that will insert placeholder for value pairs
-7.  and one that will tell you to continue or not based on if it finds a value
+7.  ** Done PreProcess macro for HH ** and one that will tell you to continue or not based on if it finds a value
 8.  Ability to create a subset of the standard internal standards per organization. These would show on the top of the page on the message details
 9.  Would family planning ever use ERG for data entry or review? If so need ability to modify entry/details form to remove what fields do not apply.
 10. Does it make sense to split the admin configuration into two (Referrals & Other), where other wouldnt rely on the 6 buckets for the templates
