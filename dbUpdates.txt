@@ -676,3 +676,32 @@ UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayText`='Submission Fi
 /** grace 06172014 11:32 AM **/
 UPDATE `universaltranslator`.`lu_ProcessStatus` SET `description`='Normal condition: This is a target status.  The transaction is ready for output generation.  When a batch is SPC, the targets will be in TPO so that the output scheduler will pick it up and process it.' WHERE `id`='19';
 
+/** grace 06172014 1:10 PM **/
+ALTER TABLE `universaltranslator`.`lu_processstatus` 
+ADD COLUMN `endUserDisplayCode` VARCHAR(5) NULL AFTER `dateCreated`,
+ADD COLUMN `endUserDisplayText` VARCHAR(45) NULL AFTER `endUserDisplayCode`,
+ADD COLUMN `endUserDescription` TEXT NULL AFTER `endUserDisplayText`;
+
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `endUserDisplayCode`='SFV', `endUserDisplayText`='Submission Failed Validation', `endUserDescription`='Error condition: The submission has failed either size, delimiter or type constraints. Please review submission, correct and resubmit.' WHERE `id`='1';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `endUserDisplayCode`='SSA', `endUserDisplayText`='Source Submission Accepted', `endUserDescription`='Normal condition: The submission has been accepted and will be processed shortly.' WHERE `id`='2';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `endUserDisplayCode`='SSA', `endUserDisplayText`='Source Submission Accepted', `endUserDescription`='Normal condition: The submission has been accepted and will be processed shortly.' WHERE `id`='3';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `endUserDisplayCode`='SBP', `endUserDisplayText`='Submission Being Processed', `endUserDescription`='Normal condition: The submission is currently being processed.' WHERE `id`='4';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `endUserDisplayCode`='SBP', `endUserDisplayText`='Submission Being Processed', `endUserDescription`='Normal condition: The submission is currently being processed.' WHERE `id`='5';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `endUserDisplayCode`='SBP', `endUserDisplayText`='Submission Being Processed', `endUserDescription`='Normal condition: The submission is currently being processed.' WHERE `id`='6';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `enduserdisplayCode`='SPE', `enduserdisplayText`='Submission processing error', `enduserdescription`='Error condition: An unexpected error occurred during processing. Please review your submission audit report. Please contact the help desk if necessary.' WHERE `id`='7';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `enduserdisplayCode`='SS', `enduserdisplayText`='Submission Saved', `enduserdescription`='Normal condition: A partially completed transaction was saved for later completion by the user using the eReferral Gateway.' WHERE `id`='8';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `enduserdisplayCode`='DNP', `enduserdisplayText`='Do Not Process', `enduserdescription`='Normal condition: A submission has been flagged by the user so that it will not be processed.' WHERE `id`='21';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `enduserdisplayCode`='SBP', `enduserdisplayText`='Submission Being Processed', `enduserdescription`='Normal condition: The submission is currently being processed.' WHERE `id`='22';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `enduserdisplayCode`='SSR', `enduserdisplayText`='Source Submission Received', `enduserdescription`='Normal condition: All transactions in a submission have been viewed/received by the destination.' WHERE `id`='23';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `enduserdisplayCode`='SBP', `enduserdisplayText`='Submission Being Processed', `enduserdescription`='Normal condition: The submission is currently being processed.' WHERE `id`='24';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `enduserdisplayCode`='SBP', `enduserdisplayText`='Submission Being Processed', `enduserdescription`='Normal condition: The submission is currently being processed.' WHERE `id`='25';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `enduserdisplayCode`='SBP', `enduserdisplayText`='Submission Being Processed', `enduserdescription`='Normal condition: The submission is currently being processed.' WHERE `id`='28';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `enduserdisplayCode`='SPE', `enduserdisplayText`='Submission processing error', `enduserdescription`='Error condition: An unexpected error occurred during processing. Please review your submission audit report. Please contact the help desk if necessary.' WHERE `id`='29';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `enduserdisplayCode`='SPE', `enduserdisplayText`='Submission processing error', `enduserdescription`='Error condition: An unexpected error occurred during processing. Please review your submission audit report. Please contact the help desk if necessary.' WHERE `id`='30';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `enduserdisplayCode`='DNP', `enduserdisplayText`='Do Not Process', `enduserdescription`='Normal condition: A submission has been flagged by the user so that it will not be processed.' WHERE `id`='32';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `enduserdisplayCode`='SSA', `enduserdisplayText`='Source Submission Accepted', `enduserdescription`='Normal condition: The submission has been accepted and will be processed shortly.' WHERE `id`='35';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `enduserdisplayCode`='SBP', `enduserdisplayText`='Submission Being Processed', `enduserdescription`='Normal condition: The submission is currently being processed.' WHERE `id`='36';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `enduserdisplayCode`='SSA', `enduserdisplayText`='Source Submission Accepted', `enduserdescription`='Normal condition: The submission has been accepted and will be processed shortly.' WHERE `id`='38';
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `enduserdisplayCode`='SPE', `enduserdisplayText`='Submission processing error', `enduserdescription`='Error condition: An unexpected error occurred during processing. Please review your submission audit report. Please contact the help desk if necessary.' WHERE `id`='39';
+
+
