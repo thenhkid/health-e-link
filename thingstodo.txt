@@ -25,7 +25,10 @@ Grace
 		 - not done 6.2
 	- Load test Dev/Test with BadBoy software
 	- Review Status List - make it more user friendly - waiting for MS feedback on end user codes for transactions (6/17/14)
-	- Review Reset process - see why can't SDC be resetted
+	- Review Reset process - see why can't SDC be reset
+	- Set up live server
+	- Review permisson and restrict r/w/x for general users - tomcat/bowlink/UT
+	
 	
 Macros needed
 How to handle numbers cw matching better - for example, reg1 sometimes submit with 001, 00004 and it really should read as 1 and 4.  Need to see how to handle isNum in mySQL
