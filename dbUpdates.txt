@@ -628,6 +628,10 @@ UPDATE `universaltranslator`.`lu_ProcessStatus` SET `displayCode`='SDC', `displa
 /** all above updates are deployed on test and dev  06172014 3:42AM **/
 
 /** grace 06172014 9:47 AM **/
+
+ALTER TABLE `universaltranslator`.`lu_processstatus` 
+CHANGE COLUMN `description` `description` TEXT NULL DEFAULT NULL ;
+
 UPDATE `universaltranslator`.`lu_ProcessStatus` SET `description`='Error condition: The submission has failed either size, delimiter or type constraints. Please review submission, correct and resubmit.' WHERE `id`='1';
 UPDATE `universaltranslator`.`lu_ProcessStatus` SET `description`='Normal condition: The submission has been accepted and will be processed shortly.' WHERE `id`='2';
 UPDATE `universaltranslator`.`lu_ProcessStatus` SET `description`='Normal condition: Error transactions have been corrected by the user and the submission has been resubmitted for processing.' WHERE `id`='3';
