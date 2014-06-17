@@ -336,6 +336,12 @@ public class adminProcessingActivity {
 
             if (!Batches.isEmpty()) {
                 for (batchDownloads batch : Batches) {
+                    
+                    if(batch.gettransportMethodId() == 1 || batch.gettransportMethodId() == 5) {
+                        String fileDownloadExt = batch.getoutputFIleName().substring(batch.getoutputFIleName().lastIndexOf("."));
+                        batch.setoutputFIleName(batch.getutBatchName()+fileDownloadExt);
+                    }
+                    
                     batch.settotalTransactions(transactionInManager.getRecordCounts(batch.getId(), statusIds, true, false));
 
                     lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
@@ -357,7 +363,10 @@ public class adminProcessingActivity {
                         batchUploads batchUploadDetails = transactionInManager.getBatchDetails(transactiontarget.getbatchUploadId());
                         
                         batch.setFromBatchName(batchUploadDetails.getutBatchName());
-                        batch.setFromBatchFile(batchUploadDetails.getoriginalFileName());
+                        if(batch.gettransportMethodId() == 5 || batch.gettransportMethodId() == 1) {
+                            String fileExt = batchUploadDetails.getoriginalFileName().substring(batchUploadDetails.getoriginalFileName().lastIndexOf("."));
+                            batch.setFromBatchFile(batchUploadDetails.getutBatchName()+fileExt);
+                        }
                         batch.setFromOrgId(batchUploadDetails.getOrgId());
                         
                     }

@@ -62,9 +62,9 @@
                                             </td>
                                             <td>
                                                 ${batch.utBatchName}
-                                                <c:if test="${batch.transportMethodId == 1}">
+                                                <c:if test="${batch.transportMethodId == 1 || batch.transportMethodId == 5}">
                                                     <br />
-                                                    <a href="/FileDownload/downloadFile.do?filename=${batch.outputFIleName}&foldername=output files&orgId=${batch.orgId}" title="View Original File">
+                                                    <a href="/FileDownload/downloadFile.do?filename=${batch.outputFIleName}&foldername=archivesOut&orgId=0" title="View Original File">
                                                         ${batch.outputFIleName}
                                                     </a>
                                                 </c:if>
@@ -73,7 +73,7 @@
                                                 ${batch.fromBatchName}
                                                 <c:if test="${not empty batch.fromBatchFile}">
                                                     <br />
-                                                    <a href="/FileDownload/downloadFile.do?filename=${batch.fromBatchFile}&foldername=input files&orgId=${batch.fromOrgId}" title="View Uploaded Source File">
+                                                    <a href="/FileDownload/downloadFile.do?filename=${batch.fromBatchFile}&foldername=archivesIn&orgId=0" title="View Uploaded Source File">
                                                         ${batch.fromBatchFile}
                                                     </a>
                                                 </c:if>
