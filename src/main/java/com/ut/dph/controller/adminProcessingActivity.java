@@ -1511,9 +1511,9 @@ public class adminProcessingActivity {
             }
 
             /**
-             * we need to check sbp (4), tbc (25) status - if server is restarted and somehow the file hangs in SBP, we want to give them option to reset if sbp/tbc start time is about two hours, that should be sufficient indication that a file is stuck we don't want to reset or cancel in the middle of the processing
+             * we need to check sbp (4), tbc (25) status, 38 SBL - if server is restarted and somehow the file hangs in SBP, we want to give them option to reset if sbp/tbc start time is about two hours, that should be sufficient indication that a file is stuck we don't want to reset or cancel in the middle of the processing
              */
-            if (batchDetails.getstatusId() == 4 || batchDetails.getstatusId() == 25) {
+            if (batchDetails.getstatusId() == 4 || batchDetails.getstatusId() == 25 || batchDetails.getstatusId() == 38) {
                 Date d1 = batchDetails.getstartDateTime();
                 Date d2 = new Date();
                 //in milliseconds
