@@ -41,6 +41,7 @@ import com.ut.dph.model.transactionTarget;
 import com.ut.dph.reference.fileSystem;
 import com.ut.dph.service.configurationManager;
 import com.ut.dph.service.configurationTransportManager;
+import com.ut.dph.service.fileManager;
 import com.ut.dph.service.organizationManager;
 import com.ut.dph.service.transactionInManager;
 import com.ut.dph.service.transactionOutManager;
@@ -53,6 +54,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -103,8 +106,13 @@ public class transactionOutManagerImpl implements transactionOutManager {
     @Autowired
     private emailMessageManager emailMessageManager;
 
+    @Autowired
+    private fileManager filemanager;
+    
     private int processingSysErrorId = 5;
 
+    private String archivePath = "/bowlink/archivesOut/";
+    
     @Override
     @Transactional
     public List<batchDownloads> getInboxBatches(int userId, int orgId, Date fromDate, Date toDate) throws Exception {
@@ -400,7 +408,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                     FTPTargetFile(batchId, transportDetails);
                                 } /* Rhapsody Method */ else if (transportDetails.gettransportMethodId() == 5) {
                                 	RhapsodyTargetFile(batchId, transportDetails);
-                            }
+                                }
 
                                 if (batchId > 0) {
                                     /* Send the email to primary contact */
@@ -880,18 +888,47 @@ public class transactionOutManagerImpl implements transactionOutManager {
 
                 }
 
-                /* Generate the file */
+                /* Generate the file according to transportDetails 
+                 * 1. we generate output file according to encoding in transportDetails
+                 * 2. we always save an encrypted copy to archivesOut
+                 * */
                 try {
                     boolean encryptMessage = false;
-
-                    if (transportDetails.gettransportMethodId() == 5) {
+                    // we only support base64 for now
+                    if (transportDetails.getEncodingId() == 2) {        
                         encryptMessage = true;
+                	}
+                    String generatedFilePath = generateTargetFile(createNewFile, transaction.getId(), batchId, transportDetails, encryptMessage);       
+                    
+                    try {
+                    	//we get dl file info
+                    	batchDownloads batchDetails = getBatchDetails(batchId);
+                    	
+                    	File generatedFile = new File(generatedFilePath);
+                    	//file extension
+                    	String fileExt = batchDetails.getoutputFIleName().substring(batchDetails.getoutputFIleName().lastIndexOf("."));
+                		
+                    	fileSystem fileSystem = new fileSystem();
+                    	File archiveFile = new File ( fileSystem.setPath(archivePath) + batchDetails.getutBatchName() + fileExt);
+                    	
+                    	//we check to see if our file is encoded
+                    	if (!encryptMessage)  {
+                    		//we encode here
+                    		String strEncodedFile = filemanager.encodeFileToBase64Binary(generatedFile);
+                    		if (archiveFile.exists()) {
+                    			archiveFile.delete();
+                    		}
+                    		filemanager.writeFile(archiveFile.getAbsolutePath(), strEncodedFile);
+                    	} else  {
+                    		Files.copy(generatedFile.toPath(), archiveFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    	}
+                    
+                    } catch (Exception e) {
+                    	throw new Exception("Error occurred trying to copy generated file to archiveOut -  batchId: " + batchId, e);    	
                     }
-                    generateTargetFile(createNewFile, transaction.getId(), batchId, transportDetails, encryptMessage);
                 } catch (Exception e) {
                     throw new Exception("Error occurred trying to generate the batch file. batchId: " + batchId, e);
                 }
-
             }
 
 
@@ -916,10 +953,10 @@ public class transactionOutManagerImpl implements transactionOutManager {
      */
     public int generateBatch(configuration configDetails, transactionTarget transaction, configurationTransport transportDetails, int sourceOrgId, String sourceFileName, boolean mergeable) throws Exception {
 
-        /* Create the batch name (OrgId+MessageTypeId+Date/Time) */
-        DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+        /* Create the batch name (OrgId+MessageTypeId+Date/Time) - need milliseconds as computer is fast and files have the same name*/
+        DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmssS");
         Date date = new Date();
-        String utbatchName = new StringBuilder().append(configDetails.getorgId()).append(configDetails.getMessageTypeId()).append(dateFormat.format(date)).toString();
+        String utbatchName = new StringBuilder().append(transportDetails.gettransportMethodId()).append(configDetails.getorgId()).append(configDetails.getMessageTypeId()).append(dateFormat.format(date)).toString();
 
 
         /* Need to create a new batch */
@@ -1001,10 +1038,10 @@ public class transactionOutManagerImpl implements transactionOutManager {
     /**
      * The 'generateTargetFile' function will generate the actual file in the correct organizations outpufiles folder.
      */
-    public void generateTargetFile(boolean createNewFile, int transactionTargetId, int batchId, configurationTransport transportDetails, boolean encrypt) throws Exception {
+    public String generateTargetFile(boolean createNewFile, int transactionTargetId, int batchId, configurationTransport transportDetails, boolean encrypt) throws Exception {
 
         String fileName = null;
-
+        String strFileLoc = "";
         batchDownloads batchDetails = transactionOutDAO.getBatchDetails(batchId);
 
         InputStream inputStream = null;
@@ -1262,7 +1299,8 @@ public class transactionOutManagerImpl implements transactionOutManager {
             }
 
         }
-
+        	strFileLoc = file.getAbsolutePath();
+        	return strFileLoc;
     }
 
     @Override
@@ -1305,10 +1343,10 @@ public class transactionOutManagerImpl implements transactionOutManager {
                     transactionInManager.updateBatchStatus(target.getbatchUploadId(), 22, "");
 
                     /* Need to update the uploaded batch transaction status */
-                    transactionInManager.updateTransactionStatus(target.getbatchUploadId(), target.gettransactionInId(), 0, 20);
+                    transactionInManager.updateTransactionStatus(target.getbatchUploadId(), target.gettransactionInId(), 0, 37);
 
                     /* Update the downloaded batch transaction status */
-                    transactionOutDAO.updateTargetTransasctionStatus(target.getbatchDLId(), 2);
+                    transactionOutDAO.updateTargetTransasctionStatus(target.getbatchDLId(), 37);
 
                 }
 
@@ -1450,6 +1488,37 @@ public class transactionOutManagerImpl implements transactionOutManager {
                 }
             }
 
+            // we should delete file now that we ftp'ed the file
+            try {
+            fileSystem dir = new fileSystem();
+            String filelocation = transportDetails.getfileLocation();
+            filelocation = filelocation.replace("/bowlink/", "");
+            dir.setDirByName(filelocation);
+            
+            File sourceFile = new File(dir.getDir() + batchFTPFileInfo.getoutputFIleName());
+            if (sourceFile.exists()) {
+            	sourceFile.delete();
+            }
+            
+            transactionOutDAO.updateBatchStatus(batchId, 23);
+            
+            for (transactionTarget target : targets) {
+
+                /* Need to update the uploaded batch status */
+                transactionInManager.updateBatchStatus(target.getbatchUploadId(), 23, "");
+
+                /* Need to update the uploaded batch transaction status */
+                transactionInManager.updateTransactionStatus(target.getbatchUploadId(), target.gettransactionInId(), 0, 20);
+
+                /* Update the downloaded batch transaction status */
+                transactionOutDAO.updateTargetTransasctionStatus(target.getbatchDLId(), 20);
+
+            }
+            
+            } catch (Exception e){
+            	throw new Exception("Error occurred during FTP - delete file and update statuses. batchId: " + batchId, e);
+            	
+            }
         } catch (Exception e) {
             throw new Exception("Error occurred trying to FTP a batch target. batchId: " + batchId, e);
         }
@@ -1780,31 +1849,51 @@ public class transactionOutManagerImpl implements transactionOutManager {
                     transactionInManager.updateBatchStatus(target.getbatchUploadId(), 22, "");
 
                     /* Need to update the uploaded batch transaction status */
-                    transactionInManager.updateTransactionStatus(target.getbatchUploadId(), target.gettransactionInId(), 0, 20);
+                    transactionInManager.updateTransactionStatus(target.getbatchUploadId(), target.gettransactionInId(), 0, 37);
 
                     /* Update the downloaded batch transaction status */
-                    transactionOutDAO.updateTargetTransasctionStatus(target.getbatchDLId(), 2);
+                    transactionOutDAO.updateTargetTransasctionStatus(target.getbatchDLId(), 37);
 
                 }
 
             }
 
             /* get the batch details */
-            batchDownloads batchFTPFileInfo = transactionOutDAO.getBatchDetails(batchId);
+            batchDownloads batchDetails = transactionOutDAO.getBatchDetails(batchId);
 
             /* Get the Rhapsody Details */
             configurationRhapsodyFields rhapsodyDetails = configurationTransportManager.getTransRhapsodyDetailsPush(transportDetails.getId());
 
-            //see if we need to encode file
+            // the file is in output folder already, we need to rebuild path and move it
             
-            //copy the file over and update the status to complete
+            fileSystem dir = new fileSystem();
+            String filelocation = transportDetails.getfileLocation();
+            filelocation = filelocation.replace("/bowlink/", "");
+            dir.setDirByName(filelocation);
             
+            File sourceFile = new File(dir.getDir() + batchDetails.getoutputFIleName());
+            File targetFile = new File ( dir.setPathFromRoot(rhapsodyDetails.getDirectory()) + batchDetails.getoutputFIleName());
+            //move the file over and update the status to complete
+            Files.move(sourceFile.toPath(), targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
             
-            //update status
+            transactionOutDAO.updateBatchStatus(batchId, 23);
+            
+            for (transactionTarget target : targets) {
 
+                /* Need to update the uploaded batch status */
+                transactionInManager.updateBatchStatus(target.getbatchUploadId(), 23, "");
+
+                /* Need to update the uploaded batch transaction status */
+                transactionInManager.updateTransactionStatus(target.getbatchUploadId(), target.gettransactionInId(), 0, 20);
+
+                /* Update the downloaded batch transaction status */
+                transactionOutDAO.updateTargetTransasctionStatus(target.getbatchDLId(), 20);
+
+            }
+            
         } catch (Exception e) {
         	e.printStackTrace();
-            System.err.println("RhapsodyTargetFile - Error occurred trying to FTP a batch target. batchId: " + batchId);
+            System.err.println("RhapsodyTargetFile - Error occurred trying to move a batch target. batchId: " + batchId);
         }
 
     }
