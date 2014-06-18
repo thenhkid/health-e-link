@@ -2931,7 +2931,7 @@ public class HealtheWebController {
 
                     String msgTypeName = configurationManager.getMessageTypeNameByConfigId(connection.gettargetConfigId());
 
-                    String transportType = configurationTransportManager.getTransportMethodById(configurationTransportManager.getTransportDetails(configDetails.getId()).gettransportMethodId());
+                    String transportType = configurationTransportManager.getTransportMethodById(configurationTransportManager.getTransportDetails(config.getId()).gettransportMethodId());
                     
                     historyResults resultEntry = null;
                     
@@ -3023,12 +3023,12 @@ public class HealtheWebController {
                 for (configurationConnection connection : targetConnections) {
 
                     configuration configDetails = configurationManager.getConfigurationById(connection.getsourceConfigId());
-
+                    
                     String srcOrgName = organizationmanager.getOrganizationById(configDetails.getorgId()).getOrgName();
 
                     String msgTypeName = configurationManager.getMessageTypeNameByConfigId(connection.gettargetConfigId());
 
-                    String transportType = configurationTransportManager.getTransportMethodById(configurationTransportManager.getTransportDetails(configDetails.getId()).gettransportMethodId());
+                    String transportType = configurationTransportManager.getTransportMethodById(configurationTransportManager.getTransportDetails(config.getId()).gettransportMethodId());
 
                     historyResults resultEntry = null;
                     
