@@ -5,14 +5,19 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMethod;
 import com.ut.dph.model.Organization;
+import com.ut.dph.model.User;
+import com.ut.dph.model.UserActivity;
 import com.ut.dph.service.organizationManager;
+import com.ut.dph.service.userManager;
 import com.ut.dph.reference.fileSystem;
 import java.io.File;
 import javax.servlet.ServletContext;
@@ -25,14 +30,41 @@ public class fileDownloadController {
     @Autowired
     private organizationManager organizationManager;
     
+    @Autowired
+    private userManager usermanager;
+
+    
     /**
      * Size of a byte buffer to read/write file
      */
     private static final int BUFFER_SIZE = 4096;
 
     @RequestMapping(value = "/downloadFile.do", method = RequestMethod.GET)
-    public void downloadFile(HttpServletRequest request, @RequestParam String filename, @RequestParam String foldername, @RequestParam(value= "orgId", required = false) Integer orgId, HttpServletResponse response) {
-        OutputStream outputStream = null;
+    public void downloadFile(HttpServletRequest request, Authentication authentication,
+    		@RequestParam String filename, @RequestParam String foldername, @RequestParam(value= "orgId", required = false) Integer orgId, HttpServletResponse response) {
+    	String desc = "";
+    	try {
+    	
+    		User userDetails = usermanager.getUserByUserName(authentication.getName());
+            
+	    	/** tracking **/
+	        UserActivity ua = new UserActivity();
+	        ua.setUserId(userDetails.getId());
+	        ua.setAccessMethod(request.getMethod());
+	        ua.setPageAccess("/downloadFile.do"); // include mapping in case we want to send them back to page in the future
+	        ua.setActivity("Downloaded File");
+	        desc = foldername + filename;
+	        if(orgId != null) {
+	        	 desc = orgId.toString() + "_" + foldername + filename;
+	        }
+	        ua.setActivityDesc(desc);
+	        usermanager.insertUserLog(ua);
+	    } catch (Exception ex) {
+    		ex.printStackTrace();
+    		System.err.println("Error tracking file downloaded " + desc);
+    		
+    	}
+    	OutputStream outputStream = null;
         InputStream in = null;
         ServletContext context = request.getServletContext();
         
