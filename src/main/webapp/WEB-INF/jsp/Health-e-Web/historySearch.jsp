@@ -91,7 +91,7 @@
                                         <select id="systemStatus" name="systemStatus" class="form-control">
                                             <option value="0">- All System Statuses -</option>
                                             <c:forEach var="status" items="${statusList}">
-                                                <option value="${status.id}-${status.category}">${status.displayCode}&nbsp;-&nbsp;${status.displayText}</option>
+                                                <option value="${status.endUserDisplayCode}-${status.category}">${status.endUserDisplayCode}&nbsp;-&nbsp;${status.endUserDescription}</option>
                                             </c:forEach>
                                         </select>
                                     </div>

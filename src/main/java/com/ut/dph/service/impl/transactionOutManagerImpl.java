@@ -1795,7 +1795,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
     }
 
     @Override
-    public boolean searchBatchForHistory(batchDownloads batchDetails, String searchTerm, Date fromDate, Date toDate) {
+    public boolean searchBatchForHistory(batchDownloads batchDetails, String searchTerm, Date fromDate, Date toDate) throws Exception {
         return transactionOutDAO.searchBatchForHistory(batchDetails, searchTerm, fromDate, toDate);
     }
    

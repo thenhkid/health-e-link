@@ -4941,14 +4941,14 @@ public class transactionInDAOImpl implements transactionInDAO {
     
     @Override
     @Transactional
-    public boolean searchBatchForHistory(batchUploads batchDetails, String searchTerm, Date fromDate, Date toDate) {
+    public boolean searchBatchForHistory(batchUploads batchDetails, String searchTerm, Date fromDate, Date toDate) throws Exception {
 
         boolean matched = true;
 
         String[] terms = searchTerm.split("\\|", -1);
         String[] systemStatus = terms[0].split("\\-", -1);
         
-        int statusId = Integer.parseInt(systemStatus[0]);
+        String statusCode = systemStatus[0];
         String statusCategory = systemStatus[1];
         
         String status = terms[1];
@@ -4975,7 +4975,9 @@ public class transactionInDAOImpl implements transactionInDAO {
             matched = false;
         }
         
-        if(!"".equals(statusCategory) && "batch".equals(statusCategory) && statusId != batchDetails.getstatusId()) {
+        lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batchDetails.getstatusId());
+        
+        if(!"".equals(statusCategory) && "batch".equals(statusCategory) && !statusCode.equals(processStatus.getEndUserDisplayCode())) {
             matched = false;
         }
         
@@ -4988,7 +4990,9 @@ public class transactionInDAOImpl implements transactionInDAO {
 
             for (transactionIn transaction : transactions) {
                 
-                if(!"".equals(statusCategory) && "transaction".equals(statusCategory) && statusId != transaction.getstatusId()) {
+                lu_ProcessStatus transprocessStatus = sysAdminManager.getProcessStatusById(transaction.getstatusId());
+                
+                if(!"".equals(statusCategory) && "transaction".equals(statusCategory) && !statusCode.equals(transprocessStatus.getEndUserDisplayCode())) {
                     matched = false;
                 }
 

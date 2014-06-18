@@ -409,7 +409,7 @@ public interface transactionInManager {
     
     List<batchUploadSummary> getuploadBatchesByConfigAndTarget(Integer configId, Integer orgId);
     
-    boolean searchBatchForHistory(batchUploads batchDetails, String searchTerm, Date fromDate, Date toDate);
+    boolean searchBatchForHistory(batchUploads batchDetails, String searchTerm, Date fromDate, Date toDate) throws Exception;
     
     
 }

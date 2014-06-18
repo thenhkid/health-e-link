@@ -3000,7 +3000,7 @@ public class transactionInManagerImpl implements transactionInManager {
     }
     
     @Override
-    public boolean searchBatchForHistory(batchUploads batchDetails, String searchTerm, Date fromDate, Date toDate) {
+    public boolean searchBatchForHistory(batchUploads batchDetails, String searchTerm, Date fromDate, Date toDate) throws Exception {
         return transactionInDAO.searchBatchForHistory(batchDetails, searchTerm, fromDate, toDate);
     }
 

@@ -850,7 +850,7 @@ public class sysAdminDAOImpl implements sysAdminDAO {
         
         Criteria statusList = sessionFactory.getCurrentSession().createCriteria(lu_ProcessStatus.class);
         statusList.add(Restrictions.eq("status",true));
-        statusList.add(Restrictions.in("id", new Integer [] {1,2,3,4,5,6,7,8,14,18,19,20,21,22,23,24,25,28,29,30,31,32,33,35,36,38,38}));
+        statusList.add(Restrictions.in("id", new Integer [] {17,31,21,14,11,9,16,20,15,25,29,8,3,23,37,33,19,12,10}));
         statusList.addOrder(Order.asc("category"));
         statusList.addOrder(Order.asc("displayText"));
         

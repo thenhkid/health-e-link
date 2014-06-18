@@ -14,6 +14,7 @@ import com.ut.dph.model.configurationConnectionReceivers;
 import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.configurationSchedules;
 import com.ut.dph.model.configurationTransport;
+import com.ut.dph.model.lutables.lu_ProcessStatus;
 import com.ut.dph.model.messagePatients;
 import com.ut.dph.model.targetOutputRunLogs;
 import com.ut.dph.model.transactionIn;
@@ -310,14 +311,14 @@ public class transactionOutDAOImpl implements transactionOutDAO {
     
     @Override
     @Transactional
-    public boolean searchBatchForHistory(batchDownloads batchDetails, String searchTerm, Date fromDate, Date toDate) {
+    public boolean searchBatchForHistory(batchDownloads batchDetails, String searchTerm, Date fromDate, Date toDate) throws Exception {
 
         boolean matched = true;
         
         String[] terms = searchTerm.split("\\|", -1);
         String[] systemStatus = terms[0].split("\\-", -1);
         
-        int statusId = Integer.parseInt(systemStatus[0]);
+        String statusCode = systemStatus[0];
         String statusCategory = systemStatus[1];
 
         String status = terms[1];
@@ -344,7 +345,9 @@ public class transactionOutDAOImpl implements transactionOutDAO {
             matched = false;
         }
         
-        if(!"".equals(statusCategory) && "batch".equals(statusCategory) && statusId != batchDetails.getstatusId()) {
+        lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batchDetails.getstatusId());
+        
+        if(!"".equals(statusCategory) && "batch".equals(statusCategory) && !statusCode.equals(processStatus.getEndUserDisplayCode())) {
             matched = false;
         }
 
@@ -363,9 +366,11 @@ public class transactionOutDAOImpl implements transactionOutDAO {
 
             transactionIn transactionInDetails = (transactionIn) transactionIn.uniqueResult();
             
-            if(!"".equals(statusCategory) && "transaction".equals(statusCategory) && statusId != transactionInDetails.getstatusId()) {
-                matched = false;
-            }
+            lu_ProcessStatus transprocessStatus = sysAdminManager.getProcessStatusById(transactionInDetails.getstatusId());
+                
+                if(!"".equals(statusCategory) && "transaction".equals(statusCategory) && !statusCode.equals(transprocessStatus.getEndUserDisplayCode())) {
+                    matched = false;
+                }
 
             if (!"0".equals(status) && !status.equals(String.valueOf(transactionInDetails.getmessageStatus()))) {
                 matched = false;
