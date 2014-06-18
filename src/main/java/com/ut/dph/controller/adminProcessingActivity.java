@@ -338,8 +338,9 @@ public class adminProcessingActivity {
                 for (batchDownloads batch : Batches) {
                     
                     if(batch.gettransportMethodId() == 1 || batch.gettransportMethodId() == 5) {
-                        String fileDownloadExt = batch.getoutputFIleName().substring(batch.getoutputFIleName().lastIndexOf("."));
-                        batch.setoutputFIleName(batch.getutBatchName()+fileDownloadExt);
+                        String fileDownloadExt = batch.getoutputFIleName().substring(batch.getoutputFIleName().lastIndexOf(".")+1);
+                        String newfileName = new StringBuilder().append(batch.getutBatchName()).append(".").append(fileDownloadExt).toString();
+                        batch.setoutputFIleName(newfileName);
                     }
                     
                     batch.settotalTransactions(transactionInManager.getRecordCounts(batch.getId(), statusIds, true, false));
@@ -363,9 +364,10 @@ public class adminProcessingActivity {
                         batchUploads batchUploadDetails = transactionInManager.getBatchDetails(transactiontarget.getbatchUploadId());
                         
                         batch.setFromBatchName(batchUploadDetails.getutBatchName());
-                        if(batch.gettransportMethodId() == 5 || batch.gettransportMethodId() == 1) {
-                            String fileExt = batchUploadDetails.getoriginalFileName().substring(batchUploadDetails.getoriginalFileName().lastIndexOf("."));
-                            batch.setFromBatchFile(batchUploadDetails.getutBatchName()+fileExt);
+                        if(batchUploadDetails.gettransportMethodId() == 5 || batchUploadDetails.gettransportMethodId() == 1) {
+                            String fileExt = batchUploadDetails.getoriginalFileName().substring(batchUploadDetails.getoriginalFileName().lastIndexOf(".")+1);
+                            String newsrcfileName = new StringBuilder().append(batchUploadDetails.getutBatchName()).append(".").append(fileExt).toString();
+                            batch.setFromBatchFile(newsrcfileName);
                         }
                         batch.setFromOrgId(batchUploadDetails.getOrgId());
                         
