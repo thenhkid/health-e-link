@@ -28,6 +28,8 @@ Grace
 	- Review Reset process - see why can't SDC be reset
 	- Set up live server
 	- Review permisson and restrict r/w/x for general users - tomcat/bowlink/UT
+	- figure out why DB crashes when record set ie. audit report wiht 1000+ errors
+	- change manager link to more discreet url
 	
 	
 Macros needed
