@@ -2,7 +2,11 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %> 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
+
 <div class="login-container" style="width:500px; margin-left: -250px;">
+     <c:if test="${not cookie.js.value}">
+            JavaScript and cookies are required for this application in order to function correctly
+        </c:if>
     <div class="login clearfix">
         <header class="login-header" role="banner">
             <div class="login-header-content">
@@ -16,7 +20,7 @@
                 Your login attempt was unsuccessful.<br />
                 - ${sessionScope["SPRING_SECURITY_LAST_EXCEPTION"].message} -
             </div>
-        </c:if>
+        </c:if>     
         <c:if test="${not empty msg}">
             <c:choose>
                 <c:when test="${msg == 'notfound'}">
@@ -30,7 +34,7 @@
                     </div>
                 </c:otherwise>
             </c:choose>
-        </c:if>            
+        </c:if> 
         <form role="form" id="form-admin-login" name='f' action="<c:url value='j_spring_security_check' />" method='POST'>
             <fieldset name="login-fields" form="form-admin-login" class="basic-clearfix">
                 <div class="form-group ${not empty error ? 'has-error' : '' }">
