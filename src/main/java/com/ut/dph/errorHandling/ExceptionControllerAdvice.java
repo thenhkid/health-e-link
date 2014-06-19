@@ -9,10 +9,12 @@ package com.ut.dph.errorHandling;
 import com.ut.dph.model.User;
 import com.ut.dph.model.mailMessage;
 import com.ut.dph.service.emailMessageManager;
+import com.ut.dph.service.userManager;
 import java.net.InetAddress;
 import java.util.Arrays;
 import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.ModelAndView;
@@ -26,9 +28,12 @@ public class ExceptionControllerAdvice {
    
     @Autowired
     private emailMessageManager emailMessageManager;
+    
+    @Autowired
+    private userManager usermanager;
  
     @ExceptionHandler(Exception.class)
-    public ModelAndView exception(HttpSession session, Exception e) throws Exception {
+    public ModelAndView exception(HttpSession session, Exception e, Authentication authentication) throws Exception {
         
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/exception");
@@ -42,10 +47,15 @@ public class ExceptionControllerAdvice {
         StringBuilder sb = new StringBuilder();
         
         /* If a user is logged in then send along the user details */
-        if(session.getAttribute("userDetails") != null) {
+        if(session.getAttribute("userDetails") != null || authentication != null) {
             User userInfo = (User)session.getAttribute("userDetails");
-            if(userInfo != null) {
-                sb.append("Logged in User: " + userInfo.getFirstName() + " " + userInfo.getLastName() + " (ID: "+ userInfo.getId() + ")");
+            
+            if(userInfo == null && authentication != null) {
+            // see if it is an admin that is logged in
+            	userInfo = usermanager.getUserByUserName(authentication.getName());          	
+            }
+            if (userInfo != null) {	
+            	sb.append("Logged in User: " + userInfo.getFirstName() + " " + userInfo.getLastName() + " (ID: "+ userInfo.getId() + ")");
                 sb.append(System.getProperty("line.separator"));
                 sb.append("User OrgId: " + userInfo.getOrgId());
                 sb.append(System.getProperty("line.separator"));
