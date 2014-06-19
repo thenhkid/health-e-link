@@ -20,7 +20,8 @@
                 <job-name>ProcessOutputFiles</job-name>
                 <job-group>processGroup</job-group>
                 <!-- seconds, minutes /(at) minute to start, hours, day of month, month, day of week, year (optional) -->
-                <cron-expression>0 0/2 * * * ?</cron-expression>
+                <!-- starts on 22 every minute-->
+                <cron-expression>22 0/1 * * * ?</cron-expression>
             </cron>
         </trigger>
     </schedule>
@@ -37,7 +38,8 @@
                 <name>5MinTrigger</name>
                 <job-name>GenerateOutputFiles</job-name>
                 <job-group>processGroup</job-group>
-                <cron-expression>0 0/2 * * * ?</cron-expression>
+                <!--  starts on 5 every 2 mins  -->
+                <cron-expression>12 0/2 * * * ?</cron-expression>
             </cron>
         </trigger>
     </schedule>
@@ -46,7 +48,7 @@
         <job>
             <name>LoadBatches</name>
             <group>processGroup</group>
-            <description>This process will run every 5 mins starting at 08 min of the hour to check if any uploaded files need to be loaded</description>
+            <description>This process will run every 3o seconds starting at 10 second on the minute to check if any uploaded files need to be loaded</description>
             <job-class>com.ut.dph.jobs.loadBatches</job-class>
         </job>
  
@@ -55,7 +57,7 @@
                 <name>10MinsTrigger</name>
                 <job-name>LoadBatches</job-name>
                 <job-group>processGroup</job-group>
-                <cron-expression>0/30 * * * * ?</cron-expression>
+                <cron-expression>10/30 * * * * ?</cron-expression>
             </cron>
         </trigger>
     </schedule>
@@ -64,7 +66,7 @@
         <job>
             <name>ProcessBatches</name>
             <group>processGroup</group>
-            <description>This process will run every 10 mins starting at 3 mins of the hour to check if any loaded files will need to be process</description>
+            <description>This process will run every 30 seconds on the 5 second of the minute  to check if any loaded files will need to be process</description>
             <job-class>com.ut.dph.jobs.processBatches</job-class>
         </job>
  
@@ -73,7 +75,7 @@
                 <name>10on15MinsTrigger</name>
                 <job-name>ProcessBatches</job-name>
                 <job-group>processGroup</job-group>
-                <cron-expression>0/45 0 * * * ?</cron-expression>
+                <cron-expression>5/30 * * * * ?</cron-expression>
             </cron>
         </trigger>
     </schedule>
@@ -82,7 +84,7 @@
         <job>
             <name>MoveSFTPFiles</name>
             <group>processGroup</group>
-            <description>This process will run every 10 mins starting at 6 mins of the hour to check if any SFTP files will need to be moved and logged</description>
+            <description>This process will run every 10 mins starting at 38 seconds of the minute to check if any SFTP files will need to be moved and logged</description>
             <job-class>com.ut.dph.jobs.MoveSFTPFiles</job-class>
         </job>
  
@@ -91,7 +93,7 @@
                 <name>moveSFTPTrigger</name>
                 <job-name>MoveSFTPFiles</job-name>
                 <job-group>processGroup</job-group>
-                <cron-expression>0 0/2 * * * ?</cron-expression>
+                <cron-expression>38 0/10 * * * ?</cron-expression>
             </cron>
         </trigger>
     </schedule>
@@ -100,7 +102,7 @@
         <job>
             <name>MoveRhapsodyFiles</name>
             <group>processGroup</group>
-            <description>This process will run every 10 mins starting at 8 mins of the hour to check if any Rhapsody file will need to be moved and logged</description>
+            <description>This process will run every minute starting at 8 mins of the hour to check if any Rhapsody file will need to be moved and logged</description>
             <job-class>com.ut.dph.jobs.MoveRhapsodyFiles</job-class>
         </job>
  
