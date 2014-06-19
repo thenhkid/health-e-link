@@ -20,7 +20,7 @@ Grace
 	- change manager link to more discreet url
 	- modify download.do to allow dl only to uses with permission - need to modify and see which other methods uses that.  
 	  We need to be able to trace back permission with file name or modify the method to be more specific. Right now it is logged. (Phase II?)
-	
+	- index db tables!
 	
 Macros needed
 How to handle numbers cw matching better - for example, reg1 sometimes submit with 001, 00004 and it really should read as 1 and 4.  Need to see how to handle isNum in mySQL

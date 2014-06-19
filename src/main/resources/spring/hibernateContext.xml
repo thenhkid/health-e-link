@@ -74,4 +74,14 @@
         </bean>
     </beans>
     
+    <beans profile="orion-prod">
+        <bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+            <property name="locations">
+                <list>
+                    <value>classpath:orion-prod.database.properties</value>
+                </list>
+            </property>
+        </bean>
+    </beans>
+    
 </beans>
