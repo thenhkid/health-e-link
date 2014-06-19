@@ -41,7 +41,7 @@ public class fileDownloadController {
 
     @RequestMapping(value = "/downloadFile.do", method = RequestMethod.GET)
     public void downloadFile(HttpServletRequest request, Authentication authentication,
-    		@RequestParam String filename, @RequestParam String foldername, @RequestParam(value= "orgId", required = false) Integer orgId, HttpServletResponse response) {
+    		@RequestParam String filename, @RequestParam String foldername, @RequestParam(value= "orgId", required = false) Integer orgId, HttpServletResponse response) throws Exception {
     	String desc = "";
     	try {
     	
@@ -67,6 +67,7 @@ public class fileDownloadController {
     	OutputStream outputStream = null;
         InputStream in = null;
         ServletContext context = request.getServletContext();
+        String errorMessage = "";
         
         try {
             fileSystem dir = new fileSystem();
@@ -109,19 +110,27 @@ public class fileDownloadController {
             outputStream.close();
             
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+        	errorMessage = e.getMessage();
+        	e.printStackTrace();
+            
         } catch (IOException e) {
-            e.printStackTrace();
+        	errorMessage = e.getMessage();
+        	e.printStackTrace();
         } finally {
             if (null != in) {
                 try {
                     in.close();
                 } catch (IOException e) {
+                	errorMessage = e.getMessage();
                     e.printStackTrace();
                 }
             }
         }
-
+        
+        /** throw error message here because want to make sure file stream is closed **/
+        if (!errorMessage.equalsIgnoreCase("")) {
+        	throw new Exception(errorMessage);
+        }
     }
 
 }
