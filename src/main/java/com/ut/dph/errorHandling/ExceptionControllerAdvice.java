@@ -9,11 +9,16 @@ package com.ut.dph.errorHandling;
 import com.ut.dph.model.User;
 import com.ut.dph.model.mailMessage;
 import com.ut.dph.service.emailMessageManager;
+
+import java.net.InetAddress;
 import java.util.Arrays;
+
 import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.context.ConfigurableWebApplicationContext;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
@@ -34,9 +39,9 @@ public class ExceptionControllerAdvice {
         
         mailMessage messageDetails = new mailMessage();
         
-        messageDetails.settoEmailAddress("dphuniversaltranslator@gmail.com");
+        messageDetails.settoEmailAddress("gchan123@yahoo.com");
         messageDetails.setfromEmailAddress("dphuniversaltranslator@gmail.com");
-        messageDetails.setmessageSubject("Exception Error");
+        messageDetails.setmessageSubject("Exception Error " + InetAddress.getLocalHost().getHostAddress());
         
         StringBuilder sb = new StringBuilder();
         
