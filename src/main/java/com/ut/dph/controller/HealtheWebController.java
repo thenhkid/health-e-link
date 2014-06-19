@@ -2929,7 +2929,7 @@ public class HealtheWebController {
 
                     String msgTypeName = configurationManager.getMessageTypeNameByConfigId(connection.gettargetConfigId());
 
-                    String transportType = configurationTransportManager.getTransportMethodById(configurationTransportManager.getTransportDetails(config.getId()).gettransportMethodId());
+                    String transportType = configurationTransportManager.getTransportMethodById(configurationTransportManager.getTransportDetails(connection.gettargetConfigId()).gettransportMethodId());
                     
                     historyResults resultEntry = null;
                     
@@ -3042,7 +3042,7 @@ public class HealtheWebController {
                     if (sentTo == 0 || sentTo == configDetails.getorgId()) {
 
                         /* Find the total messages received from this source and this configuration */
-                        List<batchDownloadSummary> receivedBatches = transactionOutManager.getuploadBatchesByConfigAndSource(connection.gettargetConfigId(), configDetails.getorgId());
+                        List<batchDownloadSummary> receivedBatches = transactionOutManager.getuploadBatchesByConfigAndSource(connection.getsourceConfigId(), configDetails.getorgId());
 
                         int matchedReceivedBatches = 0;
 

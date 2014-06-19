@@ -158,7 +158,14 @@
                                                             <tr>
                                                                 <td scope="row">${result.orgName}</td>
                                                                 <td>
-                                                                    ${result.transportType}
+                                                                    <c:choose>
+                                                                        <c:when test="${result.transportType == 'Rhapsody'}">
+                                                                            FTPS
+                                                                        </c:when>
+                                                                        <c:otherwise>
+                                                                            ${result.transportType}
+                                                                        </c:otherwise>    
+                                                                    </c:choose>
                                                                 </td>
                                                                 <td>
                                                                     ${result.messageType}
