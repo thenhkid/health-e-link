@@ -407,7 +407,7 @@ public interface transactionInManager {
     
     void sendEmailToAdmin(String message, String subject);
     
-    List<batchUploadSummary> getuploadBatchesByConfigAndTarget(Integer configId, Integer orgId);
+    List<batchUploadSummary> getuploadBatchesByConfigAndTarget(Integer configId, Integer orgId, Integer tgtConfigId);
     
     boolean searchBatchForHistory(batchUploads batchDetails, String searchTerm, Date fromDate, Date toDate) throws Exception;
     

@@ -4928,13 +4928,25 @@ public class transactionInDAOImpl implements transactionInDAO {
      */
     @Override
     @Transactional
-    public List<batchUploadSummary> getuploadBatchesByConfigAndTarget(Integer configId, Integer orgId) {
+    public List<batchUploadSummary> getuploadBatchesByConfigAndTarget(Integer configId, Integer orgId, Integer tgtConfigId) {
+        
+        String sql = "select * from batchuploadsummary where sourceConfigId = :sourceConfigId"
+                + " and targetOrgId = :targetOrgId and batchId in (select batchUploadId from transactionTarget"
+                + " where batchUploadId = batchuploadsummary.batchId and configId = :targetConfigId)";
+        
+        
+        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                .setResultTransformer(
+                        Transformers.aliasToBean(batchUploadSummary.class))
+                .setParameter("sourceConfigId", configId)
+                .setParameter("targetOrgId", orgId)
+                .setParameter("targetConfigId", tgtConfigId);
 
-        Criteria batchSummaries = sessionFactory.getCurrentSession().createCriteria(batchUploadSummary.class);
+        /*Criteria batchSummaries = sessionFactory.getCurrentSession().createCriteria(batchUploadSummary.class);
         batchSummaries.add(Restrictions.eq("sourceConfigId", configId));
-        batchSummaries.add(Restrictions.eq("targetOrgId", orgId));
+        batchSummaries.add(Restrictions.eq("targetOrgId", orgId));*/
 
-        return batchSummaries.list();
+        return query.list();
 
     }
 

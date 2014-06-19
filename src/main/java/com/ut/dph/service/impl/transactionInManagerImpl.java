@@ -2995,8 +2995,8 @@ public class transactionInManagerImpl implements transactionInManager {
     }
     
     @Override
-    public List<batchUploadSummary> getuploadBatchesByConfigAndTarget(Integer configId, Integer orgId) {
-        return transactionInDAO.getuploadBatchesByConfigAndTarget(configId, orgId);
+    public List<batchUploadSummary> getuploadBatchesByConfigAndTarget(Integer configId, Integer orgId, Integer tgtConfigId) {
+        return transactionInDAO.getuploadBatchesByConfigAndTarget(configId, orgId, tgtConfigId);
     }
     
     @Override

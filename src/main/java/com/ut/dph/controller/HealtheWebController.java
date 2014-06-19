@@ -2924,7 +2924,7 @@ public class HealtheWebController {
                 for (configurationConnection connection : sourceConnections) {
 
                     configuration configDetails = configurationManager.getConfigurationById(connection.gettargetConfigId());
-
+                   
                     String tgtOrgName = organizationmanager.getOrganizationById(configDetails.getorgId()).getOrgName();
 
                     String msgTypeName = configurationManager.getMessageTypeNameByConfigId(connection.gettargetConfigId());
@@ -2945,7 +2945,7 @@ public class HealtheWebController {
                     if (sentTo == 0 || sentTo == configDetails.getorgId()) {
 
                         /* Find the total messages sent for this target and this configuration */
-                        List<batchUploadSummary> sentBatches = transactionInManager.getuploadBatchesByConfigAndTarget(connection.getsourceConfigId(), configDetails.getorgId());
+                        List<batchUploadSummary> sentBatches = transactionInManager.getuploadBatchesByConfigAndTarget(connection.getsourceConfigId(), configDetails.getorgId(), connection.gettargetConfigId());
 
                         int matchedSentBatches = 0;
 

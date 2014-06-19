@@ -333,7 +333,7 @@ public interface transactionInDAO {
     
     Integer copyBatchDetails(Integer batchId, Integer tgtConfigId, Integer transactionId);
     
-    List<batchUploadSummary> getuploadBatchesByConfigAndTarget(Integer configId, Integer orgId);
+    List<batchUploadSummary> getuploadBatchesByConfigAndTarget(Integer configId, Integer orgId, Integer tgtConfigId);
     
     boolean searchBatchForHistory(batchUploads batchDetails, String searchTerm, Date fromDate, Date toDate) throws Exception;
     
