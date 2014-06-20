@@ -336,10 +336,11 @@ public class adminProcessingActivity {
 
             if (!Batches.isEmpty()) {
                 for (batchDownloads batch : Batches) {
-                    
+                   
                     if(batch.gettransportMethodId() == 1 || batch.gettransportMethodId() == 5) {
                         String fileDownloadExt = batch.getoutputFIleName().substring(batch.getoutputFIleName().lastIndexOf(".")+1);
                         String newfileName = new StringBuilder().append(batch.getutBatchName()).append(".").append(fileDownloadExt).toString();
+                        
                         batch.setoutputFIleName(newfileName);
                     }
                     
@@ -430,6 +431,14 @@ public class adminProcessingActivity {
 
             if (!Batches.isEmpty()) {
                 for (batchDownloads batch : Batches) {
+                    
+                    if(batch.gettransportMethodId() == 1 || batch.gettransportMethodId() == 5) {
+                        String fileDownloadExt = batch.getoutputFIleName().substring(batch.getoutputFIleName().lastIndexOf(".")+1);
+                        String newfileName = new StringBuilder().append(batch.getutBatchName()).append(".").append(fileDownloadExt).toString();
+                        
+                        batch.setoutputFIleName(newfileName);
+                    }
+                    
                     batch.settotalTransactions(transactionInManager.getRecordCounts(batch.getId(), statusIds, true, false));
 
                     lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
@@ -443,6 +452,23 @@ public class adminProcessingActivity {
                     User userDetails = usermanager.getUserById(batch.getuserId());
                     String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
                     batch.setusersName(usersName);
+                    
+                    /* Get from batch information */
+                    List<transactionTarget> transactionTargets = transactionOutManager.getTransactionsByBatchDLId(batch.getId());
+                    
+                    for(transactionTarget transactiontarget : transactionTargets) {
+                        batchUploads batchUploadDetails = transactionInManager.getBatchDetails(transactiontarget.getbatchUploadId());
+                        
+                        batch.setFromBatchName(batchUploadDetails.getutBatchName());
+                        if(batchUploadDetails.gettransportMethodId() == 5 || batchUploadDetails.gettransportMethodId() == 1) {
+                            String fileExt = batchUploadDetails.getoriginalFileName().substring(batchUploadDetails.getoriginalFileName().lastIndexOf(".")+1);
+                            String newsrcfileName = new StringBuilder().append(batchUploadDetails.getutBatchName()).append(".").append(fileExt).toString();
+                            batch.setFromBatchFile(newsrcfileName);
+                        }
+                        batch.setFromOrgId(batchUploadDetails.getOrgId());
+                        
+                    }
+
 
                 }
             }
