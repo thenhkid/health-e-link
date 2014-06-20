@@ -69,6 +69,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.InetAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.DateFormat;
@@ -2379,7 +2380,7 @@ public class transactionInManagerImpl implements transactionInManager {
                 if (!f.exists()) {
                     sftpJob.setNotes("Directory " + ftpInfo.getdirectory() + " does not exist");
                     updateSFTPRun(sftpJob);
-                    //need to get out of loop since set up was not done properly
+                    //need to get out of loop since set up was not done properly, but should not throw exception as rest of job should go on
                     sendEmailToAdmin(ftpInfo.getdirectory() + " does not exist", "SFTP Job Error");
                     break;
                 }
@@ -2843,7 +2844,7 @@ public class transactionInManagerImpl implements transactionInManager {
                 if (!f.exists()) {
                     moveJob.setNotes(("Directory " + rhapsodyInfo.getDirectory() + " does not exist"));
                     updateSFTPRun(moveJob);
-                    //need to get out of loop since set up was not done properly
+                    //need to get out of loop since set up was not done properly, will try to throw error
                     sendEmailToAdmin((rhapsodyInfo.getDirectory() + " does not exist"), "Rhapsody Job Error");
                     break;
                 }
@@ -2980,17 +2981,17 @@ public class transactionInManagerImpl implements transactionInManager {
     }
 
     @Override
-    public void sendEmailToAdmin(String message, String subject) {
+    public void sendEmailToAdmin(String message, String subject) throws Exception{
         try {
             mailMessage mail = new mailMessage();
             mail.setfromEmailAddress("dphuniversaltranslator@gmail.com");
             mail.setmessageBody(message);
-            mail.setmessageSubject(subject);
-            mail.settoEmailAddress(usermanager.getUserById(1).getEmail());
+            mail.setmessageSubject(subject + " " + InetAddress.getLocalHost().getHostAddress());
+            mail.settoEmailAddress("dphuniversaltranslator@gmail.com");
             emailManager.sendEmail(mail);
         } catch (Exception ex) {
             ex.printStackTrace();
-            System.err.println("sendEmailToAdmin message for admin was " + message + " " + ex.getCause());
+            throw new Exception (ex);
         }
     }
     
