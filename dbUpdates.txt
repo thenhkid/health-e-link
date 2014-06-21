@@ -1,0 +1,3 @@
+/** grace 06202014 11:15AM **/
+ALTER TABLE `universaltranslator`.`movefileslog` 
+ADD INDEX `pathMethodInd` (`transportMethodId` ASC, `folderPath` ASC, `method` ASC);
