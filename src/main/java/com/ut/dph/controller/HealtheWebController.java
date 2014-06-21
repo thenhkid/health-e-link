@@ -2239,7 +2239,7 @@ public class HealtheWebController {
      * @return This function will return the provider object.
      */
     @RequestMapping(value = "/submitMessageNote.do", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Integer submitMessageNote(HttpSession session, @RequestParam(value = "messageTransactionId", required = true) int messageTransactionId, @RequestParam(value = "internalStatusId", required = false) int internalStatusId, @RequestParam(value = "messageNotes", required = false) String messageNotes) throws Exception {
+    public String submitMessageNote(HttpSession session, @RequestParam(value = "messageTransactionId", required = true) int messageTransactionId, @RequestParam(value = "internalStatusId", required = false) int internalStatusId, @RequestParam(value = "messageNotes", required = false) String messageNotes) throws Exception {
 
         try {
             /* Update the internal status code if exists */
@@ -2263,7 +2263,7 @@ public class HealtheWebController {
                 transactionOutManager.saveNote(newNote);
             }
 
-            return 1;
+            return "1";
         } catch (Exception e) {
             throw new Exception("Error occcurred in creating a message note. transactionId: " + messageTransactionId, e);
         }
