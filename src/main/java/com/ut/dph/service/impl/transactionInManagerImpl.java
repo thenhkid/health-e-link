@@ -1543,11 +1543,14 @@ public class transactionInManagerImpl implements transactionInManager {
                 sysErrors = 1;
                 processingSysErrorId = 17;
             }
-
+            
+            String oldFileName = actualFileName;
+            
             if (!strDecode.equalsIgnoreCase("")) {
                 //we write and decode file
                 filemanager.writeFile((decodedFilePath + decodedFileName + decodedFileExt), strDecode);
                 actualFileName = (decodedFilePath + decodedFileName + decodedFileExt);
+                oldFileName = actualFileName;
                 /*
                  If batch is set up for CCD input then we need to translate it
                  to a pipe-delimited text file.
@@ -1555,6 +1558,11 @@ public class transactionInManagerImpl implements transactionInManager {
                 if (batch.getoriginalFileName().endsWith(".xml")) {
                     newfilename = ccdtotxt.TranslateCCDtoTxt(decodedFilePath, decodedFileName, batch.getOrgId());
                     actualFileName = (decodedFilePath + newfilename);
+                    //we remove temp load file 
+                    File tempLoadFile = new File(oldFileName);
+                    if (tempLoadFile.exists()) {
+                    	tempLoadFile.delete();
+                    }  
                     /* 
                      if the original file name is a HL7 file (".hr") then we are going to translate it to
                      a pipe-delimited text file.
@@ -1562,6 +1570,11 @@ public class transactionInManagerImpl implements transactionInManager {
                 } else if (batch.getoriginalFileName().endsWith(".hr")) {
                     newfilename = hl7toTxt.TranslateHl7toTxt(decodedFilePath, decodedFileName);
                     actualFileName = (decodedFilePath + newfilename);
+                    //we remove temp load file 
+                    File tempLoadFile = new File(oldFileName);
+                    if (tempLoadFile.exists()) {
+                    	tempLoadFile.delete();
+                    }            
                 }
 
                 //at this point, hl7 and hr are in unencoded plain text
@@ -1573,7 +1586,7 @@ public class transactionInManagerImpl implements transactionInManager {
                     Path archive = archiveFile.toPath();
                     Path actual = actualFile.toPath();
                     //we keep original file in archive folder
-                    Files.move(actual, archive, REPLACE_EXISTING);
+                    Files.move(actual, archive, REPLACE_EXISTING);                    
                 }
 
                 //3. we update batchId, loadRecordId
