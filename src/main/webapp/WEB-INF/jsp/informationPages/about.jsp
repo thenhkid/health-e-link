@@ -52,7 +52,7 @@
                             Manet Community Health Center: Manet CHC has partnered with South Shore Elder Services, Inc. to provide two bi-directional referrals - Meals on Wheels and Falls Risk Assessment.
                         </li>
                         <li>
-                            Harbor Health Services, Inc.: Harbor Health Services, Inc. has partnered with both the Multicultural VNA and the YMCA of Cape Cod to provide four bi-directional referrals -
+                            Harbor Health Services, Inc.: Harbor Health Services, Inc. has partnered with both the Multicultural Home Care and the YMCA of Cape Cod to provide four bi-directional referrals -
                             Nutrition Counseling, Fitness Counseling, Fitness and Nutrition Counseling combined, and Diabetes Education. 
                         </li>
                         <li>
