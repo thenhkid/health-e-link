@@ -524,19 +524,27 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
     @Override
     @Transactional
     @SuppressWarnings("unchecked")
-    public List<configurationTransport> getConfigTransportForFileExt(String fileExt, Integer transportMethodId) {
+    public List<configurationTransport> getConfigTransportForFileExtAndPath(String fileExt, Integer transportMethodId, Integer status, String inPath) {
         try {
 
             String sql = ("select distinct delimChar, containsHeaderRow , fileDelimiter, fileLocation, encodingId from configurationTransportDetails, ref_delimiters , configurationMessageSpecs "
                     + " where ref_delimiters.id = configurationTransportDetails.fileDelimiter "
                     + " and configurationMessageSpecs.configId = configurationTransportDetails.configId"
                     + " and fileext = :fileExt and transportmethodId = :transportMethodId"
-                    + " and configurationTransportDetails.configId in (select id from configurations where type = 1)");
+                    + " and configurationTransportDetails.configId in (select id from configurations where type = 1 and status = :status)");
+            if (transportMethodId == 5) {
+            	sql = sql  + " and configurationTransportDetails.id in (select transportId from rel_transportrhapsodydetails where directory  = :inputPath and method = 1) ";
+            } else if  (transportMethodId == 3) {
+            	sql = sql  + " and configurationTransportDetails.id in (select transportId from rel_transportftpdetails where directory  = :inputPath and method = 1) ";
+            }
+            
             Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
                     Transformers.aliasToBean(configurationTransport.class));
             query.setParameter("fileExt", fileExt);
             query.setParameter("transportMethodId", transportMethodId);
-
+            query.setParameter("status", status);
+            query.setParameter("inputPath", inPath);
+            
             List<configurationTransport> configurationTransports = query.list();
 
             return configurationTransports;
@@ -552,23 +560,32 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
     @Override
     @Transactional
     @SuppressWarnings("unchecked")
-    public List<configurationTransport> getTransportListForFileExt(String fileExt, Integer transportMethodId) {
+    public List<configurationTransport> getTransportListForFileExtAndPath
+    (String fileExt, Integer transportMethodId, Integer status, String inputPath) {
         try {
 
             String sql = ("select * "
                     + " from configurationTransportDetails "
-                    + " where fileext = :fileExt and transportmethodId = :transportMethodId");
+                    + " where fileext = :fileExt and transportmethodId = :transportMethodId and status = :status");
+            if (transportMethodId == 5) {
+            	sql = sql + " and id in (select transportId from rel_transportrhapsodydetails where directory  = :inputPath and method = 1);";
+            } else if (transportMethodId == 3)  {
+             	sql = sql + " and id in (select transportId from rel_TransportFTPDetails where directory  = :inputPath and method = 1);";          
+            }
+            
             Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
                     Transformers.aliasToBean(configurationTransport.class));
             query.setParameter("fileExt", fileExt);
             query.setParameter("transportMethodId", transportMethodId);
+            query.setParameter("status", status);
+            query.setParameter("inputPath", inputPath);
 
             List<configurationTransport> transportList = query.list();
 
             return transportList;
 
         } catch (Exception ex) {
-            System.err.println("getTransportListForFileExt " + ex.getCause());
+            System.err.println("getTransportListForFileExtAndPath " + ex.getCause());
             ex.printStackTrace();
             return null;
         }

@@ -2439,11 +2439,11 @@ public class transactionInManagerImpl implements transactionInManager {
                 String fileName = file.getName();
                 String fileExt = fileName.substring(fileName.lastIndexOf(".") + 1);
 
-                //figure out how many transports are using fileExt method
-                List<configurationTransport> transportList = configurationtransportmanager.getTransportListForFileExt(fileExt, transportMethodId);
+                //figure out how many active transports are using fileExt method for this particular path
+                List<configurationTransport> transportList = configurationtransportmanager.getTransportListForFileExtAndPath(fileExt, transportMethodId, 1, inPath);
 
                 //figure out if files has distinct delimiters
-                List<configurationTransport> transports = configurationtransportmanager.getConfigTransportForFileExt(fileExt, transportMethodId);
+                List<configurationTransport> transports = configurationtransportmanager.getConfigTransportForFileExtAndPath(fileExt, transportMethodId, 1, inPath);
 
                 DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmssS");
                 Date date = new Date();

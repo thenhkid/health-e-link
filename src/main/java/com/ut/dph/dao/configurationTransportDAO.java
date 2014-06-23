@@ -63,9 +63,9 @@ public interface configurationTransportDAO {
     
     List <configurationMessageSpecs> getConfigurationMessageSpecsForOrgTransport(Integer orgId, Integer transportMethodId, boolean getZeroMessageTypeCol);
    
-    List<configurationTransport> getConfigTransportForFileExt(String fileExt, Integer transportMethodId);
+    List<configurationTransport> getConfigTransportForFileExtAndPath(String fileExt, Integer transportMethodId, Integer status, String inputPath);
     
-    List <configurationTransport> getTransportListForFileExt(String fileExt, Integer transportMethodId);
+    List <configurationTransport> getTransportListForFileExtAndPath(String fileExt, Integer transportMethodId, Integer status, String inputPath);
     
     configurationTransport getTransportDetailsByTransportId(Integer transportId);
     

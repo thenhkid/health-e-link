@@ -224,13 +224,13 @@ public class configurationTransportManagerImpl implements configurationTransport
     }
     
 	@Override
-	public List<configurationTransport> getConfigTransportForFileExt(String fileExt, Integer transportMethodId) {
-		return configurationTransportDAO.getConfigTransportForFileExt(fileExt, transportMethodId);
+	public List<configurationTransport> getConfigTransportForFileExtAndPath(String fileExt, Integer transportMethodId, Integer status, String inputPath) {
+		return configurationTransportDAO.getConfigTransportForFileExtAndPath(fileExt, transportMethodId, status, inputPath);
 	}
 	
 	@Override
-	public List<configurationTransport> getTransportListForFileExt(String fileExt, Integer transportMethodId) {
-		return configurationTransportDAO.getTransportListForFileExt(fileExt, transportMethodId);
+	public List<configurationTransport> getTransportListForFileExtAndPath(String fileExt, Integer transportMethodId, Integer status, String inputPath) {
+		return configurationTransportDAO.getTransportListForFileExtAndPath(fileExt, transportMethodId, status, inputPath);
 	}
 
 	@Override
