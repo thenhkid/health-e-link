@@ -33,6 +33,8 @@ public class ContextProfileInitializer implements ApplicationContextInitializer<
             profiles = "orion-dev";
         } else if("10.202.52.152".equals(hostname)) {
             profiles = "orion-prod";
+        } else if("10.202.52.22".equals(hostname)) {
+            profiles = "orion-prtst";
         }
                 
         environment.setActiveProfiles(profiles);
