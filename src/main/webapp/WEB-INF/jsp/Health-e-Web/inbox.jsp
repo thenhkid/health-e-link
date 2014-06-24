@@ -42,11 +42,11 @@
                 <input type="hidden" id="batchId" name="batchId" value="" />
             </form:form>    
             <div class="form-container scrollable">
-                <div class="date-range-picker-trigger form-control pull-right daterange" style="width:265px; margin-left: 10px;">
+               <div class="date-range-picker-trigger form-control pull-right daterange" style="width:265px; margin-left: 10px;">
                     <i class="glyphicon glyphicon-calendar"></i>
                     <span class="date-label"  rel="" rel2=""><fmt:formatDate value="${fromDate}" type="date" pattern="MMM dd, yyyy" /> - <fmt:formatDate value="${toDate}" type="date" pattern="MMM dd, yyyy" /></span> <b class="caret"></b>
                 </div>
-                <table class="table table-striped table-hover table-default" <c:if test="${not empty inboxBatches}">id="dataTable"</c:if>>
+                <table class="table table-hover table-default" <c:if test="${not empty inboxBatches}">id="dataTable"</c:if>>
                     <caption style="display:none">Inbox</caption>
                     <thead>
                         <tr>
@@ -62,7 +62,7 @@
                         <c:choose>
                             <c:when test="${not empty inboxBatches}">
                                 <c:forEach var="batch" items="${inboxBatches}">
-                                    <tr>
+                                    <tr ${batch.statusValue == 'SBP' ? 'style="background-color: #B7C4DC"' : ''}>
                                         <td scope="row">${batch.utBatchName}</td>
                                         <td class="center-text">
                                             ${batch.totalTransactions}
