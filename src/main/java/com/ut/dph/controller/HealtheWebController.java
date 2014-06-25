@@ -51,7 +51,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -180,12 +183,26 @@ public class HealtheWebController {
             List<batchDownloads> inboxBatches = transactionOutManager.getInboxBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate);
 
             if (!inboxBatches.isEmpty()) {
+                
+                //we can map the process status so we only have to query once
+                List<lu_ProcessStatus> processStatusList = sysAdminManager.getAllProcessStatus();
+                Map<Integer, String> psMap = new HashMap<Integer, String>();
+                for (lu_ProcessStatus ps : processStatusList) {
+                    psMap.put(ps.getId(), ps.getEndUserDisplayCode());
+                }
+                
+                //same goes for users
+                List<User> users = usermanager.getAllUsers();
+                Map<Integer, String> userMap = new HashMap<Integer, String>();
+                for (User user : users) {
+                    userMap.put(user.getId(), (user.getFirstName() + " " + user.getLastName()));
+                }
+                
                 for (batchDownloads batch : inboxBatches) {
                     List<transactionTarget> batchTransactions = transactionOutManager.getInboxBatchTransactions(batch.getId(), userInfo.getId());
                     batch.settotalTransactions(batchTransactions.size());
-
-                    lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
-                    batch.setstatusValue(processStatus.getEndUserDisplayCode());
+                    
+                    batch.setstatusValue(psMap.get(batch.getstatusId()));
 
                     /* Get the details of the sender */
                     batchDownloadSummary downloadSummaryDetails = transactionOutManager.getDownloadSummaryDetails(batchTransactions.get(0).getId());
@@ -193,8 +210,7 @@ public class HealtheWebController {
                     int senderUserId = transactionInManager.getBatchDetails(batchTransactions.get(0).getbatchUploadId()).getuserId();
 
                     Organization orgDetails = organizationmanager.getOrganizationById(senderOrgId);
-                    User userDetails = usermanager.getUserById(senderUserId);
-
+                    
                     String senderDetails = new StringBuilder()
                             .append(orgDetails.getOrgName())
                             .append("<br />")
@@ -202,7 +218,7 @@ public class HealtheWebController {
                             .append("<br />")
                             .append(orgDetails.getCity()).append(" ").append(orgDetails.getState()).append(",").append(orgDetails.getPostalCode())
                             .append("<br />")
-                            .append("(User:").append(" ").append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).append(")").toString();
+                            .append("(User:").append(" ").append(userMap.get(senderUserId)).append(")").toString();
 
                     batch.setusersName(senderDetails);
                 }
@@ -272,12 +288,26 @@ public class HealtheWebController {
             List<batchDownloads> inboxBatches = transactionOutManager.getInboxBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate);
 
             if (!inboxBatches.isEmpty()) {
+                
+                //we can map the process status so we only have to query once
+                List<lu_ProcessStatus> processStatusList = sysAdminManager.getAllProcessStatus();
+                Map<Integer, String> psMap = new HashMap<Integer, String>();
+                for (lu_ProcessStatus ps : processStatusList) {
+                    psMap.put(ps.getId(), ps.getEndUserDisplayCode());
+                }
+                
+                //same goes for users
+                List<User> users = usermanager.getAllUsers();
+                Map<Integer, String> userMap = new HashMap<Integer, String>();
+                for (User user : users) {
+                    userMap.put(user.getId(), (user.getFirstName() + " " + user.getLastName()));
+                }
+                
                 for (batchDownloads batch : inboxBatches) {
                     List<transactionTarget> batchTransactions = transactionOutManager.getInboxBatchTransactions(batch.getId(), userInfo.getId());
                     batch.settotalTransactions(batchTransactions.size());
 
-                    lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
-                    batch.setstatusValue(processStatus.getEndUserDisplayCode());
+                    batch.setstatusValue(psMap.get(batch.getstatusId()));
 
                     /* Get the details of the sender */
                     batchDownloadSummary downloadSummaryDetails = transactionOutManager.getDownloadSummaryDetails(batchTransactions.get(0).getId());
@@ -285,7 +315,6 @@ public class HealtheWebController {
                     int senderUserId = transactionInManager.getBatchDetails(batchTransactions.get(0).getbatchUploadId()).getuserId();
 
                     Organization orgDetails = organizationmanager.getOrganizationById(senderOrgId);
-                    User userDetails = usermanager.getUserById(senderUserId);
 
                     String senderDetails = new StringBuilder()
                             .append(orgDetails.getOrgName())
@@ -294,7 +323,7 @@ public class HealtheWebController {
                             .append("<br />")
                             .append(orgDetails.getCity()).append(" ").append(orgDetails.getState()).append(",").append(orgDetails.getPostalCode())
                             .append("<br />")
-                            .append("(User:").append(" ").append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).append(")").toString();
+                            .append("(User:").append(" ").append(userMap.get(senderUserId)).append(")").toString();
 
                     batch.setusersName(senderDetails);
                 }
@@ -356,6 +385,20 @@ public class HealtheWebController {
             List<transactionTarget> batchTransactions = transactionOutManager.getInboxBatchTransactions(batchId, userInfo.getId());
 
             List<Transaction> transactionList = new ArrayList<Transaction>();
+            
+            //we can map the process status so we only have to query once
+            List<lu_ProcessStatus> processStatusList = sysAdminManager.getAllProcessStatus();
+            Map<Integer, String> psMap = new HashMap<Integer, String>();
+            for (lu_ProcessStatus ps : processStatusList) {
+                psMap.put(ps.getId(), ps.getEndUserDisplayCode());
+            }
+            
+            //we can map the process status so we only have to query once
+            List<messageType> messageTypeList = messagetypemanager.getMessageTypes();
+            Map<Integer, String> mtMap = new HashMap<Integer, String>();
+            for (messageType mtype : messageTypeList) {
+                mtMap.put(mtype.getId(), mtype.getName());
+            }
 
             for (transactionTarget transaction : batchTransactions) {
 
@@ -365,8 +408,7 @@ public class HealtheWebController {
                 transactionDetails.setdateSubmitted(transaction.getdateCreated());
                 transactionDetails.setconfigId(transaction.getconfigId());
 
-                lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(transaction.getstatusId());
-                transactionDetails.setstatusValue(processStatus.getEndUserDisplayCode());
+                transactionDetails.setstatusValue(psMap.get(transaction.getstatusId()));
 
                 transactionOutRecords records = transactionOutManager.getTransactionRecords(transaction.getId());
 
@@ -419,7 +461,7 @@ public class HealtheWebController {
 
                 /* get the message type name */
                 configuration configDetails = configurationManager.getConfigurationById(transaction.getconfigId());
-                transactionDetails.setmessageTypeName(messagetypemanager.getMessageTypeById(configDetails.getMessageTypeId()).getName());
+                transactionDetails.setmessageTypeName(mtMap.get(configDetails.getMessageTypeId()));
 
                 transactionList.add(transactionDetails);
             }
@@ -685,9 +727,23 @@ public class HealtheWebController {
 
         try {
             List<configuration> configurations = configurationManager.getActiveConfigurationsByUserId(userInfo.getId(), 2);
+            
+            //we can map the process status so we only have to query once
+            List<messageType> messageTypeList = messagetypemanager.getMessageTypes();
+            Map<Integer, String> mtMap = new HashMap<Integer, String>();
+            for (messageType mtype : messageTypeList) {
+                mtMap.put(mtype.getId(), mtype.getName());
+            }
+            
+            //if we have lots of organization in the future we can tweak this to narrow down to orgs with batches
+            List<Organization> organizations = organizationmanager.getOrganizations();
+            Map<Integer, String> orgMap = new HashMap<Integer, String>();
+            for (Organization org : organizations) {
+                orgMap.put(org.getId(), org.getOrgName());
+            }
 
             for (configuration config : configurations) {
-                config.setMessageTypeName(messagetypemanager.getMessageTypeById(config.getMessageTypeId()).getName());
+                config.setMessageTypeName(mtMap.get(config.getMessageTypeId()));
 
                 /**
                  * Get a list of connections
@@ -696,7 +752,7 @@ public class HealtheWebController {
 
                 for (configurationConnection connection : connections) {
                     configuration configDetails = configurationManager.getConfigurationById(connection.gettargetConfigId());
-                    connection.settargetOrgName(organizationmanager.getOrganizationById(configDetails.getorgId()).getOrgName());
+                    connection.settargetOrgName(orgMap.get(configDetails.getorgId()));
                     connection.settargetOrgId(configDetails.getorgId());
                 }
 
@@ -1587,15 +1643,28 @@ public class HealtheWebController {
             List<batchUploads> pendingBatches = transactionInManager.getpendingBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate);
 
             if (!pendingBatches.isEmpty()) {
+                
+                //we can map the process status so we only have to query once
+                List<lu_ProcessStatus> processStatusList = sysAdminManager.getAllProcessStatus();
+                Map<Integer, String> psMap = new HashMap<Integer, String>();
+                for (lu_ProcessStatus ps : processStatusList) {
+                    psMap.put(ps.getId(), ps.getEndUserDisplayCode());
+                }
+                
+                //same goes for users
+                List<User> users = usermanager.getAllUsers();
+                Map<Integer, String> userMap = new HashMap<Integer, String>();
+                for (User user : users) {
+                    userMap.put(user.getId(), (user.getFirstName() + " " + user.getLastName()));
+                }
+                
                 for (batchUploads batch : pendingBatches) {
                     List<transactionIn> batchTransactions = transactionInManager.getBatchTransactions(batch.getId(), userInfo.getId());
                     batch.settotalTransactions(batchTransactions.size());
 
-                    lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
-                    batch.setstatusValue(processStatus.getEndUserDisplayCode());
+                    batch.setstatusValue(psMap.get(batch.getstatusId()));
 
-                    User userDetails = usermanager.getUserById(batch.getuserId());
-                    String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
+                    String usersName = new StringBuilder().append(userMap.get(batch.getuserId())).toString();
                     batch.setusersName(usersName);
                 }
             }
@@ -1646,16 +1715,30 @@ public class HealtheWebController {
             List<batchUploads> pendingBatches = transactionInManager.getpendingBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate);
 
             if (!pendingBatches.isEmpty()) {
+                
+                //we can map the process status so we only have to query once
+                List<lu_ProcessStatus> processStatusList = sysAdminManager.getAllProcessStatus();
+                Map<Integer, String> psMap = new HashMap<Integer, String>();
+                for (lu_ProcessStatus ps : processStatusList) {
+                    psMap.put(ps.getId(), ps.getEndUserDisplayCode());
+                }
+                
+                //same goes for users
+                List<User> users = usermanager.getAllUsers();
+                Map<Integer, String> userMap = new HashMap<Integer, String>();
+                for (User user : users) {
+                    userMap.put(user.getId(), (user.getFirstName() + " " + user.getLastName()));
+                }
+                
                 for (batchUploads batch : pendingBatches) {
                     List<transactionIn> batchTransactions = transactionInManager.getBatchTransactions(batch.getId(), userInfo.getId());
                     batch.settotalTransactions(batchTransactions.size());
+                    
+                    batch.setstatusValue(psMap.get(batch.getstatusId()));
 
-                    lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
-                    batch.setstatusValue(processStatus.getEndUserDisplayCode());
-
-                    User userDetails = usermanager.getUserById(batch.getuserId());
-                    String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
+                    String usersName = new StringBuilder().append(userMap.get(batch.getuserId())).toString();
                     batch.setusersName(usersName);
+
                 }
             }
 
@@ -1713,15 +1796,28 @@ public class HealtheWebController {
             List<batchUploads> sentBatches = transactionInManager.getsentBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate);
 
             if (!sentBatches.isEmpty()) {
+                
+                //we can map the process status so we only have to query once
+                List<lu_ProcessStatus> processStatusList = sysAdminManager.getAllProcessStatus();
+                Map<Integer, String> psMap = new HashMap<Integer, String>();
+                for (lu_ProcessStatus ps : processStatusList) {
+                    psMap.put(ps.getId(), ps.getEndUserDisplayCode());
+                }
+                
+                //same goes for users
+                List<User> users = usermanager.getAllUsers();
+                Map<Integer, String> userMap = new HashMap<Integer, String>();
+                for (User user : users) {
+                    userMap.put(user.getId(), (user.getFirstName() + " " + user.getLastName()));
+                }
+                
                 for (batchUploads batch : sentBatches) {
                     List<transactionIn> batchTransactions = transactionInManager.getBatchTransactions(batch.getId(), userInfo.getId());
                     batch.settotalTransactions(batchTransactions.size());
 
-                    lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
-                    batch.setstatusValue(processStatus.getEndUserDisplayCode());
+                    batch.setstatusValue(psMap.get(batch.getstatusId()));
 
-                    User userDetails = usermanager.getUserById(batch.getuserId());
-                    String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
+                    String usersName = new StringBuilder().append(userMap.get(batch.getuserId())).toString();
                     batch.setusersName(usersName);
                 }
             }
@@ -1772,15 +1868,28 @@ public class HealtheWebController {
             List<batchUploads> sentBatches = transactionInManager.getsentBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate);
 
             if (!sentBatches.isEmpty()) {
+                
+                //we can map the process status so we only have to query once
+                List<lu_ProcessStatus> processStatusList = sysAdminManager.getAllProcessStatus();
+                Map<Integer, String> psMap = new HashMap<Integer, String>();
+                for (lu_ProcessStatus ps : processStatusList) {
+                    psMap.put(ps.getId(), ps.getEndUserDisplayCode());
+                }
+                
+                //same goes for users
+                List<User> users = usermanager.getAllUsers();
+                Map<Integer, String> userMap = new HashMap<Integer, String>();
+                for (User user : users) {
+                    userMap.put(user.getId(), (user.getFirstName() + " " + user.getLastName()));
+                }
+                
                 for (batchUploads batch : sentBatches) {
                     List<transactionIn> batchTransactions = transactionInManager.getBatchTransactions(batch.getId(), userInfo.getId());
                     batch.settotalTransactions(batchTransactions.size());
 
-                    lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
-                    batch.setstatusValue(processStatus.getEndUserDisplayCode());
+                    batch.setstatusValue(psMap.get(batch.getstatusId()));
 
-                    User userDetails = usermanager.getUserById(batch.getuserId());
-                    String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
+                    String usersName = new StringBuilder().append(userMap.get(batch.getuserId())).toString();
                     batch.setusersName(usersName);
                 }
             }
@@ -1827,6 +1936,13 @@ public class HealtheWebController {
             List<transactionIn> batchTransactions = transactionInManager.getBatchTransactions(batchId, userInfo.getId());
 
             List<Transaction> transactionList = new ArrayList<Transaction>();
+            
+            //we can map the process status so we only have to query once
+            List<lu_ProcessStatus> processStatusList = sysAdminManager.getAllProcessStatus();
+            Map<Integer, String> psMap = new HashMap<Integer, String>();
+            for (lu_ProcessStatus ps : processStatusList) {
+                psMap.put(ps.getId(), ps.getEndUserDisplayCode());
+            }
 
             for (transactionIn transaction : batchTransactions) {
 
@@ -1836,8 +1952,7 @@ public class HealtheWebController {
                 transactionDetails.setdateSubmitted(transaction.getdateCreated());
                 transactionDetails.setconfigId(transaction.getconfigId());
 
-                lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(transaction.getstatusId());
-                transactionDetails.setstatusValue(processStatus.getEndUserDisplayCode());
+                transactionDetails.setstatusValue(psMap.get(transaction.getstatusId()));
 
                 transactionInRecords records = transactionInManager.getTransactionRecords(transaction.getId());
 
@@ -2338,7 +2453,19 @@ public class HealtheWebController {
     public List<transactionRecords> setInboxFormFields(List<configurationFormFields> formfields, transactionOutRecords records, int configId, boolean readOnly, int transactionInId) throws NoSuchMethodException {
 
         List<transactionRecords> fields = new ArrayList<transactionRecords>();
-
+        
+        //we can map the process status so we only have to query once
+        List validationTypeList = messagetypemanager.getValidationTypes();
+        Map<Integer, String> vtMap = new HashMap<Integer, String>();
+        
+        for (ListIterator iter = validationTypeList.listIterator(); iter.hasNext();) {
+            
+            Object[] row = (Object[]) iter.next();
+            
+            vtMap.put(Integer.valueOf(String.valueOf(row[0])), String.valueOf(row[1]));
+            
+        }
+       
         for (configurationFormFields formfield : formfields) {
             transactionRecords field = new transactionRecords();
             field.setfieldNo(formfield.getFieldNo());
@@ -2351,7 +2478,7 @@ public class HealtheWebController {
 
             /* Get the validation */
             if (formfield.getValidationType() > 1) {
-                field.setvalidation(messagetypemanager.getValidationById(formfield.getValidationType()).toString());
+                field.setvalidation(vtMap.get(formfield.getValidationType()));
             }
 
             if (records != null) {
@@ -2404,6 +2531,18 @@ public class HealtheWebController {
     public List<transactionRecords> setOutboundFormFields(List<configurationFormFields> formfields, transactionInRecords records, int configId, boolean readOnly, int orgId) throws NoSuchMethodException {
 
         List<transactionRecords> fields = new ArrayList<transactionRecords>();
+        
+        //we can map the process status so we only have to query once
+        List validationTypeList = messagetypemanager.getValidationTypes();
+        Map<Integer, String> vtMap = new HashMap<Integer, String>();
+        
+        for (ListIterator iter = validationTypeList.listIterator(); iter.hasNext();) {
+            
+            Object[] row = (Object[]) iter.next();
+            
+            vtMap.put(Integer.valueOf(String.valueOf(row[0])), String.valueOf(row[1]));
+            
+        }
 
         for (configurationFormFields formfield : formfields) {
             transactionRecords field = new transactionRecords();
@@ -2421,7 +2560,7 @@ public class HealtheWebController {
 
             /* Get the validation */
             if (formfield.getValidationType() > 1) {
-                field.setvalidation(messagetypemanager.getValidationById(formfield.getValidationType()).toString());
+                field.setvalidation(vtMap.get(formfield.getValidationType()));
             }
 
             if (records != null) {
@@ -2490,6 +2629,13 @@ public class HealtheWebController {
             List<transactionIn> feedbackReports = transactionOutManager.getFeedbackReports(transactionId, fromPage);
 
             List<Transaction> transactionList = new ArrayList<Transaction>();
+            
+            //we can map the process status so we only have to query once
+            List<lu_ProcessStatus> processStatusList = sysAdminManager.getAllProcessStatus();
+            Map<Integer, String> psMap = new HashMap<Integer, String>();
+            for (lu_ProcessStatus ps : processStatusList) {
+                psMap.put(ps.getId(), ps.getEndUserDisplayCode());
+            }
 
             /* if coming from the sent page then we need to look for feedback reports from the 
              originating message. Otherwise we need to look for feedback reports from the message in
@@ -2512,8 +2658,7 @@ public class HealtheWebController {
                     transaction.setdateSubmitted(inboxFeedbackReport.getdateCreated());
                     transaction.setconfigId(inboxFeedbackReport.getconfigId());
 
-                    lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(inboxFeedbackReport.getstatusId());
-                    transaction.setstatusValue(processStatus.getEndUserDisplayCode());
+                    transaction.setstatusValue(psMap.get(inboxFeedbackReport.getstatusId()));
 
                     transactionOutRecords records = transactionOutManager.getTransactionRecords(inboxFeedbackReport.getId());
 
@@ -2560,8 +2705,7 @@ public class HealtheWebController {
                     transaction.setdateSubmitted(feedbackReport.getdateCreated());
                     transaction.setconfigId(feedbackReport.getconfigId());
 
-                    lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(feedbackReport.getstatusId());
-                    transaction.setstatusValue(processStatus.getEndUserDisplayCode());
+                    transaction.setstatusValue(psMap.get(feedbackReport.getstatusId()));
 
                     transactionInRecords records = transactionInManager.getTransactionRecords(feedbackReport.getId());
 
@@ -2900,6 +3044,13 @@ public class HealtheWebController {
         mav.addObject("patientId", patientId);
         mav.addObject("firstName", firstName);
         mav.addObject("providerId", providerId);
+        
+        //we can map the process status so we only have to query once
+        List<lu_ProcessStatus> processStatusList = sysAdminManager.getAllProcessStatus();
+        Map<Integer, String> psMap = new HashMap<Integer, String>();
+        for (lu_ProcessStatus ps : processStatusList) {
+            psMap.put(ps.getId(), ps.getEndUserDisplayCode());
+        }
 
         /* Get all connections for the logged in organization */
         List<configuration> configs = configurationManager.getActiveConfigurationsByOrgId(userInfo.getOrgId());
@@ -2980,8 +3131,7 @@ public class HealtheWebController {
                                     resultEntry.setTransportType(transportType);
                                     resultEntry.setBatchName(batchDetails.getutBatchName());
                                     resultEntry.setDateCreated(batchDetails.getdateSubmitted());
-                                    lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batchDetails.getstatusId());
-                                    resultEntry.setStatus(processStatus.getEndUserDisplayCode());
+                                    resultEntry.setStatus(psMap.get(batchDetails.getstatusId()));
                                     resultEntry.setStatusId(batchDetails.getstatusId());
                                     
                                      /* Get the patient data */
@@ -3077,8 +3227,7 @@ public class HealtheWebController {
                                     resultEntry.setTransportType(transportType);
                                     resultEntry.setBatchName(batchDetails.getutBatchName());
                                     resultEntry.setDateCreated(batchDetails.getdateCreated());
-                                    lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batchDetails.getstatusId());
-                                    resultEntry.setStatus(processStatus.getEndUserDisplayCode());
+                                    resultEntry.setStatus(psMap.get(batchDetails.getstatusId()));
                                     resultEntry.setStatusId(batchDetails.getstatusId());
                                     
                                      /* Get the patient data */

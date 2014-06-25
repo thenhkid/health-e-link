@@ -113,12 +113,12 @@ public class adminProcessingActivity {
 
     @Autowired
     private fileManager filemanager;
-    
+
     /**
      * The private maxResults variable will hold the number of results to show per list page.
      */
     private static int maxResults = 10;
-    
+
     private String archivePath = "/bowlink/archivesIn/";
 
     /**
@@ -167,46 +167,45 @@ public class adminProcessingActivity {
 
         /* Get all inbound transactions */
         try {
-            
-        	Integer fetchCount = 0;
+
+            Integer fetchCount = 0;
             List<batchUploads> uploadedBatches = transactionInManager.getAllUploadedBatches(fromDate, toDate, fetchCount);
 
             if (!uploadedBatches.isEmpty()) {
-            	
-            	//we can map the process status so we only have to query once
-                List <lu_ProcessStatus> processStatusList =  sysAdminManager.getAllProcessStatus();
+
+                //we can map the process status so we only have to query once
+                List<lu_ProcessStatus> processStatusList = sysAdminManager.getAllProcessStatus();
                 Map<Integer, String> psMap = new HashMap<Integer, String>();
                 for (lu_ProcessStatus ps : processStatusList) {
                     psMap.put(ps.getId(), ps.getDisplayCode());
                 }
-                
+
                 //same with transport method names
-                List <TransportMethod> transporthMethods =  configurationTransportManager.getTransportMethods(Arrays.asList(0,1));
+                List<TransportMethod> transporthMethods = configurationTransportManager.getTransportMethods(Arrays.asList(0, 1));
                 Map<Integer, String> tmMap = new HashMap<Integer, String>();
                 for (TransportMethod tms : transporthMethods) {
-                	tmMap.put(tms.getId(), tms.getTransportMethod());
+                    tmMap.put(tms.getId(), tms.getTransportMethod());
                 }
 
                 //if we have lots of organization in the future we can tweak this to narrow down to orgs with batches
                 List<Organization> organizations = organizationmanager.getOrganizations();
                 Map<Integer, String> orgMap = new HashMap<Integer, String>();
                 for (Organization org : organizations) {
-                	orgMap.put(org.getId(), org.getOrgName());
+                    orgMap.put(org.getId(), org.getOrgName());
                 }
-                
+
                 //same goes for users
-                List <User> users = usermanager.getAllUsers();
+                List<User> users = usermanager.getAllUsers();
                 Map<Integer, String> userMap = new HashMap<Integer, String>();
                 for (User user : users) {
-                	userMap.put(user.getId(), (user.getFirstName() + " " + user.getLastName()));
+                    userMap.put(user.getId(), (user.getFirstName() + " " + user.getLastName()));
                 }
-                
+
                 for (batchUploads batch : uploadedBatches) {
-                    
-                	//the count is in totalRecordCount already, can skip re-count
-                	// batch.settotalTransactions(transactionInManager.getRecordCounts(batch.getId(), statusIds, false, false));
-                	
-                	batch.setstatusValue(psMap.get(batch.getstatusId()));
+
+                    //the count is in totalRecordCount already, can skip re-count
+                    // batch.settotalTransactions(transactionInManager.getRecordCounts(batch.getId(), statusIds, false, false));
+                    batch.setstatusValue(psMap.get(batch.getstatusId()));
 
                     batch.setorgName(orgMap.get(batch.getOrgId()));
 
@@ -218,8 +217,7 @@ public class adminProcessingActivity {
             }
 
             mav.addObject("batches", uploadedBatches);
-           
-            
+
         } catch (Exception e) {
             throw new Exception("Error occurred viewing the all uploaded batches.", e);
         }
@@ -265,42 +263,42 @@ public class adminProcessingActivity {
 
         /* Get all inbound transactions */
         try {
-            
-        	Integer fetchCount = 0;
-        	/* Need to get a list of all uploaded batches */
+
+            Integer fetchCount = 0;
+            /* Need to get a list of all uploaded batches */
             List<batchUploads> uploadedBatches = transactionInManager.getAllUploadedBatches(fromDate, toDate, fetchCount);
 
             if (!uploadedBatches.isEmpty()) {
-            	//we can map the process status so we only have to query once
-                List <lu_ProcessStatus> processStatusList =  sysAdminManager.getAllProcessStatus();
+                //we can map the process status so we only have to query once
+                List<lu_ProcessStatus> processStatusList = sysAdminManager.getAllProcessStatus();
                 Map<Integer, String> psMap = new HashMap<Integer, String>();
                 for (lu_ProcessStatus ps : processStatusList) {
                     psMap.put(ps.getId(), ps.getDisplayCode());
                 }
-                
+
                 //same with transport method names
-                List <TransportMethod> transporthMethods =  configurationTransportManager.getTransportMethods(Arrays.asList(0,1));
+                List<TransportMethod> transporthMethods = configurationTransportManager.getTransportMethods(Arrays.asList(0, 1));
                 Map<Integer, String> tmMap = new HashMap<Integer, String>();
                 for (TransportMethod tms : transporthMethods) {
-                	tmMap.put(tms.getId(), tms.getTransportMethod());
+                    tmMap.put(tms.getId(), tms.getTransportMethod());
                 }
 
                 //if we have lots of organization in the future we can tweak this to narrow down to orgs with batches
                 List<Organization> organizations = organizationmanager.getOrganizations();
                 Map<Integer, String> orgMap = new HashMap<Integer, String>();
                 for (Organization org : organizations) {
-                	orgMap.put(org.getId(), org.getOrgName());
+                    orgMap.put(org.getId(), org.getOrgName());
                 }
-                
+
                 //same goes for users
-                List <User> users = usermanager.getAllUsers();
+                List<User> users = usermanager.getAllUsers();
                 Map<Integer, String> userMap = new HashMap<Integer, String>();
                 for (User user : users) {
-                	userMap.put(user.getId(), (user.getFirstName() + " " + user.getLastName()));
+                    userMap.put(user.getId(), (user.getFirstName() + " " + user.getLastName()));
                 }
-            	
-            	for (batchUploads batch : uploadedBatches) {
-                	batch.setstatusValue(psMap.get(batch.getstatusId()));
+
+                for (batchUploads batch : uploadedBatches) {
+                    batch.setstatusValue(psMap.get(batch.getstatusId()));
 
                     batch.setorgName(orgMap.get(batch.getOrgId()));
 
@@ -371,43 +369,67 @@ public class adminProcessingActivity {
             List<Integer> statusIds = new ArrayList();
 
             if (!Batches.isEmpty()) {
+
+                //we can map the process status so we only have to query once
+                List<lu_ProcessStatus> processStatusList = sysAdminManager.getAllProcessStatus();
+                Map<Integer, String> psMap = new HashMap<Integer, String>();
+                for (lu_ProcessStatus ps : processStatusList) {
+                    psMap.put(ps.getId(), ps.getDisplayCode());
+                }
+
+                //same with transport method names
+                List<TransportMethod> transporthMethods = configurationTransportManager.getTransportMethods(Arrays.asList(0, 1));
+                Map<Integer, String> tmMap = new HashMap<Integer, String>();
+                for (TransportMethod tms : transporthMethods) {
+                    tmMap.put(tms.getId(), tms.getTransportMethod());
+                }
+
+                //if we have lots of organization in the future we can tweak this to narrow down to orgs with batches
+                List<Organization> organizations = organizationmanager.getOrganizations();
+                Map<Integer, String> orgMap = new HashMap<Integer, String>();
+                for (Organization org : organizations) {
+                    orgMap.put(org.getId(), org.getOrgName());
+                }
+
+                //same goes for users
+                List<User> users = usermanager.getAllUsers();
+                Map<Integer, String> userMap = new HashMap<Integer, String>();
+                for (User user : users) {
+                    userMap.put(user.getId(), (user.getFirstName() + " " + user.getLastName()));
+                }
+
                 for (batchDownloads batch : Batches) {
-                   
-                    if(batch.gettransportMethodId() == 1 || batch.gettransportMethodId() == 5) {
-                        String fileDownloadExt = batch.getoutputFIleName().substring(batch.getoutputFIleName().lastIndexOf(".")+1);
+
+                    if (batch.gettransportMethodId() == 1 || batch.gettransportMethodId() == 5) {
+                        String fileDownloadExt = batch.getoutputFIleName().substring(batch.getoutputFIleName().lastIndexOf(".") + 1);
                         String newfileName = new StringBuilder().append(batch.getutBatchName()).append(".").append(fileDownloadExt).toString();
-                        
+
                         batch.setoutputFIleName(newfileName);
                     }
-                    
-                    batch.settotalTransactions(transactionInManager.getRecordCounts(batch.getId(), statusIds, true, false));
 
-                    lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
-                    batch.setstatusValue(processStatus.getDisplayCode());
+                    //batch.settotalTransactions(transactionInManager.getRecordCounts(batch.getId(), statusIds, true, false));
+                    batch.setstatusValue(psMap.get(batch.getstatusId()));
 
-                    Organization orgDetails = organizationmanager.getOrganizationById(batch.getOrgId());
-                    batch.setorgName(orgDetails.getOrgName());
+                    batch.setorgName(orgMap.get(batch.getOrgId()));
 
-                    batch.settransportMethod(configurationTransportManager.getTransportMethodById(batch.gettransportMethodId()));
+                    batch.settransportMethod(tmMap.get(batch.gettransportMethodId()));
 
-                    User userDetails = usermanager.getUserById(batch.getuserId());
-                    String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
-                    batch.setusersName(usersName);
-                    
+                    batch.setusersName(userMap.get(batch.getuserId()));
+
                     /* Get from batch information */
                     List<transactionTarget> transactionTargets = transactionOutManager.getTransactionsByBatchDLId(batch.getId());
-                    
-                    for(transactionTarget transactiontarget : transactionTargets) {
+
+                    for (transactionTarget transactiontarget : transactionTargets) {
                         batchUploads batchUploadDetails = transactionInManager.getBatchDetails(transactiontarget.getbatchUploadId());
-                        
+
                         batch.setFromBatchName(batchUploadDetails.getutBatchName());
-                        if(batchUploadDetails.gettransportMethodId() == 5 || batchUploadDetails.gettransportMethodId() == 1) {
-                            String fileExt = batchUploadDetails.getoriginalFileName().substring(batchUploadDetails.getoriginalFileName().lastIndexOf(".")+1);
+                        if (batchUploadDetails.gettransportMethodId() == 5 || batchUploadDetails.gettransportMethodId() == 1) {
+                            String fileExt = batchUploadDetails.getoriginalFileName().substring(batchUploadDetails.getoriginalFileName().lastIndexOf(".") + 1);
                             String newsrcfileName = new StringBuilder().append(batchUploadDetails.getutBatchName()).append(".").append(fileExt).toString();
                             batch.setFromBatchFile(newsrcfileName);
                         }
                         batch.setFromOrgId(batchUploadDetails.getOrgId());
-                        
+
                     }
 
                 }
@@ -465,46 +487,68 @@ public class adminProcessingActivity {
 
             List<Integer> statusIds = new ArrayList();
 
+            //we can map the process status so we only have to query once
+            List<lu_ProcessStatus> processStatusList = sysAdminManager.getAllProcessStatus();
+            Map<Integer, String> psMap = new HashMap<Integer, String>();
+            for (lu_ProcessStatus ps : processStatusList) {
+                psMap.put(ps.getId(), ps.getDisplayCode());
+            }
+
+            //same with transport method names
+            List<TransportMethod> transporthMethods = configurationTransportManager.getTransportMethods(Arrays.asList(0, 1));
+            Map<Integer, String> tmMap = new HashMap<Integer, String>();
+            for (TransportMethod tms : transporthMethods) {
+                tmMap.put(tms.getId(), tms.getTransportMethod());
+            }
+
+            //if we have lots of organization in the future we can tweak this to narrow down to orgs with batches
+            List<Organization> organizations = organizationmanager.getOrganizations();
+            Map<Integer, String> orgMap = new HashMap<Integer, String>();
+            for (Organization org : organizations) {
+                orgMap.put(org.getId(), org.getOrgName());
+            }
+
+            //same goes for users
+            List<User> users = usermanager.getAllUsers();
+            Map<Integer, String> userMap = new HashMap<Integer, String>();
+            for (User user : users) {
+                userMap.put(user.getId(), (user.getFirstName() + " " + user.getLastName()));
+            }
+
             if (!Batches.isEmpty()) {
                 for (batchDownloads batch : Batches) {
-                    
-                    if(batch.gettransportMethodId() == 1 || batch.gettransportMethodId() == 5) {
-                        String fileDownloadExt = batch.getoutputFIleName().substring(batch.getoutputFIleName().lastIndexOf(".")+1);
+
+                    if (batch.gettransportMethodId() == 1 || batch.gettransportMethodId() == 5) {
+                        String fileDownloadExt = batch.getoutputFIleName().substring(batch.getoutputFIleName().lastIndexOf(".") + 1);
                         String newfileName = new StringBuilder().append(batch.getutBatchName()).append(".").append(fileDownloadExt).toString();
-                        
+
                         batch.setoutputFIleName(newfileName);
                     }
-                    
-                    batch.settotalTransactions(transactionInManager.getRecordCounts(batch.getId(), statusIds, true, false));
 
-                    lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
-                    batch.setstatusValue(processStatus.getDisplayCode());
+                    //batch.settotalTransactions(transactionInManager.getRecordCounts(batch.getId(), statusIds, true, false));
+                    batch.setstatusValue(psMap.get(batch.getstatusId()));
 
-                    Organization orgDetails = organizationmanager.getOrganizationById(batch.getOrgId());
-                    batch.setorgName(orgDetails.getOrgName());
+                    batch.setorgName(orgMap.get(batch.getOrgId()));
 
-                    batch.settransportMethod(configurationTransportManager.getTransportMethodById(batch.gettransportMethodId()));
+                    batch.settransportMethod(tmMap.get(batch.gettransportMethodId()));
 
-                    User userDetails = usermanager.getUserById(batch.getuserId());
-                    String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
-                    batch.setusersName(usersName);
-                    
+                    batch.setusersName(userMap.get(batch.getuserId()));
+
                     /* Get from batch information */
                     List<transactionTarget> transactionTargets = transactionOutManager.getTransactionsByBatchDLId(batch.getId());
-                    
-                    for(transactionTarget transactiontarget : transactionTargets) {
+
+                    for (transactionTarget transactiontarget : transactionTargets) {
                         batchUploads batchUploadDetails = transactionInManager.getBatchDetails(transactiontarget.getbatchUploadId());
-                        
+
                         batch.setFromBatchName(batchUploadDetails.getutBatchName());
-                        if(batchUploadDetails.gettransportMethodId() == 5 || batchUploadDetails.gettransportMethodId() == 1) {
-                            String fileExt = batchUploadDetails.getoriginalFileName().substring(batchUploadDetails.getoriginalFileName().lastIndexOf(".")+1);
+                        if (batchUploadDetails.gettransportMethodId() == 5 || batchUploadDetails.gettransportMethodId() == 1) {
+                            String fileExt = batchUploadDetails.getoriginalFileName().substring(batchUploadDetails.getoriginalFileName().lastIndexOf(".") + 1);
                             String newsrcfileName = new StringBuilder().append(batchUploadDetails.getutBatchName()).append(".").append(fileExt).toString();
                             batch.setFromBatchFile(newsrcfileName);
                         }
                         batch.setFromOrgId(batchUploadDetails.getOrgId());
-                        
-                    }
 
+                    }
 
                 }
             }
@@ -550,113 +594,113 @@ public class adminProcessingActivity {
 
                 List<Transaction> transactionList = new ArrayList<Transaction>();
 
-                if (batchTransactions.size() > 100) {
-                    mav.addObject("toomany", "toomany");
-                    mav.addObject("size", batchTransactions.size());
-                } else {
+                //we can map the process status so we only have to query once
+                List<lu_ProcessStatus> processStatusList = sysAdminManager.getAllProcessStatus();
+                Map<Integer, String> psMap = new HashMap<Integer, String>();
+                for (lu_ProcessStatus ps : processStatusList) {
+                    psMap.put(ps.getId(), ps.getDisplayCode());
+                }
 
-                    for (transactionIn transaction : batchTransactions) {
+                for (transactionIn transaction : batchTransactions) {
 
-                        Transaction transactionDetails = new Transaction();
-                        transactionDetails.settransactionRecordId(transaction.getId());
-                        transactionDetails.setstatusId(transaction.getstatusId());
-                        transactionDetails.setdateSubmitted(transaction.getdateCreated());
-                        transactionDetails.setconfigId(transaction.getconfigId());
+                    Transaction transactionDetails = new Transaction();
+                    transactionDetails.settransactionRecordId(transaction.getId());
+                    transactionDetails.setstatusId(transaction.getstatusId());
+                    transactionDetails.setdateSubmitted(transaction.getdateCreated());
+                    transactionDetails.setconfigId(transaction.getconfigId());
+                    
+                    transactionDetails.setstatusValue(psMap.get(transaction.getstatusId()));
 
-                        lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(transaction.getstatusId());
-                        transactionDetails.setstatusValue(processStatus.getDisplayCode());
+                    transactionInRecords records = transactionInManager.getTransactionRecords(transaction.getId());
 
-                        transactionInRecords records = transactionInManager.getTransactionRecords(transaction.getId());
+                    /* Get a list of form fields */
+                    configurationTransport transportDetails = configurationTransportManager.getTransportDetails(transaction.getconfigId());
+                    List<configurationFormFields> targetInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transaction.getconfigId(), transportDetails.getId(), 3);
 
-                        /* Get a list of form fields */
-                        configurationTransport transportDetails = configurationTransportManager.getTransportDetails(transaction.getconfigId());
-                        List<configurationFormFields> targetInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transaction.getconfigId(), transportDetails.getId(), 3);
+                    /* Set all the transaction TARGET fields */
+                    List<transactionRecords> toFields;
+                    if (!targetInfoFormFields.isEmpty()) {
+                        toFields = setOutboundFormFields(targetInfoFormFields, records, 0, 0, true, 0);
 
-                        /* Set all the transaction TARGET fields */
-                        List<transactionRecords> toFields;
-                        if (!targetInfoFormFields.isEmpty()) {
-                            toFields = setOutboundFormFields(targetInfoFormFields, records, 0, 0, true, 0);
-
-                            if ("".equals(toFields.get(0).getFieldValue()) || toFields.get(0).getFieldValue() == null) {
-                                toFields = setOrgDetails(transactionInManager.getUploadSummaryDetails(transaction.getId()).gettargetOrgId());
-                            }
-                        } else {
+                        if ("".equals(toFields.get(0).getFieldValue()) || toFields.get(0).getFieldValue() == null) {
                             toFields = setOrgDetails(transactionInManager.getUploadSummaryDetails(transaction.getId()).gettargetOrgId());
                         }
-                        transactionDetails.settargetOrgFields(toFields);
-
-                        /* get the message type name */
-                        configuration configDetails = configurationManager.getConfigurationById(transaction.getconfigId());
-                        transactionDetails.setmessageTypeName(messagetypemanager.getMessageTypeById(configDetails.getMessageTypeId()).getName());
-
-                        configurationMessageSpecs messageSpecs = configurationManager.getMessageSpecs(transaction.getconfigId());
-
-                        if (messageSpecs.getrptField1() > 0) {
-
-                            configurationFormFields formField1 = configurationTransportManager.getConfigurationFieldsByFieldNo(transaction.getconfigId(), transportDetails.getId(), messageSpecs.getrptField1());
-
-                            transactionDetails.setreportableFieldHeading1(formField1.getFieldLabel());
-
-                            String rptFieldCol1 = new StringBuilder().append("f").append(messageSpecs.getrptField1()).toString();
-                            try {
-                                transactionDetails.setreportableField1(BeanUtils.getProperty(records, rptFieldCol1));
-                            } catch (IllegalAccessException ex) {
-                                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
-                            } catch (InvocationTargetException ex) {
-                                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
-                            }
-                        }
-
-                        if (messageSpecs.getrptField2() > 0) {
-
-                            configurationFormFields formField2 = configurationTransportManager.getConfigurationFieldsByFieldNo(transaction.getconfigId(), transportDetails.getId(), messageSpecs.getrptField2());
-
-                            transactionDetails.setreportableFieldHeading2(formField2.getFieldLabel());
-
-                            String rptFieldCol2 = new StringBuilder().append("f").append(messageSpecs.getrptField2()).toString();
-                            try {
-                                transactionDetails.setreportableField2(BeanUtils.getProperty(records, rptFieldCol2));
-                            } catch (IllegalAccessException ex) {
-                                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
-                            } catch (InvocationTargetException ex) {
-                                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
-                            }
-                        }
-
-                        if (messageSpecs.getrptField3() > 0) {
-
-                            configurationFormFields formField3 = configurationTransportManager.getConfigurationFieldsByFieldNo(transaction.getconfigId(), transportDetails.getId(), messageSpecs.getrptField3());
-
-                            transactionDetails.setreportableFieldHeading3(formField3.getFieldLabel());
-
-                            String rptFieldCol3 = new StringBuilder().append("f").append(messageSpecs.getrptField3()).toString();
-                            try {
-                                transactionDetails.setreportableField3(BeanUtils.getProperty(records, rptFieldCol3));
-                            } catch (IllegalAccessException ex) {
-                                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
-                            } catch (InvocationTargetException ex) {
-                                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
-                            }
-                        }
-
-                        if (messageSpecs.getrptField4() > 0) {
-
-                            configurationFormFields formField4 = configurationTransportManager.getConfigurationFieldsByFieldNo(transaction.getconfigId(), transportDetails.getId(), messageSpecs.getrptField4());
-
-                            transactionDetails.setreportableFieldHeading4(formField4.getFieldLabel());
-
-                            String rptFieldCol4 = new StringBuilder().append("f").append(messageSpecs.getrptField4()).toString();
-                            try {
-                                transactionDetails.setreportableField4(BeanUtils.getProperty(records, rptFieldCol4));
-                            } catch (IllegalAccessException ex) {
-                                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
-                            } catch (InvocationTargetException ex) {
-                                Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
-                            }
-                        }
-
-                        transactionList.add(transactionDetails);
+                    } else {
+                        toFields = setOrgDetails(transactionInManager.getUploadSummaryDetails(transaction.getId()).gettargetOrgId());
                     }
+                    transactionDetails.settargetOrgFields(toFields);
+
+                    /* get the message type name */
+                    configuration configDetails = configurationManager.getConfigurationById(transaction.getconfigId());
+                    transactionDetails.setmessageTypeName(messagetypemanager.getMessageTypeById(configDetails.getMessageTypeId()).getName());
+
+                    configurationMessageSpecs messageSpecs = configurationManager.getMessageSpecs(transaction.getconfigId());
+
+                    if (messageSpecs.getrptField1() > 0) {
+
+                        configurationFormFields formField1 = configurationTransportManager.getConfigurationFieldsByFieldNo(transaction.getconfigId(), transportDetails.getId(), messageSpecs.getrptField1());
+
+                        transactionDetails.setreportableFieldHeading1(formField1.getFieldLabel());
+
+                        String rptFieldCol1 = new StringBuilder().append("f").append(messageSpecs.getrptField1()).toString();
+                        try {
+                            transactionDetails.setreportableField1(BeanUtils.getProperty(records, rptFieldCol1));
+                        } catch (IllegalAccessException ex) {
+                            Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (InvocationTargetException ex) {
+                            Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+
+                    if (messageSpecs.getrptField2() > 0) {
+
+                        configurationFormFields formField2 = configurationTransportManager.getConfigurationFieldsByFieldNo(transaction.getconfigId(), transportDetails.getId(), messageSpecs.getrptField2());
+
+                        transactionDetails.setreportableFieldHeading2(formField2.getFieldLabel());
+
+                        String rptFieldCol2 = new StringBuilder().append("f").append(messageSpecs.getrptField2()).toString();
+                        try {
+                            transactionDetails.setreportableField2(BeanUtils.getProperty(records, rptFieldCol2));
+                        } catch (IllegalAccessException ex) {
+                            Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (InvocationTargetException ex) {
+                            Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+
+                    if (messageSpecs.getrptField3() > 0) {
+
+                        configurationFormFields formField3 = configurationTransportManager.getConfigurationFieldsByFieldNo(transaction.getconfigId(), transportDetails.getId(), messageSpecs.getrptField3());
+
+                        transactionDetails.setreportableFieldHeading3(formField3.getFieldLabel());
+
+                        String rptFieldCol3 = new StringBuilder().append("f").append(messageSpecs.getrptField3()).toString();
+                        try {
+                            transactionDetails.setreportableField3(BeanUtils.getProperty(records, rptFieldCol3));
+                        } catch (IllegalAccessException ex) {
+                            Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (InvocationTargetException ex) {
+                            Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+
+                    if (messageSpecs.getrptField4() > 0) {
+
+                        configurationFormFields formField4 = configurationTransportManager.getConfigurationFieldsByFieldNo(transaction.getconfigId(), transportDetails.getId(), messageSpecs.getrptField4());
+
+                        transactionDetails.setreportableFieldHeading4(formField4.getFieldLabel());
+
+                        String rptFieldCol4 = new StringBuilder().append("f").append(messageSpecs.getrptField4()).toString();
+                        try {
+                            transactionDetails.setreportableField4(BeanUtils.getProperty(records, rptFieldCol4));
+                        } catch (IllegalAccessException ex) {
+                            Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (InvocationTargetException ex) {
+                            Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+
+                    transactionList.add(transactionDetails);
                 }
 
                 mav.addObject("transactions", transactionList);
@@ -700,44 +744,44 @@ public class adminProcessingActivity {
                 List<transactionTarget> batchTransactions = transactionOutManager.getInboxBatchTransactions(batchDetails.getId(), 0);
 
                 List<Transaction> transactionList = new ArrayList<Transaction>();
+                
+                //we can map the process status so we only have to query once
+                List<lu_ProcessStatus> processStatusList = sysAdminManager.getAllProcessStatus();
+                Map<Integer, String> psMap = new HashMap<Integer, String>();
+                for (lu_ProcessStatus ps : processStatusList) {
+                    psMap.put(ps.getId(), ps.getDisplayCode());
+                }
 
-                if (batchTransactions.size() > 100) {
-                    mav.addObject("toomany", "toomany");
-                    mav.addObject("size", batchTransactions.size());
-                } else {
+                for (transactionTarget transaction : batchTransactions) {
 
-                    for (transactionTarget transaction : batchTransactions) {
+                    Transaction transactionDetails = new Transaction();
+                    transactionDetails.settransactionRecordId(transaction.getId());
+                    transactionDetails.setstatusId(transaction.getstatusId());
+                    transactionDetails.setdateSubmitted(transaction.getdateCreated());
+                    transactionDetails.setconfigId(transaction.getconfigId());
 
-                        Transaction transactionDetails = new Transaction();
-                        transactionDetails.settransactionRecordId(transaction.getId());
-                        transactionDetails.setstatusId(transaction.getstatusId());
-                        transactionDetails.setdateSubmitted(transaction.getdateCreated());
-                        transactionDetails.setconfigId(transaction.getconfigId());
+                    transactionDetails.setstatusValue(psMap.get(transaction.getstatusId()));
 
-                        lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(transaction.getstatusId());
-                        transactionDetails.setstatusValue(processStatus.getDisplayCode());
+                    transactionOutRecords records = transactionOutManager.getTransactionRecords(transaction.getId());
 
-                        transactionOutRecords records = transactionOutManager.getTransactionRecords(transaction.getId());
+                    /* Get a list of form fields */
+                    configurationTransport transportDetails = configurationTransportManager.getTransportDetails(transaction.getconfigId());
+                    List<configurationFormFields> sourceInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transaction.getconfigId(), transportDetails.getId(), 1);
 
-                        /* Get a list of form fields */
-                        configurationTransport transportDetails = configurationTransportManager.getTransportDetails(transaction.getconfigId());
-                        List<configurationFormFields> sourceInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transaction.getconfigId(), transportDetails.getId(), 1);
-
-                        /* Set all the transaction TARGET fields */
-                        List<transactionRecords> fromFields;
-                        if (!sourceInfoFormFields.isEmpty()) {
-                            fromFields = setInboxFormFields(sourceInfoFormFields, records, 0, true, 0);
-                        } else {
-                            fromFields = setOrgDetails(transactionOutManager.getDownloadSummaryDetails(transaction.getId()).getsourceOrgId());
-                        }
-                        transactionDetails.setsourceOrgFields(fromFields);
-
-                        /* get the message type name */
-                        configuration configDetails = configurationManager.getConfigurationById(transaction.getconfigId());
-                        transactionDetails.setmessageTypeName(messagetypemanager.getMessageTypeById(configDetails.getMessageTypeId()).getName());
-
-                        transactionList.add(transactionDetails);
+                    /* Set all the transaction TARGET fields */
+                    List<transactionRecords> fromFields;
+                    if (!sourceInfoFormFields.isEmpty()) {
+                        fromFields = setInboxFormFields(sourceInfoFormFields, records, 0, true, 0);
+                    } else {
+                        fromFields = setOrgDetails(transactionOutManager.getDownloadSummaryDetails(transaction.getId()).getsourceOrgId());
                     }
+                    transactionDetails.setsourceOrgFields(fromFields);
+
+                    /* get the message type name */
+                    configuration configDetails = configurationManager.getConfigurationById(transaction.getconfigId());
+                    transactionDetails.setmessageTypeName(messagetypemanager.getMessageTypeById(configDetails.getMessageTypeId()).getName());
+
+                    transactionList.add(transactionDetails);
                 }
 
                 mav.addObject("transactions", transactionList);
@@ -1569,7 +1613,7 @@ public class adminProcessingActivity {
 
             List<Integer> resetStatusList = Arrays.asList(2, 22, 23, 1, 8, 35); //DNP (21) is not a final status for admin
             if (!resetStatusList.contains(batchDetails.getstatusId())) {
-            	canReset = true;
+                canReset = true;
             }
 
             if (batchDetails.getstatusId() == 5) {
@@ -1606,15 +1650,15 @@ public class adminProcessingActivity {
             }
             mav.addObject("batchDetails", batchDetails);
             if (batchDetails.geterrorRecordCount() <= 1000) {
-	            try {
-	                List<TransErrorDetailDisplay> errorList = new LinkedList<TransErrorDetailDisplay>();
-	                errorList = transactionInManager.populateErrorList(batchDetails);
-	                mav.addObject("errorList", errorList);
-	            } catch (Exception e) {
-	                throw new Exception("(Admin) Error occurred in getting the audit report for an inbound batch. batchId: " + batchDetails.getId() + " ERROR: " + e.getMessage(), e);
-	            }
+                try {
+                    List<TransErrorDetailDisplay> errorList = new LinkedList<TransErrorDetailDisplay>();
+                    errorList = transactionInManager.populateErrorList(batchDetails);
+                    mav.addObject("errorList", errorList);
+                } catch (Exception e) {
+                    throw new Exception("(Admin) Error occurred in getting the audit report for an inbound batch. batchId: " + batchDetails.getId() + " ERROR: " + e.getMessage(), e);
+                }
             } else {
-            	 mav.addObject("toomany", true);
+                mav.addObject("toomany", true);
             }
         } else {
             mav.addObject("doesNotExist", true);
@@ -1662,64 +1706,64 @@ public class adminProcessingActivity {
                 boolean allowBatchClear = transactionInManager.allowBatchClear(batchId);
                 if (allowBatchClear) {
                     //if ftp or rhapsody, we flag as DNP and move file back to input folder
-                	if (batchDetails.gettransportMethodId() == 5 || batchDetails.gettransportMethodId() == 3) {
-                		transactionInManager.updateBatchStatus(batchId, 4, "startDateTime");
-                		
-                		strBatchOption = "Reset Batch  - FTP/Rhapsody Reset";
+                    if (batchDetails.gettransportMethodId() == 5 || batchDetails.gettransportMethodId() == 3) {
+                        transactionInManager.updateBatchStatus(batchId, 4, "startDateTime");
+
+                        strBatchOption = "Reset Batch  - FTP/Rhapsody Reset";
                         String fileExt = batchDetails.getoriginalFileName().substring(batchDetails.getoriginalFileName().lastIndexOf("."));
-                		fileSystem fileSystem = new fileSystem();
-                        
-                		File archiveFile = new File(fileSystem.setPath(archivePath) + batchDetails.getutBatchName() + fileExt);
+                        fileSystem fileSystem = new fileSystem();
+
+                        File archiveFile = new File(fileSystem.setPath(archivePath) + batchDetails.getutBatchName() + fileExt);
                         String fileToPath = fileSystem.setPathFromRoot(batchDetails.getOriginalFolder());
-                		//we name it ut batch name when move so we know
-                		String newFileName = transactionInManager.newFileName(fileToPath, (batchDetails.getutBatchName() + fileExt));
-                		File newFile = new File(fileToPath + newFileName);
-                		Path source = archiveFile.toPath();
-                		Path target = newFile.toPath();
-                		Files.copy(source, target);
-                		                
+                        //we name it ut batch name when move so we know
+                        String newFileName = transactionInManager.newFileName(fileToPath, (batchDetails.getutBatchName() + fileExt));
+                        File newFile = new File(fileToPath + newFileName);
+                        Path source = archiveFile.toPath();
+                        Path target = newFile.toPath();
+                        Files.copy(source, target);
+
                         transactionInManager.updateTransactionStatus(batchId, 0, 0, 34);
                         transactionInManager.updateTransactionTargetStatus(batchId, 0, 0, 34);
                         transactionInManager.updateBatchStatus(batchId, 35, "endDateTime");
-                        
-                	} else {
-                		
-                		transactionInManager.updateBatchStatus(batchId, 4, "");
-                		//2. clear
-	                    boolean cleared = transactionInManager.clearBatch(batchId);
-	                    
-	                    //copy archive file back to original folder
+
+                    } else {
+
+                        transactionInManager.updateBatchStatus(batchId, 4, "");
+                        //2. clear
+                        boolean cleared = transactionInManager.clearBatch(batchId);
+
+                        //copy archive file back to original folder
                         fileSystem dir = new fileSystem();
-                        
+
                         // we need to move unencoded file back from archive folder and replace current file
                         //we set archive path
                         try {
-                        	
-	                        File archiveFile = new File(dir.setPath(archivePath) + batchDetails.getutBatchName() + batchDetails.getoriginalFileName().substring(batchDetails.getoriginalFileName().lastIndexOf(".")));
-	                        Path archive = archiveFile.toPath();
-	                        File toFile = new File(dir.setPath(batchDetails.getFileLocation()) + batchDetails.getoriginalFileName());
-	                       	Path toPath = toFile.toPath();
-	                       	//need to encode file first
-	                       	if (batchDetails.getEncodingId() == 1) {
-	                        	String strEncodedFile = filemanager.encodeFileToBase64Binary(archiveFile);
-	                        	toFile.delete();
-	                        	 //we replace file with encoded
-	                            filemanager.writeFile(toFile.getAbsolutePath(), strEncodedFile);
-	                        } else { // already encoded
-	                        	Files.copy(archive, toPath, StandardCopyOption.REPLACE_EXISTING);
-	                        }
-	                       	
-	                       	cleared = true;
-	                       	
+
+                            File archiveFile = new File(dir.setPath(archivePath) + batchDetails.getutBatchName() + batchDetails.getoriginalFileName().substring(batchDetails.getoriginalFileName().lastIndexOf(".")));
+                            Path archive = archiveFile.toPath();
+                            File toFile = new File(dir.setPath(batchDetails.getFileLocation()) + batchDetails.getoriginalFileName());
+                            Path toPath = toFile.toPath();
+                            //need to encode file first
+                            if (batchDetails.getEncodingId() == 1) {
+                                String strEncodedFile = filemanager.encodeFileToBase64Binary(archiveFile);
+                                toFile.delete();
+                                //we replace file with encoded
+                                filemanager.writeFile(toFile.getAbsolutePath(), strEncodedFile);
+                            } else { // already encoded
+                                Files.copy(archive, toPath, StandardCopyOption.REPLACE_EXISTING);
+                            }
+
+                            cleared = true;
+
                         } catch (Exception ex) {
-	                       	ex.printStackTrace();
-                       		cleared = false;
-                       	}
-          
+                            ex.printStackTrace();
+                            cleared = false;
+                        }
+
                         if (cleared) {
-	                        transactionInManager.updateBatchStatus(batchId, 2, "startOver");
-	                    }
-                	}
+                            transactionInManager.updateBatchStatus(batchId, 2, "startOver");
+                        }
+                    }
                 }
             } else if (batchOption.equalsIgnoreCase("releaseBatch")) {
                 strBatchOption = "Released Batch";
