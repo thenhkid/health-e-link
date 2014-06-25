@@ -90,7 +90,7 @@
                                                 <a href="#statusModal" data-toggle="modal" class="viewStatus" rel="${batch.statusId}" title="View this Status">${batch.statusValue}</a>
                                             </td>
                                             <td class="center-text">
-                                               ${batch.totalTransactions}
+                                               ${batch.totalRecordCount}
                                             </td>
                                             <td class="center-text"><fmt:formatDate value="${batch.dateCreated}" type="date" pattern="M/dd/yyyy" /><br /><fmt:formatDate value="${batch.dateCreated}" type="time" pattern="h:mm:ss a" /></td>
                                             <td class="actions-col">
