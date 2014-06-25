@@ -12,6 +12,7 @@ import com.ut.dph.service.emailMessageManager;
 import com.ut.dph.service.userManager;
 import java.net.InetAddress;
 import java.util.Arrays;
+import java.util.Date;
 import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -64,12 +65,13 @@ public class ExceptionControllerAdvice {
        
         sb.append("Error: "+ e);
         sb.append("<br /><br />");
+        sb.append("Time: " + new Date());
+        sb.append("<br /><br />");
         sb.append("Message: " + e.getMessage());
         sb.append("<br /><br />");
         sb.append("Stack Trace: " + Arrays.toString(e.getStackTrace()));
         
         messageDetails.setmessageBody(sb.toString());
-        
         emailMessageManager.sendEmail(messageDetails); 
         /*mav.addObject("messageBody",sb.toString());*/
         
