@@ -124,7 +124,7 @@
                     </ul>       
 
                     <div id='content' class="tab-content">
-                    <c:if test="${type == 0 || type == 1}"> ${reportType}
+                    <c:if test="${type == 0 || type == 1}">
                         <div class="tab-pane active" id="sent">       
                             <div class="form-container scrollable" style="padding-top:20px;">
                                 <table class="table table-striped table-hover table-default" <c:if test="${not empty sentMessages}">id="dataTable"</c:if>>

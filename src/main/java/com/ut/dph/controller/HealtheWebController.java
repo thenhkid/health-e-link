@@ -8,6 +8,7 @@ package com.ut.dph.controller;
 import com.ut.dph.model.Organization;
 import com.ut.dph.model.Provider;
 import com.ut.dph.model.Transaction;
+import com.ut.dph.model.TransportMethod;
 import com.ut.dph.model.User;
 import com.ut.dph.model.UserActivity;
 import com.ut.dph.model.batchDownloadSummary;
@@ -48,6 +49,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -3051,7 +3053,21 @@ public class HealtheWebController {
         for (lu_ProcessStatus ps : processStatusList) {
             psMap.put(ps.getId(), ps.getEndUserDisplayCode());
         }
-
+        
+        //if we have lots of organization in the future we can tweak this to narrow down to orgs with batches
+        List<Organization> organizations = organizationmanager.getOrganizations();
+        Map<Integer, String> orgMap = new HashMap<Integer, String>();
+        for (Organization org : organizations) {
+            orgMap.put(org.getId(), org.getOrgName());
+        }
+        
+        //same with transport method names
+        List<TransportMethod> transporthMethods = configurationTransportManager.getTransportMethods(Arrays.asList(0, 1));
+        Map<Integer, String> tmMap = new HashMap<Integer, String>();
+        for (TransportMethod tms : transporthMethods) {
+            tmMap.put(tms.getId(), tms.getTransportMethod());
+        }
+        
         /* Get all connections for the logged in organization */
         List<configuration> configs = configurationManager.getActiveConfigurationsByOrgId(userInfo.getOrgId());
 
@@ -3076,11 +3092,11 @@ public class HealtheWebController {
 
                     configuration configDetails = configurationManager.getConfigurationById(connection.gettargetConfigId());
                    
-                    String tgtOrgName = organizationmanager.getOrganizationById(configDetails.getorgId()).getOrgName();
+                    String tgtOrgName = orgMap.get(configDetails.getorgId());
 
                     String msgTypeName = configurationManager.getMessageTypeNameByConfigId(connection.gettargetConfigId());
 
-                    String transportType = configurationTransportManager.getTransportMethodById(configurationTransportManager.getTransportDetails(connection.gettargetConfigId()).gettransportMethodId());
+                    String transportType = tmMap.get(configurationTransportManager.getTransportDetails(connection.gettargetConfigId()).gettransportMethodId());
                     
                     historyResults resultEntry = null;
                     
@@ -3172,11 +3188,11 @@ public class HealtheWebController {
 
                     configuration configDetails = configurationManager.getConfigurationById(connection.getsourceConfigId());
                     
-                    String srcOrgName = organizationmanager.getOrganizationById(configDetails.getorgId()).getOrgName();
+                    String srcOrgName = orgMap.get(configDetails.getorgId());
 
                     String msgTypeName = configurationManager.getMessageTypeNameByConfigId(connection.gettargetConfigId());
 
-                    String transportType = configurationTransportManager.getTransportMethodById(configurationTransportManager.getTransportDetails(config.getId()).gettransportMethodId());
+                    String transportType = tmMap.get(configurationTransportManager.getTransportDetails(config.getId()).gettransportMethodId());
 
                     historyResults resultEntry = null;
                     
@@ -3192,7 +3208,7 @@ public class HealtheWebController {
                     if (sentTo == 0 || sentTo == configDetails.getorgId()) {
 
                         /* Find the total messages received from this source and this configuration */
-                        List<batchDownloadSummary> receivedBatches = transactionOutManager.getuploadBatchesByConfigAndSource(connection.getsourceConfigId(), configDetails.getorgId());
+                        List<batchDownloadSummary> receivedBatches = transactionOutManager.getuploadBatchesByConfigAndSource(connection.gettargetConfigId(), configDetails.getorgId());
 
                         int matchedReceivedBatches = 0;
 

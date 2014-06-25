@@ -23,6 +23,15 @@ require(['./main'], function() {
             });
         });
         
+        var aoColumns = [
+           null,
+           null,
+           null,
+           null,
+           null,
+           null
+        ];
+        
         $('#dataTable').dataTable({
             "sPaginationType": "bootstrap",
             "oLanguage": {
@@ -35,7 +44,9 @@ require(['./main'], function() {
                         '<option value="50">50 Records</option>' +
                         '<option value="-1">All</option>' +
                         '</select>'
-            }
+            },
+           "aoColumns" : aoColumns,
+           "aaSorting" : [[5, "desc"]]
         });
 
         $('#dataTableReceived').dataTable({
@@ -50,7 +61,9 @@ require(['./main'], function() {
                         '<option value="50">50 Records</option>' +
                         '<option value="-1">All</option>' +
                         '</select>'
-            }
+            },
+           "aoColumns" : aoColumns,
+           "aaSorting" : [[5, "desc"]]
         });
 
     });
