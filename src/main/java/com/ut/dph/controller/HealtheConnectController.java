@@ -512,14 +512,26 @@ public class HealtheConnectController {
             List<batchDownloads> downloadableBatches = transactionOutManager.getdownloadableBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate);
 
             if (!downloadableBatches.isEmpty()) {
+                
+                //we can map the process status so we only have to query once
+                List<lu_ProcessStatus> processStatusList = sysAdminManager.getAllProcessStatus();
+                Map<Integer, String> psMap = new HashMap<Integer, String>();
+                for (lu_ProcessStatus ps : processStatusList) {
+                    psMap.put(ps.getId(), ps.getEndUserDisplayCode());
+                }
+                
+                //same goes for users
+                List<User> users = usermanager.getAllUsers();
+                Map<Integer, String> userMap = new HashMap<Integer, String>();
+                for (User user : users) {
+                    userMap.put(user.getId(), (user.getFirstName() + " " + user.getLastName()));
+                }
+                
                 for (batchDownloads batch : downloadableBatches) {
 
-                    lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
-                    batch.setstatusValue(processStatus.getEndUserDisplayCode());
-
-                    User userDetails = usermanager.getUserById(batch.getuserId());
-                    String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
-                    batch.setusersName(usersName);
+                    batch.setstatusValue(psMap.get(batch.getstatusId()));
+                   
+                    batch.setusersName(userMap.get(batch.getuserId()));
 
                 }
             }
@@ -571,14 +583,26 @@ public class HealtheConnectController {
             List<batchDownloads> downloadableBatches = transactionOutManager.getdownloadableBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate);
 
             if (!downloadableBatches.isEmpty()) {
+                
+                //we can map the process status so we only have to query once
+                List<lu_ProcessStatus> processStatusList = sysAdminManager.getAllProcessStatus();
+                Map<Integer, String> psMap = new HashMap<Integer, String>();
+                for (lu_ProcessStatus ps : processStatusList) {
+                    psMap.put(ps.getId(), ps.getEndUserDisplayCode());
+                }
+                
+                //same goes for users
+                List<User> users = usermanager.getAllUsers();
+                Map<Integer, String> userMap = new HashMap<Integer, String>();
+                for (User user : users) {
+                    userMap.put(user.getId(), (user.getFirstName() + " " + user.getLastName()));
+                }
+                
                 for (batchDownloads batch : downloadableBatches) {
 
-                    lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
-                    batch.setstatusValue(processStatus.getEndUserDisplayCode());
-
-                    User userDetails = usermanager.getUserById(batch.getuserId());
-                    String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
-                    batch.setusersName(usersName);
+                    batch.setstatusValue(psMap.get(batch.getstatusId()));
+                   
+                    batch.setusersName(userMap.get(batch.getuserId()));
 
                 }
             }
@@ -687,12 +711,27 @@ public class HealtheConnectController {
             List<batchUploads> uploadedBatches = transactionInManager.getuploadedBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, excludedStatusIds);
 
             if (!uploadedBatches.isEmpty()) {
+                
+                //we can map the process status so we only have to query once
+                List<lu_ProcessStatus> processStatusList = sysAdminManager.getAllProcessStatus();
+                Map<Integer, String> psMap = new HashMap<Integer, String>();
+                for (lu_ProcessStatus ps : processStatusList) {
+                    psMap.put(ps.getId(), ps.getEndUserDisplayCode());
+                }
+                
+                //same goes for users
+                List<User> users = usermanager.getAllUsers();
+                Map<Integer, String> userMap = new HashMap<Integer, String>();
+                for (User user : users) {
+                    userMap.put(user.getId(), (user.getFirstName() + " " + user.getLastName()));
+                }
+                
             	for (batchUploads batch : uploadedBatches) {
                     List<transactionIn> batchTransactions = transactionInManager.getBatchTransactions(batch.getId(), userInfo.getId());
                     batch.settotalTransactions(batchTransactions.size());
 
-                    lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
-                    batch.setstatusValue(processStatus.getEndUserDisplayCode());
+                    batch.setstatusValue(psMap.get(batch.getstatusId()));
+                    
                     if (batch.getstatusId() == 5) {
                     	Integer transTotalNotFinal = transactionInManager.getRecordCounts(batch.getId(), finalStatusIds, false, false);
                     	batch.setTransTotalNotFinal(transTotalNotFinal); 
@@ -700,10 +739,8 @@ public class HealtheConnectController {
                     		showRelButton = true;
                     	}
                     }
-
-                    User userDetails = usermanager.getUserById(batch.getuserId());
-                    String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
-                    batch.setusersName(usersName);
+                    
+                    batch.setusersName(userMap.get(batch.getuserId()));
 
                 }
             }
@@ -775,12 +812,27 @@ public class HealtheConnectController {
             List<batchUploads> uploadedBatches = transactionInManager.getuploadedBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate, excludedStatusIds);
 
             if (!uploadedBatches.isEmpty()) {
+                
+                //we can map the process status so we only have to query once
+                List<lu_ProcessStatus> processStatusList = sysAdminManager.getAllProcessStatus();
+                Map<Integer, String> psMap = new HashMap<Integer, String>();
+                for (lu_ProcessStatus ps : processStatusList) {
+                    psMap.put(ps.getId(), ps.getEndUserDisplayCode());
+                }
+                
+                //same goes for users
+                List<User> users = usermanager.getAllUsers();
+                Map<Integer, String> userMap = new HashMap<Integer, String>();
+                for (User user : users) {
+                    userMap.put(user.getId(), (user.getFirstName() + " " + user.getLastName()));
+                }
+                
             	for (batchUploads batch : uploadedBatches) {
                     List<transactionIn> batchTransactions = transactionInManager.getBatchTransactions(batch.getId(), userInfo.getId());
                     batch.settotalTransactions(batchTransactions.size());
 
-                    lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
-                    batch.setstatusValue(processStatus.getEndUserDisplayCode());
+                    batch.setstatusValue(psMap.get(batch.getstatusId()));
+                    
                     if (batch.getstatusId() == 5) {
                     	Integer transTotalNotFinal = transactionInManager.getRecordCounts(batch.getId(), finalStatusIds, false, false);
                     	batch.setTransTotalNotFinal(transTotalNotFinal); 
@@ -789,9 +841,7 @@ public class HealtheConnectController {
                     	}
                     }
 
-                    User userDetails = usermanager.getUserById(batch.getuserId());
-                    String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
-                    batch.setusersName(usersName);
+                    batch.setusersName(userMap.get(batch.getuserId()));
 
                 }
             }
