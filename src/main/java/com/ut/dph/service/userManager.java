@@ -42,5 +42,7 @@ public interface userManager {
   List <User> getSendersForConfig (List <Integer> configId);
   
   List<User> getOrgUsersForConfig(List <Integer> configId);
+  
+  List<User> getAllUsers();
 }
 

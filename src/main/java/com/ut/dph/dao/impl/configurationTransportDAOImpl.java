@@ -1,8 +1,6 @@
 package com.ut.dph.dao.impl;
 
-import java.util.Arrays;
 import java.util.List;
-
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
@@ -11,8 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
-
 import com.ut.dph.dao.configurationTransportDAO;
+import com.ut.dph.model.TransportMethod;
 import com.ut.dph.model.configurationFTPFields;
 import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.configurationMessageSpecs;
@@ -842,5 +840,23 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
             return null;
         }
     }
+    
+    /**
+     * The 'getTransportMethods' function will return a list of transport methods, it can be active, not active or both
+     *
+     */
+    @SuppressWarnings("unchecked")
+	@Override
+    @Transactional
+    public List <TransportMethod> getTransportMethods(List <Integer> statusIds) {
+        Query query = sessionFactory.getCurrentSession()
+        .createSQLQuery("SELECT id, transportMethod FROM ref_transportMethods where active in (:statusIds) order by transportMethod asc")
+        .setResultTransformer(
+                Transformers.aliasToBean(TransportMethod.class));
+        query.setParameterList("statusIds", statusIds);
+        return query.list();
+    }
+    
+    
 
 }

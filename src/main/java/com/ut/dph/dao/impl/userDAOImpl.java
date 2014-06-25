@@ -367,4 +367,13 @@ public class userDAOImpl implements userDAO {
             return null;
         }
 	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<User> getAllUsers() {
+		 Query query = sessionFactory.getCurrentSession().createQuery("from User");
+		 
+		 List<User> userList = query.list();
+	     return userList;
+	}
 }

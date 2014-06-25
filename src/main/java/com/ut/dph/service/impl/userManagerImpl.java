@@ -123,4 +123,10 @@ public class userManagerImpl implements userManager {
 		return userDAO.getOrgUsersForConfig(configIds);
 	}
 
+	@Override
+	@Transactional
+	public List<User> getAllUsers() {
+		return userDAO.getAllUsers();
+	}
+
 }

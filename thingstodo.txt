@@ -14,13 +14,15 @@ Grace
 	- Load test Dev/Test with BadBoy software
 	- Review Status List - make it more user friendly - waiting for MS feedback on end user codes for transactions (6/17/14)
 	- Review Reset process - see why can't SDC be reset
-	- Set up live server
+	- Set up live server - done
+	- Set up ptest server - done
 	- Review permission and restrict r/w/x for general users - tomcat/bowlink/UT
-	- figure out why DB crashes when record set ie. audit report wiht 1000+ errors
-	- change manager link to more discreet url
-	- modify download.do to allow dl only to uses with permission - need to modify and see which other methods uses that.  
-	  We need to be able to trace back permission with file name or modify the method to be more specific. Right now it is logged. (Phase II?)
-	- index db tables!
+	- figure out why DB crashes when record set ie. audit report wiht 1000+ errors - too many queries and tomcat stop responding, need to consolidate
+	- consolidate processing activities outbound and pending queries
+	- change manager link to more discreet url - done, all links are {web site url}/mgrApp now
+	- modify download.do to allow dl only to users with permission - need to modify and see which other methods uses that.  
+		 We need to be able to trace back permission with file name or modify the method to be more specific. Right now it is logged. (Phase II?)
+	- index db tables as needed
 	
 Macros needed
 How to handle numbers cw matching better - for example, reg1 sometimes submit with 001, 00004 and it really should read as 1 and 4.  Need to see how to handle isNum in mySQL

@@ -46,4 +46,6 @@ public interface userDAO {
     
     List<User> getOrgUsersForConfig(List <Integer> configIds);
 
+    List<User> getAllUsers();
+
 }

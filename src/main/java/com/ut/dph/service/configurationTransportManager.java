@@ -3,6 +3,7 @@ package com.ut.dph.service;
 import com.ut.dph.model.configurationFTPFields;
 
 import java.util.List;
+import com.ut.dph.model.TransportMethod;
 import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.configurationMessageSpecs;
 import com.ut.dph.model.configurationRhapsodyFields;
@@ -87,5 +88,7 @@ public interface configurationTransportManager {
     List <configurationTransport>  getTransportEncoding(String fileExt, Integer transportMethodId);
     
     Integer getOrgIdForRhapsodyPath (configurationRhapsodyFields rhapsodyInfo) throws Exception;
-  
+    
+    List <TransportMethod> getTransportMethods(List <Integer> statusIds);
+    
 }

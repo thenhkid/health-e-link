@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
-
+import com.ut.dph.model.TransportMethod;
 import com.ut.dph.model.configurationFormFields;
 import com.ut.dph.model.configurationMessageSpecs;
 import com.ut.dph.model.configurationRhapsodyFields;
@@ -16,7 +16,6 @@ import com.ut.dph.model.configurationTransportMessageTypes;
 import com.ut.dph.reference.fileSystem;
 import com.ut.dph.service.configurationTransportManager;
 import com.ut.dph.service.organizationManager;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -300,4 +299,9 @@ public class configurationTransportManagerImpl implements configurationTransport
 			configurationRhapsodyFields rhapsodyInfo) throws Exception {
 		return configurationTransportDAO.getOrgIdForRhapsodyPath(rhapsodyInfo);
 	}
+	
+	@Override
+    public List <TransportMethod> getTransportMethods(List <Integer> statusIds) {
+        return configurationTransportDAO.getTransportMethods(statusIds);
+    }
 }

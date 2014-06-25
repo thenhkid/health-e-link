@@ -7,6 +7,7 @@ package com.ut.dph.controller;
 
 import com.ut.dph.model.Organization;
 import com.ut.dph.model.Transaction;
+import com.ut.dph.model.TransportMethod;
 import com.ut.dph.model.User;
 import com.ut.dph.model.UserActivity;
 import com.ut.dph.model.batchDownloads;
@@ -50,9 +51,11 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.TimeZone;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -164,32 +167,52 @@ public class adminProcessingActivity {
 
         /* Get all inbound transactions */
         try {
-            /* Need to get a list of all uploaded batches */
-        	List<batchUploads> uploadedBatchesCount = transactionInManager.getAllUploadedBatches(fromDate, toDate, 0);
+            
         	Integer fetchCount = 0;
-        	if (uploadedBatchesCount.size() > 200) {
-        		fetchCount  = 200;
-        		mav.addObject("toomany", true);
-        	}
             List<batchUploads> uploadedBatches = transactionInManager.getAllUploadedBatches(fromDate, toDate, fetchCount);
 
-            List<Integer> statusIds = new ArrayList();
-
             if (!uploadedBatches.isEmpty()) {
+            	
+            	//we can map the process status so we only have to query once
+                List <lu_ProcessStatus> processStatusList =  sysAdminManager.getAllProcessStatus();
+                Map<Integer, String> psMap = new HashMap<Integer, String>();
+                for (lu_ProcessStatus ps : processStatusList) {
+                    psMap.put(ps.getId(), ps.getDisplayCode());
+                }
+                
+                //same with transport method names
+                List <TransportMethod> transporthMethods =  configurationTransportManager.getTransportMethods(Arrays.asList(0,1));
+                Map<Integer, String> tmMap = new HashMap<Integer, String>();
+                for (TransportMethod tms : transporthMethods) {
+                	tmMap.put(tms.getId(), tms.getTransportMethod());
+                }
+
+                //if we have lots of organization in the future we can tweak this to narrow down to orgs with batches
+                List<Organization> organizations = organizationmanager.getOrganizations();
+                Map<Integer, String> orgMap = new HashMap<Integer, String>();
+                for (Organization org : organizations) {
+                	orgMap.put(org.getId(), org.getOrgName());
+                }
+                
+                //same goes for users
+                List <User> users = usermanager.getAllUsers();
+                Map<Integer, String> userMap = new HashMap<Integer, String>();
+                for (User user : users) {
+                	userMap.put(user.getId(), (user.getFirstName() + " " + user.getLastName()));
+                }
+                
                 for (batchUploads batch : uploadedBatches) {
-                    batch.settotalTransactions(transactionInManager.getRecordCounts(batch.getId(), statusIds, false, false));
+                    
+                	//the count is in totalRecordCount already, can skip re-count
+                	// batch.settotalTransactions(transactionInManager.getRecordCounts(batch.getId(), statusIds, false, false));
+                	
+                	batch.setstatusValue(psMap.get(batch.getstatusId()));
 
-                    lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
-                    batch.setstatusValue(processStatus.getDisplayCode());
+                    batch.setorgName(orgMap.get(batch.getOrgId()));
 
-                    Organization orgDetails = organizationmanager.getOrganizationById(batch.getOrgId());
-                    batch.setorgName(orgDetails.getOrgName());
+                    batch.settransportMethod(tmMap.get(batch.gettransportMethodId()));
 
-                    batch.settransportMethod(configurationTransportManager.getTransportMethodById(batch.gettransportMethodId()));
-
-                    User userDetails = usermanager.getUserById(batch.getuserId());
-                    String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
-                    batch.setusersName(usersName);
+                    batch.setusersName(userMap.get(batch.getuserId()));
 
                 }
             }
@@ -243,34 +266,47 @@ public class adminProcessingActivity {
         /* Get all inbound transactions */
         try {
             
-        	List<batchUploads> uploadedBatchesCount = transactionInManager.getAllUploadedBatches(fromDate, toDate, 0);
         	Integer fetchCount = 0;
-        	if (uploadedBatchesCount.size() > 200) {
-        		fetchCount  = 200;
-        		mav.addObject("toomany", true);
-        	}
-        	
         	/* Need to get a list of all uploaded batches */
             List<batchUploads> uploadedBatches = transactionInManager.getAllUploadedBatches(fromDate, toDate, fetchCount);
 
-            List<Integer> statusIds = new ArrayList();
-
             if (!uploadedBatches.isEmpty()) {
-                for (batchUploads batch : uploadedBatches) {
-                    batch.settotalTransactions(transactionInManager.getRecordCounts(batch.getId(), statusIds, false, false));
+            	//we can map the process status so we only have to query once
+                List <lu_ProcessStatus> processStatusList =  sysAdminManager.getAllProcessStatus();
+                Map<Integer, String> psMap = new HashMap<Integer, String>();
+                for (lu_ProcessStatus ps : processStatusList) {
+                    psMap.put(ps.getId(), ps.getDisplayCode());
+                }
+                
+                //same with transport method names
+                List <TransportMethod> transporthMethods =  configurationTransportManager.getTransportMethods(Arrays.asList(0,1));
+                Map<Integer, String> tmMap = new HashMap<Integer, String>();
+                for (TransportMethod tms : transporthMethods) {
+                	tmMap.put(tms.getId(), tms.getTransportMethod());
+                }
 
-                    lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batch.getstatusId());
-                    batch.setstatusValue(processStatus.getDisplayCode());
+                //if we have lots of organization in the future we can tweak this to narrow down to orgs with batches
+                List<Organization> organizations = organizationmanager.getOrganizations();
+                Map<Integer, String> orgMap = new HashMap<Integer, String>();
+                for (Organization org : organizations) {
+                	orgMap.put(org.getId(), org.getOrgName());
+                }
+                
+                //same goes for users
+                List <User> users = usermanager.getAllUsers();
+                Map<Integer, String> userMap = new HashMap<Integer, String>();
+                for (User user : users) {
+                	userMap.put(user.getId(), (user.getFirstName() + " " + user.getLastName()));
+                }
+            	
+            	for (batchUploads batch : uploadedBatches) {
+                	batch.setstatusValue(psMap.get(batch.getstatusId()));
 
-                    Organization orgDetails = organizationmanager.getOrganizationById(batch.getOrgId());
-                    batch.setorgName(orgDetails.getOrgName());
+                    batch.setorgName(orgMap.get(batch.getOrgId()));
 
-                    batch.settransportMethod(configurationTransportManager.getTransportMethodById(batch.gettransportMethodId()));
+                    batch.settransportMethod(tmMap.get(batch.gettransportMethodId()));
 
-                    User userDetails = usermanager.getUserById(batch.getuserId());
-                    String usersName = new StringBuilder().append(userDetails.getFirstName()).append(" ").append(userDetails.getLastName()).toString();
-                    batch.setusersName(usersName);
-
+                    batch.setusersName(userMap.get(batch.getuserId()));
                 }
             }
 
