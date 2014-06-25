@@ -484,12 +484,19 @@ function validatePhone($phone) {
 }
 
 function validateNumericValue($fieldVal) {
-    var numericReg = /^\d*[0-9](|.\d*[0-9]|,\d*[0-9])?$/;
-    if (!numericReg.test($fieldVal)) {
+    
+    if($fieldVal.indexOf("/") != -1) {
         return false;
     }
     else {
-        return true;
+    
+        var numericReg = /^\d*[0-9](|.\d*[0-9]|,\d*[0-9])?$/;
+        if (!numericReg.test($fieldVal)) {
+            return false;
+        }
+        else {
+            return true;
+        }
     }
 }
 
