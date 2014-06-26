@@ -9,13 +9,13 @@ Chad
 Grace
     - Work with Wayne on setting up the Family Planning template and configurations
     	- finishing testing applying cw to list
-    - Look into sendMail for linux 
+    - Look into sendMail for linux - PostFix is installed and running on server already.
+    	Just change host to localhost and port to 25 with no username and pw and it will be good to go. (**Grace 06252014**)
 	- Review and add additional user logging where needed
 	- Load test Dev/Test with BadBoy software
 	- Review Status List - make it more user friendly - waiting for MS feedback on end user codes for transactions (6/17/14)
 	- Review Reset process - see why can't SDC be reset
-	- Set up live server - done
-	- Set up ptest server - done
+		modify to reset target appropriately (*6.25.2014*)
 	- Review permission and restrict r/w/x for general users - tomcat/bowlink/UT
 	- figure out why DB crashes when record set ie. audit report wiht 1000+ errors - too many queries and tomcat stop responding, need to consolidate
 	- consolidate processing activities outbound and pending queries
@@ -23,6 +23,7 @@ Grace
 	- modify download.do to allow dl only to users with permission - need to modify and see which other methods uses that.  
 		 We need to be able to trace back permission with file name or modify the method to be more specific. Right now it is logged. (Phase II?)
 	- index db tables as needed
+	- add logging for user in front end view
 	
 Macros needed
 How to handle numbers cw matching better - for example, reg1 sometimes submit with 001, 00004 and it really should read as 1 and 4.  Need to see how to handle isNum in mySQL
