@@ -62,6 +62,33 @@
                                         </spring:bind>
                                     </div>       
                                     <div class="col-md-6">
+                                        <spring:bind path="address">
+                                            <div class="form-group ${status.error ? 'has-error' : '' }">
+                                                <label class="control-label" for="address">Address *</label>
+                                                <form:input path="address" id="address" class="form-control" type="text" maxLength="45" />
+                                                <form:errors path="address" cssClass="control-label" element="label" />
+                                            </div>
+                                        </spring:bind>
+                                    </div>  
+                                     <div class="col-md-6 cb">
+                                        <spring:bind path="address2">
+                                            <div class="form-group ${status.error ? 'has-error' : '' }">
+                                                <label class="control-label" for="address2">Address 2</label>
+                                                <form:input path="address2" id="address2" class="form-control" type="text" maxLength="45" />
+                                                <form:errors path="address2" cssClass="control-label" element="label" />
+                                            </div>
+                                        </spring:bind>
+                                    </div> 
+                                    <div class="col-md-6">
+                                        <spring:bind path="city">
+                                            <div class="form-group ${status.error ? 'has-error' : '' }">
+                                                <label class="control-label" for="city">City *</label>
+                                                <form:input path="city" id="postalCode" class="form-control xs-input" type="text" maxLength="45" />
+                                                <form:errors path="city" cssClass="control-label" element="label" />
+                                            </div>
+                                        </spring:bind>
+                                    </div>              
+                                    <div class="col-md-6 cb">
                                         <spring:bind path="state">
                                             <div class="form-group ${status.error ? 'has-error' : '' }">
                                                 <label class="control-label" for="state">State *</label>
@@ -72,16 +99,7 @@
                                                 <form:errors path="state" cssClass="control-label" element="label" />
                                             </div>
                                         </spring:bind>
-                                    </div>      
-                                    <div class="col-md-6 cb">
-                                        <spring:bind path="address">
-                                            <div class="form-group ${status.error ? 'has-error' : '' }">
-                                                <label class="control-label" for="address">Address *</label>
-                                                <form:input path="address" id="address" class="form-control" type="text" maxLength="45" />
-                                                <form:errors path="address" cssClass="control-label" element="label" />
-                                            </div>
-                                        </spring:bind>
-                                    </div>       
+                                    </div>   
                                     <div class="col-md-6">
                                         <spring:bind path="postalCode">
                                             <div class="form-group ${status.error ? 'has-error' : '' }">
@@ -91,24 +109,6 @@
                                             </div>
                                         </spring:bind>
                                     </div>  
-                                    <div class="col-md-6 cb">
-                                        <spring:bind path="address2">
-                                            <div class="form-group ${status.error ? 'has-error' : '' }">
-                                                <label class="control-label" for="address2">Address 2</label>
-                                                <form:input path="address2" id="address2" class="form-control" type="text" maxLength="45" />
-                                                <form:errors path="address2" cssClass="control-label" element="label" />
-                                            </div>
-                                        </spring:bind>
-                                    </div>       
-                                    <div class="col-md-6">
-                                        <spring:bind path="city">
-                                            <div class="form-group ${status.error ? 'has-error' : '' }">
-                                                <label class="control-label" for="city">City *</label>
-                                                <form:input path="city" id="postalCode" class="form-control xs-input" type="text" maxLength="45" />
-                                                <form:errors path="city" cssClass="control-label" element="label" />
-                                            </div>
-                                        </spring:bind>
-                                    </div>    
                                     <div class="col-md-6 cb">
                                         <spring:bind path="phone">
                                             <div class="form-group ${status.error ? 'has-error' : '' }">
