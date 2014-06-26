@@ -14,3 +14,6 @@ UPDATE `universaltranslator`.`lu_processstatus` SET `endUserDisplayText`='Transa
 UPDATE `universaltranslator`.`lu_processstatus` SET `description`='Normal condition: All transactions for the submission have been delivered to the destination(s). NOTE: Source submission received (SSR) is the status which indicates that the destination has actually RECEIVED the transaction(s).' WHERE `id`='28';
 UPDATE `universaltranslator`.`lu_processstatus` SET `displayText`='Transaction Invalid', `endUserDisplayText`='Transaction Invalid' WHERE `id`='11';
 UPDATE `universaltranslator`.`lu_processstatus` SET `description`='Normal condition: This is when user closes the transaction in the eRG.  When a transaction is closed, users can no longer create feedback reports.', `endUserDescription`='Normal condition: This is when user closes the transaction in the eRG.  When a transaction is closed, users can no longer create feedback reports.' WHERE `id`='17';
+
+/** grace 06252014 10:20 PM **/
+UPDATE `universaltranslator`.`lu_ProcessStatus` SET `endUserDisplayCode`='DNP', `endUserDisplayText`='Do Not Process' WHERE `id`='35';

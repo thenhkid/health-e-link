@@ -41,17 +41,14 @@ import com.ut.dph.model.messageType;
 import com.ut.dph.service.sysAdminManager;
 import com.ut.dph.service.userManager;
 import java.text.DateFormat;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
@@ -1261,6 +1258,9 @@ public class transactionInDAOImpl implements transactionInDAO {
         findBatches.add(Restrictions.eq("orgId", orgId));
         findBatches.add(Restrictions.not(Restrictions.in("statusId", excludedStatusIds)));
         findBatches.add(Restrictions.in("configId", configIdList));
+        findBatches.add(Restrictions.ne("transportMethodId", 2));
+        findBatches.add(Restrictions.ne("transportMethodId", 5));
+        findBatches.add(Restrictions.ne("transportMethodId", 3));
 
         if (!"".equals(fromDate)) {
             findBatches.add(Restrictions.ge("dateSubmitted", fromDate));
@@ -1546,7 +1546,7 @@ public class transactionInDAOImpl implements transactionInDAO {
                 + "statusTime = CURRENT_TIMESTAMP";
 
         if (transactionId > 0) {
-            sql += " where id = :transactionId ";
+            sql += " where transactionInid = :transactionId ";
         } else {
             sql += " where batchUploadId = :batchUploadId ";
         }
@@ -2725,6 +2725,7 @@ public class transactionInDAOImpl implements transactionInDAO {
                 sql = sql + " and transactionTarget.batchUploadId = :id ";
             } else {
                 sql = sql + " and transactionTarget.transactionInId = :id ";
+                id = transactionId;
             }
             sql = sql + (" set transactionTarget.statusId = transactionIn.statusId;");
 
@@ -5037,4 +5038,105 @@ public class transactionInDAOImpl implements transactionInDAO {
 
     }
 
+	@Override
+	@Transactional
+	public Integer updateTranTargetStatusByUploadBatchId(Integer batchUploadId,
+			Integer fromStatusId, Integer toStatusId) {
+		try {
+			
+			String sql = "update transactionTarget set statusId = :toStatusId "
+					+ " where batchUploadId = :batchUploadId ";
+			
+			if (fromStatusId > 0) {
+				sql = sql + " and statusId = :fromStatusId";
+			}
+
+	        Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql);
+	        updateData.setParameter("toStatusId", toStatusId);
+	        updateData.setParameter("batchUploadId", batchUploadId);
+	        
+	        if (fromStatusId > 0) {
+	        	updateData.setParameter("fromStatusId", fromStatusId);
+	        }
+	        
+	        updateData.executeUpdate();
+	        return 0;
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		     System.err.println("updateTranTargetStatusByUploadBatchId " + ex.getCause());
+			return 1;
+		}
+	}
+	
+	
+	@Override
+    @Transactional
+    public Integer updateBatchDLStatusByUploadBatchId (Integer batchUploadId, Integer fromStatusId, Integer toStatusId,  String timeField) {
+		try {
+	        String sql = "update batchDownloads set statusId = :toStatusId ";
+	        if (timeField.equalsIgnoreCase("startover")) {
+	            // we reset time
+	            sql = sql + ", startDateTime = null, endDateTime = null";
+	        } else if (!timeField.equalsIgnoreCase("")) {
+	            sql = sql + ", " + timeField + " = CURRENT_TIMESTAMP";
+	        } else {
+	            sql = sql + ", startDateTime = CURRENT_TIMESTAMP, endDateTime = CURRENT_TIMESTAMP";
+	        }
+	        sql = sql + "  where id in (select batchDLId from transactionTarget where batchUploadId = :batchUploadId)";
+	        if  (fromStatusId > 0) {
+	        	sql = sql + " and statusId = :fromStatusId";
+	        }
+
+	        Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+	                .setParameter("toStatusId", toStatusId)
+	                .setParameter("batchUploadId", batchUploadId);
+	        if  (fromStatusId > 0) {
+	        	updateData.setParameter("fromStatusId", fromStatusId);
+	        }
+	        
+            updateData.executeUpdate();
+            return 0;
+        } catch (Exception ex) {
+        	ex.printStackTrace();
+            System.err.println("updateBatchDLStatusByUploadBatchId " + ex.getCause());
+            return 1;
+        }
+	}
+
+    @Override
+    @Transactional
+    @SuppressWarnings("unchecked")
+    public  List<Integer> getBatchDownloadIdsFromUploadId(Integer batchUploadId) {
+       try {
+	    	String sql = ("select batchDLId from "
+	                + " transactionTarget where batchUploadId = :batchUploadId ");
+	
+	        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+	        query.setParameter("batchUploadId", batchUploadId);
+	        
+	        List<Integer> batchIds = query.list();
+	        return batchIds;
+       } catch (Exception ex) {
+    	   System.err.println("getBatchDownloadIdsFromUploadId " + ex.getCause());
+           return null;
+       }
+    }
+	
+    
+    @Override
+    @Transactional
+    public Integer clearBatchDownloads(List<Integer> batchIds) {
+        String sql = "delete from batchDownloads where id in (:batchIds);";
+        try {
+            Query deleteTable = sessionFactory.getCurrentSession().createSQLQuery(sql).setParameterList("batchIds", batchIds);
+            deleteTable.executeUpdate();
+            return 0;
+        } catch (Exception ex) {
+        	ex.printStackTrace();
+            System.err.println("clearBatchDownloads " + ex.getCause().getMessage());
+            return 1;
+
+        }
+    }
+	
 }
