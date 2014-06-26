@@ -123,4 +123,7 @@ public interface transactionOutManager {
     void selectOutputRecordsForProcess(Integer transactionTargetId) throws Exception;
     
     List<batchDownloadSummary> getuploadBatchesByConfigAndSource(Integer configId, Integer orgId);
+    
+    void updateTransactionTargetStatusOutBound(Integer batchDLId, Integer transactionId, Integer fromStatusId, Integer toStatusId) throws Exception;
+    
 }

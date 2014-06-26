@@ -126,4 +126,6 @@ public interface transactionOutDAO {
     
     List<batchDownloadSummary> getuploadBatchesByConfigAndSource(Integer configId, Integer orgId);
     
+    void updateTransactionTargetStatusOutBound(Integer batchDLId, Integer transactionId, Integer fromStatusId, Integer toStatusId) throws Exception;
+    
 }

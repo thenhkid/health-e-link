@@ -1612,5 +1612,50 @@ public class transactionOutDAOImpl implements transactionOutDAO {
         return batchSummaries.list();
 
     }
+    
+    /**
+     * The 'updateTransactionTargetStatusOutBound' function will update the transactionTarget entries when the created batch has been sent.
+     *
+     * @param batchId The id of the download batch - default to 0
+     * @param transactionId The id of the specific transaction to update
+     * @param fromStatusId
+     * @param toStatusId The status we want to change to
+     */
+    @Override
+    @Transactional
+    public void updateTransactionTargetStatusOutBound(Integer batchDLId, Integer transactionId, Integer fromStatusId, Integer toStatusId) throws Exception {
+    	try {
+	        String sql = "update transactionTarget "
+	                + " set statusId = :toStatusId, "
+	                + "statusTime = CURRENT_TIMESTAMP";
+	
+	        if (transactionId > 0) {
+	            sql += " where id = :transactionId ";
+	        } else {
+	            sql += " where batchDLId = :batchDLId ";
+	        }
+	
+	        if (fromStatusId != 0) {
+	            sql = sql + " and statusId = :fromStatusId";
+	        }
+	        Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+	                .setParameter("toStatusId", toStatusId);
+	        if (transactionId > 0) {
+	            updateData.setParameter("transactionId", transactionId);
+	        } else {
+	            updateData.setParameter("batchDLId", batchDLId);
+	        }
+	
+	        if (fromStatusId != 0) {
+	            updateData.setParameter("fromStatusId", fromStatusId);
+	        }
+
+        
+            updateData.executeUpdate();
+        } catch (Exception ex) {
+            System.err.println("updateTransactionTargetStatusOutBound " + ex.getCause());
+        }
+
+    }
 
 }
