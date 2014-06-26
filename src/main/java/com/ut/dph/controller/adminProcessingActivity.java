@@ -1698,8 +1698,11 @@ public class adminProcessingActivity {
                 strBatchOption = "Cancelled Batch";
                 transactionInManager.updateBatchStatus(batchId, 4, "startDateTime");
                 transactionInManager.updateTransactionStatus(batchId, 0, 0, 31);
-                transactionInManager.updateTransactionTargetStatus(batchId, 0, 0, 31);
                 transactionInManager.updateBatchStatus(batchId, 21, "endDateTime");
+                //need to cancel targets also
+                transactionInManager.updateTranTargetStatusByUploadBatchId(batchId, 0, 31);
+                transactionInManager.updateBatchDLStatusByUploadBatchId(batchId, 0, 21, "endDateTime");
+                
             } else if (batchOption.equalsIgnoreCase("reset")) {
                 strBatchOption = "Reset Batch";
                 //1. Check
@@ -1710,6 +1713,13 @@ public class adminProcessingActivity {
                         transactionInManager.updateBatchStatus(batchId, 4, "startDateTime");
 
                         strBatchOption = "Reset Batch  - FTP/Rhapsody Reset";
+                   
+                        //targets could be created already so we need to update the target status by upload batchId 
+                        transactionInManager.updateTranTargetStatusByUploadBatchId(batchId, 0, 31);
+                        transactionInManager.updateBatchDLStatusByUploadBatchId(batchId, 0, 35, "endDateTime");
+                        transactionInManager.updateTransactionStatus(batchId, 0, 0, 31);
+                        transactionInManager.updateBatchStatus(batchId, 35, "endDateTime");
+                   
                         String fileExt = batchDetails.getoriginalFileName().substring(batchDetails.getoriginalFileName().lastIndexOf("."));
                         fileSystem fileSystem = new fileSystem();
 
@@ -1721,11 +1731,7 @@ public class adminProcessingActivity {
                         Path source = archiveFile.toPath();
                         Path target = newFile.toPath();
                         Files.copy(source, target);
-
-                        transactionInManager.updateTransactionStatus(batchId, 0, 0, 34);
-                        transactionInManager.updateTransactionTargetStatus(batchId, 0, 0, 34);
-                        transactionInManager.updateBatchStatus(batchId, 35, "endDateTime");
-
+                        
                     } else {
 
                         transactionInManager.updateBatchStatus(batchId, 4, "");

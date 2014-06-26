@@ -877,28 +877,34 @@ public class transactionInManagerImpl implements transactionInManager {
 
     @Override
     public Integer clearTransactionTables(Integer batchUploadId, boolean leaveFinalStatusIds) {
-        //TODO have in transaction block for roll back?
-        //we clear transactionTranslatedIn
-        Integer cleared = clearTransactionTranslatedIn(batchUploadId);
-        //we clear transactionInRecords
-        cleared = cleared + clearTransactionInRecords(batchUploadId);
-        //clear batchDownloadSummary
-        cleared = cleared + clearBatchDownloadSummaryByUploadBatchId(batchUploadId);
-        //clear transactionoutrecords
-        cleared = cleared + clearTransactionOutRecordsByUploadBatchId(batchUploadId);
-        //clear tto
-        cleared = cleared + clearTransactionTranslatedOutByUploadBatchId(batchUploadId);
-        //we clear transactionTarget
-        cleared = cleared + clearTransactionTarget(batchUploadId);
-        cleared = cleared + clearTransactionInErrors(batchUploadId, leaveFinalStatusIds);
-        cleared = cleared + clearBatchUploadSummary(batchUploadId);
-        cleared = cleared + clearMessageTables(batchUploadId);
-        //we clear transactionIn
-        cleared = cleared + clearTransactionIn(batchUploadId);
-
-        if (cleared > 0) {
-            flagAndEmailAdmin(batchUploadId);
-        }
+	        //TODO have in transaction block for roll back?
+	        //we clear transactionTranslatedIn
+	        Integer cleared = clearTransactionTranslatedIn(batchUploadId);
+	        //we clear transactionInRecords
+	        cleared = cleared + clearTransactionInRecords(batchUploadId);
+	        //clear batchDownloadSummary
+	        cleared = cleared + clearBatchDownloadSummaryByUploadBatchId(batchUploadId);
+	        //clear transactionoutrecords
+	        cleared = cleared + clearTransactionOutRecordsByUploadBatchId(batchUploadId);
+	        cleared = cleared + clearTransactionTranslatedOutByUploadBatchId(batchUploadId);
+	        //we clear transactionTarget
+	        List <Integer> batchDLIds = getBatchDownloadIdsFromUploadId(batchUploadId);
+	        if (batchDLIds.size() > 0) {
+	        	//need to get batchdownload Ids for transactiontargets
+	        	cleared = cleared + clearTransactionTarget(batchUploadId);
+	        	cleared = cleared + clearBatchDownloads(batchDLIds);       	
+	        }
+	        cleared = cleared + clearTransactionInErrors(batchUploadId, leaveFinalStatusIds);
+	        cleared = cleared + clearBatchUploadSummary(batchUploadId);
+	        cleared = cleared + clearMessageTables(batchUploadId);
+	        //we clear transactionIn
+	        cleared = cleared + clearTransactionIn(batchUploadId);
+	        //at SDC status, we have download batches, we need to clear those too
+	        
+	
+	        if (cleared > 0) {
+	            flagAndEmailAdmin(batchUploadId);
+	        }
         return cleared;
     }
 
@@ -3017,5 +3023,26 @@ public class transactionInManagerImpl implements transactionInManager {
     public boolean searchBatchForHistory(batchUploads batchDetails, String searchTerm, Date fromDate, Date toDate) throws Exception {
         return transactionInDAO.searchBatchForHistory(batchDetails, searchTerm, fromDate, toDate);
     }
+
+	@Override
+	public Integer updateTranTargetStatusByUploadBatchId(Integer batchUploadId,
+			Integer fromStatusId, Integer toStatusId) {
+		return transactionInDAO.updateTranTargetStatusByUploadBatchId(batchUploadId, fromStatusId, toStatusId);
+	}
+	
+	@Override
+	public Integer updateBatchDLStatusByUploadBatchId(Integer batchUploadId, Integer fromStatusId, Integer toStatusId, String timeField){
+		return transactionInDAO.updateBatchDLStatusByUploadBatchId(batchUploadId, fromStatusId, toStatusId, timeField);
+	}
+	
+    @Override
+    public List<Integer> getBatchDownloadIdsFromUploadId(Integer batchUploadId) {
+        return transactionInDAO.getBatchDownloadIdsFromUploadId(batchUploadId);
+    }
+
+	@Override
+	public Integer clearBatchDownloads(List<Integer> batchDownloadIDs) {
+		return transactionInDAO.clearBatchDownloads(batchDownloadIDs);
+	}
 
 }

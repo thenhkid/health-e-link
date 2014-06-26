@@ -312,7 +312,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
 
                 if (!processed) {
                     //we update and log
-                    transactionInManager.updateTransactionTargetStatus(0, transaction.getId(), 0, 33);
+                	updateTransactionTargetStatusOutBound(0, transaction.getId(), 0, 33);
                     transactionInManager.insertProcessingError(processingSysErrorId, null, 0, null, null, null, null, false, true, errorMessage, transaction.getId());
                 }
 
@@ -347,7 +347,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                     }
 
                     if (processingErrors != 0) {
-                        transactionInManager.updateTransactionTargetStatus(0, transaction.getId(), 0, 33);
+                    	updateTransactionTargetStatusOutBound(0, transaction.getId(), 0, 33);
                         transactionInManager.insertProcessingError(processingSysErrorId, null, 0, null, null, null, null, false, true, "error applying macros and crosswalks", transaction.getId());
                     }
 
@@ -369,7 +369,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
 
                         try {
                             /* Update the status of the transaction target to L (Loaded) (ID = 9) */
-                            transactionInManager.updateTransactionTargetStatus(0, transaction.getId(), 0, 9);
+                        	updateTransactionTargetStatusOutBound(0, transaction.getId(), 0, 9);
                         } catch (Exception e) {
                             throw new Exception("Error updating the transactionTarget status. transactionId: " + transaction.getId(), e);
                         }
@@ -936,7 +936,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
             transactionInManager.updateTransactionStatus(transaction.getbatchUploadId(), transaction.gettransactionInId(), 0, 18);
 
             /* Update the status of the transaction target to PP (Pending Pickup) (ID = 18) */
-            transactionInManager.updateTransactionTargetStatus(0, transaction.getId(), 0, 18);
+            updateTransactionTargetStatusOutBound(0, transaction.getId(), 0, 18);
 
             /* Update the status of the uploaded batch to  TBP (Target Batch Created) (ID = 28) */
             transactionInManager.updateBatchStatus(transaction.getbatchUploadId(), 28, "");
@@ -1814,7 +1814,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                 for (transactionTarget transaction : pendingTransactions) {
                     //we recheck in case another scheduler picked it up
                     if (getTransactionDetails(transaction.getId()).getstatusId() == 19) {
-                        transactionInManager.updateTransactionTargetStatus(0, transaction.getId(), 19, 37);
+                    	updateTransactionTargetStatusOutBound(0, transaction.getId(), 19, 37);
                         //we process it
                         processOutputRecords(transaction.getId());
                     }
@@ -1903,6 +1903,14 @@ public class transactionOutManagerImpl implements transactionOutManager {
     public List<batchDownloadSummary> getuploadBatchesByConfigAndSource(Integer configId, Integer orgId) {
         return transactionOutDAO.getuploadBatchesByConfigAndSource(configId, orgId);
     }
+
+	@Override
+	public void updateTransactionTargetStatusOutBound(Integer batchDLId,
+			Integer transactionId, Integer fromStatusId, Integer toStatusId)
+			throws Exception {
+		 transactionOutDAO.updateTransactionTargetStatusOutBound(batchDLId, transactionId,fromStatusId , toStatusId);
+		
+	}
 
 
 }

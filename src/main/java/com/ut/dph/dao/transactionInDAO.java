@@ -337,4 +337,12 @@ public interface transactionInDAO {
     
     boolean searchBatchForHistory(batchUploads batchDetails, String searchTerm, Date fromDate, Date toDate) throws Exception;
     
+    Integer updateTranTargetStatusByUploadBatchId(Integer batchUploadId, Integer fromStatusId, Integer toStatusId);
+    
+    Integer updateBatchDLStatusByUploadBatchId(Integer batchUploadId, Integer fromStatusId, Integer toStatusId, String timeField);
+    
+    List<Integer> getBatchDownloadIdsFromUploadId(Integer batchUploadId);
+    
+    Integer clearBatchDownloads(List <Integer> batchDownloadIDs);
+    
 }
