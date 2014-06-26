@@ -33,39 +33,39 @@
                                     <label class="control-label" for="orgName">Name</label>
                                     <input disabled value="${orgDetails.orgName}" id="orgName" class="form-control" type="text" maxLength="255" />
                                 </div>
-                            </div>       
+                            </div>  
+                             <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="control-label" for="address">Address</label>
+                                    <input disabled value="${orgDetails.address}" id="address" class="form-control" type="text" maxLength="45" />
+                                </div>
+                            </div> 
+                           <div class="col-md-6 cb">
+                                <div class="form-group">
+                                    <label class="control-label" for="address2">Address 2</label>
+                                    <input disabled value="${orgDetails.address2}" id="address2" class="form-control" type="text" maxLength="45" /> 
+                                </div>
+                            </div>   
                             <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="control-label" for="city">City</label>
+                                    <input disabled value="${orgDetails.city}" id="postalCode" class="form-control xs-input" type="text" maxLength="45" />
+                                </div>
+                            </div>      
+                            <div class="col-md-6 cb">
                                 <div class="form-group">
                                     <label class="control-label" for="state">State</label>
                                     <select disabled id="state" class="form-control half">
                                         <option value="${orgDetails.state}" >${orgDetails.state}</option>
                                     </select>
                                 </div>
-                            </div>      
-                            <div class="col-md-6 cb">
-                                <div class="form-group">
-                                    <label class="control-label" for="address">Address</label>
-                                    <input disabled value="${orgDetails.address}" id="address" class="form-control" type="text" maxLength="45" />
-                                </div>
-                            </div>       
+                            </div>   
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label class="control-label" for="postalCode">Postal Code</label>
                                     <input disabled value="${orgDetails.postalCode}" id="postalCode" class="form-control xs-input" type="text" maxLength="15" />
                                 </div>
                             </div>  
-                            <div class="col-md-6 cb">
-                                <div class="form-group">
-                                    <label class="control-label" for="address2">Address 2</label>
-                                    <input disabled value="${orgDetails.address2}" id="address2" class="form-control" type="text" maxLength="45" /> 
-                                </div>
-                            </div>       
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label class="control-label" for="city">City</label>
-                                    <input disabled value="${orgDetails.city}" id="postalCode" class="form-control xs-input" type="text" maxLength="45" />
-                                </div>
-                            </div>    
                             <div class="col-md-6 cb">
                                 <div class="form-group">
                                     <label class="control-label" for="phone">Phone</label>
