@@ -1259,9 +1259,7 @@ public class transactionInDAOImpl implements transactionInDAO {
         findBatches.add(Restrictions.not(Restrictions.in("statusId", excludedStatusIds)));
         findBatches.add(Restrictions.in("configId", configIdList));
         findBatches.add(Restrictions.ne("transportMethodId", 2));
-        findBatches.add(Restrictions.ne("transportMethodId", 5));
-        findBatches.add(Restrictions.ne("transportMethodId", 3));
-
+        
         if (!"".equals(fromDate)) {
             findBatches.add(Restrictions.ge("dateSubmitted", fromDate));
         }
