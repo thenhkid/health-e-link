@@ -14,7 +14,7 @@
                         <dd><strong>Batches Sent in the Past Hour:</strong> <fmt:formatNumber value="${summaryDetails.batchesPastHour}" /></dd>
                         <dd><strong>Batches Sent in today:</strong> <fmt:formatNumber value="${summaryDetails.batchesToday}" /></dd>
                         <dd><strong>Batches Sent in This Week:</strong> <fmt:formatNumber value="${summaryDetails.batchesThisWeek}" /></dd>
-                        <dd><strong>Total Batches in Error:</strong> <fmt:formatNumber value="${summaryDetails.batchesPastHour}" /></dd>
+                        <dd><strong>Total Batches in Error:</strong> <fmt:formatNumber value="${summaryDetails.batchesInError}" /></dd>
                     </dt>
                 </div>
             </section>
