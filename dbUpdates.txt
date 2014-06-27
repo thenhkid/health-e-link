@@ -17,3 +17,69 @@ UPDATE `universaltranslator`.`lu_processstatus` SET `description`='Normal condit
 
 /** grace 06252014 10:20 PM **/
 UPDATE `universaltranslator`.`lu_ProcessStatus` SET `endUserDisplayCode`='DNP', `endUserDisplayText`='Do Not Process' WHERE `id`='35';
+
+
+/** grace 06272014 11:59 AM **/
+
+use universaltranslator;
+
+drop procedure if exists replaceBlanksWithChars ;
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `replaceBlanksWithChars`(in configId int, 
+in batchId int, in srcField varchar(10),
+in fieldA varchar(10), in fieldB varchar(10), in con1 varchar(255), 
+in con2 varchar(255), in macroId int, in foroutboundProcessing boolean, in passClear int, in transactionId int)
+proc_main:begin
+
+-- this SP matches null or empty for fieldA and will replace it with con1
+-- FieldA - Field you would like to replace
+-- Con1 - what value would you like to replace null with
+
+set @fieldToReplace = fieldA;
+if (fieldB != 'F') then
+	set @fieldToReplace = fieldB;
+end if;
+
+-- this sets out table
+call setInboundOutBoundTables (foroutboundProcessing);
+select @translatedTable, @transactionTable, @batchTable, @batchIdType , @errorTable
+into @translatedTable, @transactionTable, @batchTable, @batchIdType , @errorTable;
+
+call getFinalStatusIds;
+select @finalStatusIds into @finalStatusIds;
+
+-- build our sql
+if (transactionId = 0) then
+	set @stmt = concat("update ",@translatedTable, " set ",fieldA," = '" ,con1,  "' where (",@fieldToReplace, " is null  
+	or length(REPLACE(REPLACE('", fieldA, "', ""\n"", """"), ""\r"", """")) = 0)and ",
+	@transactionTable,"Id in (select id from ",@transactionTable,
+				" where configId = ",configId," and ", @batchIdType," = ",batchId," and statusId not in (",@finalStatusIds ,"));");
+	END if;
+
+
+
+if (transactionId != 0) then
+	set @stmt = concat("update ",@translatedTable, " set ",fieldA," = '",con1, "' where (", @fieldToReplace , " is null
+		or length(REPLACE(REPLACE('", fieldA, "', ""\n"", """"), ""\r"", """")) = 0)and ",
+	@transactionTable,"Id = ", transactionId,";");
+	END if;
+
+
+	PREPARE stmt from @stmt;
+	EXECUTE stmt;-- execute
+
+
+
+-- we check pass /clear
+if (passClear = 2) THEN
+BEGIN
+-- accessible
+END;
+END IF;
+
+
+-- the only error for this is if SP bombs, no need to write in insert error logs
+select '';
+end proc_main$$
+DELIMITER ;
