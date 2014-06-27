@@ -50,7 +50,7 @@ public class User {
 
     @NotEmpty
     @NoHtml
-    @Size(min = 5, max = 10)
+    @Size(min = 4, max = 15)
     @Column(name = "USERNAME", nullable = false)
     private String username;
 
