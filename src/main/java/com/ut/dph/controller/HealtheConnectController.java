@@ -1320,9 +1320,12 @@ public class HealtheConnectController {
                     //check authority
                     if (allowBatchClear && userInfo.getcancelAuthority()) {
                         transactionInManager.updateBatchStatus(batchId, 4, "startDateTime");
-                        transactionInManager.updateTransactionStatus(batchId, 0, 0, 34);
-                        transactionInManager.updateTransactionTargetStatus(batchId, 0, 0, 34);
-                        transactionInManager.updateBatchStatus(batchId, 21, "endDateTime");
+                        transactionInManager.updateTransactionStatus(batchId, 0, 0, 31);
+                        transactionInManager.updateBatchStatus(batchId, 32, "endDateTime");
+                        //need to cancel targets also
+                        transactionInManager.updateTranTargetStatusByUploadBatchId(batchId, 0, 31);
+                        transactionInManager.updateBatchDLStatusByUploadBatchId(batchId, 0, 32, "endDateTime");
+                        
                         systemMessage = "Batch is set to 'Do Not Process'.";
 
                     } else {

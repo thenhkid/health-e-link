@@ -2963,7 +2963,9 @@ public class HealtheWebController {
      */
     @RequestMapping(value = "/cancelMessage.do", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody
-    Integer cancelMessageTransaction(@RequestParam(value = "transactionId", required = true) Integer transactionId, @RequestParam(value = "sent", required = true) boolean sent) throws Exception {
+    Integer cancelMessageTransaction(@RequestParam(value = "transactionId", required = true) Integer transactionId, 
+    		@RequestParam(value = "sent", required = true) boolean sent, HttpSession session
+    ) throws Exception {
 
         try {
 
@@ -2976,12 +2978,55 @@ public class HealtheWebController {
                 /* Need to update the batch status */
                 transactionOutManager.updateTargetBatchStatus(targetDetails.getbatchDLId(), 32, "");
                 transactionInManager.updateBatchStatus(targetDetails.getbatchUploadId(), 32, "");
+                
+              //we log here 
+                try {
+                    //log user activity
+                	UserActivity ua = new UserActivity();        
+                	User userInfo = (User) session.getAttribute("userDetails");
+                	ua.setUserId(userInfo.getId());
+                    ua.setFeatureId(featureId);
+                    ua.setAccessMethod("POST");
+                    ua.setPageAccess("/cancelMessage.do");
+                    ua.setActivity("Cancelled Message");
+                    ua.setTransactionTargetIds(String.valueOf(targetDetails.getId()));
+                    ua.setBatchUploadId(targetDetails.getbatchUploadId());
+                    ua.setTransactionInIds(String.valueOf(targetDetails.gettransactionInId()));
+                    ua.setBatchDownloadId(targetDetails.getbatchDLId());             
+                    usermanager.insertUserLog(ua);
+                } catch (Exception ex) {
+                    System.err.println("cancelMessage = error logging user " + ex.getCause());
+                    ex.printStackTrace();
+                }
+                
+                
             } else {
                 transactionIn transactionDetails = transactionInManager.getTransactionDetails(transactionId);
 
                 transactionInManager.cancelMessageTransaction(transactionId);
 
                 transactionInManager.updateBatchStatus(transactionDetails.getbatchId(), 32, "");
+                
+                
+              //we log here 
+                try {
+                    //log user activity
+                	UserActivity ua = new UserActivity();        
+                	User userInfo = (User) session.getAttribute("userDetails");
+                	ua.setUserId(userInfo.getId());
+                    ua.setFeatureId(featureId);
+                    ua.setAccessMethod("POST");
+                    ua.setPageAccess("/cancelMessage.do");
+                    ua.setActivity("Cancelled Message");
+                    ua.setTransactionInIds(String.valueOf(transactionDetails.getId()));
+                    ua.setBatchUploadId(transactionDetails.getbatchId());               
+                    usermanager.insertUserLog(ua);
+                } catch (Exception ex) {
+                    System.err.println("cancelMessage = error logging user " + ex.getCause());
+                    ex.printStackTrace();
+                }
+                
+                
             }
 
             return 1;
