@@ -782,6 +782,7 @@ public class HealtheWebController {
                 ua.setAccessMethod(request.getMethod());
                 ua.setPageAccess("/create");
                 ua.setActivity("Viewed Create Message Form");
+                ua.setActivityDesc("User has " + configurations.size() + " configuration(s).");
                 usermanager.insertUserLog(ua);
             } catch (Exception ex) {
                 System.err.println("createNewMesage = error logging user " + ex.getCause());
@@ -1081,6 +1082,7 @@ public class HealtheWebController {
                     ua.setAccessMethod("POST");
                     ua.setPageAccess("/" + pathVariable + "/details");
                     ua.setActivity("Showed Message Details");
+                    ua.setActivityDesc(configDetails.getconfigName());
                     ua.setBatchDownloadId(transactionTarget.getbatchDLId());
                     ua.setBatchUploadId(transactionTarget.getbatchUploadId());
                     ua.setTransactionInIds(String.valueOf(transactionTarget.gettransactionInId()));
@@ -1122,7 +1124,8 @@ public class HealtheWebController {
                     ua.setFeatureId(featureId);
                     ua.setAccessMethod("POST");
                     ua.setPageAccess("/" + pathVariable + "/details");
-                    ua.setActivity("Showed Message Details");
+                    ua.setActivity("Create New Message Details");
+                    ua.setActivityDesc(configDetails.getconfigName());
                     usermanager.insertUserLog(ua);
                 } catch (Exception ex) {
                     System.err.println("showMessageDetailsForm = error logging user " + ex.getCause());
