@@ -63,6 +63,8 @@ import org.apache.commons.net.PrintCommandListener;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
 import org.apache.commons.net.ftp.FTPSClient;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 
 @Controller
 @RequestMapping("/administrator/configurations")
@@ -86,6 +88,11 @@ public class adminConfigController {
     
     @Autowired
     private sysAdminManager sysAdminManager;
+    
+    @InitBinder
+    public void initBinder(WebDataBinder binder) {
+        binder.setAutoGrowCollectionLimit(1024);
+    }
 
     /**
      * The private variable configId will hold the configurationId when viewing a configuration this will be used when on a configuration subsections like Field Mappings, Data Translations, etc. We will use this private variable so we don't have to go fetch the id
@@ -951,20 +958,17 @@ public class adminConfigController {
             configurationmanager.updateCompletedSteps(configId, 4);
             stepsCompleted = 4;
         }
-
+        
         //Get the list of fields
         List<configurationFormFields> fields = transportDetails.getFields();
 
         if (null != fields && fields.size() > 0) {
-            for (configurationFormFields formfield : fields) {
-                //If the message type field id is blank then set the use field to no
+           for (configurationFormFields formfield : fields) {
                 if (formfield.getmessageTypeFieldId() == 0) {
                     formfield.setUseField(false);
                 } else {
                     formfield.setUseField(formfield.getUseField());
                 }
-                
-                //Update each field
                 configurationTransportManager.updateConfigurationFormFields(formfield);
             }
         }

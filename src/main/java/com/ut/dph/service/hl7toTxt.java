@@ -98,7 +98,7 @@ public class hl7toTxt {
                 recordRow = new StringBuilder().append(recordRow).append(line.replace("^","|")).toString();
             }
             else {
-                recordRow = new StringBuilder().append(recordRow).append(line).toString();  
+                recordRow = new StringBuilder().append(recordRow).append(line.replace("MSH|^", "MSH|;").replace("^","|").replace("MSH|;", "MSH|^")).toString();  
             }
             
         }
