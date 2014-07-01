@@ -225,3 +225,136 @@ end proc_main$$
 DELIMITER ;
 
 
+/** grace 07012014 1:50PM **/
+INSERT INTO `universaltranslator`.`Macro_Names` (`ID`, `CategoryId`, `Macro_Name`, `Macro_Short_Name`, `Formula`, `FieldA_Question`, `Con1_Question`, `populateFieldA`) VALUES ('83', '1', 'Convert yymmddhhmmss String to Date Time', 'yymmddhhmmss String to Date Time', 'yyyymmddTimeToDateTime', 'Please enter field to convert', 'Please enter date separator (. , / , - )', 1);
+
+use universaltranslator;
+
+drop procedure if exists yyyymmddTimeToDateTime;
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `yyyymmddTimeToDateTime`(in configId int, 
+in batchId int, in srcField varchar(10),
+in fieldA varchar(10), in fieldB varchar(10), in con1 varchar(255), 
+in con2 varchar(255), in macroId int, in foroutboundProcessing boolean, in passClear int, in transactionId int)
+proc_main:begin
+
+/** 
+This procedure take a string in yyyymmddhhmmss format and convert it into yyyy-mm-dd hh:mm:ss. 
+"-" can be "/" or "." or character of choice by user
+fieldA will be field to convert
+fieldB is not in use
+con1 will be character of choice
+con2 is not in use
+**/
+
+call setInboundOutBoundTables (foroutboundProcessing);
+select @translatedTable, @transactionTable, @batchTable, @batchIdType , @errorTable
+into @translatedTable, @transactionTable, @batchTable, @batchIdType , @errorTable;
+
+call getFinalStatusIds;
+select @finalStatusIds into @finalStatusIds;
+
+-- we build sql here 
+if (con1 = '') then
+set con1 = '-';
+end if;
+
+if (transactionId = 0) then
+set @stmt = concat("update ", @translatedTable," set ",fieldA,
+" = concat(substring(", fieldA,", 1, 4), '",con1,"', substring(",fieldA,", 5,2), '",con1,"', substring(",fieldA,", 7,2), ' ', substring(",fieldA,", 9,2), ':', substring(",fieldA,", 11,2), ':', substring(",fieldA,", 13,2))
+ where ", @transactionTable ,"Id in (select id from ",@transactionTable,
+" where configId = ",configId," and ", @batchIdType," = ",batchId," and statusId not in (",@finalStatusIds,"));");
+
+
+END if;
+
+if (transactionId != 0) then
+set @stmt = concat("update ", @translatedTable," set ",fieldA,
+" = concat(substring(", fieldA,", 1, 4), '",con1,"', substring(",fieldA,", 5,2), '",con1,"', substring(",fieldA,", 7,2), ' ', substring(",fieldA,", 9,2), ':', substring(",fieldA,", 11,2), ':', substring(",fieldA,", 13,2)) 
+where ", @transactionTable ,"Id = ",transactionId, ";");
+END if;
+
+
+PREPARE stmt from @stmt;
+EXECUTE stmt;-- execute
+
+-- we check pass /clear
+if (passClear = 2) THEN
+BEGIN
+-- not sure how to pass clear this
+END;
+END IF;
+-- see if we want to return something
+select '';
+
+end proc_main$$
+DELIMITER ;
+
+
+use universaltranslator;
+
+drop procedure if exists yyyymmddToDate;
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `yyyymmddToDate`(in configId int, 
+in batchId int, in srcField varchar(10),
+in fieldA varchar(10), in fieldB varchar(10), in con1 varchar(255), 
+in con2 varchar(255), in macroId int, in foroutboundProcessing boolean, in passClear int, in transactionId int)
+proc_main:begin
+
+/** 
+This procedure take a string in yyyymmddhhmmss format and convert it into yyyy-mm-dd hh:mm:ss. 
+"-" can be "/" or "." or character of choice by user
+fieldA will be field to convert
+fieldB is not in use
+con1 will be character of choice
+con2 is not in use
+**/
+
+call setInboundOutBoundTables (foroutboundProcessing);
+select @translatedTable, @transactionTable, @batchTable, @batchIdType , @errorTable
+into @translatedTable, @transactionTable, @batchTable, @batchIdType , @errorTable;
+
+call getFinalStatusIds;
+select @finalStatusIds into @finalStatusIds;
+
+-- we build sql here 
+if (con1 = '') then
+set con1 = '-';
+end if;
+
+if (transactionId = 0) then
+set @stmt = concat("update ", @translatedTable," set ",fieldA,
+" = concat(substring(", fieldA,", 1, 4), '",con1,"', substring(",fieldA,", 5,2), '",con1,"', substring(",fieldA,", 7,2))
+ where ", @transactionTable ,"Id in (select id from ",@transactionTable,
+" where configId = ",configId," and ", @batchIdType," = ",batchId," and statusId not in (",@finalStatusIds,"));");
+
+
+END if;
+
+if (transactionId != 0) then
+set @stmt = concat("update ", @translatedTable," set ",fieldA,
+" = concat(substring(", fieldA,", 1, 4), '",con1,"', substring(",fieldA,", 5,2), '",con1,"', substring(",fieldA,", 7,2)) 
+where ", @transactionTable ,"Id = ",transactionId, ";");
+END if;
+
+
+PREPARE stmt from @stmt;
+EXECUTE stmt;-- execute
+
+-- we check pass /clear
+if (passClear = 2) THEN
+BEGIN
+-- not sure how to pass clear this
+END;
+END IF;
+-- see if we want to return something
+select '';
+
+end proc_main$$
+DELIMITER ;
+
+
+
+
