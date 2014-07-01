@@ -1017,8 +1017,7 @@ public class adminProcessingActivity {
     ModelAndView showInboxMessageDetails(@RequestParam(value = "Type", required = true) Integer Type, @RequestParam(value = "transactionId", required = true) Integer transactionId, @RequestParam(value = "configId", required = true) Integer configId) throws Exception {
 
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("/administrator/processing-activities/messageDetails");
-
+        
         try {
 
             Transaction transaction = new Transaction();
@@ -1087,7 +1086,14 @@ public class adminProcessingActivity {
                 /* Set all the transaction DETAIL fields */
                 List<transactionRecords> detailFields = setOutboundFormFields(detailFormFields, records, transactionInfo.getconfigId(), 0, true, 0);
                 transaction.setdetailFields(detailFields);
-
+                
+                if(transportDetails.gettransportMethodId() == 5) {
+                    mav.setViewName("/administrator/processing-activities/HL7messageDetails");
+                }
+                else {
+                    mav.setViewName("/administrator/processing-activities/messageDetails");
+                }
+                
             } else {
 
                 transactionTarget transactionInfo = transactionOutManager.getTransactionDetails(transactionId);
@@ -1097,7 +1103,7 @@ public class adminProcessingActivity {
                 }
                 /* Get the configuration details */
                 configuration configDetails = configurationManager.getConfigurationById(transactionInfo.getconfigId());
-
+                
                 /* Get a list of form fields */
                 /*configurationTransport transportDetails = configurationTransportManager.getTransportDetailsByTransportMethod(transactionInfo.getconfigId(), 2);*/
                 configurationTransport transportDetails = configurationTransportManager.getTransportDetails(transactionInfo.getconfigId());
@@ -1152,14 +1158,22 @@ public class adminProcessingActivity {
                 /* Set all the transaction DETAIL fields */
                 List<transactionRecords> detailFields = setInboxFormFields(detailFormFields, records, transactionInfo.getconfigId(), true, 0);
                 transaction.setdetailFields(detailFields);
-
+                
+                if(transportDetails.gettransportMethodId() == 5) {
+                    mav.setViewName("/administrator/processing-activities/HL7messageDetails");
+                }
+                else {
+                    mav.setViewName("/administrator/processing-activities/messageDetails");
+                }
             }
-
+            
             mav.addObject("transactionDetails", transaction);
 
         } catch (Exception e) {
             throw new Exception("Error occurred in viewing the sent batch details. transactionId: " + transactionId, e);
         }
+        
+       
 
         return mav;
 

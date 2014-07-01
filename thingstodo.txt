@@ -49,3 +49,4 @@ Wishlist / down the road -
 14 a. Update the template insert code to accept R, O or D in the required field. R = Required, O = Optional and D = Default
 14 b. Update the code so that if D is set in the required field box it pulls default values (Populate from table) in the set up
 14 c. Update all configuration forms that have required as a checkbox to be a drop down R, O and D
+15. Allow a Min Admin account that can only see the processing activity screen
