@@ -849,13 +849,61 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
 	@Override
     @Transactional
     public List <TransportMethod> getTransportMethods(List <Integer> statusIds) {
-        Query query = sessionFactory.getCurrentSession()
-        .createSQLQuery("SELECT id, transportMethod FROM ref_transportMethods where active in (:statusIds) order by transportMethod asc")
-        .setResultTransformer(
-                Transformers.aliasToBean(TransportMethod.class));
-        query.setParameterList("statusIds", statusIds);
-        return query.list();
+    	 try {
+	        Query query = sessionFactory.getCurrentSession()
+	        .createSQLQuery("SELECT id, transportMethod FROM ref_transportMethods where active in (:statusIds) order by transportMethod asc")
+	        .setResultTransformer(
+	                Transformers.aliasToBean(TransportMethod.class));
+	        query.setParameterList("statusIds", statusIds);
+	        return query.list();
+    	 } catch (Exception ex) {
+             System.err.println("getTransportMethods  " + ex.getCause());
+             ex.printStackTrace();
+             return null;
+         }
     }
+
+    @SuppressWarnings("unchecked")
+	@Override
+    @Transactional
+	public List<configurationTransport> getConfigurationTransportFileExtByFileType(
+			Integer orgId, Integer transportMethodId,
+			List<Integer> fileTypeIds, List<Integer> statusIds, 
+			boolean distinctOnly, boolean foroutboundProcessing) {
+		Integer configType = 1; 
+		if (foroutboundProcessing) {
+			configType = 2;
+		}
+		try {
+			String sql = "select";
+			if (distinctOnly) {
+				sql = sql + " distinct ";
+			}
+			sql = sql + "fileType from configurationTransportDetails where ";
+			if (fileTypeIds !=  null) {
+				sql = sql +	 " fileType in (:fileTypeIds) and ";
+			}
+			sql = sql +" status in (:statusIds) and  transportmethodid = :transportMethodId and configId "
+					+ " in (select id from configurations where type = :configType and orgId = :orgId);";
+	        Query query = sessionFactory.getCurrentSession()
+	        .createSQLQuery(sql)
+	        .setResultTransformer(
+	                Transformers.aliasToBean(configurationTransport.class));
+	        if (fileTypeIds != null) {
+	        	query.setParameterList("fileTypeIds", fileTypeIds);
+	        }
+	        query.setParameterList("statusIds", statusIds);
+	        query.setParameter("transportMethodId", transportMethodId);
+	        query.setParameter("configType", configType);
+	        query.setParameter("orgId", orgId);
+	        
+	        return query.list();
+    	 } catch (Exception ex) {
+             System.err.println("getConfigurationTransportFileExtByFileType  " + ex.getCause());
+             ex.printStackTrace();
+             return null;
+         }
+	}
     
     
 

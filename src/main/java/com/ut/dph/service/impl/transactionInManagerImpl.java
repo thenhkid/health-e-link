@@ -1550,22 +1550,90 @@ public class transactionInManagerImpl implements transactionInManager {
                 processingSysErrorId = 17;
             }
             
-            String oldFileName = actualFileName;
-            
             if (!strDecode.equalsIgnoreCase("")) {
                 //we write and decode file
                 filemanager.writeFile((decodedFilePath + decodedFileName + decodedFileExt), strDecode);
                 actualFileName = (decodedFilePath + decodedFileName + decodedFileExt);
-                oldFileName = actualFileName;
+               
                 /*
                  If batch is set up for CCD input then we need to translate it
                  to a pipe-delimited text file.
                  */
-                if (batch.getoriginalFileName().endsWith(".xml")) {
+                /** 
+                 * here we need to check if we should change file to xml or hr for org
+                 * sometimes org will send hl7 files over or .out or some other extension, they all need to be .hr
+                 * all ccd file will need to end in xml
+                 * 
+                 */
+                
+                //so we check decodedFileName and change it to the proper extension if need be
+                String chagneToExtension = "";
+                String processFileName = batch.getoriginalFileName();
+                /**
+                 * For configId of 0, we need to check to see if org has hr or ccd
+                 * if configId is not 0, we pull up the extension type and rename file
+                 * if we find more than one file extension set up for org we reject them them
+                 * file extension will be 4 (hr) or 9 (ccd)
+                 * info we have from batchUpload - transportMethodId, configId, orgId
+                 * 
+                 */
+                if (batch.getConfigId() != 0) {
+                	configurationTransport ct = configurationtransportmanager.getTransportDetails(batch.getConfigId());
+                	if (ct.getfileType() == 9) {
+                		chagneToExtension = "xml";
+                	} else if (ct.getfileType() == 4) {
+                		chagneToExtension = "hr";
+                	}
+                } else if (batch.getConfigId() == 0) {
+                	//should restrict this to only 4/9
+                	//see if the users has any 4/9 fileType, we don't need to worry about changing extension if org doesn't
+                	
+                	List <configurationTransport> ctList = configurationtransportmanager.getConfigurationTransportFileExtByFileType(batch.getOrgId(), batch.gettransportMethodId(), null, Arrays.asList(1), true, false);
+                	if (ctList.size() > 1) {
+                		//it is ok to have multiple if they are not using file type 4/9, so we check again
+                		List <configurationTransport> ctList2 = configurationtransportmanager.getConfigurationTransportFileExtByFileType(batch.getOrgId(), batch.gettransportMethodId(), Arrays.asList(4,9), Arrays.asList(1), true, false);
+                    	if (ctList2.size() != 0) { //they have multiple file types defined along with hr or ccd, we fail them
+                     		//clean up
+                    		File tempLoadFile = new File(actualFileName);
+                    		if (tempLoadFile.exists()) {
+                    			tempLoadFile.delete();
+                            } 
+                    		//log
+                    		updateBatchStatus(batchId, 7, "endDateTime");
+                            insertProcessingError(18, null, batchId, null, null, null, null,
+                                    false, false, "Multiple file types were found for transport method.");
+                            //get out of loop
+                            return false;
+                    		
+                    	}
+                	} else if (ctList.size() == 1){ 
+                		if (ctList.get(0).getfileType() == 9) {
+                    		chagneToExtension = "xml";
+                    	} else if (ctList.get(0).getfileType() == 4) {
+                    		chagneToExtension = "hr";
+                    	}
+                    } 
+                	
+                }	
+                
+                
+                if (chagneToExtension != "") {
+                	processFileName = batch.getutBatchName() + "." + chagneToExtension;
+                	//we overwrite file 
+                	//old file is here actualFileName;
+                    //new file is the same name with diff extension
+                	File actualFile = new File(actualFileName);
+                	File fileWithNewExtension = new File(decodedFilePath + processFileName);
+                    Path fileWithOldExtension = actualFile.toPath();
+                    Path renamedFile = fileWithNewExtension.toPath();
+                    Files.move(fileWithOldExtension, renamedFile, REPLACE_EXISTING);                	
+                }
+                
+                if (processFileName.endsWith(".xml")) {
                     newfilename = ccdtotxt.TranslateCCDtoTxt(decodedFilePath, decodedFileName, batch.getOrgId());
                     actualFileName = (decodedFilePath + newfilename);
                     //we remove temp load file 
-                    File tempLoadFile = new File(oldFileName);
+                    File tempLoadFile = new File(decodedFilePath + processFileName);
                     if (tempLoadFile.exists()) {
                     	tempLoadFile.delete();
                     }  
@@ -1573,11 +1641,11 @@ public class transactionInManagerImpl implements transactionInManager {
                      if the original file name is a HL7 file (".hr") then we are going to translate it to
                      a pipe-delimited text file.
                      */
-                } else if (batch.getoriginalFileName().endsWith(".hr")) {
+                } else if (processFileName.endsWith(".hr")) {
                     newfilename = hl7toTxt.TranslateHl7toTxt(decodedFilePath, decodedFileName);
                     actualFileName = (decodedFilePath + newfilename);
                     //we remove temp load file 
-                    File tempLoadFile = new File(oldFileName);
+                    File tempLoadFile = new File(decodedFilePath + processFileName);
                     if (tempLoadFile.exists()) {
                     	tempLoadFile.delete();
                     }            

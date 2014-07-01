@@ -93,4 +93,7 @@ public interface configurationTransportDAO {
     Integer getOrgIdForRhapsodyPath (configurationRhapsodyFields rhapsodyInfo) throws Exception;
 
     List <TransportMethod> getTransportMethods(List <Integer> statusIds);
+    
+    List <configurationTransport> getConfigurationTransportFileExtByFileType(Integer orgId, Integer transportMethodId, List<Integer> fileTypeIds, List <Integer> statusIds, boolean distinctOnly, boolean foroutboundProcessing);
+
 }

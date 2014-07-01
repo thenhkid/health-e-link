@@ -304,4 +304,11 @@ public class configurationTransportManagerImpl implements configurationTransport
     public List <TransportMethod> getTransportMethods(List <Integer> statusIds) {
         return configurationTransportDAO.getTransportMethods(statusIds);
     }
+
+	@Override
+	public List<configurationTransport> getConfigurationTransportFileExtByFileType(
+			Integer orgId, Integer transportMethodId,
+			List<Integer> fileTypeIds, List<Integer> statusIds, boolean distinctOnly, boolean foroutboundProcessing) {
+		 return configurationTransportDAO.getConfigurationTransportFileExtByFileType(orgId,transportMethodId, fileTypeIds, statusIds, distinctOnly, foroutboundProcessing);
+	}
 }
