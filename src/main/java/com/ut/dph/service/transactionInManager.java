@@ -189,7 +189,7 @@ public interface transactionInManager {
 
     Date convertDate(String date);
 
-    boolean chkMySQLDate(String date);
+    String chkMySQLDate(String date);
 
     boolean isValidURL(String url);
 

@@ -1067,29 +1067,29 @@ public class transactionInManagerImpl implements transactionInManager {
                     //System.out.println(tr.getFieldValue());
                     //we check long dates
                     Date dateValue = null;
-                    boolean mySQLDate = chkMySQLDate(tr.getFieldValue());
+                    String mySQLDate = chkMySQLDate(tr.getFieldValue());
 
-                    if (dateValue == null && !mySQLDate) {
+                    if (dateValue == null && mySQLDate.equalsIgnoreCase("")) {
                         dateValue = convertLongDate(tr.getFieldValue());
                     }
-                    if (dateValue == null && !mySQLDate) {
+                    if (dateValue == null && mySQLDate.equalsIgnoreCase("")) {
                         dateValue = convertDate(tr.getfieldValue());
                     }
 
                     String formattedDate = null;
-                    if (dateValue != null && !mySQLDate) {
+                    if (dateValue != null && mySQLDate.equalsIgnoreCase("")) {
                         formattedDate = formatDateForDB(dateValue);
                         //3. if it converts, we update the column value
                         updateFieldValue(tr, formattedDate);
                     }
 
-                    if (formattedDate == null && !mySQLDate) {
+                    if (formattedDate == null && (mySQLDate.equalsIgnoreCase("") || mySQLDate.equalsIgnoreCase("ERROR"))) {
                         insertValidationError(tr, cff, batchUploadId);
                     }
 
                 }
             }
-            return 0;
+             return 0;
         } catch (Exception ex) {
             ex.printStackTrace();
             insertProcessingError(processingSysErrorId, cff.getconfigId(), batchUploadId, cff.getFieldNo(), null, null, validationTypeId, false, false, (ex.getClass() + " " + ex.getCause()));
@@ -1212,7 +1212,7 @@ public class transactionInManagerImpl implements transactionInManager {
         return date;
     }
 
-    public boolean chkMySQLDate(String date) {
+    public String chkMySQLDate(String date) {
 
         // some regular expression
         String time = "(\\s(([01]?\\d)|(2[0123]))[:](([012345]\\d)|(60))"
@@ -1235,13 +1235,13 @@ public class transactionInManagerImpl implements transactionInManager {
                 SimpleDateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd");
                 dateformat.setLenient(false);
                 dateformat.parse(date);
-                return true;
+                return "Valid";
             } catch (Exception e) {
                 e.printStackTrace();
-                return false;
+                return "Error";
             }
         } else {
-            return false;
+            return "";
         }
     }
 
