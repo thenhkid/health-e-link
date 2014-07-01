@@ -146,6 +146,8 @@ INSERT INTO `universaltranslator`.`lu_errorcodes` (`id`,`displayText`, `descript
 /** grace 07012014 12:55PM **/
 INSERT INTO `universaltranslator`.`Macro_Names` (`ID`, `CategoryId`, `Macro_Name`, `Macro_Short_Name`, `Formula`, `FieldA_Question`, `Con1_Question`, `populateFieldA`) VALUES ('82', '1', 'Covert yyyymmdd String to Date', 'yyyymmdd String to Date', 'yyyymmddToDate', 'Please enter field to convert', 'Please enter date separator (. , / , - )', 1);
 
+use universaltranslator;
+
 drop procedure if exists yyyymmddToDate;
 
 DELIMITER $$
