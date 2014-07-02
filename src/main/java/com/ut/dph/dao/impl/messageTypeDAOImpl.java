@@ -18,6 +18,7 @@ import com.ut.dph.model.messageType;
 import com.ut.dph.model.messageTypeDataTranslations;
 import com.ut.dph.model.messageTypeFormFields;
 import com.ut.dph.model.validationType;
+import org.hibernate.criterion.Disjunction;
 
 /**
  * The brochureDAOImpl class will implement the DAO access layer to handle updates for organization brochures
@@ -233,6 +234,13 @@ public class messageTypeDAOImpl implements messageTypeDAO {
 
         if (orgId == 0) {
             criteria.add(Restrictions.eq("orgId", 0));
+        }
+        else {
+           Disjunction or = Restrictions.disjunction();
+           or.add(Restrictions.eq("orgId", 0));
+           or.add(Restrictions.eq("orgId", orgId));
+           criteria.add(or);
+            
         }
 
         double totalCrosswalks = (double) criteria.list().size();
