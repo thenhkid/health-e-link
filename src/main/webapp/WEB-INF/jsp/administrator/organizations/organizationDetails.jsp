@@ -28,10 +28,10 @@
                         <div class="form-group">
                             <label for="status">Status * </label>
                             <div>
-                                <label class="radio-inline" for="status">
+                                <label class="radio-inline">
                                     <form:radiobutton id="status" path="status" value="true"/>Active 
                                 </label>
-                                <label class="radio-inline" for="status">
+                                <label class="radio-inline">
                                     <form:radiobutton id="status" path="status" value="false"/>Inactive
                                 </label>
                             </div>
