@@ -1087,7 +1087,7 @@ public class adminProcessingActivity {
                 List<transactionRecords> detailFields = setOutboundFormFields(detailFormFields, records, transactionInfo.getconfigId(), 0, true, 0);
                 transaction.setdetailFields(detailFields);
                 
-                if(transportDetails.gettransportMethodId() == 5) {
+                if(transportDetails.getfileType() == 4) {
                     mav.setViewName("/administrator/processing-activities/HL7messageDetails");
                 }
                 else {
@@ -1159,12 +1159,8 @@ public class adminProcessingActivity {
                 List<transactionRecords> detailFields = setInboxFormFields(detailFormFields, records, transactionInfo.getconfigId(), true, 0);
                 transaction.setdetailFields(detailFields);
                 
-                if(transportDetails.gettransportMethodId() == 5) {
-                    mav.setViewName("/administrator/processing-activities/HL7messageDetails");
-                }
-                else {
-                    mav.setViewName("/administrator/processing-activities/messageDetails");
-                }
+                mav.setViewName("/administrator/processing-activities/messageDetails");
+                
             }
             
             mav.addObject("transactionDetails", transaction);
