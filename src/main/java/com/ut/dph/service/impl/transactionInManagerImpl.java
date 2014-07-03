@@ -1131,8 +1131,8 @@ public class transactionInManagerImpl implements transactionInManager {
         String year = "\\d{4}";
 
         // define here all date format
-        String date = input.replace("/", "-");
-        date = date.replace(".", "-");
+        String date = input.replaceAll("/", "-");
+        date = date.replaceAll(".", "-");
         //ArrayList<Pattern> patterns = new ArrayList<Pattern>();
         //Pattern pattern1 = Pattern.compile(day + "-" + month + "-" + year + time); //not matching, doesn't work for 01-02-2014 is it jan or feb, will only accept us dates
         Pattern pattern2 = Pattern.compile(year + "-" + month + "-" + day + time);
@@ -1217,7 +1217,7 @@ public class transactionInManagerImpl implements transactionInManager {
         return date;
     }
 
-    public String chkMySQLDate(String date) {
+    public String chkMySQLDate(String dateValue) {
 
         // some regular expression
         String time = "(\\s(([01]?\\d)|(2[0123]))[:](([012345]\\d)|(60))"
@@ -1230,8 +1230,8 @@ public class transactionInManagerImpl implements transactionInManager {
         String year = "\\d{4}";
 
         // define here all date format
-        date.replace("/", "-");
-        date.replace(".", "-");
+        String date = dateValue.replaceAll("/", "-");
+        date = date.replaceAll("\\.", "-");
         Pattern pattern = Pattern.compile(year + "-" + month + "-" + day + time);
 
         // check dates
