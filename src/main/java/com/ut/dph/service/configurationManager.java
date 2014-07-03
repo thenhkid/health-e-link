@@ -127,4 +127,10 @@ public interface configurationManager {
   
   @SuppressWarnings("rawtypes")
   List getEncodings();
+  
+  void removeHL7ElementComponent(Integer componentId);
+  
+  void removeHL7Element(Integer elementId);
+  
+  void removeHL7Segment(Integer segmentId);
 }

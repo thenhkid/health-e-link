@@ -45,8 +45,8 @@ Wishlist / down the road -
 10. Does it make sense to split the admin configuration into two (Referrals & Other), where other wouldnt rely on the 6 buckets for the templates
 11. ** DONE (CHAD ON 6/4/14) ** prompt user when the same reportable fields are selected or give user better error message when reportable fields selected for display are the same	
 12. ** DONE (CHAD ON 6/4/14) ** Be able to import save to table / columns in the template also.
-13. Be able to delete segments, elements and components when customizing an HL7 configuration
+13. ** DONE (CHAD ON 7/3/2014) ** Be able to delete segments, elements and components when customizing an HL7 configuration
 14 a. Update the template insert code to accept R, O or D in the required field. R = Required, O = Optional and D = Default
 14 b. Update the code so that if D is set in the required field box it pulls default values (Populate from table) in the set up
 14 c. Update all configuration forms that have required as a checkbox to be a drop down R, O and D
-15. Allow a Min Admin account that can only see the processing activity screen
+15. ** DONE (CHAD ON 7/3/2014) ** Allow a Min Admin account that can only see the processing activity screen

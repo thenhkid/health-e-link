@@ -2215,5 +2215,46 @@ public class adminConfigController {
         return mav;
     }
     
+    /**
+     * The '/removeElementComponent.do' function will remove the selected HL7 element component
+     * 
+     * @param   componentId   The selected id of the element component
+     * 
+    */
+    @RequestMapping(value= "/removeElementComponent.do", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody Integer removeElementComponent(@RequestParam(value = "componentId", required = true) int componentId) {
+        
+        configurationmanager.removeHL7ElementComponent(componentId);
+        
+        return 1;
+    } 
+    
+    /**
+     * The '/removeElement.do' function will remove the selected HL7 element
+     * 
+     * @param   componentId   The selected id of the element
+     * 
+    */
+    @RequestMapping(value= "/removeElement.do", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody Integer removeElement(@RequestParam(value = "elementId", required = true) int elementId) {
+        
+        configurationmanager.removeHL7Element(elementId);
+        
+        return 1;
+    } 
+    
+    /**
+     * The '/removeSegment.do' function will remove the selected HL7 segment
+     * 
+     * @param   segmentId   The selected id of the segment
+     * 
+    */
+    @RequestMapping(value= "/removeSegment.do", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody Integer removeSegment(@RequestParam(value = "segmentId", required = true) int segmentId) {
+        
+        configurationmanager.removeHL7Segment(segmentId);
+        
+        return 1;
+    } 
     
 }

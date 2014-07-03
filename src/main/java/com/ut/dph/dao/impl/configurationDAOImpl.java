@@ -205,7 +205,6 @@ public class configurationDAOImpl implements configurationDAO {
         return query.list();
     }
 
-
     /**
      * The 'totalConfigs' function will return the total number of active configurations in the system. This will be used for pagination when viewing the list of configurations
      *
@@ -333,12 +332,12 @@ public class configurationDAOImpl implements configurationDAO {
 
         return fieldName;
     }
-    
+
     /**
      * The 'deleteDataTranslations' function will remove all data translations for the passed in configuration / transport method.
      *
      * @param	configId	The id of the configuration to remove associated translations
-     * @param   categoryId      The id of the category
+     * @param categoryId The id of the category
      * @param	transportMethod	The transport method for the configuration
      *
      */
@@ -362,7 +361,7 @@ public class configurationDAOImpl implements configurationDAO {
     public void saveDataTranslations(configurationDataTranslations translations) {
         sessionFactory.getCurrentSession().save(translations);
     }
-    
+
     /**
      * The 'getMacrosByCategory' function will return a list of available Pre and Post macros.
      *
@@ -373,9 +372,9 @@ public class configurationDAOImpl implements configurationDAO {
     public List<Macros> getMacrosByCategory(int categoryId) {
         Query query = sessionFactory.getCurrentSession().createQuery("from Macros where categoryId = :categoryId order by macro_short_name asc");
         query.setParameter("categoryId", categoryId);
-        
+
         List<Macros> macros = query.list();
-        
+
         return macros;
     }
 
@@ -420,7 +419,7 @@ public class configurationDAOImpl implements configurationDAO {
         List<configurationConnection> connections = query.list();
         return connections;
     }
-    
+
     /**
      * The 'getLatestConnections' function will return the list of configuration connections in the system.
      *
@@ -435,14 +434,13 @@ public class configurationDAOImpl implements configurationDAO {
     @Transactional
     public List<configurationConnection> getLatestConnections(int maxResults) {
         Query query = sessionFactory.getCurrentSession().createQuery("from configurationConnection order by dateCreated desc");
-        
+
         //Set the max results to display
         query.setMaxResults(maxResults);
 
         List<configurationConnection> connections = query.list();
         return connections;
     }
-    
 
     /**
      * The 'getConnectionsByConfiguration' will return a list of target connections for a passed in configuration;
@@ -461,7 +459,7 @@ public class configurationDAOImpl implements configurationDAO {
         List<configurationConnection> connections = query.list();
         return connections;
     }
-    
+
     /**
      * The 'getConnectionsByTargetConfiguration' will return a list of target connections for a passed in configuration;
      *
@@ -628,14 +626,13 @@ public class configurationDAOImpl implements configurationDAO {
     public configurationSchedules getScheduleDetails(int configId) {
         Query query = sessionFactory.getCurrentSession().createQuery("from configurationSchedules where configId = :configId");
         query.setParameter("configId", configId);
-        
-        if(query.uniqueResult() == null) {
+
+        if (query.uniqueResult() == null) {
             return null;
-        }
-        else {
+        } else {
             configurationSchedules scheduleDetails = (configurationSchedules) query.uniqueResult();
 
-            return scheduleDetails; 
+            return scheduleDetails;
         }
 
     }
@@ -676,7 +673,7 @@ public class configurationDAOImpl implements configurationDAO {
      */
     @Override
     public void updateMessageSpecs(configurationMessageSpecs messageSpecs, int transportDetailId, int clearFields) {
-       
+
         //if clearFields == 1 then we need to clear out the configuration form fields, mappings and data
         //translations. This will allow the admin to change the configuration transport method after
         //one was previously selected. This will only be available while the configuration is not active.
@@ -769,7 +766,7 @@ public class configurationDAOImpl implements configurationDAO {
         return criteria.list();
 
     }
-   
+
     @Override
     @Transactional
     @SuppressWarnings("unchecked")
@@ -804,7 +801,7 @@ public class configurationDAOImpl implements configurationDAO {
             return null;
         }
     }
-    
+
     /**
      * The 'getHL7Details' function will the HL7 details for the passed in configuration.
      *
@@ -889,8 +886,8 @@ public class configurationDAOImpl implements configurationDAO {
     @Override
     @Transactional
     public void updateHL7Details(HL7Details details) {
-       sessionFactory.getCurrentSession().update(details);
-        
+        sessionFactory.getCurrentSession().update(details);
+
     }
 
     /**
@@ -925,7 +922,7 @@ public class configurationDAOImpl implements configurationDAO {
     public void updateHL7ElementComponent(HL7ElementComponents component) {
         sessionFactory.getCurrentSession().update(component);
     }
-    
+
     /**
      * The 'saveHL7Details' function will save the new HL7 Segment
      *
@@ -999,8 +996,8 @@ public class configurationDAOImpl implements configurationDAO {
             return null;
         }
     }
-	
-	/**
+
+    /**
      * The 'getEncodings' function will return a list of available encodings
      *
      */
@@ -1008,14 +1005,49 @@ public class configurationDAOImpl implements configurationDAO {
     @Override
     @Transactional
     public List getEncodings() {
-    	try {
-    		Query query = sessionFactory.getCurrentSession().createSQLQuery("select id, encoding from ref_encoding order by id asc");
-    		return query.list();
-    	} catch (Exception ex) {
-    		ex.printStackTrace();
-    		System.err.println("getEncodings - " + ex.getCause());
-    		return null;
-    	}
+        try {
+            Query query = sessionFactory.getCurrentSession().createSQLQuery("select id, encoding from ref_encoding order by id asc");
+            return query.list();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.err.println("getEncodings - " + ex.getCause());
+            return null;
+        }
+    }
+
+    @Override
+    @Transactional
+    public void removeHL7ElementComponent(Integer componentId) {
+        Query deleteComponent = sessionFactory.getCurrentSession().createQuery("delete from HL7ElementComponents where id = :componentId");
+        deleteComponent.setParameter("componentId", componentId);
+        deleteComponent.executeUpdate();
     }
     
+    @Override
+    @Transactional
+    public void removeHL7Element(Integer elementId) {
+        Query deleteComponents = sessionFactory.getCurrentSession().createQuery("delete from HL7ElementComponents where elementId = :elementId");
+        deleteComponents.setParameter("elementId", elementId);
+        deleteComponents.executeUpdate();
+        
+        Query deleteElement = sessionFactory.getCurrentSession().createQuery("delete from HL7Elements where id = :elementId");
+        deleteElement.setParameter("elementId", elementId);
+        deleteElement.executeUpdate();
+    }
+    
+    @Override
+    @Transactional
+    public void removeHL7Segment(Integer segmentId) {
+        Query deleteComponents = sessionFactory.getCurrentSession().createSQLQuery("delete from configurationhl7elementvalues where elementId in (select id from configurationhl7elements where segmentId = :segmentId)");
+        deleteComponents.setParameter("segmentId", segmentId);
+        deleteComponents.executeUpdate();
+        
+        Query deleteElement = sessionFactory.getCurrentSession().createQuery("delete from HL7Elements where segmentId = :segmentId");
+        deleteElement.setParameter("segmentId", segmentId);
+        deleteElement.executeUpdate();
+        
+        Query deleteSegment = sessionFactory.getCurrentSession().createQuery("delete from HL7Segments where id = :segmentId");
+        deleteSegment.setParameter("segmentId", segmentId);
+        deleteSegment.executeUpdate();
+    }
 }

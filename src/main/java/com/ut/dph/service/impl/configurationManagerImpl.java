@@ -550,4 +550,19 @@ public class configurationManagerImpl implements configurationManager {
     public List getEncodings() {
         return configurationDAO.getEncodings();
     }
+    
+    @Override
+    public void removeHL7ElementComponent(Integer componentId) {
+        configurationDAO.removeHL7ElementComponent(componentId);
+    }
+    
+    @Override
+    public void removeHL7Element(Integer elementId) {
+        configurationDAO.removeHL7Element(elementId);
+    }
+    
+    @Override
+     public void removeHL7Segment(Integer segmentId) {
+         configurationDAO.removeHL7Segment(segmentId);
+     }
 }

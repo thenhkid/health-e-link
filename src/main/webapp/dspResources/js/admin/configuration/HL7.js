@@ -200,6 +200,64 @@ require(['./main'], function() {
                 }
             }
         });
+        
+        //Function to delete the selected component
+        $('.deleteComponent').click(function() {
+            var componentId = $(this).attr("rel");
+
+            var confirmed = confirm("Are you sure you want to remove this element compent?");
+            
+            if(confirmed) {
+
+                $.ajax({
+                    url: 'removeElementComponent.do',
+                    type: "POST",
+                    data: {'componentId': componentId},
+                    success: function(data) {
+                        $("#componentrow_"+componentId).remove();
+                    }
+                });
+            }
+
+        });
+        
+        //Function to delete the selected element
+        $('.deleteElement').click(function() {
+            var elementId = $(this).attr("rel");
+
+            var confirmed = confirm("Are you sure you want to remove this element?");
+            
+            if(confirmed) {
+                $.ajax({
+                    url: 'removeElement.do',
+                    type: "POST",
+                    data: {'elementId': elementId},
+                    success: function(data) {
+                        $("#elementrow_"+elementId).remove();
+                    }
+                });
+            }
+
+        });
+        
+        //Function to delete the selected segment
+        $('.deleteSegment').click(function() {
+            var segmentId = $(this).attr("rel");
+
+            var confirmed = confirm("Are you sure you want to remove this segment?");
+            
+            if(confirmed) {
+                $.ajax({
+                    url: 'removeSegment.do',
+                    type: "POST",
+                    data: {'segmentId': segmentId},
+                    success: function(data) {
+                        $("#segmentrow_"+segmentId).remove();
+                    }
+                });
+            }
+
+        });
 
     });
 

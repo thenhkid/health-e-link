@@ -92,10 +92,11 @@
                         <input type="hidden" name="HL7Segments[${segment.index}].id" value="${segments.id}" />
                         <input type="hidden" name="HL7Segments[${segment.index}].hl7Id" value="${segments.hl7Id}" />
                         <input type="hidden" class="segmentPos" name="HL7Segments[${segment.index}].displayPos" value="${segments.displayPos}" />
-                        <section class="panel panel-default">
+                        <section class="panel panel-default"  id="segmentrow_${segments.id}">
                             <div class="panel-heading">
                                 <div class="pull-right">
                                     <a href="#newSegmentElement" data-toggle="modal" rel="${segments.hl7Id}" rel2="${segments.id}" class="btn btn-primary btn-xs btn-action addNewElement" title="Add new Element">Add New Element</a>
+                                    <a href="javascript:void(0);" rel="${segments.id}" class="btn btn-primary btn-xs btn-action deleteSegment" title="Delete Segment">Delete Segment</a>
                                 </div>
                                 <h3 class="panel-title">
                                     <a data-toggle="collapse" href="#collapse-${segments.id}">
@@ -118,10 +119,11 @@
                                         <input type="hidden" name="HL7Segments[${segment.index}].HL7Elements[${element.index}].hl7Id" value="${elements.hl7Id}" />
                                         <input type="hidden" name="HL7Segments[${segment.index}].HL7Elements[${element.index}].segmentId" value="${elements.segmentId}" />
                                         <input type="hidden" class="displayPos_${elements.segmentId}" name="HL7Segments[${segment.index}].HL7Elements[${element.index}].displayPos" value="${elements.displayPos}" />
-                                        <section class="panel panel-default">
+                                        <section class="panel panel-default" id="elementrow_${elements.id}">
                                             <div class="panel-heading" style="background-color: lightgoldenrodyellow">
                                                 <div class="pull-right">
                                                     <a href="#newSegmentElement" data-toggle="modal" rel="${elements.id}" class="btn btn-primary btn-xs btn-action addNewComponent" title="Add new Component">Add New Component</a>
+                                                    <a href="javascript:void(0);" rel="${elements.id}" class="btn btn-primary btn-xs btn-action deleteElement" title="Delete Element">Delete Element</a>
                                                 </div>
                                                 <h3 class="panel-title"><strong>Element ${elements.displayPos}</strong></h3>
                                             </div>
@@ -149,7 +151,7 @@
                                                         <input type="hidden" name="HL7Segments[${segment.index}].HL7Elements[${element.index}].elementComponents[${component.index}].elementId" value="${elementComponents.elementId}" />
                                                         <input type="hidden" class="displayPos_${elementComponents.elementId}" name="HL7Segments[${segment.index}].HL7Elements[${element.index}].elementComponents[${component.index}].displayPos" value="${elementComponents.displayPos}" />
                                                         <div class="form-container scrollable">
-                                                            <div class="row">
+                                                            <div class="row" id="componentrow_${elementComponents.id}">
                                                                 <div class="form-group col-md-6">
                                                                     <label class="control-label" for="fieldDescriptor">Descriptor</label>
                                                                     <input type="text" id="fieldDescriptor" name="HL7Segments[${segment.index}].HL7Elements[${element.index}].elementComponents[${component.index}].fieldDescriptor" value="${elementComponents.fieldDescriptor}" maxLength="255" class="form-control fieldLabel" />
@@ -186,6 +188,8 @@
                                                                                 <option value="${fields[fStatus.index].fieldNo}" <c:if test="${fields[fStatus.index].fieldNo == elementComponents.fieldValue}">selected</c:if>>${fields[fStatus.index].fieldLabel} </option>
                                                                             </c:forEach>
                                                                     </select>
+                                                                    <br />
+                                                                    <a href="javascript:void(0);" rel="${elementComponents.id}" class="btn btn-primary btn-xs btn-action deleteComponent" title="Delete Component">Delete Component</a>
                                                                 </div>
                                                                 <div class="form-group col-md-6">
                                                                     <label class="control-label" for="fieldAppendText">Append Text</label>
@@ -201,8 +205,6 @@
 
                                 </div>
                             </div>
-
-
                         </section>
                     </c:forEach>
                 </form:form>
