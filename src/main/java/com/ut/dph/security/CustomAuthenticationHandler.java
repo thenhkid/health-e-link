@@ -37,17 +37,25 @@ public class CustomAuthenticationHandler extends SimpleUrlAuthenticationSuccessH
 
         usermanager.setLastLogin(authentication.getName());
 
-        if (roles.contains("ROLE_ADMIN")) {
+        if (roles.contains("ROLE_ADMIN") || roles.contains("ROLE_PROCESSINGADMIN")) {
             
-             HttpSession session = request.getSession();
+            HttpSession session = request.getSession();
              
-              searchParameters searchParameters = new searchParameters();
+            searchParameters searchParameters = new searchParameters();
             
             /* Need to store the search session object */
             session.setAttribute("searchParameters", searchParameters);
             
+            /* Need to get the userId */
+            User userDetails = usermanager.getUserByUserName(authentication.getName());
+            
+            /* Need to store the user object in session */
+            session.setAttribute("userDetails", userDetails);
+            
             getRedirectStrategy().sendRedirect(request, response, adminTargetUrl);
-        } else if (roles.contains("ROLE_USER")) {
+        } 
+        
+        else if (roles.contains("ROLE_USER")) {
             /* Need to get the userId */
             User userDetails = usermanager.getUserByUserName(authentication.getName());
             
