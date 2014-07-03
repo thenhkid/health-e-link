@@ -743,7 +743,7 @@ public class transactionInManagerImpl implements transactionInManager {
                     try {
                         processBatch(batch.getId(), false, 0);
                     } catch (Exception ex) {
-                        setBatchToError(batch.getId(), ("Errored at processBatches  " + ex.getCause()));
+                        setBatchToError(batch.getId(), ("Errored at processBatches  " + ex.toString()));
                         ex.printStackTrace();
                     }
                 }
@@ -1043,7 +1043,7 @@ public class transactionInManagerImpl implements transactionInManager {
             return 0;
         } catch (Exception ex) {
             ex.printStackTrace();
-            insertProcessingError(processingSysErrorId, cff.getconfigId(), batchUploadId, cff.getFieldNo(), null, null, validationTypeId, false, false, (ex.getClass() + " " + ex.getCause()));
+            insertProcessingError(processingSysErrorId, cff.getconfigId(), batchUploadId, cff.getFieldNo(), null, null, validationTypeId, false, false, (ex.getClass() + " " + ex.toString()));
             return 1;
         }
 
@@ -1092,7 +1092,7 @@ public class transactionInManagerImpl implements transactionInManager {
              return 0;
         } catch (Exception ex) {
             ex.printStackTrace();
-            insertProcessingError(processingSysErrorId, cff.getconfigId(), batchUploadId, cff.getFieldNo(), null, null, validationTypeId, false, false, (ex.getClass() + " " + ex.getCause()));
+            insertProcessingError(processingSysErrorId, cff.getconfigId(), batchUploadId, cff.getFieldNo(), null, null, validationTypeId, false, false, (ex.getClass() + " " + ex.toString()));
             return 1;
         }
 
@@ -1207,7 +1207,12 @@ public class transactionInManagerImpl implements transactionInManager {
         //this checks convert long date such February 2, 2014
         try {
             date = java.text.DateFormat.getDateInstance().parse(dateValue);
+            /** this method converts February 29 to March 1, 
+             *  we need to run through check two to make sure it is valid 
+             *  **/
+            
         } catch (Exception e) {
+        	
         }
         return date;
     }
@@ -1865,7 +1870,7 @@ public class transactionInManagerImpl implements transactionInManager {
             sysErrors = sysErrors + updateInvalidConfigStatus(batchId);
         } catch (Exception ex) {
             ex.printStackTrace();
-            System.err.println("flagInvalidConfig " + ex.getCause());
+            System.err.println("flagInvalidConfig " + ex.toString());
             sysErrors++;
         }
         return sysErrors;
@@ -1960,7 +1965,7 @@ public class transactionInManagerImpl implements transactionInManager {
             return sysError;
         } catch (Exception ex) {
             ex.printStackTrace();
-            System.err.println("newEntryForMultiTargets " + ex.getCause());
+            System.err.println("newEntryForMultiTargets " + ex.toString());
             return 1;
         }
     }
@@ -2241,7 +2246,7 @@ public class transactionInManagerImpl implements transactionInManager {
 
         } catch (Exception ex) {
             ex.printStackTrace();
-            System.err.println("populateErrorList " + ex.getCause());
+            System.err.println("populateErrorList " + ex.toString());
         }
 
         return tedDisplayList;
@@ -2314,7 +2319,7 @@ public class transactionInManagerImpl implements transactionInManager {
 
         } catch (Exception ex) {
             ex.printStackTrace();
-            System.err.println("getTransErrorDetails " + ex.getCause());
+            System.err.println("getTransErrorDetails " + ex.toString());
             return null;
         }
     }
@@ -2333,7 +2338,7 @@ public class transactionInManagerImpl implements transactionInManager {
             sysErrors = sysErrors + transactionInDAO.updateStatusByErrorCode(batch.getId(), 11, 11);
         } catch (Exception ex) {
             ex.printStackTrace();
-            System.err.println("flagNoPermissionConfig " + ex.getCause());
+            System.err.println("flagNoPermissionConfig " + ex.toString());
             sysErrors++;
         }
         return sysErrors;
@@ -2355,7 +2360,7 @@ public class transactionInManagerImpl implements transactionInManager {
             }
         } catch (Exception ex) {
             ex.printStackTrace();
-            System.err.println("checkPermissionForBatch " + ex.getCause());
+            System.err.println("checkPermissionForBatch " + ex.toString());
         }
         return hasPermission;
     }
@@ -2397,7 +2402,7 @@ public class transactionInManagerImpl implements transactionInManager {
             }
         } catch (Exception ex) {
             ex.printStackTrace();
-            System.err.println("populateBatchInfo " + ex.getCause());
+            System.err.println("populateBatchInfo " + ex.toString());
         }
         return uploadedBatches;
     }
@@ -2486,9 +2491,9 @@ public class transactionInManagerImpl implements transactionInManager {
             // if there are no errors, we release the folder path
         } catch (Exception ex) {
             ex.printStackTrace();
-            System.err.println("moveSFTPFilesJob " + ex.getCause());
+            System.err.println("moveSFTPFilesJob " + ex.toString());
             try {
-            sendEmailToAdmin(Arrays.toString(ex.getStackTrace()), "Rhapsody Job Error - moveSFTPFilesJob");
+            	sendEmailToAdmin((ex.toString()+ "<br/>" + Arrays.toString(ex.getStackTrace())), "SFTP Job Error - main method errored");
             } catch (Exception ex1) {
             	 System.err.println("moveSFTPFilesJob " + Arrays.toString(ex1.getStackTrace()));
             }
@@ -2734,7 +2739,7 @@ public class transactionInManagerImpl implements transactionInManager {
             		exAtFile.printStackTrace();
             		System.err.println("moveFilesByPath " +  exAtFile.toString());
                     try {
-                    	sendEmailToAdmin((exAtFile.toString()+ "<br/>" + Arrays.toString(exAtFile.getStackTrace())), "Rhapsody Job Error - file renamed");
+                    	sendEmailToAdmin((exAtFile.toString()+ "<br/>" + Arrays.toString(exAtFile.getStackTrace())), "moveFilesByPath - at rename file to error ");
                     	//we need to move that file out of the way
                     	file.renameTo((new File(file.getAbsolutePath()+ batchName + "_error")));
                     } catch  (Exception ex1) {
@@ -2750,7 +2755,7 @@ public class transactionInManagerImpl implements transactionInManager {
         } catch (Exception ex) {
             ex.printStackTrace();
             try {
-            	sendEmailToAdmin((ex.toString()+ "<br/>" + Arrays.toString(ex.getStackTrace())), "Rhapsody Job Error - issue with moving files");
+            	sendEmailToAdmin((ex.toString()+ "<br/>" + Arrays.toString(ex.getStackTrace())), "moveFilesByPath - issue with looping folder files");
                 } catch  (Exception ex1) {
                 	ex1.printStackTrace();
                 	System.err.println("moveFilesByPath " +  ex1.getMessage());
@@ -2783,7 +2788,7 @@ public class transactionInManagerImpl implements transactionInManager {
             return fileName;
         } catch (Exception ex) {
             ex.printStackTrace();
-            System.err.println("newBatchName " + ex.getCause());
+            System.err.println("newBatchName " + ex.toString());
             return null;
         }
     }
@@ -2972,11 +2977,12 @@ public class transactionInManagerImpl implements transactionInManager {
             // if there are no errors, we release the folder path
         } catch (Exception ex) {
             ex.printStackTrace();
+            System.err.println("moveRhapsodyFiles " + ex.toString());
             try {
-            	sendEmailToAdmin(Arrays.toString(ex.getStackTrace()), "Rhapsody Job Error");
+            	sendEmailToAdmin((ex.toString()+ "<br/>" + Arrays.toString(ex.getStackTrace())), "Rhapsody Job Error - main method errored");
             } catch  (Exception ex1) {
             	ex1.printStackTrace();
-                System.err.println("moveRhapsodyFiles " + ex1.getCause());
+                System.err.println("moveRhapsodyFiles " + ex1.toString());
             }
             return 1;
         }
@@ -3050,7 +3056,7 @@ public class transactionInManagerImpl implements transactionInManager {
             return error;
         } catch (Exception ex) {
             ex.printStackTrace();
-            System.err.println("processMultiValueCWData " + ex.getCause());
+            System.err.println("processMultiValueCWData " + ex.toString());
             return 1;
 
         }
