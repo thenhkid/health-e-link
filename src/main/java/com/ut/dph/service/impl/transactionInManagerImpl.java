@@ -1132,7 +1132,7 @@ public class transactionInManagerImpl implements transactionInManager {
 
         // define here all date format
         String date = input.replaceAll("/", "-");
-        date = date.replaceAll(".", "-");
+        date = date.replaceAll("\\.", "-");
         //ArrayList<Pattern> patterns = new ArrayList<Pattern>();
         //Pattern pattern1 = Pattern.compile(day + "-" + month + "-" + year + time); //not matching, doesn't work for 01-02-2014 is it jan or feb, will only accept us dates
         Pattern pattern2 = Pattern.compile(year + "-" + month + "-" + day + time);
@@ -1210,9 +1210,10 @@ public class transactionInManagerImpl implements transactionInManager {
             /** this method converts February 29 to March 1, 
              *  we need to run through check two to make sure it is valid 
              *  **/
-            
+            if (!recheckLongDate(dateValue, date.toString())) {
+            	return null;
+            }
         } catch (Exception e) {
-        	
         }
         return date;
     }
@@ -3144,6 +3145,43 @@ public class transactionInManagerImpl implements transactionInManager {
 	@Override
 	public Integer clearBatchDownloads(List<Integer> batchDownloadIDs) {
 		return transactionInDAO.clearBatchDownloads(batchDownloadIDs);
+	}
+
+	@Override
+	public boolean recheckLongDate(String longDateVal, String convertedDate) {
+		try  {
+			longDateVal = longDateVal.toLowerCase();
+			convertedDate = convertedDate.toLowerCase();
+			if (longDateVal.contains("jan") && convertedDate.contains("jan")) {
+				return true;
+			} else if (longDateVal.contains("feb") && convertedDate.contains("feb")) {
+				return true;
+			} else if (longDateVal.contains("mar") && convertedDate.contains("mar")) {
+				return true;
+			} else if (longDateVal.contains("apr") && convertedDate.contains("apr")) {
+				return true;
+			} else if (longDateVal.contains("may") && convertedDate.contains("may")) {
+				return true;
+			} else if (longDateVal.contains("jun") && convertedDate.contains("jun")) {
+				return true;
+			} else if (longDateVal.contains("jul") && convertedDate.contains("jul")) {
+				return true;
+			} else if (longDateVal.contains("aug") && convertedDate.contains("aug")) {
+				return true;
+			} else if (longDateVal.contains("sep") && convertedDate.contains("sep")) {
+				return true;
+			} else if (longDateVal.contains("oct") && convertedDate.contains("oct")) {
+				return true;
+			} else if (longDateVal.contains("nov") && convertedDate.contains("nov")) {
+				return true;
+			} else if (longDateVal.contains("dec") && convertedDate.contains("dec")) {
+				return true;
+			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			return false;
+		}
+		return false;
 	}
 
 }
