@@ -835,7 +835,6 @@ public class HealtheWebController {
                 targetConfigIds.add(connectionDetails.gettargetConfigId());
             }
 
-
             /* Get a list of form fields */
             configurationTransport transportDetails = configurationTransportManager.getTransportDetailsByTransportMethod(configId, 2);
 
@@ -871,10 +870,9 @@ public class HealtheWebController {
                     } catch (Exception e) {
                         sourceOrgAsInt = 0;
                     }
-                   System.out.println("sourceOrgAsInt: " + sourceOrgAsInt);
+                   
                     if ("".equals(fromFields.get(0).getFieldValue()) || fromFields.get(0).getFieldValue() == null || sourceOrgAsInt == transactionOutManager.getDownloadSummaryDetails(transactionDetails.getId()).getsourceOrgId()) {
                         fromFields = setInboxFormFields(senderInfoFormFields, records, configId, false, transactionDetails.gettransactionInId(), transactionOutManager.getDownloadSummaryDetails(transactionDetails.getId()).getsourceOrgId());
-                         System.out.println("fromFields.get(0).getFieldValue(): " + fromFields.get(0).getFieldValue());
                     }
                 } else {
                     fromFields = setInboxFormFields(senderInfoFormFields, records, configId, false, transactionDetails.gettransactionInId(), transactionOutManager.getDownloadSummaryDetails(transactionDetails.getId()).getsourceOrgId());
