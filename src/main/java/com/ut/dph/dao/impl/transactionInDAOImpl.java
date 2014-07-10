@@ -40,6 +40,7 @@ import com.ut.dph.model.messagePatients;
 import com.ut.dph.model.messageType;
 import com.ut.dph.service.sysAdminManager;
 import com.ut.dph.service.userManager;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -49,6 +50,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
@@ -4657,24 +4659,27 @@ public class transactionInDAOImpl implements transactionInDAO {
 
     @Override
     @Transactional
+    @SuppressWarnings("unchecked")
     public List<UserActivity> getBatchUserActivities(batchUploads batchInfo, boolean foroutboundProcessing) {
         String batchColName = "batchUploadId";
         if (foroutboundProcessing) {
             batchColName = "batchDownloadId";
         }
 
-        String sql = "select organizations.id as orgId, organizations.orgName as orgName, users.firstName as userFirstName, "
-                + "users.lastName as userLastName, userActivity.* "
-                + " from userActivity, users, organizations where users.id = userActivity.userId "
-                + " and users.orgId = organizations.id and " + batchColName + " = :batchId order by dateCreated desc, userId;";
-
+        String sql = " select  users.firstName as userFirstName, organizations.orgname as orgName, "
+        		+ " organizations.id as orgId, users.lastName as userLastName, userActivity.* "
+        		+ " from useractivity left join users on users.id = userActivity.userId left join organizations on"
+        		+ " users.orgId = organizations.id where " + batchColName +  "= :batchId order by dateCreated desc, userId";
+        
+        
         try {
             Query query = sessionFactory
                     .getCurrentSession()
                     .createSQLQuery(sql).setResultTransformer(Transformers.aliasToBean(UserActivity.class));
 
             query.setParameter("batchId", batchInfo.getId());
-            List<UserActivity> uas = query.list();
+            
+			List<UserActivity> uas = query.list();
 
             return uas;
 

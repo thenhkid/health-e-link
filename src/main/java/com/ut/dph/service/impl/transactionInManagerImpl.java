@@ -498,7 +498,24 @@ public class transactionInManagerImpl implements transactionInManager {
             insertTargets = true;
         }
         if ((batch.getstatusId() == 3 || batch.getstatusId() == 6 || batch.getstatusId() == 36)) {
-            // set batch to SBP - 4*
+        	/** insert log**/ 
+            try {
+            	 //log user activity
+                UserActivity ua = new UserActivity();
+                ua.setUserId(0);
+                ua.setFeatureId(0);
+                ua.setAccessMethod("System");
+                ua.setActivity("System Processed File");
+                ua.setBatchUploadId(batchUploadId);
+                ua.setTransactionInIds(transactionId.toString());
+                usermanager.insertUserLog(ua);
+            	
+            } catch (Exception ex) {
+            	ex.printStackTrace();
+            	System.err.println("transactionId - insert user log" +  ex.toString());
+            }
+        	
+        	// set batch to SBP - 4*
             updateBatchStatus(batchUploadId, 4, "startDateTime");
 
             //clear transactionInError table for batch, if do not clear errors is true, we skip this.
@@ -1506,6 +1523,22 @@ public class transactionInManagerImpl implements transactionInManager {
         List<Integer> errorStatusIds = Arrays.asList(11, 13, 14, 16);
         String processFolderPath = "/bowlink/loadFiles/";
         try {
+        	
+        	/** insert log**/ 
+            try {
+            	 //log user activity
+                UserActivity ua = new UserActivity();
+                ua.setUserId(0);
+                ua.setFeatureId(0);
+                ua.setAccessMethod("System");
+                ua.setActivity("System Loaded Batch");
+                ua.setBatchUploadId(batchId);
+                usermanager.insertUserLog(ua);
+            	
+            } catch (Exception ex) {
+            	ex.printStackTrace();
+            	System.err.println("loadBatch - insert user log" +  ex.toString());
+            }
             //first thing we do is get details, then we set it to  4
             batchUploads batch = getBatchDetails(batchId);
             // set batch to SBL - 38
@@ -2508,8 +2541,7 @@ public class transactionInManagerImpl implements transactionInManager {
         Integer sysErrors = 0;
 
         try {
-
-            fileSystem fileSystem = new fileSystem();
+        	fileSystem fileSystem = new fileSystem();
             String fileInPath = fileSystem.setPathFromRoot(inPath);
             File folder = new File(fileInPath);
 
@@ -2696,7 +2728,21 @@ public class transactionInManagerImpl implements transactionInManager {
 		                        }
 		                    }
 		                }
-		
+		                /** insert log**/ 
+		                try {
+		                	 //log user activity
+		                    UserActivity ua = new UserActivity();
+		                    ua.setUserId(0);
+		                    ua.setFeatureId(0);
+		                    ua.setAccessMethod("System");
+		                    ua.setActivity("System Uploaded File");
+		                    ua.setBatchUploadId(batchInfo.getId());
+		                    usermanager.insertUserLog(ua);
+		                	
+		                } catch (Exception ex) {
+		                	ex.printStackTrace();
+		                	System.err.println("moveFilesByPath - insert user log" +  ex.toString());
+		                }
 		                //we encoded user's file if it is not
 		                File newFile = new File(outPath + newFileName);
 		                // now we move file
