@@ -81,8 +81,8 @@ public class Organization {
     @Column(name = "CLEANURL", nullable = false)
     private String cleanURL;
     
-    @Column(name = "CCDJarTemplate", nullable = true)
-    private String CCDJarTemplate = null;
+    @Column(name = "parsingTemplate", nullable = true)
+    private String parsingTemplate = null;
 
     public int getId() {
         return id;
@@ -188,12 +188,12 @@ public class Organization {
         this.cleanURL = cleanURL;
     }
     
-    public String getCCDJarTemplate() {
-        return CCDJarTemplate;
+    public String getparsingTemplate() {
+        return parsingTemplate;
     }
 
-    public void setCCDJarTemplate(String CCDJarTemplate) {
-        this.CCDJarTemplate = CCDJarTemplate;
+    public void setparsingTemplate(String parsingTemplate) {
+        this.parsingTemplate = parsingTemplate;
     }
     
     public CommonsMultipartFile getFile() {

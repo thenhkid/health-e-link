@@ -3,3 +3,7 @@
 UPDATE `universaltranslator`.`userroles` SET `role`='ROLE_PROCESSINGADMIN' WHERE `id`='3';
 
 INSERT INTO `universaltranslator`.`users` (`status`, `orgId`, `firstName`, `lastName`, `username`, `password`, `roleId`, `mainContact`, `sendEmailAlert`, `email`, `userType`, `deliverAuthority`, `editAuthority`, `createAuthority`, `cancelAuthority`) VALUES (1, '1', 'Alice', 'Byrd', 'abyrd', 'abyrd', '3', '1', 0, 'alice.byrd@state.ma.us', '1', 0, 0, 0, 0);
+
+/** Chad 7.9.2014 @ 8:46 PM **/
+ALTER TABLE `universaltranslator`.`organizations` 
+CHANGE COLUMN `CCDJarTemplate` `parsingTemplate` VARCHAR(45) NULL DEFAULT NULL ;

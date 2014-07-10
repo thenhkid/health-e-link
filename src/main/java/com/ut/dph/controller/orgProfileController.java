@@ -112,7 +112,7 @@ public class orgProfileController {
         }
 
         Organization currentOrg = organizationManager.getOrganizationById(organization.getId());
-        organization.setCCDJarTemplate(currentOrg.getCCDJarTemplate());
+        organization.setparsingTemplate(currentOrg.getparsingTemplate());
 
         if (!currentOrg.getcleanURL().trim().equals(organization.getcleanURL().trim())) {
             List<Organization> existing = organizationManager.getOrganizationByName(organization.getcleanURL());

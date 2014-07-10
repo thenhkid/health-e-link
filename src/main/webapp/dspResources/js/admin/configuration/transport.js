@@ -114,7 +114,6 @@ require(['./main'], function () {
            
            var fileType = $(this).val();
            $('#fileDelimiterDiv').show();
-           $('#CCDJarTemplateDiv').hide();
            
            if(fileType == 2) {
               $('#fileExt').val('txt'); 

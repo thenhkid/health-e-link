@@ -1648,7 +1648,8 @@ public class transactionInManagerImpl implements transactionInManager {
                      a pipe-delimited text file.
                      */
                 } else if (processFileName.endsWith(".hr")) {
-                    newfilename = hl7toTxt.TranslateHl7toTxt(decodedFilePath, decodedFileName);
+                   
+                    newfilename = hl7toTxt.TranslateHl7toTxt(decodedFilePath, decodedFileName, batch.getOrgId());
                     actualFileName = (decodedFilePath + newfilename);
                     //we remove temp load file 
                     File tempLoadFile = new File(decodedFilePath + processFileName);

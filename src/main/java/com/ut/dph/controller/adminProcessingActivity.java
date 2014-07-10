@@ -1088,7 +1088,9 @@ public class adminProcessingActivity {
                 transaction.setdetailFields(detailFields);
                 
                 if(transportDetails.getfileType() == 4) {
-                    mav.setViewName("/administrator/processing-activities/HL7messageDetails");
+                    /* No longer need this */
+                    //mav.setViewName("/administrator/processing-activities/HL7messageDetails");
+                    mav.setViewName("/administrator/processing-activities/messageDetails");
                 }
                 else {
                     mav.setViewName("/administrator/processing-activities/messageDetails");

@@ -36,7 +36,7 @@ public class CCDtoTxt {
 
         dir.setDir(orgDetails.getcleanURL(), "templates");
         
-        String templatefileName = orgDetails.getCCDJarTemplate();
+        String templatefileName = orgDetails.getparsingTemplate();
         
         URLClassLoader loader = new URLClassLoader(new URL[]{new URL("file://" + dir.getDir() + templatefileName)});
 
@@ -65,8 +65,8 @@ public class CCDtoTxt {
                 if (newFile.exists()) {
                     int i = 1;
                     while (newFile.exists()) {
-                        int iDot = ccdFileName.lastIndexOf(".");
-                        newFile = new File(dir.getDir() + ccdFileName.substring(0, iDot) + "_(" + ++i + ")" + ccdFileName.substring(iDot));
+                        int iDot = newfileName.lastIndexOf(".");
+                        newFile = new File(dir.getDir() + newfileName.substring(0, iDot) + "_(" + ++i + ")" + newfileName.substring(iDot));
                     }
                     newfileName = newFile.getName();
                     newFile.createNewFile();

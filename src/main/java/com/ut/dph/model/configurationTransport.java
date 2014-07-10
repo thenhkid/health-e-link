@@ -14,16 +14,16 @@ import javax.persistence.Transient;
 @Entity
 @Table(name = "CONFIGURATIONTRANSPORTDETAILS")
 public class configurationTransport {
-
+    
     @Transient
     private List<configurationFormFields> fields = null;
 
     @Transient
     private List<configurationFTPFields> FTPfields = null;
-    
+
     @Transient
     private List<configurationRhapsodyFields> rhapsodyFields = null;
-    
+
     @Transient
     private String delimChar = null;
 
@@ -32,7 +32,7 @@ public class configurationTransport {
 
     @Transient
     private List<Integer> messageTypes = null;
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID", nullable = false)
@@ -84,10 +84,10 @@ public class configurationTransport {
     @NoHtml
     @Column(name = "FILEEXT", nullable = false)
     private String fileExt = null;
-    
+
     @Column(name = "encodingId", nullable = false)
     private int encodingId = 1;
-    
+
     public int getId() {
         return id;
     }
@@ -247,29 +247,29 @@ public class configurationTransport {
     public void setContainsHeaderRow(boolean containsHeaderRow) {
         this.containsHeaderRow = containsHeaderRow;
     }
-    
+
     public String getfileExt() {
         return fileExt;
     }
-    
+
     public void setfileExt(String fileExt) {
         this.fileExt = fileExt;
     }
 
-	public int getEncodingId() {
-		return encodingId;
-	}
+    public int getEncodingId() {
+        return encodingId;
+    }
 
-	public void setEncodingId(int encodingId) {
-		this.encodingId = encodingId;
-	}
+    public void setEncodingId(int encodingId) {
+        this.encodingId = encodingId;
+    }
 
-	public List<configurationRhapsodyFields> getRhapsodyFields() {
-		return rhapsodyFields;
-	}
+    public List<configurationRhapsodyFields> getRhapsodyFields() {
+        return rhapsodyFields;
+    }
 
-	public void setRhapsodyFields(List<configurationRhapsodyFields> rhapsodyFields) {
-		this.rhapsodyFields = rhapsodyFields;
-	}
+    public void setRhapsodyFields(List<configurationRhapsodyFields> rhapsodyFields) {
+        this.rhapsodyFields = rhapsodyFields;
+    }
 
 }
