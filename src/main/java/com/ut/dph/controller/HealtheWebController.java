@@ -827,8 +827,6 @@ public class HealtheWebController {
             Organization receivingOrgDetails = organizationmanager.getOrganizationById(configDetails.getorgId());
 
             /* Find out the target configuration id */
-            System.out.println("ConfigID: " + configId);
-            System.out.println("orgId: " + origConfigDetails.getorgId());
             List<Integer> targetConnectionIds = transactionInManager.getFeedbackReportConnection(configId, origConfigDetails.getorgId());
 
             List<Integer> targetConfigIds = new ArrayList<Integer>();
@@ -858,17 +856,34 @@ public class HealtheWebController {
             transaction.setautoRelease(transportDetails.getautoRelease());
             transaction.settargetConfigId(targetConfigIds);
             transaction.setorginialTransactionId(transactionId);
-
+            
             try {
                 List<configurationFormFields> senderInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId, transportDetails.getId(), 1);
-
                 /* Set all the transaction SOURCE ORG fields */
-                List<transactionRecords> fromFields = setInboxFormFields(senderInfoFormFields, records, configId, false, transactionDetails.gettransactionInId());
+                List<transactionRecords> fromFields;
+                if (!senderInfoFormFields.isEmpty()) {
+                    fromFields = setInboxFormFields(senderInfoFormFields, records, configId, false, transactionDetails.gettransactionInId());
+
+                    int sourceOrgAsInt;
+                    
+                    try {
+                        sourceOrgAsInt = Integer.parseInt(fromFields.get(0).getFieldValue().trim());
+                    } catch (Exception e) {
+                        sourceOrgAsInt = 0;
+                    }
+                   
+                    if ("".equals(fromFields.get(0).getFieldValue()) || fromFields.get(0).getFieldValue() == null || sourceOrgAsInt == transactionOutManager.getDownloadSummaryDetails(transactionDetails.getId()).getsourceOrgId()) {
+                        fromFields = setOrgDetails(transactionOutManager.getDownloadSummaryDetails(transactionDetails.getId()).getsourceOrgId());
+                    }
+                } else {
+                    fromFields = setOrgDetails(transactionOutManager.getDownloadSummaryDetails(transactionDetails.getId()).getsourceOrgId());
+                }
                 transaction.setsourceOrgFields(fromFields);
 
             } catch (Exception e) {
-                throw new Exception("Error retrieving feedback sender fields for configuration id: " + configId, e);
+                throw new Exception("Error retrieving sender fields for configuration id: " + configId, e);
             }
+
 
             try {
                 List<configurationFormFields> senderProviderFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId, transportDetails.getId(), 2);
