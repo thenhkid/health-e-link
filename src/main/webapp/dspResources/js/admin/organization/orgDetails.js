@@ -85,9 +85,9 @@ function checkFormFields() {
         }
 
         if (extension != "jar") {
-            $('#CCDJarTemplateDiv').addClass("has-error");
-            $('#CCDJarTemplateMsg').addClass("has-error");
-            $('#CCDJarTemplateMsg').html('The XML/CCD Parsing Script must be a jar file.');
+            $('#parsingTemplateDiv').addClass("has-error");
+            $('#parsingTemplateMsg').addClass("has-error");
+            $('#parsingTemplateMsg').html('The Parsing Script must be a jar file.');
             hasErrors = 1;
         }
 

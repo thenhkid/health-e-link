@@ -87,7 +87,7 @@ public class organizationManagerImpl implements organizationManager {
                 outputStream.close();
 
                 //Set the filename to the file name
-                organization.setCCDJarTemplate(fileName);
+                organization.setparsingTemplate(fileName);
 
             } catch (IOException e) {
                 e.printStackTrace();

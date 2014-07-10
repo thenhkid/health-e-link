@@ -107,24 +107,26 @@
                                 <form:errors path="fax" cssClass="control-label" element="label" />
                             </div>
                         </spring:bind>
-                        <c:if test="${not empty organization.CCDJarTemplate}">
-                            <div class="form-group">
-                                <label class="control-label" for="CCDJarTemplate">Current XML/CCD Parse Script</label>
-                                <input type="text" disabled id="CCDJarTemplate" class="form-control" value="${organization.CCDJarTemplate}" />
-                                <form:hidden id="CCDJarTemplate" path="CCDJarTemplate" />
-                            </div>
-                        </c:if>
-                        <spring:bind path="file">
-                            <div id="CCDJarTemplateDiv" class="form-group ${status.error ? 'has-error' : '' }">
-                                <label class="control-label" for="file">XML/CCD Parse Script (JAR file)</label>
-                                <form:input path="file" id="file" class="form-control" type="file" />
-                                <form:errors path="file" cssClass="control-label" element="label" />
-                                <span id="CCDJarTemplateMsg" class="control-label"></span>
-                            </div>
-                        </spring:bind>        
+                        <c:if test="${id > 0}">
+                            <c:if test="${not empty organization.parsingTemplate}">
+                                <div class="form-group">
+                                    <label class="control-label" for="parsingTemplate">Current Inbound File (CCD/HL7) Parsing Script</label>
+                                    <input type="text" disabled id="parsingTemplate" class="form-control" value="${organization.parsingTemplate}" />
+                                    <form:hidden id="parsingTemplate" path="parsingTemplate" />
+                                </div>
+                            </c:if>
+                            <spring:bind path="file">
+                                <div id="parsingTemplateDiv" class="form-group ${status.error ? 'has-error' : '' }">
+                                    <label class="control-label" for="file">Inbound File (CCD/HL7) Parsing Script (JAR file)</label>
+                                    <form:input path="file" id="file" class="form-control" type="file" />
+                                    <form:errors path="file" cssClass="control-label" element="label" />
+                                    <span id="parsingTemplateMsg" class="control-label"></span>
+                                </div>
+                            </spring:bind>  
+                        </c:if>      
+                        </div>
                     </div>
-                </div>
-            </section>
+                </section>
         </form:form>
     </div>
 </div>

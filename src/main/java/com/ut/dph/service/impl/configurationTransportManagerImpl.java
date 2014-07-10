@@ -33,7 +33,7 @@ public class configurationTransportManagerImpl implements configurationTransport
     
     @Autowired
     private organizationManager organizationManager;
-
+    
     @Override
     @Transactional
     public configurationTransport getTransportDetails(int configId) throws Exception {
@@ -55,7 +55,7 @@ public class configurationTransportManagerImpl implements configurationTransport
     @Override
     @Transactional
     public Integer updateTransportDetails(configurationTransport transportDetails) {
-
+        
         int transportDetailId;
         
         transportDetailId = (Integer) configurationTransportDAO.updateTransportDetails(transportDetails);

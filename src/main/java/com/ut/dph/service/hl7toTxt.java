@@ -6,14 +6,16 @@
 
 package com.ut.dph.service;
 
+import com.ut.dph.model.Organization;
 import com.ut.dph.reference.fileSystem;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.net.URLClassLoader;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -23,26 +25,40 @@ import org.springframework.stereotype.Service;
 @Service
 public class hl7toTxt {
     
-    public String TranslateHl7toTxt(String fileLocation, String fileName) throws Exception {
+    @Autowired
+    private organizationManager organizationmanager;
+    
+    @Autowired
+    private configurationTransportManager configurationtransportmanager;
+    
+    public String TranslateHl7toTxt(String fileLocation, String fileName, int orgId) throws Exception {
         
-        FileInputStream fileInput = null;
-        
+        Organization orgDetails = organizationmanager.getOrganizationById(orgId);
         fileSystem dir = new fileSystem();
+
+        dir.setDir(orgDetails.getcleanURL(), "templates");
+        
+        String templatefileName = orgDetails.getparsingTemplate();
+        
+        URLClassLoader loader = new URLClassLoader(new URL[]{new URL("file://" + dir.getDir() + templatefileName)});
+        
+        // Remove the .class extension
+        Class cls = loader.loadClass(templatefileName.substring(0, templatefileName.lastIndexOf('.')));
+        
+        Constructor constructor = cls.getConstructor();
+        
+        Object HL7Obj = constructor.newInstance();
+
+        Method myMethod = cls.getMethod("HL7toTxt", new Class[]{File.class});
+        
+        /* Get the uploaded HL7 File */
         fileLocation = fileLocation.replace("/Applications/bowlink/", "").replace("/home/bowlink/","").replace("/bowlink/", "");
         dir.setDirByName(fileLocation);
         
-        File origfile = null;
-        
-        try {
-            origfile = new File(dir.getDir() + fileName+".hr");
-            fileInput = new FileInputStream(origfile);
-            
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+        File hl7File = new File(dir.getDir() + fileName + ".hr");
         
         /* Create the output file */
-        String newfileName = new StringBuilder().append(origfile.getName().substring(0, origfile.getName().lastIndexOf("."))).append(".").append("txt").toString();
+        String newfileName = new StringBuilder().append(hl7File.getName().substring(0, hl7File.getName().lastIndexOf("."))).append(".").append("txt").toString();
         
         File newFile = new File(dir.getDir() + newfileName);
         
@@ -52,8 +68,8 @@ public class hl7toTxt {
                 if (newFile.exists()) {
                     int i = 1;
                     while (newFile.exists()) {
-                        int iDot = fileName.lastIndexOf(".");
-                        newFile = new File(dir.getDir() + fileName.substring(0, iDot) + "_(" + ++i + ")" + fileName.substring(iDot));
+                        int iDot = newfileName.lastIndexOf(".");
+                        newFile = new File(dir.getDir() + newfileName.substring(0, iDot) + "_(" + ++i + ")" + newfileName.substring(iDot));
                     }
                     newfileName = newFile.getName();
                     newFile.createNewFile();
@@ -71,40 +87,15 @@ public class hl7toTxt {
            
         }
         
-        /* Parse through the original HL7 message to create the content for the new txt file */
-        BufferedReader br = new BufferedReader(new InputStreamReader(fileInput));
-        String line;
-        int counter = 0;
-        String recordRow = "";
         FileWriter fw = new FileWriter(newFile, true);
+
+        /* END */
+        String fileRecords = (String) myMethod.invoke(HL7Obj, new Object[]{hl7File});
         
-        while ((line = br.readLine()) != null) {
-            
-            String[] lineItemsArray = line.split("\\|",-1);
-            
-            if("MSH".equals(lineItemsArray[0])) {
-                counter++;
-                //Create a new line
-                if(counter > 1) {
-                    recordRow = new StringBuilder().append(recordRow).append(System.getProperty("line.separator")).toString();
-                    fw.write(recordRow); 
-                    recordRow = "";
-                }
-            } 
-            else {
-                recordRow = new StringBuilder().append(recordRow).append("|").toString();
-            }
-            if(!"MSH".equals(lineItemsArray[0])) {
-                recordRow = new StringBuilder().append(recordRow).append(line.replace("^","|")).toString();
-            }
-            else {
-                recordRow = new StringBuilder().append(recordRow).append(line.replace("MSH|^", "MSH|;").replace("^","|").replace("MSH|;", "MSH|^")).toString();  
-            }
-            
-        }
-        fw.write(recordRow);  
+        fw.write(fileRecords);
+
         fw.close();
-        
+
         return newfileName;
         
     }
