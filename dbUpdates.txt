@@ -7,3 +7,62 @@ INSERT INTO `universaltranslator`.`users` (`status`, `orgId`, `firstName`, `last
 /** Chad 7.9.2014 @ 8:46 PM **/
 ALTER TABLE `universaltranslator`.`organizations` 
 CHANGE COLUMN `CCDJarTemplate` `parsingTemplate` VARCHAR(45) NULL DEFAULT NULL ;
+
+
+/** grace 07.15.2014 11:14 AM - applied to DPH dev, test, ptest, prod **/
+use universalTranslator;
+
+drop procedure  if exists YYYYMMDDHHMMSSMSToYYYYMMDDHHMMSS;
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `YYYYMMDDHHMMSSMSToYYYYMMDDHHMMSS`(in configId int, 
+in batchId int, in srcField varchar(10),
+in fieldA varchar(10), in fieldB varchar(10), in con1 varchar(255), 
+in con2 varchar(255), in macroId int, in foroutboundProcessing boolean, in passClear int, in transactionId int)
+proc_main:begin
+
+-- this SP strips everything after . and repalce . / : and space in date time fields and turn them 
+-- YYYY-MM-DD HH:MMSS .MS and turn it into YYYYMMDDHHMMSS
+-- we just need field A, the field that we want to change
+
+call setInboundOutBoundTables (foroutboundProcessing);
+select @translatedTable, @transactionTable, @batchTable, @batchIdType , @errorTable
+into @translatedTable, @transactionTable, @batchTable, @batchIdType , @errorTable;
+
+call getFinalStatusIds;
+select @finalStatusIds into @finalStatusIds;
+
+
+-- build our sql
+
+if (transactionId = 0) then
+	set @stmt = concat("update ",@translatedTable, " set ",fieldA," = replace(replace(replace(SUBSTRING_INDEX(TRIM(", fieldA ,"),'.', 1),'-',''), ' ',''), ':', '') where ",@transactionTable,"Id in (select id from ",@transactionTable,
+				" where configId = ",configId," and ", @batchIdType," = ",batchId," and statusId not in (",@finalStatusIds ,"));");
+	END if;
+
+
+if (transactionId != 0) then
+	set @stmt = concat("update ",@translatedTable, " set ",fieldA," = replace(replace(replace(SUBSTRING_INDEX(TRIM(", fieldA,"),'.', 1),'-',''), ' ',''), ':', '') where ",
+	@transactionTable,"Id = ", transactionId,";");
+	END if;
+
+PREPARE stmt from @stmt;
+EXECUTE stmt;-- execute
+
+-- we check pass /clear
+if (passClear = 2) THEN
+BEGIN
+-- accessible
+END;
+END IF;
+
+
+-- the only error for this is if SP bombs, no need to write in insert error logs
+select '';
+end proc_main$$
+DELIMITER ;
+
+
+INSERT INTO `universaltranslator`.`macro_names` (`ID`, `CategoryId`, `Macro_Name`, `Macro_Short_Name`, `Formula`, `FieldA_Question`, `populateFieldA`) VALUES ('84', '1', 'YYYY-MM-DD HH:MMSS .MS  To YYYYMMDDHHMMSS', 'YYYYMMDDHHMMSSMSToYYYYMMDDHHMMSS', 'YYYYMMDDHHMMSSMSToYYYYMMDDHHMMSS', 'Please enter field to convert', 1);
+
+
