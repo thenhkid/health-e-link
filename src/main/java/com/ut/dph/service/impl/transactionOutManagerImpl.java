@@ -17,6 +17,7 @@ import com.ut.dph.model.HL7Segments;
 import com.ut.dph.model.Organization;
 import com.ut.dph.model.Transaction;
 import com.ut.dph.model.User;
+import com.ut.dph.model.UserActivity;
 import com.ut.dph.model.batchDownloadSummary;
 import com.ut.dph.model.batchDownloads;
 import com.ut.dph.model.batchUploads;
@@ -46,6 +47,7 @@ import com.ut.dph.service.organizationManager;
 import com.ut.dph.service.transactionInManager;
 import com.ut.dph.service.transactionOutManager;
 import com.ut.dph.service.userManager;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
@@ -108,6 +110,9 @@ public class transactionOutManagerImpl implements transactionOutManager {
 
     @Autowired
     private fileManager filemanager;
+    
+    @Autowired
+    private userManager usermanager;
     
     private int processingSysErrorId = 5;
 
@@ -409,7 +414,26 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                 } /* Rhapsody Method */ else if (transportDetails.gettransportMethodId() == 5) {
                                 	RhapsodyTargetFile(batchId, transportDetails);
                                 }
-
+                                /** end of processing, before email **/
+                                /** insert log**/ 
+        		                try {
+        		                	 //log user activity
+        		                    UserActivity ua = new UserActivity();
+        		                    ua.setUserId(0);
+        		                    ua.setFeatureId(0);
+        		                    ua.setAccessMethod("System");
+        		                    ua.setActivity("System Processed Output File");
+        		                    ua.setBatchUploadId(transaction.getbatchUploadId());
+        		                    ua.setBatchDownloadId(batchId);
+        		                    ua.setTransactionInIds(String.valueOf(transaction.gettransactionInId()));
+        		                    ua.setTransactionTargetIds(String.valueOf(transportDetails.getId()));
+        		                    usermanager.insertUserLog(ua);
+        		                	
+        		                } catch (Exception ex) {
+        		                	ex.printStackTrace();
+        		                	System.err.println("moveFilesByPath - insert user log" +  ex.toString());
+        		                }
+                                
                                 if (batchId > 0) {
                                     /* Send the email to primary contact */
                                     try {

@@ -483,7 +483,7 @@ public class transactionInManagerImpl implements transactionInManager {
      */
     @Override
     public boolean processBatch(int batchUploadId, boolean doNotClearErrors, Integer transactionId) throws Exception {
-
+    	UserActivity ua = new UserActivity();
         Integer batchStausId = 29;
         List<Integer> errorStatusIds = Arrays.asList(11, 13, 14, 16);
         //get batch details
@@ -501,15 +501,12 @@ public class transactionInManagerImpl implements transactionInManager {
         	/** insert log**/ 
             try {
             	 //log user activity
-                UserActivity ua = new UserActivity();
                 ua.setUserId(0);
                 ua.setFeatureId(0);
                 ua.setAccessMethod("System");
                 ua.setActivity("System Processed File");
                 ua.setBatchUploadId(batchUploadId);
-                ua.setTransactionInIds(transactionId.toString());
                 usermanager.insertUserLog(ua);
-            	
             } catch (Exception ex) {
             	ex.printStackTrace();
             	System.err.println("transactionId - insert user log" +  ex.toString());
@@ -741,7 +738,16 @@ public class transactionInManagerImpl implements transactionInManager {
             } //end of making sure there is one handling details for batch
 
         } // end of single batch insert 
-
+        
+        /** update log with transactionInIds **/
+        try {
+	        if (ua != null) {
+	        	ua.setTransactionInIds(getTransactionInIdsFromBatch(batchUploadId).toString().replace("[", "").replace("]", ""));
+	        	usermanager.updateUserActivity(ua);
+	        }
+        } catch (Exception ex) {
+        	ex.printStackTrace();
+        	System.err.println("process batch - update user log" +  ex.toString());}
         return true;
     }
 
@@ -3230,5 +3236,9 @@ public class transactionInManagerImpl implements transactionInManager {
 		}
 		return false;
 	}
+
+	@Override
+	public List<Integer> getTransactionInIdsFromBatch(Integer batchUploadId) {
+		return transactionInDAO.getTransactionInIdsFromBatch(batchUploadId);	}
 
 }

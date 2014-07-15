@@ -129,4 +129,10 @@ public class userManagerImpl implements userManager {
 		return userDAO.getAllUsers();
 	}
 
+	@Override
+	@Transactional
+	public void updateUserActivity(UserActivity userActivity) {
+		userDAO.updateUserActivity(userActivity);
+	}
+
 }

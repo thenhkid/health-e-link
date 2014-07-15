@@ -420,4 +420,7 @@ public interface transactionInManager {
     Integer clearBatchDownloads(List <Integer> batchDownloadIDs);
     
     boolean recheckLongDate(String longDateVal, String convertedDate);
+    
+    List<Integer> getTransactionInIdsFromBatch(Integer batchUploadId);
+    
 }

@@ -376,4 +376,15 @@ public class userDAOImpl implements userDAO {
 		 List<User> userList = query.list();
 	     return userList;
 	}
+
+	@Override
+	public void updateUserActivity(UserActivity userActivity) {
+		try {
+			sessionFactory.getCurrentSession().update(userActivity);
+		} catch (Exception ex) {
+			System.err.println("updateUserActivity  " + ex.getCause());
+            ex.printStackTrace();
+       }
+		
+	}
 }

@@ -44,5 +44,7 @@ public interface userManager {
   List<User> getOrgUsersForConfig(List <Integer> configId);
   
   List<User> getAllUsers();
+  
+  void updateUserActivity (UserActivity userActivity);
 }
 

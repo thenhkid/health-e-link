@@ -5888,5 +5888,25 @@ public class transactionInDAOImpl implements transactionInDAO {
 
         }
     }
+
+	@Override
+	@Transactional
+	public List<Integer> getTransactionInIdsFromBatch(Integer batchUploadId) {
+		try {
+            String sql = ("select id from transactionIn where  batchId = :batchId "
+                    + " order by id;");
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+            query.setParameter("batchId", batchUploadId);
+
+            List<Integer> tiIds = query.list();
+
+            return tiIds;
+
+        } catch (Exception ex) {
+            System.err.println("getTransactionInIdsFromBatch " + ex.getCause());
+            ex.printStackTrace();
+            return null;
+        }
+	}
 	
 }
