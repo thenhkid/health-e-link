@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.ut.healthelink.impl;
+package com.ut.healthelink.dao.impl;
 
 import com.ut.healthelink.dao.transactionInDAO;
 import com.ut.healthelink.model.CrosswalkData;

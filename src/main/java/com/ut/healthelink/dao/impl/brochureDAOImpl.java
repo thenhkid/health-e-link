@@ -1,4 +1,4 @@
-package com.ut.healthelink.impl;
+package com.ut.healthelink.dao.impl;
 
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
