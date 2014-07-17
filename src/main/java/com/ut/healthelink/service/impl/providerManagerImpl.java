@@ -10,7 +10,7 @@ import com.ut.healthelink.dao.providerDAO;
 import com.ut.healthelink.model.Provider;
 import com.ut.healthelink.model.providerAddress;
 import com.ut.healthelink.model.providerIdNum;
-import com.ut.dph.service.providerManager;
+import com.ut.healthelink.service.providerManager;
 
 @Service
 public class providerManagerImpl implements providerManager {

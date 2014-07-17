@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ut.healthelink.dao.userDAO;
 import com.ut.healthelink.model.User;
-import com.ut.dph.service.userManager;
+import com.ut.healthelink.service.userManager;
 import com.ut.healthelink.model.UserActivity;
 import com.ut.healthelink.model.siteSections;
 import com.ut.healthelink.model.userAccess;

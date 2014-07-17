@@ -25,7 +25,7 @@ import com.ut.healthelink.model.Crosswalks;
 import com.ut.healthelink.model.messageType;
 import com.ut.healthelink.model.messageTypeDataTranslations;
 import com.ut.healthelink.model.messageTypeFormFields;
-import com.ut.dph.service.messageTypeManager;
+import com.ut.healthelink.service.messageTypeManager;
 
 @Controller
 @RequestMapping("/administrator/library")

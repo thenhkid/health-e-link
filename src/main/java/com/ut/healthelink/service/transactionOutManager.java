@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package com.ut.dph.service;
+package com.ut.healthelink.service;
 
 import com.ut.healthelink.model.Transaction;
 import com.ut.healthelink.model.batchDownloadSummary;

@@ -1,4 +1,4 @@
-package com.ut.dph.service;
+package com.ut.healthelink.service;
 
 import com.ut.healthelink.model.Brochure;
 

@@ -34,7 +34,7 @@ import com.ut.healthelink.model.mainHL7Details;
 import com.ut.healthelink.model.mainHL7Elements;
 import com.ut.healthelink.model.mainHL7Segments;
 import com.ut.healthelink.reference.fileSystem;
-import com.ut.dph.service.sysAdminManager;
+import com.ut.healthelink.service.sysAdminManager;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service

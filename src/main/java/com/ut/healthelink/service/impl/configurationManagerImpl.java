@@ -23,7 +23,7 @@ import com.ut.healthelink.model.configurationDataTranslations;
 import com.ut.healthelink.model.configurationMessageSpecs;
 import com.ut.healthelink.model.configurationSchedules;
 import com.ut.healthelink.reference.fileSystem;
-import com.ut.dph.service.configurationManager;
+import com.ut.healthelink.service.configurationManager;
 
 import java.io.File;
 import java.io.FileOutputStream;

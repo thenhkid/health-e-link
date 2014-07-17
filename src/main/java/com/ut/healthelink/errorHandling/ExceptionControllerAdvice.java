@@ -8,8 +8,8 @@ package com.ut.healthelink.errorHandling;
 
 import com.ut.healthelink.model.User;
 import com.ut.healthelink.model.mailMessage;
-import com.ut.dph.service.emailMessageManager;
-import com.ut.dph.service.userManager;
+import com.ut.healthelink.service.emailMessageManager;
+import com.ut.healthelink.service.userManager;
 import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.Date;

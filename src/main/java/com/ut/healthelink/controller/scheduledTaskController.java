@@ -6,9 +6,9 @@
 
 package com.ut.healthelink.controller;
 
-import com.ut.dph.service.configurationManager;
-import com.ut.dph.service.transactionInManager;
-import com.ut.dph.service.transactionOutManager;
+import com.ut.healthelink.service.configurationManager;
+import com.ut.healthelink.service.transactionInManager;
+import com.ut.healthelink.service.transactionOutManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;

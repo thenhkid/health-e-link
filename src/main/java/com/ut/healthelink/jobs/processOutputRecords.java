@@ -6,7 +6,7 @@
 
 package com.ut.healthelink.jobs;
 
-import com.ut.dph.service.transactionOutManager;
+import com.ut.healthelink.service.transactionOutManager;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.quartz.Job;

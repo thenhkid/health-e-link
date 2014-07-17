@@ -25,21 +25,21 @@ import com.ut.healthelink.model.Organization;
 import com.ut.healthelink.model.providerAddress;
 import com.ut.healthelink.model.providerIdNum;
 import com.ut.healthelink.model.userAccess;
-import com.ut.dph.service.organizationManager;
+import com.ut.healthelink.service.organizationManager;
 import com.ut.healthelink.model.User;
-import com.ut.dph.service.userManager;
+import com.ut.healthelink.service.userManager;
 import com.ut.healthelink.model.siteSections;
 import com.ut.healthelink.model.Provider;
-import com.ut.dph.service.providerManager;
+import com.ut.healthelink.service.providerManager;
 import com.ut.healthelink.model.Brochure;
 import com.ut.healthelink.model.configuration;
 import com.ut.healthelink.model.configurationTransport;
 import com.ut.healthelink.model.messageType;
-import com.ut.dph.service.brochureManager;
+import com.ut.healthelink.service.brochureManager;
 import com.ut.healthelink.reference.USStateList;
-import com.ut.dph.service.configurationManager;
-import com.ut.dph.service.configurationTransportManager;
-import com.ut.dph.service.messageTypeManager;
+import com.ut.healthelink.service.configurationManager;
+import com.ut.healthelink.service.configurationTransportManager;
+import com.ut.healthelink.service.messageTypeManager;
 
 /**
  * The adminOrgController class will handle all URL requests that fall inside of the '/administrator/organizations' url path.

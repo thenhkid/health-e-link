@@ -14,8 +14,8 @@ import org.springframework.web.multipart.MultipartFile;
 import com.ut.healthelink.dao.brochureDAO;
 import com.ut.healthelink.model.Brochure;
 import com.ut.healthelink.model.Organization;
-import com.ut.dph.service.brochureManager;
-import com.ut.dph.service.organizationManager;
+import com.ut.healthelink.service.brochureManager;
+import com.ut.healthelink.service.organizationManager;
 import com.ut.healthelink.reference.fileSystem;
 
 @Service

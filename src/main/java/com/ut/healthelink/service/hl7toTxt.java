@@ -3,12 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.ut.dph.service;
+
+package com.ut.healthelink.service;
 
 import com.ut.healthelink.model.Organization;
 import com.ut.healthelink.reference.fileSystem;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -21,16 +23,16 @@ import org.springframework.stereotype.Service;
  * @author chadmccue
  */
 @Service
-public class CCDtoTxt {
-
+public class hl7toTxt {
+    
     @Autowired
     private organizationManager organizationmanager;
     
     @Autowired
-    private configurationTransportManager configurationTransportManager;
-
-    public String TranslateCCDtoTxt(String fileLocation, String ccdFileName, int orgId) throws Exception {
-
+    private configurationTransportManager configurationtransportmanager;
+    
+    public String TranslateHl7toTxt(String fileLocation, String fileName, int orgId) throws Exception {
+        
         Organization orgDetails = organizationmanager.getOrganizationById(orgId);
         fileSystem dir = new fileSystem();
 
@@ -39,28 +41,29 @@ public class CCDtoTxt {
         String templatefileName = orgDetails.getparsingTemplate();
         
         URLClassLoader loader = new URLClassLoader(new URL[]{new URL("file://" + dir.getDir() + templatefileName)});
-
+        
         // Remove the .class extension
         Class cls = loader.loadClass(templatefileName.substring(0, templatefileName.lastIndexOf('.')));
+        
         Constructor constructor = cls.getConstructor();
+        
+        Object HL7Obj = constructor.newInstance();
 
-        Object CCDObj = constructor.newInstance();
-
-        Method myMethod = cls.getMethod("CCDtoTxt", new Class[]{File.class});
-
-        /* Get the uploaded CCD File */
+        Method myMethod = cls.getMethod("HL7toTxt", new Class[]{File.class});
+        
+        /* Get the uploaded HL7 File */
         fileLocation = fileLocation.replace("/Applications/bowlink/", "").replace("/home/bowlink/","").replace("/bowlink/", "");
         dir.setDirByName(fileLocation);
         
-        File ccdFile = new File(dir.getDir() + ccdFileName + ".xml");
+        File hl7File = new File(dir.getDir() + fileName + ".hr");
         
-        /* Create the txt file that will hold the CCD fields */
-        String newfileName = new StringBuilder().append(ccdFile.getName().substring(0, ccdFile.getName().lastIndexOf("."))).append(".").append("txt").toString();
-
+        /* Create the output file */
+        String newfileName = new StringBuilder().append(hl7File.getName().substring(0, hl7File.getName().lastIndexOf("."))).append(".").append("txt").toString();
+        
         File newFile = new File(dir.getDir() + newfileName);
         
-        if (newFile.exists()) {
-            try {
+        if(newFile.exists()) {
+             try {
 
                 if (newFile.exists()) {
                     int i = 1;
@@ -73,27 +76,29 @@ public class CCDtoTxt {
                 } else {
                     newFile.createNewFile();
                 }
-            } catch (Exception e) {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
-
-        } else {
+           
+        }
+        else {
             newFile.createNewFile();
             newfileName = newFile.getName();
-
+           
         }
-
+        
         FileWriter fw = new FileWriter(newFile, true);
 
         /* END */
-        String fileRecords = (String) myMethod.invoke(CCDObj, new Object[]{ccdFile});
+        String fileRecords = (String) myMethod.invoke(HL7Obj, new Object[]{hl7File});
         
         fw.write(fileRecords);
 
         fw.close();
 
         return newfileName;
-
+        
     }
-
+    
+    
 }

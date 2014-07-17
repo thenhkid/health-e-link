@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.stereotype.Service;
-import com.ut.dph.service.fileManager;
+import com.ut.healthelink.service.fileManager;
 
 
 @Service

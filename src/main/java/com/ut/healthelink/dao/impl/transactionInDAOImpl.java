@@ -38,8 +38,8 @@ import com.ut.healthelink.model.custom.TransErrorDetail;
 import com.ut.healthelink.model.lutables.lu_ProcessStatus;
 import com.ut.healthelink.model.messagePatients;
 import com.ut.healthelink.model.messageType;
-import com.ut.dph.service.sysAdminManager;
-import com.ut.dph.service.userManager;
+import com.ut.healthelink.service.sysAdminManager;
+import com.ut.healthelink.service.userManager;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

@@ -4,7 +4,7 @@ import com.ut.healthelink.model.Organization;
 import com.ut.healthelink.model.User;
 import com.ut.healthelink.model.custom.searchParameters;
 import com.ut.healthelink.model.userAccess;
-import com.ut.dph.service.organizationManager;
+import com.ut.healthelink.service.organizationManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.security.core.Authentication;
@@ -17,7 +17,7 @@ import javax.servlet.ServletException;
 import java.io.IOException;
 import java.util.Set;
 
-import com.ut.dph.service.userManager;
+import com.ut.healthelink.service.userManager;
 import java.util.List;
 import javax.servlet.http.HttpSession;
 

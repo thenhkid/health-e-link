@@ -42,16 +42,16 @@ import com.ut.healthelink.model.lutables.lu_ProcessStatus;
 import com.ut.healthelink.model.messagePatients;
 import com.ut.healthelink.model.systemSummary;
 import com.ut.healthelink.reference.fileSystem;
-import com.ut.dph.service.CCDtoTxt;
-import com.ut.dph.service.configurationManager;
-import com.ut.dph.service.configurationTransportManager;
-import com.ut.dph.service.emailMessageManager;
-import com.ut.dph.service.fileManager;
-import com.ut.dph.service.hl7toTxt;
-import com.ut.dph.service.messageTypeManager;
-import com.ut.dph.service.organizationManager;
-import com.ut.dph.service.sysAdminManager;
-import com.ut.dph.service.userManager;
+import com.ut.healthelink.service.CCDtoTxt;
+import com.ut.healthelink.service.configurationManager;
+import com.ut.healthelink.service.configurationTransportManager;
+import com.ut.healthelink.service.emailMessageManager;
+import com.ut.healthelink.service.fileManager;
+import com.ut.healthelink.service.hl7toTxt;
+import com.ut.healthelink.service.messageTypeManager;
+import com.ut.healthelink.service.organizationManager;
+import com.ut.healthelink.service.sysAdminManager;
+import com.ut.healthelink.service.userManager;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
@@ -61,7 +61,7 @@ import java.util.regex.Pattern;
 
 import org.springframework.stereotype.Service;
 
-import com.ut.dph.service.transactionInManager;
+import com.ut.healthelink.service.transactionInManager;
 
 import java.io.File;
 import java.io.FileFilter;

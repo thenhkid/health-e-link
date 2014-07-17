@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ut.healthelink.dao.organizationDAO;
 import com.ut.healthelink.model.Organization;
 import com.ut.healthelink.model.Provider;
-import com.ut.dph.service.organizationManager;
+import com.ut.healthelink.service.organizationManager;
 import com.ut.healthelink.model.User;
 import com.ut.healthelink.model.Brochure;
 import com.ut.healthelink.reference.fileSystem;

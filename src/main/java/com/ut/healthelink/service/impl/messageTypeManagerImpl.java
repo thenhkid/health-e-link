@@ -26,7 +26,7 @@ import org.hibernate.SessionFactory;
 
 import com.ut.healthelink.dao.messageTypeDAO;
 import com.ut.healthelink.dao.organizationDAO;
-import com.ut.dph.service.messageTypeManager;
+import com.ut.healthelink.service.messageTypeManager;
 import com.ut.healthelink.model.Crosswalks;
 import com.ut.healthelink.model.Organization;
 import com.ut.healthelink.model.messageType;

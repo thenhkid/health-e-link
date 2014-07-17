@@ -13,7 +13,7 @@ import com.ut.healthelink.model.HL7Segments;
 import com.ut.healthelink.model.mainHL7Details;
 import com.ut.healthelink.model.mainHL7Elements;
 import com.ut.healthelink.model.mainHL7Segments;
-import com.ut.dph.service.sysAdminManager;
+import com.ut.healthelink.service.sysAdminManager;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

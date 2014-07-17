@@ -17,7 +17,7 @@ import com.ut.healthelink.model.User;
 import com.ut.healthelink.model.configuration;
 import com.ut.healthelink.model.configurationConnection;
 import com.ut.healthelink.reference.fileSystem;
-import com.ut.dph.service.brochureManager;
+import com.ut.healthelink.service.brochureManager;
 import java.util.ArrayList;
 import org.hibernate.criterion.Order;
 import org.hibernate.exception.SQLGrammarException;
