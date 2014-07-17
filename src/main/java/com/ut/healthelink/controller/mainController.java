@@ -102,19 +102,7 @@ public class mainController {
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public ModelAndView welcome(HttpServletRequest request, HttpServletResponse response, RedirectAttributes redirectAttr, HttpSession session) throws Exception {
         
-        /** If the user is logged in and clicks to go home send to the account home page, otherwise the login page**/
-        User userInfo = (User)session.getAttribute("userDetails");
-        
-        if(userInfo == null) {
-           ModelAndView mav = new ModelAndView(new RedirectView("/login"));
-            return mav; 
-        }
-        else {
-            ModelAndView mav = new ModelAndView(new RedirectView("/profile"));
-            return mav;
-        }
-        
-        /*return new ModelAndView("/home");*/
+       return new ModelAndView("/home");
     }
 
     /**

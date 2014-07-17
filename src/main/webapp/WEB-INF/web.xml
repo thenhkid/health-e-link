@@ -14,7 +14,7 @@
     </context-param>
     <context-param>
         <param-name>contextInitializerClasses</param-name>
-        <param-value>com.ut.dph.security.ContextProfileInitializer</param-value>
+        <param-value>com.ut.healthelink.security.ContextProfileInitializer</param-value>
     </context-param>
     <!--  Set the default timeout setting for a logged in user/admin -->
     <session-config>

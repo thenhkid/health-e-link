@@ -45,6 +45,6 @@
         </authentication-provider>
     </authentication-manager>
      
-    <beans:bean class="com.ut.dph.security.CustomAuthenticationHandler" id="authenticationSuccessRedirecthandler"></beans:bean>
+    <beans:bean class="com.ut.healthelink.security.CustomAuthenticationHandler" id="authenticationSuccessRedirecthandler"></beans:bean>
    
 </beans:beans>

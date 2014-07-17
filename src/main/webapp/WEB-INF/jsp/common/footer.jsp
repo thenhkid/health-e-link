@@ -14,11 +14,11 @@
         </nav>
 
         <p class="vcard">
-            <span class="fn">Massachusetts Department of Public Health</span> |
-            <span class="adr"><span class="post-office-box">250 Washington Street</span>,
-                <span class="region">Boston, MA</span>
-                <span class="postal-code">02108</span></span> |
-            Phone: <span class="tel">(617) 994-9869</span> |
+            <span class="fn">BOWlink Technologies Inc.</span> |
+            <span class="adr"><span class="post-office-box">P.O. Box 275</span>,
+                <span class="region">Auburn, MA</span>
+                <span class="postal-code">01501</span></span> |
+            Phone: <span class="tel">(508) 721-1977</span> |
         </p>
         <p>
             Copyright <fmt:formatDate value="${date}" pattern="yyyy" /> Massachusetts Department of Public Health All rights reserved</p>

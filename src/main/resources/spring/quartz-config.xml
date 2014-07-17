@@ -11,7 +11,7 @@
             <name>ProcessOutputFiles</name>
             <group>processGroup</group>
             <description>This process will run every five minute to check if any outbound files must be processed</description>
-            <job-class>com.ut.dph.jobs.processOutputRecords</job-class>
+            <job-class>com.ut.healthelink.jobs.processOutputRecords</job-class>
         </job>
  
         <trigger>
@@ -30,7 +30,7 @@
             <name>GenerateOutputFiles</name>
             <group>processGroup</group>
             <description>This process will look to see if any output files need to be generated runs every 5 minutes.</description>
-            <job-class>com.ut.dph.jobs.generateOutputFiles</job-class>
+            <job-class>com.ut.healthelink.jobs.generateOutputFiles</job-class>
         </job>
  
         <trigger>
@@ -49,7 +49,7 @@
             <name>LoadBatches</name>
             <group>processGroup</group>
             <description>This process will run every 3o seconds starting at 10 second on the minute to check if any uploaded files need to be loaded</description>
-            <job-class>com.ut.dph.jobs.loadBatches</job-class>
+            <job-class>com.ut.healthelink.jobs.loadBatches</job-class>
         </job>
  
         <trigger>
@@ -67,7 +67,7 @@
             <name>ProcessBatches</name>
             <group>processGroup</group>
             <description>This process will run every 30 seconds on the 5 second of the minute  to check if any loaded files will need to be process</description>
-            <job-class>com.ut.dph.jobs.processBatches</job-class>
+            <job-class>com.ut.healthelink.jobs.processBatches</job-class>
         </job>
  
         <trigger>
@@ -85,7 +85,7 @@
             <name>MoveSFTPFiles</name>
             <group>processGroup</group>
             <description>This process will run every 10 mins starting at 38 seconds of the minute to check if any SFTP files will need to be moved and logged</description>
-            <job-class>com.ut.dph.jobs.MoveSFTPFiles</job-class>
+            <job-class>com.ut.healthelink.jobs.MoveSFTPFiles</job-class>
         </job>
  
         <trigger>
@@ -103,7 +103,7 @@
             <name>MoveRhapsodyFiles</name>
             <group>processGroup</group>
             <description>This process will run every minute starting at 8 mins of the hour to check if any Rhapsody file will need to be moved and logged</description>
-            <job-class>com.ut.dph.jobs.MoveRhapsodyFiles</job-class>
+            <job-class>com.ut.healthelink.jobs.MoveRhapsodyFiles</job-class>
         </job>
  
         <trigger>

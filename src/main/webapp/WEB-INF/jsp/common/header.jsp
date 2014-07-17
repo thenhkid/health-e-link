@@ -5,7 +5,7 @@
         <nav class="navbar primary-nav" role="navigation">
             <div class="container">
                 <div class="navbar-header">
-                    <a href="<c:url value='/'/>" class="navbar-brand" title="Massachusetts Department of Public Health Universal Translator">
+                    <a href="<c:url value='/'/>" class="navbar-brand" title="Data exchange software connecting the healthcare community">
                         <!--
                                 <img src="img/health-e-link/img-health-e-link-logo.png" class="logo" alt="Health-e-Link Logo"/>
                                 Required logo specs:
@@ -16,7 +16,7 @@
 
                                 sprite can be used with class="logo":
                         -->
-                        <span class="identity logo" alt="Massachusetts Department of Public Health Universal Translator" title="Massachusetts Department of Public Health Universal Translator"></span>
+                        <span class="identity logo" alt="Massachusetts Department of Public Health Universal Translator" title="Data exchange software connecting the healthcare community"></span>
                     </a>
                     <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
                         <span class="sr-only">Toggle navigation</span>

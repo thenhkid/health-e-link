@@ -33,7 +33,7 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
 /**
- * @see com.ut.dph.dao.sysAdminDAO
+ * @see com.ut.healthelink.dao.sysAdminDAO
  * @author gchan
  */
 @Repository
