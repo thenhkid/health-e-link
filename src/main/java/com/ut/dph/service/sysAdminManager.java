@@ -5,23 +5,23 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.ut.dph.model.custom.LogoInfo;
-import com.ut.dph.model.custom.LookUpTable;
-import com.ut.dph.model.custom.TableData;
-import com.ut.dph.model.lutables.lu_Counties;
-import com.ut.dph.model.lutables.lu_GeneralHealthStatuses;
-import com.ut.dph.model.lutables.lu_GeneralHealths;
-import com.ut.dph.model.lutables.lu_Immunizations;
-import com.ut.dph.model.lutables.lu_Manufacturers;
-import com.ut.dph.model.lutables.lu_MedicalConditions;
-import com.ut.dph.model.lutables.lu_Medications;
-import com.ut.dph.model.lutables.lu_Procedures;
-import com.ut.dph.model.lutables.lu_ProcessStatus;
-import com.ut.dph.model.lutables.lu_Tests;
-import com.ut.dph.model.Macros;
-import com.ut.dph.model.mainHL7Details;
-import com.ut.dph.model.mainHL7Elements;
-import com.ut.dph.model.mainHL7Segments;
+import com.ut.healthelink.model.custom.LogoInfo;
+import com.ut.healthelink.model.custom.LookUpTable;
+import com.ut.healthelink.model.custom.TableData;
+import com.ut.healthelink.model.lutables.lu_Counties;
+import com.ut.healthelink.model.lutables.lu_GeneralHealthStatuses;
+import com.ut.healthelink.model.lutables.lu_GeneralHealths;
+import com.ut.healthelink.model.lutables.lu_Immunizations;
+import com.ut.healthelink.model.lutables.lu_Manufacturers;
+import com.ut.healthelink.model.lutables.lu_MedicalConditions;
+import com.ut.healthelink.model.lutables.lu_Medications;
+import com.ut.healthelink.model.lutables.lu_Procedures;
+import com.ut.healthelink.model.lutables.lu_ProcessStatus;
+import com.ut.healthelink.model.lutables.lu_Tests;
+import com.ut.healthelink.model.Macros;
+import com.ut.healthelink.model.mainHL7Details;
+import com.ut.healthelink.model.mainHL7Elements;
+import com.ut.healthelink.model.mainHL7Segments;
 
 /**
  * 1. sysAdminManager should handle the adding, deleting and modifying lu_ table items 2. It should

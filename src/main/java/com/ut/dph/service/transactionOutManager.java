@@ -6,15 +6,15 @@
 
 package com.ut.dph.service;
 
-import com.ut.dph.model.Transaction;
-import com.ut.dph.model.batchDownloadSummary;
-import com.ut.dph.model.batchDownloads;
-import com.ut.dph.model.pendingDeliveryTargets;
-import com.ut.dph.model.systemSummary;
-import com.ut.dph.model.transactionIn;
-import com.ut.dph.model.transactionOutNotes;
-import com.ut.dph.model.transactionTarget;
-import com.ut.dph.model.transactionOutRecords;
+import com.ut.healthelink.model.Transaction;
+import com.ut.healthelink.model.batchDownloadSummary;
+import com.ut.healthelink.model.batchDownloads;
+import com.ut.healthelink.model.pendingDeliveryTargets;
+import com.ut.healthelink.model.systemSummary;
+import com.ut.healthelink.model.transactionIn;
+import com.ut.healthelink.model.transactionOutNotes;
+import com.ut.healthelink.model.transactionTarget;
+import com.ut.healthelink.model.transactionOutRecords;
 import java.util.Date;
 import java.util.List;
 

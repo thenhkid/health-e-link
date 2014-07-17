@@ -2,11 +2,11 @@ package com.ut.dph.service;
 
 import java.util.List;
 
-import com.ut.dph.model.Crosswalks;
-import com.ut.dph.model.messageType;
-import com.ut.dph.model.messageTypeDataTranslations;
-import com.ut.dph.model.messageTypeFormFields;
-import com.ut.dph.model.validationType;
+import com.ut.healthelink.model.Crosswalks;
+import com.ut.healthelink.model.messageType;
+import com.ut.healthelink.model.messageTypeDataTranslations;
+import com.ut.healthelink.model.messageTypeFormFields;
+import com.ut.healthelink.model.validationType;
 
 public interface messageTypeManager {
 	

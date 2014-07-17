@@ -6,8 +6,8 @@
 
 package com.ut.dph.service;
 
-import com.ut.dph.model.Organization;
-import com.ut.dph.reference.fileSystem;
+import com.ut.healthelink.model.Organization;
+import com.ut.healthelink.reference.fileSystem;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;

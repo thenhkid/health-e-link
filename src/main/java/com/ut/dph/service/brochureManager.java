@@ -1,6 +1,6 @@
 package com.ut.dph.service;
 
-import com.ut.dph.model.Brochure;
+import com.ut.healthelink.model.Brochure;
 
 public interface brochureManager {
 

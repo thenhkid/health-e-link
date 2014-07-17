@@ -2,19 +2,19 @@ package com.ut.dph.service;
 
 import java.util.List;
 
-import com.ut.dph.model.CrosswalkData;
-import com.ut.dph.model.HL7Details;
-import com.ut.dph.model.HL7ElementComponents;
-import com.ut.dph.model.HL7Elements;
-import com.ut.dph.model.HL7Segments;
-import com.ut.dph.model.Macros;
-import com.ut.dph.model.configuration;
-import com.ut.dph.model.configurationConnection;
-import com.ut.dph.model.configurationConnectionReceivers;
-import com.ut.dph.model.configurationConnectionSenders;
-import com.ut.dph.model.configurationDataTranslations;
-import com.ut.dph.model.configurationMessageSpecs;
-import com.ut.dph.model.configurationSchedules;
+import com.ut.healthelink.model.CrosswalkData;
+import com.ut.healthelink.model.HL7Details;
+import com.ut.healthelink.model.HL7ElementComponents;
+import com.ut.healthelink.model.HL7Elements;
+import com.ut.healthelink.model.HL7Segments;
+import com.ut.healthelink.model.Macros;
+import com.ut.healthelink.model.configuration;
+import com.ut.healthelink.model.configurationConnection;
+import com.ut.healthelink.model.configurationConnectionReceivers;
+import com.ut.healthelink.model.configurationConnectionSenders;
+import com.ut.healthelink.model.configurationDataTranslations;
+import com.ut.healthelink.model.configurationMessageSpecs;
+import com.ut.healthelink.model.configurationSchedules;
 
 public interface configurationManager {
 	

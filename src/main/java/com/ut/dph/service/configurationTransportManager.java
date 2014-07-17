@@ -1,14 +1,14 @@
 package com.ut.dph.service;
 
-import com.ut.dph.model.configurationFTPFields;
+import com.ut.healthelink.model.configurationFTPFields;
 
 import java.util.List;
-import com.ut.dph.model.TransportMethod;
-import com.ut.dph.model.configurationFormFields;
-import com.ut.dph.model.configurationMessageSpecs;
-import com.ut.dph.model.configurationRhapsodyFields;
-import com.ut.dph.model.configurationTransport;
-import com.ut.dph.model.configurationTransportMessageTypes;
+import com.ut.healthelink.model.TransportMethod;
+import com.ut.healthelink.model.configurationFormFields;
+import com.ut.healthelink.model.configurationMessageSpecs;
+import com.ut.healthelink.model.configurationRhapsodyFields;
+import com.ut.healthelink.model.configurationTransport;
+import com.ut.healthelink.model.configurationTransportMessageTypes;
 
 public interface configurationTransportManager {
 

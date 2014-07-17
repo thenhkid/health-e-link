@@ -6,7 +6,7 @@
 
 package com.ut.dph.service;
 
-import com.ut.dph.model.mailMessage;
+import com.ut.healthelink.model.mailMessage;
 import org.springframework.scheduling.annotation.Async;
 
 /**

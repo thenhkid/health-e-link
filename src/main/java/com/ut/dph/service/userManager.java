@@ -2,10 +2,10 @@ package com.ut.dph.service;
 
 import java.util.List;
 
-import com.ut.dph.model.User;
-import com.ut.dph.model.UserActivity;
-import com.ut.dph.model.siteSections;
-import com.ut.dph.model.userAccess;
+import com.ut.healthelink.model.User;
+import com.ut.healthelink.model.UserActivity;
+import com.ut.healthelink.model.siteSections;
+import com.ut.healthelink.model.userAccess;
 
 public interface userManager {
 	

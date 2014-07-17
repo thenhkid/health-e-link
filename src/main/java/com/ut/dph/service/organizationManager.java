@@ -2,10 +2,10 @@ package com.ut.dph.service;
 
 import java.util.List;
 
-import com.ut.dph.model.Organization;
-import com.ut.dph.model.User;
-import com.ut.dph.model.Provider;
-import com.ut.dph.model.Brochure;
+import com.ut.healthelink.model.Organization;
+import com.ut.healthelink.model.User;
+import com.ut.healthelink.model.Provider;
+import com.ut.healthelink.model.Brochure;
 
 public interface organizationManager {
 	

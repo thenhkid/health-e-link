@@ -2,9 +2,9 @@ package com.ut.dph.service;
 
 import java.util.List;
 
-import com.ut.dph.model.Provider;
-import com.ut.dph.model.providerAddress;
-import com.ut.dph.model.providerIdNum;
+import com.ut.healthelink.model.Provider;
+import com.ut.healthelink.model.providerAddress;
+import com.ut.healthelink.model.providerIdNum;
 
 public interface providerManager {
 	
