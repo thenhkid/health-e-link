@@ -1,11 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.ut.dph</groupId>
-    <artifactId>universalTranslator</artifactId>
+    <groupId>com.ut.healthelink</groupId>
+    <artifactId>health-e-link</artifactId>
     <packaging>war</packaging>
     <version>0.0.1-SNAPSHOT</version>
-    <name>universalTranslator Maven Webapp</name>
+    <name>health-e-link Maven Webapp</name>
     <url>http://maven.apache.org</url>
   
     <properties>
@@ -307,6 +307,6 @@
                 </configuration>
             </plugin>
         </plugins>
-        <finalName>universalTranslator</finalName>
+        <finalName>health-e-link</finalName>
     </build>
 </project>
