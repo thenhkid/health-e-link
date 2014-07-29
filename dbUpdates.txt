@@ -1,0 +1,11 @@
+
+/** Chad 7-29-14 @ 3:21 PM **/
+
+CREATE TABLE `healthelink`.`newsarticles` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `title` VARCHAR(45) NOT NULL,
+  `shortDesc` VARCHAR(255) NULL,
+  `longDesc` TEXT NULL,
+  `status` BIT(1) NOT NULL DEFAULT b'0',
+  `dateCreated` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`));

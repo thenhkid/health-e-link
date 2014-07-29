@@ -37,8 +37,8 @@
                                     <a href="javascript:void(0);" title="My Account" data-toggle="dropdown">My Account <b class="caret"></b></a>
                                     <ul class="dropdown-menu" role="menu" aria-labelledby="My account dropdown">
                                         <li><a href="<c:url value='/profile'/>" title="My Account">My Account</a></li>
-                                        <c:if test="${not empty userAccess}">
-                                            <c:forEach items="${userAccess}" var="sections" varStatus="aStatus">
+                                            <c:if test="${not empty userAccess}">
+                                                <c:forEach items="${userAccess}" var="sections" varStatus="aStatus">
                                                 <li>
                                                     <c:choose>
                                                         <c:when test="${sections.featureId == 3}"><a href="<c:url value='/Health-e-Web/inbox'/>" title="Health-e-Web">ERG</a></c:when>
@@ -91,6 +91,25 @@
                         <a href="" title="" class="btn btn-primary btn-action btn-primary-action">Get Started</a>
                     </div>
                 </div>
+                <!-- News Ticker -->
+                <div class="news-ticker" id="home-news">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-md-1 news-ticker-header">
+                                <h2>News</h2>
+                                <a href=""><small>View All</small></a>
+                            </div>
+                            <div class="col-md-10 news-ticker-content">
+                                <ul>
+                                    <li>
+                                        <h3><a href="" title="">News Item Title</a></h3>
+                                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit <a href="">Read More</a></p>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </c:when>
             <c:otherwise>
                 <div class="container">
@@ -130,19 +149,19 @@
                 <nav class="navbar navbar-default actions-nav" role="navigation">
                     <div class="container">
                         <ul class="nav navbar-nav navbar-actions">
-                           <li ${param['page'] == 'upload' ? 'class="active"' : ''}><a href="<c:url value='/Health-e-Connect/upload'/>" title="Upload New File" class="btn btn-link"><span class="glyphicon glyphicon-upload"></span>&nbsp; Upload Files</a><span class="indicator-active arrow-up"></span></li>
-                           <li ${param['page'] == 'download' ? 'class="active"' : ''}><a href="<c:url value='/Health-e-Connect/download'/>" title="Download Files" class="btn btn-link"><span class="glyphicon glyphicon-download"></span>&nbsp; Download Files</a><span class="indicator-active arrow-up"></span></li>
-                           <li ${param['page'] == 'audit' ? 'class="active"' : ''}><a href="<c:url value='/Health-e-Connect/auditReports'/>" title="View Audit Reports" class="btn btn-link"><span class="glyphicon glyphicon-calendar"></span>&nbsp; Audit Reports</a><span class="indicator-active arrow-up"></span></li>
+                            <li ${param['page'] == 'upload' ? 'class="active"' : ''}><a href="<c:url value='/Health-e-Connect/upload'/>" title="Upload New File" class="btn btn-link"><span class="glyphicon glyphicon-upload"></span>&nbsp; Upload Files</a><span class="indicator-active arrow-up"></span></li>
+                            <li ${param['page'] == 'download' ? 'class="active"' : ''}><a href="<c:url value='/Health-e-Connect/download'/>" title="Download Files" class="btn btn-link"><span class="glyphicon glyphicon-download"></span>&nbsp; Download Files</a><span class="indicator-active arrow-up"></span></li>
+                            <li ${param['page'] == 'audit' ? 'class="active"' : ''}><a href="<c:url value='/Health-e-Connect/auditReports'/>" title="View Audit Reports" class="btn btn-link"><span class="glyphicon glyphicon-calendar"></span>&nbsp; Audit Reports</a><span class="indicator-active arrow-up"></span></li>
                         </ul>
-                        
+
                         <c:if test="${userDetails.createAuthority == true && hasConfigurations == true}">
-                             <ul class="nav navbar-nav navbar-right navbar-actions">
+                            <ul class="nav navbar-nav navbar-right navbar-actions">
                                 <li>
                                     <a href="#uploadFile" title="Upload File" data-toggle="modal" class="uploadFile">Upload New File</a>
                                     <span class="indicator-active arrow-up"></span>
                                 </li>
                             </ul>
-                         </c:if>
+                        </c:if>
                     </div>
                 </nav>
             </c:when>
@@ -150,26 +169,26 @@
                 <nav class="navbar navbar-default actions-nav" role="navigation">
                     <div class="container">
                         <ul class="nav navbar-nav navbar-actions">
-                           <li ${param['page'] == 'editProfile' ? 'class="active"' : ''}><a href="<c:url value='/OrgProfile/editProfile'/>" title="Edit Organization Profile" class="btn btn-link"><span class="glyphicon glyphicon-edit"></span>&nbsp; Edit Organization Profile</a><span class="indicator-active arrow-up"></span></li>
-                           <li ${param['page'] == 'providers' ? 'class="active"' : ''}><a href="<c:url value='/OrgProfile/providers'/>" title="View Organization Providers" class="btn btn-link"><span class="glyphicon glyphicon-user"></span>&nbsp; View Providers</a><span class="indicator-active arrow-up"></span></li>
-                           <li ${param['page'] == 'brochures' ? 'class="active"' : ''}><a href="<c:url value='/OrgProfile/brochures'/>" title="View Uploaded Brochures" class="btn btn-link"><span class="glyphicon glyphicon-book"></span>&nbsp; View Brochures</a><span class="indicator-active arrow-up"></span></li>
-                           <li ${param['page'] == 'associations' ? 'class="active"' : ''}><a href="<c:url value='/associations/'/>" title="View Associated Organizations" class="btn btn-link"><span class="glyphicon glyphicon-tower"></span>&nbsp; Associated Organizations</a><span class="indicator-active arrow-up"></span></li>
+                            <li ${param['page'] == 'editProfile' ? 'class="active"' : ''}><a href="<c:url value='/OrgProfile/editProfile'/>" title="Edit Organization Profile" class="btn btn-link"><span class="glyphicon glyphicon-edit"></span>&nbsp; Edit Organization Profile</a><span class="indicator-active arrow-up"></span></li>
+                            <li ${param['page'] == 'providers' ? 'class="active"' : ''}><a href="<c:url value='/OrgProfile/providers'/>" title="View Organization Providers" class="btn btn-link"><span class="glyphicon glyphicon-user"></span>&nbsp; View Providers</a><span class="indicator-active arrow-up"></span></li>
+                            <li ${param['page'] == 'brochures' ? 'class="active"' : ''}><a href="<c:url value='/OrgProfile/brochures'/>" title="View Uploaded Brochures" class="btn btn-link"><span class="glyphicon glyphicon-book"></span>&nbsp; View Brochures</a><span class="indicator-active arrow-up"></span></li>
+                            <li ${param['page'] == 'associations' ? 'class="active"' : ''}><a href="<c:url value='/associations/'/>" title="View Associated Organizations" class="btn btn-link"><span class="glyphicon glyphicon-tower"></span>&nbsp; Associated Organizations</a><span class="indicator-active arrow-up"></span></li>
                         </ul>
-                        
+
                         <c:choose>
                             <c:when test="${userDetails.createAuthority == true && param['page'] == 'providers'}">
                                 <ul class="nav navbar-nav navbar-right navbar-actions">
-                                   <li>
-                                       <a href="/OrgProfile/providers/createProvider" title="Create a new provider.">Create New Provider</a>
-                                   </li>
-                               </ul>
+                                    <li>
+                                        <a href="/OrgProfile/providers/createProvider" title="Create a new provider.">Create New Provider</a>
+                                    </li>
+                                </ul>
                             </c:when>
                             <c:when test="${userDetails.createAuthority == true && param['page'] == 'brochures'}">
                                 <ul class="nav navbar-nav navbar-right navbar-actions">
-                                   <li>
-                                      <a href="#systemBrochureModal" id="createNewBrochure" data-toggle="modal" title="Create a new brochure">Create New Brochure</a>
-                                   </li>
-                               </ul>
+                                    <li>
+                                        <a href="#systemBrochureModal" id="createNewBrochure" data-toggle="modal" title="Create a new brochure">Create New Brochure</a>
+                                    </li>
+                                </ul>
                             </c:when>
                         </c:choose>
                     </div>

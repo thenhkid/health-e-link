@@ -395,8 +395,8 @@ h3 {
   background-color: transparent;
 }
 .home .header {
-  height: 609px;
   background-image: url('../../../img/front-end/health-e-link/bg-header-home.jpg');
+  background-size: auto 100%;
 }
 @media (max-width: 767px) {
   .home .header {
@@ -406,7 +406,7 @@ h3 {
 .home .header-inner {
   height: 100%;
   background-image: url('../../../img/front-end/health-e-link/bg-home-central-graphic.png');
-  background-position: center bottom;
+  background-position: center 312px;
   background-repeat: no-repeat;
 }
 .central-graphic h1,
@@ -422,6 +422,42 @@ h3 {
   background-repeat: no-repeat;
   background-position: 0 -220px;
 }
+
+.news-ticker {
+  padding: 15px 0;
+  background-color: rgba(255, 255, 255, 0.5);
+  border-top: 1px solid #fff;
+}
+.news-ticker .container {
+  background-color: rgba(255, 255, 255, 0.75);
+  padding: 20px;
+  border-radius: 10px;
+}
+.news-ticker .news-ticker-content {
+  border-left: 1px solid #ccc;
+}
+.news-ticker ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.news-ticker ul li p:last-child {
+  margin-bottom: 0;
+}
+.news-ticker h2 {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 5px;
+  margin-top: 0;
+  text-transform: uppercase;
+  color: #003366;
+}
+.news-ticker h3 {
+  font-size: 16px;
+  margin-top: 0;
+  margin-bottom: 5px;
+}
+
 .product-suite {
   background-color: #1b2e3e;
   color: #709dc3;
@@ -692,4 +728,87 @@ h3 {
 .lt-ie9 .actions-nav .navbar-nav li > a:hover {
   background: transparent;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#30000000', endColorstr='#30000000');
+}
+
+.table-striped tbody tr:nth-child(odd) td, .table-striped tbody tr:nth-child(odd) th {
+    background-color: #f9f9f9;
+}
+.table-striped tbody tr:hover td, .table-striped tbody tr:hover th {
+    background-color: #f5f5f5;
+}
+
+table .tableheader {
+    cursor: pointer;
+}
+
+table .tableheader:after {
+    content: "";
+    float: right;
+    margin-top: 7px;
+    border-width: 0 4px 4px;
+    border-style: solid;
+    border-color: #000 transparent;
+    visibility: hidden;
+}
+table .headerSortUp, table .headerSortDown {
+    background-color: transparent;
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
+}
+table .tableheader:hover:after {
+    visibility: visible;
+}
+table .headerSortDown:after, table .headerSortDown:hover:after {
+    visibility: visible;
+    filter: alpha(opacity=60);
+    -khtml-opacity: 0.6;
+    -moz-opacity: 0.6;
+    opacity: 0.6;
+}
+table .headerSortUp:after {
+    border-bottom: none;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 4px solid #000;
+    visibility: visible;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+    filter: alpha(opacity=60);
+    -khtml-opacity: 0.6;
+    -moz-opacity: 0.6;
+    opacity: 0.6;
+}
+
+
+div.dataTables_length label {
+    width: 560px;
+    float: left;
+    text-align: left;
+}
+
+div.dataTables_length select {
+    width: 75px;
+}
+
+div.dataTables_filter label {
+    float: right;
+    width: 250px;
+}
+
+div.dataTables_info {
+    padding-top: 8px;
+}
+
+div.dataTables_paginate {
+    float: right;
+    margin: 0;
+}
+
+table {
+    margin: 1em 0;
+    clear: both;
+}
+
+table.dataTable th:active {
+    outline: none;
 }
