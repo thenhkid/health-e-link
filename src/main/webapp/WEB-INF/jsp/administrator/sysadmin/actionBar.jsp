@@ -21,7 +21,10 @@
                     </c:when> 
                     <c:when test="${param['page'] == 'hl7Details'}">
                         <a href="javascript:void(0);" title="Create new HL7 Spec" class="unstyled-link">Create new HL7 Spec</a>
-                    </c:when>     
+                    </c:when>  
+                    <c:when test="${param['page'] == 'news'}">
+                        <a href="javascript:void(0);" title="Create new Article" class="unstyled-link">Create new Article</a>
+                    </c:when>  
                 </c:choose>
             </h1>
         </div>
