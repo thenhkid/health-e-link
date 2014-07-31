@@ -27,9 +27,31 @@
                 </div>
                 <div class="collapse navbar-collapse navbar-ex1-collapse">
                     <ul class="nav navbar-nav navbar-right">
-                        <li ${param['page'] == 'about' ? 'class="active"' : ''}><a href="<c:url value='/about'/>" title="About">About</a></li>
-                        <li ${param['page'] == 'productSuite' ? 'class="active"' : ''}><a href="<c:url value='/product-suite'/>" title="Product Suite">Product Suite</a></li>
-                        <li ${param['page'] == 'solutions' ? 'class="active"' : ''}><a href="<c:url value='/solutions'/>" title="Solutions">Solutions</a></li>
+                        <li ${param['page'] == 'about' ? 'class="active"' : ''}>
+                            <a href="javascript:void(0);" title="About" data-toggle="dropdown">About <b class="caret"></b></a>
+                            <ul class="dropdown-menu" role="menu" aria-labelledby="About dropdown">
+                                <li><a href="<c:url value='/about'/>" title="About Health-e-Link">About Health-e-Link</a></li>
+                                <li><a href="<c:url value='/about/how-we-work'/>" title="How We Work">How We Work</a></li>
+                            </ul> 
+                        </li>
+                        <li ${param['page'] == 'productSuite' ? 'class="active"' : ''}>
+                            <a href="javascript:void(0);" title="Product Suite" data-toggle="dropdown">Product Suite <b class="caret"></b></a>
+                            <ul class="dropdown-menu" role="menu" aria-labelledby="Product Suite dropdown">
+                                <li><a href="<c:url value='/product-suite'/>" title="Product Suite Overview">Product Suite Overview</a></li>
+                                <li><a href="<c:url value='/product-suite/health-e-net'/>" title="Health-e-Net">Health-e-Net</a></li>
+                                <li><a href="<c:url value='/product-suite/health-e-data'/>" title="Health-e-Data">Health-e-Data</a></li>
+                                <li><a href="<c:url value='/product-suite/health-e-web'/>" title="Health-e-Web">Health-e-Web</a></li>
+                            </ul> 
+                        </li>
+                        <li ${param['page'] == 'solutions' ? 'class="active"' : ''}>
+                            <a href="javascript:void(0);" title="Solutions" data-toggle="dropdown">Solutions <b class="caret"></b></a>
+                            <ul class="dropdown-menu" role="menu" aria-labelledby="Solutions dropdown">
+                                <li><a href="<c:url value='/solutions'/>" title="Solutions Overview">Solutions Overview</a></li>
+                                <li><a href="<c:url value='/solutions/services'/>" title="Services">Services</a></li>
+                                <li><a href="<c:url value='/solutions/case-studies'/>" title="Case Studies">Case Studies</a></li>
+                            </ul> 
+                        </li>
+                        <li ${param['page'] == 'partners' ? 'class="active"' : ''}><a href="<c:url value='/partners'/>" title="Partners">Partners</a></li>
                         <li ${param['page'] == 'contact' ? 'class="active"' : ''}><a href="<c:url value='/contact'/>" title="Contact">Contact</a></li>
                         <li ${param['page-id'] == 'profile' ? 'class="active"': ''}>
                             <c:choose>
@@ -52,7 +74,7 @@
                                     </ul> 
                                 </c:when>
                                 <c:otherwise>
-                                    <a href="<c:url value='login' />" title="Log In">Log In</a>
+                                    <a href="<c:url value='/login' />" title="Log In">Log In</a>
                                 </c:otherwise>
                             </c:choose>
                         </li>

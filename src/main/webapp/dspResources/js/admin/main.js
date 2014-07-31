@@ -10,13 +10,17 @@ require.config({
         'sprintf': '../vendor/sprintf',
         'moment': '../vendor/moment',
         'daterangepicker': '../vendor/daterangepicker',
-        'dataTables': '../vendor/jquery.dataTables.min'
+        'dataTables': '../vendor/jquery.dataTables.min',
+        'bootstrapwysihtlm5': '../vendor/bootstrap-wysihtml5',
+        'wysihtlm5': '../vendor/wysihtml5-0.3.0.min'
     },
     shim: {
         'bootstrap': ['jquery'],
         'responsive-tables': ['jquery'],
         'daterangepicker': ['jquery', 'bootstrap'],
-        'dataTables': ['jquery']
+        'dataTables': ['jquery'],
+        'bootstrapwysihtlm5': ['jquery','wysihtlm5'],
+        'wysihtlm5': ['jquery']
     }
 });
 
@@ -32,7 +36,7 @@ define(['jquery', 'moment', 'bootstrap', 'responsive-tables', 'mediaModal', 'ove
     $(document).tooltip({
         selector: "[data-toggle=tooltip]",
         container: "body"
-    })
+    });
 
     // modify bootstrap modal to handle spacing for scroll bars more elegantly
     $(document).on('show.bs.modal', '.modal', function() {

@@ -8,11 +8,13 @@ package com.ut.healthelink.dao;
 
 import com.ut.healthelink.model.newsArticle;
 import java.util.List;
+import org.springframework.stereotype.Repository;
 
 /**
  *
  * @author chadmccue
  */
+@Repository
 public interface newsArticleDAO {
     
     void createNewsArticle(newsArticle article) throws Exception;

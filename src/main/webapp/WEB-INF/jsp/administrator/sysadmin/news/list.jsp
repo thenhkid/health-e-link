@@ -15,74 +15,64 @@
                 </c:choose>
             </div>
         </c:if>
-                <section class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">News Articles</h3>
-                    </div>
-                    <div class="panel-body">
-                        <div class="table-actions">
-                            <div class="form form-inline pull-left">
-
-                            </div>
-                            <a href="#macroModal" id="createNewArticle" data-toggle="modal" class="btn btn-primary btn-sm pull-right" title="Create new Article">  
-                                <span class="glyphicon glyphicon-plus"></span>
-                            </a>
-                        </div>
-
-                        <div class="form-container scrollable">
-                                <table class="table table-striped table-hover table-default" <c:if test="${not empty newsArticles}">id="dataTable"</c:if>>
-                            <thead>
-                                <tr>
-                                    <th scope="col">Title</th>
-                                    <th scope="col">Status</th>
-                                    <th scope="col">Date Created</th>
-                                    <th scope="col"></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            <c:choose>
-                                <c:when test="${not empty newsArticles}">
-                                    <c:forEach var="article" items="${newsArticles}">
-                                        <tr id="dataRow">
-                                            <td scope="row">
-                                                <a href="#articleModal" data-toggle="modal" rel="${article.id}" class="articleEdit" title="Edit this article">${article.title}</a>
-                                            </td>
-                                            <td>
-                                                <c:choose>
-                                                    <c:when test="${article.status == true}">
-                                                        Active
-                                                    </c:when>
-                                                    <c:otherwise>Inactive</c:otherwise>
-                                                </c:choose>
-                                            </td>
-                                            <td>
-                                                <fmt:formatDate value="${article.dateCreated}" type="date" pattern="M/dd/yyyy" />
-                                            </td>
-                                            <td class="actions-col">
-                                                <a href="#articleModal" data-toggle="modal" rel="${article.id}" class="articleEdit" title="Edit this article">
-                                                    <span class="glyphicon glyphicon-edit"></span>
-                                                    Edit	
-                                                </a>
-                                                <a href="javascript:void(0);" rel="${article.id}" class="btn btn-link articleDelete" title="Delete this article">
-                                                    <span class="glyphicon glyphicon-remove"></span>
-                                                    Delete
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    </c:forEach>
-                                </c:when>
-                                <c:otherwise>
-                                    <tr><td colspan="5" class="center-text">There where no news articles in the system.</td></tr>
-                                </c:otherwise>
-                            </c:choose>
-                        </tbody>
-                    </table>
+            <section class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">News Articles</h3>
                 </div>
-            </section>
-        </div>		
-    </div>	
-   
-<!-- Providers modal -->
-<div class="modal fade" id="articleModal" role="dialog" tabindex="-1" aria-labeledby="Add/ Edit News Articles" aria-hidden="true" aria-describedby="Add/Edit News Articles"></div>
+                <div class="panel-body">
+                   
+                    <div class="form-container scrollable">
+                            <table class="table table-striped table-hover table-default" <c:if test="${not empty newsArticles}">id="dataTable"</c:if>>
+                        <thead>
+                            <tr>
+                                <th scope="col">Title</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Date Created</th>
+                                <th scope="col"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        <c:choose>
+                            <c:when test="${not empty newsArticles}">
+                                <c:forEach var="article" items="${newsArticles}">
+                                    <tr id="dataRow">
+                                        <td scope="row">
+                                            <a href="#articleModal" data-toggle="modal" rel="${article.id}" class="articleEdit" title="Edit this article">${article.title}</a>
+                                        </td>
+                                        <td>
+                                            <c:choose>
+                                                <c:when test="${article.status == true}">
+                                                    Active
+                                                </c:when>
+                                                <c:otherwise>Inactive</c:otherwise>
+                                            </c:choose>
+                                        </td>
+                                        <td>
+                                            <fmt:formatDate value="${article.dateCreated}" type="date" pattern="M/dd/yyyy" />
+                                        </td>
+                                        <td class="actions-col">
+                                            <a href="#articleModal" data-toggle="modal" rel="${article.id}" class="articleEdit" title="Edit this article">
+                                                <span class="glyphicon glyphicon-edit"></span>
+                                                Edit	
+                                            </a>
+                                            <a href="javascript:void(0);" rel="${article.id}" class="btn btn-link articleDelete" title="Delete this article">
+                                                <span class="glyphicon glyphicon-remove"></span>
+                                                Delete
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </c:forEach>
+                            </c:when>
+                            <c:otherwise>
+                                <tr><td colspan="4" class="center-text">There where no news articles in the system.</td></tr>
+                            </c:otherwise>
+                        </c:choose>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>		
+</div>	
+
 
 

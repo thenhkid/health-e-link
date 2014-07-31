@@ -413,6 +413,19 @@
         <put-attribute name="jscript" value="/dspResources/js/admin/sysadmin/news/list.js" />
     </definition>
     
+    <!--  this lists all news articles -->    
+    <definition name="/administrator/sysadmin/news/details" extends="base.definition.admin">
+        <put-attribute name="page-id" value="sysadmin-news" />
+        <put-attribute name="page-section" value="section-sysadmin" />
+        <put-attribute name="title" value="Administrator - Manage News Articles" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=sysadmin" />
+        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/sysadmin/actionBar.jsp?page=news" />
+        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/sysadmin/menu.jsp?page=news" />
+        <put-attribute name="body" value="/WEB-INF/jsp/administrator/sysadmin/news/details.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/admin/sysadmin/news/details.js" />
+    </definition>
+
+    
     
     <definition name="/administrator/processing-activity/inbound" extends="base.definition.admin">
         <put-attribute name="page-id" value="processing-inbound" />
@@ -554,7 +567,13 @@
     <definition name="/about" extends="base.definition.frontEnd">
         <put-attribute name="title" value="Universal Translator - About Us" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page=about" />
-        <put-attribute name="body" value="/WEB-INF/jsp/informationPages/about.jsp" />
+        <put-attribute name="body" value="/WEB-INF/jsp/informationPages/about.jsp?page=about" />
+    </definition>
+    
+    <definition name="/howwework" extends="base.definition.frontEnd">
+        <put-attribute name="title" value="Universal Translator - How We Work" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page=about" />
+        <put-attribute name="body" value="/WEB-INF/jsp/informationPages/howwework.jsp?page=howwework" />
     </definition>
     
     <definition name="/contact" extends="base.definition.frontEnd">

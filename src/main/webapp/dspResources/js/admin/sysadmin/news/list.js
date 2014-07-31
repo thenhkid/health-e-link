@@ -23,66 +23,6 @@ require(['./main'], function () {
             }
         });
 
-
-        //This function will launch the new dataItem overlay with a blank screen
-        $(document).on('click', '#createNewArticle', function() {
-
-            $.ajax({
-                    url:  'news/create',
-                type: "GET",
-                success: function(data) {
-                    $("#articleModal").html(data);
-                }
-            });
-        });
-
-
-
-    //This function will launch the edit article item overlay populating the fields
-        $(document).on('click', '.articleEdit', function() {
-
-            var articleDetailsAction = "news/view?i=" + $(this).attr('rel');
-
-            $.ajax({
-                url: articleDetailsAction,
-                type: "GET",
-                success: function(data) {
-                    $("#articleModal").html(data);
-                }
-            });
-        });
-
-
-        $(document).on('click', '#submitButton', function(event) {
-            var currentPage = $('#currentPageHolder').attr('rel');
-            var formData = $("#articleform").serialize();
-            var actionValue = "news/" + $(this).attr('rel').toLowerCase();
-            $.ajax({
-                url: actionValue,
-                data: formData,
-                type: "POST",
-                async: false,
-                success: function(data) {
-                    /** **/
-                    if (data.indexOf('articleUpdated') != -1) {
-                            var goToUrl = "news?msg=updated";
-                            
-                            window.location.href = goToUrl;
-                    } else if (data.indexOf('articleCreated') != -1) {
-                            var goToUrl = "news?msg=created";
-                        
-                        window.location.href = goToUrl;
-                    } else {
-                            $("articleModal").html(data);
-                    }
-
-                }
-
-            });
-            event.preventDefault();
-            return false;
-
-        });
         
     });
 });

@@ -22,18 +22,18 @@ import org.springframework.web.servlet.ModelAndView;
  * @author chadmccue
  */
 @Controller
-@RequestMapping({"/administrator/sysadmin/news", "/news"})
+@RequestMapping(value={"/administrator/sysadmin/news", "/news"})
 public class newsArticleController {
     
     @Autowired
     private newsArticleManager newsarticlemanager;
     
     /**
-     The '/' request will return the list of news articles that are currently in the
+     The '' request will return the list of news articles that are currently in the
      * system.
 	 
     */
-    @RequestMapping(value = "/", method = RequestMethod.GET)
+    @RequestMapping(value = "", method = RequestMethod.GET)
     public ModelAndView newsArticleList(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
         ModelAndView mav = new ModelAndView();
@@ -43,6 +43,20 @@ public class newsArticleController {
         
         mav.addObject("newsArticles", newsArticles);
 
+        return mav;
+    }
+    
+    /**
+     The '/create' request will return a blank news article form.
+     * 
+    */
+    @RequestMapping(value = "/create", method = RequestMethod.GET)
+    public ModelAndView createnewsArticle(HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/sysadmin/news/details");
+        mav.addObject("newsArticle", new newsArticle());
+        
         return mav;
     }
     

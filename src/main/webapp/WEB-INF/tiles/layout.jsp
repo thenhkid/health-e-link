@@ -19,6 +19,7 @@
 
     <!%-- Health-e-link theme --%>
     <link rel="stylesheet" href="<%=request.getContextPath()%>/dspResources/css/admin/themes/theme-health-e-link.css">
+    <link rel="stylesheet" href="<%=request.getContextPath()%>/dspResources/css/admin/bootstrap-wysihtml5.css">
     <jsp:text><![CDATA[<!--[if lte IE 9]>]]></jsp:text>
             <link rel="stylesheet" href="<%=request.getContextPath()%>/dspResources/css/admin/ie.css">
     <jsp:text><![CDATA[<![endif]-->]]></jsp:text>

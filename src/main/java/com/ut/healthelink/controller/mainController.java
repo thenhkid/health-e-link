@@ -125,7 +125,19 @@ public class mainController {
 
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/about");
-        mav.addObject("pageTitle", "About Us");
+        mav.addObject("pageTitle", "About Health-e-Link");
+        return mav;
+    }
+    
+    /**
+     * The '/about.how-we-work' GET request will display the how we work page.
+     */
+    @RequestMapping(value = "/about/how-we-work", method = RequestMethod.GET)
+    public ModelAndView howweworkPage() throws Exception {
+
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/howwework");
+        mav.addObject("pageTitle", "How We Work");
         return mav;
     }
 

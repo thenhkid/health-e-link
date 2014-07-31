@@ -40,6 +40,9 @@
                     <c:when test="${param['page'] == 'hl7Details'}">
                     <li><a href="javascript:void(0);" id="saveDetails" title="Save this Configuration initial setup" role="button"><span class="glyphicon glyphicon-ok icon-stacked"></span> Save </a></li>
                     </c:when>
+                    <c:when test="${param['page'] == 'news'}">
+                    <li><a href="<c:url value='/administrator/sysadmin/news/create' />" title="Create New Article" role="button"><span class="glyphicon icon-stacked glyphicon glyphicon-plus"></span>Create New</a></li>
+                    </c:when>
                 </c:choose>
 
         </ul>

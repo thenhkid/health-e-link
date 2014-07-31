@@ -39,6 +39,7 @@ public class newsArticle {
     @Column(name = "SHORTDESC", nullable = false)
     private String shortDesc;
     
+    @NotEmpty
     @NoHtml
     @Column(name = "LONGDESC", nullable = false)
     private String longDesc;
