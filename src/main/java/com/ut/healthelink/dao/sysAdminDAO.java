@@ -47,6 +47,8 @@ public interface sysAdminDAO {
     Long findTotalMacroRows();
     
     Long findtotalHL7Entries();
+    
+    Long findtotalNewsArticles();
 
     boolean deleteMacro(int id);
 

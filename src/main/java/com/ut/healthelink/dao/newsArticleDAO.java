@@ -25,6 +25,10 @@ public interface newsArticleDAO {
     
     List<newsArticle> listAllNewsArticles() throws Exception;
     
+    List<newsArticle> listAllActiveNewsArticles() throws Exception;
+    
     newsArticle getNewsArticleById(int id) throws Exception;
+    
+    List<newsArticle> getNewsArticleByTitle(String articleTitle) throws Exception;
     
 }

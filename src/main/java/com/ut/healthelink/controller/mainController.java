@@ -2,11 +2,12 @@ package com.ut.healthelink.controller;
 
 import com.ut.healthelink.model.User;
 import com.ut.healthelink.model.mailMessage;
+import com.ut.healthelink.model.newsArticle;
 import com.ut.healthelink.model.userAccess;
 import com.ut.healthelink.service.emailMessageManager;
+import com.ut.healthelink.service.newsArticleManager;
 import com.ut.healthelink.service.userManager;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import javax.servlet.http.HttpServletRequest;
@@ -40,6 +41,9 @@ public class mainController {
 
     @Autowired
     private emailMessageManager emailMessageManager;
+    
+    @Autowired
+    private newsArticleManager newsarticlemanager;
     
     /**
      * The '/login' request will serve up the login page.
@@ -102,7 +106,14 @@ public class mainController {
     @RequestMapping(value = "/", method = RequestMethod.GET)
     public ModelAndView welcome(HttpServletRequest request, HttpServletResponse response, RedirectAttributes redirectAttr, HttpSession session) throws Exception {
         
-       return new ModelAndView("/home");
+       /* Get a list of active news articles */
+       List<newsArticle> newsArticles = newsarticlemanager.listAllActiveNewsArticles();
+       ModelAndView mav = new ModelAndView();
+       mav.setViewName("/home");
+       mav.addObject("newsArticles", newsArticles); 
+       
+       return mav;
+       
     }
 
     /**

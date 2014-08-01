@@ -6,13 +6,10 @@
 
 <div class="main clearfix" role="main" rel="dataForTable">
     <div class="col-md-12">
-        <c:if test="${not empty param.msg}">
-            <div class="alert alert-success">
-                <c:choose><c:when test="${param.msg == 'updated'}">The news article has been successfully updated!</c:when>
-                <c:when test="${param.msg == 'created'}">The news article has been successfully added!</c:when>
-                <c:when test="${param.msg == 'deleted'}">The news article has been successfully deleted!</c:when>
-                <c:when test="${param.msg == 'notDeleted'}">The news article was not deleted.  Please try again.</c:when>
-                </c:choose>
+        <c:if test="${not empty savedStatus}" >
+            <div class="alert alert-success" role="alert">
+                <strong>Success!</strong> 
+                <c:choose><c:when test="${savedStatus == 'updated'}">The news article has been successfully updated!</c:when><c:otherwise>The news article has been successfully created!</c:otherwise></c:choose>
             </div>
         </c:if>
             <section class="panel panel-default">
@@ -37,7 +34,7 @@
                                 <c:forEach var="article" items="${newsArticles}">
                                     <tr id="dataRow">
                                         <td scope="row">
-                                            <a href="#articleModal" data-toggle="modal" rel="${article.id}" class="articleEdit" title="Edit this article">${article.title}</a>
+                                            <a href="news/edit?i=${article.id}" title="Edit this article">${article.title}</a>
                                         </td>
                                         <td>
                                             <c:choose>
@@ -51,7 +48,7 @@
                                             <fmt:formatDate value="${article.dateCreated}" type="date" pattern="M/dd/yyyy" />
                                         </td>
                                         <td class="actions-col">
-                                            <a href="#articleModal" data-toggle="modal" rel="${article.id}" class="articleEdit" title="Edit this article">
+                                            <a href="news/edit?i=${article.id}" title="Edit this article">
                                                 <span class="glyphicon glyphicon-edit"></span>
                                                 Edit	
                                             </a>

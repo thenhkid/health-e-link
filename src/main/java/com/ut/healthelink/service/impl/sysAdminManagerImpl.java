@@ -115,6 +115,11 @@ public class sysAdminManagerImpl implements sysAdminManager {
     }
     
     @Override
+    public Long findtotalNewsArticles() {
+        return sysAdminDAO.findtotalNewsArticles();
+    }
+    
+    @Override
     public String addWildCardSearch(String searchTerm) {
 
         if (!searchTerm.startsWith("%")) {

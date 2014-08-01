@@ -53,7 +53,17 @@
                     <a href="hl7" title="HL7 Specs" class="btn btn-primary btn-small" role="button">View all</a>
                 </div>
             </section>
-        </div>             
+        </div>    
+                    
+        <div class="col-md-3 col-sm-3 col-xs-6">
+            <section class="panel panel-default panel-stats">
+                <div class="panel-body">
+                    <span class="stat-number"><a href="news" title="Total number of News Articles">${totalNewsArticles}</a></span>
+                    <h3>News Articles</h3>
+                    <a href="news" title="News Articles" class="btn btn-primary btn-small" role="button">View all</a>
+                </div>
+            </section>
+        </div>                
 		<%--
         <div class="col-md-3 col-sm-3 col-xs-6">
             <section class="panel panel-default panel-stats">

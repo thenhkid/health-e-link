@@ -1,4 +1,5 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
 <header id="header" class="header" role="banner">
     <div class="header-inner">
@@ -106,32 +107,38 @@
 
 
                     <div class="central-graphic-content">
-                        <h3>Our <a href="" title="">products</a> and <a href="" title="">services</a> enable health information exchange between<br/>
+                        <h3>Our <a href="<c:url value='/product-suite'/>" title="Product Suite Overview">products</a> and <a href="<c:url value='/solutions/services'/>" title="Services">services</a> enable health information exchange between<br/>
                             groups of health care providers, community partners, and state and local health agencies.</h3>
 
-                        <a href="" title="" class="btn btn-primary btn-action">Our Solutions</a>
-                        <a href="" title="" class="btn btn-primary btn-action btn-primary-action">Get Started</a>
+                        <a href="<c:url value='/solutions'/>" title="Solutions Overview" class="btn btn-primary btn-action">Our Solutions</a>
+                        <a href="<c:url value='/about/how-we-work'/>" title="How We Work" class="btn btn-primary btn-action btn-primary-action">Get Started</a>
                     </div>
                 </div>
-                <!-- News Ticker -->
+                <%-- News Ticker --%>
+                <c:if test="${not empty newsArticles}">
                 <div class="news-ticker" id="home-news">
                     <div class="container">
+                        <c:forEach var="article" items="${newsArticles}">
                         <div class="row">
                             <div class="col-md-1 news-ticker-header">
                                 <h2>News</h2>
-                                <a href=""><small>View All</small></a>
+                                <a href="<c:url value='/news/articles'/>"  title="View all News Articles"><small>View All</small></a>
                             </div>
                             <div class="col-md-10 news-ticker-content">
                                 <ul>
                                     <li>
-                                        <h3><a href="" title="">News Item Title</a></h3>
-                                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit <a href="">Read More</a></p>
+                                        <h3><a href="/news/article/${fn:toLowerCase(fn:replace(article.title,' ','-'))}" title="${article.title}">${article.title}</a></h3>
+                                        <c:if test="${not empty article.shortDesc}">
+                                        <p>${article.shortDesc}  <a href="/news/article/${fn:toLowerCase(fn:replace(article.title,' ','-'))}" title="Read ${article.title}">Read More</a></p>
+                                        </c:if>
                                     </li>
                                 </ul>
                             </div>
                         </div>
+                        </c:forEach>
                     </div>
                 </div>
+                </c:if>
             </c:when>
             <c:otherwise>
                 <div class="container">

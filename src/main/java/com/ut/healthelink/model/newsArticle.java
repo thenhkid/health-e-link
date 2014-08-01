@@ -40,7 +40,6 @@ public class newsArticle {
     private String shortDesc;
     
     @NotEmpty
-    @NoHtml
     @Column(name = "LONGDESC", nullable = false)
     private String longDesc;
     

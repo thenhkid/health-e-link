@@ -51,8 +51,19 @@ public class newsArticleManagerImpl implements newsArticleManager {
     
     @Override
     @Transactional
+    public List<newsArticle> listAllActiveNewsArticles() throws Exception {
+        return newsArticleDAO.listAllActiveNewsArticles();
+    }
+    
+    @Override
+    @Transactional
     public newsArticle getNewsArticleById(int id) throws Exception {
         return newsArticleDAO.getNewsArticleById(id);
     }
     
+    @Override
+    @Transactional
+    public List<newsArticle> getNewsArticleByTitle(String articleTitle) throws Exception {
+        return newsArticleDAO.getNewsArticleByTitle(articleTitle);
+    }
 }

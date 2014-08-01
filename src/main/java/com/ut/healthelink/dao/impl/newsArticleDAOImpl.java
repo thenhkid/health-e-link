@@ -12,6 +12,7 @@ import java.util.List;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.exception.SQLGrammarException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,6 +97,22 @@ public class newsArticleDAOImpl implements newsArticleDAO {
     }
     
     /**
+     * The 'listAllActiveNewsArticles' function will return all the active news articles in the system
+     *
+     * @Table	newsarticles
+     *
+     * @return The function will return the news articles
+     */
+    @Override
+    @Transactional
+    public List<newsArticle> listAllActiveNewsArticles() throws Exception {
+        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(newsArticle.class);
+        criteria.add(Restrictions.eq("status", true));
+
+        return criteria.list();
+    }
+    
+    /**
      * The 'getNewsArticleById' function will return a news article based on the passed Id
      *
      * @Table	newsarticles
@@ -110,4 +127,23 @@ public class newsArticleDAOImpl implements newsArticleDAO {
          return (newsArticle) sessionFactory.getCurrentSession().get(newsArticle.class, id);
     }
     
+    /**
+     * The 'getNewsArticleByTitle' function will return a news article based on the title passed in. If mutliple
+     * records are found it will return the first.
+     * 
+     * @param articleTitle   Wil hold the title of the article to be searched.
+     * @return This function will return an newsArticle Object.
+     * @throws Exception 
+     */
+    @Override
+    @Transactional
+    public List<newsArticle> getNewsArticleByTitle(String articleTitle) throws Exception {
+        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(newsArticle.class);
+        criteria.add(Restrictions.eq("status", true));
+        criteria.add(Restrictions.eq("title", articleTitle));
+        criteria.addOrder(Order.desc("dateCreated"));
+        
+        return  criteria.list();
+        
+    }
 }

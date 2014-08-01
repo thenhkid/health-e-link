@@ -6,14 +6,7 @@
 
     <div class="col-md-12">
 
-        <c:if test="${not empty savedStatus}" >
-            <div class="alert alert-success" role="alert">
-                <strong>Success!</strong> 
-                <c:choose><c:when test="${savedStatus == 'updated'}">The organization has been successfully updated!</c:when><c:otherwise>The organization has been successfully created!</c:otherwise></c:choose>
-            </div>
-        </c:if>
-
-        <form:form commandName="newsArticle"  method="post" role="form" enctype="multipart/form-data">
+        <form:form commandName="newsArticle" id="articleForm"  method="post" role="form" enctype="multipart/form-data">
             <input type="hidden" id="action" name="action" value="save" />
             <form:hidden path="id" id="articleId" />
             <form:hidden path="dateCreated" />
@@ -36,7 +29,7 @@
                             </div>
                         </div>
                         <spring:bind path="title">
-                            <div class="form-group ${status.error ? 'has-error' : '' }">
+                            <div id="articleTitleDiv" class="form-group ${status.error ? 'has-error' : '' }">
                                 <label class="control-label" for="title">Title *</label>
                                 <form:input path="title" id="title" class="form-control" type="text" maxLength="255" />
                                 <form:errors path="title" cssClass="control-label" element="label" />

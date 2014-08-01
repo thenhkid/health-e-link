@@ -57,6 +57,8 @@ public interface sysAdminManager {
     Long findTotalMacroRows();
     
     Long findtotalHL7Entries();
+    
+    Long findtotalNewsArticles();
 
     String addWildCardSearch(String searchTerm);
 

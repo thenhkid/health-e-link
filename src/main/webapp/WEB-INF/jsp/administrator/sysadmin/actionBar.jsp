@@ -23,8 +23,11 @@
                         <a href="javascript:void(0);" title="Create new HL7 Spec" class="unstyled-link">Create new HL7 Spec</a>
                     </c:when>  
                     <c:when test="${param['page'] == 'news'}">
-                        <a href="javascript:void(0);" title="Create new Article" class="unstyled-link">Create new Article</a>
+                        <a href="javascript:void(0);" title="Create new Article" class="unstyled-link">News Articles</a>
                     </c:when>  
+                    <c:when test="${param['page'] == 'articleDetails'}">
+                        <a href="javascript:void(0);" title="Create new Article" class="unstyled-link">Article Details</a>
+                    </c:when>      
                 </c:choose>
             </h1>
         </div>
@@ -42,6 +45,9 @@
                     </c:when>
                     <c:when test="${param['page'] == 'news'}">
                     <li><a href="<c:url value='/administrator/sysadmin/news/create' />" title="Create New Article" role="button"><span class="glyphicon icon-stacked glyphicon glyphicon-plus"></span>Create New</a></li>
+                    </c:when>
+                    <c:when test="${param['page'] == 'articleDetails'}">
+                    <li><a href="javascript:void(0);" id="saveDetails" title="Save this news article" role="button"><span class="glyphicon glyphicon-ok icon-stacked"></span> Save </a></li>
                     </c:when>
                 </c:choose>
 

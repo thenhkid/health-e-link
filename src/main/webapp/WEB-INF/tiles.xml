@@ -18,7 +18,7 @@
     <definition name="/login" extends="base.definition.admin">
         <put-attribute name="page-id" value="login" />
         <put-attribute name="page-section" value="section-login" />
-        <put-attribute name="title" value="Universal Translator Account Login" />
+        <put-attribute name="title" value="Health-e-Link Account Login" />
         <put-attribute name="body" value="/WEB-INF/jsp/login.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/admin/login.js" />
     </definition>
@@ -26,14 +26,14 @@
     <definition name="/loginfailed" extends="base.definition.admin">
         <put-attribute name="page-id" value="login" />
         <put-attribute name="page-section" value="section-login" />
-        <put-attribute name="title" value="Universal Translator Account Login" />
+        <put-attribute name="title" value="Health-e-Link Account Login" />
         <put-attribute name="body" value="/WEB-INF/jsp/login.jsp" />
     </definition>
     
     <definition name="/forgotPassword" extends="base.definition.admin">
         <put-attribute name="page-id" value="login" />
         <put-attribute name="page-section" value="section-login" />
-        <put-attribute name="title" value="Universal Translator Forgot Password" />
+        <put-attribute name="title" value="Health-e-Link Forgot Password" />
         <put-attribute name="body" value="/WEB-INF/jsp/forgotPassword.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/admin/forgotPassword.js" />
     </definition>
@@ -41,7 +41,7 @@
     <definition name="/resetPassword" extends="base.definition.admin">
         <put-attribute name="page-id" value="login" />
         <put-attribute name="page-section" value="section-login" />
-        <put-attribute name="title" value="Universal Translator Reset Password" />
+        <put-attribute name="title" value="Health-e-Link Reset Password" />
         <put-attribute name="body" value="/WEB-INF/jsp/resetPassword.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/admin/resetPassword.js" />
     </definition>
@@ -419,7 +419,7 @@
         <put-attribute name="page-section" value="section-sysadmin" />
         <put-attribute name="title" value="Administrator - Manage News Articles" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=sysadmin" />
-        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/sysadmin/actionBar.jsp?page=news" />
+        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/sysadmin/actionBar.jsp?page=articleDetails" />
         <put-attribute name="menu" value="/WEB-INF/jsp/administrator/sysadmin/menu.jsp?page=news" />
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/sysadmin/news/details.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/admin/sysadmin/news/details.js" />
@@ -559,28 +559,41 @@
 
     <!-- Information Pages -->
     <definition name="/productSuite" extends="base.definition.frontEnd">
-        <put-attribute name="title" value="Universal Translator - Product Suite" />
+        <put-attribute name="title" value="Health-e-Link - Product Suite" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page=productSuite" />
         <put-attribute name="body" value="/WEB-INF/jsp/informationPages/productSuite.jsp" />
     </definition>
     
     <definition name="/about" extends="base.definition.frontEnd">
-        <put-attribute name="title" value="Universal Translator - About Us" />
+        <put-attribute name="title" value="Health-e-Link - About Us" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page=about" />
         <put-attribute name="body" value="/WEB-INF/jsp/informationPages/about.jsp?page=about" />
     </definition>
     
     <definition name="/howwework" extends="base.definition.frontEnd">
-        <put-attribute name="title" value="Universal Translator - How We Work" />
+        <put-attribute name="title" value="Health-e-Link - How We Work" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page=about" />
         <put-attribute name="body" value="/WEB-INF/jsp/informationPages/howwework.jsp?page=howwework" />
     </definition>
     
     <definition name="/contact" extends="base.definition.frontEnd">
-        <put-attribute name="title" value="Universal Translator - Contact Us" />
+        <put-attribute name="title" value="Health-e-Link - Contact Us" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page=contact" />
         <put-attribute name="body" value="/WEB-INF/jsp/informationPages/contact.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/front-end/contact.js" />
+    </definition>
+    
+    <!-- News Article Pages -->
+    <definition name="/news/list" extends="base.definition.frontEnd">
+        <put-attribute name="title" value="Health-e-Link - News Article" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp" />
+        <put-attribute name="body" value="/WEB-INF/jsp/informationPages/news/list.jsp" />
+    </definition>
+    
+    <definition name="/news/articleDetails" extends="base.definition.frontEnd">
+        <put-attribute name="title" value="Health-e-Link - News Article" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp" />
+        <put-attribute name="body" value="/WEB-INF/jsp/informationPages/news/article.jsp" />
     </definition>
 
     <!-- Profile (Account) Pages -->
