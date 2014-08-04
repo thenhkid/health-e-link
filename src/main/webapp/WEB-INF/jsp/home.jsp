@@ -16,20 +16,22 @@
     <div class="container">
         <div class="row">
             <div class="col-md-4 col-sm-4 product-summary">
-                <a href="health-e-net.html" title="" class="icon-product icon-product icon-health-e-net"></a>
-                <h3><a href="/" title="Health-e-Net">Health-e-Net</a></h3>
+                <a href="<c:url value='/product-suite/health-e-net'/>" title="Health-e-Net" class="icon-product icon-product icon-health-e-net"></a>
+                <h3><a href="<c:url value='/product-suite/health-e-net'/>" title="Health-e-Net">Health-e-Net</a></h3>
                 <p>Secure and reliable health information exchange services</p>
-                <a href="/" title="Health-e-Net" class="btn-secondary">Learn More</a>
+                <a href="<c:url value='/product-suite/health-e-net'/>" title="Health-e-Net" class="btn-secondary">Learn More</a>
             </div>
             <div class="col-md-4 col-sm-4 product-summary">
-                <a href="" title="" class="icon-product icon-health-e-data"></a>
-                <h3><a href="/" title="Health-e-Data">Health-e-Data</a></h3>
+                <a href="<c:url value='/product-suite/health-e-data'/>" title="Health-e-Data" class="icon-product icon-health-e-data"></a>
+                <h3><a href="<c:url value='/product-suite/health-e-data'/>" title="Health-e-Data">Health-e-Data</a></h3>
                 <p>Health data warehouse supporting data collection, analysis and reporting</p>
+                <a href="<c:url value='/product-suite/health-e-data'/>" title="Health-e-Data" class="btn-secondary">Learn More</a>
             </div>
             <div class="col-md-4 col-sm-4 product-summary">
-                <a href="" title="" class="icon-product icon-health-e-web"></a>
-                <h3><a href="/" title="Health-e-Web">Health-e-Web</a></h3>
+                <a href="<c:url value='/product-suite/health-e-web'/>" title="Health-e-Web" class="icon-product icon-health-e-web"></a>
+                <h3><a href="<c:url value='/product-suite/health-e-web'/>" title="Health-e-Web">Health-e-Web</a></h3>
                 <p>Data submission and management portal for sharing data with community partners.</p>
+                <a href="<c:url value='/product-suite/health-e-web'/>" title="Health-e-Web" class="btn-secondary">Learn More</a>
             </div>
         </div>
         <%--<a href="http://www.youtube.com/watch?v=DMJKG6jyHYg" data-title="Product Demo" data-toggle="modal" data-target="#mediaModal" class="product-demo center-text font-large media-modal visible-xs">

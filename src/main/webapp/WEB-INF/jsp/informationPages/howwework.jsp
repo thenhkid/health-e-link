@@ -49,28 +49,86 @@
 
             <div class="col-md-9 col-md-offset-0 col-sm-8 col-sm-offset-1 page-content">
 
-                <h3>Advancing Community Healthcare</h3>
                 <p>
-                    With a foundation in not-for-profit healthcare, BOWLink was established in 2003 to provide a cost-effective solution for exchanging vital healthcare information for community-based organizations
-                    that did not have the resources for extensive, custom IT development.
+                    At BOWLink, we work closely with our clients, large and small, because we realize the significant impact that healthcare information integration can have on health outcomes, 
+                    clinical workflow, and resource utilization. Our project development process has been designed to foster community collaboration and to help all the stakeholders: healthcare 
+                    providers, oversight agencies, payers, and patients achieve their goals. We assist our clients before, during, and after the implementation to ensure complete usability, 
+                    satisfaction, and success
+
+                    BOWlink uses a consultative approach to evaluating your requirements and defining an integrated information systems strategy that complements your existing resources and delivers 
+                    maximum value. We utilize a four step process to ensure that the Health-e-Link Suite is successfully implemented and your staff is fully prepared to take advantage of the 
+                    opportunities that data exchange offers to your organization and the healthcare community. 
                 </p>
+
+                <h3>STEP 1: Information Gathering</h3>
                 <p>
-                    BOWlink understands that the widespread availability of the Internet and the connectivity it provides, across the enterprise or community, continues to spawn new opportunities for sharing
-                    information and transforming that information into community-wide knowledge. By providing standards-based templates across the web, BOWLink provides cost-effective solutions for resolving the
-                    technical issues involved in healthcare data exchange. For all involved in providing healthcare in your community, accurate data exchange is a critical step in delivering safer, patient-centric
-                    healthcare decisions and services.
+                    BOWlink staff will conduct a thorough business and technical review of your organization and the community of healthcare providers and payers you collaborate with. Critical information gathered includes: 
                 </p>
-                <h3>The Health-e-Link Data Exchange Solution</h3>
+                <h4>Business Review</h4>
+                <ul>
+                    <li>Business strategy</li>
+                    <li>Business relationships</li>
+                    <li>Sources of data</li>
+                    <li>Users of data </li>
+                    <li>Workflow</li>
+                    <li>Policies and procedures</li>
+                </ul>
+                <h4>Technical Review</h4>
+                <ul>
+                    <li>IT strategic plan</li>
+                    <li>Infrastructure</li>
+                    <li>Technical staff and resources</li>
+                    <li>Software applications</li>
+                    <li>Policies and procedures</li>
+                </ul>
+                <h3>STEP 2: Requirements Analysis</h3>
                 <p>
-                    BOWLink's <a href="<c:url value='/product-suite'/>" title="Product Suite">Health-e-link Suite</a> of products provides a healthcare information integration solution for community and hospital-based providers, payers, and healthcare
-                    oversight agencies. We've ensured that the health information exchange meets HIPAA privacy and security standards, thereby ensuring that patient privacy concerns are addressed. BOWlink has
-                    embraced widely accepted health information technology standards that ensure that an investment with BOWlink is a strategic investment for any organization. With its modular approach to
-                    implementation, Health-e-Link offers expanded capabilities for <a href="" title="">healthcare registry systems</a>, <a href="" title="">document management</a> and <a href="" title="">secure email
-                        messaging</a>.
+                    Using the information gathered in Step 1, the Health-e-Link Team will develop a set of recommendations and requirements for your Health-e-Link system implementation. Key steps and documents include:  
+                </p>
+                <ul>
+                    <li>Data analysis</li>
+                    <li>Industry standards</li>
+                    <li>Security requirements</li>
+                    <li>Workflow enhancements</li>
+                    <li>Cost/benefit analysis</li>
+                    <li>Functional requirements specification</li>
+                    <li>System configuration specification</li>
+                </ul>
+                <h3>STEP 3: System Configuration</h3>
+                <p>
+                    Your Health-e-Link Team will recommend, configure and test the Health-e-Link modules required to support your organization's healthcare information integration goals. The detailed 
+                    specifications that are defined through the requirements analysis process are key to a successful implementation. Essential elements include:   
+                </p>
+                <ul>
+                    <li>Portal setup</li>
+                    <li>Organizations and user roles</li>
+                    <li>Security setup</li>
+                    <li>Legacy system access</li>
+                    <li>Database configuration</li>
+                    <li>Business relationships</li>
+                    <li>Analysis, visualization, and reporting</li>
+                    <li>Data entry</li>
+                    <li>Data channels</li>
+                    <li>Data translation</li>
+                    <li>Quality Control</li>
+                    <li>Processing requirements</li>
+                    <li>Monitoring Requirements</li>
+                    <li>Audit Requirements</li>
+                </ul>
+                <h3>STEP 4: Rollout</h3>
+                <p>
+                    Your Health-e-Link Team will ensure that your staff is fully trained and prepared to use and manage the Health-e-Link Suite from user and administrative perspectives. We work with 
+                    you through a well defined process and ensure that your organization is prepared to take maximum advantage of Health-e-Link's data exchange capabilities. Key steps include:  
+                </p>
+                <ul>
+                    <li>Implementation</li>
+                    <li>Training including online and on-site </li>
+                    <li>Transition</li>
+                </ul>
+                <p>
+                    For a demonstration of Health-e-link's community healthcare information integration solutions, please contact us at (508) 721-1977 or email <a href="mailto:info@health-e-link.net">info@health-e-link.net</a>
                 </p>
             </div>
-
-
         </div>
     </div>
 </div>

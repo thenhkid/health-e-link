@@ -3,9 +3,11 @@ package com.ut.healthelink.controller;
 import com.ut.healthelink.model.User;
 import com.ut.healthelink.model.mailMessage;
 import com.ut.healthelink.model.newsArticle;
+import com.ut.healthelink.model.newsletterSignup;
 import com.ut.healthelink.model.userAccess;
 import com.ut.healthelink.service.emailMessageManager;
 import com.ut.healthelink.service.newsArticleManager;
+import com.ut.healthelink.service.newsletterManager;
 import com.ut.healthelink.service.userManager;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +46,9 @@ public class mainController {
     
     @Autowired
     private newsArticleManager newsarticlemanager;
+    
+    @Autowired
+    private newsletterManager newslettermanager;
     
     /**
      * The '/login' request will serve up the login page.
@@ -117,18 +122,6 @@ public class mainController {
     }
 
     /**
-     * The '/product-suite' request will display the product suite information page.
-     */
-    @RequestMapping(value = "/product-suite", method = RequestMethod.GET)
-    public ModelAndView productSuite() throws Exception {
-
-        ModelAndView mav = new ModelAndView();
-        mav.setViewName("/productSuite");
-        mav.addObject("pageTitle", "Product Suite");
-        return mav;
-    }
-
-    /**
      * The '/about' GET request will display the about page.
      */
     @RequestMapping(value = "/about", method = RequestMethod.GET)
@@ -170,20 +163,92 @@ public class mainController {
     @RequestMapping(value = "/contact", method = RequestMethod.POST)
     public ModelAndView contactPageSend(@RequestParam String name, @RequestParam String company, @RequestParam String address, @RequestParam String city, 
             @RequestParam String state, @RequestParam String zip, @RequestParam String phone, @RequestParam String ext, @RequestParam String fax, @RequestParam String email, 
+            @RequestParam String interestedIn, @RequestParam String comments) throws Exception {
+        
+       StringBuilder sb = new StringBuilder();
+       
+       mailMessage messageDetails = new mailMessage();
+        
+       messageDetails.settoEmailAddress("info@health-e-link.net");
+       messageDetails.setfromEmailAddress("info@health-e-link.net");
+       messageDetails.setmessageSubject("Health-e-Link Contact Form Submission");
+       
+       
+        sb.append("Name: "+ name);
+        sb.append("<br /><br />");
+        sb.append("Company / Organization: " + company);
+        sb.append("<br /><br />");
+        sb.append("Address: " + address);
+        sb.append("<br /><br />");
+        sb.append("City: " + city);
+        sb.append("<br /><br />");
+        sb.append("State: " + state);
+        sb.append("<br /><br />");
+        sb.append("Zip: " + zip);
+        sb.append("<br /><br />");
+        sb.append("Phone: " + phone);
+        sb.append("<br /><br />");
+        sb.append("Ext: " + ext);
+        sb.append("<br /><br />");
+        sb.append("Fax: " + fax);
+        sb.append("<br /><br />");
+        sb.append("Email: " + email);
+        sb.append("<br /><br />");
+        sb.append("Interested In: " + interestedIn);
+        sb.append("<br /><br />");
+        sb.append("Comments: " + comments);
+        sb.append("<br /><br />");
+        
+        messageDetails.setmessageBody(sb.toString());
+        
+        emailMessageManager.sendEmail(messageDetails); 
+
+        ModelAndView mav = new ModelAndView();
+        
+        mav.setViewName("/contact");
+        mav.addObject("pageTitle", "Contact Us");
+        mav.addObject("sent","sent");
+        
+        
+        return mav;
+    }
+    
+    /**
+     * The '/partners' GEt request will display the partner request page.
+     */
+    @RequestMapping(value = "/partners", method = RequestMethod.GET)
+    public ModelAndView partnersPage() throws Exception {
+
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/partners");
+        mav.addObject("pageTitle", "Partners");
+        return mav;
+    }
+    
+    /**
+     * The '/partners' POST request will submit the parner request form.
+     */
+    @RequestMapping(value = "/partners", method = RequestMethod.POST)
+    public ModelAndView partnerPageSend(@RequestParam String name, @RequestParam String title, @RequestParam String company, @RequestParam String URL, @RequestParam String address, @RequestParam String city, 
+            @RequestParam String state, @RequestParam String zip, @RequestParam String phone, @RequestParam String ext, @RequestParam String fax, @RequestParam String email, 
             @RequestParam String comments) throws Exception {
         
        StringBuilder sb = new StringBuilder();
        
        mailMessage messageDetails = new mailMessage();
         
-       messageDetails.settoEmailAddress("e-Referral@state.ma.us");
-       messageDetails.setfromEmailAddress("dphuniversaltranslator@gmail.com");
-       messageDetails.setmessageSubject("e-Referral Contact Form Submission");
+       messageDetails.settoEmailAddress("info@health-e-link.net");
+       messageDetails.setfromEmailAddress("info@health-e-link.net");
+       messageDetails.setmessageSubject("Health-e-Link Partner Request Form Submission");
        
        
         sb.append("Name: "+ name);
         sb.append("<br /><br />");
+        sb.append("Title: "+ title);
+        sb.append("<br /><br />");
         sb.append("Company / Organization: " + company);
+        sb.append("<br /><br />");
+        sb.append("URL: "+ URL);
         sb.append("<br /><br />");
         sb.append("Address: " + address);
         sb.append("<br /><br />");
@@ -210,8 +275,8 @@ public class mainController {
 
         ModelAndView mav = new ModelAndView();
         
-        mav.setViewName("/contact");
-        mav.addObject("pageTitle", "Contact Us");
+        mav.setViewName("/partners");
+        mav.addObject("pageTitle", "Partners");
         mav.addObject("sent","sent");
         
         
@@ -387,5 +452,42 @@ public class mainController {
 
         }
 
+    }
+    
+    /**
+     * The '/emailSignUp.do' function will save the email form.
+     * 
+     * @param emailAddress	The email address being signed up
+     * @param result	The validation result
+     *
+     * @throws Exception
+     */
+    @RequestMapping(value = "/emailSignUp.do", method = RequestMethod.POST)
+    public @ResponseBody Integer emailSignUp(@RequestParam(value = "emailAddress", required = true) String emailAddress, @RequestParam(value = "unsubscribe", required = true) boolean unsubscribe) throws Exception {
+         
+        if(unsubscribe == true) {
+            newslettermanager.removeEmailAddress(emailAddress);
+            
+            return 3;
+        }
+        else {
+            /* Need to check to see if the email address is already in the system */
+            List<newsletterSignup> emailSignUps = newslettermanager.emailExists(emailAddress);
+
+            if(emailSignUps.size() > 0) {
+                return 2;
+            }
+            else {
+                newsletterSignup emailSignup = new newsletterSignup();
+                emailSignup.setEmailAddress(emailAddress);
+
+                newslettermanager.saveEmailAddress(emailSignup);
+
+                return 1;
+            }
+
+        }
+       
+        
     }
 }

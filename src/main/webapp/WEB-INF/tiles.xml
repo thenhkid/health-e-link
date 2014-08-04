@@ -561,7 +561,49 @@
     <definition name="/productSuite" extends="base.definition.frontEnd">
         <put-attribute name="title" value="Health-e-Link - Product Suite" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page=productSuite" />
-        <put-attribute name="body" value="/WEB-INF/jsp/informationPages/productSuite.jsp" />
+        <put-attribute name="body" value="/WEB-INF/jsp/informationPages/productSuite/productSuite.jsp?page=overview" />
+    </definition>
+    
+    <definition name="/healthenet" extends="base.definition.frontEnd">
+        <put-attribute name="title" value="Health-e-Link - Health-e-Net" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page=productSuite" />
+        <put-attribute name="body" value="/WEB-INF/jsp/informationPages/productSuite/health-e-net.jsp?page=healthenet" />
+    </definition>
+    
+    <definition name="/healtheweb" extends="base.definition.frontEnd">
+        <put-attribute name="title" value="Health-e-Link - Health-e-Web" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page=productSuite" />
+        <put-attribute name="body" value="/WEB-INF/jsp/informationPages/productSuite/health-e-web.jsp?page=healtheweb" />
+    </definition>
+    
+    <definition name="/healthedata" extends="base.definition.frontEnd">
+        <put-attribute name="title" value="Health-e-Link - Health-e-Data" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page=productSuite" />
+        <put-attribute name="body" value="/WEB-INF/jsp/informationPages/productSuite/health-e-data.jsp?page=healthedata" />
+    </definition>
+    
+    <definition name="/doculink" extends="base.definition.frontEnd">
+        <put-attribute name="title" value="Health-e-Link - DOC-u-Link" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page=productSuite" />
+        <put-attribute name="body" value="/WEB-INF/jsp/informationPages/productSuite/doc-u-link.jsp?page=doculink" />
+    </definition>
+    
+    <definition name="/solutionOverivew" extends="base.definition.frontEnd">
+        <put-attribute name="title" value="Health-e-Link - Solutions" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page=solutions" />
+        <put-attribute name="body" value="/WEB-INF/jsp/informationPages/solutions/overview.jsp?page=overview" />
+    </definition>
+    
+    <definition name="/services" extends="base.definition.frontEnd">
+        <put-attribute name="title" value="Health-e-Link - Professional Services" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page=solutions" />
+        <put-attribute name="body" value="/WEB-INF/jsp/informationPages/solutions/services.jsp?page=services" />
+    </definition>
+    
+    <definition name="/casestudies" extends="base.definition.frontEnd">
+        <put-attribute name="title" value="Health-e-Link - Case Studies" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page=solutions" />
+        <put-attribute name="body" value="/WEB-INF/jsp/informationPages/solutions/caseStudies.jsp?page=casestudies" />
     </definition>
     
     <definition name="/about" extends="base.definition.frontEnd">
@@ -581,6 +623,13 @@
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page=contact" />
         <put-attribute name="body" value="/WEB-INF/jsp/informationPages/contact.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/front-end/contact.js" />
+    </definition>
+    
+    <definition name="/partners" extends="base.definition.frontEnd">
+        <put-attribute name="title" value="Health-e-Link - Partners" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page=partners" />
+        <put-attribute name="body" value="/WEB-INF/jsp/informationPages/partners.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/front-end/partners.js" />
     </definition>
     
     <!-- News Article Pages -->

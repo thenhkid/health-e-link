@@ -40,13 +40,17 @@
 
                 <c:if test="${not empty sent}">
                     <div id="translationMsgDiv"  class="alert alert-success">
-                        <strong>Your request has been submitted!</strong>
+                        <strong>Your partner request form has been submitted!</strong>
                     </div>
                 </c:if>
 
-                <h2>Contact Form</h2>
+                <h2>Partner Request Form</h2>
 
-                <form:form id="contactForm" method="post" role="form">
+                <p>
+                    Health-e-link partners with leaders in healthcare information technology applications and consulting to provide modular solutions that expand their capacity to provide data 
+                    exchange solutions to their current customers. For more information about how the Health-e-Link Suite of products can solve your integration needs, please complete and send the form below. 
+                </p>
+                <form:form id="partnerForm" method="post" role="form">
                     <div class="form-container">
                         <div id="fieldDiv_name" class="form-group">
                             <label for="name" class="control-label">Name *</label>
@@ -57,6 +61,14 @@
                             <label for="company" class="control-label">Company / Organization *</label>
                             <input id="company" name="company" class="form-control required" type="text" />
                             <span id="errorMsg_company" class="control-label"></span> 
+                        </div>
+                        <div class="form-group">
+                            <label for="title" class="control-label">Title</label>
+                            <input id="title" name="title" class="form-control" type="text" />
+                        </div>
+                        <div class="form-group">
+                            <label for="URL" class="control-label">URL</label>
+                            <input id="URL" name="URL" class="form-control" type="text" />
                         </div>
                         <div class="form-group">
                             <label for="address">Address</label>
@@ -106,38 +118,11 @@
                             <span id="errorMsg_email" class="control-label"></span> 
                         </div>
                         <div class="form-group">
-                            <label for="comments">I am Interestd In:</label>
-                            <div class="checkbox">
-                                <label>
-                                    <input name='interestedIn' type="checkbox" value="Health-e-Net">
-                                    Health-e-Net
-                                </label>
-                            </div>
-                            <div class="checkbox">
-                                <label>
-                                    <input name='interestedIn' type="checkbox" value="Health-e-Data">
-                                    Health-e-Data
-                                </label>
-                            </div>
-                            <div class="checkbox">
-                                <label>
-                                    <input name='interestedIn' type="checkbox" value="Health-e-Web">
-                                    Health-e-Web
-                                </label>
-                            </div>
-                            <div class="checkbox">
-                                <label>
-                                    <input name='interestedIn' type="checkbox" value="DOC-u-Link">
-                                   DOC-u-Link
-                                </label>
-                            </div>
-                        </div>
-                        <div class="form-group">
                             <label for="comments">Comments</label>
                             <textarea id="comments" name="comments" class="form-control" rows="5"></textarea>
                         </div>
                         <div class="form-group">
-                            <input type="submit" class="btn btn-primary submitMessage" value="Send"/>
+                            <input type="button" class="btn btn-primary submitMessage" value="Send"/>
                         </div>
                     </div>
                 </form:form>

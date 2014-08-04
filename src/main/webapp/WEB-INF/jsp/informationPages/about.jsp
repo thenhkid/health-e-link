@@ -65,8 +65,8 @@
                     BOWLink's <a href="<c:url value='/product-suite'/>" title="Product Suite">Health-e-link Suite</a> of products provides a healthcare information integration solution for community and hospital-based providers, payers, and healthcare
                     oversight agencies. We've ensured that the health information exchange meets HIPAA privacy and security standards, thereby ensuring that patient privacy concerns are addressed. BOWlink has
                     embraced widely accepted health information technology standards that ensure that an investment with BOWlink is a strategic investment for any organization. With its modular approach to
-                    implementation, Health-e-Link offers expanded capabilities for <a href="" title="">healthcare registry systems</a>, <a href="" title="">document management</a> and <a href="" title="">secure email
-                        messaging</a>.
+                    implementation, Health-e-Link offers expanded capabilities for <a href="<c:url value='/product-suite/health-e-data'/>" title="healthcare registry systems">healthcare registry systems</a>, <a href="<c:url value='/product-suite/doc-u-link'/>" title="DOC-u-Link">document management</a> 
+                    and <a href="<c:url value='/product-suite/health-e-web'/>" title="Secuire Email Messaging">secure email messaging</a>.
                 </p>
             </div>
 

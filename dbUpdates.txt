@@ -9,3 +9,10 @@ CREATE TABLE `healthelink`.`newsarticles` (
   `status` BIT(1) NOT NULL DEFAULT b'0',
   `dateCreated` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`));
+
+/** Chad 8-4-14 @ 1:13 PM **/
+CREATE TABLE `healthelink`.`newsletterSignups` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `emailAddress` VARCHAR(255) NOT NULL,
+  `dateCreated` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`));
