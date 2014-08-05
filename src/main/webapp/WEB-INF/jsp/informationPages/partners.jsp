@@ -116,6 +116,7 @@
                             <label for="email" class="control-label">Email *</label>
                             <input id="email" name="email" class="form-control half required Email" type="text" />
                             <span id="errorMsg_email" class="control-label"></span> 
+                            <span class="control-label"><a href="#privacyModal" data-toggle="modal" class="btn btn-link userEdit">Privacy Policy</a></span>
                         </div>
                         <div class="form-group">
                             <label for="comments">Comments</label>
@@ -126,6 +127,57 @@
                         </div>
                     </div>
                 </form:form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Privacy Policy modal -->
+<div class="modal fade" id="privacyModal" role="dialog" tabindex="-1" aria-labeledby="Privacy Policy" aria-hidden="true" aria-describedby="Privacy Policy">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h3 class="panel-title">Privacy Policy</h3>
+            </div>
+            <div class="modal-body page-content">
+                <h3>Privacy and Security Statement:</h3>
+                <p style="font-size: 12px">
+                    Health-e-Link takes your privacy seriously. Please read the following to learn more about our policy. 
+                </p>
+
+                <h3>What this Privacy Policy Covers</h3>
+                <p style="font-size: 12px">
+                    This Privacy Policy covers Health-e-Link's treatment of personally identifiable information that Health-e-Link collects when you are on the Health-e-Link site. 
+                </p>
+
+                <h3>Information Collection and use</h3>
+                <p style="font-size: 12px">
+                    Health-e-Link may collect personally identifiable information when you contact us or join our email list such as your name, company name, email address, and other information.  
+                </p>
+
+                <h3>Information Sharing and Disclosure</h3>
+                <p style="font-size: 12px">
+                    Health-e-Link will not sell trade or rent your personally identifiable information to anyone. [Health-e-Link may provide aggregate statistics about its customers, traffic patterns, and 
+                    related site information to reputable third-party vendors, but these statistics will include no personally identifying information.]
+
+                    Health-e-Link may also release account information when we believe, in good faith that such release is reasonably necessary to (i) comply with the law, (ii) enforce or apply the terms of 
+                    our site use agreement or (iii) protect the rights, property or safety Health-e-Link , our users or others.  
+                </p>
+
+                <h3>Links</h3>
+                <p style="font-size: 12px">
+                    This site contains external links to other web sites. Health-e-Link is not responsible for the privacy policies of these sites and the information they may gather expressly or automatically. 
+                </p>
+
+                <h3>Privacy Policy and Site Use Agreement</h3>
+                <p style="font-size: 12px">
+                    Your use of this site constitutes your consent to the collection and use of the information described in this Privacy Policy by Health-e-Link .  
+                </p>
+
+                <h3>Changes to this Privacy Policy</h3>
+                <p style="font-size: 12px">
+                    Health-e-Link may edit this policy from time to time. If we make any substantial changes we will notify you by posting a prominent announcement on our pages. 
+                </p>
             </div>
         </div>
     </div>

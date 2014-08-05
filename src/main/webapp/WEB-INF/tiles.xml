@@ -625,6 +625,12 @@
         <put-attribute name="jscript" value="/dspResources/js/front-end/contact.js" />
     </definition>
     
+    <definition name="/privacy" extends="base.definition.frontEnd">
+        <put-attribute name="title" value="Health-e-Link - Privacy" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page=privacy" />
+        <put-attribute name="body" value="/WEB-INF/jsp/informationPages/privacy.jsp" />
+    </definition>
+    
     <definition name="/partners" extends="base.definition.frontEnd">
         <put-attribute name="title" value="Health-e-Link - Partners" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page=partners" />

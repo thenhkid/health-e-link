@@ -144,6 +144,18 @@ public class mainController {
         mav.addObject("pageTitle", "How We Work");
         return mav;
     }
+    
+    /**
+     * The '/privacy' GEt request will display the privacy page.
+     */
+    @RequestMapping(value = "/privacy", method = RequestMethod.GET)
+    public ModelAndView privacyPage() throws Exception {
+
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/privacy");
+        mav.addObject("pageTitle", "Privacy");
+        return mav;
+    }
 
     /**
      * The '/contact' GEt request will display the contact page.
