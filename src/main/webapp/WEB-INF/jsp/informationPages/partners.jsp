@@ -25,12 +25,6 @@
                             <dt>Contact Us By Email</dt>
                             <dd class="email"><a href="" title="">info@health-e-link.net</a></dd>
 
-                            <%--<dt>Connect</dt>
-                            <dd class="margin-small top">
-                                <a href="" title="" class="icon-social icon-facebook ir-inline">Facebook</a>
-                                <a href="" title="" class="icon-social icon-linked-in ir-inline">Linked In</a>
-                                <a href="" title="" class="icon-social icon-twitter ir-inline">Twitter</a>
-                            </dd>--%>
                         </dl>
                     </div>
                 </div>
