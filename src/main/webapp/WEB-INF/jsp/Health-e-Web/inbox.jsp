@@ -73,7 +73,7 @@
                                         <td>
                                             ${batch.usersName}
                                         </td>
-                                        <td class="center-text"><fmt:formatDate value="${batch.dateCreated}" type="date" pattern="M/dd/yyyy" /><br /><fmt:formatDate value="${batch.dateCreated}" type="time" pattern="h:mm:ss a" /></td>
+                                        <td class="center-text"><fmt:formatDate value="${batch.dateCreated}" type="date" pattern="M/dd/yyyy h:mm:ss a" /></td>
                                         <td class="actions-col" style="width:50px;">
                                             <a href="javascript:void(0);" rel="${batch.id}" class="btn btn-link viewLink">
                                                 <span class="glyphicon glyphicon-edit"></span>

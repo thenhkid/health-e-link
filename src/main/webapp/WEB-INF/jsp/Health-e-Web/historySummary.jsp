@@ -195,7 +195,7 @@
                                                                     Patient Id: ${result.patientId}
                                                                 </td>
                                                                 <td class="center-text">
-                                                                    <fmt:formatDate value="${result.dateCreated}" type="date" pattern="M/dd/yyyy" /><br /><fmt:formatDate value="${result.dateCreated}" type="time" pattern="h:mm:ss a" />
+                                                                    <fmt:formatDate value="${result.dateCreated}" type="date" pattern="M/dd/yyyy h:mm:ss a" />
                                                                 </td>
                                                             </tr>
                                                         </c:forEach>
@@ -282,7 +282,7 @@
                                                                     Patient Id: ${result.patientId}
                                                                 </td>
                                                                 <td class="center-text">
-                                                                    <fmt:formatDate value="${result.dateCreated}" type="date" pattern="M/dd/yyyy" /><br /><fmt:formatDate value="${result.dateCreated}" type="time" pattern="h:mm:ss a" />
+                                                                    <fmt:formatDate value="${result.dateCreated}" type="date" pattern="M/dd/yyyy h:mm:ss a" />
                                                                 </td>
                                                             </tr>
                                                         </c:forEach>
