@@ -116,28 +116,30 @@
                 </div>
                 <%-- News Ticker --%>
                 <c:if test="${not empty newsArticles}">
-                <div class="news-ticker" id="home-news">
-                    <div class="container">
-                        <c:forEach var="article" items="${newsArticles}">
-                        <div class="row">
-                            <div class="col-md-1 news-ticker-header">
-                                <h2>News</h2>
-                                <a href="<c:url value='/news/articles'/>"  title="View all News Articles"><small>View All</small></a>
-                            </div>
-                            <div class="col-md-10 news-ticker-content">
-                                <ul>
-                                    <li>
-                                        <h3><a href="/news/article/${fn:toLowerCase(fn:replace(article.title,' ','-'))}" title="${article.title}">${article.title}</a></h3>
-                                        <c:if test="${not empty article.shortDesc}">
-                                        <p>${article.shortDesc}  <a href="/news/article/${fn:toLowerCase(fn:replace(article.title,' ','-'))}" title="Read ${article.title}">Read More</a></p>
-                                        </c:if>
-                                    </li>
-                                </ul>
+                    <div class="news-ticker" id="home-news">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-md-1 news-ticker-header">
+                                    <h2>News</h2>
+                                    <a href="<c:url value='/news/articles'/>"  title="View all News Articles"><small>View All</small></a>
+                                </div>
+                                <div id="news-carousel" class="col-md-10 news-ticker-content news-carousel slide" data-ride="carousel">
+                                    <ul class="carousel-inner" >
+                                        <c:forEach var="article" varStatus="loop" items="${newsArticles}">
+                                        <li ${loop.index == 0 ? 'class="item active"' : 'class="item"'}>
+                                            <h3>
+                                                <a href="/news/article/${fn:toLowerCase(fn:replace(article.title,' ','-'))}" title="${article.title}">${article.title}</a>
+                                            </h3>
+                                            <c:if test="${not empty article.shortDesc}">
+                                                <p>${article.shortDesc}  <span style="padding-left:10px"><a href="/news/article/${fn:toLowerCase(fn:replace(article.title,' ','-'))}" title="Read ${article.title}">Read More</a></span></p>
+                                            </c:if>
+                                        </li>
+                                        </c:forEach>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
-                        </c:forEach>
                     </div>
-                </div>
                 </c:if>
             </c:when>
             <c:otherwise>

@@ -74,13 +74,13 @@ public class userManagerImpl implements userManager {
     public List<userAccess> getuserSections(int userId) {
         return userDAO.getuserSections(userId);
     }
-    
+
     @Override
     @Transactional
-    public List<User> getOrganizationContact(int orgId, int mainContact){
+    public List<User> getOrganizationContact(int orgId, int mainContact) {
         return userDAO.getOrganizationContact(orgId, mainContact);
     }
-    
+
     @Override
     @Transactional
     public Integer getUserByIdentifier(String identifier) {
@@ -92,47 +92,47 @@ public class userManagerImpl implements userManager {
     public User getUserByResetCode(String resetCode) {
         return userDAO.getUserByResetCode(resetCode);
     }
-    
+
     @Override
     @Transactional
-    public void insertUserLog (UserActivity userActivity) {
+    public void insertUserLog(UserActivity userActivity) {
         userDAO.insertUserLog(userActivity);
     }
 
-	@Override
-	@Transactional
-	public UserActivity getUAById(Integer uaId) {
-		return userDAO.getUAById(uaId);
-	}
-	
-	@Override
-	@Transactional
-	public List<User> getUserByTypeByOrganization(int orgId){
-		return userDAO.getUserByTypeByOrganization(orgId);
-	}
+    @Override
+    @Transactional
+    public UserActivity getUAById(Integer uaId) {
+        return userDAO.getUAById(uaId);
+    }
 
-	@Override
-	@Transactional
-	public List<User> getSendersForConfig(List <Integer> configIds) {
-		return userDAO.getSendersForConfig(configIds);
-	}
+    @Override
+    @Transactional
+    public List<User> getUserByTypeByOrganization(int orgId) {
+        return userDAO.getUserByTypeByOrganization(orgId);
+    }
 
-	@Override
-	@Transactional
-	public List<User> getOrgUsersForConfig(List <Integer> configIds) {
-		return userDAO.getOrgUsersForConfig(configIds);
-	}
+    @Override
+    @Transactional
+    public List<User> getSendersForConfig(List<Integer> configIds) {
+        return userDAO.getSendersForConfig(configIds);
+    }
 
-	@Override
-	@Transactional
-	public List<User> getAllUsers() {
-		return userDAO.getAllUsers();
-	}
+    @Override
+    @Transactional
+    public List<User> getOrgUsersForConfig(List<Integer> configIds) {
+        return userDAO.getOrgUsersForConfig(configIds);
+    }
 
-	@Override
-	@Transactional
-	public void updateUserActivity(UserActivity userActivity) {
-		userDAO.updateUserActivity(userActivity);
-	}
+    @Override
+    @Transactional
+    public List<User> getAllUsers() {
+        return userDAO.getAllUsers();
+    }
+
+    @Override
+    @Transactional
+    public void updateUserActivity(UserActivity userActivity) {
+        userDAO.updateUserActivity(userActivity);
+    }
 
 }

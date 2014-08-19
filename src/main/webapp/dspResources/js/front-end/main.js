@@ -99,6 +99,8 @@ define(['jquery', 'fixed-header', 'moment', 'bootstrap', 'responsive-tables', 'm
         searchByDateRange();
     }
     );
+    
+    $('.news-carousel').carousel();
 
 
     // left nav scrollspy
