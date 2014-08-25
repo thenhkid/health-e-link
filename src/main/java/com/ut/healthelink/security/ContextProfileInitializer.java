@@ -27,10 +27,11 @@ public class ContextProfileInitializer implements ApplicationContextInitializer<
             Logger.getLogger(ContextProfileInitializer.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        if("10.202.52.54".equals(hostname)) {
-            profiles = "healthelink-test";
-        } else if("10.202.52.152".equals(hostname)) {
-            profiles = "healthelink-prod";
+        if("172.24.16.43".equals(hostname)) {
+            profiles = "staging";
+        } 
+        else if("172.24.16.41".equals(hostname)) {
+            profiles = "prod";
         }
                 
         environment.setActiveProfiles(profiles);
