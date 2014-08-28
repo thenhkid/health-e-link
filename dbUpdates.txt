@@ -16,3 +16,7 @@ CREATE TABLE `healthelink`.`newsletterSignups` (
   `emailAddress` VARCHAR(255) NOT NULL,
   `dateCreated` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`));
+
+/** Chad 08272014 @ 12:49 PM **/
+ALTER TABLE `universaltranslator`.`organizations` 
+ADD COLUMN `parentId` INT NULL DEFAULT 0 AFTER `parsingTemplate`;
