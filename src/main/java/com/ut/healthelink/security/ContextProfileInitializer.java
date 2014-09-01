@@ -30,7 +30,7 @@ public class ContextProfileInitializer implements ApplicationContextInitializer<
         if("172.24.16.43".equals(hostname)) {
             profiles = "staging";
         } 
-        else if("172.24.16.41".equals(hostname)) {
+        else if("172.24.32.41".equals(hostname)) {
             profiles = "prod";
         }
                 
