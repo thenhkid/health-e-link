@@ -322,7 +322,7 @@ public class messageTypeDAOImpl implements messageTypeDAO {
     @SuppressWarnings("rawtypes")
     @Transactional
     public List getInformationTables() {
-        Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT distinct table_name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'universalTranslator' and TABLE_NAME LIKE 'message\\_%'");
+        Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT distinct table_name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'healthelink' and TABLE_NAME LIKE 'message\\_%'");
 
         return query.list();
     }
@@ -334,7 +334,7 @@ public class messageTypeDAOImpl implements messageTypeDAO {
     @SuppressWarnings("rawtypes")
     @Transactional
     public List getAllTables() {
-        Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT distinct table_name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'universalTranslator'");
+        Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT distinct table_name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'healthelink'");
 
         return query.list();
     }
@@ -347,7 +347,7 @@ public class messageTypeDAOImpl implements messageTypeDAO {
     @SuppressWarnings("rawtypes")
     @Transactional
     public List getTableColumns(String tableName) {
-        Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'universalTranslator' AND TABLE_NAME = :tableName and COLUMN_NAME not in ('id', 'dateCreated', 'transactionInId') order by COLUMN_NAME")
+        Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'healthelink' AND TABLE_NAME = :tableName and COLUMN_NAME not in ('id', 'dateCreated', 'transactionInId') order by COLUMN_NAME")
                 .setParameter("tableName", tableName);
 
         return query.list();

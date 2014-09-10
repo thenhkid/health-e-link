@@ -20,3 +20,17 @@ CREATE TABLE `healthelink`.`newsletterSignups` (
 /** Chad 08272014 @ 12:49 PM **/
 ALTER TABLE `universaltranslator`.`organizations` 
 ADD COLUMN `parentId` INT NULL DEFAULT 0 AFTER `parsingTemplate`;
+
+/** 09082014 @ 10:50 AM **/
+ALTER TABLE `healthelink`.`message_misc` 
+ADD COLUMN `field16` VARCHAR(500) NULL DEFAULT NULL AFTER `field15`,
+ADD COLUMN `field17` VARCHAR(500) NULL DEFAULT NULL AFTER `field16`,
+ADD COLUMN `field18` VARCHAR(500) NULL DEFAULT NULL AFTER `field17`,
+ADD COLUMN `field19` VARCHAR(500) NULL DEFAULT NULL AFTER `field18`,
+ADD COLUMN `field20` VARCHAR(500) NULL DEFAULT NULL AFTER `field19`;
+
+ALTER TABLE `healthelink`.`message_patients` 
+ADD COLUMN `familySize` VARCHAR(45) NULL DEFAULT NULL AFTER `race`;
+
+ALTER TABLE `healthelink`.`message_patients` 
+ADD COLUMN `income` VARCHAR(45) NULL DEFAULT NULL AFTER `familySize`;

@@ -34,7 +34,7 @@
                     <li><a href="javascript:void(0);" id="saveDetails" title="Save this Message Type"><span class="glyphicon glyphicon-ok icon-stacked"></span> Save </a></li>
                     <c:if test="${empty id}"><li><a href="javascript:void(0);" id="next" title="Save and Proceed to the Next Step"><span class="glyphicon glyphicon-forward icon-stacked"></span>Next Step</a></li></c:if>
                     <!--<c:if test="${not empty id}"><li><a href="#confirmationOrgDelete" data-toggle="modal" rel="${id}" title="Delete this Organization"><span class="glyphicon glyphicon-remove icon-stacked"></span>Delete</a></li></c:if>-->
-                    <li><a href="<c:url value='/administrator/library/list' />" title="Cancel"><span class="glyphicon icon-stacked custom-icon icon-cancel"></span>Cancel</a></li>
+                    <li><a href="<c:url value='/administrator/library/list' />" title="Cancel"><span class="glyphicon icon-stacked custom-icon glyphicon-ban-circle"></span>Cancel</a></li>
                     </c:when>
                     <c:when test="${param['page'] == 'list'}">
                     <li><a href="create" title="Create New Message Type"><span class="glyphicon icon-stacked glyphicon glyphicon-plus"></span>Create New</a></li>

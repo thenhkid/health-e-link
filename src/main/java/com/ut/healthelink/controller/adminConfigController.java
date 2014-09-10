@@ -1629,7 +1629,7 @@ public class adminConfigController {
             return mav;
        }
        else {
-            ModelAndView mav = new ModelAndView(new RedirectView("preProcessing"));
+            ModelAndView mav = new ModelAndView(new RedirectView("preprocessing"));
             return mav;
        }
 

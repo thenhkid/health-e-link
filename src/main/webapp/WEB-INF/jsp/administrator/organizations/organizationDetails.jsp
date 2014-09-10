@@ -115,15 +115,15 @@
                                     <form:hidden id="parsingTemplate" path="parsingTemplate" />
                                 </div>
                             </c:if>
-                            <spring:bind path="file">
-                                <div id="parsingTemplateDiv" class="form-group ${status.error ? 'has-error' : '' }">
-                                    <label class="control-label" for="file">Inbound File (CCD/HL7) Parsing Script (JAR file)</label>
-                                    <form:input path="file" id="file" class="form-control" type="file" />
-                                    <form:errors path="file" cssClass="control-label" element="label" />
-                                    <span id="parsingTemplateMsg" class="control-label"></span>
-                                </div>
-                            </spring:bind>  
-                        </c:if>      
+                         </c:if>    
+                        <spring:bind path="file">
+                            <div id="parsingTemplateDiv" class="form-group ${status.error ? 'has-error' : '' }">
+                                <label class="control-label" for="file">Inbound File (CCD/HL7) Parsing Script (JAR file)</label>
+                                <form:input path="file" id="file" class="form-control" type="file" />
+                                <form:errors path="file" cssClass="control-label" element="label" />
+                                <span id="parsingTemplateMsg" class="control-label"></span>
+                            </div>
+                        </spring:bind>  
                         </div>
                     </div>
                 </section>
