@@ -1,3 +1,7 @@
 context.xml
 /target/
 bin
+.classpath
+.settings/org.eclipse.ltk.core.refactoring.prefs
+.settings/org.eclipse.wst.common.component
+.settings/org.eclipse.wst.ws.service.policy.prefs
