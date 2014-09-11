@@ -218,5 +218,5 @@ DELIMITER ;
 
 
 /** grace applied to  all HEL servers 09112014 02:44PM **/
-UPDATE `universaltranslator`.`macro_names` SET `populateFieldA`=1 WHERE `ID`='2';
-UPDATE `universaltranslator`.`macro_names` SET `populateFieldA`=1 WHERE `ID`='1';
+UPDATE `healthelink`.`macro_names` SET `populateFieldA`=1 WHERE `ID`='2';
+UPDATE `healthelink`.`macro_names` SET `populateFieldA`=1 WHERE `ID`='1';
