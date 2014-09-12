@@ -120,6 +120,10 @@ public class adminProcessingActivity {
     private static int maxResults = 10;
 
     private String archivePath = "/bowlink/archivesIn/";
+    
+  //final status Ids
+    private List<Integer> finalStatusIds = Arrays.asList(11, 12, 13, 16);
+
 
     /**
      * The '/inbound' GET request will serve up the existing list of generated referrals and feedback reports
@@ -1630,7 +1634,7 @@ public class adminProcessingActivity {
 
             if (batchDetails.getstatusId() == 5) {
                 // now we check so we don't have to make a db hit if batch status is not 5 
-                if (transactionInManager.getRecordCounts(batchDetails.getId(), Arrays.asList(11, 12, 13, 16), false, false) == 0) {
+                if (transactionInManager.getRecordCounts(batchDetails.getId(), finalStatusIds, false, false) == 0) {
                     canSend = true;
                 }
             }
@@ -1788,7 +1792,7 @@ public class adminProcessingActivity {
                 if (batchDetails.getstatusId() == 5) {
                     transactionInManager.updateBatchStatus(batchId, 4, "startDateTime");
                     //check once again to make sure all transactions are in final status
-                    if (transactionInManager.getRecordCounts(batchId, Arrays.asList(11, 12, 13, 16), false, false) == 0) {
+                    if (transactionInManager.getRecordCounts(batchId, finalStatusIds, false, false) == 0) {
                         transactionInManager.updateBatchStatus(batchId, 6, "endDateTime");
                     } else {
                         transactionInManager.updateBatchStatus(batchId, 5, "endDateTime");

@@ -646,7 +646,7 @@ public class transactionInManagerImpl implements transactionInManager {
                  *
                  */
 
-                if (getRecordCounts(batchUploadId, Arrays.asList(11, 12, 13, 16), false, false) > 0 && batch.getstatusId() == 6) {
+                if (getRecordCounts(batchUploadId, finalStatusIds, false, false) > 0 && batch.getstatusId() == 6) {
                     //we stop here as batch is not in final status and release batch was triggered
                     batch.setstatusId(5);
                     batchStausId = 5;
@@ -662,7 +662,7 @@ public class transactionInManagerImpl implements transactionInManager {
                         || handlingDetails.get(0).geterrorHandling() == 1))) {
 
                     if (handlingDetails.get(0).getautoRelease() && handlingDetails.get(0).geterrorHandling() == 1
-                            && getRecordCounts(batchUploadId, Arrays.asList(11, 12, 13, 16), false, false) > 0) {
+                            && getRecordCounts(batchUploadId, finalStatusIds, false, false) > 0) {
                         //post records to ERG
                         batch.setstatusId(5);
                         batchStausId = 5;
@@ -704,11 +704,18 @@ public class transactionInManagerImpl implements transactionInManager {
                     batchStausId = 24;
 
                 } else if (handlingDetails.get(0).getautoRelease() && handlingDetails.get(0).geterrorHandling() == 3) {
-                    //auto-release, 3 = Reject submission on error 
-                    batchStausId = 7;
-                    //updating entire batch to reject since error transactionIds are in error tables
-                    updateTransactionTargetStatus(batchUploadId, transactionId, 14, 13);
-                    updateTransactionStatus(batchUploadId, transactionId, 14, 13);
+                	//auto-release, 3 = Reject submission on error 
+                	//we should check if there are errors for the batch
+                	//we release if the entire batch is in final status
+                	 if (getRecordCounts(batchUploadId, finalStatusIds, false, false) > 0) {
+                		 //there are records not in final status
+	                    batchStausId = 7;
+	                    //updating entire batch to reject since error transactionIds are in error tables
+	                    updateTransactionTargetStatus(batchUploadId, transactionId, 14, 13);
+	                    updateTransactionStatus(batchUploadId, transactionId, 14, 13);
+                	 }  else  {
+                		 batchStausId = 6;
+                	 }
 
                 } else if (!handlingDetails.get(0).getautoRelease() && handlingDetails.get(0).geterrorHandling() == 1) { //manual release
                     //transaction will be set to saved, batch will be set to RP
