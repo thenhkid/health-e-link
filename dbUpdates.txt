@@ -1,54 +1,11 @@
-
-/** Chad 7-29-14 @ 3:21 PM **/
-
-CREATE TABLE `healthelink`.`newsarticles` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `title` VARCHAR(45) NOT NULL,
-  `shortDesc` VARCHAR(255) NULL,
-  `longDesc` TEXT NULL,
-  `status` BIT(1) NOT NULL DEFAULT b'0',
-  `dateCreated` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`));
-
-/** Chad 8-4-14 @ 1:13 PM **/
-CREATE TABLE `healthelink`.`newsletterSignups` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `emailAddress` VARCHAR(255) NOT NULL,
-  `dateCreated` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`));
-
-/** Chad 08272014 @ 12:49 PM **/
-ALTER TABLE `healthelink`.`organizations` 
-ADD COLUMN `parentId` INT NULL DEFAULT 0 AFTER `parsingTemplate`;
-
-/** 09082014 @ 10:50 AM **/
-ALTER TABLE `healthelink`.`message_misc` 
-ADD COLUMN `field16` VARCHAR(500) NULL DEFAULT NULL AFTER `field15`,
-ADD COLUMN `field17` VARCHAR(500) NULL DEFAULT NULL AFTER `field16`,
-ADD COLUMN `field18` VARCHAR(500) NULL DEFAULT NULL AFTER `field17`,
-ADD COLUMN `field19` VARCHAR(500) NULL DEFAULT NULL AFTER `field18`,
-ADD COLUMN `field20` VARCHAR(500) NULL DEFAULT NULL AFTER `field19`;
-
-ALTER TABLE `healthelink`.`message_patients` 
-ADD COLUMN `familySize` VARCHAR(45) NULL DEFAULT NULL AFTER `race`;
-
-ALTER TABLE `healthelink`.`message_patients` 
-ADD COLUMN `income` VARCHAR(45) NULL DEFAULT NULL AFTER `familySize`;
-
-/** grace 09112014 0956AM applied to dph machine**/
-
-INSERT INTO `healthelink`.`macro_names` (`ID`, `CategoryId`, `Macro_Name`, `Macro_Short_Name`, `Formula`, `FieldA_Question`, `Con1_Question`, `Con2_Question`, `populateFieldA`) VALUES ('85', '1', 'dropValueByPriorityInboundOnly', 'topRankedInbound', 'dropValueByPriorityInboundOnly', 'Please enter field to check', 'Please enter crosswalk Id', 'Would you like to drop value? (Y/N) If N, value will be replaced with blank.', 1);
-
 use healthelink;
 
 drop procedure if exists listtorows;
 
-
 DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE ListToRows(in fieldA varchar(20), in cwId int /** con1 **/, 
+CREATE DEFINER=`root`@`localhost` PROCEDURE `ListToRows`(in fieldA varchar(20), in cwId int /** con1 **/, 
 in listOfValues varchar(255), in dropValue  varchar(255) /**con2 - y/n**/, 
 in foroutboundProcessing boolean, in transactionId int)
-
 BEGIN
 
 /** create our temp table **/
@@ -57,7 +14,7 @@ drop table if exists listToRowsTemp;
 CREATE Temporary TABLE `listToRowsTemp` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `sourceValue` varchar(255) DEFAULT NULL,
-  `priority` varchar(255) DEFAULT NULL,
+  `priority` int DEFAULT NULL,
   `matchValue` varchar(255) DEFAULT NULL,
   `transactionId` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
@@ -120,103 +77,5 @@ end if;
 	EXECUTE stmt;-- execute
 drop table listToRowsTemp;
 
-END $$
+END$$
 DELIMITER ;
-
-
-
-use healthelink;
-
-drop procedure if exists `healthelink`.`dropValueByPriorityInboundOnly`;
-
-DELIMITER $$
-CREATE DEFINER=`root`@`localhost` PROCEDURE `dropValueByPriorityInboundOnly`(in configId int, 
-in batchId int, in srcField varchar(10),
-in fieldA varchar(10), in fieldB varchar(10), in con1 varchar(255) /** cwid **/, 
-in con2 varchar(255), in macroId int, in foroutboundProcessing boolean, in passClear int, in transactionId int)
-proc_main:begin
-
-/** 
-This store procedure takes in values from a field and a cwid
-It will loop through the transactions and split the value into a row
-The priority for matching value will then be updated
-According to con2 - drop value, we will either update the lower priority to null or blank
-We will then update field value with new string value
-Assuming cw has 59 as priority 1 and 70 as priority 2
-59, 07, 12, 71, 22, 70, 02, 44
-should become
-if drop value is N
-59, 07, 12, 71, 22, , 02, 44
-if Y
-59, 07, 12, 71, 22, 02, 44
-
-sample usage
-CALL `healthelink`.`dropValueByPriorityInboundOnly`(94, 623, 'F500', 'F500', '', '10', 'Y', 85, false, 2, 0);
- 
-**/
-
-DECLARE cursor_end CONDITION FOR SQLSTATE '02000'; 
-DECLARE v_column_val VARCHAR(50); 
-DECLARE v_transactionInId VARCHAR(50); 
-DECLARE done INT DEFAULT 0; 
-DECLARE cur_table CURSOR FOR SELECT * FROM test_prepare_vw; 
-DECLARE CONTINUE HANDLER FOR cursor_end SET done = 1; 
-
-drop view if exists `test_prepare_vw`;
-call getFinalStatusIds;
-select @finalStatusIds into @finalStatusIds;
-
-
-if (transactionId = 0) then
-begin
-SET @query = CONCAT('CREATE VIEW test_prepare_vw as select ', fieldA, ' , 
-transactionInId from transactiontranslatedIn where transactionInId in 
-(select id from transactionIn where configId = ', configId, ' and batchId = ', batchId , ' and statusId not in (', @finalStatusIds,'));'); 
-PREPARE stmt from @query; 
-EXECUTE stmt; 
-DEALLOCATE PREPARE stmt; 
-
-OPEN cur_table; 
-FETCH cur_table INTO v_column_val, v_transactionInId ; 
-WHILE done = 0 DO 
-CALL `healthelink`.`ListToRows`(fieldA, con1, v_column_val, con2 , foroutboundProcessing, v_transactionInId);
-FETCH cur_table INTO v_column_val, v_transactionInId ; 
-END WHILE; 
-CLOSE cur_table; 
-
-DROP VIEW test_prepare_vw; 
-end;
-end if;
-
-
-if (transactionId != 0) then
-	set @stmt  = concat("select ", fieldA, " into @listValue from  ", @translatedTable, " where ",@transactionTable,"Id = ", transactionId, ";" );
-	insert into sqlstmt (sqlstmt) values (@stmt);
-	PREPARE stmt from @stmt;
-	EXECUTE stmt;-- execute
-
-	CALL `healthelink`.`ListToRows`(fieldA, con1, @listValue, con2 , foroutboundProcessing, transactionId);
-	END if;
-
-
-	
-
-
-
--- we check pass /clear
-if (passClear = 2) THEN
-BEGIN
--- accessible
-END;
-END IF;
-
-
--- the only error for this is if SP bombs, no need to write in insert error logs
-select '';
-end proc_main$$
-DELIMITER ;
-
-
-/** grace applied to  all HEL servers 09112014 02:44PM **/
-UPDATE `healthelink`.`macro_names` SET `populateFieldA`=1 WHERE `ID`='2';
-UPDATE `healthelink`.`macro_names` SET `populateFieldA`=1 WHERE `ID`='1';
