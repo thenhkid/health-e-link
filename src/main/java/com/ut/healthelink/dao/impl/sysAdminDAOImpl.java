@@ -45,7 +45,7 @@ public class sysAdminDAOImpl implements sysAdminDAO {
     @Autowired
     private SessionFactory sessionFactory;
 
-    private String schemaName = "universalTranslator";
+    private String schemaName = "healthelink";
 
     /**
      * this gets a list of Lookup tables *

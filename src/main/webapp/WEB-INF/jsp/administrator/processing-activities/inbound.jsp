@@ -42,7 +42,7 @@
                  </c:if>
 				
                 <div class="form-container scrollable">
-                     <div class="date-range-picker-trigger form-control pull-right daterange" style="width:245px; margin-left: 10px;">
+                     <div class="date-range-picker-trigger form-control pull-right daterange" style="width:285px; margin-left: 10px;">
                         <i class="glyphicon glyphicon-calendar"></i>
                         <span class="date-label"><fmt:formatDate value="${fromDate}" type="date" pattern="MMMM dd, yyyy" /> - <fmt:formatDate value="${toDate}" type="date" pattern="MMMM dd, yyyy" /></span> <b class="caret"></b>
                     </div>
