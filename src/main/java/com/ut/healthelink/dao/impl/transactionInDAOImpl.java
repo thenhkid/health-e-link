@@ -5909,4 +5909,28 @@ public class transactionInDAOImpl implements transactionInDAO {
         }
 	}
 	
+	
+	@Override
+	@Transactional
+	public List<Integer> getErrorCodes(List<Integer> codesToIgnore) {
+		try {
+            String sql = "select id from lu_errorcodes";
+            if (codesToIgnore.size() == 0) {
+            	sql = sql + " where id not in (:codesToIgnore);";
+            }
+
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+            if (codesToIgnore.size() == 0) {
+            	query.setParameterList("codesToIgnore", codesToIgnore);
+            }
+            
+            List<Integer> errorCodes = query.list();
+            return errorCodes;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.err.println("getErrorCodes " + ex.getCause());
+            return null;
+        }
+	}
+	
 }

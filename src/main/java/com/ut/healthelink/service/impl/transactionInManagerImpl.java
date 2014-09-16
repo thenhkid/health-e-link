@@ -1740,6 +1740,8 @@ public class transactionInManagerImpl implements transactionInManager {
                     //1. we get all configs for user - user might not have permission to submit but someone else in org does
 
                     List<configurationMessageSpecs> configurationMessageSpecs = configurationtransportmanager.getConfigurationMessageSpecsForOrgTransport(batch.getOrgId(), batch.gettransportMethodId(), false);
+                    List<configurationMessageSpecs> checkOnlyConfigForOrg = configurationtransportmanager.getConfigurationMessageSpecsForOrgTransport(batch.getOrgId(), batch.gettransportMethodId(), true);
+                    
                     //2. we get all rows for batch
                     List<transactionInRecords> tInRecords = getTransactionInRecordsForBatch(batch.getId());
                     if (tInRecords == null || tInRecords.size() == 0) {
@@ -1748,7 +1750,7 @@ public class transactionInManagerImpl implements transactionInManager {
                                 false, false, "No valid transactions were found for batch.");
                         return false;
                     }
-                    if (configurationMessageSpecs == null || configurationMessageSpecs.size() == 0) {
+                    if (configurationMessageSpecs == null || (configurationMessageSpecs.size() == 0 && checkOnlyConfigForOrg.size() == 0)) {
                         insertProcessingError(6, null, batchId, null, null, null, null,
                                 false, false, "No valid configurations were found for loading batch.");
                         // update all transactions to invalid
@@ -1757,8 +1759,14 @@ public class transactionInManagerImpl implements transactionInManager {
                         return false;
                     }
                     //if we only have one and it is set to 0,we can default, else we loop through
-                    if (configurationMessageSpecs.size() == 1 && configurationMessageSpecs.get(0).getmessageTypeCol() == 0) {
-                        sysError = sysError + updateConfigIdForBatch(batch.getId(), configurationMessageSpecs.get(0).getconfigId());
+                    if ((configurationMessageSpecs.size() == 1 && configurationMessageSpecs.get(0).getmessageTypeCol() == 0) || checkOnlyConfigForOrg.size() == 1){
+                    	int configId = 0;
+                    	if (configurationMessageSpecs.size() == 0) {
+                    		configId = 	checkOnlyConfigForOrg.get(0).getconfigId();
+                    	} else  {
+                    		configId = 	configurationMessageSpecs.get(0).getconfigId();
+                    	}
+                        sysError = sysError + updateConfigIdForBatch(batch.getId(), configId);
                     } else {
                         //3 loop through each config and mass update by config
                         for (configurationMessageSpecs cms : configurationMessageSpecs) {
@@ -2204,7 +2212,7 @@ public class transactionInManagerImpl implements transactionInManager {
             ConfigErrorInfo configErrorInfo = new ConfigErrorInfo();
             configErrorInfo.setBatchId(batchInfo.getId());
 
-            List<TransErrorDetail> tedList = getTransErrorDetailsForNoRptFields(batchInfo.getId(), Arrays.asList(5, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20));
+            List<TransErrorDetail> tedList = getTransErrorDetailsForNoRptFields(batchInfo.getId(), getErrorCodes(Arrays.asList(1,2,3,4,6,9)));
             if (tedList.size() > 0) {
                 masterTedList.addAll(tedList);
             }
@@ -3247,5 +3255,10 @@ public class transactionInManagerImpl implements transactionInManager {
 	@Override
 	public List<Integer> getTransactionInIdsFromBatch(Integer batchUploadId) {
 		return transactionInDAO.getTransactionInIdsFromBatch(batchUploadId);	}
+	
+	@Override
+	public List<Integer> getErrorCodes(List<Integer> codesToIgnore) {
+		return transactionInDAO.getErrorCodes(codesToIgnore);
+	}
 
 }

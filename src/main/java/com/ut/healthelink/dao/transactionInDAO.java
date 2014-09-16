@@ -346,5 +346,8 @@ public interface transactionInDAO {
     Integer clearBatchDownloads(List <Integer> batchDownloadIDs);
     
     List<Integer> getTransactionInIdsFromBatch(Integer batchUploadId);
+    
+    List<Integer> getErrorCodes(List<Integer> codesToIgnore);
+
    
 }

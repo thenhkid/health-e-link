@@ -423,4 +423,6 @@ public interface transactionInManager {
     
     List<Integer> getTransactionInIdsFromBatch(Integer batchUploadId);
     
+    List<Integer> getErrorCodes(List<Integer> codesToIgnore);
+ 
 }
