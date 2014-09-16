@@ -79,3 +79,87 @@ drop table listToRowsTemp;
 
 END$$
 DELIMITER ;
+
+
+/** grace 09162014 11:15AM Applied to Test and Live machines **/
+use healthelink;
+
+drop procedure if exists ListToRows;
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `ListToRows`(in fieldA varchar(20), in cwId int /** con1 **/, 
+in listOfValues varchar(255), in dropValue  varchar(255) /**con2 - y/n**/, 
+in foroutboundProcessing boolean, in transactionId int)
+BEGIN
+
+/** create our temp table **/
+drop temporary table if exists listToRowsTemp;
+
+CREATE temporary TABLE `listToRowsTemp` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `sourceValue` varchar(255) DEFAULT NULL,
+  `priority` int DEFAULT NULL,
+  `matchValue` varchar(255) DEFAULT NULL,
+  `transactionId` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+);
+
+
+	Set @stopVal = 0;
+	select LENGTH(listOfValues) - LENGTH(REPLACE(listOfValues, ',', '')) into @stopVal;
+	set @stopVal = @stopVal + 2;
+	SET @i = 1;
+
+  REPEAT
+    INSERT INTO listToRowsTemp (sourcevalue)
+      SELECT  trim(strSplit(listOfValues, ',', @i)) from transactionIn limit 1;
+    SET @i = @i + 1;
+    UNTIL @i = @stopVal
+  END REPEAT;
+
+/** make integers **/
+
+update listToRowsTemp set matchvalue = IF(CAST(sourcevalue AS UNSIGNED) = 0 , sourcevalue, CAST(sourcevalue AS UNSIGNED));
+
+/** update priority **/
+UPDATE listToRowsTemp
+INNER JOIN rel_crosswalkData ON rel_crosswalkData.sourcevalue = listToRowsTemp.matchvalue
+SET listToRowsTemp.priority = rel_crosswalkData.targetvalue
+WHERE rel_crosswalkData.crosswalkId = cwId;
+
+-- 
+
+-- drop values 
+select min(priority) into @minpri from listToRowsTemp;
+
+if (dropValue = 'Y') then
+BEGIN
+update listToRowsTemp set matchvalue = null where priority is not null and priority <> @minpri;
+END;
+END If;
+if (dropValue = 'N') then
+BEGIN
+update listToRowsTemp set matchvalue = '' where priority is not null and priority <> @minpri;
+END;
+END IF;
+
+select group_concat(matchvalue ORDER BY id SEPARATOR ',') into @singleValueFields from listToRowsTemp;
+-- update fieldValue
+
+IF (!foroutboundProcessing) then
+BEGIN
+	set @stmt = concat("update transactiontranslatedIn set ",fieldA," = '",@singleValueFields, "' where transactionInId = ", transactionId,";");
+end;
+end if;
+
+if (foroutboundProcessing) then
+BEGIN
+	set @stmt = concat("update transactiontranslatedOut set ",fieldA," = '",@singleValueFields, "' where transactionTargetId = ", transactionId,";");
+end;
+end if;	
+	PREPARE stmt from @stmt;
+	EXECUTE stmt;-- execute
+drop temporary table listToRowsTemp;
+
+END$$
+DELIMITER ;
