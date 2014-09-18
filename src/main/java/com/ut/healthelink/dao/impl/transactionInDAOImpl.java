@@ -5915,12 +5915,12 @@ public class transactionInDAOImpl implements transactionInDAO {
 	public List<Integer> getErrorCodes(List<Integer> codesToIgnore) {
 		try {
             String sql = "select id from lu_errorcodes";
-            if (codesToIgnore.size() == 0) {
+            if (codesToIgnore.size() != 0) {
             	sql = sql + " where id not in (:codesToIgnore);";
             }
 
             Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
-            if (codesToIgnore.size() == 0) {
+            if (codesToIgnore.size() != 0) {
             	query.setParameterList("codesToIgnore", codesToIgnore);
             }
             
