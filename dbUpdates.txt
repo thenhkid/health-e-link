@@ -287,3 +287,125 @@ end proc_main$$
 DELIMITER ;
 
 
+/** grace 10072014 11:22AM **/
+
+use universaltranslator;
+
+drop PROCEDURE if exists `dropValueByPriorityInboundOnly`;
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `dropValueByPriorityInboundOnly`(in configId int, 
+in batchId int, in srcField varchar(10),
+in fieldA varchar(10), in fieldB varchar(10), in con1 varchar(255) /** cwid **/, 
+in con2 varchar(255), in macroId int, in foroutboundProcessing boolean, in passClear int, in transactionId int)
+proc_main:begin
+
+/** 
+This store procedure takes in values from a field and a cwid
+It will loop through the transactions and split the value into a row
+The priority for matching value will then be updated
+According to con2 - drop value, we will either update the lower priority to null or blank
+We will then update field value with new string value
+Assuming cw has 59 as priority 1 and 70 as priority 2
+59, 07, 12, 71, 22, 70, 02, 44
+should become
+if drop value is N
+59, 07, 12, 71, 22, , 02, 44
+if Y
+59, 07, 12, 71, 22, 02, 44
+
+sample usage
+CALL `universaltranslator`.`dropValueByPriorityInboundOnly`(94, 623, 'F500', 'F500', '', '10', 'Y', 85, false, 2, 0);
+ 
+**/
+
+/** 
+cannot use view as it is not temporary and two runs at the same time will over write each other 
+need to insert data to temp table and select from there
+**/
+
+call getFinalStatusIds;
+select @finalStatusIds into @finalStatusIds;
+
+
+if (transactionId = 0) then
+
+proc_batch:begin
+
+drop temporary table if exists macroTopRanked;
+
+CREATE temporary TABLE  `universaltranslator`.`macroTopRanked` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `fieldVal` LONGTEXT NULL,
+  `macroBatchId` int NULL,
+  `macrotransactionId` INT NULL,
+	`macroConfigId` INT NULL,
+  PRIMARY KEY (`id`));
+
+
+SET @query = CONCAT('insert into macroTopRanked (fieldVal, macroBatchId, macroConfigId, macrotransactionId) 
+select ', fieldA, ' , ', batchId, ',' , configId, ', transactionInId from transactiontranslatedIn where transactionInId in 
+(select id from transactionIn where configId = ', configId, ' and batchId = ', batchId , ' and statusId not in (', @finalStatusIds,'));'); 
+
+PREPARE stmt from @query; 
+EXECUTE stmt; 
+DEALLOCATE PREPARE stmt; 
+
+
+begin
+
+DECLARE cursor_end CONDITION FOR SQLSTATE '02000'; 
+DECLARE v_column_val VARCHAR(50); 
+DECLARE v_transactionInId VARCHAR(50); 
+DECLARE v_batchId VARCHAR(50); 
+DECLARE done INT DEFAULT 0; 
+DECLARE cur_table CURSOR FOR SELECT fieldVal, macrotransactionId FROM macroTopRanked where macroBatchId = batchId and macroConfigId = configId; 
+DECLARE CONTINUE HANDLER FOR cursor_end SET done = 1; 
+
+OPEN cur_table; 
+FETCH cur_table INTO v_column_val, v_transactionInId; 
+WHILE done = 0 DO 
+if (length(v_column_val) > 0) then
+	CALL `universaltranslator`.`ListToRows`(fieldA, con1, v_column_val, con2 , foroutboundProcessing, v_transactionInId);
+end if;
+FETCH cur_table INTO v_column_val, v_transactionInId; 
+END WHILE; 
+CLOSE cur_table; 
+
+end;
+
+end proc_batch;
+end if;
+
+
+
+if (transactionId != 0) then
+	set @listValue = "";
+	set @stmt  = concat("select ", fieldA, " into @listValue from  ", @translatedTable, " where ",@transactionTable,"Id = ", transactionId, ";" );
+	insert into sqlstmt (sqlstmt) values (@stmt);
+	PREPARE stmt from @stmt;
+	EXECUTE stmt;-- execute
+
+	-- if length(@listValue) != 0 then
+	CALL `universaltranslator`.`ListToRows`(fieldA, con1, @listValue, con2 , foroutboundProcessing, transactionId);
+	-- end if;
+END if;
+
+
+	
+
+
+
+-- we check pass /clear
+if (passClear = 2) THEN
+BEGIN
+-- accessible
+END;
+END IF;
+
+
+-- the only error for this is if SP bombs, no need to write in insert error logs
+select '';
+end proc_main$$
+DELIMITER ;
+
