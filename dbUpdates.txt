@@ -409,3 +409,71 @@ select '';
 end proc_main$$
 DELIMITER ;
 
+/** Chad 10-7-2014 @ 5:44 PM **/
+
+USE `healthelink`;
+DROP procedure IF EXISTS `DateToyyyymmdd`;
+
+DELIMITER $$
+USE `healthelink`$$
+
+CREATE DEFINER=`root`@`localhost` PROCEDURE `DateToyyyymmdd`(in configId int, 
+in batchId int, in srcField varchar(10),
+in fieldA varchar(10), in fieldB varchar(10), in con1 varchar(255), 
+in con2 varchar(255), in macroId int, in foroutboundProcessing boolean, in passClear int, in transactionId int)
+proc_main:begin
+
+/** 
+This procedure take a string in yyyy-mm-dd hh:mm:ss format and convert it into yyyymmdd. 
+"-" can be "/" or "." or character of choice by user
+fieldA will be field to conver
+fieldB is not in use
+con1 is not in use
+con2 is not in use
+**/
+
+call setInboundOutBoundTables (foroutboundProcessing);
+SELECT 
+    @translatedTable,
+    @transactionTable,
+    @batchTable,
+    @batchIdType,
+    @errorTable
+INTO @translatedTable , @transactionTable , @batchTable , @batchIdType , @errorTable;
+
+call getFinalStatusIds;
+SELECT @finalStatusIds INTO @finalStatusIds;
+
+if (transactionId = 0) then
+set @stmt = concat("update ", @translatedTable," set ",fieldA,
+" = concat(substring(", fieldA,", 1, 4), substring(",fieldA,", 6,2), substring(",fieldA,", 9,2))
+ where ", @transactionTable ,"Id in (select id from ",@transactionTable,
+" where configId = ",configId," and ", @batchIdType," = ",batchId," and statusId not in (",@finalStatusIds,"));");
+
+
+END if;
+
+if (transactionId != 0) then
+set @stmt = concat("update ", @translatedTable," set ",fieldA,
+" = concat(substring(", fieldA,", 1, 4), substring(",fieldA,", 6,2), substring(",fieldA,", 9,2)) 
+where ", @transactionTable ,"Id = ",transactionId, ";");
+END if;
+
+
+PREPARE stmt from @stmt;
+EXECUTE stmt;-- execute
+
+-- we check pass /clear
+if (passClear = 2) THEN
+BEGIN
+-- not sure how to pass clear this
+END;
+END IF;
+-- see if we want to return something
+SELECT '';
+
+end proc_main$$
+
+DELIMITER ;
+
+INSERT INTO `healthelink`.`macro_names` (`CategoryId`, `Macro_Name`, `Macro_Short_Name`, `Formula`, `FieldA_Question`, `populateFieldA`) VALUES ('1', 'Convert Date to yyyymmdd String', 'DateToyyyymmdd', 'DateToyyyymmdd', 'Please enter field to convert', 1);
