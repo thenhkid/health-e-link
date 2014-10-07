@@ -22,6 +22,11 @@ require(['./main'], function () {
 
              if (confirmed) {
                  
+                $('body').overlay({
+                    glyphicon : 'floppy-disk',
+                    message : 'Processing...'
+                }); 
+                 
                 $.ajax({
                   url: 'processAllTransactions',
                   data:{'orgId': $(this).attr('rel'), 'messageTypeId': 0},
@@ -40,6 +45,11 @@ require(['./main'], function () {
              var confirmed = confirm("Are you sure you do not want to process these transactions?");
 
              if (confirmed) {
+                 
+                $('body').overlay({
+                    glyphicon : 'floppy-disk',
+                    message : 'Canceling...'
+                }); 
                  
                 $.ajax({
                   url: 'donotprocessAllTransactions',

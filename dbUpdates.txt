@@ -193,7 +193,7 @@ if Y
 59, 07, 12, 71, 22, 02, 44
 
 sample usage
-CALL `universaltranslator`.`dropValueByPriorityInboundOnly`(94, 623, 'F500', 'F500', '', '10', 'Y', 85, false, 2, 0);
+CALL `healthelink`.`dropValueByPriorityInboundOnly`(94, 623, 'F500', 'F500', '', '10', 'Y', 85, false, 2, 0);
  
 **/
 
@@ -211,7 +211,7 @@ if (transactionId = 0) then
 proc_batch:begin
 
 drop temporary table macroTopRanked;
-CREATE temporary TABLE  `universaltranslator`.`macroTopRanked` (
+CREATE temporary TABLE  `healthelink`.`macroTopRanked` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `fieldVal` LONGTEXT NULL,
   `macroBatchId` int NULL,
@@ -243,7 +243,7 @@ OPEN cur_table;
 FETCH cur_table INTO v_column_val, v_transactionInId; 
 WHILE done = 0 DO 
 if (length(v_column_val) > 0) then
-	CALL `universaltranslator`.`ListToRows`(fieldA, con1, v_column_val, con2 , foroutboundProcessing, v_transactionInId);
+	CALL `healthelink`.`ListToRows`(fieldA, con1, v_column_val, con2 , foroutboundProcessing, v_transactionInId);
 end if;
 FETCH cur_table INTO v_column_val, v_transactionInId; 
 END WHILE; 
@@ -264,7 +264,7 @@ if (transactionId != 0) then
 	EXECUTE stmt;-- execute
 
 	-- if length(@listValue) != 0 then
-	CALL `universaltranslator`.`ListToRows`(fieldA, con1, @listValue, con2 , foroutboundProcessing, transactionId);
+	CALL `healthelink`.`ListToRows`(fieldA, con1, @listValue, con2 , foroutboundProcessing, transactionId);
 	-- end if;
 END if;
 
