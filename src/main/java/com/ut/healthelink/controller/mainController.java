@@ -108,7 +108,7 @@ public class mainController {
      * @return	the home page view
      * @throws Exception
      */
-    @RequestMapping(value = "/", method = {RequestMethod.GET, RequestMethod.HEAD})
+    @RequestMapping(value = "/", method = {RequestMethod.GET})
     public ModelAndView welcome(HttpServletRequest request, HttpServletResponse response, RedirectAttributes redirectAttr, HttpSession session) throws Exception {
         
        /* Get a list of active news articles */
@@ -120,6 +120,20 @@ public class mainController {
        return mav;
        
     }
+    
+    /**
+     * The '/' head request 
+     * @param request
+     * @param response
+     * @return	the login page
+     * @throws Exception
+     */
+    @RequestMapping(value = "/", method = {RequestMethod.HEAD})
+    public ModelAndView headRequest(HttpServletRequest request, HttpServletResponse response, RedirectAttributes redirectAttr, HttpSession session) throws Exception { 
+            ModelAndView mav = new ModelAndView(new RedirectView("/home"));
+            return mav;   
+    }
+    
 
     /**
      * The '/about' GET request will display the about page.
