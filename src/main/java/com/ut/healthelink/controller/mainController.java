@@ -108,7 +108,7 @@ public class mainController {
      * @return	the home page view
      * @throws Exception
      */
-    @RequestMapping(value = "/", method = RequestMethod.GET)
+    @RequestMapping(value = "/", method = {RequestMethod.GET, RequestMethod.HEAD})
     public ModelAndView welcome(HttpServletRequest request, HttpServletResponse response, RedirectAttributes redirectAttr, HttpSession session) throws Exception {
         
        /* Get a list of active news articles */
