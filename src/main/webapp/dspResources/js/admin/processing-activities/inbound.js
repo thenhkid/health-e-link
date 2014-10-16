@@ -22,6 +22,10 @@ require(['./main'], function () {
             });
         });
         
+        var oSettings = datatable.fnSettings();
+        
+        datatable.fnSort( [ [6,'desc'] ] );
+        
    });
 });
 

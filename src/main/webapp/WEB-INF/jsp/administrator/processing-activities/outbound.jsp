@@ -92,7 +92,7 @@
                                             <td class="center-text">
                                                ${batch.totalRecordCount}
                                             </td>
-                                            <td class="center-text"><fmt:formatDate value="${batch.dateCreated}" type="date" pattern="M/dd/yyyy" /><br /><fmt:formatDate value="${batch.dateCreated}" type="time" pattern="h:mm:ss a" /></td>
+                                            <td class="center-text"><fmt:formatDate value="${batch.dateCreated}" type="both" pattern="M/dd/yyyy h:mm:ss a" /></td>
                                             <td class="actions-col">
                                                 <a href="<c:url value='/administrator/processing-activity/outbound/batch/${batch.utBatchName}' />" class="btn btn-link viewTransactions" title="View Batch Transactions" role="button">
                                                     <span class="glyphicon glyphicon-edit"></span>

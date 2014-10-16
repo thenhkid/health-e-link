@@ -34,7 +34,7 @@
                     </div>
                 </c:otherwise>
             </c:choose>
-        </c:if> 
+        </c:if>
         <form role="form" id="form-admin-login" name='f' action="<c:url value='j_spring_security_check' />" method='POST'>
             <fieldset name="login-fields" form="form-admin-login" class="basic-clearfix">
                 <div class="form-group ${not empty error ? 'has-error' : '' }">

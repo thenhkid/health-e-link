@@ -68,6 +68,12 @@ require(['./main'], function() {
             if (confirmed) {
 
                 var attachmentId = $(this).attr('rel');
+                var attachmentIds = $('#attachmentIds').val();
+                
+                //Remvoe the value from the list
+                var updatedAttachmentIds = removeValue(attachmentIds,attachmentId);
+                
+                $('#attachmentIds').val(updatedAttachmentIds);
 
                 $.ajax({
                     url: '/Health-e-Web/removeAttachment.do',
@@ -337,6 +343,17 @@ require(['./main'], function() {
     });
 });
 
+function removeValue(list, value) {
+    return list.replace(new RegExp(",?" + value + ",?"), function (match) {
+        var first_comma = match.charAt(0) === ',', second_comma;
+        
+        if(first_comma && (second_comma = match.charAt(match.length-1) === ',')) {
+            return ',';
+        }
+        return '';
+    });
+}
+
 function getTitle() {
     var titleval = $('#attachmentTitle').val();
     return titleval;
@@ -345,7 +362,7 @@ function getTitle() {
 function populateExistingAttachments() {
     var transactionId = $('#transactionId').val();
     var currentIdList = $('#attachmentIds').val();
-
+    
     $.ajax({
         url: '/Health-e-Web/populateExistingAttachments.do',
         type: 'GET',

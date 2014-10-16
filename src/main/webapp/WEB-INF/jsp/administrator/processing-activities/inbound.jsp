@@ -51,6 +51,7 @@
                             <tr>
                                 <th scope="col">Organization</th>
                                 <th scope="col">Batch ID</th>
+                                <th scope="col">Batch Type</th>
                                 <th scope="col" class="center-text">Transport Method</th>
                                 <th scope="col" class="center-text">Status</th>
                                 <th scope="col" class="center-text"># of Transactions</th>
@@ -69,14 +70,29 @@
                                             </td>
                                             <td>
                                                 ${batch.utBatchName}
-                                                <c:if test="${batch.transportMethodId == 1 ||batch.transportMethodId == 3 || batch.transportMethodId == 5}">
+                                                <c:if test="${batch.transportMethodId != 2}">
                                                 <c:set var="text" value="${fn:split(batch.originalFileName,'.')}" />
                                                 <c:set var="ext" value="${text[fn:length(text)-1]}" />
                                                 	<br />
-                                                    <a href="/FileDownload/downloadFile.do?filename=${batch.utBatchName}.${ext}&foldername=archivesIn" title="View Original File">
+                                                	<c:set var="hrefLink" value="/FileDownload/downloadFile.do?filename=${batch.utBatchName}.${ext}&foldername=archivesIn"/>
+                                                	
+                                                	<c:if test="${batch.transportMethodId  == 6}">
+                                                		<c:set var="hrefLink" value="/FileDownload/downloadFile.do?filename=${batch.utBatchName}_dec.${ext}&foldername=archivesIn"/>
+                                                	</c:if>
+                                                	
+                                                    <a href="${hrefLink}" title="View Original File">
                                                         ${batch.originalFileName}
                                                     </a>
                                                 </c:if>
+                                            </td>
+                                            <td>
+                                                <c:choose>
+                                                    <c:when test="${batch.uploadType == 'Feedback Report'}">
+                                                        ${batch.uploadType}<br/>
+                                                        Referral Batch: ${batch.referringBatch}
+                                                    </c:when>
+                                                    <c:otherwise>${batch.uploadType}</c:otherwise>    
+                                                </c:choose>
                                             </td>
                                             <td class="center-text">
                                                 ${batch.transportMethod}
@@ -87,7 +103,7 @@
                                             <td class="center-text">
                                                ${batch.totalRecordCount}
                                             </td>
-                                            <td class="center-text"><fmt:formatDate value="${batch.dateSubmitted}" type="date" pattern="M/dd/yyyy" /><br /><fmt:formatDate value="${batch.dateSubmitted}" type="time" pattern="h:mm:ss a" /></td>
+                                            <td class="center-text"><fmt:formatDate value="${batch.dateSubmitted}" type="both" pattern="M/dd/yyyy h:mm:ss a" /></td>
                                             <td class="actions-col">
                                             	<c:if test="${batch.transportMethodId != 2}">
 	                                                <a href="<c:url value='/administrator/processing-activity/inbound/batchActivities/${batch.utBatchName}'/>" class="btn btn-link viewBatchActivities" title="View Batch Activities" role="button">
