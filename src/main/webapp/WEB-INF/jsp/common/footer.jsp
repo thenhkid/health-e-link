@@ -32,8 +32,9 @@
                 <li><a href="<c:url value='/contact'/>" title="Contact">Contact</a></li>
                 <li><a href="<c:url value='/privacy'/>" title="Contact">Privacy</a></li>
                 <c:if test="${not empty pageContext.request.userPrincipal.name}"><li><a href="<c:url value='/profile'/>" title="My Account">My Account</a></li></c:if>
-                </ul>
-            </nav>
+                <c:if test="${not empty pageContext.request.userPrincipal.name}"><li><a href="#settingsModal" id="settings" data-toggle="modal" title="Account Settings" class="settings">Account Settings</a></li></c:if>
+            </ul>
+        </nav>
 
             <p class="vcard">
                 <span class="fn">BOWlink Technologies Inc.</span> |

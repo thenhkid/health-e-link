@@ -25,7 +25,13 @@ public class User {
     private List<Integer> sectionList;
     
     @Transient
+    private String orgName;
+    
+    @Transient
     private Date dateOrgWasCreated = null;
+    
+    @Transient
+    private String password;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -47,17 +53,19 @@ public class User {
     @NoHtml
     @Column(name = "LASTNAME", nullable = true)
     private String lastName;
-
+    
+    /** 
+    @NotEmpty
+    @NoHtml
+    @Column(name = "PASSWORD", nullable = false)
+    private String password;
+	**/
+    
     @NotEmpty
     @NoHtml
     @Size(min = 4, max = 15)
     @Column(name = "USERNAME", nullable = false)
     private String username;
-
-    @NotEmpty
-    @NoHtml
-    @Column(name = "PASSWORD", nullable = false)
-    private String password;
 
     @Column(name = "ROLEID", nullable = false)
     private int roleId = 2;
@@ -95,6 +103,12 @@ public class User {
     @NoHtml
     @Column(name = "RESETCODE", nullable = true)
     private String resetCode = null;
+    
+    @Column(name = "randomSalt", nullable = true)
+    private byte [] randomSalt;
+
+    @Column(name = "encryptedPw", nullable = true)
+    private byte [] encryptedPw;
     
     public int getId() {
         return id;
@@ -255,5 +269,29 @@ public class User {
     public void setresetCode(String resetCode) {
         this.resetCode = resetCode;
     }
-   
+
+    public String getOrgName() {
+        return orgName;
+    }
+
+    public void setOrgName(String orgName) {
+        this.orgName = orgName;
+    }
+
+	public byte[] getRandomSalt() {
+		return randomSalt;
+	}
+
+	public void setRandomSalt(byte[] randomSalt) {
+		this.randomSalt = randomSalt;
+	}
+
+	public byte[] getEncryptedPw() {
+		return encryptedPw;
+	}
+
+	public void setEncryptedPw(byte[] encryptedPw) {
+		this.encryptedPw = encryptedPw;
+	}
+
 }

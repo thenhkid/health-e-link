@@ -61,6 +61,9 @@ public class messageTypeFormFields {
     @NoHtml
     @Column(name = "AUTOPOPULATETABLECOL", nullable = true)
     private String autoPopulateTableCol;
+    
+    @Column(name = "FIELDTYPE", nullable = false)
+    private Integer fieldType = 1;
 
     public int getId() {
         return id;
@@ -166,4 +169,12 @@ public class messageTypeFormFields {
         this.autoPopulateTableCol = autoPopulateTableCol;
     }
 
+    public Integer getFieldType() {
+        return fieldType;
+    }
+
+    public void setFieldType(Integer fieldType) {
+        this.fieldType = fieldType;
+    }
+    
 }

@@ -12,6 +12,8 @@ import com.ut.healthelink.model.MoveFilesLog;
 import com.ut.healthelink.model.TransactionInError;
 import com.ut.healthelink.model.User;
 import com.ut.healthelink.model.UserActivity;
+import com.ut.healthelink.model.WSMessagesIn;
+import com.ut.healthelink.model.activityReportList;
 import com.ut.healthelink.model.batchMultipleTargets;
 import com.ut.healthelink.model.batchUploadSummary;
 import com.ut.healthelink.model.batchUploads;
@@ -33,6 +35,7 @@ import com.ut.healthelink.model.custom.ConfigForInsert;
 import com.ut.healthelink.model.custom.IdAndFieldValue;
 import com.ut.healthelink.model.custom.TransErrorDetail;
 import com.ut.healthelink.model.messagePatients;
+import java.math.BigInteger;
 
 import java.util.Date;
 import java.util.List;
@@ -333,7 +336,7 @@ public interface transactionInDAO {
     
     Integer copyBatchDetails(Integer batchId, Integer tgtConfigId, Integer transactionId);
     
-    List<batchUploadSummary> getuploadBatchesByConfigAndTarget(Integer configId, Integer orgId, Integer tgtConfigId);
+    List<batchUploadSummary> getuploadBatchesByConfigAndTarget(Integer configId, Integer orgId, Integer tgtConfigId, Integer userOrgId);
     
     boolean searchBatchForHistory(batchUploads batchDetails, String searchTerm, Date fromDate, Date toDate) throws Exception;
     
@@ -347,7 +350,44 @@ public interface transactionInDAO {
     
     List<Integer> getTransactionInIdsFromBatch(Integer batchUploadId);
     
-    List<Integer> getErrorCodes(List<Integer> codesToIgnore);
+    List<WSMessagesIn> getWSMessagesByStatusId(List<Integer> statusIds);
+    
+    WSMessagesIn getWSMessagesById(Integer wsMessageId);
+    
+    Integer updateWSMessage(WSMessagesIn wsMessage);
+    
+    List <Integer> getErrorCodes (List <Integer> codesToIgnore);
+    
+    Integer rejectInvalidSourceSubOrg(batchUploads batch, configurationConnection confConn, boolean nofinalStatus);
+    
+    Integer updateSSOrgIdTransactionIn(batchUploads batchUpload, configurationConnection batchTargets);
+    
+    Integer updateSSOrgIdUploadSummary(batchUploads batchUpload);
 
-   
+    Integer updateSSOrgIdTransactionTarget(batchUploads batchUpload);
+    
+    List<Integer> geBatchesIdsForReport(String fromDate, String toDate, boolean erg) throws Exception;
+    
+    BigInteger getReferralCount(String batchIds) throws Exception;
+    
+    BigInteger getFeedbackReportCount(String batchIds) throws Exception;
+    
+    List<activityReportList> getFeedbackReportList(String batchIds) throws Exception;
+    
+    List<activityReportList> getReferralList(String batchIds) throws Exception;
+    
+    List<Integer> getFeedbackTransactions(String ids, Integer configId) throws Exception;
+    
+    Integer getStatusFieldNo(Integer configId) throws Exception;
+    
+    BigInteger getTotalOpenFeedbackReports(String transIds, String fieldNo) throws Exception;
+    
+    BigInteger getTotalClosedFeedbackReports(String transIds, String fieldNo) throws Exception;
+    
+    Integer getActivityStatusFieldNo(Integer configId) throws Exception;
+    
+    BigInteger getTotalCompletedActivityStatus(String transIds, String fieldNo) throws Exception;
+    
+    BigInteger getTotalEnrolledActivityStatus(String transIds, String fieldNo) throws Exception;
+    
 }

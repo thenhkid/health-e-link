@@ -124,8 +124,9 @@ public interface transactionOutDAO {
     
     List<batchDownloadSummary> getBatchesBySentOrg(int srcorgId, int tgtOrgId, int messageTypeId) throws Exception;
     
-    List<batchDownloadSummary> getuploadBatchesByConfigAndSource(Integer configId, Integer orgId);
+    List<batchDownloadSummary> getuploadBatchesByConfigAndSource(Integer configId, Integer orgId, Integer userOrgId);
     
     void updateTransactionTargetStatusOutBound(Integer batchDLId, Integer transactionId, Integer fromStatusId, Integer toStatusId) throws Exception;
     
+    List <String> getWSSenderFromBatchDLId(List<Integer> batchDLIds) throws Exception;
 }

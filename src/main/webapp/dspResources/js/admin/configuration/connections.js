@@ -168,20 +168,21 @@ function populateUsers(orgId, selectBoxId) {
             }
 
             for (var i = 0; i < len; i++) {
-                if(users != '' && users.indexOf(data[i][0]) != -1) {
-                    if(data[i][3] == 1) {
-                        html += '<option value="' + data[i][0]+ '" selected>' + data[i][1] + ' ' + data[i][2] +' (Manager) </option>';
+                
+                if(users != '' && users.indexOf(data[i].id) != -1) {
+                    if(data[i].userType == 1) {
+                        html += '<option value="' + data[i].id+ '" selected>' + data[i].firstName + ' ' + data[i].lastName +' (Manager) - ' + data[i].orgName + ' </option>';
                     }
                     else {
-                       html += '<option value="' + data[i][0]+ '" selected>' + data[i][1] + ' ' + data[i][2] +' (Staff Member) </option>'; 
+                       html += '<option value="' + data[i].id + '" selected>' + data[i].firstName + ' ' + data[i].lastName +' (Staff Member) - ' + data[i].orgName + ' </option>'; 
                     }
                 }
                 else {
-                    if(data[i][3] == 1) {
-                        html += '<option value="' + data[i][0]+ '">' + data[i][1] + ' ' + data[i][2] +' (Manager) </option>';
+                    if(data[i].userType == 1) {
+                        html += '<option value="' + data[i].id + '">' + data[i].firstName + ' ' + data[i].lastName +' (Manager) - ' + data[i].orgName + ' </option>';
                     }
                     else {
-                        html += '<option value="' + data[i][0]+ '">' + data[i][1] + ' ' + data[i][2] +' (Staff Member) </option>'; 
+                        html += '<option value="' + data[i].id + '">' + data[i].firstName + ' ' + data[i].lastName +' (Staff Member) - ' + data[i].orgName + ' </option>'; 
                     }
                 }
             }

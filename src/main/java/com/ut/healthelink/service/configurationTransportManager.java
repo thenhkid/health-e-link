@@ -9,6 +9,7 @@ import com.ut.healthelink.model.configurationMessageSpecs;
 import com.ut.healthelink.model.configurationRhapsodyFields;
 import com.ut.healthelink.model.configurationTransport;
 import com.ut.healthelink.model.configurationTransportMessageTypes;
+import com.ut.healthelink.model.configurationWebServiceFields;
 
 public interface configurationTransportManager {
 
@@ -77,7 +78,7 @@ public interface configurationTransportManager {
     
     List<configurationTransport> getDistinctDelimCharForFileExt(String fileExt, Integer transportMethodId);
     
-    void saveTransportRhapsody(configurationRhapsodyFields rhapsodyFields);
+    void saveTransportRhapsody(configurationRhapsodyFields rhapsodyFields) throws Exception;
     
     List<configurationRhapsodyFields> getTransRhapsodyDetails(int transportDetailId) throws Exception;
     
@@ -93,4 +94,16 @@ public interface configurationTransportManager {
     
     List <configurationTransport> getConfigurationTransportFileExtByFileType(Integer orgId, Integer transportMethodId, List<Integer> fileTypeIds, List <Integer> statusIds, boolean distinctOnly, boolean foroutboundProcessing);
 
+    List<configurationWebServiceFields> getTransWSDetails(int transportDetailId) throws Exception;
+    
+    void saveTransportWebService(configurationWebServiceFields wsFields) throws Exception;
+    
+    List<configurationTransport> getDistinctTransportDetailsForOrgByTransportMethodId (Integer transportMethodId, Integer status, Integer orgId);
+    
+    List<configurationTransport> getCTForOrgByTransportMethodId(Integer transportMethodId, Integer status, Integer orgId);
+
+    configurationWebServiceFields getTransWSDetailsPush(int transportDetailId) throws Exception;
+    
+    configurationWebServiceFields getTransWSDetailsPull(int transportDetailId) throws Exception;
+    
 }

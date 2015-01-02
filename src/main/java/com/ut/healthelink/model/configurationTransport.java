@@ -25,6 +25,9 @@ public class configurationTransport {
     private List<configurationRhapsodyFields> rhapsodyFields = null;
 
     @Transient
+    private List<configurationWebServiceFields> webServiceFields = null;
+    
+    @Transient
     private String delimChar = null;
 
     @Transient
@@ -272,4 +275,13 @@ public class configurationTransport {
         this.rhapsodyFields = rhapsodyFields;
     }
 
+	public List<configurationWebServiceFields> getWebServiceFields() {
+		return webServiceFields;
+	}
+
+	public void setWebServiceFields(
+			List<configurationWebServiceFields> webServiceFields) {
+		this.webServiceFields = webServiceFields;
+	}
+    
 }

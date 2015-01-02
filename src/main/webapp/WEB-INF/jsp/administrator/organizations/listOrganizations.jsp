@@ -24,6 +24,7 @@
                         <thead>
                             <tr>
                                 <th scope="col">Organization Name ${result}</th>
+                                <th scope="col">Parent Organization Name</th>
                                 <th scope="col">Contact Information</th>
                                 <th scope="col" class="center-text"># of Users</th>
                                 <th scope="col" class="center-text"># of Configurations</th>
@@ -40,8 +41,16 @@
                                             <td scope="row">
                                                 <a href="javascript:void(0);" title="Edit this organization">${org.orgName}</a>
                                                 <br />(<c:choose><c:when test="${org.status == true}">active</c:when><c:otherwise>inactive</c:otherwise></c:choose>)
-                                                    </td>
-                                                    <td>
+                                            </td>
+                                            <td>
+                                                <c:choose>
+                                                    <c:when test="${org.parentId > 0}">
+                                                        ${orgFunctions.getOrganizationById(org.parentId).getOrgName()}
+                                                    </c:when>
+                                                    <c:otherwise>N/A</c:otherwise>
+                                                </c:choose>
+                                            </td>
+                                            <td>
                                                 ${org.address} <c:if test="${not empty org.address2}"><br />${org.address2}</c:if>
                                                 <br />${org.city}&nbsp;${org.state},&nbsp;${org.postalCode}
                                             </td>

@@ -1,16 +1,10 @@
 package com.ut.healthelink.reference;
 import java.io.BufferedReader;
 
-import org.apache.commons.codec.binary.Base64;
-
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -69,7 +63,7 @@ public class fileSystem {
             this.dir = unixDirectoryPath + orgName + "/" + folderName + "/";
         }
     }
-    
+
     public void setDirByName(String dirName) {
         //Windows
         if (os.indexOf("win") >= 0) {
@@ -111,9 +105,9 @@ public class fileSystem {
         }
 
     }
-    
+
     public void createOrgDirectory(String orgName, String dirName) {
-         try {
+        try {
             //Windows
             if (os.indexOf("win") >= 0) {
                 //C:/BowLink/
@@ -249,14 +243,13 @@ public class fileSystem {
         try {
             File file = new File(dir.getDir() + fileName);
             fileInput = new FileInputStream(file);
-            
+
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        
-        
+
         BufferedReader br = new BufferedReader(new InputStreamReader(fileInput));
-        
+
         try {
             String line;
             try {
@@ -281,50 +274,49 @@ public class fileSystem {
 
         return delimCount;
     }
-    
+
     public boolean isWinMachine() {
-    	
-    	boolean winMachine = false;
+
+        boolean winMachine = false;
         //Windows
         if (os.indexOf("win") >= 0) {
-        	winMachine =  true;
-        } 
+            winMachine = true;
+        }
         return winMachine;
     }
-    
+
     public String setPath(String addOnPath) {
-    	String path = "";
-    	//Windows
+        String path = "";
+        //Windows
         if (os.indexOf("win") >= 0) {
-        	path = winDirectoryPath.replace("\\bowlink\\", "") + addOnPath.replace("", "").replace("/", "\\");  
+            path = winDirectoryPath.replace("\\bowlink\\", "") + addOnPath.replace("", "").replace("/", "\\");
         } //Mac
         else if (os.indexOf("mac") >= 0) {
-        	path = macDirectoryPath.replace("/bowlink/", "") + addOnPath;
+            path = macDirectoryPath.replace("/bowlink/", "") + addOnPath;
         } //Unix or Linux or Solarix
         else if (os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0 || os.indexOf("aix") >= 0 || os.indexOf("sunos") >= 0) {
-        	path = unixDirectoryPath.replace("/bowlink/", "") + addOnPath;        
+            path = unixDirectoryPath.replace("/bowlink/", "") + addOnPath;
         }
         return path;
     }
 
-    
     public String setPathFromRoot(String addOnPath) {
-    	
-    	String path = "";
-    	
-    	//Windows
+
+        String path = "";
+
+        //Windows
         if (os.indexOf("win") >= 0) {
-        	path = addOnPath.replace("", "").replace("/", "\\");  
+            path = addOnPath.replace("", "").replace("/", "\\");
         } //Mac
         else if (os.indexOf("mac") >= 0) {
-        	path = addOnPath;
+            path = addOnPath;
         } //Unix or Linux or Solarix
         else if (os.indexOf("nix") >= 0 || os.indexOf("nux") >= 0 || os.indexOf("aix") >= 0 || os.indexOf("sunos") >= 0) {
-        	path = addOnPath;        
+            path = addOnPath;
         }
         return path;
     }
-    
+
     public Integer checkFileDelimiter(File file, String delim) {
 
         int delimCount = 0;
@@ -332,14 +324,13 @@ public class fileSystem {
         FileInputStream fileInput = null;
         try {
             fileInput = new FileInputStream(file);
-            
+
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        
-        
+
         BufferedReader br = new BufferedReader(new InputStreamReader(fileInput));
-        
+
         try {
             String line;
             try {
@@ -365,5 +356,27 @@ public class fileSystem {
         return delimCount;
     }
 
-      
+    public byte[] loadFile(File file) throws IOException {
+        FileInputStream is = new FileInputStream(file);
+
+        long length = file.length();
+        if (length > Integer.MAX_VALUE) {
+        // File is too large
+        }
+        byte[] bytes = new byte[(int) length];
+        int offset = 0;
+        int numRead = 0;
+        while (offset < bytes.length
+                && (numRead = is.read(bytes, offset, bytes.length - offset)) >= 0) {
+            offset += numRead;
+        }
+
+        if (offset < bytes.length) {
+            throw new IOException("Could not completely read file " + file.getName());
+        }
+
+        is.close();
+        return bytes;
+    }
+
 }

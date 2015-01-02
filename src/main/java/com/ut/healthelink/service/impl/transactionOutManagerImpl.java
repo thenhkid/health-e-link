@@ -30,11 +30,13 @@ import com.ut.healthelink.model.configurationFormFields;
 import com.ut.healthelink.model.configurationRhapsodyFields;
 import com.ut.healthelink.model.configurationSchedules;
 import com.ut.healthelink.model.configurationTransport;
+import com.ut.healthelink.model.configurationWebServiceFields;
 import com.ut.healthelink.service.emailMessageManager;
 import com.ut.healthelink.model.mailMessage;
 import com.ut.healthelink.model.pendingDeliveryTargets;
 import com.ut.healthelink.model.systemSummary;
 import com.ut.healthelink.model.targetOutputRunLogs;
+import com.ut.healthelink.model.transactionAttachment;
 import com.ut.healthelink.model.transactionIn;
 import com.ut.healthelink.model.transactionOutNotes;
 import com.ut.healthelink.model.transactionOutRecords;
@@ -47,6 +49,7 @@ import com.ut.healthelink.service.organizationManager;
 import com.ut.healthelink.service.transactionInManager;
 import com.ut.healthelink.service.transactionOutManager;
 import com.ut.healthelink.service.userManager;
+import com.ut.healthelink.webservices.WSManager;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -61,12 +64,14 @@ import java.nio.file.StandardCopyOption;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.net.PrintCommandListener;
 import org.apache.commons.net.ftp.FTPClient;
@@ -113,6 +118,9 @@ public class transactionOutManagerImpl implements transactionOutManager {
     
     @Autowired
     private userManager usermanager;
+    
+    @Autowired
+    private WSManager wsManager;
     
     private int processingSysErrorId = 5;
 
@@ -413,6 +421,8 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                     FTPTargetFile(batchId, transportDetails);
                                 } /* Rhapsody Method */ else if (transportDetails.gettransportMethodId() == 5) {
                                 	RhapsodyTargetFile(batchId, transportDetails);
+                                }/* If soap message  */ else if (transportDetails.gettransportMethodId() == 6) {
+                                	SendWSMessage(batchId, transportDetails);
                                 }
                                 /** end of processing, before email **/
                                 /** insert log**/ 
@@ -452,8 +462,8 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                             String toName = null;
                                             mailMessage msg = new mailMessage();
                                             ArrayList<String> ccAddressArray = new ArrayList<String>();
-                                            msg.setfromEmailAddress("dphuniversaltranslator@gmail.com");
-
+                                            msg.setfromEmailAddress("e-Referral@state.ma.us");
+ 
                                             if (toPrimaryContact.size() > 0) {
                                                 toName = toPrimaryContact.get(0).getFirstName() + " " + toPrimaryContact.get(0).getLastName();
                                                 msg.settoEmailAddress(toPrimaryContact.get(0).getEmail());
@@ -702,6 +712,24 @@ public class transactionOutManagerImpl implements transactionOutManager {
                             FTPTargetFile(batchId, transportDetails);
                         } /* If Rhapsody Method */ else if (transportDetails.gettransportMethodId() == 5) {
                         	RhapsodyTargetFile(batchId, transportDetails);
+                        }/* If soap message  */ else if (transportDetails.gettransportMethodId() == 6) {
+                        	/** soap messages are to be delivery instantaneously. This is for scheduled
+                        	 * output only, we error the batch and transactions **/
+                        	transactionOutDAO.updateBatchStatus(batchId, 30);
+                        	/**insert error**/
+                        	transactionInManager.insertProcessingError(20, null, batchId, null, null, null, null, false, true, "Web Service config should not be scheduled.");
+                        	updateTargetTransasctionStatus(batchId, 33);
+                        	//update transactionIn status
+                        	List<transactionTarget> targets = transactionOutDAO.getTransactionsByBatchDLId(batchId);
+                            
+                            /** we reject is targets are more than one, web service should only be sending one message at a time **/
+                        	for (transactionTarget target : targets) {
+                        		/* Need to update the uploaded batch status */
+                                transactionInManager.updateBatchStatus(target.getbatchUploadId(), 30, "");
+                                /* Need to update the uploaded batch transaction status */
+                                transactionInManager.updateTransactionStatus(target.getbatchUploadId(), target.gettransactionInId(), 0, 33);
+                            }
+                        	/** we probably should email admin to fix web configuration **/
                         }
 
                         /* Log the last run time */
@@ -723,8 +751,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                 String toName = null;
                                 mailMessage msg = new mailMessage();
                                 ArrayList<String> ccAddressArray = new ArrayList<String>();
-
-                                msg.setfromEmailAddress("dphuniversaltranslator@gmail.com");
+                                msg.setfromEmailAddress("e-Referral@state.ma.us");
 
                                 if (toPrimaryContact.size() > 0) {
                                     toName = toPrimaryContact.get(0).getFirstName() + " " + toPrimaryContact.get(0).getLastName();
@@ -836,7 +863,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                 /* Generate the batch */
                 /* (target configuration Details, transaction details, transport Details for target config, Source OrgId, Source Original Filename, mergeable) */
                 try {
-                    batchId = generateBatch(configDetails, transaction, transportDetails, uploadedBatchDetails.getOrgId(), uploadedBatchDetails.getoriginalFileName(), false);
+                    batchId = generateBatch(uploadedBatchDetails.getdateSubmitted(), configDetails, transaction, transportDetails, uploadedBatchDetails.getOrgId(), uploadedBatchDetails.getoriginalFileName(), false);
 
                     /* Update the status of the uploaded batch to  TBP (Target Batch Creating in process) (ID = 25) */
                     transactionInManager.updateBatchStatus(batchId, 25, "");
@@ -844,7 +871,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                     throw new Exception("Error occurred trying to generate a batch. transactionId: " + transaction.getId(), e);
                 }
 
-            } /* File Download || FTP || EMed-Apps */ else if (transportDetails.gettransportMethodId() == 1 || transportDetails.gettransportMethodId() == 3 || transportDetails.gettransportMethodId() == 5) {
+            } /* File Download || FTP || EMed-Apps */ else if (transportDetails.gettransportMethodId() == 1 || transportDetails.gettransportMethodId() == 3 || transportDetails.gettransportMethodId() == 5 ||transportDetails.gettransportMethodId() == 6) {
 
                 boolean createNewFile = true;
 
@@ -856,7 +883,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                     /* Generate the batch */
                     /* (target configuration Details, transaction details, transport Details for target config, Source OrgId, Source Original Filename, mergeable) */
                     try {
-                        batchId = generateBatch(configDetails, transaction, transportDetails, uploadedBatchDetails.getOrgId(), uploadedBatchDetails.getoriginalFileName(), false);
+                        batchId = generateBatch(uploadedBatchDetails.getdateSubmitted(), configDetails, transaction, transportDetails, uploadedBatchDetails.getOrgId(), uploadedBatchDetails.getoriginalFileName(), false);
 
                         /* Update the status of the uploaded batch to  TBP (Target Batch Creating in process) (ID = 25) */
                         transactionInManager.updateBatchStatus(batchId, 25, "");
@@ -876,7 +903,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                         /* Generate the batch */
                         /* (target configuration Details, transaction details, transport Details for target config, Source OrgId, Source Original Filename, mergeable) */
                         try {
-                            batchId = generateBatch(configDetails, transaction, transportDetails, uploadedBatchDetails.getOrgId(), uploadedBatchDetails.getoriginalFileName(), true);
+                            batchId = generateBatch(uploadedBatchDetails.getdateSubmitted(), configDetails, transaction, transportDetails, uploadedBatchDetails.getOrgId(), uploadedBatchDetails.getoriginalFileName(), true);
 
                             /* Update the status of the uploaded batch to  TBP (Target Batch Creating in process) (ID = 25) */
                             transactionInManager.updateBatchStatus(batchId, 25, "");
@@ -899,6 +926,9 @@ public class transactionOutManagerImpl implements transactionOutManager {
                         summary.settargetOrgId(configDetails.getorgId());
                         summary.settransactionTargetId(transaction.getId());
                         summary.setsourceOrgId(uploadedBatchDetails.getOrgId());
+                        summary.setSourceSubOrgId(transaction.getSourceSubOrgId());
+                        summary.setTargetSubOrgId(transaction.getTargetSubOrgId());
+                        
 
                         try {
                             transactionOutDAO.submitSummaryEntry(summary);
@@ -975,7 +1005,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
     /**
      * The 'generateBatch' function will create the new download batch for the target
      */
-    public int generateBatch(configuration configDetails, transactionTarget transaction, configurationTransport transportDetails, int sourceOrgId, String sourceFileName, boolean mergeable) throws Exception {
+    public int generateBatch(Date referralDate, configuration configDetails, transactionTarget transaction, configurationTransport transportDetails, int sourceOrgId, String sourceFileName, boolean mergeable) throws Exception {
 
         /* Create the batch name (OrgId+MessageTypeId+Date/Time) - need milliseconds as computer is fast and files have the same name*/
         DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmssS");
@@ -1036,6 +1066,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
         batchDownload.settransportMethodId(transportDetails.gettransportMethodId());
         batchDownload.setoutputFIleName(batchName);
         batchDownload.setmergeable(mergeable);
+        batchDownload.setdateCreated(referralDate);
 
         /* Update the status of the target batch to TBP (Target Batch Created) (ID = 28) */
         batchDownload.setstatusId(28);
@@ -1053,6 +1084,8 @@ public class transactionOutManagerImpl implements transactionOutManager {
         summary.settargetOrgId(configDetails.getorgId());
         summary.settransactionTargetId(transaction.getId());
         summary.setsourceOrgId(sourceOrgId);
+        summary.setSourceSubOrgId(transaction.getSourceSubOrgId());
+        summary.setTargetSubOrgId(transaction.getTargetSubOrgId());
 
         transactionOutDAO.submitSummaryEntry(summary);
 
@@ -1174,60 +1207,97 @@ public class transactionOutManagerImpl implements transactionOutManager {
 
                                 int elementCounter = 1;
                                 for (HL7Elements element : hl7Elements) {
-
-                                    if (!"".equals(element.getdefaultValue())) {
-                                        if ("~currDate~".equals(element.getdefaultValue())) {
-                                            SimpleDateFormat date_format = new SimpleDateFormat("yyyyMMdd");
-                                            String date = date_format.format(batchDetails.getdateCreated());
-                                            hl7recordRow.append(date);
-                                        } else {
-                                            hl7recordRow.append(element.getdefaultValue());
+                                    
+                                    /* If the HL7 requires attachments then we need to look for the "attachments" keyword
+                                    in order to loop through and retrieve all attachments to the batch.
+                                    */
+                                    if("attachments".equals(element.getelementName().toLowerCase())) {
+                                        transactionTarget targetDetails = transactionOutDAO.getTransactionDetails(transactionTargetId);
+                                        List<transactionAttachment> attachments = transactionInManager.getAttachmentsByTransactionId(targetDetails.gettransactionInId());
+                                        
+                                        if(!attachments.isEmpty()) {
+                                            Integer attachmentCounter = 1;
+                                            for(transactionAttachment attachment : attachments) {
+                                                fileSystem attachDir = new fileSystem();
+                                                attachDir.setDirByName(attachment.getfileLocation() + "/");
+                                                File f = new File(attachDir.getDir() + attachment.getfileName());
+                                                byte[] bytes = attachDir.loadFile(f);
+                                                byte[] encoded = Base64.encode(bytes);
+                                                String encodedString = new String(encoded);
+                                                if(!"".equals(attachment.gettitle()) && attachment.gettitle() != null) {
+                                                    hl7recordRow.append(attachmentCounter).append(hl7Details.getfieldSeparator()).append(attachment.gettitle()).append(hl7Details.getfieldSeparator());
+                                                }
+                                                else {
+                                                    hl7recordRow.append(attachmentCounter).append(hl7Details.getfieldSeparator()).append(attachment.getfileName()).append(hl7Details.getfieldSeparator());
+                                                }
+                                                
+                                                hl7recordRow.append(encodedString);
+                                                
+                                                if(attachmentCounter < attachments.size()) {
+                                                    hl7recordRow.append(System.getProperty("line.separator"));
+                                                    hl7recordRow.append(segment.getsegmentName()).append(hl7Details.getfieldSeparator());
+                                                    attachmentCounter += 1;
+                                                }
+                                            }
+                                            
                                         }
+                                    }
+                                    else {
 
-                                    } else {
-
-                                        /* Get the element components */
-                                        List<HL7ElementComponents> hl7Components = configurationManager.getHL7ElementComponents(element.getId());
-
-                                        if (!hl7Components.isEmpty()) {
-                                            int counter = 1;
-                                            for (HL7ElementComponents component : hl7Components) {
-
-                                                String colName = new StringBuilder().append("f").append(component.getfieldValue()).toString();
-
-                                                String fieldValue = BeanUtils.getProperty(records, colName);
-
-                                                if (fieldValue == null) {
-                                                    fieldValue = "";
-                                                } else if ("null".equals(fieldValue)) {
-                                                    fieldValue = "";
-                                                } else if (fieldValue.isEmpty()) {
-                                                    fieldValue = "";
-                                                } else if (fieldValue.length() == 0) {
-                                                    fieldValue = "";
-                                                }
-
-                                                if (!"".equals(component.getfieldDescriptor()) && component.getfieldDescriptor() != null) {
-                                                    hl7recordRow.append(component.getfieldDescriptor()).append(" ").append(fieldValue);
-                                                } else {
-                                                    hl7recordRow.append(fieldValue);
-                                                }
-
-                                                if (!"".equals(component.getFieldAppendText()) && component.getFieldAppendText() != null) {
-                                                    hl7recordRow.append(" ").append(component.getFieldAppendText());
-                                                }
-
-                                                if (counter < hl7Components.size()) {
-                                                    hl7recordRow.append(hl7Details.getcomponentSeparator());
-                                                    counter += 1;
-                                                }
-
+                                        if (!"".equals(element.getdefaultValue())) {
+                                            if ("~currDate~".equals(element.getdefaultValue())) {
+                                                SimpleDateFormat date_format = new SimpleDateFormat("yyyyMMdd");
+                                                String date = date_format.format(batchDetails.getdateCreated());
+                                                hl7recordRow.append(date);
+                                            } else {
+                                                hl7recordRow.append(element.getdefaultValue());
                                             }
 
                                         } else {
-                                            hl7recordRow.append("");
-                                        }
 
+                                            /* Get the element components */
+                                            List<HL7ElementComponents> hl7Components = configurationManager.getHL7ElementComponents(element.getId());
+
+                                            if (!hl7Components.isEmpty()) {
+                                                int counter = 1;
+                                                for (HL7ElementComponents component : hl7Components) {
+
+                                                    String colName = new StringBuilder().append("f").append(component.getfieldValue()).toString();
+
+                                                    String fieldValue = BeanUtils.getProperty(records, colName);
+
+                                                    if (fieldValue == null) {
+                                                        fieldValue = "";
+                                                    } else if ("null".equals(fieldValue)) {
+                                                        fieldValue = "";
+                                                    } else if (fieldValue.isEmpty()) {
+                                                        fieldValue = "";
+                                                    } else if (fieldValue.length() == 0) {
+                                                        fieldValue = "";
+                                                    }
+
+                                                    if (!"".equals(component.getfieldDescriptor()) && component.getfieldDescriptor() != null) {
+                                                        hl7recordRow.append(component.getfieldDescriptor()).append(" ").append(fieldValue);
+                                                    } else {
+                                                        hl7recordRow.append(fieldValue);
+                                                    }
+
+                                                    if (!"".equals(component.getFieldAppendText()) && component.getFieldAppendText() != null) {
+                                                        hl7recordRow.append(" ").append(component.getFieldAppendText());
+                                                    }
+
+                                                    if (counter < hl7Components.size()) {
+                                                        hl7recordRow.append(hl7Details.getcomponentSeparator());
+                                                        counter += 1;
+                                                    }
+
+                                                }
+
+                                            } else {
+                                                hl7recordRow.append("");
+                                            }
+
+                                        }
                                     }
 
                                     if (elementCounter < hl7Elements.size()) {
@@ -1924,8 +1994,8 @@ public class transactionOutManagerImpl implements transactionOutManager {
 
 
     @Override
-    public List<batchDownloadSummary> getuploadBatchesByConfigAndSource(Integer configId, Integer orgId) {
-        return transactionOutDAO.getuploadBatchesByConfigAndSource(configId, orgId);
+    public List<batchDownloadSummary> getuploadBatchesByConfigAndSource(Integer configId, Integer orgId, Integer userOrgId) {
+        return transactionOutDAO.getuploadBatchesByConfigAndSource(configId, orgId, userOrgId);
     }
 
 	@Override
@@ -1934,6 +2004,112 @@ public class transactionOutManagerImpl implements transactionOutManager {
 			throws Exception {
 		 transactionOutDAO.updateTransactionTargetStatusOutBound(batchDLId, transactionId,fromStatusId , toStatusId);
 		
+	}
+	
+	
+	
+	/** 
+     * The 'SendSoapMessage' function will get the WS details and move the file to the
+     * output folder defined in 
+     *
+     * @param batchId The id of the batch to move to archivesOut folder
+     */
+    private Integer SendWSMessage(int batchId, configurationTransport transportDetails)  {
+
+        try {
+
+            /* Update the status of the batch to locked */
+            transactionOutDAO.updateBatchStatus(batchId, 22);
+
+            List<transactionTarget> targets = transactionOutDAO.getTransactionsByBatchDLId(batchId);
+            
+            /** we reject is targets are more than one, web service should only be sending one message at a time **/
+            if (targets.size() > 1) {
+            	transactionOutDAO.updateBatchStatus(batchId, 30);
+            	/**insert error**/
+            	transactionInManager.insertProcessingError(20, null, batchId, null, null, null, null, false, true, "There should only be one message per web service batch.");
+            	updateTargetTransasctionStatus(batchId, 33);
+            	return null;
+            }
+        	
+        	
+            /** we lock targets **/
+            if (!targets.isEmpty()) {
+
+                for (transactionTarget target : targets) {
+
+                    /* Need to update the uploaded batch status */
+                    transactionInManager.updateBatchStatus(target.getbatchUploadId(), 22, "");
+
+                    /* Need to update the uploaded batch transaction status */
+                    transactionInManager.updateTransactionStatus(target.getbatchUploadId(), target.gettransactionInId(), 0, 37);
+
+                    /* Update the downloaded batch transaction status */
+                    transactionOutDAO.updateTargetTransasctionStatus(target.getbatchDLId(), 37);
+
+                }
+
+            }
+
+            /* get the batch details */
+            batchDownloads batchDetails = transactionOutDAO.getBatchDetails(batchId);
+
+            /* Get the WS Details  - do we need this? */
+            configurationWebServiceFields wsDetails = configurationTransportManager.getTransWSDetailsPush(transportDetails.getId());
+
+            // the file is in output folder already, we need to encrypt it and populate soap message
+            
+            //1. we read file
+            
+            fileSystem dir = new fileSystem();
+            String filelocation = transportDetails.getfileLocation();
+            filelocation = filelocation.replace("/bowlink/", "");
+            dir.setDirByName(filelocation);
+            
+            File sourceFile = new File(dir.getDir() + batchDetails.getoutputFIleName());
+            //get content
+            String fileContent = filemanager.readTextFile(sourceFile.getAbsolutePath());
+            
+            
+            //to get the original sender's email, we need to get the originalTargetId from TransactionIn and then look up the batchId
+            List <String> emails = getWSSenderFromBatchDLId((Arrays.asList(batchId)));
+            
+            String result = wsManager.sendHIESoapMessage(fileContent, emails.get(0), wsDetails.getEmail(), batchId);
+            
+            
+        	if (result.equalsIgnoreCase("success")) {
+        		transactionOutDAO.updateBatchStatus(batchId, 23);
+        	} else {
+        		transactionOutDAO.updateBatchStatus(batchId, 30);
+        		transactionInManager.insertProcessingError(20, null, batchId, null, null, null, null, false, true, "Web Service Message Failed to send.");
+            	updateTargetTransasctionStatus(batchId, 33);
+            	return null;
+        		
+        	}
+            for (transactionTarget target : targets) {
+
+                /* Need to update the uploaded batch status */
+                transactionInManager.updateBatchStatus(target.getbatchUploadId(), 23, "");
+
+                /* Need to update the uploaded batch transaction status */
+                transactionInManager.updateTransactionStatus(target.getbatchUploadId(), target.gettransactionInId(), 0, 20);
+
+                /* Update the downloaded batch transaction status */
+                transactionOutDAO.updateTargetTransasctionStatus(target.getbatchDLId(), 20);
+
+            }
+            
+        } catch (Exception e) {
+        	e.printStackTrace();
+            System.err.println("SendWSMessage - Error occurred trying to move a batch target. batchId: " + batchId);
+            return null;
+        }
+        return 1;
+    }
+
+	@Override
+	public List <String> getWSSenderFromBatchDLId(List<Integer> batchDLIds) throws Exception {
+		return transactionOutDAO.getWSSenderFromBatchDLId(batchDLIds);
 	}
 
 

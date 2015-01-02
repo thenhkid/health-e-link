@@ -47,6 +47,13 @@
                                 <c:if test="${not empty existingType}"><span class="control-label has-error">${existingType}</span></c:if>
                                 </div>
                         </spring:bind>
+                        <spring:bind path="dspName">
+                            <div class="form-group ${status.error ? 'has-error' : '' }">
+                                <label class="control-label" for="dspName">Display Name *</label>
+                                <form:input path="dspName" id="dspName" class="form-control" type="text" maxLength="255" />
+                                <form:errors path="dspName" cssClass="control-label" element="label" />
+                                </div>
+                        </spring:bind>      
                         <c:choose>
                             <c:when test="${empty id}">
                                 <spring:bind path="file">

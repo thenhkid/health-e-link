@@ -560,5 +560,10 @@ public class sysAdminManagerImpl implements sysAdminManager {
     public List<lu_ProcessStatus> getAllHistoryFormProcessStatus() throws Exception {
         return sysAdminDAO.getAllHistoryFormProcessStatus();
     }
+
+	@Override
+	public Long findTotalUsers() throws Exception {
+		 return sysAdminDAO.findTotalUsers();
+	}
    
 }

@@ -45,6 +45,9 @@ public class transactionIn {
 
     @Column(name = "MESSAGESTATUS", nullable = false)
     private int messageStatus = 1;
+    
+    @Column(name = "sourceSubOrgId", nullable = false)
+    private int sourceSubOrgId = 0;
 
     public int getId() {
         return id;
@@ -109,4 +112,14 @@ public class transactionIn {
     public void setmessageStatus(int messageStatus) {
         this.messageStatus = messageStatus;
     }
+
+	public int getSourceSubOrgId() {
+		return sourceSubOrgId;
+	}
+
+	public void setSourceSubOrgId(int sourceSubOrgId) {
+		this.sourceSubOrgId = sourceSubOrgId;
+	}
+    
+    
 }

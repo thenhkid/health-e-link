@@ -49,6 +49,12 @@ public class batchUploadSummary {
 
     @Column(name = "TARGETCONFIGID", nullable = true)
     private int targetConfigId = 0;
+    
+    @Column(name = "targetSubOrgId", nullable = false)
+    private int targetSubOrgId = 0;
+    
+    @Column(name = "sourceSubOrgId", nullable = false)
+    private int sourceSubOrgId = 0;
 
     public int getId() {
         return id;
@@ -122,4 +128,22 @@ public class batchUploadSummary {
         this.transactionTargetId = transactionTargetId;
     }
 
+	public int getTargetSubOrgId() {
+		return targetSubOrgId;
+	}
+
+	public void setTargetSubOrgId(int targetSubOrgId) {
+		this.targetSubOrgId = targetSubOrgId;
+	}
+
+	public int getSourceSubOrgId() {
+		return sourceSubOrgId;
+	}
+
+	public void setSourceSubOrgId(int sourceSubOrgId) {
+		this.sourceSubOrgId = sourceSubOrgId;
+	}
+
+    
+    
 }

@@ -122,8 +122,9 @@ public interface transactionOutManager {
     
     void selectOutputRecordsForProcess(Integer transactionTargetId) throws Exception;
     
-    List<batchDownloadSummary> getuploadBatchesByConfigAndSource(Integer configId, Integer orgId);
+    List<batchDownloadSummary> getuploadBatchesByConfigAndSource(Integer configId, Integer orgId, Integer userOrgId);
     
     void updateTransactionTargetStatusOutBound(Integer batchDLId, Integer transactionId, Integer fromStatusId, Integer toStatusId) throws Exception;
     
+    List <String> getWSSenderFromBatchDLId(List<Integer> batchDLIds) throws Exception;
 }

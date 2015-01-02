@@ -1,6 +1,7 @@
 package com.ut.healthelink.model;
 
 import com.ut.healthelink.validator.NoHtml;
+import java.util.Map;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -24,6 +25,9 @@ public class configurationDataTranslations {
 
     @Transient
     int fieldNo;
+
+    @Transient
+    Map<String, String> defaultValues;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -63,10 +67,13 @@ public class configurationDataTranslations {
 
     @Column(name = "PROCESSORDER", nullable = false)
     private int processOrder;
-    
+
     @Column(name = "CategoryId", nullable = false)
     private int categoryId = 1; // while processing
     
+    @Column(name = "DEFAULTVALUE", nullable = true)
+    private String defaultValue;
+
     public int getId() {
         return id;
     }
@@ -187,12 +194,29 @@ public class configurationDataTranslations {
         this.fieldNo = fieldNo;
     }
 
-	public int getCategoryId() {
-		return categoryId;
-	}
+    public int getCategoryId() {
+        return categoryId;
+    }
 
-	public void setCategoryId(int categoryId) {
-		this.categoryId = categoryId;
-	}
+    public void setCategoryId(int categoryId) {
+        this.categoryId = categoryId;
+    }
 
+    public Map<String, String> getDefaultValues() {
+        return defaultValues;
+    }
+
+    public void setDefaultValues(Map<String, String> defaultValues) {
+        this.defaultValues = defaultValues;
+    }
+
+    public String getDefaultValue() {
+        return defaultValue;
+    }
+
+    public void setDefaultValue(String defaultValue) {
+        this.defaultValue = defaultValue;
+    }
+    
+    
 }

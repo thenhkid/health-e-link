@@ -20,8 +20,11 @@
         <intercept-url access="permitAll" pattern="/login/*"></intercept-url>
         <intercept-url access="permitAll" pattern="/logout"></intercept-url>
         <logout invalidate-session="true" delete-cookies="JSESSIONID" logout-success-url="/login" logout-url="/logout"></logout>
-        <form-login authentication-success-handler-ref="authenticationSuccessRedirecthandler" authentication-failure-url="/loginfailed" login-page="/login"></form-login>
-        <session-management invalid-session-url="/"></session-management>
+        <form-login authentication-success-handler-ref="authenticationSuccessRedirecthandler" 
+        authentication-failure-url="/loginfailed" 
+        authentication-details-source-ref="customWebAuthenticationDetails"
+        login-page="/login"></form-login>
+        <session-management invalid-session-url="/login"></session-management>
         <headers>
             <cache-control />
             <content-type-options />
@@ -30,9 +33,19 @@
             <xss-protection />
         </headers>
     </http>
-    
-    
-
+   
+     
+    <authentication-manager>
+        	<authentication-provider ref="customAuthenticationProvider">
+        	</authentication-provider>
+    </authentication-manager>
+     
+    <beans:bean class="com.ut.healthelink.security.CustomWebAuthenticationDetails" id="customWebAuthenticationDetails"></beans:bean>
+    <beans:bean class="com.ut.healthelink.security.CustomAuthenticationProvider" id="customAuthenticationProvider"></beans:bean>
+    <beans:bean class="com.ut.healthelink.security.CustomAuthenticationHandler" id="authenticationSuccessRedirecthandler"></beans:bean>
+    <!--  -->
+ <!--
+ 
     <authentication-manager>
         <authentication-provider>
             <jdbc-user-service data-source-ref="dataSource"
@@ -45,6 +58,6 @@
         </authentication-provider>
     </authentication-manager>
      
-    <beans:bean class="com.ut.healthelink.security.CustomAuthenticationHandler" id="authenticationSuccessRedirecthandler"></beans:bean>
-   
+    <beans:bean class="com.ut.dph.security.CustomAuthenticationHandler" id="authenticationSuccessRedirecthandler"></beans:bean>
+   -->
 </beans:beans>

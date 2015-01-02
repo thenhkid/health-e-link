@@ -17,6 +17,7 @@ import com.ut.healthelink.model.configurationMessageSpecs;
 import com.ut.healthelink.model.configurationRhapsodyFields;
 import com.ut.healthelink.model.configurationTransport;
 import com.ut.healthelink.model.configurationTransportMessageTypes;
+import com.ut.healthelink.model.configurationWebServiceFields;
 
 import java.util.Iterator;
 
@@ -133,7 +134,7 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
             while (it.hasNext()) {
                 Object row[] = (Object[]) it.next();
                 id = (Integer) row[0];
-                Query query = sessionFactory.getCurrentSession().createSQLQuery("INSERT INTO configurationFormFields (messageTypeFieldId, configId, transportDetailId, fieldNo, fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, useField, saveToTableName, saveToTableCol, autoPopulateTableName, autoPopulateTableCol) SELECT id, :configId, :transportDetailId, fieldNo,  fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, 1, saveToTableName, saveToTableCol, autoPopulateTableName, autoPopulateTableCol FROM messageTypeFormFields where messageTypeId = :messageTypeId and id = :id");
+                Query query = sessionFactory.getCurrentSession().createSQLQuery("INSERT INTO configurationFormFields (messageTypeFieldId, configId, transportDetailId, fieldNo, fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, useField, saveToTableName, saveToTableCol, autoPopulateTableName, autoPopulateTableCol, fieldType) SELECT id, :configId, :transportDetailId, fieldNo,  fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, 1, saveToTableName, saveToTableCol, autoPopulateTableName, autoPopulateTableCol, fieldType FROM messageTypeFormFields where messageTypeId = :messageTypeId and id = :id");
                 query.setParameter("configId", configId);
                 query.setParameter("messageTypeId", messageTypeId);
                 query.setParameter("transportDetailId", transportId);
@@ -156,7 +157,7 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
                 }
             }
         } else {
-            Query query = sessionFactory.getCurrentSession().createSQLQuery("INSERT INTO configurationFormFields (messageTypeFieldId, configId, transportDetailId, fieldNo, fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, useField, saveToTableName, saveToTableCol, autoPopulateTableName, autoPopulateTableCol) SELECT id, :configId, :transportDetailId, fieldNo,  fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, 1, saveToTableName, saveToTableCol, autoPopulateTableName, autoPopulateTableCol FROM messageTypeFormFields where messageTypeId = :messageTypeId");
+            Query query = sessionFactory.getCurrentSession().createSQLQuery("INSERT INTO configurationFormFields (messageTypeFieldId, configId, transportDetailId, fieldNo, fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, useField, saveToTableName, saveToTableCol, autoPopulateTableName, autoPopulateTableCol, fieldType) SELECT id, :configId, :transportDetailId, fieldNo,  fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, 1, saveToTableName, saveToTableCol, autoPopulateTableName, autoPopulateTableCol, fieldType FROM messageTypeFormFields where messageTypeId = :messageTypeId");
             query.setParameter("configId", configId);
             query.setParameter("messageTypeId", messageTypeId);
             query.setParameter("transportDetailId", transportId);
@@ -734,12 +735,12 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
      */
     @Override
     @Transactional
-    public void saveTransportRhapsody(configurationRhapsodyFields rhapsodyFields) {
+    public void saveTransportRhapsody(configurationRhapsodyFields rhapsodyFields) throws Exception {
         try {
             sessionFactory.getCurrentSession().saveOrUpdate(rhapsodyFields);
         } catch (Exception ex) {
             ex.printStackTrace();
-            System.err.println("saveTransportFTP " + ex.getCause());
+            System.err.println("saveTransportRhapsody " + ex.getCause());
         }
     }
 
@@ -905,6 +906,139 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
          }
 	}
     
-    
+	@Override
+    @Transactional
+    public List<configurationWebServiceFields> getTransWSDetails(int transportDetailId) throws Exception {
+        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configurationWebServiceFields.class)
+                .add(Restrictions.eq("transportId", transportDetailId));
 
+        return criteria.list();
+    }   
+
+    @Override
+    @Transactional
+    public void saveTransportWebService(configurationWebServiceFields wsFields) throws Exception {
+        try {
+            sessionFactory.getCurrentSession().saveOrUpdate(wsFields);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.err.println("saveTransportWebService " + ex.getCause());
+        }
+    }
+
+	
+	@Override
+    @Transactional
+    @SuppressWarnings("unchecked")
+    public List<configurationTransport> getDistinctTransportDetailsForOrgByTransportMethodId (Integer transportMethodId, Integer status, Integer orgId) {
+        try {
+
+            String sql = ("select distinct fileExt, delimChar, containsHeaderRow , "
+            		+ " fileDelimiter, fileLocation, encodingId "
+            		+ " from configurationTransportDetails, ref_delimiters , configurationMessageSpecs "
+                    + " where ref_delimiters.id = configurationTransportDetails.fileDelimiter "
+                    + " and configurationMessageSpecs.configId = configurationTransportDetails.configId"
+                    + " and transportmethodId = :transportMethodId"
+                    + " and configurationTransportDetails.configId in (select id from configurations where type = 1 and status = :status and orgId = :orgId)");
+            if (transportMethodId == 5) {
+            	sql = sql  + " and configurationTransportDetails.id in (select transportId from rel_transportrhapsodydetails where method = 1) ";
+            } else if  (transportMethodId == 3) {
+            	sql = sql  + " and configurationTransportDetails.id in (select transportId from rel_transportftpdetails where method = 1) ";
+            }else if  (transportMethodId == 6) {
+            	sql = sql  + " and configurationTransportDetails.id in (select transportId from rel_transportWebServiceDetails where method = 1) ";
+            }
+            
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
+                    Transformers.aliasToBean(configurationTransport.class));
+            query.setParameter("orgId", orgId);
+            query.setParameter("transportMethodId", transportMethodId);
+            query.setParameter("status", status);
+            
+            List<configurationTransport> configurationTransports = query.list();
+
+            return configurationTransports;
+
+        } catch (Exception ex) {
+            System.err.println("getDistinctTransportDetailsForOrgByTransportMethodId " + ex.getCause());
+            ex.printStackTrace();
+
+            return null;
+        }
+    }
+    
+    @Override
+    @Transactional
+    @SuppressWarnings("unchecked")
+    public List<configurationTransport> getCTForOrgByTransportMethodId (Integer transportMethodId, Integer status, Integer orgId) {
+        try {
+
+            String sql = ("select configurationTransportDetails.* "
+            		+ " from configurationTransportDetails, ref_delimiters , configurationMessageSpecs "
+                    + " where ref_delimiters.id = configurationTransportDetails.fileDelimiter "
+                    + " and configurationMessageSpecs.configId = configurationTransportDetails.configId"
+                    + " and transportmethodId = :transportMethodId"
+                    + " and configurationTransportDetails.configId in (select id from configurations where type = 1 and status = :status and orgId = :orgId)");
+            if (transportMethodId == 5) {
+            	sql = sql  + " and configurationTransportDetails.id in (select transportId from rel_transportrhapsodydetails where method = 1) ";
+            } else if  (transportMethodId == 3) {
+            	sql = sql  + " and configurationTransportDetails.id in (select transportId from rel_transportftpdetails where method = 1) ";
+            }else if  (transportMethodId == 6) {
+            	sql = sql  + " and configurationTransportDetails.id in (select transportId from rel_transportWebServiceDetails where method = 1) ";
+            }
+            
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
+                    Transformers.aliasToBean(configurationTransport.class));
+            query.setParameter("orgId", orgId);
+            query.setParameter("transportMethodId", transportMethodId);
+            query.setParameter("status", status);
+            
+            List<configurationTransport> configurationTransports = query.list();
+
+            return configurationTransports;
+
+        } catch (Exception ex) {
+            System.err.println("getCTForOrgByTransportMethodId " + ex.getCause());
+            ex.printStackTrace();
+
+            return null;
+        }
+    }
+    
+    
+    /**
+     * The 'getTransRhapsodyDetailsPush' function will return the PUSH Rhapsody details for the passed in transportDetailsId.
+     *
+     * @param transportDetailsId The id of the selected transport method
+     *
+     * @return This function will return the PUSH Rhapsody details
+     */
+    @Override
+    @Transactional
+    public configurationWebServiceFields getTransWSDetailsPush(int transportDetailId) throws Exception {
+        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configurationWebServiceFields.class)
+                .add(Restrictions.eq("transportId", transportDetailId))
+                .add(Restrictions.eq("method", 2));
+
+        return (configurationWebServiceFields) criteria.uniqueResult();
+
+    }
+
+    /**
+     * The 'configurationRhapsodyFields' function will return the PULL Rhapsody details for the passed in transportDetailsId.
+     *
+     * @param transportDetailsId The id of the selected transport method
+     *
+     * @return This function will return the PULL Rhapsody details
+     */
+    @Override
+    @Transactional
+    public configurationWebServiceFields getTransWSDetailsPull(int transportDetailId) throws Exception {
+        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configurationWebServiceFields.class)
+                .add(Restrictions.eq("transportId", transportDetailId))
+                .add(Restrictions.eq("method", 1));
+
+        return (configurationWebServiceFields) criteria.uniqueResult();
+
+    }
+    
 }

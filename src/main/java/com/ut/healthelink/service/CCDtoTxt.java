@@ -9,10 +9,12 @@ import com.ut.healthelink.model.Organization;
 import com.ut.healthelink.reference.fileSystem;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.PrintStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.net.URLClassLoader;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -83,15 +85,24 @@ public class CCDtoTxt {
 
         }
 
-        FileWriter fw = new FileWriter(newFile, true);
-
-        /* END */
-        String fileRecords = (String) myMethod.invoke(CCDObj, new Object[]{ccdFile});
-        
-        fw.write(fileRecords);
-
-        fw.close();
-
+        try {
+	        FileWriter fw = new FileWriter(newFile, true);
+	
+	        /* END */
+	        String fileRecords = (String) myMethod.invoke(CCDObj, new Object[]{ccdFile});
+	        if (fileRecords.equalsIgnoreCase("")) {
+	        	newfileName = "FILE IS NOT XML ERROR";
+	        }
+	        fw.write(fileRecords);
+	
+	        fw.close();
+        } catch (Exception ex) {
+        	ex.printStackTrace();
+        	newfileName = "ERRORERRORERROR";
+        	PrintStream ps = new PrintStream(newFile);
+        	ex.printStackTrace(ps);
+        	ps.close();
+        }
         return newfileName;
 
     }

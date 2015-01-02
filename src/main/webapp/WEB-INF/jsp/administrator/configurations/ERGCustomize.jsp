@@ -140,6 +140,17 @@
                                                                         <input type="text" name="fields[${field.index}].fieldLabel"  value="${fieldDetails.fieldLabel}" rel="${field.index}" class="form-control fieldLabel formField" style="width:200px;" />
                                                                         <span id="fieldLabelMsg_${field.index}" class="control-label"></span>
                                                                     </div>
+                                                                    <div>
+                                                                        <div id="fieldType_${field.index}" class="form-group ${status.error ? 'has-error' : '' }">
+                                                                            <strong>Field Type</strong><br/>
+                                                                            <select name="fields[${field.index}].fieldType" class="form-control half">
+                                                                                <option value="1" label=" - Select - " >- Select -</option>
+                                                                                <c:forEach items="${fieldTypes}" varStatus="ftype">
+                                                                                    <option value="${fieldTypes[ftype.index][0]}" <c:if test="${fieldDetails.fieldType == fieldTypes[ftype.index][0]}">selected</c:if>>${fieldTypes[ftype.index][1]}</option>
+                                                                                </c:forEach>
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
                                                                 </td>
                                                                 <td>
                                                                     <div class="form-group validationTypes">

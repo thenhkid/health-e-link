@@ -17,15 +17,16 @@
         <param-value>com.ut.healthelink.security.ContextProfileInitializer</param-value>
     </context-param>
     <!--  Set the default timeout setting for a logged in user/admin -->
-    <session-config>
-        <session-timeout>30</session-timeout>
-    </session-config>
+    <session-config>  
+        <session-timeout>30</session-timeout>  
+    </session-config>  
+
     <servlet>
         <servlet-name>appServlet</servlet-name>
         <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
         <init-param>
             <param-name>contextConfigLocation</param-name>
-            <param-value/>
+            <param-value></param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>

@@ -5,6 +5,7 @@
  */
 package com.ut.healthelink.dao.impl;
 
+import com.ut.healthelink.model.activityReportList;
 import com.ut.healthelink.dao.transactionInDAO;
 import com.ut.healthelink.model.CrosswalkData;
 import com.ut.healthelink.model.Macros;
@@ -13,6 +14,7 @@ import com.ut.healthelink.model.MoveFilesLog;
 import com.ut.healthelink.model.TransactionInError;
 import com.ut.healthelink.model.User;
 import com.ut.healthelink.model.UserActivity;
+import com.ut.healthelink.model.WSMessagesIn;
 import com.ut.healthelink.model.batchMultipleTargets;
 import com.ut.healthelink.model.batchUploadSummary;
 import com.ut.healthelink.model.batchUploads;
@@ -40,6 +42,7 @@ import com.ut.healthelink.model.messagePatients;
 import com.ut.healthelink.model.messageType;
 import com.ut.healthelink.service.sysAdminManager;
 import com.ut.healthelink.service.userManager;
+import java.math.BigInteger;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -121,7 +124,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 
         List<fieldSelectOptions> fieldSelectOptions = new ArrayList<fieldSelectOptions>();
 
-        Query findCrosswalks = sessionFactory.getCurrentSession().createSQLQuery("SELECT crosswalkId, id FROM configurationDataTranslations where configId = :configId and fieldId = :fieldId");
+        Query findCrosswalks = sessionFactory.getCurrentSession().createSQLQuery("SELECT crosswalkId, id, defaultValue FROM configurationDataTranslations where configId = :configId and fieldId = :fieldId");
         findCrosswalks.setParameter("configId", configId);
         findCrosswalks.setParameter("fieldId", fieldId);
         List crosswalks = findCrosswalks.list();
@@ -130,11 +133,13 @@ public class transactionInDAOImpl implements transactionInDAO {
         int crosswalkId;
         String optionDesc;
         String optionValue;
+        String defaultValue;
         fieldSelectOptions fieldOptions = null;
 
         while (it.hasNext()) {
             Object row[] = (Object[]) it.next();
             crosswalkId = (Integer) row[0];
+            defaultValue = (String) row[2];
 
             Query crosswalkData = sessionFactory.getCurrentSession().createSQLQuery("SELECT sourceValue, descValue FROM rel_crosswalkData where crosswalkId = :crosswalkId");
             crosswalkData.setParameter("crosswalkId", crosswalkId);
@@ -149,6 +154,7 @@ public class transactionInDAOImpl implements transactionInDAO {
                 fieldOptions = new fieldSelectOptions();
                 fieldOptions.setoptionDesc(optionDesc);
                 fieldOptions.setoptionValue(optionValue);
+                fieldOptions.setDefaultValue(defaultValue);
                 fieldSelectOptions.add(fieldOptions);
             }
 
@@ -372,7 +378,10 @@ public class transactionInDAOImpl implements transactionInDAO {
 
         /* Get a list of available batches */
         Criteria batchSummaries = sessionFactory.getCurrentSession().createCriteria(batchUploadSummary.class);
-        batchSummaries.add(Restrictions.eq("sourceOrgId", orgId));
+        batchSummaries.add(Restrictions.or(
+                Restrictions.eq("sourceOrgId", orgId),
+                Restrictions.eq("sourceSubOrgId", orgId)
+        ));
         batchSummaries.add(Restrictions.in("messageTypeId", messageTypeList));
         batchSummaries.add(Restrictions.in("targetOrgId", targetOrgList));
         List<batchUploadSummary> batchUploadSummaryList = batchSummaries.list();
@@ -710,7 +719,10 @@ public class transactionInDAOImpl implements transactionInDAO {
 
         /* Get a list of available batches */
         Criteria batchSummaries = sessionFactory.getCurrentSession().createCriteria(batchUploadSummary.class);
-        batchSummaries.add(Restrictions.eq("sourceOrgId", orgId));
+        batchSummaries.add(Restrictions.or(
+                Restrictions.eq("sourceOrgId", orgId),
+                Restrictions.eq("sourceSubOrgId", orgId)
+        ));
         batchSummaries.add(Restrictions.in("messageTypeId", messageTypeList));
         batchSummaries.add(Restrictions.in("targetOrgId", targetOrgList));
         List<batchUploadSummary> batchUploadSummaryList = batchSummaries.list();
@@ -1256,12 +1268,31 @@ public class transactionInDAOImpl implements transactionInDAO {
         }
         // multiconfig is 0 so we need to add
         configIdList.add(0);
+
+        List<Integer> batchIdList = new ArrayList<Integer>();
+        Criteria findBatchesBySummary = sessionFactory.getCurrentSession().createCriteria(batchUploadSummary.class);
+        findBatchesBySummary.add(Restrictions.or(
+                Restrictions.eq("sourceOrgId", orgId),
+                Restrictions.eq("sourceSubOrgId", orgId)
+        ));
+        List<batchUploadSummary> summaries = findBatchesBySummary.list();
+
+        if (summaries.isEmpty()) {
+            batchIdList.add(0);
+        } else {
+            for (batchUploadSummary summary : summaries) {
+                if (!batchIdList.contains(summary.getbatchId())) {
+                    batchIdList.add(summary.getbatchId());
+                }
+            }
+        }
+
         Criteria findBatches = sessionFactory.getCurrentSession().createCriteria(batchUploads.class);
-        findBatches.add(Restrictions.eq("orgId", orgId));
+        findBatches.add(Restrictions.in("id", batchIdList));
         findBatches.add(Restrictions.not(Restrictions.in("statusId", excludedStatusIds)));
         findBatches.add(Restrictions.in("configId", configIdList));
         findBatches.add(Restrictions.ne("transportMethodId", 2));
-        
+
         if (!"".equals(fromDate)) {
             findBatches.add(Restrictions.ge("dateSubmitted", fromDate));
         }
@@ -1297,6 +1328,7 @@ public class transactionInDAOImpl implements transactionInDAO {
         int firstResult = 0;
 
         Criteria findBatches = sessionFactory.getCurrentSession().createCriteria(batchUploads.class);
+        findBatches.add(Restrictions.ne("totalRecordCount", 0));
 
         if (!"".equals(fromDate)) {
             findBatches.add(Restrictions.ge("dateSubmitted", fromDate));
@@ -2250,7 +2282,7 @@ public class transactionInDAOImpl implements transactionInDAO {
             sql = sql + " and statusId not in ( :transRELId )";
         }
         sql = sql + ") SET "
-        		+ "transactionTranslatedIn.F1 = transactionInRecords.F1, "
+                + "transactionTranslatedIn.F1 = transactionInRecords.F1, "
                 + "transactionTranslatedIn.F2 = transactionInRecords.F2, "
                 + "transactionTranslatedIn.F3 = transactionInRecords.F3, "
                 + "transactionTranslatedIn.F4 = transactionInRecords.F4, "
@@ -3018,10 +3050,10 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Transactional
     public Integer createLoadTable(String loadTableName) {
         try {
-        	String sql = ("create TABLE " + loadTableName 
-        			+ "(f1 text DEFAULT NULL,  f2 text DEFAULT NULL,  f3 text DEFAULT NULL,  f4 text DEFAULT NULL,  f5 text DEFAULT NULL,  f6 text DEFAULT NULL,  f7 text DEFAULT NULL,  f8 text DEFAULT NULL,  f9 text DEFAULT NULL,  f10 text DEFAULT NULL,  f11 text DEFAULT NULL,  f12 text DEFAULT NULL,  f13 text DEFAULT NULL,  f14 text DEFAULT NULL,  f15 text DEFAULT NULL,  f16 text DEFAULT NULL,  f17 text DEFAULT NULL,  f18 text DEFAULT NULL,  f19 text DEFAULT NULL,  f20 text DEFAULT NULL,  f21 text DEFAULT NULL,  f22 text DEFAULT NULL,  f23 text DEFAULT NULL,  f24 text DEFAULT NULL,  f25 text DEFAULT NULL,  f26 text DEFAULT NULL,  f27 text DEFAULT NULL,  f28 text DEFAULT NULL,  f29 text DEFAULT NULL,  f30 text DEFAULT NULL,  f31 text DEFAULT NULL,  f32 text DEFAULT NULL,  f33 text DEFAULT NULL,  f34 text DEFAULT NULL,  f35 text DEFAULT NULL,  f36 text DEFAULT NULL,  f37 text DEFAULT NULL,  f38 text DEFAULT NULL,  f39 text DEFAULT NULL,  f40 text DEFAULT NULL,  f41 text DEFAULT NULL,  f42 text DEFAULT NULL,  f43 text DEFAULT NULL,  f44 text DEFAULT NULL,  f45 text DEFAULT NULL,  f46 text DEFAULT NULL,  f47 text DEFAULT NULL,  f48 text DEFAULT NULL,  f49 text DEFAULT NULL,  f50 text DEFAULT NULL,  f51 text DEFAULT NULL,  f52 text DEFAULT NULL,  f53 text DEFAULT NULL,  f54 text DEFAULT NULL,  f55 text DEFAULT NULL,  f56 text DEFAULT NULL,  f57 text DEFAULT NULL,  f58 text DEFAULT NULL,  f59 text DEFAULT NULL,  f60 text DEFAULT NULL,  f61 text DEFAULT NULL,  f62 text DEFAULT NULL,  f63 text DEFAULT NULL,  f64 text DEFAULT NULL,  f65 text DEFAULT NULL,  f66 text DEFAULT NULL,  f67 text DEFAULT NULL,  f68 text DEFAULT NULL,  f69 text DEFAULT NULL,  f70 text DEFAULT NULL,  f71 text DEFAULT NULL,  f72 text DEFAULT NULL,  f73 text DEFAULT NULL,  f74 text DEFAULT NULL,  f75 text DEFAULT NULL,  f76 text DEFAULT NULL,  f77 text DEFAULT NULL,  f78 text DEFAULT NULL,  f79 text DEFAULT NULL,  f80 text DEFAULT NULL,  f81 text DEFAULT NULL,  f82 text DEFAULT NULL,  f83 text DEFAULT NULL,  f84 text DEFAULT NULL,  f85 text DEFAULT NULL,  f86 text DEFAULT NULL,  f87 text DEFAULT NULL,  f88 text DEFAULT NULL,  f89 text DEFAULT NULL,  f90 text DEFAULT NULL,  f91 text DEFAULT NULL,  f92 text DEFAULT NULL,  f93 text DEFAULT NULL,  f94 text DEFAULT NULL,  f95 text DEFAULT NULL,  f96 text DEFAULT NULL,  f97 text DEFAULT NULL,  f98 text DEFAULT NULL,  f99 text DEFAULT NULL,  f100 text DEFAULT NULL,  f101 text DEFAULT NULL,  f102 text DEFAULT NULL,  f103 text DEFAULT NULL,  f104 text DEFAULT NULL,  f105 text DEFAULT NULL,  f106 text DEFAULT NULL,  f107 text DEFAULT NULL,  f108 text DEFAULT NULL,  f109 text DEFAULT NULL,  f110 text DEFAULT NULL,  f111 text DEFAULT NULL,  f112 text DEFAULT NULL,  f113 text DEFAULT NULL,  f114 text DEFAULT NULL,  f115 text DEFAULT NULL,  f116 text DEFAULT NULL,  f117 text DEFAULT NULL,  f118 text DEFAULT NULL,  f119 text DEFAULT NULL,  f120 text DEFAULT NULL,  f121 text DEFAULT NULL,  f122 text DEFAULT NULL,  f123 text DEFAULT NULL,  f124 text DEFAULT NULL,  f125 text DEFAULT NULL,  f126 text DEFAULT NULL,  f127 text DEFAULT NULL,  f128 text DEFAULT NULL,  f129 text DEFAULT NULL,  f130 text DEFAULT NULL,  f131 text DEFAULT NULL,  f132 text DEFAULT NULL,  f133 text DEFAULT NULL,  f134 text DEFAULT NULL,  f135 text DEFAULT NULL,  f136 text DEFAULT NULL,  f137 text DEFAULT NULL,  f138 text DEFAULT NULL,  f139 text DEFAULT NULL,  f140 text DEFAULT NULL,  f141 text DEFAULT NULL,  f142 text DEFAULT NULL,  f143 text DEFAULT NULL,  f144 text DEFAULT NULL,  f145 text DEFAULT NULL,  f146 text DEFAULT NULL,  f147 text DEFAULT NULL,  f148 text DEFAULT NULL,  f149 text DEFAULT NULL,  f150 text DEFAULT NULL,  f151 text DEFAULT NULL,  f152 text DEFAULT NULL,  f153 text DEFAULT NULL,  f154 text DEFAULT NULL,  f155 text DEFAULT NULL,  f156 text DEFAULT NULL,  f157 text DEFAULT NULL,  f158 text DEFAULT NULL,  f159 text DEFAULT NULL,  f160 text DEFAULT NULL,  f161 text DEFAULT NULL,  f162 text DEFAULT NULL,  f163 text DEFAULT NULL,  f164 text DEFAULT NULL,  f165 text DEFAULT NULL,  f166 text DEFAULT NULL,  f167 text DEFAULT NULL,  f168 text DEFAULT NULL,  f169 text DEFAULT NULL,  f170 text DEFAULT NULL,  f171 text DEFAULT NULL,  f172 text DEFAULT NULL,  f173 text DEFAULT NULL,  f174 text DEFAULT NULL,  f175 text DEFAULT NULL,  f176 text DEFAULT NULL,  f177 text DEFAULT NULL,  f178 text DEFAULT NULL,  f179 text DEFAULT NULL,  f180 text DEFAULT NULL,  f181 text DEFAULT NULL,  f182 text DEFAULT NULL,  f183 text DEFAULT NULL,  f184 text DEFAULT NULL,  f185 text DEFAULT NULL,  f186 text DEFAULT NULL,  f187 text DEFAULT NULL,  f188 text DEFAULT NULL,  f189 text DEFAULT NULL,  f190 text DEFAULT NULL,  f191 text DEFAULT NULL,  f192 text DEFAULT NULL,  f193 text DEFAULT NULL,  f194 text DEFAULT NULL,  f195 text DEFAULT NULL,  f196 text DEFAULT NULL,  f197 text DEFAULT NULL,  f198 text DEFAULT NULL,  f199 text DEFAULT NULL,  f200 text DEFAULT NULL,  f201 text DEFAULT NULL,  f202 text DEFAULT NULL,  f203 text DEFAULT NULL,  f204 text DEFAULT NULL,  f205 text DEFAULT NULL,  f206 text DEFAULT NULL,  f207 text DEFAULT NULL,  f208 text DEFAULT NULL,  f209 text DEFAULT NULL,  f210 text DEFAULT NULL,  f211 text DEFAULT NULL,  f212 text DEFAULT NULL,  f213 text DEFAULT NULL,  f214 text DEFAULT NULL,  f215 text DEFAULT NULL,  f216 text DEFAULT NULL,  f217 text DEFAULT NULL,  f218 text DEFAULT NULL,  f219 text DEFAULT NULL,  f220 text DEFAULT NULL,  f221 text DEFAULT NULL,  f222 text DEFAULT NULL,  f223 text DEFAULT NULL,  f224 text DEFAULT NULL,  f225 text DEFAULT NULL,  f226 text DEFAULT NULL,  f227 text DEFAULT NULL,  f228 text DEFAULT NULL,  f229 text DEFAULT NULL,  f230 text DEFAULT NULL,  f231 text DEFAULT NULL,  f232 text DEFAULT NULL,  f233 text DEFAULT NULL,  f234 text DEFAULT NULL,  f235 text DEFAULT NULL,  f236 text DEFAULT NULL,  f237 text DEFAULT NULL,  f238 text DEFAULT NULL,  f239 text DEFAULT NULL,  f240 text DEFAULT NULL,  f241 text DEFAULT NULL,  f242 text DEFAULT NULL,  f243 text DEFAULT NULL,  f244 text DEFAULT NULL,  f245 text DEFAULT NULL,  f246 text DEFAULT NULL,  f247 text DEFAULT NULL,  f248 text DEFAULT NULL,  f249 text DEFAULT NULL,  f250 text DEFAULT NULL,  f251 text DEFAULT NULL,  f252 text DEFAULT NULL,  f253 text DEFAULT NULL,  f254 text DEFAULT NULL,  f255 text DEFAULT NULL,  "
-        			+ "f256 text DEFAULT NULL,f257 text DEFAULT NULL,f258 text DEFAULT NULL,f259 text DEFAULT NULL,f260 text DEFAULT NULL,f261 text DEFAULT NULL,f262 text DEFAULT NULL,f263 text DEFAULT NULL,f264 text DEFAULT NULL,f265 text DEFAULT NULL,f266 text DEFAULT NULL,f267 text DEFAULT NULL,f268 text DEFAULT NULL,f269 text DEFAULT NULL,f270 text DEFAULT NULL,f271 text DEFAULT NULL,f272 text DEFAULT NULL,f273 text DEFAULT NULL,f274 text DEFAULT NULL,f275 text DEFAULT NULL,f276 text DEFAULT NULL,f277 text DEFAULT NULL,f278 text DEFAULT NULL,f279 text DEFAULT NULL,f280 text DEFAULT NULL,f281 text DEFAULT NULL,f282 text DEFAULT NULL,f283 text DEFAULT NULL,f284 text DEFAULT NULL,f285 text DEFAULT NULL,f286 text DEFAULT NULL,f287 text DEFAULT NULL,f288 text DEFAULT NULL,f289 text DEFAULT NULL,f290 text DEFAULT NULL,f291 text DEFAULT NULL,f292 text DEFAULT NULL,f293 text DEFAULT NULL,f294 text DEFAULT NULL,f295 text DEFAULT NULL,f296 text DEFAULT NULL,f297 text DEFAULT NULL,f298 text DEFAULT NULL,f299 text DEFAULT NULL,f300 text DEFAULT NULL,f301 text DEFAULT NULL,f302 text DEFAULT NULL,f303 text DEFAULT NULL,f304 text DEFAULT NULL,f305 text DEFAULT NULL,f306 text DEFAULT NULL,f307 text DEFAULT NULL,f308 text DEFAULT NULL,f309 text DEFAULT NULL,f310 text DEFAULT NULL,f311 text DEFAULT NULL,f312 text DEFAULT NULL,f313 text DEFAULT NULL,f314 text DEFAULT NULL,f315 text DEFAULT NULL,f316 text DEFAULT NULL,f317 text DEFAULT NULL,f318 text DEFAULT NULL,f319 text DEFAULT NULL,f320 text DEFAULT NULL,f321 text DEFAULT NULL,f322 text DEFAULT NULL,f323 text DEFAULT NULL,f324 text DEFAULT NULL,f325 text DEFAULT NULL,f326 text DEFAULT NULL,f327 text DEFAULT NULL,f328 text DEFAULT NULL,f329 text DEFAULT NULL,f330 text DEFAULT NULL,f331 text DEFAULT NULL,f332 text DEFAULT NULL,f333 text DEFAULT NULL,f334 text DEFAULT NULL,f335 text DEFAULT NULL,f336 text DEFAULT NULL,f337 text DEFAULT NULL,f338 text DEFAULT NULL,f339 text DEFAULT NULL,f340 text DEFAULT NULL,f341 text DEFAULT NULL,f342 text DEFAULT NULL,f343 text DEFAULT NULL,f344 text DEFAULT NULL,f345 text DEFAULT NULL,f346 text DEFAULT NULL,f347 text DEFAULT NULL,f348 text DEFAULT NULL,f349 text DEFAULT NULL,f350 text DEFAULT NULL,f351 text DEFAULT NULL,f352 text DEFAULT NULL,f353 text DEFAULT NULL,f354 text DEFAULT NULL,f355 text DEFAULT NULL,f356 text DEFAULT NULL,f357 text DEFAULT NULL,f358 text DEFAULT NULL,f359 text DEFAULT NULL,f360 text DEFAULT NULL,f361 text DEFAULT NULL,f362 text DEFAULT NULL,f363 text DEFAULT NULL,f364 text DEFAULT NULL,f365 text DEFAULT NULL,f366 text DEFAULT NULL,f367 text DEFAULT NULL,f368 text DEFAULT NULL,f369 text DEFAULT NULL,f370 text DEFAULT NULL,f371 text DEFAULT NULL,f372 text DEFAULT NULL,f373 text DEFAULT NULL,f374 text DEFAULT NULL,f375 text DEFAULT NULL,f376 text DEFAULT NULL,f377 text DEFAULT NULL,f378 text DEFAULT NULL,f379 text DEFAULT NULL,f380 text DEFAULT NULL,f381 text DEFAULT NULL,f382 text DEFAULT NULL,f383 text DEFAULT NULL,f384 text DEFAULT NULL,f385 text DEFAULT NULL,f386 text DEFAULT NULL,f387 text DEFAULT NULL,f388 text DEFAULT NULL,f389 text DEFAULT NULL,f390 text DEFAULT NULL,f391 text DEFAULT NULL,f392 text DEFAULT NULL,f393 text DEFAULT NULL,f394 text DEFAULT NULL,f395 text DEFAULT NULL,f396 text DEFAULT NULL,f397 text DEFAULT NULL,f398 text DEFAULT NULL,f399 text DEFAULT NULL,f400 text DEFAULT NULL,f401 text DEFAULT NULL,f402 text DEFAULT NULL,f403 text DEFAULT NULL,f404 text DEFAULT NULL,f405 text DEFAULT NULL,f406 text DEFAULT NULL,f407 text DEFAULT NULL,f408 text DEFAULT NULL,f409 text DEFAULT NULL,f410 text DEFAULT NULL,f411 text DEFAULT NULL,f412 text DEFAULT NULL,f413 text DEFAULT NULL,f414 text DEFAULT NULL,f415 text DEFAULT NULL,f416 text DEFAULT NULL,f417 text DEFAULT NULL,f418 text DEFAULT NULL,f419 text DEFAULT NULL,f420 text DEFAULT NULL,f421 text DEFAULT NULL,f422 text DEFAULT NULL,f423 text DEFAULT NULL,f424 text DEFAULT NULL,f425 text DEFAULT NULL,f426 text DEFAULT NULL,f427 text DEFAULT NULL,f428 text DEFAULT NULL,f429 text DEFAULT NULL,f430 text DEFAULT NULL,f431 text DEFAULT NULL,f432 text DEFAULT NULL,f433 text DEFAULT NULL,f434 text DEFAULT NULL,f435 text DEFAULT NULL,f436 text DEFAULT NULL,f437 text DEFAULT NULL,f438 text DEFAULT NULL,f439 text DEFAULT NULL,f440 text DEFAULT NULL,f441 text DEFAULT NULL,f442 text DEFAULT NULL,f443 text DEFAULT NULL,f444 text DEFAULT NULL,f445 text DEFAULT NULL,f446 text DEFAULT NULL,f447 text DEFAULT NULL,f448 text DEFAULT NULL,f449 text DEFAULT NULL,f450 text DEFAULT NULL,f451 text DEFAULT NULL,f452 text DEFAULT NULL,f453 text DEFAULT NULL,f454 text DEFAULT NULL,f455 text DEFAULT NULL,f456 text DEFAULT NULL,f457 text DEFAULT NULL,f458 text DEFAULT NULL,f459 text DEFAULT NULL,f460 text DEFAULT NULL,f461 text DEFAULT NULL,f462 text DEFAULT NULL,f463 text DEFAULT NULL,f464 text DEFAULT NULL,f465 text DEFAULT NULL,f466 text DEFAULT NULL,f467 text DEFAULT NULL,f468 text DEFAULT NULL,f469 text DEFAULT NULL,f470 text DEFAULT NULL,f471 text DEFAULT NULL,f472 text DEFAULT NULL,f473 text DEFAULT NULL,f474 text DEFAULT NULL,f475 text DEFAULT NULL,f476 text DEFAULT NULL,f477 text DEFAULT NULL,f478 text DEFAULT NULL,f479 text DEFAULT NULL,f480 text DEFAULT NULL,f481 text DEFAULT NULL,f482 text DEFAULT NULL,f483 text DEFAULT NULL,f484 text DEFAULT NULL,f485 text DEFAULT NULL,f486 text DEFAULT NULL,f487 text DEFAULT NULL,f488 text DEFAULT NULL,f489 text DEFAULT NULL,f490 text DEFAULT NULL,f491 text DEFAULT NULL,f492 text DEFAULT NULL,f493 text DEFAULT NULL,f494 text DEFAULT NULL,f495 text DEFAULT NULL,f496 text DEFAULT NULL,f497 text DEFAULT NULL,f498 text DEFAULT NULL,f499 text DEFAULT NULL,f500 text DEFAULT NULL, "
-        			+ " batchId int(11),  loadTableId varchar(45) ,  id int(11) NOT NULL AUTO_INCREMENT,  PRIMARY KEY (id)) ENGINE=InnoDB AUTO_INCREMENT=1038 DEFAULT CHARSET=latin1;");
+            String sql = ("create TABLE " + loadTableName
+                    + "(f1 text DEFAULT NULL,  f2 text DEFAULT NULL,  f3 text DEFAULT NULL,  f4 text DEFAULT NULL,  f5 text DEFAULT NULL,  f6 text DEFAULT NULL,  f7 text DEFAULT NULL,  f8 text DEFAULT NULL,  f9 text DEFAULT NULL,  f10 text DEFAULT NULL,  f11 text DEFAULT NULL,  f12 text DEFAULT NULL,  f13 text DEFAULT NULL,  f14 text DEFAULT NULL,  f15 text DEFAULT NULL,  f16 text DEFAULT NULL,  f17 text DEFAULT NULL,  f18 text DEFAULT NULL,  f19 text DEFAULT NULL,  f20 text DEFAULT NULL,  f21 text DEFAULT NULL,  f22 text DEFAULT NULL,  f23 text DEFAULT NULL,  f24 text DEFAULT NULL,  f25 text DEFAULT NULL,  f26 text DEFAULT NULL,  f27 text DEFAULT NULL,  f28 text DEFAULT NULL,  f29 text DEFAULT NULL,  f30 text DEFAULT NULL,  f31 text DEFAULT NULL,  f32 text DEFAULT NULL,  f33 text DEFAULT NULL,  f34 text DEFAULT NULL,  f35 text DEFAULT NULL,  f36 text DEFAULT NULL,  f37 text DEFAULT NULL,  f38 text DEFAULT NULL,  f39 text DEFAULT NULL,  f40 text DEFAULT NULL,  f41 text DEFAULT NULL,  f42 text DEFAULT NULL,  f43 text DEFAULT NULL,  f44 text DEFAULT NULL,  f45 text DEFAULT NULL,  f46 text DEFAULT NULL,  f47 text DEFAULT NULL,  f48 text DEFAULT NULL,  f49 text DEFAULT NULL,  f50 text DEFAULT NULL,  f51 text DEFAULT NULL,  f52 text DEFAULT NULL,  f53 text DEFAULT NULL,  f54 text DEFAULT NULL,  f55 text DEFAULT NULL,  f56 text DEFAULT NULL,  f57 text DEFAULT NULL,  f58 text DEFAULT NULL,  f59 text DEFAULT NULL,  f60 text DEFAULT NULL,  f61 text DEFAULT NULL,  f62 text DEFAULT NULL,  f63 text DEFAULT NULL,  f64 text DEFAULT NULL,  f65 text DEFAULT NULL,  f66 text DEFAULT NULL,  f67 text DEFAULT NULL,  f68 text DEFAULT NULL,  f69 text DEFAULT NULL,  f70 text DEFAULT NULL,  f71 text DEFAULT NULL,  f72 text DEFAULT NULL,  f73 text DEFAULT NULL,  f74 text DEFAULT NULL,  f75 text DEFAULT NULL,  f76 text DEFAULT NULL,  f77 text DEFAULT NULL,  f78 text DEFAULT NULL,  f79 text DEFAULT NULL,  f80 text DEFAULT NULL,  f81 text DEFAULT NULL,  f82 text DEFAULT NULL,  f83 text DEFAULT NULL,  f84 text DEFAULT NULL,  f85 text DEFAULT NULL,  f86 text DEFAULT NULL,  f87 text DEFAULT NULL,  f88 text DEFAULT NULL,  f89 text DEFAULT NULL,  f90 text DEFAULT NULL,  f91 text DEFAULT NULL,  f92 text DEFAULT NULL,  f93 text DEFAULT NULL,  f94 text DEFAULT NULL,  f95 text DEFAULT NULL,  f96 text DEFAULT NULL,  f97 text DEFAULT NULL,  f98 text DEFAULT NULL,  f99 text DEFAULT NULL,  f100 text DEFAULT NULL,  f101 text DEFAULT NULL,  f102 text DEFAULT NULL,  f103 text DEFAULT NULL,  f104 text DEFAULT NULL,  f105 text DEFAULT NULL,  f106 text DEFAULT NULL,  f107 text DEFAULT NULL,  f108 text DEFAULT NULL,  f109 text DEFAULT NULL,  f110 text DEFAULT NULL,  f111 text DEFAULT NULL,  f112 text DEFAULT NULL,  f113 text DEFAULT NULL,  f114 text DEFAULT NULL,  f115 text DEFAULT NULL,  f116 text DEFAULT NULL,  f117 text DEFAULT NULL,  f118 text DEFAULT NULL,  f119 text DEFAULT NULL,  f120 text DEFAULT NULL,  f121 text DEFAULT NULL,  f122 text DEFAULT NULL,  f123 text DEFAULT NULL,  f124 text DEFAULT NULL,  f125 text DEFAULT NULL,  f126 text DEFAULT NULL,  f127 text DEFAULT NULL,  f128 text DEFAULT NULL,  f129 text DEFAULT NULL,  f130 text DEFAULT NULL,  f131 text DEFAULT NULL,  f132 text DEFAULT NULL,  f133 text DEFAULT NULL,  f134 text DEFAULT NULL,  f135 text DEFAULT NULL,  f136 text DEFAULT NULL,  f137 text DEFAULT NULL,  f138 text DEFAULT NULL,  f139 text DEFAULT NULL,  f140 text DEFAULT NULL,  f141 text DEFAULT NULL,  f142 text DEFAULT NULL,  f143 text DEFAULT NULL,  f144 text DEFAULT NULL,  f145 text DEFAULT NULL,  f146 text DEFAULT NULL,  f147 text DEFAULT NULL,  f148 text DEFAULT NULL,  f149 text DEFAULT NULL,  f150 text DEFAULT NULL,  f151 text DEFAULT NULL,  f152 text DEFAULT NULL,  f153 text DEFAULT NULL,  f154 text DEFAULT NULL,  f155 text DEFAULT NULL,  f156 text DEFAULT NULL,  f157 text DEFAULT NULL,  f158 text DEFAULT NULL,  f159 text DEFAULT NULL,  f160 text DEFAULT NULL,  f161 text DEFAULT NULL,  f162 text DEFAULT NULL,  f163 text DEFAULT NULL,  f164 text DEFAULT NULL,  f165 text DEFAULT NULL,  f166 text DEFAULT NULL,  f167 text DEFAULT NULL,  f168 text DEFAULT NULL,  f169 text DEFAULT NULL,  f170 text DEFAULT NULL,  f171 text DEFAULT NULL,  f172 text DEFAULT NULL,  f173 text DEFAULT NULL,  f174 text DEFAULT NULL,  f175 text DEFAULT NULL,  f176 text DEFAULT NULL,  f177 text DEFAULT NULL,  f178 text DEFAULT NULL,  f179 text DEFAULT NULL,  f180 text DEFAULT NULL,  f181 text DEFAULT NULL,  f182 text DEFAULT NULL,  f183 text DEFAULT NULL,  f184 text DEFAULT NULL,  f185 text DEFAULT NULL,  f186 text DEFAULT NULL,  f187 text DEFAULT NULL,  f188 text DEFAULT NULL,  f189 text DEFAULT NULL,  f190 text DEFAULT NULL,  f191 text DEFAULT NULL,  f192 text DEFAULT NULL,  f193 text DEFAULT NULL,  f194 text DEFAULT NULL,  f195 text DEFAULT NULL,  f196 text DEFAULT NULL,  f197 text DEFAULT NULL,  f198 text DEFAULT NULL,  f199 text DEFAULT NULL,  f200 text DEFAULT NULL,  f201 text DEFAULT NULL,  f202 text DEFAULT NULL,  f203 text DEFAULT NULL,  f204 text DEFAULT NULL,  f205 text DEFAULT NULL,  f206 text DEFAULT NULL,  f207 text DEFAULT NULL,  f208 text DEFAULT NULL,  f209 text DEFAULT NULL,  f210 text DEFAULT NULL,  f211 text DEFAULT NULL,  f212 text DEFAULT NULL,  f213 text DEFAULT NULL,  f214 text DEFAULT NULL,  f215 text DEFAULT NULL,  f216 text DEFAULT NULL,  f217 text DEFAULT NULL,  f218 text DEFAULT NULL,  f219 text DEFAULT NULL,  f220 text DEFAULT NULL,  f221 text DEFAULT NULL,  f222 text DEFAULT NULL,  f223 text DEFAULT NULL,  f224 text DEFAULT NULL,  f225 text DEFAULT NULL,  f226 text DEFAULT NULL,  f227 text DEFAULT NULL,  f228 text DEFAULT NULL,  f229 text DEFAULT NULL,  f230 text DEFAULT NULL,  f231 text DEFAULT NULL,  f232 text DEFAULT NULL,  f233 text DEFAULT NULL,  f234 text DEFAULT NULL,  f235 text DEFAULT NULL,  f236 text DEFAULT NULL,  f237 text DEFAULT NULL,  f238 text DEFAULT NULL,  f239 text DEFAULT NULL,  f240 text DEFAULT NULL,  f241 text DEFAULT NULL,  f242 text DEFAULT NULL,  f243 text DEFAULT NULL,  f244 text DEFAULT NULL,  f245 text DEFAULT NULL,  f246 text DEFAULT NULL,  f247 text DEFAULT NULL,  f248 text DEFAULT NULL,  f249 text DEFAULT NULL,  f250 text DEFAULT NULL,  f251 text DEFAULT NULL,  f252 text DEFAULT NULL,  f253 text DEFAULT NULL,  f254 text DEFAULT NULL,  f255 text DEFAULT NULL,  "
+                    + "f256 text DEFAULT NULL,f257 text DEFAULT NULL,f258 text DEFAULT NULL,f259 text DEFAULT NULL,f260 text DEFAULT NULL,f261 text DEFAULT NULL,f262 text DEFAULT NULL,f263 text DEFAULT NULL,f264 text DEFAULT NULL,f265 text DEFAULT NULL,f266 text DEFAULT NULL,f267 text DEFAULT NULL,f268 text DEFAULT NULL,f269 text DEFAULT NULL,f270 text DEFAULT NULL,f271 text DEFAULT NULL,f272 text DEFAULT NULL,f273 text DEFAULT NULL,f274 text DEFAULT NULL,f275 text DEFAULT NULL,f276 text DEFAULT NULL,f277 text DEFAULT NULL,f278 text DEFAULT NULL,f279 text DEFAULT NULL,f280 text DEFAULT NULL,f281 text DEFAULT NULL,f282 text DEFAULT NULL,f283 text DEFAULT NULL,f284 text DEFAULT NULL,f285 text DEFAULT NULL,f286 text DEFAULT NULL,f287 text DEFAULT NULL,f288 text DEFAULT NULL,f289 text DEFAULT NULL,f290 text DEFAULT NULL,f291 text DEFAULT NULL,f292 text DEFAULT NULL,f293 text DEFAULT NULL,f294 text DEFAULT NULL,f295 text DEFAULT NULL,f296 text DEFAULT NULL,f297 text DEFAULT NULL,f298 text DEFAULT NULL,f299 text DEFAULT NULL,f300 text DEFAULT NULL,f301 text DEFAULT NULL,f302 text DEFAULT NULL,f303 text DEFAULT NULL,f304 text DEFAULT NULL,f305 text DEFAULT NULL,f306 text DEFAULT NULL,f307 text DEFAULT NULL,f308 text DEFAULT NULL,f309 text DEFAULT NULL,f310 text DEFAULT NULL,f311 text DEFAULT NULL,f312 text DEFAULT NULL,f313 text DEFAULT NULL,f314 text DEFAULT NULL,f315 text DEFAULT NULL,f316 text DEFAULT NULL,f317 text DEFAULT NULL,f318 text DEFAULT NULL,f319 text DEFAULT NULL,f320 text DEFAULT NULL,f321 text DEFAULT NULL,f322 text DEFAULT NULL,f323 text DEFAULT NULL,f324 text DEFAULT NULL,f325 text DEFAULT NULL,f326 text DEFAULT NULL,f327 text DEFAULT NULL,f328 text DEFAULT NULL,f329 text DEFAULT NULL,f330 text DEFAULT NULL,f331 text DEFAULT NULL,f332 text DEFAULT NULL,f333 text DEFAULT NULL,f334 text DEFAULT NULL,f335 text DEFAULT NULL,f336 text DEFAULT NULL,f337 text DEFAULT NULL,f338 text DEFAULT NULL,f339 text DEFAULT NULL,f340 text DEFAULT NULL,f341 text DEFAULT NULL,f342 text DEFAULT NULL,f343 text DEFAULT NULL,f344 text DEFAULT NULL,f345 text DEFAULT NULL,f346 text DEFAULT NULL,f347 text DEFAULT NULL,f348 text DEFAULT NULL,f349 text DEFAULT NULL,f350 text DEFAULT NULL,f351 text DEFAULT NULL,f352 text DEFAULT NULL,f353 text DEFAULT NULL,f354 text DEFAULT NULL,f355 text DEFAULT NULL,f356 text DEFAULT NULL,f357 text DEFAULT NULL,f358 text DEFAULT NULL,f359 text DEFAULT NULL,f360 text DEFAULT NULL,f361 text DEFAULT NULL,f362 text DEFAULT NULL,f363 text DEFAULT NULL,f364 text DEFAULT NULL,f365 text DEFAULT NULL,f366 text DEFAULT NULL,f367 text DEFAULT NULL,f368 text DEFAULT NULL,f369 text DEFAULT NULL,f370 text DEFAULT NULL,f371 text DEFAULT NULL,f372 text DEFAULT NULL,f373 text DEFAULT NULL,f374 text DEFAULT NULL,f375 text DEFAULT NULL,f376 text DEFAULT NULL,f377 text DEFAULT NULL,f378 text DEFAULT NULL,f379 text DEFAULT NULL,f380 text DEFAULT NULL,f381 text DEFAULT NULL,f382 text DEFAULT NULL,f383 text DEFAULT NULL,f384 text DEFAULT NULL,f385 text DEFAULT NULL,f386 text DEFAULT NULL,f387 text DEFAULT NULL,f388 text DEFAULT NULL,f389 text DEFAULT NULL,f390 text DEFAULT NULL,f391 text DEFAULT NULL,f392 text DEFAULT NULL,f393 text DEFAULT NULL,f394 text DEFAULT NULL,f395 text DEFAULT NULL,f396 text DEFAULT NULL,f397 text DEFAULT NULL,f398 text DEFAULT NULL,f399 text DEFAULT NULL,f400 text DEFAULT NULL,f401 text DEFAULT NULL,f402 text DEFAULT NULL,f403 text DEFAULT NULL,f404 text DEFAULT NULL,f405 text DEFAULT NULL,f406 text DEFAULT NULL,f407 text DEFAULT NULL,f408 text DEFAULT NULL,f409 text DEFAULT NULL,f410 text DEFAULT NULL,f411 text DEFAULT NULL,f412 text DEFAULT NULL,f413 text DEFAULT NULL,f414 text DEFAULT NULL,f415 text DEFAULT NULL,f416 text DEFAULT NULL,f417 text DEFAULT NULL,f418 text DEFAULT NULL,f419 text DEFAULT NULL,f420 text DEFAULT NULL,f421 text DEFAULT NULL,f422 text DEFAULT NULL,f423 text DEFAULT NULL,f424 text DEFAULT NULL,f425 text DEFAULT NULL,f426 text DEFAULT NULL,f427 text DEFAULT NULL,f428 text DEFAULT NULL,f429 text DEFAULT NULL,f430 text DEFAULT NULL,f431 text DEFAULT NULL,f432 text DEFAULT NULL,f433 text DEFAULT NULL,f434 text DEFAULT NULL,f435 text DEFAULT NULL,f436 text DEFAULT NULL,f437 text DEFAULT NULL,f438 text DEFAULT NULL,f439 text DEFAULT NULL,f440 text DEFAULT NULL,f441 text DEFAULT NULL,f442 text DEFAULT NULL,f443 text DEFAULT NULL,f444 text DEFAULT NULL,f445 text DEFAULT NULL,f446 text DEFAULT NULL,f447 text DEFAULT NULL,f448 text DEFAULT NULL,f449 text DEFAULT NULL,f450 text DEFAULT NULL,f451 text DEFAULT NULL,f452 text DEFAULT NULL,f453 text DEFAULT NULL,f454 text DEFAULT NULL,f455 text DEFAULT NULL,f456 text DEFAULT NULL,f457 text DEFAULT NULL,f458 text DEFAULT NULL,f459 text DEFAULT NULL,f460 text DEFAULT NULL,f461 text DEFAULT NULL,f462 text DEFAULT NULL,f463 text DEFAULT NULL,f464 text DEFAULT NULL,f465 text DEFAULT NULL,f466 text DEFAULT NULL,f467 text DEFAULT NULL,f468 text DEFAULT NULL,f469 text DEFAULT NULL,f470 text DEFAULT NULL,f471 text DEFAULT NULL,f472 text DEFAULT NULL,f473 text DEFAULT NULL,f474 text DEFAULT NULL,f475 text DEFAULT NULL,f476 text DEFAULT NULL,f477 text DEFAULT NULL,f478 text DEFAULT NULL,f479 text DEFAULT NULL,f480 text DEFAULT NULL,f481 text DEFAULT NULL,f482 text DEFAULT NULL,f483 text DEFAULT NULL,f484 text DEFAULT NULL,f485 text DEFAULT NULL,f486 text DEFAULT NULL,f487 text DEFAULT NULL,f488 text DEFAULT NULL,f489 text DEFAULT NULL,f490 text DEFAULT NULL,f491 text DEFAULT NULL,f492 text DEFAULT NULL,f493 text DEFAULT NULL,f494 text DEFAULT NULL,f495 text DEFAULT NULL,f496 text DEFAULT NULL,f497 text DEFAULT NULL,f498 text DEFAULT NULL,f499 text DEFAULT NULL,f500 text DEFAULT NULL, "
+                    + " batchId int(11),  loadTableId varchar(45) ,  id int(11) NOT NULL AUTO_INCREMENT,  PRIMARY KEY (id)) ENGINE=InnoDB AUTO_INCREMENT=1038 DEFAULT CHARSET=latin1;");
             Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
             query.executeUpdate();
             return 0;
@@ -3686,7 +3718,7 @@ public class transactionInDAOImpl implements transactionInDAO {
     public List<configurationConnection> getBatchTargets(Integer batchId, boolean active) {
         try {
             String sql = ("select sourceConfigId, targetConfigId, configurationconnections.id, "
-                    + " targetOrgCol, orgId as targetOrgId, messageTypeId from configurations, configurationconnections , configurationMessageSpecs  "
+                    + " targetOrgCol, sourceSubOrgCol, orgId as targetOrgId, messageTypeId from configurations, configurationconnections , configurationMessageSpecs  "
                     + " where sourceconfigId in (select configId from transactionIn where  batchId = :batchId)"
                     + " and sourceConfigId = configurationMessageSpecs.configId"
                     + " and targetConfigId = configurations.id ");
@@ -4254,7 +4286,7 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Transactional
     public Integer insertTransactionTranslated(Integer oldInId, Integer newInId, batchUploadSummary bus) {
         try {
-            String sql = ("INSERT INTO transactiontranslatedin "
+            String sql = ("INSERT INTO universaltranslator.transactiontranslatedin "
                     + " (transactionInId, configId, f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16, f17, f18, f19, f20, f21, f22, f23, f24, f25, f26, f27, f28, f29, f30, f31, f32, f33, f34, f35, f36, f37, f38, f39, f40, f41, f42, f43, f44, f45, f46, f47, f48, f49, f50, f51, f52, f53, f54, f55, f56, f57, f58, f59, f60, f61, f62, f63, f64, f65, f66, f67, f68, f69, f70, f71, f72, f73, f74, f75, f76, f77, f78, f79, f80, f81, f82, f83, f84, f85, f86, f87, f88, f89, f90, f91, f92, f93, f94, f95, f96, f97, f98, f99, f100, f101, f102, f103, f104, f105, f106, f107, f108, f109, f110, f111, f112, f113, f114, f115, f116, f117, f118, f119, f120, f121, f122, f123, f124, f125, f126, f127, f128, f129, f130, f131, f132, f133, f134, f135, f136, f137, f138, f139, f140, f141, f142, f143, f144, f145, f146, f147, f148, f149, f150, f151, f152, f153, f154, f155, f156, f157, f158, f159, f160, f161, f162, f163, f164, f165, f166, f167, f168, f169, f170, f171, f172, f173, f174, f175, f176, f177, f178, f179, f180, f181, f182, f183, f184, f185, f186, f187, f188, f189, f190, f191, f192, f193, f194, f195, f196, f197, f198, f199, f200, f201, f202, f203, f204, f205, f206, f207, f208, f209, f210, f211, f212, f213, f214, f215, f216, f217, f218, f219, f220, f221, f222, f223, f224, f225, f226, f227, f228, f229, f230, f231, f232, f233, f234, f235, f236, f237, f238, f239, f240, f241, f242, f243, f244, f245, f246, f247, f248, f249, f250, f251, f252, f253, f254, f255, F256, F257,F258,F259,F260,F261,F262,F263,F264,F265,F266,F267,F268,F269,F270,F271,F272,F273,F274,F275,F276,F277,F278,F279,F280,F281,F282,F283,F284,F285,F286,F287,F288,F289,F290,F291,F292,F293,F294,F295,F296,F297,F298,F299,F300,F301,F302,F303,F304,F305,F306,F307,F308,F309,F310,F311,F312,F313,F314,F315,F316,F317,F318,F319,F320,F321,F322,F323,F324,F325,F326,F327,F328,F329,F330,F331,F332,F333,F334,F335,F336,F337,F338,F339,F340,F341,F342,F343,F344,F345,F346,F347,F348,F349,F350,F351,F352,F353,F354,F355,F356,F357,F358,F359,F360,F361,F362,F363,F364,F365,F366,F367,F368,F369,F370,F371,F372,F373,F374,F375,F376,F377,F378,F379,F380,F381,F382,F383,F384,F385,F386,F387,F388,F389,F390,F391,F392,F393,F394,F395,F396,F397,F398,F399,F400,F401,F402,F403,F404,F405,F406,F407,F408,F409,F410,F411,F412,F413,F414,F415,F416,F417,F418,F419,F420,F421,F422,F423,F424,F425,F426,F427,F428,F429,F430,F431,F432,F433,F434,F435,F436,F437,F438,F439,F440,F441,F442,F443,F444,F445,F446,F447,F448,F449,F450,F451,F452,F453,F454,F455,F456,F457,F458,F459,F460,F461,F462,F463,F464,F465,F466,F467,F468,F469,F470,F471,F472,F473,F474,F475,F476,F477,F478,F479,F480,F481,F482,F483,F484,F485,F486,F487,F488,F489,F490,F491,F492,F493,F494,F495,F496,F497,F498,F499,F500) "
                     + " select  " + newInId + ", " + bus.getsourceConfigId() + ", f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, f13, f14, f15, f16, f17, f18, f19, f20, f21, f22, f23, f24, f25, f26, f27, f28, f29, f30, f31, f32, f33, f34, f35, f36, f37, f38, f39, f40, f41, f42, f43, f44, f45, f46, f47, f48, f49, f50, f51, f52, f53, f54, f55, f56, f57, f58, f59, f60, f61, f62, f63, f64, f65, f66, f67, f68, f69, f70, f71, f72, f73, f74, f75, f76, f77, f78, f79, f80, f81, f82, f83, f84, f85, f86, f87, f88, f89, f90, f91, f92, f93, f94, f95, f96, f97, f98, f99, f100, f101, f102, f103, f104, f105, f106, f107, f108, f109, f110, f111, f112, f113, f114, f115, f116, f117, f118, f119, f120, f121, f122, f123, f124, f125, f126, f127, f128, f129, f130, f131, f132, f133, f134, f135, f136, f137, f138, f139, f140, f141, f142, f143, f144, f145, f146, f147, f148, f149, f150, f151, f152, f153, f154, f155, f156, f157, f158, f159, f160, f161, f162, f163, f164, f165, f166, f167, f168, f169, f170, f171, f172, f173, f174, f175, f176, f177, f178, f179, f180, f181, f182, f183, f184, f185, f186, f187, f188, f189, f190, f191, f192, f193, f194, f195, f196, f197, f198, f199, f200, f201, f202, f203, f204, f205, f206, f207, f208, f209, f210, f211, f212, f213, f214, f215, f216, f217, f218, f219, f220, f221, f222, f223, f224, f225, f226, f227, f228, f229, f230, f231, f232, f233, f234, f235, f236, f237, f238, f239, f240, f241, f242, f243, f244, f245, f246, f247, f248, f249, f250, f251, f252, f253, f254, f255, F256, F257,F258,F259,F260,F261,F262,F263,F264,F265,F266,F267,F268,F269,F270,F271,F272,F273,F274,F275,F276,F277,F278,F279,F280,F281,F282,F283,F284,F285,F286,F287,F288,F289,F290,F291,F292,F293,F294,F295,F296,F297,F298,F299,F300,F301,F302,F303,F304,F305,F306,F307,F308,F309,F310,F311,F312,F313,F314,F315,F316,F317,F318,F319,F320,F321,F322,F323,F324,F325,F326,F327,F328,F329,F330,F331,F332,F333,F334,F335,F336,F337,F338,F339,F340,F341,F342,F343,F344,F345,F346,F347,F348,F349,F350,F351,F352,F353,F354,F355,F356,F357,F358,F359,F360,F361,F362,F363,F364,F365,F366,F367,F368,F369,F370,F371,F372,F373,F374,F375,F376,F377,F378,F379,F380,F381,F382,F383,F384,F385,F386,F387,F388,F389,F390,F391,F392,F393,F394,F395,F396,F397,F398,F399,F400,F401,F402,F403,F404,F405,F406,F407,F408,F409,F410,F411,F412,F413,F414,F415,F416,F417,F418,F419,F420,F421,F422,F423,F424,F425,F426,F427,F428,F429,F430,F431,F432,F433,F434,F435,F436,F437,F438,F439,F440,F441,F442,F443,F444,F445,F446,F447,F448,F449,F450,F451,F452,F453,F454,F455,F456,F457,F458,F459,F460,F461,F462,F463,F464,F465,F466,F467,F468,F469,F470,F471,F472,F473,F474,F475,F476,F477,F478,F479,F480,F481,F482,F483,F484,F485,F486,F487,F488,F489,F490,F491,F492,F493,F494,F495,F496,F497,F498,F499,F500"
                     + " from transactiontranslatedin  where transactionInId = :oldInId");
@@ -4667,19 +4699,18 @@ public class transactionInDAOImpl implements transactionInDAO {
         }
 
         String sql = " select  users.firstName as userFirstName, organizations.orgname as orgName, "
-        		+ " organizations.id as orgId, users.lastName as userLastName, userActivity.* "
-        		+ " from useractivity left join users on users.id = userActivity.userId left join organizations on"
-        		+ " users.orgId = organizations.id where " + batchColName +  "= :batchId order by dateCreated desc, userId";
-        
-        
+                + " organizations.id as orgId, users.lastName as userLastName, userActivity.* "
+                + " from useractivity left join users on users.id = userActivity.userId left join organizations on"
+                + " users.orgId = organizations.id where " + batchColName + "= :batchId order by dateCreated desc, userId";
+
         try {
             Query query = sessionFactory
                     .getCurrentSession()
                     .createSQLQuery(sql).setResultTransformer(Transformers.aliasToBean(UserActivity.class));
 
             query.setParameter("batchId", batchInfo.getId());
-            
-			List<UserActivity> uas = query.list();
+
+            List<UserActivity> uas = query.list();
 
             return uas;
 
@@ -4895,7 +4926,7 @@ public class transactionInDAOImpl implements transactionInDAO {
             Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
             if (transactionId == 0) {
                 query.setParameter("configId", configId);
-                query.setParameter("transRELId", transRELId);
+                query.setParameterList("transRELId", transRELId);
             }
             query.setParameter("id", id);
 
@@ -4958,7 +4989,7 @@ public class transactionInDAOImpl implements transactionInDAO {
                     .setParameter("configId", configId)
                     .setParameter("id", id);
             if (transactionId == 0) {
-                query.setParameter("transRELId", transRELId);
+                query.setParameterList("transRELId", transRELId);
             }
             List<IdAndFieldValue> valueList = query.list();
 
@@ -5679,29 +5710,27 @@ public class transactionInDAOImpl implements transactionInDAO {
      */
     @Override
     @Transactional
-    public List<batchUploadSummary> getuploadBatchesByConfigAndTarget(Integer configId, Integer orgId, Integer tgtConfigId) {
-        
-        String sql = "select * from batchuploadsummary where sourceConfigId = :sourceConfigId"
+    public List<batchUploadSummary> getuploadBatchesByConfigAndTarget(Integer configId, Integer orgId, Integer tgtConfigId, Integer userOrgId) {
+
+        String sql = "select * from batchuploadsummary where sourceConfigId = :sourceConfigId and (sourceOrgId = :userOrgId or sourceSubOrgId = :userOrgId)"
                 + " and targetOrgId = :targetOrgId and batchId in (select batchUploadId from transactionTarget"
                 + " where batchUploadId = batchuploadsummary.batchId and configId = :targetConfigId)";
-        
-        
+
         Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
                 .setResultTransformer(
                         Transformers.aliasToBean(batchUploadSummary.class))
                 .setParameter("sourceConfigId", configId)
                 .setParameter("targetOrgId", orgId)
-                .setParameter("targetConfigId", tgtConfigId);
+                .setParameter("targetConfigId", tgtConfigId)
+                .setParameter("userOrgId", userOrgId);
 
         /*Criteria batchSummaries = sessionFactory.getCurrentSession().createCriteria(batchUploadSummary.class);
-        batchSummaries.add(Restrictions.eq("sourceConfigId", configId));
-        batchSummaries.add(Restrictions.eq("targetOrgId", orgId));*/
-
+         batchSummaries.add(Restrictions.eq("sourceConfigId", configId));
+         batchSummaries.add(Restrictions.eq("targetOrgId", orgId));*/
         return query.list();
 
     }
 
-    
     @Override
     @Transactional
     public boolean searchBatchForHistory(batchUploads batchDetails, String searchTerm, Date fromDate, Date toDate) throws Exception {
@@ -5710,10 +5739,10 @@ public class transactionInDAOImpl implements transactionInDAO {
 
         String[] terms = searchTerm.split("\\|", -1);
         String[] systemStatus = terms[0].split("\\-", -1);
-        
+
         String statusCode = systemStatus[0];
         String statusCategory = systemStatus[1];
-        
+
         String status = terms[1];
         String batchName = terms[2];
         String firstName = terms[3];
@@ -5729,21 +5758,20 @@ public class transactionInDAOImpl implements transactionInDAO {
         if (!"".equals(utBatchName) && !utBatchName.equals(batchDetails.getutBatchName())) {
             matched = false;
         }
-        
-        if(!batchDetails.getdateSubmitted().after(fromDate)) {
+
+        if (!batchDetails.getdateSubmitted().after(fromDate)) {
             matched = false;
         }
 
-        if(!batchDetails.getdateSubmitted().before(toDate)) {
+        if (!batchDetails.getdateSubmitted().before(toDate)) {
             matched = false;
         }
-        
+
         lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batchDetails.getstatusId());
-        
-        if(!"".equals(statusCategory) && "batch".equals(statusCategory) && !statusCode.equals(processStatus.getEndUserDisplayCode())) {
+
+        if (!"".equals(statusCategory) && "batch".equals(statusCategory) && !statusCode.equals(processStatus.getEndUserDisplayCode())) {
             matched = false;
         }
-        
         
         Criteria transactionQuery = sessionFactory.getCurrentSession().createCriteria(transactionIn.class);
         transactionQuery.add(Restrictions.eq("batchId", batchDetails.getId()));
@@ -5753,16 +5781,63 @@ public class transactionInDAOImpl implements transactionInDAO {
 
             for (transactionIn transaction : transactions) {
                 
+                Integer statusFieldNo = getStatusFieldNo(transaction.getConfigId());
+
                 lu_ProcessStatus transprocessStatus = sysAdminManager.getProcessStatusById(transaction.getstatusId());
+
+                if (!"".equals(statusCategory) && "transaction".equals(statusCategory) && !statusCode.equals(transprocessStatus.getEndUserDisplayCode())) {
+                    matched = false;
+                }
+
+                /*if (!"0".equals(status) && !status.equals(String.valueOf(transaction.getmessageStatus()))) {
+                    matched = false;
+                }*/
                 
-                if(!"".equals(statusCategory) && "transaction".equals(statusCategory) && !statusCode.equals(transprocessStatus.getEndUserDisplayCode())) {
+                    
+                if(statusFieldNo != null && statusFieldNo > 0) {
+                    if("0".equals(status)) {
+                        BigInteger totalOpen = getTotalOpenFeedbackReports(Integer.toString(transaction.getId()), "F"+statusFieldNo);
+                        BigInteger totalClosed = getTotalClosedFeedbackReports(Integer.toString(transaction.getId()), "F"+statusFieldNo);
+
+                        if(totalOpen != null && totalOpen.intValue() > 0) {
+                            matched = true;
+                        }
+                        else if(totalClosed != null && totalClosed.intValue() > 0) {
+                            matched = true;
+                        }
+                        else {
+                            matched = false;
+                        }
+
+                    }
+                    else if("1".equals(status)) {
+                        BigInteger totalOpen = getTotalOpenFeedbackReports(Integer.toString(transaction.getId()), "F"+statusFieldNo);
+
+                        if(totalOpen != null && totalOpen.intValue() > 0) {
+                            matched = true;
+                        }
+                        else {
+                            matched = false;
+                        }
+
+                    }
+                    else if("2".equals(status)) {
+
+                        BigInteger totalClosed = getTotalClosedFeedbackReports(Integer.toString(transaction.getId()), "F"+statusFieldNo);
+
+                        if(totalClosed != null && totalClosed.intValue() > 0) {
+                            matched = true;
+                        }
+                        else {
+                            matched = false;
+                        }
+                    }
+                }
+                else {
                     matched = false;
                 }
-
-                if(!"0".equals(status) && !status.equals(String.valueOf(transaction.getmessageStatus()))) {
-                    matched = false;
-                }
-
+                
+                
                 Criteria patientQuery = sessionFactory.getCurrentSession().createCriteria(messagePatients.class);
                 patientQuery.add(Restrictions.eq("transactionInId", transaction.getId()));
 
@@ -5788,91 +5863,89 @@ public class transactionInDAOImpl implements transactionInDAO {
 
     }
 
-	@Override
-	@Transactional
-	public Integer updateTranTargetStatusByUploadBatchId(Integer batchUploadId,
-			Integer fromStatusId, Integer toStatusId) {
-		try {
-			
-			String sql = "update transactionTarget set statusId = :toStatusId "
-					+ " where batchUploadId = :batchUploadId ";
-			
-			if (fromStatusId > 0) {
-				sql = sql + " and statusId = :fromStatusId";
-			}
-
-	        Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql);
-	        updateData.setParameter("toStatusId", toStatusId);
-	        updateData.setParameter("batchUploadId", batchUploadId);
-	        
-	        if (fromStatusId > 0) {
-	        	updateData.setParameter("fromStatusId", fromStatusId);
-	        }
-	        
-	        updateData.executeUpdate();
-	        return 0;
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		     System.err.println("updateTranTargetStatusByUploadBatchId " + ex.getCause());
-			return 1;
-		}
-	}
-	
-	
-	@Override
+    @Override
     @Transactional
-    public Integer updateBatchDLStatusByUploadBatchId (Integer batchUploadId, Integer fromStatusId, Integer toStatusId,  String timeField) {
-		try {
-	        String sql = "update batchDownloads set statusId = :toStatusId ";
-	        if (timeField.equalsIgnoreCase("startover")) {
-	            // we reset time
-	            sql = sql + ", startDateTime = null, endDateTime = null";
-	        } else if (!timeField.equalsIgnoreCase("")) {
-	            sql = sql + ", " + timeField + " = CURRENT_TIMESTAMP";
-	        } else {
-	            sql = sql + ", startDateTime = CURRENT_TIMESTAMP, endDateTime = CURRENT_TIMESTAMP";
-	        }
-	        sql = sql + "  where id in (select batchDLId from transactionTarget where batchUploadId = :batchUploadId)";
-	        if  (fromStatusId > 0) {
-	        	sql = sql + " and statusId = :fromStatusId";
-	        }
+    public Integer updateTranTargetStatusByUploadBatchId(Integer batchUploadId,
+            Integer fromStatusId, Integer toStatusId) {
+        try {
 
-	        Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
-	                .setParameter("toStatusId", toStatusId)
-	                .setParameter("batchUploadId", batchUploadId);
-	        if  (fromStatusId > 0) {
-	        	updateData.setParameter("fromStatusId", fromStatusId);
-	        }
-	        
+            String sql = "update transactionTarget set statusId = :toStatusId "
+                    + " where batchUploadId = :batchUploadId ";
+
+            if (fromStatusId > 0) {
+                sql = sql + " and statusId = :fromStatusId";
+            }
+
+            Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql);
+            updateData.setParameter("toStatusId", toStatusId);
+            updateData.setParameter("batchUploadId", batchUploadId);
+
+            if (fromStatusId > 0) {
+                updateData.setParameter("fromStatusId", fromStatusId);
+            }
+
             updateData.executeUpdate();
             return 0;
         } catch (Exception ex) {
-        	ex.printStackTrace();
+            ex.printStackTrace();
+            System.err.println("updateTranTargetStatusByUploadBatchId " + ex.getCause());
+            return 1;
+        }
+    }
+
+    @Override
+    @Transactional
+    public Integer updateBatchDLStatusByUploadBatchId(Integer batchUploadId, Integer fromStatusId, Integer toStatusId, String timeField) {
+        try {
+            String sql = "update batchDownloads set statusId = :toStatusId ";
+            if (timeField.equalsIgnoreCase("startover")) {
+                // we reset time
+                sql = sql + ", startDateTime = null, endDateTime = null";
+            } else if (!timeField.equalsIgnoreCase("")) {
+                sql = sql + ", " + timeField + " = CURRENT_TIMESTAMP";
+            } else {
+                sql = sql + ", startDateTime = CURRENT_TIMESTAMP, endDateTime = CURRENT_TIMESTAMP";
+            }
+            sql = sql + "  where id in (select batchDLId from transactionTarget where batchUploadId = :batchUploadId)";
+            if (fromStatusId > 0) {
+                sql = sql + " and statusId = :fromStatusId";
+            }
+
+            Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                    .setParameter("toStatusId", toStatusId)
+                    .setParameter("batchUploadId", batchUploadId);
+            if (fromStatusId > 0) {
+                updateData.setParameter("fromStatusId", fromStatusId);
+            }
+
+            updateData.executeUpdate();
+            return 0;
+        } catch (Exception ex) {
+            ex.printStackTrace();
             System.err.println("updateBatchDLStatusByUploadBatchId " + ex.getCause());
             return 1;
         }
-	}
+    }
 
     @Override
     @Transactional
     @SuppressWarnings("unchecked")
-    public  List<Integer> getBatchDownloadIdsFromUploadId(Integer batchUploadId) {
-       try {
-	    	String sql = ("select batchDLId from "
-	                + " transactionTarget where batchUploadId = :batchUploadId ");
-	
-	        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
-	        query.setParameter("batchUploadId", batchUploadId);
-	        
-	        List<Integer> batchIds = query.list();
-	        return batchIds;
-       } catch (Exception ex) {
-    	   System.err.println("getBatchDownloadIdsFromUploadId " + ex.getCause());
-           return null;
-       }
+    public List<Integer> getBatchDownloadIdsFromUploadId(Integer batchUploadId) {
+        try {
+            String sql = ("select batchDLId from "
+                    + " transactionTarget where batchUploadId = :batchUploadId ");
+
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+            query.setParameter("batchUploadId", batchUploadId);
+
+            List<Integer> batchIds = query.list();
+            return batchIds;
+        } catch (Exception ex) {
+            System.err.println("getBatchDownloadIdsFromUploadId " + ex.getCause());
+            return null;
+        }
     }
-	
-    
+
     @Override
     @Transactional
     public Integer clearBatchDownloads(List<Integer> batchIds) {
@@ -5882,17 +5955,17 @@ public class transactionInDAOImpl implements transactionInDAO {
             deleteTable.executeUpdate();
             return 0;
         } catch (Exception ex) {
-        	ex.printStackTrace();
+            ex.printStackTrace();
             System.err.println("clearBatchDownloads " + ex.getCause().getMessage());
             return 1;
 
         }
     }
 
-	@Override
-	@Transactional
-	public List<Integer> getTransactionInIdsFromBatch(Integer batchUploadId) {
-		try {
+    @Override
+    @Transactional
+    public List<Integer> getTransactionInIdsFromBatch(Integer batchUploadId) {
+        try {
             String sql = ("select id from transactionIn where  batchId = :batchId "
                     + " order by id;");
             Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
@@ -5907,23 +5980,78 @@ public class transactionInDAOImpl implements transactionInDAO {
             ex.printStackTrace();
             return null;
         }
-	}
-	
-	
-	@Override
-	@Transactional
-	public List<Integer> getErrorCodes(List<Integer> codesToIgnore) {
-		try {
+    }
+
+    @Override
+    @Transactional
+    @SuppressWarnings("unchecked")
+    public List<WSMessagesIn> getWSMessagesByStatusId(List<Integer> statusIds) {
+        //1 if list of statusId is null, we get all
+        try {
+            Criteria findWSMessages = sessionFactory.getCurrentSession().createCriteria(WSMessagesIn.class);
+            if (statusIds.size() != 0) {
+                findWSMessages.add(Restrictions.in("statusId", statusIds));
+            }
+
+            List<WSMessagesIn> wsMessages = findWSMessages.list();
+            return wsMessages;
+        } catch (Exception ex) {
+            System.err.println("getWSMessagesByStatusId " + ex.getCause());
+            ex.printStackTrace();
+            return null;
+        }
+
+    }
+
+    @Override
+    @Transactional
+    @SuppressWarnings("unchecked")
+    public WSMessagesIn getWSMessagesById(Integer wsMessageId) {
+        //1 if list of statusId is null, we get all
+        try {
+            Criteria findWSMessage = sessionFactory.getCurrentSession().createCriteria(WSMessagesIn.class);
+            findWSMessage.add(Restrictions.eq("id", wsMessageId));
+
+            List<WSMessagesIn> wsMessages = findWSMessage.list();
+            if (wsMessages.size() > 0) {
+                return wsMessages.get(0);
+            }
+        } catch (Exception ex) {
+            System.err.println("getWSMessagesById " + ex.getCause());
+            ex.printStackTrace();
+            return null;
+        }
+        return null;
+    }
+
+    @Override
+    @Transactional
+    public Integer updateWSMessage(WSMessagesIn wsMessage) {
+        try {
+            sessionFactory.getCurrentSession().update(wsMessage);
+            return 0;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.err.println("updateWSMessage " + ex.getCause());
+            return 1;
+        }
+
+    }
+
+    @Override
+    @Transactional
+    public List<Integer> getErrorCodes(List<Integer> codesToIgnore) {
+        try {
             String sql = "select id from lu_errorcodes";
             if (codesToIgnore.size() != 0) {
-            	sql = sql + " where id not in (:codesToIgnore);";
+                sql = sql + " where id not in (:codesToIgnore);";
             }
 
             Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
             if (codesToIgnore.size() != 0) {
-            	query.setParameterList("codesToIgnore", codesToIgnore);
+                query.setParameterList("codesToIgnore", codesToIgnore);
             }
-            
+
             List<Integer> errorCodes = query.list();
             return errorCodes;
         } catch (Exception ex) {
@@ -5931,6 +6059,296 @@ public class transactionInDAOImpl implements transactionInDAO {
             System.err.println("getErrorCodes " + ex.getCause());
             return null;
         }
-	}
-	
+    }
+
+    @Override
+    @Transactional
+    public Integer rejectInvalidSourceSubOrg(batchUploads batch,
+            configurationConnection bt, boolean nofinalStatus) {
+        try {
+            //error Id 23 - invalid SourceSubOrg
+            String sql = ("insert into transactionInErrors "
+                    + " (batchUploadId, configId, transactionInId, errorId, fieldNo) "
+                    + " select " + batch.getId() + ", " + bt.getsourceConfigId() + ", transactionInId, 23,  " + bt.getSourceSubOrgCol()
+                    + " from transactionTranslatedIn where  configId = :sourceConfigId"
+                    + " and transactionInId in (select id from transactionIn where batchId = :batchId ");
+            if (nofinalStatus) {
+                sql = sql + " and statusId not in (:transRELId)";
+            }
+            sql = sql + " and f" + bt.getSourceSubOrgCol() + " not in (select  id  from organizations where parentid = :parentOrg)"
+                    + " and f" + bt.getSourceSubOrgCol() + "  is not null) and F" + bt.getSourceSubOrgCol()
+                    + " not in (select f" + bt.getSourceSubOrgCol() + " from transactionTranslatedIn "
+                    + " where (trim(F" + bt.getSourceSubOrgCol() + ") = '0' or length(F" + bt.getSourceSubOrgCol() + ") = 0)"
+                    + " and configId = :sourceConfigId"
+                    + " and transactionInId in (select id from transactionIn where batchId = :batchId ";
+            if (nofinalStatus) {
+                sql = sql + " and statusId not in (:transRELId)";
+            }
+            sql = sql + " ) and transactionInId not in (Select transactionInId "
+                    + " from transactionINerrors where batchUPloadid = :batchId and errorId = 23));";
+
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+            query.setParameter("batchId", batch.getId());
+            query.setParameter("parentOrg", batch.getOrgId());
+            query.setParameter("sourceConfigId", bt.getsourceConfigId());
+            if (nofinalStatus) {
+                query.setParameterList("transRELId", transRELId);
+            }
+
+            query.executeUpdate();
+            return 0;
+        } catch (Exception ex) {
+            System.err.println("rejectInvalidSubSourceOrg " + ex.getCause());
+            ex.printStackTrace();
+            return 1;
+        }
+    }
+
+    @Override
+    @Transactional
+    public Integer updateSSOrgIdTransactionIn(
+            batchUploads batchUpload, configurationConnection batchTargets) {
+
+        try {
+            String sql = "UPDATE transactionIn ti, transactionTranslatedIn tti"
+                    + " SET ti.sourceSubOrgId = tti.F" + batchTargets.getSourceSubOrgCol()
+                    + " WHERE tti.transactionInId = ti.id "
+                    + " and tti.configId = :configId "
+                    + " and ti.configId = tti.configId "
+                    + " and ti.batchId = :batchId "
+                    + " and ti.statusId not in (:transRELId) "
+                    + " and tti.f" + batchTargets.getSourceSubOrgCol() + " is not null "
+                    + " and length(trim(tti.f" + batchTargets.getSourceSubOrgCol() + ")) != 0 ";
+
+            Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql);
+            updateData.setParameter("configId", batchTargets.getsourceConfigId());
+            updateData.setParameter("batchId", batchUpload.getId());
+            updateData.setParameterList("transRELId", transRELId);
+
+            updateData.executeUpdate();
+            return 0;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.err.println("updateSSOrgIdTransactionIn " + ex.getCause());
+            return 1;
+        }
+    }
+
+    @Override
+    @Transactional
+    public Integer updateSSOrgIdUploadSummary(batchUploads batchUpload) {
+
+        try {
+            String sql = "UPDATE batchuploadsummary bus, transactionIn ti"
+                    + " SET bus.sourceSubOrgId = ti.sourceSubOrgId "
+                    + " WHERE bus.batchId = ti.batchId and ti.batchId = :batchId"
+                    + " and ti.statusId not in (:transRELId)";
+
+            Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                    .setParameter("batchId", batchUpload.getId())
+                    .setParameterList("transRELId", transRELId);
+
+            updateData.executeUpdate();
+            return 0;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.err.println("updateSSOrgIdUploadSummary " + ex.getCause());
+            return 1;
+        }
+    }
+
+    @Override
+    @Transactional
+    public Integer updateSSOrgIdTransactionTarget(batchUploads batchUpload) {
+
+        try {
+            String sql = "UPDATE transactiontarget tg, transactionIn ti"
+                    + " SET tg.sourceSubOrgId = ti.sourceSubOrgId "
+                    + " WHERE tg.transactionInId = ti.id "
+                    + " and ti.batchId = :batchId "
+                    + " and tg.batchuploadid = ti.batchId "
+                    + " and ti.statusId not in (:transRELId)";
+
+            Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                    .setParameter("batchId", batchUpload.getId())
+                    .setParameterList("transRELId", transRELId);
+
+            updateData.executeUpdate();
+            return 0;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.err.println("updateSSOrgIdTransactionTarget " + ex.getCause());
+            return 1;
+        }
+    }
+
+    /**
+     * The 'geBatchesIdsForReport' function will return a list of batches for the admin in the processing activities section.
+     *
+     * @param fromDate
+     * @param toDate
+     * @return This function will return a list of batch uploads
+     * @throws Exception
+     */
+    @Override
+    @Transactional
+    public List<Integer> geBatchesIdsForReport(String fromDate, String toDate, boolean erg) throws Exception {
+
+        String sql = "select id from batchUploads a where a.totalRecordCount > 0 and (a.dateSubmitted >= '" + fromDate + "' and a.dateSubmitted < '" + toDate + "') and statusId in (2,3,4,5,6,22,23,24,25,28,36,38) ";
+        if (erg == true) {
+            sql += "and transportMethodId = 2 group by a.dateSubmitted, a.orgId ";
+        } else {
+            sql += "and transportMethodId <> 2 ";
+        }
+
+        sql += "order by dateSubmitted desc";
+
+        Query findBatches = sessionFactory.getCurrentSession().createSQLQuery(sql);
+        List batches = findBatches.list();
+
+        List<Integer> batchIds = findBatches.list();
+
+        return batchIds;
+    }
+
+    @Override
+    @Transactional
+    public BigInteger getReferralCount(String batchIds) throws Exception {
+
+        String sql = "select count(id) as totalReferrals from transactionIn a where batchId in (" + batchIds + ") and transactionTargetId = 0";
+
+        Query getReferralCount = sessionFactory.getCurrentSession().createSQLQuery(sql);
+
+        return (BigInteger) getReferralCount.uniqueResult();
+    }
+
+    @Override
+    @Transactional
+    public BigInteger getFeedbackReportCount(String batchIds) throws Exception {
+
+        String sql = "select count(id) as totalFeedbackReports from transactionIn a where batchId in (" + batchIds + ") and transactionTargetId > 0";
+
+        Query getFBCount = sessionFactory.getCurrentSession().createSQLQuery(sql);
+
+        return (BigInteger) getFBCount.uniqueResult();
+    }
+
+    @Override
+    @Transactional
+    public List<activityReportList> getFeedbackReportList(String batchIds) throws Exception {
+        String sql = ("select a.configId as configId, c.orgname as orgName, d.displayName as messageType, count(a.id) as total, d.id as messageTypeId\n"
+                + "from transactionIn a inner join configurations b on b.id = a.configId inner join organizations c on c.id = b.orgId inner join messagetypes d on d.id = b.messageTypeId\n"
+                + "where batchId in (" + batchIds + ") and transactionTargetId > 0\n"
+                + "group by a.configId;");
+
+        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
+                Transformers.aliasToBean(activityReportList.class));
+
+        List<activityReportList> activityList = query.list();
+
+        return activityList;
+    }
+
+    @Override
+    @Transactional
+    public List<activityReportList> getReferralList(String batchIds) throws Exception {
+        String sql = ("select c.orgname as orgName, d.displayName as messageType, count(a.id) as total, d.id as messageTypeId\n"
+                + "from transactionIn a inner join configurations b on b.id = a.configId inner join organizations c on c.id = b.orgId inner join messagetypes d on d.id = b.messageTypeId\n"
+                + "where batchId in (" + batchIds + ") and transactionTargetId = 0\n"
+                + "group by a.configId;");
+
+        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
+                Transformers.aliasToBean(activityReportList.class));
+
+        List<activityReportList> activityList = query.list();
+
+        return activityList;
+    }
+
+    @Override
+    @Transactional
+    public List<Integer> getFeedbackTransactions(String ids, Integer configId) throws Exception {
+
+        String sql = ("select id \n"
+                + "from transactionIn\n"
+                + "where batchId in (" + ids + ") and transactionTargetId > 0 and configId = " + configId);
+
+        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+
+        List<Integer> trans = query.list();
+
+        return trans;
+    }
+
+    @Override
+    @Transactional
+    public Integer getStatusFieldNo(Integer configId) throws Exception {
+
+        String sql = ("select fieldNo \n"
+                + "from configurationformfields\n"
+                + "where configId = " + configId + " and saveToTableCol = 'messageStatus'");
+
+        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+        
+        return (Integer) query.uniqueResult();
+    }
+    
+    @Override
+    @Transactional
+    public Integer getActivityStatusFieldNo(Integer configId) throws Exception {
+
+        String sql = ("select fieldNo \n"
+                + "from configurationformfields\n"
+                + "where configId = " + configId + " and saveToTableName = 'message_visitinfo' and saveToTableCol = 'status'");
+
+        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+        
+        return (Integer) query.uniqueResult();
+    }
+    
+
+    @Override
+    @Transactional
+    public BigInteger getTotalOpenFeedbackReports(String transIds, String fieldNo) throws Exception {
+
+        String sql = "select count(id) as totalOpen from transactionInRecords a where transactionInId in (" + transIds + ") and " + fieldNo + " = '1'";
+
+        Query getOpenCount = sessionFactory.getCurrentSession().createSQLQuery(sql);
+        
+        return (BigInteger) getOpenCount.uniqueResult();
+    }
+
+    @Override
+    @Transactional
+    public BigInteger getTotalClosedFeedbackReports(String transIds, String fieldNo) throws Exception {
+
+        String sql = "select count(id) as totalClosed from transactionInRecords a where transactionInId in (" + transIds + ") and " + fieldNo + " = '2'";
+
+        Query getClosedCount = sessionFactory.getCurrentSession().createSQLQuery(sql);
+
+        return (BigInteger) getClosedCount.uniqueResult();
+    }
+    
+    @Override
+    @Transactional
+    public BigInteger getTotalCompletedActivityStatus(String transIds, String fieldNo) throws Exception {
+        String sql = "select count(id) as totalCompleted from transactionInRecords a where transactionInId in (" + transIds + ") and " + fieldNo + " = '3'";
+         
+
+        Query getCompletedCount = sessionFactory.getCurrentSession().createSQLQuery(sql);
+        
+
+        return (BigInteger) getCompletedCount.uniqueResult();
+    }
+    
+    @Override
+    @Transactional
+    public BigInteger getTotalEnrolledActivityStatus(String transIds, String fieldNo) throws Exception{
+        String sql = "select count(id) as totalEnrolled from transactionInRecords a where transactionInId in (" + transIds + ") and " + fieldNo + " = '7'";
+
+        Query getEnrolledCount = sessionFactory.getCurrentSession().createSQLQuery(sql);
+        
+
+        return (BigInteger) getEnrolledCount.uniqueResult();
+    }
 }

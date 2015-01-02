@@ -48,6 +48,18 @@
                     </spring:bind>
                 </div>
                 <div class="form-group">
+                    <spring:bind path="fieldType">
+                        <div id="fieldTypeDiv">
+                            <label class="control-label" for="fieldType">Field Type</label>
+                            <form:select path="fieldType" id="fieldType" class="form-control half">
+                                <c:forEach items="${fieldTypes}" varStatus="ftype">
+                                    <option value="${fieldTypes[ftype.index][0]}">${fieldType[ftype.index][1]}</option>
+                                </c:forEach>
+                            </form:select>
+                        </div>
+                    </spring:bind>
+                </div>
+                <div class="form-group">
                     <spring:bind path="validationType">
                         <div id="validationTypeDiv">
                             <label class="control-label" for="validationType">Validation Type</label>

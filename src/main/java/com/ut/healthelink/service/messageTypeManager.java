@@ -53,6 +53,9 @@ public interface messageTypeManager {
 	
 	@SuppressWarnings("rawtypes")
 	List getDelimiters();
+        
+        @SuppressWarnings("rawtypes")
+        List getFieldTypes();
 	
 	Long getTotalFields(int messageTypeId);
 	

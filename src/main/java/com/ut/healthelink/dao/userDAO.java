@@ -49,5 +49,10 @@ public interface userDAO {
     List<User> getAllUsers();
     
     void updateUserActivity (UserActivity userActivity);
-
+    
+    List<String> getUserRoles (User user) throws Exception;
+    
+    void updateUserOnly(User user) throws Exception;
+    
+    List<User> getUsersByStatuRolesAndOrg(boolean status, List <Integer> rolesToExclude,  List <Integer> orgs, boolean include) throws Exception;
 }

@@ -74,6 +74,13 @@
                                             <form:errors path="messageTypeVal" cssClass="control-label" element="label" />
                                        </div>
                                     </spring:bind>
+                                    <spring:bind path="sourceSubOrgCol">
+                                        <div class="form-group ${status.error ? 'has-error' : '' }">
+                                            <label class="control-label" for="sourceSubOrgCol">Column containing the sending site</label>
+                                            <form:input path="sourceSubOrgCol" id="sourceSubOrgCol" class="form-control" type="text" maxLength="3" />
+                                            <form:errors path="sourceSubOrgCol" cssClass="control-label" element="label" />
+                                       </div>
+                                    </spring:bind>
                                     <spring:bind path="targetOrgCol">
                                         <div class="form-group ${status.error ? 'has-error' : '' }">
                                             <label class="control-label" for="targetOrgCol">Column containing the target organization *</label>

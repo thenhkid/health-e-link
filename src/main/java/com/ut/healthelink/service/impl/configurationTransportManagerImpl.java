@@ -9,6 +9,7 @@ import com.ut.healthelink.model.configurationFormFields;
 import com.ut.healthelink.model.configurationMessageSpecs;
 import com.ut.healthelink.model.configurationRhapsodyFields;
 import com.ut.healthelink.model.configurationTransport;
+import com.ut.healthelink.model.configurationWebServiceFields;
 import com.ut.healthelink.dao.configurationTransportDAO;
 import com.ut.healthelink.model.Organization;
 import com.ut.healthelink.model.configurationFTPFields;
@@ -266,7 +267,7 @@ public class configurationTransportManagerImpl implements configurationTransport
 	}
 
 	@Override
-	public void saveTransportRhapsody(configurationRhapsodyFields rhapsodyFields) {
+	public void saveTransportRhapsody(configurationRhapsodyFields rhapsodyFields) throws Exception {
 		configurationTransportDAO.saveTransportRhapsody(rhapsodyFields);	
 	}
 	
@@ -311,4 +312,44 @@ public class configurationTransportManagerImpl implements configurationTransport
 			List<Integer> fileTypeIds, List<Integer> statusIds, boolean distinctOnly, boolean foroutboundProcessing) {
 		 return configurationTransportDAO.getConfigurationTransportFileExtByFileType(orgId,transportMethodId, fileTypeIds, statusIds, distinctOnly, foroutboundProcessing);
 	}
+	
+    @Override
+    @Transactional
+    public List<configurationWebServiceFields> getTransWSDetails(int transportDetailId) throws Exception {
+        return configurationTransportDAO.getTransWSDetails(transportDetailId);
+    }
+    
+    @Override
+	public void saveTransportWebService(configurationWebServiceFields wsFields) throws Exception{
+		configurationTransportDAO.saveTransportWebService(wsFields);	
+	}
+
+
+	@Override
+	public List<configurationTransport> getDistinctTransportDetailsForOrgByTransportMethodId(
+			Integer transportMethodId, Integer status, Integer orgId) {
+		return configurationTransportDAO.getDistinctTransportDetailsForOrgByTransportMethodId(transportMethodId, status, orgId);
+	}
+	
+	@Override
+	public List<configurationTransport> getCTForOrgByTransportMethodId(
+			Integer transportMethodId, Integer status, Integer orgId) {
+		return configurationTransportDAO.getCTForOrgByTransportMethodId(transportMethodId, status, orgId);
+	}
+	
+	@Override
+    @Transactional
+    public configurationWebServiceFields getTransWSDetailsPush(int transportDetailId) throws Exception {
+        return configurationTransportDAO.getTransWSDetailsPush(transportDetailId);
+    }
+
+    @Override
+    @Transactional
+    public configurationWebServiceFields getTransWSDetailsPull(int transportDetailId) throws Exception {
+        return configurationTransportDAO.getTransWSDetailsPull(transportDetailId);
+    }
+
+    
+    
 }
+

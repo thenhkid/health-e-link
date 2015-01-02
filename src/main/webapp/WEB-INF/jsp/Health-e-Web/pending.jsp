@@ -12,8 +12,8 @@
         <div class="col-md-12 page-content">
             <ol class="breadcrumb">
                 <li><a href="<c:url value='/profile'/>">My Account</a></li>
-                <li><a href="#">eRG</a></li>
-                <li class="active">Pending Batches</li>
+                <li><a href="<c:url value='/Health-e-Web/inbox'/>">eRG</a></li>
+                <li class="active">Pending</li>
             </ol>
                 
             <c:if test="${not empty savedStatus}" >

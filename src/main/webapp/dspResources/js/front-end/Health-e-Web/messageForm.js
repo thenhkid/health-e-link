@@ -59,7 +59,51 @@ require(['./main'], function() {
 
             }
         });
-
+        
+        $(document).on('click', '.editAttachment', function() {
+            
+            var attachmentId = $(this).attr('rel');
+            $('#filenameDsp-' + attachmentId).hide();
+            $('#filenameEdit-' + attachmentId).show();
+            $('#edit-' + attachmentId).hide();
+            $('#saveedit-' + attachmentId).show();
+            $('#canceledit-' + attachmentId).show();
+            
+        });
+        
+        $(document).on('click', '.cancelAttachment', function() {
+            
+            var attachmentId = $(this).attr('rel');
+            $('#filenameDsp-' + attachmentId).show();
+            $('#filenameEdit-' + attachmentId).hide();
+            $('#edit-' + attachmentId).show();
+            $('#saveedit-' + attachmentId).hide();
+            $('#canceledit-' + attachmentId).hide();
+            
+        });
+        
+        //Function to remove the selected attachment
+        $(document).on('click', '.saveAttachment', function() {
+            
+            var attachmentId = $(this).attr('rel');
+            $('#filenameDsp-' + attachmentId).show();
+            $('#filenameEdit-' + attachmentId).hide();
+            $('#edit-' + attachmentId).show();
+            $('#saveedit-' + attachmentId).hide();
+            $('#canceledit-' + attachmentId).hide();
+            
+            var titleVal = $('.title-' + attachmentId).val();
+            
+            $.ajax({
+                url: '/Health-e-Web/saveAttachmentTitle.do',
+                type: 'POST',
+                data: {'attachmentId': attachmentId, 'title': titleVal},
+                success: function(data) {
+                    $('#dsptitle-' + attachmentId).html(titleVal);
+                }
+            });
+        });
+        
         //Function to remove the selected attachment
         $(document).on('click', '.removeAttachment', function() {
 
@@ -475,6 +519,19 @@ function checkFormFields() {
             }
         }
     });
+    
+    //Look at all the textarea fields
+    $('.textarea').each(function() {
+       
+       $(this).val($(this).val().replace(/\n/g, ""));
+       
+       var textVal = $(this).val();
+       
+       if(textVal.length == 499) {
+           alert("The note entered has the maxium allowed characters (500), make sure the note is complete.");
+       }
+       
+    });
 
     return errorFound;
 }
@@ -490,8 +547,8 @@ function validateEmail($email) {
 }
 
 function validatePhone($phone) {
-    //var phoneRegExp = /^(?:(?:\+?1\s*(?:[.-]\s*)?)?(?:\(\s*([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9])\s*\)|([2-9]1[02-9]|[2-9][02-8]1|[2-9][02-8][02-9]))\s*(?:[.-]\s*)?)?([2-9]1[02-9]|[2-9][02-9]1|[2-9][02-9]{2})\s*(?:[.-]\s*)?([0-9]{4})(?:\s*(?:#|x\.?|ext\.?|extension)\s*(\d+))?$/;
-    var phoneRegExp = /^[0-9-+]+$/;
+    var phoneRegExp = /1?\s*\W?\s*([2-9][0-8][0-9])\s*\W?\s*([2-9][0-9]{2})\s*\W?\s*([0-9]{4})(\se?x?t?(\d*))?/;
+    //var phoneRegExp = /^[0-9-+]+$/;
     if (!phoneRegExp.test($phone)) {
         return false;
     }

@@ -22,6 +22,9 @@
                     <c:when test="${param['page'] == 'hl7Details'}">
                         <a href="javascript:void(0);" title="Create new HL7 Spec" class="unstyled-link">Create new HL7 Spec</a>
                     </c:when>  
+		    <c:when test="${param['page'] == 'loginAs'}">
+                        <a href="javascript:void(0);" title="Login As" class="unstyled-link">Login As</a>
+                    </c:when>   
                     <c:when test="${param['page'] == 'news'}">
                         <a href="javascript:void(0);" title="Create new Article" class="unstyled-link">News Articles</a>
                     </c:when>  

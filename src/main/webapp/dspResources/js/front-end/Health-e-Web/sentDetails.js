@@ -34,10 +34,10 @@ require(['./main'], function () {
         //Function to display the note modal box when 
         //the internal status id is changed.
         $(document).on('change','#internalStatus',function() {
-
            //Open the note modal window
            $('#messageNoteModal').modal('show');
            $('#internalStatusId').val($('#internalStatus').val());
+           $('#internalStatusText').val($('#internalStatus option[value="'+$('#internalStatus').val()+'"]').text());
            $('#messagetransactionId').val($('#transactionId').val());
            $('#statusDisplayText').html($('#internalStatus option[value="'+$('#internalStatus').val()+'"]').text());
            $('#selStatus').show();
@@ -62,6 +62,7 @@ require(['./main'], function () {
             //Open the note modal window
            $('#messageNoteModal').modal('show');
            $('#internalStatusId').val(0);
+           $('#internalStatusText').val('');
            $('#messagetransactionId').val($('#transactionId').val());
            $('#statusDisplayText').html("");
            $('#selStatus').hide();

@@ -74,9 +74,9 @@ public class adminController {
 
         User userInfo = (User) session.getAttribute("userDetails");
 
-        if (userInfo.getRoleId() == 3) {
+        if (userInfo.getRoleId() == 3 || userInfo.getRoleId() == 4) {
             
-            ModelAndView mav = new ModelAndView(new RedirectView("/administrator/processing-activity/pending"));
+            ModelAndView mav = new ModelAndView(new RedirectView("/administrator/processing-activity/activityReport"));
             return mav;
 
         } else {

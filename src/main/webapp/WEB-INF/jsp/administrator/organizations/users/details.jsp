@@ -135,18 +135,19 @@
                     </spring:bind>
                     <spring:bind path="password">
                         <div id="passwordDiv" class="form-group ${status.error ? 'has-error' : '' }">
-                            <label class="control-label" for="password">Password *</label>
+                            <label class="control-label" for="password"><c:if test="${btnValue == 'Update'}"><i>Please leave blank if not changing</i><br/></c:if>Password *</label>
                             <form:input path="password" id="password" class="form-control" type="password" maxLength="15" autocomplete="off"  />
                             <form:errors path="password" cssClass="control-label" element="label" />
                         </div>
                     </spring:bind>
                     <div id="confirmPasswordDiv" class="form-group">
                         <label class="control-label" for="confirmPassword">Confirm Password *</label>
-                        <input id="confirmPassword" name="confirmpassword" class="form-control" maxLength="15" autocomplete="off" type="password" value=${userdetails.getPassword()} />
+                        <input id="confirmPassword" name="confirmpassword" class="form-control" maxLength="15" autocomplete="off" type="password" value="" />
                         <span id="confimPasswordMsg" class="control-label"></span>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group ${sectionListError ? 'has-error' : '' }" id="sectionListDiv">
                         <label class="control-label" for="section">Available Sections</label>
+                        <span id="sectionListMsg" class="control-label"><c:if test="${sectionListError}"><br/>Please assign at least one section to user.</c:if></span>
                         <c:forEach items="${sections}" var="section" varStatus="loopStatus">  
                             <div class="row">
                                 <div class="col-md-6">
@@ -155,7 +156,7 @@
                                     </label>
                                 </div>
                             </div>
-                        </c:forEach>
+                        </c:forEach>     
                     </div>
                     <div class="form-group">
                         <input type="button" id="submitButton" rel="${btnValue}" role="button" class="btn btn-primary" value="${btnValue}"/>
@@ -166,6 +167,7 @@
     </div>
 </div>
 
+       
 <script type="text/javascript">
 
     $(document).ready(function() {

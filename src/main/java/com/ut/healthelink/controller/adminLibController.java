@@ -229,6 +229,11 @@ public class adminLibController {
         @SuppressWarnings("rawtypes")
         List validationTypes = messagetypemanager.getValidationTypes();
         mav.addObject("validationTypes", validationTypes);
+        
+        //Get the list of available field types
+        @SuppressWarnings("rawtypes")
+        List fieldTypes = messagetypemanager.getFieldTypes();
+        mav.addObject("fieldTypes", fieldTypes);
 
         return mav;
 
@@ -290,6 +295,7 @@ public class adminLibController {
         formField.setSaveToTableCol("");
         formField.setBucketNo(bucketNo);
         formField.setBucketDspPos(newBucketDspPos);
+        formField.setFieldType(1);
         
         mav.addObject("messageTypeFormFields", formField);
         
@@ -303,6 +309,11 @@ public class adminLibController {
         @SuppressWarnings("rawtypes")
         List validationTypes = messagetypemanager.getValidationTypes();
         mav.addObject("validationTypes", validationTypes);
+        
+        //Get the list of available field types
+        @SuppressWarnings("rawtypes")
+        List fieldTypes = messagetypemanager.getFieldTypes();
+        mav.addObject("fieldTypes", fieldTypes);
         
         return mav;
     }

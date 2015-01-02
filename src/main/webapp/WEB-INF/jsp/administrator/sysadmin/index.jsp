@@ -75,10 +75,33 @@
             </section>
         </div>
 		--%>
+	 <div class="col-md-3 col-sm-3 col-xs-6">
+            <section class="panel panel-default panel-stats">
+                <div class="panel-body">
+                    <span class="stat-number"><a href="#profileModal" data-toggle="modal" class="updateprofile" title="Update my profile">1</a></span>
+                    <h3>Update my profile</h3>
+                         <a href="#profileModal" id="profileButton" class="btn btn-primary btn-small" class="updateprofile1"  data-toggle="modal" title="Update my profile">
+                         Update my profile</a>               
+                </div>
+            </section>
+        </div>     
+         <div class="col-md-3 col-sm-3 col-xs-6">
+            <section class="panel panel-default panel-stats">
+                <div class="panel-body">
+                    <span class="stat-number"><a href="loginAs" class="loginAs" title="Login As">${totalUsers}</a></span>
+                    <h3>Total Users</h3>
+                         <a href="loginAs" id="loginAs" class="btn btn-primary btn-small" class="loginAs" title="Login As User">
+                         Login As</a>               
+                </div>
+            </section>
+        </div>   	
+		
 
     </div>
 </div>
 
+<!-- my profile modal -->
+<div class="modal fade" id="profileModal" role="dialog" tabindex="-1" aria-labeledby="Modify My Profile" aria-hidden="true" aria-describedby="Modify My Profile"></div>
 
 
 

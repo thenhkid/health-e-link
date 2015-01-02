@@ -1061,7 +1061,7 @@ public class HealtheConnectController {
                     transaction.setstatusValue(processStatus.getEndUserDisplayCode());
 
                     /* get the message type name */
-                    transaction.setmessageTypeName(messagetypemanager.getMessageTypeById(configDetails.getMessageTypeId()).getName());
+                    transaction.setmessageTypeName(messagetypemanager.getMessageTypeById(configDetails.getMessageTypeId()).getDspName());
 
                     records = transactionInManager.getTransactionRecords(transactionId);
                     transaction.settransactionRecordId(records.getId());
@@ -1345,7 +1345,7 @@ public class HealtheConnectController {
                 	if (canReleaseBatch) {
                         transactionInManager.updateBatchStatus(batchId, 4, "startDateTime");
                         //check once again to make sure all transactions are in final status
-                        if (transactionInManager.getRecordCounts(batchId, finalStatusIds, false, false) == 0) {
+                        if (transactionInManager.getRecordCounts(batchId, Arrays.asList(11, 12, 13, 16), false, false) == 0) {
                             transactionInManager.updateBatchStatus(batchId, 6, "endDateTime");
                         } else {
                             transactionInManager.updateBatchStatus(batchId, 5, "endDateTime");
@@ -1630,7 +1630,7 @@ public class HealtheConnectController {
                  if (canReleaseBatch) {
                          transactionInManager.updateBatchStatus(batchId, 4, "startDateTime");
                          //check once again to make sure all transactions are in final status
-                         if (transactionInManager.getRecordCounts(batchId, finalStatusIds, false, false) == 0) {
+                         if (transactionInManager.getRecordCounts(batchId, Arrays.asList(11, 12, 13, 16), false, false) == 0) {
                              transactionInManager.updateBatchStatus(batchId, 6, "endDateTime");
                              forInsert = "Batch "+ batchInfo.getutBatchName() + " is released.";
                              systemMessage = systemMessage + forInsert + "<br/>";                           		 

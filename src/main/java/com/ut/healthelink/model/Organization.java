@@ -83,6 +83,9 @@ public class Organization {
     
     @Column(name = "parsingTemplate", nullable = true)
     private String parsingTemplate = null;
+    
+    @Column(name = "parentId", nullable = true)
+    private Integer parentId = 0;
 
     public int getId() {
         return id;
@@ -204,4 +207,12 @@ public class Organization {
         this.file = file;
     }
 
+    public Integer getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(Integer parentId) {
+        this.parentId = parentId;
+    }
+    
 }

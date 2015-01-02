@@ -32,19 +32,32 @@ public class batchUploads {
 
     @Transient
     private String usersName;
-    
+
     @Transient
     private String orgName;
-    
+
     @Transient
     private String transportMethod;
-    
+
     @Transient
     private String configName;
-    
+
     @Transient
     private Integer transTotalNotFinal = 10; // set to random number that is not 0
+
+    @Transient
+    private String uploadType = "";
     
+    @Transient
+    private String referringBatch = "";
+    
+    @Transient
+    private Integer totalOpen = 0;
+    
+    @Transient
+    private Integer totalClosed = 0;
+    
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID", nullable = false)
@@ -105,13 +118,17 @@ public class batchUploads {
 
     @Column(name = "fileLocation", nullable = true)
     private String fileLocation;
-    
+
     @NoHtml
     @Column(name = "originalFolder", nullable = false)
     private String originalFolder;
-    
+
     @Column(name = "encodingId", nullable = true)
     private Integer encodingId = 1;
+
+    @NoHtml
+    @Column(name = "senderEmail", nullable = false)
+    private String senderEmail;
 
     public boolean isContainsHeaderRow() {
         return containsHeaderRow;
@@ -276,7 +293,7 @@ public class batchUploads {
     public void setConfigId(Integer configId) {
         this.configId = configId;
     }
-    
+
     public String getDelimChar() {
         return delimChar;
     }
@@ -284,7 +301,7 @@ public class batchUploads {
     public void setDelimChar(String delimChar) {
         this.delimChar = delimChar;
     }
-    
+
     public String getorgName() {
         return orgName;
     }
@@ -292,7 +309,7 @@ public class batchUploads {
     public void setorgName(String orgName) {
         this.orgName = orgName;
     }
-    
+
     public String gettransportMethod() {
         return transportMethod;
     }
@@ -300,37 +317,77 @@ public class batchUploads {
     public void settransportMethod(String transportMethod) {
         this.transportMethod = transportMethod;
     }
-    
+
     public String getConfigName() {
-		return configName;
-	}
+        return configName;
+    }
 
-	public void setConfigName(String configName) {
-		this.configName = configName;
-	}
+    public void setConfigName(String configName) {
+        this.configName = configName;
+    }
 
-	public Integer getTransTotalNotFinal() {
-		return transTotalNotFinal;
-	}
+    public Integer getTransTotalNotFinal() {
+        return transTotalNotFinal;
+    }
 
-	public void setTransTotalNotFinal(Integer transTotalNotFinal) {
-		this.transTotalNotFinal = transTotalNotFinal;
-	}
+    public void setTransTotalNotFinal(Integer transTotalNotFinal) {
+        this.transTotalNotFinal = transTotalNotFinal;
+    }
 
-	public String getOriginalFolder() {
-		return originalFolder;
-	}
+    public String getOriginalFolder() {
+        return originalFolder;
+    }
 
-	public void setOriginalFolder(String originalFolder) {
-		this.originalFolder = originalFolder;
-	}
+    public void setOriginalFolder(String originalFolder) {
+        this.originalFolder = originalFolder;
+    }
 
-	public Integer getEncodingId() {
-		return encodingId;
-	}
+    public Integer getEncodingId() {
+        return encodingId;
+    }
 
-	public void setEncodingId(Integer encodingId) {
-		this.encodingId = encodingId;
-	}
+    public void setEncodingId(Integer encodingId) {
+        this.encodingId = encodingId;
+    }
 
+    public String getSenderEmail() {
+        return senderEmail;
+    }
+
+    public void setSenderEmail(String senderEmail) {
+        this.senderEmail = senderEmail;
+    }
+
+    public String getUploadType() {
+        return uploadType;
+    }
+
+    public void setUploadType(String uploadType) {
+        this.uploadType = uploadType;
+    }
+
+    public String getReferringBatch() {
+        return referringBatch;
+    }
+
+    public void setReferringBatch(String referringBatch) {
+        this.referringBatch = referringBatch;
+    }
+
+    public Integer getTotalOpen() {
+        return totalOpen;
+    }
+
+    public void setTotalOpen(Integer totalOpen) {
+        this.totalOpen = totalOpen;
+    }
+
+    public Integer getTotalClosed() {
+        return totalClosed;
+    }
+
+    public void setTotalClosed(Integer totalClosed) {
+        this.totalClosed = totalClosed;
+    }
+    
 }

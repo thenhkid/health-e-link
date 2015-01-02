@@ -56,21 +56,24 @@
     </bean>
     
     <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
-        <property name="host" value="smtp.gmail.com" />
-	<property name="port" value="587" />
-	<property name="username" value="information@health-e-link.net" />
-	<property name="password" value="!bowlink!" />
- 
-	<property name="javaMailProperties">
-	   <props>
-       	      <prop key="mail.smtp.auth">true</prop>
-       	      <prop key="mail.smtp.starttls.enable">true</prop>
-       	   </props>
-	</property>
+	    <property name="host" value="${mailserver.host}" />
+		<property name="port" value="${mailserver.port}" />
+		<property name="username" value="${mailserver.username}" />
+		<property name="password" value="${mailserver.password}" />
+	
+		<property name="javaMailProperties">
+		   <props>
+	       	      <prop key="mail.smtp.auth">true</prop>
+	       	      <prop key="mail.smtp.starttls.enable">true</prop>
+	       	   </props>
+		</property>
    </bean>
     
     <bean id="emailMessageManagerImpl" class="com.ut.healthelink.service.impl.emailMessageManagerImpl">
 	<property name="mailSender" ref="mailSender" />
     </bean>
+    
+    <context:property-placeholder location="file:${catalina.home}/properties/healthelink.properties"/>
+    
     
 </beans>

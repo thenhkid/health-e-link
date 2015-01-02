@@ -23,6 +23,7 @@
                             @ <fmt:formatDate value="${note.dateSubmitted}" type="time" timeStyle="short" />
                         </td>
                         <td style="white-space: normal; width:60%;">
+                            <c:if test="${note.messageStatus != null && note.messageStatus != ''}"><p style="font-weight:bold"><small>Selected Status: ${note.messageStatus}</small><p></c:if>
                             ${note.note}
                         </td>
                         <td >

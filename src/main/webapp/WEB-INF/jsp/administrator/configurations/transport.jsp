@@ -352,7 +352,46 @@
                                     </c:forEach>
                                 </div>
                             </div>
-                           
+                            
+                           <div id="wsDiv" class="methodDiv" style="display:none">
+                                <div id="wsDanger" class="alert alert-danger" style="display:none;">
+                                	<c:if test="${configurationDetails.type == 1}">
+                                		Inbound domain is a required field.
+                                	</c:if>
+                                	<c:if test="${configurationDetails.type == 2}">
+                                		Outbound email is a required field.
+                                	</c:if>
+                                    </div> 
+                                <div id="configurationDetailsTypeDiv" style="display:none;">
+                               	 <input name="configurationDetailsType" id="configurationDetailsType" class="form-control" type="hidden" value="${configurationDetails.type}"  />
+                                </div>
+                                <div class="row">
+                                    <c:forEach items="${transportDetails.webServiceFields}" var="webServiceFields" varStatus="field">
+                                        <div class="form-group col-md-6">
+                                            <div class="form-group">
+                                                <label for="status">Web Service <c:choose><c:when test="${webServiceFields.method == 1}">Inbound</c:when><c:otherwise>Outbound</c:otherwise></c:choose> Details</label>
+                                                <input name="webServiceFields[${field.index}].method" class="form-control" type="hidden" value="${webServiceFields.method}"  />
+                                                <input name="webServiceFields[${field.index}].id" id="id${webServiceFields.method}" class="form-control" type="hidden" value="${webServiceFields.id}"  />
+                                            </div>
+                                            <c:if test="${webServiceFields.method == 1}">
+                                        	<div id="wsDomain${wsFields.method}Div" class="form-group">
+                                                <label class="control-label" for="domain${webServiceFields.method}">Domain *</label>
+                                                <input name="webServiceFields[${field.index}].domain" id="domain${webServiceFields.method}" class="form-control" type="text" maxLength="255" value="${webServiceFields.domain}"  />
+                                                <span id="wsDomain${wsFields.method}Msg" class="control-label"></span>
+                                            </div> 
+                                            </c:if>
+                                            <c:if test="${webServiceFields.method == 2}">
+                                        	<div id="wsEmail${wsFields.method}Div" class="form-group">
+                                                <label class="control-label" for="email${webServiceFields.method}">Email *</label>
+                                                <input name="webServiceFields[${field.index}].email" id="email${webServiceFields.method}" class="form-control" type="text" maxLength="255" value="${webServiceFields.email}"  />
+                                                <span id="wsEmail${wsFields.method}Msg" class="control-label"></span>
+                                            </div> 
+                                            </c:if>                               
+                                        </div>
+                                    </c:forEach>
+                                </div>
+                            </div>                            
+                            
                         </div>
                     </div>
                 </section>

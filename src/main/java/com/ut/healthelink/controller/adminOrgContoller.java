@@ -4,8 +4,9 @@ import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -19,6 +20,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.ut.healthelink.model.Organization;
@@ -130,6 +132,9 @@ public class adminOrgContoller {
 
         //Get the object that will hold the states
         mav.addObject("stateList", stateList.getStates());
+        
+        List<Organization> organizations = organizationManager.getOrganizations();
+        mav.addObject("organizationList", organizations);
         return mav;
 
     }
@@ -226,6 +231,9 @@ public class adminOrgContoller {
 
         //Get the object that will hold the states
         mav.addObject("stateList", stateList.getStates());
+        
+        List<Organization> organizations = organizationManager.getOrganizations();
+        mav.addObject("organizationList", organizations);
 
         return mav;
 
@@ -440,6 +448,17 @@ public class adminOrgContoller {
     public @ResponseBody
     ModelAndView createsystemUser(@Valid @ModelAttribute(value = "userdetails") User userdetails, BindingResult result, RedirectAttributes redirectAttr, @PathVariable String cleanURL) throws Exception {
 
+    	if (userdetails.getsectionList() == null) {
+    		ModelAndView mav = new ModelAndView();
+            List<siteSections> sections = userManager.getSections();
+            mav.addObject("sections", sections);
+            mav.addObject("sectionListError", true);          
+            mav.setViewName("/administrator/organizations/users/details");
+            mav.addObject("btnValue", "Create");
+            return mav;	
+    		
+    	}
+    	
         if (result.hasErrors()) {
             ModelAndView mav = new ModelAndView();
             mav.setViewName("/administrator/organizations/users/details");
@@ -461,6 +480,7 @@ public class adminOrgContoller {
             return mav;
         }
 
+        userdetails = userManager.encryptPW(userdetails);
         userManager.createUser(userdetails);
 
         ModelAndView mav = new ModelAndView("/administrator/organizations/users/details");
@@ -484,6 +504,16 @@ public class adminOrgContoller {
     public @ResponseBody
     ModelAndView updatesystemUser(@Valid @ModelAttribute(value = "userdetails") User userdetails, BindingResult result, RedirectAttributes redirectAttr, @PathVariable String cleanURL) throws Exception {
 
+    	if (userdetails.getsectionList() == null) {
+    		ModelAndView mav = new ModelAndView();
+            List<siteSections> sections = userManager.getSections();
+            mav.addObject("sections", sections);
+            mav.addObject("sectionListError", true);          
+            mav.setViewName("/administrator/organizations/users/details");
+            mav.addObject("btnValue", "Update");
+            return mav;	
+    		
+    	}
         if (result.hasErrors()) {
             ModelAndView mav = new ModelAndView();
             List<siteSections> sections = userManager.getSections();
@@ -507,9 +537,19 @@ public class adminOrgContoller {
                 return mav;
             }
         }
-
+        
+        /** need to check user's password, if blank, we do not change **/
+        
+        //here we get salt and redo password
+        if (!userdetails.getPassword().equalsIgnoreCase("")) {
+        	userdetails = userManager.encryptPW(userdetails);
+        } else  {
+        	userdetails.setRandomSalt(currentUser.getRandomSalt());
+        	userdetails.setEncryptedPw(currentUser.getEncryptedPw());
+        }
+        
         userManager.updateUser(userdetails);
-
+        
         ModelAndView mav = new ModelAndView("/administrator/organizations/users/details");
         mav.addObject("success", "userUpdated");
         return mav;
@@ -1214,5 +1254,69 @@ public class adminOrgContoller {
         ModelAndView mav = new ModelAndView(new RedirectView("../brochures?msg=deleted"));
         return mav;
     }
+    
+    /** login as response body **/
+    @RequestMapping(value = "/{cleanURL}/loginAs", method = RequestMethod.POST)
+    public @ResponseBody
+    ModelAndView loginAs(@PathVariable String cleanURL, HttpServletRequest request) throws Exception {
+
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/organizations/users/login");
+        
+        
+        //Set the id of the organization for the new provider
+        List<Organization> organization = organizationManager.getOrganizationByName(cleanURL);
+        Organization orgDetails = organization.get(0);
+        /**
+         * Set the private variable to hold the id of the clicked organization.
+         */
+        orgId = orgDetails.getId();
+
+        String loginAsUser = request.getParameter("loginAsUser");
+        List <User> usersList = userManager.getUsersByStatuRolesAndOrg(true, Arrays.asList(1), Arrays.asList(orgId), true);
+        mav.addObject("usersList", usersList);
+        mav.addObject("loginAsUser", loginAsUser);
+        return mav;
+    }
+    
+    /** login as post check - response body **/
+    @RequestMapping(value = "/{cleanURL}/loginAsCheck", method = RequestMethod.POST)
+    public @ResponseBody
+    ModelAndView checkLoginAsPW(@PathVariable String cleanURL, HttpServletRequest request,  
+    		Authentication authentication) throws Exception {
+
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/organizations/users/login");
+        
+        User user = userManager.getUserByUserName(authentication.getName());
+        boolean okToLoginAs = false;
+        
+        /** we verify existing password **/
+        if (user.getRoleId() == 1 || user.getRoleId() == 4) {
+	        try  {
+	        	okToLoginAs = userManager.authenticate(request.getParameter("j_password"), user.getEncryptedPw(), user.getRandomSalt());
+	        } catch(Exception ex) {
+	        	okToLoginAs = false;
+	        }
+        }
+        
+        if (okToLoginAs) {
+        	mav.addObject("msg", "pwmatched");
+        } else {
+        	 //Set the id of the organization for the new provider
+            List<Organization> organization = organizationManager.getOrganizationByName(cleanURL);
+            Organization orgDetails = organization.get(0);
+            orgId = orgDetails.getId();
+            
+        	String loginAsUser = request.getParameter("loginAsUser");
+            List <User> usersList = userManager.getUsersByStatuRolesAndOrg(true, Arrays.asList(1), Arrays.asList(orgId), true);
+            mav.addObject("usersList", usersList);
+            mav.addObject("loginAsUser", loginAsUser);
+            
+        }
+        return mav;
+    }
+    
+    
 
 }

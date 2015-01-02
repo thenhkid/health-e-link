@@ -14,7 +14,7 @@
                     <div class="media-body">
                        <h2>Welcome <c:out value="${userDetails.firstName}" />!</h2>
                        <p>
-                           Listed below are your configured methods for exchanging data with the universal translator.
+                           Listed below are your configured methods for exchanging data with your eReferral partners.
                        </p>
                     </div>
                 </div>
@@ -52,6 +52,10 @@
                     </c:when>
                 </c:choose>
             </c:forEach> 
+            <h3><a href="#settingsModal" id="settings" data-toggle="modal" title="Account Settings" class="settings">Account Settings</a></h3>
+                        <p class="text">
+                            Update your account settings.
+                        </p>
             
 	</div>
     </div>

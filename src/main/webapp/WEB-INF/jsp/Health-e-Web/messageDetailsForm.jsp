@@ -15,10 +15,10 @@
 
             <ol class="breadcrumb">
                 <li><a href="<c:url value='/profile'/>">My Account</a></li>
-                <li><a href="#">eRG</a></li>
+                <li><a href="<c:url value='/Health-e-Web/inbox'/>">eRG</a></li>
                 <c:choose>
                     <c:when test="${pageHeader == 'pending'}">
-                        <li><a href="<c:url value='/Health-e-Web/pending'/>">Pending Batches</a></li>
+                        <li><a href="<c:url value='/Health-e-Web/pending'/>">Pending</a></li>
                     </c:when>
                 </c:choose>
                 <li class="active">
@@ -72,6 +72,7 @@
             <form:form id="messageForm" action="/Health-e-Web/submitMessage" modelAttribute="transaction" role="form" class="form" method="post">
                 <input type="hidden" id="action" name="action" value="save" />
                 <form:hidden path="orgId" />
+                <form:hidden path="sourceSubOrgId" />
                 <form:hidden path="configId" />
                 <form:hidden path="messageTypeId" />
                 <form:hidden path="batchName" />
@@ -82,11 +83,21 @@
                 <form:hidden path="targetConfigId" />
                 <form:hidden path="transactionTargetId" />
                 <form:hidden path="targetOrgId" />
+                <form:hidden path="targetSubOrgId" />
                 <form:hidden path="orginialTransactionId" />
                 <input type="hidden" id="attachmentIds" name="attachmentIds" value="" />
                 <c:forEach items="${transaction.sourceOrgFields}" varStatus="i">
                     <form:hidden path="sourceOrgFields[${i.index}].fieldValue" />
-                    <form:hidden path="sourceOrgFields[${i.index}].fieldNo" />
+                    
+                    <c:choose>
+                        <c:when test="${empty sourceOrgFields[i.index].fieldNo}">
+                            <form:hidden path="sourceOrgFields[${i.index}].fieldNo" value="${i.index+1}" />
+                        </c:when>
+                        <c:otherwise>
+                            <form:hidden path="sourceOrgFields[${i.index}].fieldNo" />
+                        </c:otherwise>
+                    </c:choose>
+                    
                 </c:forEach>
                 <c:forEach items="${transaction.targetOrgFields}" varStatus="t">
                     <form:hidden path="targetOrgFields[${t.index}].fieldValue" />
@@ -224,19 +235,44 @@
                                         <c:if test="${patientInfo.readOnly == true}">
                                             <input type="hidden" name="patientFields[${pfield.index}].fieldValue" value="${patientInfo.fieldValue}" />
                                         </c:if>
-                                        <div class="col-md-6 ${(pfield.index mod 2) == 0 ? 'cb' : ''}">
+                                        <c:choose>
+                                             <c:when test="${patientInfo.fieldType == 5}">
+                                                 <div class="col-md-12" style="clear:both;">
+                                             </c:when>
+                                             <c:otherwise>
+                                                 <div class="col-md-6 ${(pfield.index mod 2) == 0 ? 'cb' : ''}">
+                                             </c:otherwise>
+                                         </c:choose>
                                             <div id="fieldDiv_${patientInfo.fieldNo}" class="form-group">
-                                                <label class="control-label" for="${patientInfo.fieldNo}">
-                                                   ${patientInfo.fieldLabel}&nbsp;<c:if test="${patientInfo.required == true}">*&nbsp;</c:if></label>
+                                                <label class="control-label" for="${patientInfo.fieldNo}">${patientInfo.fieldLabel}&nbsp;<c:if test="${patientInfo.required == true}">*&nbsp;</c:if></label>
                                                 <c:choose>
-                                                    <c:when test="${patientInfo.fieldSelectOptions.size() > 0}">
-                                                        <select <c:if test="${patientInfo.readOnly == true}">disabled</c:if> id="${patientInfo.fieldNo}" name="patientFields[${pfield.index}].fieldValue" class="form-control <c:if test="${patientInfo.required == true}"> required</c:if>">
-                                                            <option value="">-Choose-</option>
-                                                            <c:forEach items="${patientInfo.fieldSelectOptions}" var="options">
-                                                                <option value="${options.optionValue}" <c:if test="${patientInfo.fieldValue == options.optionValue}">selected</c:if>>${options.optionDesc}</option>
-                                                            </c:forEach>
-                                                        </select>
+                                                    <%--
+                                                        Field Type Values
+                                                        1 = Text Box
+                                                        2 = Drop Down
+                                                        3 = Radio
+                                                        4 = Date
+                                                        5 = Comment Box
+                                                    --%>
+                                                    <c:when test="${patientInfo.fieldType == 2 || patientInfo.fieldSelectOptions.size() > 0}">
+                                                        <c:choose>
+                                                            <c:when test="${patientInfo.fieldSelectOptions.size() > 0}">
+                                                                <select <c:if test="${patientInfo.readOnly == true}">disabled</c:if> id="${patientInfo.fieldNo}" name="patientFields[${pfield.index}].fieldValue" class="form-control <c:if test="${patientInfo.required == true}"> required</c:if>">
+                                                                    <option value="">-Choose-</option>
+                                                                    <c:forEach items="${patientInfo.fieldSelectOptions}" var="options">
+                                                                        <option value="${options.optionValue}" <c:if test="${patientInfo.fieldValue == options.optionValue || options.optionValue == options.defaultValue}">selected</c:if>>${options.optionDesc}</option>
+                                                                    </c:forEach>
+                                                                </select>
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <input <c:if test="${patientInfo.readOnly == true}">disabled</c:if> id="${patientInfo.fieldNo}" name="patientFields[${pfield.index}].fieldValue" value="${patientInfo.fieldValue}" class="form-control ${patientInfo.validation.replace(' ','-')} <c:if test="${patientInfo.required == true}"> required</c:if>" type="text">
+                                                            </c:otherwise>
+                                                        </c:choose>
                                                     </c:when>
+                                                    <c:when test="${patientInfo.fieldType == 5}">
+                                                        <textarea rows="5" maxlength="500" id="${patientInfo.fieldNo}" name="patientFields[${pfield.index}].fieldValue" class="form-control ${patientFields.validation.replace(' ','-')} <c:if test="${patientInfo.required == true}"> required</c:if>">${patientInfo.fieldValue}</textarea>
+                                                    </c:when>
+                                                    <%-- Text Box Default --%>    
                                                     <c:otherwise>
                                                         <input <c:if test="${patientInfo.readOnly == true}">disabled</c:if> id="${patientInfo.fieldNo}" name="patientFields[${pfield.index}].fieldValue" value="${patientInfo.fieldValue}" class="form-control ${patientInfo.validation.replace(' ','-')} <c:if test="${patientInfo.required == true}"> required</c:if>" type="text">
                                                     </c:otherwise>
@@ -251,18 +287,52 @@
                                     <div class="col-md-12"><h4 class="form-section-heading">Message Details: </h4></div>
                                     <c:forEach items="${transaction.detailFields}" var="detailInfo" varStatus="dfield">
                                          <input type="hidden" name="detailFields[${dfield.index}].fieldNo" value="${detailInfo.fieldNo}" />
-                                         <div class="col-md-6 ${(dfield.index mod 2) == 0 ? 'cb' : ''}">
+                                         <c:choose>
+                                             <c:when test="${detailInfo.fieldType == 5}">
+                                                 <div class="col-md-12" style="clear:both;">
+                                             </c:when>
+                                             <c:otherwise>
+                                                 <div class="col-md-6 ${(dfield.index mod 2) == 0 ? 'cb' : ''}">
+                                             </c:otherwise>
+                                         </c:choose>
                                             <div id="fieldDiv_${detailInfo.fieldNo}" class="form-group">
                                                 <label class="control-label" for="fieldA">${detailInfo.fieldLabel} <c:if test="${detailInfo.required == true}">&nbsp;*</c:if></label>
                                                 <c:choose>
-                                                    <c:when test="${detailInfo.fieldSelectOptions.size() > 0}">
-                                                        <select id="${detailInfo.fieldNo}" name="detailFields[${dfield.index}].fieldValue" class="form-control <c:if test="${detailInfo.required == true}"> required</c:if>">
-                                                            <option value="">-Choose-</option>
-                                                            <c:forEach items="${detailInfo.fieldSelectOptions}" var="options">
-                                                                <option value="${options.optionValue}" <c:if test="${detailInfo.fieldValue == options.optionValue}">selected</c:if>>${options.optionDesc}</option>
-                                                            </c:forEach>
-                                                        </select>
+                                                    <%--
+                                                        Field Type Values
+                                                        1 = Text Box
+                                                        2 = Drop Down
+                                                        3 = Radio
+                                                        4 = Date
+                                                        5 = Comment Box
+                                                    --%>
+                                                    <c:when test="${detailInfo.fieldType == 2 || detailInfo.fieldSelectOptions.size() > 0}">
+                                                        <c:choose>
+                                                            <c:when test="${detailInfo.fieldSelectOptions.size() > 0}">
+                                                                <select id="${detailInfo.fieldNo}" name="detailFields[${dfield.index}].fieldValue" class="form-control <c:if test="${detailInfo.required == true}"> required</c:if>">
+                                                                    <option value="">-Choose-</option>
+                                                                    <c:forEach items="${detailInfo.fieldSelectOptions}" var="options">
+                                                                        <option value="${options.optionValue}" <c:if test="${detailInfo.fieldValue == options.optionValue || options.optionValue == options.defaultValue}">selected</c:if>>${options.optionDesc}</option>
+                                                                    </c:forEach>
+                                                                </select>
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <c:choose>
+                                                                    <c:when test="${detailInfo.readOnly == true}">
+                                                                        <input disabled value="${detailInfo.fieldValue}" class="form-control ${detailInfo.validation.replace(' ','-')} type="text">
+                                                                        <input type="hidden" id="${detailInfo.fieldNo}" name="detailFields[${dfield.index}].fieldValue" value="${detailInfo.fieldValue}" />
+                                                                    </c:when>
+                                                                    <c:otherwise>
+                                                                        <input id="${detailInfo.fieldNo}" name="detailFields[${dfield.index}].fieldValue" value="${detailInfo.fieldValue}" class="form-control ${detailInfo.validation.replace(' ','-')} <c:if test="${detailInfo.required == true}"> required</c:if>" type="text">
+                                                                    </c:otherwise>
+                                                                </c:choose>
+                                                            </c:otherwise>
+                                                        </c:choose>
+                                                    </c:when>  
+                                                    <c:when test="${detailInfo.fieldType == 5}">
+                                                        <textarea rows="5" maxlength="500" id="${detailInfo.fieldNo}" name="detailFields[${dfield.index}].fieldValue" class="form-control textarea ${detailInfo.validation.replace(' ','-')} <c:if test="${detailInfo.required == true}"> required</c:if>">${detailInfo.fieldValue}</textarea>
                                                     </c:when>
+                                                    <%-- Text Box Default --%>                    
                                                     <c:otherwise>
                                                         <c:choose>
                                                             <c:when test="${detailInfo.readOnly == true}">

@@ -7,16 +7,20 @@ require(['./main'], function () {
     
         var selMethodId = $('#transportMethod').val() 
         //Show file/download/FTP fields
-        if(selMethodId === "1" || selMethodId === "3" || selMethodId === "5") {
+        if(selMethodId == "1" || selMethodId == "3" || selMethodId == "5" || selMethodId == "6") {
             $('#upload-downloadDiv').show();
         }
 
-        if(selMethodId === "3") {
+        if(selMethodId == "3") {
             $('#additionalFTPDiv').show();
         }
         
-        if(selMethodId === "5") {
+        if(selMethodId == "5") {
         	$('#rhapsodyDiv').show();
+        }
+        
+        if(selMethodId == "6") {
+        	$('#wsDiv').show();
         }
 
         if(selMethodId !== "2" && selMethodId !== "") {
@@ -35,16 +39,20 @@ require(['./main'], function () {
            $('.methodDiv').hide();
 
            //Show file/download/FTP fields
-           if(methodId === "1" || methodId === "3" || methodId === "5") {
+           if(methodId == "1" || methodId == "3" || methodId == "5" || methodId == "6") {
                $('#upload-downloadDiv').show();
            }
 
-           if(methodId === "3") {
+           if(methodId == "3") {
                $('#additionalFTPDiv').show();
            }
           
-           if(methodId === "5") {
+           if(methodId == "5") {
         	   $('#rhapsodyDiv').show();
+           }
+           
+           if(methodId == "6") {
+        	   $('#wsDiv').show();
            }
            
            if(methodId !== "2" && methodId !== "") {
@@ -223,7 +231,7 @@ function checkFormFields() {
        hasErrors = 1;
     }
     
-    if (selMethodId === "1" || selMethodId === "3" || selMethodId === "5") {
+    if (selMethodId === "1" || selMethodId === "3" || selMethodId === "5" || selMethodId === "6") {
        
        //Make sure the file size is numeric and greate than 0
        if($('#maxFileSize').val() <= 0 || !$.isNumeric($('#maxFileSize').val())) {
@@ -382,10 +390,9 @@ function checkFormFields() {
      
        }
        
-       
-       if(selMethodId === "5") {
+       if(selMethodId == "5") {
     		//Check rhapsody get Fields
-    	          if($('#rDirectory1').val() === "") {
+    	          if($('#rDirectory1').val() == "") {
     	                $('#rDirectory1Div').addClass("has-error");
     	                $('#rDirectory1Msg').addClass("has-error");
     	                $('#rDirectory1Msg').html('The directory is a required field.');
@@ -394,7 +401,7 @@ function checkFormFields() {
 
     	        //Check rhapsody push Fields
     	           
-    	            if($('#rDirectory2').val() === "") {
+    	            if($('#rDirectory2').val() == "") {
     	                $('#rDirectory2Div').addClass("has-error");
     	                $('#rDirectory2Msg').addClass("has-error");
     	                $('#rDirectory2Msg').html('The directory is a required field.');
@@ -406,7 +413,36 @@ function checkFormFields() {
     	            hasErrors = 1;
     	        }
     	     
-    	       }
+    	 }
+       
+       if(selMethodId == "6") {
+      		//Check ws get Fields
+    	   		  /** domain 1 is a required field is configurationDetails.type == 1 **/
+    	  
+    	   if($('#configurationDetailsType').val() == "1") {
+      	          if($('#domain1').val() == "") {
+      	                $('#wsDomain1Div').addClass("has-error");
+      	                $('#wsDomain1Msg').addClass("has-error");
+      	                $('#wsDomain1Msg').html('The domain for inbound is a required field.');
+      	                hasErrors = 1;
+      	            }
+    	   }
+      	         
+      	        //Check ws push Fields
+    	   if($('#configurationDetailsType').val() == "2") {      
+      	            if($('#email2').val() == "") {
+      	                $('#wsEmail2Div').addClass("has-error");
+      	                $('#wsEmail2Msg').addClass("has-error");
+      	                $('#wsEmail2Msg').html('The email for outbound is a required field.');
+      	                hasErrors = 1;
+      	            }
+    	   }    
+      	            
+      	        if(hasErrors == 1) {
+      	            $('#wsDanger').show();
+      	            hasErrors = 1;
+      	        }
+      	 }
        
     }
     

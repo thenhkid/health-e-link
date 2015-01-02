@@ -60,8 +60,9 @@
                                     <a href="javascript:void(0);" title="My Account" data-toggle="dropdown">My Account <b class="caret"></b></a>
                                     <ul class="dropdown-menu" role="menu" aria-labelledby="My account dropdown">
                                         <li><a href="<c:url value='/profile'/>" title="My Account">My Account</a></li>
-                                            <c:if test="${not empty userAccess}">
-                                                <c:forEach items="${userAccess}" var="sections" varStatus="aStatus">
+                                         <li><a href="#settingsModal" id="settings" data-toggle="modal" title="Account Settings" class="settings">Account Settings</a></li>
+                                        <c:if test="${not empty userAccess}">
+                                            <c:forEach items="${userAccess}" var="sections" varStatus="aStatus">
                                                 <li>
                                                     <c:choose>
                                                         <c:when test="${sections.featureId == 3}"><a href="<c:url value='/Health-e-Web/inbox'/>" title="Health-e-Web">ERG</a></c:when>

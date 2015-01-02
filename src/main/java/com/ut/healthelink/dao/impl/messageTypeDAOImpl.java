@@ -306,7 +306,7 @@ public class messageTypeDAOImpl implements messageTypeDAO {
             Integer transportDetailId = (Integer) transportDetails.uniqueResult();
 
             //Bulk insert the new fieldinto the configurationTransportDetails table for the online form
-            Query bulkInsert = sessionFactory.getCurrentSession().createSQLQuery("INSERT INTO configurationFormFields (messageTypeFieldId, configId, transportDetailId, fieldNo, fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, useField, saveToTableName, saveToTableCol, autoPopulateTableName, autoPopulateTableCol) SELECT id, :configId, :transportDetailId, fieldNo,  fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, 0, saveToTableName, saveToTableCol, autoPopulateTableName, autoPopulateTableCol FROM messageTypeFormFields where id = :newfieldId");
+            Query bulkInsert = sessionFactory.getCurrentSession().createSQLQuery("INSERT INTO configurationFormFields (messageTypeFieldId, configId, transportDetailId, fieldNo, fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, useField, saveToTableName, saveToTableCol, autoPopulateTableName, autoPopulateTableCol, fieldType) SELECT id, :configId, :transportDetailId, fieldNo,  fieldDesc, fieldLabel, validationType, required, bucketNo, bucketDspPos, 0, saveToTableName, saveToTableCol, autoPopulateTableName, autoPopulateTableCol, fieldType FROM messageTypeFormFields where id = :newfieldId");
             bulkInsert.setParameter("configId", configuration.getId());
             bulkInsert.setParameter("transportDetailId", transportDetailId);
             bulkInsert.setParameter("newfieldId", lastId);
@@ -322,7 +322,7 @@ public class messageTypeDAOImpl implements messageTypeDAO {
     @SuppressWarnings("rawtypes")
     @Transactional
     public List getInformationTables() {
-        Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT distinct table_name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'healthelink' and TABLE_NAME LIKE 'message\\_%'");
+        Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT distinct table_name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'universalTranslator' and TABLE_NAME LIKE 'message\\_%'");
 
         return query.list();
     }
@@ -334,7 +334,7 @@ public class messageTypeDAOImpl implements messageTypeDAO {
     @SuppressWarnings("rawtypes")
     @Transactional
     public List getAllTables() {
-        Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT distinct table_name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'healthelink'");
+        Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT distinct table_name FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'universalTranslator'");
 
         return query.list();
     }
@@ -347,7 +347,7 @@ public class messageTypeDAOImpl implements messageTypeDAO {
     @SuppressWarnings("rawtypes")
     @Transactional
     public List getTableColumns(String tableName) {
-        Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'healthelink' AND TABLE_NAME = :tableName and COLUMN_NAME not in ('id', 'dateCreated', 'transactionInId') order by COLUMN_NAME")
+        Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = 'universalTranslator' AND TABLE_NAME = :tableName and COLUMN_NAME not in ('id', 'dateCreated', 'transactionInId') order by COLUMN_NAME")
                 .setParameter("tableName", tableName);
 
         return query.list();
@@ -363,6 +363,18 @@ public class messageTypeDAOImpl implements messageTypeDAO {
     public List getValidationTypes() {
         Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT id, validationType FROM ref_validationTypes order by id asc");
 
+        return query.list();
+    }
+    
+    /**
+     * The 'getFieldTypes' function will return a list of available field types
+     */
+    @Override
+    @SuppressWarnings("rawtypes")
+    @Transactional
+    public List getFieldTypes() {
+        Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT id, fieldType FROM ref_fieldTypes order by id asc");
+        
         return query.list();
     }
 

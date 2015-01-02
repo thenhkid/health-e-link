@@ -46,6 +46,11 @@ public class messageType {
     @Column(name = "NAME", nullable = false)
     private String name;
     
+    @NotEmpty
+    @NoHtml
+    @Column(name = "DISPLAYNAME", nullable = false)
+    private String dspName;
+    
     @NoHtml
     @Column(name = "TEMPLATEFILE", nullable = true)
     private String templateFile;
@@ -114,4 +119,12 @@ public class messageType {
         this.dataTranslations = dataTranslations;
     }
 
+    public String getDspName() {
+        return dspName;
+    }
+
+    public void setDspName(String dspName) {
+        this.dspName = dspName;
+    }
+    
 }

@@ -54,6 +54,9 @@ public interface messageTypeDAO {
 
     @SuppressWarnings("rawtypes")
     List getDelimiters();
+    
+    @SuppressWarnings("rawtypes")
+    List getFieldTypes();
 
     Long getTotalFields(int messageTypeId);
 

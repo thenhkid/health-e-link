@@ -8,12 +8,14 @@ import org.hibernate.transform.Transformers;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import com.ut.healthelink.dao.userDAO;
+import com.ut.healthelink.model.Organization;
 import com.ut.healthelink.model.User;
 import com.ut.healthelink.model.UserActivity;
 import com.ut.healthelink.model.siteSections;
 import com.ut.healthelink.model.userAccess;
-
+import java.util.ArrayList;
 
 /**
  * The userDAOImpl class will implement the DAO access layer to handle updates for organization system users
@@ -47,7 +49,7 @@ public class userDAOImpl implements userDAO {
         //Need to insert the updated sections
         List<Integer> userSections = user.getsectionList();
 
-		//Loop through the selected sections and save them for the user
+        //Loop through the selected sections and save them for the user
         //This will populate the 'rel_userSiteFeatures' table
         for (int i = 0; i < userSections.size(); i++) {
             userAccess newusersections = new userAccess();
@@ -101,21 +103,40 @@ public class userDAOImpl implements userDAO {
     public User getUserById(int userId) {
         return (User) sessionFactory.getCurrentSession().get(User.class, userId);
     }
-    
+
     /**
      * The 'getUsersByOrganization' function will return users based on the orgId passed in
-     * 
+     *
      * @param orgId The organization id to find users for
-     * 
+     *
      * @return The function will return a list of user objects
      */
     @Override
     public List<User> getUsersByOrganization(int orgId) {
-        Query query = sessionFactory.getCurrentSession().createSQLQuery("SELECT id, firstName, lastName, userType FROM users where status = 1 and orgId = :orgId order by lastName asc, firstName asc");
-              query.setParameter("orgId", orgId);
-              
-        return query.list();
-        
+
+        List<Integer> OrgIds = new ArrayList<Integer>();
+        OrgIds.add(orgId);
+
+        Criteria subOrgQuery = sessionFactory.getCurrentSession().createCriteria(Organization.class);
+        subOrgQuery.add(Restrictions.eq("status", true));
+        subOrgQuery.add(Restrictions.eq("parentId", orgId));
+
+        List<Organization> subOrgs = subOrgQuery.list();
+
+        if (!subOrgs.isEmpty()) {
+            for (Organization org : subOrgs) {
+                OrgIds.add(org.getId());
+            }
+        }
+
+        Criteria users = sessionFactory.getCurrentSession().createCriteria(User.class);
+        users.add(Restrictions.eq("status", true));
+        users.add(Restrictions.in("orgId", OrgIds));
+
+        List<User> userList = users.list();
+
+        return userList;
+
     }
 
     /**
@@ -196,14 +217,13 @@ public class userDAOImpl implements userDAO {
         List<userAccess> userSectionList = query.list();
         return userSectionList;
     }
-    
+
     /**
-     * The 'getOrganizationContact' function will return a user based on the organization id passed in
-     * and the mainContact parameter;
-     * 
-     * @orgId         The id of the organization to search a user on
-     * @mainContact   The value of the contact type to return (1 = Primary, 2 = Secondary)
-     * 
+     * The 'getOrganizationContact' function will return a user based on the organization id passed in and the mainContact parameter;
+     *
+     * @orgId The id of the organization to search a user on
+     * @mainContact The value of the contact type to return (1 = Primary, 2 = Secondary)
+     *
      * @return The function will return a user object
      */
     @Override
@@ -212,123 +232,116 @@ public class userDAOImpl implements userDAO {
         Query query = sessionFactory.getCurrentSession().createQuery("from User where orgId = :orgId and mainContact = :mainContact");
         query.setParameter("orgId", orgId);
         query.setParameter("mainContact", mainContact);
-        
+
         return query.list();
-       
+
     }
-    
+
     /**
-     * The 'getUserByIdentifier' function will try to location a user based on the identifier
-     * passed in.
-     * 
+     * The 'getUserByIdentifier' function will try to location a user based on the identifier passed in.
+     *
      * @param identifier The value that will be used to find a user.
-     * 
+     *
      * @return The function will return a user object
      */
     @Override
     public Integer getUserByIdentifier(String identifier) {
-        
+
         String sql = ("select id from users where lower(email) = '" + identifier + "' or lower(username) = '" + identifier + "' or lower(concat(concat(firstName,' '),lastName)) = '" + identifier + "'");
-        
+
         Query findUser = sessionFactory.getCurrentSession().createSQLQuery(sql);
-         
-        if(findUser.list().size() > 1) {
+
+        if (findUser.list().size() > 1) {
             return null;
-        }
-        else {
-            if(findUser.uniqueResult() == null) {
+        } else {
+            if (findUser.uniqueResult() == null) {
                 return null;
-            }
-            else {
+            } else {
                 return (Integer) findUser.uniqueResult();
             }
         }
     }
-    
+
     /**
      * The 'getUserByResetCode' function will try to location a user based on the a reset code
-     * 
+     *
      * @param resetCode The value that will be used to find a user.
-     * 
+     *
      * @return The function will return a user object
      */
     @Override
     public User getUserByResetCode(String resetCode) {
-        
+
         Query query = sessionFactory.getCurrentSession().createQuery("from User where resetCode = :resetCode");
         query.setParameter("resetCode", resetCode);
-        
-        if(query.list().size() > 1) {
+
+        if (query.list().size() > 1) {
             return null;
-        }
-        else {
-            if(query.uniqueResult() == null) {
+        } else {
+            if (query.uniqueResult() == null) {
                 return null;
-            }
-            else {
+            } else {
                 return (User) query.uniqueResult();
             }
         }
     }
-   
+
     /**
      * The 'insertUserLog' function will take a userActivity and insert the information into the database
-     * 
-     * @userActivity       An activity of the user
+     *
+     * @userActivity An activity of the user
      * @return no return is expected
      */
     @Override
     public void insertUserLog(UserActivity userActivity) {
-    	try {
-    		sessionFactory.getCurrentSession().save(userActivity);
-    	} catch (Exception ex) {
-    		System.err.println("insertUserLog " + ex.getCause());
-    		ex.printStackTrace();
-    	}
+        try {
+            sessionFactory.getCurrentSession().save(userActivity);
+        } catch (Exception ex) {
+            System.err.println("insertUserLog " + ex.getCause());
+            ex.printStackTrace();
+        }
     }
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public UserActivity getUAById(Integer uaId) {
-		try {
-			Query query = sessionFactory.getCurrentSession().createSQLQuery("select * from userActivity where id = :uaId").setResultTransformer(Transformers.aliasToBean(UserActivity.class));
-	        query.setParameter("uaId", uaId);
-	        List <UserActivity> uaList = query.list();
+    @Override
+    @SuppressWarnings("unchecked")
+    public UserActivity getUAById(Integer uaId) {
+        try {
+            Query query = sessionFactory.getCurrentSession().createSQLQuery("select * from userActivity where id = :uaId").setResultTransformer(Transformers.aliasToBean(UserActivity.class));
+            query.setParameter("uaId", uaId);
+            List<UserActivity> uaList = query.list();
             if (uaList.size() > 0) {
-            	return uaList.get(0);
+                return uaList.get(0);
             }
-    	} catch (Exception ex) {
-    		System.err.println("getUAById " + ex.getCause());
-    		ex.printStackTrace();
-    	}
-		return null;
-	}
+        } catch (Exception ex) {
+            System.err.println("getUAById " + ex.getCause());
+            ex.printStackTrace();
+        }
+        return null;
+    }
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public List<User> getUserByTypeByOrganization(int orgId) {
-		try {
-			Query query = sessionFactory.getCurrentSession().createQuery("from User where orgId = :orgId and status = 1 order by userType");
-			query.setParameter("orgId", orgId);
-			List<User> users = query.list();
-			return users;
-		} catch (Exception ex) {
-			System.err.println("getUserByTypeByOrganization " + ex.getCause());
-    		ex.printStackTrace();
-			return null;
-		}
-	}
-	
-	
-	@Override
-	@SuppressWarnings("unchecked")
-	public List <User> getSendersForConfig (List <Integer> configIds) {
-		try {
-		 	String sql = ("select * from users where id in (select userId from configurationconnectionsenders where connectionId in "
-		 			+ " (select id from configurationconnections "
-		 			+ " where sourceConfigId in ( :configId))) order by userType;");
-            
-		 	
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<User> getUserByTypeByOrganization(int orgId) {
+        try {
+            Query query = sessionFactory.getCurrentSession().createQuery("from User where orgId = :orgId and status = 1 order by userType");
+            query.setParameter("orgId", orgId);
+            List<User> users = query.list();
+            return users;
+        } catch (Exception ex) {
+            System.err.println("getUserByTypeByOrganization " + ex.getCause());
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<User> getSendersForConfig(List<Integer> configIds) {
+        try {
+            String sql = ("select * from users where id in (select userId from configurationconnectionsenders where connectionId in "
+                    + " (select id from configurationconnections "
+                    + " where sourceConfigId in ( :configId))) order by userType;");
+
             Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
                     Transformers.aliasToBean(User.class));
             query.setParameterList("configId", configIds);
@@ -342,17 +355,16 @@ public class userDAOImpl implements userDAO {
             ex.printStackTrace();
             return null;
         }
-	}
+    }
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public List<User> getOrgUsersForConfig(List <Integer> configIds) {
-		try {
-		 	String sql = ("select * from users where orgId in (select orgId from configurations where id "
-		 			+ " in ( :configId ) "
-		 			+ " and status = 1) order by userType;");
-            
-		 	
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<User> getOrgUsersForConfig(List<Integer> configIds) {
+        try {
+            String sql = ("select * from users where orgId in (select orgId from configurations where id "
+                    + " in ( :configId ) "
+                    + " and status = 1) order by userType;");
+
             Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
                     Transformers.aliasToBean(User.class));
             query.setParameterList("configId", configIds);
@@ -366,25 +378,83 @@ public class userDAOImpl implements userDAO {
             ex.printStackTrace();
             return null;
         }
-	}
+    }
 
-	@Override
-	@SuppressWarnings("unchecked")
-	public List<User> getAllUsers() {
-		 Query query = sessionFactory.getCurrentSession().createQuery("from User");
-		 
-		 List<User> userList = query.list();
-	     return userList;
-	}
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<User> getAllUsers() {
+        Query query = sessionFactory.getCurrentSession().createQuery("from User");
 
-	@Override
-	public void updateUserActivity(UserActivity userActivity) {
-		try {
-			sessionFactory.getCurrentSession().update(userActivity);
-		} catch (Exception ex) {
-			System.err.println("updateUserActivity  " + ex.getCause());
+        List<User> userList = query.list();
+        return userList;
+    }
+
+    @Override
+    public void updateUserActivity(UserActivity userActivity) {
+        try {
+            sessionFactory.getCurrentSession().update(userActivity);
+        } catch (Exception ex) {
+            System.err.println("updateUserActivity  " + ex.getCause());
             ex.printStackTrace();
-       }
-		
-	}
+        }
+
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    @Transactional
+    public List<String> getUserRoles(User user) {
+        try {
+            String sql = ("select r.role from users u inner join userRoles r on u.roleId = r.id where u.status = 1 and u.username = :userName");
+
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+            query.setParameter("userName", user.getUsername());
+            List<String> roles = query.list();
+
+            return roles;
+
+        } catch (Exception ex) {
+            System.err.println("getUserRoles  " + ex.getCause());
+            ex.printStackTrace();
+            return null;
+        }
+    }
+
+    @Override
+    @Transactional
+    public void updateUserOnly(User user) throws Exception {
+        sessionFactory.getCurrentSession().update(user);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<User> getUsersByStatuRolesAndOrg(boolean status, List<Integer> rolesToExclude, List<Integer> orgs, boolean include) throws Exception {
+        String sql = ("select users.*, orgName from users, organizations "
+                + " where users.status = :status and users.orgId = organizations.id");
+
+        if (rolesToExclude.size() != 0) {
+            sql = sql + " and roleId not in (:rolesToExclude)";
+        }
+        if (orgs.size() != 0) {
+            sql = sql + " and orgId ";
+            if (!include) {
+                sql = sql + " not ";
+            }
+            sql = sql + " in (:orgs)";
+        }
+        sql = sql + " order by orgName, username";
+        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
+                Transformers.aliasToBean(User.class));
+        query.setParameter("status", status);
+        if (rolesToExclude.size() != 0) {
+            query.setParameterList("rolesToExclude", rolesToExclude);
+        }
+        if (orgs.size() != 0) {
+            query.setParameterList("orgs", orgs);
+        }
+
+        List<User> users = query.list();
+
+        return users;
+    }
 }

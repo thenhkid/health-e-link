@@ -1,5 +1,7 @@
 package com.ut.healthelink.service;
 
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.List;
 
 import com.ut.healthelink.model.User;
@@ -46,5 +48,24 @@ public interface userManager {
   List<User> getAllUsers();
   
   void updateUserActivity (UserActivity userActivity);
+  
+  byte[] generateSalt() throws NoSuchAlgorithmException;
+  
+  
+  byte[] getEncryptedPassword(String password, byte[] salt)
+		   throws NoSuchAlgorithmException, InvalidKeySpecException;
+  
+  boolean authenticate(String attemptedPassword, byte[] encryptedPassword, byte[] salt)
+		   throws NoSuchAlgorithmException, InvalidKeySpecException;
+  
+  User encryptPW (User user) throws Exception;
+  
+  List<String> getUserRoles (User user) throws Exception;
+  
+  void updateUserOnly(User user) throws Exception;
+  
+  List<User> getUsersByStatuRolesAndOrg(boolean status, List <Integer> rolesToExclude,  List <Integer> orgs, boolean include) throws Exception;
+
+  
 }
 

@@ -5,6 +5,8 @@
  */
 package com.ut.healthelink.controller;
 
+
+import com.ut.healthelink.model.activityReportList;
 import com.ut.healthelink.model.Organization;
 import com.ut.healthelink.model.Transaction;
 import com.ut.healthelink.model.TransportMethod;
@@ -42,6 +44,7 @@ import com.ut.healthelink.service.userManager;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -121,9 +124,187 @@ public class adminProcessingActivity {
 
     private String archivePath = "/bowlink/archivesIn/";
     
-  //final status Ids
-    private List<Integer> finalStatusIds = Arrays.asList(11, 12, 13, 16);
+    
+    /**
+     * 
+     */
+    @RequestMapping(value = "/activityReport", method = RequestMethod.GET)
+    public ModelAndView activityReport(HttpSession session) throws Exception {
 
+        int year = 114;
+        int month = 0;
+        int day = 1;
+        Date originalDate = new Date(year, month, day);
+        
+        Date fromDate = getMonthDate("START");
+        Date toDate = getMonthDate("END");
+        
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/processing-activity/activityReport");
+        
+        /* Retrieve search parameters from session */
+        searchParameters searchParameters = (searchParameters) session.getAttribute("searchParameters");
+        
+        if ("".equals(searchParameters.getsection()) || !"activityReport".equals(searchParameters.getsection())) {
+            searchParameters.setfromDate(fromDate);
+            searchParameters.settoDate(toDate);
+            searchParameters.setsection("activityReport");
+        } else {
+            fromDate = searchParameters.getfromDate();
+            toDate = searchParameters.gettoDate();
+        }
+        
+        mav.addObject("fromDate", fromDate);
+        mav.addObject("toDate", toDate);
+        mav.addObject("originalDate", originalDate);
+        
+        /* Get the list of batches for the passed in dates */
+        List<Integer> batchIds = transactionInManager.getBatchesForReport(fromDate, toDate);
+        
+        /* Get totals */
+        BigInteger totalReferrals = transactionInManager.getReferralCount(batchIds);
+        mav.addObject("totalReferrals", totalReferrals);
+        
+        
+        BigInteger totalFBReports = transactionInManager.getFeedbackReportCount(batchIds);
+        mav.addObject("totalFBReports", totalFBReports);
+        
+        /* Get FB List */
+        List<activityReportList> feedbackReportList = transactionInManager.getFeedbackReportList(batchIds);
+        mav.addObject("feedbackReportList", feedbackReportList);
+        
+        Map<String, BigInteger> fbMade = new HashMap<String, BigInteger>();
+        
+        if(feedbackReportList != null && !feedbackReportList.isEmpty()) {
+            for(activityReportList fb : feedbackReportList) {
+
+                if(fbMade.containsKey(fb.getMessageType())) {
+                    BigInteger currTotal = fbMade.get(fb.getMessageType());
+                    currTotal = currTotal.add(fb.getTotal());
+                    fbMade.put(fb.getMessageType(),currTotal);
+                }
+                else {
+                    fbMade.put(fb.getMessageType(), fb.getTotal());
+                }
+            }
+        }
+        mav.addObject("fbTypesMade", fbMade);
+        
+        /* Get Referral List */
+        List<activityReportList> referralList = transactionInManager.getReferralList(batchIds);
+        mav.addObject("referralList", referralList);      
+        
+        Map<String, BigInteger> referralsMade = new HashMap<String, BigInteger>();
+        
+        if(referralList != null && !referralList.isEmpty()) {
+            for(activityReportList referral : referralList) {
+
+                if(referralsMade.containsKey(referral.getMessageType())) {
+                    BigInteger currTotal = referralsMade.get(referral.getMessageType());
+                    currTotal = currTotal.add(referral.getTotal());
+                    referralsMade.put(referral.getMessageType(),currTotal);
+                }
+                else {
+                    referralsMade.put(referral.getMessageType(), referral.getTotal());
+                }
+            }
+        }
+        mav.addObject("referralTypesMade", referralsMade);
+        
+         /* Get the activity status totals */
+        List<Integer> activityStatusTotals = transactionInManager.getActivityStatusTotals(batchIds);
+        mav.addObject("totalCompleted", activityStatusTotals.get(0));
+        mav.addObject("totalEnrolled", activityStatusTotals.get(1));
+        
+        
+        return mav;
+
+    }
+    
+    /**
+     * 
+     */
+    @RequestMapping(value = "/activityReport", method = RequestMethod.POST)
+    public ModelAndView activityReport(@RequestParam Date fromDate, @RequestParam Date toDate, HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
+
+        int year = 114;
+        int month = 0;
+        int day = 1;
+        Date originalDate = new Date(year, month, day);
+
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/processing-activity/activityReport");
+        
+        mav.addObject("fromDate", fromDate);
+        mav.addObject("toDate", toDate);
+        mav.addObject("originalDate", originalDate);
+
+        /* Retrieve search parameters from session */
+        searchParameters searchParameters = (searchParameters) session.getAttribute("searchParameters");
+        searchParameters.setfromDate(fromDate);
+        searchParameters.settoDate(toDate);
+        searchParameters.setsection("activityReport");
+        
+         /* Get the list of batches for the passed in dates */
+        List<Integer> batchIds = transactionInManager.getBatchesForReport(fromDate, toDate);
+        
+        /* Get totals */
+        BigInteger totalReferrals = transactionInManager.getReferralCount(batchIds);
+        mav.addObject("totalReferrals", totalReferrals);
+        
+        BigInteger totalFBReports = transactionInManager.getFeedbackReportCount(batchIds);
+        mav.addObject("totalFBReports", totalFBReports);
+        
+        /* Get FB List */
+        List<activityReportList> feedbackReportList = transactionInManager.getFeedbackReportList(batchIds);
+        mav.addObject("feedbackReportList", feedbackReportList);
+        
+        Map<String, BigInteger> fbMade = new HashMap<String, BigInteger>();
+        
+        if(feedbackReportList != null && !feedbackReportList.isEmpty()) {
+            for(activityReportList fb : feedbackReportList) {
+
+                if(fbMade.containsKey(fb.getMessageType())) {
+                    BigInteger currTotal = fbMade.get(fb.getMessageType());
+                    currTotal = currTotal.add(fb.getTotal());
+                    fbMade.put(fb.getMessageType(),currTotal);
+                }
+                else {
+                    fbMade.put(fb.getMessageType(), fb.getTotal());
+                }
+            }
+        }
+        mav.addObject("fbTypesMade", fbMade);
+        
+        /* Get Referral List */
+        List<activityReportList> referralList = transactionInManager.getReferralList(batchIds);
+        mav.addObject("referralList", referralList);      
+        
+        Map<String, BigInteger> referralsMade = new HashMap<String, BigInteger>();
+        
+        if(referralList != null && !referralList.isEmpty()) {
+            for(activityReportList referral : referralList) {
+
+                if(referralsMade.containsKey(referral.getMessageType())) {
+                    BigInteger currTotal = referralsMade.get(referral.getMessageType());
+                    currTotal = currTotal.add(referral.getTotal());
+                    referralsMade.put(referral.getMessageType(),currTotal);
+                }
+                else {
+                    referralsMade.put(referral.getMessageType(), referral.getTotal());
+                }
+            }
+        }
+        mav.addObject("referralTypesMade", referralsMade);
+        
+        /* Get the activity status totals */
+        List<Integer> activityStatusTotals = transactionInManager.getActivityStatusTotals(batchIds);
+        mav.addObject("totalCompleted", activityStatusTotals.get(0));
+        mav.addObject("totalEnrolled", activityStatusTotals.get(1));
+        
+        return mav;
+
+    }
 
     /**
      * The '/inbound' GET request will serve up the existing list of generated referrals and feedback reports
@@ -176,7 +357,7 @@ public class adminProcessingActivity {
             List<batchUploads> uploadedBatches = transactionInManager.getAllUploadedBatches(fromDate, toDate, fetchCount);
 
             if (!uploadedBatches.isEmpty()) {
-
+                
                 //we can map the process status so we only have to query once
                 List<lu_ProcessStatus> processStatusList = sysAdminManager.getAllProcessStatus();
                 Map<Integer, String> psMap = new HashMap<Integer, String>();
@@ -206,7 +387,51 @@ public class adminProcessingActivity {
                 }
 
                 for (batchUploads batch : uploadedBatches) {
-
+                    
+                    Integer totalOpen = 0;
+                    Integer totalClosed = 0;
+                    
+                    //Get the upload type (Referral or Feedback Report
+                    List<transactionIn> transactions = transactionInManager.getBatchTransactions(batch.getId(), 0);
+                    
+                    if(!transactions.isEmpty()) {
+                        
+                        transactionIn transactionDetails = transactionInManager.getTransactionDetails(transactions.get(0).getId());
+                        if(transactionDetails.gettransactionTargetId() > 0) {
+                            batch.setUploadType("Feedback Report");
+                            
+                            transactionTarget targetDetails = transactionInManager.getTransactionTargetDetails(transactionDetails.gettransactionTargetId());
+                            
+                            if(targetDetails != null) {
+                                /* Get the originating referall batch ID */
+                                batchUploads referringbatch = transactionInManager.getBatchDetails(targetDetails.getbatchUploadId());
+                                batch.setReferringBatch(referringbatch.getutBatchName());
+                            }
+                            else {
+                                batch.setReferringBatch("Not Found");
+                            }
+                            
+                        }
+                        else {
+                            batch.setUploadType("Referral");
+                            
+                            for(transactionIn transaction : transactions) {
+                                if(transaction.getmessageStatus() == 1) {
+                                    totalOpen+=1;
+                                }
+                                else {
+                                    totalClosed += 1;
+                                }
+                            }
+                            
+                            batch.setTotalOpen(totalOpen);
+                            batch.setTotalClosed(totalClosed);
+                        }
+                    }
+                    else {
+                        batch.setUploadType("Referral");
+                    }
+                    
                     //the count is in totalRecordCount already, can skip re-count
                     // batch.settotalTransactions(transactionInManager.getRecordCounts(batch.getId(), statusIds, false, false));
                     batch.setstatusValue(psMap.get(batch.getstatusId()));
@@ -265,7 +490,7 @@ public class adminProcessingActivity {
         systemSummary summaryDetails = transactionInManager.generateSystemInboundSummary();
         mav.addObject("summaryDetails", summaryDetails);
 
-        /* Get all inbound transactions */
+        /* Get all inbound transactions */ 
         try {
 
             Integer fetchCount = 0;
@@ -302,6 +527,52 @@ public class adminProcessingActivity {
                 }
 
                 for (batchUploads batch : uploadedBatches) {
+                    
+                    Integer totalOpen = 0;
+                    Integer totalClosed = 0;
+                    
+                    //Get the upload type (Referral or Feedback Report
+                    List<transactionIn> transactions = transactionInManager.getBatchTransactions(batch.getId(), 0);
+                    
+                    if(!transactions.isEmpty()) {
+                        transactionIn transactionDetails = transactionInManager.getTransactionDetails(transactions.get(0).getId());
+                        if(transactionDetails.gettransactionTargetId() > 0) {
+                            batch.setUploadType("Feedback Report");
+                            
+                            transactionTarget targetDetails = transactionInManager.getTransactionTargetDetails(transactionDetails.gettransactionTargetId());
+                            
+                            if(targetDetails != null) {
+                                /* Get the originating referall batch ID */
+                                batchUploads referringbatch = transactionInManager.getBatchDetails(targetDetails.getbatchUploadId());
+                                batch.setReferringBatch(referringbatch.getutBatchName());
+                            }
+                            else {
+                                batch.setReferringBatch("Not Found");
+                            }
+                            
+                        }
+                        else {
+                            batch.setUploadType("Referral");
+                            
+                            for(transactionIn transaction : transactions) {
+                                if(transaction.getmessageStatus() == 1) {
+                                    totalOpen+=1;
+                                }
+                                else {
+                                    totalClosed += 1;
+                                }
+                            }
+                            
+                            batch.setTotalOpen(totalOpen);
+                            batch.setTotalClosed(totalClosed);
+                        }
+                    }
+                    else {
+                        batch.setUploadType("Referral");
+                        batch.setTotalOpen(totalOpen);
+                        batch.setTotalClosed(totalClosed);
+                    }
+                    
                     batch.setstatusValue(psMap.get(batch.getstatusId()));
 
                     batch.setorgName(orgMap.get(batch.getOrgId()));
@@ -612,6 +883,7 @@ public class adminProcessingActivity {
                     transactionDetails.setstatusId(transaction.getstatusId());
                     transactionDetails.setdateSubmitted(transaction.getdateCreated());
                     transactionDetails.setconfigId(transaction.getconfigId());
+                    transactionDetails.setmessageStatus(transaction.getmessageStatus());
                     
                     transactionDetails.setstatusValue(psMap.get(transaction.getstatusId()));
 
@@ -776,6 +1048,29 @@ public class adminProcessingActivity {
                     List<transactionRecords> fromFields;
                     if (!sourceInfoFormFields.isEmpty()) {
                         fromFields = setInboxFormFields(sourceInfoFormFields, records, 0, true, 0);
+                        
+                        int sourceOrgAsInt = 0;
+                    
+                        try {
+                            sourceOrgAsInt = Integer.parseInt(fromFields.get(0).getFieldValue().trim());
+                        } catch (Exception e) {
+                            sourceOrgAsInt = 0;
+                        }
+
+                        if(sourceOrgAsInt > 0) {
+                            /* Make sure the org exists */
+                            Organization fromorgDetails = organizationmanager.getOrganizationById(sourceOrgAsInt);
+                            if(fromorgDetails.getId() == sourceOrgAsInt) {
+                                fromFields = setOrgDetails(sourceOrgAsInt);
+                            }
+                            else {
+                                fromFields = setOrgDetails(transactionOutManager.getDownloadSummaryDetails(transaction.getId()).getsourceOrgId());
+                            }
+                        }
+                        else if ("".equals(fromFields.get(0).getFieldValue()) || fromFields.get(0).getFieldValue() == null) {
+                            fromFields = setOrgDetails(transactionOutManager.getDownloadSummaryDetails(transaction.getId()).getsourceOrgId());
+                        }
+                        
                     } else {
                         fromFields = setOrgDetails(transactionOutManager.getDownloadSummaryDetails(transaction.getId()).getsourceOrgId());
                     }
@@ -1069,10 +1364,29 @@ public class adminProcessingActivity {
                 List<transactionRecords> toFields;
                 if (!targetInfoFormFields.isEmpty()) {
                     toFields = setOutboundFormFields(targetInfoFormFields, records, transactionInfo.getconfigId(), 0, true, 0);
+                    
+                    int targetOrgAsInt;
 
-                    if ("".equals(toFields.get(0).getFieldValue()) || toFields.get(0).getFieldValue() == null) {
+                    try {
+                        targetOrgAsInt = Integer.parseInt(toFields.get(0).getFieldValue().trim());
+                    } catch (Exception e) {
+                        targetOrgAsInt = 0;
+                    }
+
+                    if(targetOrgAsInt > 0) {
+                        /* Make sure the org exists */
+                        Organization orgDetails = organizationmanager.getOrganizationById(targetOrgAsInt);
+                        if(orgDetails.getId() == targetOrgAsInt) {
+                            toFields = setOrgDetails(targetOrgAsInt);
+                        }
+                        else {
+                            toFields = setOrgDetails(transactionInManager.getUploadSummaryDetails(transactionInfo.getId()).gettargetOrgId());
+                        }
+                    }
+                    else if ("".equals(toFields.get(0).getFieldValue()) || toFields.get(0).getFieldValue() == null) {
                         toFields = setOrgDetails(transactionInManager.getUploadSummaryDetails(transactionInfo.getId()).gettargetOrgId());
                     }
+                    
                 } else {
                     toFields = setOrgDetails(transactionInManager.getUploadSummaryDetails(transactionInfo.getId()).gettargetOrgId());
                 }
@@ -1130,6 +1444,30 @@ public class adminProcessingActivity {
                 List<transactionRecords> fromFields;
                 if (!senderInfoFormFields.isEmpty()) {
                     fromFields = setInboxFormFields(senderInfoFormFields, records, transactionInfo.getconfigId(), true, 0);
+                    
+                    int sourceOrgAsInt = 0;
+                    
+                    try {
+                        sourceOrgAsInt = Integer.parseInt(fromFields.get(0).getFieldValue().trim());
+                    } catch (Exception e) {
+                        sourceOrgAsInt = 0;
+                    }
+                    
+                    if(sourceOrgAsInt > 0) {
+                        /* Make sure the org exists */
+                        Organization orgDetails = organizationmanager.getOrganizationById(sourceOrgAsInt);
+                        if(orgDetails.getId() == sourceOrgAsInt) {
+                            fromFields = setOrgDetails(sourceOrgAsInt);
+                        }
+                        else {
+                            fromFields = setOrgDetails(transactionOutManager.getDownloadSummaryDetails(transactionInfo.getId()).getsourceOrgId());
+                        }
+                    }
+                    else if ("".equals(fromFields.get(0).getFieldValue()) || fromFields.get(0).getFieldValue() == null) {
+                        fromFields = setOrgDetails(transactionOutManager.getDownloadSummaryDetails(transactionInfo.getId()).getsourceOrgId());
+                    }
+                    
+                    
                 } else {
                     fromFields = setOrgDetails(batchInfo.getOrgId());
                 }
@@ -1143,10 +1481,29 @@ public class adminProcessingActivity {
                 List<transactionRecords> toFields;
                 if (!targetInfoFormFields.isEmpty()) {
                     toFields = setInboxFormFields(targetInfoFormFields, records, transactionInfo.getconfigId(), true, 0);
+                    
+                    int targetOrgAsInt;
 
-                    if ("".equals(toFields.get(0).getFieldValue()) || toFields.get(0).getFieldValue() == null) {
+                    try {
+                        targetOrgAsInt = Integer.parseInt(toFields.get(0).getFieldValue().trim());
+                    } catch (Exception e) {
+                        targetOrgAsInt = 0;
+                    }
+
+                    if(targetOrgAsInt > 0) {
+                        /* Make sure the org exists */
+                        Organization orgDetails = organizationmanager.getOrganizationById(targetOrgAsInt);
+                        if(orgDetails.getId() == targetOrgAsInt) {
+                            toFields = setOrgDetails(targetOrgAsInt);
+                        }
+                        else {
+                            toFields = setOrgDetails(transactionOutManager.getDownloadSummaryDetails(transactionInfo.getId()).gettargetOrgId());
+                        }
+                    }
+                    else if ("".equals(toFields.get(0).getFieldValue()) || toFields.get(0).getFieldValue() == null) {
                         toFields = setOrgDetails(transactionOutManager.getDownloadSummaryDetails(transactionInfo.getId()).gettargetOrgId());
                     }
+
                 } else {
                     toFields = setOrgDetails(transactionOutManager.getDownloadSummaryDetails(transactionInfo.getId()).gettargetOrgId());
                 }
@@ -1634,7 +1991,7 @@ public class adminProcessingActivity {
 
             if (batchDetails.getstatusId() == 5) {
                 // now we check so we don't have to make a db hit if batch status is not 5 
-                if (transactionInManager.getRecordCounts(batchDetails.getId(), finalStatusIds, false, false) == 0) {
+                if (transactionInManager.getRecordCounts(batchDetails.getId(), Arrays.asList(11, 12, 13, 16), false, false) == 0) {
                     canSend = true;
                 }
             }
@@ -1792,7 +2149,7 @@ public class adminProcessingActivity {
                 if (batchDetails.getstatusId() == 5) {
                     transactionInManager.updateBatchStatus(batchId, 4, "startDateTime");
                     //check once again to make sure all transactions are in final status
-                    if (transactionInManager.getRecordCounts(batchId, finalStatusIds, false, false) == 0) {
+                    if (transactionInManager.getRecordCounts(batchId, Arrays.asList(11, 12, 13, 16), false, false) == 0) {
                         transactionInManager.updateBatchStatus(batchId, 6, "endDateTime");
                     } else {
                         transactionInManager.updateBatchStatus(batchId, 5, "endDateTime");

@@ -74,6 +74,9 @@ public class configurationFormFields {
     @NoHtml
     @Column(name = "AUTOPOPULATETABLECOL", nullable = false)
     private String autoPopulateTableCol;
+    
+    @Column(name = "FIELDTYPE", nullable = false)
+    private Integer fieldType = 1;
 
     public int getId() {
         return id;
@@ -209,6 +212,14 @@ public class configurationFormFields {
     
     public String getautoPopulateTableCol() {
         return autoPopulateTableCol;
+    }
+
+    public Integer getFieldType() {
+        return fieldType;
+    }
+
+    public void setFieldType(Integer fieldType) {
+        this.fieldType = fieldType;
     }
     
 }

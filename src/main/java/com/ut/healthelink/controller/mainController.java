@@ -9,6 +9,7 @@ import com.ut.healthelink.service.emailMessageManager;
 import com.ut.healthelink.service.newsArticleManager;
 import com.ut.healthelink.service.newsletterManager;
 import com.ut.healthelink.service.userManager;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -386,7 +387,7 @@ public class mainController {
         sb.append("<a href='" + resetURL + randomCode + "'>Click here to reset your password.</a>");
 
         messageDetails.setmessageBody(sb.toString());
-        messageDetails.setfromEmailAddress("dphuniversaltranslator@gmail.com");
+        messageDetails.setfromEmailAddress("info@health-e-link.net");
 
         emailMessageManager.sendEmail(messageDetails);
 
@@ -430,6 +431,7 @@ public class mainController {
         } else {
             userDetails.setresetCode(null);
             userDetails.setPassword(newPassword);
+            userDetails = usermanager.encryptPW(userDetails);
 
             //Return the sections for the clicked user
             List<userAccess> userSections = usermanager.getuserSections(userDetails.getId());
@@ -458,20 +460,14 @@ public class mainController {
      */
     public String generateRandomCode() {
 
-        StringBuilder code = new StringBuilder();
-
-        /* Generate a random 6 digit number for a confirmation code */
-        for (int i = 1; i <= 7; i++) {
-            Random rand = new Random();
-            int r = rand.nextInt(8) + 1;
-            code.append(r);
-        }
-
+    	Random random = new Random();
+        String randomCode = new BigInteger(130, random).toString(32);
+       
         /* Check to make sure there is not reset code already generated */
-        User usedCode = usermanager.getUserByResetCode(code.toString());
+        User usedCode = usermanager.getUserByResetCode(randomCode);
 
         if (usedCode == null) {
-            return code.toString();
+            return randomCode;
         } else {
 
             return generateRandomCode();

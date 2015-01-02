@@ -37,6 +37,11 @@ function searchByDateRange() {
    $('#fromDate').val(fromDate);
    $('#toDate').val(toDate);
    
+   $('body').overlay({
+        glyphicon : 'floppy-disk',
+        message : 'Processing...'
+    });
+   
    $('#searchForm').submit();
 
 }

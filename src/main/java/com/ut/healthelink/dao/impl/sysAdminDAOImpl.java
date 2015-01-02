@@ -866,4 +866,12 @@ public class sysAdminDAOImpl implements sysAdminDAO {
         
     }
 
+	@Override
+	@Transactional
+	public Long findTotalUsers() throws Exception {
+		Query query = sessionFactory.getCurrentSession().createQuery("select count(id) as totalUsers from User");
+        Long totalUsers = (Long) query.uniqueResult();
+        return totalUsers;
+	}
+
 }

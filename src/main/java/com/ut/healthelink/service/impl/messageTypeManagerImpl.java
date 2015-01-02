@@ -231,6 +231,13 @@ public class messageTypeManagerImpl implements messageTypeManager {
     public String getValidationById(int id) {
         return messageTypeDAO.getValidationById(id);
     }
+    
+    @SuppressWarnings("rawtypes")
+    @Override
+    @Transactional
+    public List getFieldTypes() {
+        return messageTypeDAO.getFieldTypes();
+    }
 
     @SuppressWarnings("rawtypes")
     @Override

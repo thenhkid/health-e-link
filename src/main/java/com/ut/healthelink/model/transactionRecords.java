@@ -22,6 +22,7 @@ public class transactionRecords {
     private String fieldLabel = null;
     private int transactionId;
     private boolean readOnly = false;
+    private Integer fieldType = 1;
     
     private String errorDesc = null;
     private String errorData = null;
@@ -132,4 +133,12 @@ public class transactionRecords {
         this.errorData = errorData;
     }
 
+    public Integer getFieldType() {
+        return fieldType;
+    }
+
+    public void setFieldType(Integer fieldType) {
+        this.fieldType = fieldType;
+    }
+    
 }

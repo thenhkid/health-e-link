@@ -316,6 +316,24 @@ require(['./main'], function () {
 
         });
         
+        //Function that will handle setting a default value for a field
+        //selected crosswalk.
+        $(document).on('change', '.setDefaultValue', function() {
+            var id = $(this).attr('rel');
+            var value = $(this).val();
+            
+             //Need to update the saved process order
+            $.ajax({
+                url: 'updateDefaultValue?fieldId=' + id + '&selValue=' + value,
+                type: "POST",
+                success: function(data) {
+                    $('#translationMsgDiv').show();
+                    populateExistingTranslations(1);
+                }
+            });
+            
+        });
+        
     });
 });
 

@@ -6,7 +6,7 @@
     <caption style="display:none">Attachments</caption>
     <thead>
         <tr>
-            <th scope="col">File Name</th>
+            <th scope="col" style="width:60%">File Name</th>
             <th scope="col">File Location</th>
             <th scope="col" class="center-text"></th>
         </tr>
@@ -16,8 +16,19 @@
             <c:when test="${attachments.size() > 0}">
                 <c:forEach items="${attachments}" var="attachment" varStatus="tStatus">
                     <tr id="attachmentRow-${attachment.id}">
-                        <td scope="row">
-                            ${tStatus.index+1}.&nbsp;<c:choose><c:when test="${not empty attachment.title}">${attachment.title}</c:when><c:otherwise>${attachment.fileName}</c:otherwise></c:choose>
+                        <td scope="row" id="filenameDsp-${attachment.id}">
+                            ${tStatus.index+1}.&nbsp;<span id="dsptitle-${attachment.id}"><c:choose><c:when test="${not empty attachment.title}">${attachment.title}</c:when><c:otherwise>${attachment.fileName}</c:otherwise></c:choose></span>
+                        </td>
+                        <td scope="row" id="filenameEdit-${attachment.id}" style="display:none;">
+                            ${tStatus.index+1}.&nbsp;
+                            <c:choose>
+                                <c:when test="${not empty attachment.title}">
+                                    <input type="text"  style="width:60%" name="title" class="title-${attachment.id}" value="${attachment.title}" />
+                                </c:when>
+                                <c:otherwise>
+                                    <input type="text" style="width:60%" name="title" class="title-${attachment.id}" value="${attachment.fileName}" />
+                                </c:otherwise>
+                            </c:choose>
                         </td>
                         <td>
                             ${attachment.fileLocation}
@@ -31,8 +42,21 @@
                                     </a>
                                 </c:when>
                                 <c:otherwise>
-                                    <a href="javascript:void(0);" class="btn btn-link removeAttachment" rel="${attachment.id}" title="Remove this attachment.">
+                                    <a href="javascript:void(0);" class="btn btn-link editAttachment" rel="${attachment.id}" id="edit-${attachment.id}" title="Edit this attachment.">
                                         <span class="glyphicon glyphicon-edit"></span>
+                                        Edit
+                                    </a>
+                                    <a href="javascript:void(0);" class="btn btn-link saveAttachment" rel="${attachment.id}" id="saveedit-${attachment.id}" title="Save" style="display:none;">
+                                        <span class="glyphicon glyphicon-save"></span>
+                                        Save
+                                    </a>
+                                    <a href="javascript:void(0);" class="btn btn-link cancelAttachment" rel="${attachment.id}" id="canceledit-${attachment.id}" title="Cancel" style="display:none;">
+                                        <span class="glyphicon custom-icon icon-cancel"></span>
+                                        Cancel
+                                    </a>    
+                                        
+                                    <a href="javascript:void(0);" class="btn btn-link removeAttachment" rel="${attachment.id}" title="Remove this attachment.">
+                                        <span class="glyphicon  glyphicon-edit"></span>
                                         Remove
                                     </a>
                                 </c:otherwise>

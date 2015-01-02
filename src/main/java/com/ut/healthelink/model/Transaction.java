@@ -16,6 +16,7 @@ import java.util.List;
 public class Transaction {
     
    private int orgId;
+   private int sourceSubOrgId;
    private int userId;
    private int configId;
    private String batchName = null;
@@ -26,6 +27,7 @@ public class Transaction {
    private int messageTypeId;
    private int transactionStatusId;
    private int targetOrgId;
+   private int targetSubOrgId = 0;
    private List<Integer> targetConfigId;
    private boolean autoRelease = true;
    private Date dateSubmitted = null;
@@ -350,6 +352,22 @@ public class Transaction {
     
     public void setmessageStatus(int messageStatus) {
         this.messageStatus = messageStatus;
+    }
+
+    public int getTargetSubOrgId() {
+        return targetSubOrgId;
+    }
+
+    public void setTargetSubOrgId(int targetSubOrgId) {
+        this.targetSubOrgId = targetSubOrgId;
+    }
+    
+    public int getSourceSubOrgId() {
+        return sourceSubOrgId;
+    }
+
+    public void setSourceSubOrgId(int sourceSubOrgId) {
+        this.sourceSubOrgId = sourceSubOrgId;
     }
 
 }

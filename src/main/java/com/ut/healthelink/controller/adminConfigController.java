@@ -65,6 +65,10 @@ import org.apache.commons.net.ftp.FTPReply;
 import org.apache.commons.net.ftp.FTPSClient;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
+import com.ut.healthelink.model.configurationWebServiceFields;
+import java.util.HashMap;
+import java.util.Map;
+
 
 @Controller
 @RequestMapping("/administrator/configurations")
@@ -212,6 +216,10 @@ public class adminConfigController {
     public @ResponseBody List<User> getUsers(@RequestParam(value = "orgId", required = true) int orgId) {
         
         List<User> users = userManager.getUsersByOrganization(orgId);
+        
+        for(User user : users) {
+            user.setOrgName(organizationmanager.getOrganizationById(user.getOrgId()).getOrgName());
+        }
         
         return users;
     } 
@@ -524,6 +532,30 @@ public class adminConfigController {
             transportDetails.setRhapsodyFields(rhapsodyFields);
         }
         
+      //get WS fields
+        List<configurationWebServiceFields> wsFields = configurationTransportManager.getTransWSDetails(transportDetails.getId());
+        
+        
+        if(wsFields.isEmpty()) {
+        	
+            List<configurationWebServiceFields> emptyWSFields = new ArrayList<configurationWebServiceFields>();
+            configurationWebServiceFields inboundWSFields = new configurationWebServiceFields();
+            inboundWSFields.setMethod(1);
+            inboundWSFields.setDomain("");
+            
+            configurationWebServiceFields outboundWSFields = new configurationWebServiceFields();
+            outboundWSFields.setMethod(2);
+            outboundWSFields.setDomain(""); 
+            
+            emptyWSFields.add(inboundWSFields);
+            emptyWSFields.add(outboundWSFields);
+            
+            transportDetails.setWebServiceFields(emptyWSFields);
+        }
+        else {
+            transportDetails.setWebServiceFields(wsFields);
+        }
+        
         
         //Need to get a list of all configurations for the current organization
         List<configuration> configurations = configurationmanager.getConfigurationsByOrgId(configurationDetails.getorgId(),"");
@@ -656,6 +688,14 @@ public class adminConfigController {
             for(configurationRhapsodyFields rhapsodyFields : transportDetails.getRhapsodyFields()) {
             	rhapsodyFields.setTransportId(transportId);
                 configurationTransportManager.saveTransportRhapsody(rhapsodyFields);
+            }
+        }
+        
+        
+        if(transportDetails.gettransportMethodId() == 6 && !transportDetails.getWebServiceFields().isEmpty()) {
+            for(configurationWebServiceFields wsFields : transportDetails.getWebServiceFields()) {
+            	wsFields.setTransportId(transportId);
+                configurationTransportManager.saveTransportWebService(wsFields);
             }
         }
         
@@ -885,10 +925,13 @@ public class adminConfigController {
         //Set the variable to hold the number of completed steps for this configuration;
         mav.addObject("stepsCompleted", stepsCompleted);
         
-         //Get the list of available field validation types
+        //Get the list of available field validation types
         List validationTypes = messagetypemanager.getValidationTypes();
         mav.addObject("validationTypes", validationTypes);
-
+        
+        //Get the list of field types
+        List fieldTypes = messagetypemanager.getFieldTypes();
+        mav.addObject("fieldTypes", fieldTypes);
         
         return mav;
     }
@@ -932,7 +975,13 @@ public class adminConfigController {
         mav.addObject("templateFields", templateFields);
         
         mav.addObject("selTransportMethod", transportDetails.gettransportMethodId());
+        
+        List validationTypes = messagetypemanager.getValidationTypes();
+        mav.addObject("validationTypes", validationTypes);
        
+        //Get the list of field types
+        List fieldTypes = messagetypemanager.getFieldTypes();
+        mav.addObject("fieldTypes", fieldTypes);
         
         //Set the variable to hold the number of completed steps for this configuration;
         mav.addObject("stepsCompleted", stepsCompleted);
@@ -1121,6 +1170,9 @@ public class adminConfigController {
             String fieldName;
             String crosswalkName;
             String macroName;
+            Map<String, String> defaultValues;
+            String optionDesc;
+            String optionValue;
 
             for (configurationDataTranslations translation : existingTranslations) {
                 //Get the field name by id
@@ -1129,8 +1181,24 @@ public class adminConfigController {
 
                 //Get the crosswalk name by id
                 if (translation.getCrosswalkId() != 0) {
-                	crosswalkName = messagetypemanager.getCrosswalkName(translation.getCrosswalkId());
-                	translation.setcrosswalkName(crosswalkName);
+                    defaultValues = new HashMap<>();
+                    crosswalkName = messagetypemanager.getCrosswalkName(translation.getCrosswalkId());
+                    translation.setcrosswalkName(crosswalkName);
+
+                    /* Get values of crosswalk */
+                    List crosswalkdata = messagetypemanager.getCrosswalkData(translation.getCrosswalkId());
+
+                    Iterator cwDataIt = crosswalkdata.iterator();
+                    while (cwDataIt.hasNext()) {
+                        Object cwDatarow[] = (Object[]) cwDataIt.next();
+                        optionDesc = (String) cwDatarow[2];
+                        optionValue = (String) cwDatarow[0];
+
+                        defaultValues.put(optionValue, optionDesc);
+
+                    }
+                    
+                    translation.setDefaultValues(defaultValues);
                 }
                 
                 //Get the macro name by id
@@ -1197,6 +1265,27 @@ public class adminConfigController {
         translation.setProcessOrder(processOrder);
         translation.setPassClear(passClear);
         translation.setCategoryId(categoryId);
+        
+        if(cwId > 0) {
+            Map<String, String> defaultValues = new HashMap<>();;
+            String optionDesc;
+            String optionValue;
+            
+            /* Get values of crosswalk */
+            List crosswalkdata = messagetypemanager.getCrosswalkData(cwId);
+
+            Iterator cwDataIt = crosswalkdata.iterator();
+            while (cwDataIt.hasNext()) {
+                Object cwDatarow[] = (Object[]) cwDataIt.next();
+                optionDesc = (String) cwDatarow[2];
+                optionValue = (String) cwDatarow[0];
+
+                defaultValues.put(optionValue, optionDesc);
+
+            }
+
+            translation.setDefaultValues(defaultValues);
+        }
 
         translations.add(translation);
 
@@ -1255,6 +1344,30 @@ public class adminConfigController {
                 translation.setProcessOrder(newProcessOrder);
             } else if (translation.getProcessOrder() == newProcessOrder) {
                 translation.setProcessOrder(currProcessOrder);
+            }
+        }
+
+        return 1;
+    }
+    
+    /**
+     * The 'updateDefaultValue{params}' function will handle setting the crosswalk default value.
+     *
+     * @param	fieldId         This will hold the field that is being set
+     * @param	selValue	The selected default value
+     *
+     * @Return	1	The function will simply return a 1 back to the ajax call
+     */
+    @RequestMapping(value = "/updateDefaultValue{params}", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody
+    Integer updateDefaultValue(@RequestParam(value = "fieldId", required = true) Integer fieldId, @RequestParam(value = "selValue", required = true) String selValue) throws Exception {
+
+        Iterator<configurationDataTranslations> it = translations.iterator();
+
+        while (it.hasNext()) {
+            configurationDataTranslations translation = it.next();
+            if (translation.getId() == fieldId) {
+                translation.setDefaultValue(selValue);
             }
         }
 
@@ -1326,6 +1439,7 @@ public class adminConfigController {
                 
                 for(configurationConnectionSenders sender : senders) {
                     User userDetail = userManager.getUserById(sender.getuserId());
+                    userDetail.setOrgName(organizationmanager.getOrganizationById(userDetail.getOrgId()).getOrgName());
                     connectionSenders.add(userDetail);
                 }
                 connection.setconnectionSenders(connectionSenders);
@@ -1335,6 +1449,7 @@ public class adminConfigController {
                 
                 for(configurationConnectionReceivers receiver : receivers) {
                     User userDetail = userManager.getUserById(receiver.getuserId());
+                    userDetail.setOrgName(organizationmanager.getOrganizationById(userDetail.getOrgId()).getOrgName());
                     connectonReceivers.add(userDetail);
                 }
                 connection.setconnectionReceivers(connectonReceivers);
@@ -1408,6 +1523,7 @@ public class adminConfigController {
                 
         for(configurationConnectionSenders sender : senders) {
             User userDetail = userManager.getUserById(sender.getuserId());
+            userDetail.setOrgName(organizationmanager.getOrganizationById(userDetail.getOrgId()).getOrgName());
             connectionSenders.add(userDetail);
         }
         connectionDetails.setconnectionSenders(connectionSenders);
@@ -1417,6 +1533,7 @@ public class adminConfigController {
 
         for(configurationConnectionReceivers receiver : receivers) {
             User userDetail = userManager.getUserById(receiver.getuserId());
+            userDetail.setOrgName(organizationmanager.getOrganizationById(userDetail.getOrgId()).getOrgName());
             connectonReceivers.add(userDetail);
         }
         connectionDetails.setconnectionReceivers(connectonReceivers);
@@ -1469,10 +1586,10 @@ public class adminConfigController {
     @RequestMapping(value = "/addConnection.do", method = RequestMethod.POST)
     public ModelAndView addConnection (@ModelAttribute(value = "connectionDetails") configurationConnection connectionDetails, @RequestParam List<Integer> srcUsers, @RequestParam List<Integer> tgtUsers, RedirectAttributes redirectAttr) throws Exception {
        
-        connectionDetails.setStatus(true);
         Integer connectionId;
         
         if(connectionDetails.getId() == 0) {
+            connectionDetails.setStatus(true);
             connectionId = configurationmanager.saveConnection(connectionDetails);
             redirectAttr.addFlashAttribute("savedStatus", "created");
         }

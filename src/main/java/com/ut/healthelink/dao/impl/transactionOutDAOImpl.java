@@ -91,6 +91,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
                 + "select id from batchDownloadSummary where batchId = :batchId "
                 + "and transactionTargetId = :transactionTargetId "
                 + "and sourceOrgId = :sourceOrgId "
+                + "and sourceSubOrgId = :sourceSubOrgId "
                 + "and targetOrgId = :targetOrgId "
                 + "and messageTypeId = :messageTypeId "
                 + "and targetConfigId = :targetConfigId"
@@ -99,6 +100,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
         query.setParameter("batchId", summary.getbatchId());
         query.setParameter("transactionTargetId", summary.gettransactionTargetId());
         query.setParameter("sourceOrgId", summary.getsourceOrgId());
+        query.setParameter("sourceSubOrgId", summary.getSourceSubOrgId());
         query.setParameter("targetOrgId", summary.gettargetOrgId());
         query.setParameter("messageTypeId", summary.getmessageTypeId());
         query.setParameter("targetConfigId", summary.gettargetConfigId());
@@ -238,7 +240,10 @@ public class transactionOutDAOImpl implements transactionOutDAO {
 
         /* Get a list of available batches */
         Criteria batchSummaries = sessionFactory.getCurrentSession().createCriteria(batchDownloadSummary.class);
-        batchSummaries.add(Restrictions.eq("targetOrgId", orgId));
+        batchSummaries.add(Restrictions.or(
+                Restrictions.eq("targetOrgId", orgId), 
+                Restrictions.eq("targetSubOrgId", orgId)
+        ));
         batchSummaries.add(Restrictions.in("messageTypeId", messageTypeList));
         batchSummaries.add(Restrictions.in("sourceOrgId", sourceOrgList));
         List<batchDownloadSummary> batchDownloadSummaryList = batchSummaries.list();
@@ -902,7 +907,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
                     if (getData.uniqueResult() == null) {
                         sql += null + ",";
                     } else {
-                        sql += "'" + getData.uniqueResult() + "',";
+                        sql += "'" + getData.uniqueResult().toString().replace("'", "''") + "',";
                     }
                 }
             }
@@ -1422,8 +1427,13 @@ public class transactionOutDAOImpl implements transactionOutDAO {
         /* Get a list of available batches */
         Criteria batchSummaries = sessionFactory.getCurrentSession().createCriteria(batchDownloadSummary.class);
         batchSummaries.add(Restrictions.eq("transactionTargetId", transactionTargetId));
-
-        return (batchDownloadSummary) batchSummaries.uniqueResult();
+        
+        if(batchSummaries.list().size() > 1) {
+            return (batchDownloadSummary) batchSummaries.list().get(0);
+        }
+        else {
+            return (batchDownloadSummary) batchSummaries.uniqueResult();
+        }
 
     }
 
@@ -1603,11 +1613,16 @@ public class transactionOutDAOImpl implements transactionOutDAO {
      */
     @Override
     @Transactional
-    public List<batchDownloadSummary> getuploadBatchesByConfigAndSource(Integer configId, Integer orgId) {
+    public List<batchDownloadSummary> getuploadBatchesByConfigAndSource(Integer configId, Integer orgId, Integer userOrgId) {
 
         Criteria batchSummaries = sessionFactory.getCurrentSession().createCriteria(batchDownloadSummary.class);
         batchSummaries.add(Restrictions.eq("targetConfigId", configId));
         batchSummaries.add(Restrictions.eq("sourceOrgId", orgId));
+        batchSummaries.add(Restrictions.or(
+                Restrictions.eq("targetOrgId", userOrgId), 
+                Restrictions.eq("targetSubOrgId", userOrgId)
+        ));
+        
 
         return batchSummaries.list();
 
@@ -1657,5 +1672,21 @@ public class transactionOutDAOImpl implements transactionOutDAO {
         }
 
     }
+
+	
+    @Override
+	@Transactional
+	public List <String> getWSSenderFromBatchDLId(List<Integer> batchDLIds) throws Exception {
+		 	String SQL = "select senderEmail from batchUploads where id in "
+		 			+ " (select batchuploadId from transactiontarget where id in "
+		 			+ " (select transactionTargetId from transactionIN where id in "
+		 			+ " (select transactionInId from transactiontarget where batchDLId = :batchDLIds)))";
+		 	Query query = sessionFactory.getCurrentSession().createSQLQuery(SQL).setParameterList("batchDLIds", batchDLIds);
+		 	
+		 	List<String> emails = query.list();
+
+	        return emails;
+
+	}
 
 }

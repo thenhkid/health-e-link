@@ -262,6 +262,12 @@
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/organizations/brochures/list.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/admin/organization/brochures.js" />
     </definition>
+    
+    <!--  login as -->
+     <definition name="/administrator/organizations/users/login" extends="base.definition.admin">
+        <put-attribute name="body" value="/WEB-INF/jsp/administrator/organizations/users/loginAs.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/admin/organization/loginAs.js" />
+    </definition>
 
     <!-- Admin Message Type Library Definitions -->
     <definition name="/administrator/messageTypeLibrary/list" extends="base.definition.admin">
@@ -315,6 +321,7 @@
         <put-attribute name="page-section" value="section-dashboard" />
         <put-attribute name="title" value="Administrator" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=sysadmin" />
+        <put-attribute name="jscript" value="/dspResources/js/admin/sysadmin/index.js" />
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/sysadmin/index.jsp" />
     </definition>
     
@@ -399,6 +406,29 @@
         <put-attribute name="menu" value="/WEB-INF/jsp/administrator/sysadmin/menu.jsp?page=hl7List" />
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/sysadmin/hl7/details.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/admin/sysadmin/hl7/details.js" />
+    </definition>
+    
+    <!--  this displays the login as form -->
+    <definition name="/administrator/sysadmin/loginAs" extends="base.definition.admin">
+        <put-attribute name="page-id" value="sysadmin-loginAs" />
+        <put-attribute name="page-section" value="section-sysadmin" />
+        <put-attribute name="title" value="Administrator - Login As" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=sysadmin" />
+        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/sysadmin/actionBar.jsp?page=loginAs" />
+        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/sysadmin/menu.jsp?page=loginAs" />
+        <put-attribute name="body" value="/WEB-INF/jsp/administrator/sysadmin/loginAs/loginForm.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/admin/sysadmin/loginAs/loginForm.js" />
+    </definition>
+    
+    <definition name="/administrator/processing-activity/activityReport" extends="base.definition.admin">
+        <put-attribute name="page-id" value="processing-activityReport" />
+        <put-attribute name="page-section" value="section-processing" />
+        <put-attribute name="title" value="Administrator - Processing Activities" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=activity" />
+        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/processing-activities/actionBar.jsp?page=report" />
+        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/processing-activities/menu.jsp?page=report" />
+        <put-attribute name="body" value="/WEB-INF/jsp/administrator/processing-activities/activityReport.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/admin/processing-activities/activityReport.js" />
     </definition>
     
     <!--  this lists all news articles -->    
@@ -656,6 +686,15 @@
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=home&amp;page=profile" />
         <put-attribute name="body" value="/WEB-INF/jsp/profile/index.jsp" />
     </definition>
+    <!-- Profile (settings) Pages -->
+    <definition name="/profile/details" extends="base.definition.frontEnd">
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=home&amp;page=profile" />
+        <put-attribute name="body" value="/WEB-INF/jsp/profile/settings.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/front-end/profile/settings.js" />
+    </definition>
+    
+    
+    
     
     <!-- Health-e-Web (ERG) Pages -->
     

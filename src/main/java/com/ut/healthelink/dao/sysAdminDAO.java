@@ -143,4 +143,6 @@ public interface sysAdminDAO {
     List<lu_ProcessStatus> getAllProcessStatus() throws Exception;
     
     List<lu_ProcessStatus> getAllHistoryFormProcessStatus() throws Exception;
+    
+    Long findTotalUsers() throws Exception;
 }

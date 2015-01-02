@@ -2,6 +2,7 @@ package com.ut.healthelink.security;
 
 import com.ut.healthelink.model.Organization;
 import com.ut.healthelink.model.User;
+import com.ut.healthelink.model.UserActivity;
 import com.ut.healthelink.model.custom.searchParameters;
 import com.ut.healthelink.model.userAccess;
 import com.ut.healthelink.service.organizationManager;
@@ -36,8 +37,30 @@ public class CustomAuthenticationHandler extends SimpleUrlAuthenticationSuccessH
         Set<String> roles = AuthorityUtils.authorityListToSet(authentication.getAuthorities());
 
         usermanager.setLastLogin(authentication.getName());
-
-        if (roles.contains("ROLE_ADMIN") || roles.contains("ROLE_PROCESSINGADMIN")) {
+        /** log the admin who logged in as user**/
+        // System.out.println(request.getParameter("j_username"));
+      //we log here 
+        /* Need to get the userId */
+        User userDetails = usermanager.getUserByUserName(authentication.getName());
+        
+        if (!request.getParameter("j_username").equalsIgnoreCase(authentication.getName())) {
+	        try {
+	            //log user activity
+	        	User userLogDetails = usermanager.getUserByUserName(request.getParameter("j_username"));
+	            UserActivity ua = new UserActivity();
+	            ua.setUserId(userLogDetails.getId());
+	            ua.setFeatureId(0);
+	            ua.setAccessMethod("POST");
+	            ua.setPageAccess("/login");
+	            ua.setActivity("Login As User");
+	            ua.setActivityDesc("Login as user - " +  userDetails.getUsername() + ".  Id - " + userDetails.getId());
+	            usermanager.insertUserLog(ua);
+	        } catch (Exception ex) {
+	            System.err.println("Login Handler = error logging user " + ex.getCause());
+	            ex.printStackTrace();
+	        }
+        }
+        if (roles.contains("ROLE_ADMIN") || roles.contains("ROLE_PROCESSINGADMIN") || roles.contains("ROLE_SYSTEMADMIN")) {
             
             HttpSession session = request.getSession();
              
@@ -46,8 +69,6 @@ public class CustomAuthenticationHandler extends SimpleUrlAuthenticationSuccessH
             /* Need to store the search session object */
             session.setAttribute("searchParameters", searchParameters);
             
-            /* Need to get the userId */
-            User userDetails = usermanager.getUserByUserName(authentication.getName());
             
             /* Need to store the user object in session */
             session.setAttribute("userDetails", userDetails);
@@ -56,8 +77,6 @@ public class CustomAuthenticationHandler extends SimpleUrlAuthenticationSuccessH
         } 
         
         else if (roles.contains("ROLE_USER")) {
-            /* Need to get the userId */
-            User userDetails = usermanager.getUserByUserName(authentication.getName());
             
             Organization orgDetails = organizationManager.getOrganizationById(userDetails.getOrgId());
             

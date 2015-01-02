@@ -35,14 +35,14 @@ public class ExceptionControllerAdvice {
  
     @ExceptionHandler(Exception.class)
     public ModelAndView exception(HttpSession session, Exception e, Authentication authentication) throws Exception {
-        
+       
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/exception");
-        
+        try {
         mailMessage messageDetails = new mailMessage();
         
         messageDetails.settoEmailAddress("dphuniversaltranslator@gmail.com");
-        messageDetails.setfromEmailAddress("dphuniversaltranslator@gmail.com");
+        messageDetails.setfromEmailAddress("info@health-e-link.net");
         messageDetails.setmessageSubject("Exception Error " + InetAddress.getLocalHost().getHostAddress());
         
         StringBuilder sb = new StringBuilder();
@@ -74,6 +74,10 @@ public class ExceptionControllerAdvice {
         messageDetails.setmessageBody(sb.toString());
         emailMessageManager.sendEmail(messageDetails); 
         /*mav.addObject("messageBody",sb.toString());*/
+        } catch (Exception ex) {
+        	ex.printStackTrace();
+        	System.err.println(ex.toString() + " error at exception");
+        }
         
         return mav;
     }
