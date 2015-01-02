@@ -1,4 +1,4 @@
-package com.ut.healthelink.webservices;
+package com.ut.healthelink.webServices;
 
 import javax.xml.soap.SOAPMessage;
 import com.ut.healthelink.model.custom.ToWSSOAP;
