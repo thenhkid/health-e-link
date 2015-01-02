@@ -49,7 +49,7 @@ import com.ut.healthelink.service.organizationManager;
 import com.ut.healthelink.service.transactionInManager;
 import com.ut.healthelink.service.transactionOutManager;
 import com.ut.healthelink.service.userManager;
-import com.ut.healthelink.webservices.WSManager;
+import com.ut.healthelink.webServices.WSManager;
 
 import java.io.File;
 import java.io.FileInputStream;
