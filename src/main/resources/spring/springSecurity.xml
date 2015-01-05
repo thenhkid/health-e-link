@@ -8,6 +8,7 @@
 
     <http pattern="/css/**" security="none"/>
     <http pattern="/javascript/**" security="none" />
+    <http pattern="/" security="none"/>
     
 
     <http auto-config="true" use-expressions="true" disable-url-rewriting="false" >
