@@ -1,8 +1,9 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <jsp:useBean id="date" class="java.util.Date" />
 
-<div class="module email-list-signup">
+<%--<div class="module email-list-signup">
     <div class="container">
         <div class="alert alert-danger error" style="display: none;">
             <strong>Error!</strong> <span id="errMsg">The email address entered is invalid!</span>
@@ -22,14 +23,14 @@
             </div>
         </form>
     </div>
-</div>
+</div>--%>
 <footer class="footer">
     <div class="container">
         <nav>
             <ul class="nav-inline">
                 <li><a href="<c:url value='/'/>" title="Home">Home</a></li>
                 <li><a href="<c:url value='/about'/>" title="About">About</a></li>
-                <li><a href="<c:url value='/contact'/>" title="Contact">Contact</a></li>
+                <li><a href="<c:url value='/contact'/>" title="Contact">Contact Us</a></li>
                 <li><a href="<c:url value='/privacy'/>" title="Contact">Privacy</a></li>
                 <c:if test="${not empty pageContext.request.userPrincipal.name}"><li><a href="<c:url value='/profile'/>" title="My Account">My Account</a></li></c:if>
                 <c:if test="${not empty pageContext.request.userPrincipal.name}"><li><a href="#settingsModal" id="settings" data-toggle="modal" title="Account Settings" class="settings">Account Settings</a></li></c:if>
@@ -41,10 +42,10 @@
                 <span class="adr"><span class="post-office-box">P.O. Box 275</span>,
                     <span class="region">Auburn, MA</span>
                     <span class="postal-code">01501</span></span> |
-                Phone: <span class="tel">(508) 721-1977</span> |
+                Phone: <span class="tel">(774) 272-0313</span> 
             </p>
             <p>
-                Copyright <fmt:formatDate value="${date}" pattern="yyyy" /> Massachusetts Department of Public Health All rights reserved</p>
+            Copyright <fmt:formatDate value="${date}" pattern="yyyy" /> Massachusetts Department of Public Health All rights reserved</p>
         </p>
     </div>
 </footer>

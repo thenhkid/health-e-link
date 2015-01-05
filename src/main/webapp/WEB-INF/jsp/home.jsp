@@ -1,4 +1,5 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
 <div class="product-suite">
     <div class="product-suite-header">
@@ -16,22 +17,22 @@
     <div class="container">
         <div class="row">
             <div class="col-md-4 col-sm-4 product-summary">
-                <a href="<c:url value='/product-suite/health-e-net'/>" title="Health-e-Net" class="icon-product icon-product icon-health-e-net"></a>
-                <h3><a href="<c:url value='/product-suite/health-e-net'/>" title="Health-e-Net">Health-e-Net</a></h3>
-                <p>Secure and reliable health information exchange services</p>
-                <a href="<c:url value='/product-suite/health-e-net'/>" title="Health-e-Net" class="btn-secondary">Learn More</a>
+                <a href="<c:url value='/product-suite/eReferral'/>" title="eReferral" class="icon-product icon-product icon-health-e-net"></a>
+                <h3><a href="<c:url value='/product-suite/eReferral'/>" title="eReferral">eReferral</a></h3>
+                <p>Process referrals and feedback reports with all partners in your care network.</p>
+                <a href="<c:url value='/product-suite/eReferral'/>" title="eReferral" class="btn-secondary">Learn More</a>
             </div>
             <div class="col-md-4 col-sm-4 product-summary">
-                <a href="<c:url value='/product-suite/health-e-data'/>" title="Health-e-Data" class="icon-product icon-health-e-data"></a>
-                <h3><a href="<c:url value='/product-suite/health-e-data'/>" title="Health-e-Data">Health-e-Data</a></h3>
-                <p>Health data warehouse supporting data collection, analysis and reporting</p>
-                <a href="<c:url value='/product-suite/health-e-data'/>" title="Health-e-Data" class="btn-secondary">Learn More</a>
+                <a href="<c:url value='/product-suite/universal-hie'/>" title="Universal HIE" class="icon-product icon-health-e-data"></a>
+                <h3><a href="<c:url value='/product-suite/universal-hie'/>" title="Universal HIE">Universal HIE</a></h3>
+                <p>Connect healthcare provider EMR systems with partner systems and exchange client/patient data seamlessly.</p>
+                <a href="<c:url value='/product-suite/universal-hie'/>" title="Universal HIE" class="btn-secondary">Learn More</a>
             </div>
             <div class="col-md-4 col-sm-4 product-summary">
-                <a href="<c:url value='/product-suite/health-e-web'/>" title="Health-e-Web" class="icon-product icon-health-e-web"></a>
-                <h3><a href="<c:url value='/product-suite/health-e-web'/>" title="Health-e-Web">Health-e-Web</a></h3>
-                <p>Data submission and management portal for sharing data with community partners.</p>
-                <a href="<c:url value='/product-suite/health-e-web'/>" title="Health-e-Web" class="btn-secondary">Learn More</a>
+                <a href="<c:url value='/product-suite/clinical-data-warehouse'/>" title="Clinical Data Warehouse" class="icon-product icon-health-e-web"></a>
+                <h3><a href="<c:url value='/product-suite/clinical-data-warehouse'/>" title="Clinical Data Warehouse">Clinical Data Warehouse</a></h3>
+                <p>Securely and effectively manage patient data across multiple programs of care.</p>
+                <a href="<c:url value='/product-suite/clinical-data-warehouse'/>" title="Clinical Data Warehouse" class="btn-secondary">Learn More</a>
             </div>
         </div>
         <%--<a href="http://www.youtube.com/watch?v=DMJKG6jyHYg" data-title="Product Demo" data-toggle="modal" data-target="#mediaModal" class="product-demo center-text font-large media-modal visible-xs">
@@ -67,5 +68,34 @@
         </div>
     </div>
 </div>
-
+    
+<c:if test="${not empty newsArticles}">
+<header class="news" role="banner">
+    <%-- News Ticker --%>
+    <div class="news-ticker" id="home-news">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-1 news-ticker-header">
+                    <h2>News</h2>
+                    <a href="<c:url value='/news/articles'/>"  title="View all News Articles"><small>View All</small></a>
+                </div>
+                <div id="news-carousel" class="col-md-10 news-ticker-content news-carousel slide" data-ride="carousel">
+                    <ul class="carousel-inner" >
+                        <c:forEach var="article" varStatus="loop" items="${newsArticles}">
+                        <li ${loop.index == 0 ? 'class="item active"' : 'class="item"'}>
+                            <h3>
+                                <a href="/news/article/${fn:toLowerCase(fn:replace(article.title,' ','-'))}" title="${article.title}">${article.title}</a>
+                            </h3>
+                            <c:if test="${not empty article.shortDesc}">
+                                <p>${article.shortDesc}  <span style="padding-left:10px"><a href="/news/article/${fn:toLowerCase(fn:replace(article.title,' ','-'))}" title="Read ${article.title}">Read More</a></span></p>
+                            </c:if>
+                        </li>
+                        </c:forEach>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+ </c:if>
 

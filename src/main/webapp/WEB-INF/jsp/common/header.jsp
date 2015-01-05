@@ -39,21 +39,22 @@
                             <a href="javascript:void(0);" title="Product Suite" data-toggle="dropdown">Product Suite <b class="caret"></b></a>
                             <ul class="dropdown-menu" role="menu" aria-labelledby="Product Suite dropdown">
                                 <li><a href="<c:url value='/product-suite'/>" title="Product Suite Overview">Product Suite Overview</a></li>
-                                <li><a href="<c:url value='/product-suite/health-e-net'/>" title="Health-e-Net">Health-e-Net</a></li>
-                                <li><a href="<c:url value='/product-suite/health-e-data'/>" title="Health-e-Data">Health-e-Data</a></li>
-                                <li><a href="<c:url value='/product-suite/health-e-web'/>" title="Health-e-Web">Health-e-Web</a></li>
+                                <li><a href="<c:url value='/product-suite/eReferral'/>" title="eReferral">eReferral</a></li>
+                                <li><a href="<c:url value='/product-suite/universal-hie'/>" title="Universal HIE">Universal HIE</a></li>
+                                <li><a href="<c:url value='/product-suite/clinical-data-warehouse'/>" title="Clinical Data Warehouse">Clinical Data Warehouse</a></li>
                             </ul> 
                         </li>
                         <li ${param['page'] == 'solutions' ? 'class="active"' : ''}>
-                            <a href="javascript:void(0);" title="Solutions" data-toggle="dropdown">Solutions <b class="caret"></b></a>
+                            <a href="<c:url value='/consulting-services'/>" title="Consulting Services">Consulting Services</a>
+                            <%--<a href="javascript:void(0);" title="Solutions" data-toggle="dropdown">Consulting Services  <b class="caret"></b></a>
                             <ul class="dropdown-menu" role="menu" aria-labelledby="Solutions dropdown">
                                 <li><a href="<c:url value='/solutions'/>" title="Solutions Overview">Solutions Overview</a></li>
                                 <li><a href="<c:url value='/solutions/services'/>" title="Services">Services</a></li>
                                 <li><a href="<c:url value='/solutions/case-studies'/>" title="Case Studies">Case Studies</a></li>
-                            </ul> 
+                            </ul> --%>
                         </li>
-                        <li ${param['page'] == 'partners' ? 'class="active"' : ''}><a href="<c:url value='/partners'/>" title="Partners">Partners</a></li>
-                        <li ${param['page'] == 'contact' ? 'class="active"' : ''}><a href="<c:url value='/contact'/>" title="Contact">Contact</a></li>
+                        <%--<li ${param['page'] == 'partners' ? 'class="active"' : ''}><a href="<c:url value='/partners'/>" title="Partners">Partners</a></li>--%>
+                        <li ${param['page'] == 'contact' ? 'class="active"' : ''}><a href="<c:url value='/contact'/>" title="Contact Us">Contact Us</a></li>
                         <li ${param['page-id'] == 'profile' ? 'class="active"': ''}>
                             <c:choose>
                                 <c:when test="${not empty pageContext.request.userPrincipal.name}">
@@ -108,40 +109,14 @@
 
 
                     <div class="central-graphic-content">
-                        <h3>Our <a href="<c:url value='/product-suite'/>" title="Product Suite Overview">products</a> and <a href="<c:url value='/solutions/services'/>" title="Services">services</a> enable health information exchange between<br/>
+                        <h3>Our products and services enable health information exchange between<br/>
                             groups of health care providers, community partners, and state and local health agencies.</h3>
 
-                        <a href="<c:url value='/solutions'/>" title="Solutions Overview" class="btn btn-primary btn-action">Our Solutions</a>
+                        <a href="<c:url value='/consulting-services'/>" title="Solutions Overview" class="btn btn-primary btn-action">Our Solutions</a>
                         <a href="<c:url value='/about/how-we-work'/>" title="How We Work" class="btn btn-primary btn-action btn-primary-action">Get Started</a>
                     </div>
                 </div>
-                <%-- News Ticker --%>
-                <c:if test="${not empty newsArticles}">
-                    <div class="news-ticker" id="home-news">
-                        <div class="container">
-                            <div class="row">
-                                <div class="col-md-1 news-ticker-header">
-                                    <h2>News</h2>
-                                    <a href="<c:url value='/news/articles'/>"  title="View all News Articles"><small>View All</small></a>
-                                </div>
-                                <div id="news-carousel" class="col-md-10 news-ticker-content news-carousel slide" data-ride="carousel">
-                                    <ul class="carousel-inner" >
-                                        <c:forEach var="article" varStatus="loop" items="${newsArticles}">
-                                        <li ${loop.index == 0 ? 'class="item active"' : 'class="item"'}>
-                                            <h3>
-                                                <a href="/news/article/${fn:toLowerCase(fn:replace(article.title,' ','-'))}" title="${article.title}">${article.title}</a>
-                                            </h3>
-                                            <c:if test="${not empty article.shortDesc}">
-                                                <p>${article.shortDesc}  <span style="padding-left:10px"><a href="/news/article/${fn:toLowerCase(fn:replace(article.title,' ','-'))}" title="Read ${article.title}">Read More</a></span></p>
-                                            </c:if>
-                                        </li>
-                                        </c:forEach>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </c:if>
+               
             </c:when>
             <c:otherwise>
                 <div class="container">
@@ -149,7 +124,9 @@
                         <c:when test="${param['page-section'] == 'Health-e-Web'}"><h1 class="page-title"><span class="page-title-icon pull-left"></span>Electronic Referral Gateway</h1></c:when>
                         <c:when test="${param['page-section'] == 'Health-e-Connect'}"><h1 class="page-title"><span class="page-title-icon pull-left"></span>File Exchange</h1></c:when>
                         <c:when test="${param['page-section'] == 'Org'}"><h1 class="page-title"><span class="page-title-icon pull-left"></span>Organization Profile</h1></c:when>
-                        <c:otherwise><h1 class="page-title">${pageTitle}</h1></c:otherwise>
+                        <c:otherwise>
+                            <h1 class="page-title">${pageTitle}</h1>
+                        </c:otherwise>
                     </c:choose>
                 </div>   
             </c:otherwise>

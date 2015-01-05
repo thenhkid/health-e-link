@@ -385,14 +385,16 @@ h3 {
 .login-header-content {
   background-color: #666;
 }
-.header {
-  background-image: url('../../../img/front-end/health-e-link/bg-header-home.jpg');
-}
+
 .header-inner {
   background-image: url('../../../img/front-end/health-e-link/bg-page-title.png');
   background-position: right bottom;
   background-repeat: no-repeat;
   background-color: transparent;
+}
+
+.header {
+  background-image: url('../../../img/front-end/health-e-link/bg-header-home.jpg');
 }
 .home .header {
   background-image: url('../../../img/front-end/health-e-link/bg-header-home.jpg');
@@ -403,6 +405,13 @@ h3 {
     height: auto;
   }
 }
+
+.news {
+  background-color: #AFB8AB;
+  //background-image: url('../../../img/front-end/health-e-link/bg-home-central-graphic.png');
+  background-size: auto 100%; 
+}
+
 .home .header-inner {
   height: 100%;
   background-image: url('../../../img/front-end/health-e-link/bg-home-central-graphic.png');

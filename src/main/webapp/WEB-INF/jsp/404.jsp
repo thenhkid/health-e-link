@@ -37,11 +37,10 @@
             <div class="login-container notFound">
                 <div class="login">
                     <header class="login-header">
-                        <div class="login-header-content"><span class="logo ir" alt="{Company Name Logo}">Comany Name</span></div>
+                        <div class="login-header-content"><span class="logo ir" alt="{Company Name Logo}">Company Name</span></div>
                     </header>
                     <h1>404 Page Not Found</h1>
                     <p>Sorry, the page you have requested was not found.</p>
-                    <p class="login-note"><a href="" id="back-btn" title="" class="btn btn-primary">Go Back</a></p>
                 </div>
             </div>
         </div>

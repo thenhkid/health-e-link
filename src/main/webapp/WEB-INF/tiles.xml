@@ -594,22 +594,22 @@
         <put-attribute name="body" value="/WEB-INF/jsp/informationPages/productSuite/productSuite.jsp?page=overview" />
     </definition>
     
-    <definition name="/healthenet" extends="base.definition.frontEnd">
-        <put-attribute name="title" value="Health-e-Link - Health-e-Net" />
+    <definition name="/universal-hie" extends="base.definition.frontEnd">
+        <put-attribute name="title" value="Health-e-Link - Universal HIE" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page=productSuite" />
-        <put-attribute name="body" value="/WEB-INF/jsp/informationPages/productSuite/health-e-net.jsp?page=healthenet" />
+        <put-attribute name="body" value="/WEB-INF/jsp/informationPages/productSuite/universal-hie.jsp?page=universal-hie" />
     </definition>
     
-    <definition name="/healtheweb" extends="base.definition.frontEnd">
-        <put-attribute name="title" value="Health-e-Link - Health-e-Web" />
+    <definition name="/eReferral" extends="base.definition.frontEnd">
+        <put-attribute name="title" value="Health-e-Link - eReferral" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page=productSuite" />
-        <put-attribute name="body" value="/WEB-INF/jsp/informationPages/productSuite/health-e-web.jsp?page=healtheweb" />
+        <put-attribute name="body" value="/WEB-INF/jsp/informationPages/productSuite/eReferral.jsp?page=eReferral" />
     </definition>
     
-    <definition name="/healthedata" extends="base.definition.frontEnd">
-        <put-attribute name="title" value="Health-e-Link - Health-e-Data" />
+    <definition name="/clinical-data-warehouse" extends="base.definition.frontEnd">
+        <put-attribute name="title" value="Health-e-Link - Clinical Data Warehouse" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page=productSuite" />
-        <put-attribute name="body" value="/WEB-INF/jsp/informationPages/productSuite/health-e-data.jsp?page=healthedata" />
+        <put-attribute name="body" value="/WEB-INF/jsp/informationPages/productSuite/clinical-data-warehouse.jsp?page=clinical-data-warehouse" />
     </definition>
     
     <definition name="/doculink" extends="base.definition.frontEnd">

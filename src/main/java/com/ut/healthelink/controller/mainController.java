@@ -196,8 +196,8 @@ public class mainController {
        
        mailMessage messageDetails = new mailMessage();
         
-       messageDetails.settoEmailAddress("info@health-e-link.net");
-       messageDetails.setfromEmailAddress("info@health-e-link.net");
+       messageDetails.settoEmailAddress("information@health-e-link.net");
+       messageDetails.setfromEmailAddress("information@health-e-link.net");
        messageDetails.setmessageSubject("Health-e-Link Contact Form Submission");
        
        
@@ -264,8 +264,8 @@ public class mainController {
        
        mailMessage messageDetails = new mailMessage();
         
-       messageDetails.settoEmailAddress("info@health-e-link.net");
-       messageDetails.setfromEmailAddress("info@health-e-link.net");
+       messageDetails.settoEmailAddress("information@health-e-link.net");
+       messageDetails.setfromEmailAddress("information@health-e-link.net");
        messageDetails.setmessageSubject("Health-e-Link Partner Request Form Submission");
        
        
@@ -387,7 +387,7 @@ public class mainController {
         sb.append("<a href='" + resetURL + randomCode + "'>Click here to reset your password.</a>");
 
         messageDetails.setmessageBody(sb.toString());
-        messageDetails.setfromEmailAddress("info@health-e-link.net");
+        messageDetails.setfromEmailAddress("information@health-e-link.net");
 
         emailMessageManager.sendEmail(messageDetails);
 
