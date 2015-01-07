@@ -212,10 +212,15 @@ public class adminProcessingActivity {
         mav.addObject("referralTypesMade", referralsMade);
         
          /* Get the activity status totals */
-        List<Integer> activityStatusTotals = transactionInManager.getActivityStatusTotals(batchIds);
-        mav.addObject("totalCompleted", activityStatusTotals.get(0));
-        mav.addObject("totalEnrolled", activityStatusTotals.get(1));
         
+        List<Integer> activityStatusTotals = transactionInManager.getActivityStatusTotals(batchIds);
+        if (activityStatusTotals.size() > 0) {
+        	mav.addObject("totalCompleted", activityStatusTotals.get(0));
+        	mav.addObject("totalEnrolled", activityStatusTotals.get(1));
+        } else {
+        	 mav.addObject("totalCompleted", 0);
+             mav.addObject("totalEnrolled", 0);  	
+        }
         
         return mav;
 
