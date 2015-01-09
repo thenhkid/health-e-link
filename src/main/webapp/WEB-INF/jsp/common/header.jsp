@@ -32,20 +32,21 @@
                             <a href="javascript:void(0);" title="About" data-toggle="dropdown">About <b class="caret"></b></a>
                             <ul class="dropdown-menu" role="menu" aria-labelledby="About dropdown">
                                 <li><a href="<c:url value='/about'/>" title="About Health-e-Link">About Health-e-Link</a></li>
-                                <li><a href="<c:url value='/about/how-we-work'/>" title="How We Work">How We Work</a></li>
+                                <li><a href="<c:url value='/about/network-capabilities'/>" title="Network Capabilities">Network Capabilities</a></li>
                             </ul> 
                         </li>
                         <li ${param['page'] == 'productSuite' ? 'class="active"' : ''}>
                             <a href="javascript:void(0);" title="Product Suite" data-toggle="dropdown">Product Suite <b class="caret"></b></a>
                             <ul class="dropdown-menu" role="menu" aria-labelledby="Product Suite dropdown">
-                                <li><a href="<c:url value='/product-suite'/>" title="Product Suite Overview">Product Suite Overview</a></li>
+                                <%--<li><a href="<c:url value='/product-suite'/>" title="Product Suite Overview">Product Suite Overview</a></li> --%>
+                                <li><a href="<c:url value='/#productSuite'/>" title="Product Suite Overview">Product Suite Overview</a></li>
                                 <li><a href="<c:url value='/product-suite/eReferral'/>" title="eReferral">eReferral</a></li>
                                 <li><a href="<c:url value='/product-suite/universal-hie'/>" title="Universal HIE">Universal HIE</a></li>
                                 <li><a href="<c:url value='/product-suite/clinical-data-warehouse'/>" title="Clinical Data Warehouse">Clinical Data Warehouse</a></li>
                             </ul> 
                         </li>
                         <li ${param['page'] == 'solutions' ? 'class="active"' : ''}>
-                            <a href="<c:url value='/consulting-services'/>" title="Consulting Services">Consulting Services</a>
+                            <a href="<c:url value='/support-services'/>" title="Support Services">Support Services</a>
                             <%--<a href="javascript:void(0);" title="Solutions" data-toggle="dropdown">Consulting Services  <b class="caret"></b></a>
                             <ul class="dropdown-menu" role="menu" aria-labelledby="Solutions dropdown">
                                 <li><a href="<c:url value='/solutions'/>" title="Solutions Overview">Solutions Overview</a></li>
@@ -112,8 +113,8 @@
                         <h3>Our products and services enable health information exchange between<br/>
                             groups of health care providers, community partners, as well as federal, state and local health agencies.</h3>
 
-                        <a href="<c:url value='/about/how-we-work'/>" title="Network Capabilities" class="btn btn-primary btn-action btn-primary-action">Network Capabilities</a>
-                        <a href="<c:url value='/consulting-services'/>" title="Support Services" class="btn btn-primary btn-action">Support Services</a>
+                        <a href="<c:url value='/about/network-capabilities'/>" title="Network Capabilities" class="btn btn-primary btn-action btn-primary-action">Network Capabilities</a>
+                        <a href="<c:url value='/support-services'/>" title="Support Services" class="btn btn-primary btn-action">Support Services</a>
                     </div>
                 </div>
                

@@ -1,6 +1,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
-
+<a name='productSuite'></a>
 <div class="product-suite">
     <div class="product-suite-header">
         <div class="container">
@@ -42,7 +42,7 @@
     </div>
 </div>
 
-<div class="container main-container" role="main">
+<%--<div class="container main-container" role="main">
     <div class="page-content">
         <div class="row">
             <div class="col-md-6">
@@ -67,7 +67,7 @@
             </div>
         </div>
     </div>
-</div>
+</div>--%>
     
 <c:if test="${not empty newsArticles}">
 <header class="news" role="banner">

@@ -45,7 +45,7 @@
                 </c:if>
 
                 <p>
-                    Health-e-link's staff would be happy to contact you and discuss how our technology solutions and consulting services may help you create expanded service delivery and patient care models, improve your 
+                    Health-e-link's staff would be happy to contact you and discuss how our technology solutions and support services may help you create expanded service delivery and patient care models, improve your 
                     ability manage your network of collaborating healthcare professionals, and track program and population-based health data. Please complete the form below, provide any information you feel is relevant 
                     and we'll be in touch soon!
                 </p>
@@ -132,8 +132,8 @@
                             </div>
                             <div class="checkbox">
                                 <label>
-                                    <input name='interestedIn' type="checkbox" value="Consulting Services">
-                                    Consulting Services
+                                    <input name='interestedIn' type="checkbox" value="Support Services">
+                                    Support Services
                                 </label>
                             </div>
                         </div>

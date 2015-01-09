@@ -149,14 +149,14 @@ public class mainController {
     }
     
     /**
-     * The '/about.how-we-work' GET request will display the how we work page.
+     * The '/about/Network-Capabilities' GET request will display the Network Capabilities  page.
      */
-    @RequestMapping(value = "/about/how-we-work", method = RequestMethod.GET)
-    public ModelAndView howweworkPage() throws Exception {
+    @RequestMapping(value = "/about/network-capabilities", method = RequestMethod.GET)
+    public ModelAndView networkcapabilitiesPage() throws Exception {
 
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("/howwework");
-        mav.addObject("pageTitle", "How We Work");
+        mav.setViewName("/networkcapabilities");
+        mav.addObject("pageTitle", "Network Capabilities");
         return mav;
     }
     

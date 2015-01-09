@@ -642,10 +642,10 @@
         <put-attribute name="body" value="/WEB-INF/jsp/informationPages/about.jsp?page=about" />
     </definition>
     
-    <definition name="/howwework" extends="base.definition.frontEnd">
-        <put-attribute name="title" value="Health-e-Link - How We Work" />
+    <definition name="/networkcapabilities" extends="base.definition.frontEnd">
+        <put-attribute name="title" value="Health-e-Link - Network Capabilities" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page=about" />
-        <put-attribute name="body" value="/WEB-INF/jsp/informationPages/howwework.jsp?page=howwework" />
+        <put-attribute name="body" value="/WEB-INF/jsp/informationPages/networkcapabilities.jsp?page=networkcapabilities" />
     </definition>
     
     <definition name="/contact" extends="base.definition.frontEnd">

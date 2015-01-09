@@ -17,7 +17,7 @@
                                     <a href="">Product Suite</a>
                                     <div id="active-page-nav">
                                         <ul class="nav" >
-                                            <li ${param['page'] == 'overview' ? 'class="active"' : ''}><a href="<c:url value='/product-suite'/>" title="Product Suite Overview">Product Suite Overview</a></li>
+                                            <li ${param['page'] == 'overview' ? 'class="active"' : ''}><a href="<c:url value='/#productSuite'/>" title="Product Suite Overview">Product Suite Overview</a></li>
                                             <li ${param['page'] == 'eReferral' ? 'class="active"' : ''}><a href="<c:url value='/product-suite/eReferral'/>" title="eReferral">eReferral</a></li>
                                             <li ${param['page'] == 'universal-hie' ? 'class="active"' : ''}><a href="<c:url value='/product-suite/universal-hie'/>" title="Universal HIE">Universal HIE</a></li>
                                             <li ${param['page'] == 'clinical-data-warehouse' ? 'class="active"' : ''}><a href="<c:url value='/product-suite/clinical-data-warehouse'/>" title="Clinical Data Warehouse">Clinical Data Warehouse</a></li>
@@ -56,22 +56,22 @@
                 <br />
                 <h4>Evolving Collaborative Healthcare Landscape</h4>
                 <p>
-                    Healthcare providers, their community-based partners, and state and local health agencies are looking for innovative opportunities to help meet triple aim goals of better population health, better 
-                    experience of care and lower costs. Today, there are evolving new models of care with non-traditional healthcare providers that address the specific needs of patients outside of their primary care 
-                    settings. The challenge however is developing effective communications channels between healthcare providers and their collaborating partners. In many cases, these communications are nothing more 
-                    than word of mouth or at best, paper-based fax communications. With evolving EMR/EHR and HIE capabilities across the nation's healthcare system, there must be a better way!.
+                    Healthcare providers, their community-based partners, and public health agencies are looking for innovative opportunities to help meet triple aim goals of better population health, better experience of care 
+                    and lower costs. Today, there are evolving new models of care with non-traditional healthcare providers that address the specific needs of patients outside of their primary care settings. The challenge 
+                    however is developing effective communications channels between healthcare providers and their collaborating partners. Today, these communications channels are nothing more than word of mouth or at best, 
+                    paper-based fax communications. With evolving EMR/EHR and HIE capabilities across the nation's healthcare system, there must be a better way!
                 </p>
                 <br />
                 <h4>Health-e-link's eReferral Solution</h4>
                 <p>
-                    Health-e-link's eReferral system connects healthcare providers with their community-based partners and supports fully integrated eReferral communications regardless of the technology-based capabilities 
-                    of the eReferral partners. Using Health-e-link's eReferral system, all referral types with all collaborating partners are managed from a single location. Health-e-Link's eReferral system spans the virtual 
+                    Health-e-link's eReferral system connects healthcare providers with their community-based partners and supports fully integrated eReferral communications regardless of the technology-based capabilities of 
+                    the eReferral partners. Using Health-e-link's eReferral system, all referral types with all collaborating partners are managed from a single location. Health-e-Link's eReferral system spans the virtual 
                     boundaries between healthcare partners in your community. 
                 </p>     
                 <p>    
-                    Using state-of-the art technologies, Health-e-link provides a secure web-based network for transmitting referrals including patient contact info, clinical data, notes and reports, audio files, images 
-                    and more. Health-e-link's eReferral system supports any referral content and communicates referrals between parties using multiple data transport modes, document types and code sets - flexibility is 
-                    the key to our solution! 
+                    Using state-of-the art technologies, Health-e-link provides a secure web-based network for transmitting referrals including patient contact info, clinical data, notes and reports, audio files, images and 
+                    more. Health-e-link's eReferral system supports any referral content and communicates referrals between parties using multiple data transport modes, document types and code sets - flexibility is the key 
+                    to our solution! 
                 </p>
                 <br />
                 <h4>Health-e-link's eReferral System Improves Collaboration and Care Coordination</h4>
@@ -84,9 +84,6 @@
                     <li>Monitor and manage referrals and feedback reports from your own EMR/EHR system or use the Health-e-link eReferral portal;</li>
                     <li>Receive referrals from consumers and field staff with our mobile apps.</li>
                 </ul>
-                <p>
-                    For a demonstration of Health-e-link's interoperability and data management solutions, please contact us at (774) 272-0313 or email <a href="mailto:information@health-e-link.net">information@health-e-link.net</a>
-                </p>
             </div>
         </div>
     </div>
@@ -94,8 +91,8 @@
 
 <div class="module content-call-out">
     <div class="container center-text">
-        <p>For more information on how BOWlink Technologies can create a cost-effective healthcare information data exchange solution for your organization,
-            <br/>please contact us at <strong>(774) 272-0313</strong> or email <strong><a href="mailto:information@health-e-link.net">information@health-e-link.net</a></strong>
+        <p>
+            For more information or a demonstration of Health-e-link's interoperability and data management solutions,<br/> please contact us at <strong>(774) 272-0313</strong> or email <a href="mailto:information@health-e-link.net">information@health-e-link.net</a>
         </p>
     </div>
 </div>

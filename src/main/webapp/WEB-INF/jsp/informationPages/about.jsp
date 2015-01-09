@@ -18,7 +18,7 @@
                                     <div id="active-page-nav">
                                         <ul class="nav" >
                                             <li ${param['page'] == 'about' ? 'class="active"' : ''}><a href="<c:url value='/about'/>" title="About Health-e-Link">About Health-e-Link</a></li>
-                                            <li ${param['page'] == 'howwework' ? 'class="active"' : ''}><a href="<c:url value='/about/how-we-work'/>" title="How We Work">How We Work</a></li>
+                                            <li ${param['page'] == 'networkcapabilities' ? 'class="active"' : ''}><a href="<c:url value='/about/network-capabilities'/>" title="Network Capabilities">Network Capabilities</a></li>
                                         </ul>
                                     </div>
                                 </li>
@@ -52,7 +52,7 @@
                 <h4>Advancing Community-based Healthcare</h4>
                 <p>
                     With a foundation in community-based healthcare and public health programs, Health-e-link was established to provide cost-effective solutions for managing healthcare information for community-based 
-                    organizations and public health agencies. Health-e-link focuses specifically on the data management needs of federal and state funded healthcare programs.
+                    organizations and public health agencies. Historically, Health-e-link has focused specifically on helping our clients meet the data management needs of federal and state funded healthcare programs.
                 </p>
                 <p>
                     Health-e-link's leadership understands that the widespread adoption of health information technology including electronic medical record systems and health information exchange networks are creating 
@@ -60,17 +60,17 @@
                 </p>
                 <p>
                     However, Health-e-link's leadership also understands that the highly complex standards being promoted by the Nation-wide Health Information Network (NwHIN) strategy often impose constraints that limit 
-                    or even prevent data exchange in many networks of care. By providing a standards-based, but highly flexible health information exchange and data management solutions, Health-e-link position healthcare 
-                    providers and public health agencies to take advantage of new patient care models in their community-based networks of care.
+                    or even prevent data exchange in many networks of care. By providing a standards-based, but highly flexible health information exchange and data management solutions, Health-e-link positions healthcare providers, 
+                    community-based organizations, and public health agencies to take advantage of new patient care models in their networks of care.
                 </p>
                 <br />
                 <h4>The Health-e-Link Solution</h4>
                 <p>
-                    The Health-e-link Suite of products provides a healthcare information exchange and data management solution for all collaborating partners in any community. We've ensured that our solutions meet HIPAA 
+                    The <a href="<c:url value="/product-suite" />">Health-e-link Suite</a> of products provides a healthcare information exchange and data management solution for all collaborating partners in any any community - local, regional or national. We've ensured that our solutions meet HIPAA 
                     privacy and security standards, thereby ensuring that patient privacy concerns are addressed. Health-e-link has embraced widely accepted health information technology standards that ensure that an 
                     investment with Health-e-link is a strategic investment for any organization. With our modular approach to implementation, Health-e-Link offers capabilities for <a href="<c:url value='/product-suite/eReferral'/>" title="eReferral">eReferral systems</a>, 
                     <a href="<c:url value='/product-suite/clinical-data-warehouse'/>" title="Clinical Data Warehouse">program registry systems</a> and <a href="<c:url value='/product-suite/universal-hie'/>" title="Universal HIE">health information exchange networks</a> that are configured to meet the 
-                    specific needs of any network of care providers.
+                    specific needs of any network of healthcare providers and their partners.
                 </p>
             </div>
 
@@ -81,8 +81,8 @@
 
 <div class="module content-call-out">
     <div class="container center-text">
-        <p>For more information on how BOWlink Technologies can create a cost-effective healthcare information data exchange solution for your organization,
-            <br/>please contact us at <strong>(774) 272-0313</strong> or email <strong><a href="mailto:information@health-e-link.net">information@health-e-link.net</a></strong>
+        <p>
+            For more information or a demonstration of Health-e-link's interoperability and data management solutions,<br/> please contact us at <strong>(774) 272-0313</strong> or email <a href="mailto:information@health-e-link.net">information@health-e-link.net</a>
         </p>
     </div>
 </div>

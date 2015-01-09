@@ -16,7 +16,7 @@ import org.springframework.web.servlet.ModelAndView;
  * @author chadmccue
  */
 @Controller
-@RequestMapping("/consulting-services")
+@RequestMapping("/support-services")
 public class solutionsController {
     
     /**
@@ -27,7 +27,7 @@ public class solutionsController {
 
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/services");
-        mav.addObject("pageTitle", "Consulting Services");
+        mav.addObject("pageTitle", "Support Services");
         return mav;
     }
     

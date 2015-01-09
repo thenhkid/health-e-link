@@ -17,7 +17,7 @@
                                     <a href="">Product Suite</a>
                                     <div id="active-page-nav">
                                         <ul class="nav" >
-                                            <li ${param['page'] == 'overview' ? 'class="active"' : ''}><a href="<c:url value='/product-suite'/>" title="Product Suite Overview">Product Suite Overview</a></li>
+                                            <li ${param['page'] == 'overview' ? 'class="active"' : ''}><a href="<c:url value='/#productSuite'/>" title="Product Suite Overview">Product Suite Overview</a></li>
                                             <li ${param['page'] == 'eReferral' ? 'class="active"' : ''}><a href="<c:url value='/product-suite/eReferral'/>" title="eReferral">eReferral</a></li>
                                             <li ${param['page'] == 'universal-hie' ? 'class="active"' : ''}><a href="<c:url value='/product-suite/universal-hie'/>" title="Universal HIE">Universal HIE</a></li>
                                             <li ${param['page'] == 'clinical-data-warehouse' ? 'class="active"' : ''}><a href="<c:url value='/product-suite/clinical-data-warehouse'/>" title="Clinical Data Warehouse">Clinical Data Warehouse</a></li>
@@ -66,10 +66,10 @@
                 <h4>Health-e-link's Universal HIE Solution</h4>
                 <p>
                     The Health-e-Link Universal HIE solution is the one "flexible" health information exchange network that allows healthcare partners in your community to share patient information even when their 
-                    technology-based systems are incompatible. The Universal HIE allows you to define individual partnerships on the network and the technical specifications that support data exchange for that partnership. 
-                    The Universal HIE specifies who can share data with whom, which message types are supported, which code sets are used within the supported message types, and finally, the processing rules associated 
-                    with each data exchange configuration. Health-e-link's Universal HIE uses these configurable features to ensure that each customer's unique data exchange requirements are fully addressed. Health-e-link's 
-                    Universal HIE serves as the single point of integration with all data exchange partners in your healthcare delivery network.
+                    technology-based systems are incompatible. The Universal HIE allows you to define individual partnerships on the network and the technical specifications that support data exchange for each partnership. 
+                    The Universal HIE specifies who can share data with whom, which transport methods are supported, which document and message types are supported, which code sets are used within the supported message types, 
+                    and finally, the processing rules associated with each data exchange configuration. Health-e-link's Universal HIE uses these configurable features to ensure that each customer's unique data exchange 
+                    requirements are fully addressed. Health-e-link's Universal HIE serves as the single point of integration with all data exchange partners in your healthcare delivery network.
                 </p>
                 <br />
                 <h4>Health-e-link's Universal HIE Solves System Integration Challenges</h4>
@@ -82,12 +82,9 @@
                     <li>Easy-to-navigate web-based interface that simplifies system configuration to meet individual data exchange needs;</li>
                     <li>Operational and auditing features that support automated processing, accountability and data accuracy;</li>
                     <li>A low commitment hosted integration solution that meets short term needs while providing a pathway to unlimited expansion;</li>
-                    <li>Integration capabilities any established HIE platform including Direct;</li>
+                    <li>Integration capabilities with any established HIE platform including Direct;</li>
                     <li>Round the clock hosting and management in our secure data center.</li>
                 </ul>
-                <p>
-                    For a demonstration of Health-e-link's interoperability and data management solutions, please contact us at (774) 272-0313 or email <a href="mailto:information@health-e-link.net">information@health-e-link.net</a>
-                </p>
             </div>
         </div>
     </div>
@@ -95,8 +92,8 @@
 
 <div class="module content-call-out">
     <div class="container center-text">
-        <p>For more information on how BOWlink Technologies can create a cost-effective healthcare information data exchange solution for your organization,
-            <br/>please contact us at <strong>(774) 272-0313</strong> or email <strong><a href="mailto:information@health-e-link.net">information@health-e-link.net</a></strong>
+        <p>
+            For more information or a demonstration of Health-e-link's interoperability and data management solutions,<br/> please contact us at <strong>(774) 272-0313</strong> or email <a href="mailto:information@health-e-link.net">information@health-e-link.net</a>
         </p>
     </div>
 </div>

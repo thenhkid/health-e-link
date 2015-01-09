@@ -48,54 +48,40 @@
             </aside>
 
             <div class="col-md-9 col-md-offset-0 col-sm-8 col-sm-offset-1 page-content">
-
-                <h4>Privacy and Security Statement:</h4>
+                
+                <h4>Hosted and Licensed Solutions</h4>
                 <p>
-                    Health-e-Link takes your privacy seriously. Please read the following to learn more about our policy. 
+                    Health-e-link's technology-based solutions including eReferral, Universal HIE and Clinical Data Warehouse. Health-e-link is hosted within our secure data center and are available for customer 
+                    use on an ongoing basis. Clients can be configured and operational on Health-e-link within a matter of days. Licensed software may be installed, configured and operated by your IT staff with 
+                    Health-e-link resources available for technical support as required. Health-e-link solutions are developed on Java and Microsoft SQL Server platforms.
                 </p>
                 <br />
-                <h4>What this Privacy Policy Covers</h4>
+                <h4>Modular Design</h4>
                 <p>
-                    This Privacy Policy covers Health-e-Link's treatment of personally identifiable information that Health-e-Link collects when you are on the Health-e-Link site. 
+                    The Health-e-link Suite is modular and highly configurable to promote flexibility and ensure that our solution is configured to meet your specific needs. From network interfaces to user interfaces, 
+                    Health-e-link can be configured to align with your existing capabilities, thereby minimizing the burden we impose on your existing infrastructure and IT staff. Health-e-link modular features are only 
+                    installed if they are part of your network solution, simplifying all aspects of network management. 
                 </p>
                 <br />
-                <h4>Information Collection and use</h4>
+                <h4>Pilot and Phased Implementations</h4>
                 <p>
-                    Health-e-Link may collect personally identifiable information when you contact us or join our email list such as your name, company name, email address, and other information.  
+                    At Health-e-link, we pride ourselves on providing personalized, customized services that align with our client's unique needs and capabilities. Health-e-link's hosted solutions often serve as a 
+                    pilot platform for customers that want to evaluate Health-e-link capabilities. Health-e-link implementations can range from straightforward implementations of our hosted eReferral system that can be 
+                    accomplished in a matter of days, to state-wide implementations of our clinical data warehouse that may take several months to complete.
                 </p>
                 <br />
-                <h4>Information Sharing and Disclosure</h4>
+                <h4>Health-e-link Support Staff</h4>
                 <p>
-                    Health-e-Link will not sell trade or rent your personally identifiable information to anyone. [Health-e-Link may provide aggregate statistics about its customers, traffic patterns, and 
-                    related site information to reputable third-party vendors, but these statistics will include no personally identifying information.]
-
-                    Health-e-Link may also release account information when we believe, in good faith that such release is reasonably necessary to (i) comply with the law, (ii) enforce or apply the terms of 
-                    our site use agreement or (iii) protect the rights, property or safety Health-e-Link , our users or others.  
-                </p>
-                <br />
-                <h4>Links</h5>
-                <p>
-                    This site contains external links to other web sites. Health-e-Link is not responsible for the privacy policies of these sites and the information they may gather expressly or automatically. 
-                </p>
-                <br />
-                <h4>Privacy Policy and Site Use Agreement</h4>
-                <p>
-                    Your use of this site constitutes your consent to the collection and use of the information described in this Privacy Policy by Health-e-Link .  
-                </p>
-                <br />
-                <h4>Changes to this Privacy Policy</h4>
-                <p>
-                   Health-e-Link may edit this policy from time to time. If we make any substantial changes we will notify you by posting a prominent announcement on our pages. 
-                </p>
-                <br />
-                <h4>Questions or suggestions</h4>
-                <p>
-                    If you have any questions or suggestions send an email to <a href="mailto:information@health-e-link.net">information@health-e-link.net</a>.  
+                    For our hosted solution, Health-e-link technical support staff monitors and maintains the Health-e-link network on an ongoing basis. Health-e-link operations staff ensures that all data exchange 
+                    activity meets customer expectations based on predefined service level agreements. Health-e-link customer service staff provides ongoing help desk and training resources and also serve as the primary 
+                    point of contact for all customer issues. All the support capabilities developed at Health-e-link are transferrable to your staffs through our consulting services if you choose to license and operate
+                    Health-e-link within your facilities.
                 </p>
             </div>
         </div>
     </div>
 </div>
+
 <div class="module content-call-out">
     <div class="container center-text">
         <p>
