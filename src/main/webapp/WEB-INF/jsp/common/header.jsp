@@ -110,10 +110,10 @@
 
                     <div class="central-graphic-content">
                         <h3>Our products and services enable health information exchange between<br/>
-                            groups of health care providers, community partners, and state and local health agencies.</h3>
+                            groups of health care providers, community partners, as well as federal, state and local health agencies.</h3>
 
-                        <a href="<c:url value='/consulting-services'/>" title="Solutions Overview" class="btn btn-primary btn-action">Our Solutions</a>
-                        <a href="<c:url value='/about/how-we-work'/>" title="How We Work" class="btn btn-primary btn-action btn-primary-action">Get Started</a>
+                        <a href="<c:url value='/about/how-we-work'/>" title="Network Capabilities" class="btn btn-primary btn-action btn-primary-action">Network Capabilities</a>
+                        <a href="<c:url value='/consulting-services'/>" title="Support Services" class="btn btn-primary btn-action">Support Services</a>
                     </div>
                 </div>
                

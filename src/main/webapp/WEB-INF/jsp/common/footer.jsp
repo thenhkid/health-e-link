@@ -44,8 +44,6 @@
                     <span class="postal-code">01501</span></span> |
                 Phone: <span class="tel">(774) 272-0313</span> 
             </p>
-            <p>
-            Copyright <fmt:formatDate value="${date}" pattern="yyyy" /> Massachusetts Department of Public Health All rights reserved</p>
         </p>
     </div>
 </footer>
