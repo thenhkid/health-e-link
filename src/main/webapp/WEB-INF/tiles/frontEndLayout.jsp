@@ -14,7 +14,7 @@
 <head>
     <meta charset="utf-8">	
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <meta name="description" content="">
+    <meta name="description" content="<tiles:insertAttribute name="description" />">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <meta http-equiv="Content-Language" content="en">
     <meta http-equiv="Accept-Language" content="en">
