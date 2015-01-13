@@ -19,13 +19,13 @@
             <div class="col-md-4 col-sm-4 product-summary">
                 <a href="<c:url value='/product-suite/eReferral'/>" title="eReferral" class="icon-product icon-product icon-health-e-net"></a>
                 <h3><a href="<c:url value='/product-suite/eReferral'/>" title="eReferral">eReferral</a></h3>
-                <p>Process referrals and feedback reports with all partners in your care network.</p>
+                <p>Process referrals and feedback reports electronically with all partners in your care network.</p>
                 <a href="<c:url value='/product-suite/eReferral'/>" title="eReferral" class="btn-secondary">Learn More</a>
             </div>
             <div class="col-md-4 col-sm-4 product-summary">
                 <a href="<c:url value='/product-suite/universal-hie'/>" title="Universal HIE" class="icon-product icon-health-e-data"></a>
                 <h3><a href="<c:url value='/product-suite/universal-hie'/>" title="Universal HIE">Universal HIE</a></h3>
-                <p>Connect healthcare provider EMR systems with partner systems and exchange client/patient data seamlessly.</p>
+                <p>Connect healthcare provider EMR systems with partner systems and exchange patient data seamlessly.</p>
                 <a href="<c:url value='/product-suite/universal-hie'/>" title="Universal HIE" class="btn-secondary">Learn More</a>
             </div>
             <div class="col-md-4 col-sm-4 product-summary">

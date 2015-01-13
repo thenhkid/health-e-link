@@ -60,7 +60,8 @@
                     there has been limited success with health information exchange with the exception of targeted solutions in localized settings or alternatively, national systems focused on very limited 
                     data sets in specific program areas. For any collaborating healthcare organizations, sharing patient data has many challenges, one of which is that these organizations each employ technology-based 
                     systems with differing capabilities for data exchange. Often times, meeting the technical requirements of any data exchange project is overwhelming and in many cases, technical requirements of one 
-                    initiative conflicts with the technical requirements of another. Conflicting code sets, message types,  and transport methods confuse and potentially overwhelm technical staffs.
+                    initiative conflicts with the technical requirements of another. Conflicting code sets, message types, document types and transport methods confuse and potentially overwhelm technical staffs When 
+                    will a solution be available that eases the burden for healthcare providers to more easily share patient data?
                 </p>
                 <br />
                 <h4>Health-e-link's Universal HIE Solution</h4>
@@ -77,7 +78,7 @@
                     <li>A highly flexible data integration hub that collects, normalizes and delivers data from virtually any system using standardized or proprietary message formats and code sets;</li>
                     <li>Supports all types of data exchange from batch file upload/download, to SFTP/FTPS batch file exchange to web services/API integration.</li>
                     <li>Supports all message formats including txt files, csv files, xml files, mdb files and excel spreadsheets.</li>
-                    <li>Supports all document types including CCR, CCD, HL7, JSON and proprietary document types.</li>
+                    <li>Supports all document types including CCR, CCD, HL7, JSON and others.</li>
                     <li>Supports standard and proprietary code sets including CPT, ICD, SNOMED, LOINC and others. </li>
                     <li>Easy-to-navigate web-based interface that simplifies system configuration to meet individual data exchange needs;</li>
                     <li>Operational and auditing features that support automated processing, accountability and data accuracy;</li>

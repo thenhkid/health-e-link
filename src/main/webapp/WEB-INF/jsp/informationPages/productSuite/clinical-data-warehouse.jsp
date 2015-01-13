@@ -62,7 +62,7 @@
                     oversight, population health management and program management. These organizations are often burdened with outdated and siloed  systems using outdated and incompatible technologies. The challenge 
                     for these organizations is to find a cost-effective and strategic approach to collecting, managing, analyzing and reporting this vital data. Siloed legacy systems developed over many years plague 
                     the effectiveness of data collection and management in an evolving health IT landscape. Competing priorities and system requirements for multiple programs of care complicate the selection, implementation
-                    and management of data warehouse solutions.
+                    and management of data warehouse solutions. Is there a strategic solution that can meet long term program and data management needs across evolving networks of care?
                 </p>
                 <br />
                 <h4>Health-e-link's Clinical Data Warehouse Solution</h4>

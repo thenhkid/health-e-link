@@ -51,7 +51,7 @@
                 
                 <h4>Hosted and Licensed Solutions</h4>
                 <p>
-                    Health-e-link's technology-based solutions including eReferral, Universal HIE and Clinical Data Warehouse. Health-e-link is hosted within our secure data center and are available for customer 
+                    Health-e-link's technology-based solutions including eReferral, Universal HIE and Clinical Data Warehouse. Health-e-link solutions are hosted within our secure data center and are available for customer 
                     use on an ongoing basis. Clients can be configured and operational on Health-e-link within a matter of days. Licensed software may be installed, configured and operated by your IT staff with 
                     Health-e-link resources available for technical support as required. Health-e-link solutions are developed on Java and Microsoft SQL Server platforms.
                 </p>
@@ -74,8 +74,8 @@
                 <p>
                     For our hosted solution, Health-e-link technical support staff monitors and maintains the Health-e-link network on an ongoing basis. Health-e-link operations staff ensures that all data exchange 
                     activity meets customer expectations based on predefined service level agreements. Health-e-link customer service staff provides ongoing help desk and training resources and also serve as the primary 
-                    point of contact for all customer issues. All the support capabilities developed at Health-e-link are transferrable to your staffs through our consulting services if you choose to license and operate
-                    Health-e-link within your facilities.
+                    point of contact for all customer issues. Support capabilities developed at Health-e-link are transferrable to your staffs through our training services if you choose to license and operate Health-e-link 
+                    within your facilities.
                 </p>
             </div>
         </div>
