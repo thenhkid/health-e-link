@@ -94,17 +94,17 @@
 
 
                     <div class="central-graphic-image image-a">
-                        <img src="<%=request.getContextPath()%>/dspResources/img/front-end/health-e-link/photowithchild.jpg" />
+                        <img src="<%=request.getContextPath()%>/dspResources/img/front-end/health-e-link/photowithchild.jpg" alt="Process referrals and feedback reports electronically with all partners in your care network." />
                         <div class="caret"></div>
                     </div>
 
                     <div class="central-graphic-image image-b">
-                        <img src="<%=request.getContextPath()%>/dspResources/img/front-end/health-e-link/gymPhoto.jpg" />
+                        <img src="<%=request.getContextPath()%>/dspResources/img/front-end/health-e-link/gymPhoto.jpg" alt="Connect healthcare provider EMR systems with partner systems and exchange patient data seamlessly." />
                         <div class="caret"></div>
                     </div>
 
                     <div class="central-graphic-image image-c">
-                        <img src="<%=request.getContextPath()%>/dspResources/img/front-end/health-e-link/reportPhoto.jpg" />
+                        <img src="<%=request.getContextPath()%>/dspResources/img/front-end/health-e-link/reportPhoto.jpg" alt="Securely and effectively manage patient data across multiple programs of care." />
                         <div class="caret"></div>
                     </div>
 
