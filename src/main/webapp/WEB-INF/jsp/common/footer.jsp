@@ -3,6 +3,9 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <jsp:useBean id="date" class="java.util.Date" />
 
+<div class="modal fade" id="settingsModal" role="dialog" tabindex="-1" aria-labeledby="Settings" aria-hidden="true" aria-describedby="Settings"></div>
+
+
 <%--<div class="module email-list-signup">
     <div class="container">
         <div class="alert alert-danger error" style="display: none;">

@@ -207,3 +207,20 @@
         </c:choose>
     </div>
 </header>
+<script type="text/javascript">
+//This function will launch the overlay for settings
+require(['./main'], function () {
+    require(['jquery'], function($) {
+  
+$(document).on('click', '.settings', function() {
+	$.ajax({
+        url: '/settings',
+        type: "GET",
+        success: function(data) {
+            $("#settingsModal").html(data);
+        }
+    });
+});
+    });
+});
+</script>
