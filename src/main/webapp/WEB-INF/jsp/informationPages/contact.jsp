@@ -110,8 +110,9 @@
                             <span id="errorMsg_email" class="control-label"></span> 
                             <span class="control-label"><a href="#privacyModal" data-toggle="modal" class="btn btn-link userEdit">Privacy Policy</a></span>
                         </div>
-                        <div class="form-group">
-                            <label for="comments">I am Interested In:</label>
+                        <div id="fieldDiv_interestedIn" class="form-group">
+                        	<label for="comments">I am Interested In: *</label>
+                        	<span id="errorMsg_interestedIn" class="control-label"></span> 
                             <div class="checkbox">
                                 <label>
                                     <input name='interestedIn' type="checkbox" value="eReferral">
@@ -136,6 +137,7 @@
                                     Support Services
                                 </label>
                             </div>
+                            
                         </div>
                         <div class="form-group">
                             <label for="comments">Comments</label>
