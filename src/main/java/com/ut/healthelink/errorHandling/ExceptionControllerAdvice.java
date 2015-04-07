@@ -13,6 +13,7 @@ import com.ut.healthelink.service.userManager;
 import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.Date;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -34,7 +35,8 @@ public class ExceptionControllerAdvice {
     private userManager usermanager;
  
     @ExceptionHandler(Exception.class)
-    public ModelAndView exception(HttpSession session, Exception e, Authentication authentication) throws Exception {
+    public ModelAndView exception(HttpSession session, Exception e, HttpServletRequest request, 
+    		Authentication authentication) throws Exception {
        
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/exception");
@@ -46,6 +48,17 @@ public class ExceptionControllerAdvice {
         messageDetails.setmessageSubject("Exception Error " + InetAddress.getLocalHost().getHostAddress());
         
         StringBuilder sb = new StringBuilder();
+        
+        //we log page with error and ip of remote client if possible
+        try {
+        	if (request.getHeader("HTTP_X_FORWARDED_FOR") != null) {
+        		sb.append("HTTP_X_FORWARDED_FOR: " + request.getHeader("HTTP_X_FORWARDED_FOR") + "<br/>");      
+        	}
+        	sb.append("Remote Address: " + request.getRemoteAddr() + "<br/>"); 
+        	sb.append("Web Page: " + request.getRequestURL() + "<br/>"); 
+        } catch (Exception ex) {
+        	ex.printStackTrace();
+        }
         
         /* If a user is logged in then send along the user details */
         if(session.getAttribute("userDetails") != null || authentication != null) {
