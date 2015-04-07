@@ -50,6 +50,7 @@ public class mainController {
     
     @Autowired
     private newsletterManager newslettermanager;
+   
     
     /**
      * The '/login' request will serve up the login page.

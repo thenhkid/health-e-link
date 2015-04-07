@@ -51,12 +51,18 @@
             </aside>
 
             <div class="col-md-9 col-md-offset-0 col-sm-8 col-sm-offset-1 page-content">
-                <h3>${article.title}</h3>
-                <p>
-                    ${article.longDesc}
-                </p>
+                <c:choose>
+                    <c:when test="${article != ''}">
+                        <h3>${article.title}</h3>
+                        <p>
+                            ${article.longDesc}
+                        </p>
+                    </c:when>
+                    <c:otherwise>
+                        <p>Article was not found</p>
+                    </c:otherwise>
+                </c:choose>
             </div>
-
         </div>
     </div>
 </div>
