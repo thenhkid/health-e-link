@@ -110,8 +110,8 @@ public class mainController {
      * @return	the home page view
      * @throws Exception
      */
-    @RequestMapping(value = "/", method = {RequestMethod.GET})
-    public ModelAndView welcome(HttpServletRequest request, HttpServletResponse response, RedirectAttributes redirectAttr, HttpSession session) throws Exception {
+    @RequestMapping(value = "/", method = {RequestMethod.GET, RequestMethod.POST})
+    public ModelAndView welcome() throws Exception {
         
        /* Get a list of active news articles */
        List<newsArticle> newsArticles = newsarticlemanager.listAllActiveNewsArticles();
@@ -131,7 +131,7 @@ public class mainController {
      * @throws Exception
      */
     @RequestMapping(value = "/", method = {RequestMethod.HEAD})
-    public ModelAndView headRequest(HttpServletRequest request, HttpServletResponse response, RedirectAttributes redirectAttr, HttpSession session) throws Exception { 
+    public ModelAndView headRequest() throws Exception { 
             ModelAndView mav = new ModelAndView(new RedirectView("/home"));
             return mav;   
     }
