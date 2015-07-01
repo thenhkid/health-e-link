@@ -9,6 +9,7 @@ import com.ut.healthelink.model.HL7Elements;
 import com.ut.healthelink.model.HL7Segments;
 import com.ut.healthelink.model.Macros;
 import com.ut.healthelink.model.configuration;
+import com.ut.healthelink.model.configurationCCDElements;
 import com.ut.healthelink.model.configurationConnection;
 import com.ut.healthelink.model.configurationConnectionReceivers;
 import com.ut.healthelink.model.configurationConnectionSenders;
@@ -135,5 +136,11 @@ public interface configurationDAO {
   void removeHL7Element(Integer elementId);
   
   void removeHL7Segment(Integer segmentId);
+  
+  List<configurationCCDElements> getCCDElements(Integer configId) throws Exception;
+  
+  void saveCCDElement(configurationCCDElements ccdElement) throws Exception;
+  
+  configurationCCDElements getCCDElement(Integer elementId) throws Exception;
   
 }

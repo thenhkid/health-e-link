@@ -14,6 +14,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -25,7 +26,19 @@ import org.springframework.format.annotation.DateTimeFormat;
 @Table(name = "wsMessagesIn")
 public class WSMessagesIn {
 
-
+	
+	@Transient
+    private String orgName = null;
+    
+	@Transient
+    private String statusName = null;
+    
+	@Transient
+    private String errorDisplayText= null;
+	
+	@Transient
+    private String batchName= null;
+	
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID", nullable = false)
@@ -62,7 +75,12 @@ public class WSMessagesIn {
     @Column(name = "batchUploadId", nullable = true)
     private int batchUploadId = 0;
 	
-	
+    @Column(name = "foundPosition", nullable = true)
+    private int foundPosition = 0;
+    
+    @Column(name = "positionMatched", nullable = true)
+    private boolean positionMatched = false;
+    
     public int getId() {
 		return id;
 	}
@@ -151,5 +169,64 @@ public class WSMessagesIn {
 		this.batchUploadId = batchUploadId;
 	}
 
-	
+
+	public int getFoundPosition() {
+		return foundPosition;
+	}
+
+
+	public void setFoundPosition(int foundPosition) {
+		this.foundPosition = foundPosition;
+	}
+
+
+	public boolean isPositionMatched() {
+		return positionMatched;
+	}
+
+
+	public void setPositionMatched(boolean positionMatched) {
+		this.positionMatched = positionMatched;
+	}
+
+
+	public String getOrgName() {
+		return orgName;
+	}
+
+
+	public void setOrgName(String orgName) {
+		this.orgName = orgName;
+	}
+
+
+	public String getStatusName() {
+		return statusName;
+	}
+
+
+	public void setStatusName(String statusName) {
+		this.statusName = statusName;
+	}
+
+
+	public String getErrorDisplayText() {
+		return errorDisplayText;
+	}
+
+
+	public void setErrorDisplayText(String errorDisplayText) {
+		this.errorDisplayText = errorDisplayText;
+	}
+
+
+	public String getBatchName() {
+		return batchName;
+	}
+
+
+	public void setBatchName(String batchName) {
+		this.batchName = batchName;
+	}
+
 }

@@ -42,5 +42,7 @@ public interface organizationDAO {
     List<Brochure> getOrganizationBrochures(int orgId);
 
     List<Organization> getAssociatedOrgs(int orgId);
+    
+    List getPartnerEntriesForMap();
 
 }

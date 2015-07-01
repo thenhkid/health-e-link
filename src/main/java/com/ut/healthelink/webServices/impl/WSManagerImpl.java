@@ -1,8 +1,11 @@
 package com.ut.healthelink.webServices.impl;
 
 import java.io.ByteArrayOutputStream;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
+import java.util.Date;
+import java.util.List;
+import java.util.Properties;
+
+import javax.annotation.Resource;
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPConnection;
@@ -12,9 +15,14 @@ import javax.xml.soap.SOAPElement;
 import javax.xml.soap.SOAPEnvelope;
 import javax.xml.soap.SOAPMessage;
 import javax.xml.soap.SOAPPart;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.ut.healthelink.dao.WebServicesDAO;
 import com.ut.healthelink.dao.transactionOutDAO;
+import com.ut.healthelink.model.WSMessagesIn;
+import com.ut.healthelink.model.wsMessagesOut;
 import com.ut.healthelink.model.custom.ToWSSOAP;
 import com.ut.healthelink.service.transactionInManager;
 import com.ut.healthelink.service.transactionOutManager;
@@ -23,7 +31,10 @@ import com.ut.healthelink.webServices.WSManager;
 
 @Service
 public class WSManagerImpl implements WSManager {
-
+	
+	@Resource(name = "myProps")
+	private Properties myProps;
+	
 	@Autowired
     private transactionInManager transactionInManager;
 	
@@ -33,23 +44,37 @@ public class WSManagerImpl implements WSManager {
 	@Autowired
     private transactionOutManager transactionoutmanager;
 
+	@Autowired
+    private WebServicesDAO webservicesDAO;
 	
 	@Override
-	public String sendHIESoapMessage(String fileContent, String toEmail, String fromEmail, Integer batchId){
-		String messageResult = "failed";
+	public wsMessagesOut sendHIESoapMessage(wsMessagesOut wsMessagesOut, String fileContent){
 		try {
+			wsMessagesOut.setMessageResult("failed");
 			SOAPConnectionFactory soapConnectionFactory = SOAPConnectionFactory.newInstance();
 	        SOAPConnection soapConnection = soapConnectionFactory.createConnection();
 	
 	        // Send SOAP Message to SOAP Server
-	        //end point changes, need to put into config file of some sort
-
-			ToWSSOAP toWSOAP = getWSSOAPInfo();
-			if (!fromEmail.equalsIgnoreCase("")) {
-				toWSOAP.setFromEmail(fromEmail);
+	        ToWSSOAP toWSOAP = new ToWSSOAP();
+	       
+	        wsMessagesOut.setEndPoint(myProps.getProperty("ws.endpoint"));
+			toWSOAP.setEndPoint(myProps.getProperty("ws.endpoint"));
+			toWSOAP.setFromEmail(myProps.getProperty("ws.fromEmail"));
+			toWSOAP.setMimeType(wsMessagesOut.getMimeType());
+			
+			if (!wsMessagesOut.getFromEmail().equalsIgnoreCase("")) {
+				toWSOAP.setFromEmail(wsMessagesOut.getFromEmail());
+			} else  {
+				wsMessagesOut.setFromEmail(myProps.getProperty("ws.fromEmail"));
 			}
 			
-	        SOAPMessage soapResponse = soapConnection.call(createSOAPRequest(fileContent, toEmail, toWSOAP), toWSOAP.getEndPoint());
+			SOAPMessage soapMessage = createSOAPRequest(fileContent, wsMessagesOut.getToEmail(), toWSOAP);
+			
+			ByteArrayOutputStream stream = new ByteArrayOutputStream();
+			soapMessage.writeTo(stream);
+			wsMessagesOut.setSoapMessage(new String(stream.toByteArray(), "utf-8"));
+			
+	        SOAPMessage soapResponse = soapConnection.call(soapMessage, toWSOAP.getEndPoint());
 	
 	        // print SOAP Response
 	        System.out.println("************start of soap response *****************");
@@ -61,28 +86,36 @@ public class WSManagerImpl implements WSManager {
 	        soapResponse.writeTo(os);
 	        String responseXML = new String(os.toByteArray());
 	        System.out.println("response xml is " + responseXML);
+	        wsMessagesOut.setSoapResponse(responseXML);
 	        
 	        try {
-	        		messageResult = getXMLValue ("rhap:payload", responseXML);
-	        		System.out.println("message result is " + messageResult);
+	        		wsMessagesOut.setMessageResult(getXMLValue ("rhap:payload", responseXML));
+	        		System.out.println("message result is " + wsMessagesOut.getMessageResult());
 	        } catch(Exception ex) {
-	        	transactionOutDAO.updateBatchStatus(batchId, 30);
+	        	transactionOutDAO.updateBatchStatus(wsMessagesOut.getBatchDownloadId(), 30);
+	        	wsMessagesOut.setSoapResponse(ex.toString());
             	/**insert error**/
-            	transactionInManager.insertProcessingError(20, null, batchId, null, null, null, null, false, true, ex.toString());
-            	transactionoutmanager.updateTargetTransasctionStatus(batchId, 33);
+            	transactionInManager.insertProcessingError(21, null, wsMessagesOut.getBatchDownloadId(), null, null, null, null, true, true, ex.toString(), null);
+            	transactionoutmanager.updateTargetTransasctionStatus(wsMessagesOut.getBatchDownloadId(), 33);
 	        	ex.printStackTrace();
 	        }
 	        soapConnection.close();
 	        
 			} catch (Exception ex) {
-				transactionOutDAO.updateBatchStatus(batchId, 30);
+				transactionOutDAO.updateBatchStatus(wsMessagesOut.getBatchDownloadId(), 30);
             	/**insert error**/
-            	transactionInManager.insertProcessingError(20, null, batchId, null, null, null, null, false, true, ex.toString());
-            	transactionoutmanager.updateTargetTransasctionStatus(batchId, 33);
+            	transactionInManager.insertProcessingError(21, null, wsMessagesOut.getBatchDownloadId(), null, null, null, null, true, true, ex.toString(), null);
+            	transactionoutmanager.updateTargetTransasctionStatus(wsMessagesOut.getBatchDownloadId(), 33);
 				ex.printStackTrace();
+				wsMessagesOut.setSoapResponse(ex.toString());
 				
 			}
-		return messageResult;
+		try {
+			saveWSMessagesOut(wsMessagesOut);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		return wsMessagesOut;
 
 	}
 
@@ -137,6 +170,7 @@ public class WSManagerImpl implements WSManager {
 	        
 	        SOAPElement soapBodyElemIHE = soapBodyElem.addChildElement("ProvideAndRegisterDocumentSet", "ihe");
 	        SOAPElement soapBodyElemIHEDocument = soapBodyElemIHE.addChildElement("Document", "ihe");
+	        soapBodyElemIHEDocument.setAttribute("mimeType", toWSOAP.getMimeType());
 	        soapBodyElemIHEDocument.addChildElement("ClassCode", "ihe");
 	        soapBodyElemIHEDocument.addChildElement("ConfidentialityCode", "ihe");
 	        soapBodyElemIHEDocument.addChildElement("FormatCode", "ihe");
@@ -162,36 +196,47 @@ public class WSManagerImpl implements WSManager {
 	}
 
 	@Override
-	public ToWSSOAP getWSSOAPInfo() {
-		String hostname = null;
-		ToWSSOAP toWSOAP = new ToWSSOAP();
-		//default to test for now
-		toWSOAP.setEndPoint("http://localhost:8080");
-		toWSOAP.setFromEmail("e-Referral@state.ma.us");
-		try {
-            hostname = InetAddress.getLocalHost().getHostAddress();
-        } catch (UnknownHostException e) {
-        	System.out.print( "Error - " + e + " " +
-                    e.getStackTrace()[1].getClassName() + 
-                    "." + e.getStackTrace()[1].getMethodName() +  " "  +  e.getStackTrace());
-        }
-        
-        if("10.202.52.54".equals(hostname)) {
-        	toWSOAP.setEndPoint("http://orion-mao-testrhapgw11v:9013/services/DGL_eReferral_Interface.DGL_eReferral_InterfaceHttpSoap12Endpoint");
-        	toWSOAP.setFromEmail("ereferral@direct.ereferral.test.masshiwaystage.com");
-        } else if("10.64.61.129".equals(hostname)) {
-        	toWSOAP.setEndPoint("http://orion-mao-devrhapgw11v:9013/services/DGL_eReferral_Interface.DGL_eReferral_InterfaceHttpSoap12Endpoint");
-        	toWSOAP.setFromEmail("ereferral@direct.ereferral.dev.masshiwaystage.com");
-        } else if("10.202.52.152".equals(hostname)) {
-        	toWSOAP.setEndPoint("http://orion-mao-prodrhapgw11v:9013/services/DGL_eReferral_Interface.DGL_eReferral_InterfaceHttpSoap12Endpoint"); 
-        	toWSOAP.setFromEmail("ereferral@direct.ereferral.masshiway.net");
-        } else if("10.202.52.22".equals(hostname)) {
-        	toWSOAP.setEndPoint("http://orion-mao-prtstrhapgw11v:9013/services/DGL_eReferral_Interface.DGL_eReferral_InterfaceHttpSoap12Endpoint"); 
-        	toWSOAP.setFromEmail("ereferral@direct.ereferral.prtst.masshiwaystage.com");
-        }
-		
-		return toWSOAP;
+	public List<WSMessagesIn> getWSMessagesInList(Date fromDate, Date toDate,
+			Integer fetchSize) throws Exception {
+		return webservicesDAO.getWSMessagesInList(fromDate, toDate, fetchSize);
 	}
 
-   
+	@Override
+	public WSMessagesIn getWSMessagesIn(Integer wsId) throws Exception {
+		return webservicesDAO.getWSMessagesIn(wsId);
+	}
+
+	@Override
+	public void saveWSMessagesOut(wsMessagesOut wsMessagesOut) throws Exception {
+		webservicesDAO.saveWSMessagesOut(wsMessagesOut);
+	}
+
+	@Override
+	public List<wsMessagesOut> getWSMessagesOutList(Date fromDate, Date toDate,
+			Integer fetchSize) throws Exception {
+		return webservicesDAO.getWSMessagesOutList(fromDate, toDate, fetchSize);
+	}
+
+	@Override
+	public wsMessagesOut getWSMessagesOut(Integer wsId) throws Exception {
+		return webservicesDAO.getWSMessagesOut(wsId);
+	}
+
+	@Override
+	public List<wsMessagesOut> getWSMessagesOutByBatchId(Integer batchId)
+			throws Exception {
+		return webservicesDAO.getWSMessagesOutByBatchId(batchId);
+	}
+
+	@Override
+	public List<WSMessagesIn> getWSMessagesInByBatchId(Integer batchId)
+			throws Exception {
+		return webservicesDAO.getWSMessagesInByBatchId(batchId);
+	}
+
+	@Override
+	public void saveWSMessagesIn (WSMessagesIn wsIn) throws Exception {
+		webservicesDAO.saveWSMessagesIn(wsIn);
+	}
+	
 }

@@ -125,12 +125,14 @@
                                                 <h4 class="form-section-heading">Originating Organization Provider: </h4>
                                                 <dl class="vcard">
                                                     <dd class="fn">${transaction.sourceProviderFields[0].fieldValue}&nbsp;${transaction.sourceProviderFields[1].fieldValue}</dd>
-                                                    <dd class="fn">Id: ${transaction.sourceProviderFields[2].fieldValue}</dd>
+                                                    <c:if test="${not empty transaction.sourceProviderFields[2].fieldValue}"><dd class="fn">Id: ${transaction.sourceProviderFields[2].fieldValue}</dd></c:if>
+                                                    <c:if test="${not empty transaction.sourceProviderFields[3].fieldValue}">
                                                     <dd class="adr">
                                                         <span class="street-address">${transaction.sourceProviderFields[3].fieldValue}</span><br/>
                                                         <c:if test="${not empty transaction.sourceProviderFields[4].fieldValue}"><span class="street-address">${transaction.sourceProviderFields[4].fieldValue}</span><br/></c:if>
                                                         <span class="region">${transaction.sourceProviderFields[5].fieldValue}&nbsp;${transaction.sourceProviderFields[6].fieldValue}</span>, <span class="postal-code">${transaction.sourceProviderFields[7].fieldValue}</span>
                                                     </dd>
+                                                    </c:if>
                                                     <c:if test="${not empty transaction.sourceProviderFields[8].fieldValue}"><dd>phone: <span class="tel">${transaction.sourceProviderFields[8].fieldValue}</span></dd></c:if>
                                                     <c:if test="${not empty transaction.sourceProviderFields[9].fieldValue}"><dd>fax: <span class="tel">${transaction.sourceProviderFields[9].fieldValue}</span></dd></c:if>
                                                </dl>
@@ -296,7 +298,14 @@
                                              </c:otherwise>
                                          </c:choose>
                                             <div id="fieldDiv_${detailInfo.fieldNo}" class="form-group">
-                                                <label class="control-label" for="fieldA">${detailInfo.fieldLabel} <c:if test="${detailInfo.required == true}">&nbsp;*</c:if></label>
+                                                <label class="control-label" for="fieldA">${detailInfo.fieldLabel} 
+                                                    <c:if test="${not empty detailInfo.fieldHelp}">
+                                                        <a href="#" data-toggle="tooltip" data-placement="top" data-original-title="${detailInfo.fieldHelp}">
+                                                            <span class="glyphicon glyphicon-question-sign" style="cursor:pointer"></span>
+                                                        </a>
+                                                    </c:if>
+                                                    <c:if test="${detailInfo.required == true}">&nbsp;*</c:if> 
+                                                 </label>
                                                 <c:choose>
                                                     <%--
                                                         Field Type Values
@@ -356,45 +365,46 @@
                 </div>
                                     
                 <%-- Existing Message Attachments --%>
-                <div class="col-md-12 form-section">
-                    <section class="panel panel-default">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">Existing Attachments:</h3>
-                        </div>
-                        <div class="panel-body">
-                            <div class="form-container scrollable">
-                                <div id="existingAttachments"></div>
+                <c:if test="${transaction.attachmentLimit != 0}">
+                    <div class="col-md-12 form-section">
+                        <section class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Existing Attachments:</h3>
                             </div>
-                        </div>
-                    </section>
-                </div>  
+                            <div class="panel-body">
+                                <div class="form-container scrollable">
+                                    <div id="existingAttachments"></div>
+                                </div>
+                            </div>
+                        </section>
+                    </div>  
                     
-
-                <%-- New Message Attachment --%>
-                <div class="col-md-12 form-section">
-                    <section class="panel panel-default">
-                        <div class="panel-heading">
-                            <h3 class="panel-title">Upload New Attachment</h3>
-                        </div>
-                        <div class="panel-body">
-                            <div class="form-container scrollable">
-                               <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label class="control-label" for="attachmentTitle">Attachment Title</label>
-                                        <input id="attachmentTitle" class="form-control" />
+                    <%-- New Message Attachment --%>
+                    <div class="col-md-12 form-section attachmentUploadPanel" rel="${transaction.attachmentLimit}">
+                        <section class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">Upload New Attachment <c:if test="${transaction.attachmentLimit > 0}">- Limited to ${transaction.attachmentLimit} attachment<c:if test="${transaction.attachmentLimit > 1}">s</c:if></c:if></h3>
+                            </div>
+                            <div class="panel-body">
+                                <div class="form-container scrollable">
+                                   <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label" for="attachmentTitle">Attachment Title</label>
+                                            <input id="attachmentTitle" class="form-control" />
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label class="control-label" for="attachmentFile">Attachment File</label>
-                                        <input name="fileUpload" id="attachmentFileUpload" type="file" class="form-control" />
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="control-label" for="attachmentFile">Attachment File</label>
+                                            <br /><div id="UploadButton" class="btn btn-primary btn-action-sm UploadButton" style="cursor:pointer">Upload File</div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </section>
-                </div>
-
+                        </section>
+                    </div>
+                </c:if>
+                
                 <div class="form-group">
                     <div id="translationMsgDiv"  class="alert alert-danger" style="display:none;">
                         <strong>An error has occurred in one of the above fields!</strong>

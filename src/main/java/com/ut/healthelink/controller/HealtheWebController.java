@@ -46,7 +46,6 @@ import com.ut.healthelink.service.transactionOutManager;
 import com.ut.healthelink.service.userManager;
 
 import java.lang.reflect.InvocationTargetException;
-import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -1251,6 +1250,10 @@ public class HealtheWebController {
             transaction.setautoRelease(transportDetails.getautoRelease());
             transaction.settargetConfigId(targetConfigIds);
             transaction.setorginialTransactionId(transactionId);
+            
+            if(transportDetails.getAttachmentLimit() != null && !"".equals(transportDetails.getAttachmentLimit())) {
+                transaction.setAttachmentLimit(Integer.parseInt(transportDetails.getAttachmentLimit()));
+            }
             
             try {
                 
@@ -3015,9 +3018,9 @@ public class HealtheWebController {
      * The 'uploadMessageAttachment' will use jquery to upload a new attachment to the message
      *
      */
-    @RequestMapping(value = "/uploadMessageAttachment", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/uploadMessageAttachment", method = RequestMethod.POST, produces = MediaType.TEXT_PLAIN_VALUE)
     public @ResponseBody
-    Integer uploadMessageAttachment(@RequestParam(value = "fileUpload", required = true) MultipartFile fileUpload, @RequestParam(value = "title", required = false) String title, HttpSession session) throws Exception {
+    String uploadMessageAttachment(@RequestParam(value = "fileUpload", required = true) MultipartFile fileUpload, @RequestParam(value = "title", required = false) String title, HttpSession session) throws Exception {
 
         Integer attachmentId = 0;
 
@@ -3042,7 +3045,7 @@ public class HealtheWebController {
             throw new Exception("Error occurred when uploading a message attachment.", e);
         }
 
-        return attachmentId;
+        return Integer.toString(attachmentId);
     }
 
     /**
@@ -3361,6 +3364,7 @@ public class HealtheWebController {
             field.setreadOnly(readOnly);
             field.setfieldValue(null);
             field.setFieldType(formfield.getFieldType());
+            field.setFieldHelp(formfield.getFieldHelp());
 
             /* Get the validation */
             if (formfield.getValidationType() > 1) {
@@ -3475,6 +3479,7 @@ public class HealtheWebController {
             field.setreadOnly(readOnly);
             field.setfieldValue(null);
             field.setFieldType(formfield.getFieldType());
+            field.setFieldHelp(formfield.getFieldHelp());
 
             /* Get the pre-populated values */
             String tableName = formfield.getautoPopulateTableName();
@@ -4104,7 +4109,7 @@ public class HealtheWebController {
                     
                     historyResults resultEntry = null;
                     
-                    if(reportType == 1) {
+                    if(reportType == 1 && messageType == 0) {
                         resultEntry = new historyResults();
                         resultEntry.setorgName(tgtOrgName);
                         resultEntry.setorgId(configDetails.getorgId());
@@ -4114,7 +4119,7 @@ public class HealtheWebController {
                     }
                     
                     if (sentTo == 0 || sentTo == configDetails.getorgId()) {
-
+                        
                         /* Find the total messages sent for this target and this configuration */
                         List<batchUploadSummary> sentBatches = transactionInManager.getuploadBatchesByConfigAndTarget(connection.getsourceConfigId(), configDetails.getorgId(), connection.gettargetConfigId(), userInfo.getOrgId());
 
@@ -4153,24 +4158,39 @@ public class HealtheWebController {
                                     resultEntry.setDateCreated(batchDetails.getdateSubmitted());
                                     resultEntry.setStatus(psMap.get(batchDetails.getstatusId()));
                                     resultEntry.setStatusId(batchDetails.getstatusId());
+                                    resultEntry.setBatchId(batch.getbatchId());
                                     
-                                     /* Get the patient data */
-                                    messagePatients patientInfo = transactionInManager.getPatientTransactionDetails(transactionDetails.get(0).getId());
+                                    if(transactionDetails != null && transactionDetails.size() > 0) {
+                                        resultEntry.setTransactionId(transactionDetails.get(0).getId());
+                                    
+                                        /* Get the patient data */
+                                        messagePatients patientInfo = transactionInManager.getPatientTransactionDetails(transactionDetails.get(0).getId());
 
-                                    resultEntry.setpatientName(patientInfo.getFirstName() + " " + patientInfo.getLastName());
-                                    resultEntry.setPatientId(patientInfo.getSourcePatientId());
+                                        resultEntry.setpatientName(patientInfo.getFirstName() + " " + patientInfo.getLastName());
+                                        resultEntry.setPatientId(patientInfo.getSourcePatientId());
+                                    }
                                     
                                     resultEntry.setTotalSent(1);
                                     
                                     sentMessages.add(resultEntry); 
                                } 
-                                
                             }
-
+                            else {
+                                
+                                if(matched == true && messageType > 0) {
+                                    resultEntry = new historyResults();
+                                    resultEntry.setorgName(tgtOrgName);
+                                    resultEntry.setorgId(configDetails.getorgId());
+                                    resultEntry.setmessageType(msgTypeName);
+                                    resultEntry.setmessageTypeId(configDetails.getMessageTypeId());
+                                    resultEntry.setTransportType(transportType);
+                                }
+                            }
+                            
                         }
 
                         
-                        if(reportType == 1) {
+                        if(reportType == 1 && resultEntry != null) {
                             resultEntry.setTotalSent(matchedSentBatches);
                             sentMessages.add(resultEntry);
                         }
@@ -4200,7 +4220,7 @@ public class HealtheWebController {
 
                     historyResults resultEntry = null;
                     
-                    if(reportType == 1) {
+                    if(reportType == 1 && messageType == 0) {
                         resultEntry = new historyResults();
                         resultEntry.setorgName(srcOrgName);
                         resultEntry.setorgId(configDetails.getorgId());
@@ -4249,22 +4269,37 @@ public class HealtheWebController {
                                     resultEntry.setDateCreated(batchDetails.getdateCreated());
                                     resultEntry.setStatus(psMap.get(batchDetails.getstatusId()));
                                     resultEntry.setStatusId(batchDetails.getstatusId());
+                                    resultEntry.setBatchId(batch.getbatchId());
                                     
-                                     /* Get the patient data */
-                                    messagePatients patientInfo = transactionInManager.getPatientTransactionDetails(transactionDetails.get(0).gettransactionInId());
+                                    if(transactionDetails != null && transactionDetails.size() > 0) {
+                                        resultEntry.setTransactionId(transactionDetails.get(0).getId());
+                                    
+                                        /* Get the patient data */
+                                        messagePatients patientInfo = transactionInManager.getPatientTransactionDetails(transactionDetails.get(0).gettransactionInId());
 
-                                    resultEntry.setpatientName(patientInfo.getFirstName() + " " + patientInfo.getLastName());
-                                    resultEntry.setPatientId(patientInfo.getSourcePatientId());
+                                        resultEntry.setpatientName(patientInfo.getFirstName() + " " + patientInfo.getLastName());
+                                        resultEntry.setPatientId(patientInfo.getSourcePatientId());
+                                    }
                                     
                                     resultEntry.setTotalSent(1);
                                     
                                     receivedMessages.add(resultEntry); 
                                } 
+                            }
+                            else {
                                 
+                                if(matched == true && messageType > 0) {
+                                    resultEntry = new historyResults();
+                                    resultEntry.setorgName(srcOrgName);
+                                    resultEntry.setorgId(configDetails.getorgId());
+                                    resultEntry.setmessageType(msgTypeName);
+                                    resultEntry.setmessageTypeId(configDetails.getMessageTypeId());
+                                    resultEntry.setTransportType(transportType);
+                                }
                             }
                         }
 
-                        if(reportType == 1) {
+                        if(reportType == 1 && resultEntry != null) {
                             resultEntry.setTotalSent(matchedReceivedBatches);
                             receivedMessages.add(resultEntry);
                         }
@@ -4325,6 +4360,329 @@ public class HealtheWebController {
 
     }
 
+    /**
+     * The '/history/received/messageDetails' POST request will display the selected transaction details. This page is served up from inbox batch transaction list page. So the form will be readOnly.
+     *
+     * @param transactionId The id of the selected transaction
+     * @param fromPage The page the request is coming from (inbox)
+     *
+     * @return this request will return the messageDetailsForm
+     */
+    @RequestMapping(value = "/history/received/messageDetails", method = RequestMethod.POST)
+    public @ResponseBody ModelAndView showHistoryRecievedMessageDetails(@RequestParam(value = "transactionId", required = true) Integer transactionId, @RequestParam(value = "fromPage", required = true) String fromPage, HttpSession session) throws Exception {
 
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/Health-e-Web/messageDetailsModal");
+        mav.addObject("fromPage", fromPage);
+
+        try {
+            transactionTarget transactionInfo = transactionOutManager.getTransactionDetails(transactionId);
+
+            /* Get the details of the sent transaction */
+            transactionIn originalTransactionInfo = transactionInManager.getTransactionDetails(transactionInfo.gettransactionInId());
+
+            /* Need to update the status of the transaction to Recieved (id=20) */
+            transactionOutManager.changeDeliveryStatus(transactionInfo.getbatchDLId(), transactionInfo.getbatchUploadId(), transactionId, transactionInfo.gettransactionInId());
+
+            /* Get the configuration details */
+            configuration configDetails = configurationManager.getConfigurationById(transactionInfo.getconfigId());
+
+            /* Get the organization details for the source (Sender) organization */
+            User userInfo = (User) session.getAttribute("userDetails");
+
+            /* Get a list of form fields */
+            configurationTransport transportDetails = configurationTransportManager.getTransportDetails(transactionInfo.getconfigId());
+
+            Transaction transaction = new Transaction();
+            transactionOutRecords records = null;
+
+            batchDownloads batchInfo = transactionOutManager.getBatchDetails(transactionInfo.getbatchDLId());
+
+            transaction.setorgId(batchInfo.getOrgId());
+            transaction.settransportMethodId(2);
+            transaction.setmessageTypeId(configDetails.getMessageTypeId());
+            transaction.setuserId(batchInfo.getuserId());
+            transaction.setbatchName(batchInfo.getutBatchName());
+            transaction.setstatusId(batchInfo.getstatusId());
+            transaction.settransactionStatusId(transactionInfo.getstatusId());
+            transaction.setconfigId(transactionInfo.getconfigId());
+            transaction.setautoRelease(transportDetails.getautoRelease());
+            transaction.setbatchId(batchInfo.getId());
+            transaction.settransactionId(transactionId);
+            transaction.settransactionTargetId(transactionInfo.getId());
+            transaction.setdateSubmitted(transactionInfo.getdateCreated());
+
+            /* Check to see if the message is a feedback report */
+            if (originalTransactionInfo.gettransactionTargetId() > 0) {
+                transaction.setsourceType(2); /* Feedback report */
+
+                transaction.setorginialTransactionId(transactionOutManager.getTransactionDetails(originalTransactionInfo.gettransactionTargetId()).gettransactionInId());
+            } else {
+                transaction.setsourceType(configDetails.getsourceType());
+                transaction.setmessageStatus(originalTransactionInfo.getmessageStatus());
+            }
+            transaction.setinternalStatusId(transactionInfo.getinternalStatusId());
+
+            lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(transaction.getstatusId());
+            transaction.setstatusValue(processStatus.getEndUserDisplayCode());
+
+            /* get the message type name */
+            transaction.setmessageTypeName(messagetypemanager.getMessageTypeById(configDetails.getMessageTypeId()).getDspName());
+
+            records = transactionOutManager.getTransactionRecords(transactionId);
+            transaction.settransactionRecordId(records.getId());
+
+            try {
+                List<configurationFormFields> senderInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(), transportDetails.getId(), 1);
+                /* Set all the transaction SOURCE ORG fields */
+                List<transactionRecords> fromFields;
+                if (!senderInfoFormFields.isEmpty()) {
+                    fromFields = setInboxFormFields(senderInfoFormFields, records, transactionInfo.getconfigId(), true, 0, 0);
+
+                    int sourceOrgAsInt;
+
+                    try {
+                        sourceOrgAsInt = Integer.parseInt(fromFields.get(0).getFieldValue().trim());
+                    } catch (Exception e) {
+                        sourceOrgAsInt = 0;
+                    }
+                    
+                    if(sourceOrgAsInt > 0) {
+                        /* Make sure the org exists */
+                        Organization orgDetails = organizationmanager.getOrganizationById(sourceOrgAsInt);
+                        if(orgDetails.getId() == sourceOrgAsInt) {
+                            fromFields = setOrgDetails(sourceOrgAsInt);
+                        }
+                        else {
+                            fromFields = setOrgDetails(transactionOutManager.getDownloadSummaryDetails(transactionInfo.getId()).getsourceOrgId());
+                        }
+                    }
+                    else if ("".equals(fromFields.get(0).getFieldValue()) || "0".equals(fromFields.get(0).getFieldValue()) || fromFields.get(0).getFieldValue() == null) {
+                        fromFields = setOrgDetails(transactionOutManager.getDownloadSummaryDetails(transactionInfo.getId()).getsourceOrgId());
+                    }
+                } else {
+                    fromFields = setOrgDetails(transactionOutManager.getDownloadSummaryDetails(transactionInfo.getId()).getsourceOrgId());
+                }
+                transaction.setsourceOrgFields(fromFields);
+
+            } catch (Exception e) {
+                throw new Exception("Error retrieving sender fields for configuration id: " + transactionInfo.getconfigId(), e);
+            }
+
+            try {
+                List<configurationFormFields> senderProviderFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(), transportDetails.getId(), 2);
+                /* Set all the transaction SOURCE PROVIDER fields */
+                List<transactionRecords> fromProviderFields = setInboxFormFields(senderProviderFormFields, records, transactionInfo.getconfigId(), true, 0, 0);
+                transaction.setsourceProviderFields(fromProviderFields);
+
+            } catch (Exception e) {
+                throw new Exception("Error retrieving sender provider fields for configuration id: " + transactionInfo.getconfigId(), e);
+            }
+
+            try {
+                List<configurationFormFields> targetInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(), transportDetails.getId(), 3);
+                /* Set all the transaction TARGET fields */
+
+                List<transactionRecords> toFields;
+                if (!targetInfoFormFields.isEmpty()) {
+                    toFields = setInboxFormFields(targetInfoFormFields, records, transactionInfo.getconfigId(), true, 0, 0);
+
+                    int targetOrgAsInt;
+
+                    try {
+                        targetOrgAsInt = Integer.parseInt(toFields.get(0).getFieldValue().trim());
+                    } catch (Exception e) {
+                        targetOrgAsInt = 0;
+                    }
+
+                    if ("".equals(toFields.get(0).getFieldValue()) || toFields.get(0).getFieldValue() == null || targetOrgAsInt == transactionOutManager.getDownloadSummaryDetails(transactionInfo.getId()).gettargetOrgId()) {
+                        toFields = setOrgDetails(transactionOutManager.getDownloadSummaryDetails(transactionInfo.getId()).gettargetOrgId());
+                    }
+                } else {
+                    toFields = setOrgDetails(transactionOutManager.getDownloadSummaryDetails(transactionInfo.getId()).gettargetOrgId());
+                }
+                transaction.settargetOrgFields(toFields);
+
+            } catch (Exception e) {
+                throw new Exception("Error retrieving target fields for configuration id: " + transactionInfo.getconfigId(), e);
+            }
+
+            try {
+                List<configurationFormFields> targetProviderFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(), transportDetails.getId(), 4);
+                /* Set all the transaction TARGET PROVIDER fields */
+                List<transactionRecords> toProviderFields = setInboxFormFields(targetProviderFormFields, records, transactionInfo.getconfigId(), true, 0, 0);
+                transaction.settargetProviderFields(toProviderFields);
+
+            } catch (Exception e) {
+                throw new Exception("Error retrieving target provider fields for configuration id: " + transactionInfo.getconfigId(), e);
+            }
+
+            try {
+                List<configurationFormFields> patientInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(), transportDetails.getId(), 5);
+
+                /* Set all the transaction PATIENT fields */
+                List<transactionRecords> patientFields = setInboxFormFields(patientInfoFormFields, records, transactionInfo.getconfigId(), true, 0, 0);
+                transaction.setpatientFields(patientFields);
+
+            } catch (Exception e) {
+                throw new Exception("Error retrieving patient fields for configuration id: " + transactionInfo.getconfigId(), e);
+            }
+
+            try {
+                List<configurationFormFields> detailFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(), transportDetails.getId(), 6);
+                /* Set all the transaction DETAIL fields */
+                List<transactionRecords> detailFields = setInboxFormFields(detailFormFields, records, transactionInfo.getconfigId(), true, 0, 0);
+                transaction.setdetailFields(detailFields);
+
+            } catch (Exception e) {
+                throw new Exception("Error retrieving the detail fields for configuration id: " + transactionInfo.getconfigId(), e);
+            }
+
+            mav.addObject("transactionDetails", transaction);
+            
+            /* Get id of the associated feedback report for this message */
+            Integer feedbackConfigId = transactionOutManager.getActiveFeedbackReportsByMessageType(configDetails.getMessageTypeId(), userInfo.getOrgId());
+            mav.addObject("feedbackConfigId", feedbackConfigId);
+
+
+            mav.addObject("transactionInId", transactionInfo.gettransactionInId());
+        } catch (Exception e) {
+            throw new Exception("An error occurred in returning the details of the message, id: " + transactionId, e);
+        }
+
+        return mav;
+    }
+    
+    /**
+     * The 'history/sent/messageDetails' POST request will display the selected transaction details. This page is served up from inbox or sent Items batch transaction list page. So the form will be readOnly.
+     *
+     * @param transactionId The id of the selected transaction
+     *
+     * @return this request will return the messageDetailsForm
+     */
+    @RequestMapping(value = "history/sent/messageDetails", method = RequestMethod.POST)
+    public ModelAndView showHistorySentMessageDetails(@RequestParam(value = "transactionId", required = true) Integer transactionId, @RequestParam(value = "fromPage", required = true) String fromPage, HttpSession session) throws Exception {
+
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/Health-e-Web/messageDetailsModal");
+        mav.addObject("fromPage", fromPage);
+
+        try {
+            transactionIn transactionInfo = transactionInManager.getTransactionDetails(transactionId);
+
+            /* Get the configuration details */
+            configuration configDetails = configurationManager.getConfigurationById(transactionInfo.getconfigId());
+
+            /* Get the organization details for the source (Sender) organization */
+            User userInfo = (User) session.getAttribute("userDetails");
+
+            /* Get a list of form fields */
+            /*configurationTransport transportDetails = configurationTransportManager.getTransportDetailsByTransportMethod(transactionInfo.getconfigId(), 2);*/
+            configurationTransport transportDetails = configurationTransportManager.getTransportDetails(transactionInfo.getconfigId());
+            List<configurationFormFields> senderInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(), transportDetails.getId(), 1);
+            List<configurationFormFields> senderProviderFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(), transportDetails.getId(), 2);
+            List<configurationFormFields> targetInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(), transportDetails.getId(), 3);
+            List<configurationFormFields> targetProviderFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(), transportDetails.getId(), 4);
+            List<configurationFormFields> patientInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(), transportDetails.getId(), 5);
+            List<configurationFormFields> detailFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transactionInfo.getconfigId(), transportDetails.getId(), 6);
+
+            Transaction transaction = new Transaction();
+            transactionInRecords records = null;
+
+            batchUploads batchInfo = transactionInManager.getBatchDetails(transactionInfo.getbatchId());
+            transactionTarget transactionTarget = transactionInManager.getTransactionTarget(transactionInfo.getbatchId(), transactionId);
+
+            transaction.setorgId(batchInfo.getOrgId());
+            transaction.settransportMethodId(2);
+            transaction.setmessageTypeId(configDetails.getMessageTypeId());
+            transaction.setuserId(batchInfo.getuserId());
+            transaction.setbatchName(batchInfo.getutBatchName());
+            transaction.setoriginalFileName(batchInfo.getoriginalFileName());
+            transaction.setstatusId(batchInfo.getstatusId());
+            transaction.settransactionStatusId(transactionInfo.getstatusId());
+            transaction.settargetOrgId(0);
+            transaction.setconfigId(transactionInfo.getconfigId());
+            transaction.setautoRelease(transportDetails.getautoRelease());
+            transaction.setbatchId(batchInfo.getId());
+            transaction.settransactionId(transactionTarget.getId());
+            transaction.settransactionTargetId(transactionTarget.getId());
+            transaction.setdateSubmitted(transactionInfo.getdateCreated());
+
+            /* Check to see if the message is a feedback report */
+            if (transactionInfo.gettransactionTargetId() > 0) {
+                transaction.setsourceType(2); /* Feedback report */
+
+                transaction.setorginialTransactionId(transactionInfo.gettransactionTargetId());
+            } else {
+                transaction.setsourceType(configDetails.getsourceType());
+            }
+
+            lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(transaction.getstatusId());
+            transaction.setstatusValue(processStatus.getEndUserDisplayCode());
+
+            /* get the message type name */
+            transaction.setmessageTypeName(messagetypemanager.getMessageTypeById(configDetails.getMessageTypeId()).getDspName());
+
+            records = transactionInManager.getTransactionRecords(transactionId);
+            transaction.settransactionRecordId(records.getId());
+
+
+            /* Set all the transaction SOURCE ORG fields */
+            List<transactionRecords> fromFields;
+            if (!senderInfoFormFields.isEmpty()) {
+                fromFields = setOutboundFormFields(senderInfoFormFields, records, transactionInfo.getconfigId(), true, 0);
+            } else {
+                fromFields = setOrgDetails(batchInfo.getOrgId());
+            }
+            transaction.setsourceOrgFields(fromFields);
+
+            /* Set all the transaction SOURCE PROVIDER fields */
+            List<transactionRecords> fromProviderFields = setOutboundFormFields(senderProviderFormFields, records, transactionInfo.getconfigId(), true, 0);
+            transaction.setsourceProviderFields(fromProviderFields);
+
+            /* Set all the transaction TARGET fields */
+            List<transactionRecords> toFields;
+            if (!targetInfoFormFields.isEmpty()) {
+                toFields = setOutboundFormFields(targetInfoFormFields, records, transactionInfo.getconfigId(), true, 0);
+
+                int targetOrgAsInt;
+
+                try {
+                    targetOrgAsInt = Integer.parseInt(toFields.get(0).getFieldValue().trim());
+                } catch (Exception e) {
+                    targetOrgAsInt = 0;
+                }
+
+                if ("".equals(toFields.get(0).getFieldValue()) || toFields.get(0).getFieldValue() == null || targetOrgAsInt == transactionInManager.getUploadSummaryDetails(transactionInfo.getId()).gettargetOrgId()) {
+                    toFields = setOrgDetails(transactionInManager.getUploadSummaryDetails(transactionInfo.getId()).gettargetOrgId());
+                }
+
+            } else {
+                toFields = setOrgDetails(transactionInManager.getUploadSummaryDetails(transactionInfo.getId()).gettargetOrgId());
+            }
+            transaction.settargetOrgFields(toFields);
+
+            /* Set all the transaction TARGET PROVIDER fields */
+            List<transactionRecords> toProviderFields = setOutboundFormFields(targetProviderFormFields, records, transactionInfo.getconfigId(), true, 0);
+            transaction.settargetProviderFields(toProviderFields);
+
+            /* Set all the transaction PATIENT fields */
+            List<transactionRecords> patientFields = setOutboundFormFields(patientInfoFormFields, records, transactionInfo.getconfigId(), true, 0);
+            transaction.setpatientFields(patientFields);
+
+            /* Set all the transaction DETAIL fields */
+            List<transactionRecords> detailFields = setOutboundFormFields(detailFormFields, records, transactionInfo.getconfigId(), true, 0);
+            transaction.setdetailFields(detailFields);
+
+            mav.addObject("transactionDetails", transaction);
+
+            mav.addObject("transactionInId", transactionTarget.gettransactionInId());
+
+        } catch (Exception e) {
+            throw new Exception("Error occurred in viewing the sent batch details. transactionId: " + transactionId, e);
+        }
+
+        return mav;
+    }
 
 }

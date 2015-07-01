@@ -3,6 +3,7 @@ package com.ut.healthelink.service;
 import com.ut.healthelink.model.configurationFTPFields;
 
 import java.util.List;
+
 import com.ut.healthelink.model.TransportMethod;
 import com.ut.healthelink.model.configurationFormFields;
 import com.ut.healthelink.model.configurationMessageSpecs;
@@ -10,6 +11,7 @@ import com.ut.healthelink.model.configurationRhapsodyFields;
 import com.ut.healthelink.model.configurationTransport;
 import com.ut.healthelink.model.configurationTransportMessageTypes;
 import com.ut.healthelink.model.configurationWebServiceFields;
+import com.ut.healthelink.model.configurationWebServiceSenders;
 
 public interface configurationTransportManager {
 
@@ -106,4 +108,10 @@ public interface configurationTransportManager {
     
     configurationWebServiceFields getTransWSDetailsPull(int transportDetailId) throws Exception;
     
+    List <configurationWebServiceSenders> getWSSenderList(int transportDetailId) throws Exception;
+    
+    void saveWSSender(configurationWebServiceSenders wsSender) throws Exception;
+    
+    void deleteWSSender(configurationWebServiceSenders wsSender) throws Exception;
+      
 }

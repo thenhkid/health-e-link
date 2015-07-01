@@ -10,23 +10,20 @@ require.config({
         'sprintf': '../vendor/sprintf',
         'moment': '../vendor/moment',
         'daterangepicker': '../vendor/daterangepicker',
-        'dataTables': '../vendor/jquery.dataTables.min',
-        'bootstrapwysihtlm5': '../vendor/bootstrap-wysihtml5',
-        'wysihtlm5': '../vendor/wysihtml5-0.3.0.min'
+        'dataTables': '../vendor/jquery.dataTables.min'
     },
     shim: {
         'bootstrap': ['jquery'],
         'responsive-tables': ['jquery'],
         'daterangepicker': ['jquery', 'bootstrap'],
-        'dataTables': ['jquery'],
-        'bootstrapwysihtlm5': ['jquery','wysihtlm5'],
-        'wysihtlm5': ['jquery']
+        'dataTables': ['jquery']
     }
 });
 
 var datatable;
 
 define(['jquery', 'moment', 'bootstrap', 'responsive-tables', 'mediaModal', 'overlay', 'daterangepicker', 'dataTables'], function($, moment) {
+    
 
     $.ajaxSetup({
         cache: false

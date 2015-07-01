@@ -40,6 +40,7 @@ import com.ut.healthelink.model.custom.TransErrorDetail;
 import com.ut.healthelink.model.lutables.lu_ProcessStatus;
 import com.ut.healthelink.model.messagePatients;
 import com.ut.healthelink.model.messageType;
+import com.ut.healthelink.model.referralActivityExports;
 import com.ut.healthelink.service.sysAdminManager;
 import com.ut.healthelink.service.userManager;
 import java.math.BigInteger;
@@ -81,7 +82,7 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Autowired
     private userManager usermanager;
 
-    private String schemaName = "healthelink";
+    private String schemaName = "universalTranslator";
 
     //list of final status - these records we skip
     private List<Integer> transRELId = Arrays.asList(11, 12, 13, 16);
@@ -1311,6 +1312,69 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Transactional
     public List<batchUploads> getAllUploadedBatches(Date fromDate, Date toDate) throws Exception {
         return getAllUploadedBatches(fromDate, toDate, 0);
+    }
+    
+   
+    /**
+     * The 'getAllRejectedBatches' function will return a list of batches for the admin in the processing activities section.
+     *
+     * @param fromDate
+     * @param toDate
+     * @return This function will return a list of batch uploads
+     * @throws Exception
+     */
+    @Override
+    @Transactional
+    public List<batchUploads> getAllRejectedBatches(Date fromDate, Date toDate, Integer fetchSize) throws Exception {
+
+        int firstResult = 0;
+         
+        List<Integer> batchIdList = new ArrayList<Integer>();
+        
+        Criteria findRejectedTransactions = sessionFactory.getCurrentSession().createCriteria(transactionIn.class);
+        findRejectedTransactions.add(Restrictions.eq("transactionTargetId", 0));
+        findRejectedTransactions.add(Restrictions.or(
+                Restrictions.ge("configId", 0),
+                Restrictions.isNull("configId")
+        ));
+        findRejectedTransactions.add(Restrictions.or(
+                Restrictions.eq("statusId", 13),
+                Restrictions.eq("statusId", 11),
+                Restrictions.eq("statusId", 14)
+        ));
+        
+        List<transactionIn> batches = findRejectedTransactions.list();
+
+        if (batches.isEmpty()) {
+            batchIdList.add(0);
+        } else {
+            for (transactionIn batch : batches) {
+                if (!batchIdList.contains(batch.getbatchId())) {
+                    batchIdList.add(batch.getbatchId());
+                }
+            }
+        }
+        
+
+        Criteria findBatches = sessionFactory.getCurrentSession().createCriteria(batchUploads.class);
+        findBatches.add(Restrictions.in("id", batchIdList));
+        findBatches.add(Restrictions.ne("totalRecordCount", 0));
+
+        if (!"".equals(fromDate)) {
+            findBatches.add(Restrictions.ge("dateSubmitted", fromDate));
+        }
+
+        if (!"".equals(toDate)) {
+            findBatches.add(Restrictions.lt("dateSubmitted", toDate));
+        }
+
+        findBatches.addOrder(Order.desc("dateSubmitted"));
+
+        if (fetchSize > 0) {
+            findBatches.setMaxResults(fetchSize);
+        }
+        
+        return findBatches.list();
     }
 
     /**
@@ -4836,6 +4900,30 @@ public class transactionInDAOImpl implements transactionInDAO {
         return (messagePatients) patientDetails.uniqueResult();
 
     }
+    
+    /**
+     * The 'getPatientTransactionDetailsForExport' function will return the submitted patient data for the passed in transactionId.
+     *
+     * @param transactionInId The id of the transaction to retrieve the patient details
+     */
+    @Override
+    @Transactional
+    public messagePatients getPatientTransactionDetailsForExport(int transactionInId) {
+        
+         String sql = ("SELECT a.*, g.displayText as genderVal, r.displayText as raceVal, h.displayText as ethnicityVal, l.displayText as languageVal, addr.postalCode as zip"
+                    + " from universaltranslator.message_patients a"
+                    + " left outer join lu_genders g on g.id = a.genderId"
+                    + " left outer join lu_races r on r.id = a.raceId"
+                    + " left outer join lu_hispanics h on h.id = a.hispanicId"
+                    + " left outer join lu_languages l on l.id = a.primaryLanguageId"
+                    + " left outer join message_PatientAddresses addr on addr.transactionInId = a.transactionInId"
+                    + " where a.transactionInId = " + transactionInId);
+        
+        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(Transformers.aliasToBean(messagePatients.class));
+
+        return (messagePatients) query.uniqueResult();
+
+    }
 
     @Override
     @Transactional
@@ -4849,6 +4937,7 @@ public class transactionInDAOImpl implements transactionInDAO {
                     + " and configId in (select id from configurations where status = 1) and  "
                     + " directory not in (select folderPath from moveFilesLog where statusId = 1 and method = :method) "
                     + " group by directory order by configId;");
+            
 
             Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
                     .setResultTransformer(Transformers.aliasToBean(configurationRhapsodyFields.class))
@@ -5793,7 +5882,6 @@ public class transactionInDAOImpl implements transactionInDAO {
                     matched = false;
                 }*/
                 
-                    
                 if(statusFieldNo != null && statusFieldNo > 0) {
                     if("0".equals(status)) {
                         BigInteger totalOpen = getTotalOpenFeedbackReports(Integer.toString(transaction.getId()), "F"+statusFieldNo);
@@ -5808,7 +5896,7 @@ public class transactionInDAOImpl implements transactionInDAO {
                         else {
                             matched = false;
                         }
-
+                        
                     }
                     else if("1".equals(status)) {
                         BigInteger totalOpen = getTotalOpenFeedbackReports(Integer.toString(transaction.getId()), "F"+statusFieldNo);
@@ -5832,9 +5920,6 @@ public class transactionInDAOImpl implements transactionInDAO {
                             matched = false;
                         }
                     }
-                }
-                else {
-                    matched = false;
                 }
                 
                 
@@ -6196,7 +6281,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 
         String sql = "select id from batchUploads a where a.totalRecordCount > 0 and (a.dateSubmitted >= '" + fromDate + "' and a.dateSubmitted < '" + toDate + "') and statusId in (2,3,4,5,6,22,23,24,25,28,36,38) ";
         if (erg == true) {
-            sql += "and transportMethodId = 2 group by a.dateSubmitted, a.orgId ";
+            sql += "and transportMethodId = 2 ";
         } else {
             sql += "and transportMethodId <> 2 ";
         }
@@ -6214,9 +6299,9 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Override
     @Transactional
     public BigInteger getReferralCount(String batchIds) throws Exception {
-
-        String sql = "select count(id) as totalReferrals from transactionIn a where batchId in (" + batchIds + ") and transactionTargetId = 0";
-
+       
+        String sql = "select count(id) as totalReferrals from transactionIn a where batchId in (" + batchIds + ") and transactionTargetId = 0 and configId > 0  and statusId not in (19,15,31,13,11,14,21)";
+       
         Query getReferralCount = sessionFactory.getCurrentSession().createSQLQuery(sql);
 
         return (BigInteger) getReferralCount.uniqueResult();
@@ -6226,11 +6311,26 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Transactional
     public BigInteger getFeedbackReportCount(String batchIds) throws Exception {
 
-        String sql = "select count(id) as totalFeedbackReports from transactionIn a where batchId in (" + batchIds + ") and transactionTargetId > 0";
+        String sql = "select count(id) as totalFeedbackReports from transactionIn a where batchId in (" + batchIds + ") "
+                + "and transactionTargetId > 0 "
+                + "and configId > 0 "
+                + "and statusId not in (19,15,31,13,11,14,21) "
+                + "and id in (select transactionInId from transactionTarget where configId in (select configId from configurationTransportDetails where transportmethodId = 2))";
 
         Query getFBCount = sessionFactory.getCurrentSession().createSQLQuery(sql);
 
         return (BigInteger) getFBCount.uniqueResult();
+    }
+    
+    @Override
+    @Transactional
+    public BigInteger getRejectedCount(String fromDate, String toDate) throws Exception {
+       
+        String sql = "select count(id) as totalReferrals from transactionIn where (dateCreated >= '" + fromDate + "' and dateCreated < '" + toDate + "') and transactionTargetId = 0 and (configId >= 0 OR configId is null) and statusId in (13,11,14)";
+      
+        Query getRejectedCount = sessionFactory.getCurrentSession().createSQLQuery(sql);
+
+        return (BigInteger) getRejectedCount.uniqueResult();
     }
 
     @Override
@@ -6238,9 +6338,12 @@ public class transactionInDAOImpl implements transactionInDAO {
     public List<activityReportList> getFeedbackReportList(String batchIds) throws Exception {
         String sql = ("select a.configId as configId, c.orgname as orgName, d.displayName as messageType, count(a.id) as total, d.id as messageTypeId\n"
                 + "from transactionIn a inner join configurations b on b.id = a.configId inner join organizations c on c.id = b.orgId inner join messagetypes d on d.id = b.messageTypeId\n"
-                + "where batchId in (" + batchIds + ") and transactionTargetId > 0\n"
-                + "group by a.configId;");
-
+                + "where a.batchId in (" + batchIds + ") "
+                + "and a.transactionTargetId > 0 "
+                + "and a.statusId not in (19,15,31,13,11,14,21) "
+                + "and a.id in (select transactionInId from transactionTarget where configId in (select configId from configurationTransportDetails where transportmethodId = 2)) "
+                + "group by a.configId order by orgName asc, messageType asc;");
+        
         Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
                 Transformers.aliasToBean(activityReportList.class));
 
@@ -6252,10 +6355,11 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Override
     @Transactional
     public List<activityReportList> getReferralList(String batchIds) throws Exception {
-        String sql = ("select c.orgname as orgName, d.displayName as messageType, count(a.id) as total, d.id as messageTypeId\n"
+        String sql = ("select c.orgname as orgName, d.displayName as messageType, f.orgName as tgtOrgName, count(a.id) as total, d.id as messageTypeId\n"
                 + "from transactionIn a inner join configurations b on b.id = a.configId inner join organizations c on c.id = b.orgId inner join messagetypes d on d.id = b.messageTypeId\n"
-                + "where batchId in (" + batchIds + ") and transactionTargetId = 0\n"
-                + "group by a.configId;");
+                + "inner join batchuploadsummary e on e.batchId = a.batchId inner join organizations f on f.id = e.targetOrgId\n"
+                + "where a.batchId in (" + batchIds + ") and transactionTargetId = 0 and statusId not in (19,15,31,13,11,14,21) \n"
+                + "group by a.configId, e.targetOrgId order by orgName asc, messageType asc;");
 
         Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
                 Transformers.aliasToBean(activityReportList.class));
@@ -6271,8 +6375,12 @@ public class transactionInDAOImpl implements transactionInDAO {
 
         String sql = ("select id \n"
                 + "from transactionIn\n"
-                + "where batchId in (" + ids + ") and transactionTargetId > 0 and configId = " + configId);
-
+                + "where batchId in (" + ids + ") "
+                + "and transactionTargetId > 0 "
+                + "and statusId not in (19,15,31,13,11,14,21) "
+                + "and id in (select transactionInId from transactionTarget where configId in (select configId from configurationTransportDetails where transportmethodId = 2)) "
+                + "and configId = " + configId);
+       
         Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
 
         List<Integer> trans = query.list();
@@ -6292,6 +6400,7 @@ public class transactionInDAOImpl implements transactionInDAO {
         
         return (Integer) query.uniqueResult();
     }
+  
     
     @Override
     @Transactional
@@ -6303,16 +6412,32 @@ public class transactionInDAOImpl implements transactionInDAO {
 
         Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
         
-        return (Integer) query.uniqueResult();
+        if(query.list().size() > 1) {
+            return (Integer) query.list().get(0);
+        }
+        else {
+            return (Integer) query.uniqueResult();
+        }
+        
     }
     
-
+    @Override
+    @Transactional
+    public String getTransactionFieldValue(Integer transactionId, String fieldNo) throws Exception {
+        
+        String sql = "select " + fieldNo + " as fieldValue from transactionInRecords where transactionInId = " + transactionId;
+        
+        Query getFieldvalue = sessionFactory.getCurrentSession().createSQLQuery(sql);
+        
+        return (String) getFieldvalue.uniqueResult();
+    }
+    
     @Override
     @Transactional
     public BigInteger getTotalOpenFeedbackReports(String transIds, String fieldNo) throws Exception {
 
-        String sql = "select count(id) as totalOpen from transactionInRecords a where transactionInId in (" + transIds + ") and " + fieldNo + " = '1'";
-
+        String sql = "select count(id) as totalOpen from transactionInRecords where transactionInId in (" + transIds + ") and " + fieldNo + " = '1'";
+        
         Query getOpenCount = sessionFactory.getCurrentSession().createSQLQuery(sql);
         
         return (BigInteger) getOpenCount.uniqueResult();
@@ -6322,8 +6447,8 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Transactional
     public BigInteger getTotalClosedFeedbackReports(String transIds, String fieldNo) throws Exception {
 
-        String sql = "select count(id) as totalClosed from transactionInRecords a where transactionInId in (" + transIds + ") and " + fieldNo + " = '2'";
-
+        String sql = "select count(id) as totalClosed from transactionInRecords where transactionInId in (" + transIds + ") and " + fieldNo + " = '2'";
+        
         Query getClosedCount = sessionFactory.getCurrentSession().createSQLQuery(sql);
 
         return (BigInteger) getClosedCount.uniqueResult();
@@ -6332,7 +6457,7 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Override
     @Transactional
     public BigInteger getTotalCompletedActivityStatus(String transIds, String fieldNo) throws Exception {
-        String sql = "select count(id) as totalCompleted from transactionInRecords a where transactionInId in (" + transIds + ") and " + fieldNo + " = '3'";
+        String sql = "select count(id) as totalCompleted from transactionInRecords where transactionInId in (" + transIds + ") and " + fieldNo + " = '3'";
          
 
         Query getCompletedCount = sessionFactory.getCurrentSession().createSQLQuery(sql);
@@ -6344,11 +6469,56 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Override
     @Transactional
     public BigInteger getTotalEnrolledActivityStatus(String transIds, String fieldNo) throws Exception{
-        String sql = "select count(id) as totalEnrolled from transactionInRecords a where transactionInId in (" + transIds + ") and " + fieldNo + " = '7'";
+        String sql = "select count(id) as totalEnrolled from transactionInRecords where transactionInId in (" + transIds + ") and " + fieldNo + " = '7'";
 
         Query getEnrolledCount = sessionFactory.getCurrentSession().createSQLQuery(sql);
         
 
         return (BigInteger) getEnrolledCount.uniqueResult();
+    }
+    
+    /**
+     * The 'getReferralActivityExports' function will return a list of generated exports
+     * @return
+     * @throws Exception 
+     */
+    @Override
+    @Transactional
+    public List<referralActivityExports> getReferralActivityExports() throws Exception {
+        
+        Query query = sessionFactory.getCurrentSession().createQuery("from referralActivityExports order by dateSubmitted desc");
+
+        /** Only return the top one for right now **/
+        query.setMaxResults(1);
+        
+        return query.list();
+    }
+    
+    /**
+     * The 'saveReferralActivityExport' function will create a new activity export
+     * @param activityExport
+     * @throws Exception 
+     */
+    @Override
+    @Transactional
+    public void saveReferralActivityExport(referralActivityExports activityExport) throws Exception {
+        sessionFactory.getCurrentSession().save(activityExport);
+    }
+    
+    /**
+     * The 'getActivityStatusValueById' function will return the value of the activity status for the id 
+     * passed in.
+     * @param activityStatusId
+     * @return
+     * @throws Exception 
+     */
+    @Override
+    @Transactional
+    public String getActivityStatusValueById(Integer activityStatusId) throws Exception {
+        String sql = "select displayText as statusValue from lu_internalmessagestatus where id = " + activityStatusId;
+        
+        Query getFieldvalue = sessionFactory.getCurrentSession().createSQLQuery(sql);
+        
+        return (String) getFieldvalue.uniqueResult();
     }
 }

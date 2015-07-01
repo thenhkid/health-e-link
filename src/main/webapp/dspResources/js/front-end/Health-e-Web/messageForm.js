@@ -36,28 +36,36 @@ require(['./main'], function() {
 
 
         //Function to upload an attachment to the message
-        new AjaxUpload('attachmentFileUpload', {
-            action: '/Health-e-Web/uploadMessageAttachment',
-            name: 'fileUpload',
-            onSubmit: function(file, extension) {
-                this.setData({title: getTitle()});
-            },
-            onComplete: function(file, response) {
-                var currentIdList = $('#attachmentIds').val();
+        $('#UploadButton').ajaxUpload({
+           url: '/Health-e-Web/uploadMessageAttachment',
+           name: 'fileUpload',
+           onSubmit: function() {
+               this.setData({title: getTitle()});
+           },
+           onComplete: function(file, response) {
+               var currentIdList = $('#attachmentIds').val();
 
                 if (currentIdList == '') {
-                    $('#attachmentIds').val(response);
+                    $('#attachmentIds').val(file);
                 }
                 else {
-                    currentIdList = currentIdList + ',' + response;
+                    currentIdList = currentIdList + ',' + file;
                     $('#attachmentIds').val(currentIdList);
                 }
 
                 $('#attachmentTitle').val('');
+                
+                 var totalAttachmentsAllowed = $('.attachmentUploadPanel').attr('rel');
+                
+                if((totalAttachmentsAllowed*1) > 0) {
+                    if((currentIdList.length*1) + 1 >= (totalAttachmentsAllowed*1)) {
+                        $('.attachmentUploadPanel').hide();
+                    }
+                }
 
                 populateExistingAttachments();
-
-            }
+                
+           }
         });
         
         $(document).on('click', '.editAttachment', function() {
@@ -125,6 +133,8 @@ require(['./main'], function() {
                     data: {'attachmentId': attachmentId},
                     success: function(data) {
                         $('#attachmentRow-' + attachmentId).remove();
+                        
+                        $('.attachmentUploadPanel').show();
                     }
                 });
 

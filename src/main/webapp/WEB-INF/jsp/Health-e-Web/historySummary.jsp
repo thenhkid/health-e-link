@@ -121,32 +121,32 @@
                 <ul class="nav nav-tabs navbar-actions">
                     <c:if test="${type == 0 || type == 1}"><li ${type == 0 || type == 1 ? 'class="active"' : ''}><a href="#sent" data-toggle="tab" class="btn btn-link">Sent Messages <span class="badge" style="border:1px solid #fff">${sentTotal}</span></a></li></c:if>
                     <c:if test="${type == 0 || type == 2}"><li ${type == 2 ? 'class="active"' : ''}><a href="#received" data-toggle="tab" class="btn btn-link">Received Messages  <span class="badge" style="border:1px solid #fff">${receivedTotal}</span></a></li></c:if>
-                    </ul>       
+                </ul>       
 
-                    <div id='content' class="tab-content">
+                <div id='content' class="tab-content">
                     <c:if test="${type == 0 || type == 1}">
                         <div class="tab-pane active" id="sent">       
                             <div class="form-container scrollable" style="padding-top:20px;">
-                                <table class="table table-striped table-hover table-default" <c:if test="${not empty sentMessages}">id="dataTable"</c:if>>
-                                        <caption style="display:none">Sent Messages</caption>
-                                        <thead>
-                                            <tr>
+                                <table class="table table-striped table-hover table-default" <c:if test="${not empty sentMessages}"><c:choose><c:when test="${showDetails == false}">id="dataTable"</c:when><c:otherwise>id="dataTableDetails"</c:otherwise></c:choose></c:if>>
+                                   <caption style="display:none">Sent Messages</caption>
+                                    <thead>
+                                        <tr>
                                             <c:choose>
                                                 <c:when test="${showDetails == false}">
                                                     <th scope="col">Affiliated Organization</th>
                                                     <th scope="col">Transport Method</th>
                                                     <th scope="col">Message Type</th>
                                                     <th scope="col" class="center-text">Total Sent</th> 
-                                                    </c:when>
-                                                    <c:otherwise>
+                                                </c:when>
+                                                <c:otherwise>
                                                     <th scope="col">Affiliated Organization</th>
                                                     <th scope="col">Message Type</th>
                                                     <th scope="col">Batch Name</th>
                                                     <th scope="col" class="center-text">Status</th>
                                                     <th scope="col">Patient Name</th>
                                                     <th scope="col" class="center-text">Date Sent</th>
-                                                    </c:otherwise>    
-                                                </c:choose>         
+                                                </c:otherwise>    
+                                            </c:choose>         
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -185,7 +185,11 @@
                                                                 </td>
                                                                 <td>
                                                                     ${result.batchName}
-                                                                </td>
+                                                                    <c:if test="${result.transactionId > 0}">
+                                                                        <br />
+                                                                        <a href="#messageDetailsModal" data-toggle="modal" rel="${result.transactionId}" class="btn btn-primary btn-xs viewSent">View Details</a>
+                                                                    </c:if>
+                                                                 </td>
                                                                 <td class="center-text">
                                                                     <a href="#statusModal" data-toggle="modal" class="btn btn-link viewStatus" rel="${result.statusId}" title="View this Status">${result.status}&nbsp;<span class="badge badge-help" data-placement="top" title="" data-original-title="">?</span></a>
                                                                 </td>
@@ -211,29 +215,29 @@
                             </div> 
                         </div>
                     </c:if>
-                    <c:if test="${type == 0 || type == 2}">                    
-                        <div class="tab-pane" id="received">       
+                    <c:if test="${type == 0 || type == 2}">            
+                        <div class="tab-pane ${type == 2 ? 'active' : ''}" id="received">
                             <div class="form-container scrollable" style="padding-top:20px;">
-                                <table class="table table-striped table-hover table-default" <c:if test="${not empty receivedMessages}">id="dataTableReceived"</c:if>>
-                                        <caption style="display:none">Received Messages</caption>
-                                        <thead>
-                                            <tr>
+                                <table class="table table-striped table-hover table-default" <c:if test="${not empty receivedMessages}"><c:choose><c:when test="${showDetails == false}">id="dataTableReceived"</c:when><c:otherwise>id="dataTableReceivedDetails"</c:otherwise></c:choose></c:if>>
+                                    <caption style="display:none">Received Messages</caption>
+                                    <thead>
+                                        <tr>
                                             <c:choose>
                                                 <c:when test="${showDetails == false}">
                                                     <th scope="col">Affiliated Organization</th>
                                                     <th scope="col">Transport Method</th>
                                                     <th scope="col">Message Type</th>
                                                     <th scope="col" class="center-text">Total Received</th> 
-                                                    </c:when>
-                                                    <c:otherwise>
+                                                </c:when>
+                                                <c:otherwise>
                                                     <th scope="col">Affiliated Organization</th>
                                                     <th scope="col">Message Type</th>
                                                     <th scope="col">Batch Name</th>
                                                     <th scope="col" class="center-text">Status</th>
                                                     <th scope="col">Patient Name</th>
                                                     <th scope="col" class="center-text">Date Received</th>
-                                                    </c:otherwise>    
-                                                </c:choose>         
+                                                </c:otherwise>    
+                                            </c:choose>         
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -272,6 +276,10 @@
                                                                 </td>
                                                                 <td>
                                                                     ${result.batchName}
+                                                                    <c:if test="${result.transactionId > 0}">
+                                                                    <br />
+                                                                    <a href="#messageDetailsModal" data-toggle="modal" rel="${result.transactionId}" class="btn btn-primary btn-xs viewReceived">View Details</a>
+                                                                    </c:if>
                                                                 </td>
                                                                 <td class="center-text">
                                                                     <a href="#statusModal" data-toggle="modal" class="btn btn-link viewStatus" rel="${result.statusId}" title="View this Status">${result.status}&nbsp;<span class="badge badge-help" data-placement="top" title="" data-original-title="">?</span></a>
@@ -307,3 +315,4 @@
 </div>
 <!-- Status Definition modal -->
 <div class="modal fade" id="statusModal" role="dialog" tabindex="-1" aria-labeledby="Status Details" aria-hidden="true" aria-describedby="Status Details"></div>
+<div class="modal fade" id="messageDetailsModal" role="dialog" tabindex="-1" aria-labeledby="Message Details" aria-hidden="true" aria-describedby="Message Details"></div>

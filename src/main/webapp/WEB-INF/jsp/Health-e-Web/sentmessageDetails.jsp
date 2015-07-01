@@ -101,12 +101,14 @@
                                             <h4 class="form-section-heading">Originating Organization Provider: </h4>
                                             <dl class="vcard">
                                                 <dd class="fn">${transactionDetails.sourceProviderFields[0].fieldValue}&nbsp;${transactionDetails.sourceProviderFields[1].fieldValue}</dd>
-                                                <dd class="fn">Id: ${transactionDetails.sourceProviderFields[2].fieldValue}</dd>
+                                                <c:if test="${not empty transactionDetails.sourceProviderFields[2].fieldValue}"><dd class="fn">Id: ${transactionDetails.sourceProviderFields[2].fieldValue}</dd></c:if>
+                                                <c:if test="${not empty transactionDetails.sourceProviderFields[3].fieldValue}">
                                                 <dd class="adr">
                                                     <span class="street-address">${transactionDetails.sourceProviderFields[3].fieldValue}</span><br/>
                                                     <c:if test="${not empty transactionDetails.sourceProviderFields[4].fieldValue}"><span class="street-address">${transactionDetails.sourceProviderFields[4].fieldValue}</span><br/></c:if>
                                                     <span class="region">${transactionDetails.sourceProviderFields[5].fieldValue}&nbsp;${transactionDetails.sourceProviderFields[6].fieldValue}</span>, <span class="postal-code">${transactionDetails.sourceProviderFields[7].fieldValue}</span>
                                                 </dd>
+                                                </c:if>
                                                 <c:if test="${not empty transactionDetails.sourceProviderFields[8].fieldValue}"><dd>phone: <span class="tel">${transactionDetails.sourceProviderFields[8].fieldValue}</span></dd></c:if>
                                                 <c:if test="${not empty transactionDetails.sourceProviderFields[9].fieldValue}"><dd>fax: <span class="tel">${transactionDetails.sourceProviderFields[9].fieldValue}</span></dd></c:if>
                                             </dl>
@@ -201,7 +203,14 @@
                                              </c:otherwise>
                                          </c:choose>
                                             <div id="fieldDiv_${detailInfo.fieldNo}" class="form-group">
-                                                <label class="control-label" for="fieldA">${detailInfo.fieldLabel}</label>
+                                                <label class="control-label" for="fieldA">${detailInfo.fieldLabel} 
+                                                    <c:if test="${not empty detailInfo.fieldHelp}">
+                                                        <a href="#" data-toggle="tooltip" data-placement="top" data-original-title="${detailInfo.fieldHelp}">
+                                                            <span class="glyphicon glyphicon-question-sign" style="cursor:pointer"></span>
+                                                        </a>
+                                                    </c:if>
+                                                    <c:if test="${detailInfo.required == true}">&nbsp;*</c:if> 
+                                                 </label>
                                                 <c:choose>
                                                     <%--
                                                         Field Type Values

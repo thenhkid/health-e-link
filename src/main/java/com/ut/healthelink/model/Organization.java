@@ -23,7 +23,7 @@ public class Organization {
     
     @Transient
     private CommonsMultipartFile file = null;
-
+    
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID", nullable = false)
@@ -86,6 +86,15 @@ public class Organization {
     
     @Column(name = "parentId", nullable = true)
     private Integer parentId = 0;
+    
+    @Column(name = "LONGITUDE", nullable = true) 
+    private String longitude;
+    
+    @Column(name = "LATITUDE", nullable = true)
+    private String latitude;
+    
+    @Column(name = "ORGTYPE", nullable = false)
+    private Integer orgType = 1;
 
     public int getId() {
         return id;
@@ -213,6 +222,46 @@ public class Organization {
 
     public void setParentId(Integer parentId) {
         this.parentId = parentId;
+    }
+
+    public String getCleanURL() {
+        return cleanURL;
+    }
+
+    public void setCleanURL(String cleanURL) {
+        this.cleanURL = cleanURL;
+    }
+
+    public String getParsingTemplate() {
+        return parsingTemplate;
+    }
+
+    public void setParsingTemplate(String parsingTemplate) {
+        this.parsingTemplate = parsingTemplate;
+    }
+
+    public String getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(String longitude) {
+        this.longitude = longitude;
+    }
+
+    public String getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(String latitude) {
+        this.latitude = latitude;
+    }
+
+    public Integer getOrgType() {
+        return orgType;
+    }
+
+    public void setOrgType(Integer orgType) {
+        this.orgType = orgType;
     }
     
 }

@@ -44,11 +44,11 @@ public class ExceptionControllerAdvice {
         mailMessage messageDetails = new mailMessage();
         
         messageDetails.settoEmailAddress("dphuniversaltranslator@gmail.com");
-        messageDetails.setfromEmailAddress("information@health-e-link.net");
+        messageDetails.setfromEmailAddress("e-Referral@state.ma.us");
         messageDetails.setmessageSubject("Exception Error " + InetAddress.getLocalHost().getHostAddress());
         
         StringBuilder sb = new StringBuilder();
-        
+
         //we log page with error and ip of remote client if possible
         try {
         	if (request.getHeader("HTTP_X_FORWARDED_FOR") != null) {
@@ -61,6 +61,7 @@ public class ExceptionControllerAdvice {
         }
         
         /* If a user is logged in then send along the user details */
+        
         if(session.getAttribute("userDetails") != null || authentication != null) {
             User userInfo = (User)session.getAttribute("userDetails");
             

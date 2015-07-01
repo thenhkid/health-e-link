@@ -15,6 +15,7 @@ import com.ut.healthelink.model.transactionIn;
 import com.ut.healthelink.model.transactionOutNotes;
 import com.ut.healthelink.model.transactionTarget;
 import com.ut.healthelink.model.transactionOutRecords;
+
 import java.util.Date;
 import java.util.List;
 
@@ -127,4 +128,6 @@ public interface transactionOutManager {
     void updateTransactionTargetStatusOutBound(Integer batchDLId, Integer transactionId, Integer fromStatusId, Integer toStatusId) throws Exception;
     
     List <String> getWSSenderFromBatchDLId(List<Integer> batchDLIds) throws Exception;
+    
+   
 }

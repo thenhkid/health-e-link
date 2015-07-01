@@ -77,6 +77,10 @@ public class configurationFormFields {
     
     @Column(name = "FIELDTYPE", nullable = false)
     private Integer fieldType = 1;
+    
+    @NoHtml
+    @Column(name = "FIELDHELP", nullable = true)
+    private String fieldHelp;
 
     public int getId() {
         return id;
@@ -221,5 +225,14 @@ public class configurationFormFields {
     public void setFieldType(Integer fieldType) {
         this.fieldType = fieldType;
     }
+
+    public String getFieldHelp() {
+        return fieldHelp;
+    }
+
+    public void setFieldHelp(String fieldHelp) {
+        this.fieldHelp = fieldHelp;
+    }
+    
     
 }

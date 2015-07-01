@@ -9,7 +9,7 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 
 
-<c:set var="referralId" value="N/A"/>
+<c:set var="referralId" value=""/>
 <c:set var="urgencyVal" value="Not Reported" />
 <div class="container main-container" role="main">
     <div class="row">

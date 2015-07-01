@@ -18,6 +18,7 @@ import com.ut.healthelink.model.TransactionInError;
 import com.ut.healthelink.model.User;
 import com.ut.healthelink.model.UserActivity;
 import com.ut.healthelink.model.WSMessagesIn;
+import com.ut.healthelink.model.batchDownloads;
 import com.ut.healthelink.model.batchMultipleTargets;
 import com.ut.healthelink.model.batchUploadSummary;
 import com.ut.healthelink.model.batchUploads;
@@ -28,6 +29,7 @@ import com.ut.healthelink.model.configurationFormFields;
 import com.ut.healthelink.model.configurationMessageSpecs;
 import com.ut.healthelink.model.configurationRhapsodyFields;
 import com.ut.healthelink.model.configurationTransport;
+import com.ut.healthelink.model.configurationWebServiceFields;
 import com.ut.healthelink.model.fieldSelectOptions;
 import com.ut.healthelink.model.mailMessage;
 import com.ut.healthelink.model.transactionAttachment;
@@ -42,7 +44,9 @@ import com.ut.healthelink.model.custom.TransErrorDetail;
 import com.ut.healthelink.model.custom.TransErrorDetailDisplay;
 import com.ut.healthelink.model.lutables.lu_ProcessStatus;
 import com.ut.healthelink.model.messagePatients;
+import com.ut.healthelink.model.referralActivityExports;
 import com.ut.healthelink.model.systemSummary;
+import com.ut.healthelink.model.transactionOutNotes;
 import com.ut.healthelink.reference.fileSystem;
 import com.ut.healthelink.service.CCDtoTxt;
 import com.ut.healthelink.service.configurationManager;
@@ -54,6 +58,7 @@ import com.ut.healthelink.service.messageTypeManager;
 import com.ut.healthelink.service.organizationManager;
 import com.ut.healthelink.service.sysAdminManager;
 import com.ut.healthelink.service.userManager;
+import com.ut.healthelink.service.utilManager;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
@@ -67,7 +72,9 @@ import com.ut.healthelink.service.transactionInManager;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -89,10 +96,13 @@ import java.util.Map;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.HiddenFileFilter;
 import org.apache.commons.validator.routines.UrlValidator;
+import org.hibernate.Criteria;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+
 
 /**
  *
@@ -139,6 +149,9 @@ public class transactionInManagerImpl implements transactionInManager {
 
     @Autowired
     private emailMessageManager emailManager;
+    
+    @Autowired
+    private utilManager utilmanager;
 
     private int processingSysErrorId = 5;
 
@@ -1084,6 +1097,7 @@ public class transactionInManagerImpl implements transactionInManager {
             for (transactionRecords tr : trs) {
                 //System.out.println(tr.getfieldValue());
                 if (tr.getfieldValue() != null) {
+                	 if (tr.getfieldValue().length() != 0) {
                     //we append http:// if url doesn't start with it
                     String urlToValidate = tr.getfieldValue();
                     if (!urlToValidate.startsWith("http")) {
@@ -1092,7 +1106,7 @@ public class transactionInManagerImpl implements transactionInManager {
                     if (!isValidURL(urlToValidate)) {
                         insertValidationError(tr, cff, batchUploadId);
                     }
-
+                }
                 }
             }
             return 0;
@@ -1118,6 +1132,7 @@ public class transactionInManagerImpl implements transactionInManager {
             //2. we look at each column and check each value by trying to convert it to a date
             for (transactionRecords tr : trs) {
                 if (tr.getfieldValue() != null) {
+                	 if (tr.getfieldValue().length() != 0) {
                     //sql is picking up dates in mysql format and it is not massive inserting, running this check to avoid unnecessary sql call
                     //System.out.println(tr.getFieldValue());
                     //we check long dates
@@ -1141,7 +1156,7 @@ public class transactionInManagerImpl implements transactionInManager {
                     if (formattedDate == null && (mySQLDate.equalsIgnoreCase("") || mySQLDate.equalsIgnoreCase("ERROR"))) {
                         insertValidationError(tr, cff, batchUploadId);
                     }
-
+                 }
                 }
             }
             return 0;
@@ -2124,6 +2139,12 @@ public class transactionInManagerImpl implements transactionInManager {
     public List<batchUploads> getAllUploadedBatches(Date fromDate, Date toDate, Integer fetchSize) throws Exception {
         return transactionInDAO.getAllUploadedBatches(fromDate, toDate, fetchSize);
     }
+    
+    @Override
+    @Transactional
+    public List<batchUploads> getAllRejectedBatches(Date fromDate, Date toDate, Integer fetchSize) throws Exception {
+        return transactionInDAO.getAllRejectedBatches(fromDate, toDate, fetchSize);
+    }
 
     @Override
     public boolean searchTransactions(Transaction transaction, String searchTerm) throws Exception {
@@ -2698,10 +2719,26 @@ public class transactionInManagerImpl implements transactionInManager {
                             if (users.size() == 0) {
                                 users = usermanager.getOrgUsersForConfig(Arrays.asList(ct.getconfigId()));
                             }
-
-                            batchInfo.setuserId(users.get(0).getId());
-                            batchId = (Integer) submitBatchUpload(batchInfo);
-                            statusId = 2;
+                            
+                            /** need to log and error out file if there are no users set up for config **/
+                            if (users.size() == 0) {
+                            	if (usermanager.getUserByTypeByOrganization(orgId).size() != 0) {
+                            		batchInfo.setuserId(usermanager.getUserByTypeByOrganization(orgId).get(0).getId());
+                            	} else {
+                            		batchInfo.setuserId(1); //no users, we set to admin
+                            	}
+                            	batchId = (Integer) submitBatchUpload(batchInfo);
+                                statusId = 7;
+                                errorId = 27;
+                            	
+                            } else {
+                            	batchInfo.setuserId(users.get(0).getId());
+                                batchId = (Integer) submitBatchUpload(batchInfo);
+                                statusId = 2;
+                            	
+                            } 
+                            
+                            
 
                         } else if (transportList.size() > 1 && transports.size() > 1) {
                             //we loop though our delimiters for this type of fileExt
@@ -3416,9 +3453,16 @@ public class transactionInManagerImpl implements transactionInManager {
                 statusId = 7;
 
             } else {
-
-                configurationTransport ct = confTransports.get(0);
+            	configurationTransport ct = confTransports.get(0);
                 List<configurationTransport> cts = configurationtransportmanager.getCTForOrgByTransportMethodId(6, 1, ws.getOrgId());
+                
+                //we loop through cts and set its wsFields 
+                for (configurationTransport confTran : cts) {
+	                // need to set web service fields
+	                List<configurationWebServiceFields> wsFields = configurationtransportmanager.getTransWSDetails(confTran.getId());
+	                //set the web services fields so we can grab document tag later
+	                confTran.setWebServiceFields(wsFields);
+                }
                 encodingId = ct.getEncodingId();
                 fileExt = "." + ct.getfileExt();
                 writeToFolder = ct.getfileLocation();
@@ -3453,57 +3497,162 @@ public class transactionInManagerImpl implements transactionInManager {
                 if (users.size() == 0) {
                     users = usermanager.getOrganizationContact(ws.getOrgId(), 0);
                 }
-
-                batchInfo.setuserId(users.get(0).getId());
-	                //write payload to file
-
+                //if we can't find a user to assign the batch to - we have to error the file
+                if (users.size() == 0) {
+                	//we assign to admin
+                	batchInfo.setuserId(1);
+                	statusId = 7;
+                    errorId = 27;
+                } else {
+                	batchInfo.setuserId(users.get(0).getId());
+                }
+                	//write payload to file
                 writeToFile = dir.setPath(fileNamePath);
 
-                filemanager.writeFile(writeToFile, ws.getPayload());
-
-                //decode and check delimiter
-                File file = new File(writeToFile);
-
-                if (ct.getEncodingId() == 2) {
-                    //write to temp file
-                    String strDecode = filemanager.decodeFileToBase64Binary(file);
-                    file = new File(dir.setPath(archivePath) + batchName + "_dec" + fileExt);
-                    String decodeFilePath = dir.setPath(archivePath) + batchName + "_dec" + fileExt;
-                    filemanager.writeFile(decodeFilePath, strDecode);
-                    String encodeFilePath = dir.setPath(archivePath) + batchName + fileExt;
-                    filemanager.writeFile(encodeFilePath, ws.getPayload());
+                String messageContent = ws.getPayload();
+                
+                //need to loop through cts list's tags in the payload to see which tag we should be looking for
+                String tagToCheck = "";
+                List<String> payloadArray = new ArrayList<String>(Arrays.asList(messageContent.split(" ")));
+                int countTag = 0;
+                boolean attachmentFound = false;
+                
+                for (configurationTransport confTran : cts) {
+                	int tagPosition = 0;
+                	countTag = 0;
+                	configurationWebServiceFields wsFields = confTran.getWebServiceFields().get(0);
+                	tagToCheck = "<" + wsFields.getTagName() + ">";
+	                String tagToSplit = "</" + wsFields.getTagName() + ">";
+	                countTag = messageContent.split(tagToCheck, -1).length-1;
+	                if (countTag > 0) {
+	                	tagPosition = wsFields.getTagPosition();
+	                	messageContent = messageContent.replaceAll(tagToCheck, "");
+	                	payloadArray = new ArrayList<String>(Arrays.asList(messageContent.split(tagToSplit, -1)));
+	                	payloadArray.remove(payloadArray.size()-1);
+	                	/**
+	                	 * we start looking for attachment at position 
+	                	 * with either expected content or delimiter
+	                	 */
+	                	boolean atExpectedPosition = false;
+	                	int expectedPosition = wsFields.getTagPosition();
+	                	if (expectedPosition <= countTag) {
+	                		//we do a search for attachment at expected position
+	                		messageContent = payloadArray.get(expectedPosition-1);
+	                		String decodedString = messageContent;
+	                		if (confTran.getEncodingId() == 2) {
+	                			decodedString = utilmanager.decodeStringToBase64Binary(messageContent);
+	                		}
+	                		//now we have string, we check for either expected content or delimiter
+	                		if (wsFields.getTextInAttachment().length() == 0) {
+	                			//we look for delimiter
+	                			if (decodedString.split(("\\" + ct.getDelimChar()), -1).length-1 > 3) {
+	                				atExpectedPosition = true;
+	                			}
+	                		} else {
+	                				atExpectedPosition = decodedString.contains(wsFields.getTextInAttachment());             			
+	                		}
+	                	}
+	                	if (atExpectedPosition) {
+	                		//we have attachment
+	                		filemanager.writeFile(writeToFile, messageContent);
+	                		ws.setFoundPosition(expectedPosition);
+	                		ws.setPositionMatched(true);
+	                		attachmentFound = true;
+	                		break;
+	                	} else {
+	                		//we have to loop through all document tag
+	                		int position = 1;
+	                		for (String content : payloadArray) {
+	                			String decodedString = content;
+	                			if (confTran.getEncodingId() == 2) {
+	                				decodedString = utilmanager.decodeStringToBase64Binary(content);
+		                		}
+	                			//now we have decodedString, we check for text match or delimiter match
+	                			if (wsFields.getTextInAttachment().length() == 0) {
+		                			//we look for delimiter
+		                			if (decodedString.split(("\\" + ct.getDelimChar()), -1).length-1 > 3) {
+		                				ws.setFoundPosition(position);
+		    	                		ws.setPositionMatched(false);
+		    	                		filemanager.writeFile(writeToFile, content);
+		    	                		attachmentFound = true;
+		    	                		break;
+		                			}
+		                		} else {
+		                			if (decodedString.contains(wsFields.getTextInAttachment())) {
+		                				ws.setFoundPosition(position);
+		    	                		ws.setPositionMatched(false);
+		    	                		filemanager.writeFile(writeToFile, content);
+		    	                		attachmentFound = true;
+		    	                		break;
+		                			}	
+		                		}
+	                			position++;
+	                			attachmentFound = false;
+	                		}
+	                		
+	                	}
+	                	
+	                }	               
                 }
-
-                statusId = 2;
-                /**
-                 * can't check delimiter for certain files, xml, hr etc *
-                 */
-                if (fileExt.equalsIgnoreCase(".txt")) {
-                    int delimCount = (Integer) dir.checkFileDelimiter(file, ct.getDelimChar());
-                    if (delimCount < 3) {
-                        statusId = 7;
-                        errorId = 15;
-                    }
+                
+                if (countTag == 0) {
+                	//insert error
+                    errorId = 25;
+                    statusId = 7;
+                } else if (attachmentFound == false) {
+                	//insert error
+                    errorId = 24;
+                    statusId = 7;
                 }
-                //check file size
-                if (statusId == 2) {
-                    /**
-                     * check file size if configId is 0 we go with the smallest file size *
-                     */
+                
+                if (statusId != 7) {
+	                //decode and check delimiter
+	                File file = new File(writeToFile);
 
-                    long maxFileSize = fileSize * 1000000;
-                    if (Files.size(file.toPath()) > maxFileSize) {
-                        statusId = 7;
-                        errorId = 12;
-                    }
+	                if (ct.getEncodingId() == 2) {
+	                    //write to temp file
+	                    String strDecode = filemanager.decodeFileToBase64Binary(file);
+	                    file = new File(dir.setPath(archivePath) + batchName + "_dec" + fileExt);
+	                    String decodeFilePath = dir.setPath(archivePath) + batchName + "_dec" + fileExt;
+	                    filemanager.writeFile(decodeFilePath, strDecode);
+	                    String encodeFilePath = dir.setPath(archivePath) + batchName + "_org" +fileExt;               
+	                    filemanager.writeFile(encodeFilePath, ws.getPayload());
+	                    String encodeArchivePath = dir.setPath(archivePath) + batchName  +fileExt;
+	                    Files.copy(new File(writeToFile).toPath(), new File(encodeArchivePath).toPath(), REPLACE_EXISTING);
+	                }
+
+	                statusId = 2;
+	                /**
+	                 * can't check delimiter for certain files, xml, hr etc *
+	                 */
+	                if (fileExt.equalsIgnoreCase(".txt")) {
+	                    int delimCount = (Integer) dir.checkFileDelimiter(file, ct.getDelimChar());
+	                    if (delimCount < 3) {
+	                        statusId = 7;
+	                        errorId = 15;
+	                    }
+	                }
+	                //check file size
+	                if (statusId == 2) {
+	                    /**
+	                     * check file size if configId is 0 we go with the smallest file size *
+	                     */
+	
+	                    long maxFileSize = fileSize * 1000000;
+	                    if (Files.size(file.toPath()) > maxFileSize) {
+	                        statusId = 7;
+	                        errorId = 12;
+	                    }
+	                }
                 }
-
                 batchInfo.setstatusId(statusId);
+                batchInfo.setendDateTime(new Date());
+                batchInfo.settotalRecordCount(1); // need to be at least one to show up in activites
                 batchId = (Integer) submitBatchUpload(batchInfo);
                 if (statusId != 2) {
                     insertProcessingError(errorId, 0, batchId, null, null, null, null, false, false, "");
                 }
-
+                
                 //update message status to done
                 ws.setStatusId(2);
                 ws.setBatchUploadId(batchId);
@@ -3646,6 +3795,17 @@ public class transactionInManagerImpl implements transactionInManager {
     }
     
     @Override
+    public BigInteger getRejectedCount(Date fromDate, Date toDate) throws Exception {
+        
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String dateFrom = df.format(fromDate);
+        String dateTo = df.format(toDate);
+        
+        return transactionInDAO.getRejectedCount(dateFrom, dateTo);
+        
+    }
+    
+    @Override
     public List<activityReportList> getFeedbackReportList(List<Integer> batchIds) throws Exception {
         String ids = "";
         
@@ -3764,4 +3924,366 @@ public class transactionInManagerImpl implements transactionInManager {
         
     }
 
+    
+    @Override
+    public List<referralActivityExports> getReferralActivityExports() throws Exception {
+        return transactionInDAO.getReferralActivityExports();
+    }
+    
+    /**
+     * 
+     * @param fromDate
+     * @param toDate
+     * @throws Exception 
+     */
+    @Override
+    public void createNewReferralActivityExport(Integer userId, Date fromDate, Date toDate) throws Exception {
+        
+        /** Get every referral sent based on the dates provided **/
+        List<transactionTarget> transactions = transactionOutDAO.getSentTransactions(fromDate, toDate);
+        
+        if(transactions != null && transactions.size() > 0) {
+            
+            DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmssS");
+            Date date = new Date();
+            String fileName = new StringBuilder().append("referralactivityExport_").append(dateFormat.format(date)).append(".txt").toString();
+
+            referralActivityExports newExport = new referralActivityExports();
+            newExport.setCreatedBy(userId);
+            
+            DateFormat selDateRangeFormat = new SimpleDateFormat("MM/dd/yyyy");
+            newExport.setSelDateRange(selDateRangeFormat.format(fromDate) + " - " + selDateRangeFormat.format(toDate));
+            
+            newExport.setFileName(fileName);
+
+            transactionInDAO.saveReferralActivityExport(newExport);
+            
+            /* Create new export file */
+            InputStream inputStream = null;
+            OutputStream outputStream = null;
+            
+            fileSystem dir = new fileSystem();
+            dir.setDirByName("referralActivityExports/");
+            
+            File newFile = new File(dir.getDir() + fileName);
+            
+            /* Create the empty file in the correct location */
+            try {
+
+                if (newFile.exists()) {
+                    int i = 1;
+                    while (newFile.exists()) {
+                        int iDot = fileName.lastIndexOf(".");
+                        newFile = new File(dir.getDir() + fileName.substring(0, iDot) + "_(" + ++i + ")" + fileName.substring(iDot));
+                    }
+                    fileName = newFile.getName();
+                    newFile.createNewFile();
+                } else {
+                    newFile.createNewFile();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            
+            /* Read in the file */
+            FileInputStream fileInput = null;
+            File file = new File(dir.getDir() + fileName);
+            fileInput = new FileInputStream(file);
+            
+            FileWriter fw = null;
+
+            try {
+                fw = new FileWriter(file, true);
+            } catch (IOException ex) {
+                Logger.getLogger(transactionOutManagerImpl.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+            StringBuilder exportRow = new StringBuilder();
+            
+            /** Need to pull referral, CBO Updates and FB reports **/
+            /** IF CBO Updates a referral there should be 2 entries ,the original referral and the CBO Update **/
+            
+            exportRow.append("Transaction Type")
+                    .append("|").append("Sending Org Name")
+                    .append("|").append("Sending Site Name")
+                    .append("|").append("Receiving Org Name")
+                    .append("|").append("Receiving Site Name") 
+                    .append("|").append("Referral Date / Time")
+                    .append("|").append("eRef Referral Id") /** For feedback report it must be the original referral ID **/
+                    .append("|").append("D.O.B")
+                    .append("|").append("Gender")
+                    .append("|").append("Race")
+                    .append("|").append("Ethnicity")
+                    .append("|").append("Preferred Language")
+                    .append("|").append("Zip Code")
+                    .append("|").append("Referral Type")
+                    .append("|").append("Program Option 1") /** ?? - CDSMP, MOB, ETC **/
+                    .append("|").append("Program Option 2") /** ?? - CDSMP, MOB, ETC **/
+                    .append("|").append("Program Option 3") /** ?? - CDSMP, MOB, ETC **/
+                    .append("|").append("Program Option 4") /** ?? - CDSMP, MOB, ETC **/
+                    .append("|").append("Program Option 5") /** ?? - CDSMP, MOB, ETC **/
+                    .append("|").append("Program Option 6") /** ?? - CDSMP, MOB, ETC **/
+                    .append("|").append("Program activity status 1") /** ?? - CDSMP, MOB, ETC **/
+                    .append("|").append("Program activity status 2") /** ?? - CDSMP, MOB, ETC **/
+                    .append("|").append("Program activity status 3") /** ?? - CDSMP, MOB, ETC **/
+                    .append("|").append("Program activity status 4") /** ?? - CDSMP, MOB, ETC **/
+                    .append("|").append("Program activity status 5") /** ?? - CDSMP, MOB, ETC **/
+                    .append("|").append("Program activity status 6") /** ?? - CDSMP, MOB, ETC **/
+                    .append("|").append("Referral Status") 
+                    .append("|").append("Feedback Report Activity Status") 
+                    .append("|").append("Feedback Report Date/Time") 
+                    .append("|").append("Feedback Report Notes") 
+                    .append("|").append("CBO Activity Type Status")
+                    .append("|").append("CBO Activity Type Status Date/Time")
+                    .append("|").append("CBO Activity Notes")
+                    .append("|").append("Transaction Created By");
+
+            exportRow.append(System.getProperty("line.separator"));
+
+            fw.write(exportRow.toString());
+            
+            for(transactionTarget transaction : transactions) {
+                
+                transactionIn transactionInDetails = transactionInDAO.getTransactionDetails(transaction.gettransactionInId());
+                
+                batchUploads batchUploadDetails = transactionInDAO.getBatchDetails(transaction.getbatchUploadId());
+                batchUploadSummary batchUploadSummary = transactionInDAO.getUploadSummaryDetails(transaction.gettransactionInId());
+                
+                String type = "R";
+                String referralStatus = "";
+                String FBActivityStatus = "";
+                String FBDateTime = "";
+                String eRefId = "";
+                String referralDate = "";
+                
+                if(transactionInDetails.gettransactionTargetId() > 0) {
+                    type = "F";
+                    FBDateTime = batchUploadDetails.getdateSubmitted().toString();
+                    
+                    transactionTarget origReferralTransaction = transactionOutDAO.getTransactionDetails(transactionInDetails.gettransactionTargetId());
+                    batchUploads origbatchUploadDetails = transactionInDAO.getBatchDetails(origReferralTransaction.getbatchUploadId());
+                    
+                    referralDate = origbatchUploadDetails.getdateSubmitted().toString();
+                    eRefId = origbatchUploadDetails.getutBatchName();
+                    
+                    Integer statusFieldNo = transactionInDAO.getStatusFieldNo(transactionInDetails.getConfigId());
+                    String fieldNo = "f"+statusFieldNo;
+                    
+                    referralStatus = transactionInDAO.getTransactionFieldValue(transaction.gettransactionInId(), fieldNo);
+                    
+                    if("1".equals(referralStatus)) {
+                        referralStatus = "Open";
+                    }
+                    else if("2".equals(referralStatus)) {
+                        referralStatus = "Closed";
+                    }
+                    else {
+                        referralStatus = "Open";
+                    }
+                    
+                    Integer activityStatusFieldNo = transactionInDAO.getActivityStatusFieldNo(transactionInDetails.getConfigId());
+                    String activityfieldNo = "f"+activityStatusFieldNo;
+                    
+                    FBActivityStatus = transactionInDAO.getTransactionFieldValue(transaction.gettransactionInId(), activityfieldNo);
+                    
+                    if(Integer.parseInt(FBActivityStatus) > 0) {
+                        FBActivityStatus = transactionInDAO.getActivityStatusValueById(Integer.parseInt(FBActivityStatus));
+                    }
+                    
+                }
+                else {
+                    referralDate = batchUploadDetails.getdateSubmitted().toString();
+                    eRefId = batchUploadDetails.getutBatchName();
+                }
+               
+                
+                String messageTypeName = configurationManager.getMessageTypeNameByConfigId(batchUploadSummary.getsourceConfigId());
+                
+                batchDownloads batchDownloadDetails = transactionOutDAO.getBatchDetails(transaction.getbatchDLId());
+                
+                /** Get patient information **/
+                messagePatients patientDetails = transactionInDAO.getPatientTransactionDetailsForExport(transaction.gettransactionInId());
+                
+                Organization sourceOrg = organizationmanager.getOrganizationById(batchUploadDetails.getOrgId());
+                Organization sourceSiteOrg = null;
+                if(transaction.getSourceSubOrgId() > 0) {
+                    sourceSiteOrg = organizationmanager.getOrganizationById(transaction.getSourceSubOrgId());
+                }
+               
+                Organization targetOrg = organizationmanager.getOrganizationById(batchDownloadDetails.getOrgId());
+                Organization targetSiteOrg = null;
+                if(transaction.getTargetSubOrgId() > 0) {
+                    targetSiteOrg = organizationmanager.getOrganizationById(transaction.getTargetSubOrgId());
+                }
+                
+                
+                /**
+                 * R - (REFRRAL), C - (CBO Update) OR F - (FB REPORT)
+                 * Sending Org
+                 * Sending Site
+                 * Receiving Org
+                 * Receiving Site
+                 * Referral Date / Time
+                 * eRef Referral Id
+                 * DOB
+                 * Gender
+                 * Race
+                 * Ethnicity
+                 * Preferred Language
+                 * Zip Code
+                 * Referral Type
+                 * Program Option 1
+                 * Program Option 2
+                 * Program Option 3
+                 * Program Option 4
+                 * Program Option 5
+                 * Program Option 6
+                 * Program activity status 1
+                 * Program activity status 2
+                 * Program activity status 3
+                 * Program activity status 4
+                 * Program activity status 5
+                 * Program activity status 6
+                 * Referral Status
+                 * Feedback Report Activity Status
+                 * Feedback Report Date / Time
+                 * Feedback Report Notes
+                 * CBO Activity Type Status
+                 * CBO Activity Type Status Date / Time
+                 * CBO Notes 
+                 * Transaction Created By
+                 */
+                
+                exportRow = new StringBuilder();
+               
+                exportRow.append(type).append("|");
+                exportRow.append(sourceOrg.getOrgName()).append("|");
+
+                if(sourceSiteOrg != null) {
+                    exportRow.append(sourceSiteOrg.getOrgName()).append("|");
+                }
+                else {
+                    exportRow.append(sourceOrg.getOrgName()).append("|");
+                }
+
+                exportRow.append(targetOrg.getOrgName()).append("|");
+
+                if(targetSiteOrg != null) {
+                    exportRow.append(targetSiteOrg.getOrgName()).append("|");
+                }
+                else {
+                    exportRow.append(targetOrg.getOrgName()).append("|");
+                }
+
+                exportRow.append(referralDate).append("|")
+                .append(eRefId).append("|")        
+                .append(patientDetails.getDob()).append("|")
+                .append(patientDetails.getGenderVal()).append("|")
+                .append(patientDetails.getRaceVal()).append("|")
+                .append(patientDetails.getEthnicityVal()).append("|")
+                .append(patientDetails.getLanguageVal()).append("|")
+                .append(patientDetails.getZip()).append("|")
+                .append(messageTypeName).append("|")
+                .append("").append("|")
+                .append("").append("|")
+                .append("").append("|")
+                .append("").append("|")
+                .append("").append("|")
+                .append("").append("|")   
+                .append("").append("|")
+                .append("").append("|")
+                .append("").append("|")
+                .append("").append("|")
+                .append("").append("|")
+                .append("").append("|")           
+                .append(referralStatus).append("|")
+                .append(FBActivityStatus).append("|")
+                .append(FBDateTime).append("|")
+                .append("").append("|")        
+                .append("").append("|")
+                .append("").append("|")
+                .append("").append("|")            
+                .append("");
+
+               exportRow.append(System.getProperty("line.separator"));
+
+               fw.write(exportRow.toString());
+                
+                /* Get all notes */
+                List<transactionOutNotes> transactionNotes = transactionOutDAO.getNotesByTransactionId(transaction.getId());
+                
+                
+                if(transactionNotes != null && transactionNotes.size() > 0) {
+                    
+                    for(transactionOutNotes note : transactionNotes) {
+                        
+                        exportRow = new StringBuilder();
+                        
+                        User noteUser = usermanager.getUserById(note.getuserId());
+                        
+                        exportRow.append("C").append("|");
+                        exportRow.append(sourceOrg.getOrgName()).append("|");
+                                
+                                if(sourceSiteOrg != null) {
+                                    exportRow.append(sourceSiteOrg.getOrgName()).append("|");
+                                }
+                                else {
+                                    exportRow.append(sourceOrg.getOrgName()).append("|");
+                                }
+                                
+                                exportRow.append(targetOrg.getOrgName()).append("|");
+                                
+                                if(targetSiteOrg != null) {
+                                    exportRow.append(targetSiteOrg.getOrgName()).append("|");
+                                }
+                                else {
+                                    exportRow.append(targetOrg.getOrgName()).append("|");
+                                }
+                                
+                                exportRow.append(batchUploadDetails.getdateSubmitted()).append("|")
+                                .append(batchUploadDetails.getutBatchName()).append("|")        
+                                .append(patientDetails.getDob()).append("|")
+                                .append(patientDetails.getGenderVal()).append("|")
+                                .append(patientDetails.getRaceVal()).append("|")
+                                .append(patientDetails.getEthnicityVal()).append("|")
+                                .append(patientDetails.getLanguageVal()).append("|")
+                                .append(patientDetails.getZip()).append("|")
+                                .append(messageTypeName).append("|")
+                                .append("").append("|")
+                                .append("").append("|")
+                                .append("").append("|")
+                                .append("").append("|")
+                                .append("").append("|")
+                                .append("").append("|") 
+                                .append("").append("|")
+                                .append("").append("|")
+                                .append("").append("|")
+                                .append("").append("|")
+                                .append("").append("|")
+                                .append("").append("|")        
+                                .append("").append("|")
+                                .append("").append("|")     
+                                .append("").append("|") 
+                                .append("").append("|")         
+                                .append(note.getMessageStatus()).append("|")
+                                .append(note.getdateSubmitted()).append("|") 
+                                .append(note.getnote().trim()).append("|")    
+                                .append(noteUser.getFirstName()).append(" ")
+                                .append(noteUser.getLastName());
+                                
+                        
+                        exportRow.append(System.getProperty("line.separator"));
+                        
+                        fw.write(exportRow.toString());
+                
+                    }
+                    
+                }
+                
+            }
+            
+            fw.close();
+        }
+        
+    }
 }

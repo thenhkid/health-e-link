@@ -47,6 +47,31 @@
                                 </label>
                             </div>
                         </div>
+                        <div class="form-group">
+                            <label for="orgType">Organization Type *</label>
+                            <div>
+                                <label class="radio-inline">
+                                    <form:radiobutton id="orgType" path="orgType" value="1"/> Health Care Provider
+                                </label>
+                                <label class="radio-inline">
+                                    <form:radiobutton id="orgType" path="orgType" value="2"/> CBO 
+                                </label>
+                            </div>
+                        </div>        
+                        <spring:bind path="parentId">
+                            <div class="form-group ${status.error ? 'has-error' : '' }">
+                                <label class="control-label" for="parentId">Parent Organization</label>
+                                <form:select id="parentId" path="parentId" cssClass="form-control half">
+                                    <option value="0"> - No Parent - </option>
+                                    <c:forEach items="${organizationList}" var="org">
+                                        <c:if test="${org.id != id}">
+                                            <option value="${org.id}" ${organization.parentId == org.id ? 'selected' : ''}>${org.orgName} - (<c:choose><c:when test="${org.status == true}">active</c:when><c:otherwise>inactive</c:otherwise></c:choose>)</option>
+                                        </c:if>
+                                    </c:forEach>
+                                </form:select>
+                                <form:errors path="parentId" cssClass="control-label" element="label" />
+                            </div>
+                        </spring:bind>
                         <spring:bind path="orgName">
                             <div class="form-group ${status.error ? 'has-error' : '' } ${not empty existingOrg ? 'has-error' : ''}">
                                 <label class="control-label" for="orgName">Name *</label>
@@ -115,18 +140,32 @@
                                     <form:hidden id="parsingTemplate" path="parsingTemplate" />
                                 </div>
                             </c:if>
-                         </c:if>    
-                        <spring:bind path="file">
-                            <div id="parsingTemplateDiv" class="form-group ${status.error ? 'has-error' : '' }">
-                                <label class="control-label" for="file">Inbound File (CCD/HL7) Parsing Script (JAR file)</label>
-                                <form:input path="file" id="file" class="form-control" type="file" />
-                                <form:errors path="file" cssClass="control-label" element="label" />
-                                <span id="parsingTemplateMsg" class="control-label"></span>
-                            </div>
-                        </spring:bind>  
-                        </div>
+                            <spring:bind path="file">
+                                <div id="parsingTemplateDiv" class="form-group ${status.error ? 'has-error' : '' }">
+                                    <label class="control-label" for="file">Inbound File (CCD/HL7) Parsing Script (JAR file)</label>
+                                    <form:input path="file" id="file" class="form-control" type="file" />
+                                    <form:errors path="file" cssClass="control-label" element="label" />
+                                    <span id="parsingTemplateMsg" class="control-label"></span>
+                                </div>
+                            </spring:bind>
+                        </c:if>    
+                        <spring:bind path="longitude">
+                            <div class="form-group ${status.error ? 'has-error' : '' }">
+                                <label class="control-label" for="longitude">Longitude</label>
+                                <form:input path="longitude" id="longitude" class="form-control" type="text" maxLength="255" />
+                                <form:errors path="longitude" cssClass="control-label" element="label" />
+                                </div>
+                        </spring:bind>
+                        <spring:bind path="latitude">
+                            <div class="form-group ${status.error ? 'has-error' : '' }">
+                                <label class="control-label" for="latitude">Latitude</label>
+                                <form:input path="latitude" id="latitude" class="form-control" type="text" maxLength="255" />
+                                <form:errors path="latitude" cssClass="control-label" element="label" />
+                                </div>
+                        </spring:bind>     
                     </div>
-                </section>
+                </div>
+            </section>
         </form:form>
     </div>
 </div>

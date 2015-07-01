@@ -33,7 +33,7 @@
                 <section class="panel panel-default panel-stats" role="widget" aria-labelleby="Number of Organizations">
                     <div class="panel-body">
                         <span class="stat-number"><a href="javascript:void(0);"><c:choose><c:when test="${totalReferrals >= 0}">${totalReferrals}</c:when><c:otherwise>0</c:otherwise></c:choose></a></span>
-                        <h3>Total Referrals Sent</h3>
+                        <h3>Referrals Sent</h3>
                     </div>
                 </section>
             </div>
@@ -41,10 +41,18 @@
                 <section class="panel panel-default panel-stats" role="widget" aria-labelleby="Number of Organizations">
                     <div class="panel-body">
                         <span class="stat-number"><a href="javascript:void(0);"><c:choose><c:when test="${totalFBReports >= 0}">${totalFBReports}</c:when><c:otherwise>0</c:otherwise></c:choose></a></span>
-                        <h3>Total Feedback Reports Sent</h3>
+                        <h3>Feedback Reports Sent</h3>
                     </div>
                 </section>
-            </div>            
+            </div>   
+            <div class="col-md-3 col-sm-3 col-xs-6">
+                <section class="panel panel-default panel-stats" role="widget" aria-labelleby="Number of Organizations">
+                    <div class="panel-body">
+                        <span class="stat-number"><a href="/administrator/processing-activity/rejected"><c:choose><c:when test="${totalRejected >= 0}">${totalRejected}</c:when><c:otherwise>0</c:otherwise></c:choose></a></span>
+                        <h3>Referrals w/ Rejected Transactions</h3>
+                    </div>
+                </section>
+            </div>               
         </div>
         
         <section class="panel panel-default">
@@ -57,6 +65,7 @@
                             <thead>
                                 <tr>
                                     <th scope="col" style="width:350px;">Organization Name</th>
+                                    <th scope="col" style="width:350px;">Target Organization Name</th>
                                     <th scope="col" style="width:350px;">Message Type</th>
                                     <th scope="col" class="center-text">Total Referrals Sent</th>
                                 </tr>
@@ -66,6 +75,9 @@
                                             <tr>
                                                 <td scope="row">
                                                     ${item.orgName}
+                                                </td>
+                                                <td scope="row">
+                                                    ${item.tgtOrgName}
                                                 </td>
                                                 <td>
                                                     ${item.messageType}
@@ -78,7 +90,7 @@
                                     </c:when>
                                     <c:otherwise>
                                         <tr>
-                                            <td colspan="3">
+                                            <td colspan="4">
                                                 There were no referrals sent for the dates selected.
                                             </td>
                                         </tr>

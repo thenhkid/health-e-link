@@ -16,6 +16,7 @@ import com.ut.healthelink.model.HL7Segments;
 import com.ut.healthelink.model.Macros;
 import com.ut.healthelink.model.Organization;
 import com.ut.healthelink.model.configuration;
+import com.ut.healthelink.model.configurationCCDElements;
 import com.ut.healthelink.model.configurationConnection;
 import com.ut.healthelink.model.configurationConnectionReceivers;
 import com.ut.healthelink.model.configurationConnectionSenders;
@@ -564,5 +565,20 @@ public class configurationManagerImpl implements configurationManager {
     @Override
      public void removeHL7Segment(Integer segmentId) {
          configurationDAO.removeHL7Segment(segmentId);
+     }
+     
+     @Override
+     public List<configurationCCDElements> getCCDElements(Integer configId) throws Exception {
+         return configurationDAO.getCCDElements(configId);
+     }
+     
+     @Override
+     public void saveCCDElement(configurationCCDElements ccdElement) throws Exception {
+         configurationDAO.saveCCDElement(ccdElement);
+     }
+     
+     @Override
+     public configurationCCDElements getCCDElement(Integer elementId) throws Exception {
+         return configurationDAO.getCCDElement(elementId);
      }
 }

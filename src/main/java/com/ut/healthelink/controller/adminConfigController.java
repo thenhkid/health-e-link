@@ -3,9 +3,11 @@
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.stereotype.Controller;
@@ -34,10 +36,12 @@ import com.ut.healthelink.model.configuration;
 import com.ut.healthelink.model.configurationDataTranslations;
 import com.ut.healthelink.model.configurationFormFields;
 import com.ut.healthelink.model.configurationRhapsodyFields;
+import com.ut.healthelink.model.configurationWebServiceSenders;
 import com.ut.healthelink.model.messageTypeFormFields;
 import com.ut.healthelink.service.configurationManager;
 import com.ut.healthelink.model.Organization;
 import com.ut.healthelink.model.User;
+import com.ut.healthelink.model.configurationCCDElements;
 import com.ut.healthelink.model.configurationConnection;
 import com.ut.healthelink.model.configurationConnectionReceivers;
 import com.ut.healthelink.model.configurationConnectionSenders;
@@ -56,16 +60,20 @@ import com.ut.healthelink.reference.fileSystem;
 import com.ut.healthelink.service.configurationTransportManager;
 import com.ut.healthelink.service.sysAdminManager;
 import com.ut.healthelink.service.userManager;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.PrintWriter;
+
 import org.apache.commons.net.PrintCommandListener;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
 import org.apache.commons.net.ftp.FTPSClient;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
+
 import com.ut.healthelink.model.configurationWebServiceFields;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -124,6 +132,12 @@ public class adminConfigController {
      * of an HL7 message. This will display the HL7 Customization link in the left menu.
      */
     private static boolean HL7 = false;
+    
+    /**
+     * The private CCD variable will determine if the transport method is file download
+     * of an CCD message. This will display the CCD Customization link in the left menu.
+     */
+    private static boolean CCD = false;
     
     /** 
      * The stepsCompleted variable will hold the number of steps the configuration has gone 
@@ -358,15 +372,21 @@ public class adminConfigController {
             
             if(transportDetails.getfileType() == 4 && configurationDetails.getType() == 2) {
                 HL7 = true;
+                CCD = false;
+            }
+            else if(transportDetails.getfileType() == 9 && configurationDetails.getType() == 2) {
+                HL7 = false;
+                CCD = true;
             }
             else {
                 HL7 = false;
+                CCD = false;
             }
         }
         
-        
         mav.addObject("mappings", mappings);
         mav.addObject("HL7", HL7);
+        mav.addObject("CCD", CCD);
 
         return mav;
 
@@ -541,11 +561,13 @@ public class adminConfigController {
             List<configurationWebServiceFields> emptyWSFields = new ArrayList<configurationWebServiceFields>();
             configurationWebServiceFields inboundWSFields = new configurationWebServiceFields();
             inboundWSFields.setMethod(1);
-            inboundWSFields.setDomain("");
+            List<configurationWebServiceSenders> inboundWSDomainList = new ArrayList<configurationWebServiceSenders>();
+            //need to modify to set domain
+            inboundWSFields.setSenderDomainList(inboundWSDomainList);
+            
             
             configurationWebServiceFields outboundWSFields = new configurationWebServiceFields();
             outboundWSFields.setMethod(2);
-            outboundWSFields.setDomain(""); 
             
             emptyWSFields.add(inboundWSFields);
             emptyWSFields.add(outboundWSFields);
@@ -580,6 +602,7 @@ public class adminConfigController {
         mav.addObject("id", configId);
         mav.addObject("mappings", mappings);
         mav.addObject("HL7", HL7);
+        mav.addObject("CCD", CCD);
 
         configurationDetails.setOrgName(organizationmanager.getOrganizationById(configurationDetails.getorgId()).getOrgName());
         configurationDetails.setMessageTypeName(messagetypemanager.getMessageTypeById(configurationDetails.getMessageTypeId()).getName());
@@ -663,12 +686,23 @@ public class adminConfigController {
                 mappings = 1;
             }
         }
-        
-        if(transportDetails.getfileType() == 4  && configurationDetails.getType() == 2) {
+      
+        if(transportDetails.getfileType() == 4 && configurationDetails.getType() == 2) {
             HL7 = true;
+            CCD = false;
         }
         else {
             HL7 = false;
+            CCD = false;
+        }
+
+        if(transportDetails.getfileType() == 9 && configurationDetails.getType() == 2) {
+            HL7 = false;
+            CCD = true;
+        }
+        else {
+            HL7 = false;
+            CCD = false;
         }
         
         /** 
@@ -693,10 +727,13 @@ public class adminConfigController {
         
         
         if(transportDetails.gettransportMethodId() == 6 && !transportDetails.getWebServiceFields().isEmpty()) {
-            for(configurationWebServiceFields wsFields : transportDetails.getWebServiceFields()) {
-            	wsFields.setTransportId(transportId);
-                configurationTransportManager.saveTransportWebService(wsFields);
-            }
+        	if (configurationDetails.getType() == 2) {
+        		transportDetails.getWebServiceFields().get(1).setTransportId(transportId);
+        		configurationTransportManager.saveTransportWebService(transportDetails.getWebServiceFields().get(1));
+        	} else {
+        		transportDetails.getWebServiceFields().get(0).setTransportId(transportId);
+        		configurationTransportManager.saveTransportWebService(transportDetails.getWebServiceFields().get(0));
+        	}        
         }
         
         /**
@@ -816,6 +853,7 @@ public class adminConfigController {
         mav.addObject("id", configId);
         mav.addObject("mappings", mappings);
         mav.addObject("HL7", HL7);
+        mav.addObject("CCD", CCD);
 
         //Get the configuration details for the selected config
         configuration configurationDetails = configurationmanager.getConfigurationById(configId);
@@ -902,6 +940,7 @@ public class adminConfigController {
         mav.addObject("id", configId);
         mav.addObject("mappings", mappings);
         mav.addObject("HL7", HL7);
+        mav.addObject("CCD", CCD);
         
         //Get the configuration details for the selected config
         configuration configurationDetails = configurationmanager.getConfigurationById(configId);
@@ -950,6 +989,7 @@ public class adminConfigController {
         mav.addObject("id", configId);
         mav.addObject("mappings", mappings);
         mav.addObject("HL7", HL7);
+        mav.addObject("CCD", CCD);
 
         //Get the completed steps for the selected configuration;
         configuration configurationDetails = configurationmanager.getConfigurationById(configId);
@@ -1053,6 +1093,7 @@ public class adminConfigController {
         mav.addObject("id", configId);
         mav.addObject("mappings", mappings);
         mav.addObject("HL7", HL7);
+        mav.addObject("CCD", CCD);
         
         //Get the completed steps for the selected configuration;
         configuration configurationDetails = configurationmanager.getConfigurationById(configId);
@@ -1394,6 +1435,7 @@ public class adminConfigController {
         mav.addObject("id", configId);
         mav.addObject("mappings", mappings);
         mav.addObject("HL7", HL7);
+        mav.addObject("CCD", CCD);
         
         /* get a list of all connections in the sysetm */
         List<configurationConnection> connections = configurationmanager.getAllConnections();
@@ -1654,6 +1696,7 @@ public class adminConfigController {
         mav.addObject("id", configId);
         mav.addObject("mappings", mappings);
         mav.addObject("HL7", HL7);
+        mav.addObject("CCD", CCD);
         
         //Get the completed steps for the selected configuration;
         configuration configurationDetails = configurationmanager.getConfigurationById(configId);
@@ -1763,6 +1806,7 @@ public class adminConfigController {
         mav.addObject("id", configId);
         mav.addObject("mappings", mappings);
         mav.addObject("HL7", HL7);
+        mav.addObject("CCD", CCD);
         
         //Get the completed steps for the selected configuration;
         configuration configurationDetails = configurationmanager.getConfigurationById(configId);
@@ -1893,37 +1937,43 @@ public class adminConfigController {
         
         List<HL7Segments> segments = HL7Details.getHL7Segments();
         
-        if (null != segments && segments.size() > 0) {
+        try {
+            if (null != segments && segments.size() > 0) {
             
-            for (HL7Segments segment : segments) {
-                
-                /* Update each segment */
-                configurationmanager.updateHL7Segments(segment);
-                
-                /* Get the list of segment elements */
-                List<HL7Elements> elements = segment.getHL7Elements();
-                
-                if (null != elements && elements.size() > 0) {
-                    
-                     for (HL7Elements element : elements) {
-                         configurationmanager.updateHL7Elements(element);
-                         
-                         
-                         /* Get the list of segment element components */
-                        List<HL7ElementComponents> components = element.getelementComponents();
-                        
-                        if (null != components && components.size() > 0) {
-                            for (HL7ElementComponents component : components) {
-                                configurationmanager.updateHL7ElementComponent(component);
+                for (HL7Segments segment : segments) {
+
+                    /* Update each segment */
+                    configurationmanager.updateHL7Segments(segment);
+
+                    /* Get the list of segment elements */
+                    List<HL7Elements> elements = segment.getHL7Elements();
+
+                    if (null != elements && elements.size() > 0) {
+
+                         for (HL7Elements element : elements) {
+                             configurationmanager.updateHL7Elements(element);
+
+
+                             /* Get the list of segment element components */
+                            List<HL7ElementComponents> components = element.getelementComponents();
+
+                            if (null != components && components.size() > 0) {
+                                for (HL7ElementComponents component : components) {
+                                    configurationmanager.updateHL7ElementComponent(component);
+                                }
                             }
-                        }
-                         
-                     }
-                    
+
+                         }
+
+                    }
+
                 }
-                
             }
         }
+        catch( Exception e) {
+            
+        }
+        
         
         redirectAttr.addFlashAttribute("savedStatus", "updated");
         ModelAndView mav = new ModelAndView(new RedirectView("HL7"));
@@ -2237,6 +2287,7 @@ public class adminConfigController {
         mav.addObject("id", configId);
         mav.addObject("mappings", mappings);
         mav.addObject("HL7", HL7);
+        mav.addObject("CCD", CCD);
         
         //Get the completed steps for the selected configuration;
         configuration configurationDetails = configurationmanager.getConfigurationById(configId);
@@ -2292,6 +2343,7 @@ public class adminConfigController {
         mav.addObject("id", configId);
         mav.addObject("mappings", mappings);
         mav.addObject("HL7", HL7);
+        mav.addObject("CCD", CCD);
         
         //Get the completed steps for the selected configuration;
         configuration configurationDetails = configurationmanager.getConfigurationById(configId);
@@ -2373,5 +2425,175 @@ public class adminConfigController {
         
         return 1;
     } 
+    
+    /**
+     * The '/CCD' GET request will display the CCD customization form.
+     */
+    @RequestMapping(value = "/CCD", method = RequestMethod.GET)
+    public ModelAndView getCCDForm() throws Exception {
+
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/configurations/CCD");
+        mav.addObject("id", configId);
+        mav.addObject("mappings", mappings);
+        mav.addObject("HL7", HL7);
+        mav.addObject("CCD", CCD);
+        
+        //Set the variable to hold the number of completed steps for this configuration;
+        mav.addObject("stepsCompleted", stepsCompleted);
+        
+        //Get the completed steps for the selected configuration;
+        configuration configurationDetails = configurationmanager.getConfigurationById(configId);
+        
+        //Get the transport details by configid and selected transport method
+        configurationTransport transportDetails = configurationTransportManager.getTransportDetails(configId);
+        
+        configurationDetails.setOrgName(organizationmanager.getOrganizationById(configurationDetails.getorgId()).getOrgName());
+        configurationDetails.setMessageTypeName(messagetypemanager.getMessageTypeById(configurationDetails.getMessageTypeId()).getName());
+        configurationDetails.settransportMethod(configurationTransportManager.getTransportMethodById(transportDetails.gettransportMethodId()));
+       
+        //pass the configuration detail object back to the page.
+        mav.addObject("configurationDetails", configurationDetails);
+        
+        List<configurationCCDElements> ccdElements = configurationmanager.getCCDElements(configId);
+        mav.addObject("ccdElements", ccdElements);
+        
+        return mav;
+    
+    }
+    
+    /**
+     * The '/createNewCCDElement' function will handle displaying the create CCD Element screen.
+     * 
+     * @return This function will display the new ccd element overlay
+     */
+    @RequestMapping(value = "/createNewCCDElement", method = RequestMethod.GET)
+    public @ResponseBody ModelAndView createNewCCDElement() throws Exception {
+        
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/configurations/ccdElement");
+        
+        configurationCCDElements ccdElement = new configurationCCDElements();
+        ccdElement.setConfigId(configId);
+        mav.addObject("ccdElement", ccdElement);
+        
+        //Get the transport fields
+        //Get the transport details by configid and selected transport method
+        configurationTransport transportDetails = configurationTransportManager.getTransportDetails(configId);
+        List<configurationFormFields> fields = configurationTransportManager.getConfigurationFields(configId, transportDetails.getId());
+        transportDetails.setFields(fields);
+
+        mav.addObject("fields", fields);
+        
+        return mav;
+    }
+    
+    /**
+     * The '/editCCDElement' function will handle displaying the edit CCD Element screen.
+     * 
+     * @return This function will display the new ccd element overlay
+     */
+    @RequestMapping(value = "/editCCDElement", method = RequestMethod.GET)
+    public @ResponseBody ModelAndView editCCDElement(@RequestParam(value = "elementId", required = true) int elementId) throws Exception {
+        
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/configurations/ccdElement");
+        
+        configurationCCDElements ccdElement = configurationmanager.getCCDElement(elementId);
+        mav.addObject("ccdElement", ccdElement);
+        
+        //Get the transport fields
+        //Get the transport details by configid and selected transport method
+        configurationTransport transportDetails = configurationTransportManager.getTransportDetails(configId);
+        List<configurationFormFields> fields = configurationTransportManager.getConfigurationFields(configId, transportDetails.getId());
+        transportDetails.setFields(fields);
+
+        mav.addObject("fields", fields);
+        
+        return mav;
+    }
+    
+    
+    /**
+     * The '/saveCCDElement' POST request will handle submitting the new HL7 Segment Element
+     *
+     * @param configurationCCDElements  The object containing the CCD Element form fields
+     * @param redirectAttr	The variable that will hold values that can be read after the redirect
+     *
+     * @return	Will return the CCD Customization page on "Save"
+     *
+     * @throws Exception
+     */
+    @RequestMapping(value = "/saveCCDElement", method = RequestMethod.POST)
+    public ModelAndView saveCCDElement(@ModelAttribute(value = "ccdElement") configurationCCDElements ccdElement, RedirectAttributes redirectAttr) throws Exception {
+
+        configurationmanager.saveCCDElement(ccdElement);
+
+        redirectAttr.addFlashAttribute("savedStatus", "savedElement");
+        ModelAndView mav = new ModelAndView(new RedirectView("CCD"));
+        return mav;
+    }
+    
+    
+    /**
+     * The '/changeConnectionStatus.do' POST request will update the passed in connection status.
+     * 
+     * @param connectionId  The id for the connection to update the status for
+     * @param statusVal     The new status for the connection
+     * 
+     * @return  The method will return a 1 back to the calling ajax function.
+     */
+    @RequestMapping(value= "/getDomainSenders.do", method = RequestMethod.POST)
+    public @ResponseBody ModelAndView getDomainSenders(@RequestParam int transportId) throws Exception {
+    	ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/configurations/domainSenders");
+        configurationWebServiceFields cwsf = new configurationWebServiceFields();
+        cwsf.setTransportId(transportId);
+        cwsf.setSenderDomainList(configurationTransportManager.getWSSenderList(transportId));
+        mav.addObject("cwsf", cwsf);
+        return mav;
+
+    }
+    
+    /**
+     * The '/saveDomainSenders.do' POST request will update or add new senders.
+     * 
+     * @param configurationWebServiceFields  It will have the transportId and the list of sender domains
+
+     * @return  The method will an updated configurationWebServiceFields containing new sender domains
+     */
+    @RequestMapping(value= "/saveDomainSenders.do", method = RequestMethod.POST)
+    public @ResponseBody ModelAndView saveDomainSenders(HttpServletRequest request, @ModelAttribute(value = "cwsf") configurationWebServiceFields cwsf) throws Exception {
+    	
+    	ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/configurations/domainSenders");
+        List <configurationWebServiceSenders> domainList = cwsf.getSenderDomainList();     
+        String success = "";
+        String senders = "";
+        for (configurationWebServiceSenders confWSSender : domainList) {
+        	if (confWSSender.getDomain().length() != 0) {
+        		confWSSender.setTransportId(cwsf.getTransportId());
+        		configurationTransportManager.saveWSSender(confWSSender);
+        		success = "Updated!";
+        		senders = senders + confWSSender.getDomain() + ",";
+        	}	 else if (confWSSender.getDomain().length() == 0 && confWSSender.getId() != 0) {
+        		configurationTransportManager.deleteWSSender(confWSSender);
+        		success = "Updated!";
+        	}
+        }
+        if (senders.length() != 0) {
+        	senders = senders.substring(0, senders.length()-1);
+        }
+        
+        configurationWebServiceFields cwsfNew = new configurationWebServiceFields();
+        cwsfNew.setTransportId(cwsf.getTransportId());
+        cwsfNew.setSenderDomainList(configurationTransportManager.getWSSenderList(cwsf.getTransportId()));
+		
+        mav.addObject("cwsf", cwsfNew);
+        mav.addObject("success", success);
+        mav.addObject("senders", senders);
+        return mav;
+
+    }
     
 }

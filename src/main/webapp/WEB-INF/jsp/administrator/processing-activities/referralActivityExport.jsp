@@ -1,0 +1,84 @@
+<%-- 
+    Document   : referralActivityExport
+    Created on : Mar 20, 2015, 1:26:25 PM
+    Author     : chadmccue
+--%>
+
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@ taglib prefix="s" uri="http://www.springframework.org/tags" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+
+<div class="main clearfix" role="main">
+    <div class="col-md-9">
+        
+        <div class="row-fluid contain basic-clearfix">
+             <form:form class="form form-inline" id="searchForm" action="/administrator/processing-activity/referralActivityExport" method="post">
+                <div class="form-group">
+                    <input type="hidden" name="fromDate" id="fromDate" rel="<fmt:formatDate value="${fromDate}" type="date" pattern="MM/dd/yyyy" />" rel2="<fmt:formatDate value="${originalDate}" type="date" pattern="MM/dd/yyyy" />" value="${fromDate}" />
+                    <input type="hidden" name="toDate" id="toDate" rel="<fmt:formatDate value="${toDate}" type="date" pattern="MM/dd/yyyy" />" value="${toDate}" />
+                </div>
+            </form:form>
+            <div class="form-container scrollable ">
+                <div class="date-range-picker-trigger form-control pull-left daterange" style="width:285px; margin-right: 10px;">
+                    <i class="glyphicon glyphicon-calendar"></i>
+                    <span class="date-label"><fmt:formatDate value="${fromDate}" type="date" pattern="MMMM dd, yyyy" /> - <fmt:formatDate value="${toDate}" type="date" pattern="MMMM dd, yyyy" /></span> <b class="caret"></b>
+                 </div>
+                 <div class="pull-left">
+                     <input type="button" id="cancel" class="btn btn-primary btn-action-sm createExport" value="Create Export"/>
+                 </div>
+            </div>
+        </div>
+                
+        <section class="panel panel-default" style="margin-top: 10px">
+            <div class="panel-heading">
+                <h3 class="panel-title">Latest Export</h3>
+            </div>
+            <div class="panel-body">
+                <div class="form-container scrollable">
+                    <table class="table table-striped table-hover table-default">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Export Date</th>
+                                    <th scope="col">Selected Date Range</th>
+                                    <th scope="col" class="center-text">Created By</th>
+                                    <th scope="col" class="center-text"></th>
+                                </tr>
+                                <c:choose>
+                                    <c:when test="${not empty exports}">
+                                         <c:forEach var="export" items="${exports}">
+                                            <tr>
+                                                <td scope="row">
+                                                    <fmt:formatDate value="${export.dateSubmitted}" type="both" pattern="M/dd/yyyy h:mm:ss a" />
+                                                </td>
+                                                <td>
+                                                    ${export.selDateRange}
+                                                </td>
+                                                <td class="center-text">
+                                                    ${export.createdByName}
+                                                </td>
+                                                <td class="center-text">
+                                                    <a href="/FileDownload/downloadFile.do?filename=${export.fileName}&foldername=referralActivityExports&orgId=0" title="Download Export">
+                                                       Download Export
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </c:forEach>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <tr>
+                                            <td colspan="4">
+                                                No export has been generated.
+                                            </td>
+                                        </tr>
+                                    </c:otherwise>
+                                </c:choose>
+                            </thead>
+                    </table>
+                </div>
+            </div>
+        </section>        
+                
+    </div>
+</div>             

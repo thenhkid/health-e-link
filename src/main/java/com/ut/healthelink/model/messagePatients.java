@@ -13,6 +13,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import org.springframework.format.annotation.DateTimeFormat;
 
 /**
@@ -22,6 +23,21 @@ import org.springframework.format.annotation.DateTimeFormat;
 @Entity
 @Table(name = "MESSAGE_PATIENTS")
 public class messagePatients {
+    
+    @Transient
+    private String genderVal = "";
+    
+    @Transient
+    private String raceVal = "";
+     
+    @Transient
+    private String ethnicityVal = "";
+    
+    @Transient
+    private String languageVal = "";
+    
+    @Transient
+    private String zip = "";
     
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -39,6 +55,9 @@ public class messagePatients {
     
     @Column(name = "FIRSTNAME", nullable = true)
     private String firstName = null;
+    
+    @Column(name = "MIDDLENAME", nullable = true)
+    private String middleName = null;
     
     @Column(name = "LASTNAME", nullable = true)
     private String lastName = null;
@@ -65,10 +84,13 @@ public class messagePatients {
     private String englishProficient = null;
     
     @Column(name = "MARITALSTATUSID", nullable = true)
-    private Integer maritalStausId = 0;
+    private Integer maritalStatusId = 0;
     
     @Column(name = "INITIALCONTRACEPTIVEID", nullable = true)
     private Integer initialContraceptiveId = 0;
+    
+    @Column(name = "INITIALNOCONTRACEPTIVEID", nullable = true)
+    private Integer initialNoContraceptiveId = 0;
     
     @Column(name = "EMAIL", nullable = true)
     private String email = null;
@@ -90,6 +112,9 @@ public class messagePatients {
     
     @Column(name = "EMERGENCYTEL", nullable = true)
     private String emergencyTel = null;
+    
+    @Column(name = "PATIENTSTATUSID", nullable = true)
+    private Integer patientStatusId = 0;
     
     @DateTimeFormat(pattern = "dd/MM/yyyy hh:mm:ss")
     @Column(name = "DATECREATED", nullable = false)
@@ -202,12 +227,12 @@ public class messagePatients {
         this.englishProficient = englishProficient;
     }
 
-    public int getMaritalStausId() {
-        return maritalStausId;
+    public int getMaritalStatusId() {
+        return maritalStatusId;
     }
 
-    public void setMaritalStausId(Integer maritalStausId) {
-        this.maritalStausId = maritalStausId;
+    public void setMaritalStausId(Integer maritalStatusId) {
+        this.maritalStatusId = maritalStatusId;
     }
 
     public int getInitialContraceptiveId() {
@@ -288,6 +313,78 @@ public class messagePatients {
 
     public void setRace(String race) {
         this.race = race;
+    }
+
+    public String getGenderVal() {
+        return genderVal;
+    }
+
+    public void setGenderVal(String genderVal) {
+        this.genderVal = genderVal;
+    }
+
+    public String getRaceVal() {
+        return raceVal;
+    }
+
+    public void setRaceVal(String raceVal) {
+        this.raceVal = raceVal;
+    }
+
+    public String getEthnicityVal() {
+        return ethnicityVal;
+    }
+
+    public void setEthnicityVal(String ethnicityVal) {
+        this.ethnicityVal = ethnicityVal;
+    }
+
+    public String getLanguageVal() {
+        return languageVal;
+    }
+
+    public void setLanguageVal(String languageVal) {
+        this.languageVal = languageVal;
+    }
+
+    public String getZip() {
+        return zip;
+    }
+
+    public void setZip(String zip) {
+        this.zip = zip;
+    }
+
+    public String getMiddleName() {
+        return middleName;
+    }
+
+    public void setMiddleName(String middleName) {
+        this.middleName = middleName;
+    }
+
+    public Integer getInitialNoContraceptiveId() {
+        return initialNoContraceptiveId;
+    }
+
+    public void setInitialNoContraceptiveId(Integer initialNoContraceptiveId) {
+        this.initialNoContraceptiveId = initialNoContraceptiveId;
+    }
+
+    public String getAdditonalContactNumber() {
+        return additonalContactNumber;
+    }
+
+    public void setAdditonalContactNumber(String additonalContactNumber) {
+        this.additonalContactNumber = additonalContactNumber;
+    }
+
+    public Integer getPatientStatusId() {
+        return patientStatusId;
+    }
+
+    public void setPatientStatusId(Integer patientStatusId) {
+        this.patientStatusId = patientStatusId;
     }
     
 }

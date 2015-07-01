@@ -22,6 +22,7 @@ import com.ut.healthelink.model.batchDownloadSummary;
 import com.ut.healthelink.model.batchDownloads;
 import com.ut.healthelink.model.batchUploads;
 import com.ut.healthelink.model.configuration;
+import com.ut.healthelink.model.configurationCCDElements;
 import com.ut.healthelink.model.configurationConnection;
 import com.ut.healthelink.model.configurationConnectionReceivers;
 import com.ut.healthelink.model.configurationDataTranslations;
@@ -31,6 +32,7 @@ import com.ut.healthelink.model.configurationRhapsodyFields;
 import com.ut.healthelink.model.configurationSchedules;
 import com.ut.healthelink.model.configurationTransport;
 import com.ut.healthelink.model.configurationWebServiceFields;
+import com.ut.healthelink.model.wsMessagesOut;
 import com.ut.healthelink.service.emailMessageManager;
 import com.ut.healthelink.model.mailMessage;
 import com.ut.healthelink.model.pendingDeliveryTargets;
@@ -49,6 +51,7 @@ import com.ut.healthelink.service.organizationManager;
 import com.ut.healthelink.service.transactionInManager;
 import com.ut.healthelink.service.transactionOutManager;
 import com.ut.healthelink.service.userManager;
+import com.ut.healthelink.service.utilManager;
 import com.ut.healthelink.webServices.WSManager;
 
 import java.io.File;
@@ -60,6 +63,8 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -121,6 +126,9 @@ public class transactionOutManagerImpl implements transactionOutManager {
     
     @Autowired
     private WSManager wsManager;
+    
+    @Autowired
+    private utilManager utilmanager;
     
     private int processingSysErrorId = 5;
 
@@ -457,38 +465,71 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                         /* get the to user details */
                                         List<User> toPrimaryContact = userManager.getOrganizationContact(configurationManager.getConfigurationById(transaction.getconfigId()).getorgId(), 1);
                                         List<User> toSecondaryContact = userManager.getOrganizationContact(configurationManager.getConfigurationById(transaction.getconfigId()).getorgId(), 2);
+                                        List<User> nonMainContact = userManager.getOrganizationContact(configurationManager.getConfigurationById(transaction.getconfigId()).getorgId(), 0);
 
-                                        if (fromPrimaryContact.size() > 0 && (toPrimaryContact.size() > 0 || toSecondaryContact.size() > 0)) {
-                                            String toName = null;
+                                        if (fromPrimaryContact.size() > 0 && (toPrimaryContact.size() > 0 || toSecondaryContact.size() > 0 || nonMainContact.size() > 0)) {
+                                            String toName = "";
+                                            String toEmail = "";
                                             mailMessage msg = new mailMessage();
                                             ArrayList<String> ccAddressArray = new ArrayList<String>();
                                             msg.setfromEmailAddress("e-Referral@state.ma.us");
  
                                             if (toPrimaryContact.size() > 0) {
-                                                toName = toPrimaryContact.get(0).getFirstName() + " " + toPrimaryContact.get(0).getLastName();
-                                                msg.settoEmailAddress(toPrimaryContact.get(0).getEmail());
-
-                                                if (toPrimaryContact.size() > 1) {
-                                                    for (int i = 1; i < toPrimaryContact.size(); i++) {
-                                                        ccAddressArray.add(toPrimaryContact.get(i).getEmail());
-                                                    }
-                                                }
-
-                                                if (toSecondaryContact.size() > 0) {
-                                                    for (int i = 0; i < toSecondaryContact.size(); i++) {
-                                                        ccAddressArray.add(toSecondaryContact.get(i).getEmail());
-                                                    }
-                                                }
-                                            } else {
-                                                toName = toSecondaryContact.get(0).getFirstName() + " " + toSecondaryContact.get(0).getLastName();
-                                                msg.settoEmailAddress(toSecondaryContact.get(0).getEmail());
-
-                                                if (toSecondaryContact.size() > 1) {
-                                                    for (int i = 1; i < toSecondaryContact.size(); i++) {
-                                                        ccAddressArray.add(toSecondaryContact.get(i).getEmail());
+                                                
+                                                for(int i = 0; i < toPrimaryContact.size(); i++) {
+                                                    
+                                                    if(toPrimaryContact.get(i).getSendEmailAlert() == true) {
+                                                        
+                                                        if("".equals(toEmail)) {
+                                                            toName = toPrimaryContact.get(i).getFirstName() + " " + toPrimaryContact.get(i).getLastName();
+                                                            toEmail = toPrimaryContact.get(i).getEmail();
+                                                        }
+                                                        else {
+                                                            ccAddressArray.add(toPrimaryContact.get(i).getEmail());
+                                                        }
                                                     }
                                                 }
                                             }
+                                            
+                                            if (toSecondaryContact.size() > 0) {
+                                                
+                                                for(int i = 0; i < toSecondaryContact.size(); i++) {
+                                                    
+                                                    if(toSecondaryContact.get(i).getSendEmailAlert() == true) {
+                                                        
+                                                        if("".equals(toEmail)) {
+                                                            toName = toSecondaryContact.get(i).getFirstName() + " " + toSecondaryContact.get(i).getLastName();
+                                                            toEmail = toSecondaryContact.get(i).getEmail();
+                                                        }
+                                                        else {
+                                                            ccAddressArray.add(toSecondaryContact.get(i).getEmail());
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            
+                                            if (nonMainContact.size() > 0) {
+                                                
+                                                for(int i = 0; i < nonMainContact.size(); i++) {
+                                                    
+                                                    if(nonMainContact.get(i).getSendEmailAlert() == true) {
+                                                        
+                                                        if("".equals(toEmail)) {
+                                                            toName = nonMainContact.get(i).getFirstName() + " " + nonMainContact.get(i).getLastName();
+                                                            toEmail = nonMainContact.get(i).getEmail();
+                                                        }
+                                                        else {
+                                                            ccAddressArray.add(nonMainContact.get(i).getEmail());
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            
+                                            if("".equals(toEmail)) {
+                                                toEmail = "e-Referral@state.ma.us";
+                                            }
+                                            
+                                            msg.settoEmailAddress(toEmail);
 
                                             if (ccAddressArray.size() > 0) {
                                                 String[] ccAddressList = new String[ccAddressArray.size()];
@@ -496,11 +537,17 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                                 msg.setccEmailAddress(ccAddressList);
                                             }
 
-                                            msg.setmessageSubject("You have received a new message from the Universal Translator");
+                                            msg.setmessageSubject("You have received a new message from the eReferral System");
 
                                             /* Build the body of the email */
                                             StringBuilder sb = new StringBuilder();
-                                            sb.append("Dear " + toName + ", You have recieved a new message from the Universal Translator. ");
+                                            if(!"".equals(toName)) {
+                                               sb.append("Dear " + toName + ", You have recieved a new message from the eReferral System. ");
+                                            }
+                                            else {
+                                               sb.append("You have recieved a new message from the eReferral System. "); 
+                                            }
+                                            
                                             sb.append(System.getProperty("line.separator"));
                                             sb.append(System.getProperty("line.separator"));
                                             sb.append("BatchId: " + batchDLInfo.getutBatchName());
@@ -748,37 +795,53 @@ public class transactionOutManagerImpl implements transactionOutManager {
                             List<User> toSecondaryContact = userManager.getOrganizationContact(batchDLInfo.getOrgId(), 2);
 
                             if (toPrimaryContact.size() > 0 || toSecondaryContact.size() > 0) {
-                                String toName = null;
+                                String toName = "";
+                                String toEmail = "";
                                 mailMessage msg = new mailMessage();
                                 ArrayList<String> ccAddressArray = new ArrayList<String>();
                                 msg.setfromEmailAddress("e-Referral@state.ma.us");
-
+                                
+                                
                                 if (toPrimaryContact.size() > 0) {
-                                    toName = toPrimaryContact.get(0).getFirstName() + " " + toPrimaryContact.get(0).getLastName();
-                                    msg.settoEmailAddress(toPrimaryContact.get(0).getEmail());
+                                                
+                                    for(int i = 0; i < toPrimaryContact.size(); i++) {
 
-                                    if (toPrimaryContact.size() > 1) {
-                                        for (int i = 1; i < toPrimaryContact.size(); i++) {
-                                            ccAddressArray.add(toPrimaryContact.get(i).getEmail());
-                                        }
+                                        if(toPrimaryContact.get(i).getSendEmailAlert() == true) {
 
-                                    }
-
-                                    if (toSecondaryContact.size() > 0) {
-                                        for (int i = 0; i < toSecondaryContact.size(); i++) {
-                                            ccAddressArray.add(toSecondaryContact.get(i).getEmail());
-                                        }
-                                    }
-                                } else {
-                                    toName = toSecondaryContact.get(0).getFirstName() + " " + toSecondaryContact.get(0).getLastName();
-                                    msg.settoEmailAddress(toSecondaryContact.get(0).getEmail());
-
-                                    if (toSecondaryContact.size() > 1) {
-                                        for (int i = 1; i < toSecondaryContact.size(); i++) {
-                                            ccAddressArray.add(toSecondaryContact.get(i).getEmail());
+                                            if("".equals(toEmail)) {
+                                                toName = toPrimaryContact.get(i).getFirstName() + " " + toPrimaryContact.get(i).getLastName();
+                                                toEmail = toPrimaryContact.get(i).getEmail();
+                                            }
+                                            else {
+                                                ccAddressArray.add(toPrimaryContact.get(i).getEmail());
+                                            }
                                         }
                                     }
                                 }
+
+                                if (toSecondaryContact.size() > 0) {
+
+                                    for(int i = 0; i < toSecondaryContact.size(); i++) {
+
+                                        if(toSecondaryContact.get(i).getSendEmailAlert() == true) {
+
+                                            if("".equals(toEmail)) {
+                                                toName = toSecondaryContact.get(i).getFirstName() + " " + toSecondaryContact.get(i).getLastName();
+                                                toEmail = toSecondaryContact.get(i).getEmail();
+                                            }
+                                            else {
+                                                ccAddressArray.add(toSecondaryContact.get(i).getEmail());
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if("".equals(toEmail)) {
+                                    toEmail = "e-Referral@state.ma.us";
+                                }
+
+                                msg.settoEmailAddress(toEmail);
+                                
 
                                 if (ccAddressArray.size() > 0) {
                                     String[] ccAddressList = new String[ccAddressArray.size()];
@@ -786,11 +849,16 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                     msg.setccEmailAddress(ccAddressList);
                                 }
 
-                                msg.setmessageSubject("You have received a new message from the Universal Translator");
+                                msg.setmessageSubject("You have received a new message from the eReferral System");
 
                                 /* Build the body of the email */
                                 StringBuilder sb = new StringBuilder();
-                                sb.append("Dear " + toName + ", You have recieved a new message from the Universal Translator. ");
+                                if(!"".equals(toName)) {
+                                    sb.append("Dear " + toName + ", You have recieved a new message from the eReferral System. ");
+                                }
+                                else {
+                                    sb.append("You have recieved a new message from the eReferral System. "); 
+                                }
                                 sb.append(System.getProperty("line.separator"));
                                 sb.append(System.getProperty("line.separator"));
                                 sb.append("BatchId: " + batchDLInfo.getutBatchName());
@@ -1112,12 +1180,16 @@ public class transactionOutManagerImpl implements transactionOutManager {
         dir.setDirByName(filelocation);
 
         boolean hl7 = false;
+        boolean CCD = false;
         String fileType = (String) configurationManager.getFileTypesById(transportDetails.getfileType());
-
+        
         if ("hl7".equals(fileType)) {
             hl7 = true;
         }
-
+        else if("xml (CCD)".equals(fileType)) {
+            CCD = true;
+        }
+        
         int findExt = batchDetails.getoutputFIleName().lastIndexOf(".");
 
         if (findExt >= 0) {
@@ -1180,9 +1252,74 @@ public class transactionOutManagerImpl implements transactionOutManager {
             } catch (IOException ex) {
                 Logger.getLogger(transactionOutManagerImpl.class.getName()).log(Level.SEVERE, null, ex);
             }
+            
+            /* If a CCD file is to be generated */
+            if(CCD == true) {
+                
+                Organization orgDetails = organizationManager.getOrganizationById(configurationManager.getConfigurationById(transportDetails.getconfigId()).getorgId());
+                fileSystem ccdTemplateDir = new fileSystem();
+                ccdTemplateDir.setDir(orgDetails.getcleanURL(), "templates");
+                
+                String ccdSampleTemplate = transportDetails.getCcdSampleTemplate();
+                
+                Path path = Paths.get(ccdTemplateDir.getDir() + ccdSampleTemplate);
+                String ccdSampleContent = new String(Files.readAllBytes(path));
+                
+                Path newFilePath = Paths.get(dir.getDir() + fileName);
+                Files.write(newFilePath, ccdSampleContent.getBytes());
+                
+                String contentToUpdate = new String(Files.readAllBytes(newFilePath));
+                
+                /* Get the configurationCCDElements */
+                List<configurationCCDElements> ccdElements = configurationManager.getCCDElements(transportDetails.getconfigId());
+                
+                if(!ccdElements.isEmpty()) {
+                    
+                    for(configurationCCDElements element : ccdElements) {
+                        
+                        if(!"".equals(element.getDefaultValue())) {
+                            if ("~currDate~".equals(element.getDefaultValue())) {
+                                SimpleDateFormat date_format = new SimpleDateFormat("yyyyMMdd");
+                                String date = date_format.format(batchDetails.getdateCreated());
+                                contentToUpdate = contentToUpdate.replace(element.getElement(), date);
+                            }
+                            else {
+                                contentToUpdate = contentToUpdate.replace(element.getElement(), element.getDefaultValue());
+                            }
+                           
+                        }
+                        else {
+                             String colName = new StringBuilder().append("f").append(element.getFieldValue()).toString();
+                             
+                              String fieldValue = BeanUtils.getProperty(records, colName);
 
+                              if (fieldValue == null) {
+                                   fieldValue = "";
+                              } else if ("null".equals(fieldValue)) {
+                                  fieldValue = "";
+                              } else if (fieldValue.isEmpty()) {
+                                  fieldValue = "";
+                              } else if (fieldValue.length() == 0) {
+                                  fieldValue = "";
+                              }
+                              
+                              contentToUpdate = contentToUpdate.replace(element.getElement(), fieldValue);
+                        }
+                        
+                    }
+                }
+                
+                /** need to see if we need to  encrypt file here  
+                 **/
+                if (!encrypt) {
+                	Files.write(newFilePath, contentToUpdate.getBytes());
+                } else {
+                	String strEncodedFile = utilmanager.encodeStringToBase64Binary(contentToUpdate);
+                	Files.write(newFilePath, strEncodedFile.getBytes());
+                } 
+            }
             /* If an hl7 file is to be generated */
-            if (hl7 == true) {
+            else if (hl7 == true) {
 
                 /* Get the hl7 details */
                 HL7Details hl7Details = configurationManager.getHL7Details(transportDetails.getconfigId());
@@ -1244,7 +1381,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                     }
                                     else {
 
-                                        if (!"".equals(element.getdefaultValue())) {
+                                        if (!"".equals(element.getdefaultValue()) && element.getdefaultValue() != null) {
                                             if ("~currDate~".equals(element.getdefaultValue())) {
                                                 SimpleDateFormat date_format = new SimpleDateFormat("yyyyMMdd");
                                                 String date = date_format.format(batchDetails.getdateCreated());
@@ -1261,20 +1398,51 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                             if (!hl7Components.isEmpty()) {
                                                 int counter = 1;
                                                 for (HL7ElementComponents component : hl7Components) {
+                                                    
+                                                    String fieldValue = "";
+                                                    
+                                                    if(!"".equals(component.getDefaultValue()) && component.getDefaultValue() != null) {
+                                                        
+                                                        /* If the HL7 requires attachments then we need to look for the "attachments" keyword
+                                                        in order to loop through and retrieve all attachments to the batch.
+                                                        */
+                                                        if("attachments".equals(component.getDefaultValue().toLowerCase())) {
+                                                            transactionTarget targetDetails = transactionOutDAO.getTransactionDetails(transactionTargetId);
+                                                            List<transactionAttachment> attachments = transactionInManager.getAttachmentsByTransactionId(targetDetails.gettransactionInId());
 
-                                                    String colName = new StringBuilder().append("f").append(component.getfieldValue()).toString();
-
-                                                    String fieldValue = BeanUtils.getProperty(records, colName);
-
-                                                    if (fieldValue == null) {
-                                                        fieldValue = "";
-                                                    } else if ("null".equals(fieldValue)) {
-                                                        fieldValue = "";
-                                                    } else if (fieldValue.isEmpty()) {
-                                                        fieldValue = "";
-                                                    } else if (fieldValue.length() == 0) {
-                                                        fieldValue = "";
+                                                            if(!attachments.isEmpty()) {
+                                                                Integer attachmentCounter = 1;
+                                                                for(transactionAttachment attachment : attachments) {
+                                                                    fileSystem attachDir = new fileSystem();
+                                                                    attachDir.setDirByName(attachment.getfileLocation() + "/");
+                                                                    File f = new File(attachDir.getDir() + attachment.getfileName());
+                                                                    byte[] bytes = attachDir.loadFile(f);
+                                                                    byte[] encoded = Base64.encode(bytes);
+                                                                    fieldValue = new String(encoded);
+                                                                }
+                                                            }
+                                                        }
+                                                        else {
+                                                            fieldValue = component.getDefaultValue();
+                                                        }
+                                                        
                                                     }
+                                                    else {
+                                                        String colName = new StringBuilder().append("f").append(component.getfieldValue()).toString();
+
+                                                        fieldValue = BeanUtils.getProperty(records, colName);
+
+                                                        if (fieldValue == null) {
+                                                            fieldValue = "";
+                                                        } else if ("null".equals(fieldValue)) {
+                                                            fieldValue = "";
+                                                        } else if (fieldValue.isEmpty()) {
+                                                            fieldValue = "";
+                                                        } else if (fieldValue.length() == 0) {
+                                                            fieldValue = "";
+                                                        }
+                                                    }
+
 
                                                     if (!"".equals(component.getfieldDescriptor()) && component.getfieldDescriptor() != null) {
                                                         hl7recordRow.append(component.getfieldDescriptor()).append(" ").append(fieldValue);
@@ -2074,14 +2242,23 @@ public class transactionOutManagerImpl implements transactionOutManager {
             //to get the original sender's email, we need to get the originalTargetId from TransactionIn and then look up the batchId
             List <String> emails = getWSSenderFromBatchDLId((Arrays.asList(batchId)));
             
-            String result = wsManager.sendHIESoapMessage(fileContent, emails.get(0), wsDetails.getEmail(), batchId);
+            wsMessagesOut wsMessagesOut = new wsMessagesOut();
+            wsMessagesOut.setOrgId(batchDetails.getOrgId());
+            //String fileContent, String toEmail, String fromEmail, Integer batchId
+            wsMessagesOut.setFromEmail(wsDetails.getEmail());
+            wsMessagesOut.setToEmail(emails.get(0));
+            wsMessagesOut.setBatchDownloadId(batchId);
+            wsMessagesOut.setMimeType(wsDetails.getMimeType());
+            wsMessagesOut = wsManager.sendHIESoapMessage(wsMessagesOut, fileContent);
+            
+            String result = wsMessagesOut.getMessageResult();
             
             
         	if (result.equalsIgnoreCase("success")) {
         		transactionOutDAO.updateBatchStatus(batchId, 23);
         	} else {
         		transactionOutDAO.updateBatchStatus(batchId, 30);
-        		transactionInManager.insertProcessingError(20, null, batchId, null, null, null, null, false, true, "Web Service Message Failed to send.");
+        		transactionInManager.insertProcessingError(21, null, batchId, null, null, null, null, false, true, "Web Service Message Failed to send.");
             	updateTargetTransasctionStatus(batchId, 33);
             	return null;
         		

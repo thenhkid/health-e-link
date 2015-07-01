@@ -14,8 +14,10 @@ import com.ut.healthelink.model.transactionIn;
 import com.ut.healthelink.model.transactionOutNotes;
 import com.ut.healthelink.model.transactionOutRecords;
 import com.ut.healthelink.model.transactionTarget;
+
 import java.util.Date;
 import java.util.List;
+
 import org.springframework.stereotype.Repository;
 
 /**
@@ -129,4 +131,7 @@ public interface transactionOutDAO {
     void updateTransactionTargetStatusOutBound(Integer batchDLId, Integer transactionId, Integer fromStatusId, Integer toStatusId) throws Exception;
     
     List <String> getWSSenderFromBatchDLId(List<Integer> batchDLIds) throws Exception;
+    
+    List<transactionTarget> getSentTransactions(Date fromDate, Date toDate) throws Exception;
+    
 }

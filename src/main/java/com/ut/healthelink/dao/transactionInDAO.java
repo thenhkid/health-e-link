@@ -6,6 +6,7 @@
 
 package com.ut.healthelink.dao;
 
+import com.ut.healthelink.model.activityReportList;
 import com.ut.healthelink.model.CrosswalkData;
 import com.ut.healthelink.model.Macros;
 import com.ut.healthelink.model.MoveFilesLog;
@@ -13,7 +14,6 @@ import com.ut.healthelink.model.TransactionInError;
 import com.ut.healthelink.model.User;
 import com.ut.healthelink.model.UserActivity;
 import com.ut.healthelink.model.WSMessagesIn;
-import com.ut.healthelink.model.activityReportList;
 import com.ut.healthelink.model.batchMultipleTargets;
 import com.ut.healthelink.model.batchUploadSummary;
 import com.ut.healthelink.model.batchUploads;
@@ -35,11 +35,11 @@ import com.ut.healthelink.model.custom.ConfigForInsert;
 import com.ut.healthelink.model.custom.IdAndFieldValue;
 import com.ut.healthelink.model.custom.TransErrorDetail;
 import com.ut.healthelink.model.messagePatients;
+import com.ut.healthelink.model.referralActivityExports;
 import java.math.BigInteger;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.stereotype.Repository;
 
@@ -314,6 +314,8 @@ public interface transactionInDAO {
     
     messagePatients getPatientTransactionDetails(int transactionInId);
     
+    messagePatients getPatientTransactionDetailsForExport(int transactionInId);
+    
     List <configurationRhapsodyFields> getRhapsodyInfoForJob (Integer method);
     
     Integer insertTransactionInError(Integer newTInId, Integer oldTInId);
@@ -389,5 +391,17 @@ public interface transactionInDAO {
     BigInteger getTotalCompletedActivityStatus(String transIds, String fieldNo) throws Exception;
     
     BigInteger getTotalEnrolledActivityStatus(String transIds, String fieldNo) throws Exception;
+    
+    BigInteger getRejectedCount(String fromDate, String toDate) throws Exception;
+    
+    List<referralActivityExports> getReferralActivityExports() throws Exception;
+    
+    void saveReferralActivityExport(referralActivityExports activityExport) throws Exception;
+    
+    String getTransactionFieldValue(Integer transactionInId, String fieldNo) throws Exception;
+    
+    String getActivityStatusValueById(Integer activityStatusId) throws Exception;
+    
+    List<batchUploads> getAllRejectedBatches(Date fromDate, Date toDate, Integer fetchSize) throws Exception;
     
 }

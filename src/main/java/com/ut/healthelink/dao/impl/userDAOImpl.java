@@ -338,7 +338,7 @@ public class userDAOImpl implements userDAO {
     @SuppressWarnings("unchecked")
     public List<User> getSendersForConfig(List<Integer> configIds) {
         try {
-            String sql = ("select * from users where id in (select userId from configurationconnectionsenders where connectionId in "
+            String sql = ("select * from users where status = 1 and id in (select userId from configurationconnectionsenders where connectionId in "
                     + " (select id from configurationconnections "
                     + " where sourceConfigId in ( :configId))) order by userType;");
 
@@ -361,7 +361,7 @@ public class userDAOImpl implements userDAO {
     @SuppressWarnings("unchecked")
     public List<User> getOrgUsersForConfig(List<Integer> configIds) {
         try {
-            String sql = ("select * from users where orgId in (select orgId from configurations where id "
+            String sql = ("select * from users where status = 1 and orgId in (select orgId from configurations where id "
                     + " in ( :configId ) "
                     + " and status = 1) order by userType;");
 

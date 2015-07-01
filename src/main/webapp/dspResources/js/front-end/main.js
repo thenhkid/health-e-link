@@ -10,17 +10,21 @@ require.config({
         'fixed-header': '../fixed-header',
         'moment': '../vendor/moment',
         'daterangepicker': '../vendor/daterangepicker',
-        'dataTables': '../vendor/jquery.dataTables.min'
+        'dataTables': '../vendor/jquery.dataTables.min',
+        'maps': '../vendor/mapmarker.jquery',
+        'ajaxupload': 'ajaxupload.min'
     },
     shim: {
         'bootstrap': ['jquery'],
         'responsive-tables': ['jquery'],
         'daterangepicker': ['jquery', 'bootstrap'],
-        'dataTables': ['jquery']
+        'dataTables': ['jquery'],
+        'maps': ['jquery'],
+        'ajaxupload' : ['jquery']
     }
 });
 
-define(['jquery', 'fixed-header', 'moment', 'bootstrap', 'responsive-tables', 'mediaModal', 'overlay', 'daterangepicker', 'dataTables'], function($, fixedHeader, moment) {
+define(['jquery', 'fixed-header', 'moment', 'bootstrap', 'responsive-tables', 'mediaModal', 'overlay', 'daterangepicker', 'dataTables', 'ajaxupload'], function($, fixedHeader, moment) {
 
     var primaryNav = $('.primary-nav');
     var primaryNavHeight = primaryNav.outerHeight();
@@ -99,8 +103,6 @@ define(['jquery', 'fixed-header', 'moment', 'bootstrap', 'responsive-tables', 'm
         searchByDateRange();
     }
     );
-    
-    $('.news-carousel').carousel();
 
 
     // left nav scrollspy

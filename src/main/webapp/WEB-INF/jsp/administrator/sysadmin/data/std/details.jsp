@@ -84,7 +84,7 @@
                                 <form:errors path="description" cssClass="control-label" element="label" />
                             </div>
                         </spring:bind>
-                       
+                       <c:if test='${objectType=="lu_ProcessStatus"}'>
                       <spring:bind path="endUserDisplayCode">
 	                            <div class="form-group ${status.error ? 'has-error' : '' }">
 	                                <label class="control-label" for="endUserDisplayCode">End User Display Code</label>
@@ -106,7 +106,7 @@
                                 <form:errors path="endUserDescription" cssClass="control-label" element="label" />
                             </div>
                         </spring:bind>
-      					
+      					</c:if>
       					<c:if test='${objectType=="lu_Counties"}'>
                          <spring:bind path="state">
                             <div class="form-group ${status.error ? 'has-error' : '' }">

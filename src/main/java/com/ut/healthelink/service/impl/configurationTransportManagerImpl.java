@@ -4,19 +4,23 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.ut.healthelink.model.TransportMethod;
 import com.ut.healthelink.model.configurationFormFields;
 import com.ut.healthelink.model.configurationMessageSpecs;
 import com.ut.healthelink.model.configurationRhapsodyFields;
 import com.ut.healthelink.model.configurationTransport;
 import com.ut.healthelink.model.configurationWebServiceFields;
+import com.ut.healthelink.model.configurationWebServiceSenders;
 import com.ut.healthelink.dao.configurationTransportDAO;
 import com.ut.healthelink.model.Organization;
 import com.ut.healthelink.model.configurationFTPFields;
 import com.ut.healthelink.model.configurationTransportMessageTypes;
 import com.ut.healthelink.reference.fileSystem;
+import com.ut.healthelink.service.configurationManager;
 import com.ut.healthelink.service.configurationTransportManager;
 import com.ut.healthelink.service.organizationManager;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -34,6 +38,9 @@ public class configurationTransportManagerImpl implements configurationTransport
     
     @Autowired
     private organizationManager organizationManager;
+    
+    @Autowired
+    private configurationManager configurationManager;
     
     @Override
     @Transactional
@@ -56,6 +63,54 @@ public class configurationTransportManagerImpl implements configurationTransport
     @Override
     @Transactional
     public Integer updateTransportDetails(configurationTransport transportDetails) {
+        
+        MultipartFile CCDTemplatefile = transportDetails.getCcdTemplatefile();
+        //If a file is uploaded
+        if (CCDTemplatefile != null && !CCDTemplatefile.isEmpty()) {
+        
+            String CCDTemplatefileName = CCDTemplatefile.getOriginalFilename();
+            
+            int orgId = configurationManager.getConfigurationById(transportDetails.getconfigId()).getorgId();
+            
+            Organization orgDetails = organizationManager.getOrganizationById(orgId);
+            
+            InputStream inputStream = null;
+            OutputStream outputStream = null;
+            
+            try {
+                inputStream = CCDTemplatefile.getInputStream();
+                File newCCDTemplateFile = null;
+
+                //Set the directory to save the uploaded message type template to
+                fileSystem orgdir = new fileSystem();
+
+                orgdir.setDir(orgDetails.getcleanURL(), "templates");
+
+                newCCDTemplateFile = new File(orgdir.getDir() + CCDTemplatefileName);
+
+                if (newCCDTemplateFile.exists()) {
+                    newCCDTemplateFile.delete();
+                }
+                newCCDTemplateFile.createNewFile();
+                
+                outputStream = new FileOutputStream(newCCDTemplateFile);
+                int read = 0;
+                byte[] bytes = new byte[1024];
+
+                while ((read = inputStream.read(bytes)) != -1) {
+                    outputStream.write(bytes, 0, read);
+                }
+                outputStream.close();
+
+                //Set the filename to the file name
+                transportDetails.setCcdSampleTemplate(CCDTemplatefileName);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            
+        }
+        
         
         int transportDetailId;
         
@@ -316,7 +371,13 @@ public class configurationTransportManagerImpl implements configurationTransport
     @Override
     @Transactional
     public List<configurationWebServiceFields> getTransWSDetails(int transportDetailId) throws Exception {
-        return configurationTransportDAO.getTransWSDetails(transportDetailId);
+    	List<configurationWebServiceFields> wsFieldsList = configurationTransportDAO.getTransWSDetails(transportDetailId);
+    	for (configurationWebServiceFields wsFields : wsFieldsList) {
+    		if (wsFields.getMethod() == 1) {
+    			wsFields.setSenderDomainList(getWSSenderList(transportDetailId));
+    		}
+    	}
+    	return wsFieldsList;
     }
     
     @Override
@@ -348,6 +409,24 @@ public class configurationTransportManagerImpl implements configurationTransport
     public configurationWebServiceFields getTransWSDetailsPull(int transportDetailId) throws Exception {
         return configurationTransportDAO.getTransWSDetailsPull(transportDetailId);
     }
+
+	@Override
+	public List<configurationWebServiceSenders> getWSSenderList(
+			int transportDetailId) throws Exception {
+		return configurationTransportDAO.getWSSenderList(transportDetailId);
+	}
+
+	@Override
+	public void saveWSSender(configurationWebServiceSenders wsSender)
+			throws Exception {
+		configurationTransportDAO.saveWSSender(wsSender);
+	}
+
+	@Override
+	public void deleteWSSender(configurationWebServiceSenders wsSender)
+			throws Exception {
+		configurationTransportDAO.deleteWSSender(wsSender);
+	}
 
     
     

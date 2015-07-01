@@ -23,9 +23,11 @@ import com.ut.healthelink.model.transactionOutRecords;
 import com.ut.healthelink.model.transactionTarget;
 import com.ut.healthelink.service.sysAdminManager;
 import com.ut.healthelink.service.userManager;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
@@ -241,7 +243,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
         /* Get a list of available batches */
         Criteria batchSummaries = sessionFactory.getCurrentSession().createCriteria(batchDownloadSummary.class);
         batchSummaries.add(Restrictions.or(
-                Restrictions.eq("targetOrgId", orgId), 
+                Restrictions.eq("targetOrgId", orgId),
                 Restrictions.eq("targetSubOrgId", orgId)
         ));
         batchSummaries.add(Restrictions.in("messageTypeId", messageTypeList));
@@ -313,16 +315,15 @@ public class transactionOutDAOImpl implements transactionOutDAO {
 
     }
 
-    
     @Override
     @Transactional
     public boolean searchBatchForHistory(batchDownloads batchDetails, String searchTerm, Date fromDate, Date toDate) throws Exception {
 
         boolean matched = true;
-        
+
         String[] terms = searchTerm.split("\\|", -1);
         String[] systemStatus = terms[0].split("\\-", -1);
-        
+
         String statusCode = systemStatus[0];
         String statusCategory = systemStatus[1];
 
@@ -349,10 +350,10 @@ public class transactionOutDAOImpl implements transactionOutDAO {
         if (!batchDetails.getdateCreated().before(toDate)) {
             matched = false;
         }
-        
+
         lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(batchDetails.getstatusId());
-        
-        if(!"".equals(statusCategory) && "batch".equals(statusCategory) && !statusCode.equals(processStatus.getEndUserDisplayCode())) {
+
+        if (!"".equals(statusCategory) && "batch".equals(statusCategory) && !statusCode.equals(processStatus.getEndUserDisplayCode())) {
             matched = false;
         }
 
@@ -370,12 +371,12 @@ public class transactionOutDAOImpl implements transactionOutDAO {
             transactionIn.add(Restrictions.eq("id", transaction.gettransactionInId()));
 
             transactionIn transactionInDetails = (transactionIn) transactionIn.uniqueResult();
-            
+
             lu_ProcessStatus transprocessStatus = sysAdminManager.getProcessStatusById(transactionInDetails.getstatusId());
-                
-                if(!"".equals(statusCategory) && "transaction".equals(statusCategory) && !statusCode.equals(transprocessStatus.getEndUserDisplayCode())) {
-                    matched = false;
-                }
+
+            if (!"".equals(statusCategory) && "transaction".equals(statusCategory) && !statusCode.equals(transprocessStatus.getEndUserDisplayCode())) {
+                matched = false;
+            }
 
             if (!"0".equals(status) && !status.equals(String.valueOf(transactionInDetails.getmessageStatus()))) {
                 matched = false;
@@ -1427,11 +1428,10 @@ public class transactionOutDAOImpl implements transactionOutDAO {
         /* Get a list of available batches */
         Criteria batchSummaries = sessionFactory.getCurrentSession().createCriteria(batchDownloadSummary.class);
         batchSummaries.add(Restrictions.eq("transactionTargetId", transactionTargetId));
-        
-        if(batchSummaries.list().size() > 1) {
+
+        if (batchSummaries.list().size() > 1) {
             return (batchDownloadSummary) batchSummaries.list().get(0);
-        }
-        else {
+        } else {
             return (batchDownloadSummary) batchSummaries.uniqueResult();
         }
 
@@ -1619,15 +1619,14 @@ public class transactionOutDAOImpl implements transactionOutDAO {
         batchSummaries.add(Restrictions.eq("targetConfigId", configId));
         batchSummaries.add(Restrictions.eq("sourceOrgId", orgId));
         batchSummaries.add(Restrictions.or(
-                Restrictions.eq("targetOrgId", userOrgId), 
+                Restrictions.eq("targetOrgId", userOrgId),
                 Restrictions.eq("targetSubOrgId", userOrgId)
         ));
-        
 
         return batchSummaries.list();
 
     }
-    
+
     /**
      * The 'updateTransactionTargetStatusOutBound' function will update the transactionTarget entries when the created batch has been sent.
      *
@@ -1639,33 +1638,32 @@ public class transactionOutDAOImpl implements transactionOutDAO {
     @Override
     @Transactional
     public void updateTransactionTargetStatusOutBound(Integer batchDLId, Integer transactionId, Integer fromStatusId, Integer toStatusId) throws Exception {
-    	try {
-	        String sql = "update transactionTarget "
-	                + " set statusId = :toStatusId, "
-	                + "statusTime = CURRENT_TIMESTAMP";
-	
-	        if (transactionId > 0) {
-	            sql += " where id = :transactionId ";
-	        } else {
-	            sql += " where batchDLId = :batchDLId ";
-	        }
-	
-	        if (fromStatusId != 0) {
-	            sql = sql + " and statusId = :fromStatusId";
-	        }
-	        Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
-	                .setParameter("toStatusId", toStatusId);
-	        if (transactionId > 0) {
-	            updateData.setParameter("transactionId", transactionId);
-	        } else {
-	            updateData.setParameter("batchDLId", batchDLId);
-	        }
-	
-	        if (fromStatusId != 0) {
-	            updateData.setParameter("fromStatusId", fromStatusId);
-	        }
+        try {
+            String sql = "update transactionTarget "
+                    + " set statusId = :toStatusId, "
+                    + "statusTime = CURRENT_TIMESTAMP";
 
-        
+            if (transactionId > 0) {
+                sql += " where id = :transactionId ";
+            } else {
+                sql += " where batchDLId = :batchDLId ";
+            }
+
+            if (fromStatusId != 0) {
+                sql = sql + " and statusId = :fromStatusId";
+            }
+            Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                    .setParameter("toStatusId", toStatusId);
+            if (transactionId > 0) {
+                updateData.setParameter("transactionId", transactionId);
+            } else {
+                updateData.setParameter("batchDLId", batchDLId);
+            }
+
+            if (fromStatusId != 0) {
+                updateData.setParameter("fromStatusId", fromStatusId);
+            }
+
             updateData.executeUpdate();
         } catch (Exception ex) {
             System.err.println("updateTransactionTargetStatusOutBound " + ex.getCause());
@@ -1673,20 +1671,64 @@ public class transactionOutDAOImpl implements transactionOutDAO {
 
     }
 
-	
     @Override
-	@Transactional
-	public List <String> getWSSenderFromBatchDLId(List<Integer> batchDLIds) throws Exception {
-		 	String SQL = "select senderEmail from batchUploads where id in "
-		 			+ " (select batchuploadId from transactiontarget where id in "
-		 			+ " (select transactionTargetId from transactionIN where id in "
-		 			+ " (select transactionInId from transactiontarget where batchDLId = :batchDLIds)))";
-		 	Query query = sessionFactory.getCurrentSession().createSQLQuery(SQL).setParameterList("batchDLIds", batchDLIds);
-		 	
-		 	List<String> emails = query.list();
+    @Transactional
+    public List<String> getWSSenderFromBatchDLId(List<Integer> batchDLIds) throws Exception {
+        String SQL = "select senderEmail from batchUploads where id in "
+                + " (select batchuploadId from transactiontarget where id in "
+                + " (select transactionTargetId from transactionIN where id in "
+                + " (select transactionInId from transactiontarget where batchDLId = :batchDLIds)))";
+        Query query = sessionFactory.getCurrentSession().createSQLQuery(SQL).setParameterList("batchDLIds", batchDLIds);
 
-	        return emails;
+        List<String> emails = query.list();
 
-	}
+        return emails;
 
+    }
+
+    /**
+     * The 'getSentTransactions' method will return all pending target transactions based on the org and message type passed in.
+     *
+     *
+     * @return This function will return a list of transactionTargets
+     */
+    @Override
+    @Transactional
+    public List<transactionTarget> getSentTransactions(Date fromDate, Date toDate) throws Exception {
+        
+        /* Get a list of available batches */
+       /* Criteria transactionIn = sessionFactory.getCurrentSession().createCriteria(transactionIn.class);
+        transactionIn.add(Restrictions.eq("transactionTargetId", 0));
+        List<transactionIn> transactionInList = transactionIn.list();
+
+        List<Integer> transactionInIds = new ArrayList<Integer>();
+
+        if (transactionInList.isEmpty()) {
+            transactionInIds.add(0);
+        } else {
+
+            for (transactionIn transaction : transactionInList) {
+                transactionInIds.add(transaction.getId());
+            }
+        }*/
+        
+        
+        
+        Criteria transactions = sessionFactory.getCurrentSession().createCriteria(transactionTarget.class);
+        transactions.add(
+                Restrictions.or(
+                        Restrictions.eq("statusId", 20),
+                        Restrictions.eq("statusId", 18)
+                )
+        );
+        transactions.add(Restrictions.ge("batchDLId", 0));
+        //transactions.add(Restrictions.in("transactionInId", transactionInIds));
+
+        transactions.add(Restrictions.ge("dateCreated", fromDate));
+        transactions.add(Restrictions.lt("dateCreated", toDate));
+       
+
+        return transactions.list();
+    }
+    
 }

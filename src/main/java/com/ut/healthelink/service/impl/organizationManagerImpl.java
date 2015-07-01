@@ -18,6 +18,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ListIterator;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -181,5 +184,78 @@ public class organizationManagerImpl implements organizationManager {
     public List<Provider> getOrganizationActiveProviders(int orgId) {
         return organizationDAO.getOrganizationActiveProviders(orgId);
     }
+    
+    @Override
+    @Transactional
+    public Integer getTotalPartners() {
+        List partners = organizationDAO.getPartnerEntriesForMap();
+        
+        Integer totalPartners = 0;
+        
+        if(partners.size() > 0) {
+            for(ListIterator iter = partners.listIterator(); iter.hasNext(); ) {
+                
+                Object[] row = (Object[]) iter.next();
+                
+                if(row[9] != null) {
+                    totalPartners+=1;
+                }
+            }
+        }
+        
+        return totalPartners;
+    }
+    
+    @Override
+    @Transactional
+    public JSONObject getPartnerEntriesForMap() {
+        
+        List partners = organizationDAO.getPartnerEntriesForMap();
+        
+        JSONObject mapObject = new JSONObject();
+        
+        JSONArray partnerMapArray = new JSONArray();
+        
+        if(partners.size() > 0) {
+            for(ListIterator iter = partners.listIterator(); iter.hasNext(); ) {
+                
+                Object[] row = (Object[]) iter.next();
+                
+                if(row[9] != null) {
+                    
+                    /* Get any Brochures */
+                    List<Brochure> orgBrochures = organizationDAO.getOrganizationBrochures(Integer.valueOf(String.valueOf(row[0])));
+                
+                    JSONObject mapItemObject = new JSONObject();
 
+                    mapItemObject.put("latitude", String.valueOf(row[9]));
+                    mapItemObject.put("longitude", String.valueOf(row[8]));
+
+                    if(Integer.valueOf(String.valueOf(row[10])) == 1) {
+                        mapItemObject.put("icon", "/dspResources/img/front-end/location-pin-provider.png");
+                    }
+                    else {
+                        mapItemObject.put("icon", "/dspResources/img/front-end/location-pin-cbo.png");
+                    }
+                    
+                    if(orgBrochures != null && orgBrochures.size() > 0) {
+                        String brochureTitle = orgBrochures.get(0).getTitle();
+                        String brochureURL = "<a href=\"/FileDownload/downloadFile.do?filename="+orgBrochures.get(0).getfileName()+"&foldername=brochures&orgId="+Integer.valueOf(String.valueOf(row[0]))+"\">"+brochureTitle+"</a>";
+                        mapItemObject.put("baloon_text", "<div style=\"width:250px;\"> <strong>"+row[1]+"</strong><br />"+row[2]+"&nbsp;"+row[3]+"<br />"+row[4]+"&nbsp;"+row[5]+",&nbsp;"+row[6]+"<br />Phone:&nbsp;"+row[7]+"<br />Brochure:&nbsp"+brochureURL+"</div>");
+                    }
+                    else {
+                       mapItemObject.put("baloon_text", "<div style=\"width:250px;\"> <strong>"+row[1]+"</strong><br />"+row[2]+"&nbsp;"+row[3]+"<br />"+row[4]+"&nbsp;"+row[5]+",&nbsp;"+row[6]+"<br />Phone:&nbsp;"+row[7]+"</div>");
+                    }
+
+                    partnerMapArray.add(mapItemObject);
+                }
+            }
+            
+        }
+        
+        mapObject.put("markers", partnerMapArray);
+        
+        return mapObject;
+        
+    }
 }

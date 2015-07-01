@@ -140,7 +140,7 @@
             <name>changePW</name>
             <group>processGroup</group>
             <description>This changes the passwords</description>
-            <job-class>com.ut.dph.jobs.PWChangeJob</job-class>
+            <job-class>com.ut.healthelink.jobs.PWChangeJob</job-class>
         </job>
  
         <trigger>

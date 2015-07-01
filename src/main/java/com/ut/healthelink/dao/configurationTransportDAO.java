@@ -10,7 +10,10 @@ import com.ut.healthelink.model.configurationMessageSpecs;
 import com.ut.healthelink.model.configurationRhapsodyFields;
 import com.ut.healthelink.model.configurationTransport;
 import com.ut.healthelink.model.configurationTransportMessageTypes;
+import com.ut.healthelink.model.configurationWebServiceSenders;
+
 import org.springframework.stereotype.Repository;
+
 import com.ut.healthelink.model.configurationWebServiceFields;
 
 @Repository
@@ -108,5 +111,11 @@ public interface configurationTransportDAO {
     configurationWebServiceFields getTransWSDetailsPush(int transportDetailId) throws Exception;
     
     configurationWebServiceFields getTransWSDetailsPull(int transportDetailId) throws Exception;
+    
+    List <configurationWebServiceSenders> getWSSenderList(int transportDetailId) throws Exception;
+    
+    void saveWSSender(configurationWebServiceSenders wsSender) throws Exception;
+    
+    void deleteWSSender(configurationWebServiceSenders wsSender) throws Exception;
      
 }

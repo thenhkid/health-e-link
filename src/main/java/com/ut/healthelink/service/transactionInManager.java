@@ -36,8 +36,8 @@ import com.ut.healthelink.model.custom.IdAndFieldValue;
 import com.ut.healthelink.model.custom.TransErrorDetail;
 import com.ut.healthelink.model.custom.TransErrorDetailDisplay;
 import com.ut.healthelink.model.messagePatients;
+import com.ut.healthelink.model.referralActivityExports;
 import com.ut.healthelink.model.systemSummary;
-
 import java.io.File;
 import java.math.BigInteger;
 import java.util.Date;
@@ -452,10 +452,18 @@ public interface transactionInManager {
     
     BigInteger getFeedbackReportCount(List<Integer> batchIds) throws Exception;
     
+    BigInteger getRejectedCount(Date fromDate, Date toDate) throws Exception;
+    
     List<activityReportList> getFeedbackReportList(List<Integer> batchIds) throws Exception;
     
     List<activityReportList> getReferralList(List<Integer> batchIds) throws Exception;
     
     List<Integer> getActivityStatusTotals(List<Integer> batchIds) throws Exception;
+    
+    List<referralActivityExports> getReferralActivityExports() throws Exception;
+    
+    void createNewReferralActivityExport(Integer userId, Date fromDate, Date toDate) throws Exception;
+    
+    List<batchUploads> getAllRejectedBatches(Date fromDate, Date toDate, Integer fetchSize) throws Exception;
 
 }

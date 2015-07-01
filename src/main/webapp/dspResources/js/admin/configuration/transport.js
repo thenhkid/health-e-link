@@ -4,8 +4,22 @@ require(['./main'], function () {
     require(['jquery'], function($) {
         
         $("input:text,form").attr("autocomplete", "off");
-    
-        var selMethodId = $('#transportMethod').val() 
+        
+        /** modal for WS to add sender domains **/
+        $('#addEditDomain').click(function() {
+            var transportId = $(this).attr('rel'); 
+            $.ajax({
+                url: 'getDomainSenders.do',
+                type: "POST",
+                data: {'transportId': transportId},
+                success: function(data) {
+                	$("#domainModal").html(data);
+                }
+            });
+        });
+
+        
+        var selMethodId = $('#transportMethod').val();
         //Show file/download/FTP fields
         if(selMethodId == "1" || selMethodId == "3" || selMethodId == "5" || selMethodId == "6") {
             $('#upload-downloadDiv').show();
@@ -119,6 +133,7 @@ require(['./main'], function () {
         
         //Set the default file extension when the file type is selected
         $('#fileType').change(function() {
+            $('#ccdSampleDiv').hide();
            
            var fileType = $(this).val();
            $('#fileDelimiterDiv').show();
@@ -145,7 +160,13 @@ require(['./main'], function () {
               $('#fileExt').val('xls'); 
            }
            else if(fileType == 9) {
-              $('#fileExt').val('xml'); 
+              $('#fileExt').val('xml');
+              
+              if($('#configType').attr('rel') == 2) {
+                  $('#ccdSampleDiv').show();
+              }
+              
+              
            }
            else if(fileType == 10) {
               $('#fileExt').val('doc'); 
@@ -240,7 +261,6 @@ function checkFormFields() {
            $('#maxFileSizeMsg').html('The max file size is a required field and must be a numeric value.');
            hasErrors = 1;
        }
-       
        //Make sure the file type is selected
        if($('#fileType').val() === "") {
            $('#fileTypeDiv').addClass("has-error");
@@ -391,39 +411,39 @@ function checkFormFields() {
        }
        
        if(selMethodId == "5") {
-    		//Check rhapsody get Fields
-    	          if($('#rDirectory1').val() == "") {
-    	                $('#rDirectory1Div').addClass("has-error");
-    	                $('#rDirectory1Msg').addClass("has-error");
-    	                $('#rDirectory1Msg').html('The directory is a required field.');
-    	                hasErrors = 1;
-    	            }
+            //Check rhapsody get Fields
+            if ($('#rDirectory1').val() == "") {
+                $('#rDirectory1Div').addClass("has-error");
+                $('#rDirectory1Msg').addClass("has-error");
+                $('#rDirectory1Msg').html('The directory is a required field.');
+                hasErrors = 1;
+            }
 
-    	        //Check rhapsody push Fields
-    	           
-    	            if($('#rDirectory2').val() == "") {
-    	                $('#rDirectory2Div').addClass("has-error");
-    	                $('#rDirectory2Msg').addClass("has-error");
-    	                $('#rDirectory2Msg').html('The directory is a required field.');
-    	                hasErrors = 1;
-    	            }
+            //Check rhapsody push Fields
 
-    	        if(hasErrors == 1) {
-    	            $('#rhapsodyDanger').show();
-    	            hasErrors = 1;
-    	        }
+            if ($('#rDirectory2').val() == "") {
+                $('#rDirectory2Div').addClass("has-error");
+                $('#rDirectory2Msg').addClass("has-error");
+                $('#rDirectory2Msg').html('The directory is a required field.');
+                hasErrors = 1;
+            }
+
+            if (hasErrors == 1) {
+                $('#rhapsodyDanger').show();
+                hasErrors = 1;
+            }
     	     
     	 }
        
        if(selMethodId == "6") {
-      		//Check ws get Fields
-    	   		  /** domain 1 is a required field is configurationDetails.type == 1 **/
+            //Check ws get Fields
+    	   /** domain 1 is a required field is configurationDetails.type == 1 **/
     	  
     	   if($('#configurationDetailsType').val() == "1") {
       	          if($('#domain1').val() == "") {
       	                $('#wsDomain1Div').addClass("has-error");
       	                $('#wsDomain1Msg').addClass("has-error");
-      	                $('#wsDomain1Msg').html('The domain for inbound is a required field.');
+      	                $('#wsDomain1Msg').html('Please use add/edit button to add at least one domain.');
       	                hasErrors = 1;
       	            }
     	   }
@@ -436,6 +456,13 @@ function checkFormFields() {
       	                $('#wsEmail2Msg').html('The email for outbound is a required field.');
       	                hasErrors = 1;
       	            }
+      	            
+      	          if($('#mimeType2').val() == "") {
+    	                $('#wsMimeType2Div').addClass("has-error");
+    	                $('#wsMimeType2Msg').addClass("has-error");
+    	                $('#wsMimeType2Msg').html('The mime type for outbound is a required field.');
+    	                hasErrors = 1;
+    	            }
     	   }    
       	            
       	        if(hasErrors == 1) {
@@ -443,6 +470,36 @@ function checkFormFields() {
       	            hasErrors = 1;
       	        }
       	 }
+         
+         if(fileType == 9 && $('#configType').attr('rel') == 2) {
+             if ($('#ccdTemplatefile').val() != "") {
+
+                var filename = $('#ccdTemplatefile').val();
+                var extension = filename.replace(/^.*\./, '');
+
+                if (extension == filename) {
+                    extension = '';
+                } else {
+                    // if there is an extension, we convert to lower case
+                    // (N.B. this conversion will not effect the value of the extension
+                    // on the file upload.)
+                    extension = extension.toLowerCase();
+                }
+
+                if (extension != "xml") {
+                    $('#ccdTemplateDiv').addClass("has-error");
+                    $('#ccdTemplateMsg').addClass("has-error");
+                    $('#ccdTemplateMsg').html('The CCD Template file must be an xml file.');
+                    hasErrors = 1;
+                }
+            }
+            else {
+                $('#ccdTemplateDiv').addClass("has-error");
+                $('#ccdTemplateMsg').addClass("has-error");
+                $('#ccdTemplateMsg').html('The CCD Template file must selected.');
+                hasErrors = 1;
+            }
+         }
        
     }
     
@@ -454,7 +511,6 @@ function checkFormFields() {
         hasErrors = 1;
     }
  
-
     return hasErrors;
 }
 

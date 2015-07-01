@@ -54,6 +54,7 @@ public class Transaction {
    private List<transactionRecords> targetProviderFields = null;
    private List<transactionRecords> patientFields = null;
    private List<transactionRecords> detailFields = null;
+   private Integer attachmentLimit;
    
    private int messageStatus = 1;
    
@@ -369,5 +370,15 @@ public class Transaction {
     public void setSourceSubOrgId(int sourceSubOrgId) {
         this.sourceSubOrgId = sourceSubOrgId;
     }
+
+    public Integer getAttachmentLimit() {
+        return attachmentLimit;
+    }
+
+    public void setAttachmentLimit(Integer attachmentLimit) {
+        this.attachmentLimit = attachmentLimit;
+    }
+    
+    
 
 }

@@ -14,6 +14,7 @@ import java.util.List;
 public class transactionRecords {
 
     private String fieldValue = null;
+    private String fieldHelp = null;
     private String saveToTable = null;
     private String saveToTableCol = null;
     private int fieldNo;
@@ -140,5 +141,14 @@ public class transactionRecords {
     public void setFieldType(Integer fieldType) {
         this.fieldType = fieldType;
     }
+
+    public String getFieldHelp() {
+        return fieldHelp;
+    }
+
+    public void setFieldHelp(String fieldHelp) {
+        this.fieldHelp = fieldHelp;
+    }
+    
     
 }

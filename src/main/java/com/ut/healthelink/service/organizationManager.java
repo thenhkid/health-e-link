@@ -6,6 +6,7 @@ import com.ut.healthelink.model.Organization;
 import com.ut.healthelink.model.User;
 import com.ut.healthelink.model.Provider;
 import com.ut.healthelink.model.Brochure;
+import org.json.simple.JSONObject;
 
 public interface organizationManager {
 	
@@ -40,6 +41,10 @@ public interface organizationManager {
   List<Brochure> getOrganizationBrochures(int orgId);
   
   List<Organization> getAssociatedOrgs(int orgId);
+  
+  JSONObject getPartnerEntriesForMap();
+  
+  Integer getTotalPartners();
   
 }
 

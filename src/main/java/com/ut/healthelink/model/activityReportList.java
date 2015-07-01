@@ -15,6 +15,8 @@ public class activityReportList {
     
     String orgName;
     
+    String tgtOrgName;
+    
     String messageType;
     
     BigInteger total;
@@ -34,6 +36,14 @@ public class activityReportList {
 
     public void setOrgName(String orgName) {
         this.orgName = orgName;
+    }
+    
+     public String gettgtOrgName() {
+        return tgtOrgName;
+    }
+
+    public void settgtOrgName(String tgtOrgName) {
+        this.tgtOrgName = tgtOrgName;
     }
 
     public String getMessageType() {

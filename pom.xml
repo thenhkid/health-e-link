@@ -293,6 +293,18 @@
             <artifactId>sax</artifactId>
             <version>${sax.version}</version>
         </dependency>
+        
+        <dependency>
+            <groupId>com.googlecode.json-simple</groupId>
+            <artifactId>json-simple</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+    
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-taglibs</artifactId>
+			<version>${org.spring.security.version}</version>
+		</dependency>
     
     </dependencies>
     <build>

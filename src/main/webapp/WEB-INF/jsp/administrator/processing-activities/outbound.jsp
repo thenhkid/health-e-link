@@ -62,7 +62,7 @@
                                             </td>
                                             <td>
                                                 ${batch.utBatchName}
-                                                <c:if test="${batch.transportMethodId == 1 || batch.transportMethodId == 5}">
+                                                <c:if test="${batch.transportMethodId == 1 || batch.transportMethodId == 5 || batch.transportMethodId == 6}">
                                                     <br />
                                                     <a href="/FileDownload/downloadFile.do?filename=${batch.outputFIleName}&foldername=archivesOut&orgId=0" title="View Original File">
                                                         ${batch.outputFIleName}
@@ -83,7 +83,12 @@
                                                     <c:when test="${batch.transportMethod == 'File Upload'}">
                                                         File Download
                                                     </c:when>
-                                                    <c:otherwise>${batch.transportMethod}</c:otherwise>
+                                                    <c:when test="${batch.transportMethodId == '6'}">
+                                                        <a href="wsmessageOut/${batch.utBatchName}" title="View Web Services Status">${batch.transportMethod}</a>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                    	${batch.transportMethod}
+                                                    </c:otherwise>
                                                 </c:choose>
                                             </td>
                                             <td class="center-text">

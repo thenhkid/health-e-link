@@ -1,6 +1,7 @@
 package com.ut.healthelink.dao.impl;
 
 import java.util.List;
+
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
@@ -9,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
+
 import com.ut.healthelink.dao.configurationTransportDAO;
 import com.ut.healthelink.model.TransportMethod;
 import com.ut.healthelink.model.configurationFTPFields;
@@ -18,6 +20,7 @@ import com.ut.healthelink.model.configurationRhapsodyFields;
 import com.ut.healthelink.model.configurationTransport;
 import com.ut.healthelink.model.configurationTransportMessageTypes;
 import com.ut.healthelink.model.configurationWebServiceFields;
+import com.ut.healthelink.model.configurationWebServiceSenders;
 
 import java.util.Iterator;
 
@@ -918,12 +921,7 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
     @Override
     @Transactional
     public void saveTransportWebService(configurationWebServiceFields wsFields) throws Exception {
-        try {
-            sessionFactory.getCurrentSession().saveOrUpdate(wsFields);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            System.err.println("saveTransportWebService " + ex.getCause());
-        }
+        sessionFactory.getCurrentSession().saveOrUpdate(wsFields);
     }
 
 	
@@ -1040,5 +1038,32 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
         return (configurationWebServiceFields) criteria.uniqueResult();
 
     }
-    
+
+	@SuppressWarnings("unchecked")
+	@Override
+	@Transactional
+	public List <configurationWebServiceSenders> getWSSenderList(int transportId)
+			throws Exception {
+		 Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configurationWebServiceSenders.class)
+	                .add(Restrictions.eq("transportId", transportId));
+
+	        return criteria.list();
+	}
+	
+
+	@Override
+	@Transactional
+	public void saveWSSender(configurationWebServiceSenders wsSender)
+			throws Exception {
+		sessionFactory.getCurrentSession().saveOrUpdate(wsSender);	
+	}
+
+	@Override
+	@Transactional
+	public void deleteWSSender(configurationWebServiceSenders wsSender)
+			throws Exception {
+		sessionFactory.getCurrentSession().delete(wsSender);		
+	}
+
+	
 }

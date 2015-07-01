@@ -95,7 +95,14 @@
                                                 </c:choose>
                                             </td>
                                             <td class="center-text">
-                                                ${batch.transportMethod}
+                                            <c:choose>
+                                                <c:when test="${batch.transportMethodId == 6}">
+                                                <a href="/administrator/processing-activity/wsmessage/${batch.utBatchName}">${batch.transportMethod}</a>
+                                                </c:when>
+                                                <c:otherwise>
+                                                 ${batch.transportMethod}
+                                                </c:otherwise>
+                                                </c:choose>
                                             </td>
                                             <td class="center-text">
                                                 <a href="#statusModal" data-toggle="modal" class="viewStatus" rel="${batch.statusId}" title="View this Status">${batch.statusValue}</a>

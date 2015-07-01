@@ -22,6 +22,7 @@ import com.ut.healthelink.model.HL7Elements;
 import com.ut.healthelink.model.HL7Segments;
 import com.ut.healthelink.model.Macros;
 import com.ut.healthelink.model.configuration;
+import com.ut.healthelink.model.configurationCCDElements;
 import com.ut.healthelink.model.configurationConnection;
 import com.ut.healthelink.model.configurationConnectionReceivers;
 import com.ut.healthelink.model.configurationConnectionSenders;
@@ -1050,4 +1051,64 @@ public class configurationDAOImpl implements configurationDAO {
         deleteSegment.setParameter("segmentId", segmentId);
         deleteSegment.executeUpdate();
     }
+    
+    /**
+     * The 'getCCDElements' function will return the CCD elements for the passed in configuration.
+     *
+     * @Table configurationCCDElements
+     *
+     * @param	configId This will hold the configuration id to find
+     *
+     * @return	This function will return a configurationCCDElements object
+     */
+    @Override
+    @Transactional
+    @SuppressWarnings("unchecked")
+    public List<configurationCCDElements> getCCDElements(Integer configId) throws Exception {
+        
+        Query query = sessionFactory
+             .getCurrentSession()
+             .createSQLQuery(
+                     "select configurationCCDElements.*, configurationFormFields.fieldLabel as fieldLabel from configurationCCDElements LEFT OUTER JOIN configurationFormFields on \n" +
+"configurationFormFields.configId = configurationCCDElements.configId and configurationFormFields.fieldNo = configurationCCDElements.fieldValue"
+                     + " where configurationCCDElements.configId = :configId ")
+             .setResultTransformer(
+                     Transformers.aliasToBean(configurationCCDElements.class))
+             .setParameter("configId", configId);
+
+        List<configurationCCDElements> elements = query.list();
+        
+        return elements;
+        
+    }
+    
+    /**
+     * The 'getCCDElement' function will return the configurationCCDElement object for the passed in
+     * elementId
+     * 
+     * @param elementId The id of the selected element.
+     * 
+     * @return This function will return a single configurationCCDElement
+     * @throws Exception 
+     */
+    @Override
+    @Transactional
+    public configurationCCDElements getCCDElement(Integer elementId) throws Exception {
+        return (configurationCCDElements) sessionFactory.
+                getCurrentSession().
+                get(configurationCCDElements.class, elementId);
+    }
+    
+    /**
+     * The 'saveCCDElement' function will save the new CCD element.
+     * 
+     * @param ccdElement    This will hold the new ccdElement object
+     * @throws Exception 
+     */
+    @Override
+    @Transactional
+    public void saveCCDElement(configurationCCDElements ccdElement) throws Exception {
+        sessionFactory.getCurrentSession().saveOrUpdate(ccdElement);
+    }
+    
 }

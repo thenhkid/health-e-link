@@ -486,5 +486,24 @@ public class organizationDAOImpl implements organizationDAO {
         return orgs.list();
         
     }
+    
+    /**
+     * The 'getPartnerEntriesForMap' function will return the public active organizations for the partner map.
+    * @return
+     */
+    @Override
+    public List getPartnerEntriesForMap() {
+
+        String queryString = "";
+        
+        queryString = "SELECT id, orgName, address, address2, city, state, postalCode, phone, longitude, latitude, orgType "
+                + "FROM organizations "
+                + "WHERE status = 1 "
+                + "AND public = 1";
+        
+        Query query = sessionFactory.getCurrentSession().createSQLQuery(queryString);
+
+        return query.list();
+    }
 
 }

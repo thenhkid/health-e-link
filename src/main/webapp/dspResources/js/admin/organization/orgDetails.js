@@ -69,9 +69,8 @@ require(['./main'], function() {
 function checkFormFields() {
     var hasErrors = 0;
 
-    
-    if ($('#file').val() != "") {
-
+    if ($('#file').length > 1) {
+        
         var filename = $('#file').val();
         var extension = filename.replace(/^.*\./, '');
 

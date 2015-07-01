@@ -16,6 +16,7 @@ public class ToWSSOAP {
 	private String endPoint;
 	private String fromEmail;
 	private String toEmail;
+	private String mimeType;
 	
 	public String getEndPoint() {
 		return endPoint;
@@ -35,8 +36,12 @@ public class ToWSSOAP {
 	public void setToEmail(String toEmail) {
 		this.toEmail = toEmail;
 	}
-	
-	
-	
+	public String getMimeType() {
+		return mimeType;
+	}
+	public void setMimeType(String mimeType) {
+		this.mimeType = mimeType;
+	}
+		
 	
 }

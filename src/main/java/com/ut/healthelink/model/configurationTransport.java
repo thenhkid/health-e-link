@@ -10,11 +10,12 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
 @Entity
 @Table(name = "CONFIGURATIONTRANSPORTDETAILS")
 public class configurationTransport {
-    
+
     @Transient
     private List<configurationFormFields> fields = null;
 
@@ -26,7 +27,7 @@ public class configurationTransport {
 
     @Transient
     private List<configurationWebServiceFields> webServiceFields = null;
-    
+
     @Transient
     private String delimChar = null;
 
@@ -35,6 +36,9 @@ public class configurationTransport {
 
     @Transient
     private List<Integer> messageTypes = null;
+    
+    @Transient
+    private CommonsMultipartFile ccdTemplatefile = null;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -90,6 +94,12 @@ public class configurationTransport {
 
     @Column(name = "encodingId", nullable = false)
     private int encodingId = 1;
+
+    @Column(name = "ccdSampleTemplate", nullable = true)
+    private String ccdSampleTemplate = null;
+    
+    @Column(name = "attachmentLimit", nullable = true)
+    private String attachmentLimit = "";
 
     public int getId() {
         return id;
@@ -275,13 +285,37 @@ public class configurationTransport {
         this.rhapsodyFields = rhapsodyFields;
     }
 
-	public List<configurationWebServiceFields> getWebServiceFields() {
-		return webServiceFields;
-	}
+    public List<configurationWebServiceFields> getWebServiceFields() {
+        return webServiceFields;
+    }
 
-	public void setWebServiceFields(
-			List<configurationWebServiceFields> webServiceFields) {
-		this.webServiceFields = webServiceFields;
-	}
+    public void setWebServiceFields(
+            List<configurationWebServiceFields> webServiceFields) {
+        this.webServiceFields = webServiceFields;
+    }
+    
+    public String getCcdSampleTemplate() {
+        return ccdSampleTemplate;
+    }
+
+    public void setCcdSampleTemplate(String ccdSampleTemplate) {
+        this.ccdSampleTemplate = ccdSampleTemplate;
+    }
+
+    public CommonsMultipartFile getCcdTemplatefile() {
+        return ccdTemplatefile;
+    }
+
+    public void setCcdTemplatefile(CommonsMultipartFile ccdTemplatefile) {
+        this.ccdTemplatefile = ccdTemplatefile;
+    }
+
+    public String getAttachmentLimit() {
+        return attachmentLimit;
+    }
+
+    public void setAttachmentLimit(String attachmentLimit) {
+        this.attachmentLimit = attachmentLimit;
+    }
     
 }
