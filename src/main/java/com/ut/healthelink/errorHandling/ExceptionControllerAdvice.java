@@ -10,11 +10,15 @@ import com.ut.healthelink.model.User;
 import com.ut.healthelink.model.mailMessage;
 import com.ut.healthelink.service.emailMessageManager;
 import com.ut.healthelink.service.userManager;
-import java.net.InetAddress;
+
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Properties;
+
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -27,7 +31,10 @@ import org.springframework.web.servlet.ModelAndView;
  */
 @ControllerAdvice
 public class ExceptionControllerAdvice {
-   
+	
+	@Resource(name = "myProps")
+	private Properties myProps;
+	
     @Autowired
     private emailMessageManager emailMessageManager;
     
@@ -45,7 +52,7 @@ public class ExceptionControllerAdvice {
         
         messageDetails.settoEmailAddress("dphuniversaltranslator@gmail.com");
         messageDetails.setfromEmailAddress("e-Referral@state.ma.us");
-        messageDetails.setmessageSubject("Exception Error " + InetAddress.getLocalHost().getHostAddress());
+        messageDetails.setmessageSubject("Exception Error " + myProps.getProperty("server.identity"));
         
         StringBuilder sb = new StringBuilder();
 

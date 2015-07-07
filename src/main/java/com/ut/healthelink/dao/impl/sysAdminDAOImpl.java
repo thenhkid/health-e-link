@@ -1,6 +1,8 @@
 package com.ut.healthelink.dao.impl;
 
 import java.util.List;
+import java.util.Properties;
+
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.hibernate.transform.Transformers;
@@ -8,6 +10,7 @@ import org.hibernate.type.StandardBasicTypes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.ut.healthelink.dao.sysAdminDAO;
 import com.ut.healthelink.dao.UtilitiesDAO;
 import com.ut.healthelink.model.Macros;
@@ -27,7 +30,11 @@ import com.ut.healthelink.model.lutables.lu_Tests;
 import com.ut.healthelink.model.mainHL7Details;
 import com.ut.healthelink.model.mainHL7Elements;
 import com.ut.healthelink.model.mainHL7Segments;
+
 import java.util.ArrayList;
+
+import javax.annotation.Resource;
+
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
@@ -45,8 +52,9 @@ public class sysAdminDAOImpl implements sysAdminDAO {
     @Autowired
     private SessionFactory sessionFactory;
 
-    private String schemaName = "healthelink";
-
+	@Resource(name = "myProps")
+	private Properties myProps;
+    
     /**
      * this gets a list of Lookup tables *
      */
@@ -81,7 +89,7 @@ public class sysAdminDAOImpl implements sysAdminDAO {
                 .addScalar("description", StandardBasicTypes.STRING)
                 .setResultTransformer(
                         Transformers.aliasToBean(LookUpTable.class))
-                .setParameter("schemaName", schemaName)
+                .setParameter("schemaName",  myProps.getProperty("schemaName"))
                 .setParameter("searchTerm", searchTerm);
 
        

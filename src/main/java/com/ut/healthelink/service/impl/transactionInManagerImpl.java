@@ -79,7 +79,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
-import java.net.InetAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.DateFormat;
@@ -92,12 +91,13 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
+
+import javax.annotation.Resource;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.HiddenFileFilter;
 import org.apache.commons.validator.routines.UrlValidator;
-import org.hibernate.Criteria;
-import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -111,7 +111,10 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class transactionInManagerImpl implements transactionInManager {
 
-    @Autowired
+	@Resource(name = "myProps")
+	private Properties myProps;
+	
+	@Autowired
     private transactionInDAO transactionInDAO;
 
     @Autowired
@@ -3262,7 +3265,7 @@ public class transactionInManagerImpl implements transactionInManager {
             mailMessage mail = new mailMessage();
             mail.setfromEmailAddress("e-Referral@state.ma.us");
             mail.setmessageBody(message);
-            mail.setmessageSubject(subject + " " + InetAddress.getLocalHost().getHostAddress());
+            mail.setmessageSubject(subject + " " + myProps.getProperty("server.identity"));
             mail.settoEmailAddress("dphuniversaltranslator@gmail.com");
             emailManager.sendEmail(mail);
         } catch (Exception ex) {
