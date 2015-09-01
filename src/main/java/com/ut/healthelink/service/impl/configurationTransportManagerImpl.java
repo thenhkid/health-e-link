@@ -62,7 +62,7 @@ public class configurationTransportManagerImpl implements configurationTransport
 
     @Override
     @Transactional
-    public Integer updateTransportDetails(configurationTransport transportDetails) {
+    public Integer updateTransportDetails(configurationTransport transportDetails) throws Exception {
         
         MultipartFile CCDTemplatefile = transportDetails.getCcdTemplatefile();
         //If a file is uploaded
@@ -107,6 +107,8 @@ public class configurationTransportManagerImpl implements configurationTransport
 
             } catch (IOException e) {
                 e.printStackTrace();
+                throw new Exception(e);
+                
             }
             
         }
@@ -168,7 +170,7 @@ public class configurationTransportManagerImpl implements configurationTransport
 
     @Override
     @Transactional
-    public void saveTransportFTP(int orgId, configurationFTPFields FTPFields) {
+    public void saveTransportFTP(int orgId, configurationFTPFields FTPFields) throws Exception {
         
         /* Need to upload the certificate if uploaded */
         if (FTPFields.getfile() != null && FTPFields.getfile().getSize() > 0) {
@@ -210,6 +212,7 @@ public class configurationTransportManagerImpl implements configurationTransport
 
             } catch (IOException e) {
                 e.printStackTrace();
+                throw new Exception(e);
             }
 
         }

@@ -55,6 +55,8 @@ public class Transaction {
    private List<transactionRecords> patientFields = null;
    private List<transactionRecords> detailFields = null;
    private Integer attachmentLimit;
+   private Boolean attachmentRequired = false;
+   private String attachmentNote = "";
    
    private int messageStatus = 1;
    
@@ -378,7 +380,21 @@ public class Transaction {
     public void setAttachmentLimit(Integer attachmentLimit) {
         this.attachmentLimit = attachmentLimit;
     }
-    
-    
 
+    public Boolean getAttachmentRequired() {
+        return attachmentRequired;
+    }
+
+    public void setAttachmentRequired(Boolean attachmentRequired) {
+        this.attachmentRequired = attachmentRequired;
+    }
+
+    public String getAttachmentNote() {
+        return attachmentNote;
+    }
+
+    public void setAttachmentNote(String attachmentNote) {
+        this.attachmentNote = attachmentNote;
+    }
+    
 }

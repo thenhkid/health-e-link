@@ -57,7 +57,7 @@
                     <caption style="display:none">Pending Batches</caption>
                     <thead>
                         <tr>
-                            <c:if test="${userDetails.deliverAuthority == true}"><th scope="col" class="center-text">Send?</th></c:if>
+                            <th scope="col" class="center-text" <c:if test="${userDetails.deliverAuthority == false}">style="display:none"</c:if>>Send?</th>
                             <th scope="col">Batch Name</th>
                             <th scope="col" class="center-text">Total Transactions</th>
                             <th scope="col" class="center-text">System Status</th>
@@ -71,16 +71,14 @@
                             <c:when test="${not empty pendingBatches}">
                                 <c:forEach var="batch" items="${pendingBatches}">
                                     <tr>
-                                        <c:if test="${userDetails.deliverAuthority == true}">
-                                            <td class="actions-col center-text">
-                                                <c:choose>
-                                                    <c:when test="${batch.statusId == 5}">
-                                                        <input type="checkbox" id="batchId" name="batchId" class="batchIds" value="${batch.id}" />
-                                                    </c:when>
-                                                    <c:otherwise>&nbsp;</c:otherwise>
-                                                </c:choose>
-                                            </td>
-                                        </c:if>
+                                        <td class="actions-col center-text" <c:if test="${userDetails.deliverAuthority == false}">style="display:none"</c:if>>
+                                            <c:choose>
+                                                <c:when test="${batch.statusId == 5}">
+                                                    <input type="checkbox" id="batchId" name="batchId" class="batchIds" value="${batch.id}" />
+                                                </c:when>
+                                                <c:otherwise>&nbsp;</c:otherwise>
+                                            </c:choose>
+                                        </td>
                                         <td scope="row">${batch.utBatchName}</td>
                                         <td class="center-text">
                                             ${batch.totalTransactions}

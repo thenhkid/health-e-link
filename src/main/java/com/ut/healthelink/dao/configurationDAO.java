@@ -68,7 +68,7 @@ public interface configurationDAO {
   
   List<configurationConnection> getLatestConnections(int maxResults);
   
-  List<configurationConnection> getConnectionsByConfiguration(int configId);
+  List<configurationConnection> getConnectionsByConfiguration(int configId, int userId);
   
   List<configurationConnection> getConnectionsByTargetConfiguration(int configId);
   

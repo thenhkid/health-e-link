@@ -6,6 +6,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <jsp:useBean id="date" class="java.util.Date" />
 <fmt:formatDate value="${date}" pattern="yyyy" var="currentYear" />
 
@@ -80,12 +81,12 @@
                 <form:hidden path="transactionRecordId" />
                 <form:hidden path="batchId" />
                 <form:hidden path="transactionId" id="transactionId" />
-                <form:hidden path="targetConfigId" />
+                <form:hidden path="targetConfigId" id="targetConfigId" />
                 <form:hidden path="transactionTargetId" />
-                <form:hidden path="targetOrgId" />
-                <form:hidden path="targetSubOrgId" />
+                <form:hidden path="targetOrgId" id="targetOrgId" />
+                <form:hidden path="targetSubOrgId" id="targetSubOrgId" />
                 <form:hidden path="orginialTransactionId" />
-                <input type="hidden" id="attachmentIds" name="attachmentIds" value="" />
+                <input type="hidden" id="attachmentIds" name="attachmentIds" value="" <c:if test="${transaction.attachmentRequired == true}">class="requiredAttachment"</c:if> />
                 <c:forEach items="${transaction.sourceOrgFields}" varStatus="i">
                     <form:hidden path="sourceOrgFields[${i.index}].fieldValue" />
                     
@@ -99,8 +100,8 @@
                     </c:choose>
                     
                 </c:forEach>
-                <c:forEach items="${transaction.targetOrgFields}" varStatus="t">
-                    <form:hidden path="targetOrgFields[${t.index}].fieldValue" />
+                <c:forEach items="${transaction.targetOrgFields}" var="targetInfo" varStatus="t">
+                    <form:hidden id="targetOrg_${targetInfo.fieldNo}" path="targetOrgFields[${t.index}].fieldValue" />
                     <form:hidden path="targetOrgFields[${t.index}].fieldNo" />
                 </c:forEach>
                 <div class="panel-group form-accordion" id="accordion">
@@ -170,16 +171,31 @@
                                        </div>
                                     </div>
                                     <div class="col-md-6">
-                                        <h4 class="form-section-heading">Recipient Organization:</h4>
-                                        <dl class="vcard">
-                                            <dd class="fn">${transaction.targetOrgFields[0].fieldValue}</dd>
-                                            <dd class="adr">
-                                                <span class="street-address">${transaction.targetOrgFields[1].fieldValue}<c:if test="${not empty transaction.targetOrgFields[2].fieldValue}"><span class="street-address"> ${transaction.targetOrgFields[2].fieldValue}</span></c:if></span><br/>
-                                                <span class="region">${transaction.targetOrgFields[3].fieldValue}&nbsp;${transaction.targetOrgFields[4].fieldValue}</span>, <span class="postal-code">${transaction.targetOrgFields[5].fieldValue}</span>
-                                            </dd>
-                                            <c:if test="${not empty transaction.targetOrgFields[6].fieldValue}"><dd>phone: <span class="tel">${transaction.targetOrgFields[6].fieldValue}</span></dd></c:if>
-                                            <c:if test="${not empty transaction.targetOrgFields[7].fieldValue}"><dd>fax: <span class="tel">${transaction.targetOrgFields[7].fieldValue}</span></dd></c:if>
-                                        </dl>
+                                        <h4 class="form-section-heading">Recipient Organization: <c:if test="${pageHeader == 'pending' && not empty targets && fn:length(targets) > 1}">- <a href="javascript:void(0)" title="Change selected target." id="toOrgChange">Change</a></c:if></h4>
+                                        <c:if test="${not empty targets}">
+                                            <dl id="toOrgChoose" style="display:none">
+                                                <dd>
+                                                    Choose Target:
+                                                    <select class="form-control" id="targetorg">
+                                                        <option value="">-Choose-</option>
+                                                        <c:forEach items="${targets}" var="target">
+                                                            <option value="${target.targetOrgId}" rel="${target.targetConfigId}">${target.targetOrgName}</option>
+                                                        </c:forEach>
+                                                    </select>
+                                                </dd>
+                                            </dl>
+                                        </c:if>
+                                        <div id="toOrg">
+                                            <dl class="vcard">
+                                                <dd class="fn" id="targetOrgName">${transaction.targetOrgFields[0].fieldValue}</dd>
+                                                <dd class="adr">
+                                                    <span class="street-address" id="targetOrgAddrLine1">${transaction.targetOrgFields[1].fieldValue} </span> <span class="street-address" id="targetOrgAddrLine2"> ${transaction.targetOrgFields[2].fieldValue}</span><br/>
+                                                    <span class="region" id="targetOrgCity">${transaction.targetOrgFields[3].fieldValue}</span>&nbsp;<span id="targetOrgState">${transaction.targetOrgFields[4].fieldValue}</span>, <span class="postal-code" id="targetOrgZip">${transaction.targetOrgFields[5].fieldValue}</span>
+                                                </dd>
+                                                <c:if test="${not empty transaction.targetOrgFields[6].fieldValue}"><dd>phone: <span class="tel">${transaction.targetOrgFields[6].fieldValue}</span></dd></c:if>
+                                                <c:if test="${not empty transaction.targetOrgFields[7].fieldValue}"><dd>fax: <span class="tel">${transaction.targetOrgFields[7].fieldValue}</span></dd></c:if>
+                                            </dl>
+                                        </div>
                                         <c:if test="${pageHeader == 'feedback' || transaction.sourceType == 2}">
                                             <c:choose>
                                                 <c:when test="${not empty transaction.targetProviderFields[0].fieldValue}">
@@ -238,98 +254,115 @@
                                             <input type="hidden" name="patientFields[${pfield.index}].fieldValue" value="${patientInfo.fieldValue}" />
                                         </c:if>
                                         <c:choose>
-                                             <c:when test="${patientInfo.fieldType == 5}">
-                                                 <div class="col-md-12" style="clear:both;">
-                                             </c:when>
-                                             <c:otherwise>
-                                                 <div class="col-md-6 ${(pfield.index mod 2) == 0 ? 'cb' : ''}">
-                                             </c:otherwise>
-                                         </c:choose>
-                                            <div id="fieldDiv_${patientInfo.fieldNo}" class="form-group">
-                                                <label class="control-label" for="${patientInfo.fieldNo}">${patientInfo.fieldLabel}&nbsp;<c:if test="${patientInfo.required == true}">*&nbsp;</c:if></label>
-                                                <c:choose>
-                                                    <%--
-                                                        Field Type Values
-                                                        1 = Text Box
-                                                        2 = Drop Down
-                                                        3 = Radio
-                                                        4 = Date
-                                                        5 = Comment Box
-                                                    --%>
-                                                    <c:when test="${patientInfo.fieldType == 2 || patientInfo.fieldSelectOptions.size() > 0}">
-                                                        <c:choose>
-                                                            <c:when test="${patientInfo.fieldSelectOptions.size() > 0}">
-                                                                <select <c:if test="${patientInfo.readOnly == true}">disabled</c:if> id="${patientInfo.fieldNo}" name="patientFields[${pfield.index}].fieldValue" class="form-control <c:if test="${patientInfo.required == true}"> required</c:if>">
-                                                                    <option value="">-Choose-</option>
-                                                                    <c:forEach items="${patientInfo.fieldSelectOptions}" var="options">
-                                                                        <option value="${options.optionValue}" <c:if test="${patientInfo.fieldValue == options.optionValue || options.optionValue == options.defaultValue}">selected</c:if>>${options.optionDesc}</option>
-                                                                    </c:forEach>
-                                                                </select>
-                                                            </c:when>
-                                                            <c:otherwise>
-                                                                <input <c:if test="${patientInfo.readOnly == true}">disabled</c:if> id="${patientInfo.fieldNo}" name="patientFields[${pfield.index}].fieldValue" value="${patientInfo.fieldValue}" class="form-control ${patientInfo.validation.replace(' ','-')} <c:if test="${patientInfo.required == true}"> required</c:if>" type="text">
-                                                            </c:otherwise>
-                                                        </c:choose>
-                                                    </c:when>
-                                                    <c:when test="${patientInfo.fieldType == 5}">
-                                                        <textarea rows="5" maxlength="500" id="${patientInfo.fieldNo}" name="patientFields[${pfield.index}].fieldValue" class="form-control ${patientFields.validation.replace(' ','-')} <c:if test="${patientInfo.required == true}"> required</c:if>">${patientInfo.fieldValue}</textarea>
-                                                    </c:when>
-                                                    <%-- Text Box Default --%>    
-                                                    <c:otherwise>
-                                                        <input <c:if test="${patientInfo.readOnly == true}">disabled</c:if> id="${patientInfo.fieldNo}" name="patientFields[${pfield.index}].fieldValue" value="${patientInfo.fieldValue}" class="form-control ${patientInfo.validation.replace(' ','-')} <c:if test="${patientInfo.required == true}"> required</c:if>" type="text">
+                                            <c:when test="${patientInfo.fieldType == 5}">
+                                                <div class="col-md-12" style="clear:both;">
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <div class="col-md-6 ${(pfield.index mod 2) == 0 ? 'cb' : ''}">
                                                     </c:otherwise>
                                                 </c:choose>
-                                                <span id="errorMsg_${patientInfo.fieldNo}" class="control-label"></span>  
+                                                <div id="fieldDiv_${patientInfo.fieldNo}" class="form-group">
+                                                    <label class="control-label" for="${patientInfo.fieldNo}">${patientInfo.fieldLabel}&nbsp;<c:if test="${patientInfo.required == true}">*&nbsp;</c:if></label>
+                                                    <c:choose>
+                                                        <%--
+                                                            Field Type Values
+                                                            1 = Text Box
+                                                            2 = Drop Down
+                                                            3 = Radio
+                                                            4 = Date
+                                                            5 = Comment Box
+                                                        --%>
+                                                        <c:when test="${patientInfo.fieldType == 2 || patientInfo.fieldSelectOptions.size() > 0}">
+                                                            <c:choose>
+                                                                <c:when test="${patientInfo.fieldSelectOptions.size() > 0}">
+                                                                    <select <c:if test="${patientInfo.readOnly == true}">disabled</c:if> id="${patientInfo.fieldNo}" name="patientFields[${pfield.index}].fieldValue" class="form-control <c:if test="${patientInfo.required == true}"> required</c:if>">
+                                                                            <option value="">-Choose-</option>
+                                                                        <c:forEach items="${patientInfo.fieldSelectOptions}" var="options">
+                                                                            <option value="${options.optionValue}" <c:if test="${patientInfo.fieldValue == options.optionValue || options.optionValue == options.defaultValue}">selected</c:if>>${options.optionDesc}</option>
+                                                                        </c:forEach>
+                                                                    </select>
+                                                                </c:when>
+                                                                <c:otherwise>
+                                                                    <input <c:if test="${patientInfo.readOnly == true}">disabled</c:if> id="${patientInfo.fieldNo}" name="patientFields[${pfield.index}].fieldValue" value="${patientInfo.fieldValue}" class="form-control ${patientInfo.validation.replace(' ','-')} <c:if test="${patientInfo.required == true}"> required</c:if>" type="text">
+                                                                </c:otherwise>
+                                                            </c:choose>
+                                                        </c:when>
+                                                        <c:when test="${patientInfo.fieldType == 5}">
+                                                            <textarea rows="5" maxlength="500" id="${patientInfo.fieldNo}" name="patientFields[${pfield.index}].fieldValue" class="form-control ${patientFields.validation.replace(' ','-')} <c:if test="${patientInfo.required == true}"> required</c:if>">${patientInfo.fieldValue}</textarea>
+                                                        </c:when>
+                                                        <%-- Text Box Default --%>    
+                                                        <c:otherwise>
+                                                            <input <c:if test="${patientInfo.readOnly == true}">disabled</c:if> id="${patientInfo.fieldNo}" name="patientFields[${pfield.index}].fieldValue" value="${patientInfo.fieldValue}" class="form-control ${patientInfo.validation.replace(' ','-')} <c:if test="${patientInfo.required == true}"> required</c:if>" type="text">
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                    <span id="errorMsg_${patientInfo.fieldNo}" class="control-label"></span>  
+                                                </div>
                                             </div>
-                                         </div>
-                                    </c:forEach>
-                                </div>
+                                        </c:forEach>
+                                    </div>
 
-                                <div class="form-section row">
-                                    <div class="col-md-12"><h4 class="form-section-heading">Message Details: </h4></div>
-                                    <c:forEach items="${transaction.detailFields}" var="detailInfo" varStatus="dfield">
-                                         <input type="hidden" name="detailFields[${dfield.index}].fieldNo" value="${detailInfo.fieldNo}" />
-                                         <c:choose>
-                                             <c:when test="${detailInfo.fieldType == 5}">
-                                                 <div class="col-md-12" style="clear:both;">
-                                             </c:when>
-                                             <c:otherwise>
-                                                 <div class="col-md-6 ${(dfield.index mod 2) == 0 ? 'cb' : ''}">
-                                             </c:otherwise>
-                                         </c:choose>
-                                            <div id="fieldDiv_${detailInfo.fieldNo}" class="form-group">
-                                                <label class="control-label" for="fieldA">${detailInfo.fieldLabel} 
-                                                    <c:if test="${not empty detailInfo.fieldHelp}">
-                                                        <a href="#" data-toggle="tooltip" data-placement="top" data-original-title="${detailInfo.fieldHelp}">
-                                                            <span class="glyphicon glyphicon-question-sign" style="cursor:pointer"></span>
-                                                        </a>
-                                                    </c:if>
-                                                    <c:if test="${detailInfo.required == true}">&nbsp;*</c:if> 
-                                                 </label>
-                                                <c:choose>
-                                                    <%--
-                                                        Field Type Values
-                                                        1 = Text Box
-                                                        2 = Drop Down
-                                                        3 = Radio
-                                                        4 = Date
-                                                        5 = Comment Box
-                                                    --%>
-                                                    <c:when test="${detailInfo.fieldType == 2 || detailInfo.fieldSelectOptions.size() > 0}">
+                                    <div class="form-section row">
+                                        <div class="col-md-12"><h4 class="form-section-heading">Message Details: </h4></div>
+                                        <c:forEach items="${transaction.detailFields}" var="detailInfo" varStatus="dfield">
+                                            <input type="hidden" name="detailFields[${dfield.index}].fieldNo" value="${detailInfo.fieldNo}" />
+                                            <c:choose>
+                                                <c:when test="${detailInfo.fieldType == 5}">
+                                                    <div class="col-md-12" style="clear:both;">
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <div class="col-md-6 ${(dfield.index mod 2) == 0 ? 'cb' : ''}">
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                    <div id="fieldDiv_${detailInfo.fieldNo}" class="form-group">
+                                                        <label class="control-label" for="fieldA">${detailInfo.fieldLabel} 
+                                                            <c:if test="${not empty detailInfo.fieldHelp}">
+                                                                <a href="#" data-toggle="tooltip" data-placement="top" data-original-title="${detailInfo.fieldHelp}">
+                                                                    <span class="glyphicon glyphicon-question-sign" style="cursor:pointer"></span>
+                                                                </a>
+                                                            </c:if>
+                                                            <c:if test="${detailInfo.required == true}">&nbsp;*</c:if> 
+                                                            </label>
                                                         <c:choose>
-                                                            <c:when test="${detailInfo.fieldSelectOptions.size() > 0}">
-                                                                <select id="${detailInfo.fieldNo}" name="detailFields[${dfield.index}].fieldValue" class="form-control <c:if test="${detailInfo.required == true}"> required</c:if>">
-                                                                    <option value="">-Choose-</option>
-                                                                    <c:forEach items="${detailInfo.fieldSelectOptions}" var="options">
-                                                                        <option value="${options.optionValue}" <c:if test="${detailInfo.fieldValue == options.optionValue || options.optionValue == options.defaultValue}">selected</c:if>>${options.optionDesc}</option>
-                                                                    </c:forEach>
-                                                                </select>
+                                                            <%--
+                                                                Field Type Values
+                                                                1 = Text Box
+                                                                2 = Drop Down
+                                                                3 = Radio
+                                                                4 = Date
+                                                                5 = Comment Box
+                                                            --%>
+                                                            <c:when test="${detailInfo.fieldType == 2 || detailInfo.fieldSelectOptions.size() > 0}">
+                                                                <c:choose>
+                                                                    <c:when test="${detailInfo.fieldSelectOptions.size() > 0}">
+                                                                        <select id="${detailInfo.fieldNo}" name="detailFields[${dfield.index}].fieldValue" class="form-control <c:if test="${detailInfo.required == true}"> required</c:if>">
+                                                                                <option value="">-Choose-</option>
+                                                                            <c:forEach items="${detailInfo.fieldSelectOptions}" var="options">
+                                                                                <option value="${options.optionValue}" <c:if test="${detailInfo.fieldValue == options.optionValue || options.optionValue == options.defaultValue}">selected</c:if>>${options.optionDesc}</option>
+                                                                            </c:forEach>
+                                                                        </select>
+                                                                    </c:when>
+                                                                    <c:otherwise>
+                                                                        <c:choose>
+                                                                            <c:when test="${detailInfo.readOnly == true}">
+                                                                                <input disabled value="${detailInfo.fieldValue}" class="form-control ${detailInfo.validation.replace(' ','-')} type="text">
+                                                                                       <input type="hidden" id="${detailInfo.fieldNo}" name="detailFields[${dfield.index}].fieldValue" value="${detailInfo.fieldValue}" />
+                                                                            </c:when>
+                                                                            <c:otherwise>
+                                                                                <input id="${detailInfo.fieldNo}" name="detailFields[${dfield.index}].fieldValue" value="${detailInfo.fieldValue}" class="form-control ${detailInfo.validation.replace(' ','-')} <c:if test="${detailInfo.required == true}"> required</c:if>" type="text">
+                                                                            </c:otherwise>
+                                                                        </c:choose>
+                                                                    </c:otherwise>
+                                                                </c:choose>
+                                                            </c:when>  
+                                                            <c:when test="${detailInfo.fieldType == 5}">
+                                                                <textarea rows="5" maxlength="500" id="${detailInfo.fieldNo}" name="detailFields[${dfield.index}].fieldValue" class="form-control textarea ${detailInfo.validation.replace(' ','-')} <c:if test="${detailInfo.required == true}"> required</c:if>">${detailInfo.fieldValue}</textarea>
                                                             </c:when>
+                                                            <%-- Text Box Default --%>                    
                                                             <c:otherwise>
                                                                 <c:choose>
                                                                     <c:when test="${detailInfo.readOnly == true}">
                                                                         <input disabled value="${detailInfo.fieldValue}" class="form-control ${detailInfo.validation.replace(' ','-')} type="text">
-                                                                        <input type="hidden" id="${detailInfo.fieldNo}" name="detailFields[${dfield.index}].fieldValue" value="${detailInfo.fieldValue}" />
+                                                                               <input type="hidden" id="${detailInfo.fieldNo}" name="detailFields[${dfield.index}].fieldValue" value="${detailInfo.fieldValue}" />
                                                                     </c:when>
                                                                     <c:otherwise>
                                                                         <input id="${detailInfo.fieldNo}" name="detailFields[${dfield.index}].fieldValue" value="${detailInfo.fieldValue}" class="form-control ${detailInfo.validation.replace(' ','-')} <c:if test="${detailInfo.required == true}"> required</c:if>" type="text">
@@ -337,102 +370,91 @@
                                                                 </c:choose>
                                                             </c:otherwise>
                                                         </c:choose>
-                                                    </c:when>  
-                                                    <c:when test="${detailInfo.fieldType == 5}">
-                                                        <textarea rows="5" maxlength="500" id="${detailInfo.fieldNo}" name="detailFields[${dfield.index}].fieldValue" class="form-control textarea ${detailInfo.validation.replace(' ','-')} <c:if test="${detailInfo.required == true}"> required</c:if>">${detailInfo.fieldValue}</textarea>
-                                                    </c:when>
-                                                    <%-- Text Box Default --%>                    
-                                                    <c:otherwise>
-                                                        <c:choose>
-                                                            <c:when test="${detailInfo.readOnly == true}">
-                                                                <input disabled value="${detailInfo.fieldValue}" class="form-control ${detailInfo.validation.replace(' ','-')} type="text">
-                                                                <input type="hidden" id="${detailInfo.fieldNo}" name="detailFields[${dfield.index}].fieldValue" value="${detailInfo.fieldValue}" />
-                                                            </c:when>
-                                                            <c:otherwise>
-                                                                <input id="${detailInfo.fieldNo}" name="detailFields[${dfield.index}].fieldValue" value="${detailInfo.fieldValue}" class="form-control ${detailInfo.validation.replace(' ','-')} <c:if test="${detailInfo.required == true}"> required</c:if>" type="text">
-                                                            </c:otherwise>
-                                                        </c:choose>
-                                                    </c:otherwise>
-                                                </c:choose>
-                                                <span id="errorMsg_${detailInfo.fieldNo}" class="control-label"></span>                
-                                            </div>
-                                         </div>
-                                    </c:forEach>
+                                                        <span id="errorMsg_${detailInfo.fieldNo}" class="control-label"></span>                
+                                                    </div>
+                                                </div>
+                                            </c:forEach>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-                                    
-                <%-- Existing Message Attachments --%>
-                <c:if test="${transaction.attachmentLimit != 0}">
-                    <div class="col-md-12 form-section">
-                        <section class="panel panel-default">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">Existing Attachments:</h3>
-                            </div>
-                            <div class="panel-body">
-                                <div class="form-container scrollable">
-                                    <div id="existingAttachments"></div>
-                                </div>
-                            </div>
-                        </section>
-                    </div>  
-                    
-                    <%-- New Message Attachment --%>
-                    <div class="col-md-12 form-section attachmentUploadPanel" rel="${transaction.attachmentLimit}">
-                        <section class="panel panel-default">
-                            <div class="panel-heading">
-                                <h3 class="panel-title">Upload New Attachment <c:if test="${transaction.attachmentLimit > 0}">- Limited to ${transaction.attachmentLimit} attachment<c:if test="${transaction.attachmentLimit > 1}">s</c:if></c:if></h3>
-                            </div>
-                            <div class="panel-body">
-                                <div class="form-container scrollable">
-                                   <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label class="control-label" for="attachmentTitle">Attachment Title</label>
-                                            <input id="attachmentTitle" class="form-control" />
+
+                        <%-- Existing Message Attachments --%>
+                        <c:if test="${transaction.attachmentLimit != 0}">
+                            <div class="col-md-12 form-section">
+                                <section class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">Existing Attachments:</h3>
+                                    </div>
+                                    <div id="attachmentList" class="panel-body">
+                                        <span id="errorMsg_Attachment" class="control-label"></span>  
+                                        <div class="form-container scrollable">
+                                            <div id="existingAttachments"></div>
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label class="control-label" for="attachmentFile">Attachment File</label>
-                                            <br /><div id="UploadButton" class="btn btn-primary btn-action-sm UploadButton" style="cursor:pointer">Upload File</div>
+                                </section>
+                            </div>  
+
+                            <%-- New Message Attachment --%>
+                            <div class="col-md-12 form-section attachmentUploadPanel" rel="${transaction.attachmentLimit}">
+                                <section class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <h3 class="panel-title">Upload New Attachment <c:if test="${transaction.attachmentLimit > 0}">- Limited to ${transaction.attachmentLimit} attachment<c:if test="${transaction.attachmentLimit > 1}">s</c:if></c:if></h3>
+                                        <c:if test="${not empty transaction.attachmentNote}">
+                                            <h5>(${transaction.attachmentNote})</h5>
+                                        </c:if>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="form-container scrollable">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="control-label" for="attachmentTitle">Attachment Title</label>
+                                                    <input id="attachmentTitle" class="form-control" />
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label class="control-label" for="attachmentFile">Attachment File</label>
+                                                    <br /><div id="UploadButton" class="btn btn-primary btn-action-sm UploadButton" style="cursor:pointer">Upload File</div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
+                                </section>
                             </div>
-                        </section>
-                    </div>
-                </c:if>
-                
-                <div class="form-group">
-                    <div id="translationMsgDiv"  class="alert alert-danger" style="display:none;">
-                        <strong>An error has occurred in one of the above fields!</strong>
-                    </div>
-                    <input type="button" id="save" class="btn btn-primary btn-action-sm submitMessage" value="Save ${transaction.sourceType == 1 && (pageHeader == 'create' || pageHeader == 'pending') ? 'Referral' : 'Feedback Report'}"/>
-                    <c:choose>
-                        <c:when test="${transaction.autoRelease == true}">
-                            <input type="button" id="send" class="btn btn-primary btn-action-sm submitMessage" value="Send ${transaction.sourceType == 1 && (pageHeader == 'create' || pageHeader == 'pending') ? 'Referral' : 'Feedback Report'}"/>
-                        </c:when>
-                        <c:otherwise>
-                            <input type="button" id="release" class="btn btn-primary btn-action-sm submitMessage" value="Release"/>
-                        </c:otherwise>
-                    </c:choose> 
-                    <%-- Allow the user to delete saved messages --%>   
-                    <c:choose>
-                        <c:when test="${transaction.statusId == 15}"> 
-                            <div class="pull-right"><input type="button" id="delete" class="btn btn-primary btn-action-sm deleteMessage" value="Delete"/></div>
-                        </c:when> 
-                        <c:otherwise>
-                            <c:if test="${userDetails.cancelAuthority == true && transaction.statusId > 0}">                             
-                                <div class="pull-right"><input type="button" id="cancel" class="btn btn-primary btn-action-sm cancelMessage" value="Cancel"/></div>
-                            </c:if>
-                        </c:otherwise>
-                    </c:choose>    
+                        </c:if>
+
+                        <div class="form-group">
+                            <div id="translationMsgDiv"  class="alert alert-danger" style="display:none;">
+                                <strong>An error has occurred in one of the above fields!</strong>
+                            </div>
+                            <input type="button" id="save" class="btn btn-primary btn-action-sm submitMessage" value="Save ${transaction.sourceType == 1 && (pageHeader == 'create' || pageHeader == 'pending') ? 'Referral' : 'Feedback Report'}"/>
+                            <c:if test="${userDetails.deliverAuthority == true}">
+                                <c:choose>
+                                    <c:when test="${transaction.autoRelease == true}">
+                                        <input type="button" id="send" class="btn btn-primary btn-action-sm submitMessage" value="Send ${transaction.sourceType == 1 && (pageHeader == 'create' || pageHeader == 'pending') ? 'Referral' : 'Feedback Report'}"/>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <input type="button" id="release" class="btn btn-primary btn-action-sm submitMessage" value="Release"/>
+                                    </c:otherwise>
+                                </c:choose> 
+                            </c:if> 
+                            <%-- Allow the user to delete saved messages --%>   
+                            <c:choose>
+                                <c:when test="${transaction.statusId == 15}"> 
+                                    <div class="pull-right"><input type="button" id="delete" class="btn btn-primary btn-action-sm deleteMessage" value="Delete"/></div>
+                                    </c:when> 
+                                    <c:otherwise>
+                                        <c:if test="${userDetails.cancelAuthority == true && transaction.statusId > 0}">                             
+                                        <div class="pull-right"><input type="button" id="cancel" class="btn btn-primary btn-action-sm cancelMessage" value="Cancel"/></div>
+                                        </c:if>
+                                    </c:otherwise>
+                                </c:choose>    
+                        </div>
+                    </form:form>
                 </div>
-           </form:form>
+            </div>
         </div>
-    </div>
-</div>
-<%-- Status Definition modal --%>
-<div class="modal fade" id="statusModal" role="dialog" tabindex="-1" aria-labeledby="Status Details" aria-hidden="true" aria-describedby="Status Details"></div>
+        <%-- Status Definition modal --%>
+        <div class="modal fade" id="statusModal" role="dialog" tabindex="-1" aria-labeledby="Status Details" aria-hidden="true" aria-describedby="Status Details"></div>

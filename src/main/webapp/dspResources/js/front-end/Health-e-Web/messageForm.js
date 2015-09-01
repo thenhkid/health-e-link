@@ -227,6 +227,47 @@ require(['./main'], function() {
             }
 
         });
+        
+        //Function to change the selected target organization.
+        //This only applies to saved / pending transactions
+        $(document).on('click', '#toOrgChange', function() {
+            $('#toOrg').hide();
+            $('#toOrgChoose').show();
+        });
+        
+        $(document).on('change', '#targetorg', function() {
+           
+           if($(this).val() > 0) {
+               //$('#targetOrgId').val($(this).val());
+               $('#targetConfigId').val($(this).find('option:selected').attr('rel'));
+               $.ajax({
+                    url: '/Health-e-Web/populateNewTarget.do',
+                    type: 'GET',
+                    data: {'orgId': $(this).val()},
+                    success: function(data) {
+                        
+                        data = $(data);
+                        
+                        $('#targetOrgId').val(data.find("#newtargetOrgId").html());
+                        $('#targetSubOrgId').val(data.find("#newtargetSubOrgId").html());
+                        
+                        $('#targetOrg_19').val(data.find('#targetOrgName').html());
+                        $('#targetOrg_20').val(data.find('#targetOrgAddress').html());
+                        $('#targetOrg_21').val(data.find('#targetOrgAddress2').html());
+                        $('#targetOrg_22').val(data.find('#targetOrgCity').html());
+                        $('#targetOrg_23').val(data.find('#targetOrgState').html());
+                        $('#targetOrg_24').val(data.find('#targetOrgZip').html());
+                        $('#targetOrg_25').val(data.find('#targetOrgPhone').html());
+                        $('#targetOrg_26').val(data.find('#targetOrgFax').html());
+                        
+                        $('#toOrg').show();
+                        $('#toOrg').html(data);
+                        $('#toOrgChoose').hide();
+                    }
+               });
+           }
+           
+        });
 
         //Function hide the selected provider and show the provider
         //drop down.
@@ -432,6 +473,17 @@ function checkFormFields() {
 
     $('div').removeClass("has-error");
     $('span.has-error').html("");
+    
+    $('.requiredAttachment').each(function() {
+       
+        if($('#attachmentIds').val() == '' && $('#existingAttachments').text().indexOf('Remove') == -1) {
+            $('#attachmentList').addClass("has-error");
+            $('#errorMsg_Attachment').addClass("has-error");
+            $('#errorMsg_Attachment').html('At least one attachment must be added.');
+            errorFound = 1;
+        }
+        
+    });
 
     //Look at all required fields.
     $('.required').each(function() {

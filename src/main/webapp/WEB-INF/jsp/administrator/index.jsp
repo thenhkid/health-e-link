@@ -201,7 +201,7 @@
                 <div class="panel-heading">
                     <h3 class="panel-title">Connections</h3>
                 </div>
-                <div class="panel-body"  style="height:385px;" >
+                <div class="panel-body"  style="height:385px; overflow: auto" >
                     <h4>Latest Connections</h4>
                     <c:choose>
                         <c:when test="${not empty connections}">
@@ -214,9 +214,11 @@
                                                 <br/> <strong>Message Type:</strong>  ${connection.srcConfigDetails.getMessageTypeName()}
                                                 <br/> <strong>Transport Method:</strong> ${connection.srcConfigDetails.gettransportMethod()}
                                                 <br /><br />Authorized User(s): <br />
-                                                <c:forEach items="${connection.connectionSenders}" var="sender" varStatus="sIndex">
-                                                    ${sIndex.index+1}. ${sender.firstName}&nbsp;${sender.lastName} (<c:choose><c:when test="${sender.userType == 1}">Manager</c:when><c:otherwise>Staff Member</c:otherwise></c:choose>)<br />
-                                                </c:forEach>
+                                                <div style="height:100px; overflow: auto">
+                                                    <c:forEach items="${connection.connectionSenders}" var="sender" varStatus="sIndex">
+                                                        ${sIndex.index+1}. ${sender.firstName}&nbsp;${sender.lastName} (<c:choose><c:when test="${sender.userType == 1}">Manager</c:when><c:otherwise>Staff Member</c:otherwise></c:choose>)<br />
+                                                    </c:forEach>
+                                                </div>
                                             </td>
                                             <td>
                                                 Sending To <span class="glyphicon  glyphicon-arrow-right"></span>
@@ -226,9 +228,11 @@
                                                 <br/> <strong>Message Type:</strong>  ${connection.srcConfigDetails.getMessageTypeName()}
                                                 <br/> <strong>Transport Method:</strong> ${connection.tgtConfigDetails.gettransportMethod()}
                                                 <br /><br />Authorized User(s): <br />
-                                                <c:forEach items="${connection.connectionReceivers}" var="receiver" varStatus="rIndex">
-                                                    ${rIndex.index+1}. ${receiver.firstName}&nbsp;${receiver.lastName} (<c:choose><c:when test="${receiver.userType == 1}">Manager</c:when><c:otherwise>Staff Member</c:otherwise></c:choose>)<br />
-                                                </c:forEach>
+                                                <div style="height:100px; overflow: auto">
+                                                    <c:forEach items="${connection.connectionReceivers}" var="receiver" varStatus="rIndex">
+                                                        ${rIndex.index+1}. ${receiver.firstName}&nbsp;${receiver.lastName} (<c:choose><c:when test="${receiver.userType == 1}">Manager</c:when><c:otherwise>Staff Member</c:otherwise></c:choose>)<br />
+                                                    </c:forEach>
+                                                </div>
                                             </td>
                                         </tr>
                                     </c:forEach>

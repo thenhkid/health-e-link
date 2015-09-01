@@ -42,6 +42,12 @@
                                     </a>
                                 </c:when>
                                 <c:otherwise>
+                                     <c:if test="${pageFrom == 'pending'}">
+                                        <a href="<c:url value="/FileDownload/downloadFile.do?filename=${attachment.fileName}&foldername=${attachment.fileLocation}"/>"  class="media-modal" title="Download this brochure">
+                                            <span class="glyphicon glyphicon-edit"></span>
+                                            View	
+                                        </a>
+                                    </c:if>
                                     <a href="javascript:void(0);" class="btn btn-link editAttachment" rel="${attachment.id}" id="edit-${attachment.id}" title="Edit this attachment.">
                                         <span class="glyphicon glyphicon-edit"></span>
                                         Edit

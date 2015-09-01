@@ -61,7 +61,7 @@
                             <option value="">-Select Action-</option>
                             <option value="print">Print / Save As</option>
                             <c:if test="${transactionDetails.sourceType == 1}"><option value="feedbackReports">View Feedback Reports</option></c:if>
-                            <c:if test="${feedbackConfigId > 0 and userDetails.createAuthority == true and transactionDetails.messageStatus == 1}"><option value="${feedbackConfigId}">Create Feedback Report</option></c:if>
+                            <c:if test="${feedbackConfigId > 0 and transactionDetails.messageStatus == 1}"><option value="${feedbackConfigId}">Create Feedback Report</option></c:if>
                             <c:if test="${transactionDetails.sourceType == 2}"><option value="originalReferral">View Original Referral</option></c:if>
                         </select>
                   </div>

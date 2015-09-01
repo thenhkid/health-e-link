@@ -388,6 +388,8 @@ public interface transactionInDAO {
     
     Integer getActivityStatusFieldNo(Integer configId) throws Exception;
     
+    Integer getReferralIdFieldNo(Integer configId) throws Exception;
+    
     BigInteger getTotalCompletedActivityStatus(String transIds, String fieldNo) throws Exception;
     
     BigInteger getTotalEnrolledActivityStatus(String transIds, String fieldNo) throws Exception;
@@ -403,5 +405,7 @@ public interface transactionInDAO {
     String getActivityStatusValueById(Integer activityStatusId) throws Exception;
     
     List<batchUploads> getAllRejectedBatches(Date fromDate, Date toDate, Integer fetchSize) throws Exception;
+    
+    void clearMultipleTargets(Integer batchId) throws Exception;
     
 }

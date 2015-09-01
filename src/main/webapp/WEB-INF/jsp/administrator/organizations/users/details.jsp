@@ -28,8 +28,14 @@
                         </div>
                     </div>
                     <div class="form-group">
+                        <label for="status">Alerts</label>
+                        <br />
+                        <label class="checkbox-inline" for="receiveEmailAlert">
+                            <form:checkbox id="receiveEmailAlert" path="receiveEmailAlert" value="true" /> Receive an email when a new referral/feedback report is received.
+                        </label>
+                        <br />
                         <label class="checkbox-inline" for="sendEmailAlert">
-                            <form:checkbox id="sendEmailAlert" path="sendEmailAlert" value="true" /> Alert me via email on any new message my organization receives.
+                            <form:checkbox id="sendEmailAlert" path="sendEmailAlert" value="true" /> Receive an email confirmation when a referral/feedback report is successfully sent.
                         </label>
                     </div>
                     <div class="row">

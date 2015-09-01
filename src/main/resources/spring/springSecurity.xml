@@ -8,15 +8,14 @@
 
     <http pattern="/css/**" security="none"/>
     <http pattern="/javascript/**" security="none" />
-    <http pattern="/" security="none"/>
     
 
     <http auto-config="true" use-expressions="true" disable-url-rewriting="false" >
-        <intercept-url access="hasAnyRole('ROLE_ADMIN','ROLE_PROCESSINGADMIN')" pattern="/administrator/**"></intercept-url>
+        <intercept-url access="hasAnyRole('ROLE_ADMIN','ROLE_PROCESSINGADMIN','ROLE_SYSTEMADMIN')" pattern="/administrator/**"></intercept-url>
         <intercept-url access="hasRole('ROLE_USER')" pattern="/profile/**"></intercept-url>
         <intercept-url access="hasRole('ROLE_USER')" pattern="/Health-e-Web/**"></intercept-url>
         <intercept-url access="hasRole('ROLE_USER')" pattern="/Health-e-Connect/**"></intercept-url>
-        <intercept-url access="hasAnyRole('ROLE_ADMIN', 'ROLE_USER','ROLE_PROCESSINGADMIN')" pattern="/FileDownload/**"></intercept-url>
+        <intercept-url access="hasAnyRole('ROLE_ADMIN', 'ROLE_USER','ROLE_PROCESSINGADMIN','ROLE_SYSTEMADMIN')" pattern="/FileDownload/**"></intercept-url>
         <intercept-url access="permitAll" pattern="/scheduleTask/**"></intercept-url>
         <intercept-url access="permitAll" pattern="/login/*"></intercept-url>
         <intercept-url access="permitAll" pattern="/logout"></intercept-url>

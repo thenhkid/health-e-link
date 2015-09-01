@@ -191,8 +191,8 @@ public class configurationManagerImpl implements configurationManager {
 
     @Override
     @Transactional
-    public List<configurationConnection> getConnectionsByConfiguration(int configId) {
-        return configurationDAO.getConnectionsByConfiguration(configId);
+    public List<configurationConnection> getConnectionsByConfiguration(int configId, int userId) {
+        return configurationDAO.getConnectionsByConfiguration(configId, userId);
     }
 
     @Override
@@ -281,7 +281,7 @@ public class configurationManagerImpl implements configurationManager {
 
     @Override
     @Transactional
-    public void updateMessageSpecs(configurationMessageSpecs messageSpecs, int transportDetailId, int fileType) {
+    public void updateMessageSpecs(configurationMessageSpecs messageSpecs, int transportDetailId, int fileType) throws Exception {
 
         boolean processFile = false;
         String fileName = null;
@@ -341,6 +341,7 @@ public class configurationManagerImpl implements configurationManager {
 
             } catch (IOException e) {
                 e.printStackTrace();
+                throw new Exception (e);
             }
         }
 
@@ -351,6 +352,7 @@ public class configurationManagerImpl implements configurationManager {
                 loadExcelContents(messageSpecs.getconfigId(), transportDetailId, fileName, dir);
             } catch (Exception e1) {
                 e1.printStackTrace();
+                throw new Exception (e1);
             }
 
         }
@@ -366,7 +368,7 @@ public class configurationManagerImpl implements configurationManager {
      *
      */
     public void loadExcelContents(int id, int transportDetailId, String fileName, fileSystem dir) throws Exception {
-
+    	String errorMessage = "";
         try {
             //Set the initial value of the buckets (1);
             Integer bucketVal = new Integer(1);
@@ -389,6 +391,7 @@ public class configurationManagerImpl implements configurationManager {
 
             } catch (Exception e1) {
                 e1.printStackTrace();
+                errorMessage = errorMessage + "<br/>" + e1.getMessage();
             }
 
             //Get first/desired sheet from the workbook
@@ -462,10 +465,18 @@ public class configurationManagerImpl implements configurationManager {
                 pkg.close();
             } catch (IOException e) {
                 e.printStackTrace();
+                errorMessage = errorMessage + "<br/>" + e.getMessage();
             }
         } catch (Exception e) {
             e.printStackTrace();
+            errorMessage = errorMessage + "<br/>" + e.getMessage();
         }
+        
+        /** throw error message here because want to make sure file stream is closed **/
+        if (!errorMessage.equalsIgnoreCase("")) {
+        	throw new Exception(errorMessage);
+        }
+        
     }
 
     @Override

@@ -40,9 +40,19 @@
             <div class="col-md-12">
                 <c:forEach var="provider" varStatus="pStatus" items="${providers}">
                     <section class="panel panel-default col-md-5 ${(pStatus.index mod 2) == 0 ? 'cb' : 'pull-right'} providerBody">
-                       <div class="panel-body">
-                            <div class="form-container scrollable">
-                               <div class="col-md-5" style="margin-right:30px;" >
+                        <div class="panel-body">
+                            <div class="col-md-12 row">
+                                <c:choose>
+                                    <c:when test="${provider.status == false}">
+                                        <span class="btn-danger btn-xs">Inactive</span>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <span class="btn-success btn-xs">Active</span>
+                                    </c:otherwise>
+                                </c:choose>
+                            </div>
+                            <div class="form-container scrollable row">
+                                <div class="col-md-6" >
                                     <div class="form-group">
                                         <h2 class="form-title">${provider.firstName}&nbsp;${provider.lastName}</h2>
                                         <c:if test="${provider.providerAddresses.size() > 0}">
@@ -80,7 +90,7 @@
                     </section>
                 </c:forEach>
             </div>
-            
+
         </div>
     </div>
 </div>

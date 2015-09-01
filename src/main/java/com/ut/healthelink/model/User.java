@@ -53,14 +53,12 @@ public class User {
     @NoHtml
     @Column(name = "LASTNAME", nullable = true)
     private String lastName;
-    
-    /** 
-    @NotEmpty
-    @NoHtml
-    @Column(name = "PASSWORD", nullable = false)
-    private String password;
-	**/
-    
+
+    /**
+     * @NotEmpty @NoHtml @Column(name = "PASSWORD", nullable = false) private
+     * String password;
+	*
+     */
     @NotEmpty
     @NoHtml
     @Size(min = 4, max = 15)
@@ -75,6 +73,9 @@ public class User {
 
     @Column(name = "SENDEMAILALERT", nullable = true)
     private boolean sendEmailAlert = false;
+
+    @Column(name = "RECEIVEEMAILALERT", nullable = true)
+    private boolean receiveEmailAlert = false;
 
     @Email
     @NoHtml
@@ -294,4 +295,12 @@ public class User {
 		this.encryptedPw = encryptedPw;
 	}
 
+    public boolean getReceiveEmailAlert() {
+        return receiveEmailAlert;
+    }
+
+    public void setReceiveEmailAlert(boolean receiveEmailAlert) {
+        this.receiveEmailAlert = receiveEmailAlert;
+    }
+    
 }

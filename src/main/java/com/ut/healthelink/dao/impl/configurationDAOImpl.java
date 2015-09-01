@@ -453,9 +453,10 @@ public class configurationDAOImpl implements configurationDAO {
     @Override
     @Transactional
     @SuppressWarnings("unchecked")
-    public List<configurationConnection> getConnectionsByConfiguration(int configId) {
-        Query query = sessionFactory.getCurrentSession().createQuery("from configurationConnection where sourceConfigId = :configId");
+    public List<configurationConnection> getConnectionsByConfiguration(int configId, int userId) {
+        Query query = sessionFactory.getCurrentSession().createQuery("from configurationConnection where sourceConfigId = :configId and id in (select connectionId from configurationConnectionSenders where userId = :userId)");
         query.setParameter("configId", configId);
+        query.setParameter("userId", userId);
 
         List<configurationConnection> connections = query.list();
         return connections;
@@ -627,11 +628,15 @@ public class configurationDAOImpl implements configurationDAO {
     public configurationSchedules getScheduleDetails(int configId) {
         Query query = sessionFactory.getCurrentSession().createQuery("from configurationSchedules where configId = :configId");
         query.setParameter("configId", configId);
+        
+        configurationSchedules scheduleDetails;
 
-        if (query.uniqueResult() == null) {
-            return null;
+        if (query.list().size() > 1) {
+            scheduleDetails = (configurationSchedules) query.list().get(0);
+            
+            return scheduleDetails;
         } else {
-            configurationSchedules scheduleDetails = (configurationSchedules) query.uniqueResult();
+            scheduleDetails = (configurationSchedules) query.uniqueResult();
 
             return scheduleDetails;
         }

@@ -465,5 +465,7 @@ public interface transactionInManager {
     void createNewReferralActivityExport(Integer userId, Date fromDate, Date toDate) throws Exception;
     
     List<batchUploads> getAllRejectedBatches(Date fromDate, Date toDate, Integer fetchSize) throws Exception;
+    
+    void clearMultipleTargets(Integer batchId) throws Exception;
 
 }

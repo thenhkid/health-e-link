@@ -654,7 +654,9 @@ public class adminConfigController {
      * @return	This function will either return to the transport details screen or redirect to the next step (Field Mappings)
      */
     @RequestMapping(value = "/transport", method = RequestMethod.POST)
-    public ModelAndView updateTransportDetails(@Valid @ModelAttribute(value = "transportDetails") configurationTransport transportDetails, BindingResult result, RedirectAttributes redirectAttr, @RequestParam String action) throws Exception {
+    public ModelAndView updateTransportDetails(@Valid @ModelAttribute(value = "transportDetails") configurationTransport transportDetails, BindingResult result, RedirectAttributes redirectAttr, 
+    		@RequestParam String action, @RequestParam(value = "domain1", required = false) String domain1
+    		) throws Exception {
         
         Integer currTransportId = transportDetails.getId();
         
@@ -669,6 +671,23 @@ public class adminConfigController {
         /* submit the updates */
         Integer transportId = (Integer) configurationTransportManager.updateTransportDetails(transportDetails);
         
+        /**
+         * if it is a new transport, for web services, we add the domain sender
+         * if not, it is handled with add/edit already
+         * **/
+        if (transportDetails.gettransportMethodId() == 6) { //copied or edit
+        	//we see if domain list is 0, if so, we add, else it has been taken care of via add/edit already
+        	//we add domain1
+        	if (configurationDetails.getType() == 1) {
+	        	if (configurationTransportManager.getWSSenderList(transportId).size() == 0) {
+		        	configurationWebServiceSenders confWSSender = new configurationWebServiceSenders();
+		        	confWSSender.setTransportId(transportId);
+		        	confWSSender.setDomain(domain1);
+		    		configurationTransportManager.saveWSSender(confWSSender);
+	        	}
+        	}
+        }
+        	
         
         if(currTransportId == 0) {
             configurationTransportManager.setupOnlineForm(transportId, configId, configurationDetails.getMessageTypeId());

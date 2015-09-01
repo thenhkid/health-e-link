@@ -113,6 +113,28 @@
                                         <form:errors path="attachmentLimit" cssClass="control-label" element="label" />
                                     </div>
                                 </spring:bind>  
+                                <spring:bind path="attachmentRequired">
+                                    <div class="form-group">
+                                        <label class="control-label" for="attachmentRequired">Is at least one attachment required?</label>
+                                        <div>
+                                            <label class="radio-inline">
+                                                <form:radiobutton id="attachmentRequired" path="attachmentRequired" value="1" disabled="${transportDetails.copiedTransportId > 0 ? 'true' : 'false'}" /> Yes 
+                                            </label>
+                                            <label class="radio-inline">
+                                                <form:radiobutton id="attachmentRequired" path="attachmentRequired" value="0" disabled="${transportDetails.copiedTransportId > 0 ? 'true' : 'false'}" /> No
+                                            </label>
+                                        </div>
+                                        <c:if test="${transportDetails.copiedTransportId > 0}">
+                                            <form:hidden path="attachmentRequired" />
+                                        </c:if>    
+                                    </div>
+                                </spring:bind>  
+                                <spring:bind path="attachmentNote">
+                                    <div class="form-group">
+                                        <label class="control-label" for="attachmentNote">Attachment Heading</label>
+                                        <form:input path="attachmentNote" id="attachmentNote" class="form-control" type="text" maxLength="255" />
+                                    </div>
+                                </spring:bind>  
                             </c:if>
                             <div id="upload-downloadDiv" class="methodDiv" style="display:none">
                                 <spring:bind path="clearRecords">
@@ -409,22 +431,25 @@
                                             </div>
                                             <c:if test="${webServiceFields.method == 1}">
                                         	<div id="wsDomain1Div" class="form-group">
-                                                <label class="control-label" for="domain1">Sender Domain(s)*</label>
-                                                <a href="#domainModal" data-toggle="modal" rel="${webServiceFields.transportId}" id="addEditDomain" 
-                                                class="addEditDomain" title="Edit domains">
-                                                	Add/Edit Domains</a>
+                                                <label class="control-label" for="domain1">Sender Domain<c:if test="${fn:length(transportDetails.webServiceFields[0].senderDomainList) != 0}">(s)</c:if>*</label>
+                                                <c:if test="${fn:length(transportDetails.webServiceFields[0].senderDomainList) != 0}">
+	                                                <a href="#domainModal" data-toggle="modal" rel="${webServiceFields.transportId}" id="addEditDomain" 
+	                                                class="addEditDomain" title="Edit domains">
+	                                                	Add/Edit Domains
+	                                               	</a>
+                                                </c:if>
                                                 <c:set var="domains" value=""/>
                                                 <c:forEach 
                                                 items="${transportDetails.webServiceFields[0].senderDomainList}" 
-                                                var="domain" begin="0" end="1">
+                                                var="domain" begin="0" end="0">
                                                 <c:set var="domainList" value="${domain.domain}"/>
                                                 </c:forEach>
                                                 <c:forEach 
                                                 items="${transportDetails.webServiceFields[0].senderDomainList}" 
                                                 var="domain" begin="1" end="3">
-                                                <c:set var="domainList" value="${domainList}, ${domain.domain}"/>
+                                                	<c:set var="domainList" value="${domainList}, ${domain.domain}"/>
                                                 </c:forEach>
-                                                <input name="domain1" id="domain1" readOnly 
+                                                <input name="domain1" id="domain1" <c:if test="${fn:length(transportDetails.webServiceFields[0].senderDomainList) != 0}">readOnly</c:if> 
                                                 class="form-control" type="text" maxLength="255" value="${domainList}"/>
                                                 <span id="wsDomain1Msg" class="control-label"></span>
                                             </div> 
@@ -447,7 +472,7 @@
                                         </div>
                                         </c:if>
                                         <c:if test="${configurationDetails.type == 2}">
-                                        <c:set var="webServiceFields" value="${transportDetails.webServiceFields[1]}"/>
+                                        <c:set var="webServiceFields" value="${transportDetails.webServiceFields[0]}"/>
                                         <div class="form-group col-md-6">
                                             <div class="form-group">
                                                 <label for="status">Web Service Outbound Details</label>

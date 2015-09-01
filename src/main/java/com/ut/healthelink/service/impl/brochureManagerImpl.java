@@ -29,7 +29,7 @@ public class brochureManagerImpl implements brochureManager {
 
     @Override
     @Transactional
-    public Integer createBrochure(Brochure brochure) {
+    public Integer createBrochure(Brochure brochure) throws Exception{
         Integer lastId = null;
 
         //Need to get the cleanURL of the organization for the brochure
@@ -76,7 +76,10 @@ public class brochureManagerImpl implements brochureManager {
 
         } catch (IOException e) {
             e.printStackTrace();
+            throw new Exception (e);
         }
+        
+        
 
         //Submit the new brochure to the database
         lastId = (Integer) brochureDAO.createBrochure(brochure);
@@ -86,7 +89,7 @@ public class brochureManagerImpl implements brochureManager {
 
     @Override
     @Transactional
-    public void updateBrochure(Brochure brochure) {
+    public void updateBrochure(Brochure brochure) throws Exception{
 
         //Need to get the cleanURL of the organization for the brochure
         Organization orgDetails = organizationManager.getOrganizationById(brochure.getOrgId());
@@ -143,6 +146,7 @@ public class brochureManagerImpl implements brochureManager {
 
             } catch (IOException e) {
                 e.printStackTrace();
+                throw new Exception(e);     
             }
         }
 

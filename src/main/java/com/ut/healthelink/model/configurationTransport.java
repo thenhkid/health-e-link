@@ -100,6 +100,12 @@ public class configurationTransport {
     
     @Column(name = "attachmentLimit", nullable = true)
     private String attachmentLimit = "";
+    
+    @Column(name = "attachmentRequired", nullable = false)
+    private Boolean attachmentRequired = false;
+    
+    @Column(name = "attachmentNote", nullable = true)
+    private String attachmentNote = "";
 
     public int getId() {
         return id;
@@ -316,6 +322,22 @@ public class configurationTransport {
 
     public void setAttachmentLimit(String attachmentLimit) {
         this.attachmentLimit = attachmentLimit;
+    }
+
+    public Boolean getAttachmentRequired() {
+        return attachmentRequired;
+    }
+
+    public void setAttachmentRequired(Boolean attachmentRequired) {
+        this.attachmentRequired = attachmentRequired;
+    }
+
+    public String getAttachmentNote() {
+        return attachmentNote;
+    }
+
+    public void setAttachmentNote(String attachmentNote) {
+        this.attachmentNote = attachmentNote;
     }
     
 }

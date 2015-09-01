@@ -12,7 +12,7 @@ public interface organizationManager {
 	
   Integer createOrganization(Organization organization);
 	
-  void updateOrganization(Organization organization);
+  void updateOrganization(Organization organization) throws Exception;
 	  
   Organization getOrganizationById(int orgId);
   

@@ -51,7 +51,7 @@ public class messageTypeManagerImpl implements messageTypeManager {
 
     @Override
     @Transactional
-    public Integer createMessageType(messageType messageType) {
+    public Integer createMessageType(messageType messageType) throws Exception {
         Integer lastId = null;
 
         MultipartFile file = messageType.getFile();
@@ -59,7 +59,7 @@ public class messageTypeManagerImpl implements messageTypeManager {
 
         InputStream inputStream = null;
         OutputStream outputStream = null;
-
+        
         try {
             inputStream = file.getInputStream();
             File newFile = null;
@@ -94,6 +94,7 @@ public class messageTypeManagerImpl implements messageTypeManager {
 
         } catch (IOException e) {
             e.printStackTrace();
+            throw new Exception(e);
         }
 
         //Submit the new message type to the database
@@ -285,7 +286,7 @@ public class messageTypeManagerImpl implements messageTypeManager {
 
     @Override
     @Transactional
-    public Integer createCrosswalk(Crosswalks crosswalkDetails) {
+    public Integer createCrosswalk(Crosswalks crosswalkDetails) throws Exception {
         Integer lastId = null;
         String cleanURL = null;
 
@@ -309,11 +310,11 @@ public class messageTypeManagerImpl implements messageTypeManager {
         newFile = new File(dir.getDir() + fileName);
 
         try {
-            inputStream = file.getInputStream();
-
             if (!newFile.exists()) {
                 newFile.createNewFile();
             }
+            
+            inputStream = file.getInputStream();
             outputStream = new FileOutputStream(newFile);
             int read = 0;
             byte[] bytes = new byte[1024];
@@ -328,6 +329,7 @@ public class messageTypeManagerImpl implements messageTypeManager {
 
         } catch (IOException e) {
             e.printStackTrace();
+            throw new Exception (e);           
         }
 
         //Need to get the actual delimiter character
@@ -387,7 +389,7 @@ public class messageTypeManagerImpl implements messageTypeManager {
      * @param delim	delim: the delimiter used in the file
      *
      */
-    public void loadCrosswalkContents(int id, String fileName, String delim, String cleanURL) {
+    public void loadCrosswalkContents(int id, String fileName, String delim, String cleanURL) throws Exception{
 
         //Set the directory that holds the crosswalk files
         fileSystem dir = new fileSystem();
@@ -404,6 +406,7 @@ public class messageTypeManagerImpl implements messageTypeManager {
             file = new FileInputStream(new File(dir.getDir() + fileName));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
+            throw new Exception(e);
         }
 
         BufferedReader br = new BufferedReader(new InputStreamReader(file));
@@ -414,6 +417,7 @@ public class messageTypeManagerImpl implements messageTypeManager {
                 line = br.readLine();
             } catch (IOException e) {
                 e.printStackTrace();
+                throw new Exception(e);
             }
 
             while (line != null) {
@@ -442,6 +446,7 @@ public class messageTypeManagerImpl implements messageTypeManager {
                     line = br.readLine();
                 } catch (IOException e) {
                     e.printStackTrace();
+                    throw new Exception(e);
                 }
             }
 
@@ -450,8 +455,11 @@ public class messageTypeManagerImpl implements messageTypeManager {
                 br.close();
             } catch (IOException e) {
                 e.printStackTrace();
+                throw new Exception(e);
             }
         }
+        
+        
     }
 
     /**

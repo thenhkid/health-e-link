@@ -60,6 +60,19 @@
                                 
                                 <div class="form-section row">
                                     <div class="col-md-6 cb">
+                                        <div class="form-group">
+                                            <label for="status">Status *</label>
+                                            <div>
+                                                <label class="radio-inline">
+                                                    <form:radiobutton id="status" path="status" value="true" /> Active
+                                                </label>
+                                                <label class="radio-inline">
+                                                    <form:radiobutton id="status" path="status" value="false" /> Inactive
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>  
+                                    <div class="col-md-6 cb">
                                         <spring:bind path="firstName">
                                             <div class="form-group ${status.error ? 'has-error' : '' }">
                                                 <label class="control-label" for="firstName">First Name *</label>

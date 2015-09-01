@@ -18,6 +18,7 @@ import com.ut.healthelink.model.batchUploadSummary;
 import com.ut.healthelink.model.batchUploads;
 import com.ut.healthelink.model.configuration;
 import com.ut.healthelink.model.configurationConnection;
+import com.ut.healthelink.model.configurationConnectionReceivers;
 import com.ut.healthelink.model.configurationFormFields;
 import com.ut.healthelink.model.configurationTransport;
 import com.ut.healthelink.model.custom.searchParameters;
@@ -47,6 +48,7 @@ import com.ut.healthelink.service.userManager;
 
 import java.lang.reflect.InvocationTargetException;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -69,6 +71,7 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -239,24 +242,21 @@ public class HealtheWebController {
                                     sourceOrgAsInt = 0;
                                 }
 
-                                if(sourceOrgAsInt > 0) {
+                                if (sourceOrgAsInt > 0) {
                                     /* Make sure the org exists */
                                     Organization orgDetails = organizationmanager.getOrganizationById(sourceOrgAsInt);
-                                    if(orgDetails.getId() == sourceOrgAsInt) {
+                                    if (orgDetails.getId() == sourceOrgAsInt) {
                                         fromFields = setOrgDetails(sourceOrgAsInt);
-                                    }
-                                    else {
+                                    } else {
                                         fromFields = setOrgDetails(transactionOutManager.getDownloadSummaryDetails(transaction.getId()).getsourceOrgId());
                                     }
-                                }
-                                else if ("".equals(fromFields.get(0).getFieldValue()) || "0".equals(fromFields.get(0).getFieldValue()) || fromFields.get(0).getFieldValue() == null) {
+                                } else if ("".equals(fromFields.get(0).getFieldValue()) || "0".equals(fromFields.get(0).getFieldValue()) || fromFields.get(0).getFieldValue() == null) {
                                     fromFields = setOrgDetails(transactionOutManager.getDownloadSummaryDetails(transaction.getId()).getsourceOrgId());
                                 }
                             } else {
                                 fromFields = setOrgDetails(transactionOutManager.getDownloadSummaryDetails(transaction.getId()).getsourceOrgId());
                             }
                             transactionDetails.setsourceOrgFields(fromFields);
-
 
                         } catch (Exception e) {
                             throw new Exception("Error retrieving source fields for configuration id: " + transaction.getconfigId(), e);
@@ -297,9 +297,9 @@ public class HealtheWebController {
                         transactionList.add(transactionDetails);
                     }
                 }
-                
+
             }
-            
+
             mav.addObject("transactions", transactionList);
             mav.addObject("fromPage", "inbox");
 
@@ -329,7 +329,7 @@ public class HealtheWebController {
 
         return mav;
     }
-    
+
     /**
      * The '/inbox' request will serve up the Health-e-Web (ERG) inbox, which will show a list of transactions.
      *
@@ -340,10 +340,10 @@ public class HealtheWebController {
      */
     @RequestMapping(value = "/inbox", method = RequestMethod.POST)
     public ModelAndView searchinbox(@RequestParam Date fromDate, @RequestParam Date toDate, HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
-        
+
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/Health-e-Web/batchTransactions");
-        
+
         /* Retrieve search parameters from session */
         searchParameters searchParameters = (searchParameters) session.getAttribute("searchParameters");
         searchParameters.setfromDate(fromDate);
@@ -352,22 +352,21 @@ public class HealtheWebController {
 
         mav.addObject("fromDate", fromDate);
         mav.addObject("toDate", toDate);
-        
+
         /* Need to get all the message types set up for the user */
         User userInfo = (User) session.getAttribute("userDetails");
-        
+
         try {
             List<batchDownloads> inboxBatches = transactionOutManager.getInboxBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate);
-            
+
             List<Transaction> transactionList = new ArrayList<Transaction>();
 
             if (!inboxBatches.isEmpty()) {
-                
-                for(batchDownloads batch : inboxBatches) {
-                    
+
+                for (batchDownloads batch : inboxBatches) {
+
                     /* Get all the transactions for the batch */
                     List<transactionTarget> batchTransactions = transactionOutManager.getInboxBatchTransactions(batch.getId(), userInfo.getId());
-
 
                     //we can map the process status so we only have to query once
                     List<lu_ProcessStatus> processStatusList = sysAdminManager.getAllProcessStatus();
@@ -414,24 +413,21 @@ public class HealtheWebController {
                                     sourceOrgAsInt = 0;
                                 }
 
-                                if(sourceOrgAsInt > 0) {
+                                if (sourceOrgAsInt > 0) {
                                     /* Make sure the org exists */
                                     Organization orgDetails = organizationmanager.getOrganizationById(sourceOrgAsInt);
-                                    if(orgDetails.getId() == sourceOrgAsInt) {
+                                    if (orgDetails.getId() == sourceOrgAsInt) {
                                         fromFields = setOrgDetails(sourceOrgAsInt);
-                                    }
-                                    else {
+                                    } else {
                                         fromFields = setOrgDetails(transactionOutManager.getDownloadSummaryDetails(transaction.getId()).getsourceOrgId());
                                     }
-                                }
-                                else if ("".equals(fromFields.get(0).getFieldValue()) || "0".equals(fromFields.get(0).getFieldValue()) || fromFields.get(0).getFieldValue() == null) {
+                                } else if ("".equals(fromFields.get(0).getFieldValue()) || "0".equals(fromFields.get(0).getFieldValue()) || fromFields.get(0).getFieldValue() == null) {
                                     fromFields = setOrgDetails(transactionOutManager.getDownloadSummaryDetails(transaction.getId()).getsourceOrgId());
                                 }
                             } else {
                                 fromFields = setOrgDetails(transactionOutManager.getDownloadSummaryDetails(transaction.getId()).getsourceOrgId());
                             }
                             transactionDetails.setsourceOrgFields(fromFields);
-
 
                         } catch (Exception e) {
                             throw new Exception("Error retrieving source fields for configuration id: " + transaction.getconfigId(), e);
@@ -472,9 +468,9 @@ public class HealtheWebController {
                         transactionList.add(transactionDetails);
                     }
                 }
-                
+
             }
-            
+
             mav.addObject("transactions", transactionList);
             mav.addObject("fromPage", "inbox");
 
@@ -546,25 +542,25 @@ public class HealtheWebController {
             List<batchDownloads> inboxBatches = transactionOutManager.getInboxBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate);
 
             if (!inboxBatches.isEmpty()) {
-                
+
                 //we can map the process status so we only have to query once
                 List<lu_ProcessStatus> processStatusList = sysAdminManager.getAllProcessStatus();
                 Map<Integer, String> psMap = new HashMap<Integer, String>();
                 for (lu_ProcessStatus ps : processStatusList) {
                     psMap.put(ps.getId(), ps.getEndUserDisplayCode());
                 }
-                
+
                 //same goes for users
                 List<User> users = usermanager.getAllUsers();
                 Map<Integer, String> userMap = new HashMap<Integer, String>();
                 for (User user : users) {
                     userMap.put(user.getId(), (user.getFirstName() + " " + user.getLastName()));
                 }
-                
+
                 for (batchDownloads batch : inboxBatches) {
                     List<transactionTarget> batchTransactions = transactionOutManager.getInboxBatchTransactions(batch.getId(), userInfo.getId());
                     batch.settotalTransactions(batchTransactions.size());
-                    
+
                     batch.setstatusValue(psMap.get(batch.getstatusId()));
 
                     /* Get the details of the sender */
@@ -573,7 +569,7 @@ public class HealtheWebController {
                     int senderUserId = transactionInManager.getBatchDetails(batchTransactions.get(0).getbatchUploadId()).getuserId();
 
                     Organization orgDetails = organizationmanager.getOrganizationById(senderOrgId);
-                    
+
                     String senderDetails = new StringBuilder()
                             .append(orgDetails.getOrgName())
                             .append("<br />")
@@ -651,21 +647,21 @@ public class HealtheWebController {
             List<batchDownloads> inboxBatches = transactionOutManager.getInboxBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate);
 
             if (!inboxBatches.isEmpty()) {
-                
+
                 //we can map the process status so we only have to query once
                 List<lu_ProcessStatus> processStatusList = sysAdminManager.getAllProcessStatus();
                 Map<Integer, String> psMap = new HashMap<Integer, String>();
                 for (lu_ProcessStatus ps : processStatusList) {
                     psMap.put(ps.getId(), ps.getEndUserDisplayCode());
                 }
-                
+
                 //same goes for users
                 List<User> users = usermanager.getAllUsers();
                 Map<Integer, String> userMap = new HashMap<Integer, String>();
                 for (User user : users) {
                     userMap.put(user.getId(), (user.getFirstName() + " " + user.getLastName()));
                 }
-                
+
                 for (batchDownloads batch : inboxBatches) {
                     List<transactionTarget> batchTransactions = transactionOutManager.getInboxBatchTransactions(batch.getId(), userInfo.getId());
                     batch.settotalTransactions(batchTransactions.size());
@@ -748,14 +744,14 @@ public class HealtheWebController {
             List<transactionTarget> batchTransactions = transactionOutManager.getInboxBatchTransactions(batchId, userInfo.getId());
 
             List<Transaction> transactionList = new ArrayList<Transaction>();
-            
+
             //we can map the process status so we only have to query once
             List<lu_ProcessStatus> processStatusList = sysAdminManager.getAllProcessStatus();
             Map<Integer, String> psMap = new HashMap<Integer, String>();
             for (lu_ProcessStatus ps : processStatusList) {
                 psMap.put(ps.getId(), ps.getEndUserDisplayCode());
             }
-            
+
             //we can map the process status so we only have to query once
             List<messageType> messageTypeList = messagetypemanager.getMessageTypes();
             Map<Integer, String> mtMap = new HashMap<Integer, String>();
@@ -779,7 +775,7 @@ public class HealtheWebController {
                 configurationTransport transportDetails = configurationTransportManager.getTransportDetails(transaction.getconfigId());
 
                 try {
-                    
+
                     List<configurationFormFields> sourceInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(transaction.getconfigId(), transportDetails.getId(), 1);
                     /* Set all the transaction SOURCE ORG fields */
                     List<transactionRecords> fromFields;
@@ -794,24 +790,21 @@ public class HealtheWebController {
                             sourceOrgAsInt = 0;
                         }
 
-                        if(sourceOrgAsInt > 0) {
+                        if (sourceOrgAsInt > 0) {
                             /* Make sure the org exists */
                             Organization orgDetails = organizationmanager.getOrganizationById(sourceOrgAsInt);
-                            if(orgDetails.getId() == sourceOrgAsInt) {
+                            if (orgDetails.getId() == sourceOrgAsInt) {
                                 fromFields = setOrgDetails(sourceOrgAsInt);
-                            }
-                            else {
+                            } else {
                                 fromFields = setOrgDetails(transactionOutManager.getDownloadSummaryDetails(transaction.getId()).getsourceOrgId());
                             }
-                        }
-                        else if ("".equals(fromFields.get(0).getFieldValue()) || "0".equals(fromFields.get(0).getFieldValue()) || fromFields.get(0).getFieldValue() == null) {
+                        } else if ("".equals(fromFields.get(0).getFieldValue()) || "0".equals(fromFields.get(0).getFieldValue()) || fromFields.get(0).getFieldValue() == null) {
                             fromFields = setOrgDetails(transactionOutManager.getDownloadSummaryDetails(transaction.getId()).getsourceOrgId());
                         }
                     } else {
                         fromFields = setOrgDetails(transactionOutManager.getDownloadSummaryDetails(transaction.getId()).getsourceOrgId());
                     }
                     transactionDetails.setsourceOrgFields(fromFields);
-                    
 
                 } catch (Exception e) {
                     throw new Exception("Error retrieving source fields for configuration id: " + transaction.getconfigId(), e);
@@ -969,18 +962,16 @@ public class HealtheWebController {
                     } catch (Exception e) {
                         sourceOrgAsInt = 0;
                     }
-                    
-                    if(sourceOrgAsInt > 0) {
+
+                    if (sourceOrgAsInt > 0) {
                         /* Make sure the org exists */
                         Organization orgDetails = organizationmanager.getOrganizationById(sourceOrgAsInt);
-                        if(orgDetails.getId() == sourceOrgAsInt) {
+                        if (orgDetails.getId() == sourceOrgAsInt) {
                             fromFields = setOrgDetails(sourceOrgAsInt);
-                        }
-                        else {
+                        } else {
                             fromFields = setOrgDetails(transactionOutManager.getDownloadSummaryDetails(transactionInfo.getId()).getsourceOrgId());
                         }
-                    }
-                    else if ("".equals(fromFields.get(0).getFieldValue()) || "0".equals(fromFields.get(0).getFieldValue()) || fromFields.get(0).getFieldValue() == null) {
+                    } else if ("".equals(fromFields.get(0).getFieldValue()) || "0".equals(fromFields.get(0).getFieldValue()) || fromFields.get(0).getFieldValue() == null) {
                         fromFields = setOrgDetails(transactionOutManager.getDownloadSummaryDetails(transactionInfo.getId()).getsourceOrgId());
                     }
                 } else {
@@ -1068,7 +1059,13 @@ public class HealtheWebController {
             mav.addObject("internalStatusCodes", internalStatusCodes);
 
             /* Get id of the associated feedback report for this message */
-            Integer feedbackConfigId = transactionOutManager.getActiveFeedbackReportsByMessageType(configDetails.getMessageTypeId(), userInfo.getOrgId());
+            Organization orgDetails = organizationmanager.getOrganizationById(userInfo.getOrgId());
+            Integer orgId = userInfo.getOrgId();
+            if(orgDetails.getParentId() > 0) {
+                orgId = orgDetails.getParentId();
+            }
+            
+            Integer feedbackConfigId = transactionOutManager.getActiveFeedbackReportsByMessageType(configDetails.getMessageTypeId(), orgId);
             mav.addObject("feedbackConfigId", feedbackConfigId);
 
             /* Set the header totals */
@@ -1126,14 +1123,14 @@ public class HealtheWebController {
 
         try {
             List<configuration> configurations = configurationManager.getActiveConfigurationsByUserId(userInfo.getId(), 2);
-            
+
             //we can map the process status so we only have to query once
             List<messageType> messageTypeList = messagetypemanager.getMessageTypes();
             Map<Integer, String> mtMap = new HashMap<Integer, String>();
             for (messageType mtype : messageTypeList) {
                 mtMap.put(mtype.getId(), mtype.getDspName());
             }
-            
+
             //if we have lots of organization in the future we can tweak this to narrow down to orgs with batches
             List<Organization> organizations = organizationmanager.getOrganizations();
             Map<Integer, String> orgMap = new HashMap<Integer, String>();
@@ -1147,15 +1144,43 @@ public class HealtheWebController {
                 /**
                  * Get a list of connections
                  */
-                List<configurationConnection> connections = configurationManager.getConnectionsByConfiguration(config.getId());
+                List<configurationConnection> configConnections = new ArrayList<configurationConnection>();
+                
+                List<configurationConnection> connections = configurationManager.getConnectionsByConfiguration(config.getId(), userInfo.getId());
+                
+                ArrayList<Integer> intList = new ArrayList<>();
 
                 for (configurationConnection connection : connections) {
-                    configuration configDetails = configurationManager.getConfigurationById(connection.gettargetConfigId());
+                    
+                    /* Get the connection receivers (Targets) */
+                    List<configurationConnectionReceivers> targetUsers = configurationManager.getConnectionReceivers(connection.getId());
+                    
+                    for(configurationConnectionReceivers target : targetUsers) {
+                        User userDetails = usermanager.getUserById(target.getuserId());
+                        Organization orgDetails = organizationmanager.getOrganizationById(userDetails.getOrgId());
+                        
+                        if(!intList.contains(orgDetails.getId())) {
+                            configurationConnection newConnection = new configurationConnection();
+                            newConnection.setsourceConfigId(connection.getsourceConfigId());
+                            newConnection.settargetConfigId(connection.gettargetConfigId());
+                            newConnection.setStatus(connection.getStatus());
+                            newConnection.setDateCreated(connection.getDateCreated());
+                            newConnection.settargetOrgName(orgDetails.getOrgName());
+                            newConnection.settargetOrgId(orgDetails.getId());
+
+                            configConnections.add(newConnection);
+                            
+                            intList.add(orgDetails.getId());
+                        }
+                        
+                    }
+                    
+                    /*configuration configDetails = configurationManager.getConfigurationById(connection.gettargetConfigId());
                     connection.settargetOrgName(orgMap.get(configDetails.getorgId()));
-                    connection.settargetOrgId(configDetails.getorgId());
+                    connection.settargetOrgId(configDetails.getorgId());*/
                 }
 
-                config.setconnections(connections);
+                config.setconnections(configConnections);
 
             }
 
@@ -1234,9 +1259,18 @@ public class HealtheWebController {
 
             Transaction transaction = new Transaction();
             transactionOutRecords records = transactionOutManager.getTransactionRecords(transactionId);
+            
+            Organization userOrg = organizationmanager.getOrganizationById(userInfo.getOrgId());
+            if(userOrg.getParentId() > 0) {
+                transaction.setSourceSubOrgId(userOrg.getId());
+                transaction.setorgId(userOrg.getParentId());
+            }
+            else {
+                transaction.setorgId(userInfo.getOrgId());
+            }
 
             /* Create a new transaction */
-            transaction.setorgId(userInfo.getOrgId());
+            
             transaction.settransportMethodId(2);
             transaction.setmessageTypeId(configDetails.getMessageTypeId());
             transaction.setuserId(userInfo.getId());
@@ -1250,13 +1284,15 @@ public class HealtheWebController {
             transaction.setautoRelease(transportDetails.getautoRelease());
             transaction.settargetConfigId(targetConfigIds);
             transaction.setorginialTransactionId(transactionId);
-            
-            if(transportDetails.getAttachmentLimit() != null && !"".equals(transportDetails.getAttachmentLimit())) {
+            transaction.setAttachmentNote(transportDetails.getAttachmentNote());
+            transaction.setAttachmentRequired(transportDetails.getAttachmentRequired());
+
+            if (transportDetails.getAttachmentLimit() != null && !"".equals(transportDetails.getAttachmentLimit())) {
                 transaction.setAttachmentLimit(Integer.parseInt(transportDetails.getAttachmentLimit()));
             }
-            
+
             try {
-                
+
                 List<configurationFormFields> senderInfoFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId, transportDetails.getId(), 1);
                 /* Set all the transaction SOURCE ORG fields */
                 List<transactionRecords> fromFields;
@@ -1270,36 +1306,32 @@ public class HealtheWebController {
                     } catch (Exception e) {
                         sourceOrgAsInt = 0;
                     }
-                    
-                    if(sourceOrgAsInt > 0) {
+
+                    if (sourceOrgAsInt > 0) {
                         /* Make sure the org exists */
                         Organization orgDetails = organizationmanager.getOrganizationById(sourceOrgAsInt);
-                        if(orgDetails.getId() == sourceOrgAsInt) {
+                        if (orgDetails.getId() == sourceOrgAsInt) {
                             fromFields = setOrgDetails(sourceOrgAsInt);
-                        }
-                        else {
+                        } else {
                             fromFields = setOrgDetails(transactionOutManager.getDownloadSummaryDetails(transactionDetails.getId()).getsourceOrgId());
                         }
-                    }
-                    else if ("".equals(fromFields.get(0).getFieldValue()) || "0".equals(fromFields.get(0).getFieldValue()) || fromFields.get(0).getFieldValue() == null) {
+                    } else if ("".equals(fromFields.get(0).getFieldValue()) || "0".equals(fromFields.get(0).getFieldValue()) || fromFields.get(0).getFieldValue() == null) {
                         fromFields = setOrgDetails(transactionOutManager.getDownloadSummaryDetails(transactionDetails.getId()).getsourceOrgId());
                     }
                 } else {
                     fromFields = setOrgDetails(transactionOutManager.getDownloadSummaryDetails(transactionDetails.getId()).getsourceOrgId());
                 }
                 transaction.setsourceOrgFields(fromFields);
-                
 
             } catch (Exception e) {
                 throw new Exception("Error retrieving sender fields for configuration id: " + configId, e);
             }
 
-
             try {
                 List<configurationFormFields> senderProviderFormFields = configurationTransportManager.getConfigurationFieldsByBucket(configId, transportDetails.getId(), 2);
 
                 /* Set all the transaction SOURCE PROVIDER fields */
-                List<transactionRecords> fromProviderFields = setInboxFormFields(senderProviderFormFields, records, configId, false, transactionDetails.gettransactionInId(),0);
+                List<transactionRecords> fromProviderFields = setInboxFormFields(senderProviderFormFields, records, configId, false, transactionDetails.gettransactionInId(), 0);
                 transaction.setsourceProviderFields(fromProviderFields);
 
             } catch (Exception e) {
@@ -1312,7 +1344,7 @@ public class HealtheWebController {
                 /* Set all the transaction TARGET fields */
                 List<transactionRecords> toFields;
                 if (!targetInfoFormFields.isEmpty()) {
-                    toFields = setInboxFormFields(targetInfoFormFields, records, configId, false, transactionDetails.gettransactionInId(),0);
+                    toFields = setInboxFormFields(targetInfoFormFields, records, configId, false, transactionDetails.gettransactionInId(), 0);
 
                     int targetOrgAsInt;
 
@@ -1380,7 +1412,7 @@ public class HealtheWebController {
                     ua.setActivity("Selected Create Feedback Report");
                     ua.setBatchUploadId(transactionDetails.getbatchUploadId());
                     ua.setBatchDownloadId(transactionDetails.getbatchDLId());
-                    ua.setTransactionInIds(String.valueOf(transactionDetails.gettransactionInId()));                    
+                    ua.setTransactionInIds(String.valueOf(transactionDetails.gettransactionInId()));
                     ua.setTransactionTargetIds(String.valueOf(transactionId));
                     usermanager.insertUserLog(ua);
                 } catch (Exception ex) {
@@ -1433,7 +1465,10 @@ public class HealtheWebController {
         if (targetConfig == null) {
             targetConfig = 0;
         }
-        
+
+        /* Get the organization details for the source (Sender) organization */
+        User userInfo = (User) session.getAttribute("userDetails");
+
         ModelAndView mav = new ModelAndView();
         if ("create".equals(pathVariable)) {
             mav.setViewName("/Health-e-Web/messageDetailsForm");
@@ -1441,6 +1476,48 @@ public class HealtheWebController {
         } else {
             mav.setViewName("/Health-e-Web/pendingmessageDetailsForm");
             mav.addObject("pageHeader", "pending");
+            
+            List<configurationConnection> configConnections = new ArrayList<configurationConnection>();
+                
+            /* get a list of available targets */
+            List<configurationConnection> connections = configurationManager.getConnectionsByConfiguration(configId, userInfo.getId());
+            
+            ArrayList<Integer> intList = new ArrayList<>();
+            
+            if (connections != null && connections.size() > 0) {
+                for (configurationConnection connection : connections) {
+                    
+                    /* Get the connection receivers (Targets) */
+                    List<configurationConnectionReceivers> targetUsers = configurationManager.getConnectionReceivers(connection.getId());
+                   
+                    for(configurationConnectionReceivers target : targetUsers) {
+                        User userDetails = usermanager.getUserById(target.getuserId());
+                        Organization orgDetails = organizationmanager.getOrganizationById(userDetails.getOrgId());
+                        
+                        if(!intList.contains(orgDetails.getId())) {
+                            configurationConnection newConnection = new configurationConnection();
+                            newConnection.setsourceConfigId(connection.getsourceConfigId());
+                            newConnection.settargetConfigId(connection.gettargetConfigId());
+                            newConnection.setStatus(connection.getStatus());
+                            newConnection.setDateCreated(connection.getDateCreated());
+                            newConnection.settargetOrgName(orgDetails.getOrgName());
+                            newConnection.settargetOrgId(orgDetails.getId());
+
+                            configConnections.add(newConnection);
+                            
+                            intList.add(orgDetails.getId());
+                        }
+                    }
+                    
+                    
+                    /*configuration configDetails = configurationManager.getConfigurationById(connection.gettargetConfigId());
+                    connection.settargetOrgName(organizationmanager.getOrganizationById(configDetails.getorgId()).getOrgName());
+                    connection.settargetOrgId(configDetails.getorgId());*/
+                }
+                
+                mav.addObject("targets", configConnections);
+
+            }
         }
 
         try {
@@ -1448,9 +1525,6 @@ public class HealtheWebController {
             /* Get the configuration details */
             configuration configDetails = configurationManager.getConfigurationById(configId);
 
-            /* Get the organization details for the source (Sender) organization */
-            User userInfo = (User) session.getAttribute("userDetails");
-            
             Organization sendingOrgDetails = organizationmanager.getOrganizationById(userInfo.getOrgId());
 
             /* Get a list of form fields */
@@ -1465,14 +1539,23 @@ public class HealtheWebController {
                 transactionTarget transactionTarget = transactionInManager.getTransactionTarget(transactionInfo.getbatchId(), transactionId);
 
                 configuration targetConfigDetails = configurationManager.getConfigurationById(transactionTarget.getconfigId());
-                targetOrg = targetConfigDetails.getorgId();
-
-                transaction.setorgId(batchInfo.getOrgId());
                 
-                if(transactionInfo.getSourceSubOrgId() > 0) {
-                    transaction.setSourceSubOrgId(transactionInfo.getSourceSubOrgId());
+                if(transactionTarget.getTargetSubOrgId() > 0) {
+                    Organization targetSubOrgDetails = organizationmanager.getOrganizationById(transactionTarget.getTargetSubOrgId());
+                    targetOrg = targetSubOrgDetails.getParentId();
+                    transaction.setTargetSubOrgId(transactionTarget.getTargetSubOrgId());
+                }
+                else {
+                    targetOrg = targetConfigDetails.getorgId();
                 }
                 
+
+                transaction.setorgId(batchInfo.getOrgId());
+
+                if (transactionInfo.getSourceSubOrgId() > 0) {
+                    transaction.setSourceSubOrgId(transactionInfo.getSourceSubOrgId());
+                }
+
                 transaction.settransportMethodId(transportDetails.gettransportMethodId());
                 transaction.setmessageTypeId(configDetails.getMessageTypeId());
                 transaction.setuserId(batchInfo.getuserId());
@@ -1488,6 +1571,13 @@ public class HealtheWebController {
                 transaction.settransactionTargetId(transactionTarget.getId());
                 transaction.setdateSubmitted(transactionInfo.getdateCreated());
                 transaction.setsourceType(configDetails.getsourceType());
+                
+                transaction.setAttachmentNote(transportDetails.getAttachmentNote());
+                transaction.setAttachmentRequired(transportDetails.getAttachmentRequired());
+
+                if (transportDetails.getAttachmentLimit() != null && !"".equals(transportDetails.getAttachmentLimit())) {
+                    transaction.setAttachmentLimit(Integer.parseInt(transportDetails.getAttachmentLimit()));
+                }
 
                 List<Integer> targetConfigId = new ArrayList<Integer>();
                 targetConfigId.add(transactionTarget.getconfigId());
@@ -1503,8 +1593,8 @@ public class HealtheWebController {
 
                 records = transactionInManager.getTransactionRecords(transactionId);
                 transaction.settransactionRecordId(records.getId());
-                
-              //we log here 
+
+                //we log here 
                 try {
                     //log user activity
                     UserActivity ua = new UserActivity();
@@ -1523,20 +1613,25 @@ public class HealtheWebController {
                     System.err.println("showMessageDetailsForm = error logging user " + ex.getCause());
                     ex.printStackTrace();
                 }
-                
-                
-                
+
             } else {
                 /* Create a new transaction */
-                if(organizationmanager.getOrganizationById(userInfo.getOrgId()).getParentId() == 0) {
+                if (organizationmanager.getOrganizationById(userInfo.getOrgId()).getParentId() == 0) {
                     transaction.setorgId(userInfo.getOrgId());
                     transaction.setSourceSubOrgId(0);
-                }
-                else {
+                } else {
                     transaction.setorgId(organizationmanager.getOrganizationById(userInfo.getOrgId()).getParentId());
                     transaction.setSourceSubOrgId(userInfo.getOrgId());
                 }
                 
+                if(organizationmanager.getOrganizationById(targetOrg).getParentId() > 0) {
+                    transaction.settargetOrgId(organizationmanager.getOrganizationById(targetOrg).getParentId());
+                    transaction.setTargetSubOrgId(targetOrg);
+                }
+                else {
+                    transaction.settargetOrgId(targetOrg);
+                }
+
                 transaction.settransportMethodId(2);
                 transaction.setmessageTypeId(configDetails.getMessageTypeId());
                 transaction.setuserId(userInfo.getId());
@@ -1544,16 +1639,22 @@ public class HealtheWebController {
                 transaction.setoriginalFileName(null);
                 transaction.setstatusId(0);
                 transaction.settransactionStatusId(0);
-                transaction.settargetOrgId(targetOrg);
                 transaction.setconfigId(configId);
                 transaction.setautoRelease(transportDetails.getautoRelease());
+                
+                transaction.setAttachmentNote(transportDetails.getAttachmentNote());
+                transaction.setAttachmentRequired(transportDetails.getAttachmentRequired());
+
+                if (transportDetails.getAttachmentLimit() != null && !"".equals(transportDetails.getAttachmentLimit())) {
+                    transaction.setAttachmentLimit(Integer.parseInt(transportDetails.getAttachmentLimit()));
+                }
 
                 List<Integer> targetConfigId = new ArrayList<Integer>();
                 targetConfigId.add(targetConfig);
                 transaction.settargetConfigId(targetConfigId);
 
                 transaction.setsourceType(configDetails.getsourceType());
-                
+
                 try {
                     //log user activity
                     UserActivity ua = new UserActivity();
@@ -1568,7 +1669,7 @@ public class HealtheWebController {
                     System.err.println("showMessageDetailsForm = error logging user " + ex.getCause());
                     ex.printStackTrace();
                 }
-                
+
             }
 
             /* Get the organization details for the target (Receiving) organization */
@@ -1657,7 +1758,6 @@ public class HealtheWebController {
             mav.addObject("pendingTotal", pendingTotal);
             mav.addObject("inboxTotal", inboxTotal);
 
-            
         } catch (Exception e) {
             throw new Exception("Error occurred in getting the details for the new message form for config " + configId, e);
         }
@@ -1684,7 +1784,8 @@ public class HealtheWebController {
         Integer transactionId;
         Integer transactionRecordId;
         Integer transactionTargetId;
-
+        
+        
         /* If currBatchId == 0 then create a new batch */
         if (currBatchId == 0) {
 
@@ -1811,7 +1912,21 @@ public class HealtheWebController {
 
             try {
                 transactionIn transactionIn = transactionInManager.getTransactionDetails(transactionId);
-
+                
+                /* See if the transaction target has changed */
+                batchUploadSummary summaryDetails = transactionInManager.getUploadSummaryDetails(transactionId);
+                
+                if(summaryDetails.gettargetOrgId() != transactionDetails.gettargetOrgId()) {
+                    summaryDetails.settargetOrgId(transactionDetails.gettargetOrgId());
+                
+                    transactionInManager.submitBatchUploadSummary(summaryDetails);
+                }
+                else if(summaryDetails.getTargetSubOrgId() != transactionDetails.getTargetSubOrgId()) {
+                    summaryDetails.setTargetSubOrgId(transactionDetails.getTargetSubOrgId());
+                    
+                    transactionInManager.submitBatchUploadSummary(summaryDetails);
+                }
+                
                 /* 
                  If the "Save" button was pressed set the
                  status to "Saved"
@@ -2002,11 +2117,28 @@ public class HealtheWebController {
                 }
 
                 transactionInManager.submitTransactionTarget(transactiontarget);
-            } /* Otherwise update existing batch */ else {
+            } 
+            /* Otherwise update existing batch */ 
+            else {
                 transactionTargetId = currTransactionTargetId;
 
                 transactionTarget transactiontarget = transactionInManager.getTransactionTargetDetails(transactionTargetId);
-
+                
+                if(transactiontarget.getconfigId() != transactionDetails.gettargetConfigId().get(0)) {
+                    
+                    /* Delete multiple targets */
+                    transactionInManager.clearMultipleTargets(batchId);
+                    
+                    transactiontarget.setconfigId(transactionDetails.gettargetConfigId().get(0));
+                    
+                    transactionInManager.submitTransactionTargetChanges(transactiontarget);
+                }
+                else if(transactiontarget.getTargetSubOrgId() != transactionDetails.getTargetSubOrgId()) {
+                    transactiontarget.setTargetSubOrgId(transactionDetails.getTargetSubOrgId());
+                    
+                    transactionInManager.submitTransactionTargetChanges(transactiontarget);
+                }
+                
                 /* 
                  If the "Save" button was pressed set the
                  status to "Saved"
@@ -2119,21 +2251,21 @@ public class HealtheWebController {
             List<batchUploads> pendingBatches = transactionInManager.getpendingBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate);
 
             if (!pendingBatches.isEmpty()) {
-                
+
                 //we can map the process status so we only have to query once
                 List<lu_ProcessStatus> processStatusList = sysAdminManager.getAllProcessStatus();
                 Map<Integer, String> psMap = new HashMap<Integer, String>();
                 for (lu_ProcessStatus ps : processStatusList) {
                     psMap.put(ps.getId(), ps.getEndUserDisplayCode());
                 }
-                
+
                 //same goes for users
                 List<User> users = usermanager.getAllUsers();
                 Map<Integer, String> userMap = new HashMap<Integer, String>();
                 for (User user : users) {
                     userMap.put(user.getId(), (user.getFirstName() + " " + user.getLastName()));
                 }
-                
+
                 for (batchUploads batch : pendingBatches) {
                     List<transactionIn> batchTransactions = transactionInManager.getBatchTransactions(batch.getId(), userInfo.getId());
                     batch.settotalTransactions(batchTransactions.size());
@@ -2153,23 +2285,23 @@ public class HealtheWebController {
             mav.addObject("pendingTotal", pendingTotal);
             mav.addObject("inboxTotal", inboxTotal);
 
-          //we log here 
+            //we log here 
             try {
                 //log user activity
-            	UserActivity ua = new UserActivity();
+                UserActivity ua = new UserActivity();
                 ua.setUserId(userInfo.getId());
                 ua.setFeatureId(featureId);
                 ua.setAccessMethod("GET");
                 ua.setPageAccess("/pending");
                 ua.setActivity("View Pending Batches");
                 ua.setActivityDesc("Searched Dates " + fromDate + " - " + toDate);
-                ua.setActivityDesc("Pending Total-" + pendingTotal+ "|Inbox Total-" + inboxTotal+ "|From Date-" + fromDate + "|To Date-" + toDate);
+                ua.setActivityDesc("Pending Total-" + pendingTotal + "|Inbox Total-" + inboxTotal + "|From Date-" + fromDate + "|To Date-" + toDate);
                 usermanager.insertUserLog(ua);
             } catch (Exception ex) {
                 System.err.println("pending = error logging user " + ex.getCause());
                 ex.printStackTrace();
             }
-            
+
         } catch (Exception e) {
             throw new Exception("Error occurred trying to get pending items userId: " + userInfo.getId(), e);
         }
@@ -2208,25 +2340,25 @@ public class HealtheWebController {
             List<batchUploads> pendingBatches = transactionInManager.getpendingBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate);
 
             if (!pendingBatches.isEmpty()) {
-                
+
                 //we can map the process status so we only have to query once
                 List<lu_ProcessStatus> processStatusList = sysAdminManager.getAllProcessStatus();
                 Map<Integer, String> psMap = new HashMap<Integer, String>();
                 for (lu_ProcessStatus ps : processStatusList) {
                     psMap.put(ps.getId(), ps.getEndUserDisplayCode());
                 }
-                
+
                 //same goes for users
                 List<User> users = usermanager.getAllUsers();
                 Map<Integer, String> userMap = new HashMap<Integer, String>();
                 for (User user : users) {
                     userMap.put(user.getId(), (user.getFirstName() + " " + user.getLastName()));
                 }
-                
+
                 for (batchUploads batch : pendingBatches) {
                     List<transactionIn> batchTransactions = transactionInManager.getBatchTransactions(batch.getId(), userInfo.getId());
                     batch.settotalTransactions(batchTransactions.size());
-                    
+
                     batch.setstatusValue(psMap.get(batch.getstatusId()));
 
                     String usersName = new StringBuilder().append(userMap.get(batch.getuserId())).toString();
@@ -2243,23 +2375,23 @@ public class HealtheWebController {
             mav.addObject("pendingTotal", pendingTotal);
             mav.addObject("inboxTotal", inboxTotal);
 
-          //we log here 
+            //we log here 
             try {
                 //log user activity
-            	UserActivity ua = new UserActivity();
+                UserActivity ua = new UserActivity();
                 ua.setUserId(userInfo.getId());
                 ua.setFeatureId(featureId);
                 ua.setAccessMethod("Post");
                 ua.setPageAccess("/pending");
                 ua.setActivity("View Pending Batches");
-                ua.setActivityDesc("Pending Total-" + pendingTotal+ "|Inbox Total-" + inboxTotal+ "|From Date-" + fromDate + "|To Date-" + toDate);
+                ua.setActivityDesc("Pending Total-" + pendingTotal + "|Inbox Total-" + inboxTotal + "|From Date-" + fromDate + "|To Date-" + toDate);
                 usermanager.insertUserLog(ua);
-                
+
             } catch (Exception ex) {
                 System.err.println("ERG pending = error logging user " + ex.getCause());
                 ex.printStackTrace();
             }
-            
+
         } catch (Exception e) {
             throw new Exception("Error occurred in searching pending items.", e);
         }
@@ -2267,7 +2399,6 @@ public class HealtheWebController {
         return mav;
     }
 
-    
     /**
      * The '/sent' request will serve up the Health-e-Web (ERG) page that will list all sent messages.
      *
@@ -2299,7 +2430,7 @@ public class HealtheWebController {
             fromDate = searchParameters.getfromDate();
             toDate = searchParameters.gettoDate();
         }
-        
+
         mav.addObject("fromPage", "sent");
 
         mav.addObject("fromDate", fromDate);
@@ -2307,13 +2438,13 @@ public class HealtheWebController {
 
         try {
             List<batchUploads> sentBatches = transactionInManager.getsentBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate);
-            
+
             List<Transaction> transactionList = new ArrayList<Transaction>();
 
             if (!sentBatches.isEmpty()) {
-                
-                for(batchUploads batch : sentBatches) {
-                    
+
+                for (batchUploads batch : sentBatches) {
+
                     /* Get all the transactions for the batch */
                     List<transactionIn> batchTransactions = transactionInManager.getBatchTransactions(batch.getId(), userInfo.getId());
 
@@ -2355,10 +2486,9 @@ public class HealtheWebController {
 
                         /* Set all the transaction TARGET fields */
                         List<transactionRecords> toFields;
-                        if(transactionInManager.getUploadSummaryDetails(transaction.getId()).getTargetSubOrgId() > 0) {
+                        if (transactionInManager.getUploadSummaryDetails(transaction.getId()).getTargetSubOrgId() > 0) {
                             toFields = setOrgDetails(transactionInManager.getUploadSummaryDetails(transaction.getId()).getTargetSubOrgId());
-                        }
-                        else {
+                        } else {
                             toFields = setOrgDetails(transactionInManager.getUploadSummaryDetails(transaction.getId()).gettargetOrgId());
                         }
                         transactionDetails.settargetOrgFields(toFields);
@@ -2382,7 +2512,7 @@ public class HealtheWebController {
                 }
             }
 
-           mav.addObject("transactions", transactionList);
+            mav.addObject("transactions", transactionList);
 
             /* Set the header totals */
             setTotals(session);
@@ -2394,7 +2524,7 @@ public class HealtheWebController {
             throw new Exception("Error occurred in viewing the sent items screen. UserId: " + userInfo.getId(), e);
         }
 
-      //we log here 
+        //we log here 
         try {
             //log user activity
             UserActivity ua = new UserActivity();
@@ -2409,10 +2539,10 @@ public class HealtheWebController {
             System.err.println("ERG Sent Messages = error logging user " + ex.getCause());
             ex.printStackTrace();
         }
-        
+
         return mav;
     }
-    
+
     /**
      * The '/sent' POST request will serve up the Health-e-Web (ERG) page that will list all sent messages based on the term searched for.
      *
@@ -2437,7 +2567,7 @@ public class HealtheWebController {
         mav.addObject("fromDate", fromDate);
         mav.addObject("toDate", toDate);
         mav.addObject("fromPage", "sent");
-        
+
         /* Need to get all the message types set up for the user */
         User userInfo = (User) session.getAttribute("userDetails");
 
@@ -2447,9 +2577,9 @@ public class HealtheWebController {
             List<Transaction> transactionList = new ArrayList<Transaction>();
 
             if (!sentBatches.isEmpty()) {
-                
-                for(batchUploads batch : sentBatches) {
-                    
+
+                for (batchUploads batch : sentBatches) {
+
                     /* Get all the transactions for the batch */
                     List<transactionIn> batchTransactions = transactionInManager.getBatchTransactions(batch.getId(), userInfo.getId());
 
@@ -2491,10 +2621,9 @@ public class HealtheWebController {
 
                         /* Set all the transaction TARGET fields */
                         List<transactionRecords> toFields;
-                        if(transactionInManager.getUploadSummaryDetails(transaction.getId()).getTargetSubOrgId() > 0) {
+                        if (transactionInManager.getUploadSummaryDetails(transaction.getId()).getTargetSubOrgId() > 0) {
                             toFields = setOrgDetails(transactionInManager.getUploadSummaryDetails(transaction.getId()).getTargetSubOrgId());
-                        }
-                        else {
+                        } else {
                             toFields = setOrgDetails(transactionInManager.getUploadSummaryDetails(transaction.getId()).gettargetOrgId());
                         }
                         transactionDetails.settargetOrgFields(toFields);
@@ -2532,8 +2661,7 @@ public class HealtheWebController {
 
         return mav;
     }
-    
-    
+
     /**
      * The '/sentBatchView' request will serve up the Health-e-Web (ERG) page that will list all sent messages grouped by batch.
      *
@@ -2573,21 +2701,21 @@ public class HealtheWebController {
             List<batchUploads> sentBatches = transactionInManager.getsentBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate);
 
             if (!sentBatches.isEmpty()) {
-                
+
                 //we can map the process status so we only have to query once
                 List<lu_ProcessStatus> processStatusList = sysAdminManager.getAllProcessStatus();
                 Map<Integer, String> psMap = new HashMap<Integer, String>();
                 for (lu_ProcessStatus ps : processStatusList) {
                     psMap.put(ps.getId(), ps.getEndUserDisplayCode());
                 }
-                
+
                 //same goes for users
                 List<User> users = usermanager.getAllUsers();
                 Map<Integer, String> userMap = new HashMap<Integer, String>();
                 for (User user : users) {
                     userMap.put(user.getId(), (user.getFirstName() + " " + user.getLastName()));
                 }
-                
+
                 for (batchUploads batch : sentBatches) {
                     List<transactionIn> batchTransactions = transactionInManager.getBatchTransactions(batch.getId(), userInfo.getId());
                     batch.settotalTransactions(batchTransactions.size());
@@ -2611,11 +2739,11 @@ public class HealtheWebController {
             throw new Exception("Error occurred in viewing the sent items screen. UserId: " + userInfo.getId(), e);
         }
 
-      //we log here 
+        //we log here 
         try {
             //log user activity
-        	
-        	UserActivity ua = new UserActivity();
+
+            UserActivity ua = new UserActivity();
             ua.setUserId(userInfo.getId());
             ua.setFeatureId(featureId);
             ua.setAccessMethod("GET");
@@ -2627,8 +2755,7 @@ public class HealtheWebController {
             System.err.println("ERG Sent Messages = error logging user " + ex.getCause());
             ex.printStackTrace();
         }
-        
-        
+
         return mav;
     }
 
@@ -2663,21 +2790,21 @@ public class HealtheWebController {
             List<batchUploads> sentBatches = transactionInManager.getsentBatches(userInfo.getId(), userInfo.getOrgId(), fromDate, toDate);
 
             if (!sentBatches.isEmpty()) {
-                
+
                 //we can map the process status so we only have to query once
                 List<lu_ProcessStatus> processStatusList = sysAdminManager.getAllProcessStatus();
                 Map<Integer, String> psMap = new HashMap<Integer, String>();
                 for (lu_ProcessStatus ps : processStatusList) {
                     psMap.put(ps.getId(), ps.getEndUserDisplayCode());
                 }
-                
+
                 //same goes for users
                 List<User> users = usermanager.getAllUsers();
                 Map<Integer, String> userMap = new HashMap<Integer, String>();
                 for (User user : users) {
                     userMap.put(user.getId(), (user.getFirstName() + " " + user.getLastName()));
                 }
-                
+
                 for (batchUploads batch : sentBatches) {
                     List<transactionIn> batchTransactions = transactionInManager.getBatchTransactions(batch.getId(), userInfo.getId());
                     batch.settotalTransactions(batchTransactions.size());
@@ -2731,7 +2858,7 @@ public class HealtheWebController {
             List<transactionIn> batchTransactions = transactionInManager.getBatchTransactions(batchId, userInfo.getId());
 
             List<Transaction> transactionList = new ArrayList<Transaction>();
-            
+
             //we can map the process status so we only have to query once
             List<lu_ProcessStatus> processStatusList = sysAdminManager.getAllProcessStatus();
             Map<Integer, String> psMap = new HashMap<Integer, String>();
@@ -2770,10 +2897,9 @@ public class HealtheWebController {
 
                 /* Set all the transaction TARGET fields */
                 List<transactionRecords> toFields;
-                if(transactionInManager.getUploadSummaryDetails(transaction.getId()).getTargetSubOrgId() > 0) {
+                if (transactionInManager.getUploadSummaryDetails(transaction.getId()).getTargetSubOrgId() > 0) {
                     toFields = setOrgDetails(transactionInManager.getUploadSummaryDetails(transaction.getId()).getTargetSubOrgId());
-                }
-                else {
+                } else {
                     toFields = setOrgDetails(transactionInManager.getUploadSummaryDetails(transaction.getId()).gettargetOrgId());
                 }
                 transactionDetails.settargetOrgFields(toFields);
@@ -2802,12 +2928,11 @@ public class HealtheWebController {
 
             mav.addObject("pendingTotal", pendingTotal);
             mav.addObject("inboxTotal", inboxTotal);
-            
-            
-          //we log here 
+
+            //we log here 
             try {
                 //log user activity
-            	UserActivity ua = new UserActivity();
+                UserActivity ua = new UserActivity();
                 ua.setUserId(userInfo.getId());
                 ua.setFeatureId(featureId);
                 ua.setAccessMethod("POST");
@@ -2820,7 +2945,7 @@ public class HealtheWebController {
                 System.err.println("Viewed Sent Batch = error logging user " + ex.getCause());
                 ex.printStackTrace();
             }
-            
+
         } catch (Exception e) {
             throw new Exception("Error occurred in getting transactions for a sent batch. batchId: " + batchId, e);
         }
@@ -2967,7 +3092,7 @@ public class HealtheWebController {
             //we log here 
             try {
                 //log user activity
-            	UserActivity ua = new UserActivity();
+                UserActivity ua = new UserActivity();
                 ua.setUserId(userInfo.getId());
                 ua.setFeatureId(featureId);
                 ua.setAccessMethod("POST");
@@ -2978,14 +3103,13 @@ public class HealtheWebController {
                 ua.setBatchDownloadId(transactionTarget.getbatchDLId());
                 ua.setTransactionInIds(String.valueOf(transactionInfo.getId()));
                 ua.setTransactionTargetIds(String.valueOf(transactionTarget.getId()));
-                
+
                 usermanager.insertUserLog(ua);
             } catch (Exception ex) {
                 System.err.println("Viewed Sent Batch = error logging user " + ex.getCause());
                 ex.printStackTrace();
             }
-            
-            
+
         } catch (Exception e) {
             throw new Exception("Error occurred in viewing the sent batch details. transactionId: " + transactionId, e);
         }
@@ -3096,7 +3220,7 @@ public class HealtheWebController {
         return mav;
 
     }
-    
+
     /**
      * The 'saveAttachmentTitle.do' function will save the attachment title.
      *
@@ -3108,7 +3232,7 @@ public class HealtheWebController {
     @RequestMapping(value = "/saveAttachmentTitle.do", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody
     Integer saveAttachmentTitle(@RequestParam(value = "attachmentId", required = false) Integer attachmentId, @RequestParam(value = "title", required = false) String title) throws Exception {
-        
+
         transactionAttachment attachment = transactionInManager.getAttachmentById(attachmentId);
         attachment.settitle(title);
 
@@ -3168,6 +3292,48 @@ public class HealtheWebController {
             throw new Exception("", e);
         }
 
+    }
+
+    /**
+     * The 'populateNewTarget.do' function will get the organization details for the organization id passed in.
+     *
+     * @param orgId The id of the target organization to return details for.
+     *
+     * @return This function will return the organization object.
+     */
+    @RequestMapping(value = "/populateNewTarget.do", method = RequestMethod.GET)
+    public @ResponseBody String populateNewTarget(@RequestParam(value = "orgId", required = true) int orgId) throws Exception {
+        
+        Organization orgDetails = organizationmanager.getOrganizationById(orgId);
+        
+        StringBuilder sb = new StringBuilder();
+        if(orgDetails.getParentId() > 0) {
+           sb.append("<dl class=\"vcard\">").append("<dd class=\"fn\" id=\"newtargetOrgId\" style=\"display:none\">").append(orgDetails.getParentId()).append("</dd>");
+           sb.append("<dl class=\"vcard\">").append("<dd class=\"fn\" id=\"newtargetSubOrgId\" style=\"display:none\">").append(orgDetails.getId()).append("</dd>"); 
+        }
+        else {
+            sb.append("<dl class=\"vcard\">").append("<dd class=\"fn\" id=\"newtargetOrgId\" style=\"display:none\">").append(orgDetails.getId()).append("</dd>");
+            sb.append("<dl class=\"vcard\">").append("<dd class=\"fn\" id=\"newtargetSubOrgId\" style=\"display:none\">").append("0").append("</dd>");
+        }
+        
+        sb.append("<dl class=\"vcard\">").append("<dd class=\"fn\" id=\"targetOrgName\">").append(orgDetails.getOrgName()).append("</dd>");
+        sb.append("<dd class=\"adr\">").append("<span class=\"street-address\" id=\"targetOrgAddress\">").append(orgDetails.getAddress()).append("</span>");
+        sb.append("<span class=\"street-address\" id=\"targetOrgAddress2\">").append(orgDetails.getAddress2()).append("</span><br/>");
+        sb.append("<span class=\"region\" id=\"targetOrgCity\">").append(orgDetails.getCity()).append("</span>&nbsp;<span id=\"targetOrgState\">").append(orgDetails.getState()).append("</span>,");
+        sb.append("<span class=\"postal-code\" id=\"targetOrgZip\">").append(orgDetails.getPostalCode()).append("</span></dd>");
+        
+        if(!"".equals(orgDetails.getPhone())) {
+            sb.append("<dd>Phone: <span class=\"tel\" id=\"targetOrgPhone\">").append(orgDetails.getPhone()).append("</span></dd>");
+        }
+        
+        if(!"".equals(orgDetails.getFax())) {
+            sb.append("<dd>Fax: <span class=\"tel\" id=\"targetOrgFax\">").append(orgDetails.getFax());
+        }
+        
+        sb.append("</dl>");
+        
+        return sb.toString();
+        
     }
 
     /**
@@ -3279,12 +3445,12 @@ public class HealtheWebController {
             mav.addObject("notes", existingNotes);
             mav.addObject("pageFrom", "inbox");
 
-          //we log here 
+            //we log here 
             try {
-            	User userInfo = (User) session.getAttribute("userDetails");
-            	transactionTarget tt = transactionOutManager.getTransactionDetails(transactionId);
+                User userInfo = (User) session.getAttribute("userDetails");
+                transactionTarget tt = transactionOutManager.getTransactionDetails(transactionId);
                 //log user activity
-            	UserActivity ua = new UserActivity();
+                UserActivity ua = new UserActivity();
                 ua.setUserId(userInfo.getId());
                 ua.setFeatureId(featureId);
                 ua.setAccessMethod("GET");
@@ -3300,7 +3466,7 @@ public class HealtheWebController {
                 System.err.println("Populate Existing Notes = error logging user " + ex.getCause());
                 ex.printStackTrace();
             }
-            
+
             return mav;
         } catch (Exception e) {
             throw new Exception("Error occurred trying to get message notes. transactionId: " + transactionId, e);
@@ -3341,19 +3507,19 @@ public class HealtheWebController {
     public List<transactionRecords> setInboxFormFields(List<configurationFormFields> formfields, transactionOutRecords records, int configId, boolean readOnly, int transactionInId, int orgId) throws NoSuchMethodException {
 
         List<transactionRecords> fields = new ArrayList<transactionRecords>();
-        
+
         //we can map the process status so we only have to query once
         List validationTypeList = messagetypemanager.getValidationTypes();
         Map<Integer, String> vtMap = new HashMap<Integer, String>();
-        
+
         for (ListIterator iter = validationTypeList.listIterator(); iter.hasNext();) {
-            
+
             Object[] row = (Object[]) iter.next();
-            
+
             vtMap.put(Integer.valueOf(String.valueOf(row[0])), String.valueOf(row[1]));
-            
+
         }
-       
+
         for (configurationFormFields formfield : formfields) {
             transactionRecords field = new transactionRecords();
             field.setfieldNo(formfield.getFieldNo());
@@ -3372,28 +3538,25 @@ public class HealtheWebController {
             }
 
             if (records != null) {
-                 /* Get the pre-populated values */
+                /* Get the pre-populated values */
                 String tableName = formfield.getautoPopulateTableName();
                 String tableCol = formfield.getautoPopulateTableCol();
-                
+
                 if (transactionInId > 0 && !tableName.isEmpty() && tableName != null && tableName.startsWith("message_") && !tableCol.isEmpty() && tableCol != null) {
                     try {
                         field.setfieldValue(transactionInManager.getFieldValue(tableName, tableCol, "transactionInId", transactionInId));
-                    }
-                    catch (Exception exc) {
-                         String colName = new StringBuilder().append("f").append(formfield.getFieldNo()).toString();
-                         try {
+                    } catch (Exception exc) {
+                        String colName = new StringBuilder().append("f").append(formfield.getFieldNo()).toString();
+                        try {
                             field.setfieldValue(BeanUtils.getProperty(records, colName));
-                         } catch (IllegalAccessException ex) {
+                        } catch (IllegalAccessException ex) {
                             Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
-                         } catch (InvocationTargetException ex) {
+                        } catch (InvocationTargetException ex) {
                             Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
-                         }
-                   }
-                    
-                    
-                }
-                else {
+                        }
+                    }
+
+                } else {
                     String colName = new StringBuilder().append("f").append(formfield.getFieldNo()).toString();
                     try {
                         field.setfieldValue(BeanUtils.getProperty(records, colName));
@@ -3403,7 +3566,7 @@ public class HealtheWebController {
                         Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
-                
+
             } /* 
              If records == null and an auto populate field is set for the field get the data from the
              table/col for the transaction
@@ -3419,9 +3582,9 @@ public class HealtheWebController {
                 }
 
             }
-           
+
             if (orgId > 0) {
-                
+
                 /* Get the pre-populated values */
                 String tableName = formfield.getautoPopulateTableName();
                 String tableCol = formfield.getautoPopulateTableCol();
@@ -3453,20 +3616,20 @@ public class HealtheWebController {
      *
      * @throws NoSuchMethodException
      */
-    public List<transactionRecords> setOutboundFormFields(List<configurationFormFields> formfields, transactionInRecords records, int configId, boolean readOnly, int orgId) throws NoSuchMethodException {
+    public List<transactionRecords> setOutboundFormFields(List<configurationFormFields> formfields, transactionInRecords records, int configId, boolean readOnly, int orgId) throws NoSuchMethodException, ParseException {
 
         List<transactionRecords> fields = new ArrayList<transactionRecords>();
-        
+
         //we can map the process status so we only have to query once
         List validationTypeList = messagetypemanager.getValidationTypes();
         Map<Integer, String> vtMap = new HashMap<Integer, String>();
-        
+
         for (ListIterator iter = validationTypeList.listIterator(); iter.hasNext();) {
-            
+
             Object[] row = (Object[]) iter.next();
-            
+
             vtMap.put(Integer.valueOf(String.valueOf(row[0])), String.valueOf(row[1]));
-            
+
         }
 
         for (configurationFormFields formfield : formfields) {
@@ -3493,7 +3656,17 @@ public class HealtheWebController {
             if (records != null) {
                 String colName = new StringBuilder().append("f").append(formfield.getFieldNo()).toString();
                 try {
-                    field.setfieldValue(BeanUtils.getProperty(records, colName));
+                    String fieldValue = BeanUtils.getProperty(records, colName);
+
+                    if (fieldValue == null || "null".equals(fieldValue)) {
+                        fieldValue = "";
+                    } /* Check if date */ else if (fieldValue.length() == 10 && fieldValue.contains("-") && StringUtils.countOccurrencesOf(fieldValue, "-") == 2) {
+                        Date date = new SimpleDateFormat("yyyy-MM-dd").parse(fieldValue);
+                        fieldValue = new SimpleDateFormat("MM/dd/yyyy").format(date);
+                    }
+
+                    field.setfieldValue(fieldValue);
+
                 } catch (IllegalAccessException ex) {
                     Logger.getLogger(HealtheWebController.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (InvocationTargetException ex) {
@@ -3556,7 +3729,7 @@ public class HealtheWebController {
             List<transactionIn> feedbackReports = transactionOutManager.getFeedbackReports(transactionId, fromPage);
 
             List<Transaction> transactionList = new ArrayList<Transaction>();
-            
+
             //we can map the process status so we only have to query once
             List<lu_ProcessStatus> processStatusList = sysAdminManager.getAllProcessStatus();
             Map<Integer, String> psMap = new HashMap<Integer, String>();
@@ -3675,12 +3848,11 @@ public class HealtheWebController {
 
             mav.addObject("pendingTotal", pendingTotal);
             mav.addObject("inboxTotal", inboxTotal);
-            
-            
-          //we log here 
+
+            //we log here 
             try {
                 //log user activity
-            	UserActivity ua = new UserActivity();
+                UserActivity ua = new UserActivity();
                 ua.setUserId(userInfo.getId());
                 ua.setFeatureId(featureId);
                 ua.setAccessMethod("POST");
@@ -3690,13 +3862,13 @@ public class HealtheWebController {
                 ua.setTransactionTargetIds(String.valueOf(transactionDetails.getId()));
                 ua.setTransactionInIds(String.valueOf(transactionDetails.gettransactionInId()));
                 ua.setBatchDownloadId(transactionDetails.getbatchDLId());
-                ua.setBatchUploadId(transactionDetails.getbatchUploadId());               
+                ua.setBatchUploadId(transactionDetails.getbatchUploadId());
                 usermanager.insertUserLog(ua);
             } catch (Exception ex) {
                 System.err.println("feedbackReports = error logging user " + ex.getCause());
                 ex.printStackTrace();
             }
-            
+
         } catch (Exception e) {
             throw new Exception("Error occurred in finding associted feedback report messages. transactionId: " + transactionId, e);
         }
@@ -3744,8 +3916,8 @@ public class HealtheWebController {
      */
     @RequestMapping(value = "/cancelMessage.do", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody
-    Integer cancelMessageTransaction(@RequestParam(value = "transactionId", required = true) Integer transactionId, 
-    		@RequestParam(value = "sent", required = true) boolean sent, HttpSession session
+    Integer cancelMessageTransaction(@RequestParam(value = "transactionId", required = true) Integer transactionId,
+            @RequestParam(value = "sent", required = true) boolean sent, HttpSession session
     ) throws Exception {
 
         try {
@@ -3759,13 +3931,13 @@ public class HealtheWebController {
                 /* Need to update the batch status */
                 transactionOutManager.updateTargetBatchStatus(targetDetails.getbatchDLId(), 32, "");
                 transactionInManager.updateBatchStatus(targetDetails.getbatchUploadId(), 32, "");
-                
-              //we log here 
+
+                //we log here 
                 try {
                     //log user activity
-                	UserActivity ua = new UserActivity();        
-                	User userInfo = (User) session.getAttribute("userDetails");
-                	ua.setUserId(userInfo.getId());
+                    UserActivity ua = new UserActivity();
+                    User userInfo = (User) session.getAttribute("userDetails");
+                    ua.setUserId(userInfo.getId());
                     ua.setFeatureId(featureId);
                     ua.setAccessMethod("POST");
                     ua.setPageAccess("/cancelMessage.do");
@@ -3773,41 +3945,38 @@ public class HealtheWebController {
                     ua.setTransactionTargetIds(String.valueOf(targetDetails.getId()));
                     ua.setBatchUploadId(targetDetails.getbatchUploadId());
                     ua.setTransactionInIds(String.valueOf(targetDetails.gettransactionInId()));
-                    ua.setBatchDownloadId(targetDetails.getbatchDLId());             
+                    ua.setBatchDownloadId(targetDetails.getbatchDLId());
                     usermanager.insertUserLog(ua);
                 } catch (Exception ex) {
                     System.err.println("cancelMessage = error logging user " + ex.getCause());
                     ex.printStackTrace();
                 }
-                
-                
+
             } else {
                 transactionIn transactionDetails = transactionInManager.getTransactionDetails(transactionId);
 
                 transactionInManager.cancelMessageTransaction(transactionId);
 
                 transactionInManager.updateBatchStatus(transactionDetails.getbatchId(), 32, "");
-                
-                
-              //we log here 
+
+                //we log here 
                 try {
                     //log user activity
-                	UserActivity ua = new UserActivity();        
-                	User userInfo = (User) session.getAttribute("userDetails");
-                	ua.setUserId(userInfo.getId());
+                    UserActivity ua = new UserActivity();
+                    User userInfo = (User) session.getAttribute("userDetails");
+                    ua.setUserId(userInfo.getId());
                     ua.setFeatureId(featureId);
                     ua.setAccessMethod("POST");
                     ua.setPageAccess("/cancelMessage.do");
                     ua.setActivity("Cancelled Message");
                     ua.setTransactionInIds(String.valueOf(transactionDetails.getId()));
-                    ua.setBatchUploadId(transactionDetails.getbatchId());               
+                    ua.setBatchUploadId(transactionDetails.getbatchId());
                     usermanager.insertUserLog(ua);
                 } catch (Exception ex) {
                     System.err.println("cancelMessage = error logging user " + ex.getCause());
                     ex.printStackTrace();
                 }
-                
-                
+
             }
 
             return 1;
@@ -3914,10 +4083,9 @@ public class HealtheWebController {
 
         /* Get associated organizations */
         int orgId = 0;
-        if(organizationmanager.getOrganizationById(userInfo.getOrgId()).getParentId() > 0) {
+        if (organizationmanager.getOrganizationById(userInfo.getOrgId()).getParentId() > 0) {
             orgId = organizationmanager.getOrganizationById(userInfo.getOrgId()).getParentId();
-        }
-        else {
+        } else {
             orgId = userInfo.getOrgId();
         }
         List<Organization> associatedOrgs = organizationmanager.getAssociatedOrgs(orgId);
@@ -3928,15 +4096,15 @@ public class HealtheWebController {
         List<messageType> assocMessageTypes = messagetypemanager.getAssociatedMessageTypes(orgId);
 
         mav.addObject("assocMessageTypes", assocMessageTypes);
-        
+
         /* Get the list of process status */
         List<lu_ProcessStatus> statusList = sysAdminManager.getAllHistoryFormProcessStatus();
-        
+
         mav.addObject("statusList", statusList);
 
         //we log here 
         try {
-        	 //log user activity
+            //log user activity
             UserActivity ua = new UserActivity();
             ua.setUserId(userInfo.getId());
             ua.setFeatureId(featureId);
@@ -3958,8 +4126,6 @@ public class HealtheWebController {
         return mav;
 
     }
-    
-    
 
     /**
      * The '/history' POST request will serve up the Health-e-Web (ERG) page that will list allow the logged in user to search their referral and feedback history.
@@ -4024,19 +4190,18 @@ public class HealtheWebController {
             mav.addObject("statusText", "Closed Only");
         }
         mav.addObject("status", status);
-        
+
         String statusCode = "";
         String statusCategory = "";
-        if("0".equals(systemStatus)) {
+        if ("0".equals(systemStatus)) {
             mav.addObject("systemStatusText", "All System Statuses");
-        }
-        else {
+        } else {
             String[] selsystemStatus = systemStatus.split("\\-", -1);
             statusCode = selsystemStatus[0];
             statusCategory = selsystemStatus[1];
-            
+
             mav.addObject("systemStatusText", statusCode);
-            
+
         }
         mav.addObject("systemStatus", systemStatus);
 
@@ -4047,35 +4212,34 @@ public class HealtheWebController {
         mav.addObject("patientId", patientId);
         mav.addObject("firstName", firstName);
         mav.addObject("providerId", providerId);
-        
+
         //we can map the process status so we only have to query once
         List<lu_ProcessStatus> processStatusList = sysAdminManager.getAllProcessStatus();
         Map<Integer, String> psMap = new HashMap<Integer, String>();
         for (lu_ProcessStatus ps : processStatusList) {
             psMap.put(ps.getId(), ps.getEndUserDisplayCode());
         }
-        
+
         //if we have lots of organization in the future we can tweak this to narrow down to orgs with batches
         List<Organization> organizations = organizationmanager.getOrganizations();
         Map<Integer, String> orgMap = new HashMap<Integer, String>();
         for (Organization org : organizations) {
             orgMap.put(org.getId(), org.getOrgName());
         }
-        
+
         //same with transport method names
         List<TransportMethod> transporthMethods = configurationTransportManager.getTransportMethods(Arrays.asList(0, 1));
         Map<Integer, String> tmMap = new HashMap<Integer, String>();
         for (TransportMethod tms : transporthMethods) {
             tmMap.put(tms.getId(), tms.getTransportMethod());
         }
-        
+
         /* Get all connections for the logged in organization */
         /* Check to see if the org has a parent */
         int orgId = 0;
-        if(organizationmanager.getOrganizationById(userInfo.getOrgId()).getParentId() > 0) {
+        if (organizationmanager.getOrganizationById(userInfo.getOrgId()).getParentId() > 0) {
             orgId = organizationmanager.getOrganizationById(userInfo.getOrgId()).getParentId();
-        }
-        else {
+        } else {
             orgId = userInfo.getOrgId();
         }
         List<configuration> configs = configurationManager.getActiveConfigurationsByOrgId(orgId);
@@ -4093,23 +4257,23 @@ public class HealtheWebController {
         for (configuration config : configs) {
 
             /* Get sent messages */
-            List<configurationConnection> sourceConnections = configurationManager.getConnectionsByConfiguration(config.getId());
+            List<configurationConnection> sourceConnections = configurationManager.getConnectionsByConfiguration(config.getId(), userInfo.getId());
 
             if (!sourceConnections.isEmpty()) {
 
                 for (configurationConnection connection : sourceConnections) {
 
                     configuration configDetails = configurationManager.getConfigurationById(connection.gettargetConfigId());
-                   
+
                     String tgtOrgName = orgMap.get(configDetails.getorgId());
 
                     String msgTypeName = configurationManager.getMessageTypeNameByConfigId(connection.gettargetConfigId());
 
                     String transportType = tmMap.get(configurationTransportManager.getTransportDetails(connection.gettargetConfigId()).gettransportMethodId());
-                    
+
                     historyResults resultEntry = null;
-                    
-                    if(reportType == 1 && messageType == 0) {
+
+                    if (reportType == 1 && messageType == 0) {
                         resultEntry = new historyResults();
                         resultEntry.setorgName(tgtOrgName);
                         resultEntry.setorgId(configDetails.getorgId());
@@ -4117,22 +4281,22 @@ public class HealtheWebController {
                         resultEntry.setmessageTypeId(configDetails.getMessageTypeId());
                         resultEntry.setTransportType(transportType);
                     }
-                    
+
                     if (sentTo == 0 || sentTo == configDetails.getorgId()) {
-                        
+
                         /* Find the total messages sent for this target and this configuration */
                         List<batchUploadSummary> sentBatches = transactionInManager.getuploadBatchesByConfigAndTarget(connection.getsourceConfigId(), configDetails.getorgId(), connection.gettargetConfigId(), userInfo.getOrgId());
 
                         int matchedSentBatches = 0;
-                        
+
                         /* Need to filter based on the passed in search Criteria */
                         for (batchUploadSummary batch : sentBatches) {
                             boolean matched = true;
-                            
+
                             batchUploads batchDetails = transactionInManager.getBatchDetails(batch.getbatchId());
 
                             matched = transactionInManager.searchBatchForHistory(batchDetails, searchTerm, fromDate, toDate);
-                            
+
                             /* Check the passed in message type */
                             if (messageType > 0 && !messageType.equals(batch.getmessageTypeId())) {
                                 matched = false;
@@ -4141,13 +4305,13 @@ public class HealtheWebController {
                             if (matched == true) {
                                 matchedSentBatches += 1;
                             }
-                            
-                            if(reportType == 2) {
-                                
-                               if(matched == true) {
-                                   
+
+                            if (reportType == 2) {
+
+                                if (matched == true) {
+
                                     List<transactionIn> transactionDetails = transactionInManager.getBatchTransactions(batch.getbatchId(), batchDetails.getuserId());
-                                   
+
                                     resultEntry = new historyResults();
                                     resultEntry.setorgName(tgtOrgName);
                                     resultEntry.setorgId(configDetails.getorgId());
@@ -4159,25 +4323,24 @@ public class HealtheWebController {
                                     resultEntry.setStatus(psMap.get(batchDetails.getstatusId()));
                                     resultEntry.setStatusId(batchDetails.getstatusId());
                                     resultEntry.setBatchId(batch.getbatchId());
-                                    
-                                    if(transactionDetails != null && transactionDetails.size() > 0) {
+
+                                    if (transactionDetails != null && transactionDetails.size() > 0) {
                                         resultEntry.setTransactionId(transactionDetails.get(0).getId());
-                                    
+
                                         /* Get the patient data */
                                         messagePatients patientInfo = transactionInManager.getPatientTransactionDetails(transactionDetails.get(0).getId());
 
                                         resultEntry.setpatientName(patientInfo.getFirstName() + " " + patientInfo.getLastName());
                                         resultEntry.setPatientId(patientInfo.getSourcePatientId());
                                     }
-                                    
+
                                     resultEntry.setTotalSent(1);
-                                    
-                                    sentMessages.add(resultEntry); 
-                               } 
-                            }
-                            else {
-                                
-                                if(matched == true && messageType > 0) {
+
+                                    sentMessages.add(resultEntry);
+                                }
+                            } else {
+
+                                if (matched == true && messageType > 0) {
                                     resultEntry = new historyResults();
                                     resultEntry.setorgName(tgtOrgName);
                                     resultEntry.setorgId(configDetails.getorgId());
@@ -4186,11 +4349,10 @@ public class HealtheWebController {
                                     resultEntry.setTransportType(transportType);
                                 }
                             }
-                            
+
                         }
 
-                        
-                        if(reportType == 1 && resultEntry != null) {
+                        if (reportType == 1 && resultEntry != null) {
                             resultEntry.setTotalSent(matchedSentBatches);
                             sentMessages.add(resultEntry);
                         }
@@ -4211,7 +4373,7 @@ public class HealtheWebController {
                 for (configurationConnection connection : targetConnections) {
 
                     configuration configDetails = configurationManager.getConfigurationById(connection.getsourceConfigId());
-                    
+
                     String srcOrgName = orgMap.get(configDetails.getorgId());
 
                     String msgTypeName = configurationManager.getMessageTypeNameByConfigId(connection.gettargetConfigId());
@@ -4219,8 +4381,8 @@ public class HealtheWebController {
                     String transportType = tmMap.get(configurationTransportManager.getTransportDetails(config.getId()).gettransportMethodId());
 
                     historyResults resultEntry = null;
-                    
-                    if(reportType == 1 && messageType == 0) {
+
+                    if (reportType == 1 && messageType == 0) {
                         resultEntry = new historyResults();
                         resultEntry.setorgName(srcOrgName);
                         resultEntry.setorgId(configDetails.getorgId());
@@ -4228,7 +4390,7 @@ public class HealtheWebController {
                         resultEntry.setmessageTypeId(configDetails.getMessageTypeId());
                         resultEntry.setTransportType(transportType);
                     }
-                    
+
                     if (sentTo == 0 || sentTo == configDetails.getorgId()) {
 
                         /* Find the total messages received from this source and this configuration */
@@ -4243,7 +4405,7 @@ public class HealtheWebController {
                             batchDownloads batchDetails = transactionOutManager.getBatchDetails(batch.getbatchId());
 
                             matched = transactionOutManager.searchBatchForHistory(batchDetails, searchTerm, fromDate, toDate);
-                            
+
                             /* Check the passed in message type */
                             if (messageType > 0 && !messageType.equals(batch.getmessageTypeId())) {
                                 matched = false;
@@ -4252,13 +4414,13 @@ public class HealtheWebController {
                             if (matched == true) {
                                 matchedReceivedBatches += 1;
                             }
-                            
-                            if(reportType == 2) {
-                                
-                               if(matched == true) {
-                                   
+
+                            if (reportType == 2) {
+
+                                if (matched == true) {
+
                                     List<transactionTarget> transactionDetails = transactionOutManager.getTransactionsByBatchDLId(batch.getbatchId());
-                                   
+
                                     resultEntry = new historyResults();
                                     resultEntry.setorgName(srcOrgName);
                                     resultEntry.setorgId(configDetails.getorgId());
@@ -4270,25 +4432,24 @@ public class HealtheWebController {
                                     resultEntry.setStatus(psMap.get(batchDetails.getstatusId()));
                                     resultEntry.setStatusId(batchDetails.getstatusId());
                                     resultEntry.setBatchId(batch.getbatchId());
-                                    
-                                    if(transactionDetails != null && transactionDetails.size() > 0) {
+
+                                    if (transactionDetails != null && transactionDetails.size() > 0) {
                                         resultEntry.setTransactionId(transactionDetails.get(0).getId());
-                                    
+
                                         /* Get the patient data */
                                         messagePatients patientInfo = transactionInManager.getPatientTransactionDetails(transactionDetails.get(0).gettransactionInId());
 
                                         resultEntry.setpatientName(patientInfo.getFirstName() + " " + patientInfo.getLastName());
                                         resultEntry.setPatientId(patientInfo.getSourcePatientId());
                                     }
-                                    
+
                                     resultEntry.setTotalSent(1);
-                                    
-                                    receivedMessages.add(resultEntry); 
-                               } 
-                            }
-                            else {
-                                
-                                if(matched == true && messageType > 0) {
+
+                                    receivedMessages.add(resultEntry);
+                                }
+                            } else {
+
+                                if (matched == true && messageType > 0) {
                                     resultEntry = new historyResults();
                                     resultEntry.setorgName(srcOrgName);
                                     resultEntry.setorgId(configDetails.getorgId());
@@ -4299,7 +4460,7 @@ public class HealtheWebController {
                             }
                         }
 
-                        if(reportType == 1 && resultEntry != null) {
+                        if (reportType == 1 && resultEntry != null) {
                             resultEntry.setTotalSent(matchedReceivedBatches);
                             receivedMessages.add(resultEntry);
                         }
@@ -4307,7 +4468,7 @@ public class HealtheWebController {
                         receivedTotal += matchedReceivedBatches;
 
                     }
-                    
+
                 }
 
             }
@@ -4322,24 +4483,24 @@ public class HealtheWebController {
         //we log here 
         try {
             //log user activity
-        	StringBuilder sb = new StringBuilder();
-        	sb.append("|From Date-" + fromDate);
-        	sb.append("|To Date-" + toDate);
-        	sb.append("|Type-" + type);
-        	sb.append("|Sent To-" + sentTo);
-        	sb.append("|Message Type-" + messageType);
-        	sb.append("|Status-" + status);
-        	sb.append("|System Status-" + systemStatus);
-        	sb.append("|Report Type-" + reportType);
-        	sb.append("|Batch Name-" + batchName);
-        	sb.append("|UT Batch Name-" + utBatchName);
-        	sb.append("|Last Name-" + lastName);
-        	sb.append("|First Name-" + firstName);
-        	sb.append("|Patient Id-" + patientId);
-        	sb.append("|Provider Id-" + providerId);
-        	sb.append("|Send Messages Total-" + sentMessages.size());
-        	sb.append("|Received Messages Total-" + receivedMessages.size());
-        	
+            StringBuilder sb = new StringBuilder();
+            sb.append("|From Date-" + fromDate);
+            sb.append("|To Date-" + toDate);
+            sb.append("|Type-" + type);
+            sb.append("|Sent To-" + sentTo);
+            sb.append("|Message Type-" + messageType);
+            sb.append("|Status-" + status);
+            sb.append("|System Status-" + systemStatus);
+            sb.append("|Report Type-" + reportType);
+            sb.append("|Batch Name-" + batchName);
+            sb.append("|UT Batch Name-" + utBatchName);
+            sb.append("|Last Name-" + lastName);
+            sb.append("|First Name-" + firstName);
+            sb.append("|Patient Id-" + patientId);
+            sb.append("|Provider Id-" + providerId);
+            sb.append("|Send Messages Total-" + sentMessages.size());
+            sb.append("|Received Messages Total-" + receivedMessages.size());
+
             UserActivity ua = new UserActivity();
             ua.setUserId(userInfo.getId());
             ua.setFeatureId(featureId);
@@ -4369,7 +4530,8 @@ public class HealtheWebController {
      * @return this request will return the messageDetailsForm
      */
     @RequestMapping(value = "/history/received/messageDetails", method = RequestMethod.POST)
-    public @ResponseBody ModelAndView showHistoryRecievedMessageDetails(@RequestParam(value = "transactionId", required = true) Integer transactionId, @RequestParam(value = "fromPage", required = true) String fromPage, HttpSession session) throws Exception {
+    public @ResponseBody
+    ModelAndView showHistoryRecievedMessageDetails(@RequestParam(value = "transactionId", required = true) Integer transactionId, @RequestParam(value = "fromPage", required = true) String fromPage, HttpSession session) throws Exception {
 
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/Health-e-Web/messageDetailsModal");
@@ -4446,18 +4608,16 @@ public class HealtheWebController {
                     } catch (Exception e) {
                         sourceOrgAsInt = 0;
                     }
-                    
-                    if(sourceOrgAsInt > 0) {
+
+                    if (sourceOrgAsInt > 0) {
                         /* Make sure the org exists */
                         Organization orgDetails = organizationmanager.getOrganizationById(sourceOrgAsInt);
-                        if(orgDetails.getId() == sourceOrgAsInt) {
+                        if (orgDetails.getId() == sourceOrgAsInt) {
                             fromFields = setOrgDetails(sourceOrgAsInt);
-                        }
-                        else {
+                        } else {
                             fromFields = setOrgDetails(transactionOutManager.getDownloadSummaryDetails(transactionInfo.getId()).getsourceOrgId());
                         }
-                    }
-                    else if ("".equals(fromFields.get(0).getFieldValue()) || "0".equals(fromFields.get(0).getFieldValue()) || fromFields.get(0).getFieldValue() == null) {
+                    } else if ("".equals(fromFields.get(0).getFieldValue()) || "0".equals(fromFields.get(0).getFieldValue()) || fromFields.get(0).getFieldValue() == null) {
                         fromFields = setOrgDetails(transactionOutManager.getDownloadSummaryDetails(transactionInfo.getId()).getsourceOrgId());
                     }
                 } else {
@@ -4539,11 +4699,10 @@ public class HealtheWebController {
             }
 
             mav.addObject("transactionDetails", transaction);
-            
+
             /* Get id of the associated feedback report for this message */
             Integer feedbackConfigId = transactionOutManager.getActiveFeedbackReportsByMessageType(configDetails.getMessageTypeId(), userInfo.getOrgId());
             mav.addObject("feedbackConfigId", feedbackConfigId);
-
 
             mav.addObject("transactionInId", transactionInfo.gettransactionInId());
         } catch (Exception e) {
@@ -4552,7 +4711,7 @@ public class HealtheWebController {
 
         return mav;
     }
-    
+
     /**
      * The 'history/sent/messageDetails' POST request will display the selected transaction details. This page is served up from inbox or sent Items batch transaction list page. So the form will be readOnly.
      *

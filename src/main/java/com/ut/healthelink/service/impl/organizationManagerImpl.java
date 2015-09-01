@@ -47,7 +47,7 @@ public class organizationManagerImpl implements organizationManager {
 
     @Override
     @Transactional
-    public void updateOrganization(Organization organization) {
+    public void updateOrganization(Organization organization) throws Exception {
        
 	//Need to make sure all folders are created for
         //the organization
@@ -94,6 +94,7 @@ public class organizationManagerImpl implements organizationManager {
 
             } catch (IOException e) {
                 e.printStackTrace();
+                throw new Exception (e);
             }
             
         }

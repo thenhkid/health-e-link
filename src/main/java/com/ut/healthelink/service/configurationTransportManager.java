@@ -19,7 +19,7 @@ public interface configurationTransportManager {
 
     configurationTransport getTransportDetailsByTransportMethod(int configId, int transportMethod);
 
-    Integer updateTransportDetails(configurationTransport transportDetails);
+    Integer updateTransportDetails(configurationTransport transportDetails) throws Exception;
 
     List<configurationFormFields> getConfigurationFields(int configId, int transportDetailId);
     
@@ -40,7 +40,7 @@ public interface configurationTransportManager {
     
     configurationFTPFields getTransportFTPDetailsPull(int transportDetailId) throws Exception;
     
-    void saveTransportFTP(int orgId, configurationFTPFields FTPFields);
+    void saveTransportFTP(int orgId, configurationFTPFields FTPFields) throws Exception;
     
     String getTransportMethodById(int Id);
     

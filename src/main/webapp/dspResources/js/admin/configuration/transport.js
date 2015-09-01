@@ -443,7 +443,7 @@ function checkFormFields() {
       	          if($('#domain1').val() == "") {
       	                $('#wsDomain1Div').addClass("has-error");
       	                $('#wsDomain1Msg').addClass("has-error");
-      	                $('#wsDomain1Msg').html('Please use add/edit button to add at least one domain.');
+      	                $('#wsDomain1Msg').html('Please use add at least one domain.');
       	                hasErrors = 1;
       	            }
     	   }

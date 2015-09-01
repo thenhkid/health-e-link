@@ -84,7 +84,7 @@
                                                         <c:set var="referralId" value="${transaction.detailFields[dStatus].fieldValue}"/>
                                                     </c:if>
                                                 </c:forEach>
-                                                <c:if test="${not empty referralId}">
+                                                <c:if test="${not empty referralId && referralId != 'null'}">
                                                     (${referralId})
                                                 </c:if>
                                                 

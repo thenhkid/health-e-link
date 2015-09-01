@@ -22,6 +22,7 @@ import com.ut.healthelink.model.transactionOutNotes;
 import com.ut.healthelink.model.transactionOutRecords;
 import com.ut.healthelink.model.transactionTarget;
 import com.ut.healthelink.service.sysAdminManager;
+import com.ut.healthelink.service.transactionInManager;
 import com.ut.healthelink.service.userManager;
 
 import java.util.ArrayList;
@@ -53,6 +54,9 @@ public class transactionOutDAOImpl implements transactionOutDAO {
 
     @Autowired
     private userManager usermanager;
+    
+    @Autowired
+    private transactionInManager transactionInManager;
 
     /**
      * The 'submitBatchDownload' function will submit the new batch.
@@ -891,14 +895,20 @@ public class transactionOutDAOImpl implements transactionOutDAO {
 
                     if (idot > 0) {
                         idot += 1;
-                        rowNum = Integer.parseInt(formField.getFieldDesc().substring(idot)) - 1;
+                        rowNum = 0;
+                        try {
+                        	rowNum = Integer.parseInt(formField.getFieldDesc().substring(idot)) - 1;
+                        } catch (Exception ex) {
+                        	transactionInManager.insertProcessingError(28, null, 0, null, null, null, null, false, true, ("Expection number idot form desc, formField " + formField.getFieldDesc() + " " + ex.getLocalizedMessage()), transactionTargetId);
+                        	ex.printStackTrace();
+                        	return false;
+                        }
                     } else {
                         rowNum = 0;
                     }
 
                     dataSQL = "SELECT " + formField.getsaveToTableCol() + " from " + formField.getsaveToTableName()
                             + " WHERE transactionInId = :transactionInId LIMIT " + rowNum + ",1"; //LIMIT 0,1
-
                     Query getData = sessionFactory.getCurrentSession().createSQLQuery(dataSQL)
                             .setParameter("transactionInId", transactionInId);
 
@@ -925,6 +935,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
                 return true;
             } catch (Exception ex) {
                 ex.printStackTrace();
+                transactionInManager.insertProcessingError(29, null, 0, null, null, null, null, false, true, ("Expection at insertData - sql " +  sql + " " + ex.getLocalizedMessage()), transactionTargetId);
                 return false;
             }
 

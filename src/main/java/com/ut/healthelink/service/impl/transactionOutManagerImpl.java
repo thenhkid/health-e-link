@@ -74,8 +74,10 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.Resource;
 
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.net.PrintCommandListener;
@@ -93,7 +95,10 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 public class transactionOutManagerImpl implements transactionOutManager {
-
+    
+    @Resource(name = "myProps")
+    private Properties myProps;
+    
     @Autowired
     private transactionOutDAO transactionOutDAO;
 
@@ -329,12 +334,17 @@ public class transactionOutManagerImpl implements transactionOutManager {
                 } catch (Exception e) {
                     //throw new Exception("Error occurred trying to process output transaction. transactionId: "+transaction.getId(),e);
                     processed = false;
+                    //email admin
+                    transactionInManager.sendEmailToAdmin(("Please check transactionOutErrors - SELECT * from transactionOutErrors where transactionTargetId = " + transaction.getId()), "Process Output Error");
                 }
 
                 if (!processed) {
                     //we update and log
                 	updateTransactionTargetStatusOutBound(0, transaction.getId(), 0, 33);
                     transactionInManager.insertProcessingError(processingSysErrorId, null, 0, null, null, null, null, false, true, errorMessage, transaction.getId());
+                    //email admin
+                    transactionInManager.sendEmailToAdmin(("Please check transactionOutErrors - SELECT * from transactionOutErrors where transactionTargetId = " + transaction.getId()), "Process Output Error");
+               
                 }
 
                 Integer processingErrors;
@@ -459,14 +469,135 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                         batchDownloads batchDLInfo = transactionOutDAO.getBatchDetails(batchId);
 
                                         /* Get the from user */
-                                        Organization fromOrg = organizationManager.getOrganizationById(configurationManager.getConfigurationById(transactionInManager.getTransactionDetails(transaction.gettransactionInId()).getconfigId()).getorgId());
+                                        configuration fromConfig = configurationManager.getConfigurationById(transactionInManager.getTransactionDetails(transaction.gettransactionInId()).getconfigId());
+                                        String msgType = "";
+                                        if(fromConfig.getsourceType() == 1) {
+                                            msgType = "Referral";
+                                        }
+                                        else {
+                                            msgType = "Feedback Report";
+                                        }
+                                        
+                                        Integer fromOrgId = 0;
+                                        if(transaction.getSourceSubOrgId() > 0) {
+                                            fromOrgId = transaction.getSourceSubOrgId();
+                                        }
+                                        else {
+                                            fromOrgId = configurationManager.getConfigurationById(transactionInManager.getTransactionDetails(transaction.gettransactionInId()).getconfigId()).getorgId();
+                                        }
+                                        
+                                        Organization fromOrg = organizationManager.getOrganizationById(fromOrgId);
                                         List<User> fromPrimaryContact = userManager.getOrganizationContact(fromOrg.getId(), 1);
-
+                                        List<User> fromSecondaryContact = userManager.getOrganizationContact(fromOrg.getId(), 2);
+                                        List<User> fromnonMainContact = userManager.getOrganizationContact(fromOrg.getId(), 0);
+                                        
+                                        Integer toOrgId = 0;
+                                        if(transaction.getTargetSubOrgId()> 0) {
+                                            toOrgId = transaction.getTargetSubOrgId();
+                                        }
+                                        else {
+                                            toOrgId = configurationManager.getConfigurationById(transaction.getconfigId()).getorgId();
+                                        }
+                                        
                                         /* get the to user details */
+                                        Organization toOrg = organizationManager.getOrganizationById(toOrgId);
                                         List<User> toPrimaryContact = userManager.getOrganizationContact(configurationManager.getConfigurationById(transaction.getconfigId()).getorgId(), 1);
                                         List<User> toSecondaryContact = userManager.getOrganizationContact(configurationManager.getConfigurationById(transaction.getconfigId()).getorgId(), 2);
                                         List<User> nonMainContact = userManager.getOrganizationContact(configurationManager.getConfigurationById(transaction.getconfigId()).getorgId(), 0);
 
+                                        /* Send From Organization a email saying the referral/FB report was received */
+                                        if (fromPrimaryContact.size() > 0 || fromSecondaryContact.size() > 0 || fromnonMainContact.size() > 0) {
+                                            String fromName = "";
+                                            String fromEmail = "";
+                                            mailMessage msg = new mailMessage();
+                                            ArrayList<String> fromCCAddressArray = new ArrayList<String>();
+                                            msg.setfromEmailAddress("e-Referral@state.ma.us");
+ 
+                                            if (fromPrimaryContact.size() > 0) {
+                                                
+                                                for(int i = 0; i < fromPrimaryContact.size(); i++) {
+                                                    
+                                                    if(fromPrimaryContact.get(i).getSendEmailAlert() == true) {
+                                                        
+                                                        if("".equals(fromEmail)) {
+                                                            fromName = fromPrimaryContact.get(i).getFirstName() + " " + fromPrimaryContact.get(i).getLastName();
+                                                            fromEmail = fromPrimaryContact.get(i).getEmail();
+                                                        }
+                                                        else {
+                                                            fromCCAddressArray.add(fromPrimaryContact.get(i).getEmail());
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            
+                                            if (fromSecondaryContact.size() > 0) {
+                                                
+                                                for(int i = 0; i < fromSecondaryContact.size(); i++) {
+                                                    
+                                                    if(fromSecondaryContact.get(i).getSendEmailAlert() == true) {
+                                                        
+                                                        if("".equals(fromEmail)) {
+                                                            fromName = fromSecondaryContact.get(i).getFirstName() + " " + fromSecondaryContact.get(i).getLastName();
+                                                            fromEmail = fromSecondaryContact.get(i).getEmail();
+                                                        }
+                                                        else {
+                                                            fromCCAddressArray.add(fromSecondaryContact.get(i).getEmail());
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            
+                                            if (fromnonMainContact.size() > 0) {
+                                                
+                                                for(int i = 0; i < fromnonMainContact.size(); i++) {
+                                                    
+                                                    if(fromnonMainContact.get(i).getSendEmailAlert() == true) {
+                                                        
+                                                        if("".equals(fromEmail)) {
+                                                            fromName = fromnonMainContact.get(i).getFirstName() + " " + fromnonMainContact.get(i).getLastName();
+                                                            fromEmail = fromnonMainContact.get(i).getEmail();
+                                                        }
+                                                        else {
+                                                            fromCCAddressArray.add(fromnonMainContact.get(i).getEmail());
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                            
+                                            if(!"".equals(fromEmail)) {
+                                                //fromEmail = "e-Referral@state.ma.us";
+                                                msg.settoEmailAddress(fromEmail);
+
+                                                if (fromCCAddressArray.size() > 0) {
+                                                    String[] fromCCAddressList = new String[fromCCAddressArray.size()];
+                                                    fromCCAddressList = fromCCAddressArray.toArray(fromCCAddressList);
+                                                    msg.setccEmailAddress(fromCCAddressList);
+                                                }
+
+                                                msg.setmessageSubject("Your "+ msgType +" has been successfully delivered ("+myProps.getProperty("server.identity")+")");
+
+                                                /* Build the body of the email */
+                                                StringBuilder sb = new StringBuilder();
+                                                if(!"".equals(fromName)) {
+                                                   sb.append("Dear " + fromName + ", Your "+ msgType +" sent to " + toOrg.getOrgName() + " has been successfully delivered.");
+                                                }
+                                                else {
+                                                   sb.append("Your "+ msgType +" sent to " + toOrg.getOrgName() + " has been successfully delivered."); 
+                                                }
+
+                                                msg.setmessageBody(sb.toString());
+
+                                                /* Send the email */
+                                                try {
+                                                    emailMessageManager.sendEmail(msg);
+                                                } catch (Exception ex) {
+                                                    System.err.println("mail exception");
+                                                    //ex.printStackTrace();
+                                                }
+                                            }
+                                            
+                                        }
+                                        
                                         if (fromPrimaryContact.size() > 0 && (toPrimaryContact.size() > 0 || toSecondaryContact.size() > 0 || nonMainContact.size() > 0)) {
                                             String toName = "";
                                             String toEmail = "";
@@ -478,7 +609,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                                 
                                                 for(int i = 0; i < toPrimaryContact.size(); i++) {
                                                     
-                                                    if(toPrimaryContact.get(i).getSendEmailAlert() == true) {
+                                                    if(toPrimaryContact.get(i).getReceiveEmailAlert()== true) {
                                                         
                                                         if("".equals(toEmail)) {
                                                             toName = toPrimaryContact.get(i).getFirstName() + " " + toPrimaryContact.get(i).getLastName();
@@ -495,7 +626,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                                 
                                                 for(int i = 0; i < toSecondaryContact.size(); i++) {
                                                     
-                                                    if(toSecondaryContact.get(i).getSendEmailAlert() == true) {
+                                                    if(toSecondaryContact.get(i).getReceiveEmailAlert() == true) {
                                                         
                                                         if("".equals(toEmail)) {
                                                             toName = toSecondaryContact.get(i).getFirstName() + " " + toSecondaryContact.get(i).getLastName();
@@ -525,56 +656,61 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                                 }
                                             }
                                             
-                                            if("".equals(toEmail)) {
-                                                toEmail = "e-Referral@state.ma.us";
-                                            }
-                                            
-                                            msg.settoEmailAddress(toEmail);
+                                            if(!"".equals(toEmail)) {
+                                                //toEmail = "e-Referral@state.ma.us";
+                                                msg.settoEmailAddress(toEmail);
 
-                                            if (ccAddressArray.size() > 0) {
-                                                String[] ccAddressList = new String[ccAddressArray.size()];
-                                                ccAddressList = ccAddressArray.toArray(ccAddressList);
-                                                msg.setccEmailAddress(ccAddressList);
-                                            }
+                                                if (ccAddressArray.size() > 0) {
+                                                    String[] ccAddressList = new String[ccAddressArray.size()];
+                                                    ccAddressList = ccAddressArray.toArray(ccAddressList);
+                                                    msg.setccEmailAddress(ccAddressList);
+                                                }
 
-                                            msg.setmessageSubject("You have received a new message from the eReferral System");
+                                                msg.setmessageSubject("You have received a new message from the eReferral System ("+myProps.getProperty("server.identity")+")");
 
-                                            /* Build the body of the email */
-                                            StringBuilder sb = new StringBuilder();
-                                            if(!"".equals(toName)) {
-                                               sb.append("Dear " + toName + ", You have recieved a new message from the eReferral System. ");
-                                            }
-                                            else {
-                                               sb.append("You have recieved a new message from the eReferral System. "); 
-                                            }
-                                            
-                                            sb.append(System.getProperty("line.separator"));
-                                            sb.append(System.getProperty("line.separator"));
-                                            sb.append("BatchId: " + batchDLInfo.getutBatchName());
-                                            if (batchDLInfo.getoutputFIleName() != null && !"".equals(batchDLInfo.getoutputFIleName())) {
-                                                sb.append(System.getProperty("line.separator"));
-                                                sb.append("File Name: " + batchDLInfo.getoutputFIleName());
-                                            }
-                                            sb.append(System.getProperty("line.separator"));
-                                            sb.append("From Organization: " + fromOrg.getOrgName());
+                                                /* Build the body of the email */
+                                                StringBuilder sb = new StringBuilder();
+                                                if(!"".equals(toName)) {
+                                                   sb.append("Dear " + toName + ", You have recieved a new message from the eReferral System. ");
+                                                }
+                                                else {
+                                                   sb.append("You have recieved a new message from the eReferral System. "); 
+                                                }
 
-                                            msg.setmessageBody(sb.toString());
+                                                sb.append("<br /><br />");
+                                                sb.append("BatchId: " + batchDLInfo.getutBatchName());
+                                                if (batchDLInfo.getoutputFIleName() != null && !"".equals(batchDLInfo.getoutputFIleName())) {
+                                                    sb.append("<br />");
+                                                    sb.append("File Name: " + batchDLInfo.getoutputFIleName());
+                                                }
+                                                sb.append("<br /><br />");
+                                                sb.append("From Organization: " + fromOrg.getOrgName());
 
-                                            /* Send the email */
-                                            try {
-                                                emailMessageManager.sendEmail(msg);
-                                            } catch (Exception ex) {
-                                                System.err.println("mail exception");
-                                                //ex.printStackTrace();
+                                                msg.setmessageBody(sb.toString());
+
+                                                /* Send the email */
+                                                try {
+                                                    emailMessageManager.sendEmail(msg);
+                                                } catch (Exception ex) {
+                                                    System.err.println("mail exception");
+                                                    //ex.printStackTrace();
+                                                }
                                             }
                                         }
                                     } catch (Exception e) {
-                                        throw new Exception("Error occurred trying to send the alert email for batchId: " + batchId, e);
+                                    	//should send email to admin 
+                                    	
+                                    	throw new Exception("Error occurred trying to send the alert email for batchId: " + batchId, e);
                                     }
 
                                 }
-                            } catch (Exception e) {
-                                throw new Exception("Error occurred trying to auto process the output file.", e);
+                            } catch (Exception ex) {
+                            	try{
+                            		transactionInManager.sendEmailToAdmin((ex.toString() + "<br/>" + Arrays.toString(ex.getStackTrace())), "process output error");
+                            	} catch (Exception e) {
+                            		throw new Exception("Error occurred trying to send email error for auto process the output file ", e);
+                            	}
+                                throw new Exception("Error occurred trying to auto process the output file.", ex);
                             }
 
                         }
@@ -2153,8 +2289,14 @@ public class transactionOutManagerImpl implements transactionOutManager {
 
             }
             
-        } catch (Exception e) {
-        	e.printStackTrace();
+        } catch (Exception ex) {
+        	try{
+        		transactionInManager.sendEmailToAdmin(("RhapsodyTargetFile - Error occurred trying to move a batch target. batchId: " + batchId + "<br/>"+  ex.toString() + "<br/>" + Arrays.toString(ex.getStackTrace())), " RhapsodyTargetFile Error ");
+        	} catch (Exception e) {
+        		ex.printStackTrace();
+                System.err.println("RhapsodyTargetFile - Error occurred trying to move a batch target. batchId: " + batchId);
+        	}
+        	ex.printStackTrace();
             System.err.println("RhapsodyTargetFile - Error occurred trying to move a batch target. batchId: " + batchId);
         }
 
@@ -2276,8 +2418,14 @@ public class transactionOutManagerImpl implements transactionOutManager {
 
             }
             
-        } catch (Exception e) {
-        	e.printStackTrace();
+        } catch (Exception ex) {
+        	try{
+        		transactionInManager.sendEmailToAdmin(("SendWSMessage - Error occurred trying to move a batch target. batchId: " + batchId + "<br/>"+  ex.toString() + "<br/>" + Arrays.toString(ex.getStackTrace())), " SendWSMessage Error ");
+        	} catch (Exception e) {
+        		e.printStackTrace();
+                System.err.println("SendWSMessage - Error occurred trying to move a batch target. batchId: " + batchId);
+        	}
+        	ex.printStackTrace();
             System.err.println("SendWSMessage - Error occurred trying to move a batch target. batchId: " + batchId);
             return null;
         }

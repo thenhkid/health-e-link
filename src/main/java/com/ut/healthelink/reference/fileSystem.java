@@ -235,10 +235,11 @@ public class fileSystem {
      *
      * @returns The function will return 0 if no delimiter was found or the count of the delimiter
      */
-    public Integer checkFileDelimiter(fileSystem dir, String fileName, String delim) {
+    public Integer checkFileDelimiter(fileSystem dir, String fileName, String delim) throws Exception {
 
         int delimCount = 0;
-
+        String errorMessage = "";
+        
         FileInputStream fileInput = null;
         try {
             File file = new File(dir.getDir() + fileName);
@@ -262,16 +263,21 @@ public class fileSystem {
                     break;
                 }
             } catch (IOException ex) {
+            	errorMessage = errorMessage + "<br/>" + ex.getMessage();
                 Logger.getLogger(fileSystem.class.getName()).log(Level.SEVERE, null, ex);
             }
         } finally {
             try {
                 br.close();
             } catch (IOException e) {
+            	errorMessage = errorMessage + "<br/>" + e.getMessage();
                 e.printStackTrace();
             }
         }
-
+        /** throw error message here because want to make sure file stream is closed **/
+        if (!errorMessage.equalsIgnoreCase("")) {
+        	throw new Exception(errorMessage);
+        }
         return delimCount;
     }
 
@@ -317,15 +323,16 @@ public class fileSystem {
         return path;
     }
 
-    public Integer checkFileDelimiter(File file, String delim) {
+    public Integer checkFileDelimiter(File file, String delim) throws Exception{
 
         int delimCount = 0;
-
+        String errorMessage = "";
         FileInputStream fileInput = null;
         try {
             fileInput = new FileInputStream(file);
 
         } catch (FileNotFoundException e) {
+        	errorMessage = e.getMessage();
             e.printStackTrace();
         }
 
@@ -343,16 +350,23 @@ public class fileSystem {
                     break;
                 }
             } catch (IOException ex) {
+            	errorMessage = errorMessage + "<br/>" + ex.getMessage();
                 Logger.getLogger(fileSystem.class.getName()).log(Level.SEVERE, null, ex);
             }
         } finally {
             try {
                 br.close();
             } catch (IOException e) {
+            	errorMessage = errorMessage + "<br/>" + e.getMessage();
                 e.printStackTrace();
             }
         }
 
+        /** throw error message here because want to make sure file stream is closed **/
+        if (!errorMessage.equalsIgnoreCase("")) {
+        	throw new Exception(errorMessage);
+        }
+        
         return delimCount;
     }
 

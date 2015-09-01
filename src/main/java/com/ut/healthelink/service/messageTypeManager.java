@@ -10,7 +10,7 @@ import com.ut.healthelink.model.validationType;
 
 public interface messageTypeManager {
 	
-	Integer createMessageType(messageType messagetype);
+	Integer createMessageType(messageType messagetype) throws Exception;
 	
 	void updateMessageType(messageType messagetype);
 	
@@ -61,7 +61,7 @@ public interface messageTypeManager {
 	
 	List<Crosswalks> getCrosswalks(int page, int maxResults, int orgId);
 	
-	Integer createCrosswalk(Crosswalks crosswalkDetails);
+	Integer createCrosswalk(Crosswalks crosswalkDetails) throws Exception;
 	
 	double findTotalCrosswalks(int orgId);
 	

@@ -66,7 +66,7 @@ public interface configurationManager {
   
   List<configurationConnection> getLatestConnections(int maxResults);
   
-  List<configurationConnection> getConnectionsByConfiguration(int configId);
+  List<configurationConnection> getConnectionsByConfiguration(int configId, int userId);
   
   List<configurationConnection> getConnectionsByTargetConfiguration(int configId);
   
@@ -82,7 +82,7 @@ public interface configurationManager {
   
   configurationMessageSpecs getMessageSpecs(int configId);
   
-  void updateMessageSpecs(configurationMessageSpecs messageSpecs, int transportDetailId, int fileType);
+  void updateMessageSpecs(configurationMessageSpecs messageSpecs, int transportDetailId, int fileType) throws Exception;
   
   List<configuration> getActiveConfigurationsByUserId(int userId, int transportMethod)  throws Exception;
   

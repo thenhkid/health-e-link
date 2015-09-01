@@ -18,7 +18,7 @@
                 	<c:forEach items="${cwsf.senderDomainList}" var="senderDomainList" varStatus="field">
                 	<input name="senderDomainList[${field.index}].id" id="id${field.index}" class="form-control" type="hidden" value="${senderDomainList.id}"  />
                 	<div id="senderDomainList${field.index}Div" class="form-group">
-                                                <input name="senderDomainList[${field.index}].domain" id="senderDomainList${field.index}" class="form-control" type="text" maxLength="50" value="${senderDomainList.domain}"  />
+                                                <input name="senderDomainList[${field.index}].domain" id="senderDomainList${field.index}" class="form-control" type="text" maxLength="75" value="${senderDomainList.domain}"  />
                                                 <span id="senderDomainList${field.index}Msg" class="control-label"></span>
                                             </div>
                 	</c:forEach>
@@ -32,7 +32,7 @@
                         
                         <div id="sender${index}Div" class="form-group">
                        							 <input name="senderDomainList[${index}].id" id="id${index}" class="form-control" type="hidden" value="0"  />
-                                                <input name="senderDomainList[${index}].domain" id="senderDomainList${index}" class="form-control" type="text" maxLength="50" value=""  />
+                                                <input name="senderDomainList[${index}].domain" id="senderDomainList${index}" class="form-control" type="text" maxLength="75" value=""  />
                                                 <span id="senderDomainList${index}Msg" class="control-label"></span>
                                             </div>
                     	<div class="form-group">

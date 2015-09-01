@@ -1680,12 +1680,12 @@ public class adminProcessingActivity {
                 }
 
                 /* If autopopulate field is set make it read only */
-                if (!tableName.isEmpty() && !tableCol.isEmpty()) {
+                if (tableName != null && tableCol != null && !tableName.isEmpty() && !tableCol.isEmpty()) {
                     field.setreadOnly(true);
                 }
             } else if (orgId > 0) {
 
-                if (!tableName.isEmpty() && !tableCol.isEmpty()) {
+                if (tableName != null && tableCol != null && !tableName.isEmpty() && !tableCol.isEmpty()) {
                     field.setfieldValue(transactionInManager.getFieldValue(tableName, tableCol, "id", orgId));
                 }
             }
