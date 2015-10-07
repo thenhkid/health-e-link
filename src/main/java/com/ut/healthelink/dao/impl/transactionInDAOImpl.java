@@ -45,16 +45,16 @@ import com.ut.healthelink.service.sysAdminManager;
 import com.ut.healthelink.service.userManager;
 import java.math.BigInteger;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.Resource;
+
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.SessionFactory;
@@ -73,10 +73,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 public class transactionInDAOImpl implements transactionInDAO {
 
-	@Resource(name = "myProps")
-	private Properties myProps;
-	
-	@Autowired
+    @Autowired
     private SessionFactory sessionFactory;
 
     @Autowired
@@ -85,7 +82,9 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Autowired
     private userManager usermanager;
 
-	//list of final status - these records we skip
+    private String schemaName = "healthelink";
+
+    //list of final status - these records we skip
     private List<Integer> transRELId = Arrays.asList(11, 12, 13, 16);
 
     private int processingSysErrorId = 5;
@@ -107,7 +106,21 @@ public class transactionInDAOImpl implements transactionInDAO {
         Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
         query.setParameter("id", idValue);
 
-        String tableValue = (String) query.uniqueResult();
+        String tableValue = String.valueOf(query.uniqueResult());
+        
+        /* Check if null */
+        if(tableValue == null || "null".equals(tableValue)) {
+            tableValue = "";
+        }
+        /* Check if date */
+        else if(tableValue.length() == 10 && tableValue.contains("-")) {
+            try {
+                Date date = new SimpleDateFormat("yyyy-MM-dd").parse(tableValue);
+                tableValue = new SimpleDateFormat("MM/dd/yyyy").format(date);
+            } catch (ParseException ex) {
+                Logger.getLogger(transactionInDAOImpl.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
 
         return tableValue;
 
@@ -198,7 +211,7 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Override
     @Transactional
     public void submitBatchUploadSummary(batchUploadSummary summary) throws Exception {
-        sessionFactory.getCurrentSession().save(summary);
+        sessionFactory.getCurrentSession().saveOrUpdate(summary);
     }
 
     /**
@@ -1140,7 +1153,7 @@ public class transactionInDAOImpl implements transactionInDAO {
                 + " and table_name like concat('message_%')"
                 + " and column_name like 'transactionInId';");
         Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
-        query.setParameter("schemaName", myProps.getProperty("schemaName"));
+        query.setParameter("schemaName", schemaName);
         List<String> mt = query.list();
         return mt;
     }
@@ -6424,6 +6437,25 @@ public class transactionInDAOImpl implements transactionInDAO {
     
     @Override
     @Transactional
+    public Integer getReferralIdFieldNo(Integer configId) throws Exception {
+
+        String sql = ("select fieldNo \n"
+                + "from configurationformfields\n"
+                + "where configId = " + configId + " and saveToTableName = 'message_visitinfo' and saveToTableCol = 'referralId'");
+
+        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+        
+        if(query.list().size() > 1) {
+            return (Integer) query.list().get(0);
+        }
+        else {
+            return (Integer) query.uniqueResult();
+        }
+        
+    }
+    
+    @Override
+    @Transactional
     public String getTransactionFieldValue(Integer transactionId, String fieldNo) throws Exception {
         
         String sql = "select " + fieldNo + " as fieldValue from transactionInRecords where transactionInId = " + transactionId;
@@ -6506,6 +6538,24 @@ public class transactionInDAOImpl implements transactionInDAO {
         sessionFactory.getCurrentSession().save(activityExport);
     }
     
+    
+    /**
+     * The 'getReportActivityStatusValueById' function will return the value of the activity status for the id 
+     * passed in.
+     * @param activityStatusId
+     * @return
+     * @throws Exception 
+     */
+    @Override
+    @Transactional
+    public String getReportActivityStatusValueById(Integer activityStatusId) throws Exception {
+        String sql = "select descValue as statusValue from rel_crosswalkdata where crosswalkId = 19 and targetValue = " + activityStatusId;
+        
+        Query getFieldvalue = sessionFactory.getCurrentSession().createSQLQuery(sql);
+        
+        return (String) getFieldvalue.uniqueResult();
+    }        
+    
     /**
      * The 'getActivityStatusValueById' function will return the value of the activity status for the id 
      * passed in.
@@ -6521,5 +6571,18 @@ public class transactionInDAOImpl implements transactionInDAO {
         Query getFieldvalue = sessionFactory.getCurrentSession().createSQLQuery(sql);
         
         return (String) getFieldvalue.uniqueResult();
+    }
+    
+    /**
+     * The 'clearMultipleTargets' function will remove the multiple targets set for a configuration.
+     * @param batchId
+     * @throws Exception 
+     */
+    @Override
+    @Transactional
+    public void clearMultipleTargets(Integer batchId) throws Exception {
+        Query deletMultipleTargets = sessionFactory.getCurrentSession().createQuery("delete from batchMultipleTargets where batchId = :batchId");
+        deletMultipleTargets.setParameter("batchId", batchId);
+        deletMultipleTargets.executeUpdate();
     }
 }

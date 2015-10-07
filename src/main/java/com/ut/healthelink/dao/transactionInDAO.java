@@ -404,6 +404,8 @@ public interface transactionInDAO {
     
     String getActivityStatusValueById(Integer activityStatusId) throws Exception;
     
+    String getReportActivityStatusValueById(Integer activityStatusId) throws Exception;
+    
     List<batchUploads> getAllRejectedBatches(Date fromDate, Date toDate, Integer fetchSize) throws Exception;
     
     void clearMultipleTargets(Integer batchId) throws Exception;

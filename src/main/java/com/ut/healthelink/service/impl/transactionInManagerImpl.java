@@ -79,6 +79,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
+import java.net.InetAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.DateFormat;
@@ -92,9 +93,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-
 import javax.annotation.Resource;
-
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.HiddenFileFilter;
 import org.apache.commons.validator.routines.UrlValidator;
@@ -111,10 +110,10 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class transactionInManagerImpl implements transactionInManager {
 
-	@Resource(name = "myProps")
-	private Properties myProps;
-	
-	@Autowired
+    @Resource(name = "myProps")
+    private Properties myProps;
+
+    @Autowired
     private transactionInDAO transactionInDAO;
 
     @Autowired
@@ -152,7 +151,7 @@ public class transactionInManagerImpl implements transactionInManager {
 
     @Autowired
     private emailMessageManager emailManager;
-    
+
     @Autowired
     private utilManager utilmanager;
 
@@ -3770,8 +3769,7 @@ public class transactionInManagerImpl implements transactionInManager {
         
         if(!batchIds.isEmpty()) {
             return transactionInDAO.getReferralCount(ids);
-        }
-        else {
+        } else {
             return null;
         }
         
@@ -3791,8 +3789,7 @@ public class transactionInManagerImpl implements transactionInManager {
         
         if(!batchIds.isEmpty()) {
             return transactionInDAO.getFeedbackReportCount(ids);
-        }
-        else {
+        } else {
             return null;
         }
     }
@@ -3846,9 +3843,7 @@ public class transactionInManagerImpl implements transactionInManager {
             }
             
             return reportList;
-        }
-        
-        else {
+        } else {
             return null;
         }
         
@@ -3868,9 +3863,7 @@ public class transactionInManagerImpl implements transactionInManager {
         if(!batchIds.isEmpty()) {
             List<activityReportList> reportList = transactionInDAO.getReferralList(ids);
             return reportList;
-        }
-        
-        else {
+        } else {
             return null;
         }
     }
@@ -4012,7 +4005,10 @@ public class transactionInManagerImpl implements transactionInManager {
                     .append("|").append("Receiving Org Name")
                     .append("|").append("Receiving Site Name") 
                     .append("|").append("Referral Date / Time")
-                    .append("|").append("eRef Referral Id") /** For feedback report it must be the original referral ID **/
+                    .append("|").append("eRef Internal Referral Id") /**
+                     * For feedback report it must be the original referral ID *
+                     */
+                    .append("|").append("Provider Referral Id")
                     .append("|").append("D.O.B")
                     .append("|").append("Gender")
                     .append("|").append("Race")
@@ -4056,7 +4052,8 @@ public class transactionInManagerImpl implements transactionInManager {
                 String referralStatus = "";
                 String FBActivityStatus = "";
                 String FBDateTime = "";
-                String eRefId = "";
+                Integer eRefId = 0;
+                String referralId = "";
                 String referralDate = "";
                 
                 if(transactionInDetails.gettransactionTargetId() > 0) {
@@ -4067,8 +4064,8 @@ public class transactionInManagerImpl implements transactionInManager {
                     batchUploads origbatchUploadDetails = transactionInDAO.getBatchDetails(origReferralTransaction.getbatchUploadId());
                     
                     referralDate = origbatchUploadDetails.getdateSubmitted().toString();
-                    eRefId = origbatchUploadDetails.getutBatchName();
-                    
+                    eRefId = origbatchUploadDetails.getId();
+
                     Integer statusFieldNo = transactionInDAO.getStatusFieldNo(transactionInDetails.getConfigId());
                     String fieldNo = "f"+statusFieldNo;
                     
@@ -4076,27 +4073,50 @@ public class transactionInManagerImpl implements transactionInManager {
                     
                     if("1".equals(referralStatus)) {
                         referralStatus = "Open";
-                    }
-                    else if("2".equals(referralStatus)) {
+                    } else if ("2".equals(referralStatus)) {
                         referralStatus = "Closed";
-                    }
-                    else {
+                    } else {
                         referralStatus = "Open";
                     }
                     
-                    Integer activityStatusFieldNo = transactionInDAO.getActivityStatusFieldNo(transactionInDetails.getConfigId());
-                    String activityfieldNo = "f"+activityStatusFieldNo;
+                    Integer referralIdFieldNo = transactionInDAO.getReferralIdFieldNo(transactionInDetails.getConfigId());
                     
-                    FBActivityStatus = transactionInDAO.getTransactionFieldValue(transaction.gettransactionInId(), activityfieldNo);
-                    
-                    if(Integer.parseInt(FBActivityStatus) > 0) {
-                        FBActivityStatus = transactionInDAO.getActivityStatusValueById(Integer.parseInt(FBActivityStatus));
+                    if(referralIdFieldNo != null && referralIdFieldNo > 0) {
+                        String referralIdfieldNo = "f" + referralIdFieldNo;
+                        
+                        referralId = transactionInDAO.getTransactionFieldValue(transaction.gettransactionInId(), referralIdfieldNo);
                     }
-                    
-                }
-                else {
+
+                    Integer activityStatusFieldNo = transactionInDAO.getActivityStatusFieldNo(transactionInDetails.getConfigId());
+
+                    if (activityStatusFieldNo != null && activityStatusFieldNo > 0) {
+                        String activityfieldNo = "f" + activityStatusFieldNo;
+
+                        FBActivityStatus = transactionInDAO.getTransactionFieldValue(transaction.gettransactionInId(), activityfieldNo);
+
+                        if (FBActivityStatus != null && Integer.parseInt(FBActivityStatus) > 0) {
+                            FBActivityStatus = transactionInDAO.getReportActivityStatusValueById(Integer.parseInt(FBActivityStatus));
+                            
+                            if (FBActivityStatus == null || "".equals(FBActivityStatus) || "null".equals(FBActivityStatus)) {
+                                FBActivityStatus = "Service Update";
+                            }
+                        }
+                        else {
+                            FBActivityStatus = "Service Update";
+                        }
+                    }
+
+                } else {
                     referralDate = batchUploadDetails.getdateSubmitted().toString();
-                    eRefId = batchUploadDetails.getutBatchName();
+                    eRefId = batchUploadDetails.getId();
+                    
+                    Integer referralIdFieldNo = transactionInDAO.getReferralIdFieldNo(transactionInDetails.getConfigId());
+                    
+                    if(referralIdFieldNo != null && referralIdFieldNo > 0) {
+                        String referralIdfieldNo = "f" + referralIdFieldNo;
+                        
+                        referralId = transactionInDAO.getTransactionFieldValue(transaction.gettransactionInId(), referralIdfieldNo);
+                    }
                 }
                
                 
@@ -4164,8 +4184,7 @@ public class transactionInManagerImpl implements transactionInManager {
 
                 if(sourceSiteOrg != null) {
                     exportRow.append(sourceSiteOrg.getOrgName()).append("|");
-                }
-                else {
+                } else {
                     exportRow.append(sourceOrg.getOrgName()).append("|");
                 }
 
@@ -4173,40 +4192,52 @@ public class transactionInManagerImpl implements transactionInManager {
 
                 if(targetSiteOrg != null) {
                     exportRow.append(targetSiteOrg.getOrgName()).append("|");
-                }
-                else {
+                } else {
                     exportRow.append(targetOrg.getOrgName()).append("|");
                 }
 
                 exportRow.append(referralDate).append("|")
-                .append(eRefId).append("|")        
-                .append(patientDetails.getDob()).append("|")
-                .append(patientDetails.getGenderVal()).append("|")
-                .append(patientDetails.getRaceVal()).append("|")
-                .append(patientDetails.getEthnicityVal()).append("|")
-                .append(patientDetails.getLanguageVal()).append("|")
-                .append(patientDetails.getZip()).append("|")
-                .append(messageTypeName).append("|")
-                .append("").append("|")
-                .append("").append("|")
-                .append("").append("|")
-                .append("").append("|")
-                .append("").append("|")
-                .append("").append("|")   
-                .append("").append("|")
-                .append("").append("|")
-                .append("").append("|")
-                .append("").append("|")
-                .append("").append("|")
-                .append("").append("|")           
-                .append(referralStatus).append("|")
-                .append(FBActivityStatus).append("|")
-                .append(FBDateTime).append("|")
-                .append("").append("|")        
-                .append("").append("|")
-                .append("").append("|")
-                .append("").append("|")            
-                .append("");
+                        .append(eRefId).append("|")
+                        .append(referralId).append("|");
+                        
+                        if(patientDetails != null) {
+                            exportRow.append(patientDetails.getDob()).append("|")
+                            .append(patientDetails.getGenderVal()).append("|")
+                            .append(patientDetails.getRaceVal()).append("|")
+                            .append(patientDetails.getEthnicityVal()).append("|")
+                            .append(patientDetails.getLanguageVal()).append("|")
+                            .append(patientDetails.getZip()).append("|");
+                        }
+                        else {
+                            exportRow.append("").append("|")
+                            .append("").append("|")
+                            .append("").append("|")
+                            .append("").append("|")
+                            .append("").append("|")
+                            .append("").append("|");
+                        }
+                        
+                        exportRow.append(messageTypeName).append("|")
+                        .append("").append("|")
+                        .append("").append("|")
+                        .append("").append("|")
+                        .append("").append("|")
+                        .append("").append("|")
+                        .append("").append("|")
+                        .append("").append("|")
+                        .append("").append("|")
+                        .append("").append("|")
+                        .append("").append("|")
+                        .append("").append("|")
+                        .append("").append("|")
+                        .append(referralStatus).append("|")
+                        .append(FBActivityStatus).append("|")
+                        .append(FBDateTime).append("|")
+                        .append("").append("|")
+                        .append("").append("|")
+                        .append("").append("|")
+                        .append("").append("|")
+                        .append("");
 
                exportRow.append(System.getProperty("line.separator"));
 
@@ -4226,25 +4257,24 @@ public class transactionInManagerImpl implements transactionInManager {
                         
                         exportRow.append("C").append("|");
                         exportRow.append(sourceOrg.getOrgName()).append("|");
-                                
-                                if(sourceSiteOrg != null) {
-                                    exportRow.append(sourceSiteOrg.getOrgName()).append("|");
-                                }
-                                else {
-                                    exportRow.append(sourceOrg.getOrgName()).append("|");
-                                }
-                                
-                                exportRow.append(targetOrg.getOrgName()).append("|");
-                                
-                                if(targetSiteOrg != null) {
-                                    exportRow.append(targetSiteOrg.getOrgName()).append("|");
-                                }
-                                else {
-                                    exportRow.append(targetOrg.getOrgName()).append("|");
-                                }
-                                
-                                exportRow.append(batchUploadDetails.getdateSubmitted()).append("|")
-                                .append(batchUploadDetails.getutBatchName()).append("|")        
+
+                        if (sourceSiteOrg != null) {
+                            exportRow.append(sourceSiteOrg.getOrgName()).append("|");
+                        } else {
+                            exportRow.append(sourceOrg.getOrgName()).append("|");
+                        }
+
+                        exportRow.append(targetOrg.getOrgName()).append("|");
+
+                        if (targetSiteOrg != null) {
+                            exportRow.append(targetSiteOrg.getOrgName()).append("|");
+                        } else {
+                            exportRow.append(targetOrg.getOrgName()).append("|");
+                        }
+
+                        exportRow.append(batchUploadDetails.getdateSubmitted()).append("|")
+                                .append(batchUploadDetails.getId()).append("|")
+                                .append(referralId).append("|")
                                 .append(patientDetails.getDob()).append("|")
                                 .append(patientDetails.getGenderVal()).append("|")
                                 .append(patientDetails.getRaceVal()).append("|")
@@ -4287,6 +4317,11 @@ public class transactionInManagerImpl implements transactionInManager {
             
             fw.close();
         }
-        
+
+    }
+    
+    @Override
+    public void clearMultipleTargets(Integer batchId) throws Exception {
+        transactionInDAO.clearMultipleTargets(batchId);
     }
 }

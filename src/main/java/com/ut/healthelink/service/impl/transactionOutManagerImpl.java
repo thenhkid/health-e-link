@@ -486,10 +486,13 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                             fromOrgId = configurationManager.getConfigurationById(transactionInManager.getTransactionDetails(transaction.gettransactionInId()).getconfigId()).getorgId();
                                         }
                                         
+                                        Integer fromParentOrgId = configurationManager.getConfigurationById(transactionInManager.getTransactionDetails(transaction.gettransactionInId()).getconfigId()).getorgId();
+                                        
                                         Organization fromOrg = organizationManager.getOrganizationById(fromOrgId);
-                                        List<User> fromPrimaryContact = userManager.getOrganizationContact(fromOrg.getId(), 1);
-                                        List<User> fromSecondaryContact = userManager.getOrganizationContact(fromOrg.getId(), 2);
-                                        List<User> fromnonMainContact = userManager.getOrganizationContact(fromOrg.getId(), 0);
+                                        Organization fromParentOrg = organizationManager.getOrganizationById(fromParentOrgId);
+                                        List<User> fromPrimaryContact = userManager.getOrganizationContact(fromParentOrg.getId(), 1);
+                                        List<User> fromSecondaryContact = userManager.getOrganizationContact(fromParentOrg.getId(), 2);
+                                        List<User> fromnonMainContact = userManager.getOrganizationContact(fromParentOrg.getId(), 0);
                                         
                                         Integer toOrgId = 0;
                                         if(transaction.getTargetSubOrgId()> 0) {
@@ -598,7 +601,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                             
                                         }
                                         
-                                        if (fromPrimaryContact.size() > 0 && (toPrimaryContact.size() > 0 || toSecondaryContact.size() > 0 || nonMainContact.size() > 0)) {
+                                        if (toPrimaryContact.size() > 0 || toSecondaryContact.size() > 0 || nonMainContact.size() > 0) {
                                             String toName = "";
                                             String toEmail = "";
                                             mailMessage msg = new mailMessage();
@@ -643,7 +646,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                                 
                                                 for(int i = 0; i < nonMainContact.size(); i++) {
                                                     
-                                                    if(nonMainContact.get(i).getSendEmailAlert() == true) {
+                                                    if(nonMainContact.get(i).getReceiveEmailAlert() == true) {
                                                         
                                                         if("".equals(toEmail)) {
                                                             toName = nonMainContact.get(i).getFirstName() + " " + nonMainContact.get(i).getLastName();
