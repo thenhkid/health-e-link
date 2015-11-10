@@ -56,14 +56,14 @@ public class productSuiteController {
     }
     
     /**
-     * The '/eReferral' request will display the eReferral information page.
+     * The '/careConnect' request will display the care connect information page.
      */
-    @RequestMapping(value = "/eReferral", method = RequestMethod.GET)
-    public ModelAndView eReferral() throws Exception {
+    @RequestMapping(value = "/careConnect", method = RequestMethod.GET)
+    public ModelAndView careConnect() throws Exception {
 
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("/eReferral");
-        mav.addObject("pageTitle", "eReferral");
+        mav.setViewName("/careConnect");
+        mav.addObject("pageTitle", "Care Connect");
         return mav;
     }
     

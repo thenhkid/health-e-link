@@ -115,8 +115,8 @@
                         	<span id="errorMsg_interestedIn" class="control-label"></span> 
                             <div class="checkbox">
                                 <label>
-                                    <input name='interestedIn' type="checkbox" value="eReferral">
-                                    eReferral
+                                    <input name='interestedIn' type="checkbox" value="Care Connect">
+                                    Care Connect
                                 </label>
                             </div>
                             <div class="checkbox">

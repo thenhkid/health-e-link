@@ -68,7 +68,7 @@
                 <p>
                     The <a href="<c:url value="/product-suite" />">Health-e-link Suite</a> of products provides a healthcare information exchange and data management solution for all collaborating partners in any any community - local, regional, state-wide or national. We've ensured that our solutions meet HIPAA 
                     privacy and security standards, thereby ensuring that patient privacy concerns are addressed. Health-e-link has embraced widely accepted health information technology standards that ensure that an 
-                    investment with Health-e-link is a strategic investment for any organization. With our modular approach to implementation, Health-e-Link offers capabilities for <a href="<c:url value='/product-suite/eReferral'/>" title="eReferral">eReferral systems</a>, 
+                    investment with Health-e-link is a strategic investment for any organization. With our modular approach to implementation, Health-e-Link offers capabilities for <a href="<c:url value='/product-suite/careConnect'/>" title="Care Connect">Care Connect systems</a>, 
                     <a href="<c:url value='/product-suite/clinical-data-warehouse'/>" title="Clinical Data Warehouse">program registry systems</a> and <a href="<c:url value='/product-suite/universal-hie'/>" title="Universal HIE">health information exchange networks</a> that are configured to meet the 
                     specific needs of any network of healthcare providers and their partners.
                 </p>

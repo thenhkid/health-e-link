@@ -17,10 +17,10 @@
     <div class="container">
         <div class="row">
             <div class="col-md-4 col-sm-4 product-summary">
-                <a href="<c:url value='/product-suite/eReferral'/>" title="eReferral" class="icon-product icon-product icon-health-e-net"></a>
-                <h3><a href="<c:url value='/product-suite/eReferral'/>" title="eReferral">eReferral</a></h3>
+                <a href="<c:url value='/product-suite/careConnect'/>" title="Care Connect" class="icon-product icon-product icon-health-e-net"></a>
+                <h3><a href="<c:url value='/product-suite/careConnect'/>" title="Care Connect">Care Connect</a></h3>
                 <p>Process referrals and feedback reports electronically with all partners in your care network.</p>
-                <a href="<c:url value='/product-suite/eReferral'/>" title="eReferral" class="btn-secondary">Learn More</a>
+                <a href="<c:url value='/product-suite/careConnect'/>" title="Care Connect" class="btn-secondary">Learn More</a>
             </div>
             <div class="col-md-4 col-sm-4 product-summary">
                 <a href="<c:url value='/product-suite/universal-hie'/>" title="Universal HIE" class="icon-product icon-health-e-data"></a>

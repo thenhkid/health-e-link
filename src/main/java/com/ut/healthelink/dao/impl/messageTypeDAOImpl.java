@@ -30,10 +30,10 @@ import org.hibernate.criterion.Disjunction;
 @Repository
 public class messageTypeDAOImpl implements messageTypeDAO {
 
-	@Resource(name = "myProps")
-	private Properties myProps;
-	
-	@Autowired
+    @Resource(name = "myProps")
+    private Properties myProps;
+
+    @Autowired
     private SessionFactory sessionFactory;
     
     /**

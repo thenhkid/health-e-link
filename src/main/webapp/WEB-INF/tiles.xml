@@ -665,11 +665,11 @@ groups of health care providers, community partners, as well as federal, state a
         <put-attribute name="body" value="/WEB-INF/jsp/informationPages/productSuite/universal-hie.jsp?page=universal-hie" />
     </definition>
     
-    <definition name="/eReferral" extends="base.definition.frontEnd">
-        <put-attribute name="description" value="Health-e-link's eReferral system connects healthcare providers with their community-based partners and supports fully integrated eReferral communications regardless of the technology-based capabilities of the eReferral partners. Using Health-e-link's eReferral system, all referral types with all collaborating partners are managed from a single location. Health-e-Link's eReferral system spans the virtual boundaries between healthcare partners in your community. " />
-        <put-attribute name="title" value="Health-e-Link - eReferral" />
+    <definition name="/careConnect" extends="base.definition.frontEnd">
+        <put-attribute name="description" value="Health-e-link's care connect system connects healthcare providers with their community-based partners and supports fully integrated eReferral communications regardless of the technology-based capabilities of the eReferral partners. Using Health-e-link's care connect system, all referral types with all collaborating partners are managed from a single location. Health-e-Link's care connect system spans the virtual boundaries between healthcare partners in your community. " />
+        <put-attribute name="title" value="Health-e-Link - Care Connect" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page=productSuite" />
-        <put-attribute name="body" value="/WEB-INF/jsp/informationPages/productSuite/eReferral.jsp?page=eReferral" />
+        <put-attribute name="body" value="/WEB-INF/jsp/informationPages/productSuite/careConnect.jsp?page=careConnect" />
     </definition>
     
     <definition name="/clinical-data-warehouse" extends="base.definition.frontEnd">
@@ -745,7 +745,7 @@ groups of health care providers, community partners, as well as federal, state a
     </definition>
     
     <definition name="/partnersmap" extends="base.definition.frontEnd">
-        <put-attribute name="title" value="Health-e-Link - eReferral Partners" />
+        <put-attribute name="title" value="Health-e-Link - Partners" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page=map" />
         <put-attribute name="body" value="/WEB-INF/jsp/informationPages/partnersMap.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/front-end/partnersMap.js" />

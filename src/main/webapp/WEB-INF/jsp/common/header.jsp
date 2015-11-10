@@ -17,7 +17,7 @@
 
                                 sprite can be used with class="logo":
                         -->
-                        <span class="identity logo" alt="Massachusetts Department of Public Health Universal Translator" title="Data exchange software connecting the healthcare community"></span>
+                        <span class="identity logo" alt="Health-e-Link Universal Translator" title="Data exchange software connecting the healthcare community"></span>
                     </a>
                     <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
                         <span class="sr-only">Toggle navigation</span>
@@ -40,7 +40,7 @@
                             <ul class="dropdown-menu" role="menu" aria-labelledby="Product Suite dropdown">
                                 <%--<li><a href="<c:url value='/product-suite'/>" title="Product Suite Overview">Product Suite Overview</a></li> --%>
                                 <li><a href="<c:url value='/#productSuite'/>" title="Product Suite Overview">Product Suite Overview</a></li>
-                                <li><a href="<c:url value='/product-suite/eReferral'/>" title="eReferral">eReferral</a></li>
+                                <li><a href="<c:url value='/product-suite/careConnect'/>" title="Care Connect">Care Connect</a></li>
                                 <li><a href="<c:url value='/product-suite/universal-hie'/>" title="Universal HIE">Universal HIE</a></li>
                                 <li><a href="<c:url value='/product-suite/clinical-data-warehouse'/>" title="Clinical Data Warehouse">Clinical Data Warehouse</a></li>
                             </ul> 

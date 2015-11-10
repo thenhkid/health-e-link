@@ -377,14 +377,14 @@ public class mainController {
         mailMessage messageDetails = new mailMessage();
 
         messageDetails.settoEmailAddress(userDetails.getEmail());
-        messageDetails.setmessageSubject("Universal Translator Reset Password");
+        messageDetails.setmessageSubject("Health-e-Link Reset Password");
         
         String resetURL = request.getRequestURL().toString().replace("sendPassword.do", "resetPassword?b=");
         
         StringBuilder sb = new StringBuilder();
 
         sb.append("Dear " + userDetails.getFirstName() + ",<br />");
-        sb.append("You have recently asked to reset your Universal Translator password.<br /><br />");
+        sb.append("You have recently asked to reset your Health-e-Link password.<br /><br />");
         sb.append("<a href='" + resetURL + randomCode + "'>Click here to reset your password.</a>");
 
         messageDetails.setmessageBody(sb.toString());
