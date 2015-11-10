@@ -56,14 +56,14 @@ public class productSuiteController {
     }
     
     /**
-     * The '/careConnect' request will display the care connect information page.
+     * The '/careConnector' request will display the care connect information page.
      */
-    @RequestMapping(value = "/careConnect", method = RequestMethod.GET)
-    public ModelAndView careConnect() throws Exception {
+    @RequestMapping(value = "/careConnector", method = RequestMethod.GET)
+    public ModelAndView careConnector() throws Exception {
 
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("/careConnect");
-        mav.addObject("pageTitle", "Care Connect");
+        mav.setViewName("/careConnector");
+        mav.addObject("pageTitle", "Care Connector");
         return mav;
     }
     

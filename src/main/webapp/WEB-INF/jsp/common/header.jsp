@@ -40,7 +40,7 @@
                             <ul class="dropdown-menu" role="menu" aria-labelledby="Product Suite dropdown">
                                 <%--<li><a href="<c:url value='/product-suite'/>" title="Product Suite Overview">Product Suite Overview</a></li> --%>
                                 <li><a href="<c:url value='/#productSuite'/>" title="Product Suite Overview">Product Suite Overview</a></li>
-                                <li><a href="<c:url value='/product-suite/careConnect'/>" title="Care Connect">Care Connect</a></li>
+                                <li><a href="<c:url value='/product-suite/careConnector'/>" title="Care Connector">Care Connector</a></li>
                                 <li><a href="<c:url value='/product-suite/universal-hie'/>" title="Universal HIE">Universal HIE</a></li>
                                 <li><a href="<c:url value='/product-suite/clinical-data-warehouse'/>" title="Clinical Data Warehouse">Clinical Data Warehouse</a></li>
                             </ul> 

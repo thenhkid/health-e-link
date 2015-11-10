@@ -10,9 +10,9 @@
         <div class="row">
             <div class="col-md-4 product-summary">
                 <div class="media">
-                    <a href="/product-suite/careConnect" title="Care Connect" class="icon-product icon-product icon-health-e-net pull-left media-object" ></a>
+                    <a href="/product-suite/careConnector" title="Care Connector" class="icon-product icon-product icon-health-e-net pull-left media-object" ></a>
                     <div class="media-body">
-                        <h3><a href="/product-suite/careConnect" title="Care Connect">Care Connect</a></h3>
+                        <h3><a href="/product-suite/careConnector" title="Care Connector">Care Connector</a></h3>
                         <p>Process referrals and feedback reports with all partners in your care network.<br/>
                         </p>
                     </div>

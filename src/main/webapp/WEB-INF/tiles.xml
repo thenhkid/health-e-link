@@ -665,11 +665,11 @@ groups of health care providers, community partners, as well as federal, state a
         <put-attribute name="body" value="/WEB-INF/jsp/informationPages/productSuite/universal-hie.jsp?page=universal-hie" />
     </definition>
     
-    <definition name="/careConnect" extends="base.definition.frontEnd">
-        <put-attribute name="description" value="Health-e-link's care connect system connects healthcare providers with their community-based partners and supports fully integrated eReferral communications regardless of the technology-based capabilities of the eReferral partners. Using Health-e-link's care connect system, all referral types with all collaborating partners are managed from a single location. Health-e-Link's care connect system spans the virtual boundaries between healthcare partners in your community. " />
-        <put-attribute name="title" value="Health-e-Link - Care Connect" />
+    <definition name="/careConnector" extends="base.definition.frontEnd">
+        <put-attribute name="description" value="Health-e-link's care connector system connects healthcare providers with their community-based partners and supports fully integrated eReferral communications regardless of the technology-based capabilities of the eReferral partners. Using Health-e-link's care connector system, all referral types with all collaborating partners are managed from a single location. Health-e-Link's care connector system spans the virtual boundaries between healthcare partners in your community. " />
+        <put-attribute name="title" value="Health-e-Link - Care Connector" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page=productSuite" />
-        <put-attribute name="body" value="/WEB-INF/jsp/informationPages/productSuite/careConnect.jsp?page=careConnect" />
+        <put-attribute name="body" value="/WEB-INF/jsp/informationPages/productSuite/careConnector.jsp?page=careConnector" />
     </definition>
     
     <definition name="/clinical-data-warehouse" extends="base.definition.frontEnd">
