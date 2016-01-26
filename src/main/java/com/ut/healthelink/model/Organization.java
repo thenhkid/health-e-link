@@ -22,7 +22,10 @@ import org.springframework.web.multipart.commons.CommonsMultipartFile;
 public class Organization {
     
     @Transient
-    private CommonsMultipartFile file = null;
+    private CommonsMultipartFile file = null, headerBackgroundFile = null, headerLogoFile = null;
+    
+    @Transient
+    private String headerImageDirectory = "";
     
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -95,6 +98,12 @@ public class Organization {
     
     @Column(name = "ORGTYPE", nullable = false)
     private Integer orgType = 1;
+    
+    @Column(name = "headerLogo", nullable = false)
+    private String headerLogo;
+    
+    @Column(name = "headerBackground", nullable = false)
+    private String headerBackground;
 
     public int getId() {
         return id;
@@ -192,14 +201,7 @@ public class Organization {
         this.status = status;
     }
 
-    public String getcleanURL() {
-        return cleanURL;
-    }
-
-    public void setcleanURL(String cleanURL) {
-        this.cleanURL = cleanURL;
-    }
-    
+   
     public String getparsingTemplate() {
         return parsingTemplate;
     }
@@ -222,14 +224,6 @@ public class Organization {
 
     public void setParentId(Integer parentId) {
         this.parentId = parentId;
-    }
-
-    public String getCleanURL() {
-        return cleanURL;
-    }
-
-    public void setCleanURL(String cleanURL) {
-        this.cleanURL = cleanURL;
     }
 
     public String getParsingTemplate() {
@@ -262,6 +256,54 @@ public class Organization {
 
     public void setOrgType(Integer orgType) {
         this.orgType = orgType;
+    }
+
+    public String getHeaderLogo() {
+        return headerLogo;
+    }
+
+    public void setHeaderLogo(String headerLogo) {
+        this.headerLogo = headerLogo;
+    }
+
+    public String getHeaderBackground() {
+        return headerBackground;
+    }
+
+    public void setHeaderBackground(String headerBackground) {
+        this.headerBackground = headerBackground;
+    }
+
+    public String getHeaderImageDirectory() {
+        return headerImageDirectory;
+    }
+
+    public void setHeaderImageDirectory(String headerImageDirectory) {
+        this.headerImageDirectory = headerImageDirectory;
+    }
+
+    public String getCleanURL() {
+        return cleanURL;
+    }
+
+    public void setCleanURL(String cleanURL) {
+        this.cleanURL = cleanURL;
+    }
+
+    public CommonsMultipartFile getHeaderBackgroundFile() {
+        return headerBackgroundFile;
+    }
+
+    public void setHeaderBackgroundFile(CommonsMultipartFile headerBackgroundFile) {
+        this.headerBackgroundFile = headerBackgroundFile;
+    }
+
+    public CommonsMultipartFile getHeaderLogoFile() {
+        return headerLogoFile;
+    }
+
+    public void setHeaderLogoFile(CommonsMultipartFile headerLogoFile) {
+        this.headerLogoFile = headerLogoFile;
     }
     
 }

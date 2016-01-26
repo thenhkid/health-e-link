@@ -148,6 +148,36 @@
                                     <span id="parsingTemplateMsg" class="control-label"></span>
                                 </div>
                             </spring:bind>
+                            <c:if test="${not empty organization.headerLogo}">
+                                <div class="form-group">
+                                    <label class="control-label" for="headerLogo">Current Header Logo</label>
+                                    <input type="text" disabled id="headerLogo" class="form-control" value="${organization.headerLogo}" />
+                                    <form:hidden id="headerLogo" path="headerLogo" />
+                                </div>
+                            </c:if>
+                            <spring:bind path="headerLogoFile">
+                                <div id="parsingTemplateDiv" class="form-group ${status.error ? 'has-error' : '' }">
+                                    <label class="control-label" for="headerLogoFile">Header Logo</label>
+                                    <form:input path="headerLogoFile" id="headerLogoFile" class="form-control" type="file" />
+                                    <form:errors path="headerLogoFile" cssClass="control-label" element="label" />
+                                    <span id="headerLogoMsg" class="control-label"></span>
+                                </div>
+                            </spring:bind>
+                            <c:if test="${not empty organization.headerBackground}">
+                                <div class="form-group">
+                                    <label class="control-label" for="headerBackground">Current Background Header Image</label>
+                                    <input type="text" disabled id="headerBackground" class="form-control" value="${organization.headerBackground}" />
+                                    <form:hidden id="headerBackground" path="headerBackground" />
+                                </div>
+                            </c:if>
+                            <spring:bind path="headerBackgroundFile">
+                                <div id="parsingTemplateDiv" class="form-group ${status.error ? 'has-error' : '' }">
+                                    <label class="control-label" for="headerBackgroundFile">Background Header Image</label>
+                                    <form:input path="headerBackgroundFile" id="headerBackgroundFile" class="form-control" type="file" />
+                                    <form:errors path="headerBackgroundFile" cssClass="control-label" element="label" />
+                                    <span id="headerBackgroundMsg" class="control-label"></span>
+                                </div>
+                            </spring:bind>
                         </c:if>    
                         <spring:bind path="longitude">
                             <div class="form-group ${status.error ? 'has-error' : '' }">

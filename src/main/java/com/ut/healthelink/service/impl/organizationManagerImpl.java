@@ -40,7 +40,7 @@ public class organizationManagerImpl implements organizationManager {
         //First get the operating system
         fileSystem dir = new fileSystem();
 
-        dir.creatOrgDirectories(organization.getcleanURL());
+        dir.creatOrgDirectories(organization.getCleanURL());
 
         return lastId;
     }
@@ -53,7 +53,7 @@ public class organizationManagerImpl implements organizationManager {
         //the organization
         fileSystem dir = new fileSystem();
         
-        dir.creatOrgDirectories(organization.getcleanURL());
+        dir.creatOrgDirectories(organization.getCleanURL());
         
         MultipartFile file = organization.getFile();
         //If a file is uploaded
@@ -71,7 +71,7 @@ public class organizationManagerImpl implements organizationManager {
                 //Set the directory to save the uploaded message type template to
                 fileSystem orgdir = new fileSystem();
 
-                orgdir.setDir(organization.getcleanURL(), "templates");
+                orgdir.setDir(organization.getCleanURL(), "templates");
 
                 newFile = new File(orgdir.getDir() + fileName);
 
@@ -91,6 +91,94 @@ public class organizationManagerImpl implements organizationManager {
 
                 //Set the filename to the file name
                 organization.setparsingTemplate(fileName);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new Exception (e);
+            }
+            
+        }
+        
+        MultipartFile headerLogofile = organization.getHeaderLogoFile();
+        //If a file is uploaded
+        if (headerLogofile != null && !headerLogofile.isEmpty()) {
+        
+            String fileName = headerLogofile.getOriginalFilename();
+            
+            InputStream inputStream = null;
+            OutputStream outputStream = null;
+            
+            try {
+                inputStream = headerLogofile.getInputStream();
+                File newFile = null;
+
+                //Set the directory to save the uploaded message type template to
+                fileSystem orgdir = new fileSystem();
+
+                orgdir.setDir("headerimages",organization.getCleanURL());
+
+                newFile = new File(orgdir.getDir() + fileName);
+
+                if (newFile.exists()) {
+                    newFile.delete();
+                }
+                newFile.createNewFile();
+                
+                outputStream = new FileOutputStream(newFile);
+                int read = 0;
+                byte[] bytes = new byte[1024];
+
+                while ((read = inputStream.read(bytes)) != -1) {
+                    outputStream.write(bytes, 0, read);
+                }
+                outputStream.close();
+
+                //Set the filename to the file name
+                organization.setHeaderLogo(fileName);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new Exception (e);
+            }
+            
+        }
+        
+        MultipartFile headerBackgroundfile = organization.getHeaderBackgroundFile();
+        //If a file is uploaded
+        if (headerBackgroundfile != null && !headerBackgroundfile.isEmpty()) {
+        
+            String fileName = headerBackgroundfile.getOriginalFilename();
+            
+            InputStream inputStream = null;
+            OutputStream outputStream = null;
+            
+            try {
+                inputStream = headerBackgroundfile.getInputStream();
+                File newFile = null;
+
+                //Set the directory to save the uploaded message type template to
+                fileSystem orgdir = new fileSystem();
+
+                orgdir.setDir("headerimages",organization.getCleanURL());
+
+                newFile = new File(orgdir.getDir() + fileName);
+
+                if (newFile.exists()) {
+                    newFile.delete();
+                }
+                newFile.createNewFile();
+                
+                outputStream = new FileOutputStream(newFile);
+                int read = 0;
+                byte[] bytes = new byte[1024];
+
+                while ((read = inputStream.read(bytes)) != -1) {
+                    outputStream.write(bytes, 0, read);
+                }
+                outputStream.close();
+
+                //Set the filename to the file name
+                organization.setHeaderImageDirectory(fileName);
 
             } catch (IOException e) {
                 e.printStackTrace();

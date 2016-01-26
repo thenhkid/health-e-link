@@ -1397,7 +1397,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                 
                 Organization orgDetails = organizationManager.getOrganizationById(configurationManager.getConfigurationById(transportDetails.getconfigId()).getorgId());
                 fileSystem ccdTemplateDir = new fileSystem();
-                ccdTemplateDir.setDir(orgDetails.getcleanURL(), "templates");
+                ccdTemplateDir.setDir(orgDetails.getCleanURL(), "templates");
                 
                 String ccdSampleTemplate = transportDetails.getCcdSampleTemplate();
                 
@@ -1777,7 +1777,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                     File newFile = null;
 
                     fileSystem dir = new fileSystem();
-                    dir.setDir(orgDetails.getcleanURL(), "certificates");
+                    dir.setDir(orgDetails.getCleanURL(), "certificates");
 
                     jsch.addIdentity(new File(dir.getDir() + ftpDetails.getcertification()).getAbsolutePath());
                     session = jsch.getSession(user, host, port);

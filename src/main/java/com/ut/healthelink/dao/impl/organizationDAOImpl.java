@@ -398,7 +398,7 @@ public class organizationDAOImpl implements organizationDAO {
         //Delete the organization folder within bowlink
         try {
             fileSystem dir = new fileSystem();
-            dir.deleteOrgDirectories(orgDetails.getcleanURL());
+            dir.deleteOrgDirectories(orgDetails.getCleanURL());
 
             //Delete the organization
             Query deleteOrg = sessionFactory.getCurrentSession().createQuery("delete from Organization where id = :orgId");

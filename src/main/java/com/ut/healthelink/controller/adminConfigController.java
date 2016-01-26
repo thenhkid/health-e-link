@@ -477,10 +477,10 @@ public class adminConfigController {
             transportDetails = new configurationTransport();
             
             if(configurationDetails.getType() == 1) {
-                transportDetails.setfileLocation("/bowlink/"+orgDetails.getcleanURL()+"/input files/");
+                transportDetails.setfileLocation("/bowlink/"+orgDetails.getCleanURL()+"/input files/");
             }
             else {
-               transportDetails.setfileLocation("/bowlink/"+orgDetails.getcleanURL()+"/output files/"); 
+               transportDetails.setfileLocation("/bowlink/"+orgDetails.getCleanURL()+"/output files/"); 
             }
             
             List<Integer> assocMessageTypes = new ArrayList<Integer>();
@@ -513,11 +513,11 @@ public class adminConfigController {
             List<configurationFTPFields> emptyFTPFields = new ArrayList<configurationFTPFields>();
             configurationFTPFields pushFTPFields = new configurationFTPFields();
             pushFTPFields.setmethod(1);
-            pushFTPFields.setdirectory("/UTSFTP/"+orgDetails.getcleanURL()+"/input/");
+            pushFTPFields.setdirectory("/UTSFTP/"+orgDetails.getCleanURL()+"/input/");
             
             configurationFTPFields getFTPFields = new configurationFTPFields();
             getFTPFields.setmethod(2);
-            getFTPFields.setdirectory("/UTSFTP/"+orgDetails.getcleanURL()+"/output/"); 
+            getFTPFields.setdirectory("/UTSFTP/"+orgDetails.getCleanURL()+"/output/"); 
             
             emptyFTPFields.add(pushFTPFields);
             emptyFTPFields.add(getFTPFields);
@@ -537,11 +537,11 @@ public class adminConfigController {
             List<configurationRhapsodyFields> emptyRhapsodyFields = new ArrayList<configurationRhapsodyFields>();
             configurationRhapsodyFields pushRFields = new configurationRhapsodyFields();
             pushRFields.setMethod(1);
-            pushRFields.setDirectory("/UT/"+orgDetails.getcleanURL()+"/input/");
+            pushRFields.setDirectory("/UT/"+orgDetails.getCleanURL()+"/input/");
             
             configurationRhapsodyFields getRFields = new configurationRhapsodyFields();
             getRFields.setMethod(2);
-            getRFields.setDirectory("/UT/"+orgDetails.getcleanURL()+"/output/"); 
+            getRFields.setDirectory("/UT/"+orgDetails.getCleanURL()+"/output/"); 
             
             emptyRhapsodyFields.add(pushRFields);
             emptyRhapsodyFields.add(getRFields);
@@ -2182,7 +2182,7 @@ public class adminConfigController {
                     File newFile = null;
                     
                     fileSystem dir = new fileSystem();
-                    dir.setDir(orgDetails.getcleanURL(), "certificates");
+                    dir.setDir(orgDetails.getCleanURL(), "certificates");
 
                     jsch.addIdentity(new File(dir.getDir() + ftpDetails.getcertification()).getAbsolutePath());
                     session = jsch.getSession(user, host , port);

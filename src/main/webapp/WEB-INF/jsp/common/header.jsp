@@ -3,21 +3,25 @@
 
 <header id="header" class="header" role="banner">
     <div class="header-inner">
-        <nav class="navbar primary-nav" role="navigation">
+        <c:choose>
+            <c:when test="${not empty sessionScope.organizationDetails.headerBackground}">
+                <nav class="navbar primary-nav" role="navigation" style="background-image: url('/headerImages/${sessionScope.organizationDetails.headerImageDirectory}/${sessionScope.organizationDetails.headerBackground}'); background-repeat: repeat;">
+            </c:when>
+            <c:otherwise>
+                <nav class="navbar primary-nav" role="navigation" >
+            </c:otherwise>
+        </c:choose>
             <div class="container">
                 <div class="navbar-header">
                     <a href="<c:url value='/'/>" class="navbar-brand" title="Data exchange software connecting the healthcare community">
-                        <!--
-                                <img src="img/health-e-link/img-health-e-link-logo.png" class="logo" alt="Health-e-Link Logo"/>
-                                Required logo specs:
-                                logo width: 125px
-                                logo height: 30px
-
-                                Plain text can be used without image logo
-
-                                sprite can be used with class="logo":
-                        -->
-                        <span class="identity logo" alt="Health-e-Link Universal Translator" title="Data exchange software connecting the healthcare community"></span>
+                       <c:choose>
+                            <c:when test="${not empty sessionScope.organizationDetails.headerLogo}">
+                                 <img style="background-repeat: no-repeat; background-position: 0 0;" class="nav-user-photo" src="/headerImages/${sessionScope.organizationDetails.headerImageDirectory}/${sessionScope.organizationDetails.headerLogo}" alt="Profile Photo" />
+                            </c:when>
+                            <c:otherwise>
+                                <span class="identity logo" alt="Health-e-Link Universal Translator" title="Data exchange software connecting the healthcare community"></span>
+                            </c:otherwise>
+                        </c:choose>
                     </a>
                     <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
                         <span class="sr-only">Toggle navigation</span>

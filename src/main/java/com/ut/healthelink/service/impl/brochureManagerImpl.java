@@ -47,7 +47,7 @@ public class brochureManagerImpl implements brochureManager {
 
             //Set the directory to save the brochures to
             fileSystem dir = new fileSystem();
-            dir.setDir(orgDetails.getcleanURL(), "brochures");
+            dir.setDir(orgDetails.getCleanURL(), "brochures");
 
             newFile = new File(dir.getDir() + fileName);
 
@@ -102,7 +102,7 @@ public class brochureManagerImpl implements brochureManager {
         if (!file.isEmpty()) {
 
             fileSystem currdir = new fileSystem();
-            currdir.setDir(orgDetails.getcleanURL(), "brochures");
+            currdir.setDir(orgDetails.getCleanURL(), "brochures");
             File currFile = new File(currdir.getDir() + brochure.getfileName());
             currFile.delete();
 
@@ -117,7 +117,7 @@ public class brochureManagerImpl implements brochureManager {
 
                 //Set the directory to save the brochures to
                 fileSystem dir = new fileSystem();
-                dir.setDir(orgDetails.getcleanURL(), "brochures");
+                dir.setDir(orgDetails.getCleanURL(), "brochures");
 
                 newFile = new File(dir.getDir() + fileName);
 
@@ -167,7 +167,7 @@ public class brochureManagerImpl implements brochureManager {
 
         //Next delete the actual attachment
         fileSystem currdir = new fileSystem();
-        currdir.setDir(orgDetails.getcleanURL(), "brochures");
+        currdir.setDir(orgDetails.getCleanURL(), "brochures");
         File currFile = new File(currdir.getDir() + brochure.getfileName());
         currFile.delete();
 

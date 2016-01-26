@@ -164,7 +164,7 @@ public class adminOrgContoller {
             return mav;
         }
 
-        List<Organization> existing = organizationManager.getOrganizationByName(organization.getcleanURL());
+        List<Organization> existing = organizationManager.getOrganizationByName(organization.getCleanURL());
         if (!existing.isEmpty()) {
             ModelAndView mav = new ModelAndView();
             mav.setViewName("/administrator/organizations/organizationDetails");
@@ -188,7 +188,7 @@ public class adminOrgContoller {
              * Set the private variable to hold the id of the new organization.
              */
             orgId = id;
-            ModelAndView mav = new ModelAndView(new RedirectView(latestorg.getcleanURL() + "/"));
+            ModelAndView mav = new ModelAndView(new RedirectView(latestorg.getCleanURL() + "/"));
             return mav;
         } else {
             ModelAndView mav = new ModelAndView(new RedirectView("list"));
@@ -269,8 +269,8 @@ public class adminOrgContoller {
 
         Organization currentOrg = organizationManager.getOrganizationById(organization.getId());
 
-        if (!currentOrg.getcleanURL().trim().equals(organization.getcleanURL().trim())) {
-            List<Organization> existing = organizationManager.getOrganizationByName(organization.getcleanURL());
+        if (!currentOrg.getCleanURL().trim().equals(organization.getCleanURL().trim())) {
+            List<Organization> existing = organizationManager.getOrganizationByName(organization.getCleanURL());
             if (!existing.isEmpty()) {
                 ModelAndView mav = new ModelAndView();
                 mav.setViewName("/administrator/organizations/organizationDetails");
@@ -290,7 +290,7 @@ public class adminOrgContoller {
 
         //If the "Save" button was pressed 
         if (action.equals("save")) {
-            ModelAndView mav = new ModelAndView(new RedirectView("../" + organization.getcleanURL() + "/"));
+            ModelAndView mav = new ModelAndView(new RedirectView("../" + organization.getCleanURL() + "/"));
             return mav;
         } //If the "Save & Close" button was pressed.
         else {

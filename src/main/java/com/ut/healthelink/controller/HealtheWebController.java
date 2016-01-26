@@ -3154,12 +3154,12 @@ public class HealtheWebController {
 
         try {
             /* Upload the attachment */
-            String fileName = transactionInManager.uploadAttachment(fileUpload, sendingOrgDetails.getcleanURL());
+            String fileName = transactionInManager.uploadAttachment(fileUpload, sendingOrgDetails.getCleanURL());
 
             /* Create a new attachment */
             transactionAttachment attachment = new transactionAttachment();
             attachment.setTransactionInId(0);
-            attachment.setfileLocation("/" + sendingOrgDetails.getcleanURL() + "/attachments/");
+            attachment.setfileLocation("/" + sendingOrgDetails.getCleanURL() + "/attachments/");
             attachment.setfileName(fileName);
             attachment.settitle(title);
 

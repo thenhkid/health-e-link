@@ -46,7 +46,7 @@ public class CustomAuthenticationHandler extends SimpleUrlAuthenticationSuccessH
         if (!request.getParameter("j_username").equalsIgnoreCase(authentication.getName())) {
 	        try {
 	            //log user activity
-	        	User userLogDetails = usermanager.getUserByUserName(request.getParameter("j_username"));
+                    User userLogDetails = usermanager.getUserByUserName(request.getParameter("j_username"));
 	            UserActivity ua = new UserActivity();
 	            ua.setUserId(userLogDetails.getId());
 	            ua.setFeatureId(0);
@@ -68,7 +68,6 @@ public class CustomAuthenticationHandler extends SimpleUrlAuthenticationSuccessH
             
             /* Need to store the search session object */
             session.setAttribute("searchParameters", searchParameters);
-            
             
             /* Need to store the user object in session */
             session.setAttribute("userDetails", userDetails);
@@ -92,6 +91,26 @@ public class CustomAuthenticationHandler extends SimpleUrlAuthenticationSuccessH
             
             /* Need to store the user object in session */
             session.setAttribute("userDetails", userDetails);
+            
+            /* Check to see if header image is empty and if parent Id > 0 get the parent header image and logo */
+            if((orgDetails.getHeaderLogo() == null || "".equals(orgDetails.getHeaderLogo())) && orgDetails.getParentId() > 0) {
+                Organization parentOrgDetails = organizationManager.getOrganizationById(orgDetails.getParentId());
+                
+                if(!"".equals(parentOrgDetails.getHeaderLogo()) && parentOrgDetails.getHeaderLogo() != null) {
+                    orgDetails.setHeaderLogo(parentOrgDetails.getHeaderLogo());
+                    orgDetails.setHeaderImageDirectory(parentOrgDetails.getCleanURL());
+                }
+                if(!"".equals(parentOrgDetails.getHeaderBackground()) && parentOrgDetails.getHeaderBackground() != null) {
+                    orgDetails.setHeaderBackground(parentOrgDetails.getHeaderBackground());
+                    orgDetails.setHeaderImageDirectory(parentOrgDetails.getCleanURL());
+                }
+            }
+            else {
+                orgDetails.setHeaderLogo(orgDetails.getCleanURL());
+            }
+            
+            /* Need to store the user company information in session */
+            session.setAttribute("organizationDetails", orgDetails);
             
             /* Need to store the search session object */
             session.setAttribute("searchParameters", searchParameters);

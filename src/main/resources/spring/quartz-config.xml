@@ -6,7 +6,7 @@
         http://www.quartz-scheduler.org/xml/job_scheduling_data_1_8.xsd"
     version="1.8">
  
-    <schedule>
+   <!-- <schedule>
         <job>
             <name>ProcessOutputFiles</name>
             <group>processGroup</group>
@@ -19,13 +19,11 @@
                 <name>60SecTrigger</name>
                 <job-name>ProcessOutputFiles</job-name>
                 <job-group>processGroup</job-group>
-                <!-- seconds, minutes /(at) minute to start, hours, day of month, month, day of week, year (optional) -->
-                <!-- starts on 22 every minute-->
-                <cron-expression>22 0/1 * * * ?</cron-expression>
+                 <cron-expression>22 0/1 * * * ?</cron-expression>
             </cron>
         </trigger>
-    </schedule>
-    <schedule>
+    </schedule>-->
+    <!--<schedule>
         <job>
             <name>GenerateOutputFiles</name>
             <group>processGroup</group>
@@ -38,13 +36,12 @@
                 <name>5MinTrigger</name>
                 <job-name>GenerateOutputFiles</job-name>
                 <job-group>processGroup</job-group>
-                <!--  starts on 5 every 2 mins  -->
                 <cron-expression>12 0/2 * * * ?</cron-expression>
             </cron>
         </trigger>
-    </schedule>
+    </schedule>-->
     
-     <schedule>
+     <!--<schedule>
         <job>
             <name>LoadBatches</name>
             <group>processGroup</group>
@@ -60,9 +57,9 @@
                 <cron-expression>10/30 * * * * ?</cron-expression>
             </cron>
         </trigger>
-    </schedule>
+    </schedule>-->
     
-     <schedule>
+     <!--<schedule>
         <job>
             <name>ProcessBatches</name>
             <group>processGroup</group>
@@ -78,9 +75,9 @@
                 <cron-expression>5/30 * * * * ?</cron-expression>
             </cron>
         </trigger>
-    </schedule>
+    </schedule>-->
     <!--  -->
-    <schedule>
+    <!--<schedule>
         <job>
             <name>MoveSFTPFiles</name>
             <group>processGroup</group>
@@ -96,9 +93,9 @@
                 <cron-expression>38 0/10 * * * ?</cron-expression>
             </cron>
         </trigger>
-    </schedule>
+    </schedule>-->
 
-    <schedule>
+    <!--<schedule>
         <job>
             <name>MoveRhapsodyFiles</name>
             <group>processGroup</group>
@@ -114,9 +111,9 @@
                 <cron-expression>0 0/1 * * * ?</cron-expression>
             </cron>
         </trigger>
-    </schedule>
+    </schedule>-->
     
-    <schedule>
+    <!--<schedule>
         <job>
             <name>processWebServiceMessages</name>
             <group>processGroup</group>
@@ -132,27 +129,7 @@
                 <cron-expression>0 0/1 * * * ?</cron-expression>
             </cron>
         </trigger>
-    </schedule>    
-    
-    
-    <!--<schedule>
-        <job>
-            <name>changePW</name>
-            <group>processGroup</group>
-            <description>This changes the passwords</description>
-            <job-class>com.ut.healthelink.jobs.PWChangeJob</job-class>
-        </job>
- 
-        <trigger>
-            <cron>
-                <name>changePWTrigger</name>
-                <job-name>changePW</job-name>
-                <job-group>processGroup</job-group>
-                
-                <cron-expression>0 7/59 * * * ?</cron-expression>
-            </cron>
-        </trigger>
-    </schedule>-->
+    </schedule>    -->
     
     
 </job-scheduling-data>

@@ -408,9 +408,11 @@ h3 {
 
 .news {
   background-color: #AFB8AB;
-  //background-image: url('../../../img/front-end/health-e-link/bg-home-central-graphic.png');
   background-size: auto 100%; 
 }
+
+
+
 
 .home .header-inner {
   height: 100%;
