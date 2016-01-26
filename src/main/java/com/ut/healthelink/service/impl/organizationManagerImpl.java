@@ -178,7 +178,7 @@ public class organizationManagerImpl implements organizationManager {
                 outputStream.close();
 
                 //Set the filename to the file name
-                organization.setHeaderImageDirectory(fileName);
+                organization.setHeaderBackground(fileName);
 
             } catch (IOException e) {
                 e.printStackTrace();

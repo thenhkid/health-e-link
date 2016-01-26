@@ -96,7 +96,6 @@
                 <div class="central-graphic container">
                     <h1>Promoting Better Health and Health Care <small>One Community at a Time</small></h1>
 
-
                     <div class="central-graphic-image image-a">
                         <img src="<%=request.getContextPath()%>/dspResources/img/front-end/health-e-link/photowithchild.jpg" alt="Process referrals and feedback reports electronically with all partners in your care network." />
                         <div class="caret"></div>
@@ -111,7 +110,6 @@
                         <img src="<%=request.getContextPath()%>/dspResources/img/front-end/health-e-link/reportPhoto.jpg" alt="Securely and effectively manage patient data across multiple programs of care." />
                         <div class="caret"></div>
                     </div>
-
 
                     <div class="central-graphic-content">
                         <h3>Our products and services enable health information exchange between<br/>
@@ -129,9 +127,9 @@
                         <c:when test="${param['page-section'] == 'Health-e-Web'}"><h1 class="page-title"><span class="page-title-icon pull-left"></span>Electronic Referral Gateway</h1></c:when>
                         <c:when test="${param['page-section'] == 'Health-e-Connect'}"><h1 class="page-title"><span class="page-title-icon pull-left"></span>File Exchange</h1></c:when>
                         <c:when test="${param['page-section'] == 'Org'}"><h1 class="page-title"><span class="page-title-icon pull-left"></span>Organization Profile</h1></c:when>
-                        <c:otherwise>
-                            <h1 class="page-title">${pageTitle}</h1>
-                        </c:otherwise>
+                        <c:when test="${not empty pageTitle}">
+                             <h1 class="page-title">${pageTitle}</h1>
+                        </c:when>
                     </c:choose>
                 </div>   
             </c:otherwise>

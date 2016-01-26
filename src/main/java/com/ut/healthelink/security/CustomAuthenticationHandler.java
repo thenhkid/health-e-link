@@ -106,7 +106,7 @@ public class CustomAuthenticationHandler extends SimpleUrlAuthenticationSuccessH
                 }
             }
             else {
-                orgDetails.setHeaderLogo(orgDetails.getCleanURL());
+                orgDetails.setHeaderImageDirectory(orgDetails.getCleanURL());
             }
             
             /* Need to store the user company information in session */

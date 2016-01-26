@@ -156,7 +156,7 @@
                                 </div>
                             </c:if>
                             <spring:bind path="headerLogoFile">
-                                <div id="parsingTemplateDiv" class="form-group ${status.error ? 'has-error' : '' }">
+                                <div id="headerLogoDiv" class="form-group ${status.error ? 'has-error' : '' }">
                                     <label class="control-label" for="headerLogoFile">Header Logo</label>
                                     <form:input path="headerLogoFile" id="headerLogoFile" class="form-control" type="file" />
                                     <form:errors path="headerLogoFile" cssClass="control-label" element="label" />
@@ -171,11 +171,11 @@
                                 </div>
                             </c:if>
                             <spring:bind path="headerBackgroundFile">
-                                <div id="parsingTemplateDiv" class="form-group ${status.error ? 'has-error' : '' }">
+                                <div id="headerBackgroundDiv" class="form-group ${status.error ? 'has-error' : '' }">
                                     <label class="control-label" for="headerBackgroundFile">Background Header Image</label>
                                     <form:input path="headerBackgroundFile" id="headerBackgroundFile" class="form-control" type="file" />
                                     <form:errors path="headerBackgroundFile" cssClass="control-label" element="label" />
-                                    <span id="headerBackgroundMsg" class="control-label"></span>
+                                    <span id="headerBackgroundFileMsg" class="control-label"></span>
                                 </div>
                             </spring:bind>
                         </c:if>    
