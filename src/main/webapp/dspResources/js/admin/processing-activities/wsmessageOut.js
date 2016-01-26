@@ -14,7 +14,7 @@ require(['./main'], function () {
         $(document).on('click', '.viewSoapMessage', function(event) {
         	var wsId = $(this).attr('rel'); 
             $.ajax({
-            	url: 'viewSoapMessage.do',
+            	url: 'wsmessage/viewSoapMessage.do',
                 type: "POST",
                 data: {'wsId': wsId},
                 success: function(data) {
@@ -27,7 +27,7 @@ require(['./main'], function () {
         $(document).on('click', '.viewSoapResponse', function(event) {
         	var wsId = $(this).attr('rel'); 
             $.ajax({
-            	url: 'viewSoapResponse.do',
+            	url: 'wsmessage/viewSoapResponse.do',
                 type: "POST",
                 data: {'wsId': wsId},
                 success: function(data) {

@@ -134,44 +134,49 @@ require(['./main'], function () {
         //Set the default file extension when the file type is selected
         $('#fileType').change(function() {
             $('#ccdSampleDiv').hide();
-           
-           var fileType = $(this).val();
-           $('#fileDelimiterDiv').show();
-           
-           if(fileType == 2) {
-              $('#fileExt').val('txt'); 
-           }
-           else if(fileType == 3) {
-              $('#fileExt').val('csv'); 
-           }
-           else if(fileType == 4) {
-              $('#fileExt').val('hr'); 
-           }
-           else if(fileType == 5) {
-              $('#fileExt').val('mdb'); 
-           }
-           else if(fileType == 6) {
-              $('#fileExt').val('pdf'); 
-           }
-           else if(fileType == 7) {
-              $('#fileExt').val('odbc'); 
-           }
-           else if(fileType == 8) {
-              $('#fileExt').val('xls'); 
-           }
-           else if(fileType == 9) {
-              $('#fileExt').val('xml');
-              
-              if($('#configType').attr('rel') == 2) {
-                  $('#ccdSampleDiv').show();
-              }
-              
-              
-           }
-           else if(fileType == 10) {
-              $('#fileExt').val('doc'); 
-           }
-            
+            $('#hl7PDFSampleDiv').hide();
+
+            var fileType = $(this).val();
+            $('#fileDelimiterDiv').show();
+
+            if (fileType == 2) {
+                $('#fileExt').val('txt');
+            }
+            else if (fileType == 3) {
+                $('#fileExt').val('csv');
+            }
+            else if (fileType == 4) {
+                $('#fileExt').val('hr');
+                
+                if ($('#configType').attr('rel') == 2) {
+                    $('#hl7PDFSampleDiv').show();
+                }
+            }
+            else if (fileType == 5) {
+                $('#fileExt').val('mdb');
+            }
+            else if (fileType == 6) {
+                $('#fileExt').val('pdf');
+            }
+            else if (fileType == 7) {
+                $('#fileExt').val('odbc');
+            }
+            else if (fileType == 8) {
+                $('#fileExt').val('xls');
+            }
+            else if (fileType == 9) {
+                $('#fileExt').val('xml');
+
+                if ($('#configType').attr('rel') == 2) {
+                    $('#ccdSampleDiv').show();
+                }
+
+
+            }
+            else if (fileType == 10) {
+                $('#fileExt').val('doc');
+            }
+
         });
         
         //Test the FTP Push Connection
@@ -437,42 +442,72 @@ function checkFormFields() {
        
        if(selMethodId == "6") {
             //Check ws get Fields
-    	   /** domain 1 is a required field is configurationDetails.type == 1 **/
-    	  
-    	   if($('#configurationDetailsType').val() == "1") {
-      	          if($('#domain1').val() == "") {
-      	                $('#wsDomain1Div').addClass("has-error");
-      	                $('#wsDomain1Msg').addClass("has-error");
-      	                $('#wsDomain1Msg').html('Please use add at least one domain.');
-      	                hasErrors = 1;
-      	            }
-    	   }
-      	         
-      	        //Check ws push Fields
-    	   if($('#configurationDetailsType').val() == "2") {      
-      	            if($('#email2').val() == "") {
-      	                $('#wsEmail2Div').addClass("has-error");
-      	                $('#wsEmail2Msg').addClass("has-error");
-      	                $('#wsEmail2Msg').html('The email for outbound is a required field.');
-      	                hasErrors = 1;
-      	            }
-      	            
-      	          if($('#mimeType2').val() == "") {
-    	                $('#wsMimeType2Div').addClass("has-error");
-    	                $('#wsMimeType2Msg').addClass("has-error");
-    	                $('#wsMimeType2Msg').html('The mime type for outbound is a required field.');
-    	                hasErrors = 1;
-    	            }
-    	   }    
-      	            
-      	        if(hasErrors == 1) {
-      	            $('#wsDanger').show();
-      	            hasErrors = 1;
-      	        }
-      	 }
-         
-         if(fileType == 9 && $('#configType').attr('rel') == 2) {
-             if ($('#ccdTemplatefile').val() != "") {
+            /** domain 1 is a required field is configurationDetails.type == 1 **/
+            if ($('#configurationDetailsType').val() == "1") {
+
+                if ($('#domain1').val() == "") {
+                    $('#wsDomain1Div').addClass("has-error");
+                    $('#wsDomain1Msg').addClass("has-error");
+                    $('#wsDomain1Msg').html('Please use add at least one domain.');
+                    hasErrors = 1;
+                }
+
+            }
+
+            //Check ws push Fields
+            if ($('#configurationDetailsType').val() == "2") {
+                if ($('#email2').val() == "") {
+                    $('#wsEmail2Div').addClass("has-error");
+                    $('#wsEmail2Msg').addClass("has-error");
+                    $('#wsEmail2Msg').html('The email for outbound is a required field.');
+                    hasErrors = 1;
+                }
+
+                if ($('#mimeType2').val() == "") {
+                    $('#wsMimeType2Div').addClass("has-error");
+                    $('#wsMimeType2Msg').addClass("has-error");
+                    $('#wsMimeType2Msg').html('The mime type for outbound is a required field.');
+                    hasErrors = 1;
+                }
+            }
+            if (hasErrors == 1) {
+                $('#wsDanger').show();
+                hasErrors = 1;
+            }
+        }
+        
+        if (fileType == 4 && $('#configType').attr('rel') == 2) {
+            if ($('#hl7PDFTemplatefile').val() != "") {
+
+                var filename = $('#hl7PDFTemplatefile').val();
+                var extension = filename.replace(/^.*\./, '');
+
+                if (extension == filename) {
+                    extension = '';
+                } else {
+                    // if there is an extension, we convert to lower case
+                    // (N.B. this conversion will not effect the value of the extension
+                    // on the file upload.)
+                    extension = extension.toLowerCase();
+                }
+
+                if (extension != "txt") {
+                    $('#HL7PDFTemplateDiv').addClass("has-error");
+                    $('#HL7PDFTemplateMsg').addClass("has-error");
+                    $('#HL7PDFTemplateMsg').html('The HL7 PDF Template file must be an txt file.');
+                    hasErrors = 1;
+                }
+            }
+            else {
+                $('#HL7PDFTemplateDiv').addClass("has-error");
+                $('#HL7PDFTemplateMsg').addClass("has-error");
+                $('#HL7PDFTemplateMsg').html('The HL7 PDF Template file must selected.');
+                hasErrors = 1;
+            }
+        }
+
+        if (fileType == 9 && $('#configType').attr('rel') == 2) {
+            if ($('#ccdTemplatefile').val() != "") {
 
                 var filename = $('#ccdTemplatefile').val();
                 var extension = filename.replace(/^.*\./, '');

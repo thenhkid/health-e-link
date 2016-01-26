@@ -11,8 +11,8 @@
             <li role="menuitem" ${param['page'] == 'outbound' ? 'class="active"' : ''}><a href="/administrator/processing-activity/outbound" title="Outbound Processing Activities">Outbound Batches</a></li>
             <sec:authorize access="hasAnyRole('ROLE_ADMIN')">
                 <li role="menuitem" ${param['page'] == 'wsmessage' ? 'class="active"' : ''}><a href="/administrator/processing-activity/wsmessage" title="Web Service Messages">Web Service Messages</a></li>
-                <li role="menuitem" ${param['page'] == 'refActivityExport' ? 'class="active"' : ''}><a href="/administrator/processing-activity/referralActivityExport" title="Referral Activity Export">Referral Activity Export</a></li>
-            </sec:authorize>
+            </sec:authorize>  
+             <li role="menuitem" ${param['page'] == 'refActivityExport' ? 'class="active"' : ''}><a href="/administrator/processing-activity/referralActivityExport" title="Referral Activity Export">Referral Activity Export</a></li>
         </ul>
     </nav>
 </aside>

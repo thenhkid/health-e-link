@@ -275,7 +275,7 @@
                                                         <c:when test="${patientInfo.fieldType == 2 || patientInfo.fieldSelectOptions.size() > 0}">
                                                             <c:choose>
                                                                 <c:when test="${patientInfo.fieldSelectOptions.size() > 0}">
-                                                                    <select <c:if test="${patientInfo.readOnly == true}">disabled</c:if> id="${patientInfo.fieldNo}" name="patientFields[${pfield.index}].fieldValue" class="form-control <c:if test="${patientInfo.required == true}"> required</c:if>">
+                                                                    <select <c:if test="${patientInfo.readOnly == true}">disabled</c:if> id="${patientInfo.fieldNo}" <c:if test="${patientInfo.readOnly == false}">name="patientFields[${pfield.index}].fieldValue"</c:if> class="form-control <c:if test="${patientInfo.required == true}"> required</c:if>">
                                                                             <option value="">-Choose-</option>
                                                                         <c:forEach items="${patientInfo.fieldSelectOptions}" var="options">
                                                                             <option value="${options.optionValue}" <c:if test="${patientInfo.fieldValue == options.optionValue || options.optionValue == options.defaultValue}">selected</c:if>>${options.optionDesc}</option>
@@ -283,7 +283,7 @@
                                                                     </select>
                                                                 </c:when>
                                                                 <c:otherwise>
-                                                                    <input <c:if test="${patientInfo.readOnly == true}">disabled</c:if> id="${patientInfo.fieldNo}" name="patientFields[${pfield.index}].fieldValue" value="${patientInfo.fieldValue}" class="form-control ${patientInfo.validation.replace(' ','-')} <c:if test="${patientInfo.required == true}"> required</c:if>" type="text">
+                                                                    <input <c:if test="${patientInfo.readOnly == true}">disabled</c:if> id="${patientInfo.fieldNo}" <c:if test="${patientInfo.readOnly == false}">name="patientFields[${pfield.index}].fieldValue"</c:if> value="${patientInfo.fieldValue}" class="form-control ${patientInfo.validation.replace(' ','-')} <c:if test="${patientInfo.required == true}"> required</c:if>" type="text">
                                                                 </c:otherwise>
                                                             </c:choose>
                                                         </c:when>
@@ -292,7 +292,7 @@
                                                         </c:when>
                                                         <%-- Text Box Default --%>    
                                                         <c:otherwise>
-                                                            <input <c:if test="${patientInfo.readOnly == true}">disabled</c:if> id="${patientInfo.fieldNo}" name="patientFields[${pfield.index}].fieldValue" value="${patientInfo.fieldValue}" class="form-control ${patientInfo.validation.replace(' ','-')} <c:if test="${patientInfo.required == true}"> required</c:if>" type="text">
+                                                            <input <c:if test="${patientInfo.readOnly == true}">disabled</c:if> id="${patientInfo.fieldNo}" <c:if test="${patientInfo.readOnly == false}">name="patientFields[${pfield.index}].fieldValue"</c:if> value="${patientInfo.fieldValue}" class="form-control ${patientInfo.validation.replace(' ','-')} <c:if test="${patientInfo.required == true}"> required</c:if>" type="text">
                                                         </c:otherwise>
                                                     </c:choose>
                                                     <span id="errorMsg_${patientInfo.fieldNo}" class="control-label"></span>  
@@ -361,8 +361,8 @@
                                                             <c:otherwise>
                                                                 <c:choose>
                                                                     <c:when test="${detailInfo.readOnly == true}">
-                                                                        <input disabled value="${detailInfo.fieldValue}" class="form-control ${detailInfo.validation.replace(' ','-')} type="text">
-                                                                               <input type="hidden" id="${detailInfo.fieldNo}" name="detailFields[${dfield.index}].fieldValue" value="${detailInfo.fieldValue}" />
+                                                                        <input disabled value="${detailInfo.fieldValue}" class="form-control ${detailInfo.validation.replace(' ','-')}" type="text">
+                                                                        <input type="hidden" id="${detailInfo.fieldNo}" name="detailFields[${dfield.index}].fieldValue" value="${detailInfo.fieldValue}" />
                                                                     </c:when>
                                                                     <c:otherwise>
                                                                         <input id="${detailInfo.fieldNo}" name="detailFields[${dfield.index}].fieldValue" value="${detailInfo.fieldValue}" class="form-control ${detailInfo.validation.replace(' ','-')} <c:if test="${detailInfo.required == true}"> required</c:if>" type="text">

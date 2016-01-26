@@ -112,8 +112,9 @@
                             <thead>
                                 <tr>
                                     <th scope="col" style="width:350px;">Organization Name</th>
+                                    <th scope="col" style="width:350px;">Target Organization Name</th>
                                     <th scope="col" style="width:350px;">Message Type</th>
-                                    <th scope="col" class="center-text">Total Feedback Reports Sent</th>
+                                    <th scope="col" class="center-text">Total FB Reports Sent</th>
                                     <th scope="col" class="center-text">Total Open</th>
                                     <th scope="col" class="center-text">Total Closed</th>
                                 </tr>
@@ -123,6 +124,9 @@
                                             <tr>
                                                 <td scope="row">
                                                     ${item.orgName}
+                                                </td>
+                                                <td scope="row">
+                                                    ${item.tgtOrgName}
                                                 </td>
                                                 <td>
                                                     ${item.messageType}

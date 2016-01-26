@@ -586,11 +586,14 @@ function checkFormFields() {
     $('.textarea').each(function() {
        
        $(this).val($(this).val().replace(/\n/g, ""));
-       
+       var fieldNo = $(this).attr('id');
        var textVal = $(this).val();
        
-       if(textVal.length == 499) {
-           alert("The note entered has the maxium allowed characters (500), make sure the note is complete.");
+       if(textVal.length >= 499) {
+           $('#fieldDiv_' + fieldNo).addClass("has-error");
+           $('#errorMsg_' + fieldNo).addClass("has-error");
+           $('#errorMsg_' + fieldNo).html('The value entered has the maxium allowed characters (500), make sure the note is complete.');
+           errorFound = 1;
        }
        
     });

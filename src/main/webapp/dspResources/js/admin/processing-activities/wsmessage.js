@@ -15,7 +15,7 @@ require(['./main'], function () {
         $(document).on('click', '.viewPayload', function(event) {
         	var wsId = $(this).attr('rel'); 
             $.ajax({
-            	url: 'viewPayload.do',
+            	url: 'wsmessage/viewPayload.do',
                 type: "POST",
                 data: {'wsId': wsId},
                 success: function(data) {

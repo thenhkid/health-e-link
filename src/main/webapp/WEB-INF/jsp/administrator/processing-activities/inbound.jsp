@@ -75,7 +75,7 @@
                                                     <c:set var="ext" value="${text[fn:length(text)-1]}" />
                                                     <br />
                                                     <c:set var="hrefLink" value="/FileDownload/downloadFile.do?filename=${batch.utBatchName}.${ext}&foldername=archivesIn"/>
-
+													
                                                     <c:if test="${batch.transportMethodId  == 6}">
                                                         <c:set var="hrefLink" value="/FileDownload/downloadFile.do?filename=${batch.utBatchName}_dec.${ext}&foldername=archivesIn"/>
                                                     </c:if>
@@ -95,14 +95,7 @@
                                                 </c:choose>
                                             </td>
                                             <td class="center-text">
-                                            <c:choose>
-                                                <c:when test="${batch.transportMethodId == 6}">
-                                                <a href="/administrator/processing-activity/wsmessage/${batch.utBatchName}">${batch.transportMethod}</a>
-                                                </c:when>
-                                                <c:otherwise>
                                                  ${batch.transportMethod}
-                                                </c:otherwise>
-                                                </c:choose>
                                             </td>
                                             <td class="center-text">
                                                 <a href="#statusModal" data-toggle="modal" class="viewStatus" rel="${batch.statusId}" title="View this Status">${batch.statusValue}</a>

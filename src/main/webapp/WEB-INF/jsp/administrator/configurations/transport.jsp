@@ -231,6 +231,25 @@
                                 </spring:bind>
                                 <%-- Target File Download options only --%>
                                 <c:if test="${configurationDetails.type == 2}">
+                                    <div id="hl7PDFSampleDiv" style="display:${transportDetails.fileType == 4 ? 'block' : 'none'}">
+                                         <c:if test="${id > 0}">
+                                            <c:if test="${not empty transportDetails.HL7PDFSampleTemplate}">
+                                                <div class="form-group">
+                                                    <label class="control-label" for="HL7PDFSampleTemplate">Current HL7 PDF Template File</label>
+                                                    <input type="text" disabled id="HL7PDFSampleTemplate" class="form-control" value="${transportDetails.HL7PDFSampleTemplate}" />
+                                                    <form:hidden id="HL7PDFSampleTemplate" path="HL7PDFSampleTemplate" />
+                                                </div>
+                                            </c:if>
+                                         </c:if>     
+                                        <spring:bind path="hl7PDFTemplatefile">
+                                            <div id="HL7PDFTemplateDiv" class="form-group ${status.error ? 'has-error' : '' }">
+                                                <label class="control-label" for="hl7PDFTemplatefile">Sample HL7 PDF Template (txt file)</label>
+                                                <form:input path="hl7PDFTemplatefile" id="hl7PDFTemplatefile" class="form-control" type="file" />
+                                                <form:errors path="hl7PDFTemplatefile" cssClass="control-label" element="label" />
+                                                <span id="HL7PDFTemplateMsg" class="control-label"></span>
+                                            </div>
+                                        </spring:bind> 
+                                    </div>
                                     <div id="ccdSampleDiv" style="display:${transportDetails.fileType == 9 ? 'block' : 'none'}">
                                          <c:if test="${id > 0}">
                                             <c:if test="${not empty transportDetails.ccdSampleTemplate}">
