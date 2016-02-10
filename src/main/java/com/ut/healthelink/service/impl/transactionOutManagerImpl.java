@@ -8,6 +8,7 @@ package com.ut.healthelink.service.impl;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
+import com.ut.healthelink.service.convertTextToPDF;
 import com.ut.healthelink.dao.messageTypeDAO;
 import com.ut.healthelink.dao.transactionOutDAO;
 import com.ut.healthelink.model.HL7Details;
@@ -46,7 +47,6 @@ import com.ut.healthelink.model.transactionTarget;
 import com.ut.healthelink.reference.fileSystem;
 import com.ut.healthelink.service.configurationManager;
 import com.ut.healthelink.service.configurationTransportManager;
-import com.ut.healthelink.service.convertTextToPDF;
 import com.ut.healthelink.service.fileManager;
 import com.ut.healthelink.service.organizationManager;
 import com.ut.healthelink.service.transactionInManager;
@@ -1401,7 +1401,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                 
                 Organization orgDetails = organizationManager.getOrganizationById(configurationManager.getConfigurationById(transportDetails.getconfigId()).getorgId());
                 fileSystem ccdTemplateDir = new fileSystem();
-                ccdTemplateDir.setDir(orgDetails.getcleanURL(), "templates");
+                ccdTemplateDir.setDir(orgDetails.getCleanURL(), "templates");
                 
                 String ccdSampleTemplate = transportDetails.getCcdSampleTemplate();
                 
@@ -1492,7 +1492,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                        
                                         Organization orgDetails = organizationManager.getOrganizationById(configurationManager.getConfigurationById(transportDetails.getconfigId()).getorgId());
                                         fileSystem hl7PDFTemplateDir = new fileSystem();
-                                        hl7PDFTemplateDir.setDir(orgDetails.getcleanURL(), "templates");
+                                        hl7PDFTemplateDir.setDir(orgDetails.getCleanURL(), "templates");
 
                                         String hl7PDFSampleTemplate = transportDetails.getHL7PDFSampleTemplate();
 
@@ -1863,7 +1863,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                     File newFile = null;
 
                     fileSystem dir = new fileSystem();
-                    dir.setDir(orgDetails.getcleanURL(), "certificates");
+                    dir.setDir(orgDetails.getCleanURL(), "certificates");
 
                     jsch.addIdentity(new File(dir.getDir() + ftpDetails.getcertification()).getAbsolutePath());
                     session = jsch.getSession(user, host, port);

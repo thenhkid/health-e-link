@@ -2661,7 +2661,7 @@ public class transactionInManagerImpl implements transactionInManager {
             File[] listOfFiles = folder.listFiles((FileFilter) HiddenFileFilter.VISIBLE);
 
             Organization orgDetails = organizationmanager.getOrganizationById(orgId);
-            String defPath = "/bowlink/" + orgDetails.getcleanURL() + "/input files/";
+            String defPath = "/bowlink/" + orgDetails.getCleanURL()+ "/input files/";
             String outPath = fileSystem.setPath(defPath);
 
             //too many variables that could come into play regarding file types, will check files with one method
@@ -3449,7 +3449,7 @@ public class transactionInManagerImpl implements transactionInManager {
             batchInfo.setSenderEmail(ws.getFromAddress());
 
             Organization orgDetails = organizationmanager.getOrganizationById(ws.getOrgId());
-            String writeToFolder = "/bowlink/" + orgDetails.getcleanURL() + "/input files/";
+            String writeToFolder = "/bowlink/" + orgDetails.getCleanURL()+ "/input files/";
             String fileExt = ".txt";
             String fileNamePath = writeToFolder + batchName + fileExt;
             //set folder path

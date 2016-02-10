@@ -38,7 +38,7 @@ public class configurationTransport {
     private List<Integer> messageTypes = null;
     
     @Transient
-    private CommonsMultipartFile ccdTemplatefile = null;
+    private CommonsMultipartFile ccdTemplatefile = null, hl7PDFTemplatefile = null;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -106,6 +106,9 @@ public class configurationTransport {
     
     @Column(name = "attachmentNote", nullable = true)
     private String attachmentNote = "";
+    
+    @Column(name = "HL7PDFSampleTemplate", nullable = true)
+    private String HL7PDFSampleTemplate = null;
 
     public int getId() {
         return id;
@@ -339,5 +342,23 @@ public class configurationTransport {
     public void setAttachmentNote(String attachmentNote) {
         this.attachmentNote = attachmentNote;
     }
+
+    public String getHL7PDFSampleTemplate() {
+        return HL7PDFSampleTemplate;
+    }
+
+    public void setHL7PDFSampleTemplate(String HL7PDFSampleTemplate) {
+        this.HL7PDFSampleTemplate = HL7PDFSampleTemplate;
+    }
+
+    public CommonsMultipartFile getHl7PDFTemplatefile() {
+        return hl7PDFTemplatefile;
+    }
+
+    public void setHl7PDFTemplatefile(CommonsMultipartFile hl7PDFTemplatefile) {
+        this.hl7PDFTemplatefile = hl7PDFTemplatefile;
+    }
+    
+    
     
 }
