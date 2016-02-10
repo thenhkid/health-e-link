@@ -5,6 +5,7 @@
  */
 package com.ut.healthelink.model;
 
+import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -23,6 +24,9 @@ public class batchUploadSummary {
 
     @Transient
     private Integer transactionTargetId = 0;
+
+    @Transient
+    private Date dateSubmitted = new Date();
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -144,6 +148,12 @@ public class batchUploadSummary {
 		this.sourceSubOrgId = sourceSubOrgId;
 	}
 
-    
+    public Date getDateSubmitted() {
+        return dateSubmitted;
+    }
+
+    public void setDateSubmitted(Date dateSubmitted) {
+        this.dateSubmitted = dateSubmitted;
+    }
     
 }

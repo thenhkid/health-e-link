@@ -6,6 +6,7 @@
 
 package com.ut.healthelink.dao;
 
+import com.ut.healthelink.model.Transaction;
 import com.ut.healthelink.model.activityReportList;
 import com.ut.healthelink.model.CrosswalkData;
 import com.ut.healthelink.model.Macros;
@@ -410,4 +411,9 @@ public interface transactionInDAO {
     
     void clearMultipleTargets(Integer batchId) throws Exception;
     
+    List getConfigFieldNumbers(Integer configId) throws Exception;
+    
+    List <Transaction> setTransactionInInfoByStatusId (Integer batchId, List<Integer> statusIds, Integer howMany) throws Exception;
+    
+    Transaction setTransactionTargetInfoByStatusId (Transaction transaction) throws Exception;
 }

@@ -46,6 +46,7 @@ import com.ut.healthelink.model.transactionTarget;
 import com.ut.healthelink.reference.fileSystem;
 import com.ut.healthelink.service.configurationManager;
 import com.ut.healthelink.service.configurationTransportManager;
+import com.ut.healthelink.service.convertTextToPDF;
 import com.ut.healthelink.service.fileManager;
 import com.ut.healthelink.service.organizationManager;
 import com.ut.healthelink.service.transactionInManager;
@@ -134,6 +135,9 @@ public class transactionOutManagerImpl implements transactionOutManager {
     
     @Autowired
     private utilManager utilmanager;
+    
+    @Autowired
+    private convertTextToPDF txtToPDF;
     
     private int processingSysErrorId = 5;
 
@@ -1397,7 +1401,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                 
                 Organization orgDetails = organizationManager.getOrganizationById(configurationManager.getConfigurationById(transportDetails.getconfigId()).getorgId());
                 fileSystem ccdTemplateDir = new fileSystem();
-                ccdTemplateDir.setDir(orgDetails.getCleanURL(), "templates");
+                ccdTemplateDir.setDir(orgDetails.getcleanURL(), "templates");
                 
                 String ccdSampleTemplate = transportDetails.getCcdSampleTemplate();
                 
@@ -1464,7 +1468,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                 HL7Details hl7Details = configurationManager.getHL7Details(transportDetails.getconfigId());
 
                 if (hl7Details != null) {
-
+                    
                     /* Get the hl7 Segments */
                     List<HL7Segments> hl7Segments = configurationManager.getHL7Segments(hl7Details.getId());
 
@@ -1483,6 +1487,88 @@ public class transactionOutManagerImpl implements transactionOutManager {
 
                                 int elementCounter = 1;
                                 for (HL7Elements element : hl7Elements) {
+                                    
+                                    if("pdfattachment".equals(element.getelementName().toLowerCase()) && transportDetails.getHL7PDFSampleTemplate()!= null && !"".equals(transportDetails.getHL7PDFSampleTemplate())) {
+                                       
+                                        Organization orgDetails = organizationManager.getOrganizationById(configurationManager.getConfigurationById(transportDetails.getconfigId()).getorgId());
+                                        fileSystem hl7PDFTemplateDir = new fileSystem();
+                                        hl7PDFTemplateDir.setDir(orgDetails.getcleanURL(), "templates");
+
+                                        String hl7PDFSampleTemplate = transportDetails.getHL7PDFSampleTemplate();
+
+                                        Path path = Paths.get(hl7PDFTemplateDir.getDir() + hl7PDFSampleTemplate);
+                                        String hl7PDFSampleContent = new String(Files.readAllBytes(path));
+
+                                        Path newFilePath = Paths.get(dir.getDir() + "hl7pdf.txt");
+                                        Files.write(newFilePath, hl7PDFSampleContent.getBytes());
+
+                                        String contentToUpdate = new String(Files.readAllBytes(newFilePath));
+                                        
+                                        List<configurationCCDElements> hl7PDFElements = configurationManager.getCCDElements(transportDetails.getconfigId());
+                                        
+                                        if(!hl7PDFElements.isEmpty()) {
+                    
+                                            for(configurationCCDElements CCDelement : hl7PDFElements) {
+
+                                                if(!"".equals(CCDelement.getDefaultValue())) {
+                                                    if ("~currDate~".equals(CCDelement.getDefaultValue())) {
+                                                        SimpleDateFormat date_format = new SimpleDateFormat("yyyyMMdd");
+                                                        String date = date_format.format(batchDetails.getdateCreated());
+                                                        contentToUpdate = contentToUpdate.replace(CCDelement.getElement(), date);
+                                                    }
+                                                    else {
+                                                        contentToUpdate = contentToUpdate.replace(CCDelement.getElement(), CCDelement.getDefaultValue());
+                                                    }
+
+                                                }
+                                                else {
+                                                     String colName = new StringBuilder().append("f").append(CCDelement.getFieldValue()).toString();
+
+                                                      String fieldValue = BeanUtils.getProperty(records, colName);
+
+                                                      if (fieldValue == null) {
+                                                           fieldValue = "";
+                                                      } else if ("null".equals(fieldValue)) {
+                                                          fieldValue = "";
+                                                      } else if (fieldValue.isEmpty()) {
+                                                          fieldValue = "";
+                                                      } else if (fieldValue.length() == 0) {
+                                                          fieldValue = "";
+                                                      }
+
+                                                      contentToUpdate = contentToUpdate.replace(CCDelement.getElement(), fieldValue);
+                                                }
+
+                                            }
+                                        }
+                                        
+                                        Files.write(newFilePath, contentToUpdate.getBytes());
+                                        
+                                        File inputFile = new File(dir.getDir() + "hl7pdf.txt");
+                                        
+                                        if(txtToPDF.convertTextToPDF(inputFile, dir.getDir(), "hl7pdf.pdf")) {
+                                            fileSystem attachDir = new fileSystem();
+                                            File f = new File(dir.getDir() + "hl7pdf.pdf");
+                                            byte[] bytes = attachDir.loadFile(f);
+                                            byte[] encoded = Base64.encode(bytes);
+                                            String encodedString = new String(encoded);
+                                            
+                                            hl7recordRow.append(encodedString);
+                                            
+                                            /* Decode the encoded content back to a PDF */
+                                            /*byte[] decoded = Base64.decode(encodedString.getBytes());
+                                            File newfile = new File(dir.getDir() + "sample.pdf");
+                                            BufferedOutputStream writer = new BufferedOutputStream(new FileOutputStream(newfile));
+                                            writer.write(decoded);
+                                            writer.flush();
+                                            writer.close();*/
+                                            
+                                            /* Delete files */
+                                            inputFile.delete();
+                                            f.delete();
+                                        }
+                                        
+                                    }
                                     
                                     /* If the HL7 requires attachments then we need to look for the "attachments" keyword
                                     in order to loop through and retrieve all attachments to the batch.
@@ -1777,7 +1863,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                     File newFile = null;
 
                     fileSystem dir = new fileSystem();
-                    dir.setDir(orgDetails.getCleanURL(), "certificates");
+                    dir.setDir(orgDetails.getcleanURL(), "certificates");
 
                     jsch.addIdentity(new File(dir.getDir() + ftpDetails.getcertification()).getAbsolutePath());
                     session = jsch.getSession(user, host, port);

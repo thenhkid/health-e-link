@@ -11,6 +11,7 @@ import com.ut.healthelink.model.CrosswalkData;
 import com.ut.healthelink.model.Macros;
 import com.ut.healthelink.model.Organization;
 import com.ut.healthelink.model.MoveFilesLog;
+import com.ut.healthelink.model.Transaction;
 import com.ut.healthelink.model.TransactionInError;
 import com.ut.healthelink.model.User;
 import com.ut.healthelink.model.UserActivity;
@@ -4038,12 +4039,30 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Override
     @Transactional
     public batchUploadSummary getUploadSummaryDetails(int transactionInId) {
+        
+        try {
+            String sql = ("select batchUploadSummary.*, batchUploads.dateSubmitted as dateSubmitted from batchUploadSummary inner join batchUploads on batchUploads.id = batchUploadSummary.batchId where"
+                    + " batchUploadSummary.transactionInId = :transactionInId ");
+            
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
+                    Transformers.aliasToBean(batchUploadSummary.class));
+            query.setParameter("transactionInId", transactionInId);
 
-        /* Get a list of available batches */
+            List<batchUploadSummary> batchUploadSummaries = query.list();
+
+            return batchUploadSummaries.get(0);
+
+        } catch (Exception ex) {
+            System.err.println("getBatchUploadSummary " + ex.getCause());
+            ex.printStackTrace();
+            return null;
+        }
+        
+        /* Get a list of available batches 
         Criteria batchSummaries = sessionFactory.getCurrentSession().createCriteria(batchUploadSummary.class);
         batchSummaries.add(Restrictions.eq("transactionInId", transactionInId));
 
-        return (batchUploadSummary) batchSummaries.uniqueResult();
+        return (batchUploadSummary) batchSummaries.uniqueResult();*/
 
     }
 
@@ -4935,8 +4954,13 @@ public class transactionInDAOImpl implements transactionInDAO {
         
         Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(Transformers.aliasToBean(messagePatients.class));
 
-        return (messagePatients) query.uniqueResult();
-
+        if(query.list().size() > 1) {
+            return (messagePatients) query.list().get(0);
+        }
+        else {
+            return (messagePatients) query.uniqueResult();
+        }
+        
     }
 
     @Override
@@ -6350,8 +6374,9 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Override
     @Transactional
     public List<activityReportList> getFeedbackReportList(String batchIds) throws Exception {
-        String sql = ("select a.configId as configId, c.orgname as orgName, d.displayName as messageType, count(a.id) as total, d.id as messageTypeId\n"
+        String sql = ("select a.configId as configId, c.orgname as orgName, d.displayName as messageType, f.orgName as tgtOrgName, count(a.id) as total, d.id as messageTypeId\n"
                 + "from transactionIn a inner join configurations b on b.id = a.configId inner join organizations c on c.id = b.orgId inner join messagetypes d on d.id = b.messageTypeId\n"
+                + "inner join batchuploadsummary e on e.batchId = a.batchId inner join organizations f on f.id = e.targetOrgId\n"
                 + "where a.batchId in (" + batchIds + ") "
                 + "and a.transactionTargetId > 0 "
                 + "and a.statusId not in (19,15,31,13,11,14,21) "
@@ -6413,6 +6438,45 @@ public class transactionInDAOImpl implements transactionInDAO {
         Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
         
         return (Integer) query.uniqueResult();
+    }
+    
+    @Override
+    @Transactional
+    public List getConfigFieldNumbers(Integer configId) throws Exception {
+        String sql = (
+                "select q1.referralIdField, q2.activityStatusField, q3.notesField, q4.statusField FROM "
+                   + "("
+                   + " select configId, fieldNo as referralIdField"
+                   + " from configurationformfields"
+                   + " where configId = " + configId + " and saveToTableName = 'message_visitinfo' and saveToTableCol = 'referralId'"
+                   + ")"
+                   + " as q1 LEFT JOIN"
+                   + "("
+                   + " select configId, fieldNo as activityStatusField"
+                   + " from configurationformfields"
+                   + " where configId = " + configId + " and saveToTableName = 'message_visitinfo' and saveToTableCol = 'status'"
+                   + ")"
+                   + " as q2 on q1.configId = q2.configId"
+                   + " LEFT JOIN"
+                   + "("
+                   + " select configId, fieldNo as notesField"
+                   + " from configurationformfields"
+                   + " where configId = " + configId + " and saveToTableName = 'message_misc' and fieldType = 5"
+                   + " order by id desc"
+                   + " limit 1"
+                   + " ) as q3 on q1.configId = q3.configId"
+                   + " LEFT JOIN"
+                   + "("
+                   + " select configId, fieldNo as statusField"
+                   + " from configurationformfields"
+                   + " where configId = " + configId + " and saveToTableCol = 'messageStatus'"
+                   + " ) as q4 on q1.configId = q4.configId"
+                );
+        
+        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+        
+        return query.list();
+        
     }
   
     
@@ -6585,4 +6649,64 @@ public class transactionInDAOImpl implements transactionInDAO {
         deletMultipleTargets.setParameter("batchId", batchId);
         deletMultipleTargets.executeUpdate();
     }
+
+	@SuppressWarnings("unchecked")
+	@Override
+	@Transactional
+	public List<Transaction> setTransactionInInfoByStatusId(Integer batchId,
+			List<Integer> statusIds, Integer howMany) throws Exception {
+		
+		String sql = ("select configName as srcConfigName, "
+				+ " case sourcesuborgid when 0 then config.orgid"
+				+ " else sourcesuborgid end as orgId, "
+				+ " ti.configId , ti.id as transactionId, bu.id as batchId "
+				+ " from "
+				+ " batchuploads BU, transactionin TI, configurations config "
+				+ " where TI.statusid in (:statusIds) "
+				+ " and bu.id = ti.batchid "
+				+ " and ti.configId = config.id "
+				+ "and ti.batchid = :batchId limit :howMany");
+        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
+        		.addScalar("srcConfigName", StandardBasicTypes.STRING)
+                .addScalar("orgId", StandardBasicTypes.INTEGER)
+                .addScalar("transactionId", StandardBasicTypes.INTEGER)
+                .addScalar("configId", StandardBasicTypes.INTEGER)
+                .addScalar("batchId", StandardBasicTypes.INTEGER)
+                .setResultTransformer(
+                        Transformers.aliasToBean(Transaction.class))
+                .setParameter("batchId", batchId)
+                .setParameter("howMany", howMany)
+                .setParameterList("statusIds", statusIds)
+                ;
+
+        List<Transaction> transactions = query.list();
+
+        return transactions;
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	@Transactional
+	public Transaction setTransactionTargetInfoByStatusId (Transaction transaction)  throws Exception {
+		String sql = ("select case targetsuborgid when 0 then config.orgid"
+				+ " else targetsuborgid end as targetOrgId, configId as targetConfigId1, "
+				+ " configName as targetConfigName, transactiontarget.Id as transactionTargetId"
+				+ " from transactiontarget, configurations config "
+				+ " where transactionInId = :transactionInId and config.id = configId limit 1;");
+        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
+        		.addScalar("targetConfigId1", StandardBasicTypes.INTEGER)
+                .addScalar("targetOrgId", StandardBasicTypes.INTEGER)
+                .addScalar("targetConfigName", StandardBasicTypes.STRING)
+                .addScalar("transactionTargetId", StandardBasicTypes.INTEGER)
+                .setResultTransformer(
+                        Transformers.aliasToBean(Transaction.class))
+                .setParameter("transactionInId", transaction.gettransactionId());
+
+        List <Transaction> transactions = query.list();
+        if (transactions.size() > 0) {
+        	return transactions.get(0);
+        } else {
+        	return null;
+        }
+	}
 }

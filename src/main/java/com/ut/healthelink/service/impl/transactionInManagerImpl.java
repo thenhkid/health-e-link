@@ -91,9 +91,12 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Properties;
+
 import javax.annotation.Resource;
+
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.HiddenFileFilter;
 import org.apache.commons.validator.routines.UrlValidator;
@@ -101,7 +104,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
-
 
 /**
  *
@@ -159,6 +161,10 @@ public class transactionInManagerImpl implements transactionInManager {
 
     //final status Ids
     private List<Integer> finalStatusIds = Arrays.asList(11, 12, 13, 16);
+    
+    //reject Ids
+    private List<Integer> rejectIds = Arrays.asList(13,14);
+    
 
     private String archivePath = "/bowlink/archivesIn/";
 
@@ -782,6 +788,17 @@ public class transactionInManagerImpl implements transactionInManager {
 
             } //end of making sure there is one handling details for batch
 
+            //we finish processing, we need to alert admin if there are any records there are rejected
+            /**
+             * we check batch to see if the batch has any rejected records.
+             * if it does, we send an email to notify reject.email in properties file
+             * 
+             */
+            Integer rejectedCount = getRecordCounts(batch.getId(), rejectIds, false, true);
+            if ( rejectedCount > 0) {
+            	sendRejectNotification(batch, rejectedCount);
+            }
+            
         } // end of single batch insert 
 
         /**
@@ -2644,7 +2661,7 @@ public class transactionInManagerImpl implements transactionInManager {
             File[] listOfFiles = folder.listFiles((FileFilter) HiddenFileFilter.VISIBLE);
 
             Organization orgDetails = organizationmanager.getOrganizationById(orgId);
-            String defPath = "/bowlink/" + orgDetails.getCleanURL() + "/input files/";
+            String defPath = "/bowlink/" + orgDetails.getcleanURL() + "/input files/";
             String outPath = fileSystem.setPath(defPath);
 
             //too many variables that could come into play regarding file types, will check files with one method
@@ -3432,7 +3449,7 @@ public class transactionInManagerImpl implements transactionInManager {
             batchInfo.setSenderEmail(ws.getFromAddress());
 
             Organization orgDetails = organizationmanager.getOrganizationById(ws.getOrgId());
-            String writeToFolder = "/bowlink/" + orgDetails.getCleanURL() + "/input files/";
+            String writeToFolder = "/bowlink/" + orgDetails.getcleanURL() + "/input files/";
             String fileExt = ".txt";
             String fileNamePath = writeToFolder + batchName + fileExt;
             //set folder path
@@ -4044,8 +4061,7 @@ public class transactionInManagerImpl implements transactionInManager {
             for(transactionTarget transaction : transactions) {
                 
                 transactionIn transactionInDetails = transactionInDAO.getTransactionDetails(transaction.gettransactionInId());
-                
-                batchUploads batchUploadDetails = transactionInDAO.getBatchDetails(transaction.getbatchUploadId());
+
                 batchUploadSummary batchUploadSummary = transactionInDAO.getUploadSummaryDetails(transaction.gettransactionInId());
                 
                 String type = "R";
@@ -4055,23 +4071,54 @@ public class transactionInManagerImpl implements transactionInManager {
                 Integer eRefId = 0;
                 String referralId = "";
                 String referralDate = "";
+                String feedbackNotes = "";
                 
-                if(transactionInDetails.gettransactionTargetId() > 0) {
-                    type = "F";
-                    FBDateTime = batchUploadDetails.getdateSubmitted().toString();
+                List fieldNumbers = transactionInDAO.getConfigFieldNumbers(transactionInDetails.getConfigId());
+                
+                Integer referralIdFieldNo = 0;
+                Integer activityStatusFieldNo = 0;
+                Integer notesFieldNo = 0;
+                Integer statusFieldNo = 0;
+                
+                for (ListIterator iter = fieldNumbers.listIterator(); iter.hasNext();) {
+
+                    Object[] row = (Object[]) iter.next();
                     
+                    if(row[0] != null && Integer.valueOf(String.valueOf(row[0])) > 0) {
+                        referralIdFieldNo = Integer.valueOf(String.valueOf(row[0]));
+                    }
+                    
+                    if(row[1] != null && Integer.valueOf(String.valueOf(row[1])) > 0) {
+                        activityStatusFieldNo = Integer.valueOf(String.valueOf(row[1]));
+                    }
+                    
+                    if(row[2] != null && Integer.valueOf(String.valueOf(row[2])) > 0) {
+                        notesFieldNo = Integer.valueOf(String.valueOf(row[2]));
+                    }
+                    
+                    if(row[3] != null && Integer.valueOf(String.valueOf(row[3])) > 0) {
+                        statusFieldNo = Integer.valueOf(String.valueOf(row[3]));
+                    }
+
+                }
+                
+                if (transactionInDetails.gettransactionTargetId() > 0) {
+                    type = "F";
+                    FBDateTime = batchUploadSummary.getDateSubmitted().toString();
+
                     transactionTarget origReferralTransaction = transactionOutDAO.getTransactionDetails(transactionInDetails.gettransactionTargetId());
                     batchUploads origbatchUploadDetails = transactionInDAO.getBatchDetails(origReferralTransaction.getbatchUploadId());
-                    
+
                     referralDate = origbatchUploadDetails.getdateSubmitted().toString();
                     eRefId = origbatchUploadDetails.getId();
 
-                    Integer statusFieldNo = transactionInDAO.getStatusFieldNo(transactionInDetails.getConfigId());
-                    String fieldNo = "f"+statusFieldNo;
+                    //Integer statusFieldNo = transactionInDAO.getStatusFieldNo(transactionInDetails.getConfigId());
+                    if(statusFieldNo > 0) {
+                        String fieldNo = "f" + statusFieldNo;
+                        referralStatus = transactionInDAO.getTransactionFieldValue(transaction.gettransactionInId(), fieldNo);
+                    }
                     
-                    referralStatus = transactionInDAO.getTransactionFieldValue(transaction.gettransactionInId(), fieldNo);
-                    
-                    if("1".equals(referralStatus)) {
+                    if ("1".equals(referralStatus)) {
                         referralStatus = "Open";
                     } else if ("2".equals(referralStatus)) {
                         referralStatus = "Closed";
@@ -4079,7 +4126,11 @@ public class transactionInManagerImpl implements transactionInManager {
                         referralStatus = "Open";
                     }
                     
-                    Integer referralIdFieldNo = transactionInDAO.getReferralIdFieldNo(transactionInDetails.getConfigId());
+                    if(notesFieldNo > 0) {
+                        String notefieldNo = "f" + notesFieldNo;
+                        feedbackNotes = transactionInDAO.getTransactionFieldValue(transaction.gettransactionInId(), notefieldNo);
+                    }
+                    //Integer referralIdFieldNo = transactionInDAO.getReferralIdFieldNo(transactionInDetails.getConfigId());
                     
                     if(referralIdFieldNo != null && referralIdFieldNo > 0) {
                         String referralIdfieldNo = "f" + referralIdFieldNo;
@@ -4087,30 +4138,35 @@ public class transactionInManagerImpl implements transactionInManager {
                         referralId = transactionInDAO.getTransactionFieldValue(transaction.gettransactionInId(), referralIdfieldNo);
                     }
 
-                    Integer activityStatusFieldNo = transactionInDAO.getActivityStatusFieldNo(transactionInDetails.getConfigId());
+                    //Integer activityStatusFieldNo = transactionInDAO.getActivityStatusFieldNo(transactionInDetails.getConfigId());
 
                     if (activityStatusFieldNo != null && activityStatusFieldNo > 0) {
                         String activityfieldNo = "f" + activityStatusFieldNo;
 
                         FBActivityStatus = transactionInDAO.getTransactionFieldValue(transaction.gettransactionInId(), activityfieldNo);
 
-                        if (FBActivityStatus != null && Integer.parseInt(FBActivityStatus) > 0) {
-                            FBActivityStatus = transactionInDAO.getReportActivityStatusValueById(Integer.parseInt(FBActivityStatus));
-                            
-                            if (FBActivityStatus == null || "".equals(FBActivityStatus) || "null".equals(FBActivityStatus)) {
+                        try {
+                            if (FBActivityStatus != null && Integer.parseInt(FBActivityStatus) > 0) {
+                                FBActivityStatus = transactionInDAO.getReportActivityStatusValueById(Integer.parseInt(FBActivityStatus));
+
+                                if (FBActivityStatus == null || "".equals(FBActivityStatus) || "null".equals(FBActivityStatus)) {
+                                    FBActivityStatus = "Service Update";
+                                }
+                            }
+                            else {
                                 FBActivityStatus = "Service Update";
                             }
                         }
-                        else {
-                            FBActivityStatus = "Service Update";
+                        catch (Exception e) {
+                            
                         }
                     }
 
                 } else {
-                    referralDate = batchUploadDetails.getdateSubmitted().toString();
-                    eRefId = batchUploadDetails.getId();
+                    referralDate = batchUploadSummary.getDateSubmitted().toString();
+                    eRefId = batchUploadSummary.getbatchId();
                     
-                    Integer referralIdFieldNo = transactionInDAO.getReferralIdFieldNo(transactionInDetails.getConfigId());
+                    //Integer referralIdFieldNo = transactionInDAO.getReferralIdFieldNo(transactionInDetails.getConfigId());
                     
                     if(referralIdFieldNo != null && referralIdFieldNo > 0) {
                         String referralIdfieldNo = "f" + referralIdFieldNo;
@@ -4118,71 +4174,48 @@ public class transactionInManagerImpl implements transactionInManager {
                         referralId = transactionInDAO.getTransactionFieldValue(transaction.gettransactionInId(), referralIdfieldNo);
                     }
                 }
-               
-                
+
                 String messageTypeName = configurationManager.getMessageTypeNameByConfigId(batchUploadSummary.getsourceConfigId());
-                
+
                 batchDownloads batchDownloadDetails = transactionOutDAO.getBatchDetails(transaction.getbatchDLId());
-                
-                /** Get patient information **/
+
+                /**
+                 * Get patient information *
+                 */
                 messagePatients patientDetails = transactionInDAO.getPatientTransactionDetailsForExport(transaction.gettransactionInId());
-                
-                Organization sourceOrg = organizationmanager.getOrganizationById(batchUploadDetails.getOrgId());
+
+                Organization sourceOrg = organizationmanager.getOrganizationById(batchUploadSummary.getsourceOrgId());
                 Organization sourceSiteOrg = null;
-                if(transaction.getSourceSubOrgId() > 0) {
+                if (transaction.getSourceSubOrgId() > 0) {
                     sourceSiteOrg = organizationmanager.getOrganizationById(transaction.getSourceSubOrgId());
                 }
-               
+
                 Organization targetOrg = organizationmanager.getOrganizationById(batchDownloadDetails.getOrgId());
                 Organization targetSiteOrg = null;
-                if(transaction.getTargetSubOrgId() > 0) {
+                if (transaction.getTargetSubOrgId() > 0) {
                     targetSiteOrg = organizationmanager.getOrganizationById(transaction.getTargetSubOrgId());
                 }
-                
-                
+
                 /**
-                 * R - (REFRRAL), C - (CBO Update) OR F - (FB REPORT)
-                 * Sending Org
-                 * Sending Site
-                 * Receiving Org
-                 * Receiving Site
-                 * Referral Date / Time
-                 * eRef Referral Id
-                 * DOB
-                 * Gender
-                 * Race
-                 * Ethnicity
-                 * Preferred Language
-                 * Zip Code
-                 * Referral Type
-                 * Program Option 1
-                 * Program Option 2
-                 * Program Option 3
-                 * Program Option 4
-                 * Program Option 5
-                 * Program Option 6
-                 * Program activity status 1
-                 * Program activity status 2
-                 * Program activity status 3
-                 * Program activity status 4
-                 * Program activity status 5
-                 * Program activity status 6
-                 * Referral Status
-                 * Feedback Report Activity Status
-                 * Feedback Report Date / Time
-                 * Feedback Report Notes
-                 * CBO Activity Type Status
-                 * CBO Activity Type Status Date / Time
-                 * CBO Notes 
-                 * Transaction Created By
+                 * R - (REFRRAL), C - (CBO Update) OR F - (FB REPORT) Sending
+                 * Org Sending Site Receiving Org Receiving Site Referral Date /
+                 * Time eRef Referral Id DOB Gender Race Ethnicity Preferred
+                 * Language Zip Code Referral Type Program Option 1 Program
+                 * Option 2 Program Option 3 Program Option 4 Program Option 5
+                 * Program Option 6 Program activity status 1 Program activity
+                 * status 2 Program activity status 3 Program activity status 4
+                 * Program activity status 5 Program activity status 6 Referral
+                 * Status Feedback Report Activity Status Feedback Report Date /
+                 * Time Feedback Report Notes CBO Activity Type Status CBO
+                 * Activity Type Status Date / Time CBO Notes Transaction
+                 * Created By
                  */
-                
                 exportRow = new StringBuilder();
-               
+
                 exportRow.append(type).append("|");
                 exportRow.append(sourceOrg.getOrgName()).append("|");
 
-                if(sourceSiteOrg != null) {
+                if (sourceSiteOrg != null) {
                     exportRow.append(sourceSiteOrg.getOrgName()).append("|");
                 } else {
                     exportRow.append(sourceOrg.getOrgName()).append("|");
@@ -4190,7 +4223,7 @@ public class transactionInManagerImpl implements transactionInManager {
 
                 exportRow.append(targetOrg.getOrgName()).append("|");
 
-                if(targetSiteOrg != null) {
+                if (targetSiteOrg != null) {
                     exportRow.append(targetSiteOrg.getOrgName()).append("|");
                 } else {
                     exportRow.append(targetOrg.getOrgName()).append("|");
@@ -4233,28 +4266,27 @@ public class transactionInManagerImpl implements transactionInManager {
                         .append(referralStatus).append("|")
                         .append(FBActivityStatus).append("|")
                         .append(FBDateTime).append("|")
-                        .append("").append("|")
+                        .append(feedbackNotes).append("|")
                         .append("").append("|")
                         .append("").append("|")
                         .append("").append("|")
                         .append("");
 
-               exportRow.append(System.getProperty("line.separator"));
+                exportRow.append(System.getProperty("line.separator"));
 
-               fw.write(exportRow.toString());
-                
+                fw.write(exportRow.toString());
+
                 /* Get all notes */
                 List<transactionOutNotes> transactionNotes = transactionOutDAO.getNotesByTransactionId(transaction.getId());
-                
-                
-                if(transactionNotes != null && transactionNotes.size() > 0) {
-                    
-                    for(transactionOutNotes note : transactionNotes) {
-                        
+
+                if (transactionNotes != null && transactionNotes.size() > 0) {
+
+                    for (transactionOutNotes note : transactionNotes) {
+
                         exportRow = new StringBuilder();
-                        
+
                         User noteUser = usermanager.getUserById(note.getuserId());
-                        
+
                         exportRow.append("C").append("|");
                         exportRow.append(sourceOrg.getOrgName()).append("|");
 
@@ -4272,8 +4304,8 @@ public class transactionInManagerImpl implements transactionInManager {
                             exportRow.append(targetOrg.getOrgName()).append("|");
                         }
 
-                        exportRow.append(batchUploadDetails.getdateSubmitted()).append("|")
-                                .append(batchUploadDetails.getId()).append("|")
+                        exportRow.append(batchUploadSummary.getDateSubmitted()).append("|")
+                                .append(batchUploadSummary.getbatchId()).append("|")
                                 .append(referralId).append("|")
                                 .append(patientDetails.getDob()).append("|")
                                 .append(patientDetails.getGenderVal()).append("|")
@@ -4287,28 +4319,27 @@ public class transactionInManagerImpl implements transactionInManager {
                                 .append("").append("|")
                                 .append("").append("|")
                                 .append("").append("|")
-                                .append("").append("|") 
                                 .append("").append("|")
                                 .append("").append("|")
                                 .append("").append("|")
                                 .append("").append("|")
                                 .append("").append("|")
-                                .append("").append("|")        
                                 .append("").append("|")
-                                .append("").append("|")     
-                                .append("").append("|") 
-                                .append("").append("|")         
+                                .append("").append("|")
+                                .append("").append("|")
+                                .append("").append("|")
+                                .append("").append("|")
+                                .append("").append("|")
                                 .append(note.getMessageStatus()).append("|")
-                                .append(note.getdateSubmitted()).append("|") 
-                                .append(note.getnote().trim()).append("|")    
+                                .append(note.getdateSubmitted()).append("|")
+                                .append(note.getnote().trim()).append("|")
                                 .append(noteUser.getFirstName()).append(" ")
                                 .append(noteUser.getLastName());
-                                
-                        
+
                         exportRow.append(System.getProperty("line.separator"));
-                        
+
                         fw.write(exportRow.toString());
-                
+
                     }
                     
                 }
@@ -4324,4 +4355,65 @@ public class transactionInManagerImpl implements transactionInManager {
     public void clearMultipleTargets(Integer batchId) throws Exception {
         transactionInDAO.clearMultipleTargets(batchId);
     }
+
+	@Override
+	public void sendRejectNotification(batchUploads batch, Integer rejectCount)
+			throws Exception {
+		 mailMessage mail = new mailMessage();
+         mail.setfromEmailAddress("e-Referral@state.ma.us");
+         //build message
+         String message = "Batch "+ batch.getutBatchName() +" contains " + rejectCount + " rejected transaction(s).";
+         message = message + "<br/><br/>Please see details below.";
+         
+         List<Transaction> transactions = getTransactionsByStatusId(batch.getId(), rejectIds, 5);
+         for (Transaction transaction : transactions) {
+        	 message = message + "<br/><br/>" + transaction.getSrcOrgName() + " to " + transaction.getTargetOrgName()
+        			 + ", " + transaction.getSrcConfigName();
+         }
+         if (rejectCount >=5) {
+        	 message = message + "<br/><br/>There first 5 rejected transactions are listed above.";
+         }
+         message = message + "<br/><br/>For more information, please login and review the audit report.";
+         
+         String[] ccAddresses = new String[] {"chadmccue05@gmail.com"};
+         
+         mail.setmessageBody(message);
+         mail.setmessageSubject("eReferral System - Batch "+ batch.getutBatchName() +" contains errors " + myProps.getProperty("server.identity"));
+         mail.settoEmailAddress(myProps.getProperty("reject.email"));
+         mail.setccEmailAddress(ccAddresses);
+         emailManager.sendEmail(mail);
+}
+
+	@Override
+	public List<Transaction> getTransactionsByStatusId(Integer batchId,
+			List<Integer> statusIds, Integer howMany) throws Exception {
+		
+		List<Transaction> transactions = setTransactionInInfoByStatusId (batchId, statusIds, howMany);
+		
+		for(Transaction transaction : transactions) {
+			transaction.setSrcOrgName(organizationmanager.getOrganizationById(transaction.getorgId()).getOrgName());
+			Transaction transactionOut = setTransactionTargetInfoByStatusId (transaction); 	
+			if (transactionOut != null) {
+				transaction.setTargetOrgName(organizationmanager.getOrganizationById(transactionOut.gettargetOrgId()).getOrgName());
+				transaction.setTargetConfigId1(transactionOut.getTargetConfigId1());
+				transaction.setTargetConfigName(transactionOut.getTargetConfigName());
+				transaction.settransactionTargetId(transactionOut.gettransactionTargetId());
+				transaction.settargetOrgId(transactionOut.gettargetOrgId());
+			}
+		}
+		return transactions;
+		
+	}
+    
+	@Override
+	public List <Transaction> setTransactionInInfoByStatusId (Integer batchId, List<Integer> statusIds, Integer howMany) throws Exception{
+		 return transactionInDAO.setTransactionInInfoByStatusId(batchId, statusIds, howMany);
+	}
+	@Override
+	public Transaction setTransactionTargetInfoByStatusId (Transaction transaction ) throws Exception{
+		 return transactionInDAO.setTransactionTargetInfoByStatusId(transaction);
+	}
+	
+    
+    
 }

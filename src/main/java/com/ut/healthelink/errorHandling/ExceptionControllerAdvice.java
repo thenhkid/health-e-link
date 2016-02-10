@@ -52,7 +52,7 @@ public class ExceptionControllerAdvice {
         
         messageDetails.settoEmailAddress("dphuniversaltranslator@gmail.com");
         messageDetails.setfromEmailAddress("e-Referral@state.ma.us");
-        messageDetails.setmessageSubject("Exception Error " + myProps.getProperty("server.identity"));
+        messageDetails.setmessageSubject("Exception Error "  + " " + myProps.getProperty("server.identity"));
         
         StringBuilder sb = new StringBuilder();
 

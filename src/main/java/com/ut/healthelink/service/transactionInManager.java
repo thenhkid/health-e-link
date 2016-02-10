@@ -467,5 +467,12 @@ public interface transactionInManager {
     List<batchUploads> getAllRejectedBatches(Date fromDate, Date toDate, Integer fetchSize) throws Exception;
     
     void clearMultipleTargets(Integer batchId) throws Exception;
-
+    
+    void sendRejectNotification(batchUploads batch, Integer rejectCount) throws Exception;
+    
+    List <Transaction> getTransactionsByStatusId (Integer batchId, List<Integer> statusIds, Integer howMany) throws Exception;
+    
+    List <Transaction> setTransactionInInfoByStatusId (Integer batchId, List<Integer> statusIds, Integer howMany) throws Exception;
+    
+    Transaction setTransactionTargetInfoByStatusId (Transaction transaction) throws Exception;
 }
