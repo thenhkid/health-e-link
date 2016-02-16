@@ -6,7 +6,7 @@
         http://www.quartz-scheduler.org/xml/job_scheduling_data_1_8.xsd"
     version="1.8">
  
-   <!-- <schedule>
+   <schedule>
         <job>
             <name>ProcessOutputFiles</name>
             <group>processGroup</group>
@@ -22,8 +22,8 @@
                  <cron-expression>22 0/1 * * * ?</cron-expression>
             </cron>
         </trigger>
-    </schedule>-->
-    <!--<schedule>
+    </schedule>
+    <schedule>
         <job>
             <name>GenerateOutputFiles</name>
             <group>processGroup</group>
@@ -39,9 +39,9 @@
                 <cron-expression>12 0/2 * * * ?</cron-expression>
             </cron>
         </trigger>
-    </schedule>-->
+    </schedule>
     
-     <!--<schedule>
+     <schedule>
         <job>
             <name>LoadBatches</name>
             <group>processGroup</group>
@@ -57,9 +57,9 @@
                 <cron-expression>10/30 * * * * ?</cron-expression>
             </cron>
         </trigger>
-    </schedule>-->
+    </schedule>
     
-     <!--<schedule>
+     <schedule>
         <job>
             <name>ProcessBatches</name>
             <group>processGroup</group>
@@ -75,7 +75,7 @@
                 <cron-expression>5/30 * * * * ?</cron-expression>
             </cron>
         </trigger>
-    </schedule>-->
+    </schedule>
     <!--  -->
     <!--<schedule>
         <job>
