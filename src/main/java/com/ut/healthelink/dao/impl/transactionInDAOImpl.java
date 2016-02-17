@@ -1114,7 +1114,7 @@ public class transactionInDAOImpl implements transactionInDAO {
         Query insertData = sessionFactory.getCurrentSession().createSQLQuery(sql)
                 .setParameter("batchId", config.getBatchUploadId())
                 .setParameter("configId", config.getConfigId());
-        System.out.println(sql);
+        
         try {
             insertData.executeUpdate();
             insertSuccess = true;
@@ -1204,7 +1204,7 @@ public class transactionInDAOImpl implements transactionInDAO {
                 .setParameter("batchId", config.getBatchUploadId())
                 .setParameter("configId", config.getConfigId())
                 .setParameter("id", transId);
-        System.out.println(sql);
+        
         try {
             insertData.executeUpdate();
             return true;
