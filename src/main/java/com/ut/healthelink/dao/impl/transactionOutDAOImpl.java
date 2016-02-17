@@ -129,7 +129,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
     @Transactional
     public int findMergeableBatch(int orgId) {
 
-        Query query = sessionFactory.getCurrentSession().createQuery("select id FROM batchDownloads where orgId = :orgId and mergeable = 1 and statusId = 28");
+        Query query = sessionFactory.getCurrentSession().createQuery("select id FROM batchDownloads where orgId = :orgId and mergeable = 1 and (statusId = 23 OR statusId = 28)");
         query.setParameter("orgId", orgId);
 
         Integer batchId = (Integer) query.uniqueResult();
