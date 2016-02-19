@@ -351,7 +351,7 @@ public interface transactionInDAO {
     
     Integer clearBatchDownloads(List <Integer> batchDownloadIDs);
     
-    List<Integer> getTransactionInIdsFromBatch(Integer batchUploadId);
+    String getTransactionInIdsFromBatch(Integer batchUploadId);
     
     List<WSMessagesIn> getWSMessagesByStatusId(List<Integer> statusIds);
     

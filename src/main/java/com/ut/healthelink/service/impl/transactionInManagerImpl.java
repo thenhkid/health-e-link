@@ -806,7 +806,11 @@ public class transactionInManagerImpl implements transactionInManager {
          */
         try {
             if (ua != null) {
-                ua.setTransactionInIds(getTransactionInIdsFromBatch(batchUploadId).toString().replace("[", "").replace("]", ""));
+            	if (getTransactionInIdsFromBatch(batchUploadId).toString().replace("[", "").replace("]", "").length() > 100) {
+                    ua.setTransactionInIds(getTransactionInIdsFromBatch(batchUploadId).toString().replace("[", "").replace("]", ""));            		
+            	} else {
+            		ua.setTransactionInIds(getTransactionInIdsFromBatch(batchUploadId).toString().replace("[", "").replace("]", "")); 
+            	}
                 usermanager.updateUserActivity(ua);
             }
         } catch (Exception ex) {
@@ -3359,7 +3363,7 @@ public class transactionInManagerImpl implements transactionInManager {
     }
 
     @Override
-    public List<Integer> getTransactionInIdsFromBatch(Integer batchUploadId) {
+    public String getTransactionInIdsFromBatch(Integer batchUploadId) {
         return transactionInDAO.getTransactionInIdsFromBatch(batchUploadId);
     }
 

@@ -424,7 +424,7 @@ public interface transactionInManager {
     
     boolean recheckLongDate(String longDateVal, String convertedDate);
     
-    List<Integer> getTransactionInIdsFromBatch(Integer batchUploadId);
+    String getTransactionInIdsFromBatch(Integer batchUploadId);
     
     Integer processWebServiceMessages();
     
