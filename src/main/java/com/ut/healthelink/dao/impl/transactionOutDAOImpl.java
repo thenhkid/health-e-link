@@ -34,6 +34,7 @@ import org.hibernate.Query;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.Transformers;
 import org.hibernate.type.StandardBasicTypes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -829,24 +830,38 @@ public class transactionOutDAOImpl implements transactionOutDAO {
     }
 
     /**
-     * The 'getpendingOutPutTransactions' function will return a list of transactions that are in the 'Pending Output' status (id = 19) that are ready to start the output process
+     * The 'getpendingOutPutTransactions' function will return a list of transactions that are 
+     * in the 'Pending Output' status (id = 19) and the upload
+     * batch is not for massTranslation 
+     * that are ready to start the output process
      *
      * @param transactionTargetId This will hold a specific transaction Id to process will default to 0 which will find all transactions.
      *
      * @table transactionTarget;
      */
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     @Transactional
     public List<transactionTarget> getpendingOutPutTransactions(int transactionTargetId) throws Exception {
 
-        Criteria transactionQuery = sessionFactory.getCurrentSession().createCriteria(transactionTarget.class);
-        transactionQuery.add(Restrictions.eq("statusId", 19));
+    	String sql = "select id from transactiontarget where statusid = 19 and "
+    			+ " batchuploadid not in (select distinct batchid from transactionin "
+    			+ " where configid not in (select configid from configurationtransportdetails where"
+    			+ " masstranslation = false and status = 1)) ";
+    			if (transactionTargetId > 0) {
+    				sql = sql + " and id = :transactionTargetId";
+    	        }
+    			sql = sql + " order by statustime, id limit 1";
 
-        if (transactionTargetId > 0) {
-            transactionQuery.add(Restrictions.eq("id", transactionTargetId));
-        }
+    	Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                .addScalar("id", StandardBasicTypes.INTEGER)
+                .setResultTransformer(
+                        Transformers.aliasToBean(transactionTarget.class));
+                if (transactionTargetId > 0) {
+                	query.setParameter("transactionTargetId", transactionTargetId);
+    	        }
 
-        List<transactionTarget> transactions = transactionQuery.list();
+        List<transactionTarget> transactions = query.list();
 
         return transactions;
     }
@@ -1741,5 +1756,60 @@ public class transactionOutDAOImpl implements transactionOutDAO {
 
         return transactions.list();
     }
+
+	@Override
+	@Transactional
+	public List<transactionTarget> getTTByStatusId(int batchId,
+			List<Integer> statusIds) throws Exception {
+		Criteria transactionQuery = sessionFactory.getCurrentSession().createCriteria(transactionTarget.class);
+        transactionQuery.add(Restrictions.in("statusId", statusIds));
+        
+        if (batchId > 0) {
+            transactionQuery.add(Restrictions.eq("batchUploadId", batchId));
+        }
+
+        List<transactionTarget> transactions = transactionQuery.list();
+
+        return transactions;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	@Transactional
+	public List<Integer> getTargetConfigsForBatch(int batchId,
+			List<Integer> statusIds) throws Exception {
+		String sql = "select distinct configId from transactiontarget "
+                + " where batchUploadId = :batchUploadId and statusId in (:statusIds)";
+        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+        query.setParameter("batchUploadId", batchId);
+        query.setParameterList("statusIds", statusIds);
+        
+        List<Integer> configIds = query.list();
+        return configIds;
+	}
+
+	@Override
+	@Transactional
+	public Integer writeOutputToTextFile(configuration configurationDetails,
+			Integer batchUploadId, String filePathAndName) {
+		//we use configuration info 
+		System.out.println(new Date());
+		//build this sql
+		String sql = "SELECT f1, f2, f3, f4, f5, f6, f7, f8, f9, f10, f11, f12, "
+				+ " f13, f14, f15, f16, f17, f18, f19, f20, f11, f22, f23, f24 "
+				+ " FROM transactioninrecords where transactionInId In ("
+				+ "select id from transactionIn where batchId = :batchUploadId)"
+				+ " INTO OUTFILE  '/Applications/bowlink/CaliforniaFamilyHealthCouncil/output files/bIn_" + batchUploadId +"c_" + configurationDetails.getId() + ".txt'"
+						+ "FIELDS TERMINATED BY '|' LINES TERMINATED BY '\n';";
+		Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+        query.setParameter("batchUploadId", batchUploadId);
+        try {
+        	query.list();
+        } catch (Exception ex) {
+        	ex.printStackTrace();
+        }
+        System.out.println(new Date());
+        return 0;
+	}
     
 }

@@ -78,6 +78,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.annotation.Resource;
 
 import org.apache.commons.beanutils.BeanUtils;
@@ -2291,6 +2292,11 @@ public class transactionOutManagerImpl implements transactionOutManager {
         return transactionOutDAO.getBatchesBySentOrg(srcorgId, tgtOrgId, messageTypeId);
     }
 
+    /** modifying this to select one record at a time so we don't end up with a long list that the
+     * scheduler picks up over and over 
+     * We also should not pick up transactions from any batches that are defined for mass translation
+     */
+    
     @Override
     public void selectOutputRecordsForProcess(Integer transactionTargetId) throws Exception {
         try {
@@ -2526,7 +2532,87 @@ public class transactionOutManagerImpl implements transactionOutManager {
 		return transactionOutDAO.getWSSenderFromBatchDLId(batchDLIds);
 	}
 
+	
+	/** 
+	 * this will select an upload batch that has status of 24, check its config to make sure it is for 
+	 * mass translation and start translating
+	 * configuration that is for mass translation
+	 */
+	@Override
+	public void processMassOutputBatches() throws Exception {
+		//get all inbound batches with mass translation = true
+		List<batchUploads> inboundBatches = transactionInManager.getMassTranslateBatchForOutput(1);
+			//we lock the batch so it won't get picked up again
+		for (batchUploads inboundBatch : inboundBatches) {
+			transactionInManager.updateBatchStatus(inboundBatch.getId(), 25, "");
+			processMassOutputBatch(inboundBatch.getId());
+		}
+	}
 
+	@Override
+	public void processMassOutputBatch(Integer uploadBatchId) throws Exception {
+		try {
+			//we get the configs for the file
+				List<Integer> configIds = getTargetConfigsForBatch(uploadBatchId, Arrays.asList(19));
+				//we loop through configs
+				for (Integer configId : configIds) {
+					configuration configDetails = configurationManager.getConfigurationById(configId);
+					
+					//we set the transactionTargets for this config in batch to Load 9
+					
+					//we look up config info and insert transactions into transactionTranslatedOut
+					
+					
+					
+					//we run translations, macros and crosswalks
+					
+					//we write to final format
+					writeOutputToTextFile(configDetails, uploadBatchId, "");
+					
+					//we put file name, config and batch into a table so we can keep track
+					
+					
+					//we update status of these transactions
+					
+					
+					
+				}
+				
+				//if we don't have any errors, we grab file info
+				
+				//we check orgId and configId in file table to see if we need to merge
+				
+				// we merge or assign new download batch
+				 
+				//we update status of batch
+				
+
+		
+		} catch (Exception ex) {
+            ex.printStackTrace();
+            throw new Exception("Error at processOutputForBatch " + uploadBatchId);
+        }
+		
+	}
+
+	@Override
+	public List<transactionTarget> getTTByStatusId(int batchId,
+			List<Integer> statusIds) throws Exception {
+		return transactionOutDAO.getTTByStatusId(batchId, statusIds);
+	}
+
+	@Override
+	public List<Integer> getTargetConfigsForBatch(int batchId,
+			List<Integer> statusIds) throws Exception {
+		return transactionOutDAO.getTargetConfigsForBatch(batchId, statusIds);
+	}
+
+	@Override
+	public Integer writeOutputToTextFile(configuration configurationDetails,
+			Integer batchUploadId, String filePathAndName) throws Exception {
+		return transactionOutDAO.writeOutputToTextFile(configurationDetails, batchUploadId, filePathAndName);
+	}
+	
 }
 
 

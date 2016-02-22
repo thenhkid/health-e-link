@@ -4417,6 +4417,12 @@ public class transactionInManagerImpl implements transactionInManager {
 	public Transaction setTransactionTargetInfoByStatusId (Transaction transaction ) throws Exception{
 		 return transactionInDAO.setTransactionTargetInfoByStatusId(transaction);
 	}
+
+	@Override
+	public List<batchUploads> getMassTranslateBatchForOutput(Integer howMany)
+			throws Exception {
+		 return transactionInDAO.getMassTranslateBatchForOutput(howMany);
+	}
 	
     
     

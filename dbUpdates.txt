@@ -12,6 +12,11 @@ ADD COLUMN `headerBackground` VARCHAR(75) NULL DEFAULT NULL AFTER `headerLogo`;
 ALTER TABLE `healthelink`.`users` 
 ADD COLUMN `receiveEmailAlert` BIT(1) NULL DEFAULT b'0' AFTER `encryptedPw`;
 
+/** 02212016 Grace **/
+ALTER TABLE `healthelinkdev`.`configurationtransportdetails` 
+ADD COLUMN `massTranslation` BIT(1) NULL DEFAULT 0 AFTER `HL7PDFSampleTemplate`;
+
+
 
 
 

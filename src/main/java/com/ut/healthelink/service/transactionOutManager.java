@@ -9,6 +9,7 @@ package com.ut.healthelink.service;
 import com.ut.healthelink.model.Transaction;
 import com.ut.healthelink.model.batchDownloadSummary;
 import com.ut.healthelink.model.batchDownloads;
+import com.ut.healthelink.model.configuration;
 import com.ut.healthelink.model.pendingDeliveryTargets;
 import com.ut.healthelink.model.systemSummary;
 import com.ut.healthelink.model.transactionIn;
@@ -129,5 +130,14 @@ public interface transactionOutManager {
     
     List <String> getWSSenderFromBatchDLId(List<Integer> batchDLIds) throws Exception;
     
-   
+    void processMassOutputBatches() throws Exception;
+    
+    void processMassOutputBatch(Integer uploadBatchId) throws Exception;
+    
+    List<transactionTarget> getTTByStatusId(int batchId, List <Integer> statusIds) throws Exception;
+    
+    List<Integer> getTargetConfigsForBatch (int batchId, List <Integer> statusIds) throws Exception;
+    
+    Integer writeOutputToTextFile(configuration configId, Integer batchUploadId, String filePathAndName) throws Exception;
+    
 }

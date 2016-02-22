@@ -13,13 +13,13 @@
             <description>This process will run every five minute to check if any outbound files must be processed</description>
             <job-class>com.ut.healthelink.jobs.processOutputRecords</job-class>
         </job>
- 
+ 		<!--  changed to every 10 seconds because we are processing one by one -->
         <trigger>
             <cron>
                 <name>60SecTrigger</name>
                 <job-name>ProcessOutputFiles</job-name>
                 <job-group>processGroup</job-group>
-                 <cron-expression>22 0/1 * * * ?</cron-expression>
+                 <cron-expression>0/10 * * * * ?</cron-expression>
             </cron>
         </trigger>
     </schedule>
@@ -76,6 +76,29 @@
             </cron>
         </trigger>
     </schedule>
+    
+    
+    
+    <schedule>
+        <job>
+            <name>ProcessMassBatches</name>
+            <group>processGroup</group>
+            <description>This process will run every 30 seconds on the 5 second of the minute  to check if any loaded files will need to be process</description>
+            <job-class>com.ut.healthelink.jobs.processMassOutputRecords</job-class>
+        </job>
+ 
+        <trigger>
+            <cron>
+                <name>MassBatchTrigger</name>
+                <job-name>ProcessMassBatches</job-name>
+                <job-group>processGroup</job-group>
+                <cron-expression>5/30 * * * * ?</cron-expression>
+            </cron>
+        </trigger>
+    </schedule>
+    
+     
+    
     <!--  -->
     <!--<schedule>
         <job>
@@ -130,6 +153,8 @@
             </cron>
         </trigger>
     </schedule>    -->
+    
+      
     
     
 </job-scheduling-data>

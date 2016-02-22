@@ -87,6 +87,9 @@ public class configurationTransport {
 
     @Column(name = "COPIEDTRANSPORTID", nullable = false)
     private int copiedTransportId = 0;
+    
+    @Column(name = "massTranslation", nullable = false)
+    private boolean massTranslation = false;
 
     @NoHtml
     @Column(name = "FILEEXT", nullable = false)
@@ -358,7 +361,13 @@ public class configurationTransport {
     public void setHl7PDFTemplatefile(CommonsMultipartFile hl7PDFTemplatefile) {
         this.hl7PDFTemplatefile = hl7PDFTemplatefile;
     }
-    
-    
-    
+
+	public boolean isMassTranslation() {
+		return massTranslation;
+	}
+
+	public void setMassTranslation(boolean massTranslation) {
+		this.massTranslation = massTranslation;
+	}
+
 }

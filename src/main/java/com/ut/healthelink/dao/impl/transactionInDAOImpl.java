@@ -44,6 +44,7 @@ import com.ut.healthelink.model.messageType;
 import com.ut.healthelink.model.referralActivityExports;
 import com.ut.healthelink.service.sysAdminManager;
 import com.ut.healthelink.service.userManager;
+
 import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -6713,5 +6714,24 @@ public class transactionInDAOImpl implements transactionInDAO {
         } else {
         	return null;
         }
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	@Transactional
+	public List<batchUploads> getMassTranslateBatchForOutput(Integer howMany)
+			throws Exception {
+		String sql = ("select * from batchuploads where statusid = 24 "
+				+ " and id in (select distinct batchid from transactionin where statusId = 19 "
+				+ " and configId in (select configId from configurationtransportdetails "
+				+ " where masstranslation = true and status = 1)) order by id");
+		if (howMany != 0) {
+			sql = sql + " limit " + howMany;
+		}
+        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
+        .setResultTransformer(Transformers.aliasToBean(batchUploads.class));
+                
+        List <batchUploads> batches = query.list();
+        return batches;
 	}
 }

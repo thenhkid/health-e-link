@@ -416,4 +416,6 @@ public interface transactionInDAO {
     List <Transaction> setTransactionInInfoByStatusId (Integer batchId, List<Integer> statusIds, Integer howMany) throws Exception;
     
     Transaction setTransactionTargetInfoByStatusId (Transaction transaction) throws Exception;
+    
+    List<batchUploads> getMassTranslateBatchForOutput (Integer howMany) throws Exception;
 }

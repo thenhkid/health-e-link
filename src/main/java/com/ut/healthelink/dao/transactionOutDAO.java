@@ -8,6 +8,7 @@ package com.ut.healthelink.dao;
 
 import com.ut.healthelink.model.batchDownloadSummary;
 import com.ut.healthelink.model.batchDownloads;
+import com.ut.healthelink.model.configuration;
 import com.ut.healthelink.model.configurationSchedules;
 import com.ut.healthelink.model.targetOutputRunLogs;
 import com.ut.healthelink.model.transactionIn;
@@ -133,5 +134,13 @@ public interface transactionOutDAO {
     List <String> getWSSenderFromBatchDLId(List<Integer> batchDLIds) throws Exception;
     
     List<transactionTarget> getSentTransactions(Date fromDate, Date toDate) throws Exception;
+    
+    List<transactionTarget> getTTByStatusId(int batchId, List <Integer> statusIds) throws Exception;
+    
+    List<Integer> getTargetConfigsForBatch (int batchId, List <Integer> statusIds) throws Exception;
+    
+    Integer writeOutputToTextFile(configuration configurationDetails, Integer batchUploadId, String filePathAndName);
+
+
     
 }
