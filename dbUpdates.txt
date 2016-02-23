@@ -13,8 +13,59 @@ ALTER TABLE `healthelink`.`users`
 ADD COLUMN `receiveEmailAlert` BIT(1) NULL DEFAULT b'0' AFTER `encryptedPw`;
 
 /** 02212016 Grace **/
-ALTER TABLE `healthelinkdev`.`configurationtransportdetails` 
+ALTER TABLE `healthelink`.`configurationtransportdetails` 
 ADD COLUMN `massTranslation` BIT(1) NULL DEFAULT 0 AFTER `HL7PDFSampleTemplate`;
+
+/** 02222016 Grace **/
+INSERT INTO `healthelink`.`lu_processstatus` (`id`, `category`, `displayCode`, `displayText`, `description`, `status`, `isCustom`, `endUserDisplayCode`, `endUserDisplayText`, `endUserDescription`) VALUES ('40', 'transaction', 'TOC', 'Transaction Output Created', 'Normal condition: The transaction output is created.', 1, 0, 'TOC', 'Transaction Output Created', 'Normal condition: The transaction output is created.');
+INSERT INTO `healthelink`.`lu_errorcodes` (`id`, `displayText`, `description`, `isCustom`, `status`) VALUES ('30', 'Multiple Target Configurations', 'Multiple Target Configurations found for mass translation batch', 0, 1);
+
+USE `healthelink`;
+DROP procedure IF EXISTS `getFinalStatusIds`;
+
+DELIMITER $$
+USE `healthelink`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `getFinalStatusIds`()
+proc_main:begin
+
+set @finalStatusIds =  '11,12,13,16,18,20';
+
+end proc_main$$
+
+DELIMITER ;
+
+
+USE `healthelinkdev`;
+DROP procedure IF EXISTS `setSqlForOutboundConfig`;
+
+DELIMITER $$
+USE `healthelinkdev`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `setSqlForOutboundConfig`(in inConfigId int, in batchDownloadId int)
+proc_main:begin
+drop TEMPORARY TABLE if exists tempOut;
+CREATE TEMPORARY TABLE tempOut
+as (select min(fieldNo) as fieldNo, saveToTableName, savetotablecol, configId, batchDownloadId
+from configurationFormFields where configId = inConfigId
+and saveToTableName != ''
+group by savetotablecol, saveToTableName);
+select batchDownloadId, 
+group_concat(fieldNo ORDER BY fieldNo SEPARATOR ',')as fieldNos, 
+group_concat(savetotablecol ORDER BY fieldNo SEPARATOR ',') as saveToCols
+, saveToTableName, group_concat(
+concat(
+'group_concat(COALESCE(',savetotablecol, ', ''NULL'') order by ', saveToTableName, '.id separator ''^^^^^'' ) as ', savetotablecol
+) 
+ORDER BY fieldNo SEPARATOR ', ')  as selectFields, 
+group_concat(concat('tto.f', fieldNo, ' = selectTbl.' , savetotablecol)  ORDER BY fieldNo SEPARATOR ', ')  as updateFields,
+configId
+FROM tempOut
+where configId = inConfigId
+GROUP BY saveToTableName
+ORDER BY saveToTableName;
+
+end proc_main$$
+
+DELIMITER ;
 
 
 
