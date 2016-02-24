@@ -1043,7 +1043,7 @@ public class transactionInDAOImpl implements transactionInDAO {
             return configIds;
         } catch (Exception ex) {
             ex.printStackTrace();
-            System.err.println("clearMessageTableForBatch " + ex.getCause());
+            System.err.println("getConfigIdsForBatch " + ex.getCause());
             return null;
         }
     }
@@ -4094,6 +4094,22 @@ public class transactionInDAOImpl implements transactionInDAO {
             return 0;
         } catch (Exception ex) {
             System.err.println("clearTransactionOutRecordsByUploadBatchId " + ex.getCause().getMessage());
+            return 1;
+
+        }
+    }
+    
+    @Override
+    @Transactional
+    public Integer clearTransactionOutErrorsByUploadBatchId(Integer batchId) {
+        String sql = "delete from transactionOutErrors where transactionTargetId in ("
+                + "select id from transactionTarget where batchUploadId = :batchId);";
+        try {
+            Query deleteTable = sessionFactory.getCurrentSession().createSQLQuery(sql).setParameter("batchId", batchId);
+            deleteTable.executeUpdate();
+            return 0;
+        } catch (Exception ex) {
+            System.err.println("clearTransactionOutErrorsByUploadBatchId " + ex.getCause().getMessage());
             return 1;
 
         }

@@ -37,8 +37,8 @@ import com.ut.healthelink.model.custom.IdAndFieldValue;
 import com.ut.healthelink.model.custom.TransErrorDetail;
 import com.ut.healthelink.model.messagePatients;
 import com.ut.healthelink.model.referralActivityExports;
-import java.math.BigInteger;
 
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 
@@ -240,6 +240,8 @@ public interface transactionInDAO {
     Integer clearTransactionTranslatedOutByUploadBatchId(Integer batchId);
     
     Integer clearTransactionOutRecordsByUploadBatchId(Integer batchId);
+    
+    Integer clearTransactionOutErrorsByUploadBatchId(Integer batchId);
     
     Integer rejectInvalidTargetOrg (Integer batchId, configurationConnection batchTargets);
     

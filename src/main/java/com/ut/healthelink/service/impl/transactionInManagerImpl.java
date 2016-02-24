@@ -979,6 +979,7 @@ public class transactionInManagerImpl implements transactionInManager {
         //clear transactionoutrecords
         cleared = cleared + clearTransactionOutRecordsByUploadBatchId(batchUploadId);
         cleared = cleared + clearTransactionTranslatedOutByUploadBatchId(batchUploadId);
+        cleared = cleared + clearTransactionOutErrorsByUploadBatchId(batchUploadId);
         //we clear transactionTarget
         List<Integer> batchDLIds = getBatchDownloadIdsFromUploadId(batchUploadId);
         if (batchDLIds.size() > 0) {
@@ -2046,6 +2047,11 @@ public class transactionInManagerImpl implements transactionInManager {
     @Override
     public Integer clearTransactionOutRecordsByUploadBatchId(Integer batchId) {
         return transactionInDAO.clearTransactionOutRecordsByUploadBatchId(batchId);
+    }
+    
+    @Override
+    public Integer clearTransactionOutErrorsByUploadBatchId(Integer batchId) {
+        return transactionInDAO.clearTransactionOutErrorsByUploadBatchId(batchId);
     }
 
     @Override

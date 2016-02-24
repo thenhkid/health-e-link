@@ -15,7 +15,7 @@ import com.ut.healthelink.model.configurationConnectionReceivers;
 import com.ut.healthelink.model.configurationFormFields;
 import com.ut.healthelink.model.configurationSchedules;
 import com.ut.healthelink.model.configurationTransport;
-import com.ut.healthelink.model.custom.ConfigForInsert;
+import com.ut.healthelink.model.transactionRecords;
 import com.ut.healthelink.model.custom.ConfigOutboundForInsert;
 import com.ut.healthelink.model.lutables.lu_ProcessStatus;
 import com.ut.healthelink.model.messagePatients;
@@ -1799,23 +1799,21 @@ public class transactionOutDAOImpl implements transactionOutDAO {
 	@Transactional
 	public Integer writeOutputToTextFile(configurationTransport transportDetails, Integer batchDownloadId, String filePathAndName, String fieldNos) {
 		//we use configuration info 
-		System.out.println(new Date());
 		//build this sql
 		String sql = "SELECT " + fieldNos 
 				+ " FROM transactionOutRecords where transactionTargetId In ("
-				+ " select id from transactionTarget where batchDLId = :batchDownloadId and statusId = 37)"
+				+ " select id from transactionTarget where batchDLId = :batchDownloadId and statusId = 18)"
 				+ " INTO OUTFILE  '" + filePathAndName + "'"
 						+ " FIELDS TERMINATED BY '" + transportDetails.getDelimChar() 
 						+ "' LINES TERMINATED BY '\\n';";
 		Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
         query.setParameter("batchDownloadId", batchDownloadId);
-        System.out.println(sql);
+        //System.out.println(sql);
         try {
         	query.list();
         } catch (Exception ex) {
         	System.out.println(ex.getMessage());
         }
-        System.out.println(new Date());
         return 0;
 	}
 
@@ -1939,18 +1937,21 @@ public class transactionOutDAOImpl implements transactionOutDAO {
     }
 
 	@Override
+	@Transactional
 	public void insertFailedRequiredFields(configurationFormFields cff,
 			Integer batchDownloadId, Integer transactionTargetId) throws Exception{
 		Integer id = batchDownloadId;
-        String sql = "insert into transactionOuterrors (batchDownloadId, configId, transactionInId, fieldNo, errorid)"
-                + "select " + batchDownloadId + ", " + cff.getconfigId() + ", transactionInId, " + cff.getFieldNo()
-                + ", 1 from transactionTranslatedOut where configId = :configId "
+        String sql = "insert into transactionOuterrors (batchDownloadId, configId, transactionTargetId,"
+        		+ " fieldNo, errorid)"
+                + "select " + batchDownloadId + ", " + cff.getconfigId() + ", transactionTargetId, " 
+        		+ cff.getFieldNo() + ", 1 from transactionTranslatedOut where configId = :configId "
                 + " and (F" + cff.getFieldNo()
                 + " is  null  or length(trim(F" + cff.getFieldNo() + ")) = 0"
                 + " or length(REPLACE(REPLACE(F" + cff.getFieldNo() + ", '\n', ''), '\r', '')) = 0)"
-                + "and transactionInId ";
+                + "and transactionTargetId ";
         if (transactionTargetId == 0) {
-            sql = sql + " in (select id from transactionTarget where batchDLId = :id and configId = :configId and statusId not in (:transRELId));";
+            sql = sql + " in (select id from transactionTarget where batchDLId = :id and "
+            		+ " configId = :configId and statusId not in (:transRELId));";
         } else {
             sql = sql + " = :id";
             id = transactionTargetId;
@@ -1961,14 +1962,26 @@ public class transactionOutDAOImpl implements transactionOutDAO {
         if (transactionTargetId == 0) {
             insertData.setParameterList("transRELId", transRELId);
         }
+        
         insertData.executeUpdate();
 	}
 
 	@Override
+	@Transactional
 	public void genericValidation(configurationFormFields cff,
 			Integer validationTypeId, Integer batchDownloadId, String regEx,
 			Integer transactionTargetId) throws Exception {
-		// TODO Auto-generated method stub
+		
+		String sql = "call insertValidationErrorsOutbound(:vtType, :fieldNo, :batchUploadId, :configId, :transactionId)";
+
+        Query insertError = sessionFactory.getCurrentSession().createSQLQuery(sql);
+        insertError.setParameter("vtType", cff.getValidationType());
+        insertError.setParameter("fieldNo", cff.getFieldNo());
+        insertError.setParameter("batchUploadId", batchDownloadId);
+        insertError.setParameter("configId", cff.getconfigId());
+        insertError.setParameter("transactionId", transactionTargetId);
+        
+        insertError.executeUpdate();
 		
 	}
 
@@ -2005,5 +2018,83 @@ public class transactionOutDAOImpl implements transactionOutDAO {
         query.executeUpdate();
     }
 	
+	@Override
+    @Transactional
+    @SuppressWarnings("unchecked")
+    public List<transactionRecords> getFieldColAndValues(Integer batchDownloadId,
+            configurationFormFields cff) throws Exception{
+        String sql = ("select transactionTargetId as transactionId, F" + cff.getFieldNo()
+                + "  as fieldValue, " + cff.getFieldNo() + " as fieldNo from transactiontranslatedOut "
+                + " where configId = :configId "
+                + " and F" + cff.getFieldNo() + " is not null "
+                + " and transactionTargetId in (select id from transactionTarget where"
+                + " batchDLId = :batchDLId"
+                + " and configId = :configId and statusId not in ( :transRELId ) order by transactionTargetId); ");
+
+        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                .addScalar("transactionId", StandardBasicTypes.INTEGER)
+                .addScalar("fieldValue", StandardBasicTypes.STRING)
+                .addScalar("fieldNo", StandardBasicTypes.INTEGER)
+                .setResultTransformer(Transformers.aliasToBean(transactionRecords.class))
+                .setParameter("configId", cff.getconfigId())
+                .setParameter("batchDLId", batchDownloadId)
+                .setParameterList("transRELId", transRELId);
+
+        List<transactionRecords> trs = query.list();
+
+        return trs;
+    }
+	
     
+    @Override
+    @Transactional
+    @SuppressWarnings("unchecked")
+    public List<transactionRecords> getFieldColAndValueByTransactionId(configurationFormFields cff, Integer transactionId) throws Exception {
+         String sql = ("select transactionTargetId as transactionId, F" + cff.getFieldNo()
+                    + "  as fieldValue, " + cff.getFieldNo() + " as fieldNo from transactiontranslatedOut "
+                    + " where configId = :configId "
+                    + " and F" + cff.getFieldNo() + " is not null "
+                    + " and transactionTargetId = :id");
+
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                    .addScalar("transactionId", StandardBasicTypes.INTEGER)
+                    .addScalar("fieldValue", StandardBasicTypes.STRING)
+                    .addScalar("fieldNo", StandardBasicTypes.INTEGER)
+                    .setResultTransformer(Transformers.aliasToBean(transactionRecords.class))
+                    .setParameter("configId", cff.getconfigId())
+                    .setParameter("id", transactionId);
+
+            List<transactionRecords> trs = query.list();
+
+            return trs;
+    }
+    
+    @Override
+    @Transactional
+    public void updateFieldValue(transactionRecords tr, String newValue) throws Exception {
+        String sql = "update transactiontranslatedOut set F" + tr.getfieldNo() + " = :newValue where"
+                + " transactionTargetId = :ttiId";
+        Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql);
+        updateData.setParameter("ttiId", tr.getTransactionId());
+        updateData.setParameter("newValue", newValue);
+        updateData.executeUpdate();
+    }
+    
+    
+    @Override
+    @Transactional
+    public void insertValidationError(transactionRecords tr, configurationFormFields cff, Integer batchDownloadId) throws Exception{
+        String sql = "insert into transactionOuterrors "
+                + "(batchDownloadId, configId, transactionTargetId, fieldNo, errorid, validationTypeId)"
+                + " values (:batchDownloadId, :configId, :ttiId, :fieldNo, 2, :validationId);";
+        Query insertData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                .setParameter("batchDownloadId", batchDownloadId)
+                .setParameter("fieldNo", cff.getFieldNo())
+                .setParameter("configId", cff.getconfigId())
+                .setParameter("ttiId", tr.getTransactionId())
+                .setParameter("validationId", cff.getValidationType());
+        insertData.executeUpdate();
+       
+    }
+        
 }

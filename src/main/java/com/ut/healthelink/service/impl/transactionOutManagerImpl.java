@@ -33,6 +33,7 @@ import com.ut.healthelink.model.configurationRhapsodyFields;
 import com.ut.healthelink.model.configurationSchedules;
 import com.ut.healthelink.model.configurationTransport;
 import com.ut.healthelink.model.configurationWebServiceFields;
+import com.ut.healthelink.model.transactionRecords;
 import com.ut.healthelink.model.wsMessagesOut;
 import com.ut.healthelink.service.emailMessageManager;
 import com.ut.healthelink.model.mailMessage;
@@ -144,6 +145,9 @@ public class transactionOutManagerImpl implements transactionOutManager {
     private int processingSysErrorId = 5;
 
     private String archivePath = "/bowlink/archivesOut/";
+    
+    //list of final status - these records we skip
+    private List<Integer> transRELId = Arrays.asList(11, 12, 13, 16, 18, 20);
     
     @Override
     @Transactional
@@ -2634,7 +2638,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
 	
 	
 	@Override
-    public void runValidations(Integer batchDownloadId, Integer configId, Integer transactionId) {
+    public void runValidations(Integer batchDownloadId, Integer configId, Integer transactionId) throws Exception {
         //1. we get validation types
         //2. we skip 1 as that is not necessary
         //3. we skip date (4) as there is no isDate function in MySQL
@@ -2646,7 +2650,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
          *
          */
         //TODO was hoping to have one SP but concat in SP not setting and not catching errors correctly. Need to recheck
-        /**
+      
 		List<configurationFormFields> configurationFormFields
                 = configurationTransportManager.getCffByValidationType(configId, 0);
 
@@ -2658,50 +2662,49 @@ public class transactionOutManagerImpl implements transactionOutManager {
                     break; // no validation
                 //email calling SQL to validation and insert - one statement
                 case 2:
-                     genericValidation(cff, validationTypeId, batchUploadId, regEx, transactionId);
+                     genericValidation(cff, validationTypeId, batchDownloadId, regEx, transactionId);
                     break;
                 //phone  calling SP to validation and insert - one statement 
                 case 3:
-                    genericValidation(cff, validationTypeId, batchUploadId, regEx, transactionId);
+                    genericValidation(cff, validationTypeId, batchDownloadId, regEx, transactionId);
                     break;
                 // need to loop through each record / each field
                 case 4:
-                    dateValidation(cff, validationTypeId, batchUploadId, transactionId);
+                    dateValidation(cff, validationTypeId, batchDownloadId, transactionId);
                     break;
                 //numeric   calling SQL to validation and insert - one statement      
                 case 5:
-                    genericValidation(cff, validationTypeId, batchUploadId, regEx, transactionId);
+                    genericValidation(cff, validationTypeId, batchDownloadId, regEx, transactionId);
                     break;
                 //url - need to rethink as regExp is not validating correctly
                 case 6:
-                    urlValidation(cff, validationTypeId, batchUploadId, transactionId);
+                    urlValidation(cff, validationTypeId, batchDownloadId, transactionId);
                     break;
                 //anything new we hope to only have to modify sp
                 default:
-                    genericValidation(cff, validationTypeId, batchUploadId, regEx, transactionId);
+                    genericValidation(cff, validationTypeId, batchDownloadId, regEx, transactionId);
                     break;
             }
            
 
-        } **/
+        } 
     }
 
     @Override
     public void genericValidation(configurationFormFields cff,
-            Integer validationTypeId, Integer batchDownloadId, String regEx, Integer transactionId) {
-        	//transactionOutDAO.genericValidation(cff, validationTypeId, batchDownloadId, regEx, transactionId);
+            Integer validationTypeId, Integer batchDownloadId, String regEx, Integer transactionId) throws Exception {
+        	transactionOutDAO.genericValidation(cff, validationTypeId, batchDownloadId, regEx, transactionId);
     }
 
     @Override
     public void urlValidation(configurationFormFields cff,
-            Integer validationTypeId, Integer batchDownloadId, Integer transactionId) {
-        /**
-    	try {
+            Integer validationTypeId, Integer batchDownloadId, Integer transactionId) throws Exception{
+        
             //1. we grab all transactionInIds for messages that are not length of 0 and not null 
             List<transactionRecords> trs = null;
             //1. we grab all transactionInIds for messages that are not length of 0 and not null 
             if (transactionId == 0) {
-                trs = getFieldColAndValues(batchUploadId, cff);
+                trs = getFieldColAndValues(batchDownloadId, cff);
             } else {
                 trs = getFieldColAndValueByTransactionId(cff, transactionId);
             }
@@ -2715,30 +2718,43 @@ public class transactionOutManagerImpl implements transactionOutManager {
                     if (!urlToValidate.startsWith("http")) {
                         urlToValidate = "http://" + urlToValidate;
                     }
-                    if (!isValidURL(urlToValidate)) {
-                        insertValidationError(tr, cff, batchUploadId);
+                    if (!transactionInManager.isValidURL(urlToValidate)) {
+                        insertValidationError(tr, cff, batchDownloadId);
                     }
                 }
                 }
             }
-            return 0;
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            insertProcessingError(processingSysErrorId, cff.getconfigId(), batchUploadId, cff.getFieldNo(), null, null, validationTypeId, false, false, (ex.getClass() + " " + ex.toString()));
-            return 1;
-        }
-        **/
-
+    }
+    
+    @Override
+    public List<transactionRecords> getFieldColAndValueByTransactionId(configurationFormFields cff,
+            Integer transactionId) throws Exception {
+        return transactionOutDAO.getFieldColAndValueByTransactionId(cff, transactionId);
+    }
+    
+    @Override
+    public List<transactionRecords> getFieldColAndValues(Integer batchDownloadId, configurationFormFields cff) throws Exception {
+        return transactionOutDAO.getFieldColAndValues(batchDownloadId, cff);
     }
 
     @Override
-    public void dateValidation(configurationFormFields cff, Integer validationTypeId, Integer batchDownloadId, Integer transactionId) {
-       /**
-    	try {
+    public void updateFieldValue(transactionRecords tr, String newValue) throws Exception{
+        transactionOutDAO.updateFieldValue(tr, newValue);
+    }
+    
+    @Override
+    public void insertValidationError(transactionRecords tr,
+            configurationFormFields cff, Integer batchUploadId) throws Exception {
+        transactionOutDAO.insertValidationError(tr, cff, batchUploadId);
+    }
+    
+    @Override
+    public void dateValidation(configurationFormFields cff, Integer validationTypeId, Integer batchDownloadId, Integer transactionId) throws Exception {
+       
             List<transactionRecords> trs = null;
             //1. we grab all transactionInIds for messages that are not length of 0 and not null 
             if (transactionId == 0) {
-                trs = getFieldColAndValues(batchUploadId, cff);
+                trs = getFieldColAndValues(batchDownloadId, cff);
             } else {
                 trs = getFieldColAndValueByTransactionId(cff, transactionId);
             }
@@ -2750,37 +2766,31 @@ public class transactionOutManagerImpl implements transactionOutManager {
                     //System.out.println(tr.getFieldValue());
                     //we check long dates
                     Date dateValue = null;
-                    String mySQLDate = chkMySQLDate(tr.getFieldValue());
+                    String mySQLDate = transactionInManager.chkMySQLDate(tr.getFieldValue());
 
                     if (dateValue == null && mySQLDate.equalsIgnoreCase("")) {
-                        dateValue = convertLongDate(tr.getFieldValue());
+                        dateValue = transactionInManager.convertLongDate(tr.getFieldValue());
                     }
                     if (dateValue == null && mySQLDate.equalsIgnoreCase("")) {
-                        dateValue = convertDate(tr.getfieldValue());
+                        dateValue = transactionInManager.convertDate(tr.getfieldValue());
                     }
 
                     String formattedDate = null;
                     if (dateValue != null && mySQLDate.equalsIgnoreCase("")) {
-                        formattedDate = formatDateForDB(dateValue);
+                        formattedDate = transactionInManager.formatDateForDB(dateValue);
                         //3. if it converts, we update the column value
                         updateFieldValue(tr, formattedDate);
                     }
 
                     if (formattedDate == null && (mySQLDate.equalsIgnoreCase("") || mySQLDate.equalsIgnoreCase("ERROR"))) {
-                        insertValidationError(tr, cff, batchUploadId);
+                        insertValidationError(tr, cff, batchDownloadId);
                     }
                  }
                 }
             }
-            return 0;
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            insertProcessingError(processingSysErrorId, cff.getconfigId(), batchUploadId, cff.getFieldNo(), null, null, validationTypeId, false, false, (ex.getClass() + " " + ex.toString()));
-            return 1;
-        }
-	**/
     }
     
+   
     /** 
 	 * this will select an upload batch that has status of 24, check its config to make sure it is for 
 	 * mass translation and start translating
@@ -2903,21 +2913,23 @@ public class transactionOutManagerImpl implements transactionOutManager {
 		        	massUpdateTTO(outboundConfig, statusId);
 		        }
 		        
-		        Integer transactionId = 0;
-		        //we run translations, macros and crosswalks
-		       Integer configId = configDetails.getId();
+			        Integer transactionId = 0;
+			        //we run translations, macros and crosswalks
+		            Integer configId = configDetails.getId();
 	                //we need to run all checks before insert regardless *
-	                /**
+	                
+		            /**
 	                 * we are reordering 1. cw/macro, 2. required and 3. validate *
 	                 */
 		       		translateTargetRecords(0, configId, batchDLId, 1);
-/**
+
 	                //check R/O
 	                List<configurationFormFields> reqFields = transactionInManager.getRequiredFieldsForConfig(configId);
 
 	                for (configurationFormFields cff : reqFields) {
 	                		insertFailedRequiredFields(cff, batchDLId, transactionId);
 	                }
+	                
 	                // update status of the failed records to ERR - 14
 	                transactionInManager.updateStatusForErrorTrans(batchDLId, 14, true, transactionId);
 
@@ -2926,10 +2938,25 @@ public class transactionOutManagerImpl implements transactionOutManager {
 	                
 	                // update status of the failed records to ERR - 14
 	                transactionInManager.updateStatusForErrorTrans(batchDLId, 14, true, transactionId);
-		      **/
-	                //copy to transactionOutRecors
+		     
+	                //we do not release the batch if there are outbound errors - everything should be in final status
+	                // now we are done with processing we set the 37 records to 18
+					//we update status of these transactions from 37 to 18
+                    updateTransactionTargetStatusOutBound(batchDLId,0, statusId, 18);
+					
+	                
+	                if (transactionInManager.getRecordCounts(batchDLId, transRELId,  true, false) > 0) {
+	                	//error out batch
+	                	transactionInManager.updateBatchStatus(batchUploadId, 41, "");
+	                    transactionOutDAO.updateTargetBatchStatus(batchDLId, 41, "endDateTime");
+	                	return 1;
+	                }
+	                
+	                
+	                //copy to transactionOutRecords
 		       		moveTranslatedRecordsByBatch(batchDLId);
 	                
+		       		
 		        /* Generate the file according to transportDetails 
                  * 1. we generate output file according to encoding in transportDetails
                  * 2. we always save an encrypted copy to archivesOut
@@ -2953,14 +2980,14 @@ public class transactionOutManagerImpl implements transactionOutManager {
             		}
 		       		
 		       		writeOutputToTextFile(transportDetails, batchDLId, generatedFilePath, configFields);
-		       		
-		       		//file extension
-                	String fileExt = transportDetails.getfileExt();
+		       		String fileExt = transportDetails.getfileExt();
             		
                     //write file here
+		       		
+		       		//cp file to archiveOut
                     
                     	fileSystem fileSystem = new fileSystem();
-                    	File archiveFile = new File ( fileSystem.setPath(archivePath) + batchDownload.getutBatchName() + fileExt);
+                    	File archiveFile = new File ( fileSystem.setPath(archivePath) + batchDownload.getutBatchName()+ "." + fileExt);
                     	
                     	//we check to see if our file is encoded
                     	if (!encryptMessage)  {
@@ -2971,17 +2998,13 @@ public class transactionOutManagerImpl implements transactionOutManager {
                     		}
                     		filemanager.writeFile(archiveFile.getAbsolutePath(), strEncodedFile);
                     	} else  {
-                    		Files.copy(generatedFile.toPath(), archiveFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                    		if (generatedFile.exists()) {
+                    			generatedFile.delete();
+                    		}
+                    		Files.copy(archiveFile.toPath(), generatedFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                     	}
                     
-				
-				
-					
-					
-					//we update status of these transactions from 37 to 18
-                    updateTransactionTargetStatusOutBound(batchDLId,0, statusId, 20);
-					
-					//we update status of batch
+                    //we update status of batch
                     transactionInManager.updateBatchStatus(batchUploadId, 28, "");
                     transactionOutDAO.updateTargetBatchStatus(batchDLId, 28, "endDateTime");
 				

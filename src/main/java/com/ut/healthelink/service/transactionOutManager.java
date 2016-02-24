@@ -17,6 +17,7 @@ import com.ut.healthelink.model.pendingDeliveryTargets;
 import com.ut.healthelink.model.systemSummary;
 import com.ut.healthelink.model.transactionIn;
 import com.ut.healthelink.model.transactionOutNotes;
+import com.ut.healthelink.model.transactionRecords;
 import com.ut.healthelink.model.transactionTarget;
 import com.ut.healthelink.model.transactionOutRecords;
 import com.ut.healthelink.model.custom.ConfigOutboundForInsert;
@@ -169,4 +170,13 @@ public interface transactionOutManager {
     void dateValidation(configurationFormFields cff, Integer validationTypeId, Integer batchDownloadId, Integer transactionId) throws Exception;
     
     void moveTranslatedRecordsByBatch(int batchDownloadId) throws Exception;
+    
+    List<transactionRecords> getFieldColAndValues(Integer batchDownloadId, configurationFormFields cff) throws Exception;
+    
+    List<transactionRecords> getFieldColAndValueByTransactionId(configurationFormFields cff, Integer transactionId) throws Exception;
+    
+    void updateFieldValue (transactionRecords tr, String newValue) throws Exception;
+    
+    void insertValidationError(transactionRecords tr, configurationFormFields cff, Integer batchDownloadId) throws Exception;
+
 }

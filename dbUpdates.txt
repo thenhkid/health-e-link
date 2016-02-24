@@ -67,7 +67,131 @@ end proc_main$$
 
 DELIMITER ;
 
+/** 02232016 Grace **/
+INSERT INTO `healthelinkdev`.`lu_processstatus` (`id`, `category`, `displayCode`, `displayText`, `description`, `endUserDisplayCode`, `endUserDisplayText`, `endUserDescription`) VALUES ('41', 'Batch', 'TBJ', 'Target Batch Rejected', 'Error condition: One or more errors occurred in the submission and the submission was rejected. Please review the audit report.', 'TBJ', 'Target Batch Rejected', 'Error condition: One or more errors occurred in the submission and the submission was rejected. Please review the audit report.');
+
+USE `healthelinkdev`;
+DROP procedure IF EXISTS `stripPhoneCharsOutbound`;
+
+DELIMITER $$
+USE `healthelinkdev`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `stripPhoneCharsOutbound`(in vtType int, in fieldNo int,
+in batchDLId int, in configId int, in transactionId int)
+BEGIN
+	DECLARE varToReplace varchar(100) DEFAULT '.';
+	DECLARE part1 varchar(300) DEFAULT '.';
+	DECLARE part2 varchar(25) DEFAULT '.'; 
+	
+	if (transactionId = 0) then
+	BEGIN
+		set part1 = concat("update transactiontranslatedOut JOIN (SELECT id from transactionTarget WHERE configId = ",
+	  configId,"  and batchDLId = ", batchDLId, " and statusId not in (11,12,13,16,18,20)) as ti ON transactiontranslatedOut.transactionTargetId = ti.id SET transactiontranslatedOut.F"
+	  , fieldNo, " = replace(F", fieldNo, ", '");
+	END;
+	END if;
+
+	if (transactionId != 0) then
+	BEGIN
+	  set part1 = concat("update transactiontranslatedOut JOIN (SELECT id from transactionTarget WHERE id = ",
+	  transactionId, ") as ti ON transactiontranslatedOut.transactionTargetId = ti.id SET transactiontranslatedIn.F"
+	  , fieldNo, " = replace(F", fieldNo, ", '");
+	END;
+	END if;
+
+	
+	set part2 = "', '');";
+	set @stmt = concat(part1, varToReplace, part2);
+    PREPARE stmt from @stmt;
+	EXECUTE stmt;
+
+	set varToReplace = '-';
+	set @stmt = concat(part1, varToReplace, part2);
+	PREPARE stmt from @stmt;
+	EXECUTE stmt;
+
+	set varToReplace = ')';
+	set @stmt = concat(part1, varToReplace, part2);
+	PREPARE stmt from @stmt;
+	EXECUTE stmt;
+
+	set varToReplace = '(';
+	set @stmt = concat(part1, varToReplace, part2);
+	PREPARE stmt from @stmt;
+	EXECUTE stmt;
+
+	set varToReplace = ' ';
+	set @stmt = concat(part1, varToReplace, part2);
+	PREPARE stmt from @stmt;
+	EXECUTE stmt;
+
+ END $$
+
+DELIMITER ;
+
+USE `healthelinkdev`;
+DROP procedure IF EXISTS `insertValidationErrorsOutbound`;
+
+DELIMITER $$
+USE `healthelinkdev`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `insertValidationErrorsOutbound`(in vtType int, in fieldNo int,
+in batchDownloadId int, in configId int, in transactionId int)
+BEGIN
+
+DECLARE regEx varchar(100) DEFAULT '';
+
+CASE vtType
+	WHEN 2 THEN set regEx = '^[A-Z0-9._%-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$';
+    WHEN 3 THEN 
+		BEGIN 
+			CALL `stripPhoneCharsOutbound`(vtType, fieldNo, batchDownloadId, configId, transactionId);
+			set regEx ='^[0-9]{7,11}$';
+		END;
+	WHEN 5 THEN set regEx = '^-?[0-9]+[.]?[0-9]*$|^-?[.][0-9]+$';
+    ELSE
+        BEGIN
+        END;
+	END 
+	CASE; 
+
+IF (transactionId = 0) THEN
+set @stmt = concat(
+'insert into transactionOuterrors (batchDownloadId, transactionTargetId, fieldNo, errorid, configId,
+validationTypeId) SELECT ', batchDownloadId, ', transactionTargetId, ',fieldNo,',2, ',configId, ',' , vtType,'  
+ FROM transactionTranslatedOut WHERE trim(F' ,fieldNo, ') not REGEXP  "', regEx, '" and F',fieldNo, ' is not null 
+and length(F', fieldNO, ') != 0
+and length(trim(F', fieldNO, ')) != 0
+and length(REPLACE(REPLACE(F', fieldNO,' , "\n", ""), "\r", "") != 0) and configId = ', configId, ' and transactionTargetId 
+in (select id from transactionTarget where batchDLId = ', batchDownloadId,' and configId = ', configId,' and statusId not in (11,12,13,16,18,20));'
+);
+
+BEGIN -- true
+		PREPARE stmt from @stmt;
+		EXECUTE stmt;
+END; 
+END IF;
+
+IF (transactionId != 0) THEN
+
+set @stmt= concat(
+'insert into transactionOuterrors (batchDownloadId, transactionTargetId, fieldNo, errorid, configId, 
+validationTypeId) SELECT ', batchDownloadId, ', transactionInId, ',fieldNo,',2, ', configId, ',', vtType,'  
+ FROM transactionTranslatedOut WHERE trim(F' ,fieldNo, ') not REGEXP  "', regEx, '" and F',fieldNo, ' is not null 
+and length(F', fieldNO, ') != 0
+and length(trim(F', fieldNO, ')) != 0
+and length(REPLACE(REPLACE(F', fieldNO,', "\n", ""), "\r", "") != 0) and configId = ', configId, ' and transactionTargetId 
+in (select id from transactionTarget where id = ', transactionId, ');'
+);
+
+BEGIN -- true
+		PREPARE stmt from @stmt;
+		EXECUTE stmt;
 
 
+END; 
+END IF;
 
+ 
+END$$
+
+DELIMITER ;
 

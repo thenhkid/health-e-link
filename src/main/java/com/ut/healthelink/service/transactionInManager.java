@@ -287,7 +287,9 @@ public interface transactionInManager {
     Integer clearTransactionTranslatedOutByUploadBatchId(Integer batchId);
 
     Integer clearTransactionOutRecordsByUploadBatchId(Integer batchId);
-
+    
+    Integer clearTransactionOutErrorsByUploadBatchId(Integer batchId);
+    
     Integer rejectInvalidTargetOrg(Integer batchId, configurationConnection confConn);
 
     Integer insertBatchUploadSumByOrg(batchUploads batchUpload, configurationConnection confConn);
