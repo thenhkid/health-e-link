@@ -336,6 +336,24 @@
                                             </c:if>      
                                         </div>
                                     </spring:bind>
+                                     <spring:bind path="massTranslation">
+                                    <div class="form-group">
+                                            <label class="control-label" for="massTranslation">Mass Translation *</label>
+                                            <div>
+                                                <label class="radio-inline">
+                                                    <form:radiobutton id="massTranslation" path="massTranslation" value="true" disabled="${transportDetails.copiedTransportId > 0 ? 'true' : 'false'}" /> Yes
+                                                </label>
+                                                <label class="radio-inline">
+                                                    <form:radiobutton id="massTranslation" path="massTranslation" value="false" disabled="${transportDetails.copiedTransportId > 0 ? 'true' : 'false'}" /> No
+                                                </label>
+                                            </div>
+                                            <c:if test="${transportDetails.copiedTransportId > 0}">
+                                                <form:hidden path="massTranslation" />
+                                            </c:if>      
+                                        </div>
+                                    </spring:bind>
+                                    
+                                    
                                 </c:if>
                             </div>
                             <div id="additionalFTPDiv" class="methodDiv" style="display:none">
