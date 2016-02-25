@@ -2847,7 +2847,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
 		        //we get upload details
 				batchUploads batchUploadDetails = transactionInManager.getBatchDetails(batchUploadId);
 				
-		        String utbatchName = new StringBuilder().append(transportDetails.gettransportMethodId()).append(configDetails.getorgId()).append(configDetails.getMessageTypeId()).append(dateFormat.format(date)).toString();
+		        String utbatchName = new StringBuilder().append(transportDetails.gettransportMethodId()).append("_m_").append(configDetails.getorgId()).append(configDetails.getMessageTypeId()).append(dateFormat.format(date)).toString();
 		        
 		        /* Get the connection id for the configuration */
 		        List<configurationConnection> connections = configurationManager.getConnectionsByTargetConfiguration(configDetails.getId());

@@ -92,7 +92,7 @@
                 <name>MassBatchTrigger</name>
                 <job-name>ProcessMassBatches</job-name>
                 <job-group>processGroup</job-group>
-                <cron-expression>5/30 * * * * ?</cron-expression>
+                <cron-expression>10 0/2 * * * ?</cron-expression>
             </cron>
         </trigger>
     </schedule>
