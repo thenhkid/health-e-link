@@ -1907,12 +1907,11 @@ public class transactionOutDAOImpl implements transactionOutDAO {
 				+ " SET "
 				+ outboundConfig.getUpdateFields() 
 				+ " WHERE tto.transactiontargetid = selectTbl.transactiontargetid;";
-
+		
 		Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
         query.setParameter("batchId", outboundConfig.getBatchDownloadId());
         query.setParameter("statusId", statusId);
-        
-        //System.out.println(sql);
+       
         query.executeUpdate();
     }
 
@@ -1920,7 +1919,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
 	@Override
 	@Transactional
 	public String getConfigFieldsForOutput(Integer configId) throws Exception {
-		Query query1 = sessionFactory.getCurrentSession().createSQLQuery("SET SESSION group_concat_max_len = 1000000;");
+		Query query1 = sessionFactory.getCurrentSession().createSQLQuery("SET SESSION group_concat_max_len = 5000;");
         query1.executeUpdate(); 
 		
 		String sql = ""
