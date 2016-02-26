@@ -2095,5 +2095,37 @@ public class transactionOutDAOImpl implements transactionOutDAO {
         insertData.executeUpdate();
        
     }
+
+	@Override
+	@Transactional
+	public void updateErrorStatusForTT(Integer batchDownloadId,
+			Integer newStatusId, Integer transactionTargetId) throws Exception {
+		
+		String sql = "UPDATE  transactionTarget JOIN (select distinct transactionTargetId matchid  "
+				+ " from transactionOutErrors where batchDownloadId = :batchDownloadId";
+				if (transactionTargetId > 0) {
+					sql = sql + " and transactionTargetId = :transactionTargetId";
+				}
+				sql = sql  + ") tbl_concat "
+				+ " ON transactionTarget.id = tbl_concat.matchid "
+				+ " SET transactionTarget.statusId = :newStatusId "
+				+ " WHERE transactionTarget.batchDLId = :batchDownloadId "
+				+ " and transactionTarget.statusId not in (:transRELId)";
+				if (transactionTargetId > 0) {
+					sql = sql + " and id = :transactionTargetId";
+				}
+		//System.out.println(sql);
+		Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                .setParameter("batchDownloadId", batchDownloadId)
+                .setParameter("newStatusId", newStatusId)
+                .setParameterList("transRELId", transRELId);
+        
+        if (transactionTargetId > 0) {
+        	updateData.setParameter("transactionTargetId", transactionTargetId);
+		}
+        
+        updateData.executeUpdate();
+        
+	}
         
 }

@@ -178,5 +178,6 @@ public interface transactionOutManager {
     void updateFieldValue (transactionRecords tr, String newValue) throws Exception;
     
     void insertValidationError(transactionRecords tr, configurationFormFields cff, Integer batchDownloadId) throws Exception;
-
+    
+    void updateErrorStatusForTT (Integer batchDownloadId, Integer newStatusId, Integer transactionTargetId) throws Exception;
 }

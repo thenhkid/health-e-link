@@ -2748,6 +2748,14 @@ public class transactionOutManagerImpl implements transactionOutManager {
         transactionOutDAO.insertValidationError(tr, cff, batchUploadId);
     }
     
+    
+	@Override
+	public void updateErrorStatusForTT(Integer batchDownloadId,
+			Integer newStatusId, Integer transactionTargetId) throws Exception{
+		transactionOutDAO.updateErrorStatusForTT(batchDownloadId, newStatusId, transactionTargetId);
+	}
+    
+    
     @Override
     public void dateValidation(configurationFormFields cff, Integer validationTypeId, Integer batchDownloadId, Integer transactionId) throws Exception {
        
@@ -2811,8 +2819,6 @@ public class transactionOutManagerImpl implements transactionOutManager {
 	
 	@Override
 	public Integer processMassOutputBatch(Integer batchUploadId) throws Exception {
-		try {
-			
 				//we get the configs for the file
 				List<Integer> configIds = getTargetConfigsForBatch(batchUploadId, Arrays.asList(19));
 				
@@ -2931,14 +2937,14 @@ public class transactionOutManagerImpl implements transactionOutManager {
 	                }
 	                
 	                // update status of the failed records to ERR - 14
-	                transactionInManager.updateStatusForErrorTrans(batchDLId, 14, true, transactionId);
+	                updateErrorStatusForTT(batchDLId, 14,  transactionId);
 
 	                //run validation
 	                runValidations(batchDLId, configId, transactionId);
 	                
 	                // update status of the failed records to ERR - 14
-	                transactionInManager.updateStatusForErrorTrans(batchDLId, 14, true, transactionId);
-		     
+	                updateErrorStatusForTT(batchDLId, 14,  transactionId);
+	                
 	                //we do not release the batch if there are outbound errors - everything should be in final status
 	                // now we are done with processing we set the 37 records to 18
 					//we update status of these transactions from 37 to 18
@@ -2950,72 +2956,68 @@ public class transactionOutManagerImpl implements transactionOutManager {
 	                	transactionInManager.updateBatchStatus(batchUploadId, 41, "");
 	                    transactionOutDAO.updateTargetBatchStatus(batchDLId, 41, "endDateTime");
 	                	return 1;
+	                } else {
+	                
+	                	//copy to transactionOutRecords
+			       		moveTranslatedRecordsByBatch(batchDLId);
+		                
+			       		
+			        /* Generate the file according to transportDetails 
+	                 * 1. we generate output file according to encoding in transportDetails
+	                 * 2. we always save an encrypted copy to archivesOut
+	                 * */
+			      
+			       		//get list of config fields here
+			       		
+			       		 String configFields = getConfigFieldsForOutput(configId);
+			       		 
+				       	 boolean encryptMessage = false;
+		                 // we only support base64 for now
+		                 if (transportDetails.getEncodingId() == 2) {        
+		                     encryptMessage = true;
+		             	}
+			       		String generatedFilePath = generateTargetFile(true, 0, batchDLId, transportDetails, encryptMessage);       
+			       		transportDetails.setDelimChar(messageTypeDAO.getDelimiterChar(transportDetails.getfileDelimiter()));
+			       		//make sure we remove old file
+			       		File generatedFile = new File(generatedFilePath);
+			       		if (generatedFile.exists()) {
+			       			generatedFile.delete();
+	            		}
+			       		
+			       		writeOutputToTextFile(transportDetails, batchDLId, generatedFilePath, configFields);
+			       		String fileExt = transportDetails.getfileExt();
+	            		
+	                    //write file here
+			       		
+			       		//cp file to archiveOut
+	                    
+	                    	fileSystem fileSystem = new fileSystem();
+	                    	File archiveFile = new File ( fileSystem.setPath(archivePath) + batchDownload.getutBatchName()+ "." + fileExt);
+	                    	
+	                    	//we check to see if our file is encoded
+	                    	if (!encryptMessage)  {
+	                    		//we encode here
+	                    		String strEncodedFile = filemanager.encodeFileToBase64Binary(generatedFile);
+	                    		if (archiveFile.exists()) {
+	                    			archiveFile.delete();
+	                    		}
+	                    		filemanager.writeFile(archiveFile.getAbsolutePath(), strEncodedFile);
+	                    	} else  {
+	                    		if (generatedFile.exists()) {
+	                    			generatedFile.delete();
+	                    		}
+	                    		Files.copy(archiveFile.toPath(), generatedFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+	                    	}
+	                    
+	                    //we update status of batch
+	                    transactionInManager.updateBatchStatus(batchUploadId, 28, "");
+	                    transactionOutDAO.updateTargetBatchStatus(batchDLId, 28, "endDateTime");
+					
+						return 0;
 	                }
-	                
-	                
-	                //copy to transactionOutRecords
-		       		moveTranslatedRecordsByBatch(batchDLId);
-	                
-		       		
-		        /* Generate the file according to transportDetails 
-                 * 1. we generate output file according to encoding in transportDetails
-                 * 2. we always save an encrypted copy to archivesOut
-                 * */
-		      
-		       		//get list of config fields here
-		       		
-		       		 String configFields = getConfigFieldsForOutput(configId);
-		       		 
-			       	 boolean encryptMessage = false;
-	                 // we only support base64 for now
-	                 if (transportDetails.getEncodingId() == 2) {        
-	                     encryptMessage = true;
-	             	}
-		       		String generatedFilePath = generateTargetFile(true, 0, batchDLId, transportDetails, encryptMessage);       
-		       		transportDetails.setDelimChar(messageTypeDAO.getDelimiterChar(transportDetails.getfileDelimiter()));
-		       		//make sure we remove old file
-		       		File generatedFile = new File(generatedFilePath);
-		       		if (generatedFile.exists()) {
-		       			generatedFile.delete();
-            		}
-		       		
-		       		writeOutputToTextFile(transportDetails, batchDLId, generatedFilePath, configFields);
-		       		String fileExt = transportDetails.getfileExt();
-            		
-                    //write file here
-		       		
-		       		//cp file to archiveOut
-                    
-                    	fileSystem fileSystem = new fileSystem();
-                    	File archiveFile = new File ( fileSystem.setPath(archivePath) + batchDownload.getutBatchName()+ "." + fileExt);
-                    	
-                    	//we check to see if our file is encoded
-                    	if (!encryptMessage)  {
-                    		//we encode here
-                    		String strEncodedFile = filemanager.encodeFileToBase64Binary(generatedFile);
-                    		if (archiveFile.exists()) {
-                    			archiveFile.delete();
-                    		}
-                    		filemanager.writeFile(archiveFile.getAbsolutePath(), strEncodedFile);
-                    	} else  {
-                    		if (generatedFile.exists()) {
-                    			generatedFile.delete();
-                    		}
-                    		Files.copy(archiveFile.toPath(), generatedFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                    	}
-                    
-                    //we update status of batch
-                    transactionInManager.updateBatchStatus(batchUploadId, 28, "");
-                    transactionOutDAO.updateTargetBatchStatus(batchDLId, 28, "endDateTime");
-				
-					return 0;
-		
-		} catch (Exception ex) {
-            ex.printStackTrace();
-            throw new Exception("Error at processOutputForBatch " + batchUploadId);
-        }
-		
 	}
+
+
 
 	
 
