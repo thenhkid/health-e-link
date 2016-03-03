@@ -12,16 +12,6 @@
 
     <context:component-scan base-package="com.ut.healthelink"/>
     
-    <mvc:annotation-driven />
-    
-    <mvc:resources mapping="/dspResources/**" location="/dspResources/" /> 
-    
-    <!-- This resource variable will hold the location to the main bowlink organization resource
-    folder on the server. This will allow us to use /orgFolders when viewing files upload by
-    specific organizations -->
-    <mvc:resources mapping="/orgFolders/**" location="file:c:/bowlink/"/>
-    
-    
     <bean id="viewResolver" class="org.springframework.web.servlet.view.UrlBasedViewResolver">
         <property name="viewClass">
             <value>
@@ -79,5 +69,7 @@
  	 <property name="location" value="file:${catalina.home}/properties/healthelink.properties"/>
     </bean>
     
-    <mvc:resources mapping="/headerImages/**" location="file:${directory.path}headerimages/" /> 
+    <mvc:annotation-driven />
+    <mvc:resources mapping="/dspResources/**" location="/dspResources/" /> 
+    <mvc:resources mapping="/headerImages/**" location="file:${directory.headerImageDir}/headerimages/" />
 </beans>
