@@ -35,8 +35,11 @@ public class CustomAuthenticationHandler extends SimpleUrlAuthenticationSuccessH
         String userTargetUrl = "/profile";
         String adminTargetUrl = "/administrator";
         Set<String> roles = AuthorityUtils.authorityListToSet(authentication.getAuthorities());
-
-        usermanager.setLastLogin(authentication.getName());
+        
+        //we do not log
+        if (request.getParameter("j_username").equalsIgnoreCase(authentication.getName())) {
+        	usermanager.setLastLogin(authentication.getName());
+        }
         /** log the admin who logged in as user**/
         // System.out.println(request.getParameter("j_username"));
       //we log here 

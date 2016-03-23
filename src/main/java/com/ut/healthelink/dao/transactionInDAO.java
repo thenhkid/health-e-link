@@ -15,6 +15,7 @@ import com.ut.healthelink.model.TransactionInError;
 import com.ut.healthelink.model.User;
 import com.ut.healthelink.model.UserActivity;
 import com.ut.healthelink.model.WSMessagesIn;
+import com.ut.healthelink.model.batchClearAfterDelivery;
 import com.ut.healthelink.model.batchMultipleTargets;
 import com.ut.healthelink.model.batchUploadSummary;
 import com.ut.healthelink.model.batchUploads;
@@ -115,7 +116,7 @@ public interface transactionInDAO {
     
     boolean insertMultiValToMessageTables(ConfigForInsert config, Integer subStringCounter, Integer transId);
     
-    Integer clearMessageTableForBatch(int batchId, String tableName);
+    Integer clearMessageTable(int batchId, String tableName, int transactionInId);
     
     public List <String> getMessageTables();
     
@@ -137,9 +138,9 @@ public interface transactionInDAO {
     
     boolean allowBatchClear (Integer batchUploadId);
     
-    Integer clearTransactionInRecords(Integer batchId);
+    Integer clearTransactionInRecords(Integer batchId, Integer transactionInId);
     
-    Integer clearTransactionTranslatedIn(Integer batchUploadId);
+    Integer clearTransactionTranslatedIn(Integer batchUploadId, Integer transactionInId);
     
     Integer clearTransactionTarget(Integer batchUploadId);
 
@@ -420,4 +421,12 @@ public interface transactionInDAO {
     Transaction setTransactionTargetInfoByStatusId (Transaction transaction) throws Exception;
     
     List<batchUploads> getMassTranslateBatchForOutput (Integer howMany) throws Exception;
+    
+    void saveClearAfterDelivery (batchClearAfterDelivery cad) throws Exception;
+    
+    void updateClearAfterDelivery (batchClearAfterDelivery cad) throws Exception;
+    
+    List <batchClearAfterDelivery> getClearAfterDeliveryBatches (List<Integer> statusIds) throws Exception;
+    
+    batchClearAfterDelivery getClearAfterDeliveryById (Integer cadId) throws Exception;
 }

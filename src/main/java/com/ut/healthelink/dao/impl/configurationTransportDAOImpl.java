@@ -1065,5 +1065,26 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
 		sessionFactory.getCurrentSession().delete(wsSender);		
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	@Transactional
+	
+	public boolean hasConfigsWithMasstranslations(
+			Integer orgId, Integer transportMethodId) throws Exception {
+		 String sql = ("select masstranslation from configurationTransportDetails "
+                    + " where transportMethodId = :transportMethodId and masstranslation = true "
+                    + " and configurationTransportDetails.configId in "
+                    + "(select id from configurations where orgId = :orgId and type = 1);");
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+            query.setParameter("orgId", orgId);
+            query.setParameter("transportMethodId", transportMethodId);
+            
+            if (query.list().size() > 0)  {
+            		return true;
+            } else {
+            	return false;
+            }
+	}
+
 	
 }

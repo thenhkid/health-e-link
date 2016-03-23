@@ -16,7 +16,7 @@
  		<!--  changed to every 10 seconds because we are processing one by one -->
         <trigger>
             <cron>
-                <name>60SecTrigger</name>
+                <name>ProcessOutputFilesTrigger</name>
                 <job-name>ProcessOutputFiles</job-name>
                 <job-group>processGroup</job-group>
                  <cron-expression>0/10 * * * * ?</cron-expression>
@@ -33,7 +33,7 @@
  
         <trigger>
             <cron>
-                <name>5MinTrigger</name>
+                <name>GenerateOutputFilesTrigger</name>
                 <job-name>GenerateOutputFiles</job-name>
                 <job-group>processGroup</job-group>
                 <cron-expression>12 0/2 * * * ?</cron-expression>
@@ -51,7 +51,7 @@
  
         <trigger>
             <cron>
-                <name>10MinsTrigger</name>
+                <name>LoadBatchesTrigger</name>
                 <job-name>LoadBatches</job-name>
                 <job-group>processGroup</job-group>
                 <cron-expression>10/30 * * * * ?</cron-expression>
@@ -59,9 +59,29 @@
         </trigger>
     </schedule>
     
+         <schedule>
+        <job>
+            <name>LoadMassBatches</name>
+            <group>processGroup</group>
+            <description>This process will run every 10 minutes to look for large files</description>
+            <job-class>com.ut.healthelink.jobs.loadMassBatches</job-class>
+        </job>
+ 
+        <trigger>
+            <cron>
+                <name>LoadMassBatchesTrigger</name>
+                <job-name>LoadMassBatches</job-name>
+                <job-group>processGroup</job-group>
+                <cron-expression>0 0/10 * * * ?</cron-expression>
+            </cron>
+        </trigger>
+    </schedule>
+    
+    
+    
      <schedule>
         <job>
-            <name>ProcessBatches</name>
+            <name>ProcessInBoundBatches</name>
             <group>processGroup</group>
             <description>This process will run every 30 seconds on the 5 second of the minute  to check if any loaded files will need to be process</description>
             <job-class>com.ut.healthelink.jobs.processBatches</job-class>
@@ -69,19 +89,36 @@
  
         <trigger>
             <cron>
-                <name>10on15MinsTrigger</name>
-                <job-name>ProcessBatches</job-name>
+                <name>ProcessInBoundBatchesTrigger</name>
+                <job-name>ProcessInBoundBatches</job-name>
                 <job-group>processGroup</job-group>
                 <cron-expression>5/30 * * * * ?</cron-expression>
             </cron>
         </trigger>
     </schedule>
     
+    <schedule>
+        <job>
+            <name>ProcessMassInBoundBatches</name>
+            <group>processGroup</group>
+            <description>This process will run every 30 seconds on the 5 second of the minute  to check if any loaded files will need to be process</description>
+            <job-class>com.ut.healthelink.jobs.processMassBatches</job-class>
+        </job>
+ 
+        <trigger>
+            <cron>
+                <name>ProcessMassInBoundBatchesTrigger</name>
+                <job-name>ProcessMassInBoundBatches</job-name>
+                <job-group>processGroup</job-group>
+                <cron-expression>0 3/10 * * * ?</cron-expression>
+            </cron>
+        </trigger>
+    </schedule>
     
     
     <schedule>
         <job>
-            <name>ProcessMassBatches</name>
+            <name>ProcessMassOutputBatches</name>
             <group>processGroup</group>
             <description>This process will run every 30 seconds on the 5 second of the minute  to check if any loaded files will need to be process</description>
             <job-class>com.ut.healthelink.jobs.processMassOutputRecords</job-class>
@@ -89,14 +126,31 @@
  
         <trigger>
             <cron>
-                <name>MassBatchTrigger</name>
-                <job-name>ProcessMassBatches</job-name>
+                <name>ProcessMassOutputBatchesTrigger</name>
+                <job-name>ProcessMassOutputBatches</job-name>
                 <job-group>processGroup</job-group>
-                <cron-expression>10 0/2 * * * ?</cron-expression>
+                <cron-expression>0 7/10 * * * ?</cron-expression>
             </cron>
         </trigger>
     </schedule>
     
+    <schedule>
+        <job>
+            <name>ClearAfterDeliveryBatches</name>
+            <group>processGroup</group>
+            <description>This process will run every 10 minutes on the 2 minute to check if any clear after delivery message tables need to be cleared</description>
+            <job-class>com.ut.healthelink.jobs.clearAfterDelivery</job-class>
+        </job>
+ 
+        <trigger>
+            <cron>
+                <name>ClearAfterDeliveryBatchesTrigger</name>
+                <job-name>ClearAfterDeliveryBatches</job-name>
+                <job-group>processGroup</job-group>
+                <cron-expression>* 9/10 * * * ?</cron-expression>
+            </cron>
+        </trigger>
+    </schedule>
      
     
     <!--  -->

@@ -19,6 +19,7 @@ import com.ut.healthelink.model.User;
 import com.ut.healthelink.model.UserActivity;
 import com.ut.healthelink.model.WSMessagesIn;
 import com.ut.healthelink.model.batchDownloads;
+import com.ut.healthelink.model.batchClearAfterDelivery;
 import com.ut.healthelink.model.batchMultipleTargets;
 import com.ut.healthelink.model.batchUploadSummary;
 import com.ut.healthelink.model.batchUploads;
@@ -79,7 +80,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
-import java.net.InetAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.DateFormat;
@@ -165,9 +165,11 @@ public class transactionInManagerImpl implements transactionInManager {
     //reject Ids
     private List<Integer> rejectIds = Arrays.asList(13,14);
     
+    private String directoryPath = System.getProperty("directory.rootDir");
 
-    private String archivePath = "/bowlink/archivesIn/";
-
+    private String archivePath = (directoryPath + "archivesIn/");
+    
+    
     @Override
     @Transactional
     public String getFieldValue(String tableName, String tableCol, String idCol, int idValue) {
@@ -445,7 +447,7 @@ public class transactionInManagerImpl implements transactionInManager {
         Integer sysErrorCount = 0;
         try {
             for (String mt : mts) {
-                sysErrorCount = sysErrorCount + transactionInDAO.clearMessageTableForBatch(batchId, mt);
+                sysErrorCount = sysErrorCount + transactionInDAO.clearMessageTable(batchId, mt, 0);
             }
             return sysErrorCount;
         } catch (Exception e) {
@@ -454,7 +456,23 @@ public class transactionInManagerImpl implements transactionInManager {
 
         }
     }
+    
+    
+    @Override
+    public Integer clearMessageTablesByTransactionInId(int transactionInId) {
+        List<String> mts = transactionInDAO.getMessageTables();
+        Integer sysErrorCount = 0;
+        try {
+            for (String mt : mts) {
+                sysErrorCount = sysErrorCount + transactionInDAO.clearMessageTable(0, mt, transactionInId);
+            }
+            return sysErrorCount;
+        } catch (Exception e) {
+            System.err.println("clearMessageTablesByTransactionInId " + e.getStackTrace());
+            return 1;
 
+        }
+    }
     @Override
     public List<Integer> getBlankTransIds(ConfigForInsert config) {
         return transactionInDAO.getBlankTransIds(config);
@@ -518,10 +536,11 @@ public class transactionInManagerImpl implements transactionInManager {
 
         boolean insertTargets = false;
         // we should only insert for batches that are just loaded
-        if (batch.getstatusId() == 36) {
+        if (batch.getstatusId() == 36 || batch.getstatusId() == 43) {
             insertTargets = true;
         }
-        if ((batch.getstatusId() == 3 || batch.getstatusId() == 6 || batch.getstatusId() == 36)) {
+        if ((batch.getstatusId() == 3 || batch.getstatusId() == 6 
+        		|| batch.getstatusId() == 36 || batch.getstatusId() == 43)) {
             /**
              * insert log*
              */
@@ -901,8 +920,8 @@ public class transactionInManagerImpl implements transactionInManager {
     }
 
     @Override
-    public Integer clearTransactionInRecords(Integer batchUploadId) {
-        return transactionInDAO.clearTransactionInRecords(batchUploadId);
+    public Integer clearTransactionInRecords(Integer batchUploadId, Integer transactionInId) {
+        return transactionInDAO.clearTransactionInRecords(batchUploadId, transactionInId);
     }
 
     /**
@@ -963,17 +982,17 @@ public class transactionInManagerImpl implements transactionInManager {
     }
 
     @Override
-    public Integer clearTransactionTranslatedIn(Integer batchUploadId) {
-        return transactionInDAO.clearTransactionTranslatedIn(batchUploadId);
+    public Integer clearTransactionTranslatedIn(Integer batchUploadId, Integer transactionInId) {
+        return transactionInDAO.clearTransactionTranslatedIn(batchUploadId, transactionInId);
     }
 
     @Override
     public Integer clearTransactionTables(Integer batchUploadId, boolean leaveFinalStatusIds) {
 	        //TODO have in transaction block for roll back?
         //we clear transactionTranslatedIn
-        Integer cleared = clearTransactionTranslatedIn(batchUploadId);
+        Integer cleared = clearTransactionTranslatedIn(batchUploadId, 0);
         //we clear transactionInRecords
-        cleared = cleared + clearTransactionInRecords(batchUploadId);
+        cleared = cleared + clearTransactionInRecords(batchUploadId, 0);
         //clear batchDownloadSummary
         cleared = cleared + clearBatchDownloadSummaryByUploadBatchId(batchUploadId);
         //clear transactionoutrecords
@@ -1583,385 +1602,392 @@ public class transactionInManagerImpl implements transactionInManager {
      * this method is called by scheduler. It will take all batches with status of SSA and load them. Batch will end with a status of LOADED.
      */
     @Override
-    public void loadBatches() {
+    public void loadBatches() throws Exception{
         //1. get all batches with SSA
         List<batchUploads> batches = getBatchesByStatusIds(Arrays.asList(2));
         if (batches != null && batches.size() != 0) {
-            //we loop and process
+        	//we loop and process
             for (batchUploads batch : batches) {
-                loadBatch(batch.getId());
+            	loadBatch(batch.getId());
             }
 
         }
     }
 
     @Override
-    public boolean loadBatch(Integer batchId) {
-        Integer batchStatusId = 38;
-        List<Integer> errorStatusIds = Arrays.asList(11, 13, 14, 16);
-        String processFolderPath = "/bowlink/loadFiles/";
-        try {
+    public boolean loadBatch(Integer batchId) throws Exception {
+    	//first thing we do is get details, then we set it to  38
+    	batchUploads batch = getBatchDetails(batchId);
+    	//we recheck status in case it was picked up in a loop
+    	if (batch.getstatusId() == 2 || batch.getstatusId() == 42) {
+	    	Integer batchStatusId = 38;
+	        List<Integer> errorStatusIds = Arrays.asList(11, 13, 14, 16);
+	        String processFolderPath = "/bowlink/loadFiles/";
+	        try {
 
-            /**
-             * insert log*
-             */
-            try {
-                //log user activity
-                UserActivity ua = new UserActivity();
-                ua.setUserId(0);
-                ua.setFeatureId(0);
-                ua.setAccessMethod("System");
-                ua.setActivity("System Loaded Batch");
-                ua.setBatchUploadId(batchId);
-                usermanager.insertUserLog(ua);
-
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                System.err.println("loadBatch - insert user log" + ex.toString());
-            }
-            //first thing we do is get details, then we set it to  4
-            batchUploads batch = getBatchDetails(batchId);
+	            try {
+	                //log user activity
+	                UserActivity ua = new UserActivity();
+	                ua.setUserId(0);
+	                ua.setFeatureId(0);
+	                ua.setAccessMethod("System");
+	                ua.setActivity("System Loaded Batch");
+	                ua.setBatchUploadId(batchId);
+	                usermanager.insertUserLog(ua);
+	
+	            } catch (Exception ex) {
+	                ex.printStackTrace();
+	                System.err.println("loadBatch - insert user log" + ex.toString());
+	            }
+            
             // set batch to SBL - 38
-            updateBatchStatus(batchId, batchStatusId, "startDateTime");
+            //if could be that the process has picked this up
+           
+	            updateBatchStatus(batchId, batchStatusId, "startDateTime");
+	
+	            // let's clear all tables first as we are starting over
+	            Integer sysErrors = clearTransactionTables(batchId, false);
+	            String errorMessage = "Load errors, please contact admin to review logs";
+	            // loading batch will take it all the way to loaded (9) status for
+	            if (sysErrors > 0) {
+	                insertProcessingError(5, null, batchId, null, null, null, null, false, false, "Error cleaning out transaction tables.  Batch cannot be loaded.");
+	                updateBatchStatus(batchId, 39, "endDateTime");
+	                return false;
+	            }
 
-            // let's clear all tables first as we are starting over
-            Integer sysErrors = clearTransactionTables(batchId, false);
-            String errorMessage = "Load errors, please contact admin to review logs";
-            // loading batch will take it all the way to loaded (9) status for
-            if (sysErrors > 0) {
-                insertProcessingError(5, null, batchId, null, null, null, null, false, false, "Error cleaning out transaction tables.  Batch cannot be loaded.");
-                updateBatchStatus(batchId, 39, "endDateTime");
-                return false;
-            }
+	            String loadTableName = "uploadTable_" + batch.getId();
+	            //make sure old table is dropped if exists
+	            Integer sysError = dropLoadTable(loadTableName);
+	            sysError = sysError + createLoadTable(loadTableName);
 
-            String loadTableName = "uploadTable_" + batch.getId();
-            //make sure old table is dropped if exists
-            Integer sysError = dropLoadTable(loadTableName);
-            sysError = sysError + createLoadTable(loadTableName);
+	            //we need to index loadTable
+	            sysError = sysError + indexLoadTable(loadTableName);
+	
+	            fileSystem dir = new fileSystem();
+	            dir.setDirByName("/");
 
-            //we need to index loadTable
-            sysError = sysError + indexLoadTable(loadTableName);
+	            //2. we load data with my sql
+	            String actualFileName = null;
+	            String newfilename = null;
 
-            fileSystem dir = new fileSystem();
-            dir.setDirByName("/");
+	            /**
+	             * decoded files will always be in loadFiles folder with UTBatchName *
+	             */
+	            // all files are Base64 encoded at this point
+	            String encodedFilePath = dir.setPath(batch.getFileLocation());
+	            String encodedFileName = batch.getoriginalFileName();
+	            File encodedFile = new File(encodedFilePath + encodedFileName);
+	            String decodedFilePath = dir.setPath(processFolderPath);
+	            String decodedFileName = batch.getutBatchName();
+	            String decodedFileExt = batch.getoriginalFileName().substring(batch.getoriginalFileName().lastIndexOf("."));
+	            String strDecode = "";
+	            try {
+	                strDecode = filemanager.decodeFileToBase64Binary(encodedFile);
+	            } catch (Exception ex) {
+	                ex.printStackTrace();
+	                strDecode = "";
+	                sysErrors = 1;
+	                processingSysErrorId = 17;
+	            }
 
-            //2. we load data with my sql
-            String actualFileName = null;
-            String newfilename = null;
+	            if (!strDecode.equalsIgnoreCase("")) {
+	                //we write and decode file
+	                filemanager.writeFile((decodedFilePath + decodedFileName + decodedFileExt), strDecode);
+	                actualFileName = (decodedFilePath + decodedFileName + decodedFileExt);
+	
+	                /*
+	                 If batch is set up for CCD input then we need to translate it
+	                 to a pipe-delimited text file.
+	                 */
+	                /**
+	                 * here we need to check if we should change file to xml or hr for org sometimes org will send hl7 files over or .out or some other extension, they all need to be .hr all ccd file will need to end in xml
+	                 *
+	                 */
+	                //so we check decodedFileName and change it to the proper extension if need be
+	                String chagneToExtension = "";
+	                String processFileName = batch.getoriginalFileName();
+	                /**
+	                 * For configId of 0, we need to check to see if org has hr or ccd if configId is not 0, we pull up the extension type and rename file if we find more than one file extension set up for org we reject them them file extension will be 4 (hr) or 9 (ccd) info we have from batchUpload - transportMethodId, configId, orgId
+	                 *
+	                 */
+	                if (batch.getConfigId() != 0) {
+	                    configurationTransport ct = configurationtransportmanager.getTransportDetails(batch.getConfigId());
+	                    if (ct.getfileType() == 9) {
+	                        chagneToExtension = "xml";
+	                    } else if (ct.getfileType() == 4) {
+	                        chagneToExtension = "hr";
+	                    }
+	                } else if (batch.getConfigId() == 0) {
+	                	//should restrict this to only 4/9
+	                    //see if the users has any 4/9 fileType, we don't need to worry about changing extension if org doesn't
+	
+	                    List<configurationTransport> ctList = configurationtransportmanager.getConfigurationTransportFileExtByFileType(batch.getOrgId(), batch.gettransportMethodId(), null, Arrays.asList(1), true, false);
+	                    if (ctList.size() > 1) {
+	                        //it is ok to have multiple if they are not using file type 4/9, so we check again
+	                        List<configurationTransport> ctList2 = configurationtransportmanager.getConfigurationTransportFileExtByFileType(batch.getOrgId(), batch.gettransportMethodId(), Arrays.asList(4, 9), Arrays.asList(1), true, false);
+	                        if (ctList2.size() != 0) { //they have multiple file types defined along with hr or ccd, we fail them
+	                            //clean up
+	                            File tempLoadFile = new File(actualFileName);
+	                            if (tempLoadFile.exists()) {
+	                                tempLoadFile.delete();
+	                            }
+	                            //log
+	                            updateBatchStatus(batchId, 7, "endDateTime");
+	                            insertProcessingError(18, null, batchId, null, null, null, null,
+	                                    false, false, "Multiple file types were found for transport method.");
+	                            //get out of loop
+	                            return false;
+	
+	                        }
+	                    } else if (ctList.size() == 1) {
+	                        if (ctList.get(0).getfileType() == 9) {
+	                            chagneToExtension = "xml";
+	                        } else if (ctList.get(0).getfileType() == 4) {
+	                            chagneToExtension = "hr";
+	                        }
+	                    }
+	                }
 
-            /**
-             * decoded files will always be in loadFiles folder with UTBatchName *
-             */
-            // all files are Base64 encoded at this point
-            String encodedFilePath = dir.setPath(batch.getFileLocation());
-            String encodedFileName = batch.getoriginalFileName();
-            File encodedFile = new File(encodedFilePath + encodedFileName);
-            String decodedFilePath = dir.setPath(processFolderPath);
-            String decodedFileName = batch.getutBatchName();
-            String decodedFileExt = batch.getoriginalFileName().substring(batch.getoriginalFileName().lastIndexOf("."));
-            String strDecode = "";
-            try {
-                strDecode = filemanager.decodeFileToBase64Binary(encodedFile);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                strDecode = "";
-                sysErrors = 1;
-                processingSysErrorId = 17;
-            }
+	                if (chagneToExtension != "") {
+	                    processFileName = batch.getutBatchName() + "." + chagneToExtension;
+	                	//we overwrite file 
+	                    //old file is here actualFileName;
+	                    //new file is the same name with diff extension
+	                    File actualFile = new File(actualFileName);
+	                    File fileWithNewExtension = new File(decodedFilePath + processFileName);
+	                    Path fileWithOldExtension = actualFile.toPath();
+	                    Path renamedFile = fileWithNewExtension.toPath();
+	                    Files.move(fileWithOldExtension, renamedFile, REPLACE_EXISTING);
+	                }
 
-            if (!strDecode.equalsIgnoreCase("")) {
-                //we write and decode file
-                filemanager.writeFile((decodedFilePath + decodedFileName + decodedFileExt), strDecode);
-                actualFileName = (decodedFilePath + decodedFileName + decodedFileExt);
+	                if (processFileName.endsWith(".xml")) {
+	                    newfilename = ccdtotxt.TranslateCCDtoTxt(decodedFilePath, decodedFileName, batch.getOrgId());
+	                    if (newfilename.equals("ERRORERRORERROR")) {
+	                    	//clean up and break
+	                        //need to remove load table, will leave load file with error
+	                        sysError = sysError + dropLoadTable(loadTableName);
+	                        updateBatchStatus(batchId, 39, "endDateTime");
+	                        insertProcessingError(5, null, batchId, null, null, null, null,
+	                                false, false, "Error at applying jar template");
+	                        return false;
+	                    } else if (newfilename.equals("FILE IS NOT XML ERROR")) {
+	                    	//clean up and break
+	                        //need to remove load table, will leave load file with error
+	                        sysError = sysError + dropLoadTable(loadTableName);
+	                        updateBatchStatus(batchId, 7, "endDateTime");
+	                        insertProcessingError(22, null, batchId, null, null, null, null,
+	                                false, false, "XML format is invalid.");
+	                        return false;
+	                    }
+	
+	                    actualFileName = (decodedFilePath + newfilename);
+	                    //we remove temp load file 
+	                    File tempLoadFile = new File(decodedFilePath + processFileName);
+	                    if (tempLoadFile.exists()) {
+	                        tempLoadFile.delete();
+	                    }
+	                    /* 
+	                     if the original file name is a HL7 file (".hr") then we are going to translate it to
+	                     a pipe-delimited text file.
+	                     */
+	                } else if (processFileName.endsWith(".hr")) {
+	
+	                    newfilename = hl7toTxt.TranslateHl7toTxt(decodedFilePath, decodedFileName, batch.getOrgId());
+	                    if (newfilename.equals("ERRORERRORERROR")) {
+	                    	//clean up and break
+	                        //need to remove load table, will leave load file with error
+	                        sysError = sysError + dropLoadTable(loadTableName);
+	                        updateBatchStatus(batchId, 39, "endDateTime");
+	                        insertProcessingError(5, null, batchId, null, null, null, null,
+	                                false, false, "Error at applying jar template");
+	                        return false;
+	                    }
+	                    actualFileName = (decodedFilePath + newfilename);
+	                    //we remove temp load file 
+	                    File tempLoadFile = new File(decodedFilePath + processFileName);
+	                    if (tempLoadFile.exists()) {
+	                        tempLoadFile.delete();
+	                    }
+	                }
+	
+	                //at this point, hl7 and hr are in unencoded plain text
+	                if (actualFileName.endsWith(".txt") || actualFileName.endsWith(".csv")) {
+	                    sysError = sysError + insertLoadData(batch.getId(), batch.getDelimChar(), actualFileName, loadTableName, batch.isContainsHeaderRow());
+	                    File actualFile = new File(actualFileName);
+	                    //we are archiving it
+	                    File archiveFile = new File(dir.setPathFromRoot(archivePath) + batch.getutBatchName() + "_dec" + actualFileName.substring(actualFileName.lastIndexOf(".")));
+	                    Path archive = archiveFile.toPath();
+	                    Path actual = actualFile.toPath();
+	                    //we keep original file in archive folder
+	                    Files.move(actual, archive, REPLACE_EXISTING);
+	                }
+	
+	                //3. we update batchId, loadRecordId
+	                sysError = sysError + updateLoadTable(loadTableName, batch.getId());
+	
+	                // 4. we insert into transactionIn - status of invalid (11), batchId, loadRecordId
+	                sysError = sysError + loadTransactionIn(loadTableName, batch.getId());
+	
+	                //5. we insert into transactionInRecords - we select transactionIn batchId, transactionInId
+	                sysError = sysError + loadTransactionInRecords(batch.getId());
+	
+	                //6. we match loadRecordId and update transactionInRecords's F1-F255 data
+	                sysError = sysError + loadTransactionInRecordsData(loadTableName);
+	
+	                //7. we delete loadTable
+	                sysError = sysError + dropLoadTable(loadTableName);
+	
+	                //8. we see how if the file only has one upload type so we don't need to parse every line
+	                // if we only have one, we update the entire table 
+	                if (batch.getConfigId() != null && batch.getConfigId() != 0) {
+	                    // we update entire transactionIN with configId
+	                    sysError = sysError + updateConfigIdForBatch(batch.getId(), batch.getConfigId());
+	                } else {
+	                    //1. we get all configs for user - user might not have permission to submit but someone else in org does
+	
+	                    List<configurationMessageSpecs> configurationMessageSpecs = configurationtransportmanager.getConfigurationMessageSpecsForOrgTransport(batch.getOrgId(), batch.gettransportMethodId(), false);
+	                    List<configurationMessageSpecs> checkOnlyConfigForOrg = configurationtransportmanager.getConfigurationMessageSpecsForOrgTransport(batch.getOrgId(), batch.gettransportMethodId(), true);
+	
+	                    //2. we get all rows for batch
+	                    List<transactionInRecords> tInRecords = getTransactionInRecordsForBatch(batch.getId());
+	                    if (tInRecords == null || tInRecords.size() == 0) {
+	                        updateBatchStatus(batchId, 7, "endDateTime");
+	                        insertProcessingError(7, null, batchId, null, null, null, null,
+	                                false, false, "No valid transactions were found for batch.");
+	                        return false;
+	                    }
+	                    if (configurationMessageSpecs == null || (configurationMessageSpecs.size() == 0 && checkOnlyConfigForOrg.size() == 0)) {
+	                        insertProcessingError(6, null, batchId, null, null, null, null,
+	                                false, false, "No valid configurations were found for loading batch.");
+	                        // update all transactions to invalid
+	                        updateBatchStatus(batchId, 7, "endDateTime");
+	                        updateTransactionStatus(batchId, 0, 0, 11);
+	                        return false;
+	                    }
+	                    //if we only have one and it is set to 0,we can default, else we loop through
+	                    if ((configurationMessageSpecs.size() == 1 && configurationMessageSpecs.get(0).getmessageTypeCol() == 0) || checkOnlyConfigForOrg.size() == 1) {
+	                        int configId = 0;
+	                        if (configurationMessageSpecs.size() == 0) {
+	                            configId = checkOnlyConfigForOrg.get(0).getconfigId();
+	                        } else {
+	                            configId = configurationMessageSpecs.get(0).getconfigId();
+	                        }
+	                        sysError = sysError + updateConfigIdForBatch(batch.getId(), configId);
+	                    } else {
+	                        //3 loop through each config and mass update by config
+	                        for (configurationMessageSpecs cms : configurationMessageSpecs) {
+	                            //we update by config
+	                            if (updateConfigIdForCMS(batchId, cms) != 0) {
+	                                sysError++;
+	                                insertProcessingError(processingSysErrorId, null, batch.getId(), null, null, null, null,
+	                                        false, false, "System error while checking configuration");
+	                                //system error - break
+	                                break;
+	                            }
+	                        }
+	                        // now we looped through config, we flag the invalid records.
+	                        sysError = flagInvalidConfig(batchId);
+	                        //we also need to flag and error the ones that a user is not supposed to upload for
+	                        sysError = flagNoPermissionConfig(batch);
+	                    }
+	                }
+	
+	                //we populate transactionTranslatedIn
+	                sysError = sysError + loadTransactionTranslatedIn(batchId);
+	
+	                //update data in transactionTranslatedIn
+	                resetTransactionTranslatedIn(batchId, true);
+	                int transactionId = 0;
+	                // we trim all values
+	                trimFieldValues(batchId, false, transactionId, true);
+	
+	                //now that we have our config, we will apply pre-processing cw and macros to manipulate our data
+	                //1. find all configs for batch, loop and process
+	                List<Integer> configIds = getConfigIdsForBatch(batchId, false, transactionId);
+	                for (Integer configId : configIds) {
+	                    //we need to run all checks before insert regardless *
+	                    /**
+	                     * we are reordering 1. cw/macro, 2. required and 3. validate *
+	                     */
+	                    // 1. grab the configurationDataTranslations and run cw/macros
+	                    List<configurationDataTranslations> dataTranslations = configurationManager
+	                            .getDataTranslationsWithFieldNo(configId, 2); //pre processing
+	                    for (configurationDataTranslations cdt : dataTranslations) {
+	                        if (cdt.getCrosswalkId() != 0) {
+	                            sysError = sysError + processCrosswalk(configId, batchId, cdt, false, transactionId);
+	                        } else if (cdt.getMacroId() != 0) {
+	                            sysError = sysError + processMacro(configId, batchId, cdt, false, transactionId);
+	                        }
+	                    }
+	
+	                }
+	            }
+	            if (sysErrors > 0) {
+	                insertProcessingError(processingSysErrorId, null, batchId, null, null, null, null, false, false, errorMessage);
+	                updateBatchStatus(batchId, 39, "endDateTime");
+	                return false;
+	            }
 
-                /*
-                 If batch is set up for CCD input then we need to translate it
-                 to a pipe-delimited text file.
-                 */
-                /**
-                 * here we need to check if we should change file to xml or hr for org sometimes org will send hl7 files over or .out or some other extension, they all need to be .hr all ccd file will need to end in xml
-                 *
-                 */
-                //so we check decodedFileName and change it to the proper extension if need be
-                String chagneToExtension = "";
-                String processFileName = batch.getoriginalFileName();
-                /**
-                 * For configId of 0, we need to check to see if org has hr or ccd if configId is not 0, we pull up the extension type and rename file if we find more than one file extension set up for org we reject them them file extension will be 4 (hr) or 9 (ccd) info we have from batchUpload - transportMethodId, configId, orgId
-                 *
-                 */
-                if (batch.getConfigId() != 0) {
-                    configurationTransport ct = configurationtransportmanager.getTransportDetails(batch.getConfigId());
-                    if (ct.getfileType() == 9) {
-                        chagneToExtension = "xml";
-                    } else if (ct.getfileType() == 4) {
-                        chagneToExtension = "hr";
-                    }
-                } else if (batch.getConfigId() == 0) {
-                	//should restrict this to only 4/9
-                    //see if the users has any 4/9 fileType, we don't need to worry about changing extension if org doesn't
-
-                    List<configurationTransport> ctList = configurationtransportmanager.getConfigurationTransportFileExtByFileType(batch.getOrgId(), batch.gettransportMethodId(), null, Arrays.asList(1), true, false);
-                    if (ctList.size() > 1) {
-                        //it is ok to have multiple if they are not using file type 4/9, so we check again
-                        List<configurationTransport> ctList2 = configurationtransportmanager.getConfigurationTransportFileExtByFileType(batch.getOrgId(), batch.gettransportMethodId(), Arrays.asList(4, 9), Arrays.asList(1), true, false);
-                        if (ctList2.size() != 0) { //they have multiple file types defined along with hr or ccd, we fail them
-                            //clean up
-                            File tempLoadFile = new File(actualFileName);
-                            if (tempLoadFile.exists()) {
-                                tempLoadFile.delete();
-                            }
-                            //log
-                            updateBatchStatus(batchId, 7, "endDateTime");
-                            insertProcessingError(18, null, batchId, null, null, null, null,
-                                    false, false, "Multiple file types were found for transport method.");
-                            //get out of loop
-                            return false;
-
-                        }
-                    } else if (ctList.size() == 1) {
-                        if (ctList.get(0).getfileType() == 9) {
-                            chagneToExtension = "xml";
-                        } else if (ctList.get(0).getfileType() == 4) {
-                            chagneToExtension = "hr";
-                        }
-                    }
-
-                }
-
-                if (chagneToExtension != "") {
-                    processFileName = batch.getutBatchName() + "." + chagneToExtension;
-                	//we overwrite file 
-                    //old file is here actualFileName;
-                    //new file is the same name with diff extension
-                    File actualFile = new File(actualFileName);
-                    File fileWithNewExtension = new File(decodedFilePath + processFileName);
-                    Path fileWithOldExtension = actualFile.toPath();
-                    Path renamedFile = fileWithNewExtension.toPath();
-                    Files.move(fileWithOldExtension, renamedFile, REPLACE_EXISTING);
-                }
-
-                if (processFileName.endsWith(".xml")) {
-                    newfilename = ccdtotxt.TranslateCCDtoTxt(decodedFilePath, decodedFileName, batch.getOrgId());
-                    if (newfilename.equals("ERRORERRORERROR")) {
-                    	//clean up and break
-                        //need to remove load table, will leave load file with error
-                        sysError = sysError + dropLoadTable(loadTableName);
-                        updateBatchStatus(batchId, 39, "endDateTime");
-                        insertProcessingError(5, null, batchId, null, null, null, null,
-                                false, false, "Error at applying jar template");
-                        return false;
-                    } else if (newfilename.equals("FILE IS NOT XML ERROR")) {
-                    	//clean up and break
-                        //need to remove load table, will leave load file with error
-                        sysError = sysError + dropLoadTable(loadTableName);
-                        updateBatchStatus(batchId, 7, "endDateTime");
-                        insertProcessingError(22, null, batchId, null, null, null, null,
-                                false, false, "XML format is invalid.");
-                        return false;
-                    }
-
-                    actualFileName = (decodedFilePath + newfilename);
-                    //we remove temp load file 
-                    File tempLoadFile = new File(decodedFilePath + processFileName);
-                    if (tempLoadFile.exists()) {
-                        tempLoadFile.delete();
-                    }
-                    /* 
-                     if the original file name is a HL7 file (".hr") then we are going to translate it to
-                     a pipe-delimited text file.
-                     */
-                } else if (processFileName.endsWith(".hr")) {
-
-                    newfilename = hl7toTxt.TranslateHl7toTxt(decodedFilePath, decodedFileName, batch.getOrgId());
-                    if (newfilename.equals("ERRORERRORERROR")) {
-                    	//clean up and break
-                        //need to remove load table, will leave load file with error
-                        sysError = sysError + dropLoadTable(loadTableName);
-                        updateBatchStatus(batchId, 39, "endDateTime");
-                        insertProcessingError(5, null, batchId, null, null, null, null,
-                                false, false, "Error at applying jar template");
-                        return false;
-                    }
-                    actualFileName = (decodedFilePath + newfilename);
-                    //we remove temp load file 
-                    File tempLoadFile = new File(decodedFilePath + processFileName);
-                    if (tempLoadFile.exists()) {
-                        tempLoadFile.delete();
-                    }
-                }
-
-                //at this point, hl7 and hr are in unencoded plain text
-                if (actualFileName.endsWith(".txt") || actualFileName.endsWith(".csv")) {
-                    sysError = sysError + insertLoadData(batch.getId(), batch.getDelimChar(), actualFileName, loadTableName, batch.isContainsHeaderRow());
-                    File actualFile = new File(actualFileName);
-                    //we are archiving it
-                    File archiveFile = new File(dir.setPath(archivePath) + batch.getutBatchName() + "_dec" + actualFileName.substring(actualFileName.lastIndexOf(".")));
-                    Path archive = archiveFile.toPath();
-                    Path actual = actualFile.toPath();
-                    //we keep original file in archive folder
-                    Files.move(actual, archive, REPLACE_EXISTING);
-                }
-
-                //3. we update batchId, loadRecordId
-                sysError = sysError + updateLoadTable(loadTableName, batch.getId());
-
-                // 4. we insert into transactionIn - status of invalid (11), batchId, loadRecordId
-                sysError = sysError + loadTransactionIn(loadTableName, batch.getId());
-
-                //5. we insert into transactionInRecords - we select transactionIn batchId, transactionInId
-                sysError = sysError + loadTransactionInRecords(batch.getId());
-
-                //6. we match loadRecordId and update transactionInRecords's F1-F255 data
-                sysError = sysError + loadTransactionInRecordsData(loadTableName);
-
-                //7. we delete loadTable
-                sysError = sysError + dropLoadTable(loadTableName);
-
-                //8. we see how if the file only has one upload type so we don't need to parse every line
-                // if we only have one, we update the entire table 
-                if (batch.getConfigId() != null && batch.getConfigId() != 0) {
-                    // we update entire transactionIN with configId
-                    sysError = sysError + updateConfigIdForBatch(batch.getId(), batch.getConfigId());
-                } else {
-                    //1. we get all configs for user - user might not have permission to submit but someone else in org does
-
-                    List<configurationMessageSpecs> configurationMessageSpecs = configurationtransportmanager.getConfigurationMessageSpecsForOrgTransport(batch.getOrgId(), batch.gettransportMethodId(), false);
-                    List<configurationMessageSpecs> checkOnlyConfigForOrg = configurationtransportmanager.getConfigurationMessageSpecsForOrgTransport(batch.getOrgId(), batch.gettransportMethodId(), true);
-
-                    //2. we get all rows for batch
-                    List<transactionInRecords> tInRecords = getTransactionInRecordsForBatch(batch.getId());
-                    if (tInRecords == null || tInRecords.size() == 0) {
-                        updateBatchStatus(batchId, 7, "endDateTime");
-                        insertProcessingError(7, null, batchId, null, null, null, null,
-                                false, false, "No valid transactions were found for batch.");
-                        return false;
-                    }
-                    if (configurationMessageSpecs == null || (configurationMessageSpecs.size() == 0 && checkOnlyConfigForOrg.size() == 0)) {
-                        insertProcessingError(6, null, batchId, null, null, null, null,
-                                false, false, "No valid configurations were found for loading batch.");
-                        // update all transactions to invalid
-                        updateBatchStatus(batchId, 7, "endDateTime");
-                        updateTransactionStatus(batchId, 0, 0, 11);
-                        return false;
-                    }
-                    //if we only have one and it is set to 0,we can default, else we loop through
-                    if ((configurationMessageSpecs.size() == 1 && configurationMessageSpecs.get(0).getmessageTypeCol() == 0) || checkOnlyConfigForOrg.size() == 1) {
-                        int configId = 0;
-                        if (configurationMessageSpecs.size() == 0) {
-                            configId = checkOnlyConfigForOrg.get(0).getconfigId();
-                        } else {
-                            configId = configurationMessageSpecs.get(0).getconfigId();
-                        }
-                        sysError = sysError + updateConfigIdForBatch(batch.getId(), configId);
-                    } else {
-                        //3 loop through each config and mass update by config
-                        for (configurationMessageSpecs cms : configurationMessageSpecs) {
-                            //we update by config
-                            if (updateConfigIdForCMS(batchId, cms) != 0) {
-                                sysError++;
-                                insertProcessingError(processingSysErrorId, null, batch.getId(), null, null, null, null,
-                                        false, false, "System error while checking configuration");
-                                //system error - break
-                                break;
-                            }
-                        }
-                        // now we looped through config, we flag the invalid records.
-                        sysError = flagInvalidConfig(batchId);
-                        //we also need to flag and error the ones that a user is not supposed to upload for
-                        sysError = flagNoPermissionConfig(batch);
-                    }
-                }
-
-                //we populate transactionTranslatedIn
-                sysError = sysError + loadTransactionTranslatedIn(batchId);
-
-                //update data in transactionTranslatedIn
-                resetTransactionTranslatedIn(batchId, true);
-                int transactionId = 0;
-                // we trim all values
-                trimFieldValues(batchId, false, transactionId, true);
-
-                //now that we have our config, we will apply pre-processing cw and macros to manipulate our data
-                //1. find all configs for batch, loop and process
-                List<Integer> configIds = getConfigIdsForBatch(batchId, false, transactionId);
-                for (Integer configId : configIds) {
-                    //we need to run all checks before insert regardless *
-                    /**
-                     * we are reordering 1. cw/macro, 2. required and 3. validate *
-                     */
-                    // 1. grab the configurationDataTranslations and run cw/macros
-                    List<configurationDataTranslations> dataTranslations = configurationManager
-                            .getDataTranslationsWithFieldNo(configId, 2); //pre processing
-                    for (configurationDataTranslations cdt : dataTranslations) {
-                        if (cdt.getCrosswalkId() != 0) {
-                            sysError = sysError + processCrosswalk(configId, batchId, cdt, false, transactionId);
-                        } else if (cdt.getMacroId() != 0) {
-                            sysError = sysError + processMacro(configId, batchId, cdt, false, transactionId);
-                        }
-                    }
-
-                }
-            }
-            if (sysErrors > 0) {
-                insertProcessingError(processingSysErrorId, null, batchId, null, null, null, null, false, false, errorMessage);
-                updateBatchStatus(batchId, 39, "endDateTime");
-                return false;
-            }
-
-            //we check handling here for rejecting entire batch
-            List<configurationTransport> batchHandling = getHandlingDetailsByBatch(batchId);
-            // if entire batch failed and have no configIds, there will be no error handling found
-            if (getRecordCounts(batchId, Arrays.asList(11), false) == getRecordCounts(batchId, new ArrayList<Integer>(), false)) {
-                //entire batch failed, we reject entire batch
-                updateRecordCounts(batchId, errorStatusIds, false, "errorRecordCount");
-                updateRecordCounts(batchId, new ArrayList<Integer>(), false, "totalRecordCount");
-                updateBatchStatus(batchId, 7, "endDateTime");
-                return false;
-            } else if (batchHandling.size() != 1) {
-                //TODO email admin to fix problem
-                insertProcessingError(8, null, batchId, null, null, null, null, false, false, "Multiple or no file handling found, please check auto-release and error handling configurations");
-                updateRecordCounts(batchId, new ArrayList<Integer>(), false, "totalRecordCount");
-                // do we count pass records as errors?
-                updateRecordCounts(batchId, errorStatusIds, false, "errorRecordCount");
-                updateBatchStatus(batchId, 39, "endDateTime");
-                return false;
-            }
-            if (batchHandling.size() == 1) {
-                //reject submission on error
-                if (batchHandling.get(0).geterrorHandling() == 3) {
-                    // at this point we will only have invalid records
-                    if (getRecordCounts(batchId, errorStatusIds, false) > 0) {
-                        updateBatchStatus(batchId, 7, "endDateTime");
-                        updateRecordCounts(batchId, errorStatusIds, false, "errorRecordCount");
-                        //update loaded to rejected
-                        updateTransactionStatus(batchId, 0, 9, 13);
-                        return false;
-                    }
-                }
-            }
-
-            updateRecordCounts(batchId, errorStatusIds, false, "errorRecordCount");
-            updateRecordCounts(batchId, new ArrayList<Integer>(), false, "totalRecordCount");
-            //at the end of loaded, we update to PR
-            updateTransactionStatus(batchId, 0, 9, 10);
-            updateTransactionTargetStatus(batchId, 0, 9, 10);
-            batchStatusId = 36; //loaded without targets
-
+	            //we check handling here for rejecting entire batch
+	            List<configurationTransport> batchHandling = getHandlingDetailsByBatch(batchId);
+	            // if entire batch failed and have no configIds, there will be no error handling found
+	            if (getRecordCounts(batchId, Arrays.asList(11), false) == getRecordCounts(batchId, new ArrayList<Integer>(), false)) {
+	                //entire batch failed, we reject entire batch
+	                updateRecordCounts(batchId, errorStatusIds, false, "errorRecordCount");
+	                updateRecordCounts(batchId, new ArrayList<Integer>(), false, "totalRecordCount");
+	                updateBatchStatus(batchId, 7, "endDateTime");
+	                return false;
+	            } else if (batchHandling.size() != 1) {
+	                //TODO email admin to fix problem
+	                insertProcessingError(8, null, batchId, null, null, null, null, false, false, "Multiple or no file handling found, please check auto-release and error handling configurations");
+	                updateRecordCounts(batchId, new ArrayList<Integer>(), false, "totalRecordCount");
+	                // do we count pass records as errors?
+	                updateRecordCounts(batchId, errorStatusIds, false, "errorRecordCount");
+	                updateBatchStatus(batchId, 39, "endDateTime");
+	                return false;
+	            }
+	            if (batchHandling.size() == 1) {
+	                //reject submission on error
+	                if (batchHandling.get(0).geterrorHandling() == 3) {
+	                    // at this point we will only have invalid records
+	                    if (getRecordCounts(batchId, errorStatusIds, false) > 0) {
+	                        updateBatchStatus(batchId, 7, "endDateTime");
+	                        updateRecordCounts(batchId, errorStatusIds, false, "errorRecordCount");
+	                        //update loaded to rejected
+	                        updateTransactionStatus(batchId, 0, 9, 13);
+	                        return false;
+	                    }
+	                }
+	            }
+	
+	            updateRecordCounts(batchId, errorStatusIds, false, "errorRecordCount");
+	            updateRecordCounts(batchId, new ArrayList<Integer>(), false, "totalRecordCount");
+	            //at the end of loaded, we update to PR
+	            updateTransactionStatus(batchId, 0, 9, 10);
+	            updateTransactionTargetStatus(batchId, 0, 9, 10);
+	            //any batch over 100 records we flag as mass process, we run those every 10 mins
+	            batchUploads batchDetails = getBatchDetails(batchId);
+	            if (batchDetails.gettotalRecordCount() > 100) {
+	            	batchStatusId = 43; //loaded without targets
+	            } else {
+	            	batchStatusId = 36; //loaded without targets
+	            }
+           
         } catch (Exception ex) {
             insertProcessingError(processingSysErrorId, null, batchId, null, null, null, null, false, false, ("loadBatch error " + ex.getLocalizedMessage()));
             batchStatusId = 39;
         }
-
-        try {
-            updateBatchStatus(batchId, batchStatusId, "endDateTime");
-            updateRecordCounts(batchId, new ArrayList<Integer>(), false, "totalRecordCount");
-            // do we count pass records as errors?
-            updateRecordCounts(batchId, errorStatusIds, false, "errorRecordCount");
-        } catch (Exception ex1) {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ("loadBatch error at updating batch status - " + ex1));
-            return false;
-        }
-
+        
+	        try {
+	            updateBatchStatus(batchId, batchStatusId, "endDateTime");
+	            updateRecordCounts(batchId, new ArrayList<Integer>(), false, "totalRecordCount");
+	            // do we count pass records as errors?
+	            updateRecordCounts(batchId, errorStatusIds, false, "errorRecordCount");
+	        } catch (Exception ex1) {
+	            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ("loadBatch error at updating batch status - " + ex1));
+	            return false;
+	        }
+    }
         return true;
     }
 
@@ -2887,7 +2913,7 @@ public class transactionInManagerImpl implements transactionInManager {
                         Path source = file.toPath();
                         Path target = newFile.toPath();
 
-                        File archiveFile = new File(fileSystem.setPath(archivePath) + batchName + newFileName.substring(newFileName.lastIndexOf(".")));
+                        File archiveFile = new File(fileSystem.setPathFromRoot(archivePath) + batchName + newFileName.substring(newFileName.lastIndexOf(".")));
                         Path archive = archiveFile.toPath();
                         //we keep original file in archive folder
                         Files.copy(source, archive);
@@ -3289,7 +3315,7 @@ public class transactionInManagerImpl implements transactionInManager {
     public void sendEmailToAdmin(String message, String subject) throws Exception {
         try {
             mailMessage mail = new mailMessage();
-            mail.setfromEmailAddress("e-Referral@state.ma.us");
+            mail.setfromEmailAddress("support@health-e-link.net");
             mail.setmessageBody(message);
             mail.setmessageSubject(subject + " " + myProps.getProperty("server.identity"));
             mail.settoEmailAddress("dphuniversaltranslator@gmail.com");
@@ -3641,12 +3667,12 @@ public class transactionInManagerImpl implements transactionInManager {
 	                if (ct.getEncodingId() == 2) {
 	                    //write to temp file
 	                    String strDecode = filemanager.decodeFileToBase64Binary(file);
-	                    file = new File(dir.setPath(archivePath) + batchName + "_dec" + fileExt);
-	                    String decodeFilePath = dir.setPath(archivePath) + batchName + "_dec" + fileExt;
+	                    file = new File(dir.setPathFromRoot(archivePath) + batchName + "_dec" + fileExt);
+	                    String decodeFilePath = dir.setPathFromRoot(archivePath) + batchName + "_dec" + fileExt;
 	                    filemanager.writeFile(decodeFilePath, strDecode);
-	                    String encodeFilePath = dir.setPath(archivePath) + batchName + "_org" +fileExt;               
+	                    String encodeFilePath = dir.setPathFromRoot(archivePath) + batchName + "_org" +fileExt;               
 	                    filemanager.writeFile(encodeFilePath, ws.getPayload());
-	                    String encodeArchivePath = dir.setPath(archivePath) + batchName  +fileExt;
+	                    String encodeArchivePath = dir.setPathFromRoot(archivePath) + batchName  +fileExt;
 	                    Files.copy(new File(writeToFile).toPath(), new File(encodeArchivePath).toPath(), REPLACE_EXISTING);
 	                }
 
@@ -4369,29 +4395,33 @@ public class transactionInManagerImpl implements transactionInManager {
 	@Override
 	public void sendRejectNotification(batchUploads batch, Integer rejectCount)
 			throws Exception {
-		 mailMessage mail = new mailMessage();
-         mail.setfromEmailAddress("e-Referral@state.ma.us");
-         //build message
-         String message = "Batch "+ batch.getutBatchName() +" contains " + rejectCount + " rejected transaction(s).";
-         message = message + "<br/><br/>Please see details below.";
-         
-         List<Transaction> transactions = getTransactionsByStatusId(batch.getId(), rejectIds, 5);
-         for (Transaction transaction : transactions) {
-        	 message = message + "<br/><br/>" + transaction.getSrcOrgName() + " to " + transaction.getTargetOrgName()
-        			 + ", " + transaction.getSrcConfigName();
-         }
-         if (rejectCount >=5) {
-        	 message = message + "<br/><br/>There first 5 rejected transactions are listed above.";
-         }
-         message = message + "<br/><br/>For more information, please login and review the audit report.";
-         
-         String[] ccAddresses = new String[] {"chadmccue05@gmail.com"};
-         
-         mail.setmessageBody(message);
-         mail.setmessageSubject("eReferral System - Batch "+ batch.getutBatchName() +" contains errors " + myProps.getProperty("server.identity"));
-         mail.settoEmailAddress(myProps.getProperty("reject.email"));
-         mail.setccEmailAddress(ccAddresses);
-         emailManager.sendEmail(mail);
+		try {
+			 mailMessage mail = new mailMessage();
+	         mail.setfromEmailAddress("support@health-e-link.net");
+	         //build message
+	         String message = "Batch "+ batch.getutBatchName() +" contains " + rejectCount + " rejected transaction(s).";
+	         message = message + "<br/><br/>Please see details below.";
+	         
+	         List<Transaction> transactions = getTransactionsByStatusId(batch.getId(), rejectIds, 5);
+	         for (Transaction transaction : transactions) {
+	        	 message = message + "<br/><br/>" + transaction.getSrcOrgName() + " to " + transaction.getTargetOrgName()
+	        			 + ", " + transaction.getSrcConfigName();
+	         }
+	         if (rejectCount >=5) {
+	        	 message = message + "<br/><br/>There first 5 rejected transactions are listed above.";
+	         }
+	         message = message + "<br/><br/>For more information, please login and review the audit report.";
+	         
+	         String[] ccAddresses = new String[] {"chadmccue05@gmail.com"};
+	         
+	         mail.setmessageBody(message);
+	         mail.setmessageSubject("eReferral System - Batch "+ batch.getutBatchName() +" contains errors " + myProps.getProperty("server.identity"));
+	         mail.settoEmailAddress(myProps.getProperty("reject.email"));
+	         mail.setccEmailAddress(ccAddresses);
+	         emailManager.sendEmail(mail);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 }
 
 	@Override
@@ -4429,7 +4459,95 @@ public class transactionInManagerImpl implements transactionInManager {
 			throws Exception {
 		 return transactionInDAO.getMassTranslateBatchForOutput(howMany);
 	}
+
+	@Override
+	public void loadMassBatches() throws Exception {
+		//1. get all batches with SSA
+        List<batchUploads> batches = getBatchesByStatusIds(Arrays.asList(42));
+        if (batches != null && batches.size() != 0) {
+        	//we load one at a time
+        	loadBatch(batches.get(0).getId());
+        }
+		
+	}
 	
+	/**
+	 * We should only be loading up mass batches every 10 mins
+     */
+    @Override
+    public void processMassBatches() {
+        //0. grab all mass batches with MSL (43)
+        try {
+            List<batchUploads> batches = getBatchesByStatusIds(Arrays.asList(43));
+            if (batches != null && batches.size() != 0) {
+            	//we process one file at a time
+                processBatch(batches.get(0).getId(), false, 0);
+            }
+        } catch (Exception ex1) {
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ("processMassBatches error - " + ex1));
+        }
+
+    }
     
-    
+	@Override
+	public void saveBatchClearAfterDelivery(batchClearAfterDelivery bmt) throws Exception {
+		 transactionInDAO.saveClearAfterDelivery(bmt);
+	}
+	
+	@Override
+	public void updateBatchClearAfterDelivery(batchClearAfterDelivery bmt) throws Exception {
+		 transactionInDAO.updateClearAfterDelivery(bmt);
+	}
+
+	@Override
+	public void clearAfterDeliveryBatches() throws Exception {
+		//we get all bmt with statusId of 0
+		List <batchClearAfterDelivery> bmts = getBatchClearAfterDelivery(Arrays.asList(0));
+		//we clear one batch at a time
+		if (bmts.size() != 0) {
+			clearAfterDeliveryBatch(bmts.get(0));
+		}
+	}
+
+	@Override
+	public void clearAfterDeliveryBatch(batchClearAfterDelivery cad)
+			throws Exception {
+		//first we recheck status
+		batchClearAfterDelivery cadToClear =  getClearAfterDeliverById(cad.getId());
+		//then we update status
+		if (cadToClear.getStatusId() == 0) {
+			cadToClear.setStatusId(1);
+			updateBatchClearAfterDelivery(cadToClear);
+			if (cadToClear.getTransactionInId() != 0) {
+				//we clear transaction
+				clearMessageTablesByTransactionInId(cadToClear.getTransactionInId());
+				clearTransactionInRecords(cadToClear.getBatchUploadId(), cadToClear.getTransactionInId());
+				clearTransactionTranslatedIn(cadToClear.getBatchUploadId(), cadToClear.getTransactionInId());
+				//clear the out tables
+				transactionOutDAO.clearTransactionOutRecords(cadToClear.getTransactionTargetId());
+				transactionOutDAO.clearTransactionTranslatedOut(cadToClear.getTransactionTargetId());
+				
+			} else {
+				//we clear tables by batchId, everything else should be cleared already
+				clearMessageTables(cad.getBatchUploadId());
+			}
+			//when done, set status to 2
+			cadToClear.setStatusId(2);
+			cadToClear.setDateCompleted(new Date());
+			updateBatchClearAfterDelivery(cadToClear);
+		}
+	}
+
+	@Override
+	public List<batchClearAfterDelivery> getBatchClearAfterDelivery(
+			List<Integer> statusIds) throws Exception {
+		return transactionInDAO.getClearAfterDeliveryBatches(statusIds);
+	}
+
+	@Override
+	public batchClearAfterDelivery getClearAfterDeliverById(Integer bmtId)
+			throws Exception {
+		 return transactionInDAO.getClearAfterDeliveryById(bmtId);
+	}
+	
 }

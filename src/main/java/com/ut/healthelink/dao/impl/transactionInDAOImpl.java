@@ -16,6 +16,7 @@ import com.ut.healthelink.model.TransactionInError;
 import com.ut.healthelink.model.User;
 import com.ut.healthelink.model.UserActivity;
 import com.ut.healthelink.model.WSMessagesIn;
+import com.ut.healthelink.model.batchClearAfterDelivery;
 import com.ut.healthelink.model.batchMultipleTargets;
 import com.ut.healthelink.model.batchUploadSummary;
 import com.ut.healthelink.model.batchUploads;
@@ -1130,17 +1131,22 @@ public class transactionInDAOImpl implements transactionInDAO {
 
     @Override
     @Transactional
-    public Integer clearMessageTableForBatch(int batchId, String mt) {
-        String sql = "delete from " + mt + " where transactionInId in "
-                + " (select id from transactionIn where batchId = :id)"
-                + ";";
+    public Integer clearMessageTable(int batchId, String mt, int transactionInId) {
+        String sql = "delete from " + mt + " where transactionInId ";
+        		int id = batchId;
+        		if (transactionInId == 0) {
+        			sql = sql + "in (select id from transactionIn where batchId = :id);";
+        		} else {
+        			sql = sql + " = :id";
+        			id = transactionInId;
+        		}
         Query deleteTable = sessionFactory.getCurrentSession().createSQLQuery(sql)
-                .addScalar("id", StandardBasicTypes.INTEGER).setParameter("id", batchId);
+                .addScalar("id", StandardBasicTypes.INTEGER).setParameter("id", id);
         try {
             deleteTable.executeUpdate();
             return 0;
         } catch (Exception ex) {
-            System.err.println("clearMessageTableForBatch " + ex.getCause());
+            System.err.println("clearMessageTable " + ex.getCause());
             return 1;
 
         }
@@ -1702,12 +1708,17 @@ public class transactionInDAOImpl implements transactionInDAO {
 
     @Override
     @Transactional
-    public Integer clearTransactionInRecords(Integer batchUploadId) {
-        String sql = "delete from transactionInRecords where transactionInId in"
-                + "(select id from transactionIn where batchId = :batchUploadId )";
-
+    public Integer clearTransactionInRecords(Integer batchUploadId, Integer transactionInId) {
+        String sql = "delete from transactionInRecords where ";
+        		Integer id = batchUploadId;
+        		if (transactionInId == 0) {
+        			sql = sql	+ " batchId = :id";
+        		} else {
+        			id = transactionInId;
+        			sql = sql	+ " transactionInId = :id";
+        		}
         Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
-                .setParameter("batchUploadId", batchUploadId);
+                .setParameter("id", id);
 
         try {
             deleteData.executeUpdate();
@@ -1720,12 +1731,18 @@ public class transactionInDAOImpl implements transactionInDAO {
 
     @Override
     @Transactional
-    public Integer clearTransactionTranslatedIn(Integer batchUploadId) {
-        String sql = "delete from transactionTranslatedIn where transactionInId in"
-                + "(select id from transactionIn where batchId = :batchUploadId )";
-
-        Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
-                .setParameter("batchUploadId", batchUploadId);
+    public Integer clearTransactionTranslatedIn(Integer batchUploadId, Integer transactionInId) {
+    	
+    	String sql = "delete from transactionTranslatedIn where ";
+		Integer id = batchUploadId;
+		if (transactionInId == 0) {
+			sql = sql	+ " batchId = :id";
+		} else {
+			id = transactionInId;
+			sql = sql	+ " transactionInId = :id";
+		}
+Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+        .setParameter("id", id);
 
         try {
             deleteData.executeUpdate();
@@ -1782,9 +1799,9 @@ public class transactionInDAOImpl implements transactionInDAO {
                     + " and (F" + cff.getFieldNo()
                     + " is  null  or length(trim(F" + cff.getFieldNo() + ")) = 0"
                     + " or length(REPLACE(REPLACE(F" + cff.getFieldNo() + ", '\n', ''), '\r', '')) = 0)"
-                    + "and transactionInId ";
+                    + "and ";
             if (transactionInId == 0) {
-                sql = sql + " in (select id from transactionIn where batchId = :id and configId = :configId and statusId not in (:transRELId));";
+                sql = sql + "  batchId = :id and configId = :configId and statusId not in (:transRELId);";
             } else {
                 sql = sql + " = :id";
                 id = transactionInId;
@@ -3192,7 +3209,7 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Transactional
     public Integer loadTransactionInRecords(Integer batchId) {
         try {
-            String sql = ("insert into transactionInRecords (transactionInId, loadTableId) select id, loadTableId from transactionIn where batchId = :batchId");
+            String sql = ("insert into transactionInRecords (transactionInId, loadTableId, batchId) select id, loadTableId, batchid from transactionIn where batchId = :batchId");
             Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
             query.setParameter("batchId", batchId);
             query.executeUpdate();
@@ -3740,7 +3757,7 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Transactional
     public Integer loadTransactionTranslatedIn(Integer batchId) {
         try {
-            String sql = ("insert into transactionTranslatedIn (configId, transactionInId) select configId, id from transactionIn where batchId = :batchId and configId is not null;");
+            String sql = ("insert into transactionTranslatedIn (configId, transactionInId, batchid, statusId) select configId, id, batchid, statusId from transactionIn where batchId = :batchId and configId is not null;");
             Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
             query.setParameter("batchId", batchId);
             query.executeUpdate();
@@ -6749,5 +6766,35 @@ public class transactionInDAOImpl implements transactionInDAO {
                 
         List <batchUploads> batches = query.list();
         return batches;
+	}
+	
+	@Override
+    @Transactional
+	public void saveClearAfterDelivery(batchClearAfterDelivery bmt) throws Exception {
+		sessionFactory.getCurrentSession().save(bmt);
+	}
+	
+	@Override
+    @Transactional
+	public void updateClearAfterDelivery(batchClearAfterDelivery bmt) throws Exception {
+		sessionFactory.getCurrentSession().update(bmt);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	@Transactional
+	public List<batchClearAfterDelivery> getClearAfterDeliveryBatches(
+			List<Integer> statusIds) throws Exception {
+		 Criteria findBatches = sessionFactory.getCurrentSession().createCriteria(batchClearAfterDelivery.class);
+         findBatches.add(Restrictions.in("statusId", statusIds));
+         findBatches.addOrder(Order.asc("dateCreated"));
+         return findBatches.list();
+	}
+
+	@Override
+	@Transactional
+	public batchClearAfterDelivery getClearAfterDeliveryById(Integer bmtId)
+			throws Exception {
+		return (batchClearAfterDelivery) sessionFactory.getCurrentSession().get(batchClearAfterDelivery.class, bmtId);
 	}
 }

@@ -9,6 +9,7 @@ package com.ut.healthelink.service;
 import com.ut.healthelink.model.Transaction;
 import com.ut.healthelink.model.batchDownloadSummary;
 import com.ut.healthelink.model.batchDownloads;
+import com.ut.healthelink.model.batchClearAfterDelivery;
 import com.ut.healthelink.model.batchUploads;
 import com.ut.healthelink.model.configuration;
 import com.ut.healthelink.model.configurationFormFields;
@@ -180,4 +181,7 @@ public interface transactionOutManager {
     void insertValidationError(transactionRecords tr, configurationFormFields cff, Integer batchDownloadId) throws Exception;
     
     void updateErrorStatusForTT (Integer batchDownloadId, Integer newStatusId, Integer transactionTargetId) throws Exception;
+    
+    void clearTransactionTranslatedOutByBatchId(Integer batchDownloadId) throws Exception;
+
 }

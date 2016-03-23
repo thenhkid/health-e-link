@@ -8,6 +8,7 @@ package com.ut.healthelink.dao.impl;
 import com.ut.healthelink.dao.transactionOutDAO;
 import com.ut.healthelink.model.batchDownloadSummary;
 import com.ut.healthelink.model.batchDownloads;
+import com.ut.healthelink.model.batchClearAfterDelivery;
 import com.ut.healthelink.model.batchUploads;
 import com.ut.healthelink.model.configuration;
 import com.ut.healthelink.model.configurationConnection;
@@ -1095,7 +1096,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
         try {
             updateData.executeUpdate();
         } catch (Exception ex) {
-            System.err.println("updateTransactionStatus failed." + ex);
+            System.err.println("updateTransactionTargetBatchDLId failed." + ex);
         }
 
     }
@@ -1801,14 +1802,15 @@ public class transactionOutDAOImpl implements transactionOutDAO {
 		//we use configuration info 
 		//build this sql
 		String sql = "SELECT " + fieldNos 
-				+ " FROM transactionOutRecords where transactionTargetId In ("
-				+ " select id from transactionTarget where batchDLId = :batchDownloadId and statusId = 18)"
+				+ " FROM transactionTranslatedOut where batchId = :batchDownloadId "
+				+ " and statusId = 18 and configId = :configId"
 				+ " INTO OUTFILE  '" + filePathAndName + "'"
 						+ " FIELDS TERMINATED BY '" + transportDetails.getDelimChar() 
 						+ "' LINES TERMINATED BY '\\n';";
 		Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
         query.setParameter("batchDownloadId", batchDownloadId);
-        //System.out.println(sql);
+        query.setParameter("configId", transportDetails.getconfigId());
+        
         try {
         	query.list();
         } catch (Exception ex) {
@@ -1853,8 +1855,8 @@ public class transactionOutDAOImpl implements transactionOutDAO {
 	@Transactional
 	public void setUpTransactionTranslatedOut(
 			batchDownloads batchDowloadDetails, configuration configDetails, Integer statusId) {
-		String sql = "insert into transactionTranslatedOut (transactionTargetId, configId)"
-				+ "select  id, configId from transactionTarget where batchDLId = :batchDLId"
+		String sql = "insert into transactionTranslatedOut (transactionTargetId, configId, batchId, statusId)"
+				+ "select  id, configId, batchDLId, statusId from transactionTarget where batchDLId = :batchDLId"
 				+ " and statusId = :statusId";
 
 		Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
@@ -1947,10 +1949,10 @@ public class transactionOutDAOImpl implements transactionOutDAO {
                 + " and (F" + cff.getFieldNo()
                 + " is  null  or length(trim(F" + cff.getFieldNo() + ")) = 0"
                 + " or length(REPLACE(REPLACE(F" + cff.getFieldNo() + ", '\n', ''), '\r', '')) = 0)"
-                + "and transactionTargetId ";
+                + "and  ";
         if (transactionTargetId == 0) {
-            sql = sql + " in (select id from transactionTarget where batchDLId = :id and "
-            		+ " configId = :configId and statusId not in (:transRELId));";
+            sql = sql + " batchId = :id and "
+            		+ " configId = :configId and statusId not in (:transRELId);";
         } else {
             sql = sql + " = :id";
             id = transactionTargetId;
@@ -2127,5 +2129,22 @@ public class transactionOutDAOImpl implements transactionOutDAO {
         updateData.executeUpdate();
         
 	}
-        
+
+	@Override
+    @Transactional
+    public void clearTransactionTranslatedOutByBatchId(Integer batchDownloadId) {
+        String sql = "delete from transactionTranslatedOut where batchId = :batchDownloadId";
+
+        Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                .setParameter("batchDownloadId", batchDownloadId);
+
+        try {
+            deleteData.executeUpdate();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.err.println("clearTransactionTranslatedOutByBatchId " + ex.getCause());
+        }
+
+    }
+    
 }

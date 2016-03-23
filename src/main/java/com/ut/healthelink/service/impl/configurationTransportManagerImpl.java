@@ -431,6 +431,13 @@ public class configurationTransportManagerImpl implements configurationTransport
 		configurationTransportDAO.deleteWSSender(wsSender);
 	}
 
+	@Override
+	public boolean hasConfigsWithMasstranslations(
+			Integer orgId, Integer transportMethodId) throws Exception {
+		return configurationTransportDAO.hasConfigsWithMasstranslations(orgId, transportMethodId);
+	}
+
+	
     
     
 }

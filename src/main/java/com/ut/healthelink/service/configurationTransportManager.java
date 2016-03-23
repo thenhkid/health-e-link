@@ -113,5 +113,7 @@ public interface configurationTransportManager {
     void saveWSSender(configurationWebServiceSenders wsSender) throws Exception;
     
     void deleteWSSender(configurationWebServiceSenders wsSender) throws Exception;
+    
+    boolean hasConfigsWithMasstranslations(Integer orgId, Integer transportMethodId) throws Exception;
       
 }

@@ -14,6 +14,7 @@ import com.ut.healthelink.model.Transaction;
 import com.ut.healthelink.model.TransactionInError;
 import com.ut.healthelink.model.User;
 import com.ut.healthelink.model.WSMessagesIn;
+import com.ut.healthelink.model.batchClearAfterDelivery;
 import com.ut.healthelink.model.batchMultipleTargets;
 import com.ut.healthelink.model.batchUploadSummary;
 import com.ut.healthelink.model.batchUploads;
@@ -38,6 +39,7 @@ import com.ut.healthelink.model.custom.TransErrorDetailDisplay;
 import com.ut.healthelink.model.messagePatients;
 import com.ut.healthelink.model.referralActivityExports;
 import com.ut.healthelink.model.systemSummary;
+
 import java.io.File;
 import java.math.BigInteger;
 import java.util.Date;
@@ -121,6 +123,8 @@ public interface transactionInManager {
     List<Integer> getTransWithMultiValues(ConfigForInsert config);
 
     Integer clearMessageTables(int batchId);
+    
+    Integer clearMessageTablesByTransactionInId(int transactionInId);
 
     List<Integer> getBlankTransIds(ConfigForInsert config);
 
@@ -144,13 +148,13 @@ public interface transactionInManager {
 
     boolean setDoNotProcess(Integer batchUploadId);
 
-    Integer clearTransactionInRecords(Integer batchUploadId);
+    Integer clearTransactionInRecords(Integer batchUploadId, Integer transactionInId);
 
     boolean insertTransactions(Integer batchUploadId);
 
     Integer clearTransactionIn(Integer batchUploadId);
 
-    Integer clearTransactionTranslatedIn(Integer batchUploadId);
+    Integer clearTransactionTranslatedIn(Integer batchUploadId, Integer transactionInId);
 
     Integer clearTransactionTables(Integer batchUploadId, boolean leaveFinalStatusIds);
 
@@ -256,9 +260,9 @@ public interface transactionInManager {
 
     Integer clearBatchUploadSummary(Integer batchId);
 
-    void loadBatches();
+    void loadBatches() throws Exception;
 
-    boolean loadBatch(Integer batchId);
+    boolean loadBatch(Integer batchId) throws Exception;
 
     List<batchUploads> getBatchesByStatusIds(List<Integer> statusIds);
 
@@ -479,4 +483,21 @@ public interface transactionInManager {
     Transaction setTransactionTargetInfoByStatusId (Transaction transaction) throws Exception;
     
     List<batchUploads> getMassTranslateBatchForOutput (Integer howMany) throws Exception;
+    
+    void loadMassBatches() throws Exception;
+    
+    void processMassBatches();
+    
+    void saveBatchClearAfterDelivery (batchClearAfterDelivery bmt) throws Exception;
+    
+    void updateBatchClearAfterDelivery (batchClearAfterDelivery bmt) throws Exception;
+    
+    void clearAfterDeliveryBatches () throws Exception;
+    
+    void clearAfterDeliveryBatch (batchClearAfterDelivery bmt) throws Exception;
+    
+    List <batchClearAfterDelivery> getBatchClearAfterDelivery (List<Integer> statusIds) throws Exception;
+    
+    batchClearAfterDelivery getClearAfterDeliverById (Integer bmtId) throws Exception;
+
 }

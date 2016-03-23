@@ -21,6 +21,7 @@ import com.ut.healthelink.model.User;
 import com.ut.healthelink.model.UserActivity;
 import com.ut.healthelink.model.batchDownloadSummary;
 import com.ut.healthelink.model.batchDownloads;
+import com.ut.healthelink.model.batchClearAfterDelivery;
 import com.ut.healthelink.model.batchUploads;
 import com.ut.healthelink.model.configuration;
 import com.ut.healthelink.model.configurationCCDElements;
@@ -143,8 +144,13 @@ public class transactionOutManagerImpl implements transactionOutManager {
     private convertTextToPDF txtToPDF;
     
     private int processingSysErrorId = 5;
-
-    private String archivePath = "/bowlink/archivesOut/";
+    
+    private String directoryPath = System.getProperty("directory.rootDir");
+    
+    private String archivePath = (directoryPath + "archivesOut/");
+    
+    private String massOutPutPath = (directoryPath + "massoutputfiles/");
+   
     
     //list of final status - these records we skip
     private List<Integer> transRELId = Arrays.asList(11, 12, 13, 16, 18, 20);
@@ -445,6 +451,17 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                 if (transportDetails.gettransportMethodId() == 1) {
                                     transactionOutDAO.updateBatchStatus(batchId, 23);
                                     transactionInManager.updateBatchStatus(transaction.getbatchUploadId(), 23, "");
+                                    //check inbound for clearing options
+                                    if (configurationTransportManager.getTransportDetails(transactionInManager.getTransactionDetails(transaction.gettransactionInId()).getconfigId()).getclearRecords()) {
+                                    	//we insert into clearAfterDelivery
+                                    	batchClearAfterDelivery cad = new batchClearAfterDelivery();
+            		                    cad.setBatchDLId(batchId);
+            		                    cad.setBatchUploadId(transaction.getbatchUploadId());
+            		                    cad.setTransactionInId(transaction.gettransactionInId());
+            		                    cad.setTransactionTargetId(transaction.getId());
+            		                    transactionInManager.saveBatchClearAfterDelivery(cad);
+                                    }
+                                    
                                 } /* If FTP Call the FTP Method */ else if (transportDetails.gettransportMethodId() == 3) {
                                     FTPTargetFile(batchId, transportDetails);
                                 } /* Rhapsody Method */ else if (transportDetails.gettransportMethodId() == 5) {
@@ -524,7 +541,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                             String fromEmail = "";
                                             mailMessage msg = new mailMessage();
                                             ArrayList<String> fromCCAddressArray = new ArrayList<String>();
-                                            msg.setfromEmailAddress("e-Referral@state.ma.us");
+                                            msg.setfromEmailAddress("support@health-e-link.net");
  
                                             if (fromPrimaryContact.size() > 0) {
                                                 
@@ -578,7 +595,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                             }
                                             
                                             if(!"".equals(fromEmail)) {
-                                                //fromEmail = "e-Referral@state.ma.us";
+                                                //fromEmail = "support@health-e-link.net";
                                                 msg.settoEmailAddress(fromEmail);
 
                                                 if (fromCCAddressArray.size() > 0) {
@@ -616,7 +633,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                             String toEmail = "";
                                             mailMessage msg = new mailMessage();
                                             ArrayList<String> ccAddressArray = new ArrayList<String>();
-                                            msg.setfromEmailAddress("e-Referral@state.ma.us");
+                                            msg.setfromEmailAddress("support@health-e-link.net");
  
                                             if (toPrimaryContact.size() > 0) {
                                                 
@@ -670,7 +687,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                             }
                                             
                                             if(!"".equals(toEmail)) {
-                                                //toEmail = "e-Referral@state.ma.us";
+                                                //toEmail = "support@health-e-link.net";
                                                 msg.settoEmailAddress(toEmail);
 
                                                 if (ccAddressArray.size() > 0) {
@@ -891,7 +908,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                         configurationTransport transportDetails = configurationTransportManager.getTransportDetails(schedule.getconfigId());
 
                         /* if File Download update the status to Submission Delivery Completed ID = 23 status. This will only
-                         apply to scheduled and not continous settings. */
+                         apply to scheduled and not continuous settings. */
                         if (transportDetails.gettransportMethodId() == 1) {
                             transactionOutDAO.updateBatchStatus(batchId, 23);
 
@@ -927,7 +944,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                             }
                         	/** we probably should email admin to fix web configuration **/
                         }
-
+                        
                         /* Log the last run time */
                         try {
                             targetOutputRunLogs log = new targetOutputRunLogs();
@@ -948,7 +965,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                 String toEmail = "";
                                 mailMessage msg = new mailMessage();
                                 ArrayList<String> ccAddressArray = new ArrayList<String>();
-                                msg.setfromEmailAddress("e-Referral@state.ma.us");
+                                msg.setfromEmailAddress("support@health-e-link.net");
                                 
                                 
                                 if (toPrimaryContact.size() > 0) {
@@ -986,7 +1003,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                 }
 
                                 if("".equals(toEmail)) {
-                                    toEmail = "e-Referral@state.ma.us";
+                                    toEmail = "support@health-e-link.net";
                                 }
 
                                 msg.settoEmailAddress(toEmail);
@@ -1180,7 +1197,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                     	String fileExt = batchDetails.getoutputFIleName().substring(batchDetails.getoutputFIleName().lastIndexOf("."));
                 		
                     	fileSystem fileSystem = new fileSystem();
-                    	File archiveFile = new File ( fileSystem.setPath(archivePath) + batchDetails.getutBatchName() + fileExt);
+                    	File archiveFile = new File ( fileSystem.setPathFromRoot(archivePath) + batchDetails.getutBatchName() + fileExt);
                     	
                     	//we check to see if our file is encoded
                     	if (!encryptMessage)  {
@@ -1841,6 +1858,17 @@ public class transactionOutManagerImpl implements transactionOutManager {
                     /* Update the downloaded batch transaction status */
                     transactionOutDAO.updateTargetTransasctionStatus(target.getbatchDLId(), 37);
 
+                    //check inbound for clearing options
+                    if (configurationTransportManager.getTransportDetails(transactionInManager.getTransactionDetails(target.gettransactionInId()).getconfigId()).getclearRecords()) {
+                    	//we insert into clearAfterDelivery
+                    	batchClearAfterDelivery cad = new batchClearAfterDelivery();
+	                    cad.setBatchDLId(batchId);
+	                    cad.setBatchUploadId(target.getbatchUploadId());
+	                    cad.setTransactionInId(target.gettransactionInId());
+	                    cad.setTransactionTargetId(target.getId());
+	                    transactionInManager.saveBatchClearAfterDelivery(cad);
+                    }
+                    
                 }
 
             }
@@ -2352,6 +2380,16 @@ public class transactionOutManagerImpl implements transactionOutManager {
                     /* Update the downloaded batch transaction status */
                     transactionOutDAO.updateTargetTransasctionStatus(target.getbatchDLId(), 37);
 
+                    //check inbound for clearing options
+                    if (configurationTransportManager.getTransportDetails(transactionInManager.getTransactionDetails(target.gettransactionInId()).getconfigId()).getclearRecords()) {
+                    	//we insert into clearAfterDelivery
+                    	batchClearAfterDelivery cad = new batchClearAfterDelivery();
+	                    cad.setBatchDLId(batchId);
+	                    cad.setBatchUploadId(target.getbatchUploadId());
+	                    cad.setTransactionInId(target.gettransactionInId());
+	                    cad.setTransactionTargetId(target.getId());
+	                    transactionInManager.saveBatchClearAfterDelivery(cad);
+                    }
                 }
 
             }
@@ -2457,6 +2495,16 @@ public class transactionOutManagerImpl implements transactionOutManager {
                     /* Update the downloaded batch transaction status */
                     transactionOutDAO.updateTargetTransasctionStatus(target.getbatchDLId(), 37);
 
+                  //check inbound for clearing options
+                    if (configurationTransportManager.getTransportDetails(transactionInManager.getTransactionDetails(target.gettransactionInId()).getconfigId()).getclearRecords()) {
+                    	//we insert into clearAfterDelivery
+                    	batchClearAfterDelivery cad = new batchClearAfterDelivery();
+	                    cad.setBatchDLId(batchId);
+	                    cad.setBatchUploadId(target.getbatchUploadId());
+	                    cad.setTransactionInId(target.gettransactionInId());
+	                    cad.setTransactionTargetId(target.getId());
+	                    transactionInManager.saveBatchClearAfterDelivery(cad);
+                    }
                 }
 
             }
@@ -2816,7 +2864,12 @@ public class transactionOutManagerImpl implements transactionOutManager {
 	}
 	
 	
-	
+	@Override
+    public void clearTransactionTranslatedOutByBatchId(Integer batchDownloadId) throws Exception {
+        transactionOutDAO.clearTransactionTranslatedOutByBatchId(batchDownloadId);
+    }
+    
+
 	@Override
 	public Integer processMassOutputBatch(Integer batchUploadId) throws Exception {
 				//we get the configs for the file
@@ -2958,19 +3011,21 @@ public class transactionOutManagerImpl implements transactionOutManager {
 	                	return 1;
 	                } else {
 	                
-	                	//copy to transactionOutRecords
-			       		moveTranslatedRecordsByBatch(batchDLId);
-		                
-			       		
-			        /* Generate the file according to transportDetails 
+	                //we are not copying to transactionOutRecords 
+	                	//moveTranslatedRecordsByBatch(batchDLId);
+		           
+	                /* Generate the file according to transportDetails 
 	                 * 1. we generate output file according to encoding in transportDetails
 	                 * 2. we always save an encrypted copy to archivesOut
 	                 * */
-			      
+			       		
+			       		
 			       		//get list of config fields here
 			       		
 			       		 String configFields = getConfigFieldsForOutput(configId);
-			       		 
+			       		 //we move the file extension
+				       	 String fileExt = transportDetails.getfileExt();
+		            		
 				       	 boolean encryptMessage = false;
 		                 // we only support base64 for now
 		                 if (transportDetails.getEncodingId() == 2) {        
@@ -2984,31 +3039,58 @@ public class transactionOutManagerImpl implements transactionOutManager {
 			       			generatedFile.delete();
 	            		}
 			       		
-			       		writeOutputToTextFile(transportDetails, batchDLId, generatedFilePath, configFields);
-			       		String fileExt = transportDetails.getfileExt();
-	            		
-	                    //write file here
+			       		/**
+			       		mysql is the fastest way to output a file, but the permissions are tricky
+			      		we write to massoutfiles where both tomcat and mysql has permission. 
+			      		Then we can create, copy and delete
+			      		**/
+			       		fileSystem fileSystemOutput = new fileSystem();
+                    	File massOutFile = new File ( fileSystemOutput.setPathFromRoot(massOutPutPath) + batchDownload.getutBatchName()+ "." + fileExt);
+                    	//check to see if file is there, if so remove old file
+                    	if (massOutFile.exists()) {
+                    		massOutFile.delete();
+                		}
 			       		
-			       		//cp file to archiveOut
+			       		writeOutputToTextFile(transportDetails, batchDLId, massOutFile.getAbsolutePath(), configFields);
+			       		
+			       		//cp file to archiveOut and correct putput folder
 	                    
 	                    	fileSystem fileSystem = new fileSystem();
-	                    	File archiveFile = new File ( fileSystem.setPath(archivePath) + batchDownload.getutBatchName()+ "." + fileExt);
+	                    	File archiveFile = new File ( fileSystem.setPathFromRoot(archivePath) + batchDownload.getutBatchName()+ "." + fileExt);
 	                    	
 	                    	//we check to see if our file is encoded
 	                    	if (!encryptMessage)  {
 	                    		//we encode here
-	                    		String strEncodedFile = filemanager.encodeFileToBase64Binary(generatedFile);
+	                    		String strEncodedFile = filemanager.encodeFileToBase64Binary(massOutFile);
 	                    		if (archiveFile.exists()) {
 	                    			archiveFile.delete();
 	                    		}
 	                    		filemanager.writeFile(archiveFile.getAbsolutePath(), strEncodedFile);
+	                    		Files.copy(massOutFile.toPath(), generatedFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 	                    	} else  {
+	                    		
 	                    		if (generatedFile.exists()) {
 	                    			generatedFile.delete();
 	                    		}
 	                    		Files.copy(archiveFile.toPath(), generatedFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 	                    	}
+	                    	//now we delete massoutput file
+	                    	massOutFile.delete();
 	                    
+	                    //now we delete the data from transactionTranslatedIn, transactionTranslatedOut, transactionInRecords
+	                    //we will schedule a job to delete from message tables as it takes too long if we are not adding batchId there
+	                    clearTransactionTranslatedOutByBatchId(batchDLId);
+	                    transactionInManager.clearTransactionInRecords(batchUploadId, 0);
+	                    transactionInManager.clearTransactionTranslatedIn(batchUploadId, 0);
+	                    //we insert into batchMassTranslate so we can run it as a job and delete
+	                    /** do not want to add batchId to every message table and the delete will be slow **/
+	                    //if the inbound configuration is set to Clear Records after Delivery , we clear message tables
+	                    if (configurationTransportManager.getTransportDetails(batchUploadDetails.getConfigId()).getclearRecords()) {
+		                    batchClearAfterDelivery bmt = new batchClearAfterDelivery();
+		                    bmt.setBatchDLId(batchDLId);
+		                    bmt.setBatchUploadId(batchUploadId);
+		                    transactionInManager.saveBatchClearAfterDelivery(bmt);
+	                    }
 	                    //we update status of batch
 	                    transactionInManager.updateBatchStatus(batchUploadId, 28, "");
 	                    transactionOutDAO.updateTargetBatchStatus(batchDLId, 28, "endDateTime");
@@ -3019,20 +3101,6 @@ public class transactionOutManagerImpl implements transactionOutManager {
 
 
 
-	
-
-
-
-
-
-	
-
-
-
-	
-
-	
-	
 }
 
 
