@@ -93,13 +93,19 @@
                 <br />
                 <h4>Health-e-link Enables Data Sharing</h4>
                 <p>
-                  See how Health-e-link promotes communication and collaboration across integrted healthcare systems.  
+                  See how Health-e-link promotes communication and collaboration across integrated healthcare systems.  
                 </p>
-                <video width="520" height="340" preload="yes" controls="true">
+                <%--<video width="520" height="340" preload="yes" controls="true">
                     <source src="../../../../dspResources/health-e-link-animation7.webm" type="video/webm">
                     <source src="../../../../dspResources/health-e-link-animation7.mp4" type="video/mp4">
                     <source src="../../../../dspResources/health-e-link-animation7.mov" type="video/mov">
                     <source src="../../../../dspResources/health-e-link-animation7.ogv" type="video/ogv">
+                </video>--%>
+                <video width="520" height="340" preload="yes" controls="true">
+                    <source src="/videoFiles/health-e-link-animation7.webm" type="video/webm">
+                    <source src="/videoFiles/health-e-link-animation7.mp4" type="video/mp4">
+                    <source src="/videoFiles/health-e-link-animation7.mov" type="video/mov">
+                    <source src="/videoFiles/health-e-link-animation7.ogv" type="video/ogv">
                 </video>
             </div>
         </div>

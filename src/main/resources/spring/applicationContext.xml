@@ -97,5 +97,6 @@
     
     <mvc:annotation-driven />
     <mvc:resources mapping="/dspResources/**" location="/dspResources/" /> 
-    <mvc:resources mapping="/headerImages/**" location="file:${directory.headerImageDir}/headerimages/" />
+    <mvc:resources mapping="/headerImages/**" location="file:${directory.rootDir}/headerimages/" />
+    <mvc:resources mapping="/videoFiles/**" location="file:${directory.rootDir}/videos/" />
 </beans>
