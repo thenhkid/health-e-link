@@ -4,6 +4,7 @@
     Author     : chadmccue
 --%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+
 <div role="main">
 
     <div class="container main-container">
@@ -89,6 +90,17 @@
                     <li>Configure data exchange interfaces to import patient data from participating clinical data systems;</li>
                     <li>Configure data extracts for submission to 3rd party data analysis tools.</li>
                 </ul>
+                <br />
+                <h4>Health-e-link Enables Data Sharing</h4>
+                <p>
+                  See how Health-e-link promotes communication and collaboration across integrted healthcare systems.  
+                </p>
+                <video width="520" height="340" preload="yes" controls="true">
+                    <source src="../../../../dspResources/health-e-link-animation7.webm" type="video/webm">
+                    <source src="../../../../dspResources/health-e-link-animation7.mp4" type="video/mp4">
+                    <source src="../../../../dspResources/health-e-link-animation7.mov" type="video/mov">
+                    <source src="../../../../dspResources/health-e-link-animation7.ogv" type="video/ogv">
+                </video>
             </div>
         </div>
     </div>
