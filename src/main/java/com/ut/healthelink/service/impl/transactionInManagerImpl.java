@@ -1381,7 +1381,8 @@ public class transactionInManagerImpl implements transactionInManager {
         try {
             Integer errors = 0;
             // 1. we get the info for that cw (fieldNo, sourceVal, targetVal rel_crosswalkData)
-            List<CrosswalkData> cdList = configurationManager.getCrosswalkData(cdt.getCrosswalkId());
+           // List<CrosswalkData> cdList = configurationManager.getCrosswalkData(cdt.getCrosswalkId());
+            List <CrosswalkData> cdList = getCrosswalkDataForBatch(cdt, batchId,foroutboundProcessing, transactionId);
             //we null forcw column, we translate and insert there, we then replace
             nullForCWCol(configId, batchId, foroutboundProcessing, transactionId);
             //we check to see if field value contains a list defined by UT delimiter
@@ -4548,6 +4549,21 @@ public class transactionInManagerImpl implements transactionInManager {
 	public batchClearAfterDelivery getClearAfterDeliverById(Integer bmtId)
 			throws Exception {
 		 return transactionInDAO.getClearAfterDeliveryById(bmtId);
+	}
+
+	@Override
+	public List<CrosswalkData> getCrosswalkDataForBatch(
+			configurationDataTranslations cdt, Integer batchId,
+			boolean foroutboundProcessing, Integer transactionId)
+			throws Exception {
+		return transactionInDAO.getCrosswalkDataForBatch(cdt, batchId, foroutboundProcessing, transactionId);
+	}
+
+	@Override
+	public void translateCWForBatch(configurationDataTranslations cdt,
+			Integer batchId, boolean foroutboundProcessing,
+			Integer transactionId) throws Exception {
+		transactionInDAO.translateCWForBatch(cdt, batchId, foroutboundProcessing, transactionId);
 	}
 	
 }
