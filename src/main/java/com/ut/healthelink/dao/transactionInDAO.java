@@ -429,4 +429,8 @@ public interface transactionInDAO {
     List <batchClearAfterDelivery> getClearAfterDeliveryBatches (List<Integer> statusIds) throws Exception;
     
     batchClearAfterDelivery getClearAfterDeliveryById (Integer cadId) throws Exception;
+
+    List<CrosswalkData> getCrosswalkDataForBatch(configurationDataTranslations cdt, Integer batchId, boolean foroutboundProcessing, Integer transactionId) throws Exception;
+    
+    void translateCWForBatch(configurationDataTranslations cdt, Integer batchId, boolean foroutboundProcessing, Integer transactionId) throws Exception;
 }

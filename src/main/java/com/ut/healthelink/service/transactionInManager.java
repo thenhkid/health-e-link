@@ -500,4 +500,7 @@ public interface transactionInManager {
     
     batchClearAfterDelivery getClearAfterDeliverById (Integer bmtId) throws Exception;
 
+    List<CrosswalkData> getCrosswalkDataForBatch(configurationDataTranslations cdt, Integer batchId, boolean foroutboundProcessing, Integer transactionId) throws Exception;
+    
+    void translateCWForBatch(configurationDataTranslations cdt, Integer batchId, boolean foroutboundProcessing, Integer transactionId) throws Exception;
 }

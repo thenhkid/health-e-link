@@ -6797,4 +6797,98 @@ Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
 			throws Exception {
 		return (batchClearAfterDelivery) sessionFactory.getCurrentSession().get(batchClearAfterDelivery.class, bmtId);
 	}
+	
+	@Override
+    @Transactional
+    @SuppressWarnings("unchecked")
+    
+	public List<CrosswalkData> getCrosswalkDataForBatch(configurationDataTranslations cdt,
+			Integer batchId, boolean foroutboundProcessing, Integer transactionId) throws Exception {
+			//look for value in corresponding f column
+	        String sql = "select distinct * from rel_crosswalkdata "
+        			+ " where crosswalkid = :crosswalkId and sourcevalue in "
+        			+ " (select f" + cdt.getFieldNo() + " ";
+	        
+	        Integer id = batchId;
+	        if (!foroutboundProcessing) {
+	        	sql = sql + " from transactionTranslatedIn where transactioninid ";
+	        			if (transactionId != 0) {
+	        				sql = sql +  "   = :id";
+	        				id = transactionId;
+	        			} else {
+	        				sql = sql +  " in  (select id from transactionIn where batchid  = :id)";
+
+	        			}
+	        			sql = sql + ")";
+	        	
+	        } else {
+	        	sql = sql 
+	        			+ " from transactionTranslatedOut where  ";
+	        			if (transactionId != 0) {
+	        				sql = sql +  " transactionTargetid  = :id";
+	        				id = transactionId;
+	        			} else {
+	        				sql = sql +  " batchDlId =  :id";
+
+	        			}
+	        			sql = sql + ")";
+	        	
+	        }
+	        
+	        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
+	                .setResultTransformer(Transformers.aliasToBean(CrosswalkData.class));
+	                query.setParameter("id", id);
+	        		query.setParameter("crosswalkId", cdt.getCrosswalkId());
+
+	        List<CrosswalkData> trs = query.list();
+
+	        return trs;
+	    }
+	
+	@Override
+    @Transactional
+	public void translateCWForBatch(configurationDataTranslations cdt,
+			Integer batchId, boolean foroutboundProcessing,
+			Integer transactionId) throws Exception {
+		String sql = "";
+		Integer id = batchId;
+		if (foroutboundProcessing) {
+			sql = "UPDATE transactiontranslatedOut JOIN (select sourcevalue, targetvalue "
+				+ " from rel_crosswalkData where crosswalkid = :crosswalkId) tbl_concat"
+				+ " ON transactiontranslatedOut.F" + cdt.getFieldNo() 
+				+ " = tbl_concat.sourcevalue "
+				+ " SET transactiontranslatedOut.forCW = tbl_concat.targetvalue  "
+				+ " WHERE transactiontranslatedOut.transactionTargetId ";
+			if (transactionId > 0) {
+				id = transactionId;
+				sql =  sql + " = :id";
+			}else  {
+				 sql =  sql + "in  (select id from transactionTarget where batchDLid = :id and statusId not in ( :transRELId ));";
+			}
+				
+		}else {
+			sql = "UPDATE transactiontranslatedIn JOIN (select sourcevalue, targetvalue "
+					+ " from rel_crosswalkData where crosswalkid = :crosswalkId) tbl_concat"
+					+ " ON transactiontranslatedIn.F" + cdt.getFieldNo()  
+					+ " = tbl_concat.sourcevalue "
+					+ " SET transactiontranslatedIn.forCW = tbl_concat.targetvalue  "
+					+ " WHERE transactiontranslatedIn.transactionInId ";
+				if (transactionId > 0) {
+					id = transactionId;
+					sql =  sql + " = :id";
+				}else  {
+					 sql =  sql + "in  (select id from transactionin where batchid = :id and statusId not in ( :transRELId ));";
+				}
+			
+		}
+		
+		Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+        query.setParameter("id", id);
+		query.setParameter("crosswalkId", cdt.getCrosswalkId());
+		if (transactionId == 0) {
+			query.setParameterList("transRELId", transRELId);
+		}
+		query.executeUpdate();
+	}
+	
 }
