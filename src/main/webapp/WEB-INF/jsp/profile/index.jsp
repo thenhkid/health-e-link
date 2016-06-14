@@ -28,6 +28,12 @@
 	<div class="col-md-9 col-md-offset-0 col-sm-8 col-sm-offset-1 page-content">
             <c:forEach items="${userAccess}" var="sections" varStatus="aStatus">
                 <c:choose>
+                     <c:when test="${sections.featureId == 7}">
+                        <h3><a href="<c:url value='/clients/search'/>" title="Client Management">Client Management</a></h3>
+                        <p class="text">
+                            Search for existing clients, create new clients.
+                        </p>
+                    </c:when>
                     <c:when test="${sections.featureId == 3}">
                         <h3><a href="<c:url value='/Health-e-Web/inbox'/>" title="Health-e-Web">Electronic Referral Gateway</a></h3>
                         <p class="text">

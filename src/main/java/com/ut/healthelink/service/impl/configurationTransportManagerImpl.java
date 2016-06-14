@@ -84,7 +84,7 @@ public class configurationTransportManagerImpl implements configurationTransport
                 //Set the directory to save the uploaded message type template to
                 fileSystem orgdir = new fileSystem();
 
-                orgdir.setDir(orgDetails.getCleanURL(), "templates");
+                orgdir.setDir(orgDetails.getcleanURL(), "templates");
 
                 newCCDTemplateFile = new File(orgdir.getDir() + CCDTemplatefileName);
 
@@ -190,7 +190,7 @@ public class configurationTransportManagerImpl implements configurationTransport
 
                 //Set the directory to save the brochures to
                 fileSystem dir = new fileSystem();
-                dir.setDir(orgDetails.getCleanURL(), "certificates");
+                dir.setDir(orgDetails.getcleanURL(), "certificates");
 
                 newFile = new File(dir.getDir() + fileName);
                 

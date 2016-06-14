@@ -304,7 +304,7 @@ public class configurationManagerImpl implements configurationManager {
             //Need to get the selected organization clean url
             configuration configDetails = configurationDAO.getConfigurationById(messageSpecs.getconfigId());
             Organization orgDetails = organizationDAO.getOrganizationById(configDetails.getorgId());
-            cleanURL = orgDetails.getCleanURL();
+            cleanURL = orgDetails.getcleanURL();
 
             try {
                 inputStream = file.getInputStream();

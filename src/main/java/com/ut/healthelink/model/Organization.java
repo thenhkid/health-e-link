@@ -282,11 +282,11 @@ public class Organization {
         this.headerImageDirectory = headerImageDirectory;
     }
 
-    public String getCleanURL() {
+    public String getcleanURL() {
         return cleanURL;
     }
 
-    public void setCleanURL(String cleanURL) {
+    public void setcleanURL(String cleanURL) {
         this.cleanURL = cleanURL;
     }
 

@@ -76,6 +76,8 @@ public interface transactionInDAO {
     
     List<transactionIn> getBatchTransactions(int batchId, int userId) throws Exception;
     
+    List<transactionIn> getBatchTransactions(int batchId, int userId, List<Integer> messageTypeList, List<Integer> OrgList) throws Exception;
+    
     List<batchUploads> getsentBatches(int userId, int orgId, Date fromDate, Date toDate) throws Exception;
     
     batchUploads getBatchDetails(int batchId) throws Exception;
@@ -433,4 +435,15 @@ public interface transactionInDAO {
     List<CrosswalkData> getCrosswalkDataForBatch(configurationDataTranslations cdt, Integer batchId, boolean foroutboundProcessing, Integer transactionId) throws Exception;
     
     void translateCWForBatch(configurationDataTranslations cdt, Integer batchId, boolean foroutboundProcessing, Integer transactionId) throws Exception;
+	
+	List<referralActivityExports> getReferralActivityExportsByStatus(List<Integer> statusIds, Integer howMany) throws Exception;
+    
+    public void updateReferralActivityExport(referralActivityExports activityExport) throws Exception;
+    
+    List<referralActivityExports> getReferralActivityExportsWithUserNames(List<Integer> statusIds) throws Exception;
+    
+    referralActivityExports getReferralActivityExportById(Integer exportId) throws Exception;
+    
+
+
 }

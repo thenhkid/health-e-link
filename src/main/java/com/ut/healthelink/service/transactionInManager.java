@@ -42,6 +42,7 @@ import com.ut.healthelink.model.systemSummary;
 
 import java.io.File;
 import java.math.BigInteger;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -77,7 +78,9 @@ public interface transactionInManager {
     List<batchUploads> getpendingBatches(int userId, int orgId, Date fromDate, Date toDate) throws Exception;
 
     List<transactionIn> getBatchTransactions(int batchId, int userId) throws Exception;
-
+    
+    List<transactionIn> getBatchTransactions(int batchId, int userId, List<Integer> messageTypeList, List<Integer> OrgList) throws Exception;
+    
     List<batchUploads> getsentBatches(int userId, int orgId, Date fromDate, Date toDate) throws Exception;
 
     batchUploads getBatchDetails(int batchId) throws Exception;
@@ -468,7 +471,7 @@ public interface transactionInManager {
     
     List<referralActivityExports> getReferralActivityExports() throws Exception;
     
-    void createNewReferralActivityExport(Integer userId, Date fromDate, Date toDate) throws Exception;
+    void createNewReferralActivityExport(referralActivityExports newExport) throws Exception;
     
     List<batchUploads> getAllRejectedBatches(Date fromDate, Date toDate, Integer fetchSize) throws Exception;
     
@@ -503,4 +506,21 @@ public interface transactionInManager {
     List<CrosswalkData> getCrosswalkDataForBatch(configurationDataTranslations cdt, Integer batchId, boolean foroutboundProcessing, Integer transactionId) throws Exception;
     
     void translateCWForBatch(configurationDataTranslations cdt, Integer batchId, boolean foroutboundProcessing, Integer transactionId) throws Exception;
+
+    void processReferralActivityExportJob() throws Exception;
+    
+    List<referralActivityExports> getReferralActivityExportsByStatus(List<Integer> statusIds, Integer howMany) throws Exception;
+    
+    public void updateReferralActivityExport(referralActivityExports activityExport) throws Exception;
+    
+    void sendExportEmail(User userDetails) throws Exception;
+    
+    public void saveReferralActivityExport(referralActivityExports activityExport) throws Exception;
+    
+    List<referralActivityExports> getReferralActivityExportsWithUserNames(List<Integer> statusIds) throws Exception;
+    
+    referralActivityExports getReferralActivityExportById(Integer exportId) throws Exception;
+    
+     public List<transactionRecords> setOutboundFormFields(List<configurationFormFields> formfields, transactionInRecords records, int configId, boolean readOnly, int orgId, int clientId) throws NoSuchMethodException, ParseException;
+    
 }

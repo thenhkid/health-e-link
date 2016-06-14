@@ -100,7 +100,13 @@
             <artifactId>mail</artifactId>
             <version>${javax.mail.version}</version>
         </dependency>
-      
+        
+        <dependency>
+            <groupId>org.docx4j</groupId>
+            <artifactId>docx4j</artifactId>
+            <version>3.2.2</version>
+        </dependency>
+
         <!-- Hibernate -->
         <dependency>
             <groupId>org.hibernate</groupId>

@@ -26,6 +26,15 @@ public class referralActivityExports {
     @Transient
     private String createdByName = "";
     
+    @Transient
+    private String statusName = "";
+    
+    @Transient
+    private String encryptedId = null;
+
+    @Transient
+    private String encryptedSecret = null;
+    
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID", nullable = false)
@@ -43,6 +52,28 @@ public class referralActivityExports {
     
     @Column(name = "FILENAME", nullable = true)
     private String fileName = "";
+    /**
+    1 - Requested 2 - in process 3 - ready for viewing 4 - picked up 5 - deleted 6 - no records
+    **/
+    @Column(name = "statusId", nullable = false)
+    private Integer statusId = 1;
+    
+    @DateTimeFormat(pattern = "dd/MM/yyyy hh:mm:ss")
+    @Column(name = "fromDate", nullable = true)
+    private Date fromDate;
+    
+    @DateTimeFormat(pattern = "dd/MM/yyyy hh:mm:ss")
+    @Column(name = "toDate", nullable = true)
+    private Date toDate;
+    
+    @DateTimeFormat(pattern = "dd/MM/yyyy hh:mm:ss")
+    @Column(name = "runStart", nullable = true)
+    private Date runStart = new Date();
+    
+    @DateTimeFormat(pattern = "dd/MM/yyyy hh:mm:ss")
+    @Column(name = "runEnd", nullable = true)
+    private Date runEnd = new Date();
+    
 
     public int getId() {
         return id;
@@ -91,5 +122,69 @@ public class referralActivityExports {
     public void setCreatedByName(String createdByName) {
         this.createdByName = createdByName;
     }
-    
+
+	public Integer getStatusId() {
+		return statusId;
+	}
+
+	public void setStatusId(Integer statusId) {
+		this.statusId = statusId;
+	}
+
+	public Date getFromDate() {
+		return fromDate;
+	}
+
+	public void setFromDate(Date fromDate) {
+		this.fromDate = fromDate;
+	}
+
+	public Date getToDate() {
+		return toDate;
+	}
+
+	public void setToDate(Date toDate) {
+		this.toDate = toDate;
+	}
+
+	public Date getRunStart() {
+		return runStart;
+	}
+
+	public void setRunStart(Date runStart) {
+		this.runStart = runStart;
+	}
+
+	public Date getRunEnd() {
+		return runEnd;
+	}
+
+	public void setRunEnd(Date runEnd) {
+		this.runEnd = runEnd;
+	}
+
+	public String getStatusName() {
+		return statusName;
+	}
+
+	public void setStatusName(String statusName) {
+		this.statusName = statusName;
+	}
+
+	public String getEncryptedId() {
+		return encryptedId;
+	}
+
+	public void setEncryptedId(String encryptedId) {
+		this.encryptedId = encryptedId;
+	}
+
+	public String getEncryptedSecret() {
+		return encryptedSecret;
+	}
+
+	public void setEncryptedSecret(String encryptedSecret) {
+		this.encryptedSecret = encryptedSecret;
+	}
+
 }

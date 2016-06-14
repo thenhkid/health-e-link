@@ -24,7 +24,7 @@ public class configurationDataTranslations {
     String macroName = null;
 
     @Transient
-    int fieldNo;
+    int fieldNo, fieldType;
 
     @Transient
     Map<String, String> defaultValues;
@@ -216,6 +216,14 @@ public class configurationDataTranslations {
 
     public void setDefaultValue(String defaultValue) {
         this.defaultValue = defaultValue;
+    }
+
+    public int getFieldType() {
+        return fieldType;
+    }
+
+    public void setFieldType(int fieldType) {
+        this.fieldType = fieldType;
     }
     
     

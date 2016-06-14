@@ -114,8 +114,8 @@ public class orgProfileController {
         Organization currentOrg = organizationManager.getOrganizationById(organization.getId());
         organization.setparsingTemplate(currentOrg.getparsingTemplate());
 
-        if (!currentOrg.getCleanURL().trim().equals(organization.getCleanURL().trim())) {
-            List<Organization> existing = organizationManager.getOrganizationByName(organization.getCleanURL());
+        if (!currentOrg.getcleanURL().trim().equals(organization.getcleanURL().trim())) {
+            List<Organization> existing = organizationManager.getOrganizationByName(organization.getcleanURL());
             if (!existing.isEmpty()) {
                 ModelAndView mav = new ModelAndView();
                 mav.setViewName("/OrgProfile/editProfile");

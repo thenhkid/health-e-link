@@ -21,6 +21,7 @@ import javax.persistence.Table;
 @Table(name = "CONFIGURATIONCONNECTIONSENDERS")
 public class configurationConnectionSenders {
     
+    
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID", nullable = false)
@@ -31,6 +32,9 @@ public class configurationConnectionSenders {
     
     @Column(name = "USERID", nullable = false)
     private int userId;
+    
+    @Column(name = "SENDEMAILALERT", nullable = false)
+    private Boolean sendEmailAlert = false;
     
     public int getId() {
         return id;
@@ -55,5 +59,13 @@ public class configurationConnectionSenders {
     public void setuserId(int userId) {
         this.userId = userId;
     }
-    
+
+    public Boolean getSendEmailAlert() {
+        return sendEmailAlert;
+    }
+
+    public void setSendEmailAlert(Boolean sendEmailAlert) {
+        this.sendEmailAlert = sendEmailAlert;
+    }
+
 }

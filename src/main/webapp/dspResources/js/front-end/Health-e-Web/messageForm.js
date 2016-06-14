@@ -22,7 +22,16 @@ require(['./main'], function() {
                 errorsFound = checkFormFields();
 
                 if (errorsFound == 0) {
-                    $('#messageForm').submit();
+                    
+                    $('body').overlay({
+                    glyphicon : 'send',
+                    message : 'Sending...'
+                    });
+                    
+                   setTimeout( function () { 
+                        $("#messageForm").submit();
+                     }, 300);   
+                    
                 }
                 else {
                     $('.alert-danger').show();
@@ -30,7 +39,16 @@ require(['./main'], function() {
                 }
             }
             else {
-                $('#messageForm').submit();
+                
+                ('body').overlay({
+                  glyphicon : 'save',
+                  message : 'Saving...'
+                  });
+                  
+                setTimeout( function () { 
+                   $("#messageForm").submit();
+                }, 300);   
+                  
             }
         });
 

@@ -35,6 +35,8 @@ import com.ut.healthelink.model.transactionOutRecords;
 import com.ut.healthelink.model.transactionRecords;
 import com.ut.healthelink.model.transactionTarget;
 import com.ut.healthelink.reference.fileSystem;
+import com.ut.healthelink.security.decryptObject;
+import com.ut.healthelink.security.encryptObject;
 import com.ut.healthelink.service.configurationManager;
 import com.ut.healthelink.service.configurationTransportManager;
 import com.ut.healthelink.service.fileManager;
@@ -46,12 +48,16 @@ import com.ut.healthelink.service.transactionOutManager;
 import com.ut.healthelink.service.userManager;
 import com.ut.healthelink.webServices.WSManager;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -124,6 +130,7 @@ public class adminProcessingActivity {
     @Autowired
     private  WSManager wsmanager;
     
+    private String topSecret = "Hello123JavaTomcatMysqlDPHSystem2016";
 
     /**
      * The private maxResults variable will hold the number of results to show per list page.
@@ -2583,20 +2590,26 @@ public class adminProcessingActivity {
         mav.addObject("toDate", toDate);
         mav.addObject("originalDate", originalDate);
         
-        List<referralActivityExports> exports = transactionInManager.getReferralActivityExports();
-        
-        for(referralActivityExports export : exports) {
-            User userDetails = usermanager.getUserById(export.getCreatedBy());
-            export.setCreatedByName(userDetails.getFirstName() + " " + userDetails.getLastName());
+        List<referralActivityExports> exports = transactionInManager.getReferralActivityExportsWithUserNames(Arrays.asList(1,2,3,4,6));
+        encryptObject encrypt = new encryptObject();
+        Map<String, String> map;
+        for (referralActivityExports export : exports) {
+        	//Encrypt the use id to pass in the url
+            map = new HashMap<String, String>();
+            map.put("id", Integer.toString(export.getId()));
+            map.put("topSecret", topSecret);
+
+            String[] encrypted = encrypt.encryptObject(map);
+            export.setEncryptedId(encrypted[0]);
+            export.setEncryptedSecret(encrypted[1]);
         }
-        
         mav.addObject("exports", exports);
         
         return mav;
     }
     
     /**
-     * The '/referralActivityExport' POST method will generate a new export.
+     * The '/referralActivityExport' POST method will generate add an entry into the existing table.
      * @param session
      * @return
      * @throws Exception 
@@ -2610,18 +2623,22 @@ public class adminProcessingActivity {
 
         User userInfo = (User) session.getAttribute("userDetails");
         
-        /** Create a new export **/
-        transactionInManager.createNewReferralActivityExport(userInfo.getId(), fromDate, toDate);
+        /** insert a new export **/
+        referralActivityExports export  = new referralActivityExports();
+        
+        export.setCreatedBy(userInfo.getId());
+        export.setToDate(toDate);
+        export.setFromDate(fromDate);
+        
+        DateFormat selDateRangeFormat = new SimpleDateFormat("MM/dd/yyyy");
+        export.setSelDateRange(selDateRangeFormat.format(fromDate) + " - " + selDateRangeFormat.format(toDate));
+        export.setStatusId(1);
+        transactionInManager.saveReferralActivityExport(export); 
+        
         
         ModelAndView mav = new ModelAndView(new RedirectView("referralActivityExport"));
         return mav;
         
-        /**List<referralActivityExports> exports = transactionInManager.getReferralActivityExports();
-        
-        mav.addObject("exports", exports);
-        
-        return mav;**/
-
     }
     
     
@@ -2635,8 +2652,8 @@ public class adminProcessingActivity {
      */
     @RequestMapping(value = "/wsmessage", method = RequestMethod.GET)
     public ModelAndView listInBoundWSmessages(HttpSession session) throws Exception {
-
-        int year = 114;
+    	
+    	int year = 114;
         int month = 0;
         int day = 1;
         Date originalDate = new Date(year, month, day);
@@ -2810,7 +2827,7 @@ public class adminProcessingActivity {
     }
 
     /**this displays the payload**/
-    @RequestMapping(value= "/viewPayload.do", method = RequestMethod.POST)
+    @RequestMapping(value= "/wsmessage/viewPayload.do", method = RequestMethod.POST)
     public @ResponseBody ModelAndView viewPayload(
     		@RequestParam Integer wsId) 
     throws Exception {
@@ -3227,7 +3244,7 @@ public class adminProcessingActivity {
 
     
     /**this displays the soap message**/
-    @RequestMapping(value= "/viewSoapMessage.do", method = RequestMethod.POST)
+    @RequestMapping(value= "/wsmessage/viewSoapMessage.do", method = RequestMethod.POST)
     public @ResponseBody ModelAndView viewSoapMessage(
     		@RequestParam Integer wsId) 
     throws Exception {
@@ -3242,7 +3259,7 @@ public class adminProcessingActivity {
     }
     
     /**this displays the soap response**/
-    @RequestMapping(value= "/viewSoapResponse.do", method = RequestMethod.POST)
+    @RequestMapping(value= "/wsmessage/viewSoapResponse.do", method = RequestMethod.POST)
     public @ResponseBody ModelAndView viewSoapResponse(
     		@RequestParam Integer wsId) 
     throws Exception {
@@ -3415,5 +3432,182 @@ public class adminProcessingActivity {
         return mav;
 
     }
-     
+    
+    
+    @RequestMapping(value = "/dlExport", method = {RequestMethod.GET})
+    public void dlExport(@RequestParam String i, @RequestParam String v, 
+    		HttpSession session, HttpServletResponse response) throws Exception {
+    	
+    	User userDetails = new User();
+    	Integer exportId = 0;
+    	
+    	boolean canViewReport = false;
+    	if (session.getAttribute("userDetails") != null) {
+    		userDetails = (User) session.getAttribute("userDetails");
+    		//1 decrpt and get the reportId
+            decryptObject decrypt = new decryptObject();
+            Object obj = decrypt.decryptObject(i, v);
+            String[] result = obj.toString().split((","));
+            exportId = Integer.parseInt(result[0].substring(4));
+            
+            //now we get the report details
+            referralActivityExports export = transactionInManager.getReferralActivityExportById(exportId);
+            
+            if (export != null) {
+            	//we check permission and program
+            	if (userDetails.getRoleId() != 2)  {
+            		canViewReport = true;
+            	}
+            } 
+            //we log them, grab report for them to download
+            //if report doesn't exist we send them back to list with a message
+            UserActivity ua = new UserActivity();
+            ua.setUserId(userDetails.getId());
+            ua.setAccessMethod("POST");
+            ua.setPageAccess("/dlReport");
+           
+            
+            if (!canViewReport) {
+            	//log user activity
+            	ua.setActivity("Tried to View Export - " + exportId);
+                usermanager.insertUserLog(ua);
+            }   else {
+            	ua.setActivity("Viewed Export - " + exportId);
+                usermanager.insertUserLog(ua);
+            	
+                //generate the report for user to download
+            	//need to get report path
+                fileSystem dir = new fileSystem();
+                dir.setDirByName("referralActivityExports/");
+                String filePath = dir.getDir();
+                String fileName = export.getFileName();
+            	try {
+            		File f = new File(dir.getDir() + export.getFileName());
+
+	            	 if(!f.exists()){
+	            		 throw new Exception("Error with File " + dir.getDir() + export.getFileName());
+	            	 }
+            	 } catch (Exception e) {
+            		 try {
+           	    	  //update file to error
+           	    	  export.setStatusId(5);
+           	    	  transactionInManager.updateReferralActivityExport(export);
+           	    	  throw new Exception("File does not exists " + dir.getDir() + export.getFileName());
+           	      } catch (Exception ex1) {
+           	    	  throw new Exception("File does not exists " + dir.getDir() + export.getFileName() + ex1);
+           	      }
+       	    	  
+       	      	}
+
+          	  
+            	try {
+            		  // get your file as InputStream
+            		  InputStream is = new FileInputStream(filePath+fileName);
+            	      // copy it to response's OutputStream
+            	      
+            	      String mimeType = "application/octet-stream";
+            		  response.setContentType(mimeType);
+            		  response.setHeader("Content-Transfer-Encoding", "binary");
+                      response.setHeader("Content-Disposition", "attachment;filename=\"" + fileName + "\"");
+                      org.apache.commons.io.IOUtils.copy(is, response.getOutputStream());
+                      response.flushBuffer();
+            	      is.close();
+            	      
+            	      
+            	      
+                      //update status
+                      if (export.getStatusId() == 3) {
+                    	  export.setStatusId(4);
+                    	  transactionInManager.updateReferralActivityExport(export);
+                      }
+            	    } catch (IOException ex) {
+            	    	ex.printStackTrace();
+            	    	System.out.println("Error writing file to output stream. Filename was '{}'"+ fileName + ex);
+            	      try {
+            	    	  //update file to error
+            	    	  export.setStatusId(5);
+            	    	  transactionInManager.updateReferralActivityExport(export);
+            	    	  throw new Exception("Error with File " +filePath + fileName + ex);
+            	      } catch (Exception e) {
+            	    	  throw new Exception("Error with File " +filePath + fileName + ex);
+            	      }
+            	    }
+            	}
+            
+        } else {
+    		//someone somehow got to this link, we just log
+    		//we log who is accessing 
+            //now we have report id, we check to see which program it belongs to and if the user has permission
+        	UserActivity ua = new UserActivity();
+            ua.setUserId(userDetails.getId());
+            ua.setAccessMethod("POST");
+            ua.setPageAccess("/dlReport");
+            ua.setActivity("Tried to view export - " + exportId);
+            usermanager.insertUserLog(ua);
+            throw new Exception("invalid export view - " + exportId);	
+    	}
+    	
+    }  
+    
+    @RequestMapping(value = "/delExport", method = {RequestMethod.GET})
+    public ModelAndView delExport(@RequestParam String i, @RequestParam String v, 
+    		HttpSession session, HttpServletResponse response) throws Exception {
+    	
+    	User userDetails = new User();
+    	Integer exportId = 0;
+    	
+    	boolean canDeleteReport = false;
+    	if (session.getAttribute("userDetails") != null) {
+    		userDetails = (User) session.getAttribute("userDetails");
+    		//1 decrpt and get the reportId
+            decryptObject decrypt = new decryptObject();
+            Object obj = decrypt.decryptObject(i, v);
+            String[] result = obj.toString().split((","));
+            exportId = Integer.parseInt(result[0].substring(4));
+            
+            //now we get the report details
+            referralActivityExports export = transactionInManager.getReferralActivityExportById(exportId);
+            
+            if (export != null) {
+            	//we check permission and program
+            	if (userDetails.getRoleId() != 2)  {
+            		canDeleteReport = true;
+            	}
+            } 
+            //we log them, grab report for them to download
+            //if report doesn't exist we send them back to list with a message
+            UserActivity ua = new UserActivity();
+            ua.setUserId(userDetails.getId());
+            ua.setAccessMethod("GET");
+            ua.setPageAccess("/delReport");
+           
+            
+            if (!canDeleteReport) {
+            	//log user activity
+            	ua.setActivity("Tried to Delete Export - " + exportId);
+                usermanager.insertUserLog(ua);
+            }   else {
+            	ua.setActivity("Deleted Export - " + exportId);
+                usermanager.insertUserLog(ua);
+            	export.setStatusId(5);
+            	transactionInManager.updateReferralActivityExport(export);
+            }
+            
+        } else {
+    		//someone somehow got to this link, we just log
+    		//we log who is accessing 
+            //now we have report id, we check to see which program it belongs to and if the user has permission
+        	UserActivity ua = new UserActivity();
+            ua.setUserId(userDetails.getId());
+            ua.setAccessMethod("GET");
+            ua.setPageAccess("/dlReport");
+            ua.setActivity("Tried to delete export - " + exportId);
+            usermanager.insertUserLog(ua);
+            throw new Exception("invalid delete export view - " + exportId);	
+    	}
+    	
+    	ModelAndView mav = new ModelAndView(new RedirectView("referralActivityExport"));
+        return mav;
+    	
+    }  
 }

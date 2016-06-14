@@ -79,7 +79,7 @@
                                 <c:forEach var="org" items="${latestOrgs}">
                                     <tr>
                                         <td>
-                                            <a href="administrator/organizations/${org.cleanURL}" title="Edit this Organization"><strong>${org.orgName}</strong></a>
+                                            <a href="administrator/organizations/${org.cleanURL}/" title="Edit this Organization"><strong>${org.orgName}</strong></a>
                                             <address>
                                                 ${org.address} <c:if test="${not empty org.address2}"><br />${org.address2}</c:if>
                                                 <br />${org.city} ${org.state}, ${org.postalCode}
@@ -99,7 +99,7 @@
                                             </c:choose>
                                         </td>
                                         <td class="actions-col">
-                                            <a href="administrator/organizations/${org.cleanURL}" class="btn btn-link" title="Edit this Organization">
+                                            <a href="administrator/organizations/${org.cleanURL}/" class="btn btn-link" title="Edit this Organization">
                                                 <span class="glyphicon glyphicon-edit" role="button"></span>
                                                 Edit
                                             </a>

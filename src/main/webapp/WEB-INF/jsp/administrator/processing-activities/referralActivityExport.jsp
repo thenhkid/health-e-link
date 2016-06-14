@@ -26,29 +26,35 @@
                     <span class="date-label"><fmt:formatDate value="${fromDate}" type="date" pattern="MMMM dd, yyyy" /> - <fmt:formatDate value="${toDate}" type="date" pattern="MMMM dd, yyyy" /></span> <b class="caret"></b>
                  </div>
                  <div class="pull-left">
-                     <input type="button" id="cancel" class="btn btn-primary btn-action-sm createExport" value="Create Export"/>
+                     <input type="button" id="cancel" class="btn btn-primary btn-action-sm createExport" value="Request Export"/>
                  </div>
             </div>
         </div>
                 
         <section class="panel panel-default" style="margin-top: 10px">
             <div class="panel-heading">
-                <h3 class="panel-title">Latest Export</h3>
+                <h3 class="panel-title">Exports</h3>
             </div>
             <div class="panel-body">
                 <div class="form-container scrollable">
-                    <table class="table table-striped table-hover table-default">
+                    <table class="table table-striped table-hover table-default"  <c:if test="${not empty exports}">id="dataTable"</c:if>>
                             <thead>
                                 <tr>
+                                	<th scope="col">Status</th>
                                     <th scope="col">Export Date</th>
                                     <th scope="col">Selected Date Range</th>
                                     <th scope="col" class="center-text">Created By</th>
                                     <th scope="col" class="center-text"></th>
+                                    
                                 </tr>
-                                <c:choose>
-                                    <c:when test="${not empty exports}">
+                                </thead>
+                            <tbody>
+                                <c:if test="${fn:length(exports) > 0}">
                                          <c:forEach var="export" items="${exports}">
                                             <tr>
+                                            	<td scope="row">
+                                                    ${export.statusName}
+                                                </td>
                                                 <td scope="row">
                                                     <fmt:formatDate value="${export.dateSubmitted}" type="both" pattern="M/dd/yyyy h:mm:ss a" />
                                                 </td>
@@ -58,23 +64,29 @@
                                                 <td class="center-text">
                                                     ${export.createdByName}
                                                 </td>
-                                                <td class="center-text">
-                                                    <a href="/FileDownload/downloadFile.do?filename=${export.fileName}&foldername=referralActivityExports&orgId=0" title="Download Export">
-                                                       Download Export
-                                                    </a>
+                                                <td>
+                                                	<c:if test="${(export.statusId == 3 ||  export.statusId == 4) && fn:length(export.fileName) != 0}">
+	                                                	<span class="glyphicon glyphicon-edit"></span>
+	                                                	<a href="dlExport?i=${export.encryptedId}&v=${export.encryptedSecret}"  title="View this export" role="button">
+		                                                	Download Export
+		                                                    </a><br/>
+	                                                </c:if>
+                                                    <span class="glyphicon glyphicon-edit"></span>
+                                                    <a href="delExport?i=${export.encryptedId}&v=${export.encryptedSecret}" title="Download Export">
+	                                                       Delete Export
+	                                                </a>
                                                 </td>
                                             </tr>
                                         </c:forEach>
-                                    </c:when>
-                                    <c:otherwise>
+                                    </c:if>
+                                    <c:if test="${fn:length(exports) < 1}">
                                         <tr>
                                             <td colspan="4">
                                                 No export has been generated.
                                             </td>
                                         </tr>
-                                    </c:otherwise>
-                                </c:choose>
-                            </thead>
+                                    </c:if>
+                            </tbody>
                     </table>
                 </div>
             </div>

@@ -40,7 +40,7 @@ public class organizationManagerImpl implements organizationManager {
         //First get the operating system
         fileSystem dir = new fileSystem();
 
-        dir.creatOrgDirectories(organization.getCleanURL());
+        dir.creatOrgDirectories(organization.getcleanURL());
 
         return lastId;
     }
@@ -53,7 +53,7 @@ public class organizationManagerImpl implements organizationManager {
         //the organization
         fileSystem dir = new fileSystem();
         
-        dir.creatOrgDirectories(organization.getCleanURL());
+        dir.creatOrgDirectories(organization.getcleanURL());
         
         MultipartFile file = organization.getFile();
         //If a file is uploaded
@@ -71,7 +71,7 @@ public class organizationManagerImpl implements organizationManager {
                 //Set the directory to save the uploaded message type template to
                 fileSystem orgdir = new fileSystem();
 
-                orgdir.setDir(organization.getCleanURL(), "templates");
+                orgdir.setDir(organization.getcleanURL(), "templates");
 
                 newFile = new File(orgdir.getDir() + fileName);
 
@@ -115,7 +115,7 @@ public class organizationManagerImpl implements organizationManager {
                 //Set the directory to save the uploaded message type template to
                 fileSystem orgdir = new fileSystem();
 
-                orgdir.setDir("headerimages",organization.getCleanURL());
+                orgdir.setDir("headerimages",organization.getcleanURL());
 
                 newFile = new File(orgdir.getDir() + fileName);
 
@@ -159,7 +159,7 @@ public class organizationManagerImpl implements organizationManager {
                 //Set the directory to save the uploaded message type template to
                 fileSystem orgdir = new fileSystem();
 
-                orgdir.setDir("headerimages",organization.getCleanURL());
+                orgdir.setDir("headerimages",organization.getcleanURL());
 
                 newFile = new File(orgdir.getDir() + fileName);
 

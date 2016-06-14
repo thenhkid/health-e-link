@@ -25,14 +25,17 @@ public class User {
     private List<Integer> sectionList;
     
     @Transient
-    private String orgName;
-    
+    private String orgName, password;
+
     @Transient
     private Date dateOrgWasCreated = null;
+
+    @Transient
+    private Integer orgType;
     
     @Transient
-    private String password;
-
+    private boolean connectionAssociated = false, sendSentEmail = false, sendReceivedEmail = false;
+    
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID", nullable = false)
@@ -301,6 +304,38 @@ public class User {
 
     public void setReceiveEmailAlert(boolean receiveEmailAlert) {
         this.receiveEmailAlert = receiveEmailAlert;
+    }
+
+    public Integer getOrgType() {
+        return orgType;
+    }
+
+    public void setOrgType(Integer orgType) {
+        this.orgType = orgType;
+    }
+
+    public boolean isConnectionAssociated() {
+        return connectionAssociated;
+    }
+
+    public void setConnectionAssociated(boolean connectionAssociated) {
+        this.connectionAssociated = connectionAssociated;
+    }
+
+    public boolean isSendSentEmail() {
+        return sendSentEmail;
+    }
+
+    public void setSendSentEmail(boolean sendSentEmail) {
+        this.sendSentEmail = sendSentEmail;
+    }
+
+    public boolean isSendReceivedEmail() {
+        return sendReceivedEmail;
+    }
+
+    public void setSendReceivedEmail(boolean sendReceivedEmail) {
+        this.sendReceivedEmail = sendReceivedEmail;
     }
     
 }

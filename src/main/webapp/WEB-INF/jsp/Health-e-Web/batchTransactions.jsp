@@ -39,6 +39,7 @@
                <div class="col-md-12">
                     <form:form class="form form-inline" id="searchForm" action="${fromPage == 'sent' ? '/Health-e-Web/sent' : '/Health-e-Web/inbox'}" method="post">
                         <div class="form-group">
+                            <c:if test="${fromPage == 'inbox'}"><input type="hidden" name="viewOnly" id="viewOnly" value="${viewOnly}" /></c:if>
                             <input type="hidden" name="fromDate" id="fromDate" rel="<fmt:formatDate value="${fromDate}" type="date" pattern="MM/dd/yyyy" />" rel2="<fmt:formatDate value="${userDetails.dateOrgWasCreated}" type="date" pattern="MM/dd/yyyy" />" value="${fromDate}" />
                             <input type="hidden" name="toDate" id="toDate" rel="<fmt:formatDate value="${toDate}" type="date" pattern="MM/dd/yyyy" />" value="${toDate}" />
                         </div>
@@ -52,9 +53,21 @@
                 <input type="hidden" id="configId" name="configId" value="" />
             </form:form>    
             <div class="form-container scrollable">
+                <c:if test="${fromPage == 'inbox' && userDetails.orgType == 2}">
+                    <div class="pull-right" style="width:265px; margin-left: 10px;">
+                        <div class="form-group">
+                            <select id="viewOnlySelectBox" class="form-control">
+                                <option value="0" <c:if test="${viewOnly == 0}">selected</c:if>>Show Open & Closed Referrals</option>
+                                <option value="1" <c:if test="${viewOnly == 1}">selected</c:if>>Show Open Referrals</option>
+                                <option value="2" <c:if test="${viewOnly == 2}">selected</c:if>>Show Closed Referrals</option>
+                            </select>
+                            </div>
+                        </div>
+                    </div>
+                </c:if>        
                 <div class="date-range-picker-trigger form-control pull-right daterange" style="width:265px; margin-left: 10px;">
                     <i class="glyphicon glyphicon-calendar"></i>
-                    <span class="date-label"  rel="" rel2=""><fmt:formatDate value="${fromDate}" type="date" pattern="MMM dd, yyyy" /> - <fmt:formatDate value="${toDate}" type="date" pattern="MMM dd, yyyy" /></span> <b class="caret"></b>
+                    <span class="date-label"  rel="${fromDate}" rel2="${toDate}"><fmt:formatDate value="${fromDate}" type="date" pattern="MMM dd, yyyy" /> - <fmt:formatDate value="${toDate}" type="date" pattern="MMM dd, yyyy" /></span> <b class="caret"></b>
                 </div>
                 <table class="table table-striped table-hover table-default"  <c:if test="${not empty transactions}">id="dataTable"</c:if>>
                     <caption style="display:none">Transactions</caption>

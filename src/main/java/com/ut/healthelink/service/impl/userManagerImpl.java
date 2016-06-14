@@ -11,6 +11,7 @@ import com.ut.healthelink.dao.userDAO;
 import com.ut.healthelink.model.User;
 import com.ut.healthelink.service.userManager;
 import com.ut.healthelink.model.UserActivity;
+import com.ut.healthelink.model.configurationConnectionSenders;
 import com.ut.healthelink.model.siteSections;
 import com.ut.healthelink.model.userAccess;
 import java.security.NoSuchAlgorithmException;
@@ -129,6 +130,18 @@ public class userManagerImpl implements userManager {
     public List<User> getOrgUsersForConfig(List<Integer> configIds) {
         return userDAO.getOrgUsersForConfig(configIds);
     }
+    
+    @Override
+    @Transactional
+    public List<User> getUserConnectionListSending(Integer configId) {
+        return userDAO.getUserConnectionListSending(configId);
+    }
+    
+    @Override
+    @Transactional
+    public List<User> getUserConnectionListReceiving(Integer configId) {
+        return userDAO.getUserConnectionListReceiving(configId);
+    }
 
     @Override
     @Transactional
@@ -221,6 +234,24 @@ public class userManagerImpl implements userManager {
             throws Exception {
         return userDAO.getUsersByStatuRolesAndOrg(status, rolesToExclude, orgs, include);
 
+    }
+    
+    @Override
+    @Transactional
+    public List<Integer> getUserAllowedTargets(int userId, List<configurationConnectionSenders> connections) throws Exception {
+        return userDAO.getUserAllowedTargets(userId, connections);
+    }
+  
+    @Override
+    @Transactional
+    public List<Integer> getUserAllowedMessageTypes(int userId, List<configurationConnectionSenders> connections) throws Exception {
+        return userDAO.getUserAllowedMessageTypes(userId, connections);
+    }
+    
+    @Override
+    @Transactional
+    public List<configurationConnectionSenders> configurationConnectionSendersByUserId(int userId) throws Exception {
+        return userDAO.configurationConnectionSendersByUserId(userId);
     }
 
 }

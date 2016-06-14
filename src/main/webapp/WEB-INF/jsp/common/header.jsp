@@ -71,6 +71,7 @@
                                             <c:forEach items="${userAccess}" var="sections" varStatus="aStatus">
                                                 <li>
                                                     <c:choose>
+                                                        <c:when test="${sections.featureId == 7}"><a href="<c:url value='/clients/search'/>" title="Client Management">Client Management</a></c:when>
                                                         <c:when test="${sections.featureId == 3}"><a href="<c:url value='/Health-e-Web/inbox'/>" title="Health-e-Web">ERG</a></c:when>
                                                         <c:when test="${sections.featureId == 4}"><a href="<c:url value='/Health-e-Connect/upload'/>" title="Health-e-Connect">File Exchange</a></c:when>
                                                         <c:when test="${sections.featureId == 5}"><a href="<c:url value='/OrgProfile/editProfile'/>" title="Organization Profile">Organization Profile</a></c:when>
@@ -127,6 +128,7 @@
                         <c:when test="${param['page-section'] == 'Health-e-Web'}"><h1 class="page-title"><span class="page-title-icon pull-left"></span>Electronic Referral Gateway</h1></c:when>
                         <c:when test="${param['page-section'] == 'Health-e-Connect'}"><h1 class="page-title"><span class="page-title-icon pull-left"></span>File Exchange</h1></c:when>
                         <c:when test="${param['page-section'] == 'Org'}"><h1 class="page-title"><span class="page-title-icon pull-left"></span>Organization Profile</h1></c:when>
+                        <c:when test="${param['page-section'] == 'Clients'}"><h1 class="page-title"><span class="page-title-icon pull-left"></span>Client Management</h1></c:when>
                         <c:when test="${not empty pageTitle}">
                              <h1 class="page-title">${pageTitle}</h1>
                         </c:when>
@@ -203,6 +205,20 @@
                                 </ul>
                             </c:when>
                         </c:choose>
+                    </div>
+                </nav>
+            </c:when>
+            <c:when test="${param['page-section'] == 'Clients'}">
+                <nav class="navbar navbar-default actions-nav" role="navigation">
+                    <div class="container">
+                        <ul class="nav navbar-nav navbar-actions">
+                            <li ${param['page'] == 'search' ? 'class="active"' : ''}><a href="<c:url value='/clients/search'/>" title="Search Clients" class="btn btn-link"><span class="glyphicon glyphicon-search"></span>&nbsp; Client Search</a><span class="indicator-active arrow-up"></span></li>
+                        </ul>
+                        <ul class="nav navbar-nav navbar-right navbar-actions">
+                            <li>
+                                <a href="/clients/clientForm" title="Create a new client.">Create New Client</a>
+                            </li>
+                        </ul>
                     </div>
                 </nav>
             </c:when>

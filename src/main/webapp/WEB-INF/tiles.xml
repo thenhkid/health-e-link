@@ -954,7 +954,7 @@ groups of health care providers, community partners, as well as federal, state a
     
     <!-- Associated Organizations -->
     <definition name="/organizations/associated" extends="base.definition.frontEnd">
-   		<put-attribute name="description" value="" />
+   	<put-attribute name="description" value="" />
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Org&amp;page=associations" />
         <put-attribute name="body" value="/WEB-INF/jsp/organizations/associated.jsp" />
         <put-attribute name="jscript" value="/dspResources/js/front-end/associations/associated.js" />
@@ -965,7 +965,38 @@ groups of health care providers, community partners, as well as federal, state a
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Org&amp;page=associations" />
         <put-attribute name="body" value="/WEB-INF/jsp/organizations/orgDetails.jsp" />
     </definition>
-        
+    
+    <!-- Clients -->
+    <definition name="/clients/search" extends="base.definition.frontEnd">
+   	<put-attribute name="description" value="" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Clients&amp;page=search" />
+        <put-attribute name="body" value="/WEB-INF/jsp/clients/search.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/front-end/clients/search.js" />
+    </definition>    
+    
+    <definition name="/clients/searchResults" extends="base.definition.frontEnd">
+   	<put-attribute name="description" value="" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Clients&amp;page=search" />
+        <put-attribute name="body" value="/WEB-INF/jsp/clients/searchResults.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/front-end/clients/searchResults.js" />
+    </definition> 
+    
+    <definition name="/clients/assessments/assessmentForm" extends="base.definition.frontEnd">
+   	<put-attribute name="description" value="" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Clients&amp;page=search" />
+        <put-attribute name="body" value="/WEB-INF/jsp/clients/assessments/assessmentForm.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/front-end/clients/assessments/assessmentForm.js" />
+    </definition>  
+    
+    <definition name="/clients/assessments/assessmentConclusion" extends="base.definition.frontEnd">
+   	<put-attribute name="description" value="" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Clients&amp;page=search" />
+        <put-attribute name="body" value="/WEB-INF/jsp/clients/assessments/assessmentConclusion.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/front-end/clients/assessments/assessmentConclusion.js" />
+    </definition>   
+    
+    
+    
     <!-- Exception handling -->
     <definition name="/exception" extends="base.definition.frontEnd">
     	<put-attribute name="description" value="" />

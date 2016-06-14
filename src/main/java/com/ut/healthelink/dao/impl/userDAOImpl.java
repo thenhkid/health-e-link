@@ -13,6 +13,9 @@ import com.ut.healthelink.dao.userDAO;
 import com.ut.healthelink.model.Organization;
 import com.ut.healthelink.model.User;
 import com.ut.healthelink.model.UserActivity;
+import com.ut.healthelink.model.configuration;
+import com.ut.healthelink.model.configurationConnection;
+import com.ut.healthelink.model.configurationConnectionSenders;
 import com.ut.healthelink.model.siteSections;
 import com.ut.healthelink.model.userAccess;
 import java.util.ArrayList;
@@ -379,6 +382,50 @@ public class userDAOImpl implements userDAO {
             return null;
         }
     }
+    
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<User> getUserConnectionListSending(Integer configId) {
+        try {
+            String sql = ("select * from users where status = 1 and Id in (select userId from configurationconnectionsenders where sendEmailAlert = 1 and connectionId "
+                    + " in (select id from configurationconnections where sourceConfigId = :configId))");
+
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
+                    Transformers.aliasToBean(User.class));
+            query.setParameter("configId", configId);
+
+            List<User> users = query.list();
+
+            return users;
+
+        } catch (Exception ex) {
+            System.err.println("getOrgUsersForConfig  " + ex.getCause());
+            ex.printStackTrace();
+            return null;
+        }
+    }
+    
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<User> getUserConnectionListReceiving(Integer configId) {
+        try {
+            String sql = ("select * from users where status = 1 and Id in (select userId from configurationconnectionreceivers where sendEmailAlert = 1 and connectionId "
+                    + " in (select id from configurationconnections where targetConfigId = :configId))");
+
+            Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
+                    Transformers.aliasToBean(User.class));
+            query.setParameter("configId", configId);
+
+            List<User> users = query.list();
+
+            return users;
+
+        } catch (Exception ex) {
+            System.err.println("getOrgUsersForConfig  " + ex.getCause());
+            ex.printStackTrace();
+            return null;
+        }
+    }
 
     @Override
     @SuppressWarnings("unchecked")
@@ -456,5 +503,71 @@ public class userDAOImpl implements userDAO {
         List<User> users = query.list();
 
         return users;
+    }
+    
+    @Override
+    public List<Integer> getUserAllowedTargets(int userId, List<configurationConnectionSenders> connections) throws Exception {
+        List<Integer> orgList = new ArrayList<Integer>();
+        
+        if (connections == null || connections.isEmpty()) {
+           orgList.add(0);
+        }
+        else {
+            for (configurationConnectionSenders userConnection : connections) {
+                Criteria connection = sessionFactory.getCurrentSession().createCriteria(configurationConnection.class);
+                connection.add(Restrictions.eq("id", userConnection.getconnectionId()));
+
+                configurationConnection connectionInfo = (configurationConnection) connection.uniqueResult();
+
+                /* Get the list of target orgs */
+                Criteria targetconfigurationQuery = sessionFactory.getCurrentSession().createCriteria(configuration.class);
+                targetconfigurationQuery.add(Restrictions.eq("id", connectionInfo.gettargetConfigId()));
+                configuration targetconfigDetails = (configuration) targetconfigurationQuery.uniqueResult();
+
+                /* Add the target org to the target organization list */
+                orgList.add(targetconfigDetails.getorgId());
+            }
+        }
+        
+        return orgList;
+        
+    }
+  
+    @Override
+    public List<Integer> getUserAllowedMessageTypes(int userId, List<configurationConnectionSenders> connections) throws Exception {
+        List<Integer> messageTypeList = new ArrayList<Integer>();
+         
+        if (connections == null || connections.isEmpty()) {
+           messageTypeList.add(0);
+        }
+        else {
+           for (configurationConnectionSenders userConnection : connections) {
+                Criteria connection = sessionFactory.getCurrentSession().createCriteria(configurationConnection.class);
+                connection.add(Restrictions.eq("id", userConnection.getconnectionId()));
+
+                configurationConnection connectionInfo = (configurationConnection) connection.uniqueResult();
+
+                /* Get the message type for the configuration */
+                Criteria sourceconfigurationQuery = sessionFactory.getCurrentSession().createCriteria(configuration.class);
+                sourceconfigurationQuery.add(Restrictions.eq("id", connectionInfo.getsourceConfigId()));
+                configuration configDetails = (configuration) sourceconfigurationQuery.uniqueResult();
+
+                /* Add the message type to the message type list */
+                messageTypeList.add(configDetails.getMessageTypeId());
+
+            } 
+        }
+        
+        return messageTypeList;
+    }
+    
+    @Override
+    public List<configurationConnectionSenders> configurationConnectionSendersByUserId(int userId) {
+        /* Get a list of connections the user has access to */
+        Criteria connections = sessionFactory.getCurrentSession().createCriteria(configurationConnectionSenders.class);
+        connections.add(Restrictions.eq("userId", userId));
+        List<configurationConnectionSenders> userConnections = connections.list();
+        
+        return userConnections;
     }
 }

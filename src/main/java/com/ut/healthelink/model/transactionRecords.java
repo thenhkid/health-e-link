@@ -27,6 +27,7 @@ public class transactionRecords {
     
     private String errorDesc = null;
     private String errorData = null;
+    private boolean useField = true;
 
     public int getTransactionId() {
         return transactionId;
@@ -148,6 +149,14 @@ public class transactionRecords {
 
     public void setFieldHelp(String fieldHelp) {
         this.fieldHelp = fieldHelp;
+    }
+
+    public boolean isUseField() {
+        return useField;
+    }
+
+    public void setUseField(boolean useField) {
+        this.useField = useField;
     }
     
     

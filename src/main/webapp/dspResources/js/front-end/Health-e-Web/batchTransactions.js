@@ -82,15 +82,31 @@ require(['./main'], function () {
            "aoColumns" : aoColumns,
            "aaSorting" : [[4, "desc"]]
         });
+        
+        
+        $(document).on('change', '#viewOnlySelectBox', function() {
+            searchByDateRange()
+        });
+        
     }); 
 });
 
-function searchByDateRange() {
+function searchByDateRange() { 
    var fromDate = $('.daterange span').attr('rel');
    var toDate = $('.daterange span').attr('rel2');
-    
+   var viewOnlyVal = $('#viewOnlySelectBox').val();
+   
+   setTimeout(
+    function() {
+        $('body').overlay({
+        glyphicon : 'search',
+        message : 'Searching...'
+        });
+      }, 500);
+   
    $('#fromDate').val(fromDate);
    $('#toDate').val(toDate);
+   $('#viewOnly').val(viewOnlyVal);
    $('#searchForm').submit();
 
 }

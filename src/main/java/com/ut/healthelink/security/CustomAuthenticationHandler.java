@@ -101,15 +101,15 @@ public class CustomAuthenticationHandler extends SimpleUrlAuthenticationSuccessH
                 
                 if(!"".equals(parentOrgDetails.getHeaderLogo()) && parentOrgDetails.getHeaderLogo() != null) {
                     orgDetails.setHeaderLogo(parentOrgDetails.getHeaderLogo());
-                    orgDetails.setHeaderImageDirectory(parentOrgDetails.getCleanURL());
+                    orgDetails.setHeaderImageDirectory(parentOrgDetails.getcleanURL());
                 }
                 if(!"".equals(parentOrgDetails.getHeaderBackground()) && parentOrgDetails.getHeaderBackground() != null) {
                     orgDetails.setHeaderBackground(parentOrgDetails.getHeaderBackground());
-                    orgDetails.setHeaderImageDirectory(parentOrgDetails.getCleanURL());
+                    orgDetails.setHeaderImageDirectory(parentOrgDetails.getcleanURL());
                 }
             }
             else {
-                orgDetails.setHeaderImageDirectory(orgDetails.getCleanURL());
+                orgDetails.setHeaderImageDirectory(orgDetails.getcleanURL());
             }
             
             /* Need to store the user company information in session */

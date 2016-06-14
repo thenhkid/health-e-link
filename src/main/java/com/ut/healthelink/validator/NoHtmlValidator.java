@@ -37,7 +37,7 @@ public class NoHtmlValidator implements ConstraintValidator<NoHtml, String> {
           String sanitized = DISALLOW_ALL.sanitize(value);
           
           //Need to replace &#64; back to @
-          sanitized = sanitized.replace("&#64;", "@").replace("&amp;", "&").replace("&#39;", "'").replace("&#34;", "\"");
+          sanitized = sanitized.replace("&#64;", "@").replace("&amp;", "&").replace("&#39;", "'").replace("&#34;", "\"").replace("&#43;", "+");
           
           
           return sanitized.equals(value);

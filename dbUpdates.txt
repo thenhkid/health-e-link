@@ -195,3 +195,6 @@ END$$
 
 DELIMITER ;
 
+/** 06142016 Chad **/
+ALTER TABLE `healthelinkdev`.`message_patients` 
+ADD COLUMN `clientId` INT(11) NOT NULL DEFAULT '0' AFTER `miscField10`;

@@ -18,6 +18,7 @@
                 <input type="hidden" id="configId" name="configId" value="" />
                 <input type="hidden" id="targetOrg" name="targetOrg" value="" />
                 <input type="hidden" id="targetConfig" name="targetConfig" value="" />
+                <input type="hidden" name="clientId" value="${clientId}" />
             </form:form>
             <div class="form-container scrollable">
                 <table class="table table-striped table-hover table-default">

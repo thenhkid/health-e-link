@@ -781,7 +781,7 @@ public class configurationDAOImpl implements configurationDAO {
         Query query = sessionFactory
                 .getCurrentSession()
                 .createSQLQuery(
-                        "select configurationDataTranslations.*, fieldNo from configurationDataTranslations, configurationFormFields"
+                        "select configurationDataTranslations.*, fieldNo, fieldType from configurationDataTranslations, configurationFormFields"
                         + " where configurationDataTranslations.fieldId = configurationFormFields.id "
                         + " and configurationDataTranslations.configId = :configId and categoryId = :categoryId order by processorder asc;")
                 .setResultTransformer(

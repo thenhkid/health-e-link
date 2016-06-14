@@ -14,63 +14,63 @@ import java.util.List;
  * @author chadmccue
  */
 public class Transaction {
+
+    private int orgId;
+    private int sourceSubOrgId;
+    private int userId;
+    private int configId;
+    private String batchName = null;
+    private int transportMethodId;
+    private String originalFileName = null;
+    private int statusId;
+    private String statusValue;
+    private int messageTypeId;
+    private int transactionStatusId;
+    private int targetOrgId;
+    private int targetSubOrgId = 0;
+    private List<Integer> targetConfigId;
+    private boolean autoRelease = true;
+    private Date dateSubmitted = null;
+    private String messageTypeName = null;
+    private int batchId = 0;
+    private int transactionId = 0;
+    private int transactionRecordId = 0;
+    private int transactionTargetId = 0;
+    private int sourceType = 1;
+    private int internalStatusId = 0;
+    private int orginialTransactionId = 0;
+    private String reportableField1 = null;
+    private String reportableField2 = null;
+    private String reportableField3 = null;
+    private String reportableField4 = null;
+    private String reportableFieldHeading1 = null;
+    private String reportableFieldHeading2 = null;
+    private String reportableFieldHeading3 = null;
+    private String reportableFieldHeading4 = null;
+
+    private List<transactionRecords> sourceOrgFields = null;
+    private List<transactionRecords> sourceProviderFields = null;
+    private List<transactionRecords> targetOrgFields = null;
+    private List<transactionRecords> targetProviderFields = null;
+    private List<transactionRecords> patientFields = null;
+    private List<transactionRecords> detailFields = null;
+    private Integer attachmentLimit;
+    private Boolean attachmentRequired = false;
+    private String attachmentNote = "";
+
+    private int messageStatus = 1;
+
+    private String srcConfigName;
+    private String srcOrgName;
+    private String targetConfigName;
+    private String targetOrgName;
+    private Integer targetConfigId1;
+    private String srcSiteName;
+    private Integer parentOrgId = 0;
     
-   private int orgId;
-   private int sourceSubOrgId;
-   private int userId;
-   private int configId;
-   private String batchName = null;
-   private int transportMethodId;
-   private String originalFileName = null;
-   private int statusId;
-   private String statusValue;
-   private int messageTypeId;
-   private int transactionStatusId;
-   private int targetOrgId;
-   private int targetSubOrgId = 0;
-   private List<Integer> targetConfigId;
-   private boolean autoRelease = true;
-   private Date dateSubmitted = null;
-   private String messageTypeName = null;
-   private int batchId = 0;
-   private int transactionId = 0;
-   private int transactionRecordId = 0;
-   private int transactionTargetId = 0;
-   private int sourceType = 1;
-   private int internalStatusId = 0;
-   private int orginialTransactionId = 0;
-   private String reportableField1 = null;
-   private String reportableField2 = null;
-   private String reportableField3 = null;
-   private String reportableField4 = null;
-   private String reportableFieldHeading1 = null;
-   private String reportableFieldHeading2 = null;
-   private String reportableFieldHeading3 = null;
-   private String reportableFieldHeading4 = null;
-   
-   private List<transactionRecords> sourceOrgFields = null;
-   private List<transactionRecords> sourceProviderFields = null;
-   private List<transactionRecords> targetOrgFields = null;
-   private List<transactionRecords> targetProviderFields = null;
-   private List<transactionRecords> patientFields = null;
-   private List<transactionRecords> detailFields = null;
-   private Integer attachmentLimit;
-   private Boolean attachmentRequired = false;
-   private String attachmentNote = "";
-   
-   private int messageStatus = 1;
-   
-   private String srcConfigName;
-   private String srcOrgName;
-   private String targetConfigName;
-   private String targetOrgName;
-   private Integer targetConfigId1;
-
-
-   
-   public int getorgId() {
-       return orgId;
-   }
+    public int getorgId() {
+        return orgId;
+    }
 
    public void setorgId(int orgId) {
        this.orgId = orgId;
@@ -742,4 +742,21 @@ public class Transaction {
 		this.messageStatus = messageStatus;
 	}
 
+    public String getSrcSiteName() {
+        return srcSiteName;
+    }
+
+    public void setSrcSiteName(String srcSiteName) {
+        this.srcSiteName = srcSiteName;
+    }
+
+    public Integer getParentOrgId() {
+        return parentOrgId;
+    }
+
+    public void setParentOrgId(Integer parentOrgId) {
+        this.parentOrgId = parentOrgId;
+    }
+    
+    
 }

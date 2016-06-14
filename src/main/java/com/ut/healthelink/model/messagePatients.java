@@ -122,7 +122,68 @@ public class messagePatients {
     
     @Column(name = "RACE", nullable = true)
     private String race = null;
-
+  
+    @Column(name = "primaryGuardianFirstName", nullable = true)
+    private String primaryGuardianFirstName = null;
+    
+    @Column(name = "primaryGuardianLastName", nullable = true)
+    private String primaryGuardianLastName = null;
+    
+    @Column(name = "primaryGuardianPhone", nullable = true)
+    private String primaryGuardianPhone = null;
+    
+    @Column(name = "primaryGuardianPhone2", nullable = true)
+    private String primaryGuardianPhone2 = null;
+    
+    @Column(name = "primaryGuardianEmail", nullable = true)
+    private String primaryGuardianEmail = null;
+    
+    @Column(name = "additionalGuardianFirstName", nullable = true)
+    private String additionalGuardianFirstName = null;
+    
+    @Column(name = "additionalGuardianLastName", nullable = true)
+    private String additionalGuardianLastName = null;
+    
+    @Column(name = "additionalGuardianPhone", nullable = true)
+    private String additionalGuardianPhone = null;
+    
+    @Column(name = "additionalGuardianPhone2", nullable = true)
+    private String additionalGuardianPhone2 = null;
+    
+    @Column(name = "additionalGuardianEmail", nullable = true)
+    private String additionalGuardianEmail = null;
+    
+    @Column(name = "miscField1", nullable = true)
+    private String miscField1 = null;
+    
+    @Column(name = "miscField2", nullable = true)
+    private String miscField2 = null;
+    
+    @Column(name = "miscField3", nullable = true)
+    private String miscField3 = null;
+    
+    @Column(name = "miscField4", nullable = true)
+    private String miscField4 = null;
+    
+    @Column(name = "miscField5", nullable = true)
+    private String miscField5 = null;
+    
+    @Column(name = "miscField6", nullable = true)
+    private String miscField6 = null;
+    
+    @Column(name = "miscField7", nullable = true)
+    private String miscField7 = null;
+    
+    @Column(name = "miscField8", nullable = true)
+    private String miscField8 = null;
+    
+    @Column(name = "miscField9", nullable = true)
+    private String miscField9 = null;
+    
+    @Column(name = "miscField10", nullable = true)
+    private String miscField10 = null;
+    
+    
     public int getId() {
         return id;
     }
@@ -386,5 +447,177 @@ public class messagePatients {
     public void setPatientStatusId(Integer patientStatusId) {
         this.patientStatusId = patientStatusId;
     }
-    
+
+	public String getPrimaryGuardianFirstName() {
+		return primaryGuardianFirstName;
+	}
+
+	public void setPrimaryGuardianFirstName(String primaryGuardianFirstName) {
+		this.primaryGuardianFirstName = primaryGuardianFirstName;
+	}
+
+	public String getPrimaryGuardianLastName() {
+		return primaryGuardianLastName;
+	}
+
+	public void setPrimaryGuardianLastName(String primaryGuardianLastName) {
+		this.primaryGuardianLastName = primaryGuardianLastName;
+	}
+
+	public String getPrimaryGuardianPhone() {
+		return primaryGuardianPhone;
+	}
+
+	public void setPrimaryGuardianPhone(String primaryGuardianPhone) {
+		this.primaryGuardianPhone = primaryGuardianPhone;
+	}
+
+	public String getPrimaryGuardianPhone2() {
+		return primaryGuardianPhone2;
+	}
+
+	public void setPrimaryGuardianPhone2(String primaryGuardianPhone2) {
+		this.primaryGuardianPhone2 = primaryGuardianPhone2;
+	}
+
+	public String getPrimaryGuardianEmail() {
+		return primaryGuardianEmail;
+	}
+
+	public void setPrimaryGuardianEmail(String primaryGuardianEmail) {
+		this.primaryGuardianEmail = primaryGuardianEmail;
+	}
+
+	public String getAdditionalGuardianFirstName() {
+		return additionalGuardianFirstName;
+	}
+
+	public void setAdditionalGuardianFirstName(String additionalGuardianFirstName) {
+		this.additionalGuardianFirstName = additionalGuardianFirstName;
+	}
+
+	public String getAdditionalGuardianLastName() {
+		return additionalGuardianLastName;
+	}
+
+	public void setAdditionalGuardianLastName(String additionalGuardianLastName) {
+		this.additionalGuardianLastName = additionalGuardianLastName;
+	}
+
+	public String getAdditionalGuardianPhone() {
+		return additionalGuardianPhone;
+	}
+
+	public void setAdditionalGuardianPhone(String additionalGuardianPhone) {
+		this.additionalGuardianPhone = additionalGuardianPhone;
+	}
+
+	public String getAdditionalGuardianPhone2() {
+		return additionalGuardianPhone2;
+	}
+
+	public void setAdditionalGuardianPhone2(String additionalGuardianPhone2) {
+		this.additionalGuardianPhone2 = additionalGuardianPhone2;
+	}
+
+	public String getAdditionalGuardianEmail() {
+		return additionalGuardianEmail;
+	}
+
+	public void setAdditionalGuardianEmail(String additionalGuardianEmail) {
+		this.additionalGuardianEmail = additionalGuardianEmail;
+	}
+
+	public String getMiscField1() {
+		return miscField1;
+	}
+
+	public void setMiscField1(String miscField1) {
+		this.miscField1 = miscField1;
+	}
+
+	public String getMiscField2() {
+		return miscField2;
+	}
+
+	public void setMiscField2(String miscField2) {
+		this.miscField2 = miscField2;
+	}
+
+	public String getMiscField3() {
+		return miscField3;
+	}
+
+	public void setMiscField3(String miscField3) {
+		this.miscField3 = miscField3;
+	}
+
+	public String getMiscField4() {
+		return miscField4;
+	}
+
+	public void setMiscField4(String miscField4) {
+		this.miscField4 = miscField4;
+	}
+
+	public String getMiscField5() {
+		return miscField5;
+	}
+
+	public void setMiscField5(String miscField5) {
+		this.miscField5 = miscField5;
+	}
+
+	public String getMiscField6() {
+		return miscField6;
+	}
+
+	public void setMiscField6(String miscField6) {
+		this.miscField6 = miscField6;
+	}
+
+	public String getMiscField7() {
+		return miscField7;
+	}
+
+	public void setMiscField7(String miscField7) {
+		this.miscField7 = miscField7;
+	}
+
+	public String getMiscField8() {
+		return miscField8;
+	}
+
+	public void setMiscField8(String miscField8) {
+		this.miscField8 = miscField8;
+	}
+
+	public String getMiscField9() {
+		return miscField9;
+	}
+
+	public void setMiscField9(String miscField9) {
+		this.miscField9 = miscField9;
+	}
+
+	public String getMiscField10() {
+		return miscField10;
+	}
+
+	public void setMiscField10(String miscField10) {
+		this.miscField10 = miscField10;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public void setTransactionInId(int transactionInId) {
+		this.transactionInId = transactionInId;
+	}
+
+	public void setMaritalStatusId(Integer maritalStatusId) {
+		this.maritalStatusId = maritalStatusId;
+	}
+
 }

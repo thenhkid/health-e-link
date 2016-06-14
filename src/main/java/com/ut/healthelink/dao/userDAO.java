@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.ut.healthelink.model.User;
 import com.ut.healthelink.model.UserActivity;
+import com.ut.healthelink.model.configurationConnectionSenders;
 import com.ut.healthelink.model.siteSections;
 import com.ut.healthelink.model.userAccess;
 
@@ -45,6 +46,10 @@ public interface userDAO {
     List <User> getSendersForConfig (List <Integer> configIds);
     
     List<User> getOrgUsersForConfig(List <Integer> configIds);
+    
+    List<User> getUserConnectionListSending(Integer configId);
+    
+    List<User> getUserConnectionListReceiving(Integer configId);
 
     List<User> getAllUsers();
     
@@ -55,4 +60,10 @@ public interface userDAO {
     void updateUserOnly(User user) throws Exception;
     
     List<User> getUsersByStatuRolesAndOrg(boolean status, List <Integer> rolesToExclude,  List <Integer> orgs, boolean include) throws Exception;
+
+    List<Integer> getUserAllowedTargets(int userId, List<configurationConnectionSenders> connections) throws Exception;
+  
+    List<Integer> getUserAllowedMessageTypes(int userId, List<configurationConnectionSenders> connections) throws Exception;
+    
+    List<configurationConnectionSenders> configurationConnectionSendersByUserId(int userId) throws Exception;
 }

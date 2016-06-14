@@ -32,6 +32,9 @@ public class configurationConnectionReceivers {
     @Column(name = "USERID", nullable = false)
     private int userId;
     
+     @Column(name = "SENDEMAILALERT", nullable = false)
+    private Boolean sendEmailAlert = false;
+    
     public int getId() {
         return id;
     }
@@ -55,5 +58,14 @@ public class configurationConnectionReceivers {
     public void setuserId(int userId) {
         this.userId = userId;
     }
+
+    public Boolean getSendEmailAlert() {
+        return sendEmailAlert;
+    }
+
+    public void setSendEmailAlert(Boolean sendEmailAlert) {
+        this.sendEmailAlert = sendEmailAlert;
+    }
+    
     
 }
