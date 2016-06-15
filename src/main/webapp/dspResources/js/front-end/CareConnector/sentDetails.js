@@ -13,12 +13,12 @@ require(['./main'], function () {
                 window.print();
             }
             if($(this).val() === 'feedbackReports') {
-               $('#viewTransactionDetails').attr("action","/Health-e-Web/feedbackReports");
+               $('#viewTransactionDetails').attr("action","/CareConnector/feedbackReports");
                $('#viewTransactionDetails').submit();
             }
             else if($(this).val() === 'originalReferral') {
                if($('#fromPage').val() == 'inbox') {
-                  $('#viewTransactionDetails').attr("action","/Health-e-Web/sent/messageDetails"); 
+                  $('#viewTransactionDetails').attr("action","/CareConnector/sent/messageDetails"); 
                }
 
                $('.transactionId').val($('#formAction').attr('rel'));
@@ -48,7 +48,7 @@ require(['./main'], function () {
         //status
         $(document).on('click', '.viewStatus', function() {
             $.ajax({
-                url: '/Health-e-Web/viewStatus' + $(this).attr('rel'),
+                url: '/CareConnector/viewStatus' + $(this).attr('rel'),
                 type: "GET",
                 success: function(data) {
                     $("#statusModal").html(data);
@@ -75,7 +75,7 @@ require(['./main'], function () {
             var formData = $("#messageNoteForm").serialize();
 
             $.ajax({
-                url: '/Health-e-Web/submitMessageNote.do',
+                url: '/CareConnector/submitMessageNote.do',
                 data: formData,
                 type: "POST",
                 async: false,
@@ -96,7 +96,7 @@ require(['./main'], function () {
                 var noteId = $(this).attr('rel');
 
                 $.ajax({
-                    url: '/Health-e-Web/removeNote.do',
+                    url: '/CareConnector/removeNote.do',
                     type: 'POST',
                     data: {'noteId': noteId},
                     success: function(data) {
@@ -116,12 +116,12 @@ require(['./main'], function () {
                 var transactionId = $('#transactionId').val();
 
                 $.ajax({
-                    url: '/Health-e-Web/cancelMessage.do',
+                    url: '/CareConnector/cancelMessage.do',
                     type: 'POST',
                     data: {'transactionId': transactionId, 'sent': true},
                     success: function(data) {
                        //send the user back to the sent items box.
-                       window.location.href='/Health-e-Web/sent';
+                       window.location.href='/CareConnector/sent';
                     }
                 });
             }
@@ -145,7 +145,7 @@ function populateExistingAttachments() {
     }
     
     $.ajax({
-        url: '/Health-e-Web/populateExistingAttachments.do',
+        url: '/CareConnector/populateExistingAttachments.do',
         type: 'GET',
         data: {'transactionId': transactionId, 'newattachmentIdList': currentIdList, 'pageFrom': 'sent'},
         success: function(data) {
@@ -158,7 +158,7 @@ function populateExistingNotes() {
     var transactionId = $('#transactionId').val();
     
     $.ajax({
-        url: '/Health-e-Web/populateExistingNotes.do',
+        url: '/CareConnector/populateExistingNotes.do',
         type: 'GET',
         data: {'transactionId': transactionId},
         success: function(data) {

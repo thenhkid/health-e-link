@@ -31,6 +31,8 @@ public interface userDAO {
 
     List<userAccess> getuserSections(int userId);
     
+    List<siteSections> getuserAllowedModules(int userId);
+    
     List<User> getOrganizationContact(int orgId, int mainContact);
     
     Integer getUserByIdentifier(String identifier);

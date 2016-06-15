@@ -16,10 +16,10 @@
 
             <ol class="breadcrumb">
                 <li><a href="<c:url value='/profile'/>">My Account</a></li>
-                <li><a href="<c:url value='/Health-e-Web/inbox'/>">eRG</a></li>
+                <li><a href="<c:url value='/CareConnector/inbox'/>">CC</a></li>
                 <c:choose>
                     <c:when test="${pageHeader == 'pending'}">
-                        <li><a href="<c:url value='/Health-e-Web/pending'/>">Pending</a></li>
+                        <li><a href="<c:url value='/CareConnector/pending'/>">Pending</a></li>
                     </c:when>
                 </c:choose>
                 <li class="active">
@@ -67,10 +67,10 @@
                 </c:otherwise>
             </c:choose>
                     
-            <form:form action="/Health-e-Web/inbox/messageDetails" id="viewOriginalTransaction" method="post">
+            <form:form action="/CareConnector/inbox/messageDetails" id="viewOriginalTransaction" method="post">
                 <input type="hidden" id="originalTransactionId" name="transactionId" value="" />
             </form:form> 
-            <form:form id="messageForm" action="/Health-e-Web/submitMessage" modelAttribute="transaction" role="form" class="form" method="post">
+            <form:form id="messageForm" action="/CareConnector/submitMessage" modelAttribute="transaction" role="form" class="form" method="post">
                 <input type="hidden" id="action" name="action" value="save" />
                 <form:hidden path="orgId" />
                 <form:hidden path="sourceSubOrgId" />

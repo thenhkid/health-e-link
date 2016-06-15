@@ -82,6 +82,12 @@ public class userManagerImpl implements userManager {
     public List<userAccess> getuserSections(int userId) {
         return userDAO.getuserSections(userId);
     }
+    
+    @Override
+    @Transactional
+    public List<siteSections> getuserAllowedModules(int userId) {
+        return userDAO.getuserAllowedModules(userId);
+    }
 
     @Override
     @Transactional

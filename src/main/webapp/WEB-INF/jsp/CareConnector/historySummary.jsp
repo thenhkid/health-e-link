@@ -13,7 +13,7 @@
         <div class="col-md-12 page-content">
             <ol class="breadcrumb">
                 <li><a href="<c:url value='/profile'/>">My Account</a></li>
-                <li class="active"><a href="<c:url value='/Health-e-Web/history'/>">History</a></li>
+                <li class="active"><a href="<c:url value='/CareConnector/history'/>">History</a></li>
                 <li class="active">History Search Results</li>
             </ol>
         </div>
@@ -21,7 +21,7 @@
     <div class="row" style="padding-bottom:10px;">
         <div class="col-md-12 page-content">
             <div class="col-md-12">
-                <a href="<c:url value='/Health-e-Web/history'/>" class="btn btn-primary btn-action-sm pull-right">Return to Search Page</a>
+                <a href="<c:url value='/CareConnector/history'/>" class="btn btn-primary btn-action-sm pull-right">Return to Search Page</a>
                 <a href="javascript:void(0);" class="btn btn-primary btn-action-sm print pull-right" style="margin-right:10px;">Print</a>
             </div>
         </div> 

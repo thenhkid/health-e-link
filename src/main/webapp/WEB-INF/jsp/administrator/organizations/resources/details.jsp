@@ -7,6 +7,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib prefix="s" uri="http://www.springframework.org/tags" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
 <div class="main clearfix" role="main">
     <div class="row-fluid">
@@ -31,7 +32,7 @@
               <div class="panel-body">
                 <div class="form-container scrollable">
                     <p>
-                        Below is a list of available programs that can be associated to this organization. Mark off the programs in which <strong>${organization.orgName}</strong> offers.
+                        Programs/Services offered
                     </p>
                    <table class="table table-striped table-hover table-default">
                         <thead>
@@ -44,6 +45,7 @@
                             <c:choose>
                                 <c:when test="${not empty availPrograms}">
                                     <c:forEach var="program" items="${availPrograms}">
+                                        <c:if test="${!fn:contains(program.name, 'Feedback Report')}">
                                         <tr>
                                             <td scope="row" class="center-text">
                                                 <input type="checkbox" name="programId" value="${program.id}" ${program.useProgram == true ? 'checked="true"' : ''} />
@@ -52,6 +54,7 @@
                                                 ${program.dspName}
                                             </td>
                                         </tr>
+                                        </c:if>
                                     </c:forEach>
                                 </c:when>
                                 <c:otherwise>

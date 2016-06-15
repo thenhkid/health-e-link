@@ -28,10 +28,10 @@
                 Based on the patients chronic disease risk assessment submission we recommend the patient 
                 be referred for the following programs.
                 <ul>
-                    <li>Diabetes Prevention</li>
                     <li>CDSMP</li>
-                    <li>Nutrition</li>
+                    <li>Diabetes Prevention</li>
                     <li>Exercise</li>
+                    <li>Nutrition</li>
                 </ul>
             </p>
             <p>
@@ -49,6 +49,17 @@
                     </thead>
                     <tbody>
                         <tr>
+                            <td scope="row">CDSMP</td>
+                            <td class="center-text">
+                               <select id="targetOrg_1" class="form-control">
+                                    <option value="">- Select Location -</option>
+                                </select> 
+                            </td>
+                             <td class="actions-col center-text" >
+                               <input type="checkbox" name="configs" class="configs" value="1" />
+                            </td>
+                        </tr> 
+                        <tr>
                             <td scope="row">Diabetes Prevention</td>
                             <td class="center-text">
                                <select id="targetOrg_9" class="form-control">
@@ -59,15 +70,15 @@
                                <input type="checkbox" name="configs" class="configs" value="9" />
                             </td>
                         </tr>
-                        <tr>
-                            <td scope="row">CDSMP</td>
+                         <tr>
+                            <td scope="row">Exercise</td>
                             <td class="center-text">
-                               <select id="targetOrg_1" class="form-control">
+                               <select id="targetOrg_3" class="form-control">
                                     <option value="">- Select Location -</option>
                                 </select> 
                             </td>
-                             <td class="actions-col center-text" >
-                               <input type="checkbox" name="configs" class="configs" value="1" />
+                            <td class="actions-col center-text" >
+                               <input type="checkbox" name="configs" class="configs" value="3" />
                             </td>
                         </tr> 
                         <tr>
@@ -81,17 +92,7 @@
                                <input type="checkbox" name="configs" class="configs" value="2" />
                             </td>
                         </tr> 
-                        <tr>
-                            <td scope="row">Exercise</td>
-                            <td class="center-text">
-                               <select id="targetOrg_3" class="form-control">
-                                    <option value="">- Select Location -</option>
-                                </select> 
-                            </td>
-                            <td class="actions-col center-text" >
-                               <input type="checkbox" name="configs" class="configs" value="3" />
-                            </td>
-                        </tr> 
+                       
                     </tbody>
                 </table>
             </div>

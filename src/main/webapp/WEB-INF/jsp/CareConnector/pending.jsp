@@ -12,7 +12,7 @@
         <div class="col-md-12 page-content">
             <ol class="breadcrumb">
                 <li><a href="<c:url value='/profile'/>">My Account</a></li>
-                <li><a href="<c:url value='/Health-e-Web/inbox'/>">eRG</a></li>
+                <li><a href="<c:url value='/CareConnector/inbox'/>">CC</a></li>
                 <li class="active">Pending</li>
             </ol>
                 
@@ -31,7 +31,7 @@
                
                <div class="col-md-3">
                     
-                   <form:form class="form form-inline" id="searchForm" action="/Health-e-Web/pending" method="post">
+                   <form:form class="form form-inline" id="searchForm" action="/CareConnector/pending" method="post">
                         <div class="form-group">
                             <input type="hidden" name="fromDate" id="fromDate" rel="<fmt:formatDate value="${fromDate}" type="date" pattern="MM/dd/yyyy" />" rel2="<fmt:formatDate value="${userDetails.dateOrgWasCreated}" type="date" pattern="MM/dd/yyyy" />" value="${fromDate}" />
                             <input type="hidden" name="toDate" id="toDate" rel="<fmt:formatDate value="${toDate}" type="date" pattern="MM/dd/yyyy" />" value="${toDate}" />

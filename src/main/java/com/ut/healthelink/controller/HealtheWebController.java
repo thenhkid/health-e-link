@@ -73,7 +73,6 @@ import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -90,7 +89,7 @@ import org.springframework.web.servlet.view.RedirectView;
  * @author chadmccue
  */
 @Controller
-@RequestMapping("/Health-e-Web")
+@RequestMapping("/CareConnector")
 public class HealtheWebController {
 
     @Autowired
@@ -150,7 +149,7 @@ public class HealtheWebController {
     }
 
     /**
-     * The '/inbox' request will serve up the Health-e-Web (ERG) inbox, which will show a list of transactions.
+     * The '/inbox' request will serve up the CareConnector (ERG) inbox, which will show a list of transactions.
      *
      * @param request
      * @param response
@@ -161,7 +160,7 @@ public class HealtheWebController {
     public ModelAndView viewinbox(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
 
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("/Health-e-Web/batchTransactions");
+        mav.setViewName("/CareConnector/batchTransactions");
 
         Date fromDate = getMonthDate("START");
         Date toDate = getMonthDate("END");
@@ -379,7 +378,7 @@ public class HealtheWebController {
     }
 
     /**
-     * The '/inbox' request will serve up the Health-e-Web (ERG) inbox, which will show a list of transactions.
+     * The '/inbox' request will serve up the CareConnector (ERG) inbox, which will show a list of transactions.
      *
      * @param request
      * @param response
@@ -393,7 +392,7 @@ public class HealtheWebController {
             HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
 
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("/Health-e-Web/batchTransactions");
+        mav.setViewName("/CareConnector/batchTransactions");
 
         /* Retrieve search parameters from session */
         searchParameters searchParameters = (searchParameters) session.getAttribute("searchParameters");
@@ -595,7 +594,7 @@ public class HealtheWebController {
     }
 
     /**
-     * The '/inbox' request will serve up the Health-e-Web (ERG) inbox.
+     * The '/inbox' request will serve up the CareConnector (ERG) inbox.
      *
      * @param request
      * @param response
@@ -606,7 +605,7 @@ public class HealtheWebController {
     public ModelAndView viewBatchViewinbox(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
 
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("/Health-e-Web/inbox");
+        mav.setViewName("/CareConnector/inbox");
 
         Date fromDate = getMonthDate("START");
         Date toDate = getMonthDate("END");
@@ -712,7 +711,7 @@ public class HealtheWebController {
     }
 
     /**
-     * The '/inbox' POST request will serve up the Health-e-Web (ERG) page that will list all inbox messages based on the term searched for.
+     * The '/inbox' POST request will serve up the CareConnector (ERG) page that will list all inbox messages based on the term searched for.
      *
      * @param request
      * @param response
@@ -724,7 +723,7 @@ public class HealtheWebController {
     public ModelAndView findInboxBatches(@RequestParam Date fromDate, @RequestParam Date toDate, HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
 
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("/Health-e-Web/inbox");
+        mav.setViewName("/CareConnector/inbox");
 
         /* Retrieve search parameters from session */
         searchParameters searchParameters = (searchParameters) session.getAttribute("searchParameters");
@@ -828,7 +827,7 @@ public class HealtheWebController {
     public ModelAndView showInboxBatchTransactions(@RequestParam Integer batchId, HttpSession session) throws Exception {
 
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("/Health-e-Web/batchTransactions");
+        mav.setViewName("/CareConnector/batchTransactions");
 
         /* Need to get all the message types set up for the user */
         User userInfo = (User) session.getAttribute("userDetails");
@@ -987,7 +986,7 @@ public class HealtheWebController {
     public ModelAndView showInboxMessageDetails(@RequestParam(value = "transactionId", required = true) Integer transactionId, HttpSession session) throws Exception {
 
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("/Health-e-Web/sentmessageDetails");
+        mav.setViewName("/CareConnector/sentmessageDetails");
 
         try {
             transactionTarget transactionInfo = transactionOutManager.getTransactionDetails(transactionId);
@@ -1202,7 +1201,7 @@ public class HealtheWebController {
     }
 
     /**
-     * The '/create' request will serve up the Health-e-Web (ERG) create message page.
+     * The '/create' request will serve up the CareConnector (ERG) create message page.
      *
      * @param request
      * @param response
@@ -1221,7 +1220,7 @@ public class HealtheWebController {
         }
 
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("/Health-e-Web/create");
+        mav.setViewName("/CareConnector/create");
 
         /**
          * Need to get all the message types set up for the user
@@ -1338,7 +1337,7 @@ public class HealtheWebController {
     public ModelAndView showfeedbackReportDetailsForm(@RequestParam(value = "configId", required = true) int configId, @RequestParam(value = "transactionId", required = true) int transactionId, HttpSession session) throws Exception {
 
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("/Health-e-Web/messageDetailsForm");
+        mav.setViewName("/CareConnector/messageDetailsForm");
         mav.addObject("pageHeader", "feedback");
 
         /* Get the feedback report configuration details */
@@ -1595,10 +1594,10 @@ public class HealtheWebController {
 
         ModelAndView mav = new ModelAndView();
         if ("create".equals(pathVariable)) {
-            mav.setViewName("/Health-e-Web/messageDetailsForm");
+            mav.setViewName("/CareConnector/messageDetailsForm");
             mav.addObject("pageHeader", "create");
         } else {
-            mav.setViewName("/Health-e-Web/pendingmessageDetailsForm");
+            mav.setViewName("/CareConnector/pendingmessageDetailsForm");
             mav.addObject("pageHeader", "pending");
             
             List<configurationConnection> configConnections = new ArrayList<configurationConnection>();
@@ -2334,7 +2333,7 @@ public class HealtheWebController {
     }
 
     /**
-     * The '/pending' GET request will serve up the Health-e-Web (ERG) page that will list all pending messages.
+     * The '/pending' GET request will serve up the CareConnector (ERG) page that will list all pending messages.
      *
      * @param request
      * @param response
@@ -2345,7 +2344,7 @@ public class HealtheWebController {
     public ModelAndView pendingBatches(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
 
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("/Health-e-Web/pending");
+        mav.setViewName("/CareConnector/pending");
 
         Date fromDate = getMonthDate("START");
         Date toDate = getMonthDate("END");
@@ -2433,7 +2432,7 @@ public class HealtheWebController {
     }
 
     /**
-     * The '/pending' POST request will serve up the Health-e-Web (ERG) page that will list all pending messages based on the term searched for.
+     * The '/pending' POST request will serve up the CareConnector (ERG) page that will list all pending messages based on the term searched for.
      *
      * @param request
      * @param response
@@ -2445,7 +2444,7 @@ public class HealtheWebController {
     public ModelAndView findpendingBatches(@RequestParam Date fromDate, @RequestParam Date toDate, HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
 
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("/Health-e-Web/pending");
+        mav.setViewName("/CareConnector/pending");
 
         /* Retrieve search parameters from session */
         searchParameters searchParameters = (searchParameters) session.getAttribute("searchParameters");
@@ -2523,7 +2522,7 @@ public class HealtheWebController {
     }
 
     /**
-     * The '/sent' request will serve up the Health-e-Web (ERG) page that will list all sent messages.
+     * The '/sent' request will serve up the CareConnector (ERG) page that will list all sent messages.
      *
      * @param request
      * @param response
@@ -2534,7 +2533,7 @@ public class HealtheWebController {
     public ModelAndView sentMessages(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
 
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("/Health-e-Web/batchTransactions");
+        mav.setViewName("/CareConnector/batchTransactions");
 
         Date fromDate = getMonthDate("START");
         Date toDate = getMonthDate("END");
@@ -2694,7 +2693,7 @@ public class HealtheWebController {
     }
 
     /**
-     * The '/sent' POST request will serve up the Health-e-Web (ERG) page that will list all sent messages based on the term searched for.
+     * The '/sent' POST request will serve up the CareConnector (ERG) page that will list all sent messages based on the term searched for.
      *
      * @param request
      * @param response
@@ -2706,7 +2705,7 @@ public class HealtheWebController {
     public ModelAndView findsentTransactions(@RequestParam Date fromDate, @RequestParam Date toDate, HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
 
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("/Health-e-Web/batchTransactions");
+        mav.setViewName("/CareConnector/batchTransactions");
 
         /* Retrieve search parameters from session */
         searchParameters searchParameters = (searchParameters) session.getAttribute("searchParameters");
@@ -2839,7 +2838,7 @@ public class HealtheWebController {
     }
 
     /**
-     * The '/sentBatchView' request will serve up the Health-e-Web (ERG) page that will list all sent messages grouped by batch.
+     * The '/sentBatchView' request will serve up the CareConnector (ERG) page that will list all sent messages grouped by batch.
      *
      * @param request
      * @param response
@@ -2850,7 +2849,7 @@ public class HealtheWebController {
     public ModelAndView senBatchMessages(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
 
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("/Health-e-Web/sent");
+        mav.setViewName("/CareConnector/sent");
 
         Date fromDate = getMonthDate("START");
         Date toDate = getMonthDate("END");
@@ -2936,7 +2935,7 @@ public class HealtheWebController {
     }
 
     /**
-     * The '/sent' POST request will serve up the Health-e-Web (ERG) page that will list all sent messages based on the term searched for.
+     * The '/sent' POST request will serve up the CareConnector (ERG) page that will list all sent messages based on the term searched for.
      *
      * @param request
      * @param response
@@ -2948,7 +2947,7 @@ public class HealtheWebController {
     public ModelAndView findsentBatches(@RequestParam Date fromDate, @RequestParam Date toDate, HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
 
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("/Health-e-Web/sent");
+        mav.setViewName("/CareConnector/sent");
 
         /* Retrieve search parameters from session */
         searchParameters searchParameters = (searchParameters) session.getAttribute("searchParameters");
@@ -3020,7 +3019,7 @@ public class HealtheWebController {
     public ModelAndView showBatchTransactions(@RequestParam Integer batchId, @RequestParam String fromPage, HttpSession session) throws Exception {
 
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("/Health-e-Web/batchTransactions");
+        mav.setViewName("/CareConnector/batchTransactions");
 
         /* Need to get all the message types set up for the user */
         User userInfo = (User) session.getAttribute("userDetails");
@@ -3142,7 +3141,7 @@ public class HealtheWebController {
     public ModelAndView showMessageDetails(@RequestParam(value = "transactionId", required = true) Integer transactionId, @RequestParam(value = "fromPage", required = false) String fromPage, HttpSession session) throws Exception {
 
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("/Health-e-Web/sentmessageDetails");
+        mav.setViewName("/CareConnector/sentmessageDetails");
 
         if (fromPage != null) {
             mav.addObject("fromPage", fromPage);
@@ -3305,7 +3304,7 @@ public class HealtheWebController {
     ModelAndView viewStatus(@PathVariable int statusId) throws Exception {
 
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("/Health-e-Web/statusDetails");
+        mav.setViewName("/CareConnector/statusDetails");
 
         /* Get the details of the selected status */
         lu_ProcessStatus processStatus = sysAdminManager.getProcessStatusById(statusId);
@@ -3366,7 +3365,7 @@ public class HealtheWebController {
         }
 
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("/Health-e-Web/existingAttachments");
+        mav.setViewName("/CareConnector/existingAttachments");
 
         try {
             List<transactionAttachment> attachments = new ArrayList<transactionAttachment>();
@@ -3611,7 +3610,7 @@ public class HealtheWebController {
 
         try {
             ModelAndView mav = new ModelAndView();
-            mav.setViewName("/Health-e-Web/existingNotes");
+            mav.setViewName("/CareConnector/existingNotes");
 
             List<transactionOutNotes> existingNotes = transactionOutManager.getNotesByTransactionId(transactionId);
 
@@ -3804,7 +3803,7 @@ public class HealtheWebController {
     public ModelAndView getFeedbackReports(@RequestParam(value = "transactionId", required = true) Integer transactionId, @RequestParam(value = "fromPage", required = false) String fromPage, HttpSession session) throws Exception {
 
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("/Health-e-Web/feedbackReports");
+        mav.setViewName("/CareConnector/feedbackReports");
 
         if (fromPage == null) {
             fromPage = "inbox";
@@ -4156,7 +4155,7 @@ public class HealtheWebController {
     }
 
     /**
-     * The '/history' GET request will serve up the Health-e-Web (ERG) page that will list allow the logged in user to search their referral and feedback history.
+     * The '/history' GET request will serve up the CareConnector (ERG) page that will list allow the logged in user to search their referral and feedback history.
      *
      * @param request
      * @param response
@@ -4168,7 +4167,7 @@ public class HealtheWebController {
     public ModelAndView viewHistory(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
 
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("/Health-e-Web/history");
+        mav.setViewName("/CareConnector/history");
 
         Date fromDate = getMonthDate("START");
         Date toDate = getMonthDate("END");
@@ -4223,7 +4222,7 @@ public class HealtheWebController {
     }
 
     /**
-     * The '/history' POST request will serve up the Health-e-Web (ERG) page that will list allow the logged in user to search their referral and feedback history.
+     * The '/history' POST request will serve up the CareConnector (ERG) page that will list allow the logged in user to search their referral and feedback history.
      *
      * @param request
      * @param response
@@ -4237,7 +4236,7 @@ public class HealtheWebController {
             @RequestParam String batchName, @RequestParam String utBatchName, @RequestParam String lastName, @RequestParam String patientId, @RequestParam String firstName, @RequestParam String providerId) throws Exception {
 
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("/Health-e-Web/historySummary");
+        mav.setViewName("/CareConnector/historySummary");
 
         if (reportType == 1) {
             mav.addObject("showDetails", false);
@@ -4629,7 +4628,7 @@ public class HealtheWebController {
     ModelAndView showHistoryRecievedMessageDetails(@RequestParam(value = "transactionId", required = true) Integer transactionId, @RequestParam(value = "fromPage", required = true) String fromPage, HttpSession session) throws Exception {
 
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("/Health-e-Web/messageDetailsModal");
+        mav.setViewName("/CareConnector/messageDetailsModal");
         mav.addObject("fromPage", fromPage);
 
         try {
@@ -4818,7 +4817,7 @@ public class HealtheWebController {
     public ModelAndView showHistorySentMessageDetails(@RequestParam(value = "transactionId", required = true) Integer transactionId, @RequestParam(value = "fromPage", required = true) String fromPage, HttpSession session) throws Exception {
 
         ModelAndView mav = new ModelAndView();
-        mav.setViewName("/Health-e-Web/messageDetailsModal");
+        mav.setViewName("/CareConnector/messageDetailsModal");
         mav.addObject("fromPage", fromPage);
 
         try {

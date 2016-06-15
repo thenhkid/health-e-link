@@ -4,6 +4,7 @@ import com.ut.healthelink.model.Organization;
 import com.ut.healthelink.model.User;
 import com.ut.healthelink.model.UserActivity;
 import com.ut.healthelink.model.custom.searchParameters;
+import com.ut.healthelink.model.siteSections;
 import com.ut.healthelink.model.userAccess;
 import com.ut.healthelink.service.organizationManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,10 +88,10 @@ public class CustomAuthenticationHandler extends SimpleUrlAuthenticationSuccessH
             userDetails.setdateOrgWasCreated(orgDetails.getDateCreated());
             
             /* Need to set some session variables to hold information about the user */
-            List<userAccess> userAccess = usermanager.getuserSections(userDetails.getId());
+            List<siteSections> userAllowedModules = usermanager.getuserAllowedModules(userDetails.getId());
+            userDetails.setUserAllowedModules(userAllowedModules);
             
             HttpSession session = request.getSession();
-            session.setAttribute("userAccess" , userAccess);
             
             /* Need to store the user object in session */
             session.setAttribute("userDetails", userDetails);

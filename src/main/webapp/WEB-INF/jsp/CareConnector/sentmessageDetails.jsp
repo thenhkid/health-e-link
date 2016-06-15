@@ -18,12 +18,12 @@
 
             <ol class="breadcrumb">
                 <li><a href="<c:url value='/profile'/>">My Account</a></li>
-                <li><a href="<c:url value='/Health-e-Web/inbox'/>">eRG</a></li>
+                <li><a href="<c:url value='/CareConnector/inbox'/>">CC</a></li>
                 <li>
                     <c:choose>
-                        <c:when test="${fromPage == 'inbox'}"><a href="<c:url value='/Health-e-Web/inbox'/>">Inbox</a></c:when>
-                        <c:when test="${fromPage == 'pending'}"><a href="<c:url value='/Health-e-Web/pending'/>">Pending</a></c:when>
-                        <c:otherwise><a href="<c:url value='/Health-e-Web/sent'/>">Sent</a></c:otherwise>
+                        <c:when test="${fromPage == 'inbox'}"><a href="<c:url value='/CareConnector/inbox'/>">Inbox</a></c:when>
+                        <c:when test="${fromPage == 'pending'}"><a href="<c:url value='/CareConnector/pending'/>">Pending</a></c:when>
+                        <c:otherwise><a href="<c:url value='/CareConnector/sent'/>">Sent</a></c:otherwise>
                     </c:choose>
                 </li>
                 <li class="active">Batch #${transactionDetails.batchName}</li>
@@ -68,15 +68,15 @@
                   </div>
                </div>
             </div>    
-            <form:form action="/Health-e-Web/feedbackReport/details" id="newFeedbackForm" modelAttribute="transactionDetails" method="post">
+            <form:form action="/CareConnector/feedbackReport/details" id="newFeedbackForm" modelAttribute="transactionDetails" method="post">
                 <form:hidden path="transactionId" id="transactionId" />
                 <input type="hidden" id="feedbackConfigId" name="configId" value="" />
             </form:form>               
-            <form:form action="/Health-e-Web/inbox/messageDetails" id="viewTransactionDetails" modelAttribute="transactionDetails" method="post">
+            <form:form action="/CareConnector/inbox/messageDetails" id="viewTransactionDetails" modelAttribute="transactionDetails" method="post">
                 <form:hidden path="transactionId" class="transactionId" id="transactionId" />
                 <input type="hidden" name="fromPage" id="fromPage" value="${fromPage}" />
             </form:form>               
-            <form:form id="messageForm" action="/Health-e-Web/submitMessage" modelAttribute="transactionDetails" role="form" class="form" method="post">
+            <form:form id="messageForm" action="/CareConnector/submitMessage" modelAttribute="transactionDetails" role="form" class="form" method="post">
                 <form:hidden path="transactionId" id="transactionId" />
                 <form:hidden path="transactionTargetId" id="transactionTargetId" />
                 <input type="hidden" id="attachmentIds" name="attachmentIds" value="" />

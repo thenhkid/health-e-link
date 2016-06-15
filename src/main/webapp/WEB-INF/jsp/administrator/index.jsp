@@ -213,12 +213,6 @@
                                                 <a href="administrator/configurations/connections" title="Edit this Connection"><strong>${connection.srcConfigDetails.getOrgName()}</strong></a>
                                                 <br/> <strong>Message Type:</strong>  ${connection.srcConfigDetails.getMessageTypeName()}
                                                 <br/> <strong>Transport Method:</strong> ${connection.srcConfigDetails.gettransportMethod()}
-                                                <br /><br />Authorized User(s): <br />
-                                                <div style="height:100px; overflow: auto">
-                                                    <c:forEach items="${connection.connectionSenders}" var="sender" varStatus="sIndex">
-                                                        ${sIndex.index+1}. ${sender.firstName}&nbsp;${sender.lastName} (<c:choose><c:when test="${sender.userType == 1}">Manager</c:when><c:otherwise>Staff Member</c:otherwise></c:choose>)<br />
-                                                    </c:forEach>
-                                                </div>
                                             </td>
                                             <td>
                                                 Sending To <span class="glyphicon  glyphicon-arrow-right"></span>
@@ -227,12 +221,6 @@
                                                 <a href="administrator/configurations/connections" title="Edit this Connection"><strong>${connection.tgtConfigDetails.getOrgName()}</strong></a>
                                                 <br/> <strong>Message Type:</strong>  ${connection.srcConfigDetails.getMessageTypeName()}
                                                 <br/> <strong>Transport Method:</strong> ${connection.tgtConfigDetails.gettransportMethod()}
-                                                <br /><br />Authorized User(s): <br />
-                                                <div style="height:100px; overflow: auto">
-                                                    <c:forEach items="${connection.connectionReceivers}" var="receiver" varStatus="rIndex">
-                                                        ${rIndex.index+1}. ${receiver.firstName}&nbsp;${receiver.lastName} (<c:choose><c:when test="${receiver.userType == 1}">Manager</c:when><c:otherwise>Staff Member</c:otherwise></c:choose>)<br />
-                                                    </c:forEach>
-                                                </div>
                                             </td>
                                         </tr>
                                     </c:forEach>

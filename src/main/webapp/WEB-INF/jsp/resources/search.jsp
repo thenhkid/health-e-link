@@ -73,7 +73,51 @@
                                         <label class="control-label" for="postalCode">Postal Code</label>
                                         <input type="text" id="postalCode" name="postalCode" class="form-control" />
                                     </div>
-                                </div>   
+                                </div>  
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label" for="setting">Setting</label>
+                                        <select id=setting" name="setting" class="form-control">
+                                            <option value="">- Select -</option>
+                                            <option value="">All</option>
+                                            <option value="">Hospital</option>
+                                            <option value="">Community Health Center</option>
+                                            <option value="">Primary Care Clinic</option>
+                                            <option value="">Other</option>
+                                        </select>
+                                    </div>
+                                </div> 
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label" for="populations">Populations Serviced/Specialty Focus</label>
+                                        <select id=populations" name="populations" class="form-control">
+                                            <option value="">- Select -</option>
+                                            <option value="">All</option>
+                                            <option value="">All Adults</option>
+                                            <option value="">Young Adults Specialty</option>
+                                            <option value="">Adolescents/Children</option>
+                                            <option value="">Homeless Specialty</option>
+                                            <option value="">Pregnant or Parenting Women Specialty</option>
+                                            <option value="">Military and Veterans Specialty</option>
+                                            <option value="">HGender Specific Men or Women Specialty</option>
+                                        </select>
+                                    </div>
+                                </div> 
+                                 <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="control-label" for="paymentMethods">Payment Methods</label>
+                                        <select id=paymentMethods" name="paymentMethods" class="form-control">
+                                            <option value="">- Select -</option>
+                                            <option value="">All</option>
+                                            <option value="">DHHS-supported</option>
+                                            <option value="">Sliding Fee Scale</option>
+                                            <option value="">Medicaid/Medicare/Expanded Medicaid</option>
+                                            <option value="">Private Insurers</option>
+                                            <option value="">TriCare</option>
+                                            <option value="">Self Pay</option>
+                                        </select>
+                                    </div>
+                                </div> 
                             </div>
                         </div>
                     </section>

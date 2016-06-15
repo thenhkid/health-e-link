@@ -13,6 +13,7 @@ import javax.persistence.Table;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import com.ut.healthelink.validator.Phone;
+import java.util.List;
 import javax.persistence.Transient;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
@@ -26,6 +27,9 @@ public class Organization {
     
     @Transient
     private String headerImageDirectory = "";
+    
+    @Transient
+    private List<String> programsOffered = null;
     
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -113,6 +117,9 @@ public class Organization {
     
     @Column(name = "ORGDESC", nullable = true)
     private String orgDesc = "";
+    
+    @Column(name = "INFOURL", nullable = true)
+    private String infoURL = "";
 
     public int getId() {
         return id;
@@ -338,5 +345,22 @@ public class Organization {
     public void setOrgDesc(String orgDesc) {
         this.orgDesc = orgDesc;
     }
+
+    public String getInfoURL() {
+        return infoURL;
+    }
+
+    public void setInfoURL(String infoURL) {
+        this.infoURL = infoURL;
+    }
+
+    public List<String> getProgramsOffered() {
+        return programsOffered;
+    }
+
+    public void setProgramsOffered(List<String> programsOffered) {
+        this.programsOffered = programsOffered;
+    }
+    
     
 }

@@ -16,12 +16,12 @@
         <div class="col-md-12 page-content">
             <ol class="breadcrumb">
                 <li><a href="<c:url value='/profile'/>">My Account</a></li>
-                <li><a href="#">eRG</a></li>
+                <li><a href="#">CC</a></li>
                 <li>
                     <c:choose>
-                        <c:when test="${fromPage == 'inbox'}"><a href="<c:url value='/Health-e-Web/inbox'/>">Inbox</a></c:when>
-                        <c:when test="${fromPage == 'pending'}"><a href="<c:url value='/Health-e-Web/pending'/>">Pending</a></c:when>
-			<c:otherwise><a href="<c:url value='/Health-e-Web/sent'/>">Sent</a></c:otherwise>
+                        <c:when test="${fromPage == 'inbox'}"><a href="<c:url value='/CareConnector/inbox'/>">Inbox</a></c:when>
+                        <c:when test="${fromPage == 'pending'}"><a href="<c:url value='/CareConnector/pending'/>">Pending</a></c:when>
+			<c:otherwise><a href="<c:url value='/CareConnector/sent'/>">Sent</a></c:otherwise>
                     </c:choose>
                 </li>
             </ol>
@@ -37,7 +37,7 @@
             
             <div class="row" style="overflow:hidden;">
                <div class="col-md-12">
-                    <form:form class="form form-inline" id="searchForm" action="${fromPage == 'sent' ? '/Health-e-Web/sent' : '/Health-e-Web/inbox'}" method="post">
+                    <form:form class="form form-inline" id="searchForm" action="${fromPage == 'sent' ? '/CareConnector/sent' : '/CareConnector/inbox'}" method="post">
                         <div class="form-group">
                             <c:if test="${fromPage == 'inbox'}"><input type="hidden" name="viewOnly" id="viewOnly" value="${viewOnly}" /></c:if>
                             <input type="hidden" name="fromDate" id="fromDate" rel="<fmt:formatDate value="${fromDate}" type="date" pattern="MM/dd/yyyy" />" rel2="<fmt:formatDate value="${userDetails.dateOrgWasCreated}" type="date" pattern="MM/dd/yyyy" />" value="${fromDate}" />

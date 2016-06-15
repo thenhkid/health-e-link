@@ -12,7 +12,7 @@
         <div class="col-md-12 page-content">
             <ol class="breadcrumb">
                 <li><a href="<c:url value='/profile'/>">My Account</a></li>
-                <li><a href="<c:url value='/Health-e-Web/inbox'/>">eRG</a></li>
+                <li><a href="<c:url value='/CareConnector/inbox'/>">CC</a></li>
                 <li>
                     <a href="javascript:void(0);" id="viewOriginalTransaction" rel="${OriginaltransactionId}">Batch #${batchDetails.utBatchName}</a>
                 </li>

@@ -220,6 +220,25 @@ public class userDAOImpl implements userDAO {
         List<userAccess> userSectionList = query.list();
         return userSectionList;
     }
+    
+    /**
+     * 
+     * @param userId
+     * @return 
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<siteSections> getuserAllowedModules(int userId) {
+        String sql = "select * from utsitefeatures where id in (select featureId from rel_usersitefeatures where userId = :userId) order by featureName asc";
+        
+        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
+                    Transformers.aliasToBean(siteSections.class));
+        query.setParameter("userId", userId);
+        
+        List<siteSections> siteSections = query.list();
+        return siteSections;
+    
+    }
 
     /**
      * The 'getOrganizationContact' function will return a user based on the organization id passed in and the mainContact parameter;

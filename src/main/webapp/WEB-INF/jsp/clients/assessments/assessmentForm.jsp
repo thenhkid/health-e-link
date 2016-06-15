@@ -271,13 +271,13 @@
                                     </div> 
                                     <div class="col-md-6 cb">
                                         <div class="form-group" >
-                                            <label class="control-label" for="height">Height</label>
+                                            <label class="control-label" for="height">Height (inches)</label>
                                             <input value="" class="form-control" type="text" />
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                        <div class="form-group" >
-                                            <label class="control-label" for="weight">Weight</label>
+                                            <label class="control-label" for="weight">Weight (lbs.)</label>
                                             <input value="" class="form-control" type="text" />
                                         </div>
                                     </div> 
@@ -422,35 +422,7 @@
                                             <input name="noknownbloodsugar" type="radio" /> <span  style="margin-right:10px;">Screening Ordered</span>
                                         </div>
                                     </div>
-                                     <div class="col-md-12">
-                                       <div class="form-group" >
-                                            <label class="control-label" for="influenzavaccination">Annual Influenza Vaccination?</label>
-                                            <select class="form-control">
-                                                <option value="" label=" - Select - " ></option>
-                                                <option value="Yes">Yes</option>
-                                                <option value="No">No</option>
-                                            </select>
-                                        </div>
-                                     </div>
-                                    <div class="col-md-12 cb">
-                                        <div class="form-group" >
-                                            <label class="control-label" for="cholesterol"><strong>If Influenza vaccination is Yes:</strong></label>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-12 cb">
-                                        <div class="form-group" >
-                                            <label class="control-label" for="cholesterol">Date of most recent vaccination:</label>
-                                            <input value="" class="form-control" type="text" />
-                                        </div>
-                                    </div>
-                                    <div class="col-md-12 cb">
-                                        <div class="form-group" >
-                                            <label class="control-label" for="noinfluenzavaccination"><strong>If Influenza vaccination is No:</strong></label>
-                                            <br />
-                                            <input name="noinfluenzavaccination" type="radio" /> <span  style="margin-right:10px;">Vaccination not recommended</span>
-                                            <input name="noinfluenzavaccination" type="radio" /> <span  style="margin-right:10px;">Vaccination recommended</span>
-                                        </div>
-                                    </div>
+                                     
                                 </div>
                             </div>
                         </div>

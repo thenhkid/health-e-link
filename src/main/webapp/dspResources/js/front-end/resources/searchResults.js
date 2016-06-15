@@ -7,6 +7,10 @@
 
 require(['./main'], function () {
     require(['jquery'], function($) {
+        
+        $('.print').click(function() {
+            window.print();
+        });
 
        $(document).on('change', '.clientToDo', function() {
           
@@ -17,9 +21,21 @@ require(['./main'], function () {
                window.location.href="/clients/assessments/assessmentForm?clientId="+clientId+"&assessmentId=1";
            }
            else if(toDo === "createReferrals") {
-               window.location.href="/Health-e-Web/create?clientId="+clientId;
+               window.location.href="/CareConnector/create?clientId="+clientId;
            }
            
        });
+       
+       $(document).on('click', '#activationRequest', function() {
+           $.ajax({
+                url: '/resources/activationRequest',
+                data: {'targetOrg': $(this).attr('rel')},
+                type: "GET",
+                success: function(data) {
+                    $("#activationModal").html(data);
+                }
+           });
+       });
+       
     });
 });      

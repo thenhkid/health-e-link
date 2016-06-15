@@ -16,7 +16,7 @@
                 <li class="active">History</li>
             </ol>
 
-            <form:form id="searchHistoryForm" action="/Health-e-Web/history" role="form" class="form" method="post">
+            <form:form id="searchHistoryForm" action="/CareConnector/history" role="form" class="form" method="post">
                 <input type="hidden" name="fromDate" id="fromDate" rel="<fmt:formatDate value="${fromDate}" type="date" pattern="MM/dd/yyyy" />" rel2="<fmt:formatDate value="${userDetails.dateOrgWasCreated}" type="date" pattern="MM/dd/yyyy" />" value="${fromDate}" />
                 <input type="hidden" name="toDate" id="toDate" rel="<fmt:formatDate value="${toDate}" type="date" pattern="MM/dd/yyyy" />" value="${toDate}" />
 

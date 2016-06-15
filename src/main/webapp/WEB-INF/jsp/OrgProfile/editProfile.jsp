@@ -144,7 +144,16 @@
                                                 <form:errors path="fax" cssClass="control-label" element="label" />
                                             </div>
                                         </spring:bind>
-                                    </div>            
+                                    </div>  
+                                    <div class="col-md-12 cb">
+                                        <spring:bind path="infoURL">
+                                            <div class="form-group ${status.error ? 'has-error' : '' }">
+                                                <label class="control-label" for="infoURL">Information URL</label>
+                                                <form:input path="infoURL" id="infoURL" class="form-control" type="text" maxLength="255" />
+                                                <form:errors path="infoURL" cssClass="control-label" element="label" />
+                                            </div>
+                                        </spring:bind>
+                                    </div>                
                                 </div>
                                 <input type="button" id="save" class="btn btn-primary btn-action-sm submitMessage" value="Save"/>
                             </div>           

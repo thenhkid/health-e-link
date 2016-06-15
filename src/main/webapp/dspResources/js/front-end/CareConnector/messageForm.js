@@ -55,7 +55,7 @@ require(['./main'], function() {
 
         //Function to upload an attachment to the message
         $('#UploadButton').ajaxUpload({
-           url: '/Health-e-Web/uploadMessageAttachment',
+           url: '/CareConnector/uploadMessageAttachment',
            name: 'fileUpload',
            onSubmit: function() {
                this.setData({title: getTitle()});
@@ -121,7 +121,7 @@ require(['./main'], function() {
             var titleVal = $('.title-' + attachmentId).val();
             
             $.ajax({
-                url: '/Health-e-Web/saveAttachmentTitle.do',
+                url: '/CareConnector/saveAttachmentTitle.do',
                 type: 'POST',
                 data: {'attachmentId': attachmentId, 'title': titleVal},
                 success: function(data) {
@@ -146,7 +146,7 @@ require(['./main'], function() {
                 $('#attachmentIds').val(updatedAttachmentIds);
 
                 $.ajax({
-                    url: '/Health-e-Web/removeAttachment.do',
+                    url: '/CareConnector/removeAttachment.do',
                     type: 'POST',
                     data: {'attachmentId': attachmentId},
                     success: function(data) {
@@ -164,7 +164,7 @@ require(['./main'], function() {
         //status
         $(document).on('click', '.viewStatus', function() {
             $.ajax({
-                url: '/Health-e-Web/viewStatus' + $(this).attr('rel'),
+                url: '/CareConnector/viewStatus' + $(this).attr('rel'),
                 type: "GET",
                 success: function(data) {
                     $("#statusModal").html(data);
@@ -178,7 +178,7 @@ require(['./main'], function() {
 
             if ($(this).val() > 0) {
                 $.ajax({
-                    url: '/Health-e-Web/populateProvider.do',
+                    url: '/CareConnector/populateProvider.do',
                     type: 'GET',
                     data: {'providerId': $(this).val()},
                     success: function(data) {
@@ -259,7 +259,7 @@ require(['./main'], function() {
                //$('#targetOrgId').val($(this).val());
                $('#targetConfigId').val($(this).find('option:selected').attr('rel'));
                $.ajax({
-                    url: '/Health-e-Web/populateNewTarget.do',
+                    url: '/CareConnector/populateNewTarget.do',
                     type: 'GET',
                     data: {'orgId': $(this).val()},
                     success: function(data) {
@@ -310,7 +310,7 @@ require(['./main'], function() {
 
             if ($(this).val() > 0) {
                 $.ajax({
-                    url: '/Health-e-Web/populateProvider.do',
+                    url: '/CareConnector/populateProvider.do',
                     type: 'GET',
                     data: {'providerId': $(this).val()},
                     success: function(data) {
@@ -419,12 +419,12 @@ require(['./main'], function() {
                 var transactionId = $('#transactionId').val();
 
                 $.ajax({
-                    url: '/Health-e-Web/deleteMessage.do',
+                    url: '/CareConnector/deleteMessage.do',
                     type: 'POST',
                     data: {'transactionId': transactionId},
                     success: function(data) {
                         //send the user back to the pending items box.
-                        window.location.href = '/Health-e-Web/pending';
+                        window.location.href = '/CareConnector/pending';
                     }
                 });
             }
@@ -441,12 +441,12 @@ require(['./main'], function() {
                 var transactionId = $('#transactionId').val();
 
                 $.ajax({
-                    url: '/Health-e-Web/cancelMessage.do',
+                    url: '/CareConnector/cancelMessage.do',
                     type: 'POST',
                     data: {'transactionId': transactionId, 'sent': false},
                     success: function(data) {
                         //send the user back to the pending items box.
-                        window.location.href = '/Health-e-Web/pending';
+                        window.location.href = '/CareConnector/pending';
                     }
                 });
             }
@@ -477,7 +477,7 @@ function populateExistingAttachments() {
     var currentIdList = $('#attachmentIds').val();
     
     $.ajax({
-        url: '/Health-e-Web/populateExistingAttachments.do',
+        url: '/CareConnector/populateExistingAttachments.do',
         type: 'GET',
         data: {'transactionId': transactionId, 'newattachmentIdList': currentIdList, 'pageFrom': 'pending'},
         success: function(data) {

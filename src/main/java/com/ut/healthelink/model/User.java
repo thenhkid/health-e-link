@@ -23,7 +23,7 @@ public class User {
 
     @Transient
     private List<Integer> sectionList;
-    
+
     @Transient
     private String orgName, password;
 
@@ -32,10 +32,13 @@ public class User {
 
     @Transient
     private Integer orgType;
-    
+
     @Transient
     private boolean connectionAssociated = false, sendSentEmail = false, sendReceivedEmail = false;
-    
+
+    @Transient
+    private List<siteSections> userAllowedModules = null;
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID", nullable = false)
@@ -58,9 +61,8 @@ public class User {
     private String lastName;
 
     /**
-     * @NotEmpty @NoHtml @Column(name = "PASSWORD", nullable = false) private
-     * String password;
-	*
+     * @NotEmpty @NoHtml @Column(name = "PASSWORD", nullable = false) private String password;
+     *
      */
     @NotEmpty
     @NoHtml
@@ -74,12 +76,6 @@ public class User {
     @Column(name = "MAINCONTACT", nullable = false)
     private int mainContact = 0;
 
-    @Column(name = "SENDEMAILALERT", nullable = true)
-    private boolean sendEmailAlert = false;
-
-    @Column(name = "RECEIVEEMAILALERT", nullable = true)
-    private boolean receiveEmailAlert = false;
-
     @Email
     @NoHtml
     @Column(name = "EMAIL", nullable = false)
@@ -88,32 +84,32 @@ public class User {
     @DateTimeFormat(pattern = "dd/MM/yyyy hh:mm:ss")
     @Column(name = "DATECREATED", nullable = true)
     private Date dateCreated = new Date();
-    
+
     @Column(name = "USERTYPE", nullable = false)
     private int userType = 1;
-    
+
     @Column(name = "DELIVERAUTHORITY", nullable = false)
     private boolean deliverAuthority = false;
-    
+
     @Column(name = "EDITAUTHORITY", nullable = false)
     private boolean editAuthority = false;
-    
+
     @Column(name = "CREATEAUTHORITY", nullable = false)
     private boolean createAuthority = false;
-    
+
     @Column(name = "CANCELAUTHORITY", nullable = false)
     private boolean cancelAuthority = false;
-    
+
     @NoHtml
     @Column(name = "RESETCODE", nullable = true)
     private String resetCode = null;
-    
+
     @Column(name = "randomSalt", nullable = true)
-    private byte [] randomSalt;
+    private byte[] randomSalt;
 
     @Column(name = "encryptedPw", nullable = true)
-    private byte [] encryptedPw;
-    
+    private byte[] encryptedPw;
+
     public int getId() {
         return id;
     }
@@ -178,14 +174,6 @@ public class User {
         this.mainContact = mainContact;
     }
 
-    public boolean getSendEmailAlert() {
-        return sendEmailAlert;
-    }
-
-    public void setSendEmailAlert(boolean sendEmailAlert) {
-        this.sendEmailAlert = sendEmailAlert;
-    }
-
     public String getEmail() {
         return email;
     }
@@ -217,59 +205,59 @@ public class User {
     public void setsectionList(List<Integer> sectionList) {
         this.sectionList = sectionList;
     }
-    
+
     public int getuserType() {
         return userType;
     }
-    
+
     public void setuserType(int userType) {
         this.userType = userType;
     }
-    
+
     public boolean getdeliverAuthority() {
         return deliverAuthority;
     }
-    
+
     public void setdeliverAuthority(boolean deliverAuthority) {
         this.deliverAuthority = deliverAuthority;
     }
-    
+
     public boolean geteditAuthority() {
         return editAuthority;
     }
-    
+
     public void seteditAuthority(boolean editAuthority) {
         this.editAuthority = editAuthority;
     }
-    
+
     public boolean getcreateAuthority() {
         return createAuthority;
     }
-    
+
     public void setcreateAuthority(boolean createAuthority) {
         this.createAuthority = createAuthority;
     }
-    
+
     public boolean getcancelAuthority() {
         return cancelAuthority;
     }
-    
+
     public void setcancelAuthority(boolean cancelAuthority) {
         this.cancelAuthority = cancelAuthority;
     }
-    
+
     public Date getdateOrgWasCreated() {
         return dateOrgWasCreated;
     }
-    
+
     public void setdateOrgWasCreated(Date dateOrgWasCreated) {
         this.dateOrgWasCreated = dateOrgWasCreated;
     }
-    
+
     public String getresetCode() {
         return resetCode;
     }
-    
+
     public void setresetCode(String resetCode) {
         this.resetCode = resetCode;
     }
@@ -282,28 +270,20 @@ public class User {
         this.orgName = orgName;
     }
 
-	public byte[] getRandomSalt() {
-		return randomSalt;
-	}
-
-	public void setRandomSalt(byte[] randomSalt) {
-		this.randomSalt = randomSalt;
-	}
-
-	public byte[] getEncryptedPw() {
-		return encryptedPw;
-	}
-
-	public void setEncryptedPw(byte[] encryptedPw) {
-		this.encryptedPw = encryptedPw;
-	}
-
-    public boolean getReceiveEmailAlert() {
-        return receiveEmailAlert;
+    public byte[] getRandomSalt() {
+        return randomSalt;
     }
 
-    public void setReceiveEmailAlert(boolean receiveEmailAlert) {
-        this.receiveEmailAlert = receiveEmailAlert;
+    public void setRandomSalt(byte[] randomSalt) {
+        this.randomSalt = randomSalt;
+    }
+
+    public byte[] getEncryptedPw() {
+        return encryptedPw;
+    }
+
+    public void setEncryptedPw(byte[] encryptedPw) {
+        this.encryptedPw = encryptedPw;
     }
 
     public Integer getOrgType() {
@@ -337,5 +317,13 @@ public class User {
     public void setSendReceivedEmail(boolean sendReceivedEmail) {
         this.sendReceivedEmail = sendReceivedEmail;
     }
-    
+
+    public List<siteSections> getUserAllowedModules() {
+        return userAllowedModules;
+    }
+
+    public void setUserAllowedModules(List<siteSections> userAllowedModules) {
+        this.userAllowedModules = userAllowedModules;
+    }
+
 }

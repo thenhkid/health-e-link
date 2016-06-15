@@ -17,7 +17,7 @@ require(['./main'], function () {
                window.location.href="/clients/assessments/assessmentForm?clientId="+clientId+"&assessmentId=1";
            }
            else if(toDo === "createReferrals") {
-               window.location.href="/Health-e-Web/create?clientId="+clientId;
+               window.location.href="/CareConnector/create?clientId="+clientId;
            }
            
        });

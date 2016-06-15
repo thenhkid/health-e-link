@@ -27,17 +27,17 @@ require(['./main'], function () {
             //If user has edit capability then 'pending/details'
             //otherwise only view 'sent/messageDetails'
             if($('#fromPage').val() === "sent") {
-                $('#viewTransactionDetails').attr("action","/Health-e-Web/sent/messageDetails"); 
+                $('#viewTransactionDetails').attr("action","/CareConnector/sent/messageDetails"); 
             }
             else if($('#fromPage').val() === "inbox") {
-                $('#viewTransactionDetails').attr("action","/Health-e-Web/inbox/messageDetails"); 
+                $('#viewTransactionDetails').attr("action","/CareConnector/inbox/messageDetails"); 
             }
             else {
                 if(editAuthority === "true") {
-                    $('#viewTransactionDetails').attr("action","/Health-e-Web/pending/details");
+                    $('#viewTransactionDetails').attr("action","/CareConnector/pending/details");
                 }
                 else {
-                    $('#viewTransactionDetails').attr("action","/Health-e-Web/sent/messageDetails"); 
+                    $('#viewTransactionDetails').attr("action","/CareConnector/sent/messageDetails"); 
                 }
             }
 
@@ -49,7 +49,7 @@ require(['./main'], function () {
         //status
         $(document).on('click', '.viewStatus', function() {
             $.ajax({
-                url: '/Health-e-Web/viewStatus' + $(this).attr('rel'),
+                url: '/CareConnector/viewStatus' + $(this).attr('rel'),
                 type: "GET",
                 success: function(data) {
                     $("#statusModal").html(data);

@@ -12,6 +12,7 @@ import com.ut.healthelink.reference.USStateList;
 import com.ut.healthelink.service.messageTypeManager;
 import com.ut.healthelink.service.organizationManager;
 import com.ut.healthelink.service.userManager;
+import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 /**
@@ -90,7 +92,54 @@ public class resourceController {
         
         List<Organization> resources = organizationmanager.searchCBOOrganizations(programType,town,county,state,postalCode);
         
+        if(resources != null && resources.size() > 0) {
+            //Get a list of message types in the system 
+            List<messageType> messageTypes = messageTypeManager.getActiveMessageTypes();
+            
+            for(Organization org : resources) {
+                List<String> programsOffered = new ArrayList<String>();
+                
+                /* Get a list of modules the program uses */
+                List<Integer> usedPrograms = organizationmanager.getOrganizationPrograms(org.getId());
+
+                if (!messageTypes.isEmpty()) {
+                    for (messageType program : messageTypes) {
+                        if (usedPrograms.contains(program.getId())) {
+                            programsOffered.add(program.getName());
+                        }
+                    }
+                }
+                
+                if(programsOffered.size() > 0) {
+                    org.setProgramsOffered(programsOffered);
+                }
+                
+            }
+        }
+        
         mav.addObject("resources", resources);
+        
+        return mav;
+    }
+    
+    
+    @RequestMapping(value = "/activationRequest", method = {RequestMethod.GET})
+    public @ResponseBody
+    ModelAndView activationRequest(HttpServletRequest request, HttpSession session,
+             @RequestParam(value = "targetOrg", required = false) Integer targetOrg) throws Exception {
+        
+        ModelAndView mav = new ModelAndView();
+          /* Need to get all the message types set up for the user */
+        User userDetails = (User)session.getAttribute("userDetails");
+        mav.addObject("btnValue", "Update");
+        mav.addObject("userdetails", userDetails);
+        mav.setViewName("/resources/activationRequest");
+        
+        Organization srcOrgDetails = organizationmanager.getOrganizationById(userDetails.getOrgId());
+        Organization tgtOrgDetails = organizationmanager.getOrganizationById(targetOrg);
+        
+        mav.addObject("srcOrgDetails", srcOrgDetails);
+        mav.addObject("tgtOrgDetails", tgtOrgDetails);
         
         return mav;
     }

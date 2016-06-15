@@ -13,7 +13,7 @@ require(['./main'], function () {
         //status
         $(document).on('click', '.viewStatus', function() {
             $.ajax({
-                url: '/Health-e-Web/viewStatus' + $(this).attr('rel'),
+                url: '/CareConnector/viewStatus' + $(this).attr('rel'),
                 type: "GET",
                 success: function(data) {
                     $("#statusModal").html(data);
@@ -26,10 +26,10 @@ require(['./main'], function () {
         $(document).on('click','#viewOriginalTransaction', function() {
 
             if($('#fromPage').val() == 'sent') {
-                $('#viewOriginalTransactionDetails').attr('action','/Health-e-Web/sent/messageDetails');
+                $('#viewOriginalTransactionDetails').attr('action','/CareConnector/sent/messageDetails');
             }
             else {
-               $('#viewOriginalTransactionDetails').attr('action','/Health-e-Web/inbox/messageDetails'); 
+               $('#viewOriginalTransactionDetails').attr('action','/CareConnector/inbox/messageDetails'); 
             }
 
             $('#originalTransactionId').val($(this).attr('rel'));
@@ -49,7 +49,7 @@ require(['./main'], function () {
             //details from the inbox side.
 
             if($('#fromPage').val() == 'sent') {
-                $('#viewTransactionDetails').attr("action","/Health-e-Web/inbox/messageDetails"); 
+                $('#viewTransactionDetails').attr("action","/CareConnector/inbox/messageDetails"); 
             }
             else {
 
@@ -58,15 +58,15 @@ require(['./main'], function () {
                 //otherwise only view 'sent/messageDetails'
                 if(editAuthority === "true") {
                     if(['17','18','19','20'].indexOf(statusId) >= 0) {
-                        $('#viewTransactionDetails').attr("action","/Health-e-Web/sent/messageDetails"); 
+                        $('#viewTransactionDetails').attr("action","/CareConnector/sent/messageDetails"); 
                     }
                     else {
-                        $('#viewTransactionDetails').attr("action","/Health-e-Web/pending/details");
+                        $('#viewTransactionDetails').attr("action","/CareConnector/pending/details");
                     }
 
                 }
                 else {
-                    $('#viewTransactionDetails').attr("action","/Health-e-Web/sent/messageDetails"); 
+                    $('#viewTransactionDetails').attr("action","/CareConnector/sent/messageDetails"); 
                 }
             }
 

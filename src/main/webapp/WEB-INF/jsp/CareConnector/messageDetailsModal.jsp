@@ -11,11 +11,11 @@
 <fmt:formatDate value="${date}" pattern="yyyy" var="currentYear" />
 
 
-<form:form action="/Health-e-Web/feedbackReport/details" id="newFeedbackForm" modelAttribute="transactionDetails" method="post">
+<form:form action="/CareConnector/feedbackReport/details" id="newFeedbackForm" modelAttribute="transactionDetails" method="post">
     <form:hidden path="transactionId" id="transactionId" />
     <input type="hidden" id="feedbackConfigId" name="configId" value="" />
 </form:form>               
-<form:form action="/Health-e-Web/inbox/messageDetails" id="viewTransactionDetails" modelAttribute="transactionDetails" method="post">
+<form:form action="/CareConnector/inbox/messageDetails" id="viewTransactionDetails" modelAttribute="transactionDetails" method="post">
     <form:hidden path="transactionId" class="transactionId" id="transactionId" />
     <input type="hidden" name="fromPage" id="fromPage" value="${fromPage}" />
 </form:form>  

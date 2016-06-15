@@ -706,86 +706,85 @@ public class transactionOutManagerImpl implements transactionOutManager {
                     List<targetOutputRunLogs> logs = transactionOutDAO.getLatestRunLog(schedule.getconfigId());
 
                     /* DAILY SCHEDULE */
-                    if (schedule.gettype() == 2) {
-
-                        /* if Daily check for scheduled or continuous */
-                        if (schedule.getprocessingType() == 1) {
-                            double diffInHours;
-                            int hourOfDay;
-
-                            /* SCHEDULED */
-                            try {
-                                hourOfDay = calendar.get(Calendar.HOUR_OF_DAY);
-
-                                if (logs.size() > 0) {
-                                    targetOutputRunLogs log = logs.get(0);
-                                    long diff = currDate.getTime() - log.getlastRunTime().getTime();
-                                    diffInHours = diff / ((double) 1000 * 60 * 60);
-                                } else {
-                                    diffInHours = 0;
+                    switch (schedule.gettype()) {
+                    /* WEEKLY SCHEDULE */
+                        case 2:
+                            /* if Daily check for scheduled or continuous */
+                            if (schedule.getprocessingType() == 1) {
+                                double diffInHours;
+                                int hourOfDay;
+                                
+                                /* SCHEDULED */
+                                try {
+                                    hourOfDay = calendar.get(Calendar.HOUR_OF_DAY);
+                                    
+                                    if (logs.size() > 0) {
+                                        targetOutputRunLogs log = logs.get(0);
+                                        long diff = currDate.getTime() - log.getlastRunTime().getTime();
+                                        diffInHours = diff / ((double) 1000 * 60 * 60);
+                                    } else {
+                                        diffInHours = 0;
+                                    }
+                                } catch (Exception e) {
+                                    throw new Exception("Error trying to calculate the time difference from run logs", e);
                                 }
-                            } catch (Exception e) {
-                                throw new Exception("Error trying to calculate the time difference from run logs", e);
-                            }
-
-                            if (hourOfDay >= schedule.getprocessingTime() && (diffInHours == 0 || diffInHours >= 24)) {
-                                runProcess = true;
-                            }
-                        } else {
-                            /* CONTINUOUS */
-
-                            double diffInHours;
-                            double diffInMinutes;
-
-                            try {
-                                if (logs.size() > 0) {
-                                    targetOutputRunLogs log = logs.get(0);
-                                    long diff = currDate.getTime() - log.getlastRunTime().getTime();
-                                    diffInHours = diff / ((double) 1000 * 60 * 60);
-                                    diffInMinutes = (diffInHours - (int) diffInHours) * 60;
-                                } else {
-                                    diffInMinutes = 0;
+                                
+                                if (hourOfDay >= schedule.getprocessingTime() && (diffInHours == 0 || diffInHours >= 24)) {
+                                    runProcess = true;
                                 }
-                            } catch (Exception e) {
-                                throw new Exception("Error trying to calculate the time difference from run logs", e);
-                            }
-
-                            if (diffInMinutes == 0 || diffInMinutes >= schedule.getnewfileCheck()) {
-                                runProcess = true;
-                            }
-
-                        }
-                    } /* WEEKLY SCHEDULE */ else if (schedule.gettype() == 3) {
-                        long diffInWeeks = 0;
-
-                        if (logs.size() > 0) {
-                            targetOutputRunLogs log = logs.get(0);
-                            long diff = currDate.getTime() - log.getlastRunTime().getTime();
-
-                            diffInWeeks = diff / ((long) 7 * 24 * 60 * 60 * 1000);
-
-                            if (diffInWeeks == 0 || diffInWeeks >= 1) {
-                                runProcess = true;
-                            }
-
-                        }
-
-                    } /* MONTHLY SCHEDULE */ else if (schedule.gettype() == 4) {
-
-                        long diffInDays = 0;
-
-                        if (logs.size() > 0) {
-                            targetOutputRunLogs log = logs.get(0);
-                            long diff = currDate.getTime() - log.getlastRunTime().getTime();
-
-                            diffInDays = diff / ((long) 365.24 * 24 * 60 * 60 * 1000 / 12);
-
-                            if (diffInDays == 0 || diffInDays >= 30) {
-                                runProcess = true;
-                            }
-
-                        }
-
+                            } else {
+                                /* CONTINUOUS */
+                                
+                                double diffInHours;
+                                double diffInMinutes;
+                                
+                                try {
+                                    if (logs.size() > 0) {
+                                        targetOutputRunLogs log = logs.get(0);
+                                        long diff = currDate.getTime() - log.getlastRunTime().getTime();
+                                        diffInHours = diff / ((double) 1000 * 60 * 60);
+                                        diffInMinutes = (diffInHours - (int) diffInHours) * 60;
+                                    } else {
+                                        diffInMinutes = 0;
+                                    }
+                                } catch (Exception e) {
+                                    throw new Exception("Error trying to calculate the time difference from run logs", e);
+                                }
+                                
+                                if (diffInMinutes == 0 || diffInMinutes >= schedule.getnewfileCheck()) {
+                                    runProcess = true;
+                                }
+                                
+                            }   break;
+                    /* MONTHLY SCHEDULE */
+                        case 3:
+                            long diffInWeeks = 0;
+                            if (logs.size() > 0) {
+                                targetOutputRunLogs log = logs.get(0);
+                                long diff = currDate.getTime() - log.getlastRunTime().getTime();
+                                
+                                diffInWeeks = diff / ((long) 7 * 24 * 60 * 60 * 1000);
+                                
+                                if (diffInWeeks == 0 || diffInWeeks >= 1) {
+                                    runProcess = true;
+                                }
+                                
+                            }   break;
+                        case 4:
+                            long diffInDays = 0;
+                            if (logs.size() > 0) {
+                                targetOutputRunLogs log = logs.get(0);
+                                long diff = currDate.getTime() - log.getlastRunTime().getTime();
+                                
+                                diffInDays = diff / ((long) 365.24 * 24 * 60 * 60 * 1000 / 12);
+                                
+                                if (diffInDays == 0 || diffInDays >= 30) {
+                                    runProcess = true;
+                                }
+                                
+                            }   break;
+                        default:
+                            break;
                     }
 
                     if (runProcess == true) {
@@ -869,47 +868,25 @@ public class transactionOutManagerImpl implements transactionOutManager {
 
                         try {
                             /* Get the list of primary and secondary contacts */
-                            List<User> toPrimaryContact = userManager.getOrganizationContact(batchDLInfo.getOrgId(), 1);
-                            List<User> toSecondaryContact = userManager.getOrganizationContact(batchDLInfo.getOrgId(), 2);
-
-                            if (toPrimaryContact.size() > 0 || toSecondaryContact.size() > 0) {
+                            // Get a list of all user who should receive an email regarding the recieived referral/FB report
+                            List<User> orgToContacts = userManager.getUserConnectionListReceiving(schedule.getconfigId());
+                                 
+                            if (orgToContacts.size() > 0) {
                                 String toName = "";
                                 String toEmail = "";
                                 mailMessage msg = new mailMessage();
                                 ArrayList<String> ccAddressArray = new ArrayList<String>();
                                 msg.setfromEmailAddress("support@health-e-link.net");
                                 
-                                
-                                if (toPrimaryContact.size() > 0) {
+                                if (orgToContacts.size() > 0) {
                                                 
-                                    for(int i = 0; i < toPrimaryContact.size(); i++) {
-
-                                        if(toPrimaryContact.get(i).getSendEmailAlert() == true) {
-
-                                            if("".equals(toEmail)) {
-                                                toName = toPrimaryContact.get(i).getFirstName() + " " + toPrimaryContact.get(i).getLastName();
-                                                toEmail = toPrimaryContact.get(i).getEmail();
-                                            }
-                                            else {
-                                                ccAddressArray.add(toPrimaryContact.get(i).getEmail());
-                                            }
+                                    for(int i = 0; i < orgToContacts.size(); i++) {
+                                        if("".equals(toEmail)) {
+                                            toName = orgToContacts.get(i).getFirstName() + " " + orgToContacts.get(i).getLastName();
+                                            toEmail = orgToContacts.get(i).getEmail();
                                         }
-                                    }
-                                }
-
-                                if (toSecondaryContact.size() > 0) {
-
-                                    for(int i = 0; i < toSecondaryContact.size(); i++) {
-
-                                        if(toSecondaryContact.get(i).getSendEmailAlert() == true) {
-
-                                            if("".equals(toEmail)) {
-                                                toName = toSecondaryContact.get(i).getFirstName() + " " + toSecondaryContact.get(i).getLastName();
-                                                toEmail = toSecondaryContact.get(i).getEmail();
-                                            }
-                                            else {
-                                                ccAddressArray.add(toSecondaryContact.get(i).getEmail());
-                                            }
+                                        else {
+                                            ccAddressArray.add(orgToContacts.get(i).getEmail());
                                         }
                                     }
                                 }
@@ -920,7 +897,6 @@ public class transactionOutManagerImpl implements transactionOutManager {
 
                                 msg.settoEmailAddress(toEmail);
                                 
-
                                 if (ccAddressArray.size() > 0) {
                                     String[] ccAddressList = new String[ccAddressArray.size()];
                                     ccAddressList = ccAddressArray.toArray(ccAddressList);
@@ -931,12 +907,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
 
                                 /* Build the body of the email */
                                 StringBuilder sb = new StringBuilder();
-                                if(!"".equals(toName)) {
-                                    sb.append("Dear " + toName + ", You have recieved a new message from the eReferral System. ");
-                                }
-                                else {
-                                    sb.append("You have recieved a new message from the eReferral System. "); 
-                                }
+                                sb.append("You have recieved a new message from the eReferral System. "); 
                                 sb.append(System.getProperty("line.separator"));
                                 sb.append(System.getProperty("line.separator"));
                                 sb.append("BatchId: " + batchDLInfo.getutBatchName());

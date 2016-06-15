@@ -11,7 +11,7 @@
         <div class="col-md-12 page-content">
             <ol class="breadcrumb">
                 <li><a href="<c:url value='/profile'/>">My Account</a></li>
-                <li><a href="<c:url value='/Health-e-Web/inbox'/>">eRG</a></li>
+                <li><a href="<c:url value='/CareConnector/inbox'/>">CC</a></li>
                 <li class="active">Available Message Types</li>
             </ol>
             <form:form action="create/details" id="createMessageForm" method="post">

@@ -290,7 +290,7 @@ public class clientAssessmentController {
              Sent the user to the "Pending" items page
              */
             redirectAttr.addFlashAttribute("savedStatus", "saved");
-            ModelAndView mav = new ModelAndView(new RedirectView("/Health-e-Web/pending"));
+            ModelAndView mav = new ModelAndView(new RedirectView("/CareConnector/pending"));
             return mav;
         }
         
