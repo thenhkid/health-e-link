@@ -105,7 +105,7 @@ public class resourceController {
                 if (!messageTypes.isEmpty()) {
                     for (messageType program : messageTypes) {
                         if (usedPrograms.contains(program.getId())) {
-                            programsOffered.add(program.getName());
+                            programsOffered.add(program.getDspName());
                         }
                     }
                 }

@@ -17,6 +17,12 @@
             <div class="row" style="padding-bottom:20px;">
                 <div class="col-md-12">
                     <div class="col-md-6">
+                        <p><strong>Request For</strong></p>
+                        <p>
+                           Diabetes Prevention Program
+                        </p>
+                    </div>
+                    <div class="col-md-6">
                         <p><strong>Requested By</strong></p>
                         <p>
                             ${userdetails.firstName} ${userdetails.lastName}<br />
