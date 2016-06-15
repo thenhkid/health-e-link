@@ -72,6 +72,7 @@
                                                 <li>
                                                     <c:choose>
                                                         <c:when test="${sections.featureId == 7}"><a href="<c:url value='/clients/search'/>" title="Client Management">Client Management</a></c:when>
+                                                        <c:when test="${sections.featureId == 10}"><a href="<c:url value='/resources/search'/>" title="Resource Manager">Resource Manager</a></c:when>
                                                         <c:when test="${sections.featureId == 3}"><a href="<c:url value='/Health-e-Web/inbox'/>" title="Health-e-Web">ERG</a></c:when>
                                                         <c:when test="${sections.featureId == 4}"><a href="<c:url value='/Health-e-Connect/upload'/>" title="Health-e-Connect">File Exchange</a></c:when>
                                                         <c:when test="${sections.featureId == 5}"><a href="<c:url value='/OrgProfile/editProfile'/>" title="Organization Profile">Organization Profile</a></c:when>
@@ -129,6 +130,7 @@
                         <c:when test="${param['page-section'] == 'Health-e-Connect'}"><h1 class="page-title"><span class="page-title-icon pull-left"></span>File Exchange</h1></c:when>
                         <c:when test="${param['page-section'] == 'Org'}"><h1 class="page-title"><span class="page-title-icon pull-left"></span>Organization Profile</h1></c:when>
                         <c:when test="${param['page-section'] == 'Clients'}"><h1 class="page-title"><span class="page-title-icon pull-left"></span>Client Management</h1></c:when>
+                        <c:when test="${param['page-section'] == 'Resources'}"><h1 class="page-title"><span class="page-title-icon pull-left"></span>Resource Manager</h1></c:when>
                         <c:when test="${not empty pageTitle}">
                              <h1 class="page-title">${pageTitle}</h1>
                         </c:when>
@@ -184,6 +186,9 @@
                     <div class="container">
                         <ul class="nav navbar-nav navbar-actions">
                             <li ${param['page'] == 'editProfile' ? 'class="active"' : ''}><a href="<c:url value='/OrgProfile/editProfile'/>" title="Edit Organization Profile" class="btn btn-link"><span class="glyphicon glyphicon-edit"></span>&nbsp; Edit Organization Profile</a><span class="indicator-active arrow-up"></span></li>
+                            <c:if test="${organization.orgType == 2}">
+                                <li ${param['page'] == 'resources' ? 'class="active"' : ''}><a href="<c:url value='/OrgProfile/resources'/>" title="Edit Organization Resources" class="btn btn-link"><span class="glyphicon glyphicon-cog"></span>&nbsp; Resources</a><span class="indicator-active arrow-up"></span></li>
+                            </c:if>
                             <li ${param['page'] == 'providers' ? 'class="active"' : ''}><a href="<c:url value='/OrgProfile/providers'/>" title="View Organization Providers" class="btn btn-link"><span class="glyphicon glyphicon-user"></span>&nbsp; View Providers</a><span class="indicator-active arrow-up"></span></li>
                             <li ${param['page'] == 'brochures' ? 'class="active"' : ''}><a href="<c:url value='/OrgProfile/brochures'/>" title="View Uploaded Brochures" class="btn btn-link"><span class="glyphicon glyphicon-book"></span>&nbsp; View Brochures</a><span class="indicator-active arrow-up"></span></li>
                             <li ${param['page'] == 'associations' ? 'class="active"' : ''}><a href="<c:url value='/associations/'/>" title="View Associated Organizations" class="btn btn-link"><span class="glyphicon glyphicon-tower"></span>&nbsp; Associated Organizations</a><span class="indicator-active arrow-up"></span></li>
@@ -218,6 +223,15 @@
                             <li>
                                 <a href="/clients/clientForm" title="Create a new client.">Create New Client</a>
                             </li>
+                        </ul>
+                    </div>
+                </nav>
+            </c:when>
+            <c:when test="${param['page-section'] == 'Resources'}">
+                <nav class="navbar navbar-default actions-nav" role="navigation">
+                    <div class="container">
+                        <ul class="nav navbar-nav navbar-actions">
+                            <li ${param['page'] == 'search' ? 'class="active"' : ''}><a href="<c:url value='/resources/search'/>" title="Search Clients" class="btn btn-link"><span class="glyphicon glyphicon-search"></span>&nbsp; Resource Search</a><span class="indicator-active arrow-up"></span></li>
                         </ul>
                     </div>
                 </nav>

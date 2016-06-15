@@ -479,10 +479,10 @@ public class userDAOImpl implements userDAO {
         String sql = ("select users.*, orgName from users, organizations "
                 + " where users.status = :status and users.orgId = organizations.id");
 
-        if (rolesToExclude.size() != 0) {
+        if (!rolesToExclude.isEmpty()) {
             sql = sql + " and roleId not in (:rolesToExclude)";
         }
-        if (orgs.size() != 0) {
+        if (!orgs.isEmpty()) {
             sql = sql + " and orgId ";
             if (!include) {
                 sql = sql + " not ";
@@ -493,10 +493,10 @@ public class userDAOImpl implements userDAO {
         Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
                 Transformers.aliasToBean(User.class));
         query.setParameter("status", status);
-        if (rolesToExclude.size() != 0) {
+        if (!rolesToExclude.isEmpty()) {
             query.setParameterList("rolesToExclude", rolesToExclude);
         }
-        if (orgs.size() != 0) {
+        if (!orgs.isEmpty()) {
             query.setParameterList("orgs", orgs);
         }
 

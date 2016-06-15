@@ -68,6 +68,11 @@ public class orgController {
         List<Organization> organizations = organizationManager.getAssociatedOrgs(userInfo.getOrgId());
         mav.addObject("organizations", organizations);
         
+        /* Get the org details */
+        Organization orgDetails = organizationManager.getOrganizationById(userInfo.getOrgId());
+        
+        mav.addObject("organization", orgDetails);
+        
         return mav;
         
     }
@@ -120,6 +125,13 @@ public class orgController {
             /* Get a list of secondary contacts */
             List<User> secondaryContacts = userManager.getOrganizationContact(orgDetails.getId(), 2);
             mav.addObject("secondaryContacts", secondaryContacts);
+            
+            /* Get the org details */
+            /* Need to get all the message types set up for the user */
+            User userInfo = (User)session.getAttribute("userDetails");
+            Organization userorgDetails = organizationManager.getOrganizationById(userInfo.getOrgId());
+
+            mav.addObject("organization", userorgDetails);
 
             return mav;
         

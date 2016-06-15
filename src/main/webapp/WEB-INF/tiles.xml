@@ -279,6 +279,17 @@
         <put-attribute name="jscript" value="/dspResources/js/admin/organization/brochures.js" />
     </definition>
     
+    <definition name="/administrator/organizations/resources" extends="base.definition.admin">
+        <put-attribute name="page-id" value="organization-resourcelist" />
+        <put-attribute name="page-section" value="section-organizations" />
+        <put-attribute name="title" value="Administrator - Manage Organization Resources" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/adminHeader.jsp?sect=org" />
+        <put-attribute name="actions" value="/WEB-INF/jsp/administrator/organizations/actionBar.jsp?page=orgResources" />
+        <put-attribute name="menu" value="/WEB-INF/jsp/administrator/organizations/menu.jsp?page=resources" />
+        <put-attribute name="body" value="/WEB-INF/jsp/administrator/organizations/resources/details.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/admin/organization/resources.js" />
+    </definition>
+    
     <!--  login as -->
      <definition name="/administrator/organizations/users/login" extends="base.definition.admin">
         <put-attribute name="body" value="/WEB-INF/jsp/administrator/organizations/users/loginAs.jsp" />
@@ -952,6 +963,14 @@ groups of health care providers, community partners, as well as federal, state a
         <put-attribute name="jscript" value="/dspResources/js/front-end/OrgProfile/brochures.js" />
     </definition>
     
+    <!-- Organization Resources -->
+    <definition name="/OrgProfile/resources" extends="base.definition.frontEnd">
+    	<put-attribute name="description" value="" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Org&amp;page=resources" />
+        <put-attribute name="body" value="/WEB-INF/jsp/OrgProfile/resources.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/front-end/OrgProfile/resources.js" />
+    </definition>
+    
     <!-- Associated Organizations -->
     <definition name="/organizations/associated" extends="base.definition.frontEnd">
    	<put-attribute name="description" value="" />
@@ -965,6 +984,21 @@ groups of health care providers, community partners, as well as federal, state a
         <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Org&amp;page=associations" />
         <put-attribute name="body" value="/WEB-INF/jsp/organizations/orgDetails.jsp" />
     </definition>
+    
+    <!-- Resource Management -->
+    <definition name="/resources/search" extends="base.definition.frontEnd">
+   	<put-attribute name="description" value="" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Resources&amp;page=search" />
+        <put-attribute name="body" value="/WEB-INF/jsp/resources/search.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/front-end/resources/search.js" />
+    </definition>    
+    
+    <definition name="/resources/searchResults" extends="base.definition.frontEnd">
+   	<put-attribute name="description" value="" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=Resources&amp;page=search" />
+        <put-attribute name="body" value="/WEB-INF/jsp/resources/searchResults.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/front-end/resources/searchResults.js" />
+    </definition> 
     
     <!-- Clients -->
     <definition name="/clients/search" extends="base.definition.frontEnd">

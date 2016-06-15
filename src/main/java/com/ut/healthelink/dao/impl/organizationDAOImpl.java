@@ -16,11 +16,13 @@ import com.ut.healthelink.model.Provider;
 import com.ut.healthelink.model.User;
 import com.ut.healthelink.model.configuration;
 import com.ut.healthelink.model.configurationConnection;
+import com.ut.healthelink.model.organizationPrograms;
 import com.ut.healthelink.reference.fileSystem;
 import com.ut.healthelink.service.brochureManager;
 import java.util.ArrayList;
 import org.hibernate.criterion.Order;
 import org.hibernate.exception.SQLGrammarException;
+import org.hibernate.transform.Transformers;
 
 
 /**
@@ -134,6 +136,7 @@ public class organizationDAOImpl implements organizationDAO {
         Query query = sessionFactory.getCurrentSession().createQuery("from Organization where cleanURL is not '' order by orgName asc");
 
         List<Organization> organizationList = query.list();
+        
         return organizationList;
     }
 
@@ -499,11 +502,100 @@ public class organizationDAOImpl implements organizationDAO {
         queryString = "SELECT id, orgName, address, address2, city, state, postalCode, phone, longitude, latitude, orgType "
                 + "FROM organizations "
                 + "WHERE status = 1 "
-                + "AND public = 1";
+                + "AND publicOrg = 1";
         
         Query query = sessionFactory.getCurrentSession().createSQLQuery(queryString);
 
         return query.list();
+    }
+    
+    /**
+     * 
+     * @param programType
+     * @param town
+     * @param county
+     * @param state
+     * @param postalCode
+     * @return
+     * @throws Exception 
+     */
+    @Override
+    public List<Organization> searchCBOOrganizations(Integer programType, String town, String county, String state, String postalCode) throws Exception {
+        
+        String sql = "select * from organizations where orgType = 2 and publicOrg = 1 and status = 1";
+        
+        if(programType != null && programType > 0) {
+            sql += " and id in (select orgId from organizationprograms where programId = "+programType+")";
+        }
+        
+        if(!"".equals(town)) {
+            sql += " and town like '%"+town+"%'";
+        }
+        
+        if(!"".equals(county)) {
+            sql += " and county like '%"+county+"%'";
+        }
+        
+        if(!"".equals(state)) {
+            sql += " and state = '"+state+"'";
+        }
+        
+        if(!"".equals(postalCode)) {
+            sql += " and postalCode = '"+postalCode+"'";
+        }
+        
+        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                .setResultTransformer(Transformers.aliasToBean(Organization.class));
+        return query.list();
+        
+    }
+    
+    @Override
+    public List<Integer> getOrganizationPrograms(int orgId) throws Exception {
+        List<Integer> usedPrograms = new ArrayList<Integer>();
+        
+         String sql = "select * from organizationPrograms where orgId = " + orgId;
+        
+        
+        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                .setResultTransformer(Transformers.aliasToBean(organizationPrograms.class));
+        
+        List<organizationPrograms> programList = query.list();
+        
+        if(programList.size() > 0) {
+            for(organizationPrograms program : programList) {
+                usedPrograms.add(program.getProgramId());
+            }
+        }
+        
+        return usedPrograms;
+    }
+    
+    /**
+     * The '/saveOrganizationPrograms' function will save the list of associated programs
+     * programs
+     * 
+     * @param organizationPrograms   The object holding the organizationPrograms
+     */
+    @Override
+    public void saveOrganizationPrograms(organizationPrograms programs) throws Exception {
+       sessionFactory.getCurrentSession().save(programs);
+    }
+    
+    
+    /**
+     * The 'deleteOrganizationPrograms' function will remove all the programs for the selected 
+     * organization
+     * 
+     * @param orgId The id of the selected organization to delete.
+     */
+    @Override
+    public void deletOrganizationPrograms(int orgId) throws Exception {
+        
+        /** Need to first delete current associations **/
+        Query q1 = sessionFactory.getCurrentSession().createQuery("delete from organizationPrograms where orgId = :orgId");
+        q1.setParameter("orgId", orgId);
+        q1.executeUpdate();
     }
 
 }

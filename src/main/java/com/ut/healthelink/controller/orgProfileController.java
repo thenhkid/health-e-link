@@ -10,10 +10,13 @@ import com.ut.healthelink.model.Brochure;
 import com.ut.healthelink.model.Organization;
 import com.ut.healthelink.model.Provider;
 import com.ut.healthelink.model.User;
+import com.ut.healthelink.model.messageType;
+import com.ut.healthelink.model.organizationPrograms;
 import com.ut.healthelink.model.providerAddress;
 import com.ut.healthelink.model.providerIdNum;
 import com.ut.healthelink.reference.USStateList;
 import com.ut.healthelink.service.brochureManager;
+import com.ut.healthelink.service.messageTypeManager;
 import com.ut.healthelink.service.organizationManager;
 import com.ut.healthelink.service.providerManager;
 import java.util.List;
@@ -51,6 +54,9 @@ public class orgProfileController {
     
     @Autowired
     private brochureManager brochureManager;
+    
+    @Autowired
+    private messageTypeManager messagetypemanager;
     
     /**
      * The '/editProfile' request will serve up the organization profile edit page.
@@ -125,6 +131,17 @@ public class orgProfileController {
                 return mav;
             }
         }
+        
+        organization.setStatus(true);
+        organization.setDateCreated(currentOrg.getDateCreated());
+        organization.setparsingTemplate(currentOrg.getparsingTemplate());
+        organization.setParentId(currentOrg.getParentId());
+        organization.setHeaderLogo(currentOrg.getHeaderLogo());
+        organization.setHeaderBackground(currentOrg.getHeaderBackground());
+        organization.setLongitude(currentOrg.getLongitude());
+        organization.setLatitude(currentOrg.getLatitude());
+        organization.setOrgDesc(currentOrg.getOrgDesc());
+        organization.setOrgType(currentOrg.getOrgType());
 
         //Update the organization
         organizationManager.updateOrganization(organization);
@@ -173,6 +190,11 @@ public class orgProfileController {
             }
 
             mav.addObject("providers", providers);
+            
+            /* Get the org details */
+            Organization orgDetails = organizationManager.getOrganizationById(userInfo.getOrgId());
+
+            mav.addObject("organization", orgDetails);
 
             return mav;
         
@@ -203,6 +225,11 @@ public class orgProfileController {
         mav.setViewName("/OrgProfile/createProvider");
 
         mav.addObject("providerdetails", providerDetails);
+        
+        /* Get the org details */
+        Organization orgDetails = organizationManager.getOrganizationById(userInfo.getOrgId());
+        
+        mav.addObject("organization", orgDetails);
 
         return mav;
     }
@@ -218,6 +245,7 @@ public class orgProfileController {
         if (result.hasErrors()) {
             ModelAndView mav = new ModelAndView();
             mav.setViewName("/OrgProfile/createProvider");
+            
 
             return mav;
         }
@@ -272,6 +300,11 @@ public class orgProfileController {
                 providerDetails.setProviderIds(ids);
                 
                 mav.addObject("providerdetails", providerDetails);
+                
+                /* Get the org details */
+                Organization orgDetails = organizationManager.getOrganizationById(userInfo.getOrgId());
+
+                mav.addObject("organization", orgDetails);
                 
                 return mav;
             }
@@ -632,6 +665,11 @@ public class orgProfileController {
             List<Brochure> brochures = organizationManager.getOrganizationBrochures(userInfo.getOrgId());
 
             mav.addObject("brochures", brochures);
+            
+            /* Get the org details */
+            Organization orgDetails = organizationManager.getOrganizationById(userInfo.getOrgId());
+
+            mav.addObject("organization", orgDetails);
 
             return mav;
         
@@ -665,6 +703,11 @@ public class orgProfileController {
         brochuredetails.setOrgId(userInfo.getOrgId());
         mav.addObject("btnValue", "Create");
         mav.addObject("brochuredetails", brochuredetails);
+        
+        /* Get the org details */
+        Organization orgDetails = organizationManager.getOrganizationById(userInfo.getOrgId());
+        
+        mav.addObject("organization", orgDetails);
 
         return mav;
     }
@@ -717,4 +760,84 @@ public class orgProfileController {
         return mav;
     }
     
+    /**
+     * The '/resources' GET request will handle displaying the resources for the organization.
+     * 
+     * @return the organization brochure list
+     */
+    @RequestMapping(value = "/resources", method = RequestMethod.GET)
+    public ModelAndView viewOrgResources(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
+        
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/OrgProfile/resources");
+        
+        /* Need to get all the message types set up for the user */
+        User userInfo = (User)session.getAttribute("userDetails");
+        
+        try {
+        
+            //Get a list of message types in the system 
+            List<messageType> messageTypes = messagetypemanager.getActiveMessageTypes();
+
+            /* Get a list of modules the program uses */
+            List<Integer> usedPrograms = organizationManager.getOrganizationPrograms(userInfo.getOrgId());
+
+            if (!messageTypes.isEmpty()) {
+                for (messageType program : messageTypes) {
+                    if (usedPrograms.contains(program.getId())) {
+                        program.setUseProgram(true);
+                    }
+                }
+            }
+
+            mav.addObject("availPrograms", messageTypes);
+            
+            /* Get the org details */
+            Organization orgDetails = organizationManager.getOrganizationById(userInfo.getOrgId());
+
+            mav.addObject("organization", orgDetails);
+
+            return mav;
+        
+        }
+        catch(Exception e) {
+            throw new Exception ("Error trying to list the resources. OrgId: "+ userInfo.getOrgId(), e);
+        }
+    }
+    
+     /**
+     * The '/resources' POST request will save the program module form.
+     *
+     * @param List<Imteger>	The list of moduleIds to use.
+     *
+     * @return	Will return the program details page.
+     *
+     * @throws Exception
+     *
+     */
+    @RequestMapping(value = "/resources", method = RequestMethod.POST)
+    public ModelAndView saveprogramModules(@RequestParam List<Integer> programIds, RedirectAttributes redirectAttr, HttpSession session) throws Exception {
+
+        /* Need to get all the message types set up for the user */
+        User userInfo = (User)session.getAttribute("userDetails");
+        
+        if (programIds.isEmpty()) {
+            organizationManager.deletOrganizationPrograms(userInfo.getOrgId());
+        } else {
+            organizationManager.deletOrganizationPrograms(userInfo.getOrgId());
+
+            for (Integer programId : programIds) {
+                organizationPrograms newProgram = new organizationPrograms();
+                newProgram.setProgramId(programId);
+                newProgram.setOrgId(userInfo.getOrgId());
+                organizationManager.saveOrganizationPrograms(newProgram);
+            }
+        }
+
+        redirectAttr.addFlashAttribute("savedStatus", "save");
+
+        ModelAndView mav = new ModelAndView(new RedirectView("resources"));
+        return mav;
+    }
+
 }

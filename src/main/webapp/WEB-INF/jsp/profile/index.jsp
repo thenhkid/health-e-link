@@ -34,6 +34,12 @@
                             Search for existing clients, create new clients.
                         </p>
                     </c:when>
+                    <c:when test="${sections.featureId == 10}">
+                        <h3><a href="<c:url value='/resources/search'/>" title="Resource Management">Resource Management</a></h3>
+                        <p class="text">
+                            Search for resources, make new connections.
+                        </p>
+                    </c:when>    
                     <c:when test="${sections.featureId == 3}">
                         <h3><a href="<c:url value='/Health-e-Web/inbox'/>" title="Health-e-Web">Electronic Referral Gateway</a></h3>
                         <p class="text">

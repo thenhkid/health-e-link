@@ -12,6 +12,7 @@ import com.ut.healthelink.model.Provider;
 import com.ut.healthelink.service.organizationManager;
 import com.ut.healthelink.model.User;
 import com.ut.healthelink.model.Brochure;
+import com.ut.healthelink.model.organizationPrograms;
 import com.ut.healthelink.reference.fileSystem;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -346,5 +347,29 @@ public class organizationManagerImpl implements organizationManager {
         
         return mapObject;
         
+    }
+    
+    @Override
+    @Transactional
+    public List<Organization> searchCBOOrganizations(Integer programType, String town, String county, String state, String postalCode) throws Exception {
+        return organizationDAO.searchCBOOrganizations(programType, town, county, state, postalCode);
+    }
+    
+    @Override
+    @Transactional
+    public List<Integer> getOrganizationPrograms(int orgId) throws Exception {
+        return organizationDAO.getOrganizationPrograms(orgId);
+    }
+    
+    @Override
+    @Transactional
+    public void saveOrganizationPrograms(organizationPrograms programs) throws Exception {
+        organizationDAO.saveOrganizationPrograms(programs);
+    }
+    
+    @Override
+    @Transactional
+    public void deletOrganizationPrograms(int orgId) throws Exception {
+        organizationDAO.deletOrganizationPrograms(orgId);
     }
 }

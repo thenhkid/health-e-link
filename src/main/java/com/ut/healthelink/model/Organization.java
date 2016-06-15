@@ -70,7 +70,7 @@ public class Organization {
     @Column(name = "FAX", nullable = true)
     private String fax;
 
-    @Column(name = "PUBLICOrg", nullable = false)
+    @Column(name = "PUBLIC", nullable = false)
     private boolean publicOrg = true;
     
     @DateTimeFormat(pattern = "dd/MM/yyyy hh:mm:ss")
@@ -104,6 +104,15 @@ public class Organization {
     
     @Column(name = "headerBackground", nullable = false)
     private String headerBackground;
+    
+    @Column(name = "COUNTY", nullable = true)
+    private String county = "";
+    
+    @Column(name = "TOWN", nullable = true)
+    private String town = "";
+    
+    @Column(name = "ORGDESC", nullable = true)
+    private String orgDesc = "";
 
     public int getId() {
         return id;
@@ -304,6 +313,30 @@ public class Organization {
 
     public void setHeaderLogoFile(CommonsMultipartFile headerLogoFile) {
         this.headerLogoFile = headerLogoFile;
+    }
+
+    public String getCounty() {
+        return county;
+    }
+
+    public void setCounty(String county) {
+        this.county = county;
+    }
+
+    public String getTown() {
+        return town;
+    }
+
+    public void setTown(String town) {
+        this.town = town;
+    }
+
+    public String getOrgDesc() {
+        return orgDesc;
+    }
+
+    public void setOrgDesc(String orgDesc) {
+        this.orgDesc = orgDesc;
     }
     
 }

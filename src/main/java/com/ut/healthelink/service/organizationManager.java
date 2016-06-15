@@ -6,6 +6,7 @@ import com.ut.healthelink.model.Organization;
 import com.ut.healthelink.model.User;
 import com.ut.healthelink.model.Provider;
 import com.ut.healthelink.model.Brochure;
+import com.ut.healthelink.model.organizationPrograms;
 import org.json.simple.JSONObject;
 
 public interface organizationManager {
@@ -46,5 +47,12 @@ public interface organizationManager {
   
   Integer getTotalPartners();
   
+  List<Organization> searchCBOOrganizations(Integer programType, String town, String county, String state, String postalCode) throws Exception;
+  
+  List<Integer> getOrganizationPrograms(int orgId) throws Exception;
+  
+  void saveOrganizationPrograms(organizationPrograms programs) throws Exception;
+    
+  void deletOrganizationPrograms(int orgId) throws Exception;
 }
 

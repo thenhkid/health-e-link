@@ -87,7 +87,25 @@
                                                 <form:errors path="city" cssClass="control-label" element="label" />
                                             </div>
                                         </spring:bind>
-                                    </div>              
+                                    </div>    
+                                     <div class="col-md-6 cb">
+                                        <spring:bind path="county">
+                                            <div class="form-group ${status.error ? 'has-error' : '' }">
+                                                <label class="control-label" for="county">County</label>
+                                                <form:input path="county" id="county" class="form-control" type="text" maxLength="45" />
+                                                <form:errors path="county" cssClass="control-label" element="label" />
+                                            </div>
+                                        </spring:bind>
+                                    </div> 
+                                    <div class="col-md-6">
+                                        <spring:bind path="town">
+                                            <div class="form-group ${status.error ? 'has-error' : '' }">
+                                                <label class="control-label" for="town">Town</label>
+                                                <form:input path="town" id="town" class="form-control" type="text" maxLength="45" />
+                                                <form:errors path="town" cssClass="control-label" element="label" />
+                                            </div>
+                                        </spring:bind>
+                                    </div>                
                                     <div class="col-md-6 cb">
                                         <spring:bind path="state">
                                             <div class="form-group ${status.error ? 'has-error' : '' }">
