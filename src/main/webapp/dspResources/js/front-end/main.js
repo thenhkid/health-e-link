@@ -10,21 +10,25 @@ require.config({
         'fixed-header': '../fixed-header',
         'moment': '../vendor/moment',
         'daterangepicker': '../vendor/daterangepicker',
+        'datepicker': '../date-time/bootstrap-datepicker.min',
         'dataTables': '../vendor/jquery.dataTables.min',
         'maps': '../vendor/mapmarker.jquery',
-        'ajaxupload': 'ajaxupload.min'
+        'ajaxupload': 'ajaxupload.min',
+        'Chart': '../vendor/Chart'
     },
     shim: {
         'bootstrap': ['jquery'],
         'responsive-tables': ['jquery'],
         'daterangepicker': ['jquery', 'bootstrap'],
+        'datepicker': ['jquery', 'bootstrap'],
         'dataTables': ['jquery'],
         'maps': ['jquery'],
-        'ajaxupload' : ['jquery']
+        'ajaxupload' : ['jquery'],
+        'Chart' : ['jquery']
     }
 });
 
-define(['jquery', 'fixed-header', 'moment', 'bootstrap', 'responsive-tables', 'mediaModal', 'overlay', 'daterangepicker', 'dataTables', 'ajaxupload'], function($, fixedHeader, moment) {
+define(['jquery', 'fixed-header', 'moment', 'bootstrap', 'responsive-tables', 'mediaModal', 'overlay', 'daterangepicker', 'dataTables', 'ajaxupload', 'datepicker', 'Chart'], function($, fixedHeader, moment) {
 
     var primaryNav = $('.primary-nav');
     var primaryNavHeight = primaryNav.outerHeight();

@@ -1029,6 +1029,28 @@ groups of health care providers, community partners, as well as federal, state a
         <put-attribute name="jscript" value="/dspResources/js/front-end/clients/assessments/assessmentConclusion.js" />
     </definition>   
     
+    <!-- Dashboard -->
+    <definition name="/dashboard/dashboard" extends="base.definition.frontEnd">
+   	<put-attribute name="description" value="" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=dashboard" />
+        <put-attribute name="body" value="/WEB-INF/jsp/dashboard/dashboard.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/front-end/dashboard/dashboard.js" />
+    </definition>  
+    
+    <!-- Reporting -->
+    <definition name="/reports/request" extends="base.definition.frontEnd">
+   	<put-attribute name="description" value="" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=reports&amp;page=request" />
+        <put-attribute name="body" value="/WEB-INF/jsp/reports/request.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/front-end/reports/request.js" />
+    </definition>  
+    
+    <definition name="/reports/requestedReports" extends="base.definition.frontEnd">
+   	<put-attribute name="description" value="" />
+        <put-attribute name="header" value="/WEB-INF/jsp/common/header.jsp?page-id=profile&amp;page-section=reports&amp;page=reports" />
+        <put-attribute name="body" value="/WEB-INF/jsp/reports/requestedReports.jsp" />
+        <put-attribute name="jscript" value="/dspResources/js/front-end/reports/requestedReports.js" />
+    </definition>  
     
     
     <!-- Exception handling -->

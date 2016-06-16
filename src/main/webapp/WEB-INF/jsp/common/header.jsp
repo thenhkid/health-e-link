@@ -125,6 +125,8 @@
                         <c:when test="${param['page-section'] == 'Org'}"><h1 class="page-title"><span class="page-title-icon pull-left"></span>Organization Profile</h1></c:when>
                         <c:when test="${param['page-section'] == 'Clients'}"><h1 class="page-title"><span class="page-title-icon pull-left"></span>Client Management</h1></c:when>
                         <c:when test="${param['page-section'] == 'Resources'}"><h1 class="page-title"><span class="page-title-icon pull-left"></span>Resource Manager</h1></c:when>
+                        <c:when test="${param['page-section'] == 'dashboard'}"><h1 class="page-title"><span class="page-title-icon pull-left"></span>Dashboard</h1></c:when>
+                        <c:when test="${param['page-section'] == 'reports'}"><h1 class="page-title"><span class="page-title-icon pull-left"></span>Reports</h1></c:when>
                         <c:when test="${not empty pageTitle}">
                              <h1 class="page-title">${pageTitle}</h1>
                         </c:when>
@@ -226,6 +228,16 @@
                     <div class="container">
                         <ul class="nav navbar-nav navbar-actions">
                             <li ${param['page'] == 'search' ? 'class="active"' : ''}><a href="<c:url value='/resources/search'/>" title="Search Clients" class="btn btn-link"><span class="glyphicon glyphicon-search"></span>&nbsp; Resource Search</a><span class="indicator-active arrow-up"></span></li>
+                        </ul>
+                    </div>
+                </nav>
+            </c:when>
+            <c:when test="${param['page-section'] == 'reports'}">
+                <nav class="navbar navbar-default actions-nav" role="navigation">
+                    <div class="container">
+                        <ul class="nav navbar-nav navbar-actions">
+                            <li ${param['page'] == 'request' ? 'class="active"' : ''}><a href="<c:url value='/reports/request'/>" title="Request New Report" class="btn btn-link"><span class="glyphicon glyphicon-align-justify"></span>&nbsp; Request New Reports</a><span class="indicator-active arrow-up"></span></li>
+                            <li ${param['page'] == 'reports' ? 'class="active"' : ''}><a href="<c:url value='/reports/requestedReports'/>" title="View Requested Reports" class="btn btn-link"><span class="glyphicon glyphicon-align-justify"></span>&nbsp; View Requested Reports</a><span class="indicator-active arrow-up"></span></li>
                         </ul>
                     </div>
                 </nav>

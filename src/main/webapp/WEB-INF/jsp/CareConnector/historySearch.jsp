@@ -99,7 +99,7 @@
                             </div>
                         </div>
                     </section>
-                    <input type="button" id="search1" class="btn btn-primary btn-action-sm search" value="Search"/>   
+                    <input type="button" id="search1" class="btn btn-primary search" value="Search"/>   
                     <span style="padding-left:10px;" id="showOther"><a href="javascript:void(0);" class="showOtherCriteria">Show additional Search Criteria</a></span>
                     <section class="panel panel-default" id="additionalCriteria" style="margin-top: 20px; display:none;">
                         <div class="panel-heading">
@@ -146,7 +146,7 @@
                             </div>
                         </div>
                     </section>
-                    <input type="button" id="search2" class="btn btn-primary btn-action-sm search" value="Search" style="display:none;"/>   
+                    <input type="button" id="search2" class="btn btn-primary search" value="Search" style="display:none;"/>   
                     <span style="padding-left:10px; display: none" id="hideOther"><a href="javascript:void(0);" class="hideOtherCriteria">Hide additional Search Criteria</a></span>                     
                 </div>
 

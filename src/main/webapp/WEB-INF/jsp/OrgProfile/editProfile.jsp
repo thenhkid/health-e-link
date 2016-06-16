@@ -155,7 +155,7 @@
                                         </spring:bind>
                                     </div>                
                                 </div>
-                                <input type="button" id="save" class="btn btn-primary btn-action-sm submitMessage" value="Save"/>
+                                <input type="button" id="save" class="btn btn-primary submitMessage" value="Save"/>
                             </div>           
                         </div>
                     </div>                   

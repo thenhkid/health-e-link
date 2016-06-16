@@ -26,7 +26,7 @@
                     <span class="date-label"><fmt:formatDate value="${fromDate}" type="date" pattern="MMMM dd, yyyy" /> - <fmt:formatDate value="${toDate}" type="date" pattern="MMMM dd, yyyy" /></span> <b class="caret"></b>
                  </div>
                  <div class="pull-left">
-                     <input type="button" id="cancel" class="btn btn-primary btn-action-sm createExport" value="Request Export"/>
+                     <input type="button" id="cancel" class="btn btn-primary createExport" value="Request Export"/>
                  </div>
             </div>
         </div>

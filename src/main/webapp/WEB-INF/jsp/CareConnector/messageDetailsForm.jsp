@@ -451,7 +451,7 @@
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     <label class="control-label" for="attachmentFile">Attachment File</label>
-                                                    <br /><div id="UploadButton" class="btn btn-primary btn-action-sm UploadButton" style="cursor:pointer">Upload File</div>
+                                                    <br /><div id="UploadButton" class="btn btn-primary UploadButton" style="cursor:pointer">Upload File</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -464,25 +464,25 @@
                             <div id="translationMsgDiv"  class="alert alert-danger" style="display:none;">
                                 <strong>An error has occurred in one of the above fields!</strong>
                             </div>
-                            <input type="button" id="save" class="btn btn-primary btn-action-sm submitMessage" value="Save ${transaction.sourceType == 1 && (pageHeader == 'create' || pageHeader == 'pending') ? 'Referral' : 'Feedback Report'}"/>
+                            <input type="button" id="save" class="btn btn-primary submitMessage" value="Save ${transaction.sourceType == 1 && (pageHeader == 'create' || pageHeader == 'pending') ? 'Referral' : 'Feedback Report'}"/>
                             <c:if test="${userDetails.deliverAuthority == true}">
                                 <c:choose>
                                     <c:when test="${transaction.autoRelease == true}">
-                                        <input type="button" id="send" class="btn btn-primary btn-action-sm submitMessage" value="Send ${transaction.sourceType == 1 && (pageHeader == 'create' || pageHeader == 'pending') ? 'Referral' : 'Feedback Report'}"/>
+                                        <input type="button" id="send" class="btn btn-success submitMessage" value="Send ${transaction.sourceType == 1 && (pageHeader == 'create' || pageHeader == 'pending') ? 'Referral' : 'Feedback Report'}"/>
                                     </c:when>
                                     <c:otherwise>
-                                        <input type="button" id="release" class="btn btn-primary btn-action-sm submitMessage" value="Release"/>
+                                        <input type="button" id="release" class="btn btn-primary submitMessage" value="Release"/>
                                     </c:otherwise>
                                 </c:choose> 
                             </c:if> 
                             <%-- Allow the user to delete saved messages --%>   
                             <c:choose>
                                 <c:when test="${transaction.statusId == 15}"> 
-                                    <div class="pull-right"><input type="button" id="delete" class="btn btn-primary btn-action-sm deleteMessage" value="Delete"/></div>
+                                    <div class="pull-right"><input type="button" id="delete" class="btn btn-danger deleteMessage" value="Delete"/></div>
                                     </c:when> 
                                     <c:otherwise>
                                         <c:if test="${userDetails.cancelAuthority == true && transaction.statusId > 0}">                             
-                                        <div class="pull-right"><input type="button" id="cancel" class="btn btn-primary btn-action-sm cancelMessage" value="Cancel"/></div>
+                                        <div class="pull-right"><input type="button" id="cancel" class="btn btn-primary cancelMessage" value="Cancel"/></div>
                                         </c:if>
                                     </c:otherwise>
                                 </c:choose>    

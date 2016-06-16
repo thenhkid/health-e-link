@@ -21,8 +21,9 @@
     <div class="row" style="padding-bottom:10px;">
         <div class="col-md-12 page-content">
             <div class="col-md-12">
-                <a href="<c:url value='/CareConnector/history'/>" class="btn btn-primary btn-action-sm pull-right">Return to Search Page</a>
-                <a href="javascript:void(0);" class="btn btn-primary btn-action-sm print pull-right" style="margin-right:10px;">Print</a>
+                <a href="<c:url value='/CareConnector/history'/>" class="btn btn-primary pull-right">Return to Search Page</a>
+                <a href="javascript:void(0);" class="btn btn-success pull-right" style="margin-right:10px;">Export Results</a>
+                <a href="javascript:void(0);" class="btn btn-primary print pull-right" style="margin-right:10px;">Print</a>
             </div>
         </div> 
     </div>

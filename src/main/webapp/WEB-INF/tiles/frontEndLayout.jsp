@@ -24,12 +24,14 @@
 
     <!%-- Health-e-link theme --%>
     <link rel="stylesheet" href="<%=request.getContextPath()%>/dspResources/css/front-end/themes/theme-health-e-link.css">
+    <link rel="stylesheet" href="<%=request.getContextPath()%>/dspResources/css/datepicker.min.css">
     <jsp:text><![CDATA[<!--[if lte IE 9]>]]></jsp:text>
             <link rel="stylesheet" href="<%=request.getContextPath()%>/dspResources/css/ie.css">
     <jsp:text><![CDATA[<![endif]-->]]></jsp:text>
     <!%-- moderizer: for ie8 compatibility --%>
     <script type="text/javascript" src="<%=request.getContextPath()%>/dspResources/js/vendor/modernizr-2.6.2-respond-1.1.0.min.js"></script>
     <script data-main="<%=request.getContextPath()%>/dspResources/js/front-end/main" src="<%=request.getContextPath()%>/dspResources/js/vendor/require.js"></script>
+  
 </head>
 <body id="<tiles:insertAttribute name='page-id' ignore='true' />" class="<tiles:insertAttribute name='page-section' ignore='true' /> " >
     <div class="wrap">

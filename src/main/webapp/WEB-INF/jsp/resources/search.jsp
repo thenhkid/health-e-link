@@ -121,7 +121,7 @@
                             </div>
                         </div>
                     </section>
-                    <input type="button" id="search" class="btn btn-primary btn-action-sm search" value="Search"/>                     
+                    <input type="button" id="search" class="btn btn-primary search" value="Search"/>                     
                 </div>
 
             </form:form>    
