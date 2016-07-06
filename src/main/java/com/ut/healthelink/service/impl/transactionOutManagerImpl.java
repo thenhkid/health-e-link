@@ -3074,6 +3074,10 @@ public class transactionOutManagerImpl implements transactionOutManager {
 	                    		}
 	                    		Files.copy(archiveFile.toPath(), generatedFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 	                    	}
+	                    	//if rhapsody Target file, we need to move the file
+	                    	 if (transportDetails.gettransportMethodId() == 5) {
+	                         	RhapsodyTargetFile(batchDLId, transportDetails);
+	                    	 }
 	                    	//now we delete massoutput file
 	                    	massOutFile.delete();
 	                    

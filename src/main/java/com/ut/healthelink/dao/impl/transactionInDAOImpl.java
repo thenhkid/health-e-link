@@ -5006,7 +5006,7 @@ Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
             String sql = ("select rel_TransportRhapsodyDetails.id, directory, method, transportId "
                     + " from configurationTransportDetails, rel_TransportRhapsodyDetails "
                     + " where method = :method and configurationTransportDetails.id = rel_TransportRhapsodyDetails.transportId "
-                    + " and configId in (select id from configurations where status = 1) and  "
+                    + " and configId in (select id from configurations where status = 1 and type = 1) and  "
                     + " directory not in (select folderPath from moveFilesLog where statusId = 1 and method = :method) "
                     + " group by directory order by configId;");
             

@@ -172,7 +172,8 @@
         </trigger>
     </schedule>-->
 
-    <!--<schedule>
+    <!---->
+    <schedule>
         <job>
             <name>MoveRhapsodyFiles</name>
             <group>processGroup</group>
@@ -188,7 +189,7 @@
                 <cron-expression>0 0/1 * * * ?</cron-expression>
             </cron>
         </trigger>
-    </schedule>-->
+    </schedule>
     
     <!--<schedule>
         <job>

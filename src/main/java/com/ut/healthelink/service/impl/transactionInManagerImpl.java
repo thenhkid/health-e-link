@@ -2789,8 +2789,16 @@ public class transactionInManagerImpl implements transactionInManager {
                             	
                             } else {
                             	batchInfo.setuserId(users.get(0).getId());
-                                batchId = (Integer) submitBatchUpload(batchInfo);
-                                statusId = 2;
+                            	batchId = (Integer) submitBatchUpload(batchInfo);
+                                if (batchInfo.getConfigId() != 0) {
+	                                /** check for mass translation **/
+	                                if (configurationtransportmanager.getTransportDetails(batchInfo.getConfigId()).isMassTranslation()) {
+	                                	statusId = 42;
+	                                } else {
+	                                	statusId = 2;
+	                                }
+                                }
+                                
                             	
                             } 
                             
@@ -2835,6 +2843,12 @@ public class transactionInManagerImpl implements transactionInManager {
                                 newFileName = newFileName(outPath, fileName);
                                 batchInfo.setoriginalFileName(newFileName);
                                 batchInfo.setuserId(userId);
+                                if (batchInfo.getConfigId() != 0 && batchInfo.getstatusId() == 2) {
+	                                /** check for mass translation **/
+	                                if (configurationtransportmanager.getTransportDetails(batchInfo.getConfigId()).isMassTranslation()) {
+	                                	batchInfo.setstatusId(42);
+	                                }
+                                }
                                 batchId = (Integer) submitBatchUpload(batchInfo);
                                 batchInfo.setEncodingId(encodingId);
                             } else if (statusId != 2) {
@@ -2887,6 +2901,12 @@ public class transactionInManagerImpl implements transactionInManager {
                                     batchInfo.setoriginalFileName(newFileName);
                                     batchInfo.setuserId(userId);
                                     batchInfo.setEncodingId(encodingId);
+                                    if (batchInfo.getConfigId() != 0 && batchInfo.getstatusId() == 2) {
+    	                                /** check for mass translation **/
+    	                                if (configurationtransportmanager.getTransportDetails(batchInfo.getConfigId()).isMassTranslation()) {
+    	                                	batchInfo.setstatusId(42);
+    	                                }
+                                    }
                                     batchId = (Integer) submitBatchUpload(batchInfo);
                                 }
                             }
@@ -2930,7 +2950,7 @@ public class transactionInManagerImpl implements transactionInManager {
                             Files.move(source, target);
                         }
 
-                        if (statusId == 2) {
+                        if (statusId == 2 || statusId == 42) {
                             /**
                              * check file size if configId is 0 we go with the smallest file size *
                              */
@@ -2941,7 +2961,7 @@ public class transactionInManagerImpl implements transactionInManager {
                             }
                         }
 
-                        if (statusId != 2) {
+                        if (statusId != 2 && statusId != 42) {
                             insertProcessingError(errorId, 0, batchId, null, null, null, null, false, false, "");
                         }
 
@@ -3503,6 +3523,12 @@ public class transactionInManagerImpl implements transactionInManager {
                 batchInfo.setEncodingId(encodingId);
                 //write the file
                 filemanager.writeFile(writeToFile, ws.getPayload());
+                if (batchInfo.getConfigId() != 0 && batchInfo.getstatusId() == 2) {
+                    /** check for mass translation **/
+                    if (configurationtransportmanager.getTransportDetails(batchInfo.getConfigId()).isMassTranslation()) {
+                    	batchInfo.setstatusId(42);
+                    }
+                }
                 batchId = (Integer) submitBatchUpload(batchInfo);
                 //insert error
                 errorId = 13;
@@ -3704,8 +3730,14 @@ public class transactionInManagerImpl implements transactionInManager {
                 batchInfo.setstatusId(statusId);
                 batchInfo.setendDateTime(new Date());
                 batchInfo.settotalRecordCount(1); // need to be at least one to show up in activites
+                if (batchInfo.getConfigId() != 0 && batchInfo.getstatusId() == 2) {
+                    /** check for mass translation **/
+                    if (configurationtransportmanager.getTransportDetails(batchInfo.getConfigId()).isMassTranslation()) {
+                    	batchInfo.setstatusId(42);
+                    }
+                }
                 batchId = (Integer) submitBatchUpload(batchInfo);
-                if (statusId != 2) {
+                if (statusId != 2 || statusId != 42) {
                     insertProcessingError(errorId, 0, batchId, null, null, null, null, false, false, "");
                 }
                 
