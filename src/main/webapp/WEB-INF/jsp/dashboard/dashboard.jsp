@@ -13,7 +13,7 @@
                 <div class="col-md-4 col-sm-4 col-xs-6">
                     <section class="panel panel-default panel-stats" role="widget" aria-labelleby="Sent Referrals">
                         <div class="panel-body">
-                            <span class="stat-number"><a href="/CareConnector/sent" title="Sent Referrals">3</a></span>
+                            <span class="stat-number"><a href="/CareConnector/sent" title="Sent Referrals">220</a></span>
                             <h3>Sent Referrals</h3>
                             <a href="/CareConnector/sent" title="Sent Referrals" class="btn btn-primary btn-small">View all</a>
                         </div>
@@ -32,11 +32,11 @@
 
 
                 <div class="col-md-4 col-sm-4 col-xs-6">
-                   <section class="panel panel-default panel-stats" role="widget" aria-labelleby="Recieved Feedback Reports">
+                   <section class="panel panel-default panel-stats" role="widget" aria-labelleby="Received Feedback Reports">
                         <div class="panel-body">
-                            <span class="stat-number"><a href="/CareConnector/inbox" title="Sent Referrals">1</a></span>
-                            <h3>Recieved Feedback Reports</h3>
-                            <a href="/CareConnector/inbox" title="Recieved Feedback Reports" class="btn btn-primary btn-small">View all</a>
+                            <span class="stat-number"><a href="/CareConnector/inbox" title="Received Feedback Reports">13</a></span>
+                            <h3>Received Feedback Reports</h3>
+                            <a href="/CareConnector/inbox" title="Received Feedback Reports" class="btn btn-primary btn-small">View all</a>
                         </div>
                     </section>
                 </div>

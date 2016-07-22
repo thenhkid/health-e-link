@@ -646,8 +646,7 @@ function validateNumericValue($fieldVal) {
         return false;
     }
     else {
-    
-        var numericReg = /^\d*[0-9](|.\d*[0-9]|,\d*[0-9])?$/;
+        var numericReg = /^[0-9]+([,.][0-9]+)?$/;
         if (!numericReg.test($fieldVal)) {
             return false;
         }
