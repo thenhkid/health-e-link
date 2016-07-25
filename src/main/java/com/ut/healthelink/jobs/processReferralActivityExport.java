@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package com.ut.dph.jobs;
+package com.ut.healthelink.jobs;
 
 import com.ut.healthelink.service.transactionInManager;
 import java.util.logging.Level;
