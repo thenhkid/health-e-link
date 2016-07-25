@@ -3181,6 +3181,7 @@ public class transactionInManagerImpl implements transactionInManager {
                 //we insert job so if anything goes wrong or the scheduler overlaps, we won't be checking the same folder over and over
                 MoveFilesLog moveJob = new MoveFilesLog();
                 moveJob.setStatusId(1);
+                //modifying to append rootDir
                 moveJob.setFolderPath(rhapsodyInfo.getDirectory());
                 moveJob.setTransportMethodId(5);
                 moveJob.setMethod(1);
@@ -3190,19 +3191,19 @@ public class transactionInManagerImpl implements transactionInManager {
                 // check if directory exists, if not create
                 fileSystem fileSystem = new fileSystem();
                 //paths are from root instead of /home
-                String inPath = fileSystem.setPathFromRoot(rhapsodyInfo.getDirectory());
+                String inPath = fileSystem.setPathFromRoot(directoryPath + rhapsodyInfo.getDirectory());
                 File f = new File(inPath);
                 if (!f.exists()) {
-                    moveJob.setNotes(("Directory " + rhapsodyInfo.getDirectory() + " does not exist"));
+                    moveJob.setNotes(("Directory "+ directoryPath +   rhapsodyInfo.getDirectory() + " does not exist"));
                     updateSFTPRun(moveJob);
                     //need to get out of loop since set up was not done properly, will try to throw error
-                    sendEmailToAdmin((rhapsodyInfo.getDirectory() + " does not exist"), "Rhapsody Job Error");
+                    sendEmailToAdmin((directoryPath + rhapsodyInfo.getDirectory() + " does not exist"), "Rhapsody Job Error");
                     break;
                 }
                 //we look up org for this path
                 Integer orgId = configurationtransportmanager.getOrgIdForRhapsodyPath(rhapsodyInfo);
 
-                sysErrors = sysErrors + moveFilesByPath(rhapsodyInfo.getDirectory(), 5, orgId, rhapsodyInfo.getTransportId());
+                sysErrors = sysErrors + moveFilesByPath(directoryPath + rhapsodyInfo.getDirectory(), 5, orgId, rhapsodyInfo.getTransportId());
 
                 if (sysErrors == 0) {
                     moveJob.setStatusId(2);
