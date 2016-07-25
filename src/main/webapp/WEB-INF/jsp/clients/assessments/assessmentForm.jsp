@@ -143,7 +143,7 @@
                                                 <option value="352" <c:if test="${clientDetails.primaryLanguageId == 352}">selected</c:if>>Portuguese</option>
                                                 <option value="365" <c:if test="${clientDetails.primaryLanguageId == 365}">selected</c:if>>Russian</option>
                                                 <option value="398" <c:if test="${clientDetails.primaryLanguageId == 398}">selected</c:if>>Somali</option>
-                                                <option value="460" <c:if test="${clientDetails.primaryLanguageId == 460}">selected</c:if>>Vietnamese</option
+                                                <option value="460" <c:if test="${clientDetails.primaryLanguageId == 460}">selected</c:if>>Vietnamese</option>
                                                 <option value="454" <c:if test="${clientDetails.primaryLanguageId == 454}">selected</c:if>>Other/Unknown</option>
                                             </select>
                                         </div>

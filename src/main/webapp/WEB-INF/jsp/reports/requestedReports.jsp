@@ -28,8 +28,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr><td colspan="3" class="center-text">There are no requested reports.</td></tr>
-                       </c:choose>                  
+                        <tr><td colspan="3" class="center-text">There are no requested reports.</td></tr>                                
                     </tbody>
                 </table>
             </div>
