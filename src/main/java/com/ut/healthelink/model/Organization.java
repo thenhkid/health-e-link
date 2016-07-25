@@ -74,7 +74,7 @@ public class Organization {
     @Column(name = "FAX", nullable = true)
     private String fax;
 
-    @Column(name = "PUBLIC", nullable = false)
+    @Column(name = "publicOrg", nullable = false)
     private boolean publicOrg = true;
     
     @DateTimeFormat(pattern = "dd/MM/yyyy hh:mm:ss")
