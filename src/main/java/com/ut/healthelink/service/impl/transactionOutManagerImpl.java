@@ -2401,7 +2401,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
             dir.setDirByName(filelocation);
             
             File sourceFile = new File(dir.getDir() + batchDetails.getoutputFIleName());
-            File targetFile = new File ( dir.setPathFromRoot(rhapsodyDetails.getDirectory()) + batchDetails.getoutputFIleName());
+            File targetFile = new File ( directoryPath + rhapsodyDetails.getDirectory() + batchDetails.getoutputFIleName());
             //move the file over and update the status to complete
             Files.move(sourceFile.toPath(), targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
             

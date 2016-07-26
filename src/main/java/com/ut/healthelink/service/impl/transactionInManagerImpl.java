@@ -2722,10 +2722,10 @@ public class transactionInManagerImpl implements transactionInManager {
                         String fileExt = fileName.substring(fileName.lastIndexOf(".") + 1);
 
                         //figure out how many active transports are using fileExt method for this particular path
-                        List<configurationTransport> transportList = configurationtransportmanager.getTransportListForFileExtAndPath(fileExt, transportMethodId, 1, inPath);
+                        List<configurationTransport> transportList = configurationtransportmanager.getTransportListForFileExtAndPath(fileExt, transportMethodId, 1, inPath.replace(directoryPath, ""));
 
                         //figure out if files has distinct delimiters
-                        List<configurationTransport> transports = configurationtransportmanager.getConfigTransportForFileExtAndPath(fileExt, transportMethodId, 1, inPath);
+                        List<configurationTransport> transports = configurationtransportmanager.getConfigTransportForFileExtAndPath(fileExt, transportMethodId, 1, inPath.replace(directoryPath, ""));
 
                         batchUploads batchInfo = new batchUploads();
                         batchInfo.setOrgId(orgId);
