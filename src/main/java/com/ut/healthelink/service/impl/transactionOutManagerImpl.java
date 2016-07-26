@@ -3024,6 +3024,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
 		                 if (transportDetails.getEncodingId() == 2) {        
 		                     encryptMessage = true;
 		             	}
+		                /** **/
 			       		String generatedFilePath = generateTargetFile(true, 0, batchDLId, transportDetails, encryptMessage);       
 			       		transportDetails.setDelimChar(messageTypeDAO.getDelimiterChar(transportDetails.getfileDelimiter()));
 			       		//make sure we remove old file
@@ -3031,6 +3032,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
 			       		if (generatedFile.exists()) {
 			       			generatedFile.delete();
 	            		}
+	            		
 			       		
 			       		/**
 			       		mysql is the fastest way to output a file, but the permissions are tricky
@@ -3048,32 +3050,35 @@ public class transactionOutManagerImpl implements transactionOutManager {
 			       		
 			       		//cp file to archiveOut and correct putput folder
 	                    
-	                    	fileSystem fileSystem = new fileSystem();
-	                    	File archiveFile = new File ( fileSystem.setPathFromRoot(archivePath) + batchDownload.getutBatchName()+ "." + fileExt);
+		                    	fileSystem fileSystem = new fileSystem();
+		                    	File archiveFile = new File ( fileSystem.setPathFromRoot(archivePath) + batchDownload.getutBatchName()+ "." + fileExt);
 	                    	
-	                    	//we check to see if our file is encoded
-	                    	if (!encryptMessage)  {
-	                    		//we encode here
+	                    		//at this point, message it not encrypted
+	                    		//we always encrypt the archive file
 	                    		String strEncodedFile = filemanager.encodeFileToBase64Binary(massOutFile);
 	                    		if (archiveFile.exists()) {
 	                    			archiveFile.delete();
 	                    		}
+	                    		//write to archive folder
 	                    		filemanager.writeFile(archiveFile.getAbsolutePath(), strEncodedFile);
-	                    		Files.copy(massOutFile.toPath(), generatedFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-	                    	} else  {
 	                    		
-	                    		if (generatedFile.exists()) {
-	                    			generatedFile.delete();
-	                    		}
-	                    		Files.copy(archiveFile.toPath(), generatedFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+	                    		// if we don't need to encrypt file for users to download
+	                    		if (!encryptMessage)  {
+	                    			Files.copy(massOutFile.toPath(), generatedFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+	                    		} else { //we copy the encrypted file over
+	                    			Files.copy(archiveFile.toPath(), generatedFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+	                    		}   
+	                    		
+	                    		//now we delete massoutput file
+		                    	massOutFile.delete();
 	                    	}
 	                    	//if rhapsody Target file, we need to move the file
 	                    	 if (transportDetails.gettransportMethodId() == 5) {
 	                         	RhapsodyTargetFile(batchDLId, transportDetails);
 	                    	 }
-	                    	//now we delete massoutput file
-	                    	massOutFile.delete();
-	                    
+	                    	
+	                    	
+						
 	                    //now we delete the data from transactionTranslatedIn, transactionTranslatedOut, transactionInRecords
 	                    //we will schedule a job to delete from message tables as it takes too long if we are not adding batchId there
 	                    clearTransactionTranslatedOutByBatchId(batchDLId);
@@ -3094,11 +3099,13 @@ public class transactionOutManagerImpl implements transactionOutManager {
 					
 						return 0;
 	                }
-	}
-
 
 
 }
+
+
+
+
 
 
 
