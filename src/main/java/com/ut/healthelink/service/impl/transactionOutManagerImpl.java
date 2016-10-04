@@ -3068,14 +3068,26 @@ public class transactionOutManagerImpl implements transactionOutManager {
 	                    		} else { //we copy the encrypted file over
 	                    			Files.copy(archiveFile.toPath(), generatedFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 	                    		}   
+	                    		//we have file already, we just need to move it
+	                    		if (transportDetails.gettransportMethodId() == 5) {
+	                    			/* Get the Rhapsody Details */
+	                                configurationRhapsodyFields rhapsodyDetails = configurationTransportManager.getTransRhapsodyDetailsPush(transportDetails.getId());
+
+	                                // the file is in output folder already, we need to rebuild path and move it
+	                                
+	                                fileSystem dir = new fileSystem();
+	                                String filelocation = transportDetails.getfileLocation();
+	                                filelocation = filelocation.replace("/bowlink/", "");
+	                                dir.setDirByName(filelocation);
+	                                
+	                                File targetFile = new File ( directoryPath + rhapsodyDetails.getDirectory() + batchDownload.getoutputFIleName());
+	                                Files.copy(archiveFile.toPath(), targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+	                    		}
 	                    		
 	                    		//now we delete massoutput file
 		                    	massOutFile.delete();
 	                    	}
-	                    	//if rhapsody Target file, we need to move the file
-	                    	 if (transportDetails.gettransportMethodId() == 5) {
-	                         	RhapsodyTargetFile(batchDLId, transportDetails);
-	                    	 }
+	                    	
 	                    	
 	                    	
 						
