@@ -3076,7 +3076,7 @@ public class transactionInDAOImpl implements transactionInDAO {
             sql = " update batchUploads set " + colNameToUpdate + " = "
                     + "(select count(id) as total from transactionIn where batchId = :batchId ";
         } else {
-            sql = "update batchUploads set " + colNameToUpdate + " = (select count(id) as total "
+            sql = "update batchdownloads set " + colNameToUpdate + " = (select count(id) as total "
                     + " from transactionTarget where"
                     + " batchDLId = :batchId ";
         }

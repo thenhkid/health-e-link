@@ -50,7 +50,6 @@ import com.ut.healthelink.model.custom.ConfigOutboundForInsert;
 import com.ut.healthelink.reference.fileSystem;
 import com.ut.healthelink.service.configurationManager;
 import com.ut.healthelink.service.configurationTransportManager;
-import com.ut.healthelink.service.convertTextToPDF;
 import com.ut.healthelink.service.fileManager;
 import com.ut.healthelink.service.organizationManager;
 import com.ut.healthelink.service.transactionInManager;
@@ -84,6 +83,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.annotation.Resource;
 
 import org.apache.commons.beanutils.BeanUtils;
@@ -162,6 +162,8 @@ public class transactionOutManagerImpl implements transactionOutManager {
     
     //list of final status - these records we skip
     private List<Integer> transRELId = Arrays.asList(11, 12, 13, 16, 18, 20);
+    
+    private List<Integer> rejectIds = Arrays.asList(13, 14);
     
     @Override
     @Transactional
@@ -3087,10 +3089,11 @@ public class transactionOutManagerImpl implements transactionOutManager {
 	                    		//now we delete massoutput file
 		                    	massOutFile.delete();
 	                    	}
-	                    	
-	                    	
-	                    	
-						
+	                    
+	                		//we need to update our totals
+                			transactionInManager.updateRecordCounts(batchDownload.getId(), rejectIds, true, "totalErrorCount");
+                			transactionInManager.updateRecordCounts(batchDownload.getId(), new ArrayList<Integer>(), true, "totalRecordCount");
+                   
 	                    //now we delete the data from transactionTranslatedIn, transactionTranslatedOut, transactionInRecords
 	                    //we will schedule a job to delete from message tables as it takes too long if we are not adding batchId there
 	                    clearTransactionTranslatedOutByBatchId(batchDLId);
@@ -3109,6 +3112,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
 	                    transactionInManager.updateBatchStatus(batchUploadId, 28, "");
 	                    transactionOutDAO.updateTargetBatchStatus(batchDLId, 28, "endDateTime");
 					
+	                    
 						return 0;
 	                }
 
