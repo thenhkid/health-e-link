@@ -522,5 +522,12 @@ public interface transactionInManager {
     referralActivityExports getReferralActivityExportById(Integer exportId) throws Exception;
     
      public List<transactionRecords> setOutboundFormFields(List<configurationFormFields> formfields, transactionInRecords records, int configId, boolean readOnly, int orgId, int clientId) throws NoSuchMethodException, ParseException;
-    
+ 
+     void populateAuditReport(Integer batchUploadId, configurationMessageSpecs cms) throws Exception;
+     
+     List <Integer> getErrorFieldNos(Integer batchUploadId) throws Exception;
+     
+     void populateFieldError(Integer batchUploadId, Integer fieldNo, configurationMessageSpecs cms) throws Exception;
+     
+     void cleanAuditErrorTable(Integer batchUploadId) throws Exception;
 }

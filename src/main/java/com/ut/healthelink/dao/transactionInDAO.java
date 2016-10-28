@@ -444,6 +444,11 @@ public interface transactionInDAO {
     
     referralActivityExports getReferralActivityExportById(Integer exportId) throws Exception;
     
-
-
+    void populateAuditReport(Integer batchUploadId, Integer configId) throws Exception;
+    
+    List <Integer> getErrorFieldNos(Integer batchUploadId) throws Exception;
+    
+    void populateFieldError(Integer batchUploadId, Integer fieldNo, configurationMessageSpecs cms) throws Exception;
+    
+    void cleanAuditErrorTable(Integer batchUploadId) throws Exception;
 }

@@ -3090,15 +3090,23 @@ public class transactionOutManagerImpl implements transactionOutManager {
 		                    	massOutFile.delete();
 	                    	}
 	                    
+	                		/** before we delete, we need to track the details of the batch for RR audit report **/
+	                		//clean
+	                		transactionInManager.cleanAuditErrorTable(batchUploadId);
+	                		//populate
+	                		transactionInManager.populateAuditReport(batchUploadId, configurationManager.getMessageSpecs(batchUploadDetails.getConfigId()));
+	                
 	                		//we need to update our totals
                 			transactionInManager.updateRecordCounts(batchDownload.getId(), rejectIds, true, "totalErrorCount");
                 			transactionInManager.updateRecordCounts(batchDownload.getId(), new ArrayList<Integer>(), true, "totalRecordCount");
                    
 	                    //now we delete the data from transactionTranslatedIn, transactionTranslatedOut, transactionInRecords
 	                    //we will schedule a job to delete from message tables as it takes too long if we are not adding batchId there
-	                    clearTransactionTranslatedOutByBatchId(batchDLId);
+	                    
+                		clearTransactionTranslatedOutByBatchId(batchDLId);
 	                    transactionInManager.clearTransactionInRecords(batchUploadId, 0);
 	                    transactionInManager.clearTransactionTranslatedIn(batchUploadId, 0);
+	                    
 	                    //we insert into batchMassTranslate so we can run it as a job and delete
 	                    /** do not want to add batchId to every message table and the delete will be slow **/
 	                    //if the inbound configuration is set to Clear Records after Delivery , we clear message tables

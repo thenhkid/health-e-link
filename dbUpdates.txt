@@ -198,3 +198,86 @@ DELIMITER ;
 /** 06142016 Chad **/
 ALTER TABLE `healthelinkdev`.`message_patients` 
 ADD COLUMN `clientId` INT(11) NOT NULL DEFAULT '0' AFTER `miscField10`;
+
+
+/** grace 10212016 **/
+CREATE TABLE `healthelinkdev`.`transactionindetailauditerrors` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `batchUploadId` INT NOT NULL,
+  `configId` INT NOT NULL,
+  `transactionInId` INT NOT NULL,
+  `fieldNo` INT NOT NULL,
+  `errorId` INT NOT NULL,
+  `errorData` TEXT NULL,
+  PRIMARY KEY (`id`, `batchUploadId`, `configId`, `transactionInId`, `fieldNo`, `errorId`));
+  
+  
+  ALTER TABLE `healthelinkdev`.`transactionindetailauditerrors` 
+ADD COLUMN `reportField1Data` VARCHAR(250) NULL AFTER `errorData`,
+ADD COLUMN `reportField2Data` VARCHAR(250) NULL AFTER `reportField1Data`,
+ADD COLUMN `reportField3Data` VARCHAR(250) NULL AFTER `reportField2Data`;
+
+USE `healthelinkdev`;
+DROP procedure IF EXISTS `populateAuditReport`;
+
+DELIMITER $$
+USE `healthelinkdev`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `populateAuditReport`(in inConfigId int, 
+in inBatchId int)
+proc_main:begin
+
+delete from transactionIndetailauditerrors where batchuploadId = inBatchId and configId = inConfigId;
+
+insert into transactionIndetailauditerrors 
+(batchUploadId, configId, transactionInId, fieldNo, errorId)
+select batchUploadId, configId, transactionInId, fieldno,  errorId
+from transactionINErrors where batchuploadId = inBatchId and configId = inConfigId;
+
+ 
+-- next update error details for macro_names, validation and cw
+
+-- update macro name
+UPDATE 
+  transactionIndetailauditerrors
+  JOIN (select transactionInId matchid, macro_Name as label 
+from macro_names, transactionINErrors where macro_Names.id = transactionINErrors.macroId and batchuploadId = inBatchId) tbl_concat
+     ON transactionIndetailauditerrors.transactionInId = tbl_concat.matchid
+SET transactionIndetailauditerrors.errorDetails = tbl_concat.label 
+WHERE transactionIndetailauditerrors.batchuploadid = inBatchId and errorId = 4;
+
+-- update cw name
+UPDATE 
+  transactionIndetailauditerrors
+  JOIN (select transactionInId matchid, name as label 
+from crosswalks, transactionINErrors where crosswalks.id = transactionINErrors.cwId and batchuploadId = inBatchId) tbl_concat
+     ON transactionIndetailauditerrors.transactionInId = tbl_concat.matchid
+SET transactionIndetailauditerrors.errorDetails = tbl_concat.label 
+WHERE transactionIndetailauditerrors.batchuploadid = inBatchId and errorId =  3;
+
+-- update validation type
+UPDATE 
+  transactionIndetailauditerrors
+  JOIN (select transactionInId matchid, validationType as label 
+from ref_validationtypes, transactionINErrors where ref_validationtypes.id = transactionINErrors.validationTypeId and batchuploadId = inBatchId) tbl_concat
+     ON transactionIndetailauditerrors.transactionInId = tbl_concat.matchid
+SET transactionIndetailauditerrors.errorDetails = tbl_concat.label 
+WHERE transactionIndetailauditerrors.batchuploadid = inBatchId and errorId =  2;
+
+-- update field label
+UPDATE 
+  transactionIndetailauditerrors
+  JOIN (select fieldNo as matchid, fieldLabel as label 
+from configurationformfields where configId = inConfigId) tbl_concat
+     ON transactionIndetailauditerrors.fieldNo = tbl_concat.matchid
+SET transactionIndetailauditerrors.fieldName = tbl_concat.label 
+WHERE transactionIndetailauditerrors.batchuploadid = inBatchId;
+
+-- see if we want to return something
+select '';
+
+end proc_main$$
+
+DELIMITER ;
+
+
+  

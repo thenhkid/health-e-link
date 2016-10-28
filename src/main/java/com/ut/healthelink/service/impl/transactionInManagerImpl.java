@@ -98,8 +98,8 @@ import java.util.Map;
 import java.util.Properties;
 
 import javax.annotation.Resource;
-import org.apache.commons.beanutils.BeanUtils;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.HiddenFileFilter;
 import org.apache.commons.validator.routines.UrlValidator;
@@ -571,6 +571,7 @@ public class transactionInManagerImpl implements transactionInManager {
             //clear transactionInError table for batch, if do not clear errors is true, we skip this.
             if (!doNotClearErrors) {
                 systemErrorCount = systemErrorCount + clearTransactionInErrors(batchUploadId, true);
+                cleanAuditErrorTable(batchUploadId);
             }
 
             List<Integer> configIds = getConfigIdsForBatch(batchUploadId, false, transactionId);
@@ -1363,7 +1364,7 @@ public class transactionInManagerImpl implements transactionInManager {
                 dateformat.parse(date);
                 return "Valid";
             } catch (Exception e) {
-                e.printStackTrace();
+                //e.printStackTrace();
                 return "Error";
             }
         } else {
@@ -4490,7 +4491,7 @@ public class transactionInManagerImpl implements transactionInManager {
             mail.setccEmailAddress(ccEmailAddresses);
         }
 
-        emailManager.sendEmail(mail);
+        //emailManager.sendEmail(mail);
     }
 
     @Override
@@ -4817,5 +4818,39 @@ public class transactionInManagerImpl implements transactionInManager {
 
         return fields;
     }
+
+	@Override
+	public void populateAuditReport(Integer batchUploadId, configurationMessageSpecs cms)
+			throws Exception {
+		
+		//first we run store procedure
+		transactionInDAO.populateAuditReport(batchUploadId, cms.getconfigId());
+		// get distinct fieldNo involved
+		List <Integer> fieldNoList = getErrorFieldNos(batchUploadId);
+		//update field data
+		for (Integer fieldNo : fieldNoList) {
+			populateFieldError(batchUploadId, fieldNo, cms);
+		}
+		
+	}
+
+	@Override
+	public List<Integer> getErrorFieldNos(Integer batchUploadId)
+			throws Exception {
+		return transactionInDAO.getErrorFieldNos(batchUploadId);
+	}
+
+	@Override
+	public void populateFieldError(Integer batchUploadId, Integer fieldNo,
+			configurationMessageSpecs cms) throws Exception {
+		transactionInDAO.populateFieldError(batchUploadId, fieldNo, cms);
+	}
+
+	@Override
+	public void cleanAuditErrorTable(Integer batchUploadId) throws Exception {
+		transactionInDAO.cleanAuditErrorTable(batchUploadId);
+	}
+    
+    
 
 }

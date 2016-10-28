@@ -6977,4 +6977,83 @@ public class transactionInDAOImpl implements transactionInDAO {
         }
     }
 
+	@Override
+	@Transactional
+	public void populateAuditReport(Integer batchUploadId, Integer configId)
+			throws Exception {
+		String sql = "call populateAuditReport(:configId, :batchUploadId);";
+		Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+		query.setParameter("configId", configId);
+		query.setParameter("batchUploadId", batchUploadId);
+		query.executeUpdate();
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	@Transactional
+	public List<Integer> getErrorFieldNos(Integer batchUploadId)
+			throws Exception {
+			String sql = "select distinct fieldNo from transactionIndetailauditerrors where  "
+	               + " batchUploadId = :batchUploadId ";
+	        
+	        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+	            query.setParameter("batchUploadId", batchUploadId);
+	        List <Integer> fieldNoList = query.list();
+	        return fieldNoList;
+	}
+
+	@Override
+	@Transactional
+	public void populateFieldError(Integer batchUploadId, Integer fieldNo,
+			configurationMessageSpecs cms) throws Exception {
+		String sql = "UPDATE  transactionIndetailauditerrors  "
+				+ " JOIN (select  f" + fieldNo+ " as errorData, ";
+				if (cms.getrptField1() != 0) {
+					sql = sql + " f" + cms.getrptField1() + " as reportField1Data,";
+				}
+				if (cms.getrptField2() != 0) {
+					sql = sql + " f" + cms.getrptField2() + " as reportField2Data,";	
+				}
+				if (cms.getrptField3() != 0) {
+					sql = sql + " f" + cms.getrptField3() + " as reportField3Data,";
+				}
+				if (cms.getrptField4() != 0) {
+					sql = sql + " f" + cms.getrptField4() + " as reportField4Data,";
+				}
+				sql = sql + " transactionInId as matchId from transactionINRecords, transactionIn "
+						+ " where transactionIn.Id = transactionINRecords.transactionInId and"
+						+ " transactionIn.batchId = :batchUploadId and statusId in (13)) tbl_concat"
+						+ " ON transactionIndetailauditerrors.transactionInId = tbl_concat.matchid"
+						+ " SET transactionIndetailauditerrors.errorData = tbl_concat.errorData ";
+				if (cms.getrptField1() != 0) {
+					sql = sql + ", transactionIndetailauditerrors.reportField1Data = tbl_concat.reportField1Data";
+				}
+				if (cms.getrptField2() != 0) {
+					sql = sql + ", transactionIndetailauditerrors.reportField2Data = tbl_concat.reportField2Data";	
+				}
+				if (cms.getrptField3() != 0) {
+					sql = sql + ", transactionIndetailauditerrors.reportField3Data = tbl_concat.reportField3Data";
+				}
+				if (cms.getrptField4() != 0) {
+					sql = sql + ", transactionIndetailauditerrors.reportField4Data = tbl_concat.reportField4Data";
+				}
+				sql = sql + " WHERE transactionIndetailauditerrors.batchuploadid = :batchUploadId and fieldNo = :fieldNo"
+						+ "  and configId = :configId";
+				
+		Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+		query.setParameter("configId", cms.getconfigId());
+		query.setParameter("fieldNo", fieldNo);
+		query.setParameter("batchUploadId", batchUploadId);
+		query.executeUpdate();
+		
+	}
+
+	@Override
+	@Transactional
+	public void cleanAuditErrorTable(Integer batchUploadId) throws Exception {
+		Query clearRecords = sessionFactory.getCurrentSession().createSQLQuery("DELETE from transactionIndetailauditerrors where batchUploadId = :batchUploadId");
+        clearRecords.setParameter("batchUploadId", batchUploadId);
+        clearRecords.executeUpdate();
+	}
+
 }
