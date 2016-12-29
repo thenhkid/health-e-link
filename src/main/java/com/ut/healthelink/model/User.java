@@ -76,6 +76,12 @@ public class User {
     @Column(name = "MAINCONTACT", nullable = false)
     private int mainContact = 0;
 
+    @Column(name = "SENDEMAILALERT", nullable = true)
+    private boolean sendEmailAlert = false;
+
+    @Column(name = "RECEIVEEMAILALERT", nullable = true)
+    private boolean receiveEmailAlert = false;
+    
     @Email
     @NoHtml
     @Column(name = "EMAIL", nullable = false)
@@ -325,5 +331,86 @@ public class User {
     public void setUserAllowedModules(List<siteSections> userAllowedModules) {
         this.userAllowedModules = userAllowedModules;
     }
+
+	public List<Integer> getSectionList() {
+		return sectionList;
+	}
+
+	public void setSectionList(List<Integer> sectionList) {
+		this.sectionList = sectionList;
+	}
+
+	public Date getDateOrgWasCreated() {
+		return dateOrgWasCreated;
+	}
+
+	public void setDateOrgWasCreated(Date dateOrgWasCreated) {
+		this.dateOrgWasCreated = dateOrgWasCreated;
+	}
+
+	public boolean isSendEmailAlert() {
+		return sendEmailAlert;
+	}
+
+	public void setSendEmailAlert(boolean sendEmailAlert) {
+		this.sendEmailAlert = sendEmailAlert;
+	}
+
+	public boolean isReceiveEmailAlert() {
+		return receiveEmailAlert;
+	}
+
+	public void setReceiveEmailAlert(boolean receiveEmailAlert) {
+		this.receiveEmailAlert = receiveEmailAlert;
+	}
+
+	public int getUserType() {
+		return userType;
+	}
+
+	public void setUserType(int userType) {
+		this.userType = userType;
+	}
+
+	public boolean isDeliverAuthority() {
+		return deliverAuthority;
+	}
+
+	public void setDeliverAuthority(boolean deliverAuthority) {
+		this.deliverAuthority = deliverAuthority;
+	}
+
+	public boolean isEditAuthority() {
+		return editAuthority;
+	}
+
+	public void setEditAuthority(boolean editAuthority) {
+		this.editAuthority = editAuthority;
+	}
+
+	public boolean isCreateAuthority() {
+		return createAuthority;
+	}
+
+	public void setCreateAuthority(boolean createAuthority) {
+		this.createAuthority = createAuthority;
+	}
+
+	public boolean isCancelAuthority() {
+		return cancelAuthority;
+	}
+
+	public void setCancelAuthority(boolean cancelAuthority) {
+		this.cancelAuthority = cancelAuthority;
+	}
+
+	public String getResetCode() {
+		return resetCode;
+	}
+
+	public void setResetCode(String resetCode) {
+		this.resetCode = resetCode;
+	}
+
 
 }

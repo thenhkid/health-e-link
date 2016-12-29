@@ -280,4 +280,25 @@ end proc_main$$
 DELIMITER ;
 
 
+ALTER TABLE `healthelinkdev`.`transactionindetailauditerrors` 
+ADD INDEX `batchUploadId_idx` (`batchUploadId` ASC);
+ALTER TABLE `healthelinkdev`.`transactionindetailauditerrors` 
+ADD CONSTRAINT `batchUploadId`
+  FOREIGN KEY (`batchUploadId`)
+  REFERENCES `healthelinkdev`.`transactionindetailauditerrors` (`id`)
+  ON DELETE NO ACTION
+  ON UPDATE NO ACTION;
+  
+  
+  /** grace 12.25.16 11:21PM **/
+  ALTER TABLE `healthelink`.`organizations` 
+ADD COLUMN `town` VARCHAR(45) NULL AFTER `orgType`,
+ADD COLUMN `county` VARCHAR(45) NULL AFTER `town`,
+ADD COLUMN `infoURL` VARCHAR(255) NULL AFTER `county`;
+
+
+ALTER TABLE `healthelink`.`organizations` 
+CHANGE COLUMN `public` `publicOrg` BIT(1) NOT NULL DEFAULT b'1' COMMENT '1 = Public\n0 = Private' ;
+
+
   
