@@ -1124,9 +1124,6 @@ public class transactionInManagerImpl implements transactionInManager {
 
         }
         
-        /** clean date errors, limitation to date validation, it inserts blank dates for non required fields as errors
-         */
-        cleanNotRequiredDateErrors(batchUploadId, configId, transactionId);
         return errorCount;
     }
 
