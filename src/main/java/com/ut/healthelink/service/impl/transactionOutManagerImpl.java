@@ -2598,6 +2598,16 @@ public class transactionOutManagerImpl implements transactionOutManager {
 				return transactionOutDAO.writeOutputToTextFile(transportDetails, batchDownLoadId, filePathAndName, fieldNos);
 	}
 	
+	/** need to do this just in case we can't get web server to write to db **/
+	@Override
+	public Integer writeOutputToLocalTextFile(configurationTransport transportDetails, Integer batchDownLoadId, String filePathAndName, String fieldNos) throws Exception { 
+			//first we select the result set
+		
+		
+			//then we loop and write rows
+	
+	}
+	
 	@Override
 	public void updateTTBatchIdByUploadBatch(Integer batchUploadId,
 			Integer batchDownloadId) throws Exception {
