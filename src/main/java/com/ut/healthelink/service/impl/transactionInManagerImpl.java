@@ -3171,7 +3171,7 @@ public class transactionInManagerImpl implements transactionInManager {
     }
 
     @Override
-    public Integer moveRhapsodyFiles() {
+    public Integer moveRRFiles() {
         Integer sysErrors = 0;
 
         try {
@@ -3217,12 +3217,12 @@ public class transactionInManagerImpl implements transactionInManager {
             // if there are no errors, we release the folder path
         } catch (Exception ex) {
             ex.printStackTrace();
-            System.err.println("moveRhapsodyFiles " + ex.toString());
+            System.err.println("moveRRFiles " + ex.toString());
             try {
                 sendEmailToAdmin((ex.toString() + "<br/>" + Arrays.toString(ex.getStackTrace())), "Rhapsody Job Error - main method errored");
             } catch (Exception ex1) {
                 ex1.printStackTrace();
-                System.err.println("moveRhapsodyFiles " + ex1.toString());
+                System.err.println("moveRRFiles " + ex1.toString());
             }
             return 1;
         }

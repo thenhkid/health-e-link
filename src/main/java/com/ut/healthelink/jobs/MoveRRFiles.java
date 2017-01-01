@@ -20,7 +20,7 @@ import org.springframework.web.context.support.SpringBeanAutowiringSupport;
  *
  * @author gchan
  */
-public class MoveRhapsodyFiles implements Job {
+public class MoveRRFiles implements Job {
     
     @Autowired
     private transactionInManager transactionInManager;
@@ -30,12 +30,12 @@ public class MoveRhapsodyFiles implements Job {
         
         try {
             SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
-            transactionInManager.moveRhapsodyFiles();          
+            transactionInManager.moveRRFiles();          
         } catch (Exception ex) {
             try {
                 throw new Exception("Error occurred trying to move Rhapsody files from schedule task",ex);
             } catch (Exception ex1) {
-                Logger.getLogger(MoveRhapsodyFiles.class.getName()).log(Level.SEVERE, null, ex1);
+                Logger.getLogger(MoveRRFiles.class.getName()).log(Level.SEVERE, null, ex1);
             }
         }
         

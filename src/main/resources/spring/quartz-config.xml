@@ -36,7 +36,7 @@
                 <name>GenerateOutputFilesTrigger</name>
                 <job-name>GenerateOutputFiles</job-name>
                 <job-group>processGroup</job-group>
-                <cron-expression>12 0/2 * * * ?</cron-expression>
+                <cron-expression>0 0/1 * * * ?</cron-expression>
             </cron>
         </trigger>
     </schedule>
@@ -101,7 +101,7 @@
         <job>
             <name>ProcessMassInBoundBatches</name>
             <group>processGroup</group>
-            <description>This process will run every 30 seconds on the 5 second of the minute  to check if any loaded files will need to be process</description>
+            <description>This process will run every 10 </description>
             <job-class>com.ut.healthelink.jobs.processMassBatches</job-class>
         </job>
  
@@ -110,7 +110,7 @@
                 <name>ProcessMassInBoundBatchesTrigger</name>
                 <job-name>ProcessMassInBoundBatches</job-name>
                 <job-group>processGroup</job-group>
-                <cron-expression>0 3/10 * * * ?</cron-expression>
+                <cron-expression>0 0/10 * * * ?</cron-expression>
             </cron>
         </trigger>
     </schedule>
@@ -129,7 +129,7 @@
                 <name>ProcessMassOutputBatchesTrigger</name>
                 <job-name>ProcessMassOutputBatches</job-name>
                 <job-group>processGroup</job-group>
-                <cron-expression>0 7/10 * * * ?</cron-expression>
+                <cron-expression>0 5/10 * * * ?</cron-expression>
             </cron>
         </trigger>
     </schedule>
@@ -147,7 +147,7 @@
                 <name>ClearAfterDeliveryBatchesTrigger</name>
                 <job-name>ClearAfterDeliveryBatches</job-name>
                 <job-group>processGroup</job-group>
-                <cron-expression>* 9/10 * * * ?</cron-expression>
+                <cron-expression>* 0/5 * * * ?</cron-expression>
             </cron>
         </trigger>
     </schedule>
@@ -175,16 +175,16 @@
     <!---->
     <schedule>
         <job>
-            <name>MoveRhapsodyFiles</name>
+            <name>MoveRRFiles</name>
             <group>processGroup</group>
             <description>This process will run every minute starting at 8 mins of the hour to check if any Rhapsody file will need to be moved and logged</description>
-            <job-class>com.ut.healthelink.jobs.MoveRhapsodyFiles</job-class>
+            <job-class>com.ut.healthelink.jobs.MoveRRFiles</job-class>
         </job>
  
         <trigger>
             <cron>
-                <name>moveRhapTrigger</name>
-                <job-name>MoveRhapsodyFiles</job-name>
+                <name>moveRRTrigger</name>
+                <job-name>MoveRRFiles</job-name>
                 <job-group>processGroup</job-group>
                 <cron-expression>0 0/1 * * * ?</cron-expression>
             </cron>

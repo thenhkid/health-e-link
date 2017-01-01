@@ -391,7 +391,7 @@ public interface transactionInManager {
 
     Map<String, String> chkUploadBatchFile(configurationTransport transportDetails, File uploadedFile) throws Exception;
 
-    Integer moveRhapsodyFiles();
+    Integer moveRRFiles();
 
     List<configurationRhapsodyFields> getRhapsodyInfoForJob(Integer method);
 
