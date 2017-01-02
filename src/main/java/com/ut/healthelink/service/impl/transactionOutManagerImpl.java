@@ -157,7 +157,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
     
     private String archivePath = (directoryPath + "archivesOut/");
     
-    private String massOutPutPath = (directoryPath + "massoutputfiles/");
+    private String massOutPutPath =  System.getProperty("directory.massOutputPath");
    
     
     //list of final status - these records we skip
