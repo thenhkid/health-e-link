@@ -157,7 +157,9 @@ public class transactionOutManagerImpl implements transactionOutManager {
     
     private String archivePath = (directoryPath + "archivesOut/");
     
-    private String massOutPutPath =  System.getProperty("directory.massOutputPath");
+    private String massOutPutPath = (directoryPath + "massoutputfiles/");
+
+    private String massOutPutPathMysqlPath =  System.getProperty("directory.massOutputPath");
    
     
     //list of final status - these records we skip
@@ -3048,8 +3050,11 @@ public class transactionOutManagerImpl implements transactionOutManager {
                     		massOutFile.delete();
                 		}
 			       		
-			       		writeOutputToTextFile(transportDetails, batchDLId, massOutFile.getAbsolutePath(), configFields);
+			       		//writeOutputToTextFile(transportDetails, batchDLId, massOutFile.getAbsolutePath(), configFields);
 			       		
+                    	//here we need to pass to mysql method the db path from mysql which is massOutPutPathMysqlPath
+			       		writeOutputToTextFile(transportDetails, batchDLId, (massOutPutPathMysqlPath + batchDownload.getutBatchName()+ "." + fileExt), configFields);
+                    	
 			       		//cp file to archiveOut and correct putput folder
 	                    
 		                    	fileSystem fileSystem = new fileSystem();
@@ -3123,7 +3128,6 @@ public class transactionOutManagerImpl implements transactionOutManager {
 	                    
 						return 0;
 	                }
-
 
 }
 
