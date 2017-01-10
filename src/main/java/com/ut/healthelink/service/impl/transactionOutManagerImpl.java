@@ -81,6 +81,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -3053,11 +3054,20 @@ public class transactionOutManagerImpl implements transactionOutManager {
 			       		//writeOutputToTextFile(transportDetails, batchDLId, massOutFile.getAbsolutePath(), configFields);
 			       		
                     	//here we need to pass to mysql method the db path from mysql which is massOutPutPathMysqlPath
-			       		writeOutputToTextFile(transportDetails, batchDLId, (massOutPutPathMysqlPath + batchDownload.getutBatchName()+ "." + fileExt), configFields);
-                    	
+			       		Integer writeOutCome = writeOutputToTextFile(transportDetails, batchDLId, (massOutPutPathMysqlPath + batchDownload.getutBatchName()+ "." + fileExt), configFields);
+			       		if (!massOutFile.exists()) {
+			       			//we induce time because file is not done writing
+			       			System.out.println("in time delay one");
+			       			TimeUnit.SECONDS.sleep(30);
+			       		}
+			       		//check one more time to be safe
+			       		if (!massOutFile.exists()) {
+			       			//we induce time because file is not done writing
+			       			System.out.println("in time delay two");
+			       			TimeUnit.SECONDS.sleep(30);
+			       		}
 			       		//cp file to archiveOut and correct putput folder
-	                    
-		                    	fileSystem fileSystem = new fileSystem();
+	                    fileSystem fileSystem = new fileSystem();
 		                    	File archiveFile = new File ( fileSystem.setPathFromRoot(archivePath) + batchDownload.getutBatchName()+ "." + fileExt);
 	                    	
 	                    		//at this point, message it not encrypted
