@@ -7055,5 +7055,70 @@ public class transactionInDAOImpl implements transactionInDAO {
         clearRecords.setParameter("batchUploadId", batchUploadId);
         clearRecords.executeUpdate();
 	}
+	
+	@Override
+    @Transactional
+    public Integer executeCWDataForSingleFieldValue(Integer configId, Integer batchId, 
+    		configurationDataTranslations cdt, boolean foroutboundProcessing,  Integer transactionId) {
+
+		/**
+		 * UPDATE  transactiontranslatedin JOIN 
+		 * (select sourcevalue as matchid, targetvalue as label   from rel_crosswalkdata 
+		 * where crosswalkId = 90) 
+		 * tbl_concat ON transactiontranslatedin.forCW = tbl_concat.matchid   
+		 * SET transactiontranslatedin.f175 = tbl_concat.label  
+		 * WHERE transactiontranslatedin.configid = 27;
+		 */
+		
+        String sql;
+        Integer id = batchId;
+
+        if (foroutboundProcessing == false) {
+            sql = "update transactionTranslatedIn JOIN (select sourcevalue as matchid, targetvalue as label   "
+            		+ " from rel_crosswalkdata where crosswalkId = :crosswalkId) tbl_concat "
+            		+ " ON REPLACE(REPLACE(trim(F" + cdt.getFieldNo() + "), '\n', ''), '\r', '') = tbl_concat.matchid   "
+            		+ " SET transactiontranslatedin.forCW = tbl_concat.label  ";
+            if (transactionId == 0) {
+                sql = sql + " where configId = :configId "
+                        + " and batchId = :id and statusId not in ( :transRELId );";
+            } else {
+                sql = sql + " where transactionInId = :id";
+                id = transactionId;
+            }
+        } else {
+        	sql = "update transactionTranslatedOut JOIN (select sourcevalue as matchid, targetvalue as label   "
+            		+ " from rel_crosswalkdata where crosswalkId = :crosswalkId) tbl_concat "
+            		+ " ON REPLACE(REPLACE(trim(F" + cdt.getFieldNo() + "), '\n', ''), '\r', '') = tbl_concat.matchid   "
+            		+ " SET transactionTranslatedOut.forCW = tbl_concat.label  ";
+            if (transactionId == 0) {
+                sql = sql + "  where configId = :configId and batchId = :id and statusId not in ( :transRELId );";
+            } else {
+                sql = sql + "where transactionTargetId  = :id";
+                id = transactionId;
+            }
+        }
+
+        Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                .setParameter("crosswalkId", cdt.getCrosswalkId())
+                .setParameter("id", id);
+        if (transactionId == 0) {
+            updateData.setParameter("configId", configId);
+            updateData.setParameterList("transRELId", transRELId);
+        }
+        //System.out.println(sql);
+        
+        try {
+            updateData.executeUpdate();
+        } catch (Exception ex) {
+            System.err.println("executeCWDataForSingleFieldValue " + ex.getCause());
+            ex.printStackTrace();
+            insertProcessingError(processingSysErrorId, configId, batchId, cdt.getFieldNo(),
+                    null, cdt.getCrosswalkId(), null,
+                    false, foroutboundProcessing, ("executeCWDataForSingleFieldValue " + ex.getCause().toString()));
+        }
+        
+        return 1;
+
+    }
 
 }

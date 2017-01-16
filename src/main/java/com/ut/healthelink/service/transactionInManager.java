@@ -530,4 +530,6 @@ public interface transactionInManager {
      void populateFieldError(Integer batchUploadId, Integer fieldNo, configurationMessageSpecs cms) throws Exception;
      
      void cleanAuditErrorTable(Integer batchUploadId) throws Exception;
+     
+     Integer executeCWDataForSingleFieldValue(Integer configId, Integer batchId,  configurationDataTranslations cdt, boolean foroutboundProcessing,  Integer transactionId);
 }

@@ -1388,20 +1388,22 @@ public class transactionInManagerImpl implements transactionInManager {
             configurationDataTranslations cdt, boolean foroutboundProcessing, Integer transactionId) {
         try {
             Integer errors = 0;
-            // 1. we get the info for that cw (fieldNo, sourceVal, targetVal rel_crosswalkData)
-            // List<CrosswalkData> cdList = configurationManager.getCrosswalkData(cdt.getCrosswalkId());
-            List<CrosswalkData> cdList = getCrosswalkDataForBatch(cdt, batchId, foroutboundProcessing, transactionId);
             //we null forcw column, we translate and insert there, we then replace
             nullForCWCol(configId, batchId, foroutboundProcessing, transactionId);
             //we check to see if field value contains a list defined by UT delimiter
             List<Integer> cwMultiList = checkCWFieldForList(configId, batchId, cdt, foroutboundProcessing, transactionId);
             if (cwMultiList.size() > 0) {
+            	List<CrosswalkData> cdList = getCrosswalkDataForBatch(cdt, batchId, foroutboundProcessing, transactionId);
                 // we loop through each field value in the list and apply cw
                 errors = processMultiValueCWData(configId, batchId, cdt, cdList, foroutboundProcessing, transactionId);
             } else {
+            	/**
                 for (CrosswalkData cwd : cdList) {
                     executeSingleValueCWData(configId, batchId, cdt.getFieldNo(), cwd, foroutboundProcessing, cdt.getFieldId(), transactionId);
                 }
+                **/
+            	Integer returnCW = executeCWDataForSingleFieldValue(configId, batchId, cdt, foroutboundProcessing, transactionId);
+            	//replacing with single query that will update entire cwlist
                 if (cdt.getPassClear() == 1) {
                     //flag errors, anything row that is not null in F[FieldNo] but null in forCW
                     flagCWErrors(configId, batchId, cdt, foroutboundProcessing, transactionId);
@@ -1453,6 +1455,11 @@ public class transactionInManagerImpl implements transactionInManager {
     @Override
     public void executeSingleValueCWData(Integer configId, Integer batchId, Integer fieldNo, CrosswalkData cwd, boolean foroutboundProcessing, Integer fieldId, Integer transactionId) {
         transactionInDAO.executeSingleValueCWData(configId, batchId, fieldNo, cwd, foroutboundProcessing, fieldId, transactionId);
+    }
+    
+    @Override
+    public Integer executeCWDataForSingleFieldValue(Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing,  Integer transactionId) {
+       return transactionInDAO.executeCWDataForSingleFieldValue(configId, batchId,  cdt, foroutboundProcessing, transactionId);
     }
 
     @Override
