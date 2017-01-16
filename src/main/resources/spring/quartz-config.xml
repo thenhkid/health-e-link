@@ -72,7 +72,7 @@
                 <name>LoadMassBatchesTrigger</name>
                 <job-name>LoadMassBatches</job-name>
                 <job-group>processGroup</job-group>
-                <cron-expression>0 0/10 * * * ?</cron-expression>
+                <cron-expression>0 0/15 * * * ?</cron-expression>
             </cron>
         </trigger>
     </schedule>
@@ -110,7 +110,7 @@
                 <name>ProcessMassInBoundBatchesTrigger</name>
                 <job-name>ProcessMassInBoundBatches</job-name>
                 <job-group>processGroup</job-group>
-                <cron-expression>0 0/10 * * * ?</cron-expression>
+                <cron-expression>0 0/30 * * * ?</cron-expression>
             </cron>
         </trigger>
     </schedule>
@@ -129,7 +129,7 @@
                 <name>ProcessMassOutputBatchesTrigger</name>
                 <job-name>ProcessMassOutputBatches</job-name>
                 <job-group>processGroup</job-group>
-                <cron-expression>0 5/10 * * * ?</cron-expression>
+                <cron-expression>0 5/20 * * * ?</cron-expression>
             </cron>
         </trigger>
     </schedule>
