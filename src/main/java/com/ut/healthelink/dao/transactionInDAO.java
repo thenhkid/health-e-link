@@ -174,7 +174,7 @@ public interface transactionInDAO {
 
     void flagCWErrors (Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing, Integer transactionId);
    
-    void flagMacroErrors (Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing, Integer transactionId);
+    Integer flagMacroErrors (Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing, Integer transactionId);
 
     void resetTransactionTranslatedIn (Integer batchId, boolean resetAll, Integer transactionInId);
     

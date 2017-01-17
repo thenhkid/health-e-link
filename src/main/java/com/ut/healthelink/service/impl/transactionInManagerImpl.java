@@ -1434,7 +1434,7 @@ public class transactionInManagerImpl implements transactionInManager {
                 // we expect the target field back so we can figure out clear pass option
                 sysError = sysError + executeMacro(configId, batchId, cdt, foroutboundProcessing, macro, transactionId);
                 // insert macro errors
-                flagMacroErrors(configId, batchId, cdt, foroutboundProcessing, transactionId);
+                Integer intMacroReturn = flagMacroErrors(configId, batchId, cdt, foroutboundProcessing, transactionId);
                 return sysError;
             } catch (Exception e) {
                 e.printStackTrace();
@@ -1474,9 +1474,9 @@ public class transactionInManagerImpl implements transactionInManager {
     }
 
     @Override
-    public void flagMacroErrors(Integer configId, Integer batchId,
+    public Integer flagMacroErrors(Integer configId, Integer batchId,
             configurationDataTranslations cdt, boolean foroutboundProcessing, Integer transactionId) {
-        transactionInDAO.flagMacroErrors(configId, batchId, cdt, foroutboundProcessing, transactionId);
+        return transactionInDAO.flagMacroErrors(configId, batchId, cdt, foroutboundProcessing, transactionId);
     }
 
     @Override

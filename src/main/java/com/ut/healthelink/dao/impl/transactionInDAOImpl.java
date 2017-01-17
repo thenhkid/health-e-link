@@ -2335,7 +2335,7 @@ public class transactionInDAOImpl implements transactionInDAO {
 
     @Override
     @Transactional
-    public void flagMacroErrors(Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing, Integer transactionId) {
+    public Integer flagMacroErrors(Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing, Integer transactionId) {
         try {
             String sql;
             Integer id = batchId;
@@ -2392,6 +2392,7 @@ public class transactionInDAOImpl implements transactionInDAO {
             System.err.println("flagMacroErrors " + ex.getCause());
             ex.printStackTrace();
         }
+        return 0;
     }
 
     /**
