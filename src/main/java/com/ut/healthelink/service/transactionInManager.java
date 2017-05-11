@@ -532,4 +532,6 @@ public interface transactionInManager {
      void cleanAuditErrorTable(Integer batchUploadId) throws Exception;
      
      Integer executeCWDataForSingleFieldValue(Integer configId, Integer batchId,  configurationDataTranslations cdt, boolean foroutboundProcessing,  Integer transactionId);
+     
+     void deleteMoveFileLogsByStatus(Integer statusId)  throws Exception;
 }

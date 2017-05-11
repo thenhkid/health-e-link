@@ -454,4 +454,5 @@ public interface transactionInDAO {
     
     Integer executeCWDataForSingleFieldValue(Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing, Integer transactionId);
 
+    void deleteMoveFileLogsByStatus (Integer statusId) throws Exception;
 }

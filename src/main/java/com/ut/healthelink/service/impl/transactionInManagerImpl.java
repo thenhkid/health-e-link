@@ -2649,7 +2649,10 @@ public class transactionInManagerImpl implements transactionInManager {
         try {
             //1 . get distinct ftp paths
             List<configurationFTPFields> inputPaths = getFTPInfoForJob(1);
-
+            
+            //2 we clean up
+            deleteMoveFileLogsByStatus(2);
+            
             //loop ftp paths and check
             for (configurationFTPFields ftpInfo : inputPaths) {
                 //we insert job so if anything goes wrong or the scheduler overlaps, we won't be checking the same folder over and over
@@ -3184,7 +3187,10 @@ public class transactionInManagerImpl implements transactionInManager {
         try {
             //1 . get distinct ftp paths
             List<configurationRhapsodyFields> inputPaths = getRhapsodyInfoForJob(1);
-
+         	
+            //2 we clean up
+            deleteMoveFileLogsByStatus(2);
+            
             //loop ftp paths and check
             for (configurationRhapsodyFields rhapsodyInfo : inputPaths) {
                 //we insert job so if anything goes wrong or the scheduler overlaps, we won't be checking the same folder over and over
@@ -4859,6 +4865,9 @@ public class transactionInManagerImpl implements transactionInManager {
 		transactionInDAO.cleanAuditErrorTable(batchUploadId);
 	}
     
-    
+	@Override
+	public void deleteMoveFileLogsByStatus(Integer statusId)  throws Exception{
+		transactionInDAO.deleteMoveFileLogsByStatus(statusId);		
+	}
 
 }

@@ -7121,5 +7121,14 @@ public class transactionInDAOImpl implements transactionInDAO {
         return 1;
 
     }
+	
+	@Override
+	@Transactional
+	public void deleteMoveFileLogsByStatus (Integer statusId)  throws Exception{
+        Query deletMoveFilesLog = sessionFactory.getCurrentSession().createQuery("delete from MoveFilesLog where statusId = :statusId");
+        deletMoveFilesLog.setParameter("statusId", statusId);
+        deletMoveFilesLog.executeUpdate();
+		
+	}
 
 }
