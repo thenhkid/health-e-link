@@ -4,6 +4,10 @@
 require(['./main'], function () {
     require(['jquery'], function($) {
         
+    	var oSettings = datatable.fnSettings();
+        
+        datatable.fnSort( [ [5,'desc'] ] );
+    	
         $.ajaxSetup({
             cache: false
         });
