@@ -86,6 +86,8 @@ import java.nio.file.Path;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -4547,32 +4549,101 @@ public class transactionInManagerImpl implements transactionInManager {
 
     @Override
     public void loadMassBatches() throws Exception {
-        //1. get all batches with SSA
-        List<batchUploads> batches = getBatchesByStatusIds(Arrays.asList(42));
-        if (batches != null && batches.size() != 0) {
-            //we load one at a time
-            loadBatch(batches.get(0).getId());
+        //we check to see if anything is running first
+    	boolean run = true; 
+    	List<batchUploads> batchInProcess = getBatchesByStatusIds(Arrays.asList(38));
+    	//we check time stamp to see how long that file has been processing
+		//get the details
+    	if (batchInProcess.size() != 0) {
+	    	batchUploads batchDetails = getBatchDetails(batchInProcess.get(0).getId());
+			//check how long first batch is going
+	        //if more than 2 hours need to email 
+	        LocalDateTime d1 = LocalDateTime.ofInstant(batchDetails.getstartDateTime().toInstant(), ZoneId.systemDefault());
+	        LocalDateTime d2 = LocalDateTime.now();
+	        long diffHours = java.time.Duration.between(d1, d2).toHours();
+	        run = false;
+	        if (diffHours > 2) {
+	        	 mailMessage mail = new mailMessage();
+	        	 mail.settoEmailAddress(myProps.getProperty("admin.email"));
+	        	 mail.setfromEmailAddress("support@health-e-link.net");
+	        	 mail.setmessageSubject("HEL Loading Mass Batch running for " + diffHours + " hours - " + myProps.getProperty("server.identity"));
+	        	 StringBuilder emailBody = new StringBuilder();
+	             emailBody.append("<br/>Current Time " + d2.toString());
+	             emailBody.append("<br/>There are " + batchInProcess.size() + " with status 38 in queue.<br/>");
+	             emailBody.append("First stuck batch is id " + batchDetails.getId() + " - " + batchDetails.getoriginalFileName() + ".");
+	             mail.setmessageBody(emailBody.toString());
+	             emailManager.sendEmail(mail);
+	            //files should not take more than 4 hours to run, we check the last 48 on the list in case another one is running already
+	             d1 = LocalDateTime.ofInstant(batchInProcess.get(batchInProcess.size() - 1).getstartDateTime().toInstant(), ZoneId.systemDefault());
+	             long diffHours2 = java.time.Duration.between(d1, d2).toHours();
+	             if (diffHours2 < 4) {
+	                 System.out.println(d2 + " load mass batches not running - " + diffHours2);
+	             }	else {
+	            	 run = true;
+	             }
+	        }
+    	}
+        if (run) {
+        	List<batchUploads> batches = getBatchesByStatusIds(Arrays.asList(42));
+        	if (batches != null && batches.size() != 0) {
+        		loadBatch(batches.get(0).getId());
+        	}
         }
-
     }
 
     /**
      * We should only be loading up mass batches every 10 mins
      */
     @Override
-    public void processMassBatches() {
-        //0. grab all mass batches with MSL (43)
-        try {
-            List<batchUploads> batches = getBatchesByStatusIds(Arrays.asList(43));
-            if (batches != null && batches.size() != 0) {
-                //we process one file at a time
-                processBatch(batches.get(0).getId(), false, 0);
-            }
-        } catch (Exception ex1) {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ("processMassBatches error - " + ex1));
+    public void processMassBatches() throws Exception{
+    	// we only want to process one mass batches at a time but don't want to set the scheduler to be 1.5 hours each time a file runs
+    	//we check to see if anything is running first
+    	boolean run = true; 
+    	List<batchUploads> batchInProcess = getBatchesByStatusIds(Arrays.asList(4));
+    	//we check time stamp to see how long that file has been processing
+		//get the details
+    	if (batchInProcess.size() != 0) {
+			batchUploads batchDetails = getBatchDetails(batchInProcess.get(0).getId());
+			//check how long first batch is going
+	        //if more than 2 hours need to email 
+	        LocalDateTime d1 = LocalDateTime.ofInstant(batchDetails.getstartDateTime().toInstant(), ZoneId.systemDefault());
+	        LocalDateTime d2 = LocalDateTime.now();
+	        long diffHours = java.time.Duration.between(d1, d2).toHours();
+	        run = false;
+	        if (diffHours > 2) {
+	        	 mailMessage mail = new mailMessage();
+	        	 mail.settoEmailAddress(myProps.getProperty("admin.email"));
+	        	 mail.setfromEmailAddress("support@health-e-link.net");
+	        	 mail.setmessageSubject("HEL Loading Mass Batch running for " + diffHours + " hours - " + myProps.getProperty("server.identity"));
+	        	 StringBuilder emailBody = new StringBuilder();
+             emailBody.append("<br/>Current Time " + d2.toString());
+             emailBody.append("<br/>There are " + batchInProcess.size() + " with status 4 in queue.<br/>");
+             emailBody.append("First stuck batch is id " + batchDetails.getId() + " - " + batchDetails.getoriginalFileName() + ".");
+             mail.setmessageBody(emailBody.toString());
+             emailManager.sendEmail(mail);
+            //files should not take more than 4 hours to run, we check the last 4 on the list in case another one is running already
+             d1 = LocalDateTime.ofInstant(batchInProcess.get(batchInProcess.size() - 1).getstartDateTime().toInstant(), ZoneId.systemDefault());
+             long diffHours2 = java.time.Duration.between(d1, d2).toHours();
+             if (diffHours2 < 4) {
+                 System.out.println(d2 + " process mass batches not running - " + diffHours2);
+             }	else {
+            	 run = true;
+             }
         }
-
-    }
+	    }
+        if (run) {
+        	//0. grab all mass batches with MSL (43)
+            try {
+                List<batchUploads> batches = getBatchesByStatusIds(Arrays.asList(43));
+                if (batches != null && batches.size() != 0) {
+                    //we process one file at a time
+                    processBatch(batches.get(0).getId(), false, 0);
+                }
+            } catch (Exception ex1) {
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ("processMassBatches error - " + ex1));
+            }
+        } 
+   }
 
     @Override
     public void saveBatchClearAfterDelivery(batchClearAfterDelivery bmt) throws Exception {
@@ -4697,7 +4768,7 @@ public class transactionInManagerImpl implements transactionInManager {
     public void sendExportEmail(User userDetails) throws Exception {
         String exportMessage = "Dear " + userDetails.getFirstName() + ", <br/>Please login to download your referral activity export.  Thank you.";
         mailMessage mail = new mailMessage();
-        mail.setfromEmailAddress("e-Referral@state.ma.us");
+        mail.setfromEmailAddress("support@health-e-link.net");
         mail.setmessageBody(exportMessage);
         mail.setmessageSubject("Referral activity export is ready to be downloaded.");
         mail.settoEmailAddress(userDetails.getEmail());

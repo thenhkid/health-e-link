@@ -489,7 +489,7 @@ public interface transactionInManager {
     
     void loadMassBatches() throws Exception;
     
-    void processMassBatches();
+    void processMassBatches() throws Exception;
     
     void saveBatchClearAfterDelivery (batchClearAfterDelivery bmt) throws Exception;
     
