@@ -21,6 +21,7 @@ import com.ut.healthelink.model.configurationConnection;
 import com.ut.healthelink.model.configurationConnectionReceivers;
 import com.ut.healthelink.model.configurationConnectionSenders;
 import com.ut.healthelink.model.configurationDataTranslations;
+import com.ut.healthelink.model.configurationExcelDetails;
 import com.ut.healthelink.model.configurationMessageSpecs;
 import com.ut.healthelink.model.configurationSchedules;
 import com.ut.healthelink.reference.fileSystem;
@@ -32,6 +33,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Iterator;
+
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -592,4 +594,10 @@ public class configurationManagerImpl implements configurationManager {
      public configurationCCDElements getCCDElement(Integer elementId) throws Exception {
          return configurationDAO.getCCDElement(elementId);
      }
+
+	@Override
+	public configurationExcelDetails getExcelDetails(Integer configId, Integer orgId)
+			throws Exception {
+		return configurationDAO.getExcelDetails(configId, orgId);
+	}
 }

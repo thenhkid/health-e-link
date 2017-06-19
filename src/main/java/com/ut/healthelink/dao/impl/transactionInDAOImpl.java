@@ -2952,6 +2952,7 @@ public class transactionInDAOImpl implements transactionInDAO {
             configurationDataTranslations cdt, boolean foroutboundProcessing,
             Macros macro, Integer transactionId) {
         try {
+        	System.out.println(macro.getFormula());
             String sql = ("CALL " + macro.getFormula() + " (:configId, :batchId, :srcField, "
                     + ":fieldA, :fieldB, :con1, :con2, :macroId, :foroutboundProcessing, :passClear, :transactionId);");
             Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
@@ -7129,6 +7130,16 @@ public class transactionInDAOImpl implements transactionInDAO {
         deletMoveFilesLog.setParameter("statusId", statusId);
         deletMoveFilesLog.executeUpdate();
 		
+	}
+
+	@Override
+	@Transactional
+	public void deleteLoadTableRows(Integer howMany, String ascOrDesc,
+			String laodTableName) throws Exception {
+		
+			String sql = "delete from " + laodTableName + " order by id " + ascOrDesc + " limit " +  howMany;
+	        Query deleteTable = sessionFactory.getCurrentSession().createSQLQuery(sql);
+	        deleteTable.executeUpdate();
 	}
 
 }

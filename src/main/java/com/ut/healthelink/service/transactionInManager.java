@@ -534,4 +534,6 @@ public interface transactionInManager {
      Integer executeCWDataForSingleFieldValue(Integer configId, Integer batchId,  configurationDataTranslations cdt, boolean foroutboundProcessing,  Integer transactionId);
      
      void deleteMoveFileLogsByStatus(Integer statusId)  throws Exception;
+     
+     void deleteLoadTableRows (Integer howMany, String ascOrDesc, String laodTableName) throws Exception;
 }

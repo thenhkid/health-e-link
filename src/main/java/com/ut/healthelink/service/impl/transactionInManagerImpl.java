@@ -25,6 +25,7 @@ import com.ut.healthelink.model.batchUploadSummary;
 import com.ut.healthelink.model.batchUploads;
 import com.ut.healthelink.model.configurationConnection;
 import com.ut.healthelink.model.configurationDataTranslations;
+import com.ut.healthelink.model.configurationExcelDetails;
 import com.ut.healthelink.model.configurationFTPFields;
 import com.ut.healthelink.model.configurationFormFields;
 import com.ut.healthelink.model.configurationMessageSpecs;
@@ -60,6 +61,8 @@ import com.ut.healthelink.service.organizationManager;
 import com.ut.healthelink.service.sysAdminManager;
 import com.ut.healthelink.service.userManager;
 import com.ut.healthelink.service.utilManager;
+import com.ut.healthelink.service.xlsToTxt;
+import com.ut.healthelink.service.xlsxToTxt;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
@@ -155,7 +158,13 @@ public class transactionInManagerImpl implements transactionInManager {
 
     @Autowired
     private CCDtoTxt ccdtotxt;
-
+    
+    @Autowired
+    private xlsxToTxt xlsxtotxt;
+    
+    @Autowired
+    private xlsToTxt xlstotxt;
+    
     @Autowired
     private emailMessageManager emailManager;
 
@@ -1697,9 +1706,16 @@ public class transactionInManagerImpl implements transactionInManager {
                 String decodedFilePath = dir.setPath(processFolderPath);
                 String decodedFileName = batch.getutBatchName();
                 String decodedFileExt = batch.getoriginalFileName().substring(batch.getoriginalFileName().lastIndexOf("."));
+                String decodedFile = decodedFilePath + decodedFileName + decodedFileExt;
                 String strDecode = "";
+                boolean fileDecoded = false;
                 try {
-                    strDecode = filemanager.decodeFileToBase64Binary(encodedFile);
+                	if (decodedFileExt.equalsIgnoreCase(".xlsx")) {
+                		filemanager.decode((encodedFilePath + encodedFileName), decodedFile);
+                		fileDecoded = true;
+                	} else {
+                		strDecode = filemanager.decodeFileToBase64Binary(encodedFile);
+                	}
                 } catch (Exception ex) {
                     ex.printStackTrace();
                     strDecode = "";
@@ -1709,10 +1725,13 @@ public class transactionInManagerImpl implements transactionInManager {
 
                 if (!strDecode.equalsIgnoreCase("")) {
                     //we write and decode file
-                    filemanager.writeFile((decodedFilePath + decodedFileName + decodedFileExt), strDecode);
+                    filemanager.writeFile((decodedFile), strDecode);
                     actualFileName = (decodedFilePath + decodedFileName + decodedFileExt);
-
-                    /*
+                    fileDecoded = true;
+                }
+                   
+                if (fileDecoded) {
+                /*
 	                 If batch is set up for CCD input then we need to translate it
 	                 to a pipe-delimited text file.
                      */
@@ -1825,8 +1844,50 @@ public class transactionInManagerImpl implements transactionInManager {
                         if (tempLoadFile.exists()) {
                             tempLoadFile.delete();
                         }
+                    } else if (processFileName.endsWith(".xlsx")) {
+                    	newfilename = xlsxtotxt.TranslateXLSXtoTxt(batch.getOrgId(), decodedFilePath, decodedFileName);
+                        if (newfilename.equals("ERRORERRORERROR")) {
+                            //clean up and break
+                            //need to remove load table, will leave load file with error
+                            sysError = sysError + dropLoadTable(loadTableName);
+                            updateBatchStatus(batchId, 39, "endDateTime");
+                            insertProcessingError(5, null, batchId, null, null, null, null,
+                                    false, false, "Error translating xlsx file");
+                            return false;
+                        } else if (newfilename.equals("FILE IS NOT xslx ERROR")) {
+                            //clean up and break
+                            //need to remove load table, will leave load file with error
+                            sysError = sysError + dropLoadTable(loadTableName);
+                            updateBatchStatus(batchId, 7, "endDateTime");
+                            insertProcessingError(22, null, batchId, null, null, null, null,
+                                    false, false, "XML format is invalid.");
+                            return false;
+                        }
+                        actualFileName = (decodedFilePath + newfilename);
+                        //we remove temp load file 
+                        File tempLoadFile = new File(decodedFilePath + processFileName);
+                        if (tempLoadFile.exists()) {
+                            tempLoadFile.delete();
+                        }
+                    } else if (processFileName.endsWith(".xls")) {
+                    	newfilename = xlstotxt.TranslateXLStoTxt(batch.getOrgId(), decodedFilePath, decodedFileName);
+                        if (newfilename.equals("ERRORERRORERROR")) {
+                            //clean up and break
+                            //need to remove load table, will leave load file with error
+                            sysError = sysError + dropLoadTable(loadTableName);
+                            updateBatchStatus(batchId, 39, "endDateTime");
+                            insertProcessingError(5, null, batchId, null, null, null, null,
+                                    false, false, "Error translating xls file");
+                            return false;
+                        }
+                        actualFileName = (decodedFilePath + newfilename);
+                        //we remove temp load file 
+                        File tempLoadFile = new File(decodedFilePath + processFileName);
+                        if (tempLoadFile.exists()) {
+                            tempLoadFile.delete();
+                        }
                     }
-
+                    
                     //at this point, hl7 and hr are in unencoded plain text
                     if (actualFileName.endsWith(".txt") || actualFileName.endsWith(".csv")) {
                         sysError = sysError + insertLoadData(batch.getId(), batch.getDelimChar(), actualFileName, loadTableName, batch.isContainsHeaderRow());
@@ -1839,12 +1900,26 @@ public class transactionInManagerImpl implements transactionInManager {
                         Files.move(actual, archive, REPLACE_EXISTING);
                     }
 
+                    /** if excel files some files comes with random lines at the beginning and end, need to remove **/
+                    if (processFileName.endsWith(".xlsx") || processFileName.endsWith(".xls")) {
+                    	configurationExcelDetails excelDetails = configurationManager.getExcelDetails(batch.getConfigId(), batch.getOrgId());
+                    	if (excelDetails.getStartRow() > 1) {
+                    		deleteLoadTableRows(excelDetails.getStartRow() - 1, "asc", loadTableName);
+                    	}
+                    	if (excelDetails.getDiscardLastRows() > 0) {
+                    		deleteLoadTableRows(excelDetails.getDiscardLastRows(), " desc ", loadTableName);
+                    	}
+                    }
+                    
                     //3. we update batchId, loadRecordId
                     sysError = sysError + updateLoadTable(loadTableName, batch.getId());
 
+                    
                     // 4. we insert into transactionIn - status of invalid (11), batchId, loadRecordId
                     sysError = sysError + loadTransactionIn(loadTableName, batch.getId());
-
+                    
+                   
+                    
                     //5. we insert into transactionInRecords - we select transactionIn batchId, transactionInId
                     sysError = sysError + loadTransactionInRecords(batch.getId());
 
@@ -4939,6 +5014,13 @@ public class transactionInManagerImpl implements transactionInManager {
 	@Override
 	public void deleteMoveFileLogsByStatus(Integer statusId)  throws Exception{
 		transactionInDAO.deleteMoveFileLogsByStatus(statusId);		
+	}
+
+	@Override
+	public void deleteLoadTableRows(Integer howMany, String ascOrDesc,
+			String laodTableName) throws Exception{
+		transactionInDAO.deleteLoadTableRows(howMany, ascOrDesc, laodTableName);	
+		
 	}
 
 }
