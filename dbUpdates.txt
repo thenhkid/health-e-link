@@ -556,3 +556,379 @@ UPDATE `healthelink`.`macro_names` SET `FieldB_Question`='', `Con1_Question`='Pl
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
   
   
+/** 06242017 grace **/
+
+
+CREATE TABLE `transactiontranslatedlistin` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `batchId` int(11) NOT NULL,
+  `transactionInId` int(11) NOT NULL,
+  `concatKey` varchar(75) DEFAULT NULL,
+  `inValue` text,
+  `translatedValue` text,
+  `translateIdToKeep` int(11) DEFAULT NULL,
+  `fCol` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;
+
+
+DROP PROCEDURE `healthelink`.`cat2ApplyCWTranslatedList`;
+DROP PROCEDURE `healthelink`.`cat2CleanListTable`;
+DROP PROCEDURE `healthelink`.`cat2Concat2ColsDelimNoSpaces`;
+DROP PROCEDURE `healthelink`.`cat2Concat3ColsDelimNoSpaces`;
+DROP PROCEDURE `healthelink`.`cat2DelTransWhenFieldAIsNull`;
+DROP PROCEDURE `healthelink`.`cat2PopulateTranslatedList`;
+DROP PROCEDURE `healthelink`.`cat2UpdateListValue`;
+
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `cat2ApplyCWTranslatedList`(in configId int, 
+in batchId int, in srcField varchar(10),
+in fieldA varchar(10), in fieldB varchar(10), in con1 varchar(255), 
+in con2 varchar(255), in macroId int, in foroutboundProcessing boolean, in passClear int, in transactionId int)
+proc_main:begin
+
+-- con1 - cwId that we want to apply cw to
+
+set @listTable = "transactiontranslatedlistin";
+set @translateCol = "transactionInId";
+if (foroutboundProcessing) then
+	set @listTable = "transactiontranslatedlistout";
+    set @translateCol = "transactionTargetId";
+end if;
+
+set @stmt = "";
+-- build our sql
+
+	BEGIN
+	set @stmt1 = concat("update ",@listTable," join (select id, sourcevalue, targetvalue from rel_crosswalkdata where crosswalkid = ", con1 ,") cwdata
+			on invalue = sourcevalue set translatedvalue = targetvalue where batchId = ", batchId);
+	END;
+	
+if (transactionId != 0) then
+	set @stmt2 = concat(" and ", @translateCol , " = ", transactionId);
+END if;
+	
+	set @stmt = concat(@stmt1, @stmt2);
+    PREPARE stmt from @stmt;
+	EXECUTE stmt;-- execute
+    DEALLOCATE PREPARE stmt;
+
+  -- insert into sqlstmts (sqlstmt) values(@stmt);
+
+-- the only error for this is if SP bombs, no need to write in insert error logs
+select '';
+end proc_main$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `cat2CleanListTable`(in configId int, 
+in batchId int, in srcField varchar(10),
+in fieldA varchar(10), in fieldB varchar(10), in con1 varchar(255), 
+in con2 varchar(255), in macroId int, in foroutboundProcessing boolean, in passClear int, in transactionId int)
+proc_main:begin
+
+-- con1 column to match for delete
+
+set @listTable = "transactiontranslatedlistin";
+set @translateCol = "transactionInId";
+set @transTable = "transactiontranslatedIn";
+if (foroutboundProcessing) then
+	set @listTable = "transactiontranslatedlistout";
+    set @translateCol = "transactionTargetId";
+    set @transTable = "transactiontranslatedOut";
+end if;
+
+
+set @stmt = "";
+set @stmt2 = "";
+-- build our sql
+
+	BEGIN
+		set @stmt1 = concat("delete from  ", @listTable, " where fcol = ", con1," and batchid = ", batchId);
+
+		if (transactionId != 0) then
+			set @stmt2 = concat(" and ", @translateCol , " = ", transactionId);
+		END if;
+	END;
+    
+	set @stmt = concat(@stmt1, @stmt2);
+    
+	PREPARE stmt from @stmt;
+	EXECUTE stmt;-- execute
+    DEALLOCATE PREPARE stmt;
+-- the only error for this is if SP bombs, no need to write in insert error logs
+select '';
+end proc_main$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `cat2Concat2ColsDelimNoSpaces`(in configId int, 
+in batchId int, in srcField varchar(10),
+in fieldA varchar(10), in fieldB varchar(10), in con1 varchar(255), 
+in con2 varchar(255), in macroId int, in foroutboundProcessing boolean, in passClear int, in transactionId int)
+proc_main:begin
+
+-- SF source field 
+-- FieldA  col1 to concat
+-- fieldB - col2 to concat
+
+-- con 1 - our separator
+-- con2 column to store our new string 
+-- we want to create replace(concat('', f4, '_', f23), ' ', '')
+ 
+call setInboundOutBoundTables (foroutboundProcessing);
+select @translatedTable, @transactionTable, @batchTable, @batchIdType , @errorTable
+into @translatedTable, @transactionTable, @batchTable, @batchIdType , @errorTable;
+
+call getFinalStatusIds;
+select @finalStatusIds into @finalStatusIds;
+
+
+-- build our sql
+if (transactionId = 0) then
+	BEGIN
+	set @stmt = concat("update ",@translatedTable, " set F", con2, " =  replace(concat('',", fieldA,", '",con1,"', ",fieldB,"), ' ', '')",
+	" where  configId = ",configId," and ", @batchIdType," = ",batchId," and statusId not in (",@finalStatusIds ,");");
+	           
+	END;
+	END if;
+
+if (transactionId != 0) then
+	BEGIN
+	set @stmt = concat("update ",@translatedTable, " set F",con2, " =  replace(concat('',", fieldA,", '",con1,"', ",fieldB,"), ' ', '')",
+				 " where ",@transactionTable,"Id = ", transactionId, ";");
+	
+    END;
+	END if;
+    
+    PREPARE stmt from @stmt;
+	EXECUTE stmt;-- execute
+    DEALLOCATE PREPARE stmt;
+
+-- insert into sqlstmts (sqlstmt) values(@stmt);
+
+-- the only error for this is if SP bombs, no need to write in insert error logs
+select '';
+end proc_main$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `cat2Concat3ColsDelimNoSpaces`(in configId int, 
+in batchId int, in srcField varchar(10),
+in fieldA varchar(10), in fieldB varchar(10), in con1 varchar(255), 
+in con2 varchar(255), in macroId int, in foroutboundProcessing boolean, in passClear int, in transactionId int)
+proc_main:begin
+
+-- SF source field - usually site Id
+-- FieldA  - usually patient no
+-- fieldB - usually visit date
+
+-- con 1 - our delimiter
+-- con2 column to store our new string 
+-- we want to create replace(concat('',f2, '_', f4, '_', f23), ' ', '')
+ 
+call setInboundOutBoundTables (foroutboundProcessing);
+select @translatedTable, @transactionTable, @batchTable, @batchIdType , @errorTable
+into @translatedTable, @transactionTable, @batchTable, @batchIdType , @errorTable;
+
+call getFinalStatusIds;
+select @finalStatusIds into @finalStatusIds;
+
+
+-- build our sql
+if (transactionId = 0) then
+	BEGIN
+	set @stmt = concat("update ",@translatedTable, " set F", con2, " =  replace(concat('',", srcField,", '",con1,"', ",fieldA,", '",con1,"', ",fieldB,"), ' ', '')",
+	" where  configId = ",configId," and ", @batchIdType," = ",batchId," and statusId not in (",@finalStatusIds ,");");
+	           
+	END;
+	END if;
+
+if (transactionId != 0) then
+	BEGIN
+	set @stmt = concat("update ",@translatedTable, " set F",con2, " =  replace(concat('',", srcField,", '",con1,"', ",fieldA,", '",con1,"', ",fieldB,"), ' ', '')",
+				 " where ",@transactionTable,"Id = ", transactionId, ";");
+	
+    END;
+	END if;
+    
+    PREPARE stmt from @stmt;
+	EXECUTE stmt;-- execute
+    DEALLOCATE PREPARE stmt;
+
+-- insert into sqlstmts (sqlstmt) values(@stmt);
+
+-- the only error for this is if SP bombs, no need to write in insert error logs
+select '';
+end proc_main$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `cat2DelTransWhenFieldAIsNull`(in configId int, 
+in batchId int, in srcField varchar(10),
+in fieldA varchar(10), in fieldB varchar(10), in con1 varchar(255), 
+in con2 varchar(255), in macroId int, in foroutboundProcessing boolean, in passClear int, in transactionId int)
+proc_main:begin
+
+-- fieldA column to check
+
+set @listTable = "transactiontranslatedlistin";
+set @translateCol = "transactionInId";
+set @transTable = "transactiontranslatedIn";
+if (foroutboundProcessing) then
+	set @listTable = "transactiontranslatedlistout";
+    set @translateCol = "transactionTargetId";
+    set @transTable = "transactiontranslatedOut";
+end if;
+
+
+set @stmt = "";
+set @stmt2 = "";
+-- build our sql
+
+	BEGIN
+		set @stmt1 = concat("delete from  ", @transTable, " where batchid = ", batchId,  
+		" and ",fieldA," is null ");
+
+		if (transactionId != 0) then
+			set @stmt2 = concat(" and ", @translateCol , " = ", transactionId);
+		END if;
+	END;
+
+	set @stmt = concat(@stmt1, @stmt2);
+    
+	PREPARE stmt from @stmt;
+	EXECUTE stmt;-- execute
+    DEALLOCATE PREPARE stmt;
+    
+-- the only error for this is if SP bombs, no need to write in insert error logs
+select '';
+end proc_main$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `cat2PopulateTranslatedList`(in configId int, 
+in batchId int, in srcField varchar(10),
+in fieldA varchar(10), in fieldB varchar(10), in con1 varchar(255), 
+in con2 varchar(255), in macroId int, in foroutboundProcessing boolean, in passClear int, in transactionId int)
+proc_main:begin
+
+-- fieldA - field that holds our unique key
+-- FieldB - field that we want to translate
+-- 
+ 
+call setInboundOutBoundTables (foroutboundProcessing);
+select @translatedTable, @transactionTable, @batchTable, @batchIdType , @errorTable
+into @translatedTable, @transactionTable, @batchTable, @batchIdType , @errorTable;
+
+call getFinalStatusIds;
+select @finalStatusIds into @finalStatusIds;
+
+set @listTable = "transactiontranslatedlistin";
+if (foroutboundProcessing) then
+	set @listTable = "transactiontranslatedlistout";
+end if;
+
+set @stmt = '';
+set @stmt2 = '';
+
+
+-- build our sql
+
+	BEGIN
+		set @stmt1 = concat("insert into ", @listTable, " (batchId, transactionInId, concatKey, inValue, fcol) 
+		select  batchId, transactionInId, ", fieldA,", ", fieldB,", replace(lcase('",fieldB,"'), 'f', '') from ",@translatedTable,
+		" where  configId = ",configId," and ", @batchIdType," = ",batchId," and statusId not in (",@finalStatusIds ,")");
+	END;
+
+
+if (transactionId != 0) then
+	BEGIN
+		set @stmt2 = concat("and " ,@transactionTable,"Id = ", transactionId, ";");
+	END;
+	END if;
+    
+    set @stmt = concat(@stmt1, @stmt2);
+    PREPARE stmt from @stmt;
+	EXECUTE stmt;-- execute
+    DEALLOCATE PREPARE stmt;
+
+	-- insert into sqlstmts (sqlstmt) values(@stmt);
+
+-- the only error for this is if SP bombs, no need to write in insert error logs
+select '';
+end proc_main$$
+DELIMITER ;
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `cat2UpdateListValue`(in configId int, 
+in batchId int, in srcField varchar(10),
+in fieldA varchar(10), in fieldB varchar(10), in con1 varchar(255), 
+in con2 varchar(255), in macroId int, in foroutboundProcessing boolean, in passClear int, in transactionId int)
+proc_main:begin
+
+-- fieldA fCol with concat key
+-- fieldB where to store list
+-- con1 - field to store keep value
+-- con2 - value to match for keeping
+
+set @listTable = "transactiontranslatedlistin";
+set @translateCol = "transactionInId";
+set @transTable = "transactiontranslatedIn";
+if (foroutboundProcessing) then
+	set @listTable = "transactiontranslatedlistout";
+    set @translateCol = "transactionTargetId";
+    set @transTable = "transactiontranslatedOut";
+    
+end if;
+
+set @stmt = "";
+set @stmt2 = "";
+-- build our sql
+
+	BEGIN
+	set @stmt1 = concat("update ",@listTable," join (select distinct ",fieldA," matchValue, ",@translateCol," as keepId from ", @transTable ," where batchid = ", batchId,  
+	" and ",fieldA," is not null ");
+
+if (transactionId != 0) then
+	set @stmt2 = concat(" and ", @translateCol , " = ", transactionId);
+END if;
+	set @stmt3 = concat(" group by ", fieldA,") getId  on concatKey = matchValue  set translateIdToKeep = getId.keepId where batchId = ",batchId);
+END;
+
+	set @stmt = concat(@stmt1, @stmt2, @stmt3);
+    
+	PREPARE stmt from @stmt;
+	EXECUTE stmt;-- execute
+    DEALLOCATE PREPARE stmt;
+
+	-- need to update values to con1 to null first
+    
+    set @stmt1 = concat("update ",@transTable," set ", con1," = null where batchId = ", batchId," ");
+  
+    set @stmt = concat(@stmt1, @stmt2);
+    
+    PREPARE stmt from @stmt;
+	EXECUTE stmt;-- execute
+    DEALLOCATE PREPARE stmt;
+    
+    
+	-- now we update list
+    set @stmt1 = concat("update ", @transTable," join (select group_concat(distinct translatedValue order by translateIdToKeep) as listValue, translateIdToKeep as matchId from ",@listTable," where 
+    translatedValue is not null and fcol = replace(ucase('", srcField ,"'), 'F', '') group by translateIdToKeep) keepIds on ", @transTable,".transactionInId = matchId 
+    set ",fieldB," = listValue, ",con1," = '",con2,"' where batchId = ", batchId," ");
+  
+    set @stmt = concat(@stmt1, @stmt2);
+    
+    
+    PREPARE stmt from @stmt;
+	EXECUTE stmt;-- execute
+    DEALLOCATE PREPARE stmt;
+    
+
+-- the only error for this is if SP bombs, no need to write in insert error logs
+select '';
+end proc_main$$
+DELIMITER ;
+

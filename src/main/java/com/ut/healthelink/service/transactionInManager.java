@@ -160,7 +160,7 @@ public interface transactionInManager {
     Integer clearTransactionTranslatedIn(Integer batchUploadId, Integer transactionInId);
 
     Integer clearTransactionTables(Integer batchUploadId, boolean leaveFinalStatusIds);
-
+    
     Integer clearTransactionTarget(Integer batchUploadId);
 
     void flagAndEmailAdmin(Integer batchUploadId);
@@ -536,4 +536,7 @@ public interface transactionInManager {
      void deleteMoveFileLogsByStatus(Integer statusId)  throws Exception;
      
      void deleteLoadTableRows (Integer howMany, String ascOrDesc, String laodTableName) throws Exception;
+     
+     Integer clearTransactionTranslatedListIn(Integer batchUploadId);
+
 }

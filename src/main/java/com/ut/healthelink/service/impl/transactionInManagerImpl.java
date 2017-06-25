@@ -911,7 +911,7 @@ public class transactionInManagerImpl implements transactionInManager {
             sysError = clearMessageTables(batchUploadId);
             if (sysError == 0) {
                 int toBatchStatusId = 3; //SSA
-                if (getBatchDetails(batchUploadId).gettransportMethodId() == 2) {
+                if (getBatchDetails(batchUploadId).gettransportMethodId() == 2 || getBatchDetails(batchUploadId).gettransportMethodId() == 42) {
                     sysError = clearTransactionInErrors(batchUploadId, false);
                     toBatchStatusId = 5;
                     resetTransactionTranslatedIn(batchUploadId, true);
@@ -1028,6 +1028,8 @@ public class transactionInManagerImpl implements transactionInManager {
         cleared = cleared + clearTransactionInErrors(batchUploadId, leaveFinalStatusIds);
         cleared = cleared + clearBatchUploadSummary(batchUploadId);
         cleared = cleared + clearMessageTables(batchUploadId);
+        cleared = cleared + clearTransactionTranslatedListIn(batchUploadId);
+        
         //we clear transactionIn
         cleared = cleared + clearTransactionIn(batchUploadId);
         //at SDC status, we have download batches, we need to clear those too
@@ -5021,6 +5023,11 @@ public class transactionInManagerImpl implements transactionInManager {
 			String laodTableName) throws Exception{
 		transactionInDAO.deleteLoadTableRows(howMany, ascOrDesc, laodTableName);	
 		
+	}
+
+	@Override
+	public Integer clearTransactionTranslatedListIn(Integer batchUploadId) {
+		return transactionInDAO.clearTransactionTranslatedListIn(batchUploadId);
 	}
 
 }

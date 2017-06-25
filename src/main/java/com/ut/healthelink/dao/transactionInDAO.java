@@ -457,4 +457,6 @@ public interface transactionInDAO {
     void deleteMoveFileLogsByStatus (Integer statusId) throws Exception;
     
     void deleteLoadTableRows (Integer howMany, String ascOrDesc, String laodTableName) throws Exception;
+    
+    Integer clearTransactionTranslatedListIn(Integer batchUploadId);
 }

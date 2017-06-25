@@ -55,8 +55,11 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.annotation.Resource;
 
 import org.hibernate.Criteria;
 import org.hibernate.Query;
@@ -76,6 +79,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 public class transactionInDAOImpl implements transactionInDAO {
 
+    @Resource(name = "myProps")
+    private Properties myProps;
+	
     @Autowired
     private SessionFactory sessionFactory;
 
@@ -84,8 +90,6 @@ public class transactionInDAOImpl implements transactionInDAO {
 
     @Autowired
     private userManager usermanager;
-
-    private String schemaName = "healthelink";
 
     //list of final status - these records we skip
     private List<Integer> transRELId = Arrays.asList(11, 12, 13, 16);
@@ -1211,7 +1215,7 @@ public class transactionInDAOImpl implements transactionInDAO {
                 + " and table_name like concat('message_%')"
                 + " and column_name like 'transactionInId';");
         Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
-        query.setParameter("schemaName", schemaName);
+        query.setParameter("schemaName", myProps.getProperty("schemaName"));
         List<String> mt = query.list();
         return mt;
     }
@@ -2952,8 +2956,7 @@ public class transactionInDAOImpl implements transactionInDAO {
             configurationDataTranslations cdt, boolean foroutboundProcessing,
             Macros macro, Integer transactionId) {
         try {
-        	System.out.println(macro.getFormula());
-            String sql = ("CALL " + macro.getFormula() + " (:configId, :batchId, :srcField, "
+        	String sql = ("CALL " + macro.getFormula() + " (:configId, :batchId, :srcField, "
                     + ":fieldA, :fieldB, :con1, :con2, :macroId, :foroutboundProcessing, :passClear, :transactionId);");
             Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
             query.setParameter("configId", configId);
@@ -7141,5 +7144,22 @@ public class transactionInDAOImpl implements transactionInDAO {
 	        Query deleteTable = sessionFactory.getCurrentSession().createSQLQuery(sql);
 	        deleteTable.executeUpdate();
 	}
+	
+	@Override
+    @Transactional
+    public Integer clearTransactionTranslatedListIn(Integer batchUploadId) {
+        String sql = "delete from transactiontranslatedlistin where batchId = :batchUploadId";
+
+        Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                .setParameter("batchUploadId", batchUploadId);
+
+        try {
+            deleteData.executeUpdate();
+            return 0;
+        } catch (Exception ex) {
+            System.err.println("clearTransactionTranslatedListIn " + ex.getCause());
+            return 1;
+        }
+    }
 
 }
