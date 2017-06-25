@@ -2992,7 +2992,7 @@ public class transactionInDAOImpl implements transactionInDAO {
             //insert system error
             insertProcessingError(processingSysErrorId, configId, batchId, cdt.getFieldNo(),
                     cdt.getMacroId(), null, null,
-                    false, foroutboundProcessing, ("executeMacro " + ex.getCause().toString()), transactionId);
+                    false, foroutboundProcessing, ("executeMacro "+ macro.getFormula() + " " + ex.getCause().toString()), transactionId);
             System.err.println("executeMacro " + ex.getCause());
             ex.printStackTrace();
             return 1;
