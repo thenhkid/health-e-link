@@ -6,6 +6,7 @@
 package com.ut.healthelink.service;
 
 import com.ut.healthelink.model.Organization;
+import com.ut.healthelink.model.batchUploads;
 import com.ut.healthelink.reference.fileSystem;
 
 import java.io.File;
@@ -13,11 +14,9 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.util.Date;
 
 import org.apache.poi.hssf.extractor.ExcelExtractor;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,10 +33,14 @@ public class xlsToTxt {
     @Autowired
     private configurationTransportManager configurationTransportManager;
 
-    @SuppressWarnings("resource")
-	public String TranslateXLStoTxt(Integer orgId, String fileLocation, String excelFileName) throws Exception {
+    @Autowired
+    private transactionInManager transactioninmanager;
 
-    	Organization orgDetails = organizationmanager.getOrganizationById(orgId);
+    
+    @SuppressWarnings("resource")
+	public String TranslateXLStoTxt( String fileLocation, String excelFileName, batchUploads batch) throws Exception {
+
+    	Organization orgDetails = organizationmanager.getOrganizationById(batch.getOrgId());
         
         fileSystem dir = new fileSystem();
         
@@ -46,7 +49,7 @@ public class xlsToTxt {
         fileLocation = fileLocation.replace("/Applications/bowlink/", "").replace("/home/bowlink/","").replace("/bowlink/", "");
         dir.setDirByName(fileLocation);
         
-        String excelFile = (excelFileName + ".xlsx");
+        String excelFile = (excelFileName + ".xls");
         /* Create the txt file that will hold the excel fields */
         String newfileName = (excelFileName + ".txt");
 
@@ -78,26 +81,18 @@ public class xlsToTxt {
         }
 
         try {
-        	System.out.println(new Date());
+        	String text = "";
         	FileWriter fw = new FileWriter(newFile, true);
-	        String text = "";
-	        InputStream inp = new FileInputStream(inputFile);
-		    HSSFWorkbook wb = new HSSFWorkbook(new POIFSFileSystem(inp));
-		    ExcelExtractor extractor = new ExcelExtractor(wb);
-		    
-		    extractor.setFormulasNotResults(true);
-		    extractor.setIncludeSheetNames(false);
-		    text = extractor.getText();
-		    //need to replace all nulls
-			   String text1 = text.replaceAll("null\t", " \t");
-			   text = "";
-			   String text2 = text1.replaceAll("\tnull", "\t ");
-		       text1 = "";
-			   if (text2.equalsIgnoreCase("")) {
-		        	newfileName = "FILE IS NOT xsl ERROR";
-		        }
-		        
-		        fw.write(text2);
+	        
+        		InputStream inp = new FileInputStream(inputFile);
+        	    HSSFWorkbook wb = new HSSFWorkbook(inp);
+        	    ExcelExtractor extractor = new ExcelExtractor(wb);
+        	    extractor.setIncludeBlankCells(true);
+        	    extractor.setFormulasNotResults(true);
+        	    extractor.setIncludeSheetNames(false);
+        	    text = extractor.getText();
+        	    
+        	    fw.write(text);
 		        fw.close();
         } catch (Exception ex) {
         	ex.printStackTrace();
@@ -105,6 +100,8 @@ public class xlsToTxt {
         	PrintStream ps = new PrintStream(newFile);
         	ex.printStackTrace(ps);
         	ps.close();
+        	transactioninmanager.insertProcessingError(5, null, batch.getId(), null, null, null, null,
+                    false, false, ex.getStackTrace().toString());
         }
         return newfileName;
 

@@ -6,6 +6,7 @@
 package com.ut.healthelink.service;
 
 import com.ut.healthelink.model.Organization;
+import com.ut.healthelink.model.batchUploads;
 import com.ut.healthelink.reference.fileSystem;
 
 import java.io.File;
@@ -13,7 +14,6 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.PrintStream;
-
 
 import org.apache.poi.xssf.extractor.XSSFExcelExtractor;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -32,11 +32,14 @@ public class xlsxToTxt {
     
     @Autowired
     private configurationTransportManager configurationTransportManager;
+    
+    @Autowired
+    private transactionInManager transactioninmanager;
 
     @SuppressWarnings("resource")
-	public String TranslateXLSXtoTxt(Integer orgId, String fileLocation, String excelFileName) throws Exception {
+	public String TranslateXLSXtoTxt(String fileLocation, String excelFileName, batchUploads batch) throws Exception {
 
-    	Organization orgDetails = organizationmanager.getOrganizationById(orgId);
+    	Organization orgDetails = organizationmanager.getOrganizationById(batch.getOrgId());
         
         fileSystem dir = new fileSystem();
         
@@ -106,6 +109,8 @@ public class xlsxToTxt {
         	PrintStream ps = new PrintStream(newFile);
         	ex.printStackTrace(ps);
         	ps.close();
+        	transactioninmanager.insertProcessingError(5, null, batch.getId(), null, null, null, null,
+                    false, false, ex.getStackTrace().toString());
         }
         return newfileName;
 

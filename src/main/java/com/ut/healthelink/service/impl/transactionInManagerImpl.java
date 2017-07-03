@@ -1709,30 +1709,23 @@ public class transactionInManagerImpl implements transactionInManager {
                 String decodedFileName = batch.getutBatchName();
                 String decodedFileExt = batch.getoriginalFileName().substring(batch.getoriginalFileName().lastIndexOf("."));
                 String decodedFile = decodedFilePath + decodedFileName + decodedFileExt;
-                String strDecode = "";
+                
                 boolean fileDecoded = false;
                 try {
-                	if (decodedFileExt.equalsIgnoreCase(".xlsx")) {
                 		filemanager.decode((encodedFilePath + encodedFileName), decodedFile);
                 		fileDecoded = true;
-                	} else {
-                		strDecode = filemanager.decodeFileToBase64Binary(encodedFile);
-                	}
                 } catch (Exception ex) {
                     ex.printStackTrace();
-                    strDecode = "";
                     sysErrors = 1;
                     processingSysErrorId = 17;
                 }
 
-                if (!strDecode.equalsIgnoreCase("")) {
-                    //we write and decode file
-                    filemanager.writeFile((decodedFile), strDecode);
-                    actualFileName = (decodedFilePath + decodedFileName + decodedFileExt);
-                    fileDecoded = true;
-                }
+                
                    
                 if (fileDecoded) {
+                	
+                	actualFileName = (decodedFilePath + decodedFileName + decodedFileExt);
+                
                 /*
 	                 If batch is set up for CCD input then we need to translate it
 	                 to a pipe-delimited text file.
@@ -1847,7 +1840,7 @@ public class transactionInManagerImpl implements transactionInManager {
                             tempLoadFile.delete();
                         }
                     } else if (processFileName.endsWith(".xlsx")) {
-                    	newfilename = xlsxtotxt.TranslateXLSXtoTxt(batch.getOrgId(), decodedFilePath, decodedFileName);
+                    	newfilename = xlsxtotxt.TranslateXLSXtoTxt( decodedFilePath, decodedFileName, batch);
                         if (newfilename.equals("ERRORERRORERROR")) {
                             //clean up and break
                             //need to remove load table, will leave load file with error
@@ -1862,7 +1855,7 @@ public class transactionInManagerImpl implements transactionInManager {
                             sysError = sysError + dropLoadTable(loadTableName);
                             updateBatchStatus(batchId, 7, "endDateTime");
                             insertProcessingError(22, null, batchId, null, null, null, null,
-                                    false, false, "XML format is invalid.");
+                                    false, false, "XLSX format is invalid.");
                             return false;
                         }
                         actualFileName = (decodedFilePath + newfilename);
@@ -1872,7 +1865,7 @@ public class transactionInManagerImpl implements transactionInManager {
                             tempLoadFile.delete();
                         }
                     } else if (processFileName.endsWith(".xls")) {
-                    	newfilename = xlstotxt.TranslateXLStoTxt(batch.getOrgId(), decodedFilePath, decodedFileName);
+                    	newfilename = xlstotxt.TranslateXLStoTxt( decodedFilePath, decodedFileName, batch);
                         if (newfilename.equals("ERRORERRORERROR")) {
                             //clean up and break
                             //need to remove load table, will leave load file with error
@@ -1881,6 +1874,14 @@ public class transactionInManagerImpl implements transactionInManager {
                             insertProcessingError(5, null, batchId, null, null, null, null,
                                     false, false, "Error translating xls file");
                             return false;
+                        } else if (newfilename.equals("FILE IS NOT xsl ERROR")) {
+                            //clean up and break
+                            //need to remove load table, will leave load file with error
+                            sysError = sysError + dropLoadTable(loadTableName);
+                            updateBatchStatus(batchId, 7, "endDateTime");
+                            insertProcessingError(22, null, batchId, null, null, null, null,
+                                    false, false, "XSL format is invalid.");
+                            return false;
                         }
                         actualFileName = (decodedFilePath + newfilename);
                         //we remove temp load file 
@@ -1888,7 +1889,7 @@ public class transactionInManagerImpl implements transactionInManager {
                         if (tempLoadFile.exists()) {
                             tempLoadFile.delete();
                         }
-                    }
+                    } 
                     
                     //at this point, hl7 and hr are in unencoded plain text
                     if (actualFileName.endsWith(".txt") || actualFileName.endsWith(".csv")) {
