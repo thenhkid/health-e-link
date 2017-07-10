@@ -2060,14 +2060,7 @@ public class transactionInManagerImpl implements transactionInManager {
                 //at the end of loaded, we update to PR
                 updateTransactionStatus(batchId, 0, 9, 10);
                 updateTransactionTargetStatus(batchId, 0, 9, 10);
-                //any batch over 100 records we flag as mass process, we run those every 10 mins
-                batchUploads batchDetails = getBatchDetails(batchId);
-                if (batchDetails.gettotalRecordCount() > 100) {
-                    batchStatusId = 43; //loaded without targets
-                } else {
-                    batchStatusId = 36; //loaded without targets
-                }
-
+                batchStatusId = 43; //loaded without targets               
             } catch (Exception ex) {
                 insertProcessingError(processingSysErrorId, null, batchId, null, null, null, null, false, false, ("loadBatch error " + ex.getLocalizedMessage()));
                 batchStatusId = 39;
@@ -4704,12 +4697,12 @@ public class transactionInManagerImpl implements transactionInManager {
              long diffHours2 = java.time.Duration.between(d1, d2).toHours();
              if (diffHours2 < 4) {
                  System.out.println(d2 + " process mass batches not running - " + diffHours2);
-             }	else {
+             }	else if (diffHours2 >4) {
             	 run = true;
-             }
-        }
+             } 
+	        }
 	    }
-        if (run) {
+    	if (run) {
         	//0. grab all mass batches with MSL (43)
             try {
                 List<batchUploads> batches = getBatchesByStatusIds(Arrays.asList(43));
