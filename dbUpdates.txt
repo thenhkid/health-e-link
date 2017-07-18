@@ -932,3 +932,39 @@ select '';
 end proc_main$$
 DELIMITER ;
 
+/** 071717 **/
+USE `healthelink`;
+DROP procedure IF EXISTS `setInboundOutBoundTables`;
+
+DELIMITER $$
+USE `healthelink`$$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `setInboundOutBoundTables`(in foroutboundProcessing boolean)
+proc_main:begin
+
+-- this SP sets the inbound / outbound tables
+set @translatedTable = "transactionTranslatedIn";
+set @transactionTable = "transactionIn";
+set @batchTable = "batchUploads";
+set @batchIdType = "batchId";
+set @errorTable = "transactionInErrors";
+set @batchIdColumn = "batchUploadId";
+set @listTable = "transactiontranslatedlistin";
+
+if (foroutboundProcessing) THEN
+BEGIN -- true
+		set @translatedTable = "transactionTranslatedOut";
+		set @transactionTable = "transactionTarget";
+		set @batchTable = "batchDowloads";
+		set @batchIdType = "batchId";
+		set @errorTable = "transactionOutErrors";
+        set @batchIdColumn = "BatchDownloadId";
+        set @listTable = "transactiontranslatedlistout";
+
+END; 
+END IF;
+
+end proc_main$$
+
+DELIMITER ;
+
+

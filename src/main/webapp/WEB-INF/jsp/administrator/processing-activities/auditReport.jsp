@@ -47,10 +47,10 @@
                         <c:if test="${canEdit}">
                             <input type="button" id="rejectMessages" class="btn btn-primary btn-xs rejectMessages" value="Reject All Errors" />
                         </c:if>
-                        <c:if test="${batchDetails.statusId == 2}">
+                        <c:if test="${batchDetails.statusId == 2 || batchDetails.statusId == 42}">
                             <input type="button" id="processBatch" class="btn btn-primary btn-xs processBatch" rel="processBatch" rel2="${batchDetails.id}" value="Load Batch" />
                         </c:if>
-                        <c:if test="${batchDetails.statusId == 3 || batchDetails.statusId == 36}">
+                        <c:if test="${batchDetails.statusId == 3 || batchDetails.statusId == 36 || batchDetails.statusId == 43}">
                             <input type="button" id="processBatch" class="btn btn-primary btn-xs processBatch" rel="processBatch" rel2="${batchDetails.id}" value="Process Batch" />
                         </c:if>
                         <c:if test="${canCancel && batchDetails.statusId != 4}">
