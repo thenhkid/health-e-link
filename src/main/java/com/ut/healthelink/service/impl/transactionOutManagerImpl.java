@@ -3105,6 +3105,11 @@ public class transactionOutManagerImpl implements transactionOutManager {
 		                    	massOutFile.delete();
 	                    	}
 	                    
+	                		//we need to update status
+	                		transactionInManager.updateTransactionStatus(batchUploadId, 0, 19, 40);
+	                		updateTransactionTargetStatusOutBound(batchDLId, 0, 18, 40);
+	                
+	                
 	                		/** before we delete, we need to track the details of the batch for RR audit report **/
 	                		//clean
 	                		transactionInManager.cleanAuditErrorTable(batchUploadId);
