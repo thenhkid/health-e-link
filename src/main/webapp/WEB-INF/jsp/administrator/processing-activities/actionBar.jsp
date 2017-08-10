@@ -21,7 +21,10 @@
                     </c:when>
                     <c:when test="${param['page'] == 'refActivityExport'}">
                         <a href="javascript:void(0);" title="Referral Activity Export" class="unstyled-link">Referral Activity Export</a>
-                    </c:when>     
+                    </c:when>  
+                    <c:when test="${param['page'] == 'getLog'}">
+                        <a href="/administrator/sysadmin/getLog" title="Download Tomcat Log" class="unstyled-link">Download Tomcat Log</a>
+                    </c:when>   
                 </c:choose>
             </h1>
         </div>

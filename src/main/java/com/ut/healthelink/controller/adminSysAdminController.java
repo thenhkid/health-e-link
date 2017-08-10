@@ -1,15 +1,20 @@
 package com.ut.healthelink.controller;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.ut.healthelink.model.UserActivity;
 import com.ut.healthelink.reference.TestCategoryList;
 import com.ut.healthelink.reference.USStateList;
 import com.ut.healthelink.reference.ProcessCategoryList;
@@ -1589,5 +1594,29 @@ public class adminSysAdminController {
         return mav;
     }  
     
-    
+    @RequestMapping(value = "/getLog", method = {RequestMethod.GET})
+    public void getLog(HttpSession session, HttpServletResponse response, Authentication authentication) throws Exception {
+    	
+    	User userInfo = usermanager.getUserByUserName(authentication.getName());
+    	//log user activity
+ 	   UserActivity ua = new UserActivity();
+ 	   ua.setUserId(userInfo.getId());
+ 	   ua.setAccessMethod("GET");
+ 	   ua.setPageAccess("/getLog");
+ 	   ua.setActivity("Download Tomcat Log");
+ 	   usermanager.insertUserLog(ua);
+ 	   
+    	File logFileDir = new File(System.getProperty("catalina.home"), "logs");
+        File logFile = new File(logFileDir, "catalina.out");
+        // get your file as InputStream
+	   InputStream is = new FileInputStream(logFile);
+	   String mimeType = "application/octet-stream";
+	            		  response.setContentType(mimeType);
+	            		  response.setHeader("Content-Transfer-Encoding", "binary");
+	                      response.setHeader("Content-Disposition", "attachment;filename=catalina.out");
+	                      org.apache.commons.io.IOUtils.copy(is, response.getOutputStream());
+	                      response.flushBuffer();
+	            	      is.close();
+	   
+} 
 }

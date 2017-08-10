@@ -95,7 +95,16 @@
                 </div>
             </section>
         </div>   	
-		
+		<div class="col-md-3 col-sm-3 col-xs-6">
+            <section class="panel panel-default panel-stats">
+                <div class="panel-body">
+                    <span class="stat-number"><a href="getLog" class="getLog" title="Download Latest Tomcat Log">1</a></span>
+                    <h3>Log</h3>
+                         <a href="getLog" id="getLog" class="btn btn-primary btn-small" class="getLog" title="Download Latest Tomcat Log">
+                         Download Latest Tomcat Log</a>               
+                </div>
+            </section>
+        </div> 
 
     </div>
 </div>
