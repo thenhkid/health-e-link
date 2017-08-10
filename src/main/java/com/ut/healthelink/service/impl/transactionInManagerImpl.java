@@ -824,6 +824,7 @@ public class transactionInManagerImpl implements transactionInManager {
                 // do we count pass records as errors?
                 updateRecordCounts(batchUploadId, errorStatusIds, false, "errorRecordCount");
                 updateBatchStatus(batchUploadId, batchStausId, "endDateTime");
+                
 
             } //end of making sure there is one handling details for batch
 
@@ -833,7 +834,10 @@ public class transactionInManagerImpl implements transactionInManager {
              *
              */
             Integer rejectedCount = getRecordCounts(batch.getId(), rejectIds, false, true);
-            if (rejectedCount > 0) {
+            
+            if (rejectedCount == batch.gettotalRecordCount()) {
+             	sendEmailToAdmin((new Date() + "<br/>Please login and review. Entire batch failed.  <br/>Batch Id -  " + batch.getId() + "<br/> UT Batch Name " + batch.getutBatchName() + " <br/>Original batch file name - " + batch.getoriginalFileName()), "Entire Batch Failed");
+            } else if (rejectedCount > 0) {
                 sendRejectNotification(batch, rejectedCount);
             }
 
@@ -2074,6 +2078,11 @@ public class transactionInManagerImpl implements transactionInManager {
             } catch (Exception ex1) {
                 Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ("loadBatch error at updating batch status - " + ex1));
                 return false;
+            }
+            
+            //if status is not 43 or 36, we email admin
+            if (batchStatusId != 43 && batchStatusId != 36) {
+            	sendEmailToAdmin((new Date() + "<br/>Please login and review. Load batch failed.  <br/>Batch Id -  " + batch.getId() + "<br/> UT Batch Name " + batch.getutBatchName() + " <br/>Original batch file name - " + batch.getoriginalFileName()), "Load Batch Failed");
             }
         }
         return true;
@@ -3431,7 +3440,7 @@ public class transactionInManagerImpl implements transactionInManager {
             mail.setfromEmailAddress("support@health-e-link.net");
             mail.setmessageBody(message);
             mail.setmessageSubject(subject + " " + myProps.getProperty("server.identity"));
-            mail.settoEmailAddress("dphuniversaltranslator@gmail.com");
+            mail.settoEmailAddress(myProps.getProperty("admin.email"));
             emailManager.sendEmail(mail);
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -4529,7 +4538,9 @@ public class transactionInManagerImpl implements transactionInManager {
 
         //String[] ccAddresses = new String[2];
         List<String> ccAddresses = new ArrayList<String>();
-        ccAddresses.add("chadmccue05@gmail.com");
+        if (!myProps.getProperty("reject.ccemail").equalsIgnoreCase("")) {
+        	ccAddresses.add(myProps.getProperty("reject.ccemail"));
+        }
 
         //build message
         String message = "Batch" + batch.getutBatchName() + " contains " + rejectCount + " rejected transaction(s).";
@@ -4578,7 +4589,7 @@ public class transactionInManagerImpl implements transactionInManager {
             mail.setccEmailAddress(ccEmailAddresses);
         }
 
-        //emailManager.sendEmail(mail);
+       emailManager.sendEmail(mail);
     }
 
     @Override
