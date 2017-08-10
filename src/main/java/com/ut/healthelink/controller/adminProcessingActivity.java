@@ -2093,10 +2093,11 @@ public class adminProcessingActivity {
 
         if (userInfo != null && batchDetails != null) {
             if (batchOption.equalsIgnoreCase("processBatch")) {
-                if (batchDetails.getstatusId() == 2) {
+                if (batchDetails.getstatusId() == 2 || batchDetails.getstatusId() == 42 ) {
                     strBatchOption = "Loaded Batch";
                     transactionInManager.loadBatch(batchId);
-                } else if (batchDetails.getstatusId() == 3 || batchDetails.getstatusId() == 36) {
+                } else if (batchDetails.getstatusId() == 3 || batchDetails.getstatusId() == 36
+                		|| batchDetails.getstatusId() == 43 ) {
                     strBatchOption = "Processed Batch";
                     transactionInManager.processBatch(batchId, false, 0);
                 }
