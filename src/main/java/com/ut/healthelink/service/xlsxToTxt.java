@@ -12,10 +12,13 @@ import com.ut.healthelink.reference.fileSystem;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
-import java.io.InputStream;
 import java.io.PrintStream;
 
-import org.apache.poi.xssf.extractor.XSSFExcelExtractor;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.DataFormatter;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,7 +39,7 @@ public class xlsxToTxt {
     @Autowired
     private transactionInManager transactioninmanager;
 
-    @SuppressWarnings("resource")
+    @SuppressWarnings({ "resource", "deprecation" })
 	public String TranslateXLSXtoTxt(String fileLocation, String excelFileName, batchUploads batch) throws Exception {
 
     	Organization orgDetails = organizationmanager.getOrganizationById(batch.getOrgId());
@@ -81,27 +84,30 @@ public class xlsxToTxt {
 
         try {
 
-	        FileWriter fw = new FileWriter(newFile, true);
-	        String text = "";
-	        InputStream inp = new FileInputStream(inputFile);
-
-	       XSSFWorkbook document = new XSSFWorkbook(inp);
-	       XSSFExcelExtractor extractor = new XSSFExcelExtractor(document);
-	       extractor.setFormulasNotResults(true);
-		   extractor.setIncludeSheetNames(false);
-		   text = extractor.getText();
-		   //need to replace all nulls
-		   String text1 = text.replaceAll("null\t", " \t");
-		   text = "";
-		   String text2 = text1.replaceAll("\tnull", "\t ");
-	       text1 = "";
-		   if (text2.equalsIgnoreCase("")) {
-	        	newfileName = "FILE IS NOT xslx ERROR";
-	        }
-	        
-	        fw.write(text2);
-	        fw.close();
-
+        	FileWriter fw = new FileWriter(newFile, true);
+     	   FileInputStream excelFileInputStream = new FileInputStream(inputFile);
+            Workbook workbook = new XSSFWorkbook(excelFileInputStream);
+            Sheet datatypeSheet = workbook.getSheetAt(0);
+            StringBuffer sb = new StringBuffer();
+            DataFormatter formatter = new DataFormatter();
+            
+            for(Row row : datatypeSheet) {
+         	   for(int cn=0; cn<row.getLastCellNum(); cn++) {
+         	       // If the cell is missing from the file, generate a blank one
+         	       // (Works by specifying a MissingCellPolicy)
+         	       Cell cell = row.getCell(cn, Row.CREATE_NULL_AS_BLANK);
+         	       String text = formatter.formatCellValue(cell);
+         	       sb.append(text + batch.getDelimChar());
+         	   }
+         	   		sb.append(System.getProperty("line.separator"));
+         	}
+     	   
+             if (sb.toString().equalsIgnoreCase("")) {
+     	    	newfileName = "FILE IS NOT xslx ERROR";
+     	    }
+     	   
+     	    fw.write(sb.toString());
+     	    fw.close();
 	        
         } catch (Exception ex) {
         	ex.printStackTrace();
