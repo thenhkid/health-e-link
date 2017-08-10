@@ -19,6 +19,7 @@ import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -85,9 +86,8 @@ public class xlsxToTxt {
         try {
 
         	FileWriter fw = new FileWriter(newFile, true);
-     	   FileInputStream excelFileInputStream = new FileInputStream(inputFile);
-            Workbook workbook = new XSSFWorkbook(excelFileInputStream);
-            Sheet datatypeSheet = workbook.getSheetAt(0);
+     	    Workbook workbook = WorkbookFactory.create(inputFile);
+        	Sheet datatypeSheet = workbook.getSheetAt(0);
             StringBuffer sb = new StringBuffer();
             DataFormatter formatter = new DataFormatter();
             
