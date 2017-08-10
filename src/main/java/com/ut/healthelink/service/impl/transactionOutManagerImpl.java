@@ -3110,12 +3110,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
 	                		updateTransactionTargetStatusOutBound(batchDLId, 0, 18, 40);
 	                
 	                
-	                		/** before we delete, we need to track the details of the batch for RR audit report **/
-	                		//clean
-	                		transactionInManager.cleanAuditErrorTable(batchUploadId);
-	                		//populate
-	                		transactionInManager.populateAuditReport(batchUploadId, configurationManager.getMessageSpecs(batchUploadDetails.getConfigId()));
-	                
+	                		
 	                		//we need to update our totals
                 			transactionInManager.updateRecordCounts(batchDownload.getId(), rejectIds, true, "totalErrorCount");
                 			transactionInManager.updateRecordCounts(batchDownload.getId(), new ArrayList<Integer>(), true, "totalRecordCount");

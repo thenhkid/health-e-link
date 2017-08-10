@@ -545,10 +545,15 @@ public class transactionInManagerImpl implements transactionInManager {
     @Override
     public boolean processBatch(int batchUploadId, boolean doNotClearErrors, Integer transactionId) throws Exception {
         UserActivity ua = new UserActivity();
+        boolean isMassBatch = false;
+        
         Integer batchStausId = 29;
         List<Integer> errorStatusIds = Arrays.asList(11, 13, 14, 16);
         //get batch details
         batchUploads batch = getBatchDetails(batchUploadId);
+        if (batch.getstatusId() == 43) {
+        	 isMassBatch = true;
+        }
         //this should be the same point of both ERG and Uploaded File *
         Integer systemErrorCount = 0;
         // Check to make sure the file is valid for processing, valid file is a batch with SSL (3) or SR (6)*
@@ -839,6 +844,15 @@ public class transactionInManagerImpl implements transactionInManager {
              	sendEmailToAdmin((new Date() + "<br/>Please login and review. Entire batch failed.  <br/>Batch Id -  " + batch.getId() + "<br/> UT Batch Name " + batch.getutBatchName() + " <br/>Original batch file name - " + batch.getoriginalFileName()), "Entire Batch Failed");
             } else if (rejectedCount > 0) {
                 sendRejectNotification(batch, rejectedCount);
+            }
+            
+            //we populate additional audit table for mass batches
+            if (isMassBatch) {
+            	/** before we delete, we need to track the details of the batch for RR audit report **/
+        		//clean
+        		cleanAuditErrorTable(batch.getId());
+        		//populate
+        		populateAuditReport(batchUploadId, configurationManager.getMessageSpecs(batch.getConfigId()));
             }
 
         } // end of single batch insert 
