@@ -69,6 +69,12 @@
                                                         ${batch.originalFileName}
                                                     </a>
                                                 </c:if>
+                                                <c:if test="${(batch.transportMethodId  == 6 || batch.transportMethodId  == 5) && (batch.statusId != 42 || batch.statusId != 2) }">
+                                                        <c:set var="hrefLinkDec" value="/FileDownload/downloadFile.do?filename=${batch.utBatchName}_dec.txt&foldername=archivesIn"/>
+                                                        <a href="${hrefLinkDec}" title="View Generated Text File">
+                                                        ${batch.utBatchName}_dec.txt
+                                                        </a>
+                                                    </c:if>
                                             </td>
                                             <td>
                                                 <c:choose>
