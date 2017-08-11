@@ -61,8 +61,7 @@ import com.ut.healthelink.service.organizationManager;
 import com.ut.healthelink.service.sysAdminManager;
 import com.ut.healthelink.service.userManager;
 import com.ut.healthelink.service.utilManager;
-import com.ut.healthelink.service.xlsToTxt;
-import com.ut.healthelink.service.xlsxToTxt;
+import com.ut.healthelink.service.excelToTxt;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
@@ -71,7 +70,6 @@ import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import org.springframework.stereotype.Service;
-
 import com.ut.healthelink.service.transactionInManager;
 
 import java.io.File;
@@ -160,10 +158,7 @@ public class transactionInManagerImpl implements transactionInManager {
     private CCDtoTxt ccdtotxt;
     
     @Autowired
-    private xlsxToTxt xlsxtotxt;
-    
-    @Autowired
-    private xlsToTxt xlstotxt;
+    private excelToTxt xlsxtotxt;
     
     @Autowired
     private emailMessageManager emailManager;
@@ -1818,6 +1813,7 @@ public class transactionInManagerImpl implements transactionInManager {
                             updateBatchStatus(batchId, 39, "endDateTime");
                             insertProcessingError(5, null, batchId, null, null, null, null,
                                     false, false, "Error at applying jar template");
+                            sendEmailToAdmin((new Date() + "<br/>Please login and review. Load batch failed.  <br/>Batch Id -  " + batch.getId() + "<br/> UT Batch Name " + batch.getutBatchName() + " <br/>Original batch file name - " + batch.getoriginalFileName()), "Load XML Batch Failed");
                             return false;
                         } else if (newfilename.equals("FILE IS NOT XML ERROR")) {
                             //clean up and break
@@ -1826,6 +1822,7 @@ public class transactionInManagerImpl implements transactionInManager {
                             updateBatchStatus(batchId, 7, "endDateTime");
                             insertProcessingError(22, null, batchId, null, null, null, null,
                                     false, false, "XML format is invalid.");
+                            sendEmailToAdmin((new Date() + "<br/>Please login and review. Load batch failed.  <br/>Batch Id -  " + batch.getId() + "<br/> UT Batch Name " + batch.getutBatchName() + " <br/>Original batch file name - " + batch.getoriginalFileName()), "Load XML Batch Failed");
                             return false;
                         }
 
@@ -1849,6 +1846,7 @@ public class transactionInManagerImpl implements transactionInManager {
                             updateBatchStatus(batchId, 39, "endDateTime");
                             insertProcessingError(5, null, batchId, null, null, null, null,
                                     false, false, "Error at applying jar template");
+                            sendEmailToAdmin((new Date() + "<br/>Please login and review. Load batch failed.  <br/>Batch Id -  " + batch.getId() + "<br/> UT Batch Name " + batch.getutBatchName() + " <br/>Original batch file name - " + batch.getoriginalFileName()), "Load HR Batch Failed");
                             return false;
                         }
                         actualFileName = (decodedFilePath + newfilename);
@@ -1857,7 +1855,7 @@ public class transactionInManagerImpl implements transactionInManager {
                         if (tempLoadFile.exists()) {
                             tempLoadFile.delete();
                         }
-                    } else if (processFileName.endsWith(".xlsx")) {
+                    } else if (processFileName.endsWith(".xlsx") || processFileName.endsWith(".xls")) {
                     	newfilename = xlsxtotxt.TranslateXLSXtoTxt( decodedFilePath, decodedFileName, batch);
                         if (newfilename.equals("ERRORERRORERROR")) {
                             //clean up and break
@@ -1866,6 +1864,7 @@ public class transactionInManagerImpl implements transactionInManager {
                             updateBatchStatus(batchId, 39, "endDateTime");
                             insertProcessingError(5, null, batchId, null, null, null, null,
                                     false, false, "Error translating xlsx file");
+                            sendEmailToAdmin((new Date() + "<br/>Please login and review. Load batch failed.  <br/>Batch Id -  " + batch.getId() + "<br/> UT Batch Name " + batch.getutBatchName() + " <br/>Original batch file name - " + batch.getoriginalFileName()), "Load XLSX Batch Failed");
                             return false;
                         } else if (newfilename.equals("FILE IS NOT xslx ERROR")) {
                             //clean up and break
@@ -1874,31 +1873,7 @@ public class transactionInManagerImpl implements transactionInManager {
                             updateBatchStatus(batchId, 7, "endDateTime");
                             insertProcessingError(22, null, batchId, null, null, null, null,
                                     false, false, "XLSX format is invalid.");
-                            return false;
-                        }
-                        actualFileName = (decodedFilePath + newfilename);
-                        //we remove temp load file 
-                        File tempLoadFile = new File(decodedFilePath + processFileName);
-                        if (tempLoadFile.exists()) {
-                            tempLoadFile.delete();
-                        }
-                    } else if (processFileName.endsWith(".xls")) {
-                    	newfilename = xlstotxt.TranslateXLStoTxt( decodedFilePath, decodedFileName, batch);
-                        if (newfilename.equals("ERRORERRORERROR")) {
-                            //clean up and break
-                            //need to remove load table, will leave load file with error
-                            sysError = sysError + dropLoadTable(loadTableName);
-                            updateBatchStatus(batchId, 39, "endDateTime");
-                            insertProcessingError(5, null, batchId, null, null, null, null,
-                                    false, false, "Error translating xls file");
-                            return false;
-                        } else if (newfilename.equals("FILE IS NOT xsl ERROR")) {
-                            //clean up and break
-                            //need to remove load table, will leave load file with error
-                            sysError = sysError + dropLoadTable(loadTableName);
-                            updateBatchStatus(batchId, 7, "endDateTime");
-                            insertProcessingError(22, null, batchId, null, null, null, null,
-                                    false, false, "XSL format is invalid.");
+                            sendEmailToAdmin((new Date() + "<br/>Please login and review. Load batch failed.  <br/>Batch Id -  " + batch.getId() + "<br/> UT Batch Name " + batch.getutBatchName() + " <br/>Original batch file name - " + batch.getoriginalFileName()), "Load XLSX Batch Failed");
                             return false;
                         }
                         actualFileName = (decodedFilePath + newfilename);
