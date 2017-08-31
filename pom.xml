@@ -36,6 +36,7 @@
         <tomcat-jdbc.version>7.0.47</tomcat-jdbc.version>
         <sax.version>2.0.1</sax.version>
         <apache.poi.version>3.16</apache.poi.version>
+        <xlsx.streamer.version>1.2.0</xlsx.streamer.version>
     </properties>
   
  
@@ -329,6 +330,12 @@
 		    <version>${apache.poi.version}</version>
 		</dependency>
 
+		  <dependency>
+		    <groupId>com.monitorjbl</groupId>
+		    <artifactId>xlsx-streamer</artifactId>
+		    <version>${xlsx.streamer.version}</version>
+		  </dependency>
+ 
     </dependencies>
     <build>
         <plugins>
