@@ -43,6 +43,7 @@ public class excelToTxt {
     @Autowired
     private transactionInManager transactioninmanager;
 
+	@SuppressWarnings("deprecation")
 	public String TranslateXLSXtoTxt(String fileLocation, String excelFileName, batchUploads batch) throws Exception {
 
     	Organization orgDetails = organizationmanager.getOrganizationById(batch.getOrgId());
@@ -120,56 +121,10 @@ public class excelToTxt {
          	}
             System.out.println("After record - " + new Date());
         	
-           
-        	/**
-        	FileWriter fw = new FileWriter(newFile);
-        	System.out.println("Start wb - " + new Date());
-     	    Workbook workbook = null;
-     	    try {
-     	    	WorkbookFactory.create(new FileInputStream (inputFile));
-     	    } catch (Exception ex) {
-     	    	ex.printStackTrace();
-     	    	newfileName = "ERRORERRORERROR";
-            	PrintStream ps = new PrintStream(newFile);
-            	ex.printStackTrace(ps);
-            	ps.close();
-            	transactioninmanager.insertProcessingError(5, null, batch.getId(), null, null, null, null,
-                        false, false, ex.getStackTrace().toString());
-     	    }
-     	    System.out.println("After reading workbook - " + new Date());
-        	
-     	    Sheet datatypeSheet = workbook.getSheetAt(0);
-            
-            DataFormatter formatter = new DataFormatter();
-            System.out.println("Start record - " + new Date());
-            for(Row row : datatypeSheet) {
-            	String string = "";
-            	for(int cn=0; cn<row.getLastCellNum(); cn++) {
-         		   // If the cell is missing from the file, generate a blank one
-         	       // (Works by specifying a MissingCellPolicy)
-         	       Cell cell = row.getCell(cn, Row.CREATE_NULL_AS_BLANK);
-         	       String text = formatter.formatCellValue(cell);
-         	      string = string + text + batch.getDelimChar();
-         	   }
-            	if (row.getRowNum() != datatypeSheet.getLastRowNum()) {
-            		string = string + System.getProperty("line.separator");
-           		}
-            	String stringRemoveEmptyRows = string.replaceAll("(?m)^[ \t]*\r?\n", "");
-                fw.write(stringRemoveEmptyRows);
-         	}
-            System.out.println("After record - " + new Date());
-     	   /**
-             if (sb.toString().equalsIgnoreCase("")) {
-     	    	newfileName = "FILE IS NOT xslx ERROR";
-     	    }
-            String stringRemoveEmptyRows = sb.toString().replaceAll("(?m)^[ \t]*\r?\n", "");
-            fw.write(stringRemoveEmptyRows);
-            **/
-        	
-        	fw.close();
-     	    workbook.close();
+        	workbook.close();
      	    is.close();
-     	   
+     	    fw.close();
+    	    
      	   System.out.println("end of writing entire file - " + new Date());
      	    
         } catch (Exception ex) {

@@ -94,9 +94,13 @@ public class xlsToTxt {
         	    extractor.setIncludeSheetNames(false);
         	    text = extractor.getText();
         	    fw.write(text.replaceAll("(?m)^[ \t]*\r?\n", ""));
-		        fw.close();
-		        wb.close();
+		        
+        	    extractor.close();
+        	    wb.close();
 		        inp.close();
+		        fw.close();
+		        
+		        
 		        System.out.println("End xls - " + new Date());
         } catch (Exception ex) {
         	ex.printStackTrace();
