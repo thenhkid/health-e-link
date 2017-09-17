@@ -14,7 +14,6 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.util.Date;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DataFormatter;
@@ -92,9 +91,7 @@ public class excelToTxt {
         try {
         	
         	FileWriter fw = new FileWriter(newFile);
-        	
         	InputStream is = new FileInputStream(inputFile);
-        	System.out.println("Start wb - " + new Date());
         	Workbook workbook = StreamingReader.builder()
         	        .rowCacheSize(100)    // number of rows to keep in memory (defaults to 10)
         	        .bufferSize(4096)     // buffer size to use when reading InputStream to file (defaults to 1024)
@@ -103,7 +100,8 @@ public class excelToTxt {
         	Sheet datatypeSheet = workbook.getSheetAt(0);
             
             DataFormatter formatter = new DataFormatter();
-            System.out.println("Start record - " + new Date());
+            int  writeRow = 0;
+            
             for(Row row : datatypeSheet) {
             	String string = "";
             	for(int cn=0; cn<row.getLastCellNum(); cn++) {
@@ -111,21 +109,24 @@ public class excelToTxt {
          	       // (Works by specifying a MissingCellPolicy)
          	       Cell cell = row.getCell(cn, Row.CREATE_NULL_AS_BLANK);
          	       String text = formatter.formatCellValue(cell);
-         	      string = string + text + batch.getDelimChar();
+         	       string = string + text + batch.getDelimChar();
          	   }
-            	if (row.getRowNum() != datatypeSheet.getLastRowNum()) {
-            		string = string + System.getProperty("line.separator");
-           		}
+            	// check to see if row is blank
             	String stringRemoveEmptyRows = string.replaceAll("(?m)^[ \t]*\r?\n", "");
-                fw.write(stringRemoveEmptyRows);
-         	}
-            System.out.println("After record - " + new Date());
+            	if (stringRemoveEmptyRows.trim().length() > 0) {
+            		writeRow ++;
+            		if (writeRow == 1) {
+            			 fw.write(stringRemoveEmptyRows);
+            		} else {
+            			fw.write(System.getProperty("line.separator") + stringRemoveEmptyRows);
+            		}
+           		}
+            }
+            
         	
-        	workbook.close();
+     	    workbook.close();
      	    is.close();
      	    fw.close();
-    	    
-     	   System.out.println("end of writing entire file - " + new Date());
      	    
         } catch (Exception ex) {
         	ex.printStackTrace();
