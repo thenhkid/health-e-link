@@ -36,7 +36,7 @@
                 <name>GenerateOutputFilesTrigger</name>
                 <job-name>GenerateOutputFiles</job-name>
                 <job-group>processGroup</job-group>
-                <cron-expression>0 0/1 * * * ?</cron-expression>
+                <cron-expression>0 0/5 * * * ?</cron-expression>
             </cron>
         </trigger>
     </schedule>
@@ -63,7 +63,7 @@
         <job>
             <name>LoadMassBatches</name>
             <group>processGroup</group>
-            <description>This process will run every 90 minutes to look for large files</description>
+            <description>This process will run every 5 minutes to look for large files</description>
             <job-class>com.ut.healthelink.jobs.loadMassBatches</job-class>
         </job>
  
@@ -119,7 +119,7 @@
         <job>
             <name>ProcessMassInBoundBatches</name>
             <group>processGroup</group>
-            <description>This process will run every 10 </description>
+            <description>This process will run every 6 </description>
             <job-class>com.ut.healthelink.jobs.processMassBatches</job-class>
         </job>
  
@@ -158,7 +158,7 @@
         <job>
             <name>ProcessMassOutputBatches</name>
             <group>processGroup</group>
-            <description>This process will run every 30 seconds on the 5 second of the minute  to check if any loaded files will need to be process</description>
+            <description>This process will run every 15 mins on the 5 minute  to check if any loaded files will need to be process</description>
             <job-class>com.ut.healthelink.jobs.processMassOutputRecords</job-class>
         </job>
  
@@ -167,7 +167,7 @@
                 <name>ProcessMassOutputBatchesTrigger</name>
                 <job-name>ProcessMassOutputBatches</job-name>
                 <job-group>processGroup</job-group>
-                <cron-expression>0 5/20 * * * ?</cron-expression>
+                <cron-expression>0 5/15 * * * ?</cron-expression>
             </cron>
         </trigger>
     </schedule>
