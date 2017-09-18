@@ -27,6 +27,7 @@ import com.ut.healthelink.model.lutables.lu_Medications;
 import com.ut.healthelink.model.lutables.lu_Procedures;
 import com.ut.healthelink.model.lutables.lu_ProcessStatus;
 import com.ut.healthelink.model.lutables.lu_Tests;
+import com.ut.healthelink.model.MoveFilesLog;
 import com.ut.healthelink.model.mainHL7Details;
 import com.ut.healthelink.model.mainHL7Elements;
 import com.ut.healthelink.model.mainHL7Segments;
@@ -882,4 +883,26 @@ public class sysAdminDAOImpl implements sysAdminDAO {
         return totalUsers;
 	}
 
+	@Override
+	@Transactional
+	@SuppressWarnings("unchecked")
+	public List<MoveFilesLog> getMoveFilesLog(Integer statusId) throws Exception {
+		Criteria criteria = sessionFactory.getCurrentSession().createCriteria(MoveFilesLog.class);
+		if (statusId != null) {
+			criteria.add(Restrictions.eq("statusId",statusId));
+		}
+       
+		List<MoveFilesLog> moveLogList = criteria.list();
+        return moveLogList;
+	}
+
+	@Override
+	@Transactional
+    public void deleteMoveFilesLog(MoveFilesLog moveFileLog) throws Exception {
+        Query deleteFields = sessionFactory.getCurrentSession().createQuery("delete from MoveFilesLog where id = :moveFilePathId");
+        deleteFields.setParameter("moveFilePathId", moveFileLog.getId());
+        deleteFields.executeUpdate();
+	
+	}
+	
 }

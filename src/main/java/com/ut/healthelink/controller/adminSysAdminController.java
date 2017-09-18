@@ -22,6 +22,7 @@ import com.ut.healthelink.service.configurationManager;
 import com.ut.healthelink.service.sysAdminManager;
 import com.ut.healthelink.service.userManager;
 import com.ut.healthelink.model.Macros;
+import com.ut.healthelink.model.MoveFilesLog;
 import com.ut.healthelink.model.User;
 import com.ut.healthelink.model.custom.LogoInfo;
 import com.ut.healthelink.model.custom.LookUpTable;
@@ -90,13 +91,14 @@ public class adminSysAdminController {
         Long totalMacroRows = sysAdminManager.findTotalMacroRows();
         Long totalHL7Entries = sysAdminManager.findtotalHL7Entries();
         Long totalUsers = sysAdminManager.findTotalUsers();
+        Integer filePaths = sysAdminManager.getMoveFilesLog(1).size();
         
         mav.addObject("totalLookUpTables", totalLookUpTables);
         mav.addObject("totalMacroRows", totalMacroRows);
         mav.addObject("totalHL7Entries", totalHL7Entries);
         mav.addObject("totalUsers", totalUsers);
+        mav.addObject("filePaths", filePaths);
         
-
         return mav;
     }
 
@@ -1619,4 +1621,30 @@ public class adminSysAdminController {
 	            	      is.close();
 	   
 } 
+    
+    @RequestMapping(value = "/moveFilePaths", method = RequestMethod.GET)
+    public ModelAndView moveFilePaths(HttpServletRequest request, HttpServletResponse response, 
+    		HttpSession session, RedirectAttributes redirectAttr) throws Exception {
+
+    	ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/sysadmin/moveFilePaths");
+        //we get list of programs
+        List<MoveFilesLog> pathList = sysAdminManager.getMoveFilesLog(1);
+        mav.addObject("pathList", pathList);
+        
+        return mav;
+    }
+    
+    @RequestMapping(value = "/moveFilePaths", method = RequestMethod.POST)
+    @ResponseBody
+    public String associateEntity(@RequestParam(value = "pathId", required = true) Integer pathId) throws Exception {
+        
+    	MoveFilesLog moveFilesLog = new MoveFilesLog();
+    	moveFilesLog.setId(pathId);
+    	sysAdminManager.deleteMoveFilesLog(moveFilesLog);
+        
+        return "deleted";
+    }    	
+    
+    
 }

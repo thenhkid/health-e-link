@@ -8,7 +8,7 @@
             <li ${param['page'] == 'news' ? 'class="active"' : ''}><a href="<c:url value='/administrator/sysadmin/news'/>" title="News Articles">News Articles</a></li>
 			<li ${param['page'] == 'loginAs' ? 'class="active"' : ''}><a href="<c:url value='/administrator/sysadmin/loginAs'/>" title="Login As">Login As</a></li>
             <li ${param['page'] == 'getLog' ? 'class="active"' : ''}><a href="<c:url value='/administrator/sysadmin/getLog'/>" title="Download Log">Download Log</a></li>
-            
+            <li ${param['page'] == 'moveFilePaths' ? 'class="active"' : ''}><a href="<c:url value='/administrator/sysadmin/moveFilePaths'/>" title="Move File Paths">Move File Paths</a></li>
                 <%-- <li ${param['page'] == 'logos' ? 'class="active"' : ''}><a href="<c:url value='/administrator/sysadmin/logos'/>" title="Logo">Logos</a></li>
                 --%>
           </ul>
