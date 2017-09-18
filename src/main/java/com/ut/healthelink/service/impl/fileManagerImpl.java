@@ -1,16 +1,21 @@
 package com.ut.healthelink.service.impl;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+
 import org.apache.commons.codec.binary.Base64;
 import org.springframework.stereotype.Service;
+
 import com.ut.healthelink.service.fileManager;
 
 
@@ -118,4 +123,34 @@ public class fileManagerImpl implements fileManager {
              ex.printStackTrace();
           }         
        }
+
+
+	@Override
+	public void decode(String sourceFile, String targetFile) throws Exception{
+		byte[] decodedBytes = Base64.decodeBase64(loadFileAsBytesArray(sourceFile));
+		writeByteArraysToFile(targetFile, decodedBytes);
+		
+	}
+	
+	public  void writeByteArraysToFile(String fileName, byte[] content) throws IOException {
+		 
+        File file = new File(fileName);
+        BufferedOutputStream writer = new BufferedOutputStream(new FileOutputStream(file));
+        writer.write(content);
+        writer.flush();
+        writer.close();
+ 
+    }
+	
+	public byte[] loadFileAsBytesArray(String fileName) throws Exception {
+		 
+        File file = new File(fileName);
+        int length = (int) file.length();
+        BufferedInputStream reader = new BufferedInputStream(new FileInputStream(file));
+        byte[] bytes = new byte[length];
+        reader.read(bytes, 0, length);
+        reader.close();
+        return bytes;
+ 
+    }
 }

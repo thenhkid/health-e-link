@@ -76,6 +76,7 @@ import com.ut.healthelink.model.configurationWebServiceFields;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 
 @Controller
@@ -477,10 +478,10 @@ public class adminConfigController {
             transportDetails = new configurationTransport();
             
             if(configurationDetails.getType() == 1) {
-                transportDetails.setfileLocation("/bowlink/"+orgDetails.getCleanURL()+"/input files/");
+                transportDetails.setfileLocation("/bowlink/"+orgDetails.getcleanURL()+"/input files/");
             }
             else {
-               transportDetails.setfileLocation("/bowlink/"+orgDetails.getCleanURL()+"/output files/"); 
+               transportDetails.setfileLocation("/bowlink/"+orgDetails.getcleanURL()+"/output files/"); 
             }
             
             List<Integer> assocMessageTypes = new ArrayList<Integer>();
@@ -513,11 +514,11 @@ public class adminConfigController {
             List<configurationFTPFields> emptyFTPFields = new ArrayList<configurationFTPFields>();
             configurationFTPFields pushFTPFields = new configurationFTPFields();
             pushFTPFields.setmethod(1);
-            pushFTPFields.setdirectory("/UTSFTP/"+orgDetails.getCleanURL()+"/input/");
+            pushFTPFields.setdirectory("/UTSFTP/"+orgDetails.getcleanURL()+"/input/");
             
             configurationFTPFields getFTPFields = new configurationFTPFields();
             getFTPFields.setmethod(2);
-            getFTPFields.setdirectory("/UTSFTP/"+orgDetails.getCleanURL()+"/output/"); 
+            getFTPFields.setdirectory("/UTSFTP/"+orgDetails.getcleanURL()+"/output/"); 
             
             emptyFTPFields.add(pushFTPFields);
             emptyFTPFields.add(getFTPFields);
@@ -537,11 +538,11 @@ public class adminConfigController {
             List<configurationRhapsodyFields> emptyRhapsodyFields = new ArrayList<configurationRhapsodyFields>();
             configurationRhapsodyFields pushRFields = new configurationRhapsodyFields();
             pushRFields.setMethod(1);
-            pushRFields.setDirectory("/UT/"+orgDetails.getCleanURL()+"/input/");
+            pushRFields.setDirectory("/UT/"+orgDetails.getcleanURL()+"/input/");
             
             configurationRhapsodyFields getRFields = new configurationRhapsodyFields();
             getRFields.setMethod(2);
-            getRFields.setDirectory("/UT/"+orgDetails.getCleanURL()+"/output/"); 
+            getRFields.setDirectory("/UT/"+orgDetails.getcleanURL()+"/output/"); 
             
             emptyRhapsodyFields.add(pushRFields);
             emptyRhapsodyFields.add(getRFields);
@@ -1496,24 +1497,24 @@ public class adminConfigController {
                 }
                 
                 /* Get the list of connection senders */
-                List<configurationConnectionSenders> senders = configurationmanager.getConnectionSenders(connection.getId());
+                /*List<configurationConnectionSenders> senders = configurationmanager.getConnectionSenders(connection.getId());
                 
                 for(configurationConnectionSenders sender : senders) {
                     User userDetail = userManager.getUserById(sender.getuserId());
                     userDetail.setOrgName(organizationmanager.getOrganizationById(userDetail.getOrgId()).getOrgName());
                     connectionSenders.add(userDetail);
                 }
-                connection.setconnectionSenders(connectionSenders);
+                connection.setconnectionSenders(connectionSenders);*/
                 
                 /* Get the list of connection receivers */
-                List<configurationConnectionReceivers> receivers = configurationmanager.getConnectionReceivers(connection.getId());
+                /*List<configurationConnectionReceivers> receivers = configurationmanager.getConnectionReceivers(connection.getId());
                 
                 for(configurationConnectionReceivers receiver : receivers) {
                     User userDetail = userManager.getUserById(receiver.getuserId());
                     userDetail.setOrgName(organizationmanager.getOrganizationById(userDetail.getOrgId()).getOrgName());
                     connectonReceivers.add(userDetail);
                 }
-                connection.setconnectionReceivers(connectonReceivers);
+                connection.setconnectionReceivers(connectonReceivers);*/
                 
                 
                 connection.settgtConfigDetails(tgtconfigDetails);
@@ -1576,9 +1577,9 @@ public class adminConfigController {
         tgtconfigDetails.setorgId(organizationmanager.getOrganizationById(tgtconfigDetails.getorgId()).getId());
         connectionDetails.settgtConfigDetails(tgtconfigDetails);
         
-        List<configurationConnectionSenders> senders = configurationmanager.getConnectionSenders(connectionId);
+        /*List<configurationConnectionSenders> senders = configurationmanager.getConnectionSenders(connectionId);
         
-        /* Array to holder the users */
+        // Array to holder the users 
         List<User> connectionSenders = new ArrayList<User>();
         List<User> connectonReceivers = new ArrayList<User>();
                 
@@ -1589,7 +1590,7 @@ public class adminConfigController {
         }
         connectionDetails.setconnectionSenders(connectionSenders);
 
-        /* Get the list of connection receivers */
+        // Get the list of connection receivers 
         List<configurationConnectionReceivers> receivers = configurationmanager.getConnectionReceivers(connectionId);
 
         for(configurationConnectionReceivers receiver : receivers) {
@@ -1598,6 +1599,7 @@ public class adminConfigController {
             connectonReceivers.add(userDetail);
         }
         connectionDetails.setconnectionReceivers(connectonReceivers);
+        */
         
         mav.addObject("connectionDetails", connectionDetails);
         
@@ -1607,6 +1609,110 @@ public class adminConfigController {
         
         return mav;
     }
+    
+     /**
+     * The '/getAvailableSendingUsers.do' function will return a list of users that are associated
+     * to the selected organization.
+     * 
+     * @param orgId The organization selected in the drop down
+     * 
+     * @return users    The available users
+     */
+    @SuppressWarnings("rawtypes")
+    @RequestMapping(value= "/getAvailableSendingUsers.do", method = RequestMethod.GET)
+    public @ResponseBody ModelAndView getAvailableSendingUsers(
+            @RequestParam(value = "orgId", required = true) int orgId,
+            @RequestParam(value = "connectionId", required = true) int connectionId) {
+        
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/configurations/connectionSendingUsers");
+        
+        List<User> users = userManager.getUsersByOrganization(orgId);
+        
+        List<configurationConnectionSenders> senders = configurationmanager.getConnectionSenders(connectionId);
+        
+        List<User> connectionSenders = new ArrayList<User>();
+        
+        for(User user : users) {
+            boolean associated = false;
+            boolean sendSentEmail = false;
+            boolean sendReceivedEmail = false;
+            if(senders != null && senders.size() > 0) {
+                for(configurationConnectionSenders sender : senders) {
+                    if(sender.getuserId() == user.getId()) {
+                        associated = true;
+                        
+                        if(sender.getSendEmailAlert() == true) {
+                            sendSentEmail = true;
+                        }
+                    }
+                }
+            }
+            user.setOrgName(organizationmanager.getOrganizationById(user.getOrgId()).getOrgName());
+            user.setConnectionAssociated(associated);
+            user.setSendSentEmail(sendSentEmail);
+            user.setSendReceivedEmail(sendReceivedEmail);
+            
+            connectionSenders.add(user);
+        }
+        
+        mav.addObject("connectionSenders", connectionSenders);
+        
+        return mav;
+    } 
+    
+    /**
+     * The '/getAvailableReceivingUsers.do' function will return a list of users that are associated
+     * to the selected organization.
+     * 
+     * @param orgId The organization selected in the drop down
+     * 
+     * @return users    The available users
+     */
+    @SuppressWarnings("rawtypes")
+    @RequestMapping(value= "/getAvailableReceivingUsers.do", method = RequestMethod.GET)
+    public @ResponseBody ModelAndView getAvailableReceivingUsers(
+            @RequestParam(value = "orgId", required = true) int orgId,
+            @RequestParam(value = "connectionId", required = true) int connectionId) {
+        
+        ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/configurations/connectionReceivingUsers");
+        
+        List<User> users = userManager.getUsersByOrganization(orgId);
+        
+        List<configurationConnectionReceivers> receivers = configurationmanager.getConnectionReceivers(connectionId);
+
+        List<User> connectonReceivers = new ArrayList<User>();
+        
+        for(User user : users) {
+            boolean associated = false;
+            boolean sendSentEmail = false;
+            boolean sendReceivedEmail = false;
+            if(receivers != null && receivers.size() > 0) {
+                for(configurationConnectionReceivers receiver : receivers) {
+                    if(receiver.getuserId() == user.getId()) {
+                        associated = true;
+                        
+                        if(receiver.getSendEmailAlert() == true) {
+                            sendReceivedEmail = true;
+                        }
+                    }
+                }
+            }
+            user.setOrgName(organizationmanager.getOrganizationById(user.getOrgId()).getOrgName());
+            user.setConnectionAssociated(associated);
+            user.setSendSentEmail(sendSentEmail);
+            user.setSendReceivedEmail(sendReceivedEmail);
+            
+            connectonReceivers.add(user);
+        }
+        
+        mav.addObject("connectonReceivers", connectonReceivers);
+        
+        return mav;
+    } 
+    
+    
     
     /**
      * The '/getAvailableConfigurations.do' function will return a list of configuration that have been
@@ -1645,7 +1751,13 @@ public class adminConfigController {
      * @return	The method will return a 1 back to the calling ajax function which will handle the page load.
      */
     @RequestMapping(value = "/addConnection.do", method = RequestMethod.POST)
-    public ModelAndView addConnection (@ModelAttribute(value = "connectionDetails") configurationConnection connectionDetails, @RequestParam List<Integer> srcUsers, @RequestParam List<Integer> tgtUsers, RedirectAttributes redirectAttr) throws Exception {
+    public ModelAndView addConnection (
+            @ModelAttribute(value = "connectionDetails") configurationConnection connectionDetails, 
+            @RequestParam List<Integer> srcUsers, 
+            @RequestParam(value = "srcUsersSendEmail", required = false) List<Integer> srcUsersSendEmail,
+            @RequestParam List<Integer> tgtUsers,
+            @RequestParam(value = "tgtUsersSendEmail", required = false) List<Integer> tgtUsersSendEmail,
+            RedirectAttributes redirectAttr) throws Exception {
        
         Integer connectionId;
         
@@ -1668,6 +1780,15 @@ public class adminConfigController {
             configurationConnectionSenders senderInfo = new configurationConnectionSenders();
             senderInfo.setconnectionId(connectionId);
             senderInfo.setuserId(sender);
+            boolean sendEmail = false;
+            if(srcUsersSendEmail != null && srcUsersSendEmail.size() > 0) {
+                for(Integer sendEmailForUser : srcUsersSendEmail) {
+                    if(Objects.equals(sendEmailForUser, sender)) {
+                        sendEmail = true;
+                    }
+                }
+            }
+            senderInfo.setSendEmailAlert(sendEmail);
             configurationmanager.saveConnectionSenders(senderInfo);
         }
         
@@ -1675,6 +1796,15 @@ public class adminConfigController {
             configurationConnectionReceivers receiverInfo = new configurationConnectionReceivers();
             receiverInfo.setconnectionId(connectionId);
             receiverInfo.setuserId(receiver);
+            boolean sendEmail = false;
+            if(tgtUsersSendEmail != null && tgtUsersSendEmail.size() > 0) {
+                for(Integer sendEmailForUser : tgtUsersSendEmail) {
+                    if(Objects.equals(sendEmailForUser, receiver)) {
+                        sendEmail = true;
+                    }
+                }
+            }
+            receiverInfo.setSendEmailAlert(sendEmail);
             configurationmanager.saveConnectionReceivers(receiverInfo);
         }
         
@@ -2182,7 +2312,7 @@ public class adminConfigController {
                     File newFile = null;
                     
                     fileSystem dir = new fileSystem();
-                    dir.setDir(orgDetails.getCleanURL(), "certificates");
+                    dir.setDir(orgDetails.getcleanURL(), "certificates");
 
                     jsch.addIdentity(new File(dir.getDir() + ftpDetails.getcertification()).getAbsolutePath());
                     session = jsch.getSession(user, host , port);

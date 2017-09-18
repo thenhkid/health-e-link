@@ -2,7 +2,7 @@
 require.config({
     urlArgs: "bust=" + (new Date()).getTime(),
     paths: {
-        'jquery': '../vendor/jquery-1.10.1.min',
+        'jquery': '../vendor/jquery-1.12.2.min',
         'bootstrap': '../vendor/bootstrap',
         'responsive-tables': '../vendor/responsive-tables',
         'mediaModal': '../mediaModal',

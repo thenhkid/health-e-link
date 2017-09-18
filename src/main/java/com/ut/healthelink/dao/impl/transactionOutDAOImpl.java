@@ -1910,6 +1910,7 @@ public class transactionOutDAOImpl implements transactionOutDAO {
 				+ outboundConfig.getUpdateFields() 
 				+ " WHERE tto.transactiontargetid = selectTbl.transactiontargetid;";
 		
+		//System.out.println(sql);
 		Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
         query.setParameter("batchId", outboundConfig.getBatchDownloadId());
         query.setParameter("statusId", statusId);

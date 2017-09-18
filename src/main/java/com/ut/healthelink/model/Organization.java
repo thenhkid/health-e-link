@@ -13,6 +13,7 @@ import javax.persistence.Table;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import com.ut.healthelink.validator.Phone;
+import java.util.List;
 import javax.persistence.Transient;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.commons.CommonsMultipartFile;
@@ -26,6 +27,9 @@ public class Organization {
     
     @Transient
     private String headerImageDirectory = "";
+    
+    @Transient
+    private List<String> programsOffered = null;
     
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -70,7 +74,7 @@ public class Organization {
     @Column(name = "FAX", nullable = true)
     private String fax;
 
-    @Column(name = "PUBLIC", nullable = false)
+    @Column(name = "publicOrg", nullable = false)
     private boolean publicOrg = true;
     
     @DateTimeFormat(pattern = "dd/MM/yyyy hh:mm:ss")
@@ -104,6 +108,18 @@ public class Organization {
     
     @Column(name = "headerBackground", nullable = false)
     private String headerBackground;
+    
+    @Column(name = "COUNTY", nullable = true)
+    private String county = "";
+    
+    @Column(name = "TOWN", nullable = true)
+    private String town = "";
+    
+    @Column(name = "ORGDESC", nullable = true)
+    private String orgDesc = "";
+    
+    @Column(name = "INFOURL", nullable = true)
+    private String infoURL = "";
 
     public int getId() {
         return id;
@@ -282,11 +298,11 @@ public class Organization {
         this.headerImageDirectory = headerImageDirectory;
     }
 
-    public String getCleanURL() {
+    public String getcleanURL() {
         return cleanURL;
     }
 
-    public void setCleanURL(String cleanURL) {
+    public void setcleanURL(String cleanURL) {
         this.cleanURL = cleanURL;
     }
 
@@ -305,5 +321,46 @@ public class Organization {
     public void setHeaderLogoFile(CommonsMultipartFile headerLogoFile) {
         this.headerLogoFile = headerLogoFile;
     }
+
+    public String getCounty() {
+        return county;
+    }
+
+    public void setCounty(String county) {
+        this.county = county;
+    }
+
+    public String getTown() {
+        return town;
+    }
+
+    public void setTown(String town) {
+        this.town = town;
+    }
+
+    public String getOrgDesc() {
+        return orgDesc;
+    }
+
+    public void setOrgDesc(String orgDesc) {
+        this.orgDesc = orgDesc;
+    }
+
+    public String getInfoURL() {
+        return infoURL;
+    }
+
+    public void setInfoURL(String infoURL) {
+        this.infoURL = infoURL;
+    }
+
+    public List<String> getProgramsOffered() {
+        return programsOffered;
+    }
+
+    public void setProgramsOffered(List<String> programsOffered) {
+        this.programsOffered = programsOffered;
+    }
+    
     
 }

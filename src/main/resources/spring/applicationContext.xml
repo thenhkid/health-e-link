@@ -90,6 +90,7 @@
         <!-- The new Properties -->
         <util:properties>
             <prop key="directory.rootDir">${directory.rootDir}</prop>
+            <prop key="directory.massOutputPath">${directory.massOutputPath}</prop>
        </util:properties>
     </property>
 </bean>

@@ -75,7 +75,7 @@ public class fileDownloadController {
             if(orgId != null && orgId > 0) {
 
                 Organization organization = organizationManager.getOrganizationById(orgId);
-                String cleanURL = organization.getCleanURL();
+                String cleanURL = organization.getcleanURL();
 
                 dir.setDir(cleanURL, foldername);
             }

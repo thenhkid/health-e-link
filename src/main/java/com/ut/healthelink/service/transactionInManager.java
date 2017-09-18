@@ -42,6 +42,7 @@ import com.ut.healthelink.model.systemSummary;
 
 import java.io.File;
 import java.math.BigInteger;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -77,7 +78,9 @@ public interface transactionInManager {
     List<batchUploads> getpendingBatches(int userId, int orgId, Date fromDate, Date toDate) throws Exception;
 
     List<transactionIn> getBatchTransactions(int batchId, int userId) throws Exception;
-
+    
+    List<transactionIn> getBatchTransactions(int batchId, int userId, List<Integer> messageTypeList, List<Integer> OrgList) throws Exception;
+    
     List<batchUploads> getsentBatches(int userId, int orgId, Date fromDate, Date toDate) throws Exception;
 
     batchUploads getBatchDetails(int batchId) throws Exception;
@@ -157,7 +160,7 @@ public interface transactionInManager {
     Integer clearTransactionTranslatedIn(Integer batchUploadId, Integer transactionInId);
 
     Integer clearTransactionTables(Integer batchUploadId, boolean leaveFinalStatusIds);
-
+    
     Integer clearTransactionTarget(Integer batchUploadId);
 
     void flagAndEmailAdmin(Integer batchUploadId);
@@ -214,7 +217,7 @@ public interface transactionInManager {
 
     void flagCWErrors(Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing, Integer transactionId);
 
-    void flagMacroErrors(Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing, Integer transactionId);
+    Integer flagMacroErrors(Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing, Integer transactionId);
 
     List<configurationTransport> getHandlingDetailsByBatch(int batchId);
 
@@ -388,7 +391,7 @@ public interface transactionInManager {
 
     Map<String, String> chkUploadBatchFile(configurationTransport transportDetails, File uploadedFile) throws Exception;
 
-    Integer moveRhapsodyFiles();
+    Integer moveRRFiles();
 
     List<configurationRhapsodyFields> getRhapsodyInfoForJob(Integer method);
 
@@ -468,7 +471,7 @@ public interface transactionInManager {
     
     List<referralActivityExports> getReferralActivityExports() throws Exception;
     
-    void createNewReferralActivityExport(Integer userId, Date fromDate, Date toDate) throws Exception;
+    void createNewReferralActivityExport(referralActivityExports newExport) throws Exception;
     
     List<batchUploads> getAllRejectedBatches(Date fromDate, Date toDate, Integer fetchSize) throws Exception;
     
@@ -486,7 +489,7 @@ public interface transactionInManager {
     
     void loadMassBatches() throws Exception;
     
-    void processMassBatches();
+    void processMassBatches() throws Exception;
     
     void saveBatchClearAfterDelivery (batchClearAfterDelivery bmt) throws Exception;
     
@@ -503,4 +506,37 @@ public interface transactionInManager {
     List<CrosswalkData> getCrosswalkDataForBatch(configurationDataTranslations cdt, Integer batchId, boolean foroutboundProcessing, Integer transactionId) throws Exception;
     
     void translateCWForBatch(configurationDataTranslations cdt, Integer batchId, boolean foroutboundProcessing, Integer transactionId) throws Exception;
+
+    void processReferralActivityExportJob() throws Exception;
+    
+    List<referralActivityExports> getReferralActivityExportsByStatus(List<Integer> statusIds, Integer howMany) throws Exception;
+    
+    public void updateReferralActivityExport(referralActivityExports activityExport) throws Exception;
+    
+    void sendExportEmail(User userDetails) throws Exception;
+    
+    public void saveReferralActivityExport(referralActivityExports activityExport) throws Exception;
+    
+    List<referralActivityExports> getReferralActivityExportsWithUserNames(List<Integer> statusIds) throws Exception;
+    
+    referralActivityExports getReferralActivityExportById(Integer exportId) throws Exception;
+    
+     public List<transactionRecords> setOutboundFormFields(List<configurationFormFields> formfields, transactionInRecords records, int configId, boolean readOnly, int orgId, int clientId) throws NoSuchMethodException, ParseException;
+ 
+     void populateAuditReport(Integer batchUploadId, configurationMessageSpecs cms) throws Exception;
+     
+     List <Integer> getErrorFieldNos(Integer batchUploadId) throws Exception;
+     
+     void populateFieldError(Integer batchUploadId, Integer fieldNo, configurationMessageSpecs cms) throws Exception;
+     
+     void cleanAuditErrorTable(Integer batchUploadId) throws Exception;
+     
+     Integer executeCWDataForSingleFieldValue(Integer configId, Integer batchId,  configurationDataTranslations cdt, boolean foroutboundProcessing,  Integer transactionId);
+     
+     void deleteMoveFileLogsByStatus(Integer statusId)  throws Exception;
+     
+     void deleteLoadTableRows (Integer howMany, String ascOrDesc, String laodTableName) throws Exception;
+     
+     Integer clearTransactionTranslatedListIn(Integer batchUploadId);
+
 }

@@ -13,6 +13,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 /**
  *
@@ -21,6 +22,9 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "TRANSACTIONATTACHMENTS")
 public class transactionAttachment {
+    
+    @Transient
+    private String downloadLink;
     
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -81,4 +85,14 @@ public class transactionAttachment {
     public void settitle(String title) {
         this.title = title;
     }
+
+    public String getDownloadLink() {
+        return downloadLink;
+    }
+
+    public void setDownloadLink(String downloadLink) {
+        this.downloadLink = downloadLink;
+    }
+    
+    
 }

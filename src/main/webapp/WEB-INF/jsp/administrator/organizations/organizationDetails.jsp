@@ -132,6 +132,13 @@
                                 <form:errors path="fax" cssClass="control-label" element="label" />
                             </div>
                         </spring:bind>
+                        <spring:bind path="infoURL">
+                            <div class="form-group ${status.error ? 'has-error' : '' }">
+                                <label class="control-label" for="infoURL">Information URL</label>
+                                <form:input path="infoURL" id="infoURL" class="form-control" type="text" maxLength="255" />
+                                <form:errors path="infoURL" cssClass="control-label" element="label" />
+                            </div>
+                        </spring:bind>        
                         <c:if test="${id > 0}">
                             <c:if test="${not empty organization.parsingTemplate}">
                                 <div class="form-group">

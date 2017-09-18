@@ -28,6 +28,9 @@ public class messageType {
 
     @Transient
     private List<messageTypeDataTranslations> dataTranslations = null;
+    
+    @Transient
+    private boolean useProgram = false;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -126,5 +129,14 @@ public class messageType {
     public void setDspName(String dspName) {
         this.dspName = dspName;
     }
+
+    public boolean isUseProgram() {
+        return useProgram;
+    }
+
+    public void setUseProgram(boolean useProgram) {
+        this.useProgram = useProgram;
+    }
+    
     
 }

@@ -4,6 +4,7 @@ import com.ut.healthelink.model.Organization;
 import com.ut.healthelink.model.User;
 import com.ut.healthelink.model.UserActivity;
 import com.ut.healthelink.model.custom.searchParameters;
+import com.ut.healthelink.model.siteSections;
 import com.ut.healthelink.model.userAccess;
 import com.ut.healthelink.service.organizationManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,10 +88,10 @@ public class CustomAuthenticationHandler extends SimpleUrlAuthenticationSuccessH
             userDetails.setdateOrgWasCreated(orgDetails.getDateCreated());
             
             /* Need to set some session variables to hold information about the user */
-            List<userAccess> userAccess = usermanager.getuserSections(userDetails.getId());
+            List<siteSections> userAllowedModules = usermanager.getuserAllowedModules(userDetails.getId());
+            userDetails.setUserAllowedModules(userAllowedModules);
             
             HttpSession session = request.getSession();
-            session.setAttribute("userAccess" , userAccess);
             
             /* Need to store the user object in session */
             session.setAttribute("userDetails", userDetails);
@@ -101,15 +102,15 @@ public class CustomAuthenticationHandler extends SimpleUrlAuthenticationSuccessH
                 
                 if(!"".equals(parentOrgDetails.getHeaderLogo()) && parentOrgDetails.getHeaderLogo() != null) {
                     orgDetails.setHeaderLogo(parentOrgDetails.getHeaderLogo());
-                    orgDetails.setHeaderImageDirectory(parentOrgDetails.getCleanURL());
+                    orgDetails.setHeaderImageDirectory(parentOrgDetails.getcleanURL());
                 }
                 if(!"".equals(parentOrgDetails.getHeaderBackground()) && parentOrgDetails.getHeaderBackground() != null) {
                     orgDetails.setHeaderBackground(parentOrgDetails.getHeaderBackground());
-                    orgDetails.setHeaderImageDirectory(parentOrgDetails.getCleanURL());
+                    orgDetails.setHeaderImageDirectory(parentOrgDetails.getcleanURL());
                 }
             }
             else {
-                orgDetails.setHeaderImageDirectory(orgDetails.getCleanURL());
+                orgDetails.setHeaderImageDirectory(orgDetails.getcleanURL());
             }
             
             /* Need to store the user company information in session */

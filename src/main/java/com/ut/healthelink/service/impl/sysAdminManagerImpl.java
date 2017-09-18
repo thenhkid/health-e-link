@@ -30,11 +30,13 @@ import com.ut.healthelink.model.lutables.lu_Procedures;
 import com.ut.healthelink.model.lutables.lu_ProcessStatus;
 import com.ut.healthelink.model.lutables.lu_Tests;
 import com.ut.healthelink.model.Macros;
+import com.ut.healthelink.model.MoveFilesLog;
 import com.ut.healthelink.model.mainHL7Details;
 import com.ut.healthelink.model.mainHL7Elements;
 import com.ut.healthelink.model.mainHL7Segments;
 import com.ut.healthelink.reference.fileSystem;
 import com.ut.healthelink.service.sysAdminManager;
+
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -565,5 +567,15 @@ public class sysAdminManagerImpl implements sysAdminManager {
 	public Long findTotalUsers() throws Exception {
 		 return sysAdminDAO.findTotalUsers();
 	}
-   
+
+	@Override
+    public List<MoveFilesLog> getMoveFilesLog(Integer statusId) throws Exception {
+        return sysAdminDAO.getMoveFilesLog(statusId);
+    }
+    
+    @Override
+    public void deleteMoveFilesLog(MoveFilesLog moveFilesLog) throws Exception {
+    	sysAdminDAO.deleteMoveFilesLog(moveFilesLog);
+    }
+	
 }

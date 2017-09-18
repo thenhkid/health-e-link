@@ -36,7 +36,7 @@ public class CCDtoTxt {
         Organization orgDetails = organizationmanager.getOrganizationById(orgId);
         fileSystem dir = new fileSystem();
 
-        dir.setDir(orgDetails.getCleanURL(), "templates");
+        dir.setDir(orgDetails.getcleanURL(), "templates");
         
         String templatefileName = orgDetails.getparsingTemplate();
         

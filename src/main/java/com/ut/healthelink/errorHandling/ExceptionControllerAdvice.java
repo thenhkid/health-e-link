@@ -50,7 +50,7 @@ public class ExceptionControllerAdvice {
         try {
         mailMessage messageDetails = new mailMessage();
         
-        messageDetails.settoEmailAddress("dphuniversaltranslator@gmail.com");
+        messageDetails.settoEmailAddress(myProps.getProperty("admin.email"));
         messageDetails.setfromEmailAddress("support@health-e-link.net");
         messageDetails.setmessageSubject("Exception Error "  + " " + myProps.getProperty("server.identity"));
         
