@@ -7,4 +7,4 @@ bin
 .settings/org.eclipse.wst.ws.service.policy.prefs
 org.eclipse.wst.common.project.facet.core.xml
 src/main/webapp/dspResources/.DS_Store
-/.DS_Store
+.DS_Store

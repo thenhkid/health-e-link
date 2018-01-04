@@ -76,6 +76,8 @@ public interface transactionInDAO {
     
     List<transactionIn> getBatchTransactions(int batchId, int userId) throws Exception;
     
+    List<transactionIn> getBatchTransactions(int batchId, int userId, List<Integer> messageTypeList, List<Integer> OrgList) throws Exception;
+    
     List<batchUploads> getsentBatches(int userId, int orgId, Date fromDate, Date toDate) throws Exception;
     
     batchUploads getBatchDetails(int batchId) throws Exception;
@@ -172,7 +174,7 @@ public interface transactionInDAO {
 
     void flagCWErrors (Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing, Integer transactionId);
    
-    void flagMacroErrors (Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing, Integer transactionId);
+    Integer flagMacroErrors (Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing, Integer transactionId);
 
     void resetTransactionTranslatedIn (Integer batchId, boolean resetAll, Integer transactionInId);
     
@@ -433,4 +435,28 @@ public interface transactionInDAO {
     List<CrosswalkData> getCrosswalkDataForBatch(configurationDataTranslations cdt, Integer batchId, boolean foroutboundProcessing, Integer transactionId) throws Exception;
     
     void translateCWForBatch(configurationDataTranslations cdt, Integer batchId, boolean foroutboundProcessing, Integer transactionId) throws Exception;
+	
+	List<referralActivityExports> getReferralActivityExportsByStatus(List<Integer> statusIds, Integer howMany) throws Exception;
+    
+    public void updateReferralActivityExport(referralActivityExports activityExport) throws Exception;
+    
+    List<referralActivityExports> getReferralActivityExportsWithUserNames(List<Integer> statusIds) throws Exception;
+    
+    referralActivityExports getReferralActivityExportById(Integer exportId) throws Exception;
+    
+    void populateAuditReport(Integer batchUploadId, Integer configId) throws Exception;
+    
+    List <Integer> getErrorFieldNos(Integer batchUploadId) throws Exception;
+    
+    void populateFieldError(Integer batchUploadId, Integer fieldNo, configurationMessageSpecs cms) throws Exception;
+    
+    void cleanAuditErrorTable(Integer batchUploadId) throws Exception;
+    
+    Integer executeCWDataForSingleFieldValue(Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing, Integer transactionId);
+
+    void deleteMoveFileLogsByStatus (Integer statusId) throws Exception;
+    
+    void deleteLoadTableRows (Integer howMany, String ascOrDesc, String laodTableName) throws Exception;
+    
+    Integer clearTransactionTranslatedListIn(Integer batchUploadId);
 }

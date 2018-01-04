@@ -95,7 +95,27 @@
                 </div>
             </section>
         </div>   	
-		
+		<div class="col-md-3 col-sm-3 col-xs-3">
+            <section class="panel panel-default panel-stats">
+                <div class="panel-body">
+                    <span class="stat-number"><a href="getLog" class="getLog" title="Download Latest Tomcat Log">1</a></span>
+                    <h3>Log</h3>
+                         <a href="getLog" id="getLog" class="btn btn-primary btn-small" class="getLog" title="Download Latest Tomcat Log">
+                         Download Latest Tomcat Log</a>               
+                </div>
+            </section>
+        </div> 
+        
+        <div class="col-md-3 col-sm-3 col-xs-3">
+            <section class="panel panel-default panel-stats">
+                <div class="panel-body">
+                    <span class="stat-number"><a href="moveFilePaths" class="moveFilePaths" title="View File Paths">${filePaths}&nbsp;</a></span>
+                    <h3>View Errored File Paths</h3>
+                         <a href="moveFilePaths" id="moveFilePaths" class="btn btn-primary btn-small" class="moveFilePaths" title="View File Paths">
+                         File Paths</a>               
+                </div>
+            </section>
+        </div>
 
     </div>
 </div>

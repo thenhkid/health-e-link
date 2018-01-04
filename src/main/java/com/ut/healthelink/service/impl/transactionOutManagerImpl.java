@@ -77,8 +77,11 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -89,6 +92,12 @@ import org.apache.commons.net.PrintCommandListener;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
 import org.apache.commons.net.ftp.FTPSClient;
+import org.docx4j.Docx4J;
+import org.docx4j.convert.out.FOSettings;
+import org.docx4j.model.fields.FieldUpdater;
+import org.docx4j.model.fields.merge.DataFieldName;
+import org.docx4j.model.fields.merge.MailMerger.OutputField;
+import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.codec.Base64;
 import org.springframework.stereotype.Service;
@@ -150,10 +159,14 @@ public class transactionOutManagerImpl implements transactionOutManager {
     private String archivePath = (directoryPath + "archivesOut/");
     
     private String massOutPutPath = (directoryPath + "massoutputfiles/");
+
+    private String massOutPutPathMysqlPath =  System.getProperty("directory.massOutputPath");
    
     
     //list of final status - these records we skip
     private List<Integer> transRELId = Arrays.asList(11, 12, 13, 16, 18, 20);
+    
+    private List<Integer> rejectIds = Arrays.asList(13, 14);
     
     @Override
     @Transactional
@@ -512,15 +525,12 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                         else {
                                             fromOrgId = configurationManager.getConfigurationById(transactionInManager.getTransactionDetails(transaction.gettransactionInId()).getconfigId()).getorgId();
                                         }
-                                        
-                                        Integer fromParentOrgId = configurationManager.getConfigurationById(transactionInManager.getTransactionDetails(transaction.gettransactionInId()).getconfigId()).getorgId();
-                                        
+                                        /* get the sending organization details */
                                         Organization fromOrg = organizationManager.getOrganizationById(fromOrgId);
-                                        Organization fromParentOrg = organizationManager.getOrganizationById(fromParentOrgId);
-                                        List<User> fromPrimaryContact = userManager.getOrganizationContact(fromParentOrg.getId(), 1);
-                                        List<User> fromSecondaryContact = userManager.getOrganizationContact(fromParentOrg.getId(), 2);
-                                        List<User> fromnonMainContact = userManager.getOrganizationContact(fromParentOrg.getId(), 0);
                                         
+                                        // Get a list of all user who should receive an email regarding the sent referral/FB report
+                                        List<User> orgFromContacts = userManager.getUserConnectionListSending(transactionInManager.getTransactionDetails(transaction.gettransactionInId()).getconfigId());
+                                       
                                         Integer toOrgId = 0;
                                         if(transaction.getTargetSubOrgId()> 0) {
                                             toOrgId = transaction.getTargetSubOrgId();
@@ -529,68 +539,26 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                             toOrgId = configurationManager.getConfigurationById(transaction.getconfigId()).getorgId();
                                         }
                                         
-                                        /* get the to user details */
+                                        /* get the receiving organization details */
                                         Organization toOrg = organizationManager.getOrganizationById(toOrgId);
-                                        List<User> toPrimaryContact = userManager.getOrganizationContact(configurationManager.getConfigurationById(transaction.getconfigId()).getorgId(), 1);
-                                        List<User> toSecondaryContact = userManager.getOrganizationContact(configurationManager.getConfigurationById(transaction.getconfigId()).getorgId(), 2);
-                                        List<User> nonMainContact = userManager.getOrganizationContact(configurationManager.getConfigurationById(transaction.getconfigId()).getorgId(), 0);
-
-                                        /* Send From Organization a email saying the referral/FB report was received */
-                                        if (fromPrimaryContact.size() > 0 || fromSecondaryContact.size() > 0 || fromnonMainContact.size() > 0) {
+                                        
+                                        /* Send an email to all users in the connection setting who is set to receive an
+                                        email when the referral/FB report was sent out */
+                                        if (orgFromContacts != null && orgFromContacts.size() > 0) {
                                             String fromName = "";
                                             String fromEmail = "";
                                             mailMessage msg = new mailMessage();
                                             ArrayList<String> fromCCAddressArray = new ArrayList<String>();
                                             msg.setfromEmailAddress("support@health-e-link.net");
  
-                                            if (fromPrimaryContact.size() > 0) {
                                                 
-                                                for(int i = 0; i < fromPrimaryContact.size(); i++) {
-                                                    
-                                                    if(fromPrimaryContact.get(i).getSendEmailAlert() == true) {
-                                                        
-                                                        if("".equals(fromEmail)) {
-                                                            fromName = fromPrimaryContact.get(i).getFirstName() + " " + fromPrimaryContact.get(i).getLastName();
-                                                            fromEmail = fromPrimaryContact.get(i).getEmail();
-                                                        }
-                                                        else {
-                                                            fromCCAddressArray.add(fromPrimaryContact.get(i).getEmail());
-                                                        }
-                                                    }
+                                            for(int i = 0; i < orgFromContacts.size(); i++) {
+                                                if("".equals(fromEmail)) {
+                                                    fromName = orgFromContacts.get(i).getFirstName() + " " + orgFromContacts.get(i).getLastName();
+                                                    fromEmail = orgFromContacts.get(i).getEmail();
                                                 }
-                                            }
-                                            
-                                            if (fromSecondaryContact.size() > 0) {
-                                                
-                                                for(int i = 0; i < fromSecondaryContact.size(); i++) {
-                                                    
-                                                    if(fromSecondaryContact.get(i).getSendEmailAlert() == true) {
-                                                        
-                                                        if("".equals(fromEmail)) {
-                                                            fromName = fromSecondaryContact.get(i).getFirstName() + " " + fromSecondaryContact.get(i).getLastName();
-                                                            fromEmail = fromSecondaryContact.get(i).getEmail();
-                                                        }
-                                                        else {
-                                                            fromCCAddressArray.add(fromSecondaryContact.get(i).getEmail());
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                            
-                                            if (fromnonMainContact.size() > 0) {
-                                                
-                                                for(int i = 0; i < fromnonMainContact.size(); i++) {
-                                                    
-                                                    if(fromnonMainContact.get(i).getSendEmailAlert() == true) {
-                                                        
-                                                        if("".equals(fromEmail)) {
-                                                            fromName = fromnonMainContact.get(i).getFirstName() + " " + fromnonMainContact.get(i).getLastName();
-                                                            fromEmail = fromnonMainContact.get(i).getEmail();
-                                                        }
-                                                        else {
-                                                            fromCCAddressArray.add(fromnonMainContact.get(i).getEmail());
-                                                        }
-                                                    }
+                                                else {
+                                                    fromCCAddressArray.add(orgFromContacts.get(i).getEmail());
                                                 }
                                             }
                                             
@@ -608,13 +576,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
 
                                                 /* Build the body of the email */
                                                 StringBuilder sb = new StringBuilder();
-                                                if(!"".equals(fromName)) {
-                                                   sb.append("Dear " + fromName + ", Your "+ msgType +" sent to " + toOrg.getOrgName() + " has been successfully delivered.");
-                                                }
-                                                else {
-                                                   sb.append("Your "+ msgType +" sent to " + toOrg.getOrgName() + " has been successfully delivered."); 
-                                                }
-
+                                                sb.append("The ").append(msgType).append(" sent to ").append(toOrg.getOrgName()).append(" has been successfully delivered."); 
                                                 msg.setmessageBody(sb.toString());
 
                                                 /* Send the email */
@@ -625,71 +587,34 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                                     //ex.printStackTrace();
                                                 }
                                             }
-                                            
                                         }
                                         
-                                        if (toPrimaryContact.size() > 0 || toSecondaryContact.size() > 0 || nonMainContact.size() > 0) {
+                                        // Get a list of all user who should receive an email regarding the recieived referral/FB report
+                                        List<User> orgToContacts = userManager.getUserConnectionListReceiving(transaction.getconfigId());
+                                       
+                                        /* Send an email to all users in the connection setting who is set to receive an
+                                        email when the referral/FB report was recievied */
+                                        if (orgToContacts != null && orgToContacts.size() > 0) {
                                             String toName = "";
                                             String toEmail = "";
                                             mailMessage msg = new mailMessage();
                                             ArrayList<String> ccAddressArray = new ArrayList<String>();
                                             msg.setfromEmailAddress("support@health-e-link.net");
  
-                                            if (toPrimaryContact.size() > 0) {
-                                                
-                                                for(int i = 0; i < toPrimaryContact.size(); i++) {
-                                                    
-                                                    if(toPrimaryContact.get(i).getReceiveEmailAlert()== true) {
-                                                        
-                                                        if("".equals(toEmail)) {
-                                                            toName = toPrimaryContact.get(i).getFirstName() + " " + toPrimaryContact.get(i).getLastName();
-                                                            toEmail = toPrimaryContact.get(i).getEmail();
-                                                        }
-                                                        else {
-                                                            ccAddressArray.add(toPrimaryContact.get(i).getEmail());
-                                                        }
-                                                    }
+                                            for(int i = 0; i < orgToContacts.size(); i++) {
+                                                if("".equals(toEmail)) {
+                                                    toName = orgToContacts.get(i).getFirstName() + " " + orgToContacts.get(i).getLastName();
+                                                    toEmail = orgToContacts.get(i).getEmail();
                                                 }
-                                            }
-                                            
-                                            if (toSecondaryContact.size() > 0) {
-                                                
-                                                for(int i = 0; i < toSecondaryContact.size(); i++) {
-                                                    
-                                                    if(toSecondaryContact.get(i).getReceiveEmailAlert() == true) {
-                                                        
-                                                        if("".equals(toEmail)) {
-                                                            toName = toSecondaryContact.get(i).getFirstName() + " " + toSecondaryContact.get(i).getLastName();
-                                                            toEmail = toSecondaryContact.get(i).getEmail();
-                                                        }
-                                                        else {
-                                                            ccAddressArray.add(toSecondaryContact.get(i).getEmail());
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                            
-                                            if (nonMainContact.size() > 0) {
-                                                
-                                                for(int i = 0; i < nonMainContact.size(); i++) {
-                                                    
-                                                    if(nonMainContact.get(i).getReceiveEmailAlert() == true) {
-                                                        
-                                                        if("".equals(toEmail)) {
-                                                            toName = nonMainContact.get(i).getFirstName() + " " + nonMainContact.get(i).getLastName();
-                                                            toEmail = nonMainContact.get(i).getEmail();
-                                                        }
-                                                        else {
-                                                            ccAddressArray.add(nonMainContact.get(i).getEmail());
-                                                        }
-                                                    }
+                                                else {
+                                                    ccAddressArray.add(orgToContacts.get(i).getEmail());
                                                 }
                                             }
                                             
                                             if(!"".equals(toEmail)) {
                                                 //toEmail = "support@health-e-link.net";
                                                 msg.settoEmailAddress(toEmail);
-
+                                                
                                                 if (ccAddressArray.size() > 0) {
                                                     String[] ccAddressList = new String[ccAddressArray.size()];
                                                     ccAddressList = ccAddressArray.toArray(ccAddressList);
@@ -700,22 +625,14 @@ public class transactionOutManagerImpl implements transactionOutManager {
 
                                                 /* Build the body of the email */
                                                 StringBuilder sb = new StringBuilder();
-                                                if(!"".equals(toName)) {
-                                                   sb.append("Dear " + toName + ", You have recieved a new message from the eReferral System. ");
-                                                }
-                                                else {
-                                                   sb.append("You have recieved a new message from the eReferral System. "); 
-                                                }
-
+                                                sb.append("You have received a new message from ").append(fromOrg.getOrgName()); 
                                                 sb.append("<br /><br />");
-                                                sb.append("BatchId: " + batchDLInfo.getutBatchName());
+                                                sb.append("BatchId: ").append(batchDLInfo.getutBatchName());
                                                 if (batchDLInfo.getoutputFIleName() != null && !"".equals(batchDLInfo.getoutputFIleName())) {
                                                     sb.append("<br />");
-                                                    sb.append("File Name: " + batchDLInfo.getoutputFIleName());
+                                                    sb.append("File Name: ").append(batchDLInfo.getoutputFIleName());
                                                 }
-                                                sb.append("<br /><br />");
-                                                sb.append("From Organization: " + fromOrg.getOrgName());
-
+                                                
                                                 msg.setmessageBody(sb.toString());
 
                                                 /* Send the email */
@@ -794,86 +711,85 @@ public class transactionOutManagerImpl implements transactionOutManager {
                     List<targetOutputRunLogs> logs = transactionOutDAO.getLatestRunLog(schedule.getconfigId());
 
                     /* DAILY SCHEDULE */
-                    if (schedule.gettype() == 2) {
-
-                        /* if Daily check for scheduled or continuous */
-                        if (schedule.getprocessingType() == 1) {
-                            double diffInHours;
-                            int hourOfDay;
-
-                            /* SCHEDULED */
-                            try {
-                                hourOfDay = calendar.get(Calendar.HOUR_OF_DAY);
-
-                                if (logs.size() > 0) {
-                                    targetOutputRunLogs log = logs.get(0);
-                                    long diff = currDate.getTime() - log.getlastRunTime().getTime();
-                                    diffInHours = diff / ((double) 1000 * 60 * 60);
-                                } else {
-                                    diffInHours = 0;
+                    switch (schedule.gettype()) {
+                    /* WEEKLY SCHEDULE */
+                        case 2:
+                            /* if Daily check for scheduled or continuous */
+                            if (schedule.getprocessingType() == 1) {
+                                double diffInHours;
+                                int hourOfDay;
+                                
+                                /* SCHEDULED */
+                                try {
+                                    hourOfDay = calendar.get(Calendar.HOUR_OF_DAY);
+                                    
+                                    if (logs.size() > 0) {
+                                        targetOutputRunLogs log = logs.get(0);
+                                        long diff = currDate.getTime() - log.getlastRunTime().getTime();
+                                        diffInHours = diff / ((double) 1000 * 60 * 60);
+                                    } else {
+                                        diffInHours = 0;
+                                    }
+                                } catch (Exception e) {
+                                    throw new Exception("Error trying to calculate the time difference from run logs", e);
                                 }
-                            } catch (Exception e) {
-                                throw new Exception("Error trying to calculate the time difference from run logs", e);
-                            }
-
-                            if (hourOfDay >= schedule.getprocessingTime() && (diffInHours == 0 || diffInHours >= 24)) {
-                                runProcess = true;
-                            }
-                        } else {
-                            /* CONTINUOUS */
-
-                            double diffInHours;
-                            double diffInMinutes;
-
-                            try {
-                                if (logs.size() > 0) {
-                                    targetOutputRunLogs log = logs.get(0);
-                                    long diff = currDate.getTime() - log.getlastRunTime().getTime();
-                                    diffInHours = diff / ((double) 1000 * 60 * 60);
-                                    diffInMinutes = (diffInHours - (int) diffInHours) * 60;
-                                } else {
-                                    diffInMinutes = 0;
+                                
+                                if (hourOfDay >= schedule.getprocessingTime() && (diffInHours == 0 || diffInHours >= 24)) {
+                                    runProcess = true;
                                 }
-                            } catch (Exception e) {
-                                throw new Exception("Error trying to calculate the time difference from run logs", e);
-                            }
-
-                            if (diffInMinutes == 0 || diffInMinutes >= schedule.getnewfileCheck()) {
-                                runProcess = true;
-                            }
-
-                        }
-                    } /* WEEKLY SCHEDULE */ else if (schedule.gettype() == 3) {
-                        long diffInWeeks = 0;
-
-                        if (logs.size() > 0) {
-                            targetOutputRunLogs log = logs.get(0);
-                            long diff = currDate.getTime() - log.getlastRunTime().getTime();
-
-                            diffInWeeks = diff / ((long) 7 * 24 * 60 * 60 * 1000);
-
-                            if (diffInWeeks == 0 || diffInWeeks >= 1) {
-                                runProcess = true;
-                            }
-
-                        }
-
-                    } /* MONTHLY SCHEDULE */ else if (schedule.gettype() == 4) {
-
-                        long diffInDays = 0;
-
-                        if (logs.size() > 0) {
-                            targetOutputRunLogs log = logs.get(0);
-                            long diff = currDate.getTime() - log.getlastRunTime().getTime();
-
-                            diffInDays = diff / ((long) 365.24 * 24 * 60 * 60 * 1000 / 12);
-
-                            if (diffInDays == 0 || diffInDays >= 30) {
-                                runProcess = true;
-                            }
-
-                        }
-
+                            } else {
+                                /* CONTINUOUS */
+                                
+                                double diffInHours;
+                                double diffInMinutes;
+                                
+                                try {
+                                    if (logs.size() > 0) {
+                                        targetOutputRunLogs log = logs.get(0);
+                                        long diff = currDate.getTime() - log.getlastRunTime().getTime();
+                                        diffInHours = diff / ((double) 1000 * 60 * 60);
+                                        diffInMinutes = (diffInHours - (int) diffInHours) * 60;
+                                    } else {
+                                        diffInMinutes = 0;
+                                    }
+                                } catch (Exception e) {
+                                    throw new Exception("Error trying to calculate the time difference from run logs", e);
+                                }
+                                
+                                if (diffInMinutes == 0 || diffInMinutes >= schedule.getnewfileCheck()) {
+                                    runProcess = true;
+                                }
+                                
+                            }   break;
+                    /* MONTHLY SCHEDULE */
+                        case 3:
+                            long diffInWeeks = 0;
+                            if (logs.size() > 0) {
+                                targetOutputRunLogs log = logs.get(0);
+                                long diff = currDate.getTime() - log.getlastRunTime().getTime();
+                                
+                                diffInWeeks = diff / ((long) 7 * 24 * 60 * 60 * 1000);
+                                
+                                if (diffInWeeks == 0 || diffInWeeks >= 1) {
+                                    runProcess = true;
+                                }
+                                
+                            }   break;
+                        case 4:
+                            long diffInDays = 0;
+                            if (logs.size() > 0) {
+                                targetOutputRunLogs log = logs.get(0);
+                                long diff = currDate.getTime() - log.getlastRunTime().getTime();
+                                
+                                diffInDays = diff / ((long) 365.24 * 24 * 60 * 60 * 1000 / 12);
+                                
+                                if (diffInDays == 0 || diffInDays >= 30) {
+                                    runProcess = true;
+                                }
+                                
+                            }   break;
+                        default:
+                            break;
                     }
 
                     if (runProcess == true) {
@@ -957,47 +873,25 @@ public class transactionOutManagerImpl implements transactionOutManager {
 
                         try {
                             /* Get the list of primary and secondary contacts */
-                            List<User> toPrimaryContact = userManager.getOrganizationContact(batchDLInfo.getOrgId(), 1);
-                            List<User> toSecondaryContact = userManager.getOrganizationContact(batchDLInfo.getOrgId(), 2);
-
-                            if (toPrimaryContact.size() > 0 || toSecondaryContact.size() > 0) {
+                            // Get a list of all user who should receive an email regarding the recieived referral/FB report
+                            List<User> orgToContacts = userManager.getUserConnectionListReceiving(schedule.getconfigId());
+                                 
+                            if (orgToContacts.size() > 0) {
                                 String toName = "";
                                 String toEmail = "";
                                 mailMessage msg = new mailMessage();
                                 ArrayList<String> ccAddressArray = new ArrayList<String>();
                                 msg.setfromEmailAddress("support@health-e-link.net");
                                 
-                                
-                                if (toPrimaryContact.size() > 0) {
+                                if (orgToContacts.size() > 0) {
                                                 
-                                    for(int i = 0; i < toPrimaryContact.size(); i++) {
-
-                                        if(toPrimaryContact.get(i).getSendEmailAlert() == true) {
-
-                                            if("".equals(toEmail)) {
-                                                toName = toPrimaryContact.get(i).getFirstName() + " " + toPrimaryContact.get(i).getLastName();
-                                                toEmail = toPrimaryContact.get(i).getEmail();
-                                            }
-                                            else {
-                                                ccAddressArray.add(toPrimaryContact.get(i).getEmail());
-                                            }
+                                    for(int i = 0; i < orgToContacts.size(); i++) {
+                                        if("".equals(toEmail)) {
+                                            toName = orgToContacts.get(i).getFirstName() + " " + orgToContacts.get(i).getLastName();
+                                            toEmail = orgToContacts.get(i).getEmail();
                                         }
-                                    }
-                                }
-
-                                if (toSecondaryContact.size() > 0) {
-
-                                    for(int i = 0; i < toSecondaryContact.size(); i++) {
-
-                                        if(toSecondaryContact.get(i).getSendEmailAlert() == true) {
-
-                                            if("".equals(toEmail)) {
-                                                toName = toSecondaryContact.get(i).getFirstName() + " " + toSecondaryContact.get(i).getLastName();
-                                                toEmail = toSecondaryContact.get(i).getEmail();
-                                            }
-                                            else {
-                                                ccAddressArray.add(toSecondaryContact.get(i).getEmail());
-                                            }
+                                        else {
+                                            ccAddressArray.add(orgToContacts.get(i).getEmail());
                                         }
                                     }
                                 }
@@ -1008,7 +902,6 @@ public class transactionOutManagerImpl implements transactionOutManager {
 
                                 msg.settoEmailAddress(toEmail);
                                 
-
                                 if (ccAddressArray.size() > 0) {
                                     String[] ccAddressList = new String[ccAddressArray.size()];
                                     ccAddressList = ccAddressArray.toArray(ccAddressList);
@@ -1019,12 +912,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
 
                                 /* Build the body of the email */
                                 StringBuilder sb = new StringBuilder();
-                                if(!"".equals(toName)) {
-                                    sb.append("Dear " + toName + ", You have recieved a new message from the eReferral System. ");
-                                }
-                                else {
-                                    sb.append("You have recieved a new message from the eReferral System. "); 
-                                }
+                                sb.append("You have recieved a new message from the eReferral System. "); 
                                 sb.append(System.getProperty("line.separator"));
                                 sb.append(System.getProperty("line.separator"));
                                 sb.append("BatchId: " + batchDLInfo.getutBatchName());
@@ -1424,7 +1312,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                 
                 Organization orgDetails = organizationManager.getOrganizationById(configurationManager.getConfigurationById(transportDetails.getconfigId()).getorgId());
                 fileSystem ccdTemplateDir = new fileSystem();
-                ccdTemplateDir.setDir(orgDetails.getCleanURL(), "templates");
+                ccdTemplateDir.setDir(orgDetails.getcleanURL(), "templates");
                 
                 String ccdSampleTemplate = transportDetails.getCcdSampleTemplate();
                 
@@ -1515,69 +1403,104 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                        
                                         Organization orgDetails = organizationManager.getOrganizationById(configurationManager.getConfigurationById(transportDetails.getconfigId()).getorgId());
                                         fileSystem hl7PDFTemplateDir = new fileSystem();
-                                        hl7PDFTemplateDir.setDir(orgDetails.getCleanURL(), "templates");
+                                        hl7PDFTemplateDir.setDir(orgDetails.getcleanURL(), "templates");
 
                                         String hl7PDFSampleTemplate = transportDetails.getHL7PDFSampleTemplate();
-
-                                        Path path = Paths.get(hl7PDFTemplateDir.getDir() + hl7PDFSampleTemplate);
-                                        String hl7PDFSampleContent = new String(Files.readAllBytes(path));
-
-                                        Path newFilePath = Paths.get(dir.getDir() + "hl7pdf.txt");
-                                        Files.write(newFilePath, hl7PDFSampleContent.getBytes());
-
-                                        String contentToUpdate = new String(Files.readAllBytes(newFilePath));
                                         
-                                        List<configurationCCDElements> hl7PDFElements = configurationManager.getCCDElements(transportDetails.getconfigId());
+                                        File inputFile;
                                         
-                                        if(!hl7PDFElements.isEmpty()) {
-                    
-                                            for(configurationCCDElements CCDelement : hl7PDFElements) {
+                                        if(hl7PDFSampleTemplate.contains(".docx")) {
+                                            String inputfilepath = hl7PDFTemplateDir.getDir() + hl7PDFSampleTemplate;
+                                        
+                                            String outputfilepath = dir.getDir() + "OUT_variableReplace.docx";
 
-                                                if(!"".equals(CCDelement.getDefaultValue())) {
-                                                    if ("~currDate~".equals(CCDelement.getDefaultValue())) {
-                                                        SimpleDateFormat date_format = new SimpleDateFormat("yyyyMMdd");
-                                                        String date = date_format.format(batchDetails.getdateCreated());
-                                                        contentToUpdate = contentToUpdate.replace(CCDelement.getElement(), date);
+                                            WordprocessingMLPackage wordMLPackage = WordprocessingMLPackage.load(new java.io.File(inputfilepath));
+
+                                            //MainDocumentPart documentPart = wordMLPackage.getMainDocumentPart();
+
+                                            List<configurationCCDElements> hl7PDFElements = configurationManager.getCCDElements(transportDetails.getconfigId());
+
+                                            if(!hl7PDFElements.isEmpty()) {
+                                                
+                                                List<Map<DataFieldName, String>> data = new ArrayList<Map<DataFieldName, String>>();
+
+                                                Map<DataFieldName, String> map1 = new HashMap<DataFieldName, String>();
+                                                
+                                                for(configurationCCDElements CCDelement : hl7PDFElements) {
+                                                    
+                                                    String elementName = CCDelement.getElement().replace("<%", "").replace("%>", "");
+
+                                                    if(!"".equals(CCDelement.getDefaultValue())) {
+
+                                                        if ("~currDate~".equals(CCDelement.getDefaultValue())) {
+                                                            SimpleDateFormat date_format = new SimpleDateFormat("yyyyMMdd");
+                                                            String date = date_format.format(batchDetails.getdateCreated());
+                                                            
+                                                            map1.put(new DataFieldName(elementName), date);
+
+                                                        }
+                                                        else {
+                                                             map1.put(new DataFieldName(elementName), CCDelement.getDefaultValue());
+                                                        }
                                                     }
                                                     else {
-                                                        contentToUpdate = contentToUpdate.replace(CCDelement.getElement(), CCDelement.getDefaultValue());
+                                                        String colName = new StringBuilder().append("f").append(CCDelement.getFieldValue()).toString();
+
+                                                        String fieldValue = BeanUtils.getProperty(records, colName);
+
+                                                        if (fieldValue == null) {
+                                                             fieldValue = "";
+                                                        } else if ("null".equals(fieldValue)) {
+                                                            fieldValue = "";
+                                                        } else if (fieldValue.isEmpty()) {
+                                                            fieldValue = "";
+                                                        } else if (fieldValue.length() == 0) {
+                                                            fieldValue = "";
+                                                        }  
+
+                                                         map1.put(new DataFieldName(elementName), fieldValue);
                                                     }
-
                                                 }
-                                                else {
-                                                     String colName = new StringBuilder().append("f").append(CCDelement.getFieldValue()).toString();
-
-                                                      String fieldValue = BeanUtils.getProperty(records, colName);
-
-                                                      if (fieldValue == null) {
-                                                           fieldValue = "";
-                                                      } else if ("null".equals(fieldValue)) {
-                                                          fieldValue = "";
-                                                      } else if (fieldValue.isEmpty()) {
-                                                          fieldValue = "";
-                                                      } else if (fieldValue.length() == 0) {
-                                                          fieldValue = "";
-                                                      }
-
-                                                      contentToUpdate = contentToUpdate.replace(CCDelement.getElement(), fieldValue);
+                                                data.add(map1);
+                                                
+                                                org.docx4j.model.fields.merge.MailMerger.setMERGEFIELDInOutput(OutputField.REMOVED);
+                                                
+                                                int x=0;
+                                                for(Map<DataFieldName,String> docMapping : data) {
+                                                    org.docx4j.model.fields.merge.MailMerger.performMerge(wordMLPackage, docMapping, true);
+                                                    wordMLPackage.save(new java.io.File(outputfilepath) );
                                                 }
-
+                                                
                                             }
-                                        }
-                                        
-                                        Files.write(newFilePath, contentToUpdate.getBytes());
-                                        
-                                        File inputFile = new File(dir.getDir() + "hl7pdf.txt");
-                                        
-                                        if(txtToPDF.convertTextToPDF(inputFile, dir.getDir(), "hl7pdf.pdf")) {
+                                            
+                                            inputFile = new File(dir.getDir() + "OUT_variableReplace.docx");
+                                            
+                                            FieldUpdater updater = new FieldUpdater(wordMLPackage);
+                                            updater.update(true);
+                                            
+                                            FOSettings foSettings = Docx4J.createFOSettings();
+                                            foSettings.setWmlPackage(wordMLPackage);
+                                            
+                                            String outputfilepath2 = dir.getDir() + "hl7pdf.pdf";
+                                            OutputStream os = new java.io.FileOutputStream(outputfilepath2);
+                                            Docx4J.toFO(foSettings, os, Docx4J.FLAG_EXPORT_PREFER_XSL);
+                                            
+                                            if (wordMLPackage.getMainDocumentPart().getFontTablePart()!=null) {
+                                               wordMLPackage.getMainDocumentPart().getFontTablePart().deleteEmbeddedFontTempFiles();
+                                            }
+                                            
+                                            updater = null;
+                                            foSettings = null;
+                                            wordMLPackage = null;
+
                                             fileSystem attachDir = new fileSystem();
                                             File f = new File(dir.getDir() + "hl7pdf.pdf");
                                             byte[] bytes = attachDir.loadFile(f);
                                             byte[] encoded = Base64.encode(bytes);
                                             String encodedString = new String(encoded);
-                                            
+
                                             hl7recordRow.append(encodedString);
-                                            
+
                                             /* Decode the encoded content back to a PDF */
                                             /*byte[] decoded = Base64.decode(encodedString.getBytes());
                                             File newfile = new File(dir.getDir() + "sample.pdf");
@@ -1585,10 +1508,85 @@ public class transactionOutManagerImpl implements transactionOutManager {
                                             writer.write(decoded);
                                             writer.flush();
                                             writer.close();*/
-                                            
+
                                             /* Delete files */
                                             inputFile.delete();
                                             f.delete();
+                                        }
+                                        else {
+                                            
+                                           Path path = Paths.get(hl7PDFTemplateDir.getDir() + hl7PDFSampleTemplate);
+                                           String hl7PDFSampleContent = new String(Files.readAllBytes(path));
+
+
+                                            Path newFilePath = Paths.get(dir.getDir() + "hl7pdf.txt");
+                                            Files.write(newFilePath, hl7PDFSampleContent.getBytes());
+
+                                            String contentToUpdate = new String(Files.readAllBytes(newFilePath));
+
+                                            List<configurationCCDElements> hl7PDFElements = configurationManager.getCCDElements(transportDetails.getconfigId());
+
+                                            if(!hl7PDFElements.isEmpty()) {
+
+                                                for(configurationCCDElements CCDelement : hl7PDFElements) {
+
+                                                    if(!"".equals(CCDelement.getDefaultValue())) {
+                                                        if ("~currDate~".equals(CCDelement.getDefaultValue())) {
+                                                            SimpleDateFormat date_format = new SimpleDateFormat("yyyyMMdd");
+                                                            String date = date_format.format(batchDetails.getdateCreated());
+                                                            contentToUpdate = contentToUpdate.replace(CCDelement.getElement(), date);
+                                                        }
+                                                        else {
+                                                            contentToUpdate = contentToUpdate.replace(CCDelement.getElement(), CCDelement.getDefaultValue());
+                                                        }
+
+                                                    }
+                                                    else {
+                                                         String colName = new StringBuilder().append("f").append(CCDelement.getFieldValue()).toString();
+
+                                                          String fieldValue = BeanUtils.getProperty(records, colName);
+
+                                                          if (fieldValue == null) {
+                                                               fieldValue = "";
+                                                          } else if ("null".equals(fieldValue)) {
+                                                              fieldValue = "";
+                                                          } else if (fieldValue.isEmpty()) {
+                                                              fieldValue = "";
+                                                          } else if (fieldValue.length() == 0) {
+                                                              fieldValue = "";
+                                                          }
+
+                                                          contentToUpdate = contentToUpdate.replace(CCDelement.getElement(), fieldValue);
+                                                    }
+
+                                                }
+                                            }
+
+                                            Files.write(newFilePath, contentToUpdate.getBytes()); 
+                                            
+                                            inputFile = new File(dir.getDir() + "hl7pdf.txt");
+                                            
+                                            if(txtToPDF.convertTextToPDF(inputFile, dir.getDir(), "hl7pdf.pdf")) {
+                                                fileSystem attachDir = new fileSystem();
+                                                File f = new File(dir.getDir() + "hl7pdf.pdf");
+                                                byte[] bytes = attachDir.loadFile(f);
+                                                byte[] encoded = Base64.encode(bytes);
+                                                String encodedString = new String(encoded);
+
+                                                hl7recordRow.append(encodedString);
+
+                                                /* Decode the encoded content back to a PDF */
+                                                /*byte[] decoded = Base64.decode(encodedString.getBytes());
+                                                File newfile = new File(dir.getDir() + "sample.pdf");
+                                                BufferedOutputStream writer = new BufferedOutputStream(new FileOutputStream(newfile));
+                                                writer.write(decoded);
+                                                writer.flush();
+                                                writer.close();*/
+
+                                                /* Delete files */
+                                                inputFile.delete();
+                                                f.delete();
+                                            }
                                         }
                                         
                                     }
@@ -1897,7 +1895,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
                     File newFile = null;
 
                     fileSystem dir = new fileSystem();
-                    dir.setDir(orgDetails.getCleanURL(), "certificates");
+                    dir.setDir(orgDetails.getcleanURL(), "certificates");
 
                     jsch.addIdentity(new File(dir.getDir() + ftpDetails.getcertification()).getAbsolutePath());
                     session = jsch.getSession(user, host, port);
@@ -2408,7 +2406,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
             dir.setDirByName(filelocation);
             
             File sourceFile = new File(dir.getDir() + batchDetails.getoutputFIleName());
-            File targetFile = new File ( dir.setPathFromRoot(rhapsodyDetails.getDirectory()) + batchDetails.getoutputFIleName());
+            File targetFile = new File ( directoryPath + rhapsodyDetails.getDirectory() + batchDetails.getoutputFIleName());
             //move the file over and update the status to complete
             Files.move(sourceFile.toPath(), targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
             
@@ -3031,6 +3029,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
 		                 if (transportDetails.getEncodingId() == 2) {        
 		                     encryptMessage = true;
 		             	}
+		                /** **/
 			       		String generatedFilePath = generateTargetFile(true, 0, batchDLId, transportDetails, encryptMessage);       
 			       		transportDetails.setDelimChar(messageTypeDAO.getDelimiterChar(transportDetails.getfileDelimiter()));
 			       		//make sure we remove old file
@@ -3038,6 +3037,7 @@ public class transactionOutManagerImpl implements transactionOutManager {
 			       		if (generatedFile.exists()) {
 			       			generatedFile.delete();
 	            		}
+	            		
 			       		
 			       		/**
 			       		mysql is the fastest way to output a file, but the permissions are tricky
@@ -3051,37 +3051,77 @@ public class transactionOutManagerImpl implements transactionOutManager {
                     		massOutFile.delete();
                 		}
 			       		
-			       		writeOutputToTextFile(transportDetails, batchDLId, massOutFile.getAbsolutePath(), configFields);
+			       		//writeOutputToTextFile(transportDetails, batchDLId, massOutFile.getAbsolutePath(), configFields);
 			       		
+                    	//here we need to pass to mysql method the db path from mysql which is massOutPutPathMysqlPath
+			       		Integer writeOutCome = writeOutputToTextFile(transportDetails, batchDLId, (massOutPutPathMysqlPath + batchDownload.getutBatchName()+ "." + fileExt), configFields);
+			       		if (!massOutFile.exists()) {
+			       			//we induce time because file is not done writing
+			       			System.out.println("in time delay one");
+			       			TimeUnit.SECONDS.sleep(30);
+			       		}
+			       		//check one more time to be safe
+			       		if (!massOutFile.exists()) {
+			       			//we induce time because file is not done writing
+			       			System.out.println("in time delay two");
+			       			TimeUnit.SECONDS.sleep(30);
+			       		}
 			       		//cp file to archiveOut and correct putput folder
-	                    
-	                    	fileSystem fileSystem = new fileSystem();
-	                    	File archiveFile = new File ( fileSystem.setPathFromRoot(archivePath) + batchDownload.getutBatchName()+ "." + fileExt);
+	                    fileSystem fileSystem = new fileSystem();
+		                    	File archiveFile = new File ( fileSystem.setPathFromRoot(archivePath) + batchDownload.getutBatchName()+ "." + fileExt);
 	                    	
-	                    	//we check to see if our file is encoded
-	                    	if (!encryptMessage)  {
-	                    		//we encode here
+	                    		//at this point, message it not encrypted
+	                    		//we always encrypt the archive file
 	                    		String strEncodedFile = filemanager.encodeFileToBase64Binary(massOutFile);
 	                    		if (archiveFile.exists()) {
 	                    			archiveFile.delete();
 	                    		}
+	                    		//write to archive folder
 	                    		filemanager.writeFile(archiveFile.getAbsolutePath(), strEncodedFile);
-	                    		Files.copy(massOutFile.toPath(), generatedFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-	                    	} else  {
 	                    		
-	                    		if (generatedFile.exists()) {
-	                    			generatedFile.delete();
+	                    		// if we don't need to encrypt file for users to download
+	                    		if (!encryptMessage)  {
+	                    			Files.copy(massOutFile.toPath(), generatedFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+	                    		} else { //we copy the encrypted file over
+	                    			Files.copy(archiveFile.toPath(), generatedFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+	                    		}   
+	                    		//we have file already, we just need to move it
+	                    		if (transportDetails.gettransportMethodId() == 5) {
+	                    			/* Get the Rhapsody Details */
+	                                configurationRhapsodyFields rhapsodyDetails = configurationTransportManager.getTransRhapsodyDetailsPush(transportDetails.getId());
+
+	                                // the file is in output folder already, we need to rebuild path and move it
+	                                
+	                                fileSystem dir = new fileSystem();
+	                                String filelocation = transportDetails.getfileLocation();
+	                                filelocation = filelocation.replace("/bowlink/", "");
+	                                dir.setDirByName(filelocation);
+	                                
+	                                File targetFile = new File ( directoryPath + rhapsodyDetails.getDirectory() + batchDownload.getoutputFIleName());
+	                                Files.copy(archiveFile.toPath(), targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 	                    		}
-	                    		Files.copy(archiveFile.toPath(), generatedFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+	                    		
+	                    		//now we delete massoutput file
+		                    	massOutFile.delete();
 	                    	}
-	                    	//now we delete massoutput file
-	                    	massOutFile.delete();
 	                    
+	                		//we need to update status
+	                		transactionInManager.updateTransactionStatus(batchUploadId, 0, 19, 40);
+	                		updateTransactionTargetStatusOutBound(batchDLId, 0, 18, 40);
+	                
+	                
+	                		
+	                		//we need to update our totals
+                			transactionInManager.updateRecordCounts(batchDownload.getId(), rejectIds, true, "totalErrorCount");
+                			transactionInManager.updateRecordCounts(batchDownload.getId(), new ArrayList<Integer>(), true, "totalRecordCount");
+                   
 	                    //now we delete the data from transactionTranslatedIn, transactionTranslatedOut, transactionInRecords
 	                    //we will schedule a job to delete from message tables as it takes too long if we are not adding batchId there
-	                    clearTransactionTranslatedOutByBatchId(batchDLId);
+	                    
+                		clearTransactionTranslatedOutByBatchId(batchDLId);
 	                    transactionInManager.clearTransactionInRecords(batchUploadId, 0);
 	                    transactionInManager.clearTransactionTranslatedIn(batchUploadId, 0);
+	                    
 	                    //we insert into batchMassTranslate so we can run it as a job and delete
 	                    /** do not want to add batchId to every message table and the delete will be slow **/
 	                    //if the inbound configuration is set to Clear Records after Delivery , we clear message tables
@@ -3095,13 +3135,15 @@ public class transactionOutManagerImpl implements transactionOutManager {
 	                    transactionInManager.updateBatchStatus(batchUploadId, 28, "");
 	                    transactionOutDAO.updateTargetBatchStatus(batchDLId, 28, "endDateTime");
 					
+	                    
 						return 0;
 	                }
-	}
-
-
 
 }
+
+
+
+
 
 
 

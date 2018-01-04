@@ -27,6 +27,7 @@ import com.ut.healthelink.model.configurationConnection;
 import com.ut.healthelink.model.configurationConnectionReceivers;
 import com.ut.healthelink.model.configurationConnectionSenders;
 import com.ut.healthelink.model.configurationDataTranslations;
+import com.ut.healthelink.model.configurationExcelDetails;
 import com.ut.healthelink.model.configurationMessageSpecs;
 import com.ut.healthelink.model.configurationSchedules;
 import com.ut.healthelink.model.configurationTransport;
@@ -781,7 +782,7 @@ public class configurationDAOImpl implements configurationDAO {
         Query query = sessionFactory
                 .getCurrentSession()
                 .createSQLQuery(
-                        "select configurationDataTranslations.*, fieldNo from configurationDataTranslations, configurationFormFields"
+                        "select configurationDataTranslations.*, fieldNo, fieldType from configurationDataTranslations, configurationFormFields"
                         + " where configurationDataTranslations.fieldId = configurationFormFields.id "
                         + " and configurationDataTranslations.configId = :configId and categoryId = :categoryId order by processorder asc;")
                 .setResultTransformer(
@@ -1115,5 +1116,20 @@ public class configurationDAOImpl implements configurationDAO {
     public void saveCCDElement(configurationCCDElements ccdElement) throws Exception {
         sessionFactory.getCurrentSession().saveOrUpdate(ccdElement);
     }
+
+	@Override
+	@Transactional
+	public configurationExcelDetails getExcelDetails (Integer configId, Integer orgId) throws Exception {
+		 Criteria criteria = sessionFactory.getCurrentSession().createCriteria(configurationExcelDetails.class);
+	     criteria.add(Restrictions.eq("configId", configId));
+	     criteria.add(Restrictions.eq("orgId", orgId));
+	     
+	     if (criteria.list().size() > 0) {
+	    	 return (configurationExcelDetails) criteria.list().get(0);
+	     } else  {
+	    	 return null;
+	     }
+	     
+	}
     
 }

@@ -23,15 +23,21 @@ public class User {
 
     @Transient
     private List<Integer> sectionList;
-    
+
     @Transient
-    private String orgName;
-    
+    private String orgName, password;
+
     @Transient
     private Date dateOrgWasCreated = null;
-    
+
     @Transient
-    private String password;
+    private Integer orgType;
+
+    @Transient
+    private boolean connectionAssociated = false, sendSentEmail = false, sendReceivedEmail = false;
+
+    @Transient
+    private List<siteSections> userAllowedModules = null;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -55,9 +61,8 @@ public class User {
     private String lastName;
 
     /**
-     * @NotEmpty @NoHtml @Column(name = "PASSWORD", nullable = false) private
-     * String password;
-	*
+     * @NotEmpty @NoHtml @Column(name = "PASSWORD", nullable = false) private String password;
+     *
      */
     @NotEmpty
     @NoHtml
@@ -76,7 +81,7 @@ public class User {
 
     @Column(name = "RECEIVEEMAILALERT", nullable = true)
     private boolean receiveEmailAlert = false;
-
+    
     @Email
     @NoHtml
     @Column(name = "EMAIL", nullable = false)
@@ -85,32 +90,32 @@ public class User {
     @DateTimeFormat(pattern = "dd/MM/yyyy hh:mm:ss")
     @Column(name = "DATECREATED", nullable = true)
     private Date dateCreated = new Date();
-    
+
     @Column(name = "USERTYPE", nullable = false)
     private int userType = 1;
-    
+
     @Column(name = "DELIVERAUTHORITY", nullable = false)
     private boolean deliverAuthority = false;
-    
+
     @Column(name = "EDITAUTHORITY", nullable = false)
     private boolean editAuthority = false;
-    
+
     @Column(name = "CREATEAUTHORITY", nullable = false)
     private boolean createAuthority = false;
-    
+
     @Column(name = "CANCELAUTHORITY", nullable = false)
     private boolean cancelAuthority = false;
-    
+
     @NoHtml
     @Column(name = "RESETCODE", nullable = true)
     private String resetCode = null;
-    
+
     @Column(name = "randomSalt", nullable = true)
-    private byte [] randomSalt;
+    private byte[] randomSalt;
 
     @Column(name = "encryptedPw", nullable = true)
-    private byte [] encryptedPw;
-    
+    private byte[] encryptedPw;
+
     public int getId() {
         return id;
     }
@@ -175,14 +180,6 @@ public class User {
         this.mainContact = mainContact;
     }
 
-    public boolean getSendEmailAlert() {
-        return sendEmailAlert;
-    }
-
-    public void setSendEmailAlert(boolean sendEmailAlert) {
-        this.sendEmailAlert = sendEmailAlert;
-    }
-
     public String getEmail() {
         return email;
     }
@@ -214,59 +211,59 @@ public class User {
     public void setsectionList(List<Integer> sectionList) {
         this.sectionList = sectionList;
     }
-    
+
     public int getuserType() {
         return userType;
     }
-    
+
     public void setuserType(int userType) {
         this.userType = userType;
     }
-    
+
     public boolean getdeliverAuthority() {
         return deliverAuthority;
     }
-    
+
     public void setdeliverAuthority(boolean deliverAuthority) {
         this.deliverAuthority = deliverAuthority;
     }
-    
+
     public boolean geteditAuthority() {
         return editAuthority;
     }
-    
+
     public void seteditAuthority(boolean editAuthority) {
         this.editAuthority = editAuthority;
     }
-    
+
     public boolean getcreateAuthority() {
         return createAuthority;
     }
-    
+
     public void setcreateAuthority(boolean createAuthority) {
         this.createAuthority = createAuthority;
     }
-    
+
     public boolean getcancelAuthority() {
         return cancelAuthority;
     }
-    
+
     public void setcancelAuthority(boolean cancelAuthority) {
         this.cancelAuthority = cancelAuthority;
     }
-    
+
     public Date getdateOrgWasCreated() {
         return dateOrgWasCreated;
     }
-    
+
     public void setdateOrgWasCreated(Date dateOrgWasCreated) {
         this.dateOrgWasCreated = dateOrgWasCreated;
     }
-    
+
     public String getresetCode() {
         return resetCode;
     }
-    
+
     public void setresetCode(String resetCode) {
         this.resetCode = resetCode;
     }
@@ -279,28 +276,141 @@ public class User {
         this.orgName = orgName;
     }
 
-	public byte[] getRandomSalt() {
-		return randomSalt;
-	}
-
-	public void setRandomSalt(byte[] randomSalt) {
-		this.randomSalt = randomSalt;
-	}
-
-	public byte[] getEncryptedPw() {
-		return encryptedPw;
-	}
-
-	public void setEncryptedPw(byte[] encryptedPw) {
-		this.encryptedPw = encryptedPw;
-	}
-
-    public boolean getReceiveEmailAlert() {
-        return receiveEmailAlert;
+    public byte[] getRandomSalt() {
+        return randomSalt;
     }
 
-    public void setReceiveEmailAlert(boolean receiveEmailAlert) {
-        this.receiveEmailAlert = receiveEmailAlert;
+    public void setRandomSalt(byte[] randomSalt) {
+        this.randomSalt = randomSalt;
     }
-    
+
+    public byte[] getEncryptedPw() {
+        return encryptedPw;
+    }
+
+    public void setEncryptedPw(byte[] encryptedPw) {
+        this.encryptedPw = encryptedPw;
+    }
+
+    public Integer getOrgType() {
+        return orgType;
+    }
+
+    public void setOrgType(Integer orgType) {
+        this.orgType = orgType;
+    }
+
+    public boolean isConnectionAssociated() {
+        return connectionAssociated;
+    }
+
+    public void setConnectionAssociated(boolean connectionAssociated) {
+        this.connectionAssociated = connectionAssociated;
+    }
+
+    public boolean isSendSentEmail() {
+        return sendSentEmail;
+    }
+
+    public void setSendSentEmail(boolean sendSentEmail) {
+        this.sendSentEmail = sendSentEmail;
+    }
+
+    public boolean isSendReceivedEmail() {
+        return sendReceivedEmail;
+    }
+
+    public void setSendReceivedEmail(boolean sendReceivedEmail) {
+        this.sendReceivedEmail = sendReceivedEmail;
+    }
+
+    public List<siteSections> getUserAllowedModules() {
+        return userAllowedModules;
+    }
+
+    public void setUserAllowedModules(List<siteSections> userAllowedModules) {
+        this.userAllowedModules = userAllowedModules;
+    }
+
+	public List<Integer> getSectionList() {
+		return sectionList;
+	}
+
+	public void setSectionList(List<Integer> sectionList) {
+		this.sectionList = sectionList;
+	}
+
+	public Date getDateOrgWasCreated() {
+		return dateOrgWasCreated;
+	}
+
+	public void setDateOrgWasCreated(Date dateOrgWasCreated) {
+		this.dateOrgWasCreated = dateOrgWasCreated;
+	}
+
+	public boolean isSendEmailAlert() {
+		return sendEmailAlert;
+	}
+
+	public void setSendEmailAlert(boolean sendEmailAlert) {
+		this.sendEmailAlert = sendEmailAlert;
+	}
+
+	public boolean isReceiveEmailAlert() {
+		return receiveEmailAlert;
+	}
+
+	public void setReceiveEmailAlert(boolean receiveEmailAlert) {
+		this.receiveEmailAlert = receiveEmailAlert;
+	}
+
+	public int getUserType() {
+		return userType;
+	}
+
+	public void setUserType(int userType) {
+		this.userType = userType;
+	}
+
+	public boolean isDeliverAuthority() {
+		return deliverAuthority;
+	}
+
+	public void setDeliverAuthority(boolean deliverAuthority) {
+		this.deliverAuthority = deliverAuthority;
+	}
+
+	public boolean isEditAuthority() {
+		return editAuthority;
+	}
+
+	public void setEditAuthority(boolean editAuthority) {
+		this.editAuthority = editAuthority;
+	}
+
+	public boolean isCreateAuthority() {
+		return createAuthority;
+	}
+
+	public void setCreateAuthority(boolean createAuthority) {
+		this.createAuthority = createAuthority;
+	}
+
+	public boolean isCancelAuthority() {
+		return cancelAuthority;
+	}
+
+	public void setCancelAuthority(boolean cancelAuthority) {
+		this.cancelAuthority = cancelAuthority;
+	}
+
+	public String getResetCode() {
+		return resetCode;
+	}
+
+	public void setResetCode(String resetCode) {
+		this.resetCode = resetCode;
+	}
+
+
 }

@@ -19,7 +19,9 @@ require(['./main'], function () {
            $('#searchForm').submit();
        });
        
-        
+       var oSettings = datatable.fnSettings();
+       
+       //datatable.fnSort( [ [0,'desc'] ] );
    });
 });
 

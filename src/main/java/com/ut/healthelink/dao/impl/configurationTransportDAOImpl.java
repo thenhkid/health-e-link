@@ -568,7 +568,8 @@ public class configurationTransportDAOImpl implements configurationTransportDAO 
 
             String sql = ("select * "
                     + " from configurationTransportDetails "
-                    + " where fileext = :fileExt and transportmethodId = :transportMethodId and status = :status");
+                    + " where fileext = :fileExt and transportmethodId = :transportMethodId and status = :status "
+                    + " and configId in (select id from configurations where type = 1) ");
             if (transportMethodId == 5) {
             	sql = sql + " and id in (select transportId from rel_transportrhapsodydetails where directory  = :inputPath and method = 1);";
             } else if (transportMethodId == 3)  {

@@ -73,7 +73,7 @@ public class adminController {
     public ModelAndView listConfigurations(HttpServletRequest request, HttpServletResponse response, HttpSession session, RedirectAttributes redirectAttr) throws Exception {
 
         User userInfo = (User) session.getAttribute("userDetails");
-
+        
         if (userInfo.getRoleId() == 3 || userInfo.getRoleId() == 4) {
             
             ModelAndView mav = new ModelAndView(new RedirectView("/administrator/processing-activity/activityReport"));
@@ -83,7 +83,7 @@ public class adminController {
             ModelAndView mav = new ModelAndView();
             mav.setViewName("/administrator/dashboard");
 
-		//Need to get totals for the dashboard.
+            //Need to get totals for the dashboard.
             //Return the total list of organizations
             Long totalOrgs = organizationManager.findTotalOrgs();
             mav.addObject("totalOrgs", totalOrgs);
@@ -115,7 +115,7 @@ public class adminController {
             Organization org;
             messageType messagetype;
             configurationTransport transportDetails;
-
+            
             for (configuration config : configurations) {
                 org = organizationManager.getOrganizationById(config.getorgId());
                 config.setOrgName(org.getOrgName());
@@ -128,17 +128,14 @@ public class adminController {
                     config.settransportMethod(configurationTransportManager.getTransportMethodById(transportDetails.gettransportMethodId()));
                 }
             }
-
+            
             /* get a list of all connections in the sysetm */
             List<configurationConnection> connections = configurationmanager.getLatestConnections(maxResults);
-
+            
             /* Loop over the connections to get the configuration details */
             if (connections != null) {
                 for (configurationConnection connection : connections) {
-                    /* Array to holder the users */
-                    List<User> connectionSenders = new ArrayList<User>();
-                    List<User> connectonReceivers = new ArrayList<User>();
-
+                    
                     configuration srcconfigDetails = configurationmanager.getConfigurationById(connection.getsourceConfigId());
                     configurationTransport srctransportDetails = configurationTransportManager.getTransportDetails(srcconfigDetails.getId());
 
@@ -164,29 +161,11 @@ public class adminController {
                         tgtconfigDetails.settransportMethod(configurationTransportManager.getTransportMethodById(tgttransportDetails.gettransportMethodId()));
                     }
 
-                    /* Get the list of connection senders */
-                    List<configurationConnectionSenders> senders = configurationmanager.getConnectionSenders(connection.getId());
-
-                    for (configurationConnectionSenders sender : senders) {
-                        User userDetail = userManager.getUserById(sender.getuserId());
-                        connectionSenders.add(userDetail);
-                    }
-                    connection.setconnectionSenders(connectionSenders);
-
-                    /* Get the list of connection receivers */
-                    List<configurationConnectionReceivers> receivers = configurationmanager.getConnectionReceivers(connection.getId());
-
-                    for (configurationConnectionReceivers receiver : receivers) {
-                        User userDetail = userManager.getUserById(receiver.getuserId());
-                        connectonReceivers.add(userDetail);
-                    }
-                    connection.setconnectionReceivers(connectonReceivers);
-
                     connection.settgtConfigDetails(tgtconfigDetails);
                 }
 
             }
-
+            
             mav.addObject("connections", connections);
             return mav;
 

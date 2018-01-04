@@ -1,15 +1,20 @@
 package com.ut.healthelink.controller;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.ut.healthelink.model.UserActivity;
 import com.ut.healthelink.reference.TestCategoryList;
 import com.ut.healthelink.reference.USStateList;
 import com.ut.healthelink.reference.ProcessCategoryList;
@@ -17,6 +22,7 @@ import com.ut.healthelink.service.configurationManager;
 import com.ut.healthelink.service.sysAdminManager;
 import com.ut.healthelink.service.userManager;
 import com.ut.healthelink.model.Macros;
+import com.ut.healthelink.model.MoveFilesLog;
 import com.ut.healthelink.model.User;
 import com.ut.healthelink.model.custom.LogoInfo;
 import com.ut.healthelink.model.custom.LookUpTable;
@@ -85,13 +91,14 @@ public class adminSysAdminController {
         Long totalMacroRows = sysAdminManager.findTotalMacroRows();
         Long totalHL7Entries = sysAdminManager.findtotalHL7Entries();
         Long totalUsers = sysAdminManager.findTotalUsers();
+        Integer filePaths = sysAdminManager.getMoveFilesLog(1).size();
         
         mav.addObject("totalLookUpTables", totalLookUpTables);
         mav.addObject("totalMacroRows", totalMacroRows);
         mav.addObject("totalHL7Entries", totalHL7Entries);
         mav.addObject("totalUsers", totalUsers);
+        mav.addObject("filePaths", filePaths);
         
-
         return mav;
     }
 
@@ -1588,6 +1595,56 @@ public class adminSysAdminController {
         
         return mav;
     }  
+    
+    @RequestMapping(value = "/getLog", method = {RequestMethod.GET})
+    public void getLog(HttpSession session, HttpServletResponse response, Authentication authentication) throws Exception {
+    	
+    	User userInfo = usermanager.getUserByUserName(authentication.getName());
+    	//log user activity
+ 	   UserActivity ua = new UserActivity();
+ 	   ua.setUserId(userInfo.getId());
+ 	   ua.setAccessMethod("GET");
+ 	   ua.setPageAccess("/getLog");
+ 	   ua.setActivity("Download Tomcat Log");
+ 	   usermanager.insertUserLog(ua);
+ 	   
+    	File logFileDir = new File(System.getProperty("catalina.home"), "logs");
+        File logFile = new File(logFileDir, "catalina.out");
+        // get your file as InputStream
+	   InputStream is = new FileInputStream(logFile);
+	   String mimeType = "application/octet-stream";
+	            		  response.setContentType(mimeType);
+	            		  response.setHeader("Content-Transfer-Encoding", "binary");
+	                      response.setHeader("Content-Disposition", "attachment;filename=catalina.out");
+	                      org.apache.commons.io.IOUtils.copy(is, response.getOutputStream());
+	                      response.flushBuffer();
+	            	      is.close();
+	   
+} 
+    
+    @RequestMapping(value = "/moveFilePaths", method = RequestMethod.GET)
+    public ModelAndView moveFilePaths(HttpServletRequest request, HttpServletResponse response, 
+    		HttpSession session, RedirectAttributes redirectAttr) throws Exception {
+
+    	ModelAndView mav = new ModelAndView();
+        mav.setViewName("/administrator/sysadmin/moveFilePaths");
+        //we get list of programs
+        List<MoveFilesLog> pathList = sysAdminManager.getMoveFilesLog(1);
+        mav.addObject("pathList", pathList);
+        
+        return mav;
+    }
+    
+    @RequestMapping(value = "/moveFilePaths", method = RequestMethod.POST)
+    @ResponseBody
+    public String associateEntity(@RequestParam(value = "pathId", required = true) Integer pathId) throws Exception {
+        
+    	MoveFilesLog moveFilesLog = new MoveFilesLog();
+    	moveFilesLog.setId(pathId);
+    	sysAdminManager.deleteMoveFilesLog(moveFilesLog);
+        
+        return "deleted";
+    }    	
     
     
 }

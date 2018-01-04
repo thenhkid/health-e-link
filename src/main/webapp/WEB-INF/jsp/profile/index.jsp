@@ -4,6 +4,7 @@
     Author     : chadmccue
 --%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
 <div class="product-suite" role="main">
     <div class="page-content container">
@@ -12,51 +13,53 @@
                 <div class="media">
                     <a href="" title="" class="icon-product icon-product icon-health-e-net pull-left media-object hidden-xs" ></a>
                     <div class="media-body">
-                       <h2>Welcome <c:out value="${userDetails.firstName}" />!</h2>
-                       <p>
-                           Listed below are your configured methods for exchanging data with your eReferral partners.
-                       </p>
+                        <h2>Welcome <c:out value="${userDetails.firstName}" />!</h2>
+                        <p>
+                            CARE CONNECTOR - Your tool for collaborating with community healthcare partners! 
+                            <br/>
+                            Please select any of the available options below.
+                        </p>
                     </div>
                 </div>
             </div>
-            
+
         </div>
     </div>
 </div>
 <div class="container main-container">
     <div class="row">
-	<div class="col-md-9 col-md-offset-0 col-sm-8 col-sm-offset-1 page-content">
-            <c:forEach items="${userAccess}" var="sections" varStatus="aStatus">
-                <c:choose>
-                    <c:when test="${sections.featureId == 3}">
-                        <h3><a href="<c:url value='/Health-e-Web/inbox'/>" title="Health-e-Web">Electronic Referral Gateway</a></h3>
+        <div class="page-content">
+            <div class="col-md-6 cb" style="padding-bottom:10px;">
+                <h4><a href="#settingsModal" id="settings" data-toggle="modal" title="Account Settings" class="settings">Account Settings</a></h4>
+                <p class="text">
+                    Update your personal account settings.
+                </p>
+            </div>
+            <c:set value="1" var="countIndex" scope="page" />
+            <c:forEach var="module" items="${userDetails.userAllowedModules}">
+                <c:if test="${not empty module.url && module.id != 8 && module.id != 9 && module.id != 11}">
+                    <div class="col-md-6 ${(countIndex mod 2) == 0 ? 'cb' : ''}"  style="padding-bottom:10px;">
+                        <h4><a href="<c:url value='${module.url}'/>" title="${module.featureName}">${module.featureName}</a></h4>
                         <p class="text">
-                            Exchanging data between the plethora of different host platforms and sources is key to building the essential infrastructure necessary to support high-quality and more cost 
-                            effective care delivery. Health-e-Link Exchange solution is the one web-enabled exchange portal that allows regional healthcare partners in your community to cost-effectively 
-                            send, receive, and exchange patient healthcare information leveraging your existing business and clinical applications, and your current IT resources. 
+                            ${module.featureDesc}
                         </p>
-                    </c:when>
-                    <c:when test="${sections.featureId == 4}">
-                        <h3><a href="<c:url value='/Health-e-Connect/upload'/>" title="Health-e-Connect">File Exchange</a></h3>
+                    </div>
+                   <c:set value="${countIndex + 1}" var="countIndex" scope="page" />     
+                </c:if>
+            </c:forEach>
+            <div class="col-md-12 cb"><hr></div>
+            <c:set value="0" var="countIndex" scope="page" />
+            <c:forEach var="module" items="${userDetails.userAllowedModules}">
+                <c:if test="${not empty module.url && (module.id == 8 || module.id == 9 || module.id == 11)}">
+                    <div class="col-md-6 ${(countIndex mod 2) == 0 ? 'cb' : ''}"  style="padding-bottom:10px;">
+                        <h4><a href="<c:url value='${module.url}'/>" title="${module.featureName}">${module.featureName}</a></h4>
                         <p class="text">
-                            Exchanging data between the plethora of different host platforms and sources is key to building the essential infrastructure necessary to support high-quality and more cost 
-                            effective care delivery. Health-e-Link Exchange solution is the one web-enabled exchange portal that allows regional healthcare partners in your community to cost-effectively 
-                            send, receive, and exchange patient healthcare information leveraging your existing business and clinical applications, and your current IT resources. 
+                            ${module.featureDesc}
                         </p>
-                    </c:when>
-                    <c:when test="${sections.featureId == 5}">
-                        <h3><a href="<c:url value='/OrgProfile/editProfile'/>" title="Organization Profile">Organization Profile</a></h3>
-                        <p class="text">
-                            Update your organization profile.
-                        </p>
-                    </c:when>
-                </c:choose>
-            </c:forEach> 
-            <h3><a href="#settingsModal" id="settings" data-toggle="modal" title="Account Settings" class="settings">Account Settings</a></h3>
-                        <p class="text">
-                            Update your account settings.
-                        </p>
-            
-	</div>
+                    </div>
+                   <c:set value="${countIndex + 1}" var="countIndex" scope="page" />     
+                </c:if>
+            </c:forEach>
+        </div>
     </div>
 </div>

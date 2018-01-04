@@ -14,6 +14,7 @@ import com.ut.healthelink.model.configurationConnection;
 import com.ut.healthelink.model.configurationConnectionReceivers;
 import com.ut.healthelink.model.configurationConnectionSenders;
 import com.ut.healthelink.model.configurationDataTranslations;
+import com.ut.healthelink.model.configurationExcelDetails;
 import com.ut.healthelink.model.configurationMessageSpecs;
 import com.ut.healthelink.model.configurationSchedules;
 
@@ -140,4 +141,6 @@ public interface configurationManager {
   void saveCCDElement(configurationCCDElements ccdElement) throws Exception;
   
   configurationCCDElements getCCDElement(Integer elementId) throws Exception;
+  
+  configurationExcelDetails getExcelDetails (Integer configId, Integer orgId) throws Exception;
 }

@@ -6322,6 +6322,27 @@ td.visible-print {
   margin-left: -15px;
   margin-right: -15px;
 }
+
+.panel.panel-stats {
+    text-align: center;
+}
+.panel.panel-stats .stat-number {
+    font-size: 56px;
+    font-weight: bold;
+    line-height: 100%;
+}
+.panel.panel-stats .stat-number a:hover {
+    text-decoration: none;
+}
+.panel.panel-stats h3 {
+    display: block;
+    font-size: 16px;
+    margin: 10px 0;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    padding: 5px 0;
+}
 .panel.panel-has-nav .panel-body {
   padding: 10px;
   padding-bottom: 0;

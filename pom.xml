@@ -28,13 +28,15 @@
         <jackson-databind.version>2.3.0</jackson-databind.version>
         <jackson-core.version>2.3.0</jackson-core.version>
         <jackson-annotations.version>2.3.0</jackson-annotations.version>
-        <poi.version>3.9</poi.version>
-        <poi-ooxml.version>3.9</poi-ooxml.version>
+        <poi.version>3.16</poi.version>
+        <poi-ooxml.version>3.16</poi-ooxml.version>
         <log4j.version>2.0-beta8</log4j.version>
         <quartz.version>2.2.1</quartz.version>
         <commons-validator.version>1.4.0</commons-validator.version>
         <tomcat-jdbc.version>7.0.47</tomcat-jdbc.version>
         <sax.version>2.0.1</sax.version>
+        <apache.poi.version>3.16</apache.poi.version>
+        <xlsx.streamer.version>1.2.0</xlsx.streamer.version>
     </properties>
   
  
@@ -100,7 +102,13 @@
             <artifactId>mail</artifactId>
             <version>${javax.mail.version}</version>
         </dependency>
-      
+        
+        <dependency>
+            <groupId>org.docx4j</groupId>
+            <artifactId>docx4j</artifactId>
+            <version>3.2.2</version>
+        </dependency>
+
         <!-- Hibernate -->
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -311,7 +319,23 @@
             <artifactId>itextpdf</artifactId>
             <version>5.5.7</version>
         </dependency>
+		 <dependency>
+		    <groupId>org.apache.poi</groupId>
+		    <artifactId>poi</artifactId>
+		    <version>${apache.poi.version}</version>
+		</dependency>
+     	<dependency>
+		    <groupId>org.apache.poi</groupId>
+		    <artifactId>poi-ooxml</artifactId>
+		    <version>${apache.poi.version}</version>
+		</dependency>
 
+		  <dependency>
+		    <groupId>com.monitorjbl</groupId>
+		    <artifactId>xlsx-streamer</artifactId>
+		    <version>${xlsx.streamer.version}</version>
+		  </dependency>
+ 
     </dependencies>
     <build>
         <plugins>

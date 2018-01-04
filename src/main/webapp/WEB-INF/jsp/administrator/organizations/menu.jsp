@@ -7,6 +7,9 @@
             <li role="menuitem" ${param['page'] == 'providers' ? 'class="active"' : ''} ${id > 0 ? '' : 'class="disabled"'}><a href="${id > 0 ? 'providers' : 'javascript:void(0);'}" title="Organization Providers">Providers</a></li>
             <li role="menuitem" ${param['page'] == 'users' ? 'class="active"' : ''} ${id > 0 ? '' : 'class="disabled"'}><a href="${param['page'] != 'users' &&  id > 0 ? 'users' : 'javascript:void(0);'}" title="Organization System Users">System Users</a></li>
             <li role="menuitem" ${param['page'] == 'brochures' ? 'class="active"' : ''} ${id > 0 ? '' : 'class="disabled"'}"><a href="${param['page'] != 'brochures' && id > 0 ? 'brochures' : 'javascript:void(0);'}" title="Organization Brochures">Brochures</a></li>
+            <c:if test="${selOrgType == 2}">
+                <li role="menuitem" ${param['page'] == 'resources' ? 'class="active"' : ''} ${id > 0 ? '' : 'class="disabled"'}"><a href="${param['page'] != 'resources' && id > 0 ? 'resources' : 'javascript:void(0);'}" title="Organization Resources">Resources</a></li>
+            </c:if>
         </ul>
     </nav>
 </aside>

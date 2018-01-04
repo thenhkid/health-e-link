@@ -299,7 +299,7 @@ public class messageTypeManagerImpl implements messageTypeManager {
 
         if (crosswalkDetails.getOrgId() > 0) {
             Organization orgDetails = organizationDAO.getOrganizationById(crosswalkDetails.getOrgId());
-            cleanURL = orgDetails.getCleanURL();
+            cleanURL = orgDetails.getcleanURL();
             dir.setDir(cleanURL, "crosswalks");
         } else {
             //Set the directory to save the uploaded message type template to

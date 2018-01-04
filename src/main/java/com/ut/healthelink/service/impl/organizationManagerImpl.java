@@ -12,6 +12,7 @@ import com.ut.healthelink.model.Provider;
 import com.ut.healthelink.service.organizationManager;
 import com.ut.healthelink.model.User;
 import com.ut.healthelink.model.Brochure;
+import com.ut.healthelink.model.organizationPrograms;
 import com.ut.healthelink.reference.fileSystem;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -40,7 +41,7 @@ public class organizationManagerImpl implements organizationManager {
         //First get the operating system
         fileSystem dir = new fileSystem();
 
-        dir.creatOrgDirectories(organization.getCleanURL());
+        dir.creatOrgDirectories(organization.getcleanURL());
 
         return lastId;
     }
@@ -53,7 +54,7 @@ public class organizationManagerImpl implements organizationManager {
         //the organization
         fileSystem dir = new fileSystem();
         
-        dir.creatOrgDirectories(organization.getCleanURL());
+        dir.creatOrgDirectories(organization.getcleanURL());
         
         MultipartFile file = organization.getFile();
         //If a file is uploaded
@@ -71,7 +72,7 @@ public class organizationManagerImpl implements organizationManager {
                 //Set the directory to save the uploaded message type template to
                 fileSystem orgdir = new fileSystem();
 
-                orgdir.setDir(organization.getCleanURL(), "templates");
+                orgdir.setDir(organization.getcleanURL(), "templates");
 
                 newFile = new File(orgdir.getDir() + fileName);
 
@@ -115,7 +116,7 @@ public class organizationManagerImpl implements organizationManager {
                 //Set the directory to save the uploaded message type template to
                 fileSystem orgdir = new fileSystem();
 
-                orgdir.setDir("headerimages",organization.getCleanURL());
+                orgdir.setDir("headerimages",organization.getcleanURL());
 
                 newFile = new File(orgdir.getDir() + fileName);
 
@@ -159,7 +160,7 @@ public class organizationManagerImpl implements organizationManager {
                 //Set the directory to save the uploaded message type template to
                 fileSystem orgdir = new fileSystem();
 
-                orgdir.setDir("headerimages",organization.getCleanURL());
+                orgdir.setDir("headerimages",organization.getcleanURL());
 
                 newFile = new File(orgdir.getDir() + fileName);
 
@@ -346,5 +347,29 @@ public class organizationManagerImpl implements organizationManager {
         
         return mapObject;
         
+    }
+    
+    @Override
+    @Transactional
+    public List<Organization> searchCBOOrganizations(Integer programType, String town, String county, String state, String postalCode) throws Exception {
+        return organizationDAO.searchCBOOrganizations(programType, town, county, state, postalCode);
+    }
+    
+    @Override
+    @Transactional
+    public List<Integer> getOrganizationPrograms(int orgId) throws Exception {
+        return organizationDAO.getOrganizationPrograms(orgId);
+    }
+    
+    @Override
+    @Transactional
+    public void saveOrganizationPrograms(organizationPrograms programs) throws Exception {
+        organizationDAO.saveOrganizationPrograms(programs);
+    }
+    
+    @Override
+    @Transactional
+    public void deletOrganizationPrograms(int orgId) throws Exception {
+        organizationDAO.deletOrganizationPrograms(orgId);
     }
 }

@@ -75,14 +75,15 @@
                                                     <c:set var="ext" value="${text[fn:length(text)-1]}" />
                                                     <br />
                                                     <c:set var="hrefLink" value="/FileDownload/downloadFile.do?filename=${batch.utBatchName}.${ext}&foldername=archivesIn"/>
-													
-                                                    <c:if test="${batch.transportMethodId  == 6}">
-                                                        <c:set var="hrefLink" value="/FileDownload/downloadFile.do?filename=${batch.utBatchName}_dec.${ext}&foldername=archivesIn"/>
-                                                    </c:if>
-
-                                                    <a href="${hrefLink}" title="View Original File">
+													<a href="${hrefLink}" title="View Original File">
                                                         ${batch.originalFileName}
                                                     </a>
+                                                    <c:if test="${(batch.transportMethodId  == 6 || batch.transportMethodId  == 5) && (batch.statusId != 42 || batch.statusId != 2) }">
+                                                        <c:set var="hrefLinkDec" value="/FileDownload/downloadFile.do?filename=${batch.utBatchName}_dec.txt&foldername=archivesIn"/>
+                                                        <a href="${hrefLinkDec}" title="View Generated Text File">
+                                                        ${batch.utBatchName}_dec.txt
+                                                        </a>
+                                                    </c:if>
                                                 </c:if>
                                             </td>
                                             <td>

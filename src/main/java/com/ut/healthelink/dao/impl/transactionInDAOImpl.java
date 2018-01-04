@@ -55,8 +55,11 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.annotation.Resource;
 
 import org.hibernate.Criteria;
 import org.hibernate.Query;
@@ -76,6 +79,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Repository
 public class transactionInDAOImpl implements transactionInDAO {
 
+    @Resource(name = "myProps")
+    private Properties myProps;
+	
     @Autowired
     private SessionFactory sessionFactory;
 
@@ -84,8 +90,6 @@ public class transactionInDAOImpl implements transactionInDAO {
 
     @Autowired
     private userManager usermanager;
-
-    private String schemaName = "healthelink";
 
     //list of final status - these records we skip
     private List<Integer> transRELId = Arrays.asList(11, 12, 13, 16);
@@ -110,13 +114,11 @@ public class transactionInDAOImpl implements transactionInDAO {
         query.setParameter("id", idValue);
 
         String tableValue = String.valueOf(query.uniqueResult());
-        
+
         /* Check if null */
-        if(tableValue == null || "null".equals(tableValue)) {
+        if (tableValue == null || "null".equals(tableValue)) {
             tableValue = "";
-        }
-        /* Check if date */
-        else if(tableValue.length() == 10 && tableValue.contains("-")) {
+        } /* Check if date */ else if (tableValue.length() == 10 && tableValue.contains("-")) {
             try {
                 Date date = new SimpleDateFormat("yyyy-MM-dd").parse(tableValue);
                 tableValue = new SimpleDateFormat("MM/dd/yyyy").format(date);
@@ -646,6 +648,62 @@ public class transactionInDAOImpl implements transactionInDAO {
 
         return findTransactions.list();
     }
+	
+	 /**
+     * The 'getBatchTransactions' function will return a list of transactions within a batch. The list of transactions will only be the ones the passed in user has access to.
+     *
+     * @param batchId The id of the selected batch
+     * @param userId The id of the logged in user
+     *
+     * @return The function will return a list of transactionIn objects
+     */
+    @Override
+    @Transactional
+    public List<transactionIn> getBatchTransactions(int batchId, int userId, List<Integer> messageTypeList, List<Integer> OrgList) throws Exception {
+
+        List<Integer> transactionInIdList = new ArrayList<Integer>();
+
+        if (userId > 0) {
+            
+            /* Get a list of available batches */
+            Criteria batchSummaries = sessionFactory.getCurrentSession().createCriteria(batchUploadSummary.class);
+            batchSummaries.add(Restrictions.eq("batchId", batchId));
+            batchSummaries.add(Restrictions.in("messageTypeId", messageTypeList));
+            batchSummaries.add(Restrictions.in("targetOrgId", OrgList));
+            List<batchUploadSummary> batchUploadSummaryList = batchSummaries.list();
+
+            if (batchUploadSummaryList.isEmpty()) {
+                transactionInIdList.add(0);
+            } else {
+
+                for (batchUploadSummary summary : batchUploadSummaryList) {
+                    transactionInIdList.add(summary.gettransactionInId());
+                }
+
+            }
+        } else {
+            /* Get a list of available batches */
+            Criteria batchSummaries = sessionFactory.getCurrentSession().createCriteria(batchUploadSummary.class);
+            batchSummaries.add(Restrictions.eq("batchId", batchId));
+            List<batchUploadSummary> batchUploadSummaryList = batchSummaries.list();
+
+            if (batchUploadSummaryList.isEmpty()) {
+                transactionInIdList.add(0);
+            } else {
+
+                for (batchUploadSummary summary : batchUploadSummaryList) {
+                    transactionInIdList.add(summary.gettransactionInId());
+                }
+
+            }
+        }
+
+        Criteria findTransactions = sessionFactory.getCurrentSession().createCriteria(transactionIn.class);
+        findTransactions.add(Restrictions.in("id", transactionInIdList));
+        findTransactions.addOrder(Order.desc("dateCreated"));
+
+        return findTransactions.list();
+    }
 
     /**
      * The 'getsentBatches' function will return a list of sent batches for the organization passed in.
@@ -713,10 +771,8 @@ public class transactionInDAOImpl implements transactionInDAO {
                 /* Add the message type to the message type list */
                 if (messageTypeId == 0) {
                     messageTypeList.add(configDetails.getMessageTypeId());
-                } else {
-                    if (messageTypeId == configDetails.getMessageTypeId()) {
-                        messageTypeList.add(configDetails.getMessageTypeId());
-                    }
+                } else if (messageTypeId == configDetails.getMessageTypeId()) {
+                    messageTypeList.add(configDetails.getMessageTypeId());
                 }
 
                 /* Get the list of target orgs */
@@ -727,10 +783,8 @@ public class transactionInDAOImpl implements transactionInDAO {
                 /* Add the target org to the target organization list */
                 if (toOrgId == 0) {
                     targetOrgList.add(targetconfigDetails.getorgId());
-                } else {
-                    if (toOrgId == targetconfigDetails.getorgId()) {
-                        targetOrgList.add(targetconfigDetails.getorgId());
-                    }
+                } else if (toOrgId == targetconfigDetails.getorgId()) {
+                    targetOrgList.add(targetconfigDetails.getorgId());
                 }
             }
         }
@@ -1116,7 +1170,7 @@ public class transactionInDAOImpl implements transactionInDAO {
         Query insertData = sessionFactory.getCurrentSession().createSQLQuery(sql)
                 .setParameter("batchId", config.getBatchUploadId())
                 .setParameter("configId", config.getConfigId());
-        
+
         try {
             insertData.executeUpdate();
             insertSuccess = true;
@@ -1133,13 +1187,13 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Transactional
     public Integer clearMessageTable(int batchId, String mt, int transactionInId) {
         String sql = "delete from " + mt + " where transactionInId ";
-        		int id = batchId;
-        		if (transactionInId == 0) {
-        			sql = sql + "in (select id from transactionIn where batchId = :id);";
-        		} else {
-        			sql = sql + " = :id";
-        			id = transactionInId;
-        		}
+        int id = batchId;
+        if (transactionInId == 0) {
+            sql = sql + "in (select id from transactionIn where batchId = :id);";
+        } else {
+            sql = sql + " = :id";
+            id = transactionInId;
+        }
         Query deleteTable = sessionFactory.getCurrentSession().createSQLQuery(sql)
                 .addScalar("id", StandardBasicTypes.INTEGER).setParameter("id", id);
         try {
@@ -1161,7 +1215,7 @@ public class transactionInDAOImpl implements transactionInDAO {
                 + " and table_name like concat('message_%')"
                 + " and column_name like 'transactionInId';");
         Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
-        query.setParameter("schemaName", schemaName);
+        query.setParameter("schemaName", myProps.getProperty("schemaName"));
         List<String> mt = query.list();
         return mt;
     }
@@ -1211,7 +1265,7 @@ public class transactionInDAOImpl implements transactionInDAO {
                 .setParameter("batchId", config.getBatchUploadId())
                 .setParameter("configId", config.getConfigId())
                 .setParameter("id", transId);
-        
+
         try {
             insertData.executeUpdate();
             return true;
@@ -1335,8 +1389,7 @@ public class transactionInDAOImpl implements transactionInDAO {
     public List<batchUploads> getAllUploadedBatches(Date fromDate, Date toDate) throws Exception {
         return getAllUploadedBatches(fromDate, toDate, 0);
     }
-    
-   
+
     /**
      * The 'getAllRejectedBatches' function will return a list of batches for the admin in the processing activities section.
      *
@@ -1350,9 +1403,9 @@ public class transactionInDAOImpl implements transactionInDAO {
     public List<batchUploads> getAllRejectedBatches(Date fromDate, Date toDate, Integer fetchSize) throws Exception {
 
         int firstResult = 0;
-         
+
         List<Integer> batchIdList = new ArrayList<Integer>();
-        
+
         Criteria findRejectedTransactions = sessionFactory.getCurrentSession().createCriteria(transactionIn.class);
         findRejectedTransactions.add(Restrictions.eq("transactionTargetId", 0));
         findRejectedTransactions.add(Restrictions.or(
@@ -1364,7 +1417,7 @@ public class transactionInDAOImpl implements transactionInDAO {
                 Restrictions.eq("statusId", 11),
                 Restrictions.eq("statusId", 14)
         ));
-        
+
         List<transactionIn> batches = findRejectedTransactions.list();
 
         if (batches.isEmpty()) {
@@ -1376,7 +1429,6 @@ public class transactionInDAOImpl implements transactionInDAO {
                 }
             }
         }
-        
 
         Criteria findBatches = sessionFactory.getCurrentSession().createCriteria(batchUploads.class);
         findBatches.add(Restrictions.in("id", batchIdList));
@@ -1395,7 +1447,7 @@ public class transactionInDAOImpl implements transactionInDAO {
         if (fetchSize > 0) {
             findBatches.setMaxResults(fetchSize);
         }
-        
+
         return findBatches.list();
     }
 
@@ -1710,13 +1762,13 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Transactional
     public Integer clearTransactionInRecords(Integer batchUploadId, Integer transactionInId) {
         String sql = "delete from transactionInRecords where ";
-        		Integer id = batchUploadId;
-        		if (transactionInId == 0) {
-        			sql = sql	+ " batchId = :id";
-        		} else {
-        			id = transactionInId;
-        			sql = sql	+ " transactionInId = :id";
-        		}
+        Integer id = batchUploadId;
+        if (transactionInId == 0) {
+            sql = sql + " batchId = :id";
+        } else {
+            id = transactionInId;
+            sql = sql + " transactionInId = :id";
+        }
         Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
                 .setParameter("id", id);
 
@@ -1732,17 +1784,17 @@ public class transactionInDAOImpl implements transactionInDAO {
     @Override
     @Transactional
     public Integer clearTransactionTranslatedIn(Integer batchUploadId, Integer transactionInId) {
-    	
-    	String sql = "delete from transactionTranslatedIn where ";
-		Integer id = batchUploadId;
-		if (transactionInId == 0) {
-			sql = sql	+ " batchId = :id";
-		} else {
-			id = transactionInId;
-			sql = sql	+ " transactionInId = :id";
-		}
-Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
-        .setParameter("id", id);
+
+        String sql = "delete from transactionTranslatedIn where ";
+        Integer id = batchUploadId;
+        if (transactionInId == 0) {
+            sql = sql + " batchId = :id";
+        } else {
+            id = transactionInId;
+            sql = sql + " transactionInId = :id";
+        }
+        Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                .setParameter("id", id);
 
         try {
             deleteData.executeUpdate();
@@ -2185,26 +2237,24 @@ Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
                     }
                 }
 
-            } else {
-                if (transactionId == 0) {
-                    sql = "update transactionTranslatedOut "
-                            + " JOIN (SELECT id from transactionTarget WHERE configId = :configId"
-                            + " and batchDLId = :id and statusId not in ( :transRELId )) as ti ON transactionTranslatedOut.transactionTargetId = ti.id "
-                            + " SET transactionTranslatedOut.F" + fieldNo + " = forcw ";
-                    if (passClear == 1) {
-                        // 1 is pass, we leave original values in fieldNo alone
-                        sql = sql + "where forcw is not null;";
-                    }
-                } else {
-                    sql = "update transactionTranslatedOut "
-                            + " SET transactionTranslatedOut.F" + fieldNo + " = forcw "
-                            + " where transactionTargetId = :id";
-                    if (passClear == 1) {
-                        // 1 is pass, we leave original values in fieldNo alone
-                        sql = sql + " and  forcw is not null;";
-                    }
-                    id = transactionId;
+            } else if (transactionId == 0) {
+                sql = "update transactionTranslatedOut "
+                        + " JOIN (SELECT id from transactionTarget WHERE configId = :configId"
+                        + " and batchDLId = :id and statusId not in ( :transRELId )) as ti ON transactionTranslatedOut.transactionTargetId = ti.id "
+                        + " SET transactionTranslatedOut.F" + fieldNo + " = forcw ";
+                if (passClear == 1) {
+                    // 1 is pass, we leave original values in fieldNo alone
+                    sql = sql + "where forcw is not null;";
                 }
+            } else {
+                sql = "update transactionTranslatedOut "
+                        + " SET transactionTranslatedOut.F" + fieldNo + " = forcw "
+                        + " where transactionTargetId = :id";
+                if (passClear == 1) {
+                    // 1 is pass, we leave original values in fieldNo alone
+                    sql = sql + " and  forcw is not null;";
+                }
+                id = transactionId;
             }
 
             Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
@@ -2250,29 +2300,27 @@ Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
                         + " and transactionInId = :id";
                 id = transactionId;
             }
+        } else if (transactionId == 0) {
+            sql = "insert into transactionOutErrors (batchDownloadId, configId, "
+                    + "transactionTargetId, fieldNo, errorid, cwId)"
+                    + " select " + batchId + ", " + configId + ",  transactionTargetId, " + cdt.getFieldNo()
+                    + ", 3,  " + cdt.getCrosswalkId() + " from transactionTranslatedOut where "
+                    + " configId = :configId "
+                    + " and (F" + cdt.getFieldNo()
+                    + " is not null and length(F" + cdt.getFieldNo() + ") != 0 and forcw is null)"
+                    + " and transactionTargetId in (select id from transactionTarget "
+                    + " where batchDLId = :id"
+                    + " and configId = :configId and statusId not in ( :transRELId ));";
         } else {
-            if (transactionId == 0) {
-                sql = "insert into transactionOutErrors (batchDownloadId, configId, "
-                        + "transactionTargetId, fieldNo, errorid, cwId)"
-                        + " select " + batchId + ", " + configId + ",  transactionTargetId, " + cdt.getFieldNo()
-                        + ", 3,  " + cdt.getCrosswalkId() + " from transactionTranslatedOut where "
-                        + " configId = :configId "
-                        + " and (F" + cdt.getFieldNo()
-                        + " is not null and length(F" + cdt.getFieldNo() + ") != 0 and forcw is null)"
-                        + " and transactionTargetId in (select id from transactionTarget "
-                        + " where batchDLId = :id"
-                        + " and configId = :configId and statusId not in ( :transRELId ));";
-            } else {
-                sql = "insert into transactionOutErrors (batchDownloadId, configId, "
-                        + "transactionTargetId, fieldNo, errorid, cwId)"
-                        + " select " + batchId + ", " + configId + ",  transactionTargetId, " + cdt.getFieldNo()
-                        + ", 3,  " + cdt.getCrosswalkId() + " from transactionTranslatedOut where "
-                        + " configId = :configId "
-                        + " and (F" + cdt.getFieldNo()
-                        + " is not null and length(F" + cdt.getFieldNo() + ") != 0 and forcw is null)"
-                        + " and transactionTargetId = :id";
-                id = transactionId;
-            }
+            sql = "insert into transactionOutErrors (batchDownloadId, configId, "
+                    + "transactionTargetId, fieldNo, errorid, cwId)"
+                    + " select " + batchId + ", " + configId + ",  transactionTargetId, " + cdt.getFieldNo()
+                    + ", 3,  " + cdt.getCrosswalkId() + " from transactionTranslatedOut where "
+                    + " configId = :configId "
+                    + " and (F" + cdt.getFieldNo()
+                    + " is not null and length(F" + cdt.getFieldNo() + ") != 0 and forcw is null)"
+                    + " and transactionTargetId = :id";
+            id = transactionId;
         }
 
         Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
@@ -2291,7 +2339,7 @@ Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
 
     @Override
     @Transactional
-    public void flagMacroErrors(Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing, Integer transactionId) {
+    public Integer flagMacroErrors(Integer configId, Integer batchId, configurationDataTranslations cdt, boolean foroutboundProcessing, Integer transactionId) {
         try {
             String sql;
             Integer id = batchId;
@@ -2316,27 +2364,25 @@ Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
                             + " and transactionInId = :id);";
                     id = transactionId;
                 }
+            } else if (transactionId == 0) {
+                sql = "insert into transactionOutErrors (batchDownloadId, configId, "
+                        + "transactionTargetId, fieldNo, errorid, macroId)"
+                        + " select " + batchId + ", " + configId + ",transactionTargetId, " + cdt.getFieldNo()
+                        + ", 4,  " + cdt.getMacroId() + " from transactionTranslatedOut where "
+                        + "configId = :configId "
+                        + " and forcw = 'MACRO_ERROR'"
+                        + " and transactionTargetId in (select id from transactionTarget "
+                        + "where batchDLId = :id"
+                        + " and configId = :configId  and statusId not in ( :transRELId ));";
             } else {
-                if (transactionId == 0) {
-                    sql = "insert into transactionOutErrors (batchDownloadId, configId, "
-                            + "transactionTargetId, fieldNo, errorid, macroId)"
-                            + " select " + batchId + ", " + configId + ",transactionTargetId, " + cdt.getFieldNo()
-                            + ", 4,  " + cdt.getMacroId() + " from transactionTranslatedOut where "
-                            + "configId = :configId "
-                            + " and forcw = 'MACRO_ERROR'"
-                            + " and transactionTargetId in (select id from transactionTarget "
-                            + "where batchDLId = :id"
-                            + " and configId = :configId  and statusId not in ( :transRELId ));";
-                } else {
-                    sql = "insert into transactionOutErrors (batchDownloadId, configId, "
-                            + "transactionTargetId, fieldNo, errorid, macroId)"
-                            + "( select " + batchId + ", " + configId + ",transactionTargetId, " + cdt.getFieldNo()
-                            + ", 4,  " + cdt.getMacroId() + " from transactionTranslatedOut where "
-                            + "configId = :configId "
-                            + " and forcw = 'MACRO_ERROR'"
-                            + " and transactionTargetId = :id);";
-                    id = transactionId;
-                }
+                sql = "insert into transactionOutErrors (batchDownloadId, configId, "
+                        + "transactionTargetId, fieldNo, errorid, macroId)"
+                        + "( select " + batchId + ", " + configId + ",transactionTargetId, " + cdt.getFieldNo()
+                        + ", 4,  " + cdt.getMacroId() + " from transactionTranslatedOut where "
+                        + "configId = :configId "
+                        + " and forcw = 'MACRO_ERROR'"
+                        + " and transactionTargetId = :id);";
+                id = transactionId;
             }
 
             Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
@@ -2350,6 +2396,7 @@ Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
             System.err.println("flagMacroErrors " + ex.getCause());
             ex.printStackTrace();
         }
+        return 0;
     }
 
     /**
@@ -2909,7 +2956,7 @@ Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
             configurationDataTranslations cdt, boolean foroutboundProcessing,
             Macros macro, Integer transactionId) {
         try {
-            String sql = ("CALL " + macro.getFormula() + " (:configId, :batchId, :srcField, "
+        	String sql = ("CALL " + macro.getFormula() + " (:configId, :batchId, :srcField, "
                     + ":fieldA, :fieldB, :con1, :con2, :macroId, :foroutboundProcessing, :passClear, :transactionId);");
             Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
             query.setParameter("configId", configId);
@@ -2945,7 +2992,7 @@ Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
             //insert system error
             insertProcessingError(processingSysErrorId, configId, batchId, cdt.getFieldNo(),
                     cdt.getMacroId(), null, null,
-                    false, foroutboundProcessing, ("executeMacro " + ex.getCause().toString()), transactionId);
+                    false, foroutboundProcessing, ("executeMacro "+ macro.getFormula() + " " + ex.getCause().toString()), transactionId);
             System.err.println("executeMacro " + ex.getCause());
             ex.printStackTrace();
             return 1;
@@ -3034,7 +3081,7 @@ Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
             sql = " update batchUploads set " + colNameToUpdate + " = "
                     + "(select count(id) as total from transactionIn where batchId = :batchId ";
         } else {
-            sql = "update batchUploads set " + colNameToUpdate + " = (select count(id) as total "
+            sql = "update batchdownloads set " + colNameToUpdate + " = (select count(id) as total "
                     + " from transactionTarget where"
                     + " batchDLId = :batchId ";
         }
@@ -4057,11 +4104,11 @@ Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
     @Override
     @Transactional
     public batchUploadSummary getUploadSummaryDetails(int transactionInId) {
-        
+
         try {
             String sql = ("select batchUploadSummary.*, batchUploads.dateSubmitted as dateSubmitted from batchUploadSummary inner join batchUploads on batchUploads.id = batchUploadSummary.batchId where"
                     + " batchUploadSummary.transactionInId = :transactionInId ");
-            
+
             Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
                     Transformers.aliasToBean(batchUploadSummary.class));
             query.setParameter("transactionInId", transactionInId);
@@ -4075,13 +4122,12 @@ Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
             ex.printStackTrace();
             return null;
         }
-        
+
         /* Get a list of available batches 
         Criteria batchSummaries = sessionFactory.getCurrentSession().createCriteria(batchUploadSummary.class);
         batchSummaries.add(Restrictions.eq("transactionInId", transactionInId));
 
         return (batchUploadSummary) batchSummaries.uniqueResult();*/
-
     }
 
     @Override
@@ -4115,7 +4161,7 @@ Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
 
         }
     }
-    
+
     @Override
     @Transactional
     public Integer clearTransactionOutErrorsByUploadBatchId(Integer batchId) {
@@ -4467,7 +4513,7 @@ Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
             String sql = ("select * from transactionInErrors where batchUploadId = :batchId order by configId");
             Query query = sessionFactory.getCurrentSession()
                     .createSQLQuery(sql).setResultTransformer(
-                            Transformers.aliasToBean(TransactionInError.class));
+                    Transformers.aliasToBean(TransactionInError.class));
             query.setParameter("batchId", batchId);
 
             List<TransactionInError> errorList = query.list();
@@ -4967,7 +5013,7 @@ Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
         return (messagePatients) patientDetails.uniqueResult();
 
     }
-    
+
     /**
      * The 'getPatientTransactionDetailsForExport' function will return the submitted patient data for the passed in transactionId.
      *
@@ -4976,25 +5022,24 @@ Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
     @Override
     @Transactional
     public messagePatients getPatientTransactionDetailsForExport(int transactionInId) {
-        
-         String sql = ("SELECT a.*, g.displayText as genderVal, r.displayText as raceVal, h.displayText as ethnicityVal, l.displayText as languageVal, addr.postalCode as zip"
-                    + " from message_patients a"
-                    + " left outer join lu_genders g on g.id = a.genderId"
-                    + " left outer join lu_races r on r.id = a.raceId"
-                    + " left outer join lu_hispanics h on h.id = a.hispanicId"
-                    + " left outer join lu_languages l on l.id = a.primaryLanguageId"
-                    + " left outer join message_PatientAddresses addr on addr.transactionInId = a.transactionInId"
-                    + " where a.transactionInId = " + transactionInId);
-        
+
+        String sql = ("SELECT a.*, g.displayText as genderVal, r.displayText as raceVal, h.displayText as ethnicityVal, l.displayText as languageVal, addr.postalCode as zip"
+                + " from message_patients a"
+                + " left outer join lu_genders g on g.id = a.genderId"
+                + " left outer join lu_races r on r.id = a.raceId"
+                + " left outer join lu_hispanics h on h.id = a.hispanicId"
+                + " left outer join lu_languages l on l.id = a.primaryLanguageId"
+                + " left outer join message_PatientAddresses addr on addr.transactionInId = a.transactionInId"
+                + " where a.transactionInId = " + transactionInId);
+
         Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(Transformers.aliasToBean(messagePatients.class));
 
-        if(query.list().size() > 1) {
+        if (query.list().size() > 1) {
             return (messagePatients) query.list().get(0);
-        }
-        else {
+        } else {
             return (messagePatients) query.uniqueResult();
         }
-        
+
     }
 
     @Override
@@ -5006,10 +5051,9 @@ Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
             String sql = ("select rel_TransportRhapsodyDetails.id, directory, method, transportId "
                     + " from configurationTransportDetails, rel_TransportRhapsodyDetails "
                     + " where method = :method and configurationTransportDetails.id = rel_TransportRhapsodyDetails.transportId "
-                    + " and configId in (select id from configurations where status = 1) and  "
+                    + " and configId in (select id from configurations where status = 1 and type = 1) and  "
                     + " directory not in (select folderPath from moveFilesLog where statusId = 1 and method = :method) "
                     + " group by directory order by configId;");
-            
 
             Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
                     .setResultTransformer(Transformers.aliasToBean(configurationRhapsodyFields.class))
@@ -5164,8 +5208,7 @@ Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
 
     @Override
     @Transactional
-    public Integer updateFieldValue(String fieldValue, Integer fieldNo,
-            Integer transactionId, boolean foroutboundProcessing) {
+    public Integer updateFieldValue(String fieldValue, Integer fieldNo, Integer transactionId, boolean foroutboundProcessing) {
         try {
             String sql = "";
 
@@ -5933,7 +5976,7 @@ Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
         if (!"".equals(statusCategory) && "batch".equals(statusCategory) && !statusCode.equals(processStatus.getEndUserDisplayCode())) {
             matched = false;
         }
-        
+
         Criteria transactionQuery = sessionFactory.getCurrentSession().createCriteria(transactionIn.class);
         transactionQuery.add(Restrictions.eq("batchId", batchDetails.getId()));
         List<transactionIn> transactions = transactionQuery.list();
@@ -5941,7 +5984,7 @@ Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
         if (transactions.size() > 0) {
 
             for (transactionIn transaction : transactions) {
-                
+
                 Integer statusFieldNo = getStatusFieldNo(transaction.getConfigId());
 
                 lu_ProcessStatus transprocessStatus = sysAdminManager.getProcessStatusById(transaction.getstatusId());
@@ -5953,48 +5996,40 @@ Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
                 /*if (!"0".equals(status) && !status.equals(String.valueOf(transaction.getmessageStatus()))) {
                     matched = false;
                 }*/
-                
-                if(statusFieldNo != null && statusFieldNo > 0) {
-                    if("0".equals(status)) {
-                        BigInteger totalOpen = getTotalOpenFeedbackReports(Integer.toString(transaction.getId()), "F"+statusFieldNo);
-                        BigInteger totalClosed = getTotalClosedFeedbackReports(Integer.toString(transaction.getId()), "F"+statusFieldNo);
+                if (statusFieldNo != null && statusFieldNo > 0) {
+                    if ("0".equals(status)) {
+                        BigInteger totalOpen = getTotalOpenFeedbackReports(Integer.toString(transaction.getId()), "F" + statusFieldNo);
+                        BigInteger totalClosed = getTotalClosedFeedbackReports(Integer.toString(transaction.getId()), "F" + statusFieldNo);
 
-                        if(totalOpen != null && totalOpen.intValue() > 0) {
+                        if (totalOpen != null && totalOpen.intValue() > 0) {
                             matched = true;
-                        }
-                        else if(totalClosed != null && totalClosed.intValue() > 0) {
+                        } else if (totalClosed != null && totalClosed.intValue() > 0) {
                             matched = true;
-                        }
-                        else {
-                            matched = false;
-                        }
-                        
-                    }
-                    else if("1".equals(status)) {
-                        BigInteger totalOpen = getTotalOpenFeedbackReports(Integer.toString(transaction.getId()), "F"+statusFieldNo);
-
-                        if(totalOpen != null && totalOpen.intValue() > 0) {
-                            matched = true;
-                        }
-                        else {
+                        } else {
                             matched = false;
                         }
 
-                    }
-                    else if("2".equals(status)) {
+                    } else if ("1".equals(status)) {
+                        BigInteger totalOpen = getTotalOpenFeedbackReports(Integer.toString(transaction.getId()), "F" + statusFieldNo);
 
-                        BigInteger totalClosed = getTotalClosedFeedbackReports(Integer.toString(transaction.getId()), "F"+statusFieldNo);
-
-                        if(totalClosed != null && totalClosed.intValue() > 0) {
+                        if (totalOpen != null && totalOpen.intValue() > 0) {
                             matched = true;
+                        } else {
+                            matched = false;
                         }
-                        else {
+
+                    } else if ("2".equals(status)) {
+
+                        BigInteger totalClosed = getTotalClosedFeedbackReports(Integer.toString(transaction.getId()), "F" + statusFieldNo);
+
+                        if (totalClosed != null && totalClosed.intValue() > 0) {
+                            matched = true;
+                        } else {
                             matched = false;
                         }
                     }
                 }
-                
-                
+
                 Criteria patientQuery = sessionFactory.getCurrentSession().createCriteria(messagePatients.class);
                 patientQuery.add(Restrictions.eq("transactionInId", transaction.getId()));
 
@@ -6130,11 +6165,10 @@ Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
 
             List<String> tiIdList = query.list();
             if (tiIdList.size() > 0) {
-            	return tiIdList.get(0);
+                return tiIdList.get(0);
             } else {
-            	return " ";
+                return " ";
             }
-            
 
         } catch (Exception ex) {
             System.err.println("getTransactionInIdsFromBatch " + ex.getCause());
@@ -6376,9 +6410,9 @@ Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
     @Override
     @Transactional
     public BigInteger getReferralCount(String batchIds) throws Exception {
-       
+
         String sql = "select count(id) as totalReferrals from transactionIn a where batchId in (" + batchIds + ") and transactionTargetId = 0 and configId > 0  and statusId not in (19,15,31,13,11,14,21)";
-       
+
         Query getReferralCount = sessionFactory.getCurrentSession().createSQLQuery(sql);
 
         return (BigInteger) getReferralCount.uniqueResult();
@@ -6398,13 +6432,13 @@ Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
 
         return (BigInteger) getFBCount.uniqueResult();
     }
-    
+
     @Override
     @Transactional
     public BigInteger getRejectedCount(String fromDate, String toDate) throws Exception {
-       
+
         String sql = "select count(id) as totalReferrals from transactionIn where (dateCreated >= '" + fromDate + "' and dateCreated < '" + toDate + "') and transactionTargetId = 0 and (configId >= 0 OR configId is null) and statusId in (13,11,14)";
-      
+
         Query getRejectedCount = sessionFactory.getCurrentSession().createSQLQuery(sql);
 
         return (BigInteger) getRejectedCount.uniqueResult();
@@ -6421,7 +6455,7 @@ Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
                 + "and a.statusId not in (19,15,31,13,11,14,21) "
                 + "and a.id in (select transactionInId from transactionTarget where configId in (select configId from configurationTransportDetails where transportmethodId = 2)) "
                 + "group by a.configId order by orgName asc, messageType asc;");
-        
+
         Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
                 Transformers.aliasToBean(activityReportList.class));
 
@@ -6458,7 +6492,7 @@ Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
                 + "and statusId not in (19,15,31,13,11,14,21) "
                 + "and id in (select transactionInId from transactionTarget where configId in (select configId from configurationTransportDetails where transportmethodId = 2)) "
                 + "and configId = " + configId);
-       
+
         Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
 
         List<Integer> trans = query.list();
@@ -6475,50 +6509,47 @@ Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
                 + "where configId = " + configId + " and saveToTableCol = 'messageStatus'");
 
         Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
-        
+
         return (Integer) query.uniqueResult();
     }
-    
+
     @Override
     @Transactional
     public List getConfigFieldNumbers(Integer configId) throws Exception {
-        String sql = (
-                "select q1.referralIdField, q2.activityStatusField, q3.notesField, q4.statusField FROM "
-                   + "("
-                   + " select configId, fieldNo as referralIdField"
-                   + " from configurationformfields"
-                   + " where configId = " + configId + " and saveToTableName = 'message_visitinfo' and saveToTableCol = 'referralId'"
-                   + ")"
-                   + " as q1 LEFT JOIN"
-                   + "("
-                   + " select configId, fieldNo as activityStatusField"
-                   + " from configurationformfields"
-                   + " where configId = " + configId + " and saveToTableName = 'message_visitinfo' and saveToTableCol = 'status'"
-                   + ")"
-                   + " as q2 on q1.configId = q2.configId"
-                   + " LEFT JOIN"
-                   + "("
-                   + " select configId, fieldNo as notesField"
-                   + " from configurationformfields"
-                   + " where configId = " + configId + " and saveToTableName = 'message_misc' and fieldType = 5"
-                   + " order by id desc"
-                   + " limit 1"
-                   + " ) as q3 on q1.configId = q3.configId"
-                   + " LEFT JOIN"
-                   + "("
-                   + " select configId, fieldNo as statusField"
-                   + " from configurationformfields"
-                   + " where configId = " + configId + " and saveToTableCol = 'messageStatus'"
-                   + " ) as q4 on q1.configId = q4.configId"
-                );
-        
+        String sql = ("select q1.referralIdField, q2.activityStatusField, q3.notesField, q4.statusField FROM "
+                + "("
+                + " select configId, fieldNo as referralIdField"
+                + " from configurationformfields"
+                + " where configId = " + configId + " and saveToTableName = 'message_visitinfo' and saveToTableCol = 'referralId'"
+                + ")"
+                + " as q1 LEFT JOIN"
+                + "("
+                + " select configId, fieldNo as activityStatusField"
+                + " from configurationformfields"
+                + " where configId = " + configId + " and saveToTableName = 'message_visitinfo' and saveToTableCol = 'status'"
+                + ")"
+                + " as q2 on q1.configId = q2.configId"
+                + " LEFT JOIN"
+                + "("
+                + " select configId, fieldNo as notesField"
+                + " from configurationformfields"
+                + " where configId = " + configId + " and saveToTableName = 'message_misc' and fieldType = 5"
+                + " order by id desc"
+                + " limit 1"
+                + " ) as q3 on q1.configId = q3.configId"
+                + " LEFT JOIN"
+                + "("
+                + " select configId, fieldNo as statusField"
+                + " from configurationformfields"
+                + " where configId = " + configId + " and saveToTableCol = 'messageStatus'"
+                + " ) as q4 on q1.configId = q4.configId");
+
         Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
-        
+
         return query.list();
-        
+
     }
-  
-    
+
     @Override
     @Transactional
     public Integer getActivityStatusFieldNo(Integer configId) throws Exception {
@@ -6528,16 +6559,15 @@ Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
                 + "where configId = " + configId + " and saveToTableName = 'message_visitinfo' and saveToTableCol = 'status'");
 
         Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
-        
-        if(query.list().size() > 1) {
+
+        if (query.list().size() > 1) {
             return (Integer) query.list().get(0);
-        }
-        else {
+        } else {
             return (Integer) query.uniqueResult();
         }
-        
+
     }
-    
+
     @Override
     @Transactional
     public Integer getReferralIdFieldNo(Integer configId) throws Exception {
@@ -6547,35 +6577,34 @@ Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
                 + "where configId = " + configId + " and saveToTableName = 'message_visitinfo' and saveToTableCol = 'referralId'");
 
         Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
-        
-        if(query.list().size() > 1) {
+
+        if (query.list().size() > 1) {
             return (Integer) query.list().get(0);
-        }
-        else {
+        } else {
             return (Integer) query.uniqueResult();
         }
-        
+
     }
-    
+
     @Override
     @Transactional
     public String getTransactionFieldValue(Integer transactionId, String fieldNo) throws Exception {
-        
+
         String sql = "select " + fieldNo + " as fieldValue from transactionInRecords where transactionInId = " + transactionId;
-        
+
         Query getFieldvalue = sessionFactory.getCurrentSession().createSQLQuery(sql);
-        
+
         return (String) getFieldvalue.uniqueResult();
     }
-    
+
     @Override
     @Transactional
     public BigInteger getTotalOpenFeedbackReports(String transIds, String fieldNo) throws Exception {
 
         String sql = "select count(id) as totalOpen from transactionInRecords where transactionInId in (" + transIds + ") and " + fieldNo + " = '1'";
-        
+
         Query getOpenCount = sessionFactory.getCurrentSession().createSQLQuery(sql);
-        
+
         return (BigInteger) getOpenCount.uniqueResult();
     }
 
@@ -6584,102 +6613,103 @@ Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
     public BigInteger getTotalClosedFeedbackReports(String transIds, String fieldNo) throws Exception {
 
         String sql = "select count(id) as totalClosed from transactionInRecords where transactionInId in (" + transIds + ") and " + fieldNo + " = '2'";
-        
+
         Query getClosedCount = sessionFactory.getCurrentSession().createSQLQuery(sql);
 
         return (BigInteger) getClosedCount.uniqueResult();
     }
-    
+
     @Override
     @Transactional
     public BigInteger getTotalCompletedActivityStatus(String transIds, String fieldNo) throws Exception {
         String sql = "select count(id) as totalCompleted from transactionInRecords where transactionInId in (" + transIds + ") and " + fieldNo + " = '3'";
-         
 
         Query getCompletedCount = sessionFactory.getCurrentSession().createSQLQuery(sql);
-        
 
         return (BigInteger) getCompletedCount.uniqueResult();
     }
-    
+
     @Override
     @Transactional
-    public BigInteger getTotalEnrolledActivityStatus(String transIds, String fieldNo) throws Exception{
+    public BigInteger getTotalEnrolledActivityStatus(String transIds, String fieldNo) throws Exception {
         String sql = "select count(id) as totalEnrolled from transactionInRecords where transactionInId in (" + transIds + ") and " + fieldNo + " = '7'";
 
         Query getEnrolledCount = sessionFactory.getCurrentSession().createSQLQuery(sql);
-        
 
         return (BigInteger) getEnrolledCount.uniqueResult();
     }
-    
+
     /**
      * The 'getReferralActivityExports' function will return a list of generated exports
+     *
      * @return
-     * @throws Exception 
+     * @throws Exception
      */
     @Override
     @Transactional
     public List<referralActivityExports> getReferralActivityExports() throws Exception {
-        
+
         Query query = sessionFactory.getCurrentSession().createQuery("from referralActivityExports order by dateSubmitted desc");
 
-        /** Only return the top one for right now **/
+        /**
+         * Only return the top one for right now *
+         */
         query.setMaxResults(1);
-        
+
         return query.list();
     }
-    
+
     /**
      * The 'saveReferralActivityExport' function will create a new activity export
+     *
      * @param activityExport
-     * @throws Exception 
+     * @throws Exception
      */
     @Override
     @Transactional
     public void saveReferralActivityExport(referralActivityExports activityExport) throws Exception {
         sessionFactory.getCurrentSession().save(activityExport);
     }
-    
-    
+
     /**
-     * The 'getReportActivityStatusValueById' function will return the value of the activity status for the id 
-     * passed in.
+     * The 'getReportActivityStatusValueById' function will return the value of the activity status for the id passed in.
+     *
      * @param activityStatusId
      * @return
-     * @throws Exception 
+     * @throws Exception
      */
     @Override
     @Transactional
     public String getReportActivityStatusValueById(Integer activityStatusId) throws Exception {
         String sql = "select descValue as statusValue from rel_crosswalkdata where crosswalkId = 19 and targetValue = " + activityStatusId;
-        
+
         Query getFieldvalue = sessionFactory.getCurrentSession().createSQLQuery(sql);
-        
+
         return (String) getFieldvalue.uniqueResult();
-    }        
-    
+    }
+
     /**
-     * The 'getActivityStatusValueById' function will return the value of the activity status for the id 
-     * passed in.
+     * The 'getActivityStatusValueById' function will return the value of the activity status for the id passed in.
+     *
      * @param activityStatusId
      * @return
-     * @throws Exception 
+     * @throws Exception
      */
     @Override
     @Transactional
     public String getActivityStatusValueById(Integer activityStatusId) throws Exception {
         String sql = "select displayText as statusValue from lu_internalmessagestatus where id = " + activityStatusId;
-        
+
         Query getFieldvalue = sessionFactory.getCurrentSession().createSQLQuery(sql);
-        
+
         return (String) getFieldvalue.uniqueResult();
     }
-    
+
     /**
      * The 'clearMultipleTargets' function will remove the multiple targets set for a configuration.
+     *
      * @param batchId
-     * @throws Exception 
+     * @throws Exception
      */
     @Override
     @Transactional
@@ -6689,24 +6719,24 @@ Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
         deletMultipleTargets.executeUpdate();
     }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	@Transactional
-	public List<Transaction> setTransactionInInfoByStatusId(Integer batchId,
-			List<Integer> statusIds, Integer howMany) throws Exception {
-		
-		String sql = ("select configName as srcConfigName, "
-				+ " case sourcesuborgid when 0 then config.orgid"
-				+ " else sourcesuborgid end as orgId, "
-				+ " ti.configId , ti.id as transactionId, bu.id as batchId "
-				+ " from "
-				+ " batchuploads BU, transactionin TI, configurations config "
-				+ " where TI.statusid in (:statusIds) "
-				+ " and bu.id = ti.batchid "
-				+ " and ti.configId = config.id "
-				+ "and ti.batchid = :batchId limit :howMany");
+    @SuppressWarnings("unchecked")
+    @Override
+    @Transactional
+    public List<Transaction> setTransactionInInfoByStatusId(Integer batchId,
+            List<Integer> statusIds, Integer howMany) throws Exception {
+
+        String sql = ("select configName as srcConfigName, "
+                + " case sourcesuborgid when 0 then config.orgid"
+                + " else sourcesuborgid end as orgId, "
+                + " ti.configId , ti.id as transactionId, bu.id as batchId "
+                + " from "
+                + " batchuploads BU, transactionin TI, configurations config "
+                + " where TI.statusid in (:statusIds) "
+                + " and bu.id = ti.batchid "
+                + " and ti.configId = config.id "
+                + "and ti.batchid = :batchId limit :howMany");
         Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
-        		.addScalar("srcConfigName", StandardBasicTypes.STRING)
+                .addScalar("srcConfigName", StandardBasicTypes.STRING)
                 .addScalar("orgId", StandardBasicTypes.INTEGER)
                 .addScalar("transactionId", StandardBasicTypes.INTEGER)
                 .addScalar("configId", StandardBasicTypes.INTEGER)
@@ -6715,25 +6745,24 @@ Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
                         Transformers.aliasToBean(Transaction.class))
                 .setParameter("batchId", batchId)
                 .setParameter("howMany", howMany)
-                .setParameterList("statusIds", statusIds)
-                ;
+                .setParameterList("statusIds", statusIds);
 
         List<Transaction> transactions = query.list();
 
         return transactions;
-	}
-	
-	@SuppressWarnings("unchecked")
-	@Override
-	@Transactional
-	public Transaction setTransactionTargetInfoByStatusId (Transaction transaction)  throws Exception {
-		String sql = ("select case targetsuborgid when 0 then config.orgid"
-				+ " else targetsuborgid end as targetOrgId, configId as targetConfigId1, "
-				+ " configName as targetConfigName, transactiontarget.Id as transactionTargetId"
-				+ " from transactiontarget, configurations config "
-				+ " where transactionInId = :transactionInId and config.id = configId limit 1;");
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    @Transactional
+    public Transaction setTransactionTargetInfoByStatusId(Transaction transaction) throws Exception {
+        String sql = ("select case targetsuborgid when 0 then config.orgid"
+                + " else targetsuborgid end as targetOrgId, configId as targetConfigId1, "
+                + " configName as targetConfigName, transactiontarget.Id as transactionTargetId"
+                + " from transactiontarget, configurations config "
+                + " where transactionInId = :transactionInId and config.id = configId limit 1;");
         Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
-        		.addScalar("targetConfigId1", StandardBasicTypes.INTEGER)
+                .addScalar("targetConfigId1", StandardBasicTypes.INTEGER)
                 .addScalar("targetOrgId", StandardBasicTypes.INTEGER)
                 .addScalar("targetConfigName", StandardBasicTypes.STRING)
                 .addScalar("transactionTargetId", StandardBasicTypes.INTEGER)
@@ -6741,154 +6770,396 @@ Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
                         Transformers.aliasToBean(Transaction.class))
                 .setParameter("transactionInId", transaction.gettransactionId());
 
-        List <Transaction> transactions = query.list();
+        List<Transaction> transactions = query.list();
         if (transactions.size() > 0) {
-        	return transactions.get(0);
+            return transactions.get(0);
         } else {
-        	return null;
+            return null;
         }
-	}
+    }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	@Transactional
-	public List<batchUploads> getMassTranslateBatchForOutput(Integer howMany)
-			throws Exception {
-		String sql = ("select * from batchuploads where statusid = 24 "
-				+ " and id in (select distinct batchid from transactionin where statusId = 19 "
-				+ " and configId in (select configId from configurationtransportdetails "
-				+ " where masstranslation = true and status = 1)) order by id");
-		if (howMany != 0) {
-			sql = sql + " limit " + howMany;
-		}
+    @SuppressWarnings("unchecked")
+    @Override
+    @Transactional
+    public List<batchUploads> getMassTranslateBatchForOutput(Integer howMany)
+            throws Exception {
+        String sql = ("select * from batchuploads where statusid = 24 "
+                + " and id in (select distinct batchid from transactionin where statusId = 19 "
+                + " and configId in (select configId from configurationtransportdetails "
+                + " where masstranslation = true and status = 1)) order by id");
+        if (howMany != 0) {
+            sql = sql + " limit " + howMany;
+        }
         Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
-        .setResultTransformer(Transformers.aliasToBean(batchUploads.class));
-                
-        List <batchUploads> batches = query.list();
+                .setResultTransformer(Transformers.aliasToBean(batchUploads.class));
+
+        List<batchUploads> batches = query.list();
         return batches;
-	}
-	
-	@Override
-    @Transactional
-	public void saveClearAfterDelivery(batchClearAfterDelivery bmt) throws Exception {
-		sessionFactory.getCurrentSession().save(bmt);
-	}
-	
-	@Override
-    @Transactional
-	public void updateClearAfterDelivery(batchClearAfterDelivery bmt) throws Exception {
-		sessionFactory.getCurrentSession().update(bmt);
-	}
+    }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	@Transactional
-	public List<batchClearAfterDelivery> getClearAfterDeliveryBatches(
-			List<Integer> statusIds) throws Exception {
-		 Criteria findBatches = sessionFactory.getCurrentSession().createCriteria(batchClearAfterDelivery.class);
-         findBatches.add(Restrictions.in("statusId", statusIds));
-         findBatches.addOrder(Order.asc("dateCreated"));
-         return findBatches.list();
-	}
+    @Override
+    @Transactional
+    public void saveClearAfterDelivery(batchClearAfterDelivery bmt) throws Exception {
+        sessionFactory.getCurrentSession().save(bmt);
+    }
 
-	@Override
-	@Transactional
-	public batchClearAfterDelivery getClearAfterDeliveryById(Integer bmtId)
-			throws Exception {
-		return (batchClearAfterDelivery) sessionFactory.getCurrentSession().get(batchClearAfterDelivery.class, bmtId);
-	}
-	
-	@Override
+    @Override
+    @Transactional
+    public void updateClearAfterDelivery(batchClearAfterDelivery bmt) throws Exception {
+        sessionFactory.getCurrentSession().update(bmt);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    @Transactional
+    public List<batchClearAfterDelivery> getClearAfterDeliveryBatches(
+            List<Integer> statusIds) throws Exception {
+        Criteria findBatches = sessionFactory.getCurrentSession().createCriteria(batchClearAfterDelivery.class);
+        findBatches.add(Restrictions.in("statusId", statusIds));
+        findBatches.addOrder(Order.asc("dateCreated"));
+        return findBatches.list();
+    }
+
+    @Override
+    @Transactional
+    public batchClearAfterDelivery getClearAfterDeliveryById(Integer bmtId)
+            throws Exception {
+        return (batchClearAfterDelivery) sessionFactory.getCurrentSession().get(batchClearAfterDelivery.class, bmtId);
+    }
+
+    @Override
     @Transactional
     @SuppressWarnings("unchecked")
-    
-	public List<CrosswalkData> getCrosswalkDataForBatch(configurationDataTranslations cdt,
-			Integer batchId, boolean foroutboundProcessing, Integer transactionId) throws Exception {
-			//look for value in corresponding f column
-	        String sql = "select distinct * from rel_crosswalkdata "
-        			+ " where crosswalkid = :crosswalkId and sourcevalue in "
-        			+ " (select f" + cdt.getFieldNo() + " ";
+
+    public List<CrosswalkData> getCrosswalkDataForBatch(configurationDataTranslations cdt,
+            Integer batchId, boolean foroutboundProcessing, Integer transactionId) throws Exception {
+        //look for value in corresponding f column
+        String sql = "select distinct * from rel_crosswalkdata "
+                + " where crosswalkid = :crosswalkId and sourcevalue in "
+                + " (select f" + cdt.getFieldNo() + " ";
+
+        Integer id = batchId;
+        if (!foroutboundProcessing) {
+            sql = sql + " from transactionTranslatedIn where transactioninid ";
+            if (transactionId != 0) {
+                sql = sql + "   = :id";
+                id = transactionId;
+            } else {
+                sql = sql + " in  (select id from transactionIn where batchid  = :id)";
+
+            }
+            sql = sql + ")";
+
+        } else {
+            sql = sql
+                    + " from transactionTranslatedOut where  ";
+            if (transactionId != 0) {
+                sql = sql + " transactionTargetid  = :id";
+                id = transactionId;
+            } else {
+                sql = sql + " batchDlId =  :id";
+
+            }
+            sql = sql + ")";
+
+        }
+
+        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                .setResultTransformer(Transformers.aliasToBean(CrosswalkData.class));
+        query.setParameter("id", id);
+        query.setParameter("crosswalkId", cdt.getCrosswalkId());
+
+        List<CrosswalkData> trs = query.list();
+
+        return trs;
+    }
+
+    @Override
+    @Transactional
+    public void translateCWForBatch(configurationDataTranslations cdt,
+            Integer batchId, boolean foroutboundProcessing,
+            Integer transactionId) throws Exception {
+        String sql = "";
+        Integer id = batchId;
+        if (foroutboundProcessing) {
+            sql = "UPDATE transactiontranslatedOut JOIN (select sourcevalue, targetvalue "
+                    + " from rel_crosswalkData where crosswalkid = :crosswalkId) tbl_concat"
+                    + " ON transactiontranslatedOut.F" + cdt.getFieldNo()
+                    + " = tbl_concat.sourcevalue "
+                    + " SET transactiontranslatedOut.forCW = tbl_concat.targetvalue  "
+                    + " WHERE transactiontranslatedOut.transactionTargetId ";
+            if (transactionId > 0) {
+                id = transactionId;
+                sql = sql + " = :id";
+            } else {
+                sql = sql + "in  (select id from transactionTarget where batchDLid = :id and statusId not in ( :transRELId ));";
+            }
+
+        } else {
+            sql = "UPDATE transactiontranslatedIn JOIN (select sourcevalue, targetvalue "
+                    + " from rel_crosswalkData where crosswalkid = :crosswalkId) tbl_concat"
+                    + " ON transactiontranslatedIn.F" + cdt.getFieldNo()
+                    + " = tbl_concat.sourcevalue "
+                    + " SET transactiontranslatedIn.forCW = tbl_concat.targetvalue  "
+                    + " WHERE transactiontranslatedIn.transactionInId ";
+            if (transactionId > 0) {
+                id = transactionId;
+                sql = sql + " = :id";
+            } else {
+                sql = sql + "in  (select id from transactionin where batchid = :id and statusId not in ( :transRELId ));";
+            }
+
+        }
+
+        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+        query.setParameter("id", id);
+        query.setParameter("crosswalkId", cdt.getCrosswalkId());
+        if (transactionId == 0) {
+            query.setParameterList("transRELId", transRELId);
+        }
+        query.executeUpdate();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    @Transactional
+    public List<referralActivityExports> getReferralActivityExportsByStatus(
+            List<Integer> statusIds, Integer howMany) throws Exception {
+        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(referralActivityExports.class);
+        if (statusIds.size() > 0) {
+            criteria.add(Restrictions.in("statusId", statusIds));
+        }
+        if (howMany > 0) {
+            criteria.setMaxResults(howMany);
+        }
+        return criteria.list();
+    }
+
+    /**
+     * The 'updateReferralActivityExport' function will save update to a activity export
+     *
+     * @param activityExport
+     * @throws Exception
+     */
+    @Override
+    @Transactional
+    public void updateReferralActivityExport(referralActivityExports activityExport) throws Exception {
+        sessionFactory.getCurrentSession().update(activityExport);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    @Transactional
+    public List<referralActivityExports> getReferralActivityExportsWithUserNames(
+            List<Integer> statusIds) throws Exception {
+
+        String sql = "SELECT referralactivityexports.statusId, referralactivityexports.selDateRange, fileName, dateSubmitted,  "
+                + " referralactivityexports.id, concat(users.firstname, ' ', users.lastname) as createdByName, "
+                + " case referralactivityexports.statusId when  1 then 'Requested' when 2 then 'In Process' "
+                + " when 3 then 'Ready for Viewing' when 4 then 'Viewed' when 5 then 'Deleted' when 6 then 'No Referrals Found' end as statusName"
+                + " from  referralactivityexports, users "
+                + " where users.id = referralactivityexports.createdBy  and referralactivityexports.statusId in (:statusId) "
+                + " order by dateSubmitted desc;";
+        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql).setResultTransformer(
+                Transformers.aliasToBean(referralActivityExports.class));
+        query.setParameterList("statusId", statusIds);
+
+        List<referralActivityExports> exports = query.list();
+        return exports;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    @Transactional
+    public referralActivityExports getReferralActivityExportById(Integer exportId) throws Exception {
+        Criteria criteria = sessionFactory.getCurrentSession().createCriteria(referralActivityExports.class);
+        criteria.add(Restrictions.eq("id", exportId));
+        List<referralActivityExports> exports = criteria.list();
+        if (exports.size() > 0) {
+            return exports.get(0);
+        } else {
+            return null;
+        }
+    }
+
+	@Override
+	@Transactional
+	public void populateAuditReport(Integer batchUploadId, Integer configId)
+			throws Exception {
+		String sql = "call populateAuditReport(:configId, :batchUploadId);";
+		Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+		query.setParameter("configId", configId);
+		query.setParameter("batchUploadId", batchUploadId);
+		query.executeUpdate();
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	@Transactional
+	public List<Integer> getErrorFieldNos(Integer batchUploadId)
+			throws Exception {
+			String sql = "select distinct fieldNo from transactionIndetailauditerrors where  "
+	               + " batchUploadId = :batchUploadId ";
 	        
-	        Integer id = batchId;
-	        if (!foroutboundProcessing) {
-	        	sql = sql + " from transactionTranslatedIn where transactioninid ";
-	        			if (transactionId != 0) {
-	        				sql = sql +  "   = :id";
-	        				id = transactionId;
-	        			} else {
-	        				sql = sql +  " in  (select id from transactionIn where batchid  = :id)";
+	        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+	            query.setParameter("batchUploadId", batchUploadId);
+	        List <Integer> fieldNoList = query.list();
+	        return fieldNoList;
+	}
 
-	        			}
-	        			sql = sql + ")";
-	        	
-	        } else {
-	        	sql = sql 
-	        			+ " from transactionTranslatedOut where  ";
-	        			if (transactionId != 0) {
-	        				sql = sql +  " transactionTargetid  = :id";
-	        				id = transactionId;
-	        			} else {
-	        				sql = sql +  " batchDlId =  :id";
+	@Override
+	@Transactional
+	public void populateFieldError(Integer batchUploadId, Integer fieldNo,
+			configurationMessageSpecs cms) throws Exception {
+		String sql = "UPDATE  transactionIndetailauditerrors  "
+				+ " JOIN (select  f" + fieldNo+ " as errorData, ";
+				if (cms.getrptField1() != 0) {
+					sql = sql + " f" + cms.getrptField1() + " as reportField1Data,";
+				}
+				if (cms.getrptField2() != 0) {
+					sql = sql + " f" + cms.getrptField2() + " as reportField2Data,";	
+				}
+				if (cms.getrptField3() != 0) {
+					sql = sql + " f" + cms.getrptField3() + " as reportField3Data,";
+				}
+				if (cms.getrptField4() != 0) {
+					sql = sql + " f" + cms.getrptField4() + " as reportField4Data,";
+				}
+				sql = sql + " transactionInId as matchId from transactionINRecords, transactionIn "
+						+ " where transactionIn.Id = transactionINRecords.transactionInId and"
+						+ " transactionIn.batchId = :batchUploadId and statusId in (13)) tbl_concat"
+						+ " ON transactionIndetailauditerrors.transactionInId = tbl_concat.matchid"
+						+ " SET transactionIndetailauditerrors.errorData = tbl_concat.errorData ";
+				if (cms.getrptField1() != 0) {
+					sql = sql + ", transactionIndetailauditerrors.reportField1Data = tbl_concat.reportField1Data";
+				}
+				if (cms.getrptField2() != 0) {
+					sql = sql + ", transactionIndetailauditerrors.reportField2Data = tbl_concat.reportField2Data";	
+				}
+				if (cms.getrptField3() != 0) {
+					sql = sql + ", transactionIndetailauditerrors.reportField3Data = tbl_concat.reportField3Data";
+				}
+				if (cms.getrptField4() != 0) {
+					sql = sql + ", transactionIndetailauditerrors.reportField4Data = tbl_concat.reportField4Data";
+				}
+				sql = sql + " WHERE transactionIndetailauditerrors.batchuploadid = :batchUploadId and fieldNo = :fieldNo"
+						+ "  and configId = :configId";
+				
+		Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
+		query.setParameter("configId", cms.getconfigId());
+		query.setParameter("fieldNo", fieldNo);
+		query.setParameter("batchUploadId", batchUploadId);
+		query.executeUpdate();
+		
+	}
 
-	        			}
-	        			sql = sql + ")";
-	        	
-	        }
-	        
-	        Query query = sessionFactory.getCurrentSession().createSQLQuery(sql)
-	                .setResultTransformer(Transformers.aliasToBean(CrosswalkData.class));
-	                query.setParameter("id", id);
-	        		query.setParameter("crosswalkId", cdt.getCrosswalkId());
-
-	        List<CrosswalkData> trs = query.list();
-
-	        return trs;
-	    }
+	@Override
+	@Transactional
+	public void cleanAuditErrorTable(Integer batchUploadId) throws Exception {
+		Query clearRecords = sessionFactory.getCurrentSession().createSQLQuery("DELETE from transactionIndetailauditerrors where batchUploadId = :batchUploadId");
+        clearRecords.setParameter("batchUploadId", batchUploadId);
+        clearRecords.executeUpdate();
+	}
 	
 	@Override
     @Transactional
-	public void translateCWForBatch(configurationDataTranslations cdt,
-			Integer batchId, boolean foroutboundProcessing,
-			Integer transactionId) throws Exception {
-		String sql = "";
-		Integer id = batchId;
-		if (foroutboundProcessing) {
-			sql = "UPDATE transactiontranslatedOut JOIN (select sourcevalue, targetvalue "
-				+ " from rel_crosswalkData where crosswalkid = :crosswalkId) tbl_concat"
-				+ " ON transactiontranslatedOut.F" + cdt.getFieldNo() 
-				+ " = tbl_concat.sourcevalue "
-				+ " SET transactiontranslatedOut.forCW = tbl_concat.targetvalue  "
-				+ " WHERE transactiontranslatedOut.transactionTargetId ";
-			if (transactionId > 0) {
-				id = transactionId;
-				sql =  sql + " = :id";
-			}else  {
-				 sql =  sql + "in  (select id from transactionTarget where batchDLid = :id and statusId not in ( :transRELId ));";
-			}
-				
-		}else {
-			sql = "UPDATE transactiontranslatedIn JOIN (select sourcevalue, targetvalue "
-					+ " from rel_crosswalkData where crosswalkid = :crosswalkId) tbl_concat"
-					+ " ON transactiontranslatedIn.F" + cdt.getFieldNo()  
-					+ " = tbl_concat.sourcevalue "
-					+ " SET transactiontranslatedIn.forCW = tbl_concat.targetvalue  "
-					+ " WHERE transactiontranslatedIn.transactionInId ";
-				if (transactionId > 0) {
-					id = transactionId;
-					sql =  sql + " = :id";
-				}else  {
-					 sql =  sql + "in  (select id from transactionin where batchid = :id and statusId not in ( :transRELId ));";
-				}
-			
-		}
+    public Integer executeCWDataForSingleFieldValue(Integer configId, Integer batchId, 
+    		configurationDataTranslations cdt, boolean foroutboundProcessing,  Integer transactionId) {
+
+		/**
+		 * UPDATE  transactiontranslatedin JOIN 
+		 * (select sourcevalue as matchid, targetvalue as label   from rel_crosswalkdata 
+		 * where crosswalkId = 90) 
+		 * tbl_concat ON transactiontranslatedin.forCW = tbl_concat.matchid   
+		 * SET transactiontranslatedin.f175 = tbl_concat.label  
+		 * WHERE transactiontranslatedin.configid = 27;
+		 */
 		
-		Query query = sessionFactory.getCurrentSession().createSQLQuery(sql);
-        query.setParameter("id", id);
-		query.setParameter("crosswalkId", cdt.getCrosswalkId());
-		if (transactionId == 0) {
-			query.setParameterList("transRELId", transRELId);
-		}
-		query.executeUpdate();
+        String sql;
+        Integer id = batchId;
+
+        if (foroutboundProcessing == false) {
+            sql = "update transactionTranslatedIn JOIN (select sourcevalue as matchid, targetvalue as label   "
+            		+ " from rel_crosswalkdata where crosswalkId = :crosswalkId) tbl_concat "
+            		+ " ON REPLACE(REPLACE(trim(F" + cdt.getFieldNo() + "), '\n', ''), '\r', '') = tbl_concat.matchid   "
+            		+ " SET transactiontranslatedin.forCW = tbl_concat.label  ";
+            if (transactionId == 0) {
+                sql = sql + " where configId = :configId "
+                        + " and batchId = :id and statusId not in ( :transRELId );";
+            } else {
+                sql = sql + " where transactionInId = :id";
+                id = transactionId;
+            }
+        } else {
+        	sql = "update transactionTranslatedOut JOIN (select sourcevalue as matchid, targetvalue as label   "
+            		+ " from rel_crosswalkdata where crosswalkId = :crosswalkId) tbl_concat "
+            		+ " ON REPLACE(REPLACE(trim(F" + cdt.getFieldNo() + "), '\n', ''), '\r', '') = tbl_concat.matchid   "
+            		+ " SET transactionTranslatedOut.forCW = tbl_concat.label  ";
+            if (transactionId == 0) {
+                sql = sql + "  where configId = :configId and batchId = :id and statusId not in ( :transRELId );";
+            } else {
+                sql = sql + "where transactionTargetId  = :id";
+                id = transactionId;
+            }
+        }
+
+        Query updateData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                .setParameter("crosswalkId", cdt.getCrosswalkId())
+                .setParameter("id", id);
+        if (transactionId == 0) {
+            updateData.setParameter("configId", configId);
+            updateData.setParameterList("transRELId", transRELId);
+        }
+        //System.out.println(sql);
+        
+        try {
+            updateData.executeUpdate();
+        } catch (Exception ex) {
+            System.err.println("executeCWDataForSingleFieldValue " + ex.getCause());
+            ex.printStackTrace();
+            insertProcessingError(processingSysErrorId, configId, batchId, cdt.getFieldNo(),
+                    null, cdt.getCrosswalkId(), null,
+                    false, foroutboundProcessing, ("executeCWDataForSingleFieldValue " + ex.getCause().toString()));
+        }
+        
+        return 1;
+
+    }
+	
+	@Override
+	@Transactional
+	public void deleteMoveFileLogsByStatus (Integer statusId)  throws Exception{
+        Query deletMoveFilesLog = sessionFactory.getCurrentSession().createQuery("delete from MoveFilesLog where statusId = :statusId");
+        deletMoveFilesLog.setParameter("statusId", statusId);
+        deletMoveFilesLog.executeUpdate();
+		
+	}
+
+	@Override
+	@Transactional
+	public void deleteLoadTableRows(Integer howMany, String ascOrDesc,
+			String laodTableName) throws Exception {
+		
+			String sql = "delete from " + laodTableName + " order by id " + ascOrDesc + " limit " +  howMany;
+	        Query deleteTable = sessionFactory.getCurrentSession().createSQLQuery(sql);
+	        deleteTable.executeUpdate();
 	}
 	
+	@Override
+    @Transactional
+    public Integer clearTransactionTranslatedListIn(Integer batchUploadId) {
+        String sql = "delete from transactiontranslatedlistin where batchId = :batchUploadId";
+
+        Query deleteData = sessionFactory.getCurrentSession().createSQLQuery(sql)
+                .setParameter("batchUploadId", batchUploadId);
+
+        try {
+            deleteData.executeUpdate();
+            return 0;
+        } catch (Exception ex) {
+            System.err.println("clearTransactionTranslatedListIn " + ex.getCause());
+            return 1;
+        }
+    }
+
 }

@@ -15,7 +15,7 @@
             <h3 class="panel-title"><c:choose><c:when test="${connectionDetails.id > 0}">Update</c:when><c:otherwise>Create New</c:otherwise></c:choose> Configuration Connection</h3>
          </div>
         <form:form id="connectionForm" modelAttribute="connectionDetails" action="addConnection.do" method="post" role="form">
-        <form:hidden path="id" />
+        <form:hidden path="id" id="connectionId" />
          <div class="modal-body">
             <div class="form-group">
                 <label for="status">Status * </label>
@@ -56,9 +56,7 @@
                        </spring:bind>
                         <div id="srcUsersDiv" class="form-group ${status.error ? 'has-error' : '' }">
                             <label class="control-label" for="srcUsers">Authorized User(s) <span id="srcUsersFound"></span> *</label>
-                            <select multiple="true" id="srcUsers" name="srcUsers" rel="<c:forEach items='${connectionDetails.connectionSenders}' var='sender'>${sender.id},</c:forEach>" class="form-control" >
-                                <option value="">- Select -</option>
-                            </select>
+                            <div id="srcUsersTable" style="max-height:200px; overflow: auto"></div>
                             <span id="srcUsersMsg" class="control-label"></span>
                        </div>         
                     </div>
@@ -92,9 +90,7 @@
                       </spring:bind>
                         <div id="tgtUsersDiv" class="form-group ${status.error ? 'has-error' : '' }">
                             <label class="control-label" for="tgtUsers">Authorized User(s) <span id="tgtUsersFound"></span> *</label>
-                            <select multiple="true" id="tgtUsers" name="tgtUsers" rel="<c:forEach items='${connectionDetails.connectionReceivers}' var='receiver'>${receiver.id},</c:forEach>" class="form-control" >
-                                <option value="">- Select -</option>
-                            </select>
+                            <div id="tgtUsersTable" style="max-height:200px; overflow: auto"></div>
                             <span id="tgtUsersMsg" class="control-label"></span>
                        </div>      
                     </div>
@@ -112,13 +108,16 @@
 $(function() {
     var srcOrg = $('.selsrcOrganization').val();
     var tgtOrg = $('.seltgtOrganization').val();
+    var connectionId = $('#connectionId').val();
+    
     if(srcOrg > 0) {
         populateConfigurations(srcOrg, 'srcConfig');
-        populateUsers(srcOrg, 'srcUsers');
+        populateUsers(srcOrg, 'srcUsersTable', connectionId);
     }
     if(tgtOrg > 0) {
         populateConfigurations(tgtOrg, 'tgtConfig');
-        populateUsers(tgtOrg, 'tgtUsers');
+        populateUsers(tgtOrg, 'tgtUsersTable', connectionId);
     }
+    
 });
 </script>

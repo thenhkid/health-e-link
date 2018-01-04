@@ -66,18 +66,14 @@
                                     <a href="javascript:void(0);" title="My Account" data-toggle="dropdown">My Account <b class="caret"></b></a>
                                     <ul class="dropdown-menu" role="menu" aria-labelledby="My account dropdown">
                                         <li><a href="<c:url value='/profile'/>" title="My Account">My Account</a></li>
-                                         <li><a href="#settingsModal" id="settings" data-toggle="modal" title="Account Settings" class="settings">Account Settings</a></li>
-                                        <c:if test="${not empty userAccess}">
-                                            <c:forEach items="${userAccess}" var="sections" varStatus="aStatus">
+                                        <li><a href="#settingsModal" id="settings" data-toggle="modal" title="Account Settings" class="settings">Account Settings</a></li>
+                                        <c:forEach var="module" items="${userDetails.userAllowedModules}">
+                                             <c:if test="${not empty module.url}">
                                                 <li>
-                                                    <c:choose>
-                                                        <c:when test="${sections.featureId == 3}"><a href="<c:url value='/Health-e-Web/inbox'/>" title="Health-e-Web">ERG</a></c:when>
-                                                        <c:when test="${sections.featureId == 4}"><a href="<c:url value='/Health-e-Connect/upload'/>" title="Health-e-Connect">File Exchange</a></c:when>
-                                                        <c:when test="${sections.featureId == 5}"><a href="<c:url value='/OrgProfile/editProfile'/>" title="Organization Profile">Organization Profile</a></c:when>
-                                                    </c:choose>
+                                                    <a href="<c:url value='${module.url}'/>" title="${module.featureName}">${module.featureName}</a>
                                                 </li>
-                                            </c:forEach> 
-                                        </c:if>
+                                             </c:if>
+                                        </c:forEach>
                                         <li><a title="log out" href="<c:url value='/logout' />">Log out</a></li>
                                     </ul> 
                                 </c:when>
@@ -124,9 +120,13 @@
             <c:otherwise>
                 <div class="container">
                     <c:choose>
-                        <c:when test="${param['page-section'] == 'Health-e-Web'}"><h1 class="page-title"><span class="page-title-icon pull-left"></span>Electronic Referral Gateway</h1></c:when>
+                        <c:when test="${param['page-section'] == 'CareConnector'}"><h1 class="page-title"><span class="page-title-icon pull-left"></span>Care Connector</h1></c:when>
                         <c:when test="${param['page-section'] == 'Health-e-Connect'}"><h1 class="page-title"><span class="page-title-icon pull-left"></span>File Exchange</h1></c:when>
                         <c:when test="${param['page-section'] == 'Org'}"><h1 class="page-title"><span class="page-title-icon pull-left"></span>Organization Profile</h1></c:when>
+                        <c:when test="${param['page-section'] == 'Clients'}"><h1 class="page-title"><span class="page-title-icon pull-left"></span>Client Management</h1></c:when>
+                        <c:when test="${param['page-section'] == 'Resources'}"><h1 class="page-title"><span class="page-title-icon pull-left"></span>Resource Manager</h1></c:when>
+                        <c:when test="${param['page-section'] == 'dashboard'}"><h1 class="page-title"><span class="page-title-icon pull-left"></span>Dashboard</h1></c:when>
+                        <c:when test="${param['page-section'] == 'reports'}"><h1 class="page-title"><span class="page-title-icon pull-left"></span>Reports</h1></c:when>
                         <c:when test="${not empty pageTitle}">
                              <h1 class="page-title">${pageTitle}</h1>
                         </c:when>
@@ -137,19 +137,19 @@
 
         <%-- Section Nav --%>
         <c:choose>
-            <c:when test="${param['page-section'] == 'Health-e-Web'}">
+            <c:when test="${param['page-section'] == 'CareConnector'}">
                 <nav class="navbar navbar-default actions-nav" role="navigation">
                     <div class="container">
                         <ul class="nav navbar-nav navbar-actions">
-                            <li ${(param['page'] == 'inbox' || fromPage == 'inbox' || pageHeader == 'feedback') && fromPage != 'sent' ? 'class="active"' : ''}><a href="<c:url value='/Health-e-Web/inbox'/>" title="Inbox" class="btn btn-link"><span class="glyphicon glyphicon-inbox"></span>&nbsp; Inbox <c:if test="${inboxTotal > 0}"><span class="badge" style="background-color:transparent; border:1px solid #fff">${inboxTotal}</span></c:if></a><span class="indicator-active arrow-up"></span></li>
-                            <li ${(param['page'] == 'sent' || fromPage == 'sent') && fromPage != 'pending' && fromPage != 'inbox' ? 'class="active"' : ''}><a href="<c:url value='/Health-e-Web/sent'/>" title="Sent Items" class="btn btn-link"><span class="glyphicon glyphicon-send"></span>&nbsp; Sent</a><span class="indicator-active arrow-up"></span></li>
-                            <li ${param['page'] == 'pending' || fromPage == 'pending' ? 'class="active"' : ''}><a href="<c:url value='/Health-e-Web/pending'/>" title="Pending Items" class="btn btn-link"><span class="glyphicon glyphicon-time"></span>&nbsp; Pending <c:if test="${pendingTotal > 0}"><span class="badge" style="background-color:transparent; border:1px solid #fff">${pendingTotal}</span></c:if></a><span class="indicator-active arrow-up"></span></li>
-                            <li ${param['page'] == 'history' ? 'class="active"' : ''}><a href="<c:url value='/Health-e-Web/history'/>" title="History" class="btn btn-link"><span class="glyphicon glyphicon-calendar"></span>&nbsp; History</a><span class="indicator-active arrow-up"></span></li>
+                            <li ${(param['page'] == 'inbox' || fromPage == 'inbox' || pageHeader == 'feedback') && fromPage != 'sent' ? 'class="active"' : ''}><a href="<c:url value='/CareConnector/inbox'/>" title="Inbox" class="btn btn-link"><span class="glyphicon glyphicon-inbox"></span>&nbsp; Inbox <c:if test="${inboxTotal > 0}"><span class="badge" style="background-color:transparent; border:1px solid #fff">${inboxTotal}</span></c:if></a><span class="indicator-active arrow-up"></span></li>
+                            <li ${(param['page'] == 'sent' || fromPage == 'sent') && fromPage != 'pending' && fromPage != 'inbox' ? 'class="active"' : ''}><a href="<c:url value='/CareConnector/sent'/>" title="Sent Items" class="btn btn-link"><span class="glyphicon glyphicon-send"></span>&nbsp; Sent</a><span class="indicator-active arrow-up"></span></li>
+                            <li ${param['page'] == 'pending' || fromPage == 'pending' ? 'class="active"' : ''}><a href="<c:url value='/CareConnector/pending'/>" title="Pending Items" class="btn btn-link"><span class="glyphicon glyphicon-time"></span>&nbsp; Pending <c:if test="${pendingTotal > 0}"><span class="badge" style="background-color:transparent; border:1px solid #fff">${pendingTotal}</span></c:if></a><span class="indicator-active arrow-up"></span></li>
+                            <li ${param['page'] == 'history' ? 'class="active"' : ''}><a href="<c:url value='/CareConnector/history'/>" title="History" class="btn btn-link"><span class="glyphicon glyphicon-calendar"></span>&nbsp; History</a><span class="indicator-active arrow-up"></span></li>
                         </ul>
                         <c:if test="${userDetails.createAuthority == true}">
                             <ul class="nav navbar-nav navbar-right navbar-actions">
                                 <li ${param['page'] == 'create' && pageHeader != 'feedback' ? 'class="active"' : ''}>
-                                    <a href="<c:url value='/Health-e-Web/create'/>" title="Create New Referral" >Create New Referral</a>
+                                    <a href="<c:url value='/CareConnector/create'/>" title="Create New Referral" >Create New Referral</a>
                                     <span class="indicator-active arrow-up"></span>
                                 </li>
                             </ul>
@@ -182,6 +182,9 @@
                     <div class="container">
                         <ul class="nav navbar-nav navbar-actions">
                             <li ${param['page'] == 'editProfile' ? 'class="active"' : ''}><a href="<c:url value='/OrgProfile/editProfile'/>" title="Edit Organization Profile" class="btn btn-link"><span class="glyphicon glyphicon-edit"></span>&nbsp; Edit Organization Profile</a><span class="indicator-active arrow-up"></span></li>
+                            <c:if test="${organization.orgType == 2}">
+                                <li ${param['page'] == 'resources' ? 'class="active"' : ''}><a href="<c:url value='/OrgProfile/resources'/>" title="Edit Organization Resources" class="btn btn-link"><span class="glyphicon glyphicon-cog"></span>&nbsp; Resources</a><span class="indicator-active arrow-up"></span></li>
+                            </c:if>
                             <li ${param['page'] == 'providers' ? 'class="active"' : ''}><a href="<c:url value='/OrgProfile/providers'/>" title="View Organization Providers" class="btn btn-link"><span class="glyphicon glyphicon-user"></span>&nbsp; View Providers</a><span class="indicator-active arrow-up"></span></li>
                             <li ${param['page'] == 'brochures' ? 'class="active"' : ''}><a href="<c:url value='/OrgProfile/brochures'/>" title="View Uploaded Brochures" class="btn btn-link"><span class="glyphicon glyphicon-book"></span>&nbsp; View Brochures</a><span class="indicator-active arrow-up"></span></li>
                             <li ${param['page'] == 'associations' ? 'class="active"' : ''}><a href="<c:url value='/associations/'/>" title="View Associated Organizations" class="btn btn-link"><span class="glyphicon glyphicon-tower"></span>&nbsp; Associated Organizations</a><span class="indicator-active arrow-up"></span></li>
@@ -203,6 +206,39 @@
                                 </ul>
                             </c:when>
                         </c:choose>
+                    </div>
+                </nav>
+            </c:when>
+            <c:when test="${param['page-section'] == 'Clients'}">
+                <nav class="navbar navbar-default actions-nav" role="navigation">
+                    <div class="container">
+                        <ul class="nav navbar-nav navbar-actions">
+                            <li ${param['page'] == 'search' ? 'class="active"' : ''}><a href="<c:url value='/clients/search'/>" title="Search Clients" class="btn btn-link"><span class="glyphicon glyphicon-search"></span>&nbsp; Client Search</a><span class="indicator-active arrow-up"></span></li>
+                        </ul>
+                        <ul class="nav navbar-nav navbar-right navbar-actions">
+                            <li>
+                                <a href="/clients/clientForm" title="Create a new client.">Create New Client</a>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+            </c:when>
+            <c:when test="${param['page-section'] == 'Resources'}">
+                <nav class="navbar navbar-default actions-nav" role="navigation">
+                    <div class="container">
+                        <ul class="nav navbar-nav navbar-actions">
+                            <li ${param['page'] == 'search' ? 'class="active"' : ''}><a href="<c:url value='/resources/search'/>" title="Search Clients" class="btn btn-link"><span class="glyphicon glyphicon-search"></span>&nbsp; Resource Search</a><span class="indicator-active arrow-up"></span></li>
+                        </ul>
+                    </div>
+                </nav>
+            </c:when>
+            <c:when test="${param['page-section'] == 'reports'}">
+                <nav class="navbar navbar-default actions-nav" role="navigation">
+                    <div class="container">
+                        <ul class="nav navbar-nav navbar-actions">
+                            <li ${param['page'] == 'request' ? 'class="active"' : ''}><a href="<c:url value='/reports/request'/>" title="Request New Report" class="btn btn-link"><span class="glyphicon glyphicon-align-justify"></span>&nbsp; Request New Reports</a><span class="indicator-active arrow-up"></span></li>
+                            <li ${param['page'] == 'reports' ? 'class="active"' : ''}><a href="<c:url value='/reports/requestedReports'/>" title="View Requested Reports" class="btn btn-link"><span class="glyphicon glyphicon-align-justify"></span>&nbsp; View Requested Reports</a><span class="indicator-active arrow-up"></span></li>
+                        </ul>
                     </div>
                 </nav>
             </c:when>
