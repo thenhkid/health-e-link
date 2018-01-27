@@ -17,6 +17,7 @@ import com.ut.healthelink.model.UserActivity;
 import com.ut.healthelink.model.WSMessagesIn;
 import com.ut.healthelink.model.batchClearAfterDelivery;
 import com.ut.healthelink.model.batchMultipleTargets;
+import com.ut.healthelink.model.batchRetry;
 import com.ut.healthelink.model.batchUploadSummary;
 import com.ut.healthelink.model.batchUploads;
 import com.ut.healthelink.model.configurationConnection;
@@ -459,4 +460,13 @@ public interface transactionInDAO {
     void deleteLoadTableRows (Integer howMany, String ascOrDesc, String laodTableName) throws Exception;
     
     Integer clearTransactionTranslatedListIn(Integer batchUploadId);
+    
+    Integer clearTransactionAttachments(Integer batchId);
+    
+    batchRetry getBatchRetryByUploadId (Integer batchUploadId, Integer statusId) throws Exception;
+    
+    void saveBatchRetry (batchRetry br) throws Exception;
+    
+    void clearBatchRetry (Integer batchUploadId) throws Exception;
+    
 }
