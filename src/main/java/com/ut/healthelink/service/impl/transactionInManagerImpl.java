@@ -21,6 +21,7 @@ import com.ut.healthelink.model.WSMessagesIn;
 import com.ut.healthelink.model.batchDownloads;
 import com.ut.healthelink.model.batchClearAfterDelivery;
 import com.ut.healthelink.model.batchMultipleTargets;
+import com.ut.healthelink.model.batchRetry;
 import com.ut.healthelink.model.batchUploadSummary;
 import com.ut.healthelink.model.batchUploads;
 import com.ut.healthelink.model.configurationConnection;
@@ -1418,7 +1419,8 @@ public class transactionInManagerImpl implements transactionInManager {
     public Integer processCrosswalk(Integer configId, Integer batchId,
             configurationDataTranslations cdt, boolean foroutboundProcessing, Integer transactionId) {
         try {
-            Integer errors = 0;
+            
+        	Integer errors = 0;
             //we null forcw column, we translate and insert there, we then replace
             nullForCWCol(configId, batchId, foroutboundProcessing, transactionId);
             //we check to see if field value contains a list defined by UT delimiter
@@ -1930,14 +1932,16 @@ public class transactionInManagerImpl implements transactionInManager {
 
                     /** if excel files some files comes with random lines at the beginning and end, need to remove **/
                     if (processFileName.endsWith(".xlsx") || processFileName.endsWith(".xls")) {
-                    	configurationExcelDetails excelDetails = configurationManager.getExcelDetails(batch.getConfigId(), batch.getOrgId());
-                    	if (excelDetails.getStartRow() > 1) {
-                    		deleteLoadTableRows(excelDetails.getStartRow() - 1, "asc", loadTableName);
-                    	}
-                    	if (excelDetails.getDiscardLastRows() > 0) {
-                    		deleteLoadTableRows(excelDetails.getDiscardLastRows(), " desc ", loadTableName);
-                    	}
-                    }
+            			configurationExcelDetails excelDetails = configurationManager.getExcelDetails(batch.getConfigId(), batch.getOrgId());
+            			if (excelDetails != null) {
+            			    if (excelDetails.getStartRow() > 1) {
+            				deleteLoadTableRows(excelDetails.getStartRow() - 1, "asc", loadTableName);
+            			    }
+            			    if (excelDetails.getDiscardLastRows() > 0) {
+            				deleteLoadTableRows(excelDetails.getDiscardLastRows(), " desc ", loadTableName);
+            			    }
+            			}
+            		}
                     
                     //3. we update batchId, loadRecordId
                     sysError = sysError + updateLoadTable(loadTableName, batch.getId());
@@ -4652,102 +4656,194 @@ public class transactionInManagerImpl implements transactionInManager {
 
     @Override
     public void loadMassBatches() throws Exception {
-        //we check to see if anything is running first
-    	boolean run = true; 
-    	List<batchUploads> batchInProcess = getBatchesByStatusIds(Arrays.asList(38));
-    	//we check time stamp to see how long that file has been processing
-		//get the details
-    	if (batchInProcess.size() != 0) {
-	    	batchUploads batchDetails = getBatchDetails(batchInProcess.get(0).getId());
-			//check how long first batch is going
-	        //if more than 2 hours need to email 
-	        LocalDateTime d1 = LocalDateTime.ofInstant(batchDetails.getstartDateTime().toInstant(), ZoneId.systemDefault());
-	        LocalDateTime d2 = LocalDateTime.now();
-	        long diffHours = java.time.Duration.between(d1, d2).toHours();
-	        run = false;
-	        if (diffHours > 2) {
-	        	 mailMessage mail = new mailMessage();
-	        	 mail.settoEmailAddress(myProps.getProperty("admin.email"));
-	        	 mail.setfromEmailAddress("support@health-e-link.net");
-	        	 mail.setmessageSubject("HEL Loading Mass Batch running for " + diffHours + " hours - " + myProps.getProperty("server.identity"));
-	        	 StringBuilder emailBody = new StringBuilder();
-	             emailBody.append("<br/>Current Time " + d2.toString());
-	             emailBody.append("<br/>There are " + batchInProcess.size() + " with status 38 in queue.<br/>");
-	             emailBody.append("First stuck batch is id " + batchDetails.getId() + " - " + batchDetails.getoriginalFileName() + ".");
-	             mail.setmessageBody(emailBody.toString());
-	             emailManager.sendEmail(mail);
-	            //files should not take more than 4 hours to run, we check the last 48 on the list in case another one is running already
-	             d1 = LocalDateTime.ofInstant(batchInProcess.get(batchInProcess.size() - 1).getstartDateTime().toInstant(), ZoneId.systemDefault());
-	             long diffHours2 = java.time.Duration.between(d1, d2).toHours();
-	             if (diffHours2 < 4) {
-	                 System.out.println(d2 + " load mass batches not running - " + diffHours2);
-	             }	else {
-	            	 run = true;
-	             }
-	        }
-    	}
-        if (run) {
-        	List<batchUploads> batches = getBatchesByStatusIds(Arrays.asList(42));
-        	if (batches != null && batches.size() != 0) {
-        		loadBatch(batches.get(0).getId());
-        	}
-        }
+    /** 
+     * 	need to update to reprocess the batch once if it is stuck for three hours
+     *  1. during first reprocess we need to notify admin
+     *  2. track it so we don't reprocess it again infinite times
+     *  3. if stuck again we set status to 58, NTR (Need to Review)
+     *  
+     * **/	
+    	
+	//we check to see if anything is running first
+	boolean run = true;
+	List<batchUploads> batchInProcess = getBatchesByStatusIds(Arrays.asList(38));
+	//we check time stamp to see how long that file has been processing
+	//get the details
+	if (batchInProcess.size() != 0) {
+		    batchUploads stuckBatchDetails = getBatchDetails(batchInProcess.get(0).getId());
+		    //check how long first batch is going
+		    //if more than 2 hours need to email 
+		    LocalDateTime d1 = LocalDateTime.ofInstant(stuckBatchDetails.getstartDateTime().toInstant(), ZoneId.systemDefault());
+		    LocalDateTime d2 = LocalDateTime.now();
+		    long diffHours = java.time.Duration.between(d1, d2).toHours();
+		    run = false;
+		    if (diffHours >= 3) {
+			    /** batch running for over 3 hours, we need to see if it has been re-process **/
+			    //see if this batch has been retried
+			    batchRetry br = getBatchRetryByUploadId(stuckBatchDetails.getId(), 38);
+			  	String subject = "Retrying Batch loadMassBatches ";
+			  	String msgBody = "Batch " + stuckBatchDetails.getId() + " ("+stuckBatchDetails.getutBatchName() +") will be retried.";
+			  	if (br == null) {
+			  		//we retry this batch
+			  		br = new batchRetry();
+			  		br.setFromStatusId(38);
+			  		br.setBatchUploadId(stuckBatchDetails.getId());
+			  		saveBatchRetry(br);
+			  		//reset status for batch so it will get pick up again
+			  		//reprocess means resetting it to 42 and insert an entry into batchRetry so we know
+			  		updateBatchStatus(stuckBatchDetails.getId(), 42, "endDateTime");
+				    //having log in new table and checking userActivity as if it is reset manually by user and gets stuck again it wont' retry and we want it to retry at least once each time it is reset
+				    try {
+						//log user activity
+				    	UserActivity ua = new UserActivity();
+						ua.setUserId(0);
+						ua.setFeatureId(0);
+						ua.setAccessMethod("System");
+						ua.setActivity("System Set Batch To Retry During Loading");
+						ua.setBatchUploadId(stuckBatchDetails.getId());
+						usermanager.insertUserLog(ua);
+					    } catch (Exception ex) {
+						ex.printStackTrace();
+						System.err.println("transactionId - insert user log" + ex.toString());
+					    }
+			  		} else {
+			  			try {
+							//log user activity
+					    	UserActivity ua = new UserActivity();
+							ua.setUserId(0);
+							ua.setFeatureId(0);
+							ua.setAccessMethod("System");
+							ua.setActivity("System Set to Status 58 - Loading");
+							ua.setBatchUploadId(stuckBatchDetails.getId());
+							usermanager.insertUserLog(ua);
+						 } catch (Exception ex) {
+								ex.printStackTrace();
+								System.err.println("transactionId - insert user log" + ex.toString());
+						 }
+			  			subject = "Batch set to Need to Review - processMassBatches ";
+			  			msgBody = "Batch " + stuckBatchDetails.getId() + " ("+stuckBatchDetails.getutBatchName() +") needs to be reviewed.";
+			  			//58
+			  			updateBatchStatus(stuckBatchDetails.getId(), 58, "endDateTime");
+			  		} 
+				    //we notify admin
+				    //we also notify admin
+					mailMessage mail = new mailMessage();
+					mail.settoEmailAddress(myProps.getProperty("admin.email"));
+					mail.setfromEmailAddress("support@health-e-link.net");
+					mail.setmessageSubject(subject + " " + myProps.getProperty("server.identity"));
+					StringBuilder emailBody = new StringBuilder();
+					emailBody.append("<br/>Current Time " + d2.toString());
+					emailBody.append("<br/><br/>"+ msgBody + "<br/>File Name is  - " + stuckBatchDetails.getoriginalFileName() + ".");
+					emailBody.append("<br/>" + batchInProcess.size() + " batch(es) with status 38 in queue.<br/>");
+					mail.setmessageBody(emailBody.toString());
+					emailManager.sendEmail(mail);
+				}
+		}
+	
+		if (run) {
+		    List<batchUploads> batches = getBatchesByStatusIds(Arrays.asList(42));
+		    if (batches != null && batches.size() != 0) {
+		    	loadBatch(batches.get(0).getId());
+		    }
+		}
     }
 
     /**
      * We should only be loading up mass batches every 10 mins
      */
     @Override
-    public void processMassBatches() throws Exception{
-    	// we only want to process one mass batches at a time but don't want to set the scheduler to be 1.5 hours each time a file runs
-    	//we check to see if anything is running first
-    	boolean run = true; 
-    	List<batchUploads> batchInProcess = getBatchesByStatusIds(Arrays.asList(4));
-    	//we check time stamp to see how long that file has been processing
-		//get the details
-    	if (batchInProcess.size() != 0) {
-			batchUploads batchDetails = getBatchDetails(batchInProcess.get(0).getId());
-			//check how long first batch is going
-	        //if more than 2 hours need to email 
-	        LocalDateTime d1 = LocalDateTime.ofInstant(batchDetails.getstartDateTime().toInstant(), ZoneId.systemDefault());
-	        LocalDateTime d2 = LocalDateTime.now();
-	        long diffHours = java.time.Duration.between(d1, d2).toHours();
-	        run = false;
-	        if (diffHours > 2) {
-	        	 mailMessage mail = new mailMessage();
-	        	 mail.settoEmailAddress(myProps.getProperty("admin.email"));
-	        	 mail.setfromEmailAddress("support@health-e-link.net");
-	        	 mail.setmessageSubject("HEL Loading Mass Batch running for " + diffHours + " hours - " + myProps.getProperty("server.identity"));
-	        	 StringBuilder emailBody = new StringBuilder();
-             emailBody.append("<br/>Current Time " + d2.toString());
-             emailBody.append("<br/>There are " + batchInProcess.size() + " with status 4 in queue.<br/>");
-             emailBody.append("First stuck batch is id " + batchDetails.getId() + " - " + batchDetails.getoriginalFileName() + ".");
-             mail.setmessageBody(emailBody.toString());
-             emailManager.sendEmail(mail);
-            //files should not take more than 4 hours to run, we check the last 4 on the list in case another one is running already
-             d1 = LocalDateTime.ofInstant(batchInProcess.get(batchInProcess.size() - 1).getstartDateTime().toInstant(), ZoneId.systemDefault());
-             long diffHours2 = java.time.Duration.between(d1, d2).toHours();
-             if (diffHours2 < 4) {
-                 System.out.println(d2 + " process mass batches not running - " + diffHours2);
-             }	else if (diffHours2 >4) {
-            	 run = true;
-             } 
-	        }
+    public void processMassBatches() throws Exception {
+	// we only want to process one mass batches at a time but don't want to set the scheduler to be 1.5 hours each time a file runs
+	//we check to see if anything is running first
+	boolean run = true;
+	List<batchUploads> batchInProcess = getBatchesByStatusIds(Arrays.asList(4));
+	//we check time stamp to see how long that file has been processing
+	//get the details
+	if (batchInProcess.size() != 0) {
+	    batchUploads stuckBatchDetails = getBatchDetails(batchInProcess.get(0).getId());
+	    //check how long first batch is going
+	    //if more than 2 hours need to email 
+	    LocalDateTime d1 = LocalDateTime.ofInstant(stuckBatchDetails.getstartDateTime().toInstant(), ZoneId.systemDefault());
+	    LocalDateTime d2 = LocalDateTime.now();
+	    long diffHours = java.time.Duration.between(d1, d2).toHours();
+	    run = false;
+	    if (diffHours >= 3) {
+		    /** batch running for over 3 hours, we need to see if it has been re-process **/
+		    //see if this batch has been retried
+		    batchRetry br = getBatchRetryByUploadId(stuckBatchDetails.getId(), 4);
+		    String subject = "Retrying Batch - processMassBatches";
+		  	String msgBody = "Batch " + stuckBatchDetails.getId() + " ("+stuckBatchDetails.getutBatchName() +") will be retried.";
+		  	if (br == null) {
+		  		//we retry this batch
+		  		br = new batchRetry();
+		  		br.setFromStatusId(4);
+		  		br.setBatchUploadId(stuckBatchDetails.getId());
+		  		saveBatchRetry(br);
+		  		//reset status for batch so it will get pick up again
+		  		//reprocess means resetting it to 42 and insert an entry into batchRetry so we know
+		  		updateBatchStatus(stuckBatchDetails.getId(), 42, "endDateTime");
+			    
+			    //having log in new table and checking userActivity as if it is reset manually by user and gets stuck again it wont' retry and we want it to retry at least once each time it is reset
+			    try {
+					//log user activity
+			    	UserActivity ua = new UserActivity();
+					ua.setUserId(0);
+					ua.setFeatureId(0);
+					ua.setAccessMethod("System");
+					ua.setActivity("System Set Batch To Retry - Processing");
+					ua.setBatchUploadId(stuckBatchDetails.getId());
+					usermanager.insertUserLog(ua);
+				    } catch (Exception ex) {
+					ex.printStackTrace();
+					System.err.println("transactionId - insert user log" + ex.toString());
+				    }
+		  		} else {
+		  			try {
+						//log user activity
+				    	UserActivity ua = new UserActivity();
+						ua.setUserId(0);
+						ua.setFeatureId(0);
+						ua.setAccessMethod("System");
+						ua.setActivity("System Set to Status 58 - Processing");
+						ua.setBatchUploadId(stuckBatchDetails.getId());
+						usermanager.insertUserLog(ua);
+					 } catch (Exception ex) {
+							ex.printStackTrace();
+							System.err.println("transactionId - insert user log" + ex.toString());
+					 }
+		  			subject = "Batch set to Need to Review - processMassBatches ";
+		  			msgBody = "Batch " + stuckBatchDetails.getId() + " ("+stuckBatchDetails.getutBatchName() +") needs to be reviewed.";
+		  			//58
+		  			updateBatchStatus(stuckBatchDetails.getId(), 58, "endDateTime");
+		  		} 
+			    //we notify admin
+			    //we also notify admin
+				mailMessage mail = new mailMessage();
+				mail.settoEmailAddress(myProps.getProperty("admin.email"));
+				mail.setfromEmailAddress("support@health-e-link.net");
+				mail.setmessageSubject(subject + " " + myProps.getProperty("server.identity"));
+				StringBuilder emailBody = new StringBuilder();
+				emailBody.append("<br/>Current Time " + d2.toString());
+				emailBody.append("<br/><br/>"+ msgBody + "<br/>File Name is  - " + stuckBatchDetails.getoriginalFileName() + ".");
+				emailBody.append("<br/>" + batchInProcess.size() + " batch(es) with status 4 in queue.<br/>");
+				mail.setmessageBody(emailBody.toString());
+				emailManager.sendEmail(mail);
+			}
+		}
+	
+	if (run) {
+	    //0. grab all mass batches with MSL (43)
+	    try {
+		List<batchUploads> batches = getBatchesByStatusIds(Arrays.asList(43));
+		if (batches != null && batches.size() != 0) {
+		    //we process one file at a time
+			processBatch(batches.get(0).getId(), false, 0);
+		}
+	    } catch (Exception ex1) {
+		Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ("processMassBatches error - " + ex1));
 	    }
-    	if (run) {
-        	//0. grab all mass batches with MSL (43)
-            try {
-                List<batchUploads> batches = getBatchesByStatusIds(Arrays.asList(43));
-                if (batches != null && batches.size() != 0) {
-                    //we process one file at a time
-                    processBatch(batches.get(0).getId(), false, 0);
-                }
-            } catch (Exception ex1) {
-                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, null, ("processMassBatches error - " + ex1));
-            }
-        } 
-   }
-
+	}
+    }
     @Override
     public void saveBatchClearAfterDelivery(batchClearAfterDelivery bmt) throws Exception {
         transactionInDAO.saveClearAfterDelivery(bmt);
@@ -5055,5 +5151,26 @@ public class transactionInManagerImpl implements transactionInManager {
 	public Integer clearTransactionTranslatedListIn(Integer batchUploadId) {
 		return transactionInDAO.clearTransactionTranslatedListIn(batchUploadId);
 	}
+	
+	@Override
+	public Integer clearTransactionAttachments(Integer batchUploadId) {
+		return transactionInDAO.clearTransactionAttachments(batchUploadId);
+	}
 
+	@Override
+	public batchRetry getBatchRetryByUploadId(Integer batchUploadId, Integer statusId)
+			throws Exception {
+		return transactionInDAO.getBatchRetryByUploadId(batchUploadId, statusId);
+	}
+
+	@Override
+	public void saveBatchRetry(batchRetry br) throws Exception {
+		transactionInDAO.saveBatchRetry(br);
+	}
+
+	@Override
+	public void clearBatchRetry(Integer batchUploadId) throws Exception {
+		transactionInDAO.clearBatchRetry(batchUploadId);
+	}
+	
 }

@@ -70,7 +70,7 @@
                                             	</c:choose>
                                             </td>
                                            <td>
-                                            	<fmt:formatDate value="${batchDetails.dateSubmitted}" type="date" pattern="M/dd/yyyy" />&nbsp;&nbsp;<fmt:formatDate value="${ua.dateCreated}" type="time" pattern="h:mm:ss a" />
+                                            	<fmt:formatDate value="${ua.dateSubmitted}" type="date" pattern="M/dd/yyyy" />&nbsp;&nbsp;<fmt:formatDate value="${ua.dateCreated}" type="time" pattern="h:mm:ss a" />
                                             </td>                                         
                                       </tr>
                                   </c:forEach>
